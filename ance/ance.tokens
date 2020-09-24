@@ -1,0 +1,5 @@
+RETURN=1
+SEMICOLON=2
+WHITESPACE=3
+'return'=1
+';'=2

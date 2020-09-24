@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Grammar Files">
+      <UniqueIdentifier>{0532355c-dd35-4907-aaeb-04948f6a7373}</UniqueIdentifier>
+      <Extensions>g4</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Generated Files">
+      <UniqueIdentifier>{6527581c-4214-4004-b929-61faa58d4a6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Generated Files">
+      <UniqueIdentifier>{d97c7151-9e65-4a3d-824f-8c1c425dce03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Statement Files">
+      <UniqueIdentifier>{c7488b05-ca99-4e76-8d7a-655d8e822979}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Statement Files">
+      <UniqueIdentifier>{458bd779-0b4c-4423-bc77-484c66c2399d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileListener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="anceBaseListener.cpp">
+      <Filter>Source Files\Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="anceLexer.cpp">
+      <Filter>Source Files\Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="anceListener.cpp">
+      <Filter>Source Files\Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="anceParser.cpp">
+      <Filter>Source Files\Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Statement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="return_statement.cpp">
+      <Filter>Source Files\Statement Files</Filter>
+    </ClCompile>
+    <ClCompile Include="anceCompiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FileListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="anceBaseListener.h">
+      <Filter>Header Files\Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="anceLexer.h">
+      <Filter>Header Files\Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="anceListener.h">
+      <Filter>Header Files\Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="anceParser.h">
+      <Filter>Header Files\Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Statement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="return_statement.h">
+      <Filter>Header Files\Statement Files</Filter>
+    </ClInclude>
+    <ClInclude Include="anceCompiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ance.g4">
+      <Filter>Grammar Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>
