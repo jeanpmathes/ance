@@ -4,14 +4,19 @@ Application::Application()
 {
 }
 
-void Application::PushStatement(const Statement& statement)
+size_t Application::StatementCount()
+{
+	return statements.size();
+}
+
+void Application::PushStatement(Statement* statement)
 {
 	statements.push_back(statement);
 }
 
-Statement& Application::PopStatement()
+Statement* Application::PopStatement()
 {
-	Statement& statement = statements.front();
+	Statement* statement = statements.front();
 	statements.pop_front();
 	return statement;
 }

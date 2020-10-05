@@ -1,8 +1,8 @@
 #pragma once
-#include <string>
 #include "Application.h"
+#include <filesystem>
 class anceCompiler
 {
 public:
-	std::string Compile(const Application& application);
+	void Compile(Application& application, const std::filesystem::path& output_dir);
 };

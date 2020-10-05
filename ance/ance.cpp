@@ -6,7 +6,10 @@
 #include "anceParser.h"
 #include "anceBaseListener.h"
 
+#include "llvm/Support/TargetSelect.h"
+
 #include "FileListener.h"
+#include "anceCompiler.h"
 
 int main()
 {
@@ -23,6 +26,15 @@ int main()
 
 	antlr4::tree::ParseTree* tree = parser.file();
 	antlr4::tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
+
+	llvm::InitializeAllTargetInfos();
+	llvm::InitializeAllTargets();
+	llvm::InitializeAllTargetMCs();
+	llvm::InitializeAllAsmPrinters();
+	llvm::InitializeAllAsmPrinters();
+
+	anceCompiler compiler;
+	compiler.Compile(application, std::filesystem::path("C:\\Users\\jeanp\\source\\repos\\ance\\ance_output"));
 
 	system("pause");
 }

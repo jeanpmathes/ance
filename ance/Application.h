@@ -6,9 +6,10 @@ class Application
 {
 public:
 	Application();
-	void PushStatement(const Statement& statement);
-	Statement& PopStatement();
+	size_t StatementCount();
+	void PushStatement(Statement* statement);
+	Statement* PopStatement();
 
 private:
-	std::list<Statement> statements;
+	std::list<Statement*> statements;
 };
