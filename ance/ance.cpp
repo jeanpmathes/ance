@@ -21,7 +21,7 @@ int main()
 	antlr4::CommonTokenStream tokens(&lexer);
 	anceParser parser(&tokens);
 
-	Application application;
+	Application application("program");
 	FileListener listener(application);
 
 	antlr4::tree::ParseTree* tree = parser.file();
@@ -33,8 +33,6 @@ int main()
 	llvm::InitializeAllAsmPrinters();
 	llvm::InitializeAllAsmPrinters();
 
-	anceCompiler compiler;
-	compiler.Compile(application, std::filesystem::path("C:\\Users\\jeanp\\source\\repos\\ance\\ance_output"));
-
-	system("pause");
+	anceCompiler compiler(application);
+	compiler.Compile(std::filesystem::path("C:\\Users\\jeanp\\source\\repos\\ance\\ance_output"));
 }

@@ -5,6 +5,19 @@ VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ance", "ance\ance.vcxproj", "{003E7140-BF2E-4011-A287-41BB47E7C0F0}"
 EndProject
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "program", "ance_output\bin\program.exe", "{A09B1B34-EB80-49FD-9813-F4062CB2F209}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = C:\Users\jeanp\source\repos\ance\ance_output\bin\program.exe
+		RemoteMachine = DESKTOP-H6R98B6
+		StartingDirectory = C:\Users\jeanp\source\repos\ance\ance_output\bin
+		Environment = Default
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		UseLegacyDebugEngines = No
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug DLL|x64 = Debug DLL|x64
@@ -45,6 +58,18 @@ Global
 		{003E7140-BF2E-4011-A287-41BB47E7C0F0}.Release|x64.Build.0 = Release|x64
 		{003E7140-BF2E-4011-A287-41BB47E7C0F0}.Release|x86.ActiveCfg = Release|Win32
 		{003E7140-BF2E-4011-A287-41BB47E7C0F0}.Release|x86.Build.0 = Release|Win32
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Debug DLL|x64.ActiveCfg = Release|x64
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Debug DLL|x86.ActiveCfg = Release|x64
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Debug Static|x64.ActiveCfg = Release|x64
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Debug Static|x86.ActiveCfg = Release|x64
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Debug|x64.ActiveCfg = Release|x64
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Debug|x86.ActiveCfg = Release|x64
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Release DLL|x64.ActiveCfg = Release|x64
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Release DLL|x86.ActiveCfg = Release|x64
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Release Static|x64.ActiveCfg = Release|x64
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Release Static|x86.ActiveCfg = Release|x64
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Release|x64.ActiveCfg = Release|x64
+		{A09B1B34-EB80-49FD-9813-F4062CB2F209}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

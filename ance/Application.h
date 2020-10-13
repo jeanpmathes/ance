@@ -5,11 +5,15 @@
 class Application
 {
 public:
-	Application();
+	Application(const std::string& n);
+
+	const std::string GetName();
+
 	size_t StatementCount();
 	void PushStatement(Statement* statement);
 	Statement* PopStatement();
 
 private:
+	std::string name;
 	std::list<Statement*> statements;
 };

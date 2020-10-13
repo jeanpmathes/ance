@@ -8,6 +8,6 @@ FileListener::FileListener(Application& app)
 
 void FileListener::exitReturn_statement(anceParser::Return_statementContext* ctx)
 {
-	return_statement* statement = new return_statement();
+	return_statement* statement = new return_statement(ctx->getStart()->getLine(), ctx->getStart()->getCharPositionInLine());
 	application.PushStatement(statement);
 }
