@@ -29,6 +29,9 @@
     <Filter Include="Header Files\Statement Files">
       <UniqueIdentifier>{458bd779-0b4c-4423-bc77-484c66c2399d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Test Files">
+      <UniqueIdentifier>{26782f49-6eae-4e68-a459-4319920a410e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ance.cpp">
@@ -94,6 +97,12 @@
   <ItemGroup>
     <None Include="ance.g4">
       <Filter>Grammar Files</Filter>
+    </None>
+    <None Include="..\ance_examples\first.ance">
+      <Filter>Test Files</Filter>
+    </None>
+    <None Include="..\ance_examples\first.nc">
+      <Filter>Test Files</Filter>
     </None>
   </ItemGroup>
 </Project>

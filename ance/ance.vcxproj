@@ -236,6 +236,8 @@
     <ClInclude Include="Statement.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\ance_examples\first.ance" />
+    <None Include="..\ance_examples\first.nc" />
     <None Include="ance.g4" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

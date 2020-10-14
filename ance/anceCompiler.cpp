@@ -35,9 +35,9 @@ anceCompiler::anceCompiler(Application& app) : application(app), ir(context)
 
 	di = new llvm::DIBuilder(*module);
 
-	proj_file = di->createFile(application.GetName() + ".ance", ".");
+	proj_file = di->createFile(application.GetProjectFile().filename().string(), application.GetProjectFile().string());
 	unit = di->createCompileUnit(llvm::dwarf::DW_LANG_C, proj_file, "ancec-0", false, "", 0);
-	code_file = di->createFile(application.GetName() + ".nc", ".");
+	code_file = di->createFile(application.GetCodeFile().filename().string(), application.GetCodeFile().string());
 }
 
 void anceCompiler::Compile(const std::filesystem::path& output_dir)
@@ -96,12 +96,12 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 	std::filesystem::create_directory(bc_dir);
 	std::filesystem::create_directory(bin_dir);
 
-	std::filesystem::path bc = bc_dir / "program.bc";
+	std::filesystem::path bc = bc_dir / (application.GetName() + ".bc");
 	std::ofstream ofs(bc.string());
 	ofs.close();
 
-	std::filesystem::path exe = bin_dir / "program.exe";
-	std::filesystem::path pdb = bin_dir / "program.pdb";
+	std::filesystem::path exe = bin_dir / (application.GetName() + ".exe");
+	std::filesystem::path pdb = bin_dir / (application.GetName() + ".pdb");
 
 	std::error_code ec;
 	llvm::raw_fd_ostream os(bc.string(), ec);

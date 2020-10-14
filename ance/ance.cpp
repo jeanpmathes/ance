@@ -11,17 +11,32 @@
 #include "FileListener.h"
 #include "anceCompiler.h"
 
-int main()
+int main(int argc, char** argv)
 {
-	std::string code = "return ;";
-	std::istringstream stream(code);
+	if (argc != 2)
+	{
+		std::cout << "Requires exactly one parameter." << std::endl;
 
-	antlr4::ANTLRInputStream input(stream);
+		return EXIT_FAILURE;
+	}
+
+	std::filesystem::path proj_file(argv[1]);
+
+	std::ifstream t(proj_file);
+	std::stringstream buffer;
+	buffer << t.rdbuf();
+
+	std::filesystem::path code_file = proj_file.replace_filename(buffer.str());
+
+	std::fstream code;
+	code.open(code_file);
+
+	antlr4::ANTLRInputStream input(code);
 	anceLexer lexer(&input);
 	antlr4::CommonTokenStream tokens(&lexer);
 	anceParser parser(&tokens);
 
-	Application application("program");
+	Application application(proj_file, code_file);
 	FileListener listener(application);
 
 	antlr4::tree::ParseTree* tree = parser.file();
@@ -35,4 +50,6 @@ int main()
 
 	anceCompiler compiler(application);
 	compiler.Compile(std::filesystem::path("C:\\Users\\jeanp\\source\\repos\\ance\\ance_output"));
+
+	return EXIT_SUCCESS;
 }
