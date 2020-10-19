@@ -12,7 +12,7 @@
 class  anceLexer : public antlr4::Lexer {
 public:
   enum {
-    RETURN = 1, SEMICOLON = 2, WHITESPACE = 3
+    INTEGER = 1, RETURN = 2, SEMICOLON = 3, WHITESPACE = 4
   };
 
   anceLexer(antlr4::CharStream *input);

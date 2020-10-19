@@ -26,7 +26,8 @@ int main(int argc, char** argv)
 	std::stringstream buffer;
 	buffer << t.rdbuf();
 
-	std::filesystem::path code_file = proj_file.replace_filename(buffer.str());
+	std::filesystem::path code_file = std::filesystem::path(proj_file);
+	code_file.replace_filename(buffer.str());
 
 	std::fstream code;
 	code.open(code_file);

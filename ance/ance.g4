@@ -9,8 +9,10 @@ statement
 	;
 
 return_statement
-	: RETURN SEMICOLON
+	: RETURN ( INTEGER )? SEMICOLON
 	;
+
+INTEGER : [0-9]+ ;
 
 RETURN : 'return' ;
 

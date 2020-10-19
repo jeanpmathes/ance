@@ -23,9 +23,14 @@ anceCompiler::anceCompiler(Application& app) : application(app), ir(context)
 	const llvm::Target* t = llvm::TargetRegistry::lookupTarget(triple.str(), err);
 
 	llvm::Optional<llvm::Reloc::Model> rm;
+	rm = llvm::Reloc::Static;
+
+	llvm::Optional<llvm::CodeModel::Model> cm;
+	cm = llvm::CodeModel::Large;
 
 	llvm::TargetOptions opt;
-	llvm::TargetMachine* tm = t->createTargetMachine(triple.str(), "generic", "", opt, rm, llvm::None, llvm::CodeGenOpt::None);
+
+	llvm::TargetMachine* tm = t->createTargetMachine(triple.str(), "generic", "", opt, rm, cm, llvm::CodeGenOpt::None);
 
 	llvm::DataLayout dl = tm->createDataLayout();
 	module->setDataLayout(dl);
@@ -46,11 +51,12 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 
 	llvm::FunctionType* main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), false);
 	llvm::Function* main = llvm::Function::Create(main_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "main", module);
+	main->addFnAttr(llvm::Attribute::NoInline);
 
 	llvm::SmallVector<llvm::Metadata*, 1> tys;
 	tys.push_back(ui32);
 	llvm::DISubroutineType* main_type_di = di->createSubroutineType(di->getOrCreateTypeArray(tys));
-	llvm::DISubprogram* main_di = di->createFunction(unit, "main", "main", code_file, 0, main_type_di, 0, llvm::DINode::DIFlags::FlagZero, llvm::DISubprogram::toSPFlags(true, true, false, 0U, true));
+	llvm::DISubprogram* main_di = di->createFunction(unit, "main", "main", code_file, 0, main_type_di, 0, llvm::DINode::DIFlags::FlagZero, llvm::DISubprogram::toSPFlags(true, true, true, 0U, true));
 	main->setSubprogram(main_di);
 
 	BuildApplication(main);
@@ -101,14 +107,13 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 	ofs.close();
 
 	std::filesystem::path exe = bin_dir / (application.GetName() + ".exe");
-	std::filesystem::path pdb = bin_dir / (application.GetName() + ".pdb");
 
 	std::error_code ec;
 	llvm::raw_fd_ostream os(bc.string(), ec);
 	llvm::WriteBitcodeToFile(*module, os);
 	os.close();
 
-	LinkModule(bc, exe, pdb);
+	LinkModule(bc, exe);
 }
 
 void anceCompiler::BuildApplication(llvm::Function* main)
@@ -126,12 +131,18 @@ void anceCompiler::BuildApplication(llvm::Function* main)
 
 		delete(statement);
 	}
+
+	ir.SetCurrentDebugLocation(nullptr);
 }
 
-void anceCompiler::LinkModule(std::filesystem::path& bc, std::filesystem::path& exe, std::filesystem::path& pdb)
+void anceCompiler::LinkModule(std::filesystem::path& bc, std::filesystem::path& exe)
 {
 	std::vector<const char*> args;
 	args.push_back("lld");
+
+	args.push_back("/verbose");
+
+	args.push_back("/debug:FULL");
 
 	args.push_back("/machine:x64");
 	args.push_back("/subsystem:windows");
@@ -142,23 +153,16 @@ void anceCompiler::LinkModule(std::filesystem::path& bc, std::filesystem::path& 
 
 	args.push_back("/entry:_start");
 
-	args.push_back("/debug");
-
 	// ! string copy not wanted, but necessary as bc.string().c_str() did not work - string was corrupted after passing it to link.
 	// todo a more elegant solution should be found!
 	std::string out = "/out:" + exe.string();
 	char output[out.size() + 1];
 	strcpy(output, out.c_str());
 
-	std::string dbg = "/pdb:" + pdb.string();
-	char debug[dbg.size() + 1];
-	strcpy(debug, dbg.c_str());
-
 	char input[bc.string().size() + 1];
 	strcpy(input, bc.string().c_str());
 
 	args.push_back(output);
-	/*args.push_back(debug);*/
 	args.push_back(input);
 
 	lld::coff::link(args, false, llvm::outs(), llvm::errs());

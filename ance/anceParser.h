@@ -12,7 +12,7 @@
 class  anceParser : public antlr4::Parser {
 public:
   enum {
-    RETURN = 1, SEMICOLON = 2, WHITESPACE = 3
+    INTEGER = 1, RETURN = 2, SEMICOLON = 3, WHITESPACE = 4
   };
 
   enum {
@@ -65,6 +65,7 @@ public:
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *RETURN();
     antlr4::tree::TerminalNode *SEMICOLON();
+    antlr4::tree::TerminalNode *INTEGER();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;

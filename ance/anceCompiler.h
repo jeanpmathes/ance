@@ -11,7 +11,7 @@ public:
 
 private:
 	void BuildApplication(llvm::Function* main);
-	void LinkModule(std::filesystem::path& bc, std::filesystem::path& exe, std::filesystem::path& pdb);
+	void LinkModule(std::filesystem::path& bc, std::filesystem::path& exe);
 
 private:
 	Application& application;
