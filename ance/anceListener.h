@@ -20,6 +20,9 @@ public:
   virtual void enterStatement(anceParser::StatementContext *ctx) = 0;
   virtual void exitStatement(anceParser::StatementContext *ctx) = 0;
 
+  virtual void enterPrint_statement(anceParser::Print_statementContext *ctx) = 0;
+  virtual void exitPrint_statement(anceParser::Print_statementContext *ctx) = 0;
+
   virtual void enterReturn_statement(anceParser::Return_statementContext *ctx) = 0;
   virtual void exitReturn_statement(anceParser::Return_statementContext *ctx) = 0;
 

@@ -10,6 +10,7 @@ class FileListener :
 public:
 	FileListener(Application& application);
 
+	void exitPrint_statement(anceParser::Print_statementContext* ctx) override;
 	void exitReturn_statement(anceParser::Return_statementContext* ctx) override;
 
 private:

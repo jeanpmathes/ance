@@ -43,6 +43,8 @@ anceCompiler::anceCompiler(Application& app) : application(app), ir(context)
 	proj_file = di->createFile(application.GetProjectFile().filename().string(), application.GetProjectFile().string());
 	unit = di->createCompileUnit(llvm::dwarf::DW_LANG_C, proj_file, "ancec-0", false, "", 0);
 	code_file = di->createFile(application.GetCodeFile().filename().string(), application.GetCodeFile().string());
+
+	state = new CompileState(&context, module, &ir, di);
 }
 
 void anceCompiler::Compile(const std::filesystem::path& output_dir)
@@ -69,12 +71,7 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 	llvm::BasicBlock* exit_block = llvm::BasicBlock::Create(context, "entry", exit);
 	ir.SetInsertPoint(exit_block);
 
-	llvm::Type* exitProcess_params[] = { llvm::Type::getInt32Ty(context) };
-	llvm::FunctionType* exitProcess_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context), exitProcess_params, false);
-	llvm::Function* exitProcess = llvm::Function::Create(exitProcess_type, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "ExitProcess", module);
-
-	llvm::Value* exitProcess_args[] = { exit->getArg(0) };
-	ir.CreateCall(exitProcess_type, exitProcess, exitProcess_args);
+	state->buildnativecall_ExitProcess(exit->getArg(0));
 
 	ir.CreateRetVoid();
 
@@ -127,7 +124,7 @@ void anceCompiler::BuildApplication(llvm::Function* main)
 
 		ir.SetCurrentDebugLocation(llvm::DILocation::get(context, statement->getLine(), statement->getColumn(), main->getSubprogram()));
 
-		statement->build(context, ir, di, main);
+		statement->build(context, state, ir, di, main);
 
 		delete(statement);
 	}

@@ -64,6 +64,12 @@
     <ClCompile Include="anceCompiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="print_statement.cpp">
+      <Filter>Source Files\Statement Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CompileState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileListener.h">
@@ -91,6 +97,12 @@
       <Filter>Header Files\Statement Files</Filter>
     </ClInclude>
     <ClInclude Include="anceCompiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="print_statement.h">
+      <Filter>Header Files\Statement Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CompileState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

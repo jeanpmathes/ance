@@ -1,6 +1,8 @@
 INTEGER=1
-RETURN=2
-SEMICOLON=3
-WHITESPACE=4
-'return'=2
-';'=3
+PRINT=2
+RETURN=3
+SEMICOLON=4
+WHITESPACE=5
+'print'=2
+'return'=3
+';'=4

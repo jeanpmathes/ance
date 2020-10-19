@@ -37,8 +37,12 @@ anceParser::FileContext::FileContext(ParserRuleContext *parent, size_t invokingS
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::StatementContext* anceParser::FileContext::statement() {
-  return getRuleContext<anceParser::StatementContext>(0);
+std::vector<anceParser::StatementContext *> anceParser::FileContext::statement() {
+  return getRuleContexts<anceParser::StatementContext>();
+}
+
+anceParser::StatementContext* anceParser::FileContext::statement(size_t i) {
+  return getRuleContext<anceParser::StatementContext>(i);
 }
 
 
@@ -61,14 +65,25 @@ void anceParser::FileContext::exitRule(tree::ParseTreeListener *listener) {
 anceParser::FileContext* anceParser::file() {
   FileContext *_localctx = _tracker.createInstance<FileContext>(_ctx, getState());
   enterRule(_localctx, 0, anceParser::RuleFile);
+  size_t _la = 0;
 
   auto onExit = finally([=] {
     exitRule();
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(6);
-    statement();
+    setState(9); 
+    _errHandler->sync(this);
+    _la = _input->LA(1);
+    do {
+      setState(8);
+      statement();
+      setState(11); 
+      _errHandler->sync(this);
+      _la = _input->LA(1);
+    } while (_la == anceParser::PRINT
+
+    || _la == anceParser::RETURN);
    
   }
   catch (RecognitionException &e) {
@@ -84,6 +99,10 @@ anceParser::FileContext* anceParser::file() {
 
 anceParser::StatementContext::StatementContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
+}
+
+anceParser::Print_statementContext* anceParser::StatementContext::print_statement() {
+  return getRuleContext<anceParser::Print_statementContext>(0);
 }
 
 anceParser::Return_statementContext* anceParser::StatementContext::return_statement() {
@@ -115,9 +134,81 @@ anceParser::StatementContext* anceParser::statement() {
     exitRule();
   });
   try {
+    setState(15);
+    _errHandler->sync(this);
+    switch (_input->LA(1)) {
+      case anceParser::PRINT: {
+        enterOuterAlt(_localctx, 1);
+        setState(13);
+        print_statement();
+        break;
+      }
+
+      case anceParser::RETURN: {
+        enterOuterAlt(_localctx, 2);
+        setState(14);
+        return_statement();
+        break;
+      }
+
+    default:
+      throw NoViableAltException(this);
+    }
+   
+  }
+  catch (RecognitionException &e) {
+    _errHandler->reportError(this, e);
+    _localctx->exception = std::current_exception();
+    _errHandler->recover(this, _localctx->exception);
+  }
+
+  return _localctx;
+}
+
+//----------------- Print_statementContext ------------------------------------------------------------------
+
+anceParser::Print_statementContext::Print_statementContext(ParserRuleContext *parent, size_t invokingState)
+  : ParserRuleContext(parent, invokingState) {
+}
+
+tree::TerminalNode* anceParser::Print_statementContext::PRINT() {
+  return getToken(anceParser::PRINT, 0);
+}
+
+tree::TerminalNode* anceParser::Print_statementContext::SEMICOLON() {
+  return getToken(anceParser::SEMICOLON, 0);
+}
+
+
+size_t anceParser::Print_statementContext::getRuleIndex() const {
+  return anceParser::RulePrint_statement;
+}
+
+void anceParser::Print_statementContext::enterRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<anceListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->enterPrint_statement(this);
+}
+
+void anceParser::Print_statementContext::exitRule(tree::ParseTreeListener *listener) {
+  auto parserListener = dynamic_cast<anceListener *>(listener);
+  if (parserListener != nullptr)
+    parserListener->exitPrint_statement(this);
+}
+
+anceParser::Print_statementContext* anceParser::print_statement() {
+  Print_statementContext *_localctx = _tracker.createInstance<Print_statementContext>(_ctx, getState());
+  enterRule(_localctx, 4, anceParser::RulePrint_statement);
+
+  auto onExit = finally([=] {
+    exitRule();
+  });
+  try {
     enterOuterAlt(_localctx, 1);
-    setState(8);
-    return_statement();
+    setState(17);
+    match(anceParser::PRINT);
+    setState(18);
+    match(anceParser::SEMICOLON);
    
   }
   catch (RecognitionException &e) {
@@ -166,7 +257,7 @@ void anceParser::Return_statementContext::exitRule(tree::ParseTreeListener *list
 
 anceParser::Return_statementContext* anceParser::return_statement() {
   Return_statementContext *_localctx = _tracker.createInstance<Return_statementContext>(_ctx, getState());
-  enterRule(_localctx, 4, anceParser::RuleReturn_statement);
+  enterRule(_localctx, 6, anceParser::RuleReturn_statement);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -174,17 +265,17 @@ anceParser::Return_statementContext* anceParser::return_statement() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(10);
+    setState(20);
     match(anceParser::RETURN);
-    setState(12);
+    setState(22);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if (_la == anceParser::INTEGER) {
-      setState(11);
+      setState(21);
       match(anceParser::INTEGER);
     }
-    setState(14);
+    setState(24);
     match(anceParser::SEMICOLON);
    
   }
@@ -206,15 +297,15 @@ atn::ATN anceParser::_atn;
 std::vector<uint16_t> anceParser::_serializedATN;
 
 std::vector<std::string> anceParser::_ruleNames = {
-  "file", "statement", "return_statement"
+  "file", "statement", "print_statement", "return_statement"
 };
 
 std::vector<std::string> anceParser::_literalNames = {
-  "", "", "'return'", "';'"
+  "", "", "'print'", "'return'", "';'"
 };
 
 std::vector<std::string> anceParser::_symbolicNames = {
-  "", "INTEGER", "RETURN", "SEMICOLON", "WHITESPACE"
+  "", "INTEGER", "PRINT", "RETURN", "SEMICOLON", "WHITESPACE"
 };
 
 dfa::Vocabulary anceParser::_vocabulary(_literalNames, _symbolicNames);
@@ -237,16 +328,23 @@ anceParser::Initializer::Initializer() {
 
   _serializedATN = {
     0x3, 0x608b, 0xa72a, 0x8133, 0xb9ed, 0x417c, 0x3be7, 0x7786, 0x5964, 
-    0x3, 0x6, 0x13, 0x4, 0x2, 0x9, 0x2, 0x4, 0x3, 0x9, 0x3, 0x4, 0x4, 0x9, 
-    0x4, 0x3, 0x2, 0x3, 0x2, 0x3, 0x3, 0x3, 0x3, 0x3, 0x4, 0x3, 0x4, 0x5, 
-    0x4, 0xf, 0xa, 0x4, 0x3, 0x4, 0x3, 0x4, 0x3, 0x4, 0x2, 0x2, 0x5, 0x2, 
-    0x4, 0x6, 0x2, 0x2, 0x2, 0x10, 0x2, 0x8, 0x3, 0x2, 0x2, 0x2, 0x4, 0xa, 
-    0x3, 0x2, 0x2, 0x2, 0x6, 0xc, 0x3, 0x2, 0x2, 0x2, 0x8, 0x9, 0x5, 0x4, 
-    0x3, 0x2, 0x9, 0x3, 0x3, 0x2, 0x2, 0x2, 0xa, 0xb, 0x5, 0x6, 0x4, 0x2, 
-    0xb, 0x5, 0x3, 0x2, 0x2, 0x2, 0xc, 0xe, 0x7, 0x4, 0x2, 0x2, 0xd, 0xf, 
-    0x7, 0x3, 0x2, 0x2, 0xe, 0xd, 0x3, 0x2, 0x2, 0x2, 0xe, 0xf, 0x3, 0x2, 
-    0x2, 0x2, 0xf, 0x10, 0x3, 0x2, 0x2, 0x2, 0x10, 0x11, 0x7, 0x5, 0x2, 
-    0x2, 0x11, 0x7, 0x3, 0x2, 0x2, 0x2, 0x3, 0xe, 
+    0x3, 0x7, 0x1d, 0x4, 0x2, 0x9, 0x2, 0x4, 0x3, 0x9, 0x3, 0x4, 0x4, 0x9, 
+    0x4, 0x4, 0x5, 0x9, 0x5, 0x3, 0x2, 0x6, 0x2, 0xc, 0xa, 0x2, 0xd, 0x2, 
+    0xe, 0x2, 0xd, 0x3, 0x3, 0x3, 0x3, 0x5, 0x3, 0x12, 0xa, 0x3, 0x3, 0x4, 
+    0x3, 0x4, 0x3, 0x4, 0x3, 0x5, 0x3, 0x5, 0x5, 0x5, 0x19, 0xa, 0x5, 0x3, 
+    0x5, 0x3, 0x5, 0x3, 0x5, 0x2, 0x2, 0x6, 0x2, 0x4, 0x6, 0x8, 0x2, 0x2, 
+    0x2, 0x1b, 0x2, 0xb, 0x3, 0x2, 0x2, 0x2, 0x4, 0x11, 0x3, 0x2, 0x2, 0x2, 
+    0x6, 0x13, 0x3, 0x2, 0x2, 0x2, 0x8, 0x16, 0x3, 0x2, 0x2, 0x2, 0xa, 0xc, 
+    0x5, 0x4, 0x3, 0x2, 0xb, 0xa, 0x3, 0x2, 0x2, 0x2, 0xc, 0xd, 0x3, 0x2, 
+    0x2, 0x2, 0xd, 0xb, 0x3, 0x2, 0x2, 0x2, 0xd, 0xe, 0x3, 0x2, 0x2, 0x2, 
+    0xe, 0x3, 0x3, 0x2, 0x2, 0x2, 0xf, 0x12, 0x5, 0x6, 0x4, 0x2, 0x10, 0x12, 
+    0x5, 0x8, 0x5, 0x2, 0x11, 0xf, 0x3, 0x2, 0x2, 0x2, 0x11, 0x10, 0x3, 
+    0x2, 0x2, 0x2, 0x12, 0x5, 0x3, 0x2, 0x2, 0x2, 0x13, 0x14, 0x7, 0x4, 
+    0x2, 0x2, 0x14, 0x15, 0x7, 0x6, 0x2, 0x2, 0x15, 0x7, 0x3, 0x2, 0x2, 
+    0x2, 0x16, 0x18, 0x7, 0x5, 0x2, 0x2, 0x17, 0x19, 0x7, 0x3, 0x2, 0x2, 
+    0x18, 0x17, 0x3, 0x2, 0x2, 0x2, 0x18, 0x19, 0x3, 0x2, 0x2, 0x2, 0x19, 
+    0x1a, 0x3, 0x2, 0x2, 0x2, 0x1a, 0x1b, 0x7, 0x6, 0x2, 0x2, 0x1b, 0x9, 
+    0x3, 0x2, 0x2, 0x2, 0x5, 0xd, 0x11, 0x18, 
   };
 
   atn::ATNDeserializer deserializer;

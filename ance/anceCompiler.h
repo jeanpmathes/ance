@@ -1,7 +1,10 @@
 #pragma once
 #include "Application.h"
+#include "CompileState.h"
+
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
+
 #include <filesystem>
 class anceCompiler
 {
@@ -20,8 +23,11 @@ private:
 
 private:
 	llvm::Module* module;
+
 	llvm::DIBuilder* di;
 	llvm::DIFile* proj_file;
 	llvm::DICompileUnit* unit;
 	llvm::DIFile* code_file;
+
+	CompileState* state;
 };

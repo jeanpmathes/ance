@@ -1,11 +1,16 @@
 grammar ance;
 
 file
-	: statement
+	: ( statement )+
 	;
 
 statement
-	: return_statement
+	: print_statement
+	| return_statement
+	;
+
+print_statement
+	: PRINT SEMICOLON
 	;
 
 return_statement
@@ -14,6 +19,7 @@ return_statement
 
 INTEGER : [0-9]+ ;
 
+PRINT : 'print' ;
 RETURN : 'return' ;
 
 SEMICOLON : ';' ;

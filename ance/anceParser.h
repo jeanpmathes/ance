@@ -12,11 +12,11 @@
 class  anceParser : public antlr4::Parser {
 public:
   enum {
-    INTEGER = 1, RETURN = 2, SEMICOLON = 3, WHITESPACE = 4
+    INTEGER = 1, PRINT = 2, RETURN = 3, SEMICOLON = 4, WHITESPACE = 5
   };
 
   enum {
-    RuleFile = 0, RuleStatement = 1, RuleReturn_statement = 2
+    RuleFile = 0, RuleStatement = 1, RulePrint_statement = 2, RuleReturn_statement = 3
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -31,13 +31,15 @@ public:
 
   class FileContext;
   class StatementContext;
+  class Print_statementContext;
   class Return_statementContext; 
 
   class  FileContext : public antlr4::ParserRuleContext {
   public:
     FileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    StatementContext *statement();
+    std::vector<StatementContext *> statement();
+    StatementContext* statement(size_t i);
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -50,6 +52,7 @@ public:
   public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    Print_statementContext *print_statement();
     Return_statementContext *return_statement();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
@@ -58,6 +61,20 @@ public:
   };
 
   StatementContext* statement();
+
+  class  Print_statementContext : public antlr4::ParserRuleContext {
+  public:
+    Print_statementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *PRINT();
+    antlr4::tree::TerminalNode *SEMICOLON();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+   
+  };
+
+  Print_statementContext* print_statement();
 
   class  Return_statementContext : public antlr4::ParserRuleContext {
   public:

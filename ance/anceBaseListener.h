@@ -22,6 +22,9 @@ public:
   virtual void enterStatement(anceParser::StatementContext * /*ctx*/) override { }
   virtual void exitStatement(anceParser::StatementContext * /*ctx*/) override { }
 
+  virtual void enterPrint_statement(anceParser::Print_statementContext * /*ctx*/) override { }
+  virtual void exitPrint_statement(anceParser::Print_statementContext * /*ctx*/) override { }
+
   virtual void enterReturn_statement(anceParser::Return_statementContext * /*ctx*/) override { }
   virtual void exitReturn_statement(anceParser::Return_statementContext * /*ctx*/) override { }
 
