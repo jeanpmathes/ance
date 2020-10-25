@@ -235,6 +235,7 @@
     <ClInclude Include="anceCompiler.h" />
     <ClInclude Include="CompileState.h" />
     <ClInclude Include="FileListener.h" />
+    <ClInclude Include="anceConstants.h" />
     <ClInclude Include="print_statement.h" />
     <ClInclude Include="return_statement.h" />
     <ClInclude Include="Statement.h" />

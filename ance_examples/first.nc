@@ -1,3 +1,3 @@
-
+print ;
 
 return 0;

@@ -8,7 +8,7 @@ public:
 	Statement(unsigned int l, unsigned int c);
 	unsigned int getLine();
 	unsigned int getColumn();
-	virtual void build(llvm::LLVMContext& c, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di, llvm::Function* func) = 0;
+	virtual void build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di, llvm::Function* func) = 0;
 	virtual ~Statement() = 0;
 
 private:

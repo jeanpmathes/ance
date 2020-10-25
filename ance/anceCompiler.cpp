@@ -1,10 +1,11 @@
 #include "anceCompiler.h"
+#include "anceConstants.h"
+
 #include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <string>
 
-#include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Support/TargetRegistry.h"
@@ -51,6 +52,12 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 {
 	llvm::DIBasicType* ui32 = di->createBasicType("ui32", 32, llvm::dwarf::DW_ATE_unsigned);
 
+	llvm::ConstantPointerNull* null = llvm::ConstantPointerNull::get(llvm::PointerType::getInt8PtrTy(context));
+
+	new llvm::GlobalVariable(*module, llvm::Type::getInt8PtrTy(context), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_INPUT_HANDLE);
+	new llvm::GlobalVariable(*module, llvm::Type::getInt8PtrTy(context), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_OUTPUT_HANDLE);
+	new llvm::GlobalVariable(*module, llvm::Type::getInt8PtrTy(context), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_ERROR_HANDLE);
+
 	llvm::FunctionType* main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), false);
 	llvm::Function* main = llvm::Function::Create(main_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "main", module);
 	main->addFnAttr(llvm::Attribute::NoInline);
@@ -71,6 +78,7 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 	llvm::BasicBlock* exit_block = llvm::BasicBlock::Create(context, "entry", exit);
 	ir.SetInsertPoint(exit_block);
 
+	state->buildnativecall_FreeConsole();
 	state->buildnativecall_ExitProcess(exit->getArg(0));
 
 	ir.CreateRetVoid();
@@ -79,7 +87,32 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 	llvm::Function* start = llvm::Function::Create(start_type, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "_start", module);
 
 	llvm::BasicBlock* start_block = llvm::BasicBlock::Create(context, "entry", start);
+	llvm::BasicBlock* alloc_block = llvm::BasicBlock::Create(context, "no_console", start);
+	llvm::BasicBlock* prep_block = llvm::BasicBlock::Create(context, "prep", start);
+
 	ir.SetInsertPoint(start_block);
+
+	llvm::Value* attach_success = state->buildnativecall_AttachConsole(-1); // ATTACH_PARENT_PROCESS
+	ir.CreateCondBr(attach_success, prep_block, alloc_block);
+
+	ir.SetInsertPoint(alloc_block);
+
+	state->buildnativecall_AllocConsole();
+	ir.CreateBr(prep_block);
+
+	ir.SetInsertPoint(prep_block);
+
+	llvm::GlobalVariable* var = module->getGlobalVariable(ANCE_STD_INPUT_HANDLE);
+	llvm::Value* handle = state->buildnativecall_GetStdHandle(-10);
+	ir.CreateStore(handle, var);
+
+	var = module->getGlobalVariable(ANCE_STD_OUTPUT_HANDLE);
+	handle = state->buildnativecall_GetStdHandle(-11);
+	ir.CreateStore(handle, var);
+
+	var = module->getGlobalVariable(ANCE_STD_ERROR_HANDLE);
+	handle = state->buildnativecall_GetStdHandle(-12);
+	ir.CreateStore(handle, var);
 
 	llvm::CallInst* main_exitcode = ir.CreateCall(main_type, main, llvm::None, "exitcode");
 
@@ -124,7 +157,7 @@ void anceCompiler::BuildApplication(llvm::Function* main)
 
 		ir.SetCurrentDebugLocation(llvm::DILocation::get(context, statement->getLine(), statement->getColumn(), main->getSubprogram()));
 
-		statement->build(context, state, ir, di, main);
+		statement->build(context, module, state, ir, di, main);
 
 		delete(statement);
 	}

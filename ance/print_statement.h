@@ -5,6 +5,6 @@ class print_statement :
 {
 public:
 	print_statement(unsigned int l, unsigned int c);
-	void build(llvm::LLVMContext& c, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di, llvm::Function* func);
+	void build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di, llvm::Function* func);
 	~print_statement();
 };

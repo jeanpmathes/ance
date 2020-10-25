@@ -105,6 +105,9 @@
     <ClInclude Include="CompileState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="anceConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ance.g4">
