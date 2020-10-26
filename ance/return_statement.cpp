@@ -1,6 +1,6 @@
 #include "return_statement.h"
 
-return_statement::return_statement(unsigned int l, unsigned int c, uint32_t code) : Statement(l, c)
+return_statement::return_statement(const unsigned int l, const unsigned int c, uint32_t code) : Statement(l, c)
 {
 	exit_code = code;
 }
@@ -11,6 +11,4 @@ void return_statement::build(llvm::LLVMContext& c, llvm::Module* m, CompileState
 	ir.CreateRet(return_val);
 }
 
-return_statement::~return_statement()
-{
-}
+return_statement::~return_statement() = default;

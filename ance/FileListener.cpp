@@ -12,7 +12,42 @@ void FileListener::exitPrint_statement(anceParser::Print_statementContext* ctx)
 	unsigned int line = ctx->getStart()->getLine();
 	unsigned int column = ctx->getStart()->getCharPositionInLine();
 
-	print_statement* statement = new print_statement(line, column);
+	std::string unparsed = ctx->STRING()->getText();
+	std::stringstream builder;
+
+	bool escaped = false;
+
+	for (char const& c : unparsed)
+	{
+		if (escaped)
+		{
+			switch (c)
+			{
+			case 'n':
+				builder << '\n';
+				break;;
+
+			default:
+				builder << c;
+				break;
+			}
+
+			escaped = false;
+		}
+		else
+		{
+			if (c == '\\')
+			{
+				escaped = true;
+			}
+			else if (c != '"')
+			{
+				builder << c;
+			}
+		}
+	}
+
+	print_statement* statement = new print_statement(line, column, builder.str());
 	application.PushStatement(statement);
 }
 

@@ -10,13 +10,14 @@ statement
 	;
 
 print_statement
-	: PRINT SEMICOLON
+	: PRINT STRING SEMICOLON
 	;
 
 return_statement
 	: RETURN ( INTEGER )? SEMICOLON
 	;
 
+STRING : '"' ('\\'. | .)*? '"';
 INTEGER : [0-9]+ ;
 
 PRINT : 'print' ;

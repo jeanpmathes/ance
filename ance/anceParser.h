@@ -12,7 +12,7 @@
 class  anceParser : public antlr4::Parser {
 public:
   enum {
-    INTEGER = 1, PRINT = 2, RETURN = 3, SEMICOLON = 4, WHITESPACE = 5
+    STRING = 1, INTEGER = 2, PRINT = 3, RETURN = 4, SEMICOLON = 5, WHITESPACE = 6
   };
 
   enum {
@@ -67,6 +67,7 @@ public:
     Print_statementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *PRINT();
+    antlr4::tree::TerminalNode *STRING();
     antlr4::tree::TerminalNode *SEMICOLON();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
