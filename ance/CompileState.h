@@ -17,7 +17,7 @@ private:
 	// native: AllocConsole
 
 public:
-	llvm::Value* buildnativecall_AllocConsole();
+	llvm::Value* buildnativecall_AllocConsole() const;
 
 private:
 	llvm::FunctionType* allocConsole_type;
@@ -26,7 +26,7 @@ private:
 	// native: AttachConsole
 
 public:
-	llvm::Value* buildnativecall_AttachConsole(int32_t pid);
+	llvm::Value* buildnativecall_AttachConsole(int32_t pid) const;
 
 private:
 	llvm::FunctionType* attachConsole_type;
@@ -35,7 +35,7 @@ private:
 	// native: FreeConsole
 
 public:
-	llvm::Value* buildnativecall_FreeConsole();
+	llvm::Value* buildnativecall_FreeConsole() const;
 
 private:
 	llvm::FunctionType* freeConsole_type;
@@ -44,7 +44,7 @@ private:
 	// native: GetStdHandle
 
 public:
-	llvm::Value* buildnativecall_GetStdHandle(int32_t nStdHandle);
+	llvm::Value* buildnativecall_GetStdHandle(int32_t nStdHandle) const;
 
 private:
 	llvm::FunctionType* getStdHandle_type;
@@ -53,7 +53,7 @@ private:
 	// native: WriteFile (Kernel32)
 
 public:
-	llvm::Value* buildnativecall_WriteFile(llvm::Value* hFile, llvm::Value* lpBuffer, llvm::Value* nNumberOfBytesToWrite, llvm::Value* lpNumberOfBytesWritten, llvm::Value* lpOverlapped);
+	llvm::Value* buildnativecall_WriteFile(llvm::Value* hFile, llvm::Value* lpBuffer, llvm::Value* nNumberOfBytesToWrite, llvm::Value* lpNumberOfBytesWritten, llvm::Value* lpOverlapped) const;
 
 private:
 	llvm::FunctionType* writeFile_type;
@@ -62,7 +62,7 @@ private:
 	// native: ExitProcess (Kernel32)
 
 public:
-	void buildnativecall_ExitProcess(llvm::Value* uExitCode);
+	void buildnativecall_ExitProcess(llvm::Value* uExitCode) const;
 
 private:
 	llvm::FunctionType* exitProcess_type;

@@ -4,22 +4,22 @@ Application::Application(std::filesystem::path project_file, std::filesystem::pa
 {
 }
 
-const std::string Application::GetName()
+const std::string Application::GetName() const
 {
 	return proj_file.stem().string();
 }
 
-const std::filesystem::path Application::GetProjectFile()
+const std::filesystem::path Application::GetProjectFile() const
 {
 	return std::filesystem::path(proj_file);
 }
 
-const std::filesystem::path Application::GetCodeFile()
+const std::filesystem::path Application::GetCodeFile() const
 {
 	return std::filesystem::path(code_file);
 }
 
-size_t Application::StatementCount()
+size_t Application::StatementCount() const
 {
 	return statements.size();
 }

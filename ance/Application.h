@@ -8,11 +8,11 @@ class Application
 public:
 	Application(std::filesystem::path project_file, std::filesystem::path nccode_file);
 
-	const std::string GetName();
-	const std::filesystem::path GetProjectFile();
-	const std::filesystem::path GetCodeFile();
+	const std::string GetName() const;
+	const std::filesystem::path GetProjectFile() const;
+	const std::filesystem::path GetCodeFile() const;
 
-	size_t StatementCount();
+	size_t StatementCount() const;
 	void PushStatement(Statement* statement);
 	Statement* PopStatement();
 

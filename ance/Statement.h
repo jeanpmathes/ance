@@ -6,8 +6,8 @@ class Statement
 {
 public:
 	Statement(unsigned int l, unsigned int c);
-	unsigned int getLine();
-	unsigned int getColumn();
+	unsigned int getLine() const;
+	unsigned int getColumn() const;
 	virtual void build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di, llvm::Function* func) = 0;
 	virtual ~Statement() = 0;
 

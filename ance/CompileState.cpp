@@ -36,14 +36,14 @@ CompileState::CompileState(llvm::LLVMContext* c, llvm::Module* m, llvm::IRBuilde
 	exitProcess = llvm::Function::Create(exitProcess_type, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "ExitProcess", module);
 }
 
-llvm::Value* CompileState::buildnativecall_AllocConsole()
+llvm::Value* CompileState::buildnativecall_AllocConsole() const
 {
 	llvm::CallInst* ret = ir_builder->CreateCall(allocConsole_type, allocConsole);
 
 	return ret;
 }
 
-llvm::Value* CompileState::buildnativecall_AttachConsole(int32_t pid)
+llvm::Value* CompileState::buildnativecall_AttachConsole(int32_t pid) const
 {
 	llvm::Value* attachConsole_args[] = { llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), pid, true) };
 	llvm::CallInst* ret = ir_builder->CreateCall(attachConsole_type, attachConsole, attachConsole_args);
@@ -51,14 +51,14 @@ llvm::Value* CompileState::buildnativecall_AttachConsole(int32_t pid)
 	return ret;
 }
 
-llvm::Value* CompileState::buildnativecall_FreeConsole()
+llvm::Value* CompileState::buildnativecall_FreeConsole() const
 {
 	llvm::CallInst* ret = ir_builder->CreateCall(freeConsole_type, freeConsole);
 
 	return ret;
 }
 
-llvm::Value* CompileState::buildnativecall_GetStdHandle(int32_t nStdHandle)
+llvm::Value* CompileState::buildnativecall_GetStdHandle(int32_t nStdHandle) const
 {
 	llvm::Value* getStdHandle_args[] = { llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context), nStdHandle, true) };
 	llvm::CallInst* ret = ir_builder->CreateCall(getStdHandle_type, getStdHandle, getStdHandle_args);
@@ -66,7 +66,7 @@ llvm::Value* CompileState::buildnativecall_GetStdHandle(int32_t nStdHandle)
 	return ret;
 }
 
-llvm::Value* CompileState::buildnativecall_WriteFile(llvm::Value* hFile, llvm::Value* lpBuffer, llvm::Value* nNumberOfBytesToWrite, llvm::Value* lpNumberOfBytesWritten, llvm::Value* lpOverlapped)
+llvm::Value* CompileState::buildnativecall_WriteFile(llvm::Value* hFile, llvm::Value* lpBuffer, llvm::Value* nNumberOfBytesToWrite, llvm::Value* lpNumberOfBytesWritten, llvm::Value* lpOverlapped) const
 {
 	llvm::Value* writeFile_args[] = { hFile, lpBuffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, lpOverlapped };
 	llvm::CallInst* ret = ir_builder->CreateCall(writeFile_type, writeFile, writeFile_args);
@@ -74,7 +74,7 @@ llvm::Value* CompileState::buildnativecall_WriteFile(llvm::Value* hFile, llvm::V
 	return ret;
 }
 
-void CompileState::buildnativecall_ExitProcess(llvm::Value* uExitCode)
+void CompileState::buildnativecall_ExitProcess(llvm::Value* uExitCode) const
 {
 	llvm::Value* exitProcess_args[] = { uExitCode };
 	ir_builder->CreateCall(exitProcess_type, exitProcess, exitProcess_args);

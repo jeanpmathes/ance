@@ -6,12 +6,12 @@ Statement::Statement(unsigned int l, unsigned int c)
 	column = c;
 }
 
-unsigned int Statement::getLine()
+unsigned int Statement::getLine() const
 {
 	return line;
 }
 
-unsigned int Statement::getColumn()
+unsigned int Statement::getColumn() const
 {
 	return column;
 }
