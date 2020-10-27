@@ -12,11 +12,14 @@
 class  anceParser : public antlr4::Parser {
 public:
   enum {
-    STRING = 1, INTEGER = 2, PRINT = 3, RETURN = 4, SEMICOLON = 5, WHITESPACE = 6
+    STRING = 1, INTEGER = 2, MAIN = 3, PRINT = 4, RETURN = 5, PARANTHESE_OPEN = 6, 
+    PARANTHESE_CLOSED = 7, BRACE_OPEN = 8, BRACE_CLOSED = 9, SEMICOLON = 10, 
+    WHITESPACE = 11
   };
 
   enum {
-    RuleFile = 0, RuleStatement = 1, RulePrint_statement = 2, RuleReturn_statement = 3
+    RuleFile = 0, RuleEntry = 1, RuleStatement = 2, RulePrint_statement = 3, 
+    RuleReturn_statement = 4
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -30,6 +33,7 @@ public:
 
 
   class FileContext;
+  class EntryContext;
   class StatementContext;
   class Print_statementContext;
   class Return_statementContext; 
@@ -38,6 +42,24 @@ public:
   public:
     FileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    EntryContext *entry();
+
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+   
+  };
+
+  FileContext* file();
+
+  class  EntryContext : public antlr4::ParserRuleContext {
+  public:
+    EntryContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *MAIN();
+    antlr4::tree::TerminalNode *PARANTHESE_OPEN();
+    antlr4::tree::TerminalNode *PARANTHESE_CLOSED();
+    antlr4::tree::TerminalNode *BRACE_OPEN();
+    antlr4::tree::TerminalNode *BRACE_CLOSED();
     std::vector<StatementContext *> statement();
     StatementContext* statement(size_t i);
 
@@ -46,7 +68,7 @@ public:
    
   };
 
-  FileContext* file();
+  EntryContext* entry();
 
   class  StatementContext : public antlr4::ParserRuleContext {
   public:

@@ -17,6 +17,9 @@ public:
   virtual void enterFile(anceParser::FileContext *ctx) = 0;
   virtual void exitFile(anceParser::FileContext *ctx) = 0;
 
+  virtual void enterEntry(anceParser::EntryContext *ctx) = 0;
+  virtual void exitEntry(anceParser::EntryContext *ctx) = 0;
+
   virtual void enterStatement(anceParser::StatementContext *ctx) = 0;
   virtual void exitStatement(anceParser::StatementContext *ctx) = 0;
 

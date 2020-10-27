@@ -1,7 +1,11 @@
 grammar ance;
 
 file
-	: ( statement )+
+	: entry
+	;
+
+entry 
+	: MAIN PARANTHESE_OPEN PARANTHESE_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
 	;
 
 statement
@@ -20,8 +24,15 @@ return_statement
 STRING : '"' ('\\'. | .)*? '"';
 INTEGER : [0-9]+ ;
 
+MAIN : 'main' ;
 PRINT : 'print' ;
 RETURN : 'return' ;
+
+PARANTHESE_OPEN : '(' ;
+PARANTHESE_CLOSED : ')' ;
+
+BRACE_OPEN : '{' ;
+BRACE_CLOSED : '}' ;
 
 SEMICOLON : ';' ;
 

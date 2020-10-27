@@ -1,7 +1,5 @@
-print "V 1.0.0\n" ;
-print "HELLO WORLD IN ANCE\n";
-print "\"";
-print "";
-print "\n\nfin";
+main() {
+	print "HELLO WORLD\n";
 
-return 0;
+	return 0;
+}
