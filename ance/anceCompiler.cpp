@@ -52,14 +52,56 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 {
 	llvm::DIBasicType* ui32 = di->createBasicType("ui32", 32, llvm::dwarf::DW_ATE_unsigned);
 
+	SetupGlobals();
+
+	llvm::FunctionType* main_type;
+	llvm::Function* main;
+	BuildMain(ui32, main_type, main);
+
+	llvm::FunctionType* exit_type;
+	llvm::Function* exit;
+	BuildExit(exit_type, exit);
+
+	BuildStart(main_type, main, exit_type, exit);
+
+	di->finalize();
+
+	llvm::verifyModule(*module, &llvm::errs());
+	module->print(llvm::outs(), nullptr);
+
+	std::filesystem::path bc_dir = output_dir / "bc";
+	std::filesystem::path bin_dir = output_dir / "bin";
+
+	std::filesystem::create_directory(bc_dir);
+	std::filesystem::create_directory(bin_dir);
+
+	std::filesystem::path bc = bc_dir / (application.GetName() + ".bc");
+	std::ofstream ofs(bc.string());
+	ofs.close();
+
+	std::filesystem::path exe = bin_dir / (application.GetName() + ".exe");
+
+	std::error_code ec;
+	llvm::raw_fd_ostream os(bc.string(), ec);
+	llvm::WriteBitcodeToFile(*module, os);
+	os.close();
+
+	LinkModule(bc, exe);
+}
+
+void anceCompiler::SetupGlobals()
+{
 	llvm::ConstantPointerNull* null = llvm::ConstantPointerNull::get(llvm::PointerType::getInt8PtrTy(context));
 
 	new llvm::GlobalVariable(*module, llvm::Type::getInt8PtrTy(context), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_INPUT_HANDLE);
 	new llvm::GlobalVariable(*module, llvm::Type::getInt8PtrTy(context), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_OUTPUT_HANDLE);
 	new llvm::GlobalVariable(*module, llvm::Type::getInt8PtrTy(context), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_ERROR_HANDLE);
+}
 
-	llvm::FunctionType* main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), false);
-	llvm::Function* main = llvm::Function::Create(main_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "main", module);
+void anceCompiler::BuildMain(llvm::DIBasicType* ui32, llvm::FunctionType*& main_type, llvm::Function*& main)
+{
+	main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), false);
+	main = llvm::Function::Create(main_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "main", module);
 	main->addFnAttr(llvm::Attribute::NoInline);
 
 	llvm::SmallVector<llvm::Metadata*, 1> tys;
@@ -69,10 +111,32 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 	main->setSubprogram(main_di);
 
 	BuildApplication(main);
+}
 
+void anceCompiler::BuildApplication(llvm::Function* main)
+{
+	llvm::BasicBlock* main_block = llvm::BasicBlock::Create(context, "entry", main);
+	ir.SetInsertPoint(main_block);
+
+	while (application.StatementCount() > 0)
+	{
+		Statement* statement = application.PopStatement();
+
+		ir.SetCurrentDebugLocation(llvm::DILocation::get(context, statement->getLine(), statement->getColumn(), main->getSubprogram()));
+
+		statement->build(context, module, state, ir, di, main);
+
+		delete(statement);
+	}
+
+	ir.SetCurrentDebugLocation(nullptr);
+}
+
+void anceCompiler::BuildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit)
+{
 	llvm::Type* exit_params[] = { llvm::Type::getInt32Ty(context) };
-	llvm::FunctionType* exit_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context), exit_params, false);
-	llvm::Function* exit = llvm::Function::Create(exit_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_exit", module);
+	exit_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context), exit_params, false);
+	exit = llvm::Function::Create(exit_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_exit", module);
 	exit->getArg(0)->setName("exitcode");
 
 	llvm::BasicBlock* exit_block = llvm::BasicBlock::Create(context, "entry", exit);
@@ -82,7 +146,10 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 	state->buildnativecall_ExitProcess(exit->getArg(0));
 
 	ir.CreateRetVoid();
+}
 
+void anceCompiler::BuildStart(llvm::FunctionType* main_type, llvm::Function* main, llvm::FunctionType* exit_type, llvm::Function* exit)
+{
 	llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context), false);
 	llvm::Function* start = llvm::Function::Create(start_type, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "_start", module);
 
@@ -120,49 +187,6 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 	ir.CreateCall(exit_type, exit, exit_args);
 
 	ir.CreateRetVoid();
-
-	di->finalize();
-
-	llvm::verifyModule(*module, &llvm::errs());
-	module->print(llvm::outs(), nullptr);
-
-	std::filesystem::path bc_dir = output_dir / "bc";
-	std::filesystem::path bin_dir = output_dir / "bin";
-
-	std::filesystem::create_directory(bc_dir);
-	std::filesystem::create_directory(bin_dir);
-
-	std::filesystem::path bc = bc_dir / (application.GetName() + ".bc");
-	std::ofstream ofs(bc.string());
-	ofs.close();
-
-	std::filesystem::path exe = bin_dir / (application.GetName() + ".exe");
-
-	std::error_code ec;
-	llvm::raw_fd_ostream os(bc.string(), ec);
-	llvm::WriteBitcodeToFile(*module, os);
-	os.close();
-
-	LinkModule(bc, exe);
-}
-
-void anceCompiler::BuildApplication(llvm::Function* main)
-{
-	llvm::BasicBlock* main_block = llvm::BasicBlock::Create(context, "entry", main);
-	ir.SetInsertPoint(main_block);
-
-	while (application.StatementCount() > 0)
-	{
-		Statement* statement = application.PopStatement();
-
-		ir.SetCurrentDebugLocation(llvm::DILocation::get(context, statement->getLine(), statement->getColumn(), main->getSubprogram()));
-
-		statement->build(context, module, state, ir, di, main);
-
-		delete(statement);
-	}
-
-	ir.SetCurrentDebugLocation(nullptr);
 }
 
 void anceCompiler::LinkModule(std::filesystem::path& bc, std::filesystem::path& exe)

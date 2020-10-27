@@ -13,7 +13,11 @@ public:
 	void Compile(const std::filesystem::path& output_dir);
 
 private:
+	void SetupGlobals();
+	void BuildMain(llvm::DIBasicType* ui32, llvm::FunctionType*& main_type, llvm::Function*& main);
 	void BuildApplication(llvm::Function* main);
+	void BuildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
+	void BuildStart(llvm::FunctionType* main_type, llvm::Function* main, llvm::FunctionType* exit_type, llvm::Function* exit);
 	void LinkModule(std::filesystem::path& bc, std::filesystem::path& exe);
 
 private:
