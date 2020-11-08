@@ -46,17 +46,22 @@ anceCompiler::anceCompiler(Application& app) : application(app), ir(context)
 	code_file = di->createFile(application.GetCodeFile().filename().string(), application.GetCodeFile().string());
 
 	state = new CompileState(&context, module, &ir, di);
+	state->application = &application;
+	state->unit = unit;
+	state->code_file = code_file;
 }
 
 void anceCompiler::Compile(const std::filesystem::path& output_dir)
 {
-	llvm::DIBasicType* ui32 = di->createBasicType("ui32", 32, llvm::dwarf::DW_ATE_unsigned);
+	state->ui32 = di->createBasicType("ui32", 32, llvm::dwarf::DW_ATE_unsigned);
 
 	SetupGlobals();
 
-	llvm::FunctionType* main_type;
-	llvm::Function* main;
-	BuildMain(ui32, main_type, main);
+	application.BuildFunctionNames(context, module, state, ir, di);
+	application.BuildFunctions(context, module, state, ir, di);
+
+	llvm::FunctionType* main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), false);
+	llvm::Function* main = module->getFunction("main");
 
 	llvm::FunctionType* exit_type;
 	llvm::Function* exit;
@@ -96,40 +101,6 @@ void anceCompiler::SetupGlobals()
 	new llvm::GlobalVariable(*module, llvm::Type::getInt8PtrTy(context), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_INPUT_HANDLE);
 	new llvm::GlobalVariable(*module, llvm::Type::getInt8PtrTy(context), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_OUTPUT_HANDLE);
 	new llvm::GlobalVariable(*module, llvm::Type::getInt8PtrTy(context), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_ERROR_HANDLE);
-}
-
-void anceCompiler::BuildMain(llvm::DIBasicType* ui32, llvm::FunctionType*& main_type, llvm::Function*& main)
-{
-	main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), false);
-	main = llvm::Function::Create(main_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "main", module);
-	main->addFnAttr(llvm::Attribute::NoInline);
-
-	llvm::SmallVector<llvm::Metadata*, 1> tys;
-	tys.push_back(ui32);
-	llvm::DISubroutineType* main_type_di = di->createSubroutineType(di->getOrCreateTypeArray(tys));
-	llvm::DISubprogram* main_di = di->createFunction(unit, "main", "main", code_file, 0, main_type_di, 0, llvm::DINode::DIFlags::FlagZero, llvm::DISubprogram::toSPFlags(true, true, true, 0U, true));
-	main->setSubprogram(main_di);
-
-	BuildApplication(main);
-}
-
-void anceCompiler::BuildApplication(llvm::Function* main)
-{
-	llvm::BasicBlock* main_block = llvm::BasicBlock::Create(context, "entry", main);
-	ir.SetInsertPoint(main_block);
-
-	while (application.StatementCount() > 0)
-	{
-		Statement* statement = application.PopStatement();
-
-		ir.SetCurrentDebugLocation(llvm::DILocation::get(context, statement->getLine(), statement->getColumn(), main->getSubprogram()));
-
-		statement->build(context, module, state, ir, di, main);
-
-		delete(statement);
-	}
-
-	ir.SetCurrentDebugLocation(nullptr);
 }
 
 void anceCompiler::BuildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit)

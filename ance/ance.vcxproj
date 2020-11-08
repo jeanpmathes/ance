@@ -222,6 +222,8 @@
     <ClCompile Include="anceCompiler.cpp" />
     <ClCompile Include="CompileState.cpp" />
     <ClCompile Include="FileListener.cpp" />
+    <ClCompile Include="Function.cpp" />
+    <ClCompile Include="function_call.cpp" />
     <ClCompile Include="print_statement.cpp" />
     <ClCompile Include="return_statement.cpp" />
     <ClCompile Include="Statement.cpp" />
@@ -236,6 +238,8 @@
     <ClInclude Include="CompileState.h" />
     <ClInclude Include="FileListener.h" />
     <ClInclude Include="anceConstants.h" />
+    <ClInclude Include="Function.h" />
+    <ClInclude Include="function_call.h" />
     <ClInclude Include="print_statement.h" />
     <ClInclude Include="return_statement.h" />
     <ClInclude Include="Statement.h" />

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ANCECOMPILER_H
+#define ANCECOMPILER_H
+
 #include "Application.h"
 #include "CompileState.h"
 
@@ -14,8 +16,6 @@ public:
 
 private:
 	void SetupGlobals();
-	void BuildMain(llvm::DIBasicType* ui32, llvm::FunctionType*& main_type, llvm::Function*& main);
-	void BuildApplication(llvm::Function* main);
 	void BuildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
 	void BuildStart(llvm::FunctionType* main_type, llvm::Function* main, llvm::FunctionType* exit_type, llvm::Function* exit);
 	void LinkModule(std::filesystem::path& bc, std::filesystem::path& exe);
@@ -35,3 +35,4 @@ private:
 
 	CompileState* state;
 };
+#endif

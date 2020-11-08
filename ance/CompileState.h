@@ -1,8 +1,13 @@
-#pragma once
-#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/Module.h"
+#ifndef COMPILESTATE_H
+#define COMPILESTATE_H
+
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
+
+#include "Application.h"
+
+class Application;
+
 class CompileState
 {
 public:
@@ -13,6 +18,12 @@ private:
 	llvm::Module* module;
 	llvm::IRBuilder<>* ir_builder;
 	llvm::DIBuilder* di_builder;
+
+public:
+	Application* application;
+	llvm::DICompileUnit* unit;
+	llvm::DIFile* code_file;
+	llvm::DIBasicType* ui32;
 
 	// native: AllocConsole
 
@@ -68,3 +79,4 @@ private:
 	llvm::FunctionType* exitProcess_type;
 	llvm::Function* exitProcess;
 };
+#endif

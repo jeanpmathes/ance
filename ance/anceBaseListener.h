@@ -19,11 +19,20 @@ public:
   virtual void enterFile(anceParser::FileContext * /*ctx*/) override { }
   virtual void exitFile(anceParser::FileContext * /*ctx*/) override { }
 
+  virtual void enterType(anceParser::TypeContext * /*ctx*/) override { }
+  virtual void exitType(anceParser::TypeContext * /*ctx*/) override { }
+
   virtual void enterEntry(anceParser::EntryContext * /*ctx*/) override { }
   virtual void exitEntry(anceParser::EntryContext * /*ctx*/) override { }
 
+  virtual void enterFunction(anceParser::FunctionContext * /*ctx*/) override { }
+  virtual void exitFunction(anceParser::FunctionContext * /*ctx*/) override { }
+
   virtual void enterStatement(anceParser::StatementContext * /*ctx*/) override { }
   virtual void exitStatement(anceParser::StatementContext * /*ctx*/) override { }
+
+  virtual void enterFunction_call(anceParser::Function_callContext * /*ctx*/) override { }
+  virtual void exitFunction_call(anceParser::Function_callContext * /*ctx*/) override { }
 
   virtual void enterPrint_statement(anceParser::Print_statementContext * /*ctx*/) override { }
   virtual void exitPrint_statement(anceParser::Print_statementContext * /*ctx*/) override { }

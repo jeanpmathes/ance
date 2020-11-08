@@ -32,6 +32,12 @@
     <Filter Include="Test Files">
       <UniqueIdentifier>{26782f49-6eae-4e68-a459-4319920a410e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Construct Files">
+      <UniqueIdentifier>{20ed5751-92c0-424c-8e89-e5fd29878a1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Construct Files">
+      <UniqueIdentifier>{6c1c3d26-5cd5-4cfa-8647-65c4d4d40088}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ance.cpp">
@@ -70,6 +76,12 @@
     <ClCompile Include="CompileState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Function.cpp">
+      <Filter>Source Files\Construct Files</Filter>
+    </ClCompile>
+    <ClCompile Include="function_call.cpp">
+      <Filter>Source Files\Statement Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileListener.h">
@@ -107,6 +119,12 @@
     </ClInclude>
     <ClInclude Include="anceConstants.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Function.h">
+      <Filter>Header Files\Construct Files</Filter>
+    </ClInclude>
+    <ClInclude Include="function_call.h">
+      <Filter>Header Files\Statement Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

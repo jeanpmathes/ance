@@ -1,13 +1,13 @@
  
 #include "Statement.h"
-class return_statement :
+class function_call :
 	public Statement
 {
 public:
-	return_statement(unsigned int l, unsigned int c, uint32_t code);
+	function_call(unsigned int l, unsigned int c, std::string ident);
 	void build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
-	~return_statement();
+	~function_call();
 
 private:
-	uint32_t exit_code;
+	std::string identifier;
 };

@@ -17,11 +17,20 @@ public:
   virtual void enterFile(anceParser::FileContext *ctx) = 0;
   virtual void exitFile(anceParser::FileContext *ctx) = 0;
 
+  virtual void enterType(anceParser::TypeContext *ctx) = 0;
+  virtual void exitType(anceParser::TypeContext *ctx) = 0;
+
   virtual void enterEntry(anceParser::EntryContext *ctx) = 0;
   virtual void exitEntry(anceParser::EntryContext *ctx) = 0;
 
+  virtual void enterFunction(anceParser::FunctionContext *ctx) = 0;
+  virtual void exitFunction(anceParser::FunctionContext *ctx) = 0;
+
   virtual void enterStatement(anceParser::StatementContext *ctx) = 0;
   virtual void exitStatement(anceParser::StatementContext *ctx) = 0;
+
+  virtual void enterFunction_call(anceParser::Function_callContext *ctx) = 0;
+  virtual void exitFunction_call(anceParser::Function_callContext *ctx) = 0;
 
   virtual void enterPrint_statement(anceParser::Print_statementContext *ctx) = 0;
   virtual void exitPrint_statement(anceParser::Print_statementContext *ctx) = 0;
