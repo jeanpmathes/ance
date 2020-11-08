@@ -35,6 +35,13 @@ bool Application::Validate()
 		}
 	}
 
+	if (functions.find("main") == functions.end())
+	{
+		std::cout << "No main function was found!" << std::endl;
+
+		valid = false;
+	}
+
 	return valid;
 }
 

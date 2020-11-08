@@ -1,6 +1,6 @@
 #include "Function.h"
 
-ance::Function::Function(std::string fn_name) : name(fn_name)
+ance::Function::Function(std::string fn_name, unsigned int l, unsigned int c) : name(fn_name), line(l), column(c)
 {
 }
 
@@ -22,7 +22,7 @@ void ance::Function::BuildName(llvm::LLVMContext& c, llvm::Module* m, CompileSta
 	llvm::SmallVector<llvm::Metadata*, 1> tys;
 	tys.push_back(state->ui32);
 	llvm::DISubroutineType* debug_type = di->createSubroutineType(di->getOrCreateTypeArray(tys));
-	llvm::DISubprogram* debug = di->createFunction(state->unit, name, name, state->code_file, 0, debug_type, 0, llvm::DINode::DIFlags::FlagZero, llvm::DISubprogram::toSPFlags(true, true, false, 0U, name == "main"));
+	llvm::DISubprogram* debug = di->createFunction(state->unit, name, name, state->code_file, line, debug_type, 0, llvm::DINode::DIFlags::FlagZero, llvm::DISubprogram::toSPFlags(true, true, false, 0U, name == "main"));
 	llvmFunction->setSubprogram(debug);
 }
 

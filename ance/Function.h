@@ -18,7 +18,7 @@ namespace ance
 	class Function
 	{
 	public:
-		Function(std::string fn_name);
+		Function(std::string fn_name, unsigned int l, unsigned int c);
 
 		std::string GetName();
 
@@ -30,6 +30,7 @@ namespace ance
 
 	private:
 		std::string name;
+		unsigned int line, column;
 		std::list<Statement*> statements;
 
 		llvm::FunctionType* llvmType;

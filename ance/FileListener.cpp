@@ -11,12 +11,18 @@ FileListener::FileListener(Application& app)
 
 void FileListener::enterEntry(anceParser::EntryContext* ctx)
 {
-	application.AddAndEnterFunction(new ance::Function("main"));
+	unsigned int line = ctx->getStart()->getLine();
+	unsigned int column = ctx->getStart()->getCharPositionInLine();
+
+	application.AddAndEnterFunction(new ance::Function("main", line, column));
 }
 
 void FileListener::enterFunction(anceParser::FunctionContext* ctx)
 {
-	application.AddAndEnterFunction(new ance::Function(ctx->IDENTIFIER()->getText()));
+	unsigned int line = ctx->getStart()->getLine();
+	unsigned int column = ctx->getStart()->getCharPositionInLine();
+
+	application.AddAndEnterFunction(new ance::Function(ctx->IDENTIFIER()->getText(), line, column));
 }
 
 void FileListener::exitPrint_statement(anceParser::Print_statementContext* ctx)
