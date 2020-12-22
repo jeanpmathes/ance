@@ -16,6 +16,4 @@ unsigned int Statement::getColumn() const
 	return column;
 }
 
-Statement::~Statement()
-{
-}
+Statement::~Statement() = default;

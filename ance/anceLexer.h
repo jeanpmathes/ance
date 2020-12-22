@@ -12,9 +12,9 @@
 class  anceLexer : public antlr4::Lexer {
 public:
   enum {
-    STRING = 1, INTEGER = 2, MAIN = 3, PRINT = 4, RETURN = 5, IDENTIFIER = 6, 
-    PARANTHESE_OPEN = 7, PARANTHESE_CLOSED = 8, BRACE_OPEN = 9, BRACE_CLOSED = 10, 
-    SEMICOLON = 11, WHITESPACE = 12
+    STRING = 1, INTEGER = 2, MAIN = 3, PRINT = 4, RETURN = 5, CONST = 6, 
+    IDENTIFIER = 7, ASSIGNMENT = 8, PARANTHESE_OPEN = 9, PARANTHESE_CLOSED = 10, 
+    BRACE_OPEN = 11, BRACE_CLOSED = 12, SEMICOLON = 13, WHITESPACE = 14
   };
 
   anceLexer(antlr4::CharStream *input);

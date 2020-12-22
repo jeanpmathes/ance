@@ -6,7 +6,7 @@ function_call::function_call(unsigned int l, unsigned int c, std::string ident) 
 
 void function_call::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
-	ance::Function* fn = state->application->GetFunction(identifier);
+	ance::Function* fn = state->application->scope()->GetFunction(identifier);
 	fn->BuildCall(c, m, state, ir, di);
 }
 

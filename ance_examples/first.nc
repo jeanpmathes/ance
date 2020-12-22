@@ -1,19 +1,8 @@
+const a = "a simple string";
+const b = "another string";
+
 main() {
-	hello_world();
-	newline();
-	newline();
-	hello_world();
-	newline();
-
+	print "HELLO THERE \n";
+	print "HOW ARE YOU?? \n"
 	return 0;
-}
-
-newline() {
-	print "\n";
-	return;
-}
-
-hello_world() {
-	print "HELLO WORLD";
-	return;
 }

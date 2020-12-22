@@ -4,12 +4,11 @@
 #include "antlr4-runtime.h"
 #include "anceLexer.h"
 #include "anceParser.h"
-#include "anceBaseListener.h"
 
 #include "llvm/Support/TargetSelect.h"
 
-#include "FileListener.h"
 #include "anceCompiler.h"
+#include "Visitor.h"
 
 int main(int argc, char** argv)
 {
@@ -38,10 +37,10 @@ int main(int argc, char** argv)
 	anceParser parser(&tokens);
 
 	Application application(proj_file, code_file);
-	FileListener listener(application);
+	auto visitor = new Visitor(application);
 
 	antlr4::tree::ParseTree* tree = parser.file();
-	antlr4::tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
+	visitor->visit(tree);
 
 	llvm::InitializeAllTargetInfos();
 	llvm::InitializeAllTargets();

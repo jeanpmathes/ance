@@ -9,12 +9,16 @@
 
 #include "Statement.h"
 #include "Function.h"
+#include "Scope.h"
 #include "CompileState.h"
 
 class Statement;
 class CompileState;
 
-namespace ance { class Function; }
+namespace ance {
+	class Scope;
+	class Function;
+}
 
 class Application
 {
@@ -27,23 +31,13 @@ public:
 
 	bool Validate();
 
-	size_t FunctionCount() const;
-	void AddFunctionName(std::string name);
-	void AddAndEnterFunction(ance::Function* function);
-
-	void PushStatementToCurrentFunction(Statement* statement);
-
-	void BuildFunctionNames(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
-	void BuildFunctions(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
-
-	ance::Function* GetFunction(std::string identifier);
+	ance::Scope* scope();
 
 private:
 	std::filesystem::path proj_file;
 	std::filesystem::path code_file;
 
-	std::map<std::string, ance::Function*> functions;
-	ance::Function* current;
+	ance::Scope* global_scope;
 };
 
 #endif

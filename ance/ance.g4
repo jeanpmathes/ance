@@ -1,7 +1,15 @@
 grammar ance;
 
 file
-	: ( type )+
+	: ( type | value )+
+	;
+
+value
+	: constant_declaration
+	;
+
+constant_declaration
+	: CONST IDENTIFIER ASSIGNMENT literal_expression SEMICOLON
 	;
 
 type
@@ -28,11 +36,24 @@ function_call
 	;
 
 print_statement
-	: PRINT STRING SEMICOLON
+	: PRINT expression SEMICOLON
 	;
 
 return_statement
 	: RETURN ( INTEGER )? SEMICOLON
+	;
+
+expression
+	: variable_expression
+	| literal_expression
+	;
+
+variable_expression
+	: IDENTIFIER
+	;
+
+literal_expression
+	: STRING
 	;
 
 STRING : '"' ('\\'. | .)*? '"';
@@ -41,8 +62,11 @@ INTEGER : [0-9]+ ;
 MAIN : 'main' ;
 PRINT : 'print' ;
 RETURN : 'return' ;
+CONST : 'const' ;
 
 IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
+
+ASSIGNMENT : '=' ;
 
 PARANTHESE_OPEN : '(' ;
 PARANTHESE_CLOSED : ')' ;

@@ -57,8 +57,9 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 
 	SetupGlobals();
 
-	application.BuildFunctionNames(context, module, state, ir, di);
-	application.BuildFunctions(context, module, state, ir, di);
+	application.scope()->BuildVariables(context, module, state, ir, di);
+	application.scope()->BuildFunctionNames(context, module, state, ir, di);
+	application.scope()->BuildFunctions(context, module, state, ir, di);
 
 	llvm::FunctionType* main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), false);
 	llvm::Function* main = module->getFunction("main");

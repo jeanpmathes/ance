@@ -122,7 +122,7 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>-w anceBaseListener.h -w anceBaseListener.cpp -w anceLexer.h -w anceLexer.cpp  -w anceListener.h -w anceListener.cpp  -w anceParser.h -w anceParser.cpp %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-w anceBaseVisitor.h -w anceBaseVisitor.cpp -w anceLexer.h -w anceLexer.cpp  -w anceVisitor.h -w anceVisitor.cpp  -w anceParser.h -w anceParser.cpp %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
@@ -133,7 +133,7 @@
       <PreventDllBinding>true</PreventDllBinding>
     </Link>
     <PreBuildEvent>
-      <Command>java -jar ./antlr/antlr.jar -Dlanguage=Cpp ./ance.g4</Command>
+      <Command>java -jar ./antlr/antlr.jar -no-listener -visitor -Dlanguage=Cpp ./ance.g4</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -147,7 +147,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalOptions>-w anceBaseListener.h -w anceBaseListener.cpp -w anceLexer.h -w anceLexer.cpp  -w anceListener.h -w anceListener.cpp  -w anceParser.h -w anceParser.cpp %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-w anceBaseVisitor.h -w anceBaseVisitor.cpp -w anceLexer.h -w anceLexer.cpp  -w anceVisitor.h -w anceVisitor.cpp  -w anceParser.h -w anceParser.cpp %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
@@ -160,7 +160,7 @@
       <PreventDllBinding>true</PreventDllBinding>
     </Link>
     <PreBuildEvent>
-      <Command>java -jar ./antlr/antlr.jar -Dlanguage=Cpp ./ance.g4</Command>
+      <Command>java -jar ./antlr/antlr.jar -no-listener -visitor -Dlanguage=Cpp ./ance.g4</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -171,7 +171,7 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>-w anceBaseListener.h -w anceBaseListener.cpp -w anceLexer.h -w anceLexer.cpp  -w anceListener.h -w anceListener.cpp  -w anceParser.h -w anceParser.cpp %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-w anceBaseVisitor.h -w anceBaseVisitor.cpp -w anceLexer.h -w anceLexer.cpp  -w anceVisitor.h -w anceVisitor.cpp  -w anceParser.h -w anceParser.cpp %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
@@ -182,7 +182,7 @@
       <PreventDllBinding>true</PreventDllBinding>
     </Link>
     <PreBuildEvent>
-      <Command>java -jar ./antlr/antlr.jar -Dlanguage=Cpp ./ance.g4</Command>
+      <Command>java -jar ./antlr/antlr.jar -no-listener -visitor -Dlanguage=Cpp ./ance.g4</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -196,7 +196,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalOptions>-w anceBaseListener.h -w anceBaseListener.cpp -w anceLexer.h -w anceLexer.cpp  -w anceListener.h -w anceListener.cpp  -w anceParser.h -w anceParser.cpp %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-w anceBaseVisitor.h -w anceBaseVisitor.cpp -w anceLexer.h -w anceLexer.cpp  -w anceVisitor.h -w anceVisitor.cpp  -w anceParser.h -w anceParser.cpp %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
@@ -209,40 +209,50 @@
       <PreventDllBinding>true</PreventDllBinding>
     </Link>
     <PreBuildEvent>
-      <Command>java -jar ./antlr/antlr.jar -Dlanguage=Cpp ./ance.g4</Command>
+      <Command>java -jar ./antlr/antlr.jar -no-listener -visitor -Dlanguage=Cpp ./ance.g4</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ance.cpp" />
-    <ClCompile Include="anceBaseListener.cpp" />
+    <ClCompile Include="anceBaseVisitor.cpp" />
     <ClCompile Include="anceLexer.cpp" />
-    <ClCompile Include="anceListener.cpp" />
     <ClCompile Include="anceParser.cpp" />
+    <ClCompile Include="anceVisitor.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="anceCompiler.cpp" />
     <ClCompile Include="CompileState.cpp" />
-    <ClCompile Include="FileListener.cpp" />
+    <ClCompile Include="Expression.cpp" />
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="function_call.cpp" />
+    <ClCompile Include="literal_expression.cpp" />
     <ClCompile Include="print_statement.cpp" />
     <ClCompile Include="return_statement.cpp" />
+    <ClCompile Include="Scope.cpp" />
     <ClCompile Include="Statement.cpp" />
+    <ClCompile Include="Value.cpp" />
+    <ClCompile Include="variable_expression.cpp" />
+    <ClCompile Include="Visitor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="anceBaseListener.h" />
+    <ClInclude Include="anceBaseVisitor.h" />
     <ClInclude Include="anceLexer.h" />
-    <ClInclude Include="anceListener.h" />
     <ClInclude Include="anceParser.h" />
+    <ClInclude Include="anceVisitor.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="anceCompiler.h" />
     <ClInclude Include="CompileState.h" />
-    <ClInclude Include="FileListener.h" />
+    <ClInclude Include="Expression.h" />
     <ClInclude Include="anceConstants.h" />
     <ClInclude Include="Function.h" />
     <ClInclude Include="function_call.h" />
+    <ClInclude Include="literal_expression.h" />
     <ClInclude Include="print_statement.h" />
     <ClInclude Include="return_statement.h" />
+    <ClInclude Include="Scope.h" />
     <ClInclude Include="Statement.h" />
+    <ClInclude Include="Value.h" />
+    <ClInclude Include="variable_expression.h" />
+    <ClInclude Include="Visitor.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ance_examples\first.ance" />

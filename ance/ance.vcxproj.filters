@@ -38,21 +38,24 @@
     <Filter Include="Source Files\Construct Files">
       <UniqueIdentifier>{6c1c3d26-5cd5-4cfa-8647-65c4d4d40088}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Expression Files">
+      <UniqueIdentifier>{ea1d5d11-4ef2-4a43-b6bd-2f615d24cdfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Expression Files">
+      <UniqueIdentifier>{56ad0b51-1486-4840-afd4-65a6acdf8cb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Visitor Files">
+      <UniqueIdentifier>{7629393a-404e-4599-be1f-c06f6ab03692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Visitor Files">
+      <UniqueIdentifier>{97c50b01-e8d0-426d-b7c0-1b70bb7629c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileListener.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="anceBaseListener.cpp">
-      <Filter>Source Files\Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="anceLexer.cpp">
-      <Filter>Source Files\Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="anceListener.cpp">
       <Filter>Source Files\Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="anceParser.cpp">
@@ -82,18 +85,33 @@
     <ClCompile Include="function_call.cpp">
       <Filter>Source Files\Statement Files</Filter>
     </ClCompile>
+    <ClCompile Include="Value.cpp">
+      <Filter>Source Files\Construct Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scope.cpp">
+      <Filter>Source Files\Construct Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Expression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="variable_expression.cpp">
+      <Filter>Source Files\Expression Files</Filter>
+    </ClCompile>
+    <ClCompile Include="literal_expression.cpp">
+      <Filter>Source Files\Expression Files</Filter>
+    </ClCompile>
+    <ClCompile Include="anceBaseVisitor.cpp">
+      <Filter>Source Files\Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="anceVisitor.cpp">
+      <Filter>Source Files\Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Visitor.cpp">
+      <Filter>Source Files\Visitor Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileListener.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="anceBaseListener.h">
-      <Filter>Header Files\Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="anceLexer.h">
-      <Filter>Header Files\Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="anceListener.h">
       <Filter>Header Files\Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="anceParser.h">
@@ -125,6 +143,30 @@
     </ClInclude>
     <ClInclude Include="function_call.h">
       <Filter>Header Files\Statement Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Value.h">
+      <Filter>Header Files\Construct Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scope.h">
+      <Filter>Header Files\Construct Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Expression.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="literal_expression.h">
+      <Filter>Header Files\Expression Files</Filter>
+    </ClInclude>
+    <ClInclude Include="variable_expression.h">
+      <Filter>Header Files\Expression Files</Filter>
+    </ClInclude>
+    <ClInclude Include="anceBaseVisitor.h">
+      <Filter>Header Files\Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="anceVisitor.h">
+      <Filter>Header Files\Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Visitor.h">
+      <Filter>Header Files\Visitor Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

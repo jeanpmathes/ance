@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-Application::Application(std::filesystem::path project_file, std::filesystem::path nccode_file) : proj_file(project_file), code_file(nccode_file), current(nullptr)
+Application::Application(std::filesystem::path project_file, std::filesystem::path nccode_file) : proj_file(project_file), code_file(nccode_file), global_scope(new ance::Scope())
 {
 }
 
@@ -23,19 +23,9 @@ const std::filesystem::path Application::GetCodeFile() const
 
 bool Application::Validate()
 {
-	bool valid = true;
+	bool valid = global_scope->Validate();
 
-	for (auto const& [key, val] : functions)
-	{
-		if (val == nullptr)
-		{
-			std::cout << "A function is used but not defined: " << key << std::endl;
-
-			valid = false;
-		}
-	}
-
-	if (functions.find("main") == functions.end())
+	if (!global_scope->HasFunction("main"))
 	{
 		std::cout << "No main function was found!" << std::endl;
 
@@ -45,44 +35,7 @@ bool Application::Validate()
 	return valid;
 }
 
-size_t Application::FunctionCount() const
+ance::Scope* Application::scope()
 {
-	return functions.size();
-}
-
-void Application::AddFunctionName(std::string name)
-{
-	if (functions.find(name) == functions.end()) functions[name] = nullptr;
-}
-
-void Application::AddAndEnterFunction(ance::Function* function)
-{
-	functions[function->GetName()] = function;
-	current = function;
-}
-
-void Application::PushStatementToCurrentFunction(Statement* statement)
-{
-	current->push_statement(statement);
-}
-
-void Application::BuildFunctionNames(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
-{
-	for (auto const& [key, val] : functions)
-	{
-		val->BuildName(c, m, state, ir, di);
-	}
-}
-
-void Application::BuildFunctions(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
-{
-	for (auto const& [key, val] : functions)
-	{
-		val->Build(c, m, state, ir, di);
-	}
-}
-
-ance::Function* Application::GetFunction(std::string identifier)
-{
-	return functions.at(identifier);
+	return global_scope;
 }
