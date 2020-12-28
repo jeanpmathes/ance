@@ -91,9 +91,6 @@
     <ClCompile Include="Scope.cpp">
       <Filter>Source Files\Construct Files</Filter>
     </ClCompile>
-    <ClCompile Include="Expression.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="variable_expression.cpp">
       <Filter>Source Files\Expression Files</Filter>
     </ClCompile>
@@ -108,6 +105,9 @@
     </ClCompile>
     <ClCompile Include="Visitor.cpp">
       <Filter>Source Files\Visitor Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Constant.cpp">
+      <Filter>Source Files\Construct Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +167,12 @@
     </ClInclude>
     <ClInclude Include="Visitor.h">
       <Filter>Header Files\Visitor Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantExpression.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Constant.h">
+      <Filter>Header Files\Construct Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

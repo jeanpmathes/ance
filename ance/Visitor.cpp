@@ -10,8 +10,9 @@ antlrcpp::Any Visitor::visitConstant_declaration(anceParser::Constant_declaratio
 {
 	std::string identifier = context->IDENTIFIER()->getText();
 	Expression* expr = visit(context->literal_expression());
+	ConstantExpression* const_exp = static_cast<ConstantExpression*>(expr);
 
-	application_.scope()->DeclareConstant(identifier, expr->get_value());
+	application_.scope()->DeclareConstant(identifier, const_exp->get_constant_value());
 
 	return this->visitChildren(context);
 }

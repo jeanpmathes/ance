@@ -1,5 +1,8 @@
 #include "Value.h"
 
+#include "Expression.h"
+#include "CompileState.h"
+
 ance::Value::Value(Expression* expression) : expression_(expression)
 {
 }

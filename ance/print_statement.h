@@ -1,6 +1,8 @@
 #include "Statement.h"
-class print_statement :
-	public Statement
+
+class Expression;
+
+class print_statement : public Statement
 {
 public:
 	print_statement(unsigned int l, unsigned int c, Expression* expression);

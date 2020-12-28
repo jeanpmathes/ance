@@ -2,6 +2,11 @@
 
 #include <iostream>
 
+#include "llvm/IR/Constant.h"
+
+#include "Function.h"
+#include "Constant.h"
+
 bool ance::Scope::Validate()
 {
 	bool valid = true;
@@ -19,17 +24,17 @@ bool ance::Scope::Validate()
 	return valid;
 }
 
-void ance::Scope::DeclareConstant(std::string identifier, ance::Value* value)
+void ance::Scope::DeclareConstant(std::string identifier, ance::Constant* constant)
 {
-	assert(variables[identifier] == nullptr);
-	variables[identifier] = value;
+	assert(constants[identifier] == nullptr);
+	constants[identifier] = constant;
 }
 
 void ance::Scope::BuildVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
-	for (auto const& [identifier, variable] : variables)
+	for (auto const& [identifier, variable] : constants)
 	{
-		llvm::Constant* init = static_cast<llvm::Constant*>(variable->get_value(c, m, state, ir, di));
+		llvm::Constant* init = variable->get_constant(c);
 		llvm_variables[identifier] = new llvm::GlobalVariable(*m, init->getType(), true, llvm::GlobalValue::LinkageTypes::PrivateLinkage, init, identifier);
 	}
 }

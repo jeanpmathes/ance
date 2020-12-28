@@ -2,7 +2,7 @@ const a = "a simple string";
 const b = "another string";
 
 main() {
-	print "HELLO THERE \n";
-	print "HOW ARE YOU?? \n"
+	print "ABCD";
+	print "EFGH";
 	return 0;
 }

@@ -7,16 +7,12 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
 
-#include "Statement.h"
-#include "Function.h"
-#include "CompileState.h"
-#include "Value.h"
-
 class Statement;
 class CompileState;
 
 namespace ance
 {
+	class Constant;
 	class Function;
 	class Value;
 
@@ -25,7 +21,7 @@ namespace ance
 	public:
 		bool Validate();
 
-		void DeclareConstant(std::string identifier, ance::Value* value);
+		void DeclareConstant(std::string identifier, ance::Constant* constant);
 
 		void BuildVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 		llvm::Value* GetVariable(std::string identifier);
@@ -43,7 +39,7 @@ namespace ance
 		ance::Function* GetFunction(std::string identifier);
 
 	private:
-		std::map<std::string, ance::Value*> variables;
+		std::map<std::string, ance::Constant*> constants;
 		std::map<std::string, llvm::Value*> llvm_variables;
 
 		std::map<std::string, ance::Function*> functions;
