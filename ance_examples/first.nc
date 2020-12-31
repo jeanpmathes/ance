@@ -1,8 +1,20 @@
-const a = "a simple string";
-const b = "another string";
+const a = "a";
+const b = "b";
 
-main() {
-	print "ABCD";
-	print "EFGH";
+const endl = "\n";
+
+newline() 
+{
+	print endl;
+	return 0;
+}
+
+main() 
+{
+	print a;
+	print b;
+
+	newline();
+
 	return 0;
 }

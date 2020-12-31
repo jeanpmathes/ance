@@ -1,6 +1,7 @@
 #include "Visitor.h"
 
 #include "literal_expression.h"
+#include "variable_expression.h"
 
 Visitor::Visitor(Application& application) : application_(application)
 {
@@ -80,6 +81,13 @@ antlrcpp::Any Visitor::visitFunction_call(anceParser::Function_callContext* cont
 	application_.scope()->PushStatementToCurrentFunction(new function_call(line, column, identifier));
 
 	return this->visitChildren(context);
+}
+
+antlrcpp::Any Visitor::visitVariable_expression(anceParser::Variable_expressionContext* context)
+{
+	std::string identifier = context->IDENTIFIER()->getText();
+
+	return static_cast<Expression*>(new variable_expression(application_.scope(), identifier));
 }
 
 antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionContext* context)

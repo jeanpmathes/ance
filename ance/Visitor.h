@@ -19,6 +19,7 @@ public:
 	antlrcpp::Any visitReturn_statement(anceParser::Return_statementContext* context) override;
 	antlrcpp::Any visitFunction_call(anceParser::Function_callContext* context) override;
 
+	antlrcpp::Any visitVariable_expression(anceParser::Variable_expressionContext* context) override;
 	antlrcpp::Any visitLiteral_expression(anceParser::Literal_expressionContext* context) override;
 
 private:
