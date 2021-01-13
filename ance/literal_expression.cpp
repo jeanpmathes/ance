@@ -14,12 +14,7 @@ ance::Value* literal_expression::get_value()
 
 llvm::Value* literal_expression::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
-	auto* char_arr_const = llvm::ConstantDataArray::getString(c, literal_, true);
-
-	llvm::AllocaInst* char_arr_ptr = ir.CreateAlloca(char_arr_const->getType(), 0, llvm::ConstantInt::get(llvm::Type::getInt64Ty(c), literal_.size() + 1));
-	ir.CreateStore(char_arr_const, char_arr_ptr);
-
-	return char_arr_ptr;
+	return llvm::ConstantDataArray::getString(c, literal_, false);
 }
 
 ance::Constant* literal_expression::get_constant_value()
@@ -29,7 +24,7 @@ ance::Constant* literal_expression::get_constant_value()
 
 llvm::Constant* literal_expression::build_constant(llvm::LLVMContext& c)
 {
-	return llvm::ConstantDataArray::getString(c, literal_, true);
+	return llvm::ConstantDataArray::getString(c, literal_, false);
 }
 
 literal_expression::~literal_expression() = default;

@@ -14,7 +14,7 @@ ance::Value* variable_expression::get_value()
 
 llvm::Value* variable_expression::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
-	return scope_->GetVariable(identifier_);
+	return scope_->GetConstantOrVariable(identifier_, c, m, state, ir, di);
 }
 
 variable_expression::~variable_expression() = default;

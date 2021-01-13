@@ -106,7 +106,16 @@
     <ClCompile Include="Visitor.cpp">
       <Filter>Source Files\Visitor Files</Filter>
     </ClCompile>
+    <ClCompile Include="assignment_statement.cpp">
+      <Filter>Source Files\Statement Files</Filter>
+    </ClCompile>
+    <ClCompile Include="default_value_expression.cpp">
+      <Filter>Source Files\Expression Files</Filter>
+    </ClCompile>
     <ClCompile Include="Constant.cpp">
+      <Filter>Source Files\Construct Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalVariable.cpp">
       <Filter>Source Files\Construct Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -172,6 +181,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Constant.h">
+      <Filter>Header Files\Construct Files</Filter>
+    </ClInclude>
+    <ClInclude Include="assignment_statement.h">
+      <Filter>Header Files\Statement Files</Filter>
+    </ClInclude>
+    <ClInclude Include="default_value_expression.h">
+      <Filter>Header Files\Expression Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AccessModifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalVariable.h">
       <Filter>Header Files\Construct Files</Filter>
     </ClInclude>
   </ItemGroup>

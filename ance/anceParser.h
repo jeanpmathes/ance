@@ -13,15 +13,17 @@ class  anceParser : public antlr4::Parser {
 public:
   enum {
     STRING = 1, INTEGER = 2, MAIN = 3, PRINT = 4, RETURN = 5, CONST = 6, 
-    IDENTIFIER = 7, ASSIGNMENT = 8, PARANTHESE_OPEN = 9, PARANTHESE_CLOSED = 10, 
-    BRACE_OPEN = 11, BRACE_CLOSED = 12, SEMICOLON = 13, WHITESPACE = 14
+    PUBLIC = 7, PRIVATE = 8, IDENTIFIER = 9, ASSIGNMENT = 10, PARANTHESE_OPEN = 11, 
+    PARANTHESE_CLOSED = 12, BRACE_OPEN = 13, BRACE_CLOSED = 14, SEMICOLON = 15, 
+    WHITESPACE = 16
   };
 
   enum {
-    RuleFile = 0, RuleValue = 1, RuleConstant_declaration = 2, RuleType = 3, 
-    RuleEntry = 4, RuleFunction = 5, RuleStatement = 6, RuleFunction_call = 7, 
-    RulePrint_statement = 8, RuleReturn_statement = 9, RuleExpression = 10, 
-    RuleVariable_expression = 11, RuleLiteral_expression = 12
+    RuleFile = 0, RuleValue = 1, RuleConstant_declaration = 2, RuleVariable_declaration = 3, 
+    RuleType = 4, RuleEntry = 5, RuleFunction = 6, RuleAccess_modifier = 7, 
+    RuleStatement = 8, RuleFunction_call = 9, RuleVariable_assignment = 10, 
+    RulePrint_statement = 11, RuleReturn_statement = 12, RuleExpression = 13, 
+    RuleVariable_expression = 14, RuleLiteral_expression = 15
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -37,11 +39,14 @@ public:
   class FileContext;
   class ValueContext;
   class Constant_declarationContext;
+  class Variable_declarationContext;
   class TypeContext;
   class EntryContext;
   class FunctionContext;
+  class Access_modifierContext;
   class StatementContext;
   class Function_callContext;
+  class Variable_assignmentContext;
   class Print_statementContext;
   class Return_statementContext;
   class ExpressionContext;
@@ -69,6 +74,7 @@ public:
     ValueContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     Constant_declarationContext *constant_declaration();
+    Variable_declarationContext *variable_declaration();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -81,6 +87,7 @@ public:
   public:
     Constant_declarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    Access_modifierContext *access_modifier();
     antlr4::tree::TerminalNode *CONST();
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *ASSIGNMENT();
@@ -93,6 +100,23 @@ public:
   };
 
   Constant_declarationContext* constant_declaration();
+
+  class  Variable_declarationContext : public antlr4::ParserRuleContext {
+  public:
+    Variable_declarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    Access_modifierContext *access_modifier();
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *SEMICOLON();
+    antlr4::tree::TerminalNode *ASSIGNMENT();
+    Literal_expressionContext *literal_expression();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Variable_declarationContext* variable_declaration();
 
   class  TypeContext : public antlr4::ParserRuleContext {
   public:
@@ -146,11 +170,26 @@ public:
 
   FunctionContext* function();
 
+  class  Access_modifierContext : public antlr4::ParserRuleContext {
+  public:
+    Access_modifierContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *PUBLIC();
+    antlr4::tree::TerminalNode *PRIVATE();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Access_modifierContext* access_modifier();
+
   class  StatementContext : public antlr4::ParserRuleContext {
   public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     Function_callContext *function_call();
+    Variable_assignmentContext *variable_assignment();
     Print_statementContext *print_statement();
     Return_statementContext *return_statement();
 
@@ -176,6 +215,22 @@ public:
   };
 
   Function_callContext* function_call();
+
+  class  Variable_assignmentContext : public antlr4::ParserRuleContext {
+  public:
+    Variable_assignmentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *ASSIGNMENT();
+    ExpressionContext *expression();
+    antlr4::tree::TerminalNode *SEMICOLON();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Variable_assignmentContext* variable_assignment();
 
   class  Print_statementContext : public antlr4::ParserRuleContext {
   public:

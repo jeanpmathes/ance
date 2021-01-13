@@ -25,15 +25,21 @@ public:
 
     virtual antlrcpp::Any visitConstant_declaration(anceParser::Constant_declarationContext *context) = 0;
 
+    virtual antlrcpp::Any visitVariable_declaration(anceParser::Variable_declarationContext *context) = 0;
+
     virtual antlrcpp::Any visitType(anceParser::TypeContext *context) = 0;
 
     virtual antlrcpp::Any visitEntry(anceParser::EntryContext *context) = 0;
 
     virtual antlrcpp::Any visitFunction(anceParser::FunctionContext *context) = 0;
 
+    virtual antlrcpp::Any visitAccess_modifier(anceParser::Access_modifierContext *context) = 0;
+
     virtual antlrcpp::Any visitStatement(anceParser::StatementContext *context) = 0;
 
     virtual antlrcpp::Any visitFunction_call(anceParser::Function_callContext *context) = 0;
+
+    virtual antlrcpp::Any visitVariable_assignment(anceParser::Variable_assignmentContext *context) = 0;
 
     virtual antlrcpp::Any visitPrint_statement(anceParser::Print_statementContext *context) = 0;
 

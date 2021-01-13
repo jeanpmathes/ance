@@ -220,10 +220,13 @@
     <ClCompile Include="anceVisitor.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="anceCompiler.cpp" />
+    <ClCompile Include="assignment_statement.cpp" />
     <ClCompile Include="CompileState.cpp" />
     <ClCompile Include="Constant.cpp" />
+    <ClCompile Include="default_value_expression.cpp" />
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="function_call.cpp" />
+    <ClCompile Include="GlobalVariable.cpp" />
     <ClCompile Include="literal_expression.cpp" />
     <ClCompile Include="print_statement.cpp" />
     <ClCompile Include="return_statement.cpp" />
@@ -234,19 +237,23 @@
     <ClCompile Include="Visitor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AccessModifier.h" />
     <ClInclude Include="anceBaseVisitor.h" />
     <ClInclude Include="anceLexer.h" />
     <ClInclude Include="anceParser.h" />
     <ClInclude Include="anceVisitor.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="anceCompiler.h" />
+    <ClInclude Include="assignment_statement.h" />
     <ClInclude Include="CompileState.h" />
     <ClInclude Include="Constant.h" />
     <ClInclude Include="ConstantExpression.h" />
+    <ClInclude Include="default_value_expression.h" />
     <ClInclude Include="Expression.h" />
     <ClInclude Include="anceConstants.h" />
     <ClInclude Include="Function.h" />
     <ClInclude Include="function_call.h" />
+    <ClInclude Include="GlobalVariable.h" />
     <ClInclude Include="literal_expression.h" />
     <ClInclude Include="print_statement.h" />
     <ClInclude Include="return_statement.h" />

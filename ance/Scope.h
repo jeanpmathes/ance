@@ -4,9 +4,12 @@
 #include <map>
 #include <string>
 
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/DIBuilder.h"
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/DIBuilder.h>
 
+#include "GlobalVariable.h"
+
+enum class access_modifier;
 class Statement;
 class CompileState;
 
@@ -21,10 +24,14 @@ namespace ance
 	public:
 		bool Validate();
 
-		void DeclareConstant(std::string identifier, ance::Constant* constant);
+		void DeclareConstant(access_modifier access, std::string identifier, ance::Constant* constant);
+		void DeclareGlobalVariable(access_modifier access, std::string identifier, ance::Constant* value);
+		void BuildConstantsAndVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
-		void BuildVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
-		llvm::Value* GetVariable(std::string identifier);
+		llvm::Value* GetConstant(std::string identifier, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		llvm::Value* GetVariable(std::string identifier, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		llvm::Value* GetConstantOrVariable(std::string identifier, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		void set_variable(std::string identifier, llvm::Value* value, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
 		size_t FunctionCount() const;
 		void AddFunctionName(std::string name);
@@ -39,8 +46,10 @@ namespace ance
 		ance::Function* GetFunction(std::string identifier);
 
 	private:
-		std::map<std::string, ance::Constant*> constants;
-		std::map<std::string, llvm::Value*> llvm_variables;
+		std::map<std::string, ance::GlobalVariable*> global_constants;
+		std::map<std::string, ance::GlobalVariable*> global_variables;
+		std::map<std::string, llvm::Value*> llvm_global_constants;
+		std::map<std::string, llvm::Value*> llvm_global_variables;
 
 		std::map<std::string, ance::Function*> functions;
 		ance::Function* current;

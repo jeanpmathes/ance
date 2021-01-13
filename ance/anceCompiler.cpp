@@ -57,7 +57,7 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 
 	SetupGlobals();
 
-	application.scope()->BuildVariables(context, module, state, ir, di);
+	application.scope()->BuildConstantsAndVariables(context, module, state, ir, di);
 	application.scope()->BuildFunctionNames(context, module, state, ir, di);
 	application.scope()->BuildFunctions(context, module, state, ir, di);
 

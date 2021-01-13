@@ -13,8 +13,9 @@ class  anceLexer : public antlr4::Lexer {
 public:
   enum {
     STRING = 1, INTEGER = 2, MAIN = 3, PRINT = 4, RETURN = 5, CONST = 6, 
-    IDENTIFIER = 7, ASSIGNMENT = 8, PARANTHESE_OPEN = 9, PARANTHESE_CLOSED = 10, 
-    BRACE_OPEN = 11, BRACE_CLOSED = 12, SEMICOLON = 13, WHITESPACE = 14
+    PUBLIC = 7, PRIVATE = 8, IDENTIFIER = 9, ASSIGNMENT = 10, PARANTHESE_OPEN = 11, 
+    PARANTHESE_CLOSED = 12, BRACE_OPEN = 13, BRACE_CLOSED = 14, SEMICOLON = 15, 
+    WHITESPACE = 16
   };
 
   anceLexer(antlr4::CharStream *input);

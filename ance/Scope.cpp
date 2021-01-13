@@ -24,24 +24,71 @@ bool ance::Scope::Validate()
 	return valid;
 }
 
-void ance::Scope::DeclareConstant(std::string identifier, ance::Constant* constant)
+void ance::Scope::DeclareConstant(access_modifier access, std::string identifier, ance::Constant* constant)
 {
-	assert(constants[identifier] == nullptr);
-	constants[identifier] = constant;
+	assert(global_variables[identifier] == nullptr);
+	assert(global_constants[identifier] == nullptr);
+
+	global_constants[identifier] = new ance::GlobalVariable(access, identifier, constant, true);
 }
 
-void ance::Scope::BuildVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+void ance::Scope::DeclareGlobalVariable(access_modifier access, std::string identifier, ance::Constant* value)
 {
-	for (auto const& [identifier, variable] : constants)
+	assert(global_variables[identifier] == nullptr);
+	assert(global_constants[identifier] == nullptr);
+
+	global_variables[identifier] = new ance::GlobalVariable(access, identifier, value, false);
+}
+
+void ance::Scope::BuildConstantsAndVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+{
+	for (auto const& [identifier, constant] : global_constants)
 	{
-		llvm::Constant* init = variable->get_constant(c);
-		llvm_variables[identifier] = new llvm::GlobalVariable(*m, init->getType(), true, llvm::GlobalValue::LinkageTypes::PrivateLinkage, init, identifier);
+		if (!constant) continue;
+		llvm_global_constants[identifier] = constant->Build(c, m);
+	}
+
+	for (auto const& [identifier, variable] : global_variables)
+	{
+		if (!variable) continue;
+		llvm_global_variables[identifier] = variable->Build(c, m);
 	}
 }
 
-llvm::Value* ance::Scope::GetVariable(std::string identifier)
+llvm::Value* ance::Scope::GetConstant(std::string identifier, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
-	return llvm_variables.at(identifier);
+	llvm::Value* const_ptr = llvm_global_constants.at(identifier);
+	assert(const_ptr != nullptr);
+
+	llvm::Type* const_type = static_cast<llvm::PointerType*>(const_ptr->getType())->getElementType();
+	return ir.CreateLoad(const_type, const_ptr);
+}
+
+llvm::Value* ance::Scope::GetVariable(std::string identifier, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+{
+	llvm::Value* value_ptr = llvm_global_constants.at(identifier);
+	assert(value_ptr != nullptr);
+
+	llvm::Type* value_type = static_cast<llvm::PointerType*>(value_ptr->getType())->getElementType();
+	return ir.CreateLoad(value_type, value_ptr);
+}
+
+llvm::Value* ance::Scope::GetConstantOrVariable(std::string identifier, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+{
+	llvm::Value* value_ptr = llvm_global_constants[identifier];
+	if (value_ptr == nullptr) value_ptr = llvm_global_variables[identifier];
+	assert(value_ptr != nullptr);
+
+	llvm::Type* value_type = static_cast<llvm::PointerType*>(value_ptr->getType())->getElementType();
+	return ir.CreateLoad(value_type, value_ptr);
+}
+
+void ance::Scope::set_variable(std::string identifier, llvm::Value* value, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+{
+	llvm::Value* value_ptr = llvm_global_variables[identifier];
+	assert(value_ptr != nullptr);
+
+	ir.CreateStore(value, value_ptr);
 }
 
 size_t ance::Scope::FunctionCount() const

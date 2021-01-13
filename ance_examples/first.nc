@@ -1,20 +1,24 @@
-const a = "a";
-const b = "b";
+private const newline = "\n";
 
-const endl = "\n";
+public a = "a";
+private b = "--------";
 
-newline() 
+print_newline() 
 {
-	print endl;
+	print newline;
 	return 0;
 }
 
 main() 
 {
+	a = "c";
+	b = "12345678";
+
+	print "WELCOME";
 	print a;
 	print b;
 
-	newline();
+	print_newline();
 
 	return 0;
 }

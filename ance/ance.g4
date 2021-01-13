@@ -6,10 +6,15 @@ file
 
 value
 	: constant_declaration
+	| variable_declaration
 	;
 
 constant_declaration
-	: CONST IDENTIFIER ASSIGNMENT literal_expression SEMICOLON
+	: access_modifier CONST IDENTIFIER ASSIGNMENT literal_expression SEMICOLON
+	;
+
+variable_declaration
+	: access_modifier IDENTIFIER ( ASSIGNMENT literal_expression )? SEMICOLON
 	;
 
 type
@@ -25,14 +30,24 @@ function
 	: IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
 	;
 
+access_modifier
+	: PUBLIC
+	| PRIVATE
+	;
+
 statement
 	: function_call
+	| variable_assignment
 	| print_statement
 	| return_statement
 	;
 
 function_call
 	: IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED SEMICOLON
+	;
+
+variable_assignment
+	: IDENTIFIER ASSIGNMENT expression SEMICOLON
 	;
 
 print_statement
@@ -63,6 +78,8 @@ MAIN : 'main' ;
 PRINT : 'print' ;
 RETURN : 'return' ;
 CONST : 'const' ;
+PUBLIC : 'public' ;
+PRIVATE : 'private' ;
 
 IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
 
