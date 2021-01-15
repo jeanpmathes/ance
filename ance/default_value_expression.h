@@ -17,7 +17,6 @@ public:
 	~default_value_expression();
 
 private:
-	ance::Value* value_;
 	ance::Constant* constant_;
 };
 

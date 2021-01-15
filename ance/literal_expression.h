@@ -17,7 +17,6 @@ public:
 	~literal_expression();
 
 private:
-	ance::Value* value_;
 	ance::Constant* constant_;
 	std::string literal_;
 };

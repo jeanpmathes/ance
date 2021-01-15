@@ -13,7 +13,8 @@ namespace ance
 	{
 	public:
 		Value(Expression* expression);
-		llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		virtual llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		virtual ~Value() = default;
 
 	private:
 		Expression* expression_;
