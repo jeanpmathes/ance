@@ -50,6 +50,12 @@
     <Filter Include="Header Files\Visitor Files">
       <UniqueIdentifier>{97c50b01-e8d0-426d-b7c0-1b70bb7629c2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Type Files">
+      <UniqueIdentifier>{9a7ce0e5-2718-4419-8bd9-07a15e974f98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Type Files">
+      <UniqueIdentifier>{73646e45-12f9-48de-aa91-fc5d05b45893}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ance.cpp">
@@ -117,6 +123,15 @@
     </ClCompile>
     <ClCompile Include="GlobalVariable.cpp">
       <Filter>Source Files\Construct Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IntegerType.cpp">
+      <Filter>Source Files\Type Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ArrayType.cpp">
+      <Filter>Source Files\Type Files</Filter>
+    </ClCompile>
+    <ClCompile Include="integer_expression.cpp">
+      <Filter>Source Files\Expression Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -194,6 +209,18 @@
     </ClInclude>
     <ClInclude Include="GlobalVariable.h">
       <Filter>Header Files\Construct Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type.h">
+      <Filter>Header Files\Type Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IntegerType.h">
+      <Filter>Header Files\Type Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayType.h">
+      <Filter>Header Files\Type Files</Filter>
+    </ClInclude>
+    <ClInclude Include="integer_expression.h">
+      <Filter>Header Files\Expression Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

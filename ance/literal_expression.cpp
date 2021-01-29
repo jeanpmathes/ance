@@ -1,10 +1,19 @@
 #include "literal_expression.h"
 
+#include "ArrayType.h"
 #include "Value.h"
 #include "Constant.h"
+#include "IntegerType.h"
 
-literal_expression::literal_expression(std::string literal) : constant_(new ance::Constant(this)), literal_(literal)
+literal_expression::literal_expression(std::string literal, ance::Scope* scope) :
+	type_(ance::ArrayType::get(scope, ance::IntegerType::get(scope, 8, false), literal.size())),
+	constant_(new ance::Constant(this)), literal_(literal)
 {
+}
+
+ance::Type* literal_expression::get_type()
+{
+	return type_;
 }
 
 ance::Value* literal_expression::get_value()

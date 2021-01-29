@@ -1,7 +1,7 @@
 grammar ance;
 
 file
-	: ( type | value )+
+	: ( value | code )+
 	;
 
 value
@@ -10,14 +10,14 @@ value
 	;
 
 constant_declaration
-	: access_modifier CONST IDENTIFIER ASSIGNMENT literal_expression SEMICOLON
+	: access_modifier CONST type IDENTIFIER ASSIGNMENT constant_expression SEMICOLON
 	;
 
 variable_declaration
-	: access_modifier IDENTIFIER ( ASSIGNMENT literal_expression )? SEMICOLON
+	: access_modifier type IDENTIFIER ( ASSIGNMENT constant_expression )? SEMICOLON
 	;
 
-type
+code
 	: entry
 	| function
 	;
@@ -55,21 +55,66 @@ print_statement
 	;
 
 return_statement
-	: RETURN ( INTEGER )? SEMICOLON
+	: RETURN ( expression )? SEMICOLON
 	;
 
 expression
 	: variable_expression
-	| literal_expression
+	| constant_expression
 	;
 
 variable_expression
 	: IDENTIFIER
 	;
 
+constant_expression
+	: literal_expression
+	| integer_expression
+	;
+
 literal_expression
 	: STRING
 	;
+
+integer_expression
+	: unsigned_integer
+	| signed_integer
+	| special_integer
+	;
+
+unsigned_integer
+	: INTEGER ( COLON INTEGER )?
+	;
+
+signed_integer
+	: SIGNED_INTEGER ( COLON INTEGER )?
+	;
+
+special_integer
+	: HEX_INTEGER ( COLON INTEGER )?
+	| BIN_INTEGER ( COLON INTEGER )?
+	| OCT_INTEGER ( COLON INTEGER )?
+	;
+
+type
+	: integer_type
+	| array_type
+	;
+
+integer_type
+	: NATIVE_INTEGER_TYPE
+	;
+
+array_type
+	: BRACKET_OPEN type COLON INTEGER BRACKET_CLOSED
+	;
+
+NATIVE_INTEGER_TYPE : 'u'? 'i' INTEGER ;
+
+SIGNED_INTEGER : ( '+' | '-' ) INTEGER ;
+HEX_INTEGER : '0' [xX] [0-9a-fA-F]+ ;
+BIN_INTEGER : '0' [bB] [01]+ ;
+OCT_INTEGER : '0' [oO] [0-7]+ ;
 
 STRING : '"' ('\\'. | .)*? '"';
 INTEGER : [0-9]+ ;
@@ -91,6 +136,10 @@ PARANTHESE_CLOSED : ')' ;
 BRACE_OPEN : '{' ;
 BRACE_CLOSED : '}' ;
 
+BRACKET_OPEN : '[' ;
+BRACKET_CLOSED : ']' ;
+
+COLON : ':' ;
 SEMICOLON : ';' ;
 
 WHITESPACE : [ \t\r\n]+ -> skip ;

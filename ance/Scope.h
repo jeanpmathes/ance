@@ -8,6 +8,7 @@
 #include <llvm/IR/DIBuilder.h>
 
 #include "GlobalVariable.h"
+#include "Type.h"
 
 enum class access_modifier;
 class Statement;
@@ -24,8 +25,13 @@ namespace ance
 	public:
 		bool Validate();
 
-		void DeclareConstant(access_modifier access, std::string identifier, ance::Constant* constant);
-		void DeclareGlobalVariable(access_modifier access, std::string identifier, ance::Constant* value);
+		bool is_type_registered(std::string type_name);
+		ance::Type* get_type(std::string type_name);
+		void register_type(ance::Type* type);
+
+		void DeclareConstant(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* constant);
+		void DeclareGlobalVariable(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* value);
+		ance::Type* GetVariableOrConstantType(std::string identifier);
 		void BuildConstantsAndVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
 		llvm::Value* GetConstant(std::string identifier, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
@@ -46,6 +52,8 @@ namespace ance
 		ance::Function* GetFunction(std::string identifier);
 
 	private:
+		std::map<std::string, ance::Type*> types_;
+
 		std::map<std::string, ance::GlobalVariable*> global_constants;
 		std::map<std::string, ance::GlobalVariable*> global_variables;
 		std::map<std::string, llvm::Value*> llvm_global_constants;

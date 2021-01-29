@@ -2,9 +2,15 @@
 
 #include "Value.h"
 #include "Constant.h"
+#include "Type.h"
 
-default_value_expression::default_value_expression() : constant_(new ance::Constant(this))
+default_value_expression::default_value_expression(ance::Type* type) : type_(type), constant_(new ance::Constant(this))
 {
+}
+
+ance::Type* default_value_expression::get_type()
+{
+	return type_;
 }
 
 ance::Value* default_value_expression::get_value()
@@ -24,7 +30,7 @@ ance::Constant* default_value_expression::get_constant_value()
 
 llvm::Constant* default_value_expression::build_constant(llvm::LLVMContext& c)
 {
-	return llvm::ConstantDataArray::getString(c, "", false);
+	return type_->get_default(c);
 }
 
 default_value_expression::~default_value_expression() = default;

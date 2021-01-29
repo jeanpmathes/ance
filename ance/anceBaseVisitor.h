@@ -31,7 +31,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitType(anceParser::TypeContext *ctx) override {
+  virtual antlrcpp::Any visitCode(anceParser::CodeContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -75,7 +75,39 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitConstant_expression(anceParser::Constant_expressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitLiteral_expression(anceParser::Literal_expressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitInteger_expression(anceParser::Integer_expressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitUnsigned_integer(anceParser::Unsigned_integerContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitSigned_integer(anceParser::Signed_integerContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitSpecial_integer(anceParser::Special_integerContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitType(anceParser::TypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *ctx) override {
     return visitChildren(ctx);
   }
 

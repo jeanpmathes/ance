@@ -3,8 +3,15 @@
 #include "Value.h"
 #include "Scope.h"
 
-variable_expression::variable_expression(ance::Scope* scope, std::string identifier) : scope_(scope), identifier_(identifier), value_(new ance::Value(this))
+variable_expression::variable_expression(ance::Scope* scope, std::string identifier) :
+	type_(scope->GetVariableOrConstantType(identifier)), scope_(scope), identifier_(identifier),
+	value_(new ance::Value(this))
 {
+}
+
+ance::Type* variable_expression::get_type()
+{
+	return type_;
 }
 
 ance::Value* variable_expression::get_value()

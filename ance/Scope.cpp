@@ -24,20 +24,50 @@ bool ance::Scope::Validate()
 	return valid;
 }
 
-void ance::Scope::DeclareConstant(access_modifier access, std::string identifier, ance::Constant* constant)
+bool ance::Scope::is_type_registered(std::string type_name)
 {
-	assert(global_variables[identifier] == nullptr);
-	assert(global_constants[identifier] == nullptr);
-
-	global_constants[identifier] = new ance::GlobalVariable(access, identifier, constant, true);
+	return types_.find(type_name) != types_.end();
 }
 
-void ance::Scope::DeclareGlobalVariable(access_modifier access, std::string identifier, ance::Constant* value)
+ance::Type* ance::Scope::get_type(std::string type_name)
 {
-	assert(global_variables[identifier] == nullptr);
-	assert(global_constants[identifier] == nullptr);
+	return types_.at(type_name);
+}
 
-	global_variables[identifier] = new ance::GlobalVariable(access, identifier, value, false);
+void ance::Scope::register_type(ance::Type* type)
+{
+	types_[type->get_name()] = type;
+}
+
+void ance::Scope::DeclareConstant(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* constant)
+{
+	assert(global_variables.find(identifier) == global_variables.end());
+	assert(global_constants.find(identifier) == global_constants.end());
+
+	global_constants[identifier] = new ance::GlobalVariable(access, identifier, type, constant, true);
+}
+
+void ance::Scope::DeclareGlobalVariable(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* value)
+{
+	assert(global_variables.find(identifier) == global_variables.end());
+	assert(global_constants.find(identifier) == global_constants.end());
+
+	global_variables[identifier] = new ance::GlobalVariable(access, identifier, type, value, false);
+}
+
+ance::Type* ance::Scope::GetVariableOrConstantType(std::string identifier)
+{
+	if (global_variables.find(identifier) != global_variables.end())
+	{
+		return global_variables[identifier]->type();
+	}
+
+	if (global_constants.find(identifier) != global_constants.end())
+	{
+		return global_constants[identifier]->type();
+	}
+
+	return nullptr;
 }
 
 void ance::Scope::BuildConstantsAndVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)

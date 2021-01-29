@@ -27,7 +27,7 @@ public:
 
     virtual antlrcpp::Any visitVariable_declaration(anceParser::Variable_declarationContext *context) = 0;
 
-    virtual antlrcpp::Any visitType(anceParser::TypeContext *context) = 0;
+    virtual antlrcpp::Any visitCode(anceParser::CodeContext *context) = 0;
 
     virtual antlrcpp::Any visitEntry(anceParser::EntryContext *context) = 0;
 
@@ -49,7 +49,23 @@ public:
 
     virtual antlrcpp::Any visitVariable_expression(anceParser::Variable_expressionContext *context) = 0;
 
+    virtual antlrcpp::Any visitConstant_expression(anceParser::Constant_expressionContext *context) = 0;
+
     virtual antlrcpp::Any visitLiteral_expression(anceParser::Literal_expressionContext *context) = 0;
+
+    virtual antlrcpp::Any visitInteger_expression(anceParser::Integer_expressionContext *context) = 0;
+
+    virtual antlrcpp::Any visitUnsigned_integer(anceParser::Unsigned_integerContext *context) = 0;
+
+    virtual antlrcpp::Any visitSigned_integer(anceParser::Signed_integerContext *context) = 0;
+
+    virtual antlrcpp::Any visitSpecial_integer(anceParser::Special_integerContext *context) = 0;
+
+    virtual antlrcpp::Any visitType(anceParser::TypeContext *context) = 0;
+
+    virtual antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext *context) = 0;
+
+    virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *context) = 0;
 
 
 };

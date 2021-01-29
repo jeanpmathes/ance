@@ -1,10 +1,13 @@
 #include "Visitor.h"
 
 #include "AccessModifier.h"
+#include "ArrayType.h"
 #include "literal_expression.h"
 #include "variable_expression.h"
 #include "assignment_statement.h"
 #include "default_value_expression.h"
+#include "IntegerType.h"
+#include "integer_expression.h"
 
 Visitor::Visitor(Application& application) : application_(application)
 {
@@ -17,11 +20,12 @@ antlrcpp::Any Visitor::visitConstant_declaration(anceParser::Constant_declaratio
 	if (context->access_modifier()->PUBLIC()) access = access_modifier::public_access;
 	else if (context->access_modifier()->PRIVATE()) access = access_modifier::private_access;
 
+	ance::Type* type = visit(context->type());
 	std::string identifier = context->IDENTIFIER()->getText();
-	Expression* expr = visit(context->literal_expression());
+	Expression* expr = visit(context->constant_expression());
 	ConstantExpression* const_exp = static_cast<ConstantExpression*>(expr);
 
-	application_.scope()->DeclareConstant(access, identifier, const_exp->get_constant_value());
+	application_.scope()->DeclareConstant(access, identifier, type, const_exp->get_constant_value());
 
 	return this->visitChildren(context);
 }
@@ -33,21 +37,22 @@ antlrcpp::Any Visitor::visitVariable_declaration(anceParser::Variable_declaratio
 	if (context->access_modifier()->PUBLIC()) access = access_modifier::public_access;
 	else if (context->access_modifier()->PRIVATE()) access = access_modifier::private_access;
 
+	ance::Type* type = visit(context->type());
 	std::string identifier = context->IDENTIFIER()->getText();
 
 	ConstantExpression* const_exp;
 
-	if (context->literal_expression())
+	if (context->constant_expression())
 	{
-		Expression* expr = visit(context->literal_expression());
+		Expression* expr = visit(context->constant_expression());
 		const_exp = static_cast<ConstantExpression*>(expr);
 	}
 	else
 	{
-		const_exp = new default_value_expression();
+		const_exp = new default_value_expression(type);
 	}
 
-	application_.scope()->DeclareGlobalVariable(access, identifier, const_exp->get_constant_value());
+	application_.scope()->DeclareGlobalVariable(access, identifier, type, const_exp->get_constant_value());
 
 	return this->visitChildren(context);
 }
@@ -90,14 +95,15 @@ antlrcpp::Any Visitor::visitReturn_statement(anceParser::Return_statementContext
 	unsigned int line = context->getStart()->getLine();
 	unsigned int column = context->getStart()->getCharPositionInLine();
 
-	uint32_t exit_code = 0;
+	ance::Value* return_value = nullptr;
 
-	if (context->INTEGER() != nullptr)
+	if (context->expression() != nullptr)
 	{
-		exit_code = std::stoul(context->INTEGER()->getText());
+		Expression* expression = visit(context->expression());
+		return_value = expression->get_value();
 	}
 
-	return_statement* statement = new return_statement(line, column, exit_code);
+	const auto statement = new return_statement(line, column, return_value);
 	application_.scope()->PushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
@@ -174,5 +180,89 @@ antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionCon
 		}
 	}
 
-	return static_cast<Expression*>(new literal_expression(builder.str()));
+	return static_cast<Expression*>(new literal_expression(builder.str(), application_.scope()));
+}
+
+antlrcpp::Any Visitor::visitUnsigned_integer(anceParser::Unsigned_integerContext* context)
+{
+	uint64_t size = 64;
+
+	if (context->INTEGER(1))
+	{
+		size = std::stoi(context->INTEGER(1)->getText());
+	}
+
+	const llvm::APInt integer(size, context->INTEGER(0)->getText(), 10);
+	return static_cast<Expression*>(new integer_expression(integer, application_.scope(), size, false));
+}
+
+antlrcpp::Any Visitor::visitSigned_integer(anceParser::Signed_integerContext* context)
+{
+	uint64_t size = 64;
+
+	if (context->INTEGER())
+	{
+		size = std::stoi(context->INTEGER()->getText());
+	}
+
+	const llvm::APInt integer(size, context->SIGNED_INTEGER()->getText(), 10);
+	return static_cast<Expression*>(new integer_expression(integer, application_.scope(), size, true));
+}
+
+antlrcpp::Any Visitor::visitSpecial_integer(anceParser::Special_integerContext* context)
+{
+	uint64_t size = 64;
+
+	if (context->INTEGER())
+	{
+		size = std::stoi(context->INTEGER()->getText());
+	}
+
+	std::string integer_str;
+	int radix;
+
+	if (context->HEX_INTEGER())
+	{
+		integer_str = context->HEX_INTEGER()->getText();
+		radix = 16;
+	}
+
+	if (context->BIN_INTEGER())
+	{
+		integer_str = context->BIN_INTEGER()->getText();
+		radix = 2;
+	}
+
+	if (context->OCT_INTEGER())
+	{
+		integer_str = context->OCT_INTEGER()->getText();
+		radix = 8;
+	}
+
+	const llvm::APInt integer(size, integer_str, radix);
+	return static_cast<Expression*>(new integer_expression(integer, application_.scope(), size, false));
+}
+
+antlrcpp::Any Visitor::visitInteger_type(anceParser::Integer_typeContext* context)
+{
+	ance::Type* type;
+
+	std::string integer_type_str = context->NATIVE_INTEGER_TYPE()->getText();
+
+	bool is_unsigned = integer_type_str[0] == 'u';
+	uint64_t size = std::stoi(integer_type_str.substr(1 + integer_type_str.find('i')));
+
+	type = ance::IntegerType::get(application_.scope(), size, !is_unsigned);
+
+	return type;
+}
+
+antlrcpp::Any Visitor::visitArray_type(anceParser::Array_typeContext* context)
+{
+	ance::Type* type;
+
+	ance::Type* element_type = visit(context->type());
+	type = ance::ArrayType::get(application_.scope(), element_type, std::stoi(context->INTEGER()->getText()));
+
+	return type;
 }

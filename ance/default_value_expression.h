@@ -6,7 +6,9 @@
 class default_value_expression : public ConstantExpression
 {
 public:
-	default_value_expression();
+	default_value_expression(ance::Type* type);
+
+	ance::Type* get_type() override;
 
 	ance::Value* get_value();
 	llvm::Value* build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
@@ -17,6 +19,7 @@ public:
 	~default_value_expression();
 
 private:
+	ance::Type* type_;
 	ance::Constant* constant_;
 };
 

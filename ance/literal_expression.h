@@ -3,10 +3,16 @@
 
 #include "ConstantExpression.h"
 
+namespace ance {
+	class Scope;
+}
+
 class literal_expression : public ConstantExpression
 {
 public:
-	literal_expression(std::string literal);
+	literal_expression(std::string literal, ance::Scope* scope);
+
+	ance::Type* get_type() override;
 
 	ance::Value* get_value();
 	llvm::Value* build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
@@ -17,6 +23,7 @@ public:
 	~literal_expression();
 
 private:
+	ance::Type* type_;
 	ance::Constant* constant_;
 	std::string literal_;
 };
