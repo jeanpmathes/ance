@@ -7,6 +7,7 @@ return_statement::return_statement(const unsigned int l, const unsigned int c, a
 
 void return_statement::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
+	// todo get function type from scope
 	assert(return_value_->get_type()->get_name() == "ui32");
 
 	llvm::Value* return_val = return_value_->get_value(c, m, state, ir, di);

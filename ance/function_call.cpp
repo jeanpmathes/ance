@@ -1,15 +1,31 @@
 #include "function_call.h"
 
-function_call::function_call(unsigned int l, unsigned int c, std::string ident) : Statement(l, c), identifier(ident)
+#include "CompileState.h"
+#include "Value.h"
+
+namespace ance {
+	class Function;
+}
+
+function_call::function_call(std::string identifier) : identifier_(identifier), return_value_(new ance::Value(this))
 {
 }
 
-void function_call::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+ance::Type* function_call::get_type()
 {
-	ance::Function* fn = state->application->scope()->GetFunction(identifier);
-	fn->BuildCall(c, m, state, ir, di);
+	// todo solve how to implement this
+	return nullptr;
 }
 
-function_call::~function_call()
+ance::Value* function_call::get_value()
 {
+	return return_value_;
 }
+
+llvm::Value* function_call::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+{
+	ance::Function* fn = state->application->scope()->GetFunction(identifier_);
+	return fn->BuildCall(c, m, state, ir, di);
+}
+
+function_call::~function_call() = default;

@@ -15,10 +15,12 @@ class CompileState;
 
 namespace ance
 {
+	class Type;
+
 	class Function
 	{
 	public:
-		Function(std::string fn_name, unsigned int l, unsigned int c);
+		Function(std::string fn_name, ance::Type* return_type, unsigned int l, unsigned int c);
 
 		std::string GetName();
 
@@ -33,6 +35,7 @@ namespace ance
 		unsigned int line, column;
 		std::list<Statement*> statements;
 
+		ance::Type* return_type;
 		llvm::FunctionType* llvmType;
 		llvm::Function* llvmFunction;
 	};

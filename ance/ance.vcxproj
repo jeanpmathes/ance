@@ -225,6 +225,7 @@
     <ClCompile Include="CompileState.cpp" />
     <ClCompile Include="Constant.cpp" />
     <ClCompile Include="default_value_expression.cpp" />
+    <ClCompile Include="expression_statement.cpp" />
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="function_call.cpp" />
     <ClCompile Include="GlobalVariable.cpp" />
@@ -255,6 +256,7 @@
     <ClInclude Include="default_value_expression.h" />
     <ClInclude Include="Expression.h" />
     <ClInclude Include="anceConstants.h" />
+    <ClInclude Include="expression_statement.h" />
     <ClInclude Include="Function.h" />
     <ClInclude Include="function_call.h" />
     <ClInclude Include="GlobalVariable.h" />

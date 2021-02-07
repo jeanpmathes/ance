@@ -13,13 +13,24 @@ private ui64 hex = 0xCAFEBABE;
 private ui64 bin = 0b010101010101;
 private ui64 oct = 0o1234567;
 
-print_newline()
+void print_newline()
 {
 	print newline;
-	return 0:32;
+	return;
 }
 
-main() 
+[ui8 : 1] get_newline()
+{
+	return newline;
+}
+
+[ui8 : 1] print_and_pass_trough_newline() 
+{
+	print get_newline();
+	return get_newline();
+}
+
+ui32 main() 
 {
 	a = "c";
 	b = "12345678";
@@ -32,6 +43,8 @@ main()
 
 	FAILURE = 1:32;
 	INTEGER = -234;
+
+	print_and_pass_trough_newline();
 
 	return FAILURE;
 }

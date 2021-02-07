@@ -88,9 +88,6 @@
     <ClCompile Include="Function.cpp">
       <Filter>Source Files\Construct Files</Filter>
     </ClCompile>
-    <ClCompile Include="function_call.cpp">
-      <Filter>Source Files\Statement Files</Filter>
-    </ClCompile>
     <ClCompile Include="Value.cpp">
       <Filter>Source Files\Construct Files</Filter>
     </ClCompile>
@@ -133,6 +130,12 @@
     <ClCompile Include="integer_expression.cpp">
       <Filter>Source Files\Expression Files</Filter>
     </ClCompile>
+    <ClCompile Include="expression_statement.cpp">
+      <Filter>Source Files\Statement Files</Filter>
+    </ClCompile>
+    <ClCompile Include="function_call.cpp">
+      <Filter>Source Files\Expression Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anceLexer.h">
@@ -164,9 +167,6 @@
     </ClInclude>
     <ClInclude Include="Function.h">
       <Filter>Header Files\Construct Files</Filter>
-    </ClInclude>
-    <ClInclude Include="function_call.h">
-      <Filter>Header Files\Statement Files</Filter>
     </ClInclude>
     <ClInclude Include="Value.h">
       <Filter>Header Files\Construct Files</Filter>
@@ -220,6 +220,12 @@
       <Filter>Header Files\Type Files</Filter>
     </ClInclude>
     <ClInclude Include="integer_expression.h">
+      <Filter>Header Files\Expression Files</Filter>
+    </ClInclude>
+    <ClInclude Include="expression_statement.h">
+      <Filter>Header Files\Statement Files</Filter>
+    </ClInclude>
+    <ClInclude Include="function_call.h">
       <Filter>Header Files\Expression Files</Filter>
     </ClInclude>
   </ItemGroup>

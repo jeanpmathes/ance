@@ -1,6 +1,6 @@
 #include "Function.h"
 
-ance::Function::Function(std::string fn_name, unsigned int l, unsigned int c) : name(fn_name), line(l), column(c)
+ance::Function::Function(std::string fn_name, ance::Type* return_type, unsigned int l, unsigned int c) : name(fn_name), return_type(return_type), line(l), column(c)
 {
 }
 
@@ -16,7 +16,7 @@ void  ance::Function::push_statement(Statement* statement)
 
 void ance::Function::BuildName(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
-	llvmType = llvm::FunctionType::get(llvm::Type::getInt32Ty(c), false);
+	llvmType = llvm::FunctionType::get(return_type->get_native_type(c), false);
 	llvmFunction = llvm::Function::Create(llvmType, llvm::GlobalValue::LinkageTypes::PrivateLinkage, name, m);
 
 	llvm::SmallVector<llvm::Metadata*, 1> tys;

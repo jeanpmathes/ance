@@ -6,6 +6,7 @@
 #include "variable_expression.h"
 #include "assignment_statement.h"
 #include "default_value_expression.h"
+#include "expression_statement.h"
 #include "IntegerType.h"
 #include "integer_expression.h"
 
@@ -57,22 +58,27 @@ antlrcpp::Any Visitor::visitVariable_declaration(anceParser::Variable_declaratio
 	return this->visitChildren(context);
 }
 
-antlrcpp::Any Visitor::visitEntry(anceParser::EntryContext* context)
-{
-	unsigned int line = context->getStart()->getLine();
-	unsigned int column = context->getStart()->getCharPositionInLine();
-
-	application_.scope()->AddAndEnterFunction(new ance::Function("main", line, column));
-
-	return this->visitChildren(context);
-}
-
 antlrcpp::Any Visitor::visitFunction(anceParser::FunctionContext* context)
 {
 	unsigned int line = context->getStart()->getLine();
 	unsigned int column = context->getStart()->getCharPositionInLine();
 
-	application_.scope()->AddAndEnterFunction(new ance::Function(context->IDENTIFIER()->getText(), line, column));
+	ance::Type* return_type = visit(context->type());
+
+	application_.scope()->AddAndEnterFunction(new ance::Function(context->IDENTIFIER()->getText(), return_type, line, column));
+
+	return this->visitChildren(context);
+}
+
+antlrcpp::Any Visitor::visitExpression_statement(anceParser::Expression_statementContext* context)
+{
+	unsigned int line = context->getStart()->getLine();
+	unsigned int column = context->getStart()->getCharPositionInLine();
+
+	Expression* expression = visit(context->independent_expression());
+
+	auto* statement = new expression_statement(expression, line, column);
+	application_.scope()->PushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
 }
@@ -82,9 +88,9 @@ antlrcpp::Any Visitor::visitPrint_statement(anceParser::Print_statementContext* 
 	unsigned int line = context->getStart()->getLine();
 	unsigned int column = context->getStart()->getCharPositionInLine();
 
-	Expression* expression = this->visit(context->expression());
+	Expression* expression = visit(context->expression());
 
-	print_statement* statement = new print_statement(line, column, expression);
+	auto* statement = new print_statement(line, column, expression);
 	application_.scope()->PushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
@@ -109,20 +115,6 @@ antlrcpp::Any Visitor::visitReturn_statement(anceParser::Return_statementContext
 	return this->visitChildren(context);
 }
 
-antlrcpp::Any Visitor::visitFunction_call(anceParser::Function_callContext* context)
-{
-	std::string identifier = context->IDENTIFIER()->getText();
-
-	application_.scope()->AddFunctionName(identifier);
-
-	unsigned int line = context->getStart()->getLine();
-	unsigned int column = context->getStart()->getCharPositionInLine();
-
-	application_.scope()->PushStatementToCurrentFunction(new function_call(line, column, identifier));
-
-	return this->visitChildren(context);
-}
-
 antlrcpp::Any Visitor::visitVariable_assignment(anceParser::Variable_assignmentContext* context)
 {
 	unsigned int line = context->getStart()->getLine();
@@ -134,6 +126,15 @@ antlrcpp::Any Visitor::visitVariable_assignment(anceParser::Variable_assignmentC
 	application_.scope()->PushStatementToCurrentFunction(new assignment_statement(line, column, identifier, application_.scope(), assigned));
 
 	return this->visitChildren(context);
+}
+
+antlrcpp::Any Visitor::visitFunction_call(anceParser::Function_callContext* context)
+{
+	std::string identifier = context->IDENTIFIER()->getText();
+
+	application_.scope()->AddFunctionName(identifier);
+
+	return static_cast<Expression*>(new function_call(identifier));
 }
 
 antlrcpp::Any Visitor::visitVariable_expression(anceParser::Variable_expressionContext* context)
@@ -158,7 +159,11 @@ antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionCon
 			{
 			case 'n':
 				builder << '\n';
-				break;;
+				break;
+
+			case '0':
+				builder << '\0';
+				break;
 
 			default:
 				builder << c;

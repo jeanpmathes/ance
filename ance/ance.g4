@@ -18,16 +18,11 @@ variable_declaration
 	;
 
 code
-	: entry
-	| function
-	;
-
-entry 
-	: MAIN PARANTHESE_OPEN PARANTHESE_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
+	: function
 	;
 
 function
-	: IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
+	: type IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
 	;
 
 access_modifier
@@ -36,15 +31,14 @@ access_modifier
 	;
 
 statement
-	: function_call
+	: expression_statement
 	| variable_assignment
 	| print_statement
 	| return_statement
 	;
 
-function_call
-	: IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED SEMICOLON
-	;
+expression_statement
+	: independent_expression SEMICOLON ;
 
 variable_assignment
 	: IDENTIFIER ASSIGNMENT expression SEMICOLON
@@ -61,6 +55,14 @@ return_statement
 expression
 	: variable_expression
 	| constant_expression
+	;
+
+independent_expression
+	: function_call
+	;
+
+function_call
+	: IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED SEMICOLON
 	;
 
 variable_expression
@@ -119,7 +121,6 @@ OCT_INTEGER : '0' [oO] [0-7]+ ;
 STRING : '"' ('\\'. | .)*? '"';
 INTEGER : [0-9]+ ;
 
-MAIN : 'main' ;
 PRINT : 'print' ;
 RETURN : 'return' ;
 CONST : 'const' ;
