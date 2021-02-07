@@ -1,0 +1,71 @@
+"C:\Program Files\JetBrains\CLion 2020.2.4\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_C_COMPILER=C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/Llvm/bin/clang-cl.exe" "-DCMAKE_CXX_COMPILER=C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/Llvm/bin/clang-cl.exe" -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32 -G "CodeBlocks - NMake Makefiles" C:\Users\jeanp\source\repos\ance
+-- The CXX compiler identification is Clang 10.0.0 with MSVC-like command-line
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/Llvm/bin/clang-cl.exe
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/Llvm/bin/clang-cl.exe - works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+x64 architecture in use
+CMake Warning at CMake/Utils.cmake:202 (message):
+  Corresponding cmake file from props
+  "C:/Users/jeanp/source/repos/ance/ance/LLVM.cmake" doesn't exist
+Call Stack (most recent call first):
+  ance/CMakeLists.txt:158 (use_props)
+
+
+CMake Warning at CMake/Utils.cmake:202 (message):
+  Corresponding cmake file from props
+  "C:/Users/jeanp/source/repos/ance/ance/LLVM.cmake" doesn't exist
+Call Stack (most recent call first):
+  ance/CMakeLists.txt:159 (use_props)
+
+
+CMake Warning at CMake/Utils.cmake:202 (message):
+  Corresponding cmake file from props
+  "C:/Users/jeanp/source/repos/ance/ance/LLVM.cmake" doesn't exist
+Call Stack (most recent call first):
+  ance/CMakeLists.txt:160 (use_props)
+
+
+CMake Warning at CMake/Utils.cmake:202 (message):
+  Corresponding cmake file from props
+  "C:/Users/jeanp/source/repos/ance/ance/LLVM.cmake" doesn't exist
+Call Stack (most recent call first):
+  ance/CMakeLists.txt:161 (use_props)
+
+
+CMake Warning at CMake/Utils.cmake:202 (message):
+  Corresponding cmake file from props
+  "C:/Users/jeanp/source/repos/ance/ance/LLVM.cmake" doesn't exist
+Call Stack (most recent call first):
+  ance/CMakeLists.txt:162 (use_props)
+
+
+CMake Warning at CMake/Utils.cmake:202 (message):
+  Corresponding cmake file from props
+  "C:/Users/jeanp/source/repos/ance/ance/LLVM.cmake" doesn't exist
+Call Stack (most recent call first):
+  ance/CMakeLists.txt:163 (use_props)
+
+
+-- Configuring done
+-- Generating done
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+
+
+-- Build files have been written to: C:/Users/jeanp/source/repos/ance/cmake-build-debug
+
+Problems were encountered while collecting compiler information:
+	clang-cl: error: no such file or directory: 'anceBaseVisitor.h'
+	clang-cl: error: no such file or directory: 'anceBaseVisitor.cpp'
+	clang-cl: error: no such file or directory: 'anceLexer.h'
+	clang-cl: error: no such file or directory: 'anceLexer.cpp'
+	clang-cl: error: no such file or directory: 'anceVisitor.h'
+	clang-cl: error: no such file or directory: 'anceVisitor.cpp'
+	clang-cl: error: no such file or directory: 'anceParser.h'
+	clang-cl: error: no such file or directory: 'anceParser.cpp'
