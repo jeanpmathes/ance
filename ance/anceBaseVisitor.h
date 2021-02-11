@@ -19,7 +19,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitValue(anceParser::ValueContext *ctx) override {
+  virtual antlrcpp::Any visitData(anceParser::DataContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -112,6 +112,10 @@ public:
   }
 
   virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitVoid_type(anceParser::Void_typeContext *ctx) override {
     return visitChildren(ctx);
   }
 

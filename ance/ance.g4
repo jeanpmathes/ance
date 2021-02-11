@@ -1,10 +1,10 @@
 grammar ance;
 
 file
-	: ( value | code )+
+	: ( data | code )*
 	;
 
-value
+data
 	: constant_declaration
 	| variable_declaration
 	;
@@ -38,7 +38,8 @@ statement
 	;
 
 expression_statement
-	: independent_expression SEMICOLON ;
+	: independent_expression SEMICOLON 
+	;
 
 variable_assignment
 	: IDENTIFIER ASSIGNMENT expression SEMICOLON
@@ -55,6 +56,7 @@ return_statement
 expression
 	: variable_expression
 	| constant_expression
+	| independent_expression
 	;
 
 independent_expression
@@ -62,7 +64,7 @@ independent_expression
 	;
 
 function_call
-	: IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED SEMICOLON
+	: IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED
 	;
 
 variable_expression
@@ -101,6 +103,7 @@ special_integer
 type
 	: integer_type
 	| array_type
+	| void_type
 	;
 
 integer_type
@@ -109,6 +112,10 @@ integer_type
 
 array_type
 	: BRACKET_OPEN type COLON INTEGER BRACKET_CLOSED
+	;
+
+void_type
+	: VOID
 	;
 
 NATIVE_INTEGER_TYPE : 'u'? 'i' INTEGER ;
@@ -126,6 +133,7 @@ RETURN : 'return' ;
 CONST : 'const' ;
 PUBLIC : 'public' ;
 PRIVATE : 'private' ;
+VOID : 'void' ;
 
 IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
 

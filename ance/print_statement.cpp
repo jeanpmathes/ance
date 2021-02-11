@@ -1,13 +1,11 @@
 #include "print_statement.h"
 
-#include <iostream>
-
 #include "anceConstants.h"
 
 #include "Expression.h"
 #include "Value.h"
 
-print_statement::print_statement(const unsigned int l, const unsigned int c, Expression* expression) : Statement(c, l), expression_(expression)
+print_statement::print_statement(ance::Function* function, const unsigned int l, const unsigned int c, Expression* expression) : Statement(function, c, l), expression_(expression)
 {
 }
 

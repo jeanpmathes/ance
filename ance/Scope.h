@@ -50,6 +50,7 @@ namespace ance
 
 		bool HasFunction(std::string identifier);
 		ance::Function* GetFunction(std::string identifier);
+		ance::Function* get_current_function() const;
 
 	private:
 		std::map<std::string, ance::Type*> types_;

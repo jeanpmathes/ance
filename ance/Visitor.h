@@ -1,8 +1,6 @@
 #pragma once
 #include "anceBaseVisitor.h"
 
-#include "function_call.h"
-#include "print_statement.h"
 #include "return_statement.h"
 
 class Visitor : public anceBaseVisitor
@@ -30,6 +28,7 @@ public:
 
 	antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext* context) override;
 	antlrcpp::Any visitArray_type(anceParser::Array_typeContext* context) override;
+	antlrcpp::Any visitVoid_type(anceParser::Void_typeContext* context) override;
 
 private:
 	Application application_;

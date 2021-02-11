@@ -21,7 +21,7 @@ public:
    */
     virtual antlrcpp::Any visitFile(anceParser::FileContext *context) = 0;
 
-    virtual antlrcpp::Any visitValue(anceParser::ValueContext *context) = 0;
+    virtual antlrcpp::Any visitData(anceParser::DataContext *context) = 0;
 
     virtual antlrcpp::Any visitConstant_declaration(anceParser::Constant_declarationContext *context) = 0;
 
@@ -68,6 +68,8 @@ public:
     virtual antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext *context) = 0;
 
     virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *context) = 0;
+
+    virtual antlrcpp::Any visitVoid_type(anceParser::Void_typeContext *context) = 0;
 
 
 };

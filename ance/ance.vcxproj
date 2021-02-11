@@ -240,6 +240,7 @@
     <ClCompile Include="Value.cpp" />
     <ClCompile Include="variable_expression.cpp" />
     <ClCompile Include="Visitor.cpp" />
+    <ClCompile Include="VoidType.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccessModifier.h" />
@@ -272,6 +273,7 @@
     <ClInclude Include="Value.h" />
     <ClInclude Include="variable_expression.h" />
     <ClInclude Include="Visitor.h" />
+    <ClInclude Include="VoidType.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ance_examples\first.ance" />

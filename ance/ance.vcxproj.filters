@@ -136,6 +136,9 @@
     <ClCompile Include="function_call.cpp">
       <Filter>Source Files\Expression Files</Filter>
     </ClCompile>
+    <ClCompile Include="VoidType.cpp">
+      <Filter>Source Files\Type Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anceLexer.h">
@@ -227,6 +230,9 @@
     </ClInclude>
     <ClInclude Include="function_call.h">
       <Filter>Header Files\Expression Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VoidType.h">
+      <Filter>Header Files\Type Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

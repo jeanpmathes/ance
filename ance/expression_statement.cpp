@@ -2,7 +2,7 @@
 
 #include "Expression.h"
 
-expression_statement::expression_statement(Expression* expression, unsigned l, unsigned c) : Statement(l, c), expression_(expression)
+expression_statement::expression_statement(ance::Function* function, Expression* expression, unsigned l, unsigned c) : Statement(function, l, c), expression_(expression)
 {
 }
 

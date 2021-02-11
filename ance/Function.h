@@ -16,13 +16,16 @@ class CompileState;
 namespace ance
 {
 	class Type;
+	class Scope;
 
 	class Function
 	{
 	public:
-		Function(std::string fn_name, ance::Type* return_type, unsigned int l, unsigned int c);
+		Function(std::string fn_name, ance::Type* return_type, ance::Scope* scope, unsigned int l, unsigned int c);
 
-		std::string GetName();
+		std::string GetName() const;
+		ance::Type* get_return_type() const;
+		ance::Scope* get_scope() const;
 
 		void push_statement(Statement* statement);
 
@@ -33,6 +36,8 @@ namespace ance
 	private:
 		std::string name;
 		unsigned int line, column;
+		ance::Scope* scope_;
+
 		std::list<Statement*> statements;
 
 		ance::Type* return_type;

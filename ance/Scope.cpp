@@ -169,3 +169,8 @@ ance::Function* ance::Scope::GetFunction(std::string identifier)
 {
 	return functions.at(identifier);
 }
+
+ance::Function* ance::Scope::get_current_function() const
+{
+	return current;
+}

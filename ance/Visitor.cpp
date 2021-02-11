@@ -7,8 +7,11 @@
 #include "assignment_statement.h"
 #include "default_value_expression.h"
 #include "expression_statement.h"
+#include "function_call.h"
 #include "IntegerType.h"
 #include "integer_expression.h"
+#include "print_statement.h"
+#include "VoidType.h"
 
 Visitor::Visitor(Application& application) : application_(application)
 {
@@ -65,7 +68,7 @@ antlrcpp::Any Visitor::visitFunction(anceParser::FunctionContext* context)
 
 	ance::Type* return_type = visit(context->type());
 
-	application_.scope()->AddAndEnterFunction(new ance::Function(context->IDENTIFIER()->getText(), return_type, line, column));
+	application_.scope()->AddAndEnterFunction(new ance::Function(context->IDENTIFIER()->getText(), return_type, application_.scope(), line, column));
 
 	return this->visitChildren(context);
 }
@@ -77,7 +80,7 @@ antlrcpp::Any Visitor::visitExpression_statement(anceParser::Expression_statemen
 
 	Expression* expression = visit(context->independent_expression());
 
-	auto* statement = new expression_statement(expression, line, column);
+	auto* statement = new expression_statement(application_.scope()->get_current_function(), expression, line, column);
 	application_.scope()->PushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
@@ -90,7 +93,7 @@ antlrcpp::Any Visitor::visitPrint_statement(anceParser::Print_statementContext* 
 
 	Expression* expression = visit(context->expression());
 
-	auto* statement = new print_statement(line, column, expression);
+	auto* statement = new print_statement(application_.scope()->get_current_function(), line, column, expression);
 	application_.scope()->PushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
@@ -109,7 +112,7 @@ antlrcpp::Any Visitor::visitReturn_statement(anceParser::Return_statementContext
 		return_value = expression->get_value();
 	}
 
-	const auto statement = new return_statement(line, column, return_value);
+	const auto statement = new return_statement(application_.scope()->get_current_function(), line, column, return_value);
 	application_.scope()->PushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
@@ -123,7 +126,7 @@ antlrcpp::Any Visitor::visitVariable_assignment(anceParser::Variable_assignmentC
 	std::string identifier = context->IDENTIFIER()->getText();
 	Expression* assigned = visit(context->expression());
 
-	application_.scope()->PushStatementToCurrentFunction(new assignment_statement(line, column, identifier, application_.scope(), assigned));
+	application_.scope()->PushStatementToCurrentFunction(new assignment_statement(application_.scope()->get_current_function(), line, column, identifier, assigned));
 
 	return this->visitChildren(context);
 }
@@ -134,7 +137,7 @@ antlrcpp::Any Visitor::visitFunction_call(anceParser::Function_callContext* cont
 
 	application_.scope()->AddFunctionName(identifier);
 
-	return static_cast<Expression*>(new function_call(identifier));
+	return static_cast<Expression*>(new function_call(identifier, application_.scope()));
 }
 
 antlrcpp::Any Visitor::visitVariable_expression(anceParser::Variable_expressionContext* context)
@@ -269,5 +272,11 @@ antlrcpp::Any Visitor::visitArray_type(anceParser::Array_typeContext* context)
 	ance::Type* element_type = visit(context->type());
 	type = ance::ArrayType::get(application_.scope(), element_type, std::stoi(context->INTEGER()->getText()));
 
+	return type;
+}
+
+antlrcpp::Any Visitor::visitVoid_type(anceParser::Void_typeContext* context)
+{
+	ance::Type* type = ance::VoidType::get();
 	return type;
 }

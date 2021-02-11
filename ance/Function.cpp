@@ -1,12 +1,22 @@
 #include "Function.h"
 
-ance::Function::Function(std::string fn_name, ance::Type* return_type, unsigned int l, unsigned int c) : name(fn_name), return_type(return_type), line(l), column(c)
+ance::Function::Function(std::string fn_name, ance::Type* return_type, ance::Scope* scope, unsigned int l, unsigned int c) : name(fn_name), line(l), column(c), return_type(return_type), scope_(scope)
 {
 }
 
-std::string ance::Function::GetName()
+std::string ance::Function::GetName() const
 {
 	return name;
+}
+
+ance::Type* ance::Function::get_return_type() const
+{
+	return return_type;
+}
+
+ance::Scope* ance::Function::get_scope() const
+{
+	return scope_;
 }
 
 void  ance::Function::push_statement(Statement* statement)

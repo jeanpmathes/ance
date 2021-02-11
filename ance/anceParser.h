@@ -14,20 +14,21 @@ public:
   enum {
     NATIVE_INTEGER_TYPE = 1, SIGNED_INTEGER = 2, HEX_INTEGER = 3, BIN_INTEGER = 4, 
     OCT_INTEGER = 5, STRING = 6, INTEGER = 7, PRINT = 8, RETURN = 9, CONST = 10, 
-    PUBLIC = 11, PRIVATE = 12, IDENTIFIER = 13, ASSIGNMENT = 14, PARANTHESE_OPEN = 15, 
-    PARANTHESE_CLOSED = 16, BRACE_OPEN = 17, BRACE_CLOSED = 18, BRACKET_OPEN = 19, 
-    BRACKET_CLOSED = 20, COLON = 21, SEMICOLON = 22, WHITESPACE = 23
+    PUBLIC = 11, PRIVATE = 12, VOID = 13, IDENTIFIER = 14, ASSIGNMENT = 15, 
+    PARANTHESE_OPEN = 16, PARANTHESE_CLOSED = 17, BRACE_OPEN = 18, BRACE_CLOSED = 19, 
+    BRACKET_OPEN = 20, BRACKET_CLOSED = 21, COLON = 22, SEMICOLON = 23, 
+    WHITESPACE = 24
   };
 
   enum {
-    RuleFile = 0, RuleValue = 1, RuleConstant_declaration = 2, RuleVariable_declaration = 3, 
+    RuleFile = 0, RuleData = 1, RuleConstant_declaration = 2, RuleVariable_declaration = 3, 
     RuleCode = 4, RuleFunction = 5, RuleAccess_modifier = 6, RuleStatement = 7, 
     RuleExpression_statement = 8, RuleVariable_assignment = 9, RulePrint_statement = 10, 
     RuleReturn_statement = 11, RuleExpression = 12, RuleIndependent_expression = 13, 
     RuleFunction_call = 14, RuleVariable_expression = 15, RuleConstant_expression = 16, 
     RuleLiteral_expression = 17, RuleInteger_expression = 18, RuleUnsigned_integer = 19, 
     RuleSigned_integer = 20, RuleSpecial_integer = 21, RuleType = 22, RuleInteger_type = 23, 
-    RuleArray_type = 24
+    RuleArray_type = 24, RuleVoid_type = 25
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -41,7 +42,7 @@ public:
 
 
   class FileContext;
-  class ValueContext;
+  class DataContext;
   class Constant_declarationContext;
   class Variable_declarationContext;
   class CodeContext;
@@ -64,14 +65,15 @@ public:
   class Special_integerContext;
   class TypeContext;
   class Integer_typeContext;
-  class Array_typeContext; 
+  class Array_typeContext;
+  class Void_typeContext; 
 
   class  FileContext : public antlr4::ParserRuleContext {
   public:
     FileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    std::vector<ValueContext *> value();
-    ValueContext* value(size_t i);
+    std::vector<DataContext *> data();
+    DataContext* data(size_t i);
     std::vector<CodeContext *> code();
     CodeContext* code(size_t i);
 
@@ -82,9 +84,9 @@ public:
 
   FileContext* file();
 
-  class  ValueContext : public antlr4::ParserRuleContext {
+  class  DataContext : public antlr4::ParserRuleContext {
   public:
-    ValueContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    DataContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     Constant_declarationContext *constant_declaration();
     Variable_declarationContext *variable_declaration();
@@ -94,7 +96,7 @@ public:
    
   };
 
-  ValueContext* value();
+  DataContext* data();
 
   class  Constant_declarationContext : public antlr4::ParserRuleContext {
   public:
@@ -262,6 +264,7 @@ public:
     virtual size_t getRuleIndex() const override;
     Variable_expressionContext *variable_expression();
     Constant_expressionContext *constant_expression();
+    Independent_expressionContext *independent_expression();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -290,7 +293,6 @@ public:
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *PARANTHESE_OPEN();
     antlr4::tree::TerminalNode *PARANTHESE_CLOSED();
-    antlr4::tree::TerminalNode *SEMICOLON();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -407,6 +409,7 @@ public:
     virtual size_t getRuleIndex() const override;
     Integer_typeContext *integer_type();
     Array_typeContext *array_type();
+    Void_typeContext *void_type();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -444,6 +447,19 @@ public:
   };
 
   Array_typeContext* array_type();
+
+  class  Void_typeContext : public antlr4::ParserRuleContext {
+  public:
+    Void_typeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *VOID();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Void_typeContext* void_type();
 
 
 private:

@@ -7,14 +7,13 @@ namespace ance {
 	class Function;
 }
 
-function_call::function_call(std::string identifier) : identifier_(identifier), return_value_(new ance::Value(this))
+function_call::function_call(std::string identifier, ance::Scope* scope) : scope_(scope), identifier_(identifier), return_value_(new ance::Value(this))
 {
 }
 
 ance::Type* function_call::get_type()
 {
-	// todo solve how to implement this
-	return nullptr;
+	return scope_->GetFunction(identifier_)->get_return_type();
 }
 
 ance::Value* function_call::get_value()
