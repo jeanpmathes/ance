@@ -139,6 +139,9 @@
     <ClCompile Include="VoidType.cpp">
       <Filter>Source Files\Type Files</Filter>
     </ClCompile>
+    <ClCompile Include="Variable.cpp">
+      <Filter>Source Files\Construct Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anceLexer.h">
@@ -233,6 +236,9 @@
     </ClInclude>
     <ClInclude Include="VoidType.h">
       <Filter>Header Files\Type Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Variable.h">
+      <Filter>Header Files\Construct Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

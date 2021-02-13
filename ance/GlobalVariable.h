@@ -2,6 +2,8 @@
 #define GLOBAL_VARIABLE_H
 #include <string>
 
+#include "Variable.h"
+
 namespace llvm {
 	class LLVMContext;
 	class Module;
@@ -15,20 +17,18 @@ namespace ance
 	class Constant;
 	class Type;
 
-	class GlobalVariable
+	class GlobalVariable : public Variable
 	{
 	public:
-		GlobalVariable(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* constant_init, bool is_constant);
-		llvm::GlobalVariable* Build(llvm::LLVMContext& c, llvm::Module* m);
+		GlobalVariable(ance::Scope* containing_scope, access_modifier access, std::string identifier, ance::Type* type, ance::Constant* constant_init, bool is_constant);
+		void build_global(llvm::LLVMContext& c, llvm::Module* m);
 
-		ance::Type* type();
-
+		llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		void set_value(llvm::Value* value, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 	private:
 		access_modifier access_;
-		std::string identifier_;
-		ance::Type* type_;
 		ance::Constant* constant_init_;
-		bool is_constant_;
+		llvm::GlobalVariable* native_variable_;
 	};
 }
 

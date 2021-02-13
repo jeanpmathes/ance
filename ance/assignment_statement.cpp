@@ -10,7 +10,7 @@ assignment_statement::assignment_statement(ance::Function* function, unsigned in
 
 void assignment_statement::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
-	get_containing_function()->get_scope()->set_variable(variable_identifier_, assigned_->get_value()->get_value(c, m, state, ir, di), c, m, state, ir, di);
+	get_containing_function()->get_scope()->get_variable(variable_identifier_)->set_value(assigned_->get_value()->get_value(c, m, state, ir, di), c, m, state, ir, di);
 }
 
 assignment_statement::~assignment_statement() = default;

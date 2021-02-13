@@ -4,7 +4,7 @@
 #include "Scope.h"
 
 variable_expression::variable_expression(ance::Scope* scope, std::string identifier) :
-	type_(scope->GetVariableOrConstantType(identifier)), scope_(scope), identifier_(identifier),
+	type_(scope->get_variable(identifier)->type()), scope_(scope), identifier_(identifier),
 	value_(new ance::Value(this))
 {
 }
@@ -21,7 +21,7 @@ ance::Value* variable_expression::get_value()
 
 llvm::Value* variable_expression::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
-	return scope_->GetConstantOrVariable(identifier_, c, m, state, ir, di);
+	return scope_->get_variable(identifier_)->get_value(c, m, state, ir, di);
 }
 
 variable_expression::~variable_expression() = default;
