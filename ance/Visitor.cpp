@@ -29,7 +29,7 @@ antlrcpp::Any Visitor::visitConstant_declaration(anceParser::Constant_declaratio
 	Expression* expr = visit(context->constant_expression());
 	ConstantExpression* const_exp = static_cast<ConstantExpression*>(expr);
 
-	application_.scope()->DeclareConstant(access, identifier, type, const_exp->get_constant_value());
+	application_.scope()->define_global_constant(access, identifier, type, const_exp->get_constant_value());
 
 	return this->visitChildren(context);
 }
@@ -56,7 +56,7 @@ antlrcpp::Any Visitor::visitVariable_declaration(anceParser::Variable_declaratio
 		const_exp = new default_value_expression(type);
 	}
 
-	application_.scope()->DeclareGlobalVariable(access, identifier, type, const_exp->get_constant_value());
+	application_.scope()->define_global_variable(access, identifier, type, const_exp->get_constant_value());
 
 	return this->visitChildren(context);
 }
@@ -144,7 +144,7 @@ antlrcpp::Any Visitor::visitVariable_expression(anceParser::Variable_expressionC
 {
 	std::string identifier = context->IDENTIFIER()->getText();
 
-	return static_cast<Expression*>(new variable_expression(application_.scope(), identifier));
+	return static_cast<Expression*>(new variable_expression(application_.scope()->get_variable(identifier)));
 }
 
 antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionContext* context)

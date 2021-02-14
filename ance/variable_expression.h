@@ -4,13 +4,14 @@
 #include "Expression.h"
 
 namespace ance {
+	class Variable;
 	class Scope;
 }
 
 class variable_expression : public Expression
 {
 public:
-	variable_expression(ance::Scope* scope, std::string identifier);
+	variable_expression(ance::Variable* variable);
 
 	ance::Type* get_type() override;
 
@@ -20,9 +21,7 @@ public:
 	~variable_expression();
 
 private:
-	ance::Type* type_;
-	ance::Scope* scope_;
-	std::string identifier_;
+	ance::Variable* variable_;
 	ance::Value* value_;
 };
 #endif

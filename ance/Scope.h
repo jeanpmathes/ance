@@ -29,8 +29,8 @@ namespace ance
 		ance::Type* get_type(std::string type_name);
 		void register_type(ance::Type* type);
 
-		void DeclareConstant(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* constant);
-		void DeclareGlobalVariable(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* value);
+		void define_global_constant(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* constant);
+		void define_global_variable(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* value);
 		ance::Variable* get_variable(std::string identifier);
 		void BuildConstantsAndVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
@@ -52,6 +52,7 @@ namespace ance
 
 		std::map<std::string, ance::GlobalVariable*> global_constants;
 		std::map<std::string, ance::GlobalVariable*> global_variables;
+		std::map<std::string, ance::GlobalVariable*> global_undefined;
 
 		std::map<std::string, ance::Function*> functions;
 		ance::Function* current = nullptr;

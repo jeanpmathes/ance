@@ -21,6 +21,9 @@ namespace ance
 	{
 	public:
 		GlobalVariable(ance::Scope* containing_scope, access_modifier access, std::string identifier, ance::Type* type, ance::Constant* constant_init, bool is_constant);
+		explicit GlobalVariable(std::string identifier);
+
+		void define_global(ance::Scope* containing_scope, access_modifier access, ance::Type* type, ance::Constant* constant_init, bool is_constant);
 		void build_global(llvm::LLVMContext& c, llvm::Module* m);
 
 		llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);

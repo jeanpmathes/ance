@@ -14,12 +14,26 @@ namespace llvm {
 ance::GlobalVariable::GlobalVariable(ance::Scope* containing_scope, access_modifier access, std::string identifier, ance::Type* type, ance::Constant* constant_init, bool is_constant)
 	: Variable(containing_scope, identifier, type, is_constant), access_(access), constant_init_(constant_init), native_variable_(nullptr)
 {
-	assert(type != ance::VoidType::get());
-	assert(type->get_name() == constant_init->get_type()->get_name());
+}
+
+ance::GlobalVariable::GlobalVariable(std::string identifier)
+	: Variable(identifier), access_(access_modifier::private_access), constant_init_(nullptr), native_variable_(nullptr)
+{
+}
+
+void ance::GlobalVariable::define_global(ance::Scope* containing_scope, access_modifier access, ance::Type* type, ance::Constant* constant_init, bool is_constant)
+{
+	this->define(containing_scope, type, is_constant);
+
+	access_ = access;
+	constant_init_ = constant_init;
 }
 
 void ance::GlobalVariable::build_global(llvm::LLVMContext& c, llvm::Module* m)
 {
+	assert(type() != ance::VoidType::get());
+	assert(type()->get_name() == constant_init_->get_type()->get_name());
+
 	llvm::GlobalValue::LinkageTypes linkage;
 
 	switch (access_)

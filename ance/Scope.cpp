@@ -21,6 +21,13 @@ bool ance::Scope::Validate()
 		}
 	}
 
+	if (!global_undefined.empty())
+	{
+		std::cout << "Undefined global variables." << std::endl;
+
+		valid = false;
+	}
+
 	return valid;
 }
 
@@ -39,20 +46,44 @@ void ance::Scope::register_type(ance::Type* type)
 	types_[type->get_name()] = type;
 }
 
-void ance::Scope::DeclareConstant(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* constant)
+void ance::Scope::define_global_constant(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* constant)
 {
 	assert(global_variables.find(identifier) == global_variables.end());
 	assert(global_constants.find(identifier) == global_constants.end());
 
-	global_constants[identifier] = new ance::GlobalVariable(this, access, identifier, type, constant, true);
+	if (global_undefined.find(identifier) != global_undefined.end())
+	{
+		GlobalVariable* undefined = global_undefined[identifier];
+
+		undefined->define_global(this, access, type, constant, true);
+		global_constants[identifier] = undefined;
+
+		global_undefined.erase(identifier);
+	}
+	else
+	{
+		global_constants[identifier] = new ance::GlobalVariable(this, access, identifier, type, constant, true);
+	}
 }
 
-void ance::Scope::DeclareGlobalVariable(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* value)
+void ance::Scope::define_global_variable(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* value)
 {
 	assert(global_variables.find(identifier) == global_variables.end());
 	assert(global_constants.find(identifier) == global_constants.end());
 
-	global_variables[identifier] = new ance::GlobalVariable(this, access, identifier, type, value, false);
+	if (global_undefined.find(identifier) != global_undefined.end())
+	{
+		GlobalVariable* undefined = global_undefined[identifier];
+
+		undefined->define_global(this, access, type, value, false);
+		global_variables[identifier] = undefined;
+
+		global_undefined.erase(identifier);
+	}
+	else
+	{
+		global_variables[identifier] = new ance::GlobalVariable(this, access, identifier, type, value, false);
+	}
 }
 
 ance::Variable* ance::Scope::get_variable(std::string identifier)
@@ -67,7 +98,15 @@ ance::Variable* ance::Scope::get_variable(std::string identifier)
 		return global_constants[identifier];
 	}
 
-	return nullptr;
+	if (global_undefined.find(identifier) != global_undefined.end())
+	{
+		return global_undefined[identifier];
+	}
+
+	// Create an undefined global variable.
+	auto* undefined = new GlobalVariable(identifier);
+	global_undefined[identifier] = undefined;
+	return undefined;
 }
 
 void ance::Scope::BuildConstantsAndVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)

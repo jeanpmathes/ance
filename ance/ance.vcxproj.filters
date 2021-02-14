@@ -198,9 +198,6 @@
     <ClInclude Include="Visitor.h">
       <Filter>Header Files\Visitor Files</Filter>
     </ClInclude>
-    <ClInclude Include="ConstantExpression.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Constant.h">
       <Filter>Header Files\Construct Files</Filter>
     </ClInclude>
@@ -239,6 +236,9 @@
     </ClInclude>
     <ClInclude Include="Variable.h">
       <Filter>Header Files\Construct Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantExpression.h">
+      <Filter>Header Files\Expression Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

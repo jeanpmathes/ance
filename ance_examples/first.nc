@@ -3,9 +3,6 @@ private const [ui8 : 1] newline = "\n";
 public [ui8 : 1] a = "a";
 private [ui8 : 8] b = "--------";
 
-private ui32 SUCCESS = 0:32;
-private ui32 FAILURE = 420:32;
-
 private i42 TEST = +11:42;
 private i64 INTEGER = -187;
 
@@ -48,3 +45,6 @@ ui32 main()
 
 	return FAILURE;
 }
+
+private ui32 SUCCESS = 0:32;
+private ui32 FAILURE = 420:32;
