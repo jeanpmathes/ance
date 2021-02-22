@@ -1,10 +1,17 @@
 #include "Function.h"
 
-ance::Function::Function(std::string fn_name, ance::Type* return_type, ance::Scope* scope, unsigned int l, unsigned int c) : name(fn_name), line(l), column(c), return_type(return_type), scope_(scope)
+#include <utility>
+
+#include "AccessModifier.h"
+#include "LocalScope.h"
+
+ance::Function::Function(access_modifier access, std::string fn_name, ance::Type* return_type, ance::Scope* scope, unsigned int l, unsigned int c) :
+	access_(access), name(std::move(fn_name)), line(l), column(c), local_scope_(new ance::LocalScope(scope)), return_type(return_type),
+	llvmType(nullptr), llvmFunction(nullptr)
 {
 }
 
-std::string ance::Function::GetName() const
+std::string ance::Function::get_name() const
 {
 	return name;
 }
@@ -14,9 +21,9 @@ ance::Type* ance::Function::get_return_type() const
 	return return_type;
 }
 
-ance::Scope* ance::Function::get_scope() const
+ance::LocalScope* ance::Function::get_scope() const
 {
-	return scope_;
+	return local_scope_;
 }
 
 void  ance::Function::push_statement(Statement* statement)
@@ -24,10 +31,10 @@ void  ance::Function::push_statement(Statement* statement)
 	statements.push_back(statement);
 }
 
-void ance::Function::BuildName(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+void ance::Function::build_name(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
 	llvmType = llvm::FunctionType::get(return_type->get_native_type(c), false);
-	llvmFunction = llvm::Function::Create(llvmType, llvm::GlobalValue::LinkageTypes::PrivateLinkage, name, m);
+	llvmFunction = llvm::Function::Create(llvmType, convert(access_), name, m);
 
 	llvm::SmallVector<llvm::Metadata*, 1> tys;
 	tys.push_back(state->ui32);
@@ -36,7 +43,7 @@ void ance::Function::BuildName(llvm::LLVMContext& c, llvm::Module* m, CompileSta
 	llvmFunction->setSubprogram(debug);
 }
 
-void ance::Function::Build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+void ance::Function::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
 	llvm::BasicBlock* block = llvm::BasicBlock::Create(c, "entry", llvmFunction);
 
@@ -52,7 +59,7 @@ void ance::Function::Build(llvm::LLVMContext& c, llvm::Module* m, CompileState* 
 	ir.SetCurrentDebugLocation(nullptr);
 }
 
-llvm::CallInst* ance::Function::BuildCall(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+llvm::CallInst* ance::Function::build_call(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) const
 {
 	return ir.CreateCall(llvmType, llvmFunction);
 }

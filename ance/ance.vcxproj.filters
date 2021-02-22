@@ -56,6 +56,12 @@
     <Filter Include="Source Files\Type Files">
       <UniqueIdentifier>{73646e45-12f9-48de-aa91-fc5d05b45893}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Scope">
+      <UniqueIdentifier>{5bdd163a-2568-41b2-b047-4fb0ff900f24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scope">
+      <UniqueIdentifier>{e45fc164-59c1-4ea6-a535-c782d7641ba7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ance.cpp">
@@ -89,9 +95,6 @@
       <Filter>Source Files\Construct Files</Filter>
     </ClCompile>
     <ClCompile Include="Value.cpp">
-      <Filter>Source Files\Construct Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Scope.cpp">
       <Filter>Source Files\Construct Files</Filter>
     </ClCompile>
     <ClCompile Include="variable_expression.cpp">
@@ -142,6 +145,18 @@
     <ClCompile Include="Variable.cpp">
       <Filter>Source Files\Construct Files</Filter>
     </ClCompile>
+    <ClCompile Include="Scope.cpp">
+      <Filter>Source Files\Scope</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalScope.cpp">
+      <Filter>Source Files\Scope</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalScope.cpp">
+      <Filter>Source Files\Scope</Filter>
+    </ClCompile>
+    <ClCompile Include="AccessModifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anceLexer.h">
@@ -175,9 +190,6 @@
       <Filter>Header Files\Construct Files</Filter>
     </ClInclude>
     <ClInclude Include="Value.h">
-      <Filter>Header Files\Construct Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Scope.h">
       <Filter>Header Files\Construct Files</Filter>
     </ClInclude>
     <ClInclude Include="Expression.h">
@@ -239,6 +251,15 @@
     </ClInclude>
     <ClInclude Include="ConstantExpression.h">
       <Filter>Header Files\Expression Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scope.h">
+      <Filter>Header Files\Scope</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalScope.h">
+      <Filter>Header Files\Scope</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalScope.h">
+      <Filter>Header Files\Scope</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

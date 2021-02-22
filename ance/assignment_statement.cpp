@@ -1,10 +1,14 @@
 #include "assignment_statement.h"
 
+#include <utility>
+
 #include "Expression.h"
+#include "Function.h"
+#include "LocalScope.h"
 #include "Value.h"
 
 assignment_statement::assignment_statement(ance::Function* function, unsigned int l, unsigned int c, std::string variable_identifier, Expression* assigned) :
-	Statement(function, l, c), variable_identifier_(variable_identifier), assigned_(assigned)
+	Statement(function, l, c), variable_identifier_(std::move(variable_identifier)), assigned_(assigned)
 {
 }
 

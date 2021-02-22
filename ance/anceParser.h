@@ -152,6 +152,7 @@ public:
   public:
     FunctionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    Access_modifierContext *access_modifier();
     TypeContext *type();
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *PARANTHESE_OPEN();

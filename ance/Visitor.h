@@ -30,6 +30,8 @@ public:
 	antlrcpp::Any visitArray_type(anceParser::Array_typeContext* context) override;
 	antlrcpp::Any visitVoid_type(anceParser::Void_typeContext* context) override;
 
+	antlrcpp::Any visitAccess_modifier(anceParser::Access_modifierContext* context) override;
+
 private:
 	Application application_;
 };

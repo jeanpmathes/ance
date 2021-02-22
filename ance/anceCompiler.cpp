@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 
+#include "GlobalScope.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Support/TargetRegistry.h"
@@ -57,9 +58,9 @@ void anceCompiler::Compile(const std::filesystem::path& output_dir)
 
 	SetupGlobals();
 
-	application.scope()->BuildConstantsAndVariables(context, module, state, ir, di);
-	application.scope()->BuildFunctionNames(context, module, state, ir, di);
-	application.scope()->BuildFunctions(context, module, state, ir, di);
+	application.global_scope()->build_variables(context, module, state, ir, di);
+	application.global_scope()->BuildFunctionNames(context, module, state, ir, di);
+	application.global_scope()->BuildFunctions(context, module, state, ir, di);
 
 	llvm::FunctionType* main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), false);
 	llvm::Function* main = module->getFunction("main");

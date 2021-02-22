@@ -7,7 +7,9 @@
 #include "assignment_statement.h"
 #include "default_value_expression.h"
 #include "expression_statement.h"
+#include "Function.h"
 #include "function_call.h"
+#include "GlobalScope.h"
 #include "IntegerType.h"
 #include "integer_expression.h"
 #include "print_statement.h"
@@ -19,28 +21,20 @@ Visitor::Visitor(Application& application) : application_(application)
 
 antlrcpp::Any Visitor::visitConstant_declaration(anceParser::Constant_declarationContext* context)
 {
-	access_modifier access;
-
-	if (context->access_modifier()->PUBLIC()) access = access_modifier::public_access;
-	else if (context->access_modifier()->PRIVATE()) access = access_modifier::private_access;
-
+	access_modifier access = visit(context->access_modifier());
 	ance::Type* type = visit(context->type());
 	std::string identifier = context->IDENTIFIER()->getText();
 	Expression* expr = visit(context->constant_expression());
 	ConstantExpression* const_exp = static_cast<ConstantExpression*>(expr);
 
-	application_.scope()->define_global_constant(access, identifier, type, const_exp->get_constant_value());
+	application_.global_scope()->define_global_constant(access, identifier, type, const_exp->get_constant_value());
 
 	return this->visitChildren(context);
 }
 
 antlrcpp::Any Visitor::visitVariable_declaration(anceParser::Variable_declarationContext* context)
 {
-	access_modifier access;
-
-	if (context->access_modifier()->PUBLIC()) access = access_modifier::public_access;
-	else if (context->access_modifier()->PRIVATE()) access = access_modifier::private_access;
-
+	access_modifier access = visit(context->access_modifier());
 	ance::Type* type = visit(context->type());
 	std::string identifier = context->IDENTIFIER()->getText();
 
@@ -56,7 +50,7 @@ antlrcpp::Any Visitor::visitVariable_declaration(anceParser::Variable_declaratio
 		const_exp = new default_value_expression(type);
 	}
 
-	application_.scope()->define_global_variable(access, identifier, type, const_exp->get_constant_value());
+	application_.global_scope()->define_global_variable(access, identifier, type, const_exp->get_constant_value());
 
 	return this->visitChildren(context);
 }
@@ -66,9 +60,10 @@ antlrcpp::Any Visitor::visitFunction(anceParser::FunctionContext* context)
 	unsigned int line = context->getStart()->getLine();
 	unsigned int column = context->getStart()->getCharPositionInLine();
 
+	access_modifier access = visit(context->access_modifier());
 	ance::Type* return_type = visit(context->type());
 
-	application_.scope()->AddAndEnterFunction(new ance::Function(context->IDENTIFIER()->getText(), return_type, application_.scope(), line, column));
+	application_.global_scope()->AddAndEnterFunction(new ance::Function(access, context->IDENTIFIER()->getText(), return_type, application_.global_scope(), line, column));
 
 	return this->visitChildren(context);
 }
@@ -80,8 +75,8 @@ antlrcpp::Any Visitor::visitExpression_statement(anceParser::Expression_statemen
 
 	Expression* expression = visit(context->independent_expression());
 
-	auto* statement = new expression_statement(application_.scope()->get_current_function(), expression, line, column);
-	application_.scope()->PushStatementToCurrentFunction(statement);
+	auto* statement = new expression_statement(application_.global_scope()->get_current_function(), expression, line, column);
+	application_.global_scope()->PushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
 }
@@ -93,8 +88,8 @@ antlrcpp::Any Visitor::visitPrint_statement(anceParser::Print_statementContext* 
 
 	Expression* expression = visit(context->expression());
 
-	auto* statement = new print_statement(application_.scope()->get_current_function(), line, column, expression);
-	application_.scope()->PushStatementToCurrentFunction(statement);
+	auto* statement = new print_statement(application_.global_scope()->get_current_function(), line, column, expression);
+	application_.global_scope()->PushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
 }
@@ -112,8 +107,8 @@ antlrcpp::Any Visitor::visitReturn_statement(anceParser::Return_statementContext
 		return_value = expression->get_value();
 	}
 
-	const auto statement = new return_statement(application_.scope()->get_current_function(), line, column, return_value);
-	application_.scope()->PushStatementToCurrentFunction(statement);
+	const auto statement = new return_statement(application_.global_scope()->get_current_function(), line, column, return_value);
+	application_.global_scope()->PushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
 }
@@ -126,7 +121,7 @@ antlrcpp::Any Visitor::visitVariable_assignment(anceParser::Variable_assignmentC
 	std::string identifier = context->IDENTIFIER()->getText();
 	Expression* assigned = visit(context->expression());
 
-	application_.scope()->PushStatementToCurrentFunction(new assignment_statement(application_.scope()->get_current_function(), line, column, identifier, assigned));
+	application_.global_scope()->PushStatementToCurrentFunction(new assignment_statement(application_.global_scope()->get_current_function(), line, column, identifier, assigned));
 
 	return this->visitChildren(context);
 }
@@ -135,16 +130,16 @@ antlrcpp::Any Visitor::visitFunction_call(anceParser::Function_callContext* cont
 {
 	std::string identifier = context->IDENTIFIER()->getText();
 
-	application_.scope()->AddFunctionName(identifier);
+	application_.global_scope()->AddFunctionName(identifier);
 
-	return static_cast<Expression*>(new function_call(identifier, application_.scope()));
+	return static_cast<Expression*>(new function_call(identifier, application_.global_scope()));
 }
 
 antlrcpp::Any Visitor::visitVariable_expression(anceParser::Variable_expressionContext* context)
 {
 	std::string identifier = context->IDENTIFIER()->getText();
 
-	return static_cast<Expression*>(new variable_expression(application_.scope()->get_variable(identifier)));
+	return static_cast<Expression*>(new variable_expression(application_.global_scope()->get_variable(identifier)));
 }
 
 antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionContext* context)
@@ -188,7 +183,7 @@ antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionCon
 		}
 	}
 
-	return static_cast<Expression*>(new literal_expression(builder.str(), application_.scope()));
+	return static_cast<Expression*>(new literal_expression(builder.str(), application_.global_scope()));
 }
 
 antlrcpp::Any Visitor::visitUnsigned_integer(anceParser::Unsigned_integerContext* context)
@@ -201,7 +196,7 @@ antlrcpp::Any Visitor::visitUnsigned_integer(anceParser::Unsigned_integerContext
 	}
 
 	const llvm::APInt integer(size, context->INTEGER(0)->getText(), 10);
-	return static_cast<Expression*>(new integer_expression(integer, application_.scope(), size, false));
+	return static_cast<Expression*>(new integer_expression(integer, application_.global_scope(), size, false));
 }
 
 antlrcpp::Any Visitor::visitSigned_integer(anceParser::Signed_integerContext* context)
@@ -214,7 +209,7 @@ antlrcpp::Any Visitor::visitSigned_integer(anceParser::Signed_integerContext* co
 	}
 
 	const llvm::APInt integer(size, context->SIGNED_INTEGER()->getText(), 10);
-	return static_cast<Expression*>(new integer_expression(integer, application_.scope(), size, true));
+	return static_cast<Expression*>(new integer_expression(integer, application_.global_scope(), size, true));
 }
 
 antlrcpp::Any Visitor::visitSpecial_integer(anceParser::Special_integerContext* context)
@@ -248,7 +243,7 @@ antlrcpp::Any Visitor::visitSpecial_integer(anceParser::Special_integerContext* 
 	}
 
 	const llvm::APInt integer(size, integer_str, radix);
-	return static_cast<Expression*>(new integer_expression(integer, application_.scope(), size, false));
+	return static_cast<Expression*>(new integer_expression(integer, application_.global_scope(), size, false));
 }
 
 antlrcpp::Any Visitor::visitInteger_type(anceParser::Integer_typeContext* context)
@@ -260,7 +255,7 @@ antlrcpp::Any Visitor::visitInteger_type(anceParser::Integer_typeContext* contex
 	bool is_unsigned = integer_type_str[0] == 'u';
 	uint64_t size = std::stoi(integer_type_str.substr(1 + integer_type_str.find('i')));
 
-	type = ance::IntegerType::get(application_.scope(), size, !is_unsigned);
+	type = ance::IntegerType::get(application_.global_scope(), size, !is_unsigned);
 
 	return type;
 }
@@ -270,7 +265,7 @@ antlrcpp::Any Visitor::visitArray_type(anceParser::Array_typeContext* context)
 	ance::Type* type;
 
 	ance::Type* element_type = visit(context->type());
-	type = ance::ArrayType::get(application_.scope(), element_type, std::stoi(context->INTEGER()->getText()));
+	type = ance::ArrayType::get(application_.global_scope(), element_type, std::stoi(context->INTEGER()->getText()));
 
 	return type;
 }
@@ -279,4 +274,14 @@ antlrcpp::Any Visitor::visitVoid_type(anceParser::Void_typeContext* context)
 {
 	ance::Type* type = ance::VoidType::get();
 	return type;
+}
+
+antlrcpp::Any Visitor::visitAccess_modifier(anceParser::Access_modifierContext* context)
+{
+	access_modifier access;
+
+	if (context->PUBLIC()) access = access_modifier::public_access;
+	else if (context->PRIVATE()) access = access_modifier::private_access;
+
+	return access;
 }

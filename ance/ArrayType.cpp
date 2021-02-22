@@ -4,6 +4,8 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
 
+#include "GlobalScope.h"
+
 ance::ArrayType::ArrayType(Type* element_type, const uint64_t size) :
 	size_(size),
 	element_type_(element_type),
@@ -43,14 +45,14 @@ ance::Type* ance::ArrayType::get(ance::Scope* scope, Type* element_type, uint64_
 	ance::ArrayType* type = new ance::ArrayType(element_type, size);
 	std::string type_name = type->get_name();
 
-	if (scope->is_type_registered(type_name))
+	if (scope->get_global_scope()->is_type_registered(type_name))
 	{
 		delete type;
-		return scope->get_type(type_name);
+		return scope->get_global_scope()->get_type(type_name);
 	}
 	else
 	{
-		scope->register_type(type);
+		scope->get_global_scope()->register_type(type);
 		return type;
 	}
 }

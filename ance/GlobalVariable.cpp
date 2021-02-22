@@ -34,17 +34,7 @@ void ance::GlobalVariable::build_global(llvm::LLVMContext& c, llvm::Module* m)
 	assert(type() != ance::VoidType::get());
 	assert(type()->get_name() == constant_init_->get_type()->get_name());
 
-	llvm::GlobalValue::LinkageTypes linkage;
-
-	switch (access_)
-	{
-	case access_modifier::private_access:
-		linkage = llvm::GlobalValue::LinkageTypes::PrivateLinkage;
-		break;
-	case access_modifier::public_access:
-		linkage = llvm::GlobalValue::LinkageTypes::ExternalLinkage;
-		break;
-	}
+	llvm::GlobalValue::LinkageTypes linkage = convert(access_);
 
 	llvm::Constant* native_initializer = constant_init_->get_constant(c);
 	native_variable_ = new llvm::GlobalVariable(*m, type()->get_native_type(c), is_constant(), linkage, native_initializer, identifier());

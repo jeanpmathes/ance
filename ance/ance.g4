@@ -22,7 +22,7 @@ code
 	;
 
 function
-	: type IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
+	: access_modifier type IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
 	;
 
 access_modifier

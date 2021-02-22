@@ -1,6 +1,7 @@
 #include "return_statement.h"
 #include "Value.h"
 #include "VoidType.h"
+#include "Function.h"
 
 return_statement::return_statement(ance::Function* function, const unsigned int l, const unsigned int c, ance::Value* return_value) : Statement(function, l, c), return_value_(return_value)
 {

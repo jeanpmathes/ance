@@ -3,6 +3,7 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/Type.h>
 
+#include "GlobalScope.h"
 #include "Scope.h"
 
 ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed) : bit_size_(bit_size), is_signed_(is_signed), type_(nullptr)
@@ -35,14 +36,14 @@ ance::Type* ance::IntegerType::get(ance::Scope* scope, uint64_t bit_size, bool i
 	ance::IntegerType* type = new ance::IntegerType(bit_size, is_signed);
 	std::string type_name = type->get_name();
 
-	if (scope->is_type_registered(type_name))
+	if (scope->get_global_scope()->is_type_registered(type_name))
 	{
 		delete type;
-		return scope->get_type(type_name);
+		return scope->get_global_scope()->get_type(type_name);
 	}
 	else
 	{
-		scope->register_type(type);
+		scope->get_global_scope()->register_type(type);
 		return type;
 	}
 }

@@ -2,15 +2,8 @@
 #define APPLICATION_H
 
 #include <filesystem>
-#include <map>
 
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/DIBuilder.h"
-
-#include "Statement.h"
-#include "Function.h"
 #include "Scope.h"
-#include "CompileState.h"
 
 class Statement;
 class CompileState;
@@ -31,13 +24,13 @@ public:
 
 	bool Validate();
 
-	ance::Scope* scope();
+	ance::GlobalScope* global_scope();
 
 private:
 	std::filesystem::path proj_file;
 	std::filesystem::path code_file;
 
-	ance::Scope* global_scope;
+	ance::GlobalScope* global_scope_;
 };
 
 #endif

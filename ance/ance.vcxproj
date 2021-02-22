@@ -214,6 +214,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AccessModifier.cpp" />
     <ClCompile Include="ance.cpp" />
     <ClCompile Include="anceBaseVisitor.cpp" />
     <ClCompile Include="anceLexer.cpp" />
@@ -229,10 +230,12 @@
     <ClCompile Include="expression_statement.cpp" />
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="function_call.cpp" />
+    <ClCompile Include="GlobalScope.cpp" />
     <ClCompile Include="GlobalVariable.cpp" />
     <ClCompile Include="IntegerType.cpp" />
     <ClCompile Include="integer_expression.cpp" />
     <ClCompile Include="literal_expression.cpp" />
+    <ClCompile Include="LocalScope.cpp" />
     <ClCompile Include="print_statement.cpp" />
     <ClCompile Include="return_statement.cpp" />
     <ClCompile Include="Scope.cpp" />
@@ -262,10 +265,12 @@
     <ClInclude Include="expression_statement.h" />
     <ClInclude Include="Function.h" />
     <ClInclude Include="function_call.h" />
+    <ClInclude Include="GlobalScope.h" />
     <ClInclude Include="GlobalVariable.h" />
     <ClInclude Include="IntegerType.h" />
     <ClInclude Include="integer_expression.h" />
     <ClInclude Include="literal_expression.h" />
+    <ClInclude Include="LocalScope.h" />
     <ClInclude Include="print_statement.h" />
     <ClInclude Include="return_statement.h" />
     <ClInclude Include="Scope.h" />

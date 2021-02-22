@@ -2,7 +2,9 @@
 
 #include <iostream>
 
-Application::Application(std::filesystem::path project_file, std::filesystem::path nccode_file) : proj_file(project_file), code_file(nccode_file), global_scope(new ance::Scope())
+#include "GlobalScope.h"
+
+Application::Application(std::filesystem::path project_file, std::filesystem::path nccode_file) : proj_file(project_file), code_file(nccode_file), global_scope_(new ance::GlobalScope())
 {
 }
 
@@ -23,9 +25,9 @@ const std::filesystem::path Application::GetCodeFile() const
 
 bool Application::Validate()
 {
-	bool valid = global_scope->Validate();
+	bool valid = global_scope_->validate();
 
-	if (!global_scope->HasFunction("main"))
+	if (!global_scope_->HasFunction("main"))
 	{
 		std::cout << "No main function was found!" << std::endl;
 
@@ -35,7 +37,7 @@ bool Application::Validate()
 	return valid;
 }
 
-ance::Scope* Application::scope()
+ance::GlobalScope* Application::global_scope()
 {
-	return global_scope;
+	return global_scope_;
 }

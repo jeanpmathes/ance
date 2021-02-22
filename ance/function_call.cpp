@@ -1,6 +1,8 @@
 #include "function_call.h"
 
 #include "CompileState.h"
+#include "Function.h"
+#include "GlobalScope.h"
 #include "Value.h"
 
 namespace ance {
@@ -13,7 +15,7 @@ function_call::function_call(std::string identifier, ance::Scope* scope) : scope
 
 ance::Type* function_call::get_type()
 {
-	return scope_->GetFunction(identifier_)->get_return_type();
+	return scope_->get_global_scope()->GetFunction(identifier_)->get_return_type();
 }
 
 ance::Value* function_call::get_value()
@@ -23,8 +25,8 @@ ance::Value* function_call::get_value()
 
 llvm::Value* function_call::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
-	ance::Function* fn = state->application->scope()->GetFunction(identifier_);
-	return fn->BuildCall(c, m, state, ir, di);
+	ance::Function* fn = state->application->global_scope()->GetFunction(identifier_);
+	return fn->build_call(c, m, state, ir, di);
 }
 
 function_call::~function_call() = default;
