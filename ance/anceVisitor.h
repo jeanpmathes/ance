@@ -37,6 +37,8 @@ public:
 
     virtual antlrcpp::Any visitExpression_statement(anceParser::Expression_statementContext *context) = 0;
 
+    virtual antlrcpp::Any visitLocal_variable_definition(anceParser::Local_variable_definitionContext *context) = 0;
+
     virtual antlrcpp::Any visitVariable_assignment(anceParser::Variable_assignmentContext *context) = 0;
 
     virtual antlrcpp::Any visitPrint_statement(anceParser::Print_statementContext *context) = 0;

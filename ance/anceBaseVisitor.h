@@ -51,6 +51,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitLocal_variable_definition(anceParser::Local_variable_definitionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitVariable_assignment(anceParser::Variable_assignmentContext *ctx) override {
     return visitChildren(ctx);
   }

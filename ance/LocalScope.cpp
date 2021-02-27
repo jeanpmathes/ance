@@ -16,10 +16,14 @@ bool ance::LocalScope::validate()
 	return true;
 }
 
-void ance::LocalScope::define_local_variable(const std::string& identifier, ance::Type* type, ance::Value* value)
+ance::LocalVariable* ance::LocalScope::define_local_variable(const std::string& identifier, ance::Type* type, Expression* expression)
 {
 	assert(local_variables.find(identifier) == local_variables.end());
-	local_variables[identifier] = nullptr; // todo
+
+	ance::LocalVariable* variable = new LocalVariable(this, identifier, type, expression->get_value());
+	local_variables[identifier] = variable;
+
+	return variable;
 }
 
 ance::Variable* ance::LocalScope::get_variable(const std::string identifier)
@@ -30,8 +34,4 @@ ance::Variable* ance::LocalScope::get_variable(const std::string identifier)
 	}
 
 	return get_global_scope()->get_variable(identifier);
-}
-
-void ance::LocalScope::build_variables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
-{
 }

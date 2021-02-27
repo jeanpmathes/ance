@@ -32,6 +32,7 @@ access_modifier
 
 statement
 	: expression_statement
+	| local_variable_definition
 	| variable_assignment
 	| print_statement
 	| return_statement
@@ -39,6 +40,10 @@ statement
 
 expression_statement
 	: independent_expression SEMICOLON 
+	;
+
+local_variable_definition
+	: type IDENTIFIER ( ASSIGNMENT expression )? SEMICOLON
 	;
 
 variable_assignment
@@ -137,7 +142,7 @@ VOID : 'void' ;
 
 IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
 
-ASSIGNMENT : '=' ;
+ASSIGNMENT : '<-' ;
 
 PARANTHESE_OPEN : '(' ;
 PARANTHESE_CLOSED : ')' ;

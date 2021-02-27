@@ -23,12 +23,12 @@ public:
   enum {
     RuleFile = 0, RuleData = 1, RuleConstant_declaration = 2, RuleVariable_declaration = 3, 
     RuleCode = 4, RuleFunction = 5, RuleAccess_modifier = 6, RuleStatement = 7, 
-    RuleExpression_statement = 8, RuleVariable_assignment = 9, RulePrint_statement = 10, 
-    RuleReturn_statement = 11, RuleExpression = 12, RuleIndependent_expression = 13, 
-    RuleFunction_call = 14, RuleVariable_expression = 15, RuleConstant_expression = 16, 
-    RuleLiteral_expression = 17, RuleInteger_expression = 18, RuleUnsigned_integer = 19, 
-    RuleSigned_integer = 20, RuleSpecial_integer = 21, RuleType = 22, RuleInteger_type = 23, 
-    RuleArray_type = 24, RuleVoid_type = 25
+    RuleExpression_statement = 8, RuleLocal_variable_definition = 9, RuleVariable_assignment = 10, 
+    RulePrint_statement = 11, RuleReturn_statement = 12, RuleExpression = 13, 
+    RuleIndependent_expression = 14, RuleFunction_call = 15, RuleVariable_expression = 16, 
+    RuleConstant_expression = 17, RuleLiteral_expression = 18, RuleInteger_expression = 19, 
+    RuleUnsigned_integer = 20, RuleSigned_integer = 21, RuleSpecial_integer = 22, 
+    RuleType = 23, RuleInteger_type = 24, RuleArray_type = 25, RuleVoid_type = 26
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -50,6 +50,7 @@ public:
   class Access_modifierContext;
   class StatementContext;
   class Expression_statementContext;
+  class Local_variable_definitionContext;
   class Variable_assignmentContext;
   class Print_statementContext;
   class Return_statementContext;
@@ -188,6 +189,7 @@ public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     Expression_statementContext *expression_statement();
+    Local_variable_definitionContext *local_variable_definition();
     Variable_assignmentContext *variable_assignment();
     Print_statementContext *print_statement();
     Return_statementContext *return_statement();
@@ -212,6 +214,23 @@ public:
   };
 
   Expression_statementContext* expression_statement();
+
+  class  Local_variable_definitionContext : public antlr4::ParserRuleContext {
+  public:
+    Local_variable_definitionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    TypeContext *type();
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *SEMICOLON();
+    antlr4::tree::TerminalNode *ASSIGNMENT();
+    ExpressionContext *expression();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Local_variable_definitionContext* local_variable_definition();
 
   class  Variable_assignmentContext : public antlr4::ParserRuleContext {
   public:

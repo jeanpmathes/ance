@@ -29,7 +29,6 @@ namespace ance
 		virtual bool validate() = 0;
 
 		virtual ance::Variable* get_variable(std::string identifier) = 0;
-		virtual void build_variables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
 	};
 }
 #endif

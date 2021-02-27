@@ -49,7 +49,7 @@ void ance::Function::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* 
 
 	ir.SetInsertPoint(block);
 
-	for (auto statement : statements)
+	for (auto* statement : statements)
 	{
 		ir.SetCurrentDebugLocation(llvm::DILocation::get(c, statement->getLine(), statement->getColumn(), llvmFunction->getSubprogram()));
 

@@ -14,9 +14,10 @@ public:
 	antlrcpp::Any visitFunction(anceParser::FunctionContext* context) override;
 
 	antlrcpp::Any visitExpression_statement(anceParser::Expression_statementContext* context) override;
+	antlrcpp::Any visitLocal_variable_definition(anceParser::Local_variable_definitionContext* context) override;
+	antlrcpp::Any visitVariable_assignment(anceParser::Variable_assignmentContext* context) override;
 	antlrcpp::Any visitPrint_statement(anceParser::Print_statementContext* context) override;
 	antlrcpp::Any visitReturn_statement(anceParser::Return_statementContext* context) override;
-	antlrcpp::Any visitVariable_assignment(anceParser::Variable_assignmentContext* context) override;
 
 	antlrcpp::Any visitFunction_call(anceParser::Function_callContext* context) override;
 	antlrcpp::Any visitVariable_expression(anceParser::Variable_expressionContext* context) override;

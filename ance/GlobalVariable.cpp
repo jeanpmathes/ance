@@ -42,7 +42,7 @@ void ance::GlobalVariable::build_global(llvm::LLVMContext& c, llvm::Module* m)
 
 llvm::Value* ance::GlobalVariable::get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
-	const auto value_type = static_cast<llvm::PointerType*>(native_variable_->getType())->getElementType();
+	auto* const value_type = static_cast<llvm::PointerType*>(native_variable_->getType())->getElementType();
 	return ir.CreateLoad(value_type, native_variable_);
 }
 

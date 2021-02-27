@@ -157,6 +157,12 @@
     <ClCompile Include="AccessModifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="local_variable_definition.cpp">
+      <Filter>Source Files\Statement Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalVariable.cpp">
+      <Filter>Source Files\Construct Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anceLexer.h">
@@ -260,6 +266,12 @@
     </ClInclude>
     <ClInclude Include="LocalScope.h">
       <Filter>Header Files\Scope</Filter>
+    </ClInclude>
+    <ClInclude Include="local_variable_definition.h">
+      <Filter>Header Files\Statement Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalVariable.h">
+      <Filter>Header Files\Construct Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

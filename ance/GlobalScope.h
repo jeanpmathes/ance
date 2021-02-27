@@ -19,7 +19,7 @@ namespace ance
 		void define_global_variable(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* value);
 
 		ance::Variable* get_variable(std::string identifier) override;
-		void build_variables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
+		void build_variables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
 		size_t FunctionCount() const;
 		void AddFunctionName(std::string name);

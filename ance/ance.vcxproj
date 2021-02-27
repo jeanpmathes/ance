@@ -236,6 +236,8 @@
     <ClCompile Include="integer_expression.cpp" />
     <ClCompile Include="literal_expression.cpp" />
     <ClCompile Include="LocalScope.cpp" />
+    <ClCompile Include="LocalVariable.cpp" />
+    <ClCompile Include="local_variable_definition.cpp" />
     <ClCompile Include="print_statement.cpp" />
     <ClCompile Include="return_statement.cpp" />
     <ClCompile Include="Scope.cpp" />
@@ -271,6 +273,8 @@
     <ClInclude Include="integer_expression.h" />
     <ClInclude Include="literal_expression.h" />
     <ClInclude Include="LocalScope.h" />
+    <ClInclude Include="LocalVariable.h" />
+    <ClInclude Include="local_variable_definition.h" />
     <ClInclude Include="print_statement.h" />
     <ClInclude Include="return_statement.h" />
     <ClInclude Include="Scope.h" />

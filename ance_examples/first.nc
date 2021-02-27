@@ -1,19 +1,19 @@
-private const [ui8 : 1] newline = "\n";
+private const [ui8 : 1] newline <- "\n";
 
-public [ui8 : 1] a = "a";
-private [ui8 : 8] b = "--------";
+public [ui8 : 1] a <- "a";
+private [ui8 : 8] b <- "--------";
 
-private i42 TEST = +11:42;
-private i64 INTEGER = -187;
+private i42 TEST <- +11:42;
+private i64 INTEGER <- -187;
 
-private ui64 hex = 0xCAFEBABE;
-private ui64 bin = 0b010101010101;
-private ui64 oct = 0o1234567;
+private ui64 hex <- 0xCAFEBABE;
+private ui64 bin <- 0b010101010101;
+private ui64 oct <- 0o1234567;
 
-public ui32 main() 
+public ui32 main()
 {
-	a = "c";
-	b = "12345678";
+	a <- "c";
+	b <- "12345678";
 
 	print "WELCOME";
 	print a;
@@ -21,12 +21,25 @@ public ui32 main()
 
 	print_newline();
 
-	FAILURE = 1:32;
-	INTEGER = -234;
+	FAILURE <- 1:32;
+	INTEGER <- -234;
 
 	print_and_pass_trough_newline();
 
-	return FAILURE;
+	ui64 i <- 11;
+	ui64 j;
+
+	i <- j;
+	j <- get_answer();
+	i <- get_answer();
+	j <- get_answer();
+	j <- INTEGER;
+
+	return SUCCESS;
+}
+
+private ui64 get_answer() {
+	return 42;
 }
 
 private void print_newline()
@@ -46,5 +59,5 @@ private [ui8 : 1] print_and_pass_trough_newline()
 	return get_newline();
 }
 
-private ui32 SUCCESS = 0:32;
-private ui32 FAILURE = 420:32;
+private ui32 SUCCESS <- 0:32;
+private ui32 FAILURE <- 420:32;
