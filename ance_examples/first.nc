@@ -1,4 +1,4 @@
-private const [ui8 : 1] newline <- "\n";
+private const [ui8 : 1] newline := "\n";
 
 public [ui8 : 1] a <- "a";
 private [ui8 : 8] b <- "--------";
@@ -21,7 +21,6 @@ public ui32 main()
 
 	print_newline();
 
-	FAILURE <- 1:32;
 	INTEGER <- -234;
 
 	print_and_pass_trough_newline();
@@ -59,5 +58,5 @@ private [ui8 : 1] print_and_pass_trough_newline()
 	return get_newline();
 }
 
-private ui32 SUCCESS <- 0:32;
-private ui32 FAILURE <- 420:32;
+private const ui32 SUCCESS := 0:32;
+private const ui32 FAILURE := 1:32;

@@ -10,7 +10,7 @@ data
 	;
 
 constant_declaration
-	: access_modifier CONST type IDENTIFIER ASSIGNMENT constant_expression SEMICOLON
+	: access_modifier CONST type IDENTIFIER DEFINITION constant_expression SEMICOLON
 	;
 
 variable_declaration
@@ -142,6 +142,7 @@ VOID : 'void' ;
 
 IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
 
+DEFINITION : ':=' ;
 ASSIGNMENT : '<-' ;
 
 PARANTHESE_OPEN : '(' ;
