@@ -163,6 +163,15 @@
     <ClCompile Include="LocalVariable.cpp">
       <Filter>Source Files\Construct Files</Filter>
     </ClCompile>
+    <ClCompile Include="Parameter.cpp">
+      <Filter>Source Files\Construct Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ExpressionValue.cpp">
+      <Filter>Source Files\Construct Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ValueWrapper.cpp">
+      <Filter>Source Files\Construct Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anceLexer.h">
@@ -271,6 +280,15 @@
       <Filter>Header Files\Statement Files</Filter>
     </ClInclude>
     <ClInclude Include="LocalVariable.h">
+      <Filter>Header Files\Construct Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Parameter.h">
+      <Filter>Header Files\Construct Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExpressionValue.h">
+      <Filter>Header Files\Construct Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ValueWrapper.h">
       <Filter>Header Files\Construct Files</Filter>
     </ClInclude>
   </ItemGroup>

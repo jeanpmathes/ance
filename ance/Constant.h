@@ -2,7 +2,7 @@
 #define ANCE_CONSTANT_H
 
 #include "ConstantExpression.h"
-#include "Value.h"
+#include "ExpressionValue.h"
 
 #include "llvm/IR/DIBuilder.h"
 #include "llvm/IR/IRBuilder.h"
@@ -11,7 +11,7 @@ class ConstantExpression;
 
 namespace ance
 {
-	class Constant : public Value
+	class Constant : public ExpressionValue
 	{
 	public:
 		Constant(ConstantExpression* expression);

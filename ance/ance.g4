@@ -22,7 +22,15 @@ code
 	;
 
 function
-	: access_modifier type IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
+	: access_modifier type IDENTIFIER PARANTHESE_OPEN parameters PARANTHESE_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
+	;
+
+parameters
+	: (parameter (COMMA parameter)* )?
+	;
+
+parameter
+	: type IDENTIFIER
 	;
 
 access_modifier
@@ -69,7 +77,11 @@ independent_expression
 	;
 
 function_call
-	: IDENTIFIER PARANTHESE_OPEN PARANTHESE_CLOSED
+	: IDENTIFIER PARANTHESE_OPEN arguments PARANTHESE_CLOSED
+	;
+
+arguments
+	: (expression (COMMA expression)* )?
 	;
 
 variable_expression
@@ -154,6 +166,7 @@ BRACE_CLOSED : '}' ;
 BRACKET_OPEN : '[' ;
 BRACKET_CLOSED : ']' ;
 
+COMMA : ',' ;
 COLON : ':' ;
 SEMICOLON : ';' ;
 

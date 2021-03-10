@@ -31,6 +31,10 @@ public:
 
     virtual antlrcpp::Any visitFunction(anceParser::FunctionContext *context) = 0;
 
+    virtual antlrcpp::Any visitParameters(anceParser::ParametersContext *context) = 0;
+
+    virtual antlrcpp::Any visitParameter(anceParser::ParameterContext *context) = 0;
+
     virtual antlrcpp::Any visitAccess_modifier(anceParser::Access_modifierContext *context) = 0;
 
     virtual antlrcpp::Any visitStatement(anceParser::StatementContext *context) = 0;
@@ -50,6 +54,8 @@ public:
     virtual antlrcpp::Any visitIndependent_expression(anceParser::Independent_expressionContext *context) = 0;
 
     virtual antlrcpp::Any visitFunction_call(anceParser::Function_callContext *context) = 0;
+
+    virtual antlrcpp::Any visitArguments(anceParser::ArgumentsContext *context) = 0;
 
     virtual antlrcpp::Any visitVariable_expression(anceParser::Variable_expressionContext *context) = 0;
 

@@ -14,13 +14,8 @@ namespace ance
 	class Value
 	{
 	public:
-		Value(Expression* expression);
-		ance::Type* get_type();
-		virtual llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
-		virtual ~Value() = default;
-
-	private:
-		Expression* expression_;
+		virtual ance::Type* get_type() = 0;
+		virtual llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
 	};
 }
 #endif

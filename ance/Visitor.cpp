@@ -1,6 +1,7 @@
 #include "Visitor.h"
 
 #include "AccessModifier.h"
+#include "Parameter.h"
 #include "ArrayType.h"
 #include "literal_expression.h"
 #include "variable_expression.h"
@@ -65,9 +66,31 @@ antlrcpp::Any Visitor::visitFunction(anceParser::FunctionContext* context)
 	access_modifier access = visit(context->access_modifier());
 	ance::Type* return_type = visit(context->type());
 
-	application_.global_scope()->AddAndEnterFunction(new ance::Function(access, context->IDENTIFIER()->getText(), return_type, application_.global_scope(), line, column));
+	std::vector<ance::Parameter*> parameters = visit(context->parameters());
+
+	application_.global_scope()->AddAndEnterFunction(new ance::Function(access, context->IDENTIFIER()->getText(), return_type, parameters, application_.global_scope(), line, column));
 
 	return this->visitChildren(context);
+}
+
+antlrcpp::Any Visitor::visitParameters(anceParser::ParametersContext* context)
+{
+	std::vector<ance::Parameter*> params;
+
+	for (auto* param : context->parameter())
+	{
+		params.push_back(visit(param));
+	}
+
+	return params;
+}
+
+antlrcpp::Any Visitor::visitParameter(anceParser::ParameterContext* context)
+{
+	ance::Type* type = visit(context->type());
+	const std::string identifier = context->IDENTIFIER()->getText();
+
+	return new ance::Parameter(type, identifier);
 }
 
 antlrcpp::Any Visitor::visitExpression_statement(anceParser::Expression_statementContext* context)
@@ -157,10 +180,23 @@ antlrcpp::Any Visitor::visitReturn_statement(anceParser::Return_statementContext
 antlrcpp::Any Visitor::visitFunction_call(anceParser::Function_callContext* context)
 {
 	std::string identifier = context->IDENTIFIER()->getText();
+	std::vector<Expression*> arguments = visit(context->arguments());
 
 	application_.global_scope()->AddFunctionName(identifier);
 
-	return static_cast<Expression*>(new function_call(identifier, application_.global_scope()));
+	return static_cast<Expression*>(new function_call(identifier, application_.global_scope(), arguments));
+}
+
+antlrcpp::Any Visitor::visitArguments(anceParser::ArgumentsContext* context)
+{
+	std::vector<Expression*> arguments;
+
+	for (auto* argument : context->expression())
+	{
+		arguments.push_back(visit(argument));
+	}
+
+	return arguments;
 }
 
 antlrcpp::Any Visitor::visitVariable_expression(anceParser::Variable_expressionContext* context)

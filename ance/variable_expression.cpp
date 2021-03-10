@@ -1,10 +1,11 @@
 #include "variable_expression.h"
 
+#include "ExpressionValue.h"
 #include "Value.h"
 #include "Scope.h"
 
 variable_expression::variable_expression(ance::Variable* variable) :
-	variable_(variable), value_(new ance::Value(this))
+	variable_(variable), value_(new ance::ExpressionValue(this))
 {
 }
 

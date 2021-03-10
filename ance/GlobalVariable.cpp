@@ -32,7 +32,7 @@ void ance::GlobalVariable::define_global(ance::Scope* containing_scope, access_m
 void ance::GlobalVariable::build_global(llvm::LLVMContext& c, llvm::Module* m)
 {
 	assert(type() != ance::VoidType::get());
-	assert(type()->get_name() == constant_init_->get_type()->get_name());
+	assert(type() == constant_init_->get_type());
 
 	llvm::GlobalValue::LinkageTypes linkage = convert(access_);
 

@@ -9,7 +9,9 @@ ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope, std::stri
 
 void ance::LocalVariable::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
+	assert(value_);
 	assert(type() == value_->get_type());
+
 	native_value_ = value_->get_value(c, m, state, ir, di);
 	native_value_->setName(identifier());
 }

@@ -1,6 +1,7 @@
 #include "LocalScope.h"
 #include "Constant.h"
 #include "GlobalScope.h"
+#include "ValueWrapper.h"
 
 ance::LocalScope::LocalScope(ance::Scope* parent) : parent_(parent)
 {
@@ -21,6 +22,15 @@ ance::LocalVariable* ance::LocalScope::define_local_variable(const std::string& 
 	assert(local_variables.find(identifier) == local_variables.end());
 
 	ance::LocalVariable* variable = new LocalVariable(this, identifier, type, expression->get_value());
+	local_variables[identifier] = variable;
+
+	return variable;
+}
+
+ance::LocalVariable* ance::LocalScope::define_local_variable(const std::string& identifier, ance::Type* type, ance::Value* value)
+{
+	assert(local_variables.find(identifier) == local_variables.end());
+	ance::LocalVariable* variable = new LocalVariable(this, identifier, type, value);
 	local_variables[identifier] = variable;
 
 	return variable;

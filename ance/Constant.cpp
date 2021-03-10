@@ -1,6 +1,6 @@
 #include "Constant.h"
 
-ance::Constant::Constant(ConstantExpression* expression) : Value(expression), expression_(expression)
+ance::Constant::Constant(ConstantExpression* expression) : ance::ExpressionValue(expression), expression_(expression)
 {
 }
 

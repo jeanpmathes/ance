@@ -18,6 +18,7 @@ namespace ance
 		bool validate() override;
 
 		ance::LocalVariable* define_local_variable(const std::string& identifier, ance::Type* type, Expression* expression);
+		ance::LocalVariable* define_local_variable(const std::string& identifier, ance::Type* type, ance::Value* value);
 		ance::Variable* get_variable(std::string identifier) override;
 
 	private:

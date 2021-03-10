@@ -222,6 +222,8 @@
     <ClCompile Include="anceVisitor.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="anceCompiler.cpp" />
+    <ClCompile Include="ExpressionValue.cpp" />
+    <ClCompile Include="Parameter.cpp" />
     <ClCompile Include="ArrayType.cpp" />
     <ClCompile Include="assignment_statement.cpp" />
     <ClCompile Include="CompileState.cpp" />
@@ -243,6 +245,7 @@
     <ClCompile Include="Scope.cpp" />
     <ClCompile Include="Statement.cpp" />
     <ClCompile Include="Value.cpp" />
+    <ClCompile Include="ValueWrapper.cpp" />
     <ClCompile Include="Variable.cpp" />
     <ClCompile Include="variable_expression.cpp" />
     <ClCompile Include="Visitor.cpp" />
@@ -256,6 +259,8 @@
     <ClInclude Include="anceVisitor.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="anceCompiler.h" />
+    <ClInclude Include="ExpressionValue.h" />
+    <ClInclude Include="Parameter.h" />
     <ClInclude Include="ArrayType.h" />
     <ClInclude Include="assignment_statement.h" />
     <ClInclude Include="CompileState.h" />
@@ -281,6 +286,7 @@
     <ClInclude Include="Statement.h" />
     <ClInclude Include="Type.h" />
     <ClInclude Include="Value.h" />
+    <ClInclude Include="ValueWrapper.h" />
     <ClInclude Include="Variable.h" />
     <ClInclude Include="variable_expression.h" />
     <ClInclude Include="Visitor.h" />

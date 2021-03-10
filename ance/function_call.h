@@ -10,7 +10,7 @@ namespace ance {
 class function_call : public Expression
 {
 public:
-	function_call(std::string identifier, ance::Scope* scope);
+	function_call(std::string identifier, ance::Scope* scope, std::vector<Expression*> arguments);
 
 	ance::Type* get_type() override;
 
@@ -22,6 +22,7 @@ public:
 private:
 	ance::Scope* scope_;
 	std::string identifier_;
+	std::vector<Expression*> arguments_;
 	ance::Value* return_value_;
 };
 #endif

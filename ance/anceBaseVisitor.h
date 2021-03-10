@@ -39,6 +39,14 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitParameters(anceParser::ParametersContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitParameter(anceParser::ParameterContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitAccess_modifier(anceParser::Access_modifierContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -76,6 +84,10 @@ public:
   }
 
   virtual antlrcpp::Any visitFunction_call(anceParser::Function_callContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitArguments(anceParser::ArgumentsContext *ctx) override {
     return visitChildren(ctx);
   }
 
