@@ -34,6 +34,9 @@ namespace ance
 
 		void build_name(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 		void build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+
+		void add_return(ance::Value* value = nullptr);
+
 		llvm::CallInst* build_call(const std::vector<ance::Value*>& arguments, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) const;
 
 	private:
@@ -49,6 +52,9 @@ namespace ance
 		ance::Type* return_type_;
 		llvm::FunctionType* native_type_;
 		llvm::Function* native_function_;
+
+		ance::Value* return_value_;
+		bool hasReturn_;
 	};
 }
 

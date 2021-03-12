@@ -50,15 +50,12 @@ private ui64 get_answer() {
 private void print_newline()
 {
 	print newline;
-	return;
 }
 
 private void print_ln([ui8 : 8] word) 
 {
 	print word;
 	print newline;
-
-	return;
 }
 
 private void print_arrow([ui8 : 1] start, [ui8 : 1] tip) 
@@ -66,8 +63,6 @@ private void print_arrow([ui8 : 1] start, [ui8 : 1] tip)
 	print start;
 	print " ----> ";
 	print tip;
-
-	return;
 }
 
 public [ui8 : 1] get_newline()

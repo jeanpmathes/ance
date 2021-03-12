@@ -5,10 +5,11 @@
 #include "Value.h"
 #include "AccessModifier.h"
 #include "LocalScope.h"
+#include "VoidType.h"
 
 ance::Function::Function(access_modifier access, std::string fn_name, ance::Type* return_type, std::vector<ance::Parameter*> parameters, ance::Scope* scope, unsigned int l, unsigned int c) :
 	access_(access), name_(std::move(fn_name)), parameters_(parameters), line_(l), column_(c), local_scope_(new ance::LocalScope(scope)), return_type_(return_type),
-	native_type_(nullptr), native_function_(nullptr)
+	native_type_(nullptr), native_function_(nullptr), hasReturn_(false), return_value_(nullptr)
 {
 	for (auto* parameter : parameters_)
 	{
@@ -77,9 +78,51 @@ void ance::Function::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* 
 		ir.SetCurrentDebugLocation(llvm::DILocation::get(c, statement->getLine(), statement->getColumn(), native_function_->getSubprogram()));
 
 		statement->build(c, m, state, ir, di);
+
+		if (hasReturn_)
+		{
+			if (return_value_)
+			{
+				ir.CreateRet(return_value_->get_value(c, m, state, ir, di));
+			}
+			else
+			{
+				ir.CreateRetVoid();
+			}
+
+			break;
+		}
+	}
+
+	if (!hasReturn_)
+	{
+		if (return_type_ == ance::VoidType::get())
+		{
+			ir.CreateRetVoid();
+		}
+		else
+		{
+			assert(true); // return required
+		}
 	}
 
 	ir.SetCurrentDebugLocation(nullptr);
+}
+
+void ance::Function::add_return(ance::Value* value)
+{
+	if (value)
+	{
+		assert(value->get_type() == return_type_);
+		return_value_ = value;
+		hasReturn_ = true;
+	}
+	else
+	{
+		assert(return_type_ == ance::VoidType::get());
+		return_value_ = nullptr;
+		hasReturn_ = true;
+	}
 }
 
 llvm::CallInst* ance::Function::build_call(const std::vector<ance::Value*>& arguments, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) const
