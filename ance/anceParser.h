@@ -12,12 +12,14 @@
 class  anceParser : public antlr4::Parser {
 public:
   enum {
-    NATIVE_INTEGER_TYPE = 1, SIGNED_INTEGER = 2, HEX_INTEGER = 3, BIN_INTEGER = 4, 
-    OCT_INTEGER = 5, STRING = 6, INTEGER = 7, PRINT = 8, RETURN = 9, CONST = 10, 
-    PUBLIC = 11, PRIVATE = 12, VOID = 13, IDENTIFIER = 14, DEFINITION = 15, 
-    ASSIGNMENT = 16, PARANTHESE_OPEN = 17, PARANTHESE_CLOSED = 18, BRACE_OPEN = 19, 
-    BRACE_CLOSED = 20, BRACKET_OPEN = 21, BRACKET_CLOSED = 22, COMMA = 23, 
-    COLON = 24, SEMICOLON = 25, WHITESPACE = 26
+    NATIVE_INTEGER_TYPE = 1, HALF_TYPE = 2, SINGLE_TYPE = 3, DOUBLE_TYPE = 4, 
+    QUAD_TYPE = 5, SIGNED_INTEGER = 6, HEX_INTEGER = 7, BIN_INTEGER = 8, 
+    OCT_INTEGER = 9, HALF = 10, SINGLE = 11, DOUBLE = 12, QUAD = 13, DECIMAL = 14, 
+    STRING = 15, INTEGER = 16, PRINT = 17, RETURN = 18, CONST = 19, PUBLIC = 20, 
+    PRIVATE = 21, VOID = 22, IDENTIFIER = 23, DEFINITION = 24, ASSIGNMENT = 25, 
+    PARANTHESE_OPEN = 26, PARANTHESE_CLOSED = 27, BRACE_OPEN = 28, BRACE_CLOSED = 29, 
+    BRACKET_OPEN = 30, BRACKET_CLOSED = 31, COMMA = 32, COLON = 33, SEMICOLON = 34, 
+    WHITESPACE = 35
   };
 
   enum {
@@ -29,7 +31,8 @@ public:
     RuleFunction_call = 17, RuleArguments = 18, RuleVariable_expression = 19, 
     RuleConstant_expression = 20, RuleLiteral_expression = 21, RuleInteger_expression = 22, 
     RuleUnsigned_integer = 23, RuleSigned_integer = 24, RuleSpecial_integer = 25, 
-    RuleType = 26, RuleInteger_type = 27, RuleArray_type = 28, RuleVoid_type = 29
+    RuleFloating_point_expression = 26, RuleType = 27, RuleInteger_type = 28, 
+    RuleFloating_point_type = 29, RuleArray_type = 30, RuleVoid_type = 31
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -68,8 +71,10 @@ public:
   class Unsigned_integerContext;
   class Signed_integerContext;
   class Special_integerContext;
+  class Floating_point_expressionContext;
   class TypeContext;
   class Integer_typeContext;
+  class Floating_point_typeContext;
   class Array_typeContext;
   class Void_typeContext; 
 
@@ -392,6 +397,7 @@ public:
     virtual size_t getRuleIndex() const override;
     Literal_expressionContext *literal_expression();
     Integer_expressionContext *integer_expression();
+    Floating_point_expressionContext *floating_point_expression();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -475,11 +481,28 @@ public:
 
   Special_integerContext* special_integer();
 
+  class  Floating_point_expressionContext : public antlr4::ParserRuleContext {
+  public:
+    Floating_point_expressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *HALF();
+    antlr4::tree::TerminalNode *SINGLE();
+    antlr4::tree::TerminalNode *DOUBLE();
+    antlr4::tree::TerminalNode *QUAD();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Floating_point_expressionContext* floating_point_expression();
+
   class  TypeContext : public antlr4::ParserRuleContext {
   public:
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     Integer_typeContext *integer_type();
+    Floating_point_typeContext *floating_point_type();
     Array_typeContext *array_type();
     Void_typeContext *void_type();
 
@@ -502,6 +525,22 @@ public:
   };
 
   Integer_typeContext* integer_type();
+
+  class  Floating_point_typeContext : public antlr4::ParserRuleContext {
+  public:
+    Floating_point_typeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *HALF_TYPE();
+    antlr4::tree::TerminalNode *SINGLE_TYPE();
+    antlr4::tree::TerminalNode *DOUBLE_TYPE();
+    antlr4::tree::TerminalNode *QUAD_TYPE();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Floating_point_typeContext* floating_point_type();
 
   class  Array_typeContext : public antlr4::ParserRuleContext {
   public:

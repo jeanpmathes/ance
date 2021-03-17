@@ -26,12 +26,14 @@ public:
 
 	antlrcpp::Any visitVariable_expression(anceParser::Variable_expressionContext* context) override;
 	antlrcpp::Any visitLiteral_expression(anceParser::Literal_expressionContext* context) override;
+	antlrcpp::Any visitFloating_point_expression(anceParser::Floating_point_expressionContext* context) override;
 
 	antlrcpp::Any visitUnsigned_integer(anceParser::Unsigned_integerContext* context) override;
 	antlrcpp::Any visitSigned_integer(anceParser::Signed_integerContext* context) override;
 	antlrcpp::Any visitSpecial_integer(anceParser::Special_integerContext* context) override;
 
 	antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext* context) override;
+	antlrcpp::Any visitFloating_point_type(anceParser::Floating_point_typeContext* context) override;
 	antlrcpp::Any visitArray_type(anceParser::Array_typeContext* context) override;
 	antlrcpp::Any visitVoid_type(anceParser::Void_typeContext* context) override;
 

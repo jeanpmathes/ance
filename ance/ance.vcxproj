@@ -222,7 +222,12 @@
     <ClCompile Include="anceVisitor.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="anceCompiler.cpp" />
+    <ClCompile Include="DoubleType.cpp" />
     <ClCompile Include="ExpressionValue.cpp" />
+    <ClCompile Include="FloatingPointType.cpp" />
+    <ClCompile Include="floating_point_expression.cpp" />
+    <ClCompile Include="SingleType.cpp" />
+    <ClCompile Include="HalfType.cpp" />
     <ClCompile Include="Parameter.cpp" />
     <ClCompile Include="ArrayType.cpp" />
     <ClCompile Include="assignment_statement.cpp" />
@@ -241,6 +246,7 @@
     <ClCompile Include="LocalVariable.cpp" />
     <ClCompile Include="local_variable_definition.cpp" />
     <ClCompile Include="print_statement.cpp" />
+    <ClCompile Include="QuadType.cpp" />
     <ClCompile Include="return_statement.cpp" />
     <ClCompile Include="Scope.cpp" />
     <ClCompile Include="Statement.cpp" />
@@ -259,7 +265,12 @@
     <ClInclude Include="anceVisitor.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="anceCompiler.h" />
+    <ClInclude Include="DoubleType.h" />
     <ClInclude Include="ExpressionValue.h" />
+    <ClInclude Include="FloatingPointType.h" />
+    <ClInclude Include="floating_point_expression.h" />
+    <ClInclude Include="SingleType.h" />
+    <ClInclude Include="HalfType.h" />
     <ClInclude Include="Parameter.h" />
     <ClInclude Include="ArrayType.h" />
     <ClInclude Include="assignment_statement.h" />
@@ -281,6 +292,7 @@
     <ClInclude Include="LocalVariable.h" />
     <ClInclude Include="local_variable_definition.h" />
     <ClInclude Include="print_statement.h" />
+    <ClInclude Include="QuadType.h" />
     <ClInclude Include="return_statement.h" />
     <ClInclude Include="Scope.h" />
     <ClInclude Include="Statement.h" />

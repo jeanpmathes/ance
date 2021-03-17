@@ -119,11 +119,19 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitFloating_point_expression(anceParser::Floating_point_expressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitType(anceParser::TypeContext *ctx) override {
     return visitChildren(ctx);
   }
 
   virtual antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitFloating_point_type(anceParser::Floating_point_typeContext *ctx) override {
     return visitChildren(ctx);
   }
 

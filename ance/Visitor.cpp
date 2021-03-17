@@ -7,15 +7,20 @@
 #include "variable_expression.h"
 #include "assignment_statement.h"
 #include "default_value_expression.h"
+#include "DoubleType.h"
 #include "expression_statement.h"
+#include "floating_point_expression.h"
+#include "SingleType.h"
 #include "Function.h"
 #include "function_call.h"
 #include "GlobalScope.h"
+#include "HalfType.h"
 #include "IntegerType.h"
 #include "integer_expression.h"
 #include "LocalScope.h"
 #include "local_variable_definition.h"
 #include "print_statement.h"
+#include "QuadType.h"
 #include "VoidType.h"
 
 Visitor::Visitor(Application& application) : application_(application)
@@ -250,6 +255,38 @@ antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionCon
 	return static_cast<Expression*>(new literal_expression(builder.str(), application_.global_scope()));
 }
 
+antlrcpp::Any Visitor::visitFloating_point_expression(anceParser::Floating_point_expressionContext* context)
+{
+	llvm::APFloat number = llvm::APFloat::getZero(llvm::APFloat::Bogus());
+	ance::FloatingPointType* type = nullptr;
+
+	if (context->HALF())
+	{
+		number = llvm::APFloat(llvm::APFloat::IEEEhalf(), context->getText().erase(context->getText().size() - 1));
+		type = ance::HalfType::get(application_.global_scope());
+	}
+
+	if (context->SINGLE())
+	{
+		number = llvm::APFloat(llvm::APFloat::IEEEsingle(), context->getText().erase(context->getText().size() - 1));
+		type = ance::SingleType::get(application_.global_scope());
+	}
+
+	if (context->DOUBLE())
+	{
+		number = llvm::APFloat(llvm::APFloat::IEEEdouble(), context->getText().erase(context->getText().size() - 1));
+		type = ance::DoubleType::get(application_.global_scope());
+	}
+
+	if (context->QUAD())
+	{
+		number = llvm::APFloat(llvm::APFloat::IEEEquad(), context->getText().erase(context->getText().size() - 1));
+		type = ance::QuadType::get(application_.global_scope());
+	}
+
+	return static_cast<Expression*>(new floating_point_expression(type, number));
+}
+
 antlrcpp::Any Visitor::visitUnsigned_integer(anceParser::Unsigned_integerContext* context)
 {
 	uint64_t size = 64;
@@ -320,6 +357,33 @@ antlrcpp::Any Visitor::visitInteger_type(anceParser::Integer_typeContext* contex
 	uint64_t size = std::stoi(integer_type_str.substr(1 + integer_type_str.find('i')));
 
 	type = ance::IntegerType::get(application_.global_scope(), size, !is_unsigned);
+
+	return type;
+}
+
+antlrcpp::Any Visitor::visitFloating_point_type(anceParser::Floating_point_typeContext* context)
+{
+	ance::Type* type;
+
+	if (context->HALF_TYPE())
+	{
+		type = ance::HalfType::get(application_.global_scope());
+	}
+
+	if (context->SINGLE_TYPE())
+	{
+		type = ance::SingleType::get(application_.global_scope());
+	}
+
+	if (context->DOUBLE_TYPE())
+	{
+		type = ance::DoubleType::get(application_.global_scope());
+	}
+
+	if (context->QUAD_TYPE())
+	{
+		type = ance::QuadType::get(application_.global_scope());
+	}
 
 	return type;
 }

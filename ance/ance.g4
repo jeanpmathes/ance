@@ -91,6 +91,7 @@ variable_expression
 constant_expression
 	: literal_expression
 	| integer_expression
+	| floating_point_expression
 	;
 
 literal_expression
@@ -117,14 +118,29 @@ special_integer
 	| OCT_INTEGER ( COLON INTEGER )?
 	;
 
+floating_point_expression
+	: HALF
+	| SINGLE
+	| DOUBLE
+	| QUAD
+	;
+
 type
 	: integer_type
+	| floating_point_type
 	| array_type
 	| void_type
 	;
 
 integer_type
 	: NATIVE_INTEGER_TYPE
+	;
+
+floating_point_type
+	: HALF_TYPE
+	| SINGLE_TYPE
+	| DOUBLE_TYPE
+	| QUAD_TYPE
 	;
 
 array_type
@@ -137,10 +153,22 @@ void_type
 
 NATIVE_INTEGER_TYPE : 'u'? 'i' INTEGER ;
 
+HALF_TYPE: 'half' ;
+SINGLE_TYPE: 'single' ;
+DOUBLE_TYPE: 'double' ;
+QUAD_TYPE: 'quad' ;
+
 SIGNED_INTEGER : ( '+' | '-' ) INTEGER ;
 HEX_INTEGER : '0' [xX] [0-9a-fA-F]+ ;
 BIN_INTEGER : '0' [bB] [01]+ ;
 OCT_INTEGER : '0' [oO] [0-7]+ ;
+
+HALF : DECIMAL 'h' ;
+SINGLE : DECIMAL 's' ;
+DOUBLE : DECIMAL 'd' ;
+QUAD : DECIMAL 'q' ;
+
+DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ;
 
 STRING : '"' ('\\'. | .)*? '"';
 INTEGER : [0-9]+ ;

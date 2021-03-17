@@ -10,6 +10,11 @@ private ui64 hex <- 0xCAFEBABE;
 private ui64 bin <- 0b010101010101;
 private ui64 oct <- 0o1234567;
 
+private half h <- 00.00h;
+private single s <- 12.5s;
+private double d <- -0.003d;
+private quad q <- .5q;
+
 public ui32 main()
 {
 	a <- "c";

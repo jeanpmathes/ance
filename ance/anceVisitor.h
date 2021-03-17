@@ -71,9 +71,13 @@ public:
 
     virtual antlrcpp::Any visitSpecial_integer(anceParser::Special_integerContext *context) = 0;
 
+    virtual antlrcpp::Any visitFloating_point_expression(anceParser::Floating_point_expressionContext *context) = 0;
+
     virtual antlrcpp::Any visitType(anceParser::TypeContext *context) = 0;
 
     virtual antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext *context) = 0;
+
+    virtual antlrcpp::Any visitFloating_point_type(anceParser::Floating_point_typeContext *context) = 0;
 
     virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *context) = 0;
 

@@ -172,6 +172,24 @@
     <ClCompile Include="ValueWrapper.cpp">
       <Filter>Source Files\Construct Files</Filter>
     </ClCompile>
+    <ClCompile Include="HalfType.cpp">
+      <Filter>Source Files\Type Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DoubleType.cpp">
+      <Filter>Source Files\Type Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadType.cpp">
+      <Filter>Source Files\Type Files</Filter>
+    </ClCompile>
+    <ClCompile Include="floating_point_expression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FloatingPointType.cpp">
+      <Filter>Source Files\Type Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SingleType.cpp">
+      <Filter>Source Files\Type Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anceLexer.h">
@@ -290,6 +308,24 @@
     </ClInclude>
     <ClInclude Include="ValueWrapper.h">
       <Filter>Header Files\Construct Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HalfType.h">
+      <Filter>Header Files\Type Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadType.h">
+      <Filter>Header Files\Type Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DoubleType.h">
+      <Filter>Header Files\Type Files</Filter>
+    </ClInclude>
+    <ClInclude Include="floating_point_expression.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FloatingPointType.h">
+      <Filter>Header Files\Type Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SingleType.h">
+      <Filter>Header Files\Type Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
