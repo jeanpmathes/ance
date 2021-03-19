@@ -7,6 +7,7 @@
 #include <string>
 
 #include "GlobalScope.h"
+#include "SizeType.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Support/TargetRegistry.h"
@@ -35,6 +36,9 @@ anceCompiler::anceCompiler(Application& app) : application(app), ir(context)
 	llvm::TargetMachine* tm = t->createTargetMachine(triple.str(), "generic", "", opt, rm, cm, llvm::CodeGenOpt::None);
 
 	llvm::DataLayout dl = tm->createDataLayout();
+	application.set_pointer_size(dl.getPointerSize());
+	ance::SizeType::init(context, app);
+
 	module->setDataLayout(dl);
 	module->setTargetTriple(triple.str());
 

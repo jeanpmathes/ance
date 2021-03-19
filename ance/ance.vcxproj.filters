@@ -190,6 +190,15 @@
     <ClCompile Include="SingleType.cpp">
       <Filter>Source Files\Type Files</Filter>
     </ClCompile>
+    <ClCompile Include="sizeof_type.cpp">
+      <Filter>Source Files\Expression Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sizeof_expression.cpp">
+      <Filter>Source Files\Expression Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SizeType.cpp">
+      <Filter>Source Files\Type Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anceLexer.h">
@@ -326,6 +335,15 @@
     </ClInclude>
     <ClInclude Include="SingleType.h">
       <Filter>Header Files\Type Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sizeof_expression.h">
+      <Filter>Header Files\Expression Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SizeType.h">
+      <Filter>Header Files\Type Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sizeof_type.h">
+      <Filter>Header Files\Expression Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

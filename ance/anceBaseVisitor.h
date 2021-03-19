@@ -95,6 +95,14 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitSizeof_type_expression(anceParser::Sizeof_type_expressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitSizeof_exp_expression(anceParser::Sizeof_exp_expressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitConstant_expression(anceParser::Constant_expressionContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -132,6 +140,10 @@ public:
   }
 
   virtual antlrcpp::Any visitFloating_point_type(anceParser::Floating_point_typeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitSize_type(anceParser::Size_typeContext *ctx) override {
     return visitChildren(ctx);
   }
 

@@ -15,11 +15,11 @@ public:
     NATIVE_INTEGER_TYPE = 1, HALF_TYPE = 2, SINGLE_TYPE = 3, DOUBLE_TYPE = 4, 
     QUAD_TYPE = 5, SIGNED_INTEGER = 6, HEX_INTEGER = 7, BIN_INTEGER = 8, 
     OCT_INTEGER = 9, HALF = 10, SINGLE = 11, DOUBLE = 12, QUAD = 13, DECIMAL = 14, 
-    STRING = 15, INTEGER = 16, PRINT = 17, RETURN = 18, CONST = 19, PUBLIC = 20, 
-    PRIVATE = 21, VOID = 22, IDENTIFIER = 23, DEFINITION = 24, ASSIGNMENT = 25, 
-    PARANTHESE_OPEN = 26, PARANTHESE_CLOSED = 27, BRACE_OPEN = 28, BRACE_CLOSED = 29, 
-    BRACKET_OPEN = 30, BRACKET_CLOSED = 31, COMMA = 32, COLON = 33, SEMICOLON = 34, 
-    WHITESPACE = 35
+    STRING = 15, INTEGER = 16, SIZEOF = 17, SIZE = 18, PRINT = 19, RETURN = 20, 
+    CONST = 21, PUBLIC = 22, PRIVATE = 23, VOID = 24, IDENTIFIER = 25, DEFINITION = 26, 
+    ASSIGNMENT = 27, PARANTHESE_OPEN = 28, PARANTHESE_CLOSED = 29, BRACE_OPEN = 30, 
+    BRACE_CLOSED = 31, BRACKET_OPEN = 32, BRACKET_CLOSED = 33, COMMA = 34, 
+    COLON = 35, SEMICOLON = 36, WHITESPACE = 37
   };
 
   enum {
@@ -29,10 +29,11 @@ public:
     RuleLocal_variable_definition = 11, RuleVariable_assignment = 12, RulePrint_statement = 13, 
     RuleReturn_statement = 14, RuleExpression = 15, RuleIndependent_expression = 16, 
     RuleFunction_call = 17, RuleArguments = 18, RuleVariable_expression = 19, 
-    RuleConstant_expression = 20, RuleLiteral_expression = 21, RuleInteger_expression = 22, 
-    RuleUnsigned_integer = 23, RuleSigned_integer = 24, RuleSpecial_integer = 25, 
-    RuleFloating_point_expression = 26, RuleType = 27, RuleInteger_type = 28, 
-    RuleFloating_point_type = 29, RuleArray_type = 30, RuleVoid_type = 31
+    RuleSizeof_type_expression = 20, RuleSizeof_exp_expression = 21, RuleConstant_expression = 22, 
+    RuleLiteral_expression = 23, RuleInteger_expression = 24, RuleUnsigned_integer = 25, 
+    RuleSigned_integer = 26, RuleSpecial_integer = 27, RuleFloating_point_expression = 28, 
+    RuleType = 29, RuleInteger_type = 30, RuleFloating_point_type = 31, 
+    RuleSize_type = 32, RuleArray_type = 33, RuleVoid_type = 34
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -65,6 +66,8 @@ public:
   class Function_callContext;
   class ArgumentsContext;
   class Variable_expressionContext;
+  class Sizeof_type_expressionContext;
+  class Sizeof_exp_expressionContext;
   class Constant_expressionContext;
   class Literal_expressionContext;
   class Integer_expressionContext;
@@ -75,6 +78,7 @@ public:
   class TypeContext;
   class Integer_typeContext;
   class Floating_point_typeContext;
+  class Size_typeContext;
   class Array_typeContext;
   class Void_typeContext; 
 
@@ -323,6 +327,8 @@ public:
     ExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     Variable_expressionContext *variable_expression();
+    Sizeof_type_expressionContext *sizeof_type_expression();
+    Sizeof_exp_expressionContext *sizeof_exp_expression();
     Constant_expressionContext *constant_expression();
     Independent_expressionContext *independent_expression();
 
@@ -390,6 +396,36 @@ public:
   };
 
   Variable_expressionContext* variable_expression();
+
+  class  Sizeof_type_expressionContext : public antlr4::ParserRuleContext {
+  public:
+    Sizeof_type_expressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *SIZEOF();
+    TypeContext *type();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Sizeof_type_expressionContext* sizeof_type_expression();
+
+  class  Sizeof_exp_expressionContext : public antlr4::ParserRuleContext {
+  public:
+    Sizeof_exp_expressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *SIZEOF();
+    antlr4::tree::TerminalNode *PARANTHESE_OPEN();
+    ExpressionContext *expression();
+    antlr4::tree::TerminalNode *PARANTHESE_CLOSED();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Sizeof_exp_expressionContext* sizeof_exp_expression();
 
   class  Constant_expressionContext : public antlr4::ParserRuleContext {
   public:
@@ -503,6 +539,7 @@ public:
     virtual size_t getRuleIndex() const override;
     Integer_typeContext *integer_type();
     Floating_point_typeContext *floating_point_type();
+    Size_typeContext *size_type();
     Array_typeContext *array_type();
     Void_typeContext *void_type();
 
@@ -541,6 +578,19 @@ public:
   };
 
   Floating_point_typeContext* floating_point_type();
+
+  class  Size_typeContext : public antlr4::ParserRuleContext {
+  public:
+    Size_typeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *SIZE();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Size_typeContext* size_type();
 
   class  Array_typeContext : public antlr4::ParserRuleContext {
   public:

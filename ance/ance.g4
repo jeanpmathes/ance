@@ -68,6 +68,8 @@ return_statement
 
 expression
 	: variable_expression
+	| sizeof_type_expression
+	| sizeof_exp_expression
 	| constant_expression
 	| independent_expression
 	;
@@ -86,6 +88,14 @@ arguments
 
 variable_expression
 	: IDENTIFIER
+	;
+
+sizeof_type_expression
+	: SIZEOF type
+	;
+
+sizeof_exp_expression
+	: SIZEOF PARANTHESE_OPEN expression PARANTHESE_CLOSED
 	;
 
 constant_expression
@@ -128,6 +138,7 @@ floating_point_expression
 type
 	: integer_type
 	| floating_point_type
+	| size_type
 	| array_type
 	| void_type
 	;
@@ -141,6 +152,10 @@ floating_point_type
 	| SINGLE_TYPE
 	| DOUBLE_TYPE
 	| QUAD_TYPE
+	;
+
+size_type
+	: SIZE
 	;
 
 array_type
@@ -172,6 +187,9 @@ DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ;
 
 STRING : '"' ('\\'. | .)*? '"';
 INTEGER : [0-9]+ ;
+
+SIZEOF : 'sizeof' ;
+SIZE : 'size' ;
 
 PRINT : 'print' ;
 RETURN : 'return' ;

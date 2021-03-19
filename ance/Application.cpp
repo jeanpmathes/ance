@@ -8,6 +8,11 @@ Application::Application(std::filesystem::path project_file, std::filesystem::pa
 {
 }
 
+void Application::set_pointer_size(unsigned size)
+{
+	pointer_size_ = size;
+}
+
 const std::string Application::GetName() const
 {
 	return proj_file.stem().string();
@@ -21,6 +26,11 @@ const std::filesystem::path Application::GetProjectFile() const
 const std::filesystem::path Application::GetCodeFile() const
 {
 	return std::filesystem::path(code_file);
+}
+
+unsigned Application::get_bitness()
+{
+	return pointer_size_ * 8;
 }
 
 bool Application::Validate()

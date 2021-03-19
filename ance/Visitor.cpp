@@ -21,6 +21,9 @@
 #include "local_variable_definition.h"
 #include "print_statement.h"
 #include "QuadType.h"
+#include "sizeof_expression.h"
+#include "sizeof_type.h"
+#include "SizeType.h"
 #include "VoidType.h"
 
 Visitor::Visitor(Application& application) : application_(application)
@@ -211,6 +214,18 @@ antlrcpp::Any Visitor::visitVariable_expression(anceParser::Variable_expressionC
 	return static_cast<Expression*>(new variable_expression(application_.global_scope()->get_current_function()->get_scope()->get_variable(identifier)));
 }
 
+antlrcpp::Any Visitor::visitSizeof_type_expression(anceParser::Sizeof_type_expressionContext* context)
+{
+	ance::Type* type = visit(context->type());
+	return static_cast<Expression*>(new sizeof_type(type, application_));
+}
+
+antlrcpp::Any Visitor::visitSizeof_exp_expression(anceParser::Sizeof_exp_expressionContext* context)
+{
+	Expression* exp = visit(context->expression());
+	return static_cast<Expression*>(new sizeof_expression(exp, application_));
+}
+
 antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionContext* context)
 {
 	std::string unparsed = context->STRING()->getText();
@@ -385,6 +400,12 @@ antlrcpp::Any Visitor::visitFloating_point_type(anceParser::Floating_point_typeC
 		type = ance::QuadType::get(application_.global_scope());
 	}
 
+	return type;
+}
+
+antlrcpp::Any Visitor::visitSize_type(anceParser::Size_typeContext* context)
+{
+	ance::Type* type = ance::SizeType::get(application_);
 	return type;
 }
 

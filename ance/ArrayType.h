@@ -1,5 +1,5 @@
-#ifndef ARRAY_TYPE_H
-#define ARRAY_TYPE_H
+#ifndef ANCE_ARRAY_TYPE_H
+#define ANCE_ARRAY_TYPE_H
 
 #include "Type.h"
 

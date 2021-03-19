@@ -42,8 +42,11 @@ public ui32 main()
 	print_arrow("a", "b");
 
 	print_ln("--------");
-	print_ln("POGGERS ");
+	print_ln("NICE DAY");
 	print_ln("HELLO   ");
+
+	size s1 <- id(sizeof i32);
+	size s2 <- id(sizeof(b));
 
 	return SUCCESS;
 }
@@ -79,6 +82,11 @@ private [ui8 : 1] print_and_pass_trough_newline()
 {
 	print get_newline();
 	return get_newline();
+}
+
+private size id(size s) 
+{
+	return s;
 }
 
 private const ui32 SUCCESS := 0:32;

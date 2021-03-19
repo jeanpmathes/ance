@@ -249,6 +249,9 @@
     <ClCompile Include="QuadType.cpp" />
     <ClCompile Include="return_statement.cpp" />
     <ClCompile Include="Scope.cpp" />
+    <ClCompile Include="sizeof_expression.cpp" />
+    <ClCompile Include="sizeof_type.cpp" />
+    <ClCompile Include="SizeType.cpp" />
     <ClCompile Include="Statement.cpp" />
     <ClCompile Include="Value.cpp" />
     <ClCompile Include="ValueWrapper.cpp" />
@@ -295,6 +298,9 @@
     <ClInclude Include="QuadType.h" />
     <ClInclude Include="return_statement.h" />
     <ClInclude Include="Scope.h" />
+    <ClInclude Include="sizeof_expression.h" />
+    <ClInclude Include="sizeof_type.h" />
+    <ClInclude Include="SizeType.h" />
     <ClInclude Include="Statement.h" />
     <ClInclude Include="Type.h" />
     <ClInclude Include="Value.h" />

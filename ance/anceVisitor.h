@@ -59,6 +59,10 @@ public:
 
     virtual antlrcpp::Any visitVariable_expression(anceParser::Variable_expressionContext *context) = 0;
 
+    virtual antlrcpp::Any visitSizeof_type_expression(anceParser::Sizeof_type_expressionContext *context) = 0;
+
+    virtual antlrcpp::Any visitSizeof_exp_expression(anceParser::Sizeof_exp_expressionContext *context) = 0;
+
     virtual antlrcpp::Any visitConstant_expression(anceParser::Constant_expressionContext *context) = 0;
 
     virtual antlrcpp::Any visitLiteral_expression(anceParser::Literal_expressionContext *context) = 0;
@@ -78,6 +82,8 @@ public:
     virtual antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext *context) = 0;
 
     virtual antlrcpp::Any visitFloating_point_type(anceParser::Floating_point_typeContext *context) = 0;
+
+    virtual antlrcpp::Any visitSize_type(anceParser::Size_typeContext *context) = 0;
 
     virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *context) = 0;
 
