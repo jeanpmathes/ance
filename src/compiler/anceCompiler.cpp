@@ -8,7 +8,7 @@
 
 #include "GlobalScope.h"
 #include "SizeType.h"
-#include "llvm/IR/Module.h"
+
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Support/TargetRegistry.h"
 #include "llvm/IR/Verifier.h"

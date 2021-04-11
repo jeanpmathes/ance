@@ -358,6 +358,8 @@ antlrcpp::Any Visitor::visitSpecial_integer(anceParser::Special_integerContext* 
 		radix = 8;
 	}
 
+    integer_str.erase(0, 2);
+
 	const llvm::APInt integer(size, integer_str, radix);
 	return static_cast<Expression*>(new integer_expression(integer, application_.global_scope(), size, false));
 }

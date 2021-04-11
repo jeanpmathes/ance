@@ -1,5 +1,5 @@
 
-// Generated from ./ance.g4 by ANTLR 4.8
+// Generated from ./src/grammar/ance.g4 by ANTLR 4.8
 
 
 #include "anceVisitor.h"
@@ -403,16 +403,16 @@ tree::TerminalNode* anceParser::FunctionContext::IDENTIFIER() {
   return getToken(anceParser::IDENTIFIER, 0);
 }
 
-tree::TerminalNode* anceParser::FunctionContext::PARANTHESE_OPEN() {
-  return getToken(anceParser::PARANTHESE_OPEN, 0);
+tree::TerminalNode* anceParser::FunctionContext::PARENTHESES_OPEN() {
+  return getToken(anceParser::PARENTHESES_OPEN, 0);
 }
 
 anceParser::ParametersContext* anceParser::FunctionContext::parameters() {
   return getRuleContext<anceParser::ParametersContext>(0);
 }
 
-tree::TerminalNode* anceParser::FunctionContext::PARANTHESE_CLOSED() {
-  return getToken(anceParser::PARANTHESE_CLOSED, 0);
+tree::TerminalNode* anceParser::FunctionContext::PARENTHESES_CLOSED() {
+  return getToken(anceParser::PARENTHESES_CLOSED, 0);
 }
 
 tree::TerminalNode* anceParser::FunctionContext::BRACE_OPEN() {
@@ -461,11 +461,11 @@ anceParser::FunctionContext* anceParser::function() {
     setState(102);
     match(anceParser::IDENTIFIER);
     setState(103);
-    match(anceParser::PARANTHESE_OPEN);
+    match(anceParser::PARENTHESES_OPEN);
     setState(104);
     parameters();
     setState(105);
-    match(anceParser::PARANTHESE_CLOSED);
+    match(anceParser::PARENTHESES_CLOSED);
     setState(106);
     match(anceParser::BRACE_OPEN);
     setState(108); 
@@ -1268,16 +1268,16 @@ tree::TerminalNode* anceParser::Function_callContext::IDENTIFIER() {
   return getToken(anceParser::IDENTIFIER, 0);
 }
 
-tree::TerminalNode* anceParser::Function_callContext::PARANTHESE_OPEN() {
-  return getToken(anceParser::PARANTHESE_OPEN, 0);
+tree::TerminalNode* anceParser::Function_callContext::PARENTHESES_OPEN() {
+  return getToken(anceParser::PARENTHESES_OPEN, 0);
 }
 
 anceParser::ArgumentsContext* anceParser::Function_callContext::arguments() {
   return getRuleContext<anceParser::ArgumentsContext>(0);
 }
 
-tree::TerminalNode* anceParser::Function_callContext::PARANTHESE_CLOSED() {
-  return getToken(anceParser::PARANTHESE_CLOSED, 0);
+tree::TerminalNode* anceParser::Function_callContext::PARENTHESES_CLOSED() {
+  return getToken(anceParser::PARENTHESES_CLOSED, 0);
 }
 
 
@@ -1305,11 +1305,11 @@ anceParser::Function_callContext* anceParser::function_call() {
     setState(171);
     match(anceParser::IDENTIFIER);
     setState(172);
-    match(anceParser::PARANTHESE_OPEN);
+    match(anceParser::PARENTHESES_OPEN);
     setState(173);
     arguments();
     setState(174);
-    match(anceParser::PARANTHESE_CLOSED);
+    match(anceParser::PARENTHESES_CLOSED);
    
   }
   catch (RecognitionException &e) {
@@ -1515,16 +1515,16 @@ tree::TerminalNode* anceParser::Sizeof_exp_expressionContext::SIZEOF() {
   return getToken(anceParser::SIZEOF, 0);
 }
 
-tree::TerminalNode* anceParser::Sizeof_exp_expressionContext::PARANTHESE_OPEN() {
-  return getToken(anceParser::PARANTHESE_OPEN, 0);
+tree::TerminalNode* anceParser::Sizeof_exp_expressionContext::PARENTHESES_OPEN() {
+  return getToken(anceParser::PARENTHESES_OPEN, 0);
 }
 
 anceParser::ExpressionContext* anceParser::Sizeof_exp_expressionContext::expression() {
   return getRuleContext<anceParser::ExpressionContext>(0);
 }
 
-tree::TerminalNode* anceParser::Sizeof_exp_expressionContext::PARANTHESE_CLOSED() {
-  return getToken(anceParser::PARANTHESE_CLOSED, 0);
+tree::TerminalNode* anceParser::Sizeof_exp_expressionContext::PARENTHESES_CLOSED() {
+  return getToken(anceParser::PARENTHESES_CLOSED, 0);
 }
 
 
@@ -1552,11 +1552,11 @@ anceParser::Sizeof_exp_expressionContext* anceParser::sizeof_exp_expression() {
     setState(191);
     match(anceParser::SIZEOF);
     setState(192);
-    match(anceParser::PARANTHESE_OPEN);
+    match(anceParser::PARENTHESES_OPEN);
     setState(193);
     expression();
     setState(194);
-    match(anceParser::PARANTHESE_CLOSED);
+    match(anceParser::PARENTHESES_CLOSED);
    
   }
   catch (RecognitionException &e) {
@@ -2496,9 +2496,9 @@ std::vector<std::string> anceParser::_symbolicNames = {
   "QUAD_TYPE", "SIGNED_INTEGER", "HEX_INTEGER", "BIN_INTEGER", "OCT_INTEGER", 
   "HALF", "SINGLE", "DOUBLE", "QUAD", "DECIMAL", "STRING", "INTEGER", "SIZEOF", 
   "SIZE", "PRINT", "RETURN", "CONST", "PUBLIC", "PRIVATE", "VOID", "IDENTIFIER", 
-  "DEFINITION", "ASSIGNMENT", "PARANTHESE_OPEN", "PARANTHESE_CLOSED", "BRACE_OPEN", 
-  "BRACE_CLOSED", "BRACKET_OPEN", "BRACKET_CLOSED", "COMMA", "COLON", "SEMICOLON", 
-  "WHITESPACE"
+  "DEFINITION", "ASSIGNMENT", "PARENTHESES_OPEN", "PARENTHESES_CLOSED", 
+  "BRACE_OPEN", "BRACE_CLOSED", "BRACKET_OPEN", "BRACKET_CLOSED", "COMMA", 
+  "COLON", "SEMICOLON", "WHITESPACE"
 };
 
 dfa::Vocabulary anceParser::_vocabulary(_literalNames, _symbolicNames);

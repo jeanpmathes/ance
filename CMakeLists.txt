@@ -1,110 +1,29 @@
-cmake_minimum_required(VERSION 3.15.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.17)
+project(ance)
 
-set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_GENERATOR_PLATFORM x64)
 
-project(ance CXX)
+include(C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
-################################################################################
-# Set target arch type if empty. Visual studio solution generator provides it.
-################################################################################
-if(NOT CMAKE_VS_PLATFORM_NAME)
-    set(CMAKE_VS_PLATFORM_NAME "x64")
-endif()
-message("${CMAKE_VS_PLATFORM_NAME} architecture in use")
+set(VCPKG_TARGET_TRIPLET x64-windows)
+set(CMAKE_TOOLCHAIN_FILE C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
-if(NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64"
-     OR "${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86"))
-    message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
-endif()
+find_path(ANTLR4_INCLUDE_DIR antlr4-runtime.h HINTS C:/dev/vcpkg/installed/x64-windows/include/antlr4-runtime/)
+message(STATUS "Found antlr4 includes at: ${ANTLR4_INCLUDE_DIR}")
+find_library(ANTLR4_LIB antlr4-runtime)
+message(STATUS "Found antlr4 lib at: ${ANTLR4_LIB}")
+include_directories(${ANTLR4_INCLUDE_DIR})
 
-################################################################################
-# Global configuration types
-################################################################################
-set(CMAKE_CONFIGURATION_TYPES
-    "Debug"
-    "DebugDLL"
-    "DebugStatic"
-    "Release"
-    "ReleaseDLL"
-    "ReleaseStatic"
-    CACHE STRING "" FORCE
-)
+find_package(LLVM CONFIG REQUIRED)
+message(STATUS "Found llvm package ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+include_directories(${LLVM_INCLUDE_DIRS})
+add_definitions(${LLVM_DEFINITIONS})
 
-################################################################################
-# Global compiler options
-################################################################################
-if(MSVC)
-    # remove default flags provided with CMake for MSVC
-    set(CMAKE_CXX_FLAGS "")
-    set(CMAKE_CXX_FLAGS_DEBUG "")
-    set(CMAKE_CXX_FLAGS_DEBUGDLL "")
-    set(CMAKE_CXX_FLAGS_DEBUGSTATIC "")
-    set(CMAKE_CXX_FLAGS_RELEASE "")
-    set(CMAKE_CXX_FLAGS_RELEASEDLL "")
-    set(CMAKE_CXX_FLAGS_RELEASESTATIC "")
-endif()
+find_package(LLD CONFIG REQUIRED)
+message(STATUS "Found LLDConfig.cmake in ${LLD_CMAKE_DIR}")
+include_directories(${LLD_INCLUDE_DIRS})
 
-################################################################################
-# Global linker options
-################################################################################
-if(MSVC)
-    # remove default flags provided with CMake for MSVC
-    set(CMAKE_EXE_LINKER_FLAGS "")
-    set(CMAKE_MODULE_LINKER_FLAGS "")
-    set(CMAKE_SHARED_LINKER_FLAGS "")
-    set(CMAKE_STATIC_LINKER_FLAGS "")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_STATIC_LINKER_FLAGS_DEBUG "${CMAKE_STATIC_LINKER_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUGDLL "${CMAKE_EXE_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS_DEBUGDLL "${CMAKE_MODULE_LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS_DEBUGDLL "${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_STATIC_LINKER_FLAGS_DEBUGDLL "${CMAKE_STATIC_LINKER_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUGSTATIC "${CMAKE_EXE_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS_DEBUGSTATIC "${CMAKE_MODULE_LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS_DEBUGSTATIC "${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_STATIC_LINKER_FLAGS_DEBUGSTATIC "${CMAKE_STATIC_LINKER_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASEDLL "${CMAKE_EXE_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS_RELEASEDLL "${CMAKE_MODULE_LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS_RELEASEDLL "${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_STATIC_LINKER_FLAGS_RELEASEDLL "${CMAKE_STATIC_LINKER_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASESTATIC "${CMAKE_EXE_LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS_RELEASESTATIC "${CMAKE_MODULE_LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS_RELEASESTATIC "${CMAKE_SHARED_LINKER_FLAGS}")
-    set(CMAKE_STATIC_LINKER_FLAGS_RELEASESTATIC "${CMAKE_STATIC_LINKER_FLAGS}")
-endif()
-
-################################################################################
-# Nuget packages function stub.
-################################################################################
-function(use_package TARGET PACKAGE VERSION)
-    message(WARNING "No implementation of use_package. Create yours. "
-                    "Package \"${PACKAGE}\" with version \"${VERSION}\" "
-                    "for target \"${TARGET}\" is ignored!")
-endfunction()
-
-################################################################################
-# Common utils
-################################################################################
-include(CMake/Utils.cmake)
-
-################################################################################
-# Additional Global Settings(add specific info there)
-################################################################################
-include(CMake/GlobalSettingsInclude.cmake OPTIONAL)
-
-################################################################################
-# Use solution folders feature
-################################################################################
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-################################################################################
-# Sub-projects
-################################################################################
-add_subdirectory(ance)
-
+include_directories(src)
+add_subdirectory(src)

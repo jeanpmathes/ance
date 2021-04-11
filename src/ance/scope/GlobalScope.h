@@ -1,5 +1,6 @@
 #ifndef ANCE_GLOBALSCOPE_H
 #define ANCE_GLOBALSCOPE_H
+
 #include "Scope.h"
 
 namespace ance

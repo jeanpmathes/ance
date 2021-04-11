@@ -22,7 +22,7 @@ code
 	;
 
 function
-	: access_modifier type IDENTIFIER PARANTHESE_OPEN parameters PARANTHESE_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
+	: access_modifier type IDENTIFIER PARENTHESES_OPEN parameters PARENTHESES_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
 	;
 
 parameters
@@ -79,7 +79,7 @@ independent_expression
 	;
 
 function_call
-	: IDENTIFIER PARANTHESE_OPEN arguments PARANTHESE_CLOSED
+	: IDENTIFIER PARENTHESES_OPEN arguments PARENTHESES_CLOSED
 	;
 
 arguments
@@ -95,7 +95,7 @@ sizeof_type_expression
 	;
 
 sizeof_exp_expression
-	: SIZEOF PARANTHESE_OPEN expression PARANTHESE_CLOSED
+	: SIZEOF PARENTHESES_OPEN expression PARENTHESES_CLOSED
 	;
 
 constant_expression
@@ -203,8 +203,8 @@ IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
 DEFINITION : ':=' ;
 ASSIGNMENT : '<-' ;
 
-PARANTHESE_OPEN : '(' ;
-PARANTHESE_CLOSED : ')' ;
+PARENTHESES_OPEN : '(' ;
+PARENTHESES_CLOSED : ')' ;
 
 BRACE_OPEN : '{' ;
 BRACE_CLOSED : '}' ;

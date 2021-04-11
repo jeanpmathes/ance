@@ -1,6 +1,7 @@
 #include "Function.h"
 
 #include <utility>
+#include <llvm/ADT/SmallVector.h> // critical, missing include will cause linking error
 
 #include "Value.h"
 #include "AccessModifier.h"

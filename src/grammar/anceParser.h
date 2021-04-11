@@ -1,5 +1,5 @@
 
-// Generated from ./ance.g4 by ANTLR 4.8
+// Generated from ./src/grammar/ance.g4 by ANTLR 4.8
 
 #pragma once
 
@@ -17,7 +17,7 @@ public:
     OCT_INTEGER = 9, HALF = 10, SINGLE = 11, DOUBLE = 12, QUAD = 13, DECIMAL = 14, 
     STRING = 15, INTEGER = 16, SIZEOF = 17, SIZE = 18, PRINT = 19, RETURN = 20, 
     CONST = 21, PUBLIC = 22, PRIVATE = 23, VOID = 24, IDENTIFIER = 25, DEFINITION = 26, 
-    ASSIGNMENT = 27, PARANTHESE_OPEN = 28, PARANTHESE_CLOSED = 29, BRACE_OPEN = 30, 
+    ASSIGNMENT = 27, PARENTHESES_OPEN = 28, PARENTHESES_CLOSED = 29, BRACE_OPEN = 30, 
     BRACE_CLOSED = 31, BRACKET_OPEN = 32, BRACKET_CLOSED = 33, COMMA = 34, 
     COLON = 35, SEMICOLON = 36, WHITESPACE = 37
   };
@@ -169,9 +169,9 @@ public:
     Access_modifierContext *access_modifier();
     TypeContext *type();
     antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *PARANTHESE_OPEN();
+    antlr4::tree::TerminalNode *PARENTHESES_OPEN();
     ParametersContext *parameters();
-    antlr4::tree::TerminalNode *PARANTHESE_CLOSED();
+    antlr4::tree::TerminalNode *PARENTHESES_CLOSED();
     antlr4::tree::TerminalNode *BRACE_OPEN();
     antlr4::tree::TerminalNode *BRACE_CLOSED();
     std::vector<StatementContext *> statement();
@@ -357,9 +357,9 @@ public:
     Function_callContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *PARANTHESE_OPEN();
+    antlr4::tree::TerminalNode *PARENTHESES_OPEN();
     ArgumentsContext *arguments();
-    antlr4::tree::TerminalNode *PARANTHESE_CLOSED();
+    antlr4::tree::TerminalNode *PARENTHESES_CLOSED();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -416,9 +416,9 @@ public:
     Sizeof_exp_expressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *SIZEOF();
-    antlr4::tree::TerminalNode *PARANTHESE_OPEN();
+    antlr4::tree::TerminalNode *PARENTHESES_OPEN();
     ExpressionContext *expression();
-    antlr4::tree::TerminalNode *PARANTHESE_CLOSED();
+    antlr4::tree::TerminalNode *PARENTHESES_CLOSED();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
