@@ -1,11 +1,11 @@
 #ifndef SIZEOF_EXPRESSION_H
 #define SIZEOF_EXPRESSION_H
 
-#include "Expression.h"
+#include "BuildableExpression.h"
 
 class Application;
 
-class sizeof_expression : public Expression
+class sizeof_expression : public BuildableExpression
 {
 public:
 	sizeof_expression(Expression* expression, Application& app);

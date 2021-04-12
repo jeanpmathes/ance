@@ -1,7 +1,7 @@
 #include "function_call.h"
 
 #include "CompileState.h"
-#include "ExpressionValue.h"
+#include "ExpressionBackedValue.h"
 #include "Function.h"
 #include "GlobalScope.h"
 #include "Value.h"
@@ -10,7 +10,7 @@ namespace ance {
 	class Function;
 }
 
-function_call::function_call(std::string identifier, ance::Scope* scope, std::vector<Expression*> arguments) : scope_(scope), identifier_(identifier), return_value_(new ance::ExpressionValue(this)), arguments_(arguments)
+function_call::function_call(std::string identifier, ance::Scope* scope, std::vector<Expression*> arguments) : scope_(scope), identifier_(identifier), return_value_(new ance::ExpressionBackedValue(this)), arguments_(arguments)
 {
 }
 

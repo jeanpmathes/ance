@@ -1,7 +1,7 @@
 #include "LocalScope.h"
 #include "Constant.h"
 #include "GlobalScope.h"
-#include "ValueWrapper.h"
+#include "WrappedNativeValue.h"
 
 ance::LocalScope::LocalScope(ance::Scope* parent) : parent_(parent)
 {

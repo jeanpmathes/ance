@@ -36,7 +36,7 @@ antlrcpp::Any Visitor::visitConstant_declaration(anceParser::Constant_declaratio
 	ance::Type* type = visit(context->type());
 	std::string identifier = context->IDENTIFIER()->getText();
 	Expression* expr = visit(context->constant_expression());
-	ConstantExpression* const_exp = static_cast<ConstantExpression*>(expr);
+	auto* const_exp = dynamic_cast<ConstantExpression*>(expr);
 
 	application_.global_scope()->define_global_constant(access, identifier, type, const_exp->get_constant_value());
 
@@ -49,19 +49,19 @@ antlrcpp::Any Visitor::visitVariable_declaration(anceParser::Variable_declaratio
 	ance::Type* type = visit(context->type());
 	std::string identifier = context->IDENTIFIER()->getText();
 
-	ConstantExpression* const_exp;
+	ConstantExpression* const_expr;
 
 	if (context->constant_expression())
 	{
 		Expression* expr = visit(context->constant_expression());
-		const_exp = static_cast<ConstantExpression*>(expr);
+		const_expr = dynamic_cast<ConstantExpression*>(expr);
 	}
 	else
 	{
-		const_exp = new default_value_expression(type);
+		const_expr = new default_value_expression(type);
 	}
 
-	application_.global_scope()->define_global_variable(access, identifier, type, const_exp->get_constant_value());
+	application_.global_scope()->define_global_variable(access, identifier, type, const_expr->get_constant_value());
 
 	return this->visitChildren(context);
 }
@@ -108,7 +108,7 @@ antlrcpp::Any Visitor::visitExpression_statement(anceParser::Expression_statemen
 
 	Expression* expression = visit(context->independent_expression());
 
-	auto* statement = new expression_statement(application_.global_scope()->get_current_function(), expression, line, column);
+	auto* statement = new expression_statement(application_.global_scope()->get_current_function(), dynamic_cast<BuildableExpression*>(expression), line, column);
 	application_.global_scope()->PushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
@@ -405,7 +405,7 @@ antlrcpp::Any Visitor::visitFloating_point_type(anceParser::Floating_point_typeC
 	return type;
 }
 
-antlrcpp::Any Visitor::visitSize_type(anceParser::Size_typeContext* context)
+antlrcpp::Any Visitor::visitSize_type(anceParser::Size_typeContext*)
 {
 	ance::Type* type = ance::SizeType::get(application_);
 	return type;
@@ -421,7 +421,7 @@ antlrcpp::Any Visitor::visitArray_type(anceParser::Array_typeContext* context)
 	return type;
 }
 
-antlrcpp::Any Visitor::visitVoid_type(anceParser::Void_typeContext* context)
+antlrcpp::Any Visitor::visitVoid_type(anceParser::Void_typeContext*)
 {
 	ance::Type* type = ance::VoidType::get();
 	return type;

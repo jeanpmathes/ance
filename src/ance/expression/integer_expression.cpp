@@ -2,12 +2,12 @@
 
 #include <utility>
 
-#include "Constant.h"
+#include "ExpressionBackedConstant.h"
 #include "IntegerType.h"
 
 integer_expression::integer_expression(llvm::APInt integer, ance::Scope* scope, uint64_t bit_size, bool is_signed) :
 	type_(ance::IntegerType::get(scope, bit_size, is_signed)),
-	constant_(new ance::Constant(this)), integer_(std::move(integer))
+	constant_(new ance::ExpressionBackedConstant(this)), integer_(std::move(integer))
 {
 }
 

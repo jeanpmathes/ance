@@ -1,13 +1,13 @@
 #ifndef LITERAL_EXPRESSION_H
 #define LITERAL_EXPRESSION_H
 
-#include "ConstantExpression.h"
+#include "BuildableConstantExpression.h"
 
 namespace ance {
 	class Scope;
 }
 
-class literal_expression : public ConstantExpression
+class literal_expression : public BuildableConstantExpression
 {
 public:
 	literal_expression(std::string literal, ance::Scope* scope);

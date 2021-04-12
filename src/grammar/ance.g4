@@ -159,7 +159,7 @@ size_type
 	;
 
 array_type
-	: BRACKET_OPEN type COLON INTEGER BRACKET_CLOSED
+	: BRACKET_OPEN INTEGER COLON type BRACKET_CLOSED
 	;
 
 void_type

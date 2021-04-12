@@ -597,9 +597,9 @@ public:
     Array_typeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *BRACKET_OPEN();
-    TypeContext *type();
-    antlr4::tree::TerminalNode *COLON();
     antlr4::tree::TerminalNode *INTEGER();
+    antlr4::tree::TerminalNode *COLON();
+    TypeContext *type();
     antlr4::tree::TerminalNode *BRACKET_CLOSED();
 
 

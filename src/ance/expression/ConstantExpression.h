@@ -11,10 +11,9 @@ namespace ance
 	class Constant;
 }
 
-class ConstantExpression : public Expression
+class ConstantExpression : public virtual Expression
 {
 public:
 	virtual ance::Constant* get_constant_value() = 0;
-	virtual llvm::Constant* build_constant(llvm::LLVMContext& c) = 0;
 };
 #endif

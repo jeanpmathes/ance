@@ -1,14 +1,14 @@
 #ifndef VARIABLE_EXPRESSION_H
 #define VARIABLE_EXPRESSION_H
 
-#include "Expression.h"
+#include "BuildableExpression.h"
 
 namespace ance {
 	class Variable;
 	class Scope;
 }
 
-class variable_expression : public Expression
+class variable_expression : public BuildableExpression
 {
 public:
 	variable_expression(ance::Variable* variable);

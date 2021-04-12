@@ -2,11 +2,11 @@
 
 #include <utility>
 
-#include "Constant.h"
+#include "ExpressionBackedConstant.h"
 #include "FloatingPointType.h"
 
 floating_point_expression::floating_point_expression(ance::FloatingPointType* type, llvm::APFloat number)
-	: type_(type), number_(std::move(number)), constant_(new ance::Constant(this))
+	: type_(type), number_(std::move(number)), constant_(new ance::ExpressionBackedConstant(this))
 {
 }
 

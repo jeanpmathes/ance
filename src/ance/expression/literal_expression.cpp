@@ -1,5 +1,6 @@
 #include "literal_expression.h"
 
+#include "ExpressionBackedConstant.h"
 #include "ArrayType.h"
 #include "Value.h"
 #include "Constant.h"
@@ -7,7 +8,7 @@
 
 literal_expression::literal_expression(std::string literal, ance::Scope* scope) :
 	type_(ance::ArrayType::get(scope, ance::IntegerType::get(scope, 8, false), literal.size())),
-	constant_(new ance::Constant(this)), literal_(literal)
+	constant_(new ance::ExpressionBackedConstant(this)), literal_(literal)
 {
 }
 

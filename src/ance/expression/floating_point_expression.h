@@ -1,13 +1,13 @@
 #ifndef FLOATING_POINT_EXPRESSION_H
 #define FLOATING_POINT_EXPRESSION_H
 
-#include "ConstantExpression.h"
+#include "BuildableConstantExpression.h"
 
 namespace ance {
 	class FloatingPointType;
 }
 
-class floating_point_expression : public ConstantExpression
+class floating_point_expression : public BuildableConstantExpression
 {
 public:
 	floating_point_expression(ance::FloatingPointType* type, llvm::APFloat number);

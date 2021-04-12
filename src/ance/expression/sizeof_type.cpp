@@ -1,10 +1,10 @@
 #include "sizeof_type.h"
 
 #include "CompileState.h"
-#include "ExpressionValue.h"
+#include "ExpressionBackedValue.h"
 #include "SizeType.h"
 
-sizeof_type::sizeof_type(ance::Type* type, Application& app) : return_value_(new ance::ExpressionValue(this)), return_type_(ance::SizeType::get(app)), type_(type)
+sizeof_type::sizeof_type(ance::Type* type, Application& app) : return_value_(new ance::ExpressionBackedValue(this)), return_type_(ance::SizeType::get(app)), type_(type)
 {
 }
 

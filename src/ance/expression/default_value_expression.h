@@ -1,9 +1,9 @@
 #ifndef DEFAULT_VALUE_EXPRESSION_H
 #define DEFAULT_VALUE_EXPRESSION_H
 
-#include "ConstantExpression.h"
+#include "BuildableConstantExpression.h"
 
-class default_value_expression : public ConstantExpression
+class default_value_expression : public BuildableConstantExpression
 {
 public:
 	default_value_expression(ance::Type* type);

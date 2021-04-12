@@ -181,7 +181,7 @@ void anceCompiler::LinkModule(std::filesystem::path& bc, std::filesystem::path& 
 
 	args.push_back("/defaultlib:kernel32");
 
-	args.push_back("/libpath:C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.19041.0\\um\\x64");
+	args.push_back(R"(/libpath:C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64)");
 
 	args.push_back("/entry:_start");
 

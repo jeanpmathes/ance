@@ -1,11 +1,11 @@
 #ifndef SIZEOF_TYPE_H
 #define SIZEOF_TYPE_H
 
-#include "Expression.h"
+#include "BuildableExpression.h"
 
 class Application;
 
-class sizeof_type : public Expression
+class sizeof_type : public BuildableExpression
 {
 public:
 	sizeof_type(ance::Type* type, Application& app);

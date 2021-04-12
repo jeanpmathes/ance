@@ -4,10 +4,10 @@
 
 namespace ance
 {
-	class ValueWrapper : public Value
+	class WrappedNativeValue : public Value
 	{
 	public:
-		ValueWrapper(ance::Type* type, llvm::Value* value = nullptr);
+		WrappedNativeValue(ance::Type* type, llvm::Value* value = nullptr);
 
 		void set_value(llvm::Value* value);
 

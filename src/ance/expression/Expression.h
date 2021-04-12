@@ -16,9 +16,7 @@ class Expression
 {
 public:
 	virtual ance::Type* get_type() = 0;
-
 	virtual ance::Value* get_value() = 0;
-	virtual llvm::Value* build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
 
 	virtual ~Expression() = default;
 };

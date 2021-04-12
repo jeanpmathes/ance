@@ -1,8 +1,8 @@
 #include "expression_statement.h"
 
-#include "Expression.h"
+#include "BuildableExpression.h"
 
-expression_statement::expression_statement(ance::Function* function, Expression* expression, unsigned l, unsigned c) : Statement(function, l, c), expression_(expression)
+expression_statement::expression_statement(ance::Function* function, BuildableExpression* expression, unsigned l, unsigned c) : Statement(function, l, c), expression_(expression)
 {
 }
 

@@ -2,24 +2,20 @@
 #define ANCE_CONSTANT_H
 
 #include "ConstantExpression.h"
-#include "ExpressionValue.h"
+#include "ExpressionBackedValue.h"
 
 #include "llvm/IR/DIBuilder.h"
 #include "llvm/IR/IRBuilder.h"
 
-class ConstantExpression;
-
 namespace ance
 {
-	class Constant : public ExpressionValue
+	class Constant : public Value
 	{
 	public:
-		Constant(ConstantExpression* expression);
-		llvm::Constant* get_constant(llvm::LLVMContext& c);
+		virtual llvm::Constant* get_constant(llvm::LLVMContext& c) = 0;
+		ance::Type * get_type() override = 0;
 		llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
 
-	private:
-		ConstantExpression* expression_;
 	};
 }
 #endif
