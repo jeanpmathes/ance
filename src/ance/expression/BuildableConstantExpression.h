@@ -11,7 +11,6 @@ class BuildableConstantExpression : public ConstantExpression, public BuildableE
         ance::Type* get_type() override = 0;
         ance::Constant* get_constant_value() override = 0;
 
-        ance::Value* get_value() override;
         llvm::Value * build(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) override;
 };
 

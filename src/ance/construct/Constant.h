@@ -13,7 +13,6 @@ namespace ance
 	{
 	public:
 		virtual llvm::Constant* get_constant(llvm::LLVMContext& c) = 0;
-		ance::Type * get_type() override = 0;
 		llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
 
 	};

@@ -10,4 +10,7 @@ target_sources(ance PRIVATE Constant.cpp
                             Value.cpp
                             WrappedNativeValue.cpp
                             WrappedNativeConstant.cpp
+                            StringConstant.cpp
+                            IntegerConstant.cpp
+                            FloatConstant.cpp
                             Variable.cpp)

@@ -3,20 +3,17 @@
 #include "AccessModifier.h"
 #include "Parameter.h"
 #include "ArrayType.h"
-#include "literal_expression.h"
 #include "variable_expression.h"
 #include "assignment_statement.h"
 #include "default_value_expression.h"
 #include "DoubleType.h"
 #include "expression_statement.h"
-#include "floating_point_expression.h"
 #include "SingleType.h"
 #include "Function.h"
 #include "function_call.h"
 #include "GlobalScope.h"
 #include "HalfType.h"
 #include "IntegerType.h"
-#include "integer_expression.h"
 #include "LocalScope.h"
 #include "local_variable_definition.h"
 #include "print_statement.h"
@@ -25,6 +22,10 @@
 #include "sizeof_type.h"
 #include "SizeType.h"
 #include "VoidType.h"
+#include "StringConstant.h"
+#include "IntegerConstant.h"
+#include "FloatConstant.h"
+#include "constantliteral_expression.h"
 
 Visitor::Visitor(Application& application) : application_(application)
 {
@@ -97,9 +98,9 @@ antlrcpp::Any Visitor::visitParameters(anceParser::ParametersContext* context)
 antlrcpp::Any Visitor::visitParameter(anceParser::ParameterContext* context)
 {
 	ance::Type* type = visit(context->type());
-	const std::string identifier = context->IDENTIFIER()->getText();
+	const std::string kIdentifier = context->IDENTIFIER()->getText();
 
-	return new ance::Parameter(type, identifier);
+	return new ance::Parameter(type, kIdentifier);
 }
 
 antlrcpp::Any Visitor::visitExpression_statement(anceParser::Expression_statementContext* context)
@@ -232,46 +233,10 @@ antlrcpp::Any Visitor::visitSizeof_exp_expression(anceParser::Sizeof_exp_express
 
 antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionContext* context)
 {
-	std::string unparsed = context->STRING()->getText();
-	std::stringstream builder;
+	std::string str = ance::StringConstant::parse(context->STRING()->getText());
 
-	bool escaped = false;
-
-	for (char const& c : unparsed)
-	{
-		if (escaped)
-		{
-			switch (c)
-			{
-			case 'n':
-				builder << '\n';
-				break;
-
-			case '0':
-				builder << '\0';
-				break;
-
-			default:
-				builder << c;
-				break;
-			}
-
-			escaped = false;
-		}
-		else
-		{
-			if (c == '\\')
-			{
-				escaped = true;
-			}
-			else if (c != '"')
-			{
-				builder << c;
-			}
-		}
-	}
-
-	return static_cast<Expression*>(new literal_expression(builder.str(), application_.global_scope()));
+	ance::Constant* string = new ance::StringConstant(str, application_.global_scope());
+	return static_cast<Expression*>(new constantliteral_expression(string));
 }
 
 antlrcpp::Any Visitor::visitFloating_point_expression(anceParser::Floating_point_expressionContext* context)
@@ -303,7 +268,8 @@ antlrcpp::Any Visitor::visitFloating_point_expression(anceParser::Floating_point
 		type = ance::QuadType::get(application_.global_scope());
 	}
 
-	return static_cast<Expression*>(new floating_point_expression(type, number));
+	auto* flt = new ance::FloatConstant(number, type);
+	return static_cast<Expression*>(new constantliteral_expression(flt));
 }
 
 antlrcpp::Any Visitor::visitUnsigned_integer(anceParser::Unsigned_integerContext* context)
@@ -315,8 +281,9 @@ antlrcpp::Any Visitor::visitUnsigned_integer(anceParser::Unsigned_integerContext
 		size = std::stoi(context->INTEGER(1)->getText());
 	}
 
-	const llvm::APInt integer(size, context->INTEGER(0)->getText(), 10);
-	Expression* expression = new integer_expression(integer, application_.global_scope(), size, false);
+	const llvm::APInt kInteger(size, context->INTEGER(0)->getText(), 10);
+	auto* integer = new ance::IntegerConstant(kInteger, false, application_.global_scope());
+	Expression* expression = new constantliteral_expression(integer);
 	return expression;
 }
 
@@ -329,8 +296,9 @@ antlrcpp::Any Visitor::visitSigned_integer(anceParser::Signed_integerContext* co
 		size = std::stoi(context->INTEGER()->getText());
 	}
 
-	const llvm::APInt integer(size, context->SIGNED_INTEGER()->getText(), 10);
-	Expression* expression = new integer_expression(integer, application_.global_scope(), size, true);
+	const llvm::APInt kInteger(size, context->SIGNED_INTEGER()->getText(), 10);
+	auto* integer = new ance::IntegerConstant(kInteger, true, application_.global_scope());
+	Expression* expression = new constantliteral_expression(integer);
 	return expression;
 }
 
@@ -366,8 +334,9 @@ antlrcpp::Any Visitor::visitSpecial_integer(anceParser::Special_integerContext* 
 
     integer_str.erase(0, 2);
 
-	const llvm::APInt integer(size, integer_str, radix);
-	Expression* expression = new integer_expression(integer, application_.global_scope(), size, false);
+	const llvm::APInt kInteger(size, integer_str, radix);
+	auto* integer = new ance::IntegerConstant(kInteger, false, application_.global_scope());
+	Expression* expression = new constantliteral_expression(integer);
 	return expression;
 }
 

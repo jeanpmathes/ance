@@ -15,5 +15,6 @@ class ConstantExpression : public virtual Expression
 {
 public:
 	virtual ance::Constant* get_constant_value() = 0;
+	ance::Value * get_value() override;
 };
 #endif
