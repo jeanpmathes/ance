@@ -1,5 +1,5 @@
-#ifndef ANCE_SIZETYPE_H
-#define ANCE_SIZETYPE_H
+#ifndef ANCE_SRC_ANCE_TYPE_SIZETYPE_H_
+#define ANCE_SRC_ANCE_TYPE_SIZETYPE_H_
 
 #include "Type.h"
 
@@ -10,14 +10,14 @@ namespace ance
 	class SizeType : public ance::Type
 	{
 	public:
-		std::string get_name() override;
-		llvm::Constant* get_default(llvm::LLVMContext& c) override;
-		llvm::Type* get_native_type(llvm::LLVMContext& c) override;
+		std::string getName() override;
+		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
+		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
 
-		llvm::Value* build_value(llvm::TypeSize size);
+		llvm::Value* buildValue(llvm::TypeSize size);
 
 	private:
-		inline static SizeType* instance = nullptr;
+		inline static SizeType* instance_ = nullptr;
 		inline static llvm::Type* native_type_ = nullptr;
 
 	public:

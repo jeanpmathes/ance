@@ -1,5 +1,5 @@
-#ifndef INTEGER_TYPE_H
-#define INTEGER_TYPE_H
+#ifndef ANCE_SRC_ANCE_TYPE_INTEGERTYPE_H_
+#define ANCE_SRC_ANCE_TYPE_INTEGERTYPE_H_
 
 #include "Type.h"
 
@@ -13,9 +13,9 @@ namespace ance
 		IntegerType(uint64_t bit_size, bool is_signed);
 
 	public:
-		std::string get_name() override;
-		llvm::Constant* get_default(llvm::LLVMContext& c) override;
-		llvm::Type* get_native_type(llvm::LLVMContext& c) override;
+		std::string getName() override;
+		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
+		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
 
 	private:
 		uint64_t bit_size_;

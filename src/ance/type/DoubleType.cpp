@@ -5,28 +5,28 @@
 #include "GlobalScope.h"
 #include "Scope.h"
 
-std::string ance::DoubleType::get_name()
+std::string ance::DoubleType::getName()
 {
 	return "double";
 }
 
-llvm::Constant* ance::DoubleType::get_default(llvm::LLVMContext& c)
+llvm::Constant* ance::DoubleType::getDefault(llvm::LLVMContext& c)
 {
-	return llvm::ConstantFP::get(get_native_type(c), 0);
+	return llvm::ConstantFP::get(getNativeType(c), 0);
 }
 
-llvm::Type* ance::DoubleType::get_native_type(llvm::LLVMContext& c)
+llvm::Type* ance::DoubleType::getNativeType(llvm::LLVMContext& c)
 {
 	return llvm::Type::getDoubleTy(c);
 }
 
 ance::FloatingPointType* ance::DoubleType::get(ance::Scope* scope)
 {
-	if (!instance)
+	if (!instance_)
 	{
-		instance = new DoubleType();
-		scope->get_global_scope()->register_type(instance);
+        instance_ = new DoubleType();
+        scope->getGlobalScope()->registerType(instance_);
 	}
 
-	return instance;
+	return instance_;
 }

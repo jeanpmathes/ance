@@ -2,8 +2,8 @@
 #define ACCESS_MODIFIER_H
 #include <llvm/IR/GlobalValue.h>
 
-enum class access_modifier { public_access, private_access };
+enum class AccessModifier { PUBLIC_ACCESS, PRIVATE_ACCESS };
 
-llvm::GlobalValue::LinkageTypes convert(access_modifier access);
+llvm::GlobalValue::LinkageTypes Convert(AccessModifier access);
 
 #endif

@@ -4,40 +4,40 @@
 
 #include "GlobalScope.h"
 
-Application::Application(std::filesystem::path project_file, std::filesystem::path nccode_file) : proj_file(project_file), code_file(nccode_file), global_scope_(new ance::GlobalScope())
+Application::Application(std::filesystem::path project_file, std::filesystem::path nccode_file) : proj_file_(project_file), code_file_(nccode_file), global_scope_(new ance::GlobalScope())
 {
 }
 
-void Application::set_pointer_size(unsigned size)
+void Application::setPointerSize(unsigned size)
 {
 	pointer_size_ = size;
 }
 
-const std::string Application::GetName() const
+const std::string Application::getName() const
 {
-	return proj_file.stem().string();
+	return proj_file_.stem().string();
 }
 
-const std::filesystem::path Application::GetProjectFile() const
+const std::filesystem::path Application::getProjectFile() const
 {
-	return std::filesystem::path(proj_file);
+	return std::filesystem::path(proj_file_);
 }
 
-const std::filesystem::path Application::GetCodeFile() const
+const std::filesystem::path Application::getCodeFile() const
 {
-	return std::filesystem::path(code_file);
+	return std::filesystem::path(code_file_);
 }
 
-unsigned Application::get_bitness()
+unsigned Application::getBitness()
 {
 	return pointer_size_ * 8;
 }
 
-bool Application::Validate()
+bool Application::validate()
 {
 	bool valid = global_scope_->validate();
 
-	if (!global_scope_->HasFunction("main"))
+	if (!global_scope_->hasFunction("main"))
 	{
 		std::cout << "No main function was found!" << std::endl;
 
@@ -47,7 +47,7 @@ bool Application::Validate()
 	return valid;
 }
 
-ance::GlobalScope* Application::global_scope()
+ance::GlobalScope* Application::globalScope()
 {
 	return global_scope_;
 }

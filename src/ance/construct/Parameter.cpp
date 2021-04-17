@@ -16,7 +16,7 @@ std::string ance::Parameter::name()
 	return name_;
 }
 
-ance::Value* ance::Parameter::get_value()
+ance::Value* ance::Parameter::getValue()
 {
 	return wrapper_;
 }
@@ -26,10 +26,10 @@ void ance::Parameter::wrap(llvm::Argument* argument)
 	argument_ = argument;
 	argument->setName(name_);
 
-	wrapper_->set_value(argument);
+    wrapper_->setValue(argument);
 }
 
-llvm::Argument* ance::Parameter::get_wrapped()
+llvm::Argument* ance::Parameter::getWrapped()
 {
 	return argument_;
 }

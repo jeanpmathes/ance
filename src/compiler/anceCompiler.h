@@ -1,5 +1,5 @@
-#ifndef ANCECOMPILER_H
-#define ANCECOMPILER_H
+#ifndef ANCE_SRC_COMPILER_ANCECOMPILER_H_
+#define ANCE_SRC_COMPILER_ANCECOMPILER_H_
 
 #include <filesystem>
 
@@ -11,28 +11,28 @@
 class anceCompiler
 {
 public:
-	anceCompiler(Application& app);
-	void Compile(const std::filesystem::path& output_dir);
+	explicit anceCompiler(Application& app);
+	void compile(const std::filesystem::path& output_dir);
 
 private:
-	void SetupGlobals();
-	void BuildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
-	void BuildStart(llvm::FunctionType* main_type, llvm::Function* main, llvm::FunctionType* exit_type, llvm::Function* exit);
-	void LinkModule(std::filesystem::path& bc, std::filesystem::path& exe);
+	void setupGlobals();
+	void buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
+	void buildStart(llvm::FunctionType* main_type, llvm::Function* main, llvm::FunctionType* exit_type, llvm::Function* exit);
+	void linkModule(std::filesystem::path& bc, std::filesystem::path& exe);
 
 private:
-	Application& application;
-	llvm::LLVMContext context;
-	llvm::IRBuilder<> ir;
+	Application& application_;
+	llvm::LLVMContext context_;
+	llvm::IRBuilder<> ir_;
 
 private:
-	llvm::Module* module;
+	llvm::Module* module_;
 
-	llvm::DIBuilder* di;
-	llvm::DIFile* proj_file;
-	llvm::DICompileUnit* unit;
-	llvm::DIFile* code_file;
+	llvm::DIBuilder* di_;
+	llvm::DIFile* proj_file_;
+	llvm::DICompileUnit* unit_;
+	llvm::DIFile* code_file_;
 
-	CompileState* state;
+	CompileState* state_;
 };
 #endif

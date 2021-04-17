@@ -7,9 +7,9 @@ ance::LocalScope::LocalScope(ance::Scope* parent) : parent_(parent)
 {
 }
 
-ance::GlobalScope* ance::LocalScope::get_global_scope()
+ance::GlobalScope* ance::LocalScope::getGlobalScope()
 {
-	return parent_->get_global_scope();
+	return parent_->getGlobalScope();
 }
 
 bool ance::LocalScope::validate()
@@ -17,17 +17,17 @@ bool ance::LocalScope::validate()
 	return true;
 }
 
-ance::LocalVariable* ance::LocalScope::define_local_variable(const std::string& identifier, ance::Type* type, Expression* expression)
+ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& identifier, ance::Type* type, Expression* expression)
 {
 	assert(local_variables.find(identifier) == local_variables.end());
 
-	ance::LocalVariable* variable = new LocalVariable(this, identifier, type, expression->get_value());
+	ance::LocalVariable* variable = new LocalVariable(this, identifier, type, expression->getValue());
 	local_variables[identifier] = variable;
 
 	return variable;
 }
 
-ance::LocalVariable* ance::LocalScope::define_local_variable(const std::string& identifier, ance::Type* type, ance::Value* value)
+ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& identifier, ance::Type* type, ance::Value* value)
 {
 	assert(local_variables.find(identifier) == local_variables.end());
 	ance::LocalVariable* variable = new LocalVariable(this, identifier, type, value);
@@ -36,12 +36,12 @@ ance::LocalVariable* ance::LocalScope::define_local_variable(const std::string& 
 	return variable;
 }
 
-ance::Variable* ance::LocalScope::get_variable(const std::string identifier)
+ance::Variable* ance::LocalScope::getVariable(std::string identifier)
 {
 	if (local_variables.find(identifier) != local_variables.end())
 	{
 		return local_variables[identifier];
 	}
 
-	return get_global_scope()->get_variable(identifier);
+	return getGlobalScope()->getVariable(identifier);
 }

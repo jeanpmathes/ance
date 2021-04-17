@@ -49,10 +49,10 @@ int main(int argc, char** argv)
     llvm::InitializeAllAsmPrinters();
     llvm::InitializeAllAsmPrinters();
 
-    if (application.Validate())
+    if (application.validate())
     {
         anceCompiler compiler(application);
-        compiler.Compile(std::filesystem::path("C:\\Users\\jeanp\\source\\repos\\ance\\ance_output"));
+        compiler.compile(std::filesystem::path("C:\\Users\\jeanp\\source\\repos\\ance\\ance_output"));
 
         return EXIT_SUCCESS;
     }

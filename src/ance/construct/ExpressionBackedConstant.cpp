@@ -4,12 +4,12 @@ ance::ExpressionBackedConstant::ExpressionBackedConstant(BuildableConstantExpres
 {
 }
 
-ance::Type *ance::ExpressionBackedConstant::get_type()
+ance::Type *ance::ExpressionBackedConstant::getType()
 {
-    return expression_->get_type();
+    return expression_->getType();
 }
 
-llvm::Constant* ance::ExpressionBackedConstant::get_constant(llvm::LLVMContext& c)
+llvm::Constant* ance::ExpressionBackedConstant::getConstant(llvm::LLVMContext& c)
 {
-  return expression_->build_constant(c);
+  return expression_->buildConstant(c);
 }

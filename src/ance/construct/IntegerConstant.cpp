@@ -10,16 +10,16 @@ ance::IntegerConstant::IntegerConstant(llvm::APInt integer, bool is_signed, ance
 {
 }
 
-ance::Type* ance::IntegerConstant::get_type()
+ance::Type* ance::IntegerConstant::getType()
 {
     return type_;
 }
 
-llvm::Constant* ance::IntegerConstant::get_constant(llvm::LLVMContext& c)
+llvm::Constant* ance::IntegerConstant::getConstant(llvm::LLVMContext& c)
 {
     if (!constant_)
     {
-        constant_ = llvm::ConstantInt::get(type_->get_native_type(c), integer_);
+        constant_ = llvm::ConstantInt::get(type_->getNativeType(c), integer_);
     }
 
     return constant_;

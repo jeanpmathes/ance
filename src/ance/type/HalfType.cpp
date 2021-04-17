@@ -5,28 +5,28 @@
 #include "GlobalScope.h"
 #include "Scope.h"
 
-std::string ance::HalfType::get_name()
+std::string ance::HalfType::getName()
 {
 	return "half";
 }
 
-llvm::Constant* ance::HalfType::get_default(llvm::LLVMContext& c)
+llvm::Constant* ance::HalfType::getDefault(llvm::LLVMContext& c)
 {
-	return llvm::ConstantFP::get(get_native_type(c), 0);
+	return llvm::ConstantFP::get(getNativeType(c), 0);
 }
 
-llvm::Type* ance::HalfType::get_native_type(llvm::LLVMContext& c)
+llvm::Type* ance::HalfType::getNativeType(llvm::LLVMContext& c)
 {
 	return llvm::Type::getHalfTy(c);
 }
 
 ance::FloatingPointType* ance::HalfType::get(ance::Scope* scope)
 {
-	if (!instance)
+	if (!instance_)
 	{
-		instance = new HalfType();
-		scope->get_global_scope()->register_type(instance);
+        instance_ = new HalfType();
+        scope->getGlobalScope()->registerType(instance_);
 	}
 
-	return instance;
+	return instance_;
 }

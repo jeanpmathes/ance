@@ -13,28 +13,28 @@ ance::ArrayType::ArrayType(Type* element_type, const uint64_t size) :
 {
 }
 
-std::string ance::ArrayType::get_name()
+std::string ance::ArrayType::getName()
 {
-	return element_type_->get_name() + "[" + std::to_string(size_) + "]";
+	return element_type_->getName() + "[" + std::to_string(size_) + "]";
 }
 
-llvm::Constant* ance::ArrayType::get_default(llvm::LLVMContext& c)
+llvm::Constant* ance::ArrayType::getDefault(llvm::LLVMContext& c)
 {
 	llvm::Constant* consts[size_];
-	std::fill_n(consts, size_, element_type_->get_default(c));
+	std::fill_n(consts, size_, element_type_->getDefault(c));
 
-	if (!type_) get_native_type(c);
+	if (!type_) getNativeType(c);
 
 	llvm::ArrayRef<llvm::Constant*> content = llvm::ArrayRef<llvm::Constant*>(&consts[0], size_);
 
 	return llvm::ConstantArray::get(type_, content);
 }
 
-llvm::Type* ance::ArrayType::get_native_type(llvm::LLVMContext& c)
+llvm::Type* ance::ArrayType::getNativeType(llvm::LLVMContext& c)
 {
 	if (!type_)
 	{
-		type_ = llvm::ArrayType::get(element_type_->get_native_type(c), size_);
+		type_ = llvm::ArrayType::get(element_type_->getNativeType(c), size_);
 	}
 
 	return type_;
@@ -43,16 +43,16 @@ llvm::Type* ance::ArrayType::get_native_type(llvm::LLVMContext& c)
 ance::Type* ance::ArrayType::get(ance::Scope* scope, Type* element_type, uint64_t size)
 {
 	ance::ArrayType* type = new ance::ArrayType(element_type, size);
-	std::string type_name = type->get_name();
+	std::string type_name = type->getName();
 
-	if (scope->get_global_scope()->is_type_registered(type_name))
+	if (scope->getGlobalScope()->isTypeRegistered(type_name))
 	{
 		delete type;
-		return scope->get_global_scope()->get_type(type_name);
+		return scope->getGlobalScope()->getType(type_name);
 	}
 	else
 	{
-		scope->get_global_scope()->register_type(type);
+        scope->getGlobalScope()->registerType(type);
 		return type;
 	}
 }

@@ -1,5 +1,5 @@
-#ifndef ANCE_FUNCTION_H
-#define ANCE_FUNCTION_H
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_FUNCTION_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_FUNCTION_H_
 
 #include <list>
 #include <string>
@@ -24,23 +24,23 @@ namespace ance
 	class Function
 	{
 	public:
-		Function(access_modifier access, std::string fn_name, ance::Type* return_type, std::vector<ance::Parameter*> parameters, ance::Scope* scope, unsigned int l, unsigned int c);
+		Function(AccessModifier access, std::string fn_name, ance::Type* return_type, std::vector<ance::Parameter*> parameters, ance::Scope* scope, unsigned int l, unsigned int c);
 
-		std::string get_name() const;
-		ance::Type* get_return_type() const;
-		ance::LocalScope* get_scope() const;
+		[[nodiscard]] std::string getName() const;
+		[[nodiscard]] ance::Type* getReturnType() const;
+		[[nodiscard]] ance::LocalScope* getScope() const;
 
-		void push_statement(Statement* statement);
+		void pushStatement(Statement* statement);
 
-		void build_name(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		void buildName(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 		void build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
-		void add_return(ance::Value* value = nullptr);
+		void addReturn(ance::Value* value = nullptr);
 
-		llvm::CallInst* build_call(const std::vector<ance::Value*>& arguments, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) const;
+		llvm::CallInst* buildCall(const std::vector<ance::Value*>& arguments, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) const;
 
 	private:
-		access_modifier access_;
+		AccessModifier access_;
 		std::string name_;
 		std::vector<ance::Parameter*> parameters_;
 		unsigned int line_, column_;
@@ -54,7 +54,7 @@ namespace ance
 		llvm::Function* native_function_;
 
 		ance::Value* return_value_;
-		bool hasReturn_;
+		bool has_return_;
 	};
 }
 

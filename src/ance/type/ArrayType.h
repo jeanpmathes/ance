@@ -1,5 +1,5 @@
-#ifndef ANCE_ARRAY_TYPE_H
-#define ANCE_ARRAY_TYPE_H
+#ifndef ANCE_SRC_ANCE_TYPE_ARRAYTYPE_H_
+#define ANCE_SRC_ANCE_TYPE_ARRAYTYPE_H_
 
 #include "Type.h"
 
@@ -17,9 +17,9 @@ namespace ance
 		ArrayType(Type* element_type, uint64_t size);
 
 	public:
-		std::string get_name() override;
-		llvm::Constant* get_default(llvm::LLVMContext& c) override;
-		llvm::Type* get_native_type(llvm::LLVMContext& c) override;
+		std::string getName() override;
+		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
+		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
 
 	private:
 		uint64_t size_;

@@ -1,5 +1,5 @@
-#ifndef ANCE_SCOPE_H
-#define ANCE_SCOPE_H
+#ifndef ANCE_SRC_ANCE_SCOPE_SCOPE_H_
+#define ANCE_SRC_ANCE_SCOPE_SCOPE_H_
 
 #include <map>
 #include <string>
@@ -10,7 +10,7 @@
 #include "GlobalVariable.h"
 #include "Type.h"
 
-enum class access_modifier;
+enum class AccessModifier;
 class Statement;
 class CompileState;
 
@@ -24,11 +24,11 @@ namespace ance
 	class Scope
 	{
 	public:
-		virtual ance::GlobalScope* get_global_scope() = 0;
+		virtual ance::GlobalScope* getGlobalScope() = 0;
 
 		virtual bool validate() = 0;
 
-		virtual ance::Variable* get_variable(std::string identifier) = 0;
+		virtual ance::Variable* getVariable(std::string identifier) = 0;
 	};
 }
 #endif

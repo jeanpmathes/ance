@@ -1,5 +1,5 @@
-#ifndef ANCE_VARIABLE_H
-#define ANCE_VARIABLE_H
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_VARIABLE_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_VARIABLE_H_
 #include <string>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
@@ -23,15 +23,15 @@ namespace ance
 		explicit Variable(std::string identifier);
 
 		void define(ance::Scope* containing_scope, ance::Type* type, bool is_constant);
-		bool is_defined();
+		bool isDefined();
 
 	public:
-		std::string identifier() const;
-		ance::Type* type() const;
-		bool is_constant() const;
+		[[nodiscard]] std::string identifier() const;
+		[[nodiscard]] ance::Type* type() const;
+		[[nodiscard]] bool isConstant() const;
 
-		virtual llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
-		virtual void set_value(llvm::Value* value, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
+		virtual llvm::Value* getValue(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
+		virtual void setValue(llvm::Value* value, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
 
 	private:
 		std::string identifier_;

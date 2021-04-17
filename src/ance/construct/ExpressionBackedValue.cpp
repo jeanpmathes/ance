@@ -6,12 +6,12 @@ ance::ExpressionBackedValue::ExpressionBackedValue(BuildableExpression* expressi
 {
 }
 
-ance::Type* ance::ExpressionBackedValue::get_type()
+ance::Type* ance::ExpressionBackedValue::getType()
 {
-	return expression_->get_type();
+	return expression_->getType();
 }
 
-llvm::Value* ance::ExpressionBackedValue::get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+llvm::Value* ance::ExpressionBackedValue::getValue(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
 	return expression_->build(c, m, state, ir, di);
 }

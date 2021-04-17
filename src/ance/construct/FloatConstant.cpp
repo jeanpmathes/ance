@@ -5,16 +5,16 @@ ance::FloatConstant::FloatConstant(llvm::APFloat number, ance::FloatingPointType
 {
 }
 
-ance::Type* ance::FloatConstant::get_type()
+ance::Type* ance::FloatConstant::getType()
 {
     return type_;
 }
 
-llvm::Constant* ance::FloatConstant::get_constant(llvm::LLVMContext& c)
+llvm::Constant* ance::FloatConstant::getConstant(llvm::LLVMContext& c)
 {
     if (!constant_)
     {
-        constant_ = llvm::ConstantFP::get(type_->get_native_type(c), float_);
+        constant_ = llvm::ConstantFP::get(type_->getNativeType(c), float_);
     }
 
     return constant_;

@@ -2,7 +2,7 @@
 
 #include "Constant.h"
 
-ance::Value* ConstantExpression::get_value()
+ance::Value* ConstantExpression::getValue()
 {
-    return get_constant_value();
+    return getConstantValue();
 }

@@ -1,5 +1,5 @@
-#ifndef CONSTANT_EXPRESSION_H
-#define CONSTANT_EXPRESSION_H
+#ifndef ANCE_SRC_ANCE_EXPRESSION_CONSTANTEXPRESSION_H_
+#define ANCE_SRC_ANCE_EXPRESSION_CONSTANTEXPRESSION_H_
 
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Constant.h"
@@ -14,7 +14,7 @@ namespace ance
 class ConstantExpression : public virtual Expression
 {
 public:
-	virtual ance::Constant* get_constant_value() = 0;
-	ance::Value * get_value() override;
+	virtual ance::Constant* getConstantValue() = 0;
+	ance::Value * getValue() override;
 };
 #endif

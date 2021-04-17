@@ -1,5 +1,5 @@
-#ifndef EXPRESSION_H
-#define EXPRESSION_H
+#ifndef ANCE_SRC_ANCE_EXPRESSION_EXPRESSION_H_
+#define ANCE_SRC_ANCE_EXPRESSION_EXPRESSION_H_
 
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
@@ -15,8 +15,8 @@ namespace ance
 class Expression
 {
 public:
-	virtual ance::Type* get_type() = 0;
-	virtual ance::Value* get_value() = 0;
+	virtual ance::Type* getType() = 0;
+	virtual ance::Value* getValue() = 0;
 
 	virtual ~Expression() = default;
 };

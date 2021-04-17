@@ -1,5 +1,5 @@
-#ifndef ANCE_FLOATINGPOINTTYPE_H
-#define ANCE_FLOATINGPOINTTYPE_H
+#ifndef ANCE_SRC_ANCE_TYPE_FLOATINGPOINTTYPE_H_
+#define ANCE_SRC_ANCE_TYPE_FLOATINGPOINTTYPE_H_
 
 #include "Type.h"
 
@@ -8,9 +8,9 @@ namespace ance
 	class FloatingPointType : public Type
 	{
 	public:
-		std::string get_name() override = 0;
-		llvm::Constant* get_default(llvm::LLVMContext& c) override = 0;
-		llvm::Type* get_native_type(llvm::LLVMContext& c) override = 0;
+		std::string getName() override = 0;
+		llvm::Constant* getDefault(llvm::LLVMContext& c) override = 0;
+		llvm::Type* getNativeType(llvm::LLVMContext& c) override = 0;
 	};
 }
 #endif

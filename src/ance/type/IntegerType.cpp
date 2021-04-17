@@ -10,18 +10,18 @@ ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed) : bit_size_(bi
 {
 }
 
-std::string ance::IntegerType::get_name()
+std::string ance::IntegerType::getName()
 {
 	if (is_signed_) return "i" + std::to_string(bit_size_);
 	else return "ui" + std::to_string(bit_size_);
 }
 
-llvm::Constant* ance::IntegerType::get_default(llvm::LLVMContext& c)
+llvm::Constant* ance::IntegerType::getDefault(llvm::LLVMContext& c)
 {
-	return llvm::ConstantInt::get(get_native_type(c), 0, is_signed_);
+	return llvm::ConstantInt::get(getNativeType(c), 0, is_signed_);
 }
 
-llvm::Type* ance::IntegerType::get_native_type(llvm::LLVMContext& c)
+llvm::Type* ance::IntegerType::getNativeType(llvm::LLVMContext& c)
 {
 	if (!type_)
 	{
@@ -34,16 +34,16 @@ llvm::Type* ance::IntegerType::get_native_type(llvm::LLVMContext& c)
 ance::Type* ance::IntegerType::get(ance::Scope* scope, uint64_t bit_size, bool is_signed)
 {
 	ance::IntegerType* type = new ance::IntegerType(bit_size, is_signed);
-	std::string type_name = type->get_name();
+	std::string type_name = type->getName();
 
-	if (scope->get_global_scope()->is_type_registered(type_name))
+	if (scope->getGlobalScope()->isTypeRegistered(type_name))
 	{
 		delete type;
-		return scope->get_global_scope()->get_type(type_name);
+		return scope->getGlobalScope()->getType(type_name);
 	}
 	else
 	{
-		scope->get_global_scope()->register_type(type);
+        scope->getGlobalScope()->registerType(type);
 		return type;
 	}
 }

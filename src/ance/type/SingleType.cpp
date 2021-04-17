@@ -5,28 +5,28 @@
 #include "GlobalScope.h"
 #include "Scope.h"
 
-std::string ance::SingleType::get_name()
+std::string ance::SingleType::getName()
 {
 	return "single";
 }
 
-llvm::Constant* ance::SingleType::get_default(llvm::LLVMContext& c)
+llvm::Constant* ance::SingleType::getDefault(llvm::LLVMContext& c)
 {
-	return llvm::ConstantFP::get(get_native_type(c), 0);
+	return llvm::ConstantFP::get(getNativeType(c), 0);
 }
 
-llvm::Type* ance::SingleType::get_native_type(llvm::LLVMContext& c)
+llvm::Type* ance::SingleType::getNativeType(llvm::LLVMContext& c)
 {
 	return llvm::Type::getFloatTy(c);
 }
 
 ance::FloatingPointType* ance::SingleType::get(ance::Scope* scope)
 {
-	if (!instance)
+	if (!instance_)
 	{
-		instance = new SingleType();
-		scope->get_global_scope()->register_type(instance);
+        instance_ = new SingleType();
+        scope->getGlobalScope()->registerType(instance_);
 	}
 
-	return instance;
+	return instance_;
 }

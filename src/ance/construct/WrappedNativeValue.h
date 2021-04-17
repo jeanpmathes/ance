@@ -1,5 +1,5 @@
-#ifndef ANCE_VALUEWRAPPER_H
-#define ANCE_VALUEWRAPPER_H
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_WRAPPEDNATIVEVALUE_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_WRAPPEDNATIVEVALUE_H_
 #include "Value.h"
 
 namespace ance
@@ -7,12 +7,12 @@ namespace ance
 	class WrappedNativeValue : public Value
 	{
 	public:
-		WrappedNativeValue(ance::Type* type, llvm::Value* value = nullptr);
+		explicit WrappedNativeValue(ance::Type* type, llvm::Value* value = nullptr);
 
-		void set_value(llvm::Value* value);
+		void setValue(llvm::Value* value);
 
-		ance::Type* get_type() override;
-		llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
+		ance::Type* getType() override;
+		llvm::Value* getValue(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
 
 	private:
 		ance::Type* type_;

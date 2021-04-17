@@ -2,23 +2,23 @@
 
 Statement::Statement(ance::Function* function, unsigned int l, unsigned int c) : function_(function)
 {
-	line = l;
-	column = c;
+    line_ = l;
+    column_ = c;
 }
 
-ance::Function* Statement::get_containing_function() const
+ance::Function* Statement::getContainingFunction() const
 {
 	return function_;
 }
 
 unsigned int Statement::getLine() const
 {
-	return line;
+	return line_;
 }
 
 unsigned int Statement::getColumn() const
 {
-	return column;
+	return column_;
 }
 
 Statement::~Statement() = default;

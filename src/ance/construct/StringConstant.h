@@ -10,8 +10,8 @@ namespace ance
     {
         public:
             StringConstant(std::string string, ance::Scope* scope);
-            ance::Type * get_type() override;
-            llvm::Constant* get_constant(llvm::LLVMContext &c) override;
+            ance::Type * getType() override;
+            llvm::Constant* getConstant(llvm::LLVMContext &c) override;
 
             static std::string parse(const std::string& unparsed);
 

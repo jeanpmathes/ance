@@ -1,5 +1,5 @@
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#ifndef ANCE_SRC_COMPILER_APPLICATION_H_
+#define ANCE_SRC_COMPILER_APPLICATION_H_
 
 #include <filesystem>
 
@@ -17,21 +17,21 @@ class Application
 {
 public:
 	Application(std::filesystem::path project_file, std::filesystem::path nccode_file);
-	void set_pointer_size(unsigned size);
+	void setPointerSize(unsigned size);
 
-	const std::string GetName() const;
-	const std::filesystem::path GetProjectFile() const;
-	const std::filesystem::path GetCodeFile() const;
+	[[nodiscard]] const std::string getName() const;
+	[[nodiscard]] const std::filesystem::path getProjectFile() const;
+	[[nodiscard]] const std::filesystem::path getCodeFile() const;
 
-	unsigned get_bitness();
+	unsigned getBitness();
 
-	bool Validate();
+	bool validate();
 
-	ance::GlobalScope* global_scope();
+	ance::GlobalScope* globalScope();
 
 private:
-	std::filesystem::path proj_file;
-	std::filesystem::path code_file;
+	std::filesystem::path proj_file_;
+	std::filesystem::path code_file_;
 
 	ance::GlobalScope* global_scope_;
 

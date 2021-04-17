@@ -10,10 +10,10 @@ namespace ance
         public:
             WrappedNativeConstant(ance::Type* type, llvm::Constant* constant = nullptr);
 
-            void set_constant(llvm::Constant* constant);
+            void setConstant(llvm::Constant* constant);
 
-            ance::Type* get_type() override;
-            llvm::Constant * get_constant(llvm::LLVMContext &c) override;
+            ance::Type* getType() override;
+            llvm::Constant * getConstant(llvm::LLVMContext &c) override;
 
         private:
             ance::Type* type_;

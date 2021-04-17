@@ -21,7 +21,7 @@ void ance::Variable::define(ance::Scope* containing_scope, ance::Type* type, boo
 	is_defined_ = true;
 }
 
-bool ance::Variable::is_defined()
+bool ance::Variable::isDefined()
 {
 	return is_defined_;
 }
@@ -38,7 +38,7 @@ ance::Type* ance::Variable::type() const
 	return type_;
 }
 
-bool ance::Variable::is_constant() const
+bool ance::Variable::isConstant() const
 {
 	assert(is_defined_);
 	return is_constant_;

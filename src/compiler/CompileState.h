@@ -1,5 +1,5 @@
-#ifndef COMPILESTATE_H
-#define COMPILESTATE_H
+#ifndef ANCE_SRC_COMPILER_COMPILESTATE_H_
+#define ANCE_SRC_COMPILER_COMPILESTATE_H_
 
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
@@ -14,52 +14,52 @@ public:
 	CompileState(llvm::LLVMContext* c, llvm::Module* m, llvm::IRBuilder<>* ir, llvm::DIBuilder* di);
 
 private:
-	llvm::LLVMContext* context;
-	llvm::Module* module;
-	llvm::IRBuilder<>* ir_builder;
-	llvm::DIBuilder* di_builder;
+	llvm::LLVMContext* context_;
+	llvm::Module* module_;
+	llvm::IRBuilder<>* ir_builder_;
+	llvm::DIBuilder* di_builder_;
 
 public:
-	Application* application;
-	llvm::DICompileUnit* unit;
-	llvm::DIFile* code_file;
-	llvm::DIBasicType* ui32;
+	Application* application_;
+	llvm::DICompileUnit* unit_;
+	llvm::DIFile* code_file_;
+	llvm::DIBasicType* ui_32_;
 
 	// native: AllocConsole
 
 public:
-	llvm::Value* buildnativecall_AllocConsole() const;
+	[[nodiscard]] llvm::Value* buildnativecall_AllocConsole() const;
 
 private:
-	llvm::FunctionType* allocConsole_type;
-	llvm::Function* allocConsole;
+	llvm::FunctionType* alloc_console_type_;
+	llvm::Function* alloc_console_;
 
 	// native: AttachConsole
 
 public:
-	llvm::Value* buildnativecall_AttachConsole(int32_t pid) const;
+	[[nodiscard]] llvm::Value* buildnativecall_AttachConsole(int32_t pid) const;
 
 private:
-	llvm::FunctionType* attachConsole_type;
-	llvm::Function* attachConsole;
+	llvm::FunctionType* attach_console_type_;
+	llvm::Function* attach_console_;
 
 	// native: FreeConsole
 
 public:
-	llvm::Value* buildnativecall_FreeConsole() const;
+	[[nodiscard]] llvm::Value* buildnativecall_FreeConsole() const;
 
 private:
-	llvm::FunctionType* freeConsole_type;
-	llvm::Function* freeConsole;
+	llvm::FunctionType* free_console_type_;
+	llvm::Function* free_console_;
 
 	// native: GetStdHandle
 
 public:
-	llvm::Value* buildnativecall_GetStdHandle(int32_t nStdHandle) const;
+	[[nodiscard]] llvm::Value* buildnativecall_GetStdHandle(int32_t nStdHandle) const;
 
 private:
-	llvm::FunctionType* getStdHandle_type;
-	llvm::Function* getStdHandle;
+	llvm::FunctionType* get_std_handle_type_;
+	llvm::Function* get_std_handle_;
 
 	// native: WriteFile (Kernel32)
 
@@ -67,8 +67,8 @@ public:
 	llvm::Value* buildnativecall_WriteFile(llvm::Value* hFile, llvm::Value* lpBuffer, llvm::Value* nNumberOfBytesToWrite, llvm::Value* lpNumberOfBytesWritten, llvm::Value* lpOverlapped) const;
 
 private:
-	llvm::FunctionType* writeFile_type;
-	llvm::Function* writeFile;
+	llvm::FunctionType* write_file_type_;
+	llvm::Function* write_file_;
 
 	// native: ExitProcess (Kernel32)
 
@@ -76,7 +76,7 @@ public:
 	void buildnativecall_ExitProcess(llvm::Value* uExitCode) const;
 
 private:
-	llvm::FunctionType* exitProcess_type;
-	llvm::Function* exitProcess;
+	llvm::FunctionType* exit_process_type_;
+	llvm::Function* exit_process_;
 };
 #endif

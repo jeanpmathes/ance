@@ -5,28 +5,28 @@
 #include "GlobalScope.h"
 #include "Scope.h"
 
-std::string ance::QuadType::get_name()
+std::string ance::QuadType::getName()
 {
 	return "quad";
 }
 
-llvm::Constant* ance::QuadType::get_default(llvm::LLVMContext& c)
+llvm::Constant* ance::QuadType::getDefault(llvm::LLVMContext& c)
 {
-	return llvm::ConstantFP::get(get_native_type(c), 0);
+	return llvm::ConstantFP::get(getNativeType(c), 0);
 }
 
-llvm::Type* ance::QuadType::get_native_type(llvm::LLVMContext& c)
+llvm::Type* ance::QuadType::getNativeType(llvm::LLVMContext& c)
 {
 	return llvm::Type::getFP128Ty(c);
 }
 
 ance::FloatingPointType* ance::QuadType::get(ance::Scope* scope)
 {
-	if (!instance)
+	if (!instance_)
 	{
-		instance = new QuadType();
-		scope->get_global_scope()->register_type(instance);
+        instance_ = new QuadType();
+        scope->getGlobalScope()->registerType(instance_);
 	}
 
-	return instance;
+	return instance_;
 }

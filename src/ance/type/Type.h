@@ -1,5 +1,5 @@
-#ifndef TYPE_H
-#define TYPE_H
+#ifndef ANCE_SRC_ANCE_TYPE_TYPE_H_
+#define ANCE_SRC_ANCE_TYPE_TYPE_H_
 
 #include <string>
 #include <llvm/IR/Constant.h>
@@ -16,16 +16,16 @@ namespace ance
 	class Type
 	{
 	public:
-		virtual std::string get_name() = 0;
-		virtual llvm::Constant* get_default(llvm::LLVMContext& c) = 0;
-		virtual llvm::Type* get_native_type(llvm::LLVMContext& c) = 0;
+		virtual std::string getName() = 0;
+		virtual llvm::Constant* getDefault(llvm::LLVMContext& c) = 0;
+		virtual llvm::Type* getNativeType(llvm::LLVMContext& c) = 0;
 
-		llvm::TypeSize get_size(llvm::Module* m);
+		llvm::TypeSize getSize(llvm::Module* m);
 	};
 
-	inline llvm::TypeSize Type::get_size(llvm::Module* m)
+	inline llvm::TypeSize Type::getSize(llvm::Module* m)
 	{
-		return m->getDataLayout().getTypeAllocSize(get_native_type(m->getContext()));
+		return m->getDataLayout().getTypeAllocSize(getNativeType(m->getContext()));
 	}
 }
 #endif

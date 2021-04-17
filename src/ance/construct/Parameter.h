@@ -1,5 +1,5 @@
-#ifndef ANCE_PARAMETER_H
-#define ANCE_PARAMETER_H
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_PARAMETER_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_PARAMETER_H_
 
 #include <string>
 
@@ -18,10 +18,10 @@ namespace ance
 		ance::Type* type();
 		std::string name();
 
-		ance::Value* get_value();
+		ance::Value* getValue();
 
 		void wrap(llvm::Argument* argument);
-		llvm::Argument* get_wrapped();
+		llvm::Argument* getWrapped();
 
 	private:
 		ance::Type* type_;

@@ -12,12 +12,12 @@ ance::StringConstant::StringConstant(std::string string, ance::Scope* scope)
 
 }
 
-ance::Type* ance::StringConstant::get_type()
+ance::Type* ance::StringConstant::getType()
 {
     return type_;
 }
 
-llvm::Constant* ance::StringConstant::get_constant(llvm::LLVMContext& c)
+llvm::Constant* ance::StringConstant::getConstant(llvm::LLVMContext& c)
 {
     if (!constant_)
     {

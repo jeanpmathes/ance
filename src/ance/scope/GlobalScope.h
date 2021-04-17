@@ -1,5 +1,5 @@
-#ifndef ANCE_GLOBALSCOPE_H
-#define ANCE_GLOBALSCOPE_H
+#ifndef ANCE_SRC_ANCE_SCOPE_GLOBALSCOPE_H_
+#define ANCE_SRC_ANCE_SCOPE_GLOBALSCOPE_H_
 
 #include "Scope.h"
 
@@ -8,42 +8,42 @@ namespace ance
 	class GlobalScope : public Scope
 	{
 	public:
-		ance::GlobalScope* get_global_scope() override;
+		ance::GlobalScope* getGlobalScope() override;
 
 		bool validate() override;
 
-		bool is_type_registered(std::string type_name);
-		ance::Type* get_type(std::string type_name);
-		void register_type(ance::Type* type);
+		bool isTypeRegistered(std::string type_name);
+		ance::Type* getType(std::string type_name);
+		void registerType(ance::Type* type);
 
-		void define_global_constant(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* constant);
-		void define_global_variable(access_modifier access, std::string identifier, ance::Type* type, ance::Constant* value);
+		void defineGlobalConstant(AccessModifier access, std::string identifier, ance::Type* type, ance::Constant* constant);
+		void defineGlobalVariable(AccessModifier access, std::string identifier, ance::Type* type, ance::Constant* value);
 
-		ance::Variable* get_variable(std::string identifier) override;
-		void build_variables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		ance::Variable* getVariable(std::string identifier) override;
+		void buildVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
-		size_t FunctionCount() const;
-		void AddFunctionName(std::string name);
-		void AddAndEnterFunction(ance::Function* function);
+		size_t functionCount() const;
+		void addFunctionName(std::string name);
+		void addAndEnterFunction(ance::Function* function);
 
-		void PushStatementToCurrentFunction(Statement* statement);
+		void pushStatementToCurrentFunction(Statement* statement);
 
-		void BuildFunctionNames(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
-		void BuildFunctions(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		void buildFunctionNames(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		void buildFunctions(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
-		bool HasFunction(std::string identifier);
-		ance::Function* GetFunction(std::string identifier);
-		ance::Function* get_current_function() const;
+		bool hasFunction(std::string identifier);
+		ance::Function* getFunction(std::string identifier);
+		[[nodiscard]] ance::Function* getCurrentFunction() const;
 
 	private:
 		std::map<std::string, ance::Type*> types_;
 
-		std::map<std::string, ance::GlobalVariable*> global_constants;
-		std::map<std::string, ance::GlobalVariable*> global_variables;
-		std::map<std::string, ance::GlobalVariable*> global_undefined;
+		std::map<std::string, ance::GlobalVariable*> global_constants_;
+		std::map<std::string, ance::GlobalVariable*> global_variables_;
+		std::map<std::string, ance::GlobalVariable*> global_undefined_;
 
-		std::map<std::string, ance::Function*> functions;
-		ance::Function* current = nullptr;
+		std::map<std::string, ance::Function*> functions_;
+		ance::Function* current_ = nullptr;
 	};
 }
 #endif

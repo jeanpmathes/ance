@@ -1,5 +1,5 @@
-#ifndef ANCE_EXPRESSIONVALUE_H
-#define ANCE_EXPRESSIONVALUE_H
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_EXPRESSIONBACKEDVALUE_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_EXPRESSIONBACKEDVALUE_H_
 
 #include "Value.h"
 #include "BuildableExpression.h"
@@ -9,9 +9,9 @@ namespace ance
 	class ExpressionBackedValue : public Value
 	{
 	public:
-		ExpressionBackedValue(BuildableExpression* expression);
-		ance::Type* get_type() override;
-		llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
+		explicit ExpressionBackedValue(BuildableExpression* expression);
+		ance::Type* getType() override;
+		llvm::Value* getValue(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
 
 	private:
         BuildableExpression* expression_;

@@ -1,5 +1,5 @@
-#ifndef ANCE_LOCALSCOPE_H
-#define ANCE_LOCALSCOPE_H
+#ifndef ANCE_SRC_ANCE_SCOPE_LOCALSCOPE_H_
+#define ANCE_SRC_ANCE_SCOPE_LOCALSCOPE_H_
 
 #include "LocalVariable.h"
 #include "Scope.h"
@@ -13,13 +13,13 @@ namespace ance
 	public:
 		explicit LocalScope(ance::Scope* parent);
 
-		ance::GlobalScope* get_global_scope() override;
+		ance::GlobalScope* getGlobalScope() override;
 
 		bool validate() override;
 
-		ance::LocalVariable* define_local_variable(const std::string& identifier, ance::Type* type, Expression* expression);
-		ance::LocalVariable* define_local_variable(const std::string& identifier, ance::Type* type, ance::Value* value);
-		ance::Variable* get_variable(std::string identifier) override;
+		ance::LocalVariable* defineLocalVariable(const std::string& identifier, ance::Type* type, Expression* expression);
+		ance::LocalVariable* defineLocalVariable(const std::string& identifier, ance::Type* type, ance::Value* value);
+		ance::Variable* getVariable(std::string identifier) override;
 
 	private:
 		ance::Scope* parent_;

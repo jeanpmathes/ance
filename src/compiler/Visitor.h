@@ -1,12 +1,12 @@
 #pragma once
 #include "anceBaseVisitor.h"
 
-#include "return_statement.h"
+#include "ReturnStatement.h"
 
 class Visitor : public anceBaseVisitor
 {
 public:
-	Visitor(Application& application);
+	explicit Visitor(Application& application);
 
 	antlrcpp::Any visitConstant_declaration(anceParser::Constant_declarationContext* context) override;
 	antlrcpp::Any visitVariable_declaration(anceParser::Variable_declarationContext* context) override;

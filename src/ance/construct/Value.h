@@ -1,5 +1,5 @@
-#ifndef ANCE_VALUE_H
-#define ANCE_VALUE_H
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_VALUE_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_VALUE_H_
 
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
@@ -14,8 +14,8 @@ namespace ance
 	class Value
 	{
 	public:
-		virtual ance::Type* get_type() = 0;
-		virtual llvm::Value* get_value(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
+		virtual ance::Type* getType() = 0;
+		virtual llvm::Value* getValue(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
 	};
 }
 #endif

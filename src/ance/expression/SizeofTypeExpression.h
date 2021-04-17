@@ -1,18 +1,18 @@
-#ifndef SIZEOF_TYPE_H
-#define SIZEOF_TYPE_H
+#ifndef ANCE_SRC_ANCE_EXPRESSION_SIZEOFTYPEEXPRESSION_H_
+#define ANCE_SRC_ANCE_EXPRESSION_SIZEOFTYPEEXPRESSION_H_
 
 #include "BuildableExpression.h"
 
 class Application;
 
-class sizeof_type : public BuildableExpression
+class SizeofTypeExpression : public BuildableExpression
 {
 public:
-	sizeof_type(ance::Type* type, Application& app);
+	SizeofTypeExpression(ance::Type* type, Application& app);
 
-	ance::Type* get_type() override;
+	ance::Type* getType() override;
 
-	ance::Value* get_value() override;
+	ance::Value* getValue() override;
 	llvm::Value* build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
 
 private:
