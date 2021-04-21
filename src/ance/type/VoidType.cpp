@@ -8,7 +8,7 @@ std::string ance::VoidType::getName()
 	return "void";
 }
 
-llvm::Constant* ance::VoidType::getDefault(llvm::LLVMContext& c)
+llvm::Constant* ance::VoidType::getDefault(llvm::LLVMContext&)
 {
 	throw std::logic_error("Void does not have a default value.");
 }

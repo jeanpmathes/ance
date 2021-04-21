@@ -35,12 +35,12 @@ bool ance::GlobalScope::validate()
 	return valid;
 }
 
-bool ance::GlobalScope::isTypeRegistered(std::string type_name)
+bool ance::GlobalScope::isTypeRegistered(const std::string& type_name)
 {
 	return types_.find(type_name) != types_.end();
 }
 
-ance::Type* ance::GlobalScope::getType(std::string type_name)
+ance::Type* ance::GlobalScope::getType(const std::string& type_name)
 {
 	return types_.at(type_name);
 }
@@ -50,7 +50,7 @@ void ance::GlobalScope::registerType(ance::Type* type)
 	types_[type->getName()] = type;
 }
 
-void ance::GlobalScope::defineGlobalConstant(AccessModifier access, std::string identifier, ance::Type* type, ance::Constant* constant)
+void ance::GlobalScope::defineGlobalConstant(AccessModifier access, const std::string& identifier, ance::Type* type, ance::Constant* constant)
 {
 	assert(global_variables_.find(identifier) == global_variables_.end());
 	assert(global_constants_.find(identifier) == global_constants_.end());
@@ -70,7 +70,7 @@ void ance::GlobalScope::defineGlobalConstant(AccessModifier access, std::string 
 	}
 }
 
-void ance::GlobalScope::defineGlobalVariable(AccessModifier access, std::string identifier, ance::Type* type, ance::Constant* value)
+void ance::GlobalScope::defineGlobalVariable(AccessModifier access, const std::string& identifier, ance::Type* type, ance::Constant* value)
 {
 	assert(global_variables_.find(identifier) == global_variables_.end());
 	assert(global_constants_.find(identifier) == global_constants_.end());
@@ -113,7 +113,7 @@ ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
 	return undefined;
 }
 
-void ance::GlobalScope::buildVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+void ance::GlobalScope::buildVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState*, llvm::IRBuilder<>&, llvm::DIBuilder*)
 {
 	for (auto const& [identifier, constant] : global_constants_)
 	{
@@ -133,7 +133,7 @@ size_t ance::GlobalScope::functionCount() const
 	return functions_.size();
 }
 
-void ance::GlobalScope::addFunctionName(std::string name)
+void ance::GlobalScope::addFunctionName(const std::string& name)
 {
 	if (functions_.find(name) == functions_.end()) functions_[name] = nullptr;
 }
@@ -165,14 +165,14 @@ void ance::GlobalScope::buildFunctions(llvm::LLVMContext& c, llvm::Module* m, Co
 	}
 }
 
-bool ance::GlobalScope::hasFunction(std::string identifier)
+bool ance::GlobalScope::hasFunction(const std::string& identifier)
 {
 	if (functions_.find(identifier) != functions_.end())
 		return true;
 	return false;
 }
 
-ance::Function* ance::GlobalScope::getFunction(std::string identifier)
+ance::Function* ance::GlobalScope::getFunction(const std::string& identifier)
 {
 	return functions_.at(identifier);
 }

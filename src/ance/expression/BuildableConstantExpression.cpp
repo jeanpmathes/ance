@@ -1,7 +1,7 @@
 #include "BuildableConstantExpression.h"
 #include "Constant.h"
 
-llvm::Value* BuildableConstantExpression::build(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di)
+llvm::Value* BuildableConstantExpression::build(llvm::LLVMContext& c, llvm::Module*, CompileState*, llvm::IRBuilder<>&, llvm::DIBuilder*)
 {
     return buildConstant(c);
 }

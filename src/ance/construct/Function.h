@@ -43,7 +43,8 @@ namespace ance
 		AccessModifier access_;
 		std::string name_;
 		std::vector<ance::Parameter*> parameters_;
-		unsigned int line_, column_;
+		unsigned int line_;
+        [[maybe_unused]] unsigned int column_;
 		ance::LocalScope* local_scope_;
 
 		std::vector<ance::LocalVariable*> arguments_;

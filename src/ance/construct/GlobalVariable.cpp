@@ -2,6 +2,8 @@
 
 #include <llvm/IR/GlobalValue.h>
 
+#include <utility>
+
 #include "Constant.h"
 #include "AccessModifier.h"
 #include "Type.h"
@@ -12,12 +14,12 @@ namespace llvm {
 }
 
 ance::GlobalVariable::GlobalVariable(ance::Scope* containing_scope, AccessModifier access, std::string identifier, ance::Type* type, ance::Constant* constant_init, bool is_constant)
-	: Variable(containing_scope, identifier, type, is_constant), access_(access), constant_init_(constant_init), native_variable_(nullptr)
+	: Variable(containing_scope, std::move(identifier), type, is_constant), access_(access), constant_init_(constant_init), native_variable_(nullptr)
 {
 }
 
 ance::GlobalVariable::GlobalVariable(std::string identifier)
-	: Variable(identifier), access_(AccessModifier::PRIVATE_ACCESS), constant_init_(nullptr), native_variable_(nullptr)
+	: Variable(std::move(identifier)), access_(AccessModifier::PRIVATE_ACCESS), constant_init_(nullptr), native_variable_(nullptr)
 {
 }
 
@@ -41,13 +43,13 @@ void ance::GlobalVariable::buildGlobal(llvm::LLVMContext& c, llvm::Module* m)
                                                 isConstant(), linkage, native_initializer, identifier());
 }
 
-llvm::Value* ance::GlobalVariable::getValue(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+llvm::Value* ance::GlobalVariable::getValue(llvm::LLVMContext&, llvm::Module*, CompileState*, llvm::IRBuilder<>& ir, llvm::DIBuilder*)
 {
 	auto* const value_type = static_cast<llvm::PointerType*>(native_variable_->getType())->getElementType();
 	return ir.CreateLoad(value_type, native_variable_);
 }
 
-void ance::GlobalVariable::setValue(llvm::Value* value, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+void ance::GlobalVariable::setValue(llvm::Value* value, llvm::LLVMContext&, llvm::Module*, CompileState*, llvm::IRBuilder<>& ir, llvm::DIBuilder*)
 {
 	assert(!isConstant());
 	ir.CreateStore(value, native_variable_);

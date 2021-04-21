@@ -21,6 +21,9 @@ namespace ance
 		virtual llvm::Type* getNativeType(llvm::LLVMContext& c) = 0;
 
 		llvm::TypeSize getSize(llvm::Module* m);
+
+    protected:
+	        virtual ~Type() = default;
 	};
 
 	inline llvm::TypeSize Type::getSize(llvm::Module* m)

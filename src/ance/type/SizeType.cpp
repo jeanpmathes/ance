@@ -15,7 +15,7 @@ llvm::Constant* ance::SizeType::getDefault(llvm::LLVMContext& c)
 	return llvm::ConstantInt::get(getNativeType(c), 0, false);
 }
 
-llvm::Type* ance::SizeType::getNativeType(llvm::LLVMContext& c)
+llvm::Type* ance::SizeType::getNativeType(llvm::LLVMContext&)
 {
 	return native_type_;
 }

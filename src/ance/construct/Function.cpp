@@ -9,8 +9,8 @@
 #include "VoidType.h"
 
 ance::Function::Function(AccessModifier access, std::string fn_name, ance::Type* return_type, std::vector<ance::Parameter*> parameters, ance::Scope* scope, unsigned int l, unsigned int c) :
-    access_(access), name_(std::move(fn_name)), parameters_(parameters), line_(l), column_(c), local_scope_(new ance::LocalScope(scope)), return_type_(return_type),
-    native_type_(nullptr), native_function_(nullptr), has_return_(false), return_value_(nullptr)
+    access_(access), name_(std::move(fn_name)), parameters_(std::move(parameters)), line_(l), column_(c), local_scope_(new ance::LocalScope(scope)), return_type_(return_type),
+    native_type_(nullptr), native_function_(nullptr), return_value_(nullptr), has_return_(false)
 {
 	for (auto* parameter : parameters_)
 	{
@@ -40,7 +40,7 @@ void  ance::Function::pushStatement(Statement* statement)
 	statements_.push_back(statement);
 }
 
-void ance::Function::buildName(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+void ance::Function::buildName(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>&, llvm::DIBuilder* di)
 {
 	std::vector<llvm::Type*> param_types;
 
@@ -137,8 +137,9 @@ llvm::CallInst* ance::Function::buildCall(const std::vector<ance::Value*>& argum
 	}
 
 	std::vector<llvm::Value*> args;
+	args.reserve(arguments.size());
 
-	for (auto* arg : arguments)
+    for (auto* arg : arguments)
 	{
 		args.push_back(arg->getValue(c, m, state, ir, di));
 	}

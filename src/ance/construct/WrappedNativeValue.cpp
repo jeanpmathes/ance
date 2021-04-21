@@ -14,7 +14,7 @@ ance::Type* ance::WrappedNativeValue::getType()
 	return type_;
 }
 
-llvm::Value* ance::WrappedNativeValue::getValue(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+llvm::Value* ance::WrappedNativeValue::getValue(llvm::LLVMContext&, llvm::Module*, CompileState*, llvm::IRBuilder<>&, llvm::DIBuilder*)
 {
 	return value_;
 }

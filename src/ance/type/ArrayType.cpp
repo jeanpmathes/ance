@@ -42,7 +42,7 @@ llvm::Type* ance::ArrayType::getNativeType(llvm::LLVMContext& c)
 
 ance::Type* ance::ArrayType::get(ance::Scope* scope, Type* element_type, uint64_t size)
 {
-	ance::ArrayType* type = new ance::ArrayType(element_type, size);
+	auto* type = new ance::ArrayType(element_type, size);
 	std::string type_name = type->getName();
 
 	if (scope->getGlobalScope()->isTypeRegistered(type_name))

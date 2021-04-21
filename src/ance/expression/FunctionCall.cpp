@@ -10,7 +10,8 @@ namespace ance {
 	class Function;
 }
 
-FunctionCall::FunctionCall(std::string identifier, ance::Scope* scope, std::vector<Expression*> arguments) : scope_(scope), identifier_(identifier), return_value_(new ance::ExpressionBackedValue(this)), arguments_(arguments)
+FunctionCall::FunctionCall(std::string identifier, ance::Scope* scope, std::vector<Expression*> arguments)
+    : scope_(scope), identifier_(identifier), arguments_(arguments), return_value_(new ance::ExpressionBackedValue(this))
 {
 }
 

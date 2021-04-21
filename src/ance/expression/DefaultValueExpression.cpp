@@ -20,7 +20,7 @@ ance::Value* DefaultValueExpression::getValue()
 	return constant_;
 }
 
-llvm::Value* DefaultValueExpression::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+llvm::Value* DefaultValueExpression::build(llvm::LLVMContext& c, llvm::Module*, CompileState*, llvm::IRBuilder<>&, llvm::DIBuilder*)
 {
 	return buildConstant(c);
 }

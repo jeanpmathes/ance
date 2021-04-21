@@ -18,7 +18,7 @@ ance::Value* SizeofExprExpression::getValue()
 	return  return_value_;
 }
 
-llvm::Value* SizeofExprExpression::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+llvm::Value* SizeofExprExpression::build(llvm::LLVMContext&, llvm::Module* m, CompileState* state, llvm::IRBuilder<>&, llvm::DIBuilder*)
 {
 	return ance::SizeType::get(*state->application_)->buildValue(expression_->getType()->getSize(m));
 }

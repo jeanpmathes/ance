@@ -12,18 +12,18 @@ namespace ance
 
 		bool validate() override;
 
-		bool isTypeRegistered(std::string type_name);
-		ance::Type* getType(std::string type_name);
+		bool isTypeRegistered(const std::string& type_name);
+		ance::Type* getType(const std::string& type_name);
 		void registerType(ance::Type* type);
 
-		void defineGlobalConstant(AccessModifier access, std::string identifier, ance::Type* type, ance::Constant* constant);
-		void defineGlobalVariable(AccessModifier access, std::string identifier, ance::Type* type, ance::Constant* value);
+		void defineGlobalConstant(AccessModifier access, const std::string& identifier, ance::Type* type, ance::Constant* constant);
+		void defineGlobalVariable(AccessModifier access, const std::string& identifier, ance::Type* type, ance::Constant* value);
 
 		ance::Variable* getVariable(std::string identifier) override;
 		void buildVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
 		size_t functionCount() const;
-		void addFunctionName(std::string name);
+		void addFunctionName(const std::string& name);
 		void addAndEnterFunction(ance::Function* function);
 
 		void pushStatementToCurrentFunction(Statement* statement);
@@ -31,8 +31,8 @@ namespace ance
 		void buildFunctionNames(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 		void buildFunctions(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
-		bool hasFunction(std::string identifier);
-		ance::Function* getFunction(std::string identifier);
+		bool hasFunction(const std::string& identifier);
+		ance::Function* getFunction(const std::string& identifier);
 		[[nodiscard]] ance::Function* getCurrentFunction() const;
 
 	private:

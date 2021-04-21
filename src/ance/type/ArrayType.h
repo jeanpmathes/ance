@@ -21,6 +21,8 @@ namespace ance
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
 		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
 
+		virtual ~ArrayType() = default;
+
 	private:
 		uint64_t size_;
 		ance::Type* element_type_;
