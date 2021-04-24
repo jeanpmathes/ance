@@ -6,36 +6,42 @@
 #include "Scope.h"
 
 class Statement;
+
 class CompileState;
 
-namespace ance {
-	class Scope;
-	class Function;
+namespace ance
+{
+class Scope;
+
+class Function;
 }
 
 class Application
 {
-public:
-	Application(std::filesystem::path project_file, std::filesystem::path nccode_file);
-	void setPointerSize(unsigned size);
+	public:
+		Application(std::filesystem::path project_file, std::filesystem::path nccode_file);
 
-	[[nodiscard]] std::string getName() const;
-	[[nodiscard]] std::filesystem::path getProjectFile() const;
-	[[nodiscard]] std::filesystem::path getCodeFile() const;
+		void setPointerSize(unsigned size);
 
-	unsigned getBitness();
+		[[nodiscard]] std::string getName() const;
 
-	bool validate();
+		[[nodiscard]] std::filesystem::path getProjectFile() const;
 
-	ance::GlobalScope* globalScope();
+		[[nodiscard]] std::filesystem::path getCodeFile() const;
 
-private:
-	std::filesystem::path proj_file_;
-	std::filesystem::path code_file_;
+		unsigned getBitness();
 
-	ance::GlobalScope* global_scope_;
+		bool validate();
 
-	unsigned pointer_size_{0};
+		ance::GlobalScope* globalScope();
+
+	private:
+		std::filesystem::path proj_file_;
+		std::filesystem::path code_file_;
+
+		ance::GlobalScope* global_scope_;
+
+		unsigned pointer_size_{0};
 };
 
 #endif

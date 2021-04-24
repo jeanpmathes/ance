@@ -24,8 +24,8 @@ ance::FloatingPointType* ance::QuadType::get(ance::Scope* scope)
 {
 	if (!instance_)
 	{
-        instance_ = new QuadType();
-        scope->getGlobalScope()->registerType(instance_);
+		instance_ = new QuadType();
+		scope->getGlobalScope()->registerType(instance_);
 	}
 
 	return instance_;

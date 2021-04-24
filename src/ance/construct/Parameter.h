@@ -7,20 +7,23 @@
 
 namespace ance
 {
-	class WrappedNativeValue;
-	class Type;
+class WrappedNativeValue;
 
-	class Parameter
-	{
+class Type;
+
+class Parameter
+{
 	public:
 		Parameter(ance::Type* type, std::string name);
 
 		ance::Type* type();
+
 		std::string name();
 
 		ance::Value* getValue();
 
 		void wrap(llvm::Argument* argument);
+
 		llvm::Argument* getWrapped();
 
 	private:
@@ -30,6 +33,6 @@ namespace ance
 		ance::WrappedNativeValue* wrapper_;
 
 		llvm::Argument* argument_{nullptr};
-	};
+};
 }
 #endif

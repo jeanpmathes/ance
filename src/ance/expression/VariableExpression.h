@@ -3,25 +3,35 @@
 
 #include "BuildableExpression.h"
 
-namespace ance {
-	class Variable;
-	class Scope;
+namespace ance
+{
+class Variable;
+
+class Scope;
 }
 
 class VariableExpression : public BuildableExpression
 {
-public:
-	explicit VariableExpression(ance::Variable* variable);
+	public:
+		explicit VariableExpression(ance::Variable* variable);
 
-	ance::Type* getType() override;
+		ance::Type* getType() override;
 
-	ance::Value* getValue() override;
-	llvm::Value* build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
+		ance::Value* getValue() override;
 
-	~VariableExpression() override;
+		llvm::Value* build(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) override;
 
-private:
-	ance::Variable* variable_;
-	ance::Value* value_;
+		~VariableExpression() override;
+
+	private:
+		ance::Variable* variable_;
+		ance::Value* value_;
 };
+
 #endif

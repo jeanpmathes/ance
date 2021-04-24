@@ -24,8 +24,8 @@ ance::FloatingPointType* ance::SingleType::get(ance::Scope* scope)
 {
 	if (!instance_)
 	{
-        instance_ = new SingleType();
-        scope->getGlobalScope()->registerType(instance_);
+		instance_ = new SingleType();
+		scope->getGlobalScope()->registerType(instance_);
 	}
 
 	return instance_;

@@ -8,16 +8,19 @@ class CompileState;
 
 namespace ance
 {
-	class Value;
-	class Type;
+class Value;
+
+class Type;
 }
 
 class Expression
 {
-public:
-	virtual ance::Type* getType() = 0;
-	virtual ance::Value* getValue() = 0;
+	public:
+		virtual ance::Type* getType() = 0;
 
-	virtual ~Expression() = default;
+		virtual ance::Value* getValue() = 0;
+
+		virtual ~Expression() = default;
 };
+
 #endif

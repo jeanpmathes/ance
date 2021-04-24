@@ -6,7 +6,7 @@
 #include "GlobalScope.h"
 
 Application::Application(std::filesystem::path project_file, std::filesystem::path nccode_file)
-    : proj_file_(std::move(project_file)), code_file_(std::move(nccode_file)), global_scope_(new ance::GlobalScope())
+	: proj_file_(std::move(project_file)), code_file_(std::move(nccode_file)), global_scope_(new ance::GlobalScope())
 {
 }
 

@@ -7,18 +7,25 @@ class Application;
 
 class SizeofExprExpression : public BuildableExpression
 {
-public:
-	SizeofExprExpression(Expression* expression, Application& app);
+	public:
+		SizeofExprExpression(Expression* expression, Application& app);
 
-	ance::Type* getType() override;
+		ance::Type* getType() override;
 
-	ance::Value* getValue() override;
-	llvm::Value* build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
+		ance::Value* getValue() override;
 
-private:
-	ance::Value* return_value_;
-	ance::Type* return_type_;
-	Expression* expression_;
+		llvm::Value* build(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) override;
+
+	private:
+		ance::Value* return_value_;
+		ance::Type* return_type_;
+		Expression* expression_;
 };
 
 #endif

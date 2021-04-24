@@ -27,7 +27,8 @@
 #include "FloatConstant.h"
 #include "ConstantLiteralExpression.h"
 
-Visitor::Visitor(Application& application) : application_(application)
+Visitor::Visitor(Application& application)
+	: application_(application)
 {
 }
 
@@ -39,7 +40,7 @@ antlrcpp::Any Visitor::visitConstant_declaration(anceParser::Constant_declaratio
 	Expression* expr = visit(context->constant_expression());
 	auto* const_expr = dynamic_cast<ConstantExpression*>(expr);
 
-    application_.globalScope()->defineGlobalConstant(access, identifier, type, const_expr->getConstantValue());
+	application_.globalScope()->defineGlobalConstant(access, identifier, type, const_expr->getConstantValue());
 
 	return this->visitChildren(context);
 }
@@ -62,7 +63,7 @@ antlrcpp::Any Visitor::visitVariable_declaration(anceParser::Variable_declaratio
 		const_expr = new DefaultValueExpression(type);
 	}
 
-    application_.globalScope()->defineGlobalVariable(access, identifier, type, const_expr->getConstantValue());
+	application_.globalScope()->defineGlobalVariable(access, identifier, type, const_expr->getConstantValue());
 
 	return this->visitChildren(context);
 }
@@ -77,9 +78,11 @@ antlrcpp::Any Visitor::visitFunction(anceParser::FunctionContext* context)
 
 	std::vector<ance::Parameter*> parameters = visit(context->parameters());
 
-    auto* function = new ance::Function(access, context->IDENTIFIER()->getText(), return_type, parameters,
-                                        application_.globalScope(), line, column);
-    application_.globalScope()->addAndEnterFunction(function);
+	auto* function = new ance::Function(
+		access, context->IDENTIFIER()->getText(), return_type, parameters,
+		application_.globalScope(), line, column
+	);
+	application_.globalScope()->addAndEnterFunction(function);
 
 	return this->visitChildren(context);
 }
@@ -112,8 +115,9 @@ antlrcpp::Any Visitor::visitExpression_statement(anceParser::Expression_statemen
 	Expression* expression = visit(context->independent_expression());
 	auto* buildable_expression = dynamic_cast<BuildableExpression*>(expression);
 
-	auto* statement = new ExpressionStatement(application_.globalScope()->getCurrentFunction(), buildable_expression, line, column);
-    application_.globalScope()->pushStatementToCurrentFunction(statement);
+	auto* statement =
+		new ExpressionStatement(application_.globalScope()->getCurrentFunction(), buildable_expression, line, column);
+	application_.globalScope()->pushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
 }
@@ -138,9 +142,10 @@ antlrcpp::Any Visitor::visitLocal_variable_definition(anceParser::Local_variable
 	}
 
 	ance::LocalVariable* variable =
-        application_.globalScope()->getCurrentFunction()->getScope()->defineLocalVariable(identifier, type, assigned);
-	auto* statement = new LocalVariableDefinition(application_.globalScope()->getCurrentFunction(), line, column, variable);
-    application_.globalScope()->pushStatementToCurrentFunction(statement);
+		application_.globalScope()->getCurrentFunction()->getScope()->defineLocalVariable(identifier, type, assigned);
+	auto* statement =
+		new LocalVariableDefinition(application_.globalScope()->getCurrentFunction(), line, column, variable);
+	application_.globalScope()->pushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
 }
@@ -153,13 +158,15 @@ antlrcpp::Any Visitor::visitVariable_assignment(anceParser::Variable_assignmentC
 	std::string identifier = context->IDENTIFIER()->getText();
 	Expression* assigned = visit(context->expression());
 
-    application_.globalScope()
-        ->pushStatementToCurrentFunction(
-            new AssignmentStatement(application_.globalScope()->getCurrentFunction(),
-                                    line,
-                                    column,
-                                    identifier,
-                                    assigned));
+	application_.globalScope()
+				->pushStatementToCurrentFunction(
+					new AssignmentStatement(
+						application_.globalScope()->getCurrentFunction(),
+						line,
+						column,
+						identifier,
+						assigned
+					));
 
 	return this->visitChildren(context);
 }
@@ -172,7 +179,7 @@ antlrcpp::Any Visitor::visitPrint_statement(anceParser::Print_statementContext* 
 	Expression* expression = visit(context->expression());
 
 	auto* statement = new PrintStatement(application_.globalScope()->getCurrentFunction(), line, column, expression);
-    application_.globalScope()->pushStatementToCurrentFunction(statement);
+	application_.globalScope()->pushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
 }
@@ -190,8 +197,9 @@ antlrcpp::Any Visitor::visitReturn_statement(anceParser::Return_statementContext
 		return_value = expression->getValue();
 	}
 
-	auto* const statement = new ReturnStatement(application_.globalScope()->getCurrentFunction(), line, column, return_value);
-    application_.globalScope()->pushStatementToCurrentFunction(statement);
+	auto* const statement =
+		new ReturnStatement(application_.globalScope()->getCurrentFunction(), line, column, return_value);
+	application_.globalScope()->pushStatementToCurrentFunction(statement);
 
 	return this->visitChildren(context);
 }
@@ -201,7 +209,7 @@ antlrcpp::Any Visitor::visitFunction_call(anceParser::Function_callContext* cont
 	std::string identifier = context->IDENTIFIER()->getText();
 	std::vector<Expression*> arguments = visit(context->arguments());
 
-    application_.globalScope()->addFunctionName(identifier);
+	application_.globalScope()->addFunctionName(identifier);
 
 	return static_cast<Expression*>(new FunctionCall(identifier, application_.globalScope(), arguments));
 }
@@ -221,8 +229,9 @@ antlrcpp::Any Visitor::visitArguments(anceParser::ArgumentsContext* context)
 antlrcpp::Any Visitor::visitVariable_expression(anceParser::Variable_expressionContext* context)
 {
 	std::string identifier = context->IDENTIFIER()->getText();
-    Expression* expression = new VariableExpression(application_.globalScope()->getCurrentFunction()->getScope()
-                                                         ->getVariable(identifier));
+	Expression* expression = new VariableExpression(
+		application_.globalScope()->getCurrentFunction()->getScope()
+					->getVariable(identifier));
 	return expression;
 }
 
@@ -339,7 +348,7 @@ antlrcpp::Any Visitor::visitSpecial_integer(anceParser::Special_integerContext* 
 		radix = 8;
 	}
 
-    integer_str.erase(0, 2);
+	integer_str.erase(0, 2);
 
 	const llvm::APInt kInteger(size, integer_str, radix);
 	auto* integer = new ance::IntegerConstant(kInteger, false, application_.globalScope());

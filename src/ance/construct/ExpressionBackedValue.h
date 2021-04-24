@@ -6,15 +6,23 @@
 
 namespace ance
 {
-	class ExpressionBackedValue : public Value
-	{
+class ExpressionBackedValue : public Value
+{
 	public:
 		explicit ExpressionBackedValue(BuildableExpression* expression);
+
 		ance::Type* getType() override;
-		llvm::Value* getValue(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
+
+		llvm::Value* getValue(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) override;
 
 	private:
-        BuildableExpression* expression_;
-	};
+		BuildableExpression* expression_;
+};
 }
 #endif

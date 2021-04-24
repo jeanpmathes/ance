@@ -3,22 +3,25 @@
 
 #include "Type.h"
 
-namespace llvm {
-	class ArrayType;
+namespace llvm
+{
+class ArrayType;
 }
 
 namespace ance
 {
-	class Scope;
+class Scope;
 
-	class ArrayType : public Type
-	{
+class ArrayType : public Type
+{
 	private:
 		ArrayType(Type* element_type, uint64_t size);
 
 	public:
 		std::string getName() override;
+
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
+
 		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
 
 		~ArrayType() override = default;
@@ -30,7 +33,7 @@ namespace ance
 
 	public:
 		static ance::Type* get(ance::Scope* scope, Type* element_type, uint64_t size);
-	};
+};
 }
 
 #endif

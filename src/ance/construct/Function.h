@@ -13,38 +13,71 @@
 #include "Expression.h"
 
 class Statement;
+
 class CompileState;
 
 namespace ance
 {
-	class LocalScope;
-	class Type;
-	class LocalScope;
+class LocalScope;
 
-	class Function
-	{
+class Type;
+
+class LocalScope;
+
+class Function
+{
 	public:
-		Function(AccessModifier access, std::string fn_name, ance::Type* return_type, std::vector<ance::Parameter*> parameters, ance::Scope* scope, unsigned int l, unsigned int c);
+		Function(
+			AccessModifier access,
+			std::string fn_name,
+			ance::Type* return_type,
+			std::vector<ance::Parameter*> parameters,
+			ance::Scope* scope,
+			unsigned int l,
+			unsigned int c
+		);
 
 		[[nodiscard]] std::string getName() const;
+
 		[[nodiscard]] ance::Type* getReturnType() const;
+
 		[[nodiscard]] ance::LocalScope* getScope() const;
 
 		void pushStatement(Statement* statement);
 
-		void buildName(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
-		void build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		void buildName(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		);
+
+		void build(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		);
 
 		void addReturn(ance::Value* value = nullptr);
 
-		llvm::CallInst* buildCall(const std::vector<ance::Value*>& arguments, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) const;
+		llvm::CallInst* buildCall(
+			const std::vector<ance::Value*>& arguments,
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) const;
 
 	private:
 		AccessModifier access_;
 		std::string name_;
 		std::vector<ance::Parameter*> parameters_;
 		unsigned int line_;
-        [[maybe_unused]] unsigned int column_;
+		[[maybe_unused]] unsigned int column_;
 		ance::LocalScope* local_scope_;
 
 		std::vector<ance::LocalVariable*> arguments_;
@@ -56,7 +89,7 @@ namespace ance
 
 		ance::Value* return_value_{nullptr};
 		bool has_return_{false};
-	};
+};
 }
 
 #endif

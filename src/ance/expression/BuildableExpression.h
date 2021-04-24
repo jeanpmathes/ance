@@ -5,8 +5,14 @@
 
 class BuildableExpression : public virtual Expression
 {
-    public:
-        virtual llvm::Value* build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
+	public:
+		virtual llvm::Value* build(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) = 0;
 };
 
 #endif

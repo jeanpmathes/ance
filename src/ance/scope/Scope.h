@@ -11,24 +11,29 @@
 #include "Type.h"
 
 enum class AccessModifier;
+
 class Statement;
+
 class CompileState;
 
 namespace ance
 {
-	class Constant;
-	class Function;
-	class Value;
-	class GlobalScope;
+class Constant;
 
-	class Scope
-	{
+class Function;
+
+class Value;
+
+class GlobalScope;
+
+class Scope
+{
 	public:
 		virtual ance::GlobalScope* getGlobalScope() = 0;
 
 		virtual bool validate() = 0;
 
 		virtual ance::Variable* getVariable(std::string identifier) = 0;
-	};
+};
 }
 #endif

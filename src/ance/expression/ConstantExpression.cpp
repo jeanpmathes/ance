@@ -4,5 +4,5 @@
 
 ance::Value* ConstantExpression::getValue()
 {
-    return getConstantValue();
+	return getConstantValue();
 }

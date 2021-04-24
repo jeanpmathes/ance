@@ -8,13 +8,15 @@
 
 namespace ance
 {
-	class Constant;
+class Constant;
 }
 
 class ConstantExpression : public virtual Expression
 {
-public:
-	virtual ance::Constant* getConstantValue() = 0;
-	ance::Value * getValue() override;
+	public:
+		virtual ance::Constant* getConstantValue() = 0;
+
+		ance::Value* getValue() override;
 };
+
 #endif

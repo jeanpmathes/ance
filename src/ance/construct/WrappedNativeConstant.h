@@ -5,20 +5,21 @@
 
 namespace ance
 {
-    class WrappedNativeConstant : public Constant
-    {
-        public:
-            WrappedNativeConstant(ance::Type* type, llvm::Constant* constant = nullptr);
+class WrappedNativeConstant : public Constant
+{
+	public:
+		WrappedNativeConstant(ance::Type* type, llvm::Constant* constant = nullptr);
 
-            void setConstant(llvm::Constant* constant);
+		void setConstant(llvm::Constant* constant);
 
-            ance::Type* getType() override;
-            llvm::Constant * getConstant(llvm::LLVMContext &c) override;
+		ance::Type* getType() override;
 
-        private:
-            ance::Type* type_;
-            llvm::Constant* constant_;
-    };
+		llvm::Constant* getConstant(llvm::LLVMContext& c) override;
+
+	private:
+		ance::Type* type_;
+		llvm::Constant* constant_;
+};
 }
 
 #endif

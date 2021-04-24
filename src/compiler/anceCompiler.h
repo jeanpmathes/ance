@@ -8,31 +8,42 @@
 
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
+
 class anceCompiler
 {
-public:
-	explicit anceCompiler(Application& app);
-	void compile(const std::filesystem::path& output_dir);
+	public:
+		explicit anceCompiler(Application& app);
 
-private:
-	void setupGlobals();
-	void buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
-	void buildStart(llvm::FunctionType* main_type, llvm::Function* main, llvm::FunctionType* exit_type, llvm::Function* exit);
-	void linkModule(std::filesystem::path& bc, std::filesystem::path& exe);
+		void compile(const std::filesystem::path& output_dir);
 
-private:
-	Application& application_;
-	llvm::LLVMContext context_;
-	llvm::IRBuilder<> ir_;
+	private:
+		void setupGlobals();
 
-private:
-	llvm::Module* module_;
+		void buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
 
-	llvm::DIBuilder* di_;
-	llvm::DIFile* proj_file_;
-	llvm::DICompileUnit* unit_;
-	llvm::DIFile* code_file_;
+		void buildStart(
+			llvm::FunctionType* main_type,
+			llvm::Function* main,
+			llvm::FunctionType* exit_type,
+			llvm::Function* exit
+		);
 
-	CompileState* state_;
+		void linkModule(std::filesystem::path& bc, std::filesystem::path& exe);
+
+	private:
+		Application& application_;
+		llvm::LLVMContext context_;
+		llvm::IRBuilder<> ir_;
+
+	private:
+		llvm::Module* module_;
+
+		llvm::DIBuilder* di_;
+		llvm::DIFile* proj_file_;
+		llvm::DICompileUnit* unit_;
+		llvm::DIFile* code_file_;
+
+		CompileState* state_;
 };
+
 #endif

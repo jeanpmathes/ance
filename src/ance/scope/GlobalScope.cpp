@@ -15,7 +15,7 @@ bool ance::GlobalScope::validate()
 {
 	auto valid = true;
 
-	for (auto const& [key, val] : functions_)
+	for (auto const&[key, val] : functions_)
 	{
 		if (val == nullptr)
 		{
@@ -50,7 +50,12 @@ void ance::GlobalScope::registerType(ance::Type* type)
 	types_[type->getName()] = type;
 }
 
-void ance::GlobalScope::defineGlobalConstant(AccessModifier access, const std::string& identifier, ance::Type* type, ance::Constant* constant)
+void ance::GlobalScope::defineGlobalConstant(
+	AccessModifier access,
+	const std::string& identifier,
+	ance::Type* type,
+	ance::Constant* constant
+)
 {
 	assert(global_variables_.find(identifier) == global_variables_.end());
 	assert(global_constants_.find(identifier) == global_constants_.end());
@@ -59,18 +64,23 @@ void ance::GlobalScope::defineGlobalConstant(AccessModifier access, const std::s
 	{
 		GlobalVariable* undefined = global_undefined_[identifier];
 
-        undefined->defineGlobal(this, access, type, constant, true);
-        global_constants_[identifier] = undefined;
+		undefined->defineGlobal(this, access, type, constant, true);
+		global_constants_[identifier] = undefined;
 
 		global_undefined_.erase(identifier);
 	}
 	else
 	{
-        global_constants_[identifier] = new ance::GlobalVariable(this, access, identifier, type, constant, true);
+		global_constants_[identifier] = new ance::GlobalVariable(this, access, identifier, type, constant, true);
 	}
 }
 
-void ance::GlobalScope::defineGlobalVariable(AccessModifier access, const std::string& identifier, ance::Type* type, ance::Constant* value)
+void ance::GlobalScope::defineGlobalVariable(
+	AccessModifier access,
+	const std::string& identifier,
+	ance::Type* type,
+	ance::Constant* value
+)
 {
 	assert(global_variables_.find(identifier) == global_variables_.end());
 	assert(global_constants_.find(identifier) == global_constants_.end());
@@ -79,14 +89,14 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier access, const std::s
 	{
 		GlobalVariable* undefined = global_undefined_[identifier];
 
-        undefined->defineGlobal(this, access, type, value, false);
-        global_variables_[identifier] = undefined;
+		undefined->defineGlobal(this, access, type, value, false);
+		global_variables_[identifier] = undefined;
 
 		global_undefined_.erase(identifier);
 	}
 	else
 	{
-        global_variables_[identifier] = new ance::GlobalVariable(this, access, identifier, type, value, false);
+		global_variables_[identifier] = new ance::GlobalVariable(this, access, identifier, type, value, false);
 	}
 }
 
@@ -109,22 +119,28 @@ ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
 
 	// Create an undefined global variable.
 	auto* undefined = new GlobalVariable(identifier);
-    global_undefined_[identifier] = undefined;
+	global_undefined_[identifier] = undefined;
 	return undefined;
 }
 
-void ance::GlobalScope::buildVariables(llvm::LLVMContext& c, llvm::Module* m, CompileState*, llvm::IRBuilder<>&, llvm::DIBuilder*)
+void ance::GlobalScope::buildVariables(
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState*,
+	llvm::IRBuilder<>&,
+	llvm::DIBuilder*
+)
 {
-	for (auto const& [identifier, constant] : global_constants_)
+	for (auto const&[identifier, constant] : global_constants_)
 	{
 		if (!constant) continue;
-        constant->buildGlobal(c, m);
+		constant->buildGlobal(c, m);
 	}
 
-	for (auto const& [identifier, variable] : global_variables_)
+	for (auto const&[identifier, variable] : global_variables_)
 	{
 		if (!variable) continue;
-        variable->buildGlobal(c, m);
+		variable->buildGlobal(c, m);
 	}
 }
 
@@ -140,26 +156,38 @@ void ance::GlobalScope::addFunctionName(const std::string& name)
 
 void ance::GlobalScope::addAndEnterFunction(ance::Function* function)
 {
-    functions_[function->getName()] = function;
-    current_ = function;
+	functions_[function->getName()] = function;
+	current_ = function;
 }
 
 void ance::GlobalScope::pushStatementToCurrentFunction(Statement* statement)
 {
-    current_->pushStatement(statement);
+	current_->pushStatement(statement);
 }
 
-void ance::GlobalScope::buildFunctionNames(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+void ance::GlobalScope::buildFunctionNames(
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+)
 {
-	for (auto const& [key, val] : functions_)
+	for (auto const&[key, val] : functions_)
 	{
-        val->buildName(c, m, state, ir, di);
+		val->buildName(c, m, state, ir, di);
 	}
 }
 
-void ance::GlobalScope::buildFunctions(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+void ance::GlobalScope::buildFunctions(
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+)
 {
-	for (auto const& [key, val] : functions_)
+	for (auto const&[key, val] : functions_)
 	{
 		val->build(c, m, state, ir, di);
 	}

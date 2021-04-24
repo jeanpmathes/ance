@@ -6,7 +6,8 @@
 
 #include "GlobalScope.h"
 
-ance::ArrayType::ArrayType(Type* element_type, const uint64_t size) :
+ance::ArrayType::ArrayType(Type* element_type, const uint64_t size)
+	:
 	size_(size),
 	element_type_(element_type)
 {
@@ -51,7 +52,7 @@ ance::Type* ance::ArrayType::get(ance::Scope* scope, Type* element_type, uint64_
 	}
 	else
 	{
-        scope->getGlobalScope()->registerType(type);
+		scope->getGlobalScope()->registerType(type);
 		return type;
 	}
 }

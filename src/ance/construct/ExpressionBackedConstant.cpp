@@ -1,15 +1,18 @@
 #include "ExpressionBackedConstant.h"
 
-ance::ExpressionBackedConstant::ExpressionBackedConstant(BuildableConstantExpression* expression) : expression_(expression)
+ance::ExpressionBackedConstant::ExpressionBackedConstant(BuildableConstantExpression* expression)
+	: expression_(
+	expression
+)
 {
 }
 
-ance::Type *ance::ExpressionBackedConstant::getType()
+ance::Type* ance::ExpressionBackedConstant::getType()
 {
-    return expression_->getType();
+	return expression_->getType();
 }
 
 llvm::Constant* ance::ExpressionBackedConstant::getConstant(llvm::LLVMContext& c)
 {
-  return expression_->buildConstant(c);
+	return expression_->buildConstant(c);
 }

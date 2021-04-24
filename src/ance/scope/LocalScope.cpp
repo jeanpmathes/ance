@@ -3,7 +3,8 @@
 #include "GlobalScope.h"
 #include "WrappedNativeValue.h"
 
-ance::LocalScope::LocalScope(ance::Scope* parent) : parent_(parent)
+ance::LocalScope::LocalScope(ance::Scope* parent)
+	: parent_(parent)
 {
 }
 
@@ -17,7 +18,11 @@ bool ance::LocalScope::validate()
 	return true;
 }
 
-ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& identifier, ance::Type* type, Expression* expression)
+ance::LocalVariable* ance::LocalScope::defineLocalVariable(
+	const std::string& identifier,
+	ance::Type* type,
+	Expression* expression
+)
 {
 	assert(local_variables.find(identifier) == local_variables.end());
 
@@ -27,7 +32,11 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& id
 	return variable;
 }
 
-ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& identifier, ance::Type* type, ance::Value* value)
+ance::LocalVariable* ance::LocalScope::defineLocalVariable(
+	const std::string& identifier,
+	ance::Type* type,
+	ance::Value* value
+)
 {
 	assert(local_variables.find(identifier) == local_variables.end());
 	auto* variable = new LocalVariable(this, identifier, type, value);

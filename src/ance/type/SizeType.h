@@ -7,11 +7,13 @@ class Application;
 
 namespace ance
 {
-	class SizeType : public ance::Type
-	{
+class SizeType : public ance::Type
+{
 	public:
 		std::string getName() override;
+
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
+
 		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
 
 		llvm::Value* buildValue(llvm::TypeSize size);
@@ -22,7 +24,8 @@ namespace ance
 
 	public:
 		static void init(llvm::LLVMContext& c, Application& app);
+
 		static ance::SizeType* get(Application& app);
-	};
+};
 }
 #endif

@@ -5,13 +5,15 @@
 
 namespace ance
 {
-	class Scope;
+class Scope;
 
-	class SingleType : public FloatingPointType
-	{
+class SingleType : public FloatingPointType
+{
 	public:
 		std::string getName() override;
+
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
+
 		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
 
 	private:
@@ -19,6 +21,6 @@ namespace ance
 
 	public:
 		static ance::FloatingPointType* get(ance::Scope* scope);
-	};
+};
 }
 #endif

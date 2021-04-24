@@ -5,16 +5,18 @@
 
 namespace ance
 {
-	class Scope;
+class Scope;
 
-	class IntegerType : public Type
-	{
+class IntegerType : public Type
+{
 	private:
 		IntegerType(uint64_t bit_size, bool is_signed);
 
 	public:
 		std::string getName() override;
+
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
+
 		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
 
 	private:
@@ -24,7 +26,7 @@ namespace ance
 
 	public:
 		static ance::Type* get(ance::Scope* scope, uint64_t bit_size, bool is_signed);
-	};
+};
 }
 
 #endif

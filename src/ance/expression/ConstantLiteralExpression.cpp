@@ -3,17 +3,18 @@
 #include "Constant.h"
 #include "Scope.h"
 
-ConstantLiteralExpression::ConstantLiteralExpression(ance::Constant* constant) : constant_(constant)
+ConstantLiteralExpression::ConstantLiteralExpression(ance::Constant* constant)
+	: constant_(constant)
 {
 
 }
 
 ance::Type* ConstantLiteralExpression::getType()
 {
-    return constant_->getType();
+	return constant_->getType();
 }
 
 ance::Constant* ConstantLiteralExpression::getConstantValue()
 {
-    return constant_;
+	return constant_;
 }

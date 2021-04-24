@@ -17,9 +17,10 @@
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include "lld/Common/Driver.h"
 
-anceCompiler::anceCompiler(Application& app) : application_(app), ir_(context_)
+anceCompiler::anceCompiler(Application& app)
+	: application_(app), ir_(context_)
 {
-    module_ = new llvm::Module(application_.getName(), context_);
+	module_ = new llvm::Module(application_.getName(), context_);
 
 	llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
 
@@ -37,7 +38,7 @@ anceCompiler::anceCompiler(Application& app) : application_(app), ir_(context_)
 	llvm::TargetMachine* tm = t->createTargetMachine(triple.str(), "generic", "", opt, rm, cm, llvm::CodeGenOpt::None);
 
 	llvm::DataLayout dl = tm->createDataLayout();
-    application_.setPointerSize(dl.getPointerSize());
+	application_.setPointerSize(dl.getPointerSize());
 	ance::SizeType::init(context_, app);
 
 	module_->setDataLayout(dl);
@@ -45,36 +46,37 @@ anceCompiler::anceCompiler(Application& app) : application_(app), ir_(context_)
 
 	module_->addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
 
-    di_ = new llvm::DIBuilder(*module_);
+	di_ = new llvm::DIBuilder(*module_);
 
-    proj_file_ = di_->createFile(application_.getProjectFile().filename().string(), application_.getProjectFile().string());
-    unit_ = di_->createCompileUnit(llvm::dwarf::DW_LANG_C, proj_file_, "ancec-0", false, "", 0);
-    code_file_ = di_->createFile(application_.getCodeFile().filename().string(), application_.getCodeFile().string());
+	proj_file_ =
+		di_->createFile(application_.getProjectFile().filename().string(), application_.getProjectFile().string());
+	unit_ = di_->createCompileUnit(llvm::dwarf::DW_LANG_C, proj_file_, "ancec-0", false, "", 0);
+	code_file_ = di_->createFile(application_.getCodeFile().filename().string(), application_.getCodeFile().string());
 
-    state_ = new CompileState(&context_, module_, &ir_, di_);
-    state_->application_ = &application_;
-    state_->unit_ = unit_;
-    state_->code_file_ = code_file_;
+	state_ = new CompileState(&context_, module_, &ir_, di_);
+	state_->application_ = &application_;
+	state_->unit_ = unit_;
+	state_->code_file_ = code_file_;
 }
 
 void anceCompiler::compile(const std::filesystem::path& output_dir)
 {
-    state_->ui_32_ = di_->createBasicType("ui32", 32, llvm::dwarf::DW_ATE_unsigned);
+	state_->ui_32_ = di_->createBasicType("ui32", 32, llvm::dwarf::DW_ATE_unsigned);
 
-    setupGlobals();
+	setupGlobals();
 
-    application_.globalScope()->buildVariables(context_, module_, state_, ir_, di_);
-    application_.globalScope()->buildFunctionNames(context_, module_, state_, ir_, di_);
-    application_.globalScope()->buildFunctions(context_, module_, state_, ir_, di_);
+	application_.globalScope()->buildVariables(context_, module_, state_, ir_, di_);
+	application_.globalScope()->buildFunctionNames(context_, module_, state_, ir_, di_);
+	application_.globalScope()->buildFunctions(context_, module_, state_, ir_, di_);
 
 	llvm::FunctionType* main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(context_), false);
 	llvm::Function* main = module_->getFunction("main");
 
 	llvm::FunctionType* exit_type;
 	llvm::Function* exit;
-    buildExit(exit_type, exit);
+	buildExit(exit_type, exit);
 
-    buildStart(main_type, main, exit_type, exit);
+	buildStart(main_type, main, exit_type, exit);
 
 	di_->finalize();
 
@@ -98,21 +100,42 @@ void anceCompiler::compile(const std::filesystem::path& output_dir)
 	llvm::WriteBitcodeToFile(*module_, os);
 	os.close();
 
-    linkModule(bc, exe);
+	linkModule(bc, exe);
 }
 
 void anceCompiler::setupGlobals()
 {
 	llvm::ConstantPointerNull* null = llvm::ConstantPointerNull::get(llvm::PointerType::getInt8PtrTy(context_));
 
-	new llvm::GlobalVariable(*module_, llvm::Type::getInt8PtrTy(context_), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_INPUT_HANDLE);
-	new llvm::GlobalVariable(*module_, llvm::Type::getInt8PtrTy(context_), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_OUTPUT_HANDLE);
-	new llvm::GlobalVariable(*module_, llvm::Type::getInt8PtrTy(context_), false, llvm::GlobalValue::LinkageTypes::CommonLinkage, null, ANCE_STD_ERROR_HANDLE);
+	new llvm::GlobalVariable(
+		*module_,
+		llvm::Type::getInt8PtrTy(context_),
+		false,
+		llvm::GlobalValue::LinkageTypes::CommonLinkage,
+		null,
+		ANCE_STD_INPUT_HANDLE
+	);
+	new llvm::GlobalVariable(
+		*module_,
+		llvm::Type::getInt8PtrTy(context_),
+		false,
+		llvm::GlobalValue::LinkageTypes::CommonLinkage,
+		null,
+		ANCE_STD_OUTPUT_HANDLE
+	);
+	new llvm::GlobalVariable(
+		*module_,
+		llvm::Type::getInt8PtrTy(context_),
+		false,
+		llvm::GlobalValue::LinkageTypes::CommonLinkage,
+		null,
+		ANCE_STD_ERROR_HANDLE
+	);
 }
 
 void anceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit)
 {
-	llvm::Type* exit_params[] = { llvm::Type::getInt32Ty(context_) };
+	llvm::Type* exit_params[] = {llvm::Type::getInt32Ty(context_)};
 	exit_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context_), exit_params, false);
 	exit = llvm::Function::Create(exit_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_exit", module_);
 	exit->getArg(0)->setName("exitcode");
@@ -126,10 +149,16 @@ void anceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& ex
 	ir_.CreateRetVoid();
 }
 
-void anceCompiler::buildStart(llvm::FunctionType* main_type, llvm::Function* main, llvm::FunctionType* exit_type, llvm::Function* exit)
+void anceCompiler::buildStart(
+	llvm::FunctionType* main_type,
+	llvm::Function* main,
+	llvm::FunctionType* exit_type,
+	llvm::Function* exit
+)
 {
 	llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context_), false);
-	llvm::Function* start = llvm::Function::Create(start_type, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "_start", module_);
+	llvm::Function* start =
+		llvm::Function::Create(start_type, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "_start", module_);
 
 	llvm::BasicBlock* start_block = llvm::BasicBlock::Create(context_, "entry", start);
 	llvm::BasicBlock* alloc_block = llvm::BasicBlock::Create(context_, "no_console", start);
@@ -161,7 +190,7 @@ void anceCompiler::buildStart(llvm::FunctionType* main_type, llvm::Function* mai
 
 	llvm::CallInst* main_exitcode = ir_.CreateCall(main_type, main, llvm::None, "exitcode");
 
-	llvm::Value* exit_args = { main_exitcode };
+	llvm::Value* exit_args = {main_exitcode};
 	ir_.CreateCall(exit_type, exit, exit_args);
 
 	ir_.CreateRetVoid();

@@ -6,66 +6,66 @@
 #include "IntegerType.h"
 
 ance::StringConstant::StringConstant(std::string string, ance::Scope* scope)
-    : type_(ance::ArrayType::get(scope, ance::IntegerType::get(scope, 8, false), string.size())),
-      string_(string)
+	: type_(ance::ArrayType::get(scope, ance::IntegerType::get(scope, 8, false), string.size())),
+	  string_(string)
 {
 
 }
 
 ance::Type* ance::StringConstant::getType()
 {
-    return type_;
+	return type_;
 }
 
 llvm::Constant* ance::StringConstant::getConstant(llvm::LLVMContext& c)
 {
-    if (!constant_)
-    {
-        constant_ = llvm::ConstantDataArray::getString(c, string_, false);
-    }
+	if (!constant_)
+	{
+		constant_ = llvm::ConstantDataArray::getString(c, string_, false);
+	}
 
-    return constant_;
+	return constant_;
 }
 
 std::string ance::StringConstant::parse(const std::string& unparsed)
 {
-    std::stringstream builder;
+	std::stringstream builder;
 
-    bool escaped = false;
+	bool escaped = false;
 
-    for (char const& c : unparsed)
-    {
-        if (escaped)
-        {
-            switch (c)
-            {
-                case 'n':
-                    builder << '\n';
-                    break;
+	for (char const& c : unparsed)
+	{
+		if (escaped)
+		{
+			switch (c)
+			{
+				case 'n':
+					builder << '\n';
+					break;
 
-                case '0':
-                    builder << '\0';
-                    break;
+				case '0':
+					builder << '\0';
+					break;
 
-                default:
-                    builder << c;
-                    break;
-            }
+				default:
+					builder << c;
+					break;
+			}
 
-            escaped = false;
-        }
-        else
-        {
-            if (c == '\\')
-            {
-                escaped = true;
-            }
-            else if (c != '"')
-            {
-                builder << c;
-            }
-        }
-    }
+			escaped = false;
+		}
+		else
+		{
+			if (c == '\\')
+			{
+				escaped = true;
+			}
+			else if (c != '"')
+			{
+				builder << c;
+			}
+		}
+	}
 
-    return builder.str();
+	return builder.str();
 }

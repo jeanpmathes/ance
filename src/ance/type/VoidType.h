@@ -5,12 +5,14 @@
 
 namespace ance
 {
-	class VoidType : public Type
-	{
+class VoidType : public Type
+{
 	public:
 
 		std::string getName() override;
+
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
+
 		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
 
 	private:
@@ -21,6 +23,6 @@ namespace ance
 
 	private:
 		static VoidType* instance_;
-	};
+};
 }
 #endif

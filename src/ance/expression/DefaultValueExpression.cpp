@@ -6,7 +6,8 @@
 
 #include "ExpressionBackedConstant.h"
 
-DefaultValueExpression::DefaultValueExpression(ance::Type* type) : type_(type), constant_(new ance::ExpressionBackedConstant(this))
+DefaultValueExpression::DefaultValueExpression(ance::Type* type)
+	: type_(type), constant_(new ance::ExpressionBackedConstant(this))
 {
 }
 
@@ -20,7 +21,13 @@ ance::Value* DefaultValueExpression::getValue()
 	return constant_;
 }
 
-llvm::Value* DefaultValueExpression::build(llvm::LLVMContext& c, llvm::Module*, CompileState*, llvm::IRBuilder<>&, llvm::DIBuilder*)
+llvm::Value* DefaultValueExpression::build(
+	llvm::LLVMContext& c,
+	llvm::Module*,
+	CompileState*,
+	llvm::IRBuilder<>&,
+	llvm::DIBuilder*
+)
 {
 	return buildConstant(c);
 }

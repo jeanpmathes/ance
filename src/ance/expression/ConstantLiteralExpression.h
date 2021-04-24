@@ -5,14 +5,15 @@
 
 class ConstantLiteralExpression : public ConstantExpression
 {
-    public:
-        explicit ConstantLiteralExpression(ance::Constant* constant);
+	public:
+		explicit ConstantLiteralExpression(ance::Constant* constant);
 
-        ance::Type* getType() override;
-        ance::Constant* getConstantValue() override;
+		ance::Type* getType() override;
 
-    private:
-        ance::Constant* constant_;
+		ance::Constant* getConstantValue() override;
+
+	private:
+		ance::Constant* constant_;
 };
 
 #endif

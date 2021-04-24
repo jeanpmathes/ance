@@ -5,22 +5,30 @@
 
 class DefaultValueExpression : public BuildableConstantExpression
 {
-public:
-	explicit DefaultValueExpression(ance::Type* type);
+	public:
+		explicit DefaultValueExpression(ance::Type* type);
 
-	ance::Type* getType() override;
+		ance::Type* getType() override;
 
-	ance::Value* getValue() override;
-	llvm::Value* build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
+		ance::Value* getValue() override;
 
-	ance::Constant* getConstantValue() override;
-	llvm::Constant* buildConstant(llvm::LLVMContext& c) override;
+		llvm::Value* build(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) override;
 
-	~DefaultValueExpression() override;
+		ance::Constant* getConstantValue() override;
 
-private:
-	ance::Type* type_;
-	ance::Constant* constant_;
+		llvm::Constant* buildConstant(llvm::LLVMContext& c) override;
+
+		~DefaultValueExpression() override;
+
+	private:
+		ance::Type* type_;
+		ance::Constant* constant_;
 };
 
 #endif

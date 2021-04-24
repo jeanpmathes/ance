@@ -9,12 +9,19 @@
 
 namespace ance
 {
-	class Constant : public Value
-	{
+class Constant : public Value
+{
 	public:
 		virtual llvm::Constant* getConstant(llvm::LLVMContext& c) = 0;
-		llvm::Value* getValue(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
 
-	};
+		llvm::Value* getValue(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) override;
+
+};
 }
 #endif

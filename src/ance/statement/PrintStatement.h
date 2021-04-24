@@ -4,11 +4,19 @@ class Expression;
 
 class PrintStatement : public Statement
 {
-public:
-	PrintStatement(ance::Function* function, unsigned int l, unsigned int c, Expression* expression);
-	void build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
-	~PrintStatement() override;
+	public:
+		PrintStatement(ance::Function* function, unsigned int l, unsigned int c, Expression* expression);
 
-private:
-	Expression* expression_;
+		void build(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) override;
+
+		~PrintStatement() override;
+
+	private:
+		Expression* expression_;
 };

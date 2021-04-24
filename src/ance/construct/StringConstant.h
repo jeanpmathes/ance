@@ -6,20 +6,22 @@
 
 namespace ance
 {
-    class StringConstant : public Constant
-    {
-        public:
-            StringConstant(std::string string, ance::Scope* scope);
-            ance::Type * getType() override;
-            llvm::Constant* getConstant(llvm::LLVMContext &c) override;
+class StringConstant : public Constant
+{
+	public:
+		StringConstant(std::string string, ance::Scope* scope);
 
-            static std::string parse(const std::string& unparsed);
+		ance::Type* getType() override;
 
-        private:
-            ance::Type* type_;
-            std::string string_;
-            llvm::Constant* constant_{nullptr};
-    };
+		llvm::Constant* getConstant(llvm::LLVMContext& c) override;
+
+		static std::string parse(const std::string& unparsed);
+
+	private:
+		ance::Type* type_;
+		std::string string_;
+		llvm::Constant* constant_{nullptr};
+};
 }
 
 #endif

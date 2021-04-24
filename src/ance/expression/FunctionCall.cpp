@@ -6,12 +6,16 @@
 #include "GlobalScope.h"
 #include "Value.h"
 
-namespace ance {
-	class Function;
+namespace ance
+{
+class Function;
 }
 
 FunctionCall::FunctionCall(std::string identifier, ance::Scope* scope, std::vector<Expression*> arguments)
-    : scope_(scope), identifier_(identifier), arguments_(arguments), return_value_(new ance::ExpressionBackedValue(this))
+	: scope_(scope),
+	  identifier_(identifier),
+	  arguments_(arguments),
+	  return_value_(new ance::ExpressionBackedValue(this))
 {
 }
 
@@ -25,7 +29,13 @@ ance::Value* FunctionCall::getValue()
 	return return_value_;
 }
 
-llvm::Value* FunctionCall::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+llvm::Value* FunctionCall::build(
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+)
 {
 	ance::Function* fn = state->application_->globalScope()->getFunction(identifier_);
 

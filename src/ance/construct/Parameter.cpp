@@ -2,7 +2,8 @@
 
 #include "WrappedNativeValue.h"
 
-ance::Parameter::Parameter(ance::Type* type, std::string name) : type_(type), name_(name), wrapper_(new WrappedNativeValue(type))
+ance::Parameter::Parameter(ance::Type* type, std::string name)
+	: type_(type), name_(name), wrapper_(new WrappedNativeValue(type))
 {
 }
 
@@ -26,7 +27,7 @@ void ance::Parameter::wrap(llvm::Argument* argument)
 	argument_ = argument;
 	argument->setName(name_);
 
-    wrapper_->setValue(argument);
+	wrapper_->setValue(argument);
 }
 
 llvm::Argument* ance::Parameter::getWrapped()

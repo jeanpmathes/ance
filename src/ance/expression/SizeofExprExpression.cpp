@@ -5,7 +5,9 @@
 #include "SizeType.h"
 
 SizeofExprExpression::SizeofExprExpression(Expression* expression, Application& app)
-    : return_value_(new ance::ExpressionBackedValue(this)), return_type_(ance::SizeType::get(app)), expression_(expression)
+	: return_value_(new ance::ExpressionBackedValue(this)),
+	  return_type_(ance::SizeType::get(app)),
+	  expression_(expression)
 {
 }
 
@@ -16,10 +18,16 @@ ance::Type* SizeofExprExpression::getType()
 
 ance::Value* SizeofExprExpression::getValue()
 {
-	return  return_value_;
+	return return_value_;
 }
 
-llvm::Value* SizeofExprExpression::build(llvm::LLVMContext&, llvm::Module* m, CompileState* state, llvm::IRBuilder<>&, llvm::DIBuilder*)
+llvm::Value* SizeofExprExpression::build(
+	llvm::LLVMContext&,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>&,
+	llvm::DIBuilder*
+)
 {
 	return ance::SizeType::get(*state->application_)->buildValue(expression_->getType()->getSize(m));
 }

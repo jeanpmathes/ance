@@ -1,19 +1,22 @@
 #include "WrappedNativeConstant.h"
 
-ance::WrappedNativeConstant::WrappedNativeConstant(ance::Type* type, llvm::Constant* constant) : type_(type), constant_(constant) {
+ance::WrappedNativeConstant::WrappedNativeConstant(ance::Type* type, llvm::Constant* constant)
+	: type_(type), constant_(constant)
+{
 
 }
-void ance::WrappedNativeConstant::setConstant(llvm::Constant *constant)
+
+void ance::WrappedNativeConstant::setConstant(llvm::Constant* constant)
 {
-    constant_ = constant;
+	constant_ = constant;
 }
 
-ance::Type *ance::WrappedNativeConstant::getType()
+ance::Type* ance::WrappedNativeConstant::getType()
 {
-    return type_;
+	return type_;
 }
 
-llvm::Constant *ance::WrappedNativeConstant::getConstant(llvm::LLVMContext&)
+llvm::Constant* ance::WrappedNativeConstant::getConstant(llvm::LLVMContext&)
 {
-    return constant_;
+	return constant_;
 }

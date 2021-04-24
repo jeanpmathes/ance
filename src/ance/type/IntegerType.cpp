@@ -6,7 +6,8 @@
 #include "GlobalScope.h"
 #include "Scope.h"
 
-ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed) : bit_size_(bit_size), is_signed_(is_signed)
+ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed)
+	: bit_size_(bit_size), is_signed_(is_signed)
 {
 }
 
@@ -43,7 +44,7 @@ ance::Type* ance::IntegerType::get(ance::Scope* scope, uint64_t bit_size, bool i
 	}
 	else
 	{
-        scope->getGlobalScope()->registerType(type);
+		scope->getGlobalScope()->registerType(type);
 		return type;
 	}
 }

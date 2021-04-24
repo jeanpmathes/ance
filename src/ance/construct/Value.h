@@ -5,17 +5,25 @@
 #include "llvm/IR/DIBuilder.h"
 
 class Expression;
+
 class CompileState;
 
 namespace ance
 {
-	class Type;
+class Type;
 
-	class Value
-	{
+class Value
+{
 	public:
 		virtual ance::Type* getType() = 0;
-		virtual llvm::Value* getValue(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
-	};
+
+		virtual llvm::Value* getValue(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) = 0;
+};
 }
 #endif

@@ -35,8 +35,8 @@ ance::SizeType* ance::SizeType::get(Application& app)
 {
 	if (!instance_)
 	{
-        instance_ = new SizeType();
-        app.globalScope()->registerType(instance_);
+		instance_ = new SizeType();
+		app.globalScope()->registerType(instance_);
 	}
 
 	return instance_;

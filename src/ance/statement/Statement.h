@@ -10,23 +10,34 @@ class CompileState;
 
 namespace ance
 {
-	class Function;
+class Function;
 }
 
 class Statement
 {
-public:
-	Statement(ance::Function* function, unsigned int l, unsigned int c);
-	[[nodiscard]] ance::Function* getContainingFunction() const;
-	[[nodiscard]] unsigned int getLine() const;
-	[[nodiscard]] unsigned int getColumn() const;
-	virtual void build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
-	virtual ~Statement() = 0;
+	public:
+		Statement(ance::Function* function, unsigned int l, unsigned int c);
 
-private:
-	ance::Function* function_;
-	unsigned int line_;
-	unsigned int column_;
+		[[nodiscard]] ance::Function* getContainingFunction() const;
+
+		[[nodiscard]] unsigned int getLine() const;
+
+		[[nodiscard]] unsigned int getColumn() const;
+
+		virtual void build(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) = 0;
+
+		virtual ~Statement() = 0;
+
+	private:
+		ance::Function* function_;
+		unsigned int line_;
+		unsigned int column_;
 };
 
 #endif
