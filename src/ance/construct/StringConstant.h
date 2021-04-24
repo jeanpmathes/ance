@@ -18,7 +18,7 @@ namespace ance
         private:
             ance::Type* type_;
             std::string string_;
-            llvm::Constant* constant_;
+            llvm::Constant* constant_{nullptr};
     };
 }
 

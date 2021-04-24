@@ -1,7 +1,7 @@
 #include "FloatConstant.h"
 
 ance::FloatConstant::FloatConstant(llvm::APFloat number, ance::FloatingPointType* type)
-    : type_(type), float_(std::move(number)), constant_(nullptr)
+    : type_(type), float_(std::move(number))
 {
 }
 

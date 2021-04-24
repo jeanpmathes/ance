@@ -52,7 +52,7 @@ int main(int argc, char** argv)
     if (application.validate())
     {
         anceCompiler compiler(application);
-        compiler.compile(std::filesystem::path("C:\\Users\\jeanp\\source\\repos\\ance\\ance_output"));
+        compiler.compile(std::filesystem::path(R"(C:\Users\jeanp\source\repos\ance\ance_output)"));
 
         return EXIT_SUCCESS;
     }

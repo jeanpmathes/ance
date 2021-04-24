@@ -1,12 +1,14 @@
 #include "Variable.h"
 
+#include <utility>
+
 ance::Variable::Variable(ance::Scope* containing_scope, std::string identifier, ance::Type* type, bool is_constant) :
-	identifier_(identifier), is_defined_(true), scope_(containing_scope), type_(type), is_constant_(is_constant)
+	identifier_(std::move(identifier)), is_defined_(true), scope_(containing_scope), type_(type), is_constant_(is_constant)
 {
 }
 
 ance::Variable::Variable(std::string identifier) :
-	identifier_(identifier), is_defined_(false), scope_(nullptr), type_(nullptr), is_constant_(true)
+	identifier_(std::move(identifier)), is_defined_(false), scope_(nullptr), type_(nullptr), is_constant_(true)
 {
 }
 

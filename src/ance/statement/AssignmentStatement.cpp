@@ -14,17 +14,12 @@ AssignmentStatement::AssignmentStatement(ance::Function* function, unsigned int 
 
 void AssignmentStatement::build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
 {
-    getContainingFunction()->getScope()->getVariable(variable_identifier_)->setValue(assigned_->getValue()
-                                                                                            ->getValue(c,
-                                                                                                       m,
-                                                                                                       state,
-                                                                                                       ir,
-                                                                                                       di),
-                                                                                     c,
-                                                                                     m,
-                                                                                     state,
-                                                                                     ir,
-                                                                                     di);
+    getContainingFunction()
+        ->getScope()
+        ->getVariable(variable_identifier_)
+        ->setValue(
+            assigned_->getValue()->getValue(c, m, state, ir, di),
+            c, m, state, ir, di);
 }
 
 AssignmentStatement::~AssignmentStatement() = default;

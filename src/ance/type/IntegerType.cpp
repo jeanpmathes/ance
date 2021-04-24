@@ -6,7 +6,7 @@
 #include "GlobalScope.h"
 #include "Scope.h"
 
-ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed) : bit_size_(bit_size), is_signed_(is_signed), type_(nullptr)
+ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed) : bit_size_(bit_size), is_signed_(is_signed)
 {
 }
 
@@ -33,7 +33,7 @@ llvm::Type* ance::IntegerType::getNativeType(llvm::LLVMContext& c)
 
 ance::Type* ance::IntegerType::get(ance::Scope* scope, uint64_t bit_size, bool is_signed)
 {
-	ance::IntegerType* type = new ance::IntegerType(bit_size, is_signed);
+	auto* type = new ance::IntegerType(bit_size, is_signed);
 	std::string type_name = type->getName();
 
 	if (scope->getGlobalScope()->isTypeRegistered(type_name))

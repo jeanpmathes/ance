@@ -1,10 +1,12 @@
 #include "Application.h"
 
 #include <iostream>
+#include <utility>
 
 #include "GlobalScope.h"
 
-Application::Application(std::filesystem::path project_file, std::filesystem::path nccode_file) : proj_file_(project_file), code_file_(nccode_file), global_scope_(new ance::GlobalScope())
+Application::Application(std::filesystem::path project_file, std::filesystem::path nccode_file)
+    : proj_file_(std::move(project_file)), code_file_(std::move(nccode_file)), global_scope_(new ance::GlobalScope())
 {
 }
 
@@ -13,17 +15,17 @@ void Application::setPointerSize(unsigned size)
 	pointer_size_ = size;
 }
 
-const std::string Application::getName() const
+std::string Application::getName() const
 {
 	return proj_file_.stem().string();
 }
 
-const std::filesystem::path Application::getProjectFile() const
+std::filesystem::path Application::getProjectFile() const
 {
 	return std::filesystem::path(proj_file_);
 }
 
-const std::filesystem::path Application::getCodeFile() const
+std::filesystem::path Application::getCodeFile() const
 {
 	return std::filesystem::path(code_file_);
 }

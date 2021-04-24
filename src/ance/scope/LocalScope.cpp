@@ -21,7 +21,7 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& id
 {
 	assert(local_variables.find(identifier) == local_variables.end());
 
-	ance::LocalVariable* variable = new LocalVariable(this, identifier, type, expression->getValue());
+	auto* variable = new LocalVariable(this, identifier, type, expression->getValue());
 	local_variables[identifier] = variable;
 
 	return variable;
@@ -30,7 +30,7 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& id
 ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& identifier, ance::Type* type, ance::Value* value)
 {
 	assert(local_variables.find(identifier) == local_variables.end());
-	ance::LocalVariable* variable = new LocalVariable(this, identifier, type, value);
+	auto* variable = new LocalVariable(this, identifier, type, value);
 	local_variables[identifier] = variable;
 
 	return variable;

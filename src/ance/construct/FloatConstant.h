@@ -16,7 +16,7 @@ namespace ance
         private:
             ance::Type* type_;
             llvm::APFloat float_;
-            llvm::Constant* constant_;
+            llvm::Constant* constant_{nullptr};
     };
 }
 

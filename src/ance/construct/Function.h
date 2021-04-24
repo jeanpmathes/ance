@@ -50,12 +50,12 @@ namespace ance
 		std::vector<ance::LocalVariable*> arguments_;
 		std::list<Statement*> statements_;
 
-		ance::Type* return_type_;
-		llvm::FunctionType* native_type_;
-		llvm::Function* native_function_;
+		ance::Type* return_type_{nullptr};
+		llvm::FunctionType* native_type_{nullptr};
+		llvm::Function* native_function_{nullptr};
 
-		ance::Value* return_value_;
-		bool has_return_;
+		ance::Value* return_value_{nullptr};
+		bool has_return_{false};
 	};
 }
 

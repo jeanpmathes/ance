@@ -6,7 +6,7 @@
 
 ance::IntegerConstant::IntegerConstant(llvm::APInt integer, bool is_signed, ance::Scope* scope)
     : type_(ance::IntegerType::get(scope, integer.getBitWidth(), is_signed)),
-      integer_(std::move(integer)), constant_(nullptr)
+      integer_(std::move(integer))
 {
 }
 

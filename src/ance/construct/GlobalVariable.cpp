@@ -14,12 +14,12 @@ namespace llvm {
 }
 
 ance::GlobalVariable::GlobalVariable(ance::Scope* containing_scope, AccessModifier access, std::string identifier, ance::Type* type, ance::Constant* constant_init, bool is_constant)
-	: Variable(containing_scope, std::move(identifier), type, is_constant), access_(access), constant_init_(constant_init), native_variable_(nullptr)
+	: Variable(containing_scope, std::move(identifier), type, is_constant), access_(access), constant_init_(constant_init)
 {
 }
 
 ance::GlobalVariable::GlobalVariable(std::string identifier)
-	: Variable(std::move(identifier)), access_(AccessModifier::PRIVATE_ACCESS), constant_init_(nullptr), native_variable_(nullptr)
+	: Variable(std::move(identifier)), access_(AccessModifier::PRIVATE_ACCESS)
 {
 }
 

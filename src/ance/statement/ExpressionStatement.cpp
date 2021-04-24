@@ -2,7 +2,8 @@
 
 #include "BuildableExpression.h"
 
-ExpressionStatement::ExpressionStatement(ance::Function* function, BuildableExpression* expression, unsigned l, unsigned c) : Statement(function, l, c), expression_(expression)
+ExpressionStatement::ExpressionStatement(ance::Function* function, BuildableExpression* expression, unsigned l, unsigned c)
+    : Statement(function, l, c), expression_(expression)
 {
 }
 

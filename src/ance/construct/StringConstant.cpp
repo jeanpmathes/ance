@@ -7,7 +7,7 @@
 
 ance::StringConstant::StringConstant(std::string string, ance::Scope* scope)
     : type_(ance::ArrayType::get(scope, ance::IntegerType::get(scope, 8, false), string.size())),
-      string_(string), constant_(nullptr)
+      string_(string)
 {
 
 }

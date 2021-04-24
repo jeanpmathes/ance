@@ -6,7 +6,7 @@
 #include "Value.h"
 
 ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope, std::string identifier, ance::Type* type, ance::Value* value)
-    : Variable(containing_scope, std::move(identifier), type, false), value_(value), native_value_(nullptr)
+    : Variable(containing_scope, std::move(identifier), type, false), value_(value)
 {
 }
 

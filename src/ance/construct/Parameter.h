@@ -29,7 +29,7 @@ namespace ance
 
 		ance::WrappedNativeValue* wrapper_;
 
-		llvm::Argument* argument_;
+		llvm::Argument* argument_{nullptr};
 	};
 }
 #endif

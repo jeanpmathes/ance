@@ -17,6 +17,6 @@ namespace ance {
 
 	private:
 		ance::Value* value_;
-		llvm::Value* native_value_;
+		llvm::Value* native_value_{nullptr};
 	};
 }

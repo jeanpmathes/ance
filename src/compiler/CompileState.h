@@ -20,10 +20,10 @@ private:
 	llvm::DIBuilder* di_builder_;
 
 public:
-	Application* application_;
-	llvm::DICompileUnit* unit_;
-	llvm::DIFile* code_file_;
-	llvm::DIBasicType* ui_32_;
+    Application* application_;
+	llvm::DICompileUnit* unit_{nullptr};
+	llvm::DIFile* code_file_{nullptr};
+	llvm::DIBasicType* ui_32_{nullptr};
 
 	// native: AllocConsole
 

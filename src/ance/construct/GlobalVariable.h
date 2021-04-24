@@ -31,8 +31,8 @@ namespace ance
 
 	private:
 		AccessModifier access_;
-		ance::Constant* constant_init_;
-		llvm::GlobalVariable* native_variable_;
+		ance::Constant* constant_init_{nullptr};
+		llvm::GlobalVariable* native_variable_{nullptr};
 	};
 }
 

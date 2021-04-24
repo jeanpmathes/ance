@@ -4,7 +4,8 @@
 #include "ExpressionBackedValue.h"
 #include "SizeType.h"
 
-SizeofExprExpression::SizeofExprExpression(Expression* expression, Application& app) : return_value_(new ance::ExpressionBackedValue(this)), return_type_(ance::SizeType::get(app)), expression_(expression)
+SizeofExprExpression::SizeofExprExpression(Expression* expression, Application& app)
+    : return_value_(new ance::ExpressionBackedValue(this)), return_type_(ance::SizeType::get(app)), expression_(expression)
 {
 }
 

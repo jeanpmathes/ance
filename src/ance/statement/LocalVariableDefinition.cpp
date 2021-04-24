@@ -4,8 +4,8 @@
 #include "Function.h"
 #include "LocalScope.h"
 
-LocalVariableDefinition::LocalVariableDefinition(ance::Function* function, unsigned l, unsigned c, ance::LocalVariable* variable) :
-	Statement(function, l, c), variable_(variable)
+LocalVariableDefinition::LocalVariableDefinition(ance::Function* function, unsigned l, unsigned c, ance::LocalVariable* variable)
+    : Statement(function, l, c), variable_(variable)
 {
 }
 

@@ -8,8 +8,7 @@
 
 ance::ArrayType::ArrayType(Type* element_type, const uint64_t size) :
 	size_(size),
-	element_type_(element_type),
-	type_(nullptr)
+	element_type_(element_type)
 {
 }
 

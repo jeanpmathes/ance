@@ -5,7 +5,8 @@
 #include "Expression.h"
 #include "Value.h"
 
-PrintStatement::PrintStatement(ance::Function* function, const unsigned int l, const unsigned int c, Expression* expression) : Statement(function, c, l), expression_(expression)
+PrintStatement::PrintStatement(ance::Function* function, const unsigned int l, const unsigned int c, Expression* expression)
+    : Statement(function, l, c), expression_(expression)
 {
 }
 

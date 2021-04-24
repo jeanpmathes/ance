@@ -19,9 +19,9 @@ public:
 	Application(std::filesystem::path project_file, std::filesystem::path nccode_file);
 	void setPointerSize(unsigned size);
 
-	[[nodiscard]] const std::string getName() const;
-	[[nodiscard]] const std::filesystem::path getProjectFile() const;
-	[[nodiscard]] const std::filesystem::path getCodeFile() const;
+	[[nodiscard]] std::string getName() const;
+	[[nodiscard]] std::filesystem::path getProjectFile() const;
+	[[nodiscard]] std::filesystem::path getCodeFile() const;
 
 	unsigned getBitness();
 
@@ -35,7 +35,7 @@ private:
 
 	ance::GlobalScope* global_scope_;
 
-	unsigned pointer_size_;
+	unsigned pointer_size_{0};
 };
 
 #endif

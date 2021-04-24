@@ -2,7 +2,7 @@
 
 #include "WrappedNativeValue.h"
 
-ance::Parameter::Parameter(ance::Type* type, std::string name) : type_(type), name_(name), wrapper_(new WrappedNativeValue(type)), argument_(nullptr)
+ance::Parameter::Parameter(ance::Type* type, std::string name) : type_(type), name_(name), wrapper_(new WrappedNativeValue(type))
 {
 }
 
