@@ -8,4 +8,5 @@ target_sources(ance PRIVATE ArrayType.cpp
         SingleType.cpp
         SizeType.cpp
         Type.cpp
-        VoidType.cpp)
+        VoidType.cpp
+        FloatingPointType.cpp)
