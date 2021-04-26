@@ -10,11 +10,11 @@ data
 	;
 
 constant_declaration
-	: access_modifier CONST type IDENTIFIER DEFINITION constant_expression SEMICOLON
+	: access_modifier CONST type IDENTIFIER DEFINITION constant_expression ';'
 	;
 
 variable_declaration
-	: access_modifier type IDENTIFIER ( ASSIGNMENT constant_expression )? SEMICOLON
+	: access_modifier type IDENTIFIER ( ASSIGNMENT constant_expression )? ';'
 	;
 
 code
@@ -22,11 +22,11 @@ code
 	;
 
 function
-	: access_modifier type IDENTIFIER PARENTHESES_OPEN parameters PARENTHESES_CLOSED BRACE_OPEN ( statement )+ BRACE_CLOSED
+	: access_modifier type IDENTIFIER '(' parameters ')' '{' ( statement )+ '}'
 	;
 
 parameters
-	: (parameter (COMMA parameter)* )?
+	: (parameter (',' parameter)* )?
 	;
 
 parameter
@@ -47,23 +47,23 @@ statement
 	;
 
 expression_statement
-	: independent_expression SEMICOLON 
+	: independent_expression ';'
 	;
 
 local_variable_definition
-	: type IDENTIFIER ( ASSIGNMENT expression )? SEMICOLON
+	: type IDENTIFIER ( ASSIGNMENT expression )? ';'
 	;
 
 variable_assignment
-	: IDENTIFIER ASSIGNMENT expression SEMICOLON
+	: IDENTIFIER ASSIGNMENT expression ';'
 	;
 
 print_statement
-	: PRINT expression SEMICOLON
+	: PRINT expression ';'
 	;
 
 return_statement
-	: RETURN ( expression )? SEMICOLON
+	: RETURN ( expression )? ';'
 	;
 
 expression
@@ -79,11 +79,11 @@ independent_expression
 	;
 
 function_call
-	: IDENTIFIER PARENTHESES_OPEN arguments PARENTHESES_CLOSED
+	: IDENTIFIER '(' arguments ')'
 	;
 
 arguments
-	: (expression (COMMA expression)* )?
+	: (expression (',' expression)* )?
 	;
 
 variable_expression
@@ -95,7 +95,7 @@ sizeof_type_expression
 	;
 
 sizeof_exp_expression
-	: SIZEOF PARENTHESES_OPEN expression PARENTHESES_CLOSED
+	: SIZEOF '(' expression ')'
 	;
 
 constant_expression
@@ -115,17 +115,17 @@ integer_expression
 	;
 
 unsigned_integer
-	: INTEGER ( COLON INTEGER )?
+	: INTEGER ( ':' INTEGER )?
 	;
 
 signed_integer
-	: SIGNED_INTEGER ( COLON INTEGER )?
+	: SIGNED_INTEGER ( ':' INTEGER )?
 	;
 
 special_integer
-	: HEX_INTEGER ( COLON INTEGER )?
-	| BIN_INTEGER ( COLON INTEGER )?
-	| OCT_INTEGER ( COLON INTEGER )?
+	: HEX_INTEGER ( ':' INTEGER )?
+	| BIN_INTEGER ( ':' INTEGER )?
+	| OCT_INTEGER ( ':' INTEGER )?
 	;
 
 floating_point_expression
@@ -159,7 +159,7 @@ size_type
 	;
 
 array_type
-	: BRACKET_OPEN INTEGER COLON type BRACKET_CLOSED
+	: '[' INTEGER ':' type ']'
 	;
 
 void_type
@@ -202,18 +202,5 @@ IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
 
 DEFINITION : ':=' ;
 ASSIGNMENT : '<-' ;
-
-PARENTHESES_OPEN : '(' ;
-PARENTHESES_CLOSED : ')' ;
-
-BRACE_OPEN : '{' ;
-BRACE_CLOSED : '}' ;
-
-BRACKET_OPEN : '[' ;
-BRACKET_CLOSED : ']' ;
-
-COMMA : ',' ;
-COLON : ':' ;
-SEMICOLON : ';' ;
 
 WHITESPACE : [ \t\r\n]+ -> skip ;
