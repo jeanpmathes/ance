@@ -18,9 +18,12 @@ llvm::Type* ance::VoidType::getNativeType(llvm::LLVMContext& c)
 	return llvm::Type::getVoidTy(c);
 }
 
-ance::VoidType* ance::VoidType::instance_ = new ance::VoidType();
-
 ance::VoidType* ance::VoidType::get()
 {
+	if (!instance_)
+	{
+		instance_ = new ance::VoidType();
+	}
+
 	return instance_;
 }

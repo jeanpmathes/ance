@@ -22,7 +22,7 @@ class VoidType : public Type
 		static VoidType* get();
 
 	private:
-		static VoidType* instance_;
+		inline static VoidType* instance_ = nullptr;
 };
 }
 #endif
