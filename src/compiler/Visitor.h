@@ -63,7 +63,7 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitArray_type(anceParser::Array_typeContext* context) override;
 
-		antlrcpp::Any visitKeyword_type(anceParser::Keyword_typeContext *ctx) override;
+		antlrcpp::Any visitKeyword_type(anceParser::Keyword_typeContext* ctx) override;
 
 		antlrcpp::Any visitAccess_modifier(anceParser::Access_modifierContext* context) override;
 

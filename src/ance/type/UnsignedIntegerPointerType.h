@@ -7,6 +7,7 @@
 #include "Type.h"
 
 class Application;
+
 class CompileState;
 
 namespace ance
@@ -20,7 +21,14 @@ class UnsignedIntegerPointerType : public Type
 
 		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
 
-		static llvm::Value* buildValue(llvm::Value* pointer, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		static llvm::Value* buildValue(
+			llvm::Value* pointer,
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		);
 
 	private:
 		inline static UnsignedIntegerPointerType* instance_ = nullptr;
