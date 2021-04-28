@@ -5,15 +5,13 @@
 #include "SizeType.h"
 
 SizeofExprExpression::SizeofExprExpression(Expression* expression)
-	: return_value_(new ance::ExpressionBackedValue(this)),
-	  return_type_(ance::SizeType::get()),
-	  expression_(expression)
+	: return_value_(new ance::ExpressionBackedValue(this)), expression_(expression)
 {
 }
 
 ance::Type* SizeofExprExpression::getType()
 {
-	return return_type_;
+	return ance::SizeType::get();
 }
 
 ance::Value* SizeofExprExpression::getValue()
@@ -24,7 +22,7 @@ ance::Value* SizeofExprExpression::getValue()
 llvm::Value* SizeofExprExpression::build(
 	llvm::LLVMContext&,
 	llvm::Module* m,
-	CompileState* state,
+	CompileState*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )

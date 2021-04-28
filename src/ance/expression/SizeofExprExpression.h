@@ -8,7 +8,7 @@ class Application;
 class SizeofExprExpression : public BuildableExpression
 {
 	public:
-		SizeofExprExpression(Expression* expression);
+		explicit SizeofExprExpression(Expression* expression);
 
 		ance::Type* getType() override;
 
@@ -24,7 +24,6 @@ class SizeofExprExpression : public BuildableExpression
 
 	private:
 		ance::Value* return_value_;
-		ance::Type* return_type_;
 		Expression* expression_;
 };
 
