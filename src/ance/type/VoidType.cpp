@@ -1,8 +1,5 @@
 #include "VoidType.h"
 
-#include <stdexcept>
-#include <llvm/IR/Type.h>
-
 std::string ance::VoidType::getName()
 {
 	return "void";
