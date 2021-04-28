@@ -2,11 +2,12 @@
 #include <process.h>
 #include <filesystem>
 
-#include "antlr4-runtime.h"
+#include <antlr4-runtime.h>
 #include "anceLexer.h"
 #include "anceParser.h"
 
-#include "llvm/Support/TargetSelect.h"
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Support/ManagedStatic.h>
 
 #include "anceCompiler.h"
 #include "Visitor.h"
@@ -49,15 +50,21 @@ int main(int argc, char** argv)
 	llvm::InitializeAllAsmPrinters();
 	llvm::InitializeAllAsmPrinters();
 
+	int e;
+
 	if (application.validate())
 	{
 		anceCompiler compiler(application);
 		compiler.compile(std::filesystem::path(R"(C:\Users\jeanp\source\repos\ance\ance_output)"));
 
-		return EXIT_SUCCESS;
+		e = EXIT_SUCCESS;
 	}
 	else
 	{
-		return EXIT_FAILURE;
+		e = EXIT_FAILURE;
 	}
+
+	llvm::llvm_shutdown();
+
+	return e;
 }
