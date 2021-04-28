@@ -8,6 +8,7 @@
 
 #include "GlobalScope.h"
 #include "SizeType.h"
+#include "UnsignedIntegerPointerType.h"
 
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Support/TargetRegistry.h"
@@ -40,6 +41,7 @@ anceCompiler::anceCompiler(Application& app)
 	llvm::DataLayout dl = tm->createDataLayout();
 	application_.setPointerSize(dl.getPointerSize());
 	ance::SizeType::init(context_, app);
+	ance::UnsignedIntegerPointerType::init(context_, app);
 
 	module_->setDataLayout(dl);
 	module_->setTargetTriple(triple.str());

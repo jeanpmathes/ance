@@ -7,6 +7,7 @@ target_sources(ance PRIVATE ArrayType.cpp
         QuadType.cpp
         SingleType.cpp
         SizeType.cpp
+        UnsignedIntegerPointerType.cpp
         Type.cpp
         VoidType.cpp
         FloatingPointType.cpp)
