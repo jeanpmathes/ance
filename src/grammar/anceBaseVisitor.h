@@ -139,6 +139,14 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitKeyword_type(anceParser::Keyword_typeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitFloating_point_type(anceParser::Floating_point_typeContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -147,7 +155,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *ctx) override {
+  virtual antlrcpp::Any visitUnsigned_integer_pointer_type(anceParser::Unsigned_integer_pointer_typeContext *ctx) override {
     return visitChildren(ctx);
   }
 

@@ -137,15 +137,24 @@ floating_point_expression
 
 type
 	: integer_type
-	| floating_point_type
-	| size_type
 	| array_type
-	| void_type
+	| keyword_type
 	;
 
 integer_type
 	: NATIVE_INTEGER_TYPE
 	;
+
+array_type
+	: '[' INTEGER ':' type ']'
+	;
+
+keyword_type
+    : floating_point_type
+    | size_type
+    | unsigned_integer_pointer_type
+    | void_type
+    ;
 
 floating_point_type
 	: HALF_TYPE
@@ -158,9 +167,9 @@ size_type
 	: SIZE
 	;
 
-array_type
-	: '[' INTEGER ':' type ']'
-	;
+unsigned_integer_pointer_type
+    : UIPTR
+    ;
 
 void_type
 	: VOID
@@ -190,6 +199,7 @@ INTEGER : [0-9]+ ;
 
 SIZEOF : 'sizeof' ;
 SIZE : 'size' ;
+UIPTR : 'uiptr' ;
 
 PRINT : 'print' ;
 RETURN : 'return' ;

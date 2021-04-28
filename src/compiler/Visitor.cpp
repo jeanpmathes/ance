@@ -370,39 +370,6 @@ antlrcpp::Any Visitor::visitInteger_type(anceParser::Integer_typeContext* contex
 	return type;
 }
 
-antlrcpp::Any Visitor::visitFloating_point_type(anceParser::Floating_point_typeContext* context)
-{
-	ance::Type* type;
-
-	if (context->HALF_TYPE())
-	{
-		type = ance::HalfType::get();
-	}
-
-	if (context->SINGLE_TYPE())
-	{
-		type = ance::SingleType::get();
-	}
-
-	if (context->DOUBLE_TYPE())
-	{
-		type = ance::DoubleType::get();
-	}
-
-	if (context->QUAD_TYPE())
-	{
-		type = ance::QuadType::get();
-	}
-
-	return type;
-}
-
-antlrcpp::Any Visitor::visitSize_type(anceParser::Size_typeContext*)
-{
-	ance::Type* type = ance::SizeType::get();
-	return type;
-}
-
 antlrcpp::Any Visitor::visitArray_type(anceParser::Array_typeContext* context)
 {
 	ance::Type* type;
@@ -414,9 +381,9 @@ antlrcpp::Any Visitor::visitArray_type(anceParser::Array_typeContext* context)
 	return type;
 }
 
-antlrcpp::Any Visitor::visitVoid_type(anceParser::Void_typeContext*)
+antlrcpp::Any Visitor::visitKeyword_type(anceParser::Keyword_typeContext* ctx)
 {
-	ance::Type* type = ance::VoidType::get();
+	ance::Type* type = application_.globalScope()->getType(ctx->getText());
 	return type;
 }
 

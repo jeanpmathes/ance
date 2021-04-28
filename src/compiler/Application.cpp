@@ -5,9 +5,28 @@
 
 #include "GlobalScope.h"
 
+#include "HalfType.h"
+#include "SingleType.h"
+#include "DoubleType.h"
+#include "QuadType.h"
+
+#include "VoidType.h"
+#include "SizeType.h"
+#include "UnsignedIntegerPointerType.h"
+
 Application::Application(std::filesystem::path project_file, std::filesystem::path nccode_file)
 	: proj_file_(std::move(project_file)), code_file_(std::move(nccode_file)), global_scope_(new ance::GlobalScope())
 {
+	// Register keyword types
+
+	global_scope_->registerType(ance::HalfType::get());
+	global_scope_->registerType(ance::SingleType::get());
+	global_scope_->registerType(ance::DoubleType::get());
+	global_scope_->registerType(ance::QuadType::get());
+
+	global_scope_->registerType(ance::VoidType::get());
+	global_scope_->registerType(ance::SizeType::get());
+	global_scope_->registerType(ance::UnsignedIntegerPointerType::get());
 }
 
 void Application::setPointerSize(unsigned size)

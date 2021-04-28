@@ -17,8 +17,8 @@ public:
     DOUBLE_TYPE = 13, QUAD_TYPE = 14, SIGNED_INTEGER = 15, HEX_INTEGER = 16, 
     BIN_INTEGER = 17, OCT_INTEGER = 18, HALF = 19, SINGLE = 20, DOUBLE = 21, 
     QUAD = 22, DECIMAL = 23, STRING = 24, INTEGER = 25, SIZEOF = 26, SIZE = 27, 
-    PRINT = 28, RETURN = 29, CONST = 30, PUBLIC = 31, PRIVATE = 32, VOID = 33, 
-    IDENTIFIER = 34, DEFINITION = 35, ASSIGNMENT = 36, WHITESPACE = 37
+    UIPTR = 28, PRINT = 29, RETURN = 30, CONST = 31, PUBLIC = 32, PRIVATE = 33, 
+    VOID = 34, IDENTIFIER = 35, DEFINITION = 36, ASSIGNMENT = 37, WHITESPACE = 38
   };
 
   enum {
@@ -31,8 +31,9 @@ public:
     RuleSizeof_type_expression = 20, RuleSizeof_exp_expression = 21, RuleConstant_expression = 22, 
     RuleLiteral_expression = 23, RuleInteger_expression = 24, RuleUnsigned_integer = 25, 
     RuleSigned_integer = 26, RuleSpecial_integer = 27, RuleFloating_point_expression = 28, 
-    RuleType = 29, RuleInteger_type = 30, RuleFloating_point_type = 31, 
-    RuleSize_type = 32, RuleArray_type = 33, RuleVoid_type = 34
+    RuleType = 29, RuleInteger_type = 30, RuleArray_type = 31, RuleKeyword_type = 32, 
+    RuleFloating_point_type = 33, RuleSize_type = 34, RuleUnsigned_integer_pointer_type = 35, 
+    RuleVoid_type = 36
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -76,9 +77,11 @@ public:
   class Floating_point_expressionContext;
   class TypeContext;
   class Integer_typeContext;
+  class Array_typeContext;
+  class Keyword_typeContext;
   class Floating_point_typeContext;
   class Size_typeContext;
-  class Array_typeContext;
+  class Unsigned_integer_pointer_typeContext;
   class Void_typeContext; 
 
   class  FileContext : public antlr4::ParserRuleContext {
@@ -515,10 +518,8 @@ public:
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     Integer_typeContext *integer_type();
-    Floating_point_typeContext *floating_point_type();
-    Size_typeContext *size_type();
     Array_typeContext *array_type();
-    Void_typeContext *void_type();
+    Keyword_typeContext *keyword_type();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -539,6 +540,36 @@ public:
   };
 
   Integer_typeContext* integer_type();
+
+  class  Array_typeContext : public antlr4::ParserRuleContext {
+  public:
+    Array_typeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *INTEGER();
+    TypeContext *type();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Array_typeContext* array_type();
+
+  class  Keyword_typeContext : public antlr4::ParserRuleContext {
+  public:
+    Keyword_typeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    Floating_point_typeContext *floating_point_type();
+    Size_typeContext *size_type();
+    Unsigned_integer_pointer_typeContext *unsigned_integer_pointer_type();
+    Void_typeContext *void_type();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Keyword_typeContext* keyword_type();
 
   class  Floating_point_typeContext : public antlr4::ParserRuleContext {
   public:
@@ -569,19 +600,18 @@ public:
 
   Size_typeContext* size_type();
 
-  class  Array_typeContext : public antlr4::ParserRuleContext {
+  class  Unsigned_integer_pointer_typeContext : public antlr4::ParserRuleContext {
   public:
-    Array_typeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    Unsigned_integer_pointer_typeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *INTEGER();
-    TypeContext *type();
+    antlr4::tree::TerminalNode *UIPTR();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
 
-  Array_typeContext* array_type();
+  Unsigned_integer_pointer_typeContext* unsigned_integer_pointer_type();
 
   class  Void_typeContext : public antlr4::ParserRuleContext {
   public:

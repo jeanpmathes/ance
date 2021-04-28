@@ -81,11 +81,15 @@ public:
 
     virtual antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext *context) = 0;
 
+    virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *context) = 0;
+
+    virtual antlrcpp::Any visitKeyword_type(anceParser::Keyword_typeContext *context) = 0;
+
     virtual antlrcpp::Any visitFloating_point_type(anceParser::Floating_point_typeContext *context) = 0;
 
     virtual antlrcpp::Any visitSize_type(anceParser::Size_typeContext *context) = 0;
 
-    virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *context) = 0;
+    virtual antlrcpp::Any visitUnsigned_integer_pointer_type(anceParser::Unsigned_integer_pointer_typeContext *context) = 0;
 
     virtual antlrcpp::Any visitVoid_type(anceParser::Void_typeContext *context) = 0;
 

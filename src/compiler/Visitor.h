@@ -9,15 +9,21 @@ class Visitor : public anceBaseVisitor
 	public:
 		explicit Visitor(Application& application);
 
+		// Declarations
+
 		antlrcpp::Any visitConstant_declaration(anceParser::Constant_declarationContext* context) override;
 
 		antlrcpp::Any visitVariable_declaration(anceParser::Variable_declarationContext* context) override;
+
+		// Functions
 
 		antlrcpp::Any visitFunction(anceParser::FunctionContext* context) override;
 
 		antlrcpp::Any visitParameters(anceParser::ParametersContext* context) override;
 
 		antlrcpp::Any visitParameter(anceParser::ParameterContext* context) override;
+
+		// Statements
 
 		antlrcpp::Any visitExpression_statement(anceParser::Expression_statementContext* context) override;
 
@@ -28,6 +34,8 @@ class Visitor : public anceBaseVisitor
 		antlrcpp::Any visitPrint_statement(anceParser::Print_statementContext* context) override;
 
 		antlrcpp::Any visitReturn_statement(anceParser::Return_statementContext* context) override;
+
+		// Expressions
 
 		antlrcpp::Any visitFunction_call(anceParser::Function_callContext* context) override;
 
@@ -43,6 +51,8 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitFloating_point_expression(anceParser::Floating_point_expressionContext* context) override;
 
+		// Literals and Types
+
 		antlrcpp::Any visitUnsigned_integer(anceParser::Unsigned_integerContext* context) override;
 
 		antlrcpp::Any visitSigned_integer(anceParser::Signed_integerContext* context) override;
@@ -51,13 +61,9 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext* context) override;
 
-		antlrcpp::Any visitFloating_point_type(anceParser::Floating_point_typeContext* context) override;
-
-		antlrcpp::Any visitSize_type(anceParser::Size_typeContext* context) override;
-
 		antlrcpp::Any visitArray_type(anceParser::Array_typeContext* context) override;
 
-		antlrcpp::Any visitVoid_type(anceParser::Void_typeContext* context) override;
+		antlrcpp::Any visitKeyword_type(anceParser::Keyword_typeContext *ctx) override;
 
 		antlrcpp::Any visitAccess_modifier(anceParser::Access_modifierContext* context) override;
 
