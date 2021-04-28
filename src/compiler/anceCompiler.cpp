@@ -6,17 +6,17 @@
 #include <fstream>
 #include <string>
 
+#include <llvm/Target/TargetMachine.h>
+#include <llvm/Support/TargetRegistry.h>
+#include <llvm/IR/Verifier.h>
+#include <llvm/Support/Host.h>
+
+#include <llvm/Bitcode/BitcodeWriter.h>
+#include <lld/Common/Driver.h>
+
 #include "GlobalScope.h"
 #include "SizeType.h"
 #include "UnsignedIntegerPointerType.h"
-
-#include "llvm/Target/TargetMachine.h"
-#include "llvm/Support/TargetRegistry.h"
-#include "llvm/IR/Verifier.h"
-#include "llvm/Support/Host.h"
-
-#include "llvm/Bitcode/BitcodeWriter.h"
-#include "lld/Common/Driver.h"
 
 anceCompiler::anceCompiler(Application& app)
 	: application_(app), ir_(context_)
