@@ -29,10 +29,5 @@ class Type
 	protected:
 		virtual ~Type() = default;
 };
-
-inline llvm::TypeSize Type::getSize(llvm::Module* m)
-{
-	return m->getDataLayout().getTypeAllocSize(getNativeType(m->getContext()));
-}
 }
 #endif

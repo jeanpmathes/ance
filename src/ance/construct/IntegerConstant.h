@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_ANCE_CONSTRUCT_INTEGERCONSTANT_H_
 #define ANCE_SRC_ANCE_CONSTRUCT_INTEGERCONSTANT_H_
 
-#include "Scope.h"
+#include "Application.h"
 #include "Constant.h"
 
 namespace ance
@@ -9,7 +9,7 @@ namespace ance
 class IntegerConstant : public Constant
 {
 	public:
-		IntegerConstant(llvm::APInt integer, bool is_signed, ance::Scope* scope);
+		IntegerConstant(llvm::APInt integer, bool is_signed, Application& app);
 
 		ance::Type* getType() override;
 

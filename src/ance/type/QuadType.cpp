@@ -20,12 +20,11 @@ llvm::Type* ance::QuadType::getNativeType(llvm::LLVMContext& c)
 	return llvm::Type::getFP128Ty(c);
 }
 
-ance::FloatingPointType* ance::QuadType::get(ance::Scope* scope)
+ance::FloatingPointType* ance::QuadType::get()
 {
 	if (!instance_)
 	{
 		instance_ = new QuadType();
-		scope->getGlobalScope()->registerType(instance_);
 	}
 
 	return instance_;

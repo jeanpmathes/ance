@@ -20,12 +20,11 @@ llvm::Type* ance::SingleType::getNativeType(llvm::LLVMContext& c)
 	return llvm::Type::getFloatTy(c);
 }
 
-ance::FloatingPointType* ance::SingleType::get(ance::Scope* scope)
+ance::FloatingPointType* ance::SingleType::get()
 {
 	if (!instance_)
 	{
 		instance_ = new SingleType();
-		scope->getGlobalScope()->registerType(instance_);
 	}
 
 	return instance_;

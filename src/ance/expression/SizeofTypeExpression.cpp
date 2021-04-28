@@ -4,8 +4,8 @@
 #include "ExpressionBackedValue.h"
 #include "SizeType.h"
 
-SizeofTypeExpression::SizeofTypeExpression(ance::Type* type, Application& app)
-	: return_value_(new ance::ExpressionBackedValue(this)), return_type_(ance::SizeType::get(app)), type_(type)
+SizeofTypeExpression::SizeofTypeExpression(ance::Type* type)
+	: return_value_(new ance::ExpressionBackedValue(this)), return_type_(ance::SizeType::get()), type_(type)
 {
 }
 
@@ -27,5 +27,5 @@ llvm::Value* SizeofTypeExpression::build(
 	llvm::DIBuilder*
 )
 {
-	return ance::SizeType::get(*state->application_)->buildValue(type_->getSize(m));
+	return ance::SizeType::get()->buildValue(type_->getSize(m));
 }

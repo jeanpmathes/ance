@@ -40,19 +40,19 @@ llvm::Type* ance::ArrayType::getNativeType(llvm::LLVMContext& c)
 	return type_;
 }
 
-ance::Type* ance::ArrayType::get(ance::Scope* scope, Type* element_type, uint64_t size)
+ance::Type* ance::ArrayType::get(Application& app, Type* element_type, uint64_t size)
 {
 	auto* type = new ance::ArrayType(element_type, size);
 	std::string type_name = type->getName();
 
-	if (scope->getGlobalScope()->isTypeRegistered(type_name))
+	if (app.globalScope()->isTypeRegistered(type_name))
 	{
 		delete type;
-		return scope->getGlobalScope()->getType(type_name);
+		return app.globalScope()->getType(type_name);
 	}
 	else
 	{
-		scope->getGlobalScope()->registerType(type);
+		app.globalScope()->registerType(type);
 		return type;
 	}
 }

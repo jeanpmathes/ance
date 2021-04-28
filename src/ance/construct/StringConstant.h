@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_ANCE_CONSTRUCT_STRINGCONSTANT_H_
 #define ANCE_SRC_ANCE_CONSTRUCT_STRINGCONSTANT_H_
 
-#include "Scope.h"
+#include "Application.h"
 #include "Constant.h"
 
 namespace ance
@@ -9,7 +9,7 @@ namespace ance
 class StringConstant : public Constant
 {
 	public:
-		StringConstant(std::string string, ance::Scope* scope);
+		StringConstant(std::string string, Application& app);
 
 		ance::Type* getType() override;
 

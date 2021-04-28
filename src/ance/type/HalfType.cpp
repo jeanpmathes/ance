@@ -20,12 +20,11 @@ llvm::Type* ance::HalfType::getNativeType(llvm::LLVMContext& c)
 	return llvm::Type::getHalfTy(c);
 }
 
-ance::FloatingPointType* ance::HalfType::get(ance::Scope* scope)
+ance::FloatingPointType* ance::HalfType::get()
 {
 	if (!instance_)
 	{
 		instance_ = new HalfType();
-		scope->getGlobalScope()->registerType(instance_);
 	}
 
 	return instance_;

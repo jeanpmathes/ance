@@ -238,20 +238,20 @@ antlrcpp::Any Visitor::visitVariable_expression(anceParser::Variable_expressionC
 antlrcpp::Any Visitor::visitSizeof_type_expression(anceParser::Sizeof_type_expressionContext* context)
 {
 	ance::Type* type = visit(context->type());
-	return static_cast<Expression*>(new SizeofTypeExpression(type, application_));
+	return static_cast<Expression*>(new SizeofTypeExpression(type));
 }
 
 antlrcpp::Any Visitor::visitSizeof_exp_expression(anceParser::Sizeof_exp_expressionContext* context)
 {
 	Expression* expr = visit(context->expression());
-	return static_cast<Expression*>(new SizeofExprExpression(expr, application_));
+	return static_cast<Expression*>(new SizeofExprExpression(expr));
 }
 
 antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionContext* context)
 {
 	std::string str = ance::StringConstant::parse(context->STRING()->getText());
 
-	ance::Constant* string = new ance::StringConstant(str, application_.globalScope());
+	ance::Constant* string = new ance::StringConstant(str, application_);
 	return static_cast<Expression*>(new ConstantLiteralExpression(string));
 }
 
@@ -263,25 +263,25 @@ antlrcpp::Any Visitor::visitFloating_point_expression(anceParser::Floating_point
 	if (context->HALF())
 	{
 		number = llvm::APFloat(llvm::APFloat::IEEEhalf(), context->getText().erase(context->getText().size() - 1));
-		type = ance::HalfType::get(application_.globalScope());
+		type = ance::HalfType::get();
 	}
 
 	if (context->SINGLE())
 	{
 		number = llvm::APFloat(llvm::APFloat::IEEEsingle(), context->getText().erase(context->getText().size() - 1));
-		type = ance::SingleType::get(application_.globalScope());
+		type = ance::SingleType::get();
 	}
 
 	if (context->DOUBLE())
 	{
 		number = llvm::APFloat(llvm::APFloat::IEEEdouble(), context->getText().erase(context->getText().size() - 1));
-		type = ance::DoubleType::get(application_.globalScope());
+		type = ance::DoubleType::get();
 	}
 
 	if (context->QUAD())
 	{
 		number = llvm::APFloat(llvm::APFloat::IEEEquad(), context->getText().erase(context->getText().size() - 1));
-		type = ance::QuadType::get(application_.globalScope());
+		type = ance::QuadType::get();
 	}
 
 	auto* flt = new ance::FloatConstant(number, type);
@@ -298,7 +298,7 @@ antlrcpp::Any Visitor::visitUnsigned_integer(anceParser::Unsigned_integerContext
 	}
 
 	const llvm::APInt kInteger(size, context->INTEGER(0)->getText(), 10);
-	auto* integer = new ance::IntegerConstant(kInteger, false, application_.globalScope());
+	auto* integer = new ance::IntegerConstant(kInteger, false, application_);
 	Expression* expression = new ConstantLiteralExpression(integer);
 	return expression;
 }
@@ -313,7 +313,7 @@ antlrcpp::Any Visitor::visitSigned_integer(anceParser::Signed_integerContext* co
 	}
 
 	const llvm::APInt kInteger(size, context->SIGNED_INTEGER()->getText(), 10);
-	auto* integer = new ance::IntegerConstant(kInteger, true, application_.globalScope());
+	auto* integer = new ance::IntegerConstant(kInteger, true, application_);
 	Expression* expression = new ConstantLiteralExpression(integer);
 	return expression;
 }
@@ -351,7 +351,7 @@ antlrcpp::Any Visitor::visitSpecial_integer(anceParser::Special_integerContext* 
 	integer_str.erase(0, 2);
 
 	const llvm::APInt kInteger(size, integer_str, radix);
-	auto* integer = new ance::IntegerConstant(kInteger, false, application_.globalScope());
+	auto* integer = new ance::IntegerConstant(kInteger, false, application_);
 	Expression* expression = new ConstantLiteralExpression(integer);
 	return expression;
 }
@@ -365,7 +365,7 @@ antlrcpp::Any Visitor::visitInteger_type(anceParser::Integer_typeContext* contex
 	bool is_unsigned = integer_type_str[0] == 'u';
 	uint64_t size = std::stoi(integer_type_str.substr(1 + integer_type_str.find('i')));
 
-	type = ance::IntegerType::get(application_.globalScope(), size, !is_unsigned);
+	type = ance::IntegerType::get(application_, size, !is_unsigned);
 
 	return type;
 }
@@ -376,22 +376,22 @@ antlrcpp::Any Visitor::visitFloating_point_type(anceParser::Floating_point_typeC
 
 	if (context->HALF_TYPE())
 	{
-		type = ance::HalfType::get(application_.globalScope());
+		type = ance::HalfType::get();
 	}
 
 	if (context->SINGLE_TYPE())
 	{
-		type = ance::SingleType::get(application_.globalScope());
+		type = ance::SingleType::get();
 	}
 
 	if (context->DOUBLE_TYPE())
 	{
-		type = ance::DoubleType::get(application_.globalScope());
+		type = ance::DoubleType::get();
 	}
 
 	if (context->QUAD_TYPE())
 	{
-		type = ance::QuadType::get(application_.globalScope());
+		type = ance::QuadType::get();
 	}
 
 	return type;
@@ -399,7 +399,7 @@ antlrcpp::Any Visitor::visitFloating_point_type(anceParser::Floating_point_typeC
 
 antlrcpp::Any Visitor::visitSize_type(anceParser::Size_typeContext*)
 {
-	ance::Type* type = ance::SizeType::get(application_);
+	ance::Type* type = ance::SizeType::get();
 	return type;
 }
 
@@ -409,7 +409,7 @@ antlrcpp::Any Visitor::visitArray_type(anceParser::Array_typeContext* context)
 
 	ance::Type* element_type = visit(context->type());
 	uint64_t size = std::stoi(context->INTEGER()->getText());
-	type = ance::ArrayType::get(application_.globalScope(), element_type, size);
+	type = ance::ArrayType::get(application_, element_type, size);
 
 	return type;
 }

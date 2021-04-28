@@ -25,7 +25,7 @@ class SizeType : public ance::Type
 	public:
 		static void init(llvm::LLVMContext& c, Application& app);
 
-		static ance::SizeType* get(Application& app);
+		static ance::SizeType* get();
 };
 }
 #endif

@@ -2,6 +2,7 @@
 #define ANCE_SRC_ANCE_TYPE_ARRAYTYPE_H_
 
 #include "Type.h"
+#include "Application.h"
 
 namespace llvm
 {
@@ -32,7 +33,7 @@ class ArrayType : public Type
 		llvm::ArrayType* type_{nullptr};
 
 	public:
-		static ance::Type* get(ance::Scope* scope, Type* element_type, uint64_t size);
+		static ance::Type* get(Application& app, Type* element_type, uint64_t size);
 };
 }
 

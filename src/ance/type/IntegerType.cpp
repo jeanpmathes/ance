@@ -32,19 +32,19 @@ llvm::Type* ance::IntegerType::getNativeType(llvm::LLVMContext& c)
 	return type_;
 }
 
-ance::Type* ance::IntegerType::get(ance::Scope* scope, uint64_t bit_size, bool is_signed)
+ance::Type* ance::IntegerType::get(Application& app, uint64_t bit_size, bool is_signed)
 {
 	auto* type = new ance::IntegerType(bit_size, is_signed);
 	std::string type_name = type->getName();
 
-	if (scope->getGlobalScope()->isTypeRegistered(type_name))
+	if (app.globalScope()->isTypeRegistered(type_name))
 	{
 		delete type;
-		return scope->getGlobalScope()->getType(type_name);
+		return app.globalScope()->getType(type_name);
 	}
 	else
 	{
-		scope->getGlobalScope()->registerType(type);
+		app.globalScope()->registerType(type);
 		return type;
 	}
 }

@@ -31,12 +31,11 @@ void ance::SizeType::init(llvm::LLVMContext& c, Application& app)
 	native_type_ = llvm::Type::getIntNTy(c, app.getBitness());
 }
 
-ance::SizeType* ance::SizeType::get(Application& app)
+ance::SizeType* ance::SizeType::get()
 {
 	if (!instance_)
 	{
 		instance_ = new SizeType();
-		app.globalScope()->registerType(instance_);
 	}
 
 	return instance_;

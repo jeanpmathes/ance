@@ -20,12 +20,11 @@ llvm::Type* ance::DoubleType::getNativeType(llvm::LLVMContext& c)
 	return llvm::Type::getDoubleTy(c);
 }
 
-ance::FloatingPointType* ance::DoubleType::get(ance::Scope* scope)
+ance::FloatingPointType* ance::DoubleType::get()
 {
 	if (!instance_)
 	{
 		instance_ = new DoubleType();
-		scope->getGlobalScope()->registerType(instance_);
 	}
 
 	return instance_;

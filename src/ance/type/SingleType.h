@@ -20,7 +20,7 @@ class SingleType : public FloatingPointType
 		inline static FloatingPointType* instance_ = nullptr;
 
 	public:
-		static ance::FloatingPointType* get(ance::Scope* scope);
+		static ance::FloatingPointType* get();
 };
 }
 #endif

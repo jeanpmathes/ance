@@ -5,8 +5,8 @@
 #include "ArrayType.h"
 #include "IntegerType.h"
 
-ance::StringConstant::StringConstant(std::string string, ance::Scope* scope)
-	: type_(ance::ArrayType::get(scope, ance::IntegerType::get(scope, 8, false), string.size())),
+ance::StringConstant::StringConstant(std::string string, Application& app)
+	: type_(ance::ArrayType::get(app, ance::IntegerType::get(app, 8, false), string.size())),
 	  string_(string)
 {
 

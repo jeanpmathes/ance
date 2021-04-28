@@ -4,8 +4,8 @@
 
 #include "IntegerType.h"
 
-ance::IntegerConstant::IntegerConstant(llvm::APInt integer, bool is_signed, ance::Scope* scope)
-	: type_(ance::IntegerType::get(scope, integer.getBitWidth(), is_signed)),
+ance::IntegerConstant::IntegerConstant(llvm::APInt integer, bool is_signed, Application& app)
+	: type_(ance::IntegerType::get(app, integer.getBitWidth(), is_signed)),
 	  integer_(std::move(integer))
 {
 }

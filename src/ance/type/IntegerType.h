@@ -1,6 +1,7 @@
 #ifndef ANCE_SRC_ANCE_TYPE_INTEGERTYPE_H_
 #define ANCE_SRC_ANCE_TYPE_INTEGERTYPE_H_
 
+#include "Application.h"
 #include "Type.h"
 
 namespace ance
@@ -25,7 +26,7 @@ class IntegerType : public Type
 		llvm::Type* type_{nullptr};
 
 	public:
-		static ance::Type* get(ance::Scope* scope, uint64_t bit_size, bool is_signed);
+		static ance::Type* get(Application& app, uint64_t bit_size, bool is_signed);
 };
 }
 

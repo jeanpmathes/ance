@@ -8,7 +8,7 @@ class Application;
 class SizeofTypeExpression : public BuildableExpression
 {
 	public:
-		SizeofTypeExpression(ance::Type* type, Application& app);
+		SizeofTypeExpression(ance::Type* type);
 
 		ance::Type* getType() override;
 
