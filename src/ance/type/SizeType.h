@@ -16,7 +16,7 @@ class SizeType : public ance::Type
 
 		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
 
-		llvm::Value* buildValue(llvm::TypeSize size);
+		static llvm::Value* buildValue(llvm::TypeSize size);
 
 	private:
 		inline static SizeType* instance_ = nullptr;

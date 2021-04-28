@@ -27,5 +27,5 @@ llvm::Value* SizeofExprExpression::build(
 	llvm::DIBuilder*
 )
 {
-	return ance::SizeType::get()->buildValue(expression_->getType()->getSize(m));
+	return ance::SizeType::buildValue(expression_->getType()->getSize(m));
 }
