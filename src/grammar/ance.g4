@@ -100,6 +100,7 @@ sizeof_exp_expression
 
 constant_expression
 	: literal_expression
+	| byte_expression
 	| integer_expression
 	| floating_point_expression
 	;
@@ -107,6 +108,10 @@ constant_expression
 literal_expression
 	: STRING
 	;
+
+byte_expression
+    : BYTE
+    ;
 
 integer_expression
 	: unsigned_integer
@@ -194,7 +199,8 @@ QUAD : DECIMAL 'q' ;
 
 DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ;
 
-STRING : '"' ('\\'. | .)*? '"';
+STRING : '"' ('\\'. | .)*? '"' ;
+BYTE : '\'' ( . | '\\' . ) '\'' ;
 INTEGER : [0-9]+ ;
 
 SIZEOF : 'sizeof' ;

@@ -49,6 +49,8 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitLiteral_expression(anceParser::Literal_expressionContext* context) override;
 
+		antlrcpp::Any visitByte_expression(anceParser::Byte_expressionContext *ctx) override;
+
 		antlrcpp::Any visitFloating_point_expression(anceParser::Floating_point_expressionContext* context) override;
 
 		// Literals and Types

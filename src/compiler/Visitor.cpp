@@ -20,9 +20,8 @@
 #include "QuadType.h"
 #include "SizeofExprExpression.h"
 #include "SizeofTypeExpression.h"
-#include "SizeType.h"
-#include "VoidType.h"
 #include "StringConstant.h"
+#include "ByteConstant.h"
 #include "IntegerConstant.h"
 #include "FloatConstant.h"
 #include "ConstantLiteralExpression.h"
@@ -253,6 +252,14 @@ antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionCon
 
 	ance::Constant* string = new ance::StringConstant(str, application_);
 	return static_cast<Expression*>(new ConstantLiteralExpression(string));
+}
+
+antlrcpp::Any Visitor::visitByte_expression(anceParser::Byte_expressionContext* ctx)
+{
+	uint8_t b = ance::ByteConstant::parse(ctx->BYTE()->getText());
+
+	ance::Constant* byte = new ance::ByteConstant(b, application_);
+	return static_cast<Expression*>(new ConstantLiteralExpression(byte));
 }
 
 antlrcpp::Any Visitor::visitFloating_point_expression(anceParser::Floating_point_expressionContext* context)

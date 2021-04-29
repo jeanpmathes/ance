@@ -12,6 +12,7 @@ target_sources(ance PRIVATE
                WrappedNativeValue.cpp
                WrappedNativeConstant.cpp
                StringConstant.cpp
+               ByteConstant.cpp
                IntegerConstant.cpp
                FloatConstant.cpp
                Variable.cpp)
