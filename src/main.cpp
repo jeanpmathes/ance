@@ -14,9 +14,9 @@
 
 int main(int argc, char** argv)
 {
-	if (argc != 2)
+	if (argc != 3)
 	{
-		std::cout << "Requires exactly one parameter." << std::endl;
+		std::cout << "Requires exactly two parameters." << std::endl;
 
 		return EXIT_FAILURE;
 	}
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 	if (application.validate())
 	{
 		anceCompiler compiler(application);
-		compiler.compile(std::filesystem::path(R"(C:\Users\jeanp\source\repos\ance\ance_output)"));
+		compiler.compile(std::filesystem::path(argv[2]));
 
 		e = EXIT_SUCCESS;
 	}
