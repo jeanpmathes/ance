@@ -99,13 +99,13 @@ sizeof_exp_expression
 	;
 
 constant_expression
-	: literal_expression
+	: string_expression
 	| byte_expression
 	| integer_expression
 	| floating_point_expression
 	;
 
-literal_expression
+string_expression
 	: STRING
 	;
 

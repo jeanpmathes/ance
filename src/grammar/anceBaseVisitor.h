@@ -107,7 +107,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitLiteral_expression(anceParser::Literal_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitString_expression(anceParser::String_expressionContext *ctx) override {
     return visitChildren(ctx);
   }
 

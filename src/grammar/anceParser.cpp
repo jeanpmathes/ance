@@ -1502,8 +1502,8 @@ anceParser::Constant_expressionContext::Constant_expressionContext(ParserRuleCon
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::Literal_expressionContext* anceParser::Constant_expressionContext::literal_expression() {
-  return getRuleContext<anceParser::Literal_expressionContext>(0);
+anceParser::String_expressionContext* anceParser::Constant_expressionContext::string_expression() {
+  return getRuleContext<anceParser::String_expressionContext>(0);
 }
 
 anceParser::Byte_expressionContext* anceParser::Constant_expressionContext::byte_expression() {
@@ -1545,7 +1545,7 @@ anceParser::Constant_expressionContext* anceParser::constant_expression() {
       case anceParser::STRING: {
         enterOuterAlt(_localctx, 1);
         setState(202);
-        literal_expression();
+        string_expression();
         break;
       }
 
@@ -1591,32 +1591,32 @@ anceParser::Constant_expressionContext* anceParser::constant_expression() {
   return _localctx;
 }
 
-//----------------- Literal_expressionContext ------------------------------------------------------------------
+//----------------- String_expressionContext ------------------------------------------------------------------
 
-anceParser::Literal_expressionContext::Literal_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::String_expressionContext::String_expressionContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Literal_expressionContext::STRING() {
+tree::TerminalNode* anceParser::String_expressionContext::STRING() {
   return getToken(anceParser::STRING, 0);
 }
 
 
-size_t anceParser::Literal_expressionContext::getRuleIndex() const {
-  return anceParser::RuleLiteral_expression;
+size_t anceParser::String_expressionContext::getRuleIndex() const {
+  return anceParser::RuleString_expression;
 }
 
 
-antlrcpp::Any anceParser::Literal_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::String_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitLiteral_expression(this);
+    return parserVisitor->visitString_expression(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Literal_expressionContext* anceParser::literal_expression() {
-  Literal_expressionContext *_localctx = _tracker.createInstance<Literal_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 46, anceParser::RuleLiteral_expression);
+anceParser::String_expressionContext* anceParser::string_expression() {
+  String_expressionContext *_localctx = _tracker.createInstance<String_expressionContext>(_ctx, getState());
+  enterRule(_localctx, 46, anceParser::RuleString_expression);
 
   auto onExit = finally([=] {
     exitRule();
@@ -2555,11 +2555,10 @@ std::vector<std::string> anceParser::_ruleNames = {
   "expression_statement", "local_variable_definition", "variable_assignment", 
   "print_statement", "return_statement", "expression", "independent_expression", 
   "function_call", "arguments", "variable_expression", "sizeof_type_expression", 
-  "sizeof_exp_expression", "constant_expression", "literal_expression", 
-  "byte_expression", "integer_expression", "unsigned_integer", "signed_integer", 
-  "special_integer", "floating_point_expression", "type", "integer_type", 
-  "array_type", "keyword_type", "floating_point_type", "size_type", "unsigned_integer_pointer_type", 
-  "void_type"
+  "sizeof_exp_expression", "constant_expression", "string_expression", "byte_expression", 
+  "integer_expression", "unsigned_integer", "signed_integer", "special_integer", 
+  "floating_point_expression", "type", "integer_type", "array_type", "keyword_type", 
+  "floating_point_type", "size_type", "unsigned_integer_pointer_type", "void_type"
 };
 
 std::vector<std::string> anceParser::_literalNames = {

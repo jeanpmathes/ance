@@ -246,9 +246,9 @@ antlrcpp::Any Visitor::visitSizeof_exp_expression(anceParser::Sizeof_exp_express
 	return static_cast<Expression*>(new SizeofExprExpression(expr));
 }
 
-antlrcpp::Any Visitor::visitLiteral_expression(anceParser::Literal_expressionContext* context)
+antlrcpp::Any Visitor::visitString_expression(anceParser::String_expressionContext* ctx)
 {
-	std::string str = ance::StringConstant::parse(context->STRING()->getText());
+	std::string str = ance::StringConstant::parse(ctx->STRING()->getText());
 
 	ance::Constant* string = new ance::StringConstant(str, application_);
 	return static_cast<Expression*>(new ConstantLiteralExpression(string));

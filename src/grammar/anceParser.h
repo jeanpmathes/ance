@@ -30,7 +30,7 @@ public:
     RuleReturn_statement = 14, RuleExpression = 15, RuleIndependent_expression = 16, 
     RuleFunction_call = 17, RuleArguments = 18, RuleVariable_expression = 19, 
     RuleSizeof_type_expression = 20, RuleSizeof_exp_expression = 21, RuleConstant_expression = 22, 
-    RuleLiteral_expression = 23, RuleByte_expression = 24, RuleInteger_expression = 25, 
+    RuleString_expression = 23, RuleByte_expression = 24, RuleInteger_expression = 25, 
     RuleUnsigned_integer = 26, RuleSigned_integer = 27, RuleSpecial_integer = 28, 
     RuleFloating_point_expression = 29, RuleType = 30, RuleInteger_type = 31, 
     RuleArray_type = 32, RuleKeyword_type = 33, RuleFloating_point_type = 34, 
@@ -70,7 +70,7 @@ public:
   class Sizeof_type_expressionContext;
   class Sizeof_exp_expressionContext;
   class Constant_expressionContext;
-  class Literal_expressionContext;
+  class String_expressionContext;
   class Byte_expressionContext;
   class Integer_expressionContext;
   class Unsigned_integerContext;
@@ -416,7 +416,7 @@ public:
   public:
     Constant_expressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    Literal_expressionContext *literal_expression();
+    String_expressionContext *string_expression();
     Byte_expressionContext *byte_expression();
     Integer_expressionContext *integer_expression();
     Floating_point_expressionContext *floating_point_expression();
@@ -428,9 +428,9 @@ public:
 
   Constant_expressionContext* constant_expression();
 
-  class  Literal_expressionContext : public antlr4::ParserRuleContext {
+  class  String_expressionContext : public antlr4::ParserRuleContext {
   public:
-    Literal_expressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    String_expressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *STRING();
 
@@ -439,7 +439,7 @@ public:
    
   };
 
-  Literal_expressionContext* literal_expression();
+  String_expressionContext* string_expression();
 
   class  Byte_expressionContext : public antlr4::ParserRuleContext {
   public:

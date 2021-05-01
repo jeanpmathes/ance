@@ -65,7 +65,7 @@ public:
 
     virtual antlrcpp::Any visitConstant_expression(anceParser::Constant_expressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitLiteral_expression(anceParser::Literal_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitString_expression(anceParser::String_expressionContext *context) = 0;
 
     virtual antlrcpp::Any visitByte_expression(anceParser::Byte_expressionContext *context) = 0;
 

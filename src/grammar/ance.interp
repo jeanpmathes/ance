@@ -106,7 +106,7 @@ variable_expression
 sizeof_type_expression
 sizeof_exp_expression
 constant_expression
-literal_expression
+string_expression
 byte_expression
 integer_expression
 unsigned_integer

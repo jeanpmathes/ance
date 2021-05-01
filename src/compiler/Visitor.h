@@ -47,7 +47,7 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitSizeof_exp_expression(anceParser::Sizeof_exp_expressionContext* context) override;
 
-		antlrcpp::Any visitLiteral_expression(anceParser::Literal_expressionContext* context) override;
+		antlrcpp::Any visitString_expression(anceParser::String_expressionContext *ctx) override;
 
 		antlrcpp::Any visitByte_expression(anceParser::Byte_expressionContext *ctx) override;
 
