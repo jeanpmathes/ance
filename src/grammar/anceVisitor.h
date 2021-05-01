@@ -79,6 +79,8 @@ public:
 
     virtual antlrcpp::Any visitFloating_point_expression(anceParser::Floating_point_expressionContext *context) = 0;
 
+    virtual antlrcpp::Any visitBoolean_expression(anceParser::Boolean_expressionContext *context) = 0;
+
     virtual antlrcpp::Any visitType(anceParser::TypeContext *context) = 0;
 
     virtual antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext *context) = 0;

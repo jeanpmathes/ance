@@ -135,6 +135,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitBoolean_expression(anceParser::Boolean_expressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitType(anceParser::TypeContext *ctx) override {
     return visitChildren(ctx);
   }

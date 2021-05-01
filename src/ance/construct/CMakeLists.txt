@@ -15,4 +15,5 @@ target_sources(ance PRIVATE
                ByteConstant.cpp
                IntegerConstant.cpp
                FloatConstant.cpp
+               BooleanConstant.cpp
                Variable.cpp)

@@ -103,6 +103,7 @@ constant_expression
 	| byte_expression
 	| integer_expression
 	| floating_point_expression
+	| boolean_expression
 	;
 
 string_expression
@@ -139,6 +140,11 @@ floating_point_expression
 	| DOUBLE
 	| QUAD
 	;
+
+boolean_expression
+    : TRUE
+    | FALSE
+    ;
 
 type
 	: integer_type
@@ -202,6 +208,9 @@ DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ;
 STRING : '"' ('\\'. | .)*? '"' ;
 BYTE : '\'' ( . | '\\' . ) '\'' ;
 INTEGER : [0-9]+ ;
+
+TRUE : 'true' ;
+FALSE : 'false' ;
 
 SIZEOF : 'sizeof' ;
 SIZE : 'size' ;

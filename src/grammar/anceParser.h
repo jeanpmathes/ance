@@ -16,10 +16,10 @@ public:
     T__7 = 8, T__8 = 9, NATIVE_INTEGER_TYPE = 10, HALF_TYPE = 11, SINGLE_TYPE = 12, 
     DOUBLE_TYPE = 13, QUAD_TYPE = 14, SIGNED_INTEGER = 15, HEX_INTEGER = 16, 
     BIN_INTEGER = 17, OCT_INTEGER = 18, HALF = 19, SINGLE = 20, DOUBLE = 21, 
-    QUAD = 22, DECIMAL = 23, STRING = 24, BYTE = 25, INTEGER = 26, SIZEOF = 27, 
-    SIZE = 28, UIPTR = 29, PRINT = 30, RETURN = 31, CONST = 32, PUBLIC = 33, 
-    PRIVATE = 34, VOID = 35, IDENTIFIER = 36, DEFINITION = 37, ASSIGNMENT = 38, 
-    WHITESPACE = 39
+    QUAD = 22, DECIMAL = 23, STRING = 24, BYTE = 25, INTEGER = 26, TRUE = 27, 
+    FALSE = 28, SIZEOF = 29, SIZE = 30, UIPTR = 31, PRINT = 32, RETURN = 33, 
+    CONST = 34, PUBLIC = 35, PRIVATE = 36, VOID = 37, IDENTIFIER = 38, DEFINITION = 39, 
+    ASSIGNMENT = 40, WHITESPACE = 41
   };
 
   enum {
@@ -32,9 +32,9 @@ public:
     RuleSizeof_type_expression = 20, RuleSizeof_exp_expression = 21, RuleConstant_expression = 22, 
     RuleString_expression = 23, RuleByte_expression = 24, RuleInteger_expression = 25, 
     RuleUnsigned_integer = 26, RuleSigned_integer = 27, RuleSpecial_integer = 28, 
-    RuleFloating_point_expression = 29, RuleType = 30, RuleInteger_type = 31, 
-    RuleArray_type = 32, RuleKeyword_type = 33, RuleFloating_point_type = 34, 
-    RuleSize_type = 35, RuleUnsigned_integer_pointer_type = 36, RuleVoid_type = 37
+    RuleFloating_point_expression = 29, RuleBoolean_expression = 30, RuleType = 31, 
+    RuleInteger_type = 32, RuleArray_type = 33, RuleKeyword_type = 34, RuleFloating_point_type = 35, 
+    RuleSize_type = 36, RuleUnsigned_integer_pointer_type = 37, RuleVoid_type = 38
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -77,6 +77,7 @@ public:
   class Signed_integerContext;
   class Special_integerContext;
   class Floating_point_expressionContext;
+  class Boolean_expressionContext;
   class TypeContext;
   class Integer_typeContext;
   class Array_typeContext;
@@ -420,6 +421,7 @@ public:
     Byte_expressionContext *byte_expression();
     Integer_expressionContext *integer_expression();
     Floating_point_expressionContext *floating_point_expression();
+    Boolean_expressionContext *boolean_expression();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -528,6 +530,20 @@ public:
   };
 
   Floating_point_expressionContext* floating_point_expression();
+
+  class  Boolean_expressionContext : public antlr4::ParserRuleContext {
+  public:
+    Boolean_expressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *TRUE();
+    antlr4::tree::TerminalNode *FALSE();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  Boolean_expressionContext* boolean_expression();
 
   class  TypeContext : public antlr4::ParserRuleContext {
   public:

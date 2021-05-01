@@ -24,6 +24,7 @@
 #include "ByteConstant.h"
 #include "IntegerConstant.h"
 #include "FloatConstant.h"
+#include "BooleanConstant.h"
 #include "ConstantLiteralExpression.h"
 
 Visitor::Visitor(Application& application)
@@ -293,6 +294,16 @@ antlrcpp::Any Visitor::visitFloating_point_expression(anceParser::Floating_point
 
 	auto* flt = new ance::FloatConstant(number, type);
 	return static_cast<Expression*>(new ConstantLiteralExpression(flt));
+}
+
+antlrcpp::Any Visitor::visitBoolean_expression(anceParser::Boolean_expressionContext* ctx)
+{
+	ance::Constant* constant = nullptr;
+
+	if (ctx->FALSE()) constant = ance::BooleanConstant::createFalse(application_);
+	if (ctx->TRUE()) constant = ance::BooleanConstant::createTrue(application_);
+
+	return static_cast<Expression*>(new ConstantLiteralExpression(constant));
 }
 
 antlrcpp::Any Visitor::visitUnsigned_integer(anceParser::Unsigned_integerContext* context)

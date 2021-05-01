@@ -53,6 +53,8 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitFloating_point_expression(anceParser::Floating_point_expressionContext* context) override;
 
+		antlrcpp::Any visitBoolean_expression(anceParser::Boolean_expressionContext *ctx) override;
+
 		// Literals and Types
 
 		antlrcpp::Any visitUnsigned_integer(anceParser::Unsigned_integerContext* context) override;
