@@ -1,13 +1,19 @@
 #include "VariableExpression.h"
 
+#include <utility>
+
 #include "ExpressionBackedValue.h"
 #include "Value.h"
 #include "Scope.h"
 
-VariableExpression::VariableExpression(ance::Variable* variable)
-	:
-	variable_(variable), value_(new ance::ExpressionBackedValue(this))
+VariableExpression::VariableExpression(std::string identifier)
+	: identifier_(std::move(identifier)), value_(new ance::ExpressionBackedValue(this))
 {
+}
+
+void VariableExpression::setScope(ance::Scope* scope)
+{
+	variable_ = scope->getVariable(identifier_);
 }
 
 ance::Type* VariableExpression::getType()

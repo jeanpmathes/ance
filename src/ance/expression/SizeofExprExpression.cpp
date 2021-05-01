@@ -9,6 +9,11 @@ SizeofExprExpression::SizeofExprExpression(Expression* expression)
 {
 }
 
+void SizeofExprExpression::setScope(ance::Scope* scope)
+{
+	expression_->setScope(scope);
+}
+
 ance::Type* SizeofExprExpression::getType()
 {
 	return ance::SizeType::get();

@@ -4,15 +4,23 @@
 
 #include "Expression.h"
 #include "Value.h"
+#include "Function.h"
+#include "LocalScope.h"
 
 PrintStatement::PrintStatement(
-	ance::Function* function,
+	Expression* expression,
 	const unsigned int l,
-	const unsigned int c,
-	Expression* expression
+	const unsigned int c
 )
-	: Statement(function, l, c), expression_(expression)
+	: Statement(l, c), expression_(expression)
 {
+}
+
+void PrintStatement::setContainingFunction(ance::Function* function)
+{
+	Statement::setContainingFunction(function);
+
+	expression_->setScope(function->getScope());
 }
 
 void PrintStatement::build(

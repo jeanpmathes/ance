@@ -46,9 +46,13 @@ class GlobalScope : public Scope
 
 		void addFunctionName(const std::string& name);
 
-		void addAndEnterFunction(ance::Function* function);
+		void addFunction(ance::Function* function);
 
-		void pushStatementToCurrentFunction(Statement* statement);
+		bool hasFunction(const std::string& identifier);
+
+		bool isFunctionDefined(const std::string& identifier);
+
+		ance::Function* getFunction(const std::string& identifier);
 
 		void buildFunctionNames(
 			llvm::LLVMContext& c,
@@ -66,12 +70,6 @@ class GlobalScope : public Scope
 			llvm::DIBuilder* di
 		);
 
-		bool hasFunction(const std::string& identifier);
-
-		ance::Function* getFunction(const std::string& identifier);
-
-		[[nodiscard]] ance::Function* getCurrentFunction() const;
-
 	private:
 		std::map<std::string, ance::Type*> types_;
 
@@ -80,7 +78,6 @@ class GlobalScope : public Scope
 		std::map<std::string, ance::GlobalVariable*> global_undefined_;
 
 		std::map<std::string, ance::Function*> functions_;
-		ance::Function* current_ = nullptr;
 };
 }
 #endif

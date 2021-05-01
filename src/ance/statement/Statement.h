@@ -16,7 +16,9 @@ class Function;
 class Statement
 {
 	public:
-		Statement(ance::Function* function, unsigned int l, unsigned int c);
+		Statement(unsigned int l, unsigned int c);
+
+		virtual void setContainingFunction(ance::Function* function);
 
 		[[nodiscard]] ance::Function* getContainingFunction() const;
 
@@ -35,7 +37,7 @@ class Statement
 		virtual ~Statement() = 0;
 
 	private:
-		ance::Function* function_;
+		ance::Function* function_{nullptr};
 		unsigned int line_;
 		unsigned int column_;
 };

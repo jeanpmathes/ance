@@ -154,15 +154,27 @@ void ance::GlobalScope::addFunctionName(const std::string& name)
 	if (functions_.find(name) == functions_.end()) functions_[name] = nullptr;
 }
 
-void ance::GlobalScope::addAndEnterFunction(ance::Function* function)
+void ance::GlobalScope::addFunction(ance::Function* function)
 {
+	assert(!isFunctionDefined(function->getName()));
 	functions_[function->getName()] = function;
-	current_ = function;
 }
 
-void ance::GlobalScope::pushStatementToCurrentFunction(Statement* statement)
+bool ance::GlobalScope::hasFunction(const std::string& identifier)
 {
-	current_->pushStatement(statement);
+	if (functions_.find(identifier) != functions_.end())
+		return true;
+	return false;
+}
+
+bool ance::GlobalScope::isFunctionDefined(const std::string& identifier)
+{
+	return hasFunction(identifier) && functions_[identifier] != nullptr;
+}
+
+ance::Function* ance::GlobalScope::getFunction(const std::string& identifier)
+{
+	return functions_.at(identifier);
 }
 
 void ance::GlobalScope::buildFunctionNames(
@@ -191,21 +203,4 @@ void ance::GlobalScope::buildFunctions(
 	{
 		val->build(c, m, state, ir, di);
 	}
-}
-
-bool ance::GlobalScope::hasFunction(const std::string& identifier)
-{
-	if (functions_.find(identifier) != functions_.end())
-		return true;
-	return false;
-}
-
-ance::Function* ance::GlobalScope::getFunction(const std::string& identifier)
-{
-	return functions_.at(identifier);
-}
-
-ance::Function* ance::GlobalScope::getCurrentFunction() const
-{
-	return current_;
 }

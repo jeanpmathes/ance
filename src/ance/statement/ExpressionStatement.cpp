@@ -1,15 +1,23 @@
 #include "ExpressionStatement.h"
 
 #include "BuildableExpression.h"
+#include "Function.h"
+#include "LocalScope.h"
 
 ExpressionStatement::ExpressionStatement(
-	ance::Function* function,
 	BuildableExpression* expression,
 	unsigned l,
 	unsigned c
 )
-	: Statement(function, l, c), expression_(expression)
+	: Statement(l, c), expression_(expression)
 {
+}
+
+void ExpressionStatement::setContainingFunction(ance::Function* function)
+{
+	Statement::setContainingFunction(function);
+
+	expression_->setScope(function->getScope());
 }
 
 void ExpressionStatement::build(

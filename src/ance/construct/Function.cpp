@@ -53,6 +53,7 @@ ance::LocalScope* ance::Function::getScope() const
 void ance::Function::pushStatement(Statement* statement)
 {
 	statements_.push_back(statement);
+	statement->setContainingFunction(this);
 }
 
 void ance::Function::buildName(

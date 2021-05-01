@@ -11,11 +11,15 @@ namespace ance
 class Value;
 
 class Type;
+
+class Scope;
 }
 
 class Expression
 {
 	public:
+		virtual void setScope(ance::Scope* scope);
+
 		virtual ance::Type* getType() = 0;
 
 		virtual ance::Value* getValue() = 0;

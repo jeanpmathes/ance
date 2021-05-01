@@ -1,12 +1,15 @@
 #pragma once
 
 #include "Statement.h"
+#include "Expression.h"
 
 class ReturnStatement :
 	public Statement
 {
 	public:
-		ReturnStatement(ance::Function* function, unsigned int l, unsigned int c, ance::Value* return_value);
+		ReturnStatement(Expression* return_value, unsigned int l, unsigned int c);
+
+		void setContainingFunction(ance::Function *function) override;
 
 		void build(
 			llvm::LLVMContext& c,
@@ -19,5 +22,5 @@ class ReturnStatement :
 		~ReturnStatement() override;
 
 	private:
-		ance::Value* return_value_;
+		Expression* return_value_;
 };

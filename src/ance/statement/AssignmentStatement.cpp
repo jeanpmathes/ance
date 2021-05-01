@@ -8,16 +8,23 @@
 #include "Value.h"
 
 AssignmentStatement::AssignmentStatement(
-	ance::Function* function,
-	unsigned int l,
-	unsigned int c,
 	std::string variable_identifier,
-	Expression* assigned
+	Expression* assigned,
+	unsigned int l,
+	unsigned int c
 )
 	:
-	Statement(function, l, c), variable_identifier_(std::move(variable_identifier)), assigned_(assigned)
+	Statement(l, c), variable_identifier_(std::move(variable_identifier)), assigned_(assigned)
 {
 }
+
+void AssignmentStatement::setContainingFunction(ance::Function* function)
+{
+	Statement::setContainingFunction(function);
+
+	assigned_->setScope(function->getScope());
+}
+
 
 void AssignmentStatement::build(
 	llvm::LLVMContext& c,

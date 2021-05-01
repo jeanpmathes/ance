@@ -13,7 +13,9 @@ class Scope;
 class VariableExpression : public BuildableExpression
 {
 	public:
-		explicit VariableExpression(ance::Variable* variable);
+		explicit VariableExpression(std::string identifier);
+
+		void setScope(ance::Scope* scope) override;
 
 		ance::Type* getType() override;
 
@@ -30,8 +32,9 @@ class VariableExpression : public BuildableExpression
 		~VariableExpression() override;
 
 	private:
-		ance::Variable* variable_;
+		std::string identifier_;
 		ance::Value* value_;
+		ance::Variable* variable_{nullptr};
 };
 
 #endif

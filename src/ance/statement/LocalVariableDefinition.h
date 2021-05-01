@@ -13,11 +13,14 @@ class LocalVariableDefinition : public Statement
 {
 	public:
 		LocalVariableDefinition(
-			ance::Function* function,
+			std::string identifier,
+			ance::Type* type,
+			Expression* assigned,
 			unsigned int l,
-			unsigned int c,
-			ance::LocalVariable* variable
+			unsigned int c
 		);
+
+		void setContainingFunction(ance::Function *function) override;
 
 		void build(
 			llvm::LLVMContext& c,
@@ -28,5 +31,9 @@ class LocalVariableDefinition : public Statement
 		) override;
 
 	private:
-		ance::LocalVariable* variable_;
+		std::string identifier_;
+		ance::Type* type_;
+		Expression* assigned_;
+
+		ance::LocalVariable* variable_{nullptr};
 };

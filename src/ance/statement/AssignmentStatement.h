@@ -8,12 +8,13 @@ class AssignmentStatement : public Statement
 {
 	public:
 		AssignmentStatement(
-			ance::Function* function,
-			unsigned int l,
-			unsigned int c,
 			std::string variable_identifier,
-			Expression* assigned
+			Expression* assigned,
+			unsigned int l,
+			unsigned int c
 		);
+
+		void setContainingFunction(ance::Function *function) override;
 
 		void build(
 			llvm::LLVMContext& c,

@@ -10,6 +10,8 @@ class SizeofExprExpression : public BuildableExpression
 	public:
 		explicit SizeofExprExpression(Expression* expression);
 
+		void setScope(ance::Scope* scope) override;
+
 		ance::Type* getType() override;
 
 		ance::Value* getValue() override;

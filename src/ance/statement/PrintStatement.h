@@ -5,7 +5,9 @@ class Expression;
 class PrintStatement : public Statement
 {
 	public:
-		PrintStatement(ance::Function* function, unsigned int l, unsigned int c, Expression* expression);
+		PrintStatement(Expression* expression, unsigned int l, unsigned int c);
+
+		void setContainingFunction(ance::Function *function) override;
 
 		void build(
 			llvm::LLVMContext& c,

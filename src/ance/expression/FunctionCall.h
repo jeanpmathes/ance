@@ -11,7 +11,9 @@ class Scope;
 class FunctionCall : public BuildableExpression
 {
 	public:
-		FunctionCall(std::string identifier, ance::Scope* scope, std::vector<Expression*> arguments);
+		FunctionCall(std::string identifier, std::vector<Expression*> arguments);
+
+		void setScope(ance::Scope* scope) override;
 
 		ance::Type* getType() override;
 
@@ -28,10 +30,10 @@ class FunctionCall : public BuildableExpression
 		~FunctionCall() override;
 
 	private:
-		ance::Scope* scope_;
 		std::string identifier_;
 		std::vector<Expression*> arguments_;
 		ance::Value* return_value_;
+		ance::Scope* scope_{nullptr};
 };
 
 #endif

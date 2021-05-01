@@ -1,5 +1,7 @@
 #include "FunctionCall.h"
 
+#include <utility>
+
 #include "CompileState.h"
 #include "ExpressionBackedValue.h"
 #include "Function.h"
@@ -11,12 +13,21 @@ namespace ance
 class Function;
 }
 
-FunctionCall::FunctionCall(std::string identifier, ance::Scope* scope, std::vector<Expression*> arguments)
-	: scope_(scope),
-	  identifier_(identifier),
-	  arguments_(arguments),
+FunctionCall::FunctionCall(std::string identifier, std::vector<Expression*> arguments)
+	: identifier_(std::move(identifier)),
+	  arguments_(std::move(arguments)),
 	  return_value_(new ance::ExpressionBackedValue(this))
 {
+}
+
+void FunctionCall::setScope(ance::Scope* scope)
+{
+	scope_ = scope;
+
+	for (auto* arg : arguments_)
+	{
+		arg->setScope(scope);
+	}
 }
 
 ance::Type* FunctionCall::getType()
