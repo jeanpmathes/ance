@@ -229,3 +229,6 @@ DEFINITION : ':=' ;
 ASSIGNMENT : '<-' ;
 
 WHITESPACE : [ \t\r\n]+ -> skip ;
+
+BLOCK_COMMENT : '/*' .*? '*/' -> skip;
+LINE_COMMENT : '//' ~[\r\n]* -> skip;
