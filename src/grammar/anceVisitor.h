@@ -81,7 +81,13 @@ public:
 
     virtual antlrcpp::Any visitBoolean_expression(anceParser::Boolean_expressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitType(anceParser::TypeContext *context) = 0;
+    virtual antlrcpp::Any visitInteger(anceParser::IntegerContext *context) = 0;
+
+    virtual antlrcpp::Any visitArray(anceParser::ArrayContext *context) = 0;
+
+    virtual antlrcpp::Any visitKeyword(anceParser::KeywordContext *context) = 0;
+
+    virtual antlrcpp::Any visitPointer(anceParser::PointerContext *context) = 0;
 
     virtual antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext *context) = 0;
 

@@ -147,9 +147,10 @@ boolean_expression
     ;
 
 type
-	: integer_type
-	| array_type
-	| keyword_type
+	: integer_type # Integer
+	| array_type # Array
+	| keyword_type # Keyword
+	| type '*' # Pointer
 	;
 
 integer_type

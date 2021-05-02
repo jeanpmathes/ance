@@ -47,13 +47,13 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitSizeof_exp_expression(anceParser::Sizeof_exp_expressionContext* context) override;
 
-		antlrcpp::Any visitString_expression(anceParser::String_expressionContext *ctx) override;
+		antlrcpp::Any visitString_expression(anceParser::String_expressionContext* ctx) override;
 
-		antlrcpp::Any visitByte_expression(anceParser::Byte_expressionContext *ctx) override;
+		antlrcpp::Any visitByte_expression(anceParser::Byte_expressionContext* ctx) override;
 
 		antlrcpp::Any visitFloating_point_expression(anceParser::Floating_point_expressionContext* context) override;
 
-		antlrcpp::Any visitBoolean_expression(anceParser::Boolean_expressionContext *ctx) override;
+		antlrcpp::Any visitBoolean_expression(anceParser::Boolean_expressionContext* ctx) override;
 
 		// Literals and Types
 
@@ -68,6 +68,8 @@ class Visitor : public anceBaseVisitor
 		antlrcpp::Any visitArray_type(anceParser::Array_typeContext* context) override;
 
 		antlrcpp::Any visitKeyword_type(anceParser::Keyword_typeContext* ctx) override;
+
+		antlrcpp::Any visitPointer(anceParser::PointerContext* ctx) override;
 
 		antlrcpp::Any visitAccess_modifier(anceParser::Access_modifierContext* context) override;
 

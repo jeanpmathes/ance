@@ -9,6 +9,7 @@
 #include "DoubleType.h"
 #include "ExpressionStatement.h"
 #include "SingleType.h"
+#include "PointerType.h"
 #include "Function.h"
 #include "FunctionCall.h"
 #include "GlobalScope.h"
@@ -393,6 +394,13 @@ antlrcpp::Any Visitor::visitArray_type(anceParser::Array_typeContext* context)
 antlrcpp::Any Visitor::visitKeyword_type(anceParser::Keyword_typeContext* ctx)
 {
 	ance::Type* type = application_.globalScope()->getType(ctx->getText());
+	return type;
+}
+
+antlrcpp::Any Visitor::visitPointer(anceParser::PointerContext* ctx)
+{
+	ance::Type* element_type = visit(ctx->type());
+	ance::Type* type = ance::PointerType::get(application_, element_type);
 	return type;
 }
 

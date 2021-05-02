@@ -13,13 +13,14 @@ class  anceParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    T__7 = 8, T__8 = 9, NATIVE_INTEGER_TYPE = 10, HALF_TYPE = 11, SINGLE_TYPE = 12, 
-    DOUBLE_TYPE = 13, QUAD_TYPE = 14, SIGNED_INTEGER = 15, HEX_INTEGER = 16, 
-    BIN_INTEGER = 17, OCT_INTEGER = 18, HALF = 19, SINGLE = 20, DOUBLE = 21, 
-    QUAD = 22, DECIMAL = 23, STRING = 24, BYTE = 25, INTEGER = 26, TRUE = 27, 
-    FALSE = 28, SIZEOF = 29, SIZE = 30, UIPTR = 31, PRINT = 32, RETURN = 33, 
-    CONST = 34, PUBLIC = 35, PRIVATE = 36, VOID = 37, IDENTIFIER = 38, DEFINITION = 39, 
-    ASSIGNMENT = 40, WHITESPACE = 41, BLOCK_COMMENT = 42, LINE_COMMENT = 43
+    T__7 = 8, T__8 = 9, T__9 = 10, NATIVE_INTEGER_TYPE = 11, HALF_TYPE = 12, 
+    SINGLE_TYPE = 13, DOUBLE_TYPE = 14, QUAD_TYPE = 15, SIGNED_INTEGER = 16, 
+    HEX_INTEGER = 17, BIN_INTEGER = 18, OCT_INTEGER = 19, HALF = 20, SINGLE = 21, 
+    DOUBLE = 22, QUAD = 23, DECIMAL = 24, STRING = 25, BYTE = 26, INTEGER = 27, 
+    TRUE = 28, FALSE = 29, SIZEOF = 30, SIZE = 31, UIPTR = 32, PRINT = 33, 
+    RETURN = 34, CONST = 35, PUBLIC = 36, PRIVATE = 37, VOID = 38, IDENTIFIER = 39, 
+    DEFINITION = 40, ASSIGNMENT = 41, WHITESPACE = 42, BLOCK_COMMENT = 43, 
+    LINE_COMMENT = 44
   };
 
   enum {
@@ -548,18 +549,54 @@ public:
   class  TypeContext : public antlr4::ParserRuleContext {
   public:
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    TypeContext() = default;
+    void copyFrom(TypeContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
     virtual size_t getRuleIndex() const override;
-    Integer_typeContext *integer_type();
-    Array_typeContext *array_type();
-    Keyword_typeContext *keyword_type();
 
-
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
 
-  TypeContext* type();
+  class  IntegerContext : public TypeContext {
+  public:
+    IntegerContext(TypeContext *ctx);
 
+    Integer_typeContext *integer_type();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  ArrayContext : public TypeContext {
+  public:
+    ArrayContext(TypeContext *ctx);
+
+    Array_typeContext *array_type();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  KeywordContext : public TypeContext {
+  public:
+    KeywordContext(TypeContext *ctx);
+
+    Keyword_typeContext *keyword_type();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  PointerContext : public TypeContext {
+  public:
+    PointerContext(TypeContext *ctx);
+
+    TypeContext *type();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  TypeContext* type();
+  TypeContext* type(int precedence);
   class  Integer_typeContext : public antlr4::ParserRuleContext {
   public:
     Integer_typeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -658,6 +695,9 @@ public:
 
   Void_typeContext* void_type();
 
+
+  virtual bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
+  bool typeSempred(TypeContext *_localctx, size_t predicateIndex);
 
 private:
   static std::vector<antlr4::dfa::DFA> _decisionToDFA;
