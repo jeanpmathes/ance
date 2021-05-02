@@ -5,7 +5,8 @@
 #include "Application.h"
 #include "GlobalScope.h"
 
-ance::PointerType::PointerType(ance::Type* element_type) : element_type_(element_type)
+ance::PointerType::PointerType(ance::Type* element_type)
+	: element_type_(element_type)
 {
 
 }

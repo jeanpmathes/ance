@@ -1,10 +1,11 @@
 #ifndef ANCE_SRC_COMPILER_COMPILESTATE_H_
 #define ANCE_SRC_COMPILER_COMPILESTATE_H_
 
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/DIBuilder.h"
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/DIBuilder.h>
 
 #include "Application.h"
+#include "Runtime.h"
 
 class Application;
 
@@ -21,6 +22,7 @@ class CompileState
 
 	public:
 		Application* application_;
+		Runtime* runtime_;
 		llvm::DICompileUnit* unit_{nullptr};
 		llvm::DIFile* code_file_{nullptr};
 		llvm::DIBasicType* ui_32_{nullptr};

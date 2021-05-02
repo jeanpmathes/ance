@@ -1,5 +1,7 @@
 #include "Visitor.h"
 
+#include <stdexcept>
+
 #include "HalfType.h"
 #include "IntegerType.h"
 #include "SingleType.h"
@@ -11,6 +13,7 @@
 #include "GlobalScope.h"
 #include "LocalScope.h"
 
+#include "Runtime.h"
 #include "AccessModifier.h"
 #include "Function.h"
 #include "Parameter.h"
@@ -26,6 +29,7 @@
 #include "ConstantLiteralExpression.h"
 #include "DefaultValueExpression.h"
 #include "VariableExpression.h"
+#include "AllocationExpression.h"
 
 #include "StringConstant.h"
 #include "ByteConstant.h"
@@ -232,6 +236,15 @@ antlrcpp::Any Visitor::visitVariable_expression(anceParser::Variable_expressionC
 	return expression;
 }
 
+antlrcpp::Any Visitor::visitAllocation_expression(anceParser::Allocation_expressionContext* ctx)
+{
+	Runtime::Allocator allocator = visit(ctx->allocator());
+	ance::Type* type = visit(ctx->type());
+
+	Expression* expression = new AllocationExpression(allocator, type, application_);
+	return expression;
+}
+
 antlrcpp::Any Visitor::visitSizeof_type_expression(anceParser::Sizeof_type_expressionContext* context)
 {
 	ance::Type* type = visit(context->type());
@@ -417,4 +430,19 @@ antlrcpp::Any Visitor::visitAccess_modifier(anceParser::Access_modifierContext* 
 	else if (context->PRIVATE()) access = AccessModifier::PRIVATE_ACCESS;
 
 	return access;
+}
+
+antlrcpp::Any Visitor::visitAllocator(anceParser::AllocatorContext* ctx)
+{
+	if (ctx->AUTOMATIC())
+	{
+		return Runtime::Allocator::AUTOMATIC;
+	}
+
+	if (ctx->DYNAMIC())
+	{
+		return Runtime::Allocator::DYNAMIC;
+	}
+
+	throw std::logic_error("Allocator not defined.");
 }

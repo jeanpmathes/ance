@@ -9,4 +9,5 @@ target_sources(ance PRIVATE DefaultValueExpression.cpp
                ConstantLiteralExpression.cpp
                SizeofExprExpression.cpp
                SizeofTypeExpression.cpp
-               VariableExpression.cpp)
+               VariableExpression.cpp
+               AllocationExpression.cpp)

@@ -68,6 +68,7 @@ return_statement
 
 expression
 	: variable_expression
+	| allocation_expression
 	| sizeof_type_expression
 	| sizeof_exp_expression
 	| constant_expression
@@ -89,6 +90,15 @@ arguments
 variable_expression
 	: IDENTIFIER
 	;
+
+allocation_expression
+    : 'new' allocator type
+    ;
+
+allocator
+    : DYNAMIC
+    | AUTOMATIC
+    ;
 
 sizeof_type_expression
 	: SIZEOF type
@@ -209,6 +219,9 @@ DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ;
 STRING : '"' ('\\'. | .)*? '"' ;
 BYTE : '\'' ( . | '\\' . ) '\'' ;
 INTEGER : [0-9]+ ;
+
+DYNAMIC : 'dynamic' ;
+AUTOMATIC : 'automatic' ;
 
 TRUE : 'true' ;
 FALSE : 'false' ;

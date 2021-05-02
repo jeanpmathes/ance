@@ -63,6 +63,9 @@ anceCompiler::anceCompiler(Application& app)
 
 void anceCompiler::compile(const std::filesystem::path& output_dir)
 {
+	state_->runtime_ = new Runtime();
+	state_->runtime_->init(context_, module_, state_, ir_, di_);
+
 	state_->ui_32_ = di_->createBasicType("ui32", 32, llvm::dwarf::DW_ATE_unsigned);
 
 	setupGlobals();
