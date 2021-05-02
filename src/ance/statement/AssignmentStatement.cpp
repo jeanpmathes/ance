@@ -25,7 +25,6 @@ void AssignmentStatement::setContainingFunction(ance::Function* function)
 	assigned_->setScope(function->getScope());
 }
 
-
 void AssignmentStatement::build(
 	llvm::LLVMContext& c,
 	llvm::Module* m,

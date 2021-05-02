@@ -18,6 +18,7 @@ class BooleanConstant : public Constant
 		llvm::Constant* getConstant(llvm::LLVMContext& c) override;
 
 		static ance::BooleanConstant* createFalse(Application& app);
+
 		static ance::BooleanConstant* createTrue(Application& app);
 
 	private:

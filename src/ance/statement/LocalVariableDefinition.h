@@ -20,7 +20,7 @@ class LocalVariableDefinition : public Statement
 			unsigned int c
 		);
 
-		void setContainingFunction(ance::Function *function) override;
+		void setContainingFunction(ance::Function* function) override;
 
 		void build(
 			llvm::LLVMContext& c,

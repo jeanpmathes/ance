@@ -9,7 +9,7 @@ class ReturnStatement :
 	public:
 		ReturnStatement(Expression* return_value, unsigned int l, unsigned int c);
 
-		void setContainingFunction(ance::Function *function) override;
+		void setContainingFunction(ance::Function* function) override;
 
 		void build(
 			llvm::LLVMContext& c,

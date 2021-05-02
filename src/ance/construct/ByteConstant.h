@@ -21,6 +21,7 @@ class ByteConstant : public Constant
 		llvm::Constant* getConstant(llvm::LLVMContext& c) override;
 
 		static char resolveEscaped(char content);
+
 		static uint8_t parse(const std::string& unparsed);
 
 	private:
