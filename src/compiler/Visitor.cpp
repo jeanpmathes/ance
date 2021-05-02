@@ -1,32 +1,37 @@
 #include "Visitor.h"
 
-#include "AccessModifier.h"
-#include "Parameter.h"
-#include "ArrayType.h"
-#include "VariableExpression.h"
-#include "AssignmentStatement.h"
-#include "DefaultValueExpression.h"
-#include "DoubleType.h"
-#include "ExpressionStatement.h"
-#include "SingleType.h"
-#include "PointerType.h"
-#include "Function.h"
-#include "FunctionCall.h"
-#include "GlobalScope.h"
 #include "HalfType.h"
 #include "IntegerType.h"
+#include "SingleType.h"
+#include "PointerType.h"
+#include "ArrayType.h"
+#include "QuadType.h"
+#include "DoubleType.h"
+
+#include "GlobalScope.h"
 #include "LocalScope.h"
+
+#include "AccessModifier.h"
+#include "Function.h"
+#include "Parameter.h"
+
+#include "AssignmentStatement.h"
+#include "ExpressionStatement.h"
 #include "LocalVariableDefinition.h"
 #include "PrintStatement.h"
-#include "QuadType.h"
+
+#include "FunctionCall.h"
 #include "SizeofExprExpression.h"
 #include "SizeofTypeExpression.h"
+#include "ConstantLiteralExpression.h"
+#include "DefaultValueExpression.h"
+#include "VariableExpression.h"
+
 #include "StringConstant.h"
 #include "ByteConstant.h"
 #include "IntegerConstant.h"
 #include "FloatConstant.h"
 #include "BooleanConstant.h"
-#include "ConstantLiteralExpression.h"
 
 Visitor::Visitor(Application& application)
 	: application_(application)
