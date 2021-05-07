@@ -69,7 +69,7 @@ void Runtime::deleteDynamic(
 )
 {
 	ance::Type* type = value->getType();
-	assert(dynamic_cast<ance::PointerType*>(type) && "Type is pointer type.");
+	assert(dynamic_cast<ance::PointerType*>(type) && "Type of value to delete has to be pointer type.");
 
 	llvm::Value* ptr = value->getValue(c, m, state, ir, di);
 	llvm::Value* opaque_ptr = ir.CreateBitCast(ptr, llvm::Type::getInt8PtrTy(c));
