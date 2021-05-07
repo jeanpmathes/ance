@@ -23,7 +23,6 @@ class PointerType : public Type
 
 	private:
 		ance::Type* element_type_;
-		llvm::PointerType* type_{nullptr};
 
 	public:
 		static ance::Type* get(Application& app, Type* element_type);
