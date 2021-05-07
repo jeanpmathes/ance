@@ -3,10 +3,10 @@
 #include <stdexcept>
 
 #include "Type.h"
+#include "Value.h"
 #include "CompileState.h"
 #include "SizeType.h"
 #include "PointerType.h"
-#include "CompileState.h"
 
 void Runtime::init(
 	llvm::LLVMContext& c,
@@ -16,6 +16,7 @@ void Runtime::init(
 	llvm::DIBuilder*
 )
 {
+	// Setup dynamic memory allocation call.
 	llvm::Type* allocate_dynamic_params[] =
 		{llvm::Type::getInt32Ty(c), ance::SizeType::get()->getNativeType(c)};
 	allocate_dynamic_type_ = llvm::FunctionType::get(llvm::Type::getInt8PtrTy(c), allocate_dynamic_params, false);
@@ -23,6 +24,16 @@ void Runtime::init(
 		allocate_dynamic_type_,
 		llvm::GlobalValue::LinkageTypes::ExternalLinkage,
 		"GlobalAlloc",
+		m
+	);
+
+	// Setup dynamic memory delete call.
+	llvm::Type* delete_dynamic_params[] = {llvm::Type::getInt8PtrTy(c)};
+	delete_dynamic_type_ = llvm::FunctionType::get(llvm::Type::getInt8PtrTy(c), delete_dynamic_params, false);
+	delete_dynamic_ = llvm::Function::Create(
+		delete_dynamic_type_,
+		llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+		"GlobalFree",
 		m
 	);
 }
@@ -46,6 +57,26 @@ llvm::Value* Runtime::allocate(
 		default:
 			throw std::invalid_argument("Unsupported allocation type.");
 	}
+}
+
+void Runtime::deleteDynamic(
+	ance::Value* value,
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+)
+{
+	ance::Type* type = value->getType();
+	assert(dynamic_cast<ance::PointerType*>(type) && "Type is pointer type.");
+
+	llvm::Value* ptr = value->getValue(c, m, state, ir, di);
+	llvm::Value* opaque_ptr = ir.CreateBitCast(ptr, llvm::Type::getInt8PtrTy(c));
+
+	llvm::Value* args[] = {opaque_ptr};
+
+	ir.CreateCall(delete_dynamic_type_, delete_dynamic_, args);
 }
 
 llvm::Value* Runtime::allocateAutomatic(

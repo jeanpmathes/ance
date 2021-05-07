@@ -12,6 +12,7 @@ class CompileState;
 namespace ance
 {
 class Type;
+class Value;
 }
 
 class Runtime
@@ -28,6 +29,9 @@ class Runtime
 	private:
 		llvm::FunctionType* allocate_dynamic_type_;
 		llvm::Function* allocate_dynamic_;
+
+		llvm::FunctionType* delete_dynamic_type_;
+		llvm::Function* delete_dynamic_;
 
 	public:
 
@@ -46,6 +50,8 @@ class Runtime
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);
+
+		void deleteDynamic(ance::Value* value, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
 	private:
 		llvm::Value* allocateAutomatic(

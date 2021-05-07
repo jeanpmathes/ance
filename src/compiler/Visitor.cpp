@@ -22,6 +22,7 @@
 #include "ExpressionStatement.h"
 #include "LocalVariableDefinition.h"
 #include "PrintStatement.h"
+#include "DeleteStatement.h"
 
 #include "FunctionCall.h"
 #include "SizeofExprExpression.h"
@@ -185,6 +186,18 @@ antlrcpp::Any Visitor::visitPrint_statement(anceParser::Print_statementContext* 
 	Expression* expression = visit(context->expression());
 
 	auto* statement = new PrintStatement(expression, line, column);
+
+	return static_cast<Statement*>(statement);
+}
+
+antlrcpp::Any Visitor::visitDelete_statement(anceParser::Delete_statementContext* ctx)
+{
+	unsigned int line = ctx->getStart()->getLine();
+	unsigned int column = ctx->getStart()->getCharPositionInLine();
+
+	Expression* expression = visit(ctx->expression());
+
+	auto* statement = new DeleteStatement(expression, line, column);
 
 	return static_cast<Statement*>(statement);
 }

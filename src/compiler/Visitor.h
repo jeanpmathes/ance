@@ -33,6 +33,8 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitPrint_statement(anceParser::Print_statementContext* context) override;
 
+		antlrcpp::Any visitDelete_statement(anceParser::Delete_statementContext *ctx) override;
+
 		antlrcpp::Any visitReturn_statement(anceParser::Return_statementContext* context) override;
 
 		// Expressions

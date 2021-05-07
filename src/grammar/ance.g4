@@ -43,6 +43,7 @@ statement
 	| local_variable_definition
 	| variable_assignment
 	| print_statement
+	| delete_statement
 	| return_statement
 	;
 
@@ -61,6 +62,10 @@ variable_assignment
 print_statement
 	: PRINT expression ';'
 	;
+
+delete_statement
+    : DELETE expression ';'
+    ;
 
 return_statement
 	: RETURN ( expression )? ';'
@@ -232,9 +237,12 @@ UIPTR : 'uiptr' ;
 
 PRINT : 'print' ;
 RETURN : 'return' ;
+DELETE : 'delete' ;
 CONST : 'const' ;
+
 PUBLIC : 'public' ;
 PRIVATE : 'private' ;
+
 VOID : 'void' ;
 
 IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
