@@ -4,6 +4,7 @@
 
 #include "Application.h"
 #include "GlobalScope.h"
+#include "VoidType.h"
 
 ance::PointerType::PointerType(ance::Type* element_type)
 	: element_type_(element_type)
@@ -23,7 +24,18 @@ llvm::Constant* ance::PointerType::getDefault(llvm::LLVMContext& c)
 
 llvm::PointerType* ance::PointerType::getNativeType(llvm::LLVMContext& c)
 {
-	return llvm::PointerType::get(element_type_->getNativeType(c), 0);
+	llvm::Type* native_type;
+
+	if (element_type_ == ance::VoidType::get())
+	{
+		native_type = llvm::Type::getInt8PtrTy(c);
+	}
+	else
+	{
+		native_type = element_type_->getNativeType(c);
+	}
+
+	return llvm::PointerType::get(native_type, 0);
 }
 
 ance::Type* ance::PointerType::get(Application& app, ance::Type* element_type)
