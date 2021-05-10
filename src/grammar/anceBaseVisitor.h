@@ -23,11 +23,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitConstant_declaration(anceParser::Constant_declarationContext *ctx) override {
+  virtual antlrcpp::Any visitConstantDeclaration(anceParser::ConstantDeclarationContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitVariable_declaration(anceParser::Variable_declarationContext *ctx) override {
+  virtual antlrcpp::Any visitVariableDeclaration(anceParser::VariableDeclarationContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -47,7 +47,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitAccess_modifier(anceParser::Access_modifierContext *ctx) override {
+  virtual antlrcpp::Any visitAccessModifier(anceParser::AccessModifierContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -55,27 +55,27 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitExpression_statement(anceParser::Expression_statementContext *ctx) override {
+  virtual antlrcpp::Any visitExpressionStatement(anceParser::ExpressionStatementContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitLocal_variable_definition(anceParser::Local_variable_definitionContext *ctx) override {
+  virtual antlrcpp::Any visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitVariable_assignment(anceParser::Variable_assignmentContext *ctx) override {
+  virtual antlrcpp::Any visitVariableAssignment(anceParser::VariableAssignmentContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitPrint_statement(anceParser::Print_statementContext *ctx) override {
+  virtual antlrcpp::Any visitPrintStatement(anceParser::PrintStatementContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitDelete_statement(anceParser::Delete_statementContext *ctx) override {
+  virtual antlrcpp::Any visitDeleteStatement(anceParser::DeleteStatementContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitReturn_statement(anceParser::Return_statementContext *ctx) override {
+  virtual antlrcpp::Any visitReturnStatement(anceParser::ReturnStatementContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -83,11 +83,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitIndependent_expression(anceParser::Independent_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitIndependentExpression(anceParser::IndependentExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitFunction_call(anceParser::Function_callContext *ctx) override {
+  virtual antlrcpp::Any visitFunctionCall(anceParser::FunctionCallContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -95,11 +95,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitVariable_expression(anceParser::Variable_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitVariableExpression(anceParser::VariableExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitAllocation_expression(anceParser::Allocation_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitAllocationExpression(anceParser::AllocationExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -107,47 +107,47 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSizeof_type_expression(anceParser::Sizeof_type_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitSizeofTypeExpression(anceParser::SizeofTypeExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSizeof_exp_expression(anceParser::Sizeof_exp_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitSizeofExpExpression(anceParser::SizeofExpExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitConstant_expression(anceParser::Constant_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitLiteralExpression(anceParser::LiteralExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitString_expression(anceParser::String_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitStringLiteral(anceParser::StringLiteralContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitByte_expression(anceParser::Byte_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitByteLiteral(anceParser::ByteLiteralContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitInteger_expression(anceParser::Integer_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitIntegerLiteral(anceParser::IntegerLiteralContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitUnsigned_integer(anceParser::Unsigned_integerContext *ctx) override {
+  virtual antlrcpp::Any visitUnsignedInteger(anceParser::UnsignedIntegerContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSigned_integer(anceParser::Signed_integerContext *ctx) override {
+  virtual antlrcpp::Any visitSignedInteger(anceParser::SignedIntegerContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSpecial_integer(anceParser::Special_integerContext *ctx) override {
+  virtual antlrcpp::Any visitSpecialInteger(anceParser::SpecialIntegerContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitFloating_point_expression(anceParser::Floating_point_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitBoolean_expression(anceParser::Boolean_expressionContext *ctx) override {
+  virtual antlrcpp::Any visitBooleanLiteral(anceParser::BooleanLiteralContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -167,31 +167,31 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext *ctx) override {
+  virtual antlrcpp::Any visitIntegerType(anceParser::IntegerTypeContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *ctx) override {
+  virtual antlrcpp::Any visitArrayType(anceParser::ArrayTypeContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitKeyword_type(anceParser::Keyword_typeContext *ctx) override {
+  virtual antlrcpp::Any visitKeywordType(anceParser::KeywordTypeContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitFloating_point_type(anceParser::Floating_point_typeContext *ctx) override {
+  virtual antlrcpp::Any visitFloatingPointType(anceParser::FloatingPointTypeContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSize_type(anceParser::Size_typeContext *ctx) override {
+  virtual antlrcpp::Any visitSizeType(anceParser::SizeTypeContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitUnsigned_integer_pointer_type(anceParser::Unsigned_integer_pointer_typeContext *ctx) override {
+  virtual antlrcpp::Any visitUnsignedIntegerPointerType(anceParser::UnsignedIntegerPointerTypeContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitVoid_type(anceParser::Void_typeContext *ctx) override {
+  virtual antlrcpp::Any visitVoidType(anceParser::VoidTypeContext *ctx) override {
     return visitChildren(ctx);
   }
 

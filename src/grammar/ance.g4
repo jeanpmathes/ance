@@ -5,16 +5,16 @@ file
 	;
 
 data
-	: constant_declaration
-	| variable_declaration
+	: constantDeclaration
+	| variableDeclaration
 	;
 
-constant_declaration
-	: access_modifier CONST type IDENTIFIER DEFINITION constant_expression ';'
+constantDeclaration
+	: accessModifier CONST type IDENTIFIER DEFINITION literalExpression ';'
 	;
 
-variable_declaration
-	: access_modifier type IDENTIFIER ( ASSIGNMENT constant_expression )? ';'
+variableDeclaration
+	: accessModifier type IDENTIFIER ( ASSIGNMENT literalExpression )? ';'
 	;
 
 code
@@ -22,7 +22,7 @@ code
 	;
 
 function
-	: access_modifier type IDENTIFIER '(' parameters ')' '{' ( statement )+ '}'
+	: accessModifier type IDENTIFIER '(' parameters ')' '{' ( statement )+ '}'
 	;
 
 parameters
@@ -33,58 +33,58 @@ parameter
 	: type IDENTIFIER
 	;
 
-access_modifier
+accessModifier
 	: PUBLIC
 	| PRIVATE
 	;
 
 statement
-	: expression_statement
-	| local_variable_definition
-	| variable_assignment
-	| print_statement
-	| delete_statement
-	| return_statement
+	: expressionStatement
+	| localVariableDefinition
+	| variableAssignment
+	| printStatement
+	| deleteStatement
+	| returnStatement
 	;
 
-expression_statement
-	: independent_expression ';'
+expressionStatement
+	: independentExpression ';'
 	;
 
-local_variable_definition
+localVariableDefinition
 	: type IDENTIFIER ( ASSIGNMENT expression )? ';'
 	;
 
-variable_assignment
+variableAssignment
 	: IDENTIFIER ASSIGNMENT expression ';'
 	;
 
-print_statement
+printStatement
 	: PRINT expression ';'
 	;
 
-delete_statement
+deleteStatement
     : DELETE expression ';'
     ;
 
-return_statement
+returnStatement
 	: RETURN ( expression )? ';'
 	;
 
 expression
-	: variable_expression
-	| allocation_expression
-	| sizeof_type_expression
-	| sizeof_exp_expression
-	| constant_expression
-	| independent_expression
+	: variableExpression
+	| allocationExpression
+	| sizeofTypeExpression
+	| sizeofExpExpression
+	| literalExpression
+	| independentExpression
 	;
 
-independent_expression
-	: function_call
+independentExpression
+	: functionCall
 	;
 
-function_call
+functionCall
 	: IDENTIFIER '(' arguments ')'
 	;
 
@@ -92,11 +92,11 @@ arguments
 	: (expression (',' expression)* )?
 	;
 
-variable_expression
+variableExpression
 	: IDENTIFIER
 	;
 
-allocation_expression
+allocationExpression
     : 'new' allocator type
     ;
 
@@ -105,100 +105,100 @@ allocator
     | AUTOMATIC
     ;
 
-sizeof_type_expression
+sizeofTypeExpression
 	: SIZEOF type
 	;
 
-sizeof_exp_expression
+sizeofExpExpression
 	: SIZEOF '(' expression ')'
 	;
 
-constant_expression
-	: string_expression
-	| byte_expression
-	| integer_expression
-	| floating_point_expression
-	| boolean_expression
+literalExpression
+	: stringLiteral
+	| byteLiteral
+	| integerLiteral
+	| floatingPointLiteral
+	| booleanLiteral
 	;
 
-string_expression
+stringLiteral
 	: STRING
 	;
 
-byte_expression
+byteLiteral
     : BYTE
     ;
 
-integer_expression
-	: unsigned_integer
-	| signed_integer
-	| special_integer
+integerLiteral
+	: unsignedInteger
+	| signedInteger
+	| specialInteger
 	;
 
-unsigned_integer
+unsignedInteger
 	: INTEGER ( ':' INTEGER )?
 	;
 
-signed_integer
+signedInteger
 	: SIGNED_INTEGER ( ':' INTEGER )?
 	;
 
-special_integer
+specialInteger
 	: HEX_INTEGER ( ':' INTEGER )?
 	| BIN_INTEGER ( ':' INTEGER )?
 	| OCT_INTEGER ( ':' INTEGER )?
 	;
 
-floating_point_expression
+floatingPointLiteral
 	: HALF
 	| SINGLE
 	| DOUBLE
 	| QUAD
 	;
 
-boolean_expression
+booleanLiteral
     : TRUE
     | FALSE
     ;
 
 type
-	: integer_type # Integer
-	| array_type # Array
-	| keyword_type # Keyword
+	: integerType # Integer
+	| arrayType # Array
+	| keywordType # Keyword
 	| type '*' # Pointer
 	;
 
-integer_type
+integerType
 	: NATIVE_INTEGER_TYPE
 	;
 
-array_type
+arrayType
 	: '[' INTEGER ':' type ']'
 	;
 
-keyword_type
-    : floating_point_type
-    | size_type
-    | unsigned_integer_pointer_type
-    | void_type
+keywordType
+    : floatingPointType
+    | sizeType
+    | unsignedIntegerPointerType
+    | voidType
     ;
 
-floating_point_type
+floatingPointType
 	: HALF_TYPE
 	| SINGLE_TYPE
 	| DOUBLE_TYPE
 	| QUAD_TYPE
 	;
 
-size_type
+sizeType
 	: SIZE
 	;
 
-unsigned_integer_pointer_type
+unsignedIntegerPointerType
     : UIPTR
     ;
 
-void_type
+voidType
 	: VOID
 	;
 

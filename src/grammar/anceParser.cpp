@@ -119,12 +119,12 @@ anceParser::DataContext::DataContext(ParserRuleContext *parent, size_t invokingS
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::Constant_declarationContext* anceParser::DataContext::constant_declaration() {
-  return getRuleContext<anceParser::Constant_declarationContext>(0);
+anceParser::ConstantDeclarationContext* anceParser::DataContext::constantDeclaration() {
+  return getRuleContext<anceParser::ConstantDeclarationContext>(0);
 }
 
-anceParser::Variable_declarationContext* anceParser::DataContext::variable_declaration() {
-  return getRuleContext<anceParser::Variable_declarationContext>(0);
+anceParser::VariableDeclarationContext* anceParser::DataContext::variableDeclaration() {
+  return getRuleContext<anceParser::VariableDeclarationContext>(0);
 }
 
 
@@ -154,14 +154,14 @@ anceParser::DataContext* anceParser::data() {
     case 1: {
       enterOuterAlt(_localctx, 1);
       setState(91);
-      constant_declaration();
+      constantDeclaration();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
       setState(92);
-      variable_declaration();
+      variableDeclaration();
       break;
     }
 
@@ -177,52 +177,52 @@ anceParser::DataContext* anceParser::data() {
   return _localctx;
 }
 
-//----------------- Constant_declarationContext ------------------------------------------------------------------
+//----------------- ConstantDeclarationContext ------------------------------------------------------------------
 
-anceParser::Constant_declarationContext::Constant_declarationContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::ConstantDeclarationContext::ConstantDeclarationContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::Access_modifierContext* anceParser::Constant_declarationContext::access_modifier() {
-  return getRuleContext<anceParser::Access_modifierContext>(0);
+anceParser::AccessModifierContext* anceParser::ConstantDeclarationContext::accessModifier() {
+  return getRuleContext<anceParser::AccessModifierContext>(0);
 }
 
-tree::TerminalNode* anceParser::Constant_declarationContext::CONST() {
+tree::TerminalNode* anceParser::ConstantDeclarationContext::CONST() {
   return getToken(anceParser::CONST, 0);
 }
 
-anceParser::TypeContext* anceParser::Constant_declarationContext::type() {
+anceParser::TypeContext* anceParser::ConstantDeclarationContext::type() {
   return getRuleContext<anceParser::TypeContext>(0);
 }
 
-tree::TerminalNode* anceParser::Constant_declarationContext::IDENTIFIER() {
+tree::TerminalNode* anceParser::ConstantDeclarationContext::IDENTIFIER() {
   return getToken(anceParser::IDENTIFIER, 0);
 }
 
-tree::TerminalNode* anceParser::Constant_declarationContext::DEFINITION() {
+tree::TerminalNode* anceParser::ConstantDeclarationContext::DEFINITION() {
   return getToken(anceParser::DEFINITION, 0);
 }
 
-anceParser::Constant_expressionContext* anceParser::Constant_declarationContext::constant_expression() {
-  return getRuleContext<anceParser::Constant_expressionContext>(0);
+anceParser::LiteralExpressionContext* anceParser::ConstantDeclarationContext::literalExpression() {
+  return getRuleContext<anceParser::LiteralExpressionContext>(0);
 }
 
 
-size_t anceParser::Constant_declarationContext::getRuleIndex() const {
-  return anceParser::RuleConstant_declaration;
+size_t anceParser::ConstantDeclarationContext::getRuleIndex() const {
+  return anceParser::RuleConstantDeclaration;
 }
 
 
-antlrcpp::Any anceParser::Constant_declarationContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::ConstantDeclarationContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitConstant_declaration(this);
+    return parserVisitor->visitConstantDeclaration(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Constant_declarationContext* anceParser::constant_declaration() {
-  Constant_declarationContext *_localctx = _tracker.createInstance<Constant_declarationContext>(_ctx, getState());
-  enterRule(_localctx, 4, anceParser::RuleConstant_declaration);
+anceParser::ConstantDeclarationContext* anceParser::constantDeclaration() {
+  ConstantDeclarationContext *_localctx = _tracker.createInstance<ConstantDeclarationContext>(_ctx, getState());
+  enterRule(_localctx, 4, anceParser::RuleConstantDeclaration);
 
   auto onExit = finally([=] {
     exitRule();
@@ -230,7 +230,7 @@ anceParser::Constant_declarationContext* anceParser::constant_declaration() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(95);
-    access_modifier();
+    accessModifier();
     setState(96);
     match(anceParser::CONST);
     setState(97);
@@ -240,7 +240,7 @@ anceParser::Constant_declarationContext* anceParser::constant_declaration() {
     setState(99);
     match(anceParser::DEFINITION);
     setState(100);
-    constant_expression();
+    literalExpression();
     setState(101);
     match(anceParser::T__0);
    
@@ -254,48 +254,48 @@ anceParser::Constant_declarationContext* anceParser::constant_declaration() {
   return _localctx;
 }
 
-//----------------- Variable_declarationContext ------------------------------------------------------------------
+//----------------- VariableDeclarationContext ------------------------------------------------------------------
 
-anceParser::Variable_declarationContext::Variable_declarationContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::VariableDeclarationContext::VariableDeclarationContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::Access_modifierContext* anceParser::Variable_declarationContext::access_modifier() {
-  return getRuleContext<anceParser::Access_modifierContext>(0);
+anceParser::AccessModifierContext* anceParser::VariableDeclarationContext::accessModifier() {
+  return getRuleContext<anceParser::AccessModifierContext>(0);
 }
 
-anceParser::TypeContext* anceParser::Variable_declarationContext::type() {
+anceParser::TypeContext* anceParser::VariableDeclarationContext::type() {
   return getRuleContext<anceParser::TypeContext>(0);
 }
 
-tree::TerminalNode* anceParser::Variable_declarationContext::IDENTIFIER() {
+tree::TerminalNode* anceParser::VariableDeclarationContext::IDENTIFIER() {
   return getToken(anceParser::IDENTIFIER, 0);
 }
 
-tree::TerminalNode* anceParser::Variable_declarationContext::ASSIGNMENT() {
+tree::TerminalNode* anceParser::VariableDeclarationContext::ASSIGNMENT() {
   return getToken(anceParser::ASSIGNMENT, 0);
 }
 
-anceParser::Constant_expressionContext* anceParser::Variable_declarationContext::constant_expression() {
-  return getRuleContext<anceParser::Constant_expressionContext>(0);
+anceParser::LiteralExpressionContext* anceParser::VariableDeclarationContext::literalExpression() {
+  return getRuleContext<anceParser::LiteralExpressionContext>(0);
 }
 
 
-size_t anceParser::Variable_declarationContext::getRuleIndex() const {
-  return anceParser::RuleVariable_declaration;
+size_t anceParser::VariableDeclarationContext::getRuleIndex() const {
+  return anceParser::RuleVariableDeclaration;
 }
 
 
-antlrcpp::Any anceParser::Variable_declarationContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::VariableDeclarationContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitVariable_declaration(this);
+    return parserVisitor->visitVariableDeclaration(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Variable_declarationContext* anceParser::variable_declaration() {
-  Variable_declarationContext *_localctx = _tracker.createInstance<Variable_declarationContext>(_ctx, getState());
-  enterRule(_localctx, 6, anceParser::RuleVariable_declaration);
+anceParser::VariableDeclarationContext* anceParser::variableDeclaration() {
+  VariableDeclarationContext *_localctx = _tracker.createInstance<VariableDeclarationContext>(_ctx, getState());
+  enterRule(_localctx, 6, anceParser::RuleVariableDeclaration);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -304,7 +304,7 @@ anceParser::Variable_declarationContext* anceParser::variable_declaration() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(103);
-    access_modifier();
+    accessModifier();
     setState(104);
     type(0);
     setState(105);
@@ -317,7 +317,7 @@ anceParser::Variable_declarationContext* anceParser::variable_declaration() {
       setState(106);
       match(anceParser::ASSIGNMENT);
       setState(107);
-      constant_expression();
+      literalExpression();
     }
     setState(110);
     match(anceParser::T__0);
@@ -383,8 +383,8 @@ anceParser::FunctionContext::FunctionContext(ParserRuleContext *parent, size_t i
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::Access_modifierContext* anceParser::FunctionContext::access_modifier() {
-  return getRuleContext<anceParser::Access_modifierContext>(0);
+anceParser::AccessModifierContext* anceParser::FunctionContext::accessModifier() {
+  return getRuleContext<anceParser::AccessModifierContext>(0);
 }
 
 anceParser::TypeContext* anceParser::FunctionContext::type() {
@@ -431,7 +431,7 @@ anceParser::FunctionContext* anceParser::function() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(114);
-    access_modifier();
+    accessModifier();
     setState(115);
     type(0);
     setState(116);
@@ -608,36 +608,36 @@ anceParser::ParameterContext* anceParser::parameter() {
   return _localctx;
 }
 
-//----------------- Access_modifierContext ------------------------------------------------------------------
+//----------------- AccessModifierContext ------------------------------------------------------------------
 
-anceParser::Access_modifierContext::Access_modifierContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::AccessModifierContext::AccessModifierContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Access_modifierContext::PUBLIC() {
+tree::TerminalNode* anceParser::AccessModifierContext::PUBLIC() {
   return getToken(anceParser::PUBLIC, 0);
 }
 
-tree::TerminalNode* anceParser::Access_modifierContext::PRIVATE() {
+tree::TerminalNode* anceParser::AccessModifierContext::PRIVATE() {
   return getToken(anceParser::PRIVATE, 0);
 }
 
 
-size_t anceParser::Access_modifierContext::getRuleIndex() const {
-  return anceParser::RuleAccess_modifier;
+size_t anceParser::AccessModifierContext::getRuleIndex() const {
+  return anceParser::RuleAccessModifier;
 }
 
 
-antlrcpp::Any anceParser::Access_modifierContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::AccessModifierContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitAccess_modifier(this);
+    return parserVisitor->visitAccessModifier(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Access_modifierContext* anceParser::access_modifier() {
-  Access_modifierContext *_localctx = _tracker.createInstance<Access_modifierContext>(_ctx, getState());
-  enterRule(_localctx, 16, anceParser::RuleAccess_modifier);
+anceParser::AccessModifierContext* anceParser::accessModifier() {
+  AccessModifierContext *_localctx = _tracker.createInstance<AccessModifierContext>(_ctx, getState());
+  enterRule(_localctx, 16, anceParser::RuleAccessModifier);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -673,28 +673,28 @@ anceParser::StatementContext::StatementContext(ParserRuleContext *parent, size_t
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::Expression_statementContext* anceParser::StatementContext::expression_statement() {
-  return getRuleContext<anceParser::Expression_statementContext>(0);
+anceParser::ExpressionStatementContext* anceParser::StatementContext::expressionStatement() {
+  return getRuleContext<anceParser::ExpressionStatementContext>(0);
 }
 
-anceParser::Local_variable_definitionContext* anceParser::StatementContext::local_variable_definition() {
-  return getRuleContext<anceParser::Local_variable_definitionContext>(0);
+anceParser::LocalVariableDefinitionContext* anceParser::StatementContext::localVariableDefinition() {
+  return getRuleContext<anceParser::LocalVariableDefinitionContext>(0);
 }
 
-anceParser::Variable_assignmentContext* anceParser::StatementContext::variable_assignment() {
-  return getRuleContext<anceParser::Variable_assignmentContext>(0);
+anceParser::VariableAssignmentContext* anceParser::StatementContext::variableAssignment() {
+  return getRuleContext<anceParser::VariableAssignmentContext>(0);
 }
 
-anceParser::Print_statementContext* anceParser::StatementContext::print_statement() {
-  return getRuleContext<anceParser::Print_statementContext>(0);
+anceParser::PrintStatementContext* anceParser::StatementContext::printStatement() {
+  return getRuleContext<anceParser::PrintStatementContext>(0);
 }
 
-anceParser::Delete_statementContext* anceParser::StatementContext::delete_statement() {
-  return getRuleContext<anceParser::Delete_statementContext>(0);
+anceParser::DeleteStatementContext* anceParser::StatementContext::deleteStatement() {
+  return getRuleContext<anceParser::DeleteStatementContext>(0);
 }
 
-anceParser::Return_statementContext* anceParser::StatementContext::return_statement() {
-  return getRuleContext<anceParser::Return_statementContext>(0);
+anceParser::ReturnStatementContext* anceParser::StatementContext::returnStatement() {
+  return getRuleContext<anceParser::ReturnStatementContext>(0);
 }
 
 
@@ -724,42 +724,42 @@ anceParser::StatementContext* anceParser::statement() {
     case 1: {
       enterOuterAlt(_localctx, 1);
       setState(143);
-      expression_statement();
+      expressionStatement();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
       setState(144);
-      local_variable_definition();
+      localVariableDefinition();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
       setState(145);
-      variable_assignment();
+      variableAssignment();
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
       setState(146);
-      print_statement();
+      printStatement();
       break;
     }
 
     case 5: {
       enterOuterAlt(_localctx, 5);
       setState(147);
-      delete_statement();
+      deleteStatement();
       break;
     }
 
     case 6: {
       enterOuterAlt(_localctx, 6);
       setState(148);
-      return_statement();
+      returnStatement();
       break;
     }
 
@@ -775,32 +775,32 @@ anceParser::StatementContext* anceParser::statement() {
   return _localctx;
 }
 
-//----------------- Expression_statementContext ------------------------------------------------------------------
+//----------------- ExpressionStatementContext ------------------------------------------------------------------
 
-anceParser::Expression_statementContext::Expression_statementContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::ExpressionStatementContext::ExpressionStatementContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::Independent_expressionContext* anceParser::Expression_statementContext::independent_expression() {
-  return getRuleContext<anceParser::Independent_expressionContext>(0);
+anceParser::IndependentExpressionContext* anceParser::ExpressionStatementContext::independentExpression() {
+  return getRuleContext<anceParser::IndependentExpressionContext>(0);
 }
 
 
-size_t anceParser::Expression_statementContext::getRuleIndex() const {
-  return anceParser::RuleExpression_statement;
+size_t anceParser::ExpressionStatementContext::getRuleIndex() const {
+  return anceParser::RuleExpressionStatement;
 }
 
 
-antlrcpp::Any anceParser::Expression_statementContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::ExpressionStatementContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitExpression_statement(this);
+    return parserVisitor->visitExpressionStatement(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Expression_statementContext* anceParser::expression_statement() {
-  Expression_statementContext *_localctx = _tracker.createInstance<Expression_statementContext>(_ctx, getState());
-  enterRule(_localctx, 20, anceParser::RuleExpression_statement);
+anceParser::ExpressionStatementContext* anceParser::expressionStatement() {
+  ExpressionStatementContext *_localctx = _tracker.createInstance<ExpressionStatementContext>(_ctx, getState());
+  enterRule(_localctx, 20, anceParser::RuleExpressionStatement);
 
   auto onExit = finally([=] {
     exitRule();
@@ -808,7 +808,7 @@ anceParser::Expression_statementContext* anceParser::expression_statement() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(151);
-    independent_expression();
+    independentExpression();
     setState(152);
     match(anceParser::T__0);
    
@@ -822,44 +822,44 @@ anceParser::Expression_statementContext* anceParser::expression_statement() {
   return _localctx;
 }
 
-//----------------- Local_variable_definitionContext ------------------------------------------------------------------
+//----------------- LocalVariableDefinitionContext ------------------------------------------------------------------
 
-anceParser::Local_variable_definitionContext::Local_variable_definitionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::LocalVariableDefinitionContext::LocalVariableDefinitionContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::TypeContext* anceParser::Local_variable_definitionContext::type() {
+anceParser::TypeContext* anceParser::LocalVariableDefinitionContext::type() {
   return getRuleContext<anceParser::TypeContext>(0);
 }
 
-tree::TerminalNode* anceParser::Local_variable_definitionContext::IDENTIFIER() {
+tree::TerminalNode* anceParser::LocalVariableDefinitionContext::IDENTIFIER() {
   return getToken(anceParser::IDENTIFIER, 0);
 }
 
-tree::TerminalNode* anceParser::Local_variable_definitionContext::ASSIGNMENT() {
+tree::TerminalNode* anceParser::LocalVariableDefinitionContext::ASSIGNMENT() {
   return getToken(anceParser::ASSIGNMENT, 0);
 }
 
-anceParser::ExpressionContext* anceParser::Local_variable_definitionContext::expression() {
+anceParser::ExpressionContext* anceParser::LocalVariableDefinitionContext::expression() {
   return getRuleContext<anceParser::ExpressionContext>(0);
 }
 
 
-size_t anceParser::Local_variable_definitionContext::getRuleIndex() const {
-  return anceParser::RuleLocal_variable_definition;
+size_t anceParser::LocalVariableDefinitionContext::getRuleIndex() const {
+  return anceParser::RuleLocalVariableDefinition;
 }
 
 
-antlrcpp::Any anceParser::Local_variable_definitionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::LocalVariableDefinitionContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitLocal_variable_definition(this);
+    return parserVisitor->visitLocalVariableDefinition(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Local_variable_definitionContext* anceParser::local_variable_definition() {
-  Local_variable_definitionContext *_localctx = _tracker.createInstance<Local_variable_definitionContext>(_ctx, getState());
-  enterRule(_localctx, 22, anceParser::RuleLocal_variable_definition);
+anceParser::LocalVariableDefinitionContext* anceParser::localVariableDefinition() {
+  LocalVariableDefinitionContext *_localctx = _tracker.createInstance<LocalVariableDefinitionContext>(_ctx, getState());
+  enterRule(_localctx, 22, anceParser::RuleLocalVariableDefinition);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -894,40 +894,40 @@ anceParser::Local_variable_definitionContext* anceParser::local_variable_definit
   return _localctx;
 }
 
-//----------------- Variable_assignmentContext ------------------------------------------------------------------
+//----------------- VariableAssignmentContext ------------------------------------------------------------------
 
-anceParser::Variable_assignmentContext::Variable_assignmentContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::VariableAssignmentContext::VariableAssignmentContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Variable_assignmentContext::IDENTIFIER() {
+tree::TerminalNode* anceParser::VariableAssignmentContext::IDENTIFIER() {
   return getToken(anceParser::IDENTIFIER, 0);
 }
 
-tree::TerminalNode* anceParser::Variable_assignmentContext::ASSIGNMENT() {
+tree::TerminalNode* anceParser::VariableAssignmentContext::ASSIGNMENT() {
   return getToken(anceParser::ASSIGNMENT, 0);
 }
 
-anceParser::ExpressionContext* anceParser::Variable_assignmentContext::expression() {
+anceParser::ExpressionContext* anceParser::VariableAssignmentContext::expression() {
   return getRuleContext<anceParser::ExpressionContext>(0);
 }
 
 
-size_t anceParser::Variable_assignmentContext::getRuleIndex() const {
-  return anceParser::RuleVariable_assignment;
+size_t anceParser::VariableAssignmentContext::getRuleIndex() const {
+  return anceParser::RuleVariableAssignment;
 }
 
 
-antlrcpp::Any anceParser::Variable_assignmentContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::VariableAssignmentContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitVariable_assignment(this);
+    return parserVisitor->visitVariableAssignment(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Variable_assignmentContext* anceParser::variable_assignment() {
-  Variable_assignmentContext *_localctx = _tracker.createInstance<Variable_assignmentContext>(_ctx, getState());
-  enterRule(_localctx, 24, anceParser::RuleVariable_assignment);
+anceParser::VariableAssignmentContext* anceParser::variableAssignment() {
+  VariableAssignmentContext *_localctx = _tracker.createInstance<VariableAssignmentContext>(_ctx, getState());
+  enterRule(_localctx, 24, anceParser::RuleVariableAssignment);
 
   auto onExit = finally([=] {
     exitRule();
@@ -953,36 +953,36 @@ anceParser::Variable_assignmentContext* anceParser::variable_assignment() {
   return _localctx;
 }
 
-//----------------- Print_statementContext ------------------------------------------------------------------
+//----------------- PrintStatementContext ------------------------------------------------------------------
 
-anceParser::Print_statementContext::Print_statementContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::PrintStatementContext::PrintStatementContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Print_statementContext::PRINT() {
+tree::TerminalNode* anceParser::PrintStatementContext::PRINT() {
   return getToken(anceParser::PRINT, 0);
 }
 
-anceParser::ExpressionContext* anceParser::Print_statementContext::expression() {
+anceParser::ExpressionContext* anceParser::PrintStatementContext::expression() {
   return getRuleContext<anceParser::ExpressionContext>(0);
 }
 
 
-size_t anceParser::Print_statementContext::getRuleIndex() const {
-  return anceParser::RulePrint_statement;
+size_t anceParser::PrintStatementContext::getRuleIndex() const {
+  return anceParser::RulePrintStatement;
 }
 
 
-antlrcpp::Any anceParser::Print_statementContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::PrintStatementContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitPrint_statement(this);
+    return parserVisitor->visitPrintStatement(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Print_statementContext* anceParser::print_statement() {
-  Print_statementContext *_localctx = _tracker.createInstance<Print_statementContext>(_ctx, getState());
-  enterRule(_localctx, 26, anceParser::RulePrint_statement);
+anceParser::PrintStatementContext* anceParser::printStatement() {
+  PrintStatementContext *_localctx = _tracker.createInstance<PrintStatementContext>(_ctx, getState());
+  enterRule(_localctx, 26, anceParser::RulePrintStatement);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1006,36 +1006,36 @@ anceParser::Print_statementContext* anceParser::print_statement() {
   return _localctx;
 }
 
-//----------------- Delete_statementContext ------------------------------------------------------------------
+//----------------- DeleteStatementContext ------------------------------------------------------------------
 
-anceParser::Delete_statementContext::Delete_statementContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::DeleteStatementContext::DeleteStatementContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Delete_statementContext::DELETE() {
+tree::TerminalNode* anceParser::DeleteStatementContext::DELETE() {
   return getToken(anceParser::DELETE, 0);
 }
 
-anceParser::ExpressionContext* anceParser::Delete_statementContext::expression() {
+anceParser::ExpressionContext* anceParser::DeleteStatementContext::expression() {
   return getRuleContext<anceParser::ExpressionContext>(0);
 }
 
 
-size_t anceParser::Delete_statementContext::getRuleIndex() const {
-  return anceParser::RuleDelete_statement;
+size_t anceParser::DeleteStatementContext::getRuleIndex() const {
+  return anceParser::RuleDeleteStatement;
 }
 
 
-antlrcpp::Any anceParser::Delete_statementContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::DeleteStatementContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitDelete_statement(this);
+    return parserVisitor->visitDeleteStatement(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Delete_statementContext* anceParser::delete_statement() {
-  Delete_statementContext *_localctx = _tracker.createInstance<Delete_statementContext>(_ctx, getState());
-  enterRule(_localctx, 28, anceParser::RuleDelete_statement);
+anceParser::DeleteStatementContext* anceParser::deleteStatement() {
+  DeleteStatementContext *_localctx = _tracker.createInstance<DeleteStatementContext>(_ctx, getState());
+  enterRule(_localctx, 28, anceParser::RuleDeleteStatement);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1059,36 +1059,36 @@ anceParser::Delete_statementContext* anceParser::delete_statement() {
   return _localctx;
 }
 
-//----------------- Return_statementContext ------------------------------------------------------------------
+//----------------- ReturnStatementContext ------------------------------------------------------------------
 
-anceParser::Return_statementContext::Return_statementContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::ReturnStatementContext::ReturnStatementContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Return_statementContext::RETURN() {
+tree::TerminalNode* anceParser::ReturnStatementContext::RETURN() {
   return getToken(anceParser::RETURN, 0);
 }
 
-anceParser::ExpressionContext* anceParser::Return_statementContext::expression() {
+anceParser::ExpressionContext* anceParser::ReturnStatementContext::expression() {
   return getRuleContext<anceParser::ExpressionContext>(0);
 }
 
 
-size_t anceParser::Return_statementContext::getRuleIndex() const {
-  return anceParser::RuleReturn_statement;
+size_t anceParser::ReturnStatementContext::getRuleIndex() const {
+  return anceParser::RuleReturnStatement;
 }
 
 
-antlrcpp::Any anceParser::Return_statementContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::ReturnStatementContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitReturn_statement(this);
+    return parserVisitor->visitReturnStatement(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Return_statementContext* anceParser::return_statement() {
-  Return_statementContext *_localctx = _tracker.createInstance<Return_statementContext>(_ctx, getState());
-  enterRule(_localctx, 30, anceParser::RuleReturn_statement);
+anceParser::ReturnStatementContext* anceParser::returnStatement() {
+  ReturnStatementContext *_localctx = _tracker.createInstance<ReturnStatementContext>(_ctx, getState());
+  enterRule(_localctx, 30, anceParser::RuleReturnStatement);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -1141,28 +1141,28 @@ anceParser::ExpressionContext::ExpressionContext(ParserRuleContext *parent, size
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::Variable_expressionContext* anceParser::ExpressionContext::variable_expression() {
-  return getRuleContext<anceParser::Variable_expressionContext>(0);
+anceParser::VariableExpressionContext* anceParser::ExpressionContext::variableExpression() {
+  return getRuleContext<anceParser::VariableExpressionContext>(0);
 }
 
-anceParser::Allocation_expressionContext* anceParser::ExpressionContext::allocation_expression() {
-  return getRuleContext<anceParser::Allocation_expressionContext>(0);
+anceParser::AllocationExpressionContext* anceParser::ExpressionContext::allocationExpression() {
+  return getRuleContext<anceParser::AllocationExpressionContext>(0);
 }
 
-anceParser::Sizeof_type_expressionContext* anceParser::ExpressionContext::sizeof_type_expression() {
-  return getRuleContext<anceParser::Sizeof_type_expressionContext>(0);
+anceParser::SizeofTypeExpressionContext* anceParser::ExpressionContext::sizeofTypeExpression() {
+  return getRuleContext<anceParser::SizeofTypeExpressionContext>(0);
 }
 
-anceParser::Sizeof_exp_expressionContext* anceParser::ExpressionContext::sizeof_exp_expression() {
-  return getRuleContext<anceParser::Sizeof_exp_expressionContext>(0);
+anceParser::SizeofExpExpressionContext* anceParser::ExpressionContext::sizeofExpExpression() {
+  return getRuleContext<anceParser::SizeofExpExpressionContext>(0);
 }
 
-anceParser::Constant_expressionContext* anceParser::ExpressionContext::constant_expression() {
-  return getRuleContext<anceParser::Constant_expressionContext>(0);
+anceParser::LiteralExpressionContext* anceParser::ExpressionContext::literalExpression() {
+  return getRuleContext<anceParser::LiteralExpressionContext>(0);
 }
 
-anceParser::Independent_expressionContext* anceParser::ExpressionContext::independent_expression() {
-  return getRuleContext<anceParser::Independent_expressionContext>(0);
+anceParser::IndependentExpressionContext* anceParser::ExpressionContext::independentExpression() {
+  return getRuleContext<anceParser::IndependentExpressionContext>(0);
 }
 
 
@@ -1192,42 +1192,42 @@ anceParser::ExpressionContext* anceParser::expression() {
     case 1: {
       enterOuterAlt(_localctx, 1);
       setState(181);
-      variable_expression();
+      variableExpression();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
       setState(182);
-      allocation_expression();
+      allocationExpression();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
       setState(183);
-      sizeof_type_expression();
+      sizeofTypeExpression();
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
       setState(184);
-      sizeof_exp_expression();
+      sizeofExpExpression();
       break;
     }
 
     case 5: {
       enterOuterAlt(_localctx, 5);
       setState(185);
-      constant_expression();
+      literalExpression();
       break;
     }
 
     case 6: {
       enterOuterAlt(_localctx, 6);
       setState(186);
-      independent_expression();
+      independentExpression();
       break;
     }
 
@@ -1243,32 +1243,32 @@ anceParser::ExpressionContext* anceParser::expression() {
   return _localctx;
 }
 
-//----------------- Independent_expressionContext ------------------------------------------------------------------
+//----------------- IndependentExpressionContext ------------------------------------------------------------------
 
-anceParser::Independent_expressionContext::Independent_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::IndependentExpressionContext::IndependentExpressionContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::Function_callContext* anceParser::Independent_expressionContext::function_call() {
-  return getRuleContext<anceParser::Function_callContext>(0);
+anceParser::FunctionCallContext* anceParser::IndependentExpressionContext::functionCall() {
+  return getRuleContext<anceParser::FunctionCallContext>(0);
 }
 
 
-size_t anceParser::Independent_expressionContext::getRuleIndex() const {
-  return anceParser::RuleIndependent_expression;
+size_t anceParser::IndependentExpressionContext::getRuleIndex() const {
+  return anceParser::RuleIndependentExpression;
 }
 
 
-antlrcpp::Any anceParser::Independent_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::IndependentExpressionContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitIndependent_expression(this);
+    return parserVisitor->visitIndependentExpression(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Independent_expressionContext* anceParser::independent_expression() {
-  Independent_expressionContext *_localctx = _tracker.createInstance<Independent_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 34, anceParser::RuleIndependent_expression);
+anceParser::IndependentExpressionContext* anceParser::independentExpression() {
+  IndependentExpressionContext *_localctx = _tracker.createInstance<IndependentExpressionContext>(_ctx, getState());
+  enterRule(_localctx, 34, anceParser::RuleIndependentExpression);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1276,7 +1276,7 @@ anceParser::Independent_expressionContext* anceParser::independent_expression() 
   try {
     enterOuterAlt(_localctx, 1);
     setState(189);
-    function_call();
+    functionCall();
    
   }
   catch (RecognitionException &e) {
@@ -1288,36 +1288,36 @@ anceParser::Independent_expressionContext* anceParser::independent_expression() 
   return _localctx;
 }
 
-//----------------- Function_callContext ------------------------------------------------------------------
+//----------------- FunctionCallContext ------------------------------------------------------------------
 
-anceParser::Function_callContext::Function_callContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::FunctionCallContext::FunctionCallContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Function_callContext::IDENTIFIER() {
+tree::TerminalNode* anceParser::FunctionCallContext::IDENTIFIER() {
   return getToken(anceParser::IDENTIFIER, 0);
 }
 
-anceParser::ArgumentsContext* anceParser::Function_callContext::arguments() {
+anceParser::ArgumentsContext* anceParser::FunctionCallContext::arguments() {
   return getRuleContext<anceParser::ArgumentsContext>(0);
 }
 
 
-size_t anceParser::Function_callContext::getRuleIndex() const {
-  return anceParser::RuleFunction_call;
+size_t anceParser::FunctionCallContext::getRuleIndex() const {
+  return anceParser::RuleFunctionCall;
 }
 
 
-antlrcpp::Any anceParser::Function_callContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::FunctionCallContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitFunction_call(this);
+    return parserVisitor->visitFunctionCall(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Function_callContext* anceParser::function_call() {
-  Function_callContext *_localctx = _tracker.createInstance<Function_callContext>(_ctx, getState());
-  enterRule(_localctx, 36, anceParser::RuleFunction_call);
+anceParser::FunctionCallContext* anceParser::functionCall() {
+  FunctionCallContext *_localctx = _tracker.createInstance<FunctionCallContext>(_ctx, getState());
+  enterRule(_localctx, 36, anceParser::RuleFunctionCall);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1427,32 +1427,32 @@ anceParser::ArgumentsContext* anceParser::arguments() {
   return _localctx;
 }
 
-//----------------- Variable_expressionContext ------------------------------------------------------------------
+//----------------- VariableExpressionContext ------------------------------------------------------------------
 
-anceParser::Variable_expressionContext::Variable_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::VariableExpressionContext::VariableExpressionContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Variable_expressionContext::IDENTIFIER() {
+tree::TerminalNode* anceParser::VariableExpressionContext::IDENTIFIER() {
   return getToken(anceParser::IDENTIFIER, 0);
 }
 
 
-size_t anceParser::Variable_expressionContext::getRuleIndex() const {
-  return anceParser::RuleVariable_expression;
+size_t anceParser::VariableExpressionContext::getRuleIndex() const {
+  return anceParser::RuleVariableExpression;
 }
 
 
-antlrcpp::Any anceParser::Variable_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::VariableExpressionContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitVariable_expression(this);
+    return parserVisitor->visitVariableExpression(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Variable_expressionContext* anceParser::variable_expression() {
-  Variable_expressionContext *_localctx = _tracker.createInstance<Variable_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 40, anceParser::RuleVariable_expression);
+anceParser::VariableExpressionContext* anceParser::variableExpression() {
+  VariableExpressionContext *_localctx = _tracker.createInstance<VariableExpressionContext>(_ctx, getState());
+  enterRule(_localctx, 40, anceParser::RuleVariableExpression);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1472,36 +1472,36 @@ anceParser::Variable_expressionContext* anceParser::variable_expression() {
   return _localctx;
 }
 
-//----------------- Allocation_expressionContext ------------------------------------------------------------------
+//----------------- AllocationExpressionContext ------------------------------------------------------------------
 
-anceParser::Allocation_expressionContext::Allocation_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::AllocationExpressionContext::AllocationExpressionContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::AllocatorContext* anceParser::Allocation_expressionContext::allocator() {
+anceParser::AllocatorContext* anceParser::AllocationExpressionContext::allocator() {
   return getRuleContext<anceParser::AllocatorContext>(0);
 }
 
-anceParser::TypeContext* anceParser::Allocation_expressionContext::type() {
+anceParser::TypeContext* anceParser::AllocationExpressionContext::type() {
   return getRuleContext<anceParser::TypeContext>(0);
 }
 
 
-size_t anceParser::Allocation_expressionContext::getRuleIndex() const {
-  return anceParser::RuleAllocation_expression;
+size_t anceParser::AllocationExpressionContext::getRuleIndex() const {
+  return anceParser::RuleAllocationExpression;
 }
 
 
-antlrcpp::Any anceParser::Allocation_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::AllocationExpressionContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitAllocation_expression(this);
+    return parserVisitor->visitAllocationExpression(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Allocation_expressionContext* anceParser::allocation_expression() {
-  Allocation_expressionContext *_localctx = _tracker.createInstance<Allocation_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 42, anceParser::RuleAllocation_expression);
+anceParser::AllocationExpressionContext* anceParser::allocationExpression() {
+  AllocationExpressionContext *_localctx = _tracker.createInstance<AllocationExpressionContext>(_ctx, getState());
+  enterRule(_localctx, 42, anceParser::RuleAllocationExpression);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1584,36 +1584,36 @@ anceParser::AllocatorContext* anceParser::allocator() {
   return _localctx;
 }
 
-//----------------- Sizeof_type_expressionContext ------------------------------------------------------------------
+//----------------- SizeofTypeExpressionContext ------------------------------------------------------------------
 
-anceParser::Sizeof_type_expressionContext::Sizeof_type_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::SizeofTypeExpressionContext::SizeofTypeExpressionContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Sizeof_type_expressionContext::SIZEOF() {
+tree::TerminalNode* anceParser::SizeofTypeExpressionContext::SIZEOF() {
   return getToken(anceParser::SIZEOF, 0);
 }
 
-anceParser::TypeContext* anceParser::Sizeof_type_expressionContext::type() {
+anceParser::TypeContext* anceParser::SizeofTypeExpressionContext::type() {
   return getRuleContext<anceParser::TypeContext>(0);
 }
 
 
-size_t anceParser::Sizeof_type_expressionContext::getRuleIndex() const {
-  return anceParser::RuleSizeof_type_expression;
+size_t anceParser::SizeofTypeExpressionContext::getRuleIndex() const {
+  return anceParser::RuleSizeofTypeExpression;
 }
 
 
-antlrcpp::Any anceParser::Sizeof_type_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::SizeofTypeExpressionContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitSizeof_type_expression(this);
+    return parserVisitor->visitSizeofTypeExpression(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Sizeof_type_expressionContext* anceParser::sizeof_type_expression() {
-  Sizeof_type_expressionContext *_localctx = _tracker.createInstance<Sizeof_type_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 46, anceParser::RuleSizeof_type_expression);
+anceParser::SizeofTypeExpressionContext* anceParser::sizeofTypeExpression() {
+  SizeofTypeExpressionContext *_localctx = _tracker.createInstance<SizeofTypeExpressionContext>(_ctx, getState());
+  enterRule(_localctx, 46, anceParser::RuleSizeofTypeExpression);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1635,36 +1635,36 @@ anceParser::Sizeof_type_expressionContext* anceParser::sizeof_type_expression() 
   return _localctx;
 }
 
-//----------------- Sizeof_exp_expressionContext ------------------------------------------------------------------
+//----------------- SizeofExpExpressionContext ------------------------------------------------------------------
 
-anceParser::Sizeof_exp_expressionContext::Sizeof_exp_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::SizeofExpExpressionContext::SizeofExpExpressionContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Sizeof_exp_expressionContext::SIZEOF() {
+tree::TerminalNode* anceParser::SizeofExpExpressionContext::SIZEOF() {
   return getToken(anceParser::SIZEOF, 0);
 }
 
-anceParser::ExpressionContext* anceParser::Sizeof_exp_expressionContext::expression() {
+anceParser::ExpressionContext* anceParser::SizeofExpExpressionContext::expression() {
   return getRuleContext<anceParser::ExpressionContext>(0);
 }
 
 
-size_t anceParser::Sizeof_exp_expressionContext::getRuleIndex() const {
-  return anceParser::RuleSizeof_exp_expression;
+size_t anceParser::SizeofExpExpressionContext::getRuleIndex() const {
+  return anceParser::RuleSizeofExpExpression;
 }
 
 
-antlrcpp::Any anceParser::Sizeof_exp_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::SizeofExpExpressionContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitSizeof_exp_expression(this);
+    return parserVisitor->visitSizeofExpExpression(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Sizeof_exp_expressionContext* anceParser::sizeof_exp_expression() {
-  Sizeof_exp_expressionContext *_localctx = _tracker.createInstance<Sizeof_exp_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 48, anceParser::RuleSizeof_exp_expression);
+anceParser::SizeofExpExpressionContext* anceParser::sizeofExpExpression() {
+  SizeofExpExpressionContext *_localctx = _tracker.createInstance<SizeofExpExpressionContext>(_ctx, getState());
+  enterRule(_localctx, 48, anceParser::RuleSizeofExpExpression);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1690,48 +1690,48 @@ anceParser::Sizeof_exp_expressionContext* anceParser::sizeof_exp_expression() {
   return _localctx;
 }
 
-//----------------- Constant_expressionContext ------------------------------------------------------------------
+//----------------- LiteralExpressionContext ------------------------------------------------------------------
 
-anceParser::Constant_expressionContext::Constant_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::LiteralExpressionContext::LiteralExpressionContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::String_expressionContext* anceParser::Constant_expressionContext::string_expression() {
-  return getRuleContext<anceParser::String_expressionContext>(0);
+anceParser::StringLiteralContext* anceParser::LiteralExpressionContext::stringLiteral() {
+  return getRuleContext<anceParser::StringLiteralContext>(0);
 }
 
-anceParser::Byte_expressionContext* anceParser::Constant_expressionContext::byte_expression() {
-  return getRuleContext<anceParser::Byte_expressionContext>(0);
+anceParser::ByteLiteralContext* anceParser::LiteralExpressionContext::byteLiteral() {
+  return getRuleContext<anceParser::ByteLiteralContext>(0);
 }
 
-anceParser::Integer_expressionContext* anceParser::Constant_expressionContext::integer_expression() {
-  return getRuleContext<anceParser::Integer_expressionContext>(0);
+anceParser::IntegerLiteralContext* anceParser::LiteralExpressionContext::integerLiteral() {
+  return getRuleContext<anceParser::IntegerLiteralContext>(0);
 }
 
-anceParser::Floating_point_expressionContext* anceParser::Constant_expressionContext::floating_point_expression() {
-  return getRuleContext<anceParser::Floating_point_expressionContext>(0);
+anceParser::FloatingPointLiteralContext* anceParser::LiteralExpressionContext::floatingPointLiteral() {
+  return getRuleContext<anceParser::FloatingPointLiteralContext>(0);
 }
 
-anceParser::Boolean_expressionContext* anceParser::Constant_expressionContext::boolean_expression() {
-  return getRuleContext<anceParser::Boolean_expressionContext>(0);
-}
-
-
-size_t anceParser::Constant_expressionContext::getRuleIndex() const {
-  return anceParser::RuleConstant_expression;
+anceParser::BooleanLiteralContext* anceParser::LiteralExpressionContext::booleanLiteral() {
+  return getRuleContext<anceParser::BooleanLiteralContext>(0);
 }
 
 
-antlrcpp::Any anceParser::Constant_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+size_t anceParser::LiteralExpressionContext::getRuleIndex() const {
+  return anceParser::RuleLiteralExpression;
+}
+
+
+antlrcpp::Any anceParser::LiteralExpressionContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitConstant_expression(this);
+    return parserVisitor->visitLiteralExpression(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Constant_expressionContext* anceParser::constant_expression() {
-  Constant_expressionContext *_localctx = _tracker.createInstance<Constant_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 50, anceParser::RuleConstant_expression);
+anceParser::LiteralExpressionContext* anceParser::literalExpression() {
+  LiteralExpressionContext *_localctx = _tracker.createInstance<LiteralExpressionContext>(_ctx, getState());
+  enterRule(_localctx, 50, anceParser::RuleLiteralExpression);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1743,14 +1743,14 @@ anceParser::Constant_expressionContext* anceParser::constant_expression() {
       case anceParser::STRING: {
         enterOuterAlt(_localctx, 1);
         setState(222);
-        string_expression();
+        stringLiteral();
         break;
       }
 
       case anceParser::BYTE: {
         enterOuterAlt(_localctx, 2);
         setState(223);
-        byte_expression();
+        byteLiteral();
         break;
       }
 
@@ -1761,7 +1761,7 @@ anceParser::Constant_expressionContext* anceParser::constant_expression() {
       case anceParser::INTEGER: {
         enterOuterAlt(_localctx, 3);
         setState(224);
-        integer_expression();
+        integerLiteral();
         break;
       }
 
@@ -1771,7 +1771,7 @@ anceParser::Constant_expressionContext* anceParser::constant_expression() {
       case anceParser::QUAD: {
         enterOuterAlt(_localctx, 4);
         setState(225);
-        floating_point_expression();
+        floatingPointLiteral();
         break;
       }
 
@@ -1779,7 +1779,7 @@ anceParser::Constant_expressionContext* anceParser::constant_expression() {
       case anceParser::FALSE: {
         enterOuterAlt(_localctx, 5);
         setState(226);
-        boolean_expression();
+        booleanLiteral();
         break;
       }
 
@@ -1797,32 +1797,32 @@ anceParser::Constant_expressionContext* anceParser::constant_expression() {
   return _localctx;
 }
 
-//----------------- String_expressionContext ------------------------------------------------------------------
+//----------------- StringLiteralContext ------------------------------------------------------------------
 
-anceParser::String_expressionContext::String_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::StringLiteralContext::StringLiteralContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::String_expressionContext::STRING() {
+tree::TerminalNode* anceParser::StringLiteralContext::STRING() {
   return getToken(anceParser::STRING, 0);
 }
 
 
-size_t anceParser::String_expressionContext::getRuleIndex() const {
-  return anceParser::RuleString_expression;
+size_t anceParser::StringLiteralContext::getRuleIndex() const {
+  return anceParser::RuleStringLiteral;
 }
 
 
-antlrcpp::Any anceParser::String_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::StringLiteralContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitString_expression(this);
+    return parserVisitor->visitStringLiteral(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::String_expressionContext* anceParser::string_expression() {
-  String_expressionContext *_localctx = _tracker.createInstance<String_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 52, anceParser::RuleString_expression);
+anceParser::StringLiteralContext* anceParser::stringLiteral() {
+  StringLiteralContext *_localctx = _tracker.createInstance<StringLiteralContext>(_ctx, getState());
+  enterRule(_localctx, 52, anceParser::RuleStringLiteral);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1842,32 +1842,32 @@ anceParser::String_expressionContext* anceParser::string_expression() {
   return _localctx;
 }
 
-//----------------- Byte_expressionContext ------------------------------------------------------------------
+//----------------- ByteLiteralContext ------------------------------------------------------------------
 
-anceParser::Byte_expressionContext::Byte_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::ByteLiteralContext::ByteLiteralContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Byte_expressionContext::BYTE() {
+tree::TerminalNode* anceParser::ByteLiteralContext::BYTE() {
   return getToken(anceParser::BYTE, 0);
 }
 
 
-size_t anceParser::Byte_expressionContext::getRuleIndex() const {
-  return anceParser::RuleByte_expression;
+size_t anceParser::ByteLiteralContext::getRuleIndex() const {
+  return anceParser::RuleByteLiteral;
 }
 
 
-antlrcpp::Any anceParser::Byte_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::ByteLiteralContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitByte_expression(this);
+    return parserVisitor->visitByteLiteral(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Byte_expressionContext* anceParser::byte_expression() {
-  Byte_expressionContext *_localctx = _tracker.createInstance<Byte_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 54, anceParser::RuleByte_expression);
+anceParser::ByteLiteralContext* anceParser::byteLiteral() {
+  ByteLiteralContext *_localctx = _tracker.createInstance<ByteLiteralContext>(_ctx, getState());
+  enterRule(_localctx, 54, anceParser::RuleByteLiteral);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1887,40 +1887,40 @@ anceParser::Byte_expressionContext* anceParser::byte_expression() {
   return _localctx;
 }
 
-//----------------- Integer_expressionContext ------------------------------------------------------------------
+//----------------- IntegerLiteralContext ------------------------------------------------------------------
 
-anceParser::Integer_expressionContext::Integer_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::IntegerLiteralContext::IntegerLiteralContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::Unsigned_integerContext* anceParser::Integer_expressionContext::unsigned_integer() {
-  return getRuleContext<anceParser::Unsigned_integerContext>(0);
+anceParser::UnsignedIntegerContext* anceParser::IntegerLiteralContext::unsignedInteger() {
+  return getRuleContext<anceParser::UnsignedIntegerContext>(0);
 }
 
-anceParser::Signed_integerContext* anceParser::Integer_expressionContext::signed_integer() {
-  return getRuleContext<anceParser::Signed_integerContext>(0);
+anceParser::SignedIntegerContext* anceParser::IntegerLiteralContext::signedInteger() {
+  return getRuleContext<anceParser::SignedIntegerContext>(0);
 }
 
-anceParser::Special_integerContext* anceParser::Integer_expressionContext::special_integer() {
-  return getRuleContext<anceParser::Special_integerContext>(0);
-}
-
-
-size_t anceParser::Integer_expressionContext::getRuleIndex() const {
-  return anceParser::RuleInteger_expression;
+anceParser::SpecialIntegerContext* anceParser::IntegerLiteralContext::specialInteger() {
+  return getRuleContext<anceParser::SpecialIntegerContext>(0);
 }
 
 
-antlrcpp::Any anceParser::Integer_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+size_t anceParser::IntegerLiteralContext::getRuleIndex() const {
+  return anceParser::RuleIntegerLiteral;
+}
+
+
+antlrcpp::Any anceParser::IntegerLiteralContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitInteger_expression(this);
+    return parserVisitor->visitIntegerLiteral(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Integer_expressionContext* anceParser::integer_expression() {
-  Integer_expressionContext *_localctx = _tracker.createInstance<Integer_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 56, anceParser::RuleInteger_expression);
+anceParser::IntegerLiteralContext* anceParser::integerLiteral() {
+  IntegerLiteralContext *_localctx = _tracker.createInstance<IntegerLiteralContext>(_ctx, getState());
+  enterRule(_localctx, 56, anceParser::RuleIntegerLiteral);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1932,14 +1932,14 @@ anceParser::Integer_expressionContext* anceParser::integer_expression() {
       case anceParser::INTEGER: {
         enterOuterAlt(_localctx, 1);
         setState(233);
-        unsigned_integer();
+        unsignedInteger();
         break;
       }
 
       case anceParser::SIGNED_INTEGER: {
         enterOuterAlt(_localctx, 2);
         setState(234);
-        signed_integer();
+        signedInteger();
         break;
       }
 
@@ -1948,7 +1948,7 @@ anceParser::Integer_expressionContext* anceParser::integer_expression() {
       case anceParser::OCT_INTEGER: {
         enterOuterAlt(_localctx, 3);
         setState(235);
-        special_integer();
+        specialInteger();
         break;
       }
 
@@ -1966,36 +1966,36 @@ anceParser::Integer_expressionContext* anceParser::integer_expression() {
   return _localctx;
 }
 
-//----------------- Unsigned_integerContext ------------------------------------------------------------------
+//----------------- UnsignedIntegerContext ------------------------------------------------------------------
 
-anceParser::Unsigned_integerContext::Unsigned_integerContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::UnsignedIntegerContext::UnsignedIntegerContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-std::vector<tree::TerminalNode *> anceParser::Unsigned_integerContext::INTEGER() {
+std::vector<tree::TerminalNode *> anceParser::UnsignedIntegerContext::INTEGER() {
   return getTokens(anceParser::INTEGER);
 }
 
-tree::TerminalNode* anceParser::Unsigned_integerContext::INTEGER(size_t i) {
+tree::TerminalNode* anceParser::UnsignedIntegerContext::INTEGER(size_t i) {
   return getToken(anceParser::INTEGER, i);
 }
 
 
-size_t anceParser::Unsigned_integerContext::getRuleIndex() const {
-  return anceParser::RuleUnsigned_integer;
+size_t anceParser::UnsignedIntegerContext::getRuleIndex() const {
+  return anceParser::RuleUnsignedInteger;
 }
 
 
-antlrcpp::Any anceParser::Unsigned_integerContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::UnsignedIntegerContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitUnsigned_integer(this);
+    return parserVisitor->visitUnsignedInteger(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Unsigned_integerContext* anceParser::unsigned_integer() {
-  Unsigned_integerContext *_localctx = _tracker.createInstance<Unsigned_integerContext>(_ctx, getState());
-  enterRule(_localctx, 58, anceParser::RuleUnsigned_integer);
+anceParser::UnsignedIntegerContext* anceParser::unsignedInteger() {
+  UnsignedIntegerContext *_localctx = _tracker.createInstance<UnsignedIntegerContext>(_ctx, getState());
+  enterRule(_localctx, 58, anceParser::RuleUnsignedInteger);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -2026,36 +2026,36 @@ anceParser::Unsigned_integerContext* anceParser::unsigned_integer() {
   return _localctx;
 }
 
-//----------------- Signed_integerContext ------------------------------------------------------------------
+//----------------- SignedIntegerContext ------------------------------------------------------------------
 
-anceParser::Signed_integerContext::Signed_integerContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::SignedIntegerContext::SignedIntegerContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Signed_integerContext::SIGNED_INTEGER() {
+tree::TerminalNode* anceParser::SignedIntegerContext::SIGNED_INTEGER() {
   return getToken(anceParser::SIGNED_INTEGER, 0);
 }
 
-tree::TerminalNode* anceParser::Signed_integerContext::INTEGER() {
+tree::TerminalNode* anceParser::SignedIntegerContext::INTEGER() {
   return getToken(anceParser::INTEGER, 0);
 }
 
 
-size_t anceParser::Signed_integerContext::getRuleIndex() const {
-  return anceParser::RuleSigned_integer;
+size_t anceParser::SignedIntegerContext::getRuleIndex() const {
+  return anceParser::RuleSignedInteger;
 }
 
 
-antlrcpp::Any anceParser::Signed_integerContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::SignedIntegerContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitSigned_integer(this);
+    return parserVisitor->visitSignedInteger(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Signed_integerContext* anceParser::signed_integer() {
-  Signed_integerContext *_localctx = _tracker.createInstance<Signed_integerContext>(_ctx, getState());
-  enterRule(_localctx, 60, anceParser::RuleSigned_integer);
+anceParser::SignedIntegerContext* anceParser::signedInteger() {
+  SignedIntegerContext *_localctx = _tracker.createInstance<SignedIntegerContext>(_ctx, getState());
+  enterRule(_localctx, 60, anceParser::RuleSignedInteger);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -2086,44 +2086,44 @@ anceParser::Signed_integerContext* anceParser::signed_integer() {
   return _localctx;
 }
 
-//----------------- Special_integerContext ------------------------------------------------------------------
+//----------------- SpecialIntegerContext ------------------------------------------------------------------
 
-anceParser::Special_integerContext::Special_integerContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::SpecialIntegerContext::SpecialIntegerContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Special_integerContext::HEX_INTEGER() {
+tree::TerminalNode* anceParser::SpecialIntegerContext::HEX_INTEGER() {
   return getToken(anceParser::HEX_INTEGER, 0);
 }
 
-tree::TerminalNode* anceParser::Special_integerContext::INTEGER() {
+tree::TerminalNode* anceParser::SpecialIntegerContext::INTEGER() {
   return getToken(anceParser::INTEGER, 0);
 }
 
-tree::TerminalNode* anceParser::Special_integerContext::BIN_INTEGER() {
+tree::TerminalNode* anceParser::SpecialIntegerContext::BIN_INTEGER() {
   return getToken(anceParser::BIN_INTEGER, 0);
 }
 
-tree::TerminalNode* anceParser::Special_integerContext::OCT_INTEGER() {
+tree::TerminalNode* anceParser::SpecialIntegerContext::OCT_INTEGER() {
   return getToken(anceParser::OCT_INTEGER, 0);
 }
 
 
-size_t anceParser::Special_integerContext::getRuleIndex() const {
-  return anceParser::RuleSpecial_integer;
+size_t anceParser::SpecialIntegerContext::getRuleIndex() const {
+  return anceParser::RuleSpecialInteger;
 }
 
 
-antlrcpp::Any anceParser::Special_integerContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::SpecialIntegerContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitSpecial_integer(this);
+    return parserVisitor->visitSpecialInteger(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Special_integerContext* anceParser::special_integer() {
-  Special_integerContext *_localctx = _tracker.createInstance<Special_integerContext>(_ctx, getState());
-  enterRule(_localctx, 62, anceParser::RuleSpecial_integer);
+anceParser::SpecialIntegerContext* anceParser::specialInteger() {
+  SpecialIntegerContext *_localctx = _tracker.createInstance<SpecialIntegerContext>(_ctx, getState());
+  enterRule(_localctx, 62, anceParser::RuleSpecialInteger);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -2198,44 +2198,44 @@ anceParser::Special_integerContext* anceParser::special_integer() {
   return _localctx;
 }
 
-//----------------- Floating_point_expressionContext ------------------------------------------------------------------
+//----------------- FloatingPointLiteralContext ------------------------------------------------------------------
 
-anceParser::Floating_point_expressionContext::Floating_point_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::FloatingPointLiteralContext::FloatingPointLiteralContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Floating_point_expressionContext::HALF() {
+tree::TerminalNode* anceParser::FloatingPointLiteralContext::HALF() {
   return getToken(anceParser::HALF, 0);
 }
 
-tree::TerminalNode* anceParser::Floating_point_expressionContext::SINGLE() {
+tree::TerminalNode* anceParser::FloatingPointLiteralContext::SINGLE() {
   return getToken(anceParser::SINGLE, 0);
 }
 
-tree::TerminalNode* anceParser::Floating_point_expressionContext::DOUBLE() {
+tree::TerminalNode* anceParser::FloatingPointLiteralContext::DOUBLE() {
   return getToken(anceParser::DOUBLE, 0);
 }
 
-tree::TerminalNode* anceParser::Floating_point_expressionContext::QUAD() {
+tree::TerminalNode* anceParser::FloatingPointLiteralContext::QUAD() {
   return getToken(anceParser::QUAD, 0);
 }
 
 
-size_t anceParser::Floating_point_expressionContext::getRuleIndex() const {
-  return anceParser::RuleFloating_point_expression;
+size_t anceParser::FloatingPointLiteralContext::getRuleIndex() const {
+  return anceParser::RuleFloatingPointLiteral;
 }
 
 
-antlrcpp::Any anceParser::Floating_point_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::FloatingPointLiteralContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitFloating_point_expression(this);
+    return parserVisitor->visitFloatingPointLiteral(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Floating_point_expressionContext* anceParser::floating_point_expression() {
-  Floating_point_expressionContext *_localctx = _tracker.createInstance<Floating_point_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 64, anceParser::RuleFloating_point_expression);
+anceParser::FloatingPointLiteralContext* anceParser::floatingPointLiteral() {
+  FloatingPointLiteralContext *_localctx = _tracker.createInstance<FloatingPointLiteralContext>(_ctx, getState());
+  enterRule(_localctx, 64, anceParser::RuleFloatingPointLiteral);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -2267,36 +2267,36 @@ anceParser::Floating_point_expressionContext* anceParser::floating_point_express
   return _localctx;
 }
 
-//----------------- Boolean_expressionContext ------------------------------------------------------------------
+//----------------- BooleanLiteralContext ------------------------------------------------------------------
 
-anceParser::Boolean_expressionContext::Boolean_expressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::BooleanLiteralContext::BooleanLiteralContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Boolean_expressionContext::TRUE() {
+tree::TerminalNode* anceParser::BooleanLiteralContext::TRUE() {
   return getToken(anceParser::TRUE, 0);
 }
 
-tree::TerminalNode* anceParser::Boolean_expressionContext::FALSE() {
+tree::TerminalNode* anceParser::BooleanLiteralContext::FALSE() {
   return getToken(anceParser::FALSE, 0);
 }
 
 
-size_t anceParser::Boolean_expressionContext::getRuleIndex() const {
-  return anceParser::RuleBoolean_expression;
+size_t anceParser::BooleanLiteralContext::getRuleIndex() const {
+  return anceParser::RuleBooleanLiteral;
 }
 
 
-antlrcpp::Any anceParser::Boolean_expressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::BooleanLiteralContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitBoolean_expression(this);
+    return parserVisitor->visitBooleanLiteral(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Boolean_expressionContext* anceParser::boolean_expression() {
-  Boolean_expressionContext *_localctx = _tracker.createInstance<Boolean_expressionContext>(_ctx, getState());
-  enterRule(_localctx, 66, anceParser::RuleBoolean_expression);
+anceParser::BooleanLiteralContext* anceParser::booleanLiteral() {
+  BooleanLiteralContext *_localctx = _tracker.createInstance<BooleanLiteralContext>(_ctx, getState());
+  enterRule(_localctx, 66, anceParser::RuleBooleanLiteral);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -2343,8 +2343,8 @@ void anceParser::TypeContext::copyFrom(TypeContext *ctx) {
 
 //----------------- IntegerContext ------------------------------------------------------------------
 
-anceParser::Integer_typeContext* anceParser::IntegerContext::integer_type() {
-  return getRuleContext<anceParser::Integer_typeContext>(0);
+anceParser::IntegerTypeContext* anceParser::IntegerContext::integerType() {
+  return getRuleContext<anceParser::IntegerTypeContext>(0);
 }
 
 anceParser::IntegerContext::IntegerContext(TypeContext *ctx) { copyFrom(ctx); }
@@ -2358,8 +2358,8 @@ antlrcpp::Any anceParser::IntegerContext::accept(tree::ParseTreeVisitor *visitor
 }
 //----------------- ArrayContext ------------------------------------------------------------------
 
-anceParser::Array_typeContext* anceParser::ArrayContext::array_type() {
-  return getRuleContext<anceParser::Array_typeContext>(0);
+anceParser::ArrayTypeContext* anceParser::ArrayContext::arrayType() {
+  return getRuleContext<anceParser::ArrayTypeContext>(0);
 }
 
 anceParser::ArrayContext::ArrayContext(TypeContext *ctx) { copyFrom(ctx); }
@@ -2373,8 +2373,8 @@ antlrcpp::Any anceParser::ArrayContext::accept(tree::ParseTreeVisitor *visitor) 
 }
 //----------------- KeywordContext ------------------------------------------------------------------
 
-anceParser::Keyword_typeContext* anceParser::KeywordContext::keyword_type() {
-  return getRuleContext<anceParser::Keyword_typeContext>(0);
+anceParser::KeywordTypeContext* anceParser::KeywordContext::keywordType() {
+  return getRuleContext<anceParser::KeywordTypeContext>(0);
 }
 
 anceParser::KeywordContext::KeywordContext(TypeContext *ctx) { copyFrom(ctx); }
@@ -2432,7 +2432,7 @@ anceParser::TypeContext* anceParser::type(int precedence) {
         previousContext = _localctx;
 
         setState(270);
-        integer_type();
+        integerType();
         break;
       }
 
@@ -2441,7 +2441,7 @@ anceParser::TypeContext* anceParser::type(int precedence) {
         _ctx = _localctx;
         previousContext = _localctx;
         setState(271);
-        array_type();
+        arrayType();
         break;
       }
 
@@ -2456,7 +2456,7 @@ anceParser::TypeContext* anceParser::type(int precedence) {
         _ctx = _localctx;
         previousContext = _localctx;
         setState(272);
-        keyword_type();
+        keywordType();
         break;
       }
 
@@ -2494,32 +2494,32 @@ anceParser::TypeContext* anceParser::type(int precedence) {
   return _localctx;
 }
 
-//----------------- Integer_typeContext ------------------------------------------------------------------
+//----------------- IntegerTypeContext ------------------------------------------------------------------
 
-anceParser::Integer_typeContext::Integer_typeContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::IntegerTypeContext::IntegerTypeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Integer_typeContext::NATIVE_INTEGER_TYPE() {
+tree::TerminalNode* anceParser::IntegerTypeContext::NATIVE_INTEGER_TYPE() {
   return getToken(anceParser::NATIVE_INTEGER_TYPE, 0);
 }
 
 
-size_t anceParser::Integer_typeContext::getRuleIndex() const {
-  return anceParser::RuleInteger_type;
+size_t anceParser::IntegerTypeContext::getRuleIndex() const {
+  return anceParser::RuleIntegerType;
 }
 
 
-antlrcpp::Any anceParser::Integer_typeContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::IntegerTypeContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitInteger_type(this);
+    return parserVisitor->visitIntegerType(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Integer_typeContext* anceParser::integer_type() {
-  Integer_typeContext *_localctx = _tracker.createInstance<Integer_typeContext>(_ctx, getState());
-  enterRule(_localctx, 70, anceParser::RuleInteger_type);
+anceParser::IntegerTypeContext* anceParser::integerType() {
+  IntegerTypeContext *_localctx = _tracker.createInstance<IntegerTypeContext>(_ctx, getState());
+  enterRule(_localctx, 70, anceParser::RuleIntegerType);
 
   auto onExit = finally([=] {
     exitRule();
@@ -2539,36 +2539,36 @@ anceParser::Integer_typeContext* anceParser::integer_type() {
   return _localctx;
 }
 
-//----------------- Array_typeContext ------------------------------------------------------------------
+//----------------- ArrayTypeContext ------------------------------------------------------------------
 
-anceParser::Array_typeContext::Array_typeContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::ArrayTypeContext::ArrayTypeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Array_typeContext::INTEGER() {
+tree::TerminalNode* anceParser::ArrayTypeContext::INTEGER() {
   return getToken(anceParser::INTEGER, 0);
 }
 
-anceParser::TypeContext* anceParser::Array_typeContext::type() {
+anceParser::TypeContext* anceParser::ArrayTypeContext::type() {
   return getRuleContext<anceParser::TypeContext>(0);
 }
 
 
-size_t anceParser::Array_typeContext::getRuleIndex() const {
-  return anceParser::RuleArray_type;
+size_t anceParser::ArrayTypeContext::getRuleIndex() const {
+  return anceParser::RuleArrayType;
 }
 
 
-antlrcpp::Any anceParser::Array_typeContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::ArrayTypeContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitArray_type(this);
+    return parserVisitor->visitArrayType(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Array_typeContext* anceParser::array_type() {
-  Array_typeContext *_localctx = _tracker.createInstance<Array_typeContext>(_ctx, getState());
-  enterRule(_localctx, 72, anceParser::RuleArray_type);
+anceParser::ArrayTypeContext* anceParser::arrayType() {
+  ArrayTypeContext *_localctx = _tracker.createInstance<ArrayTypeContext>(_ctx, getState());
+  enterRule(_localctx, 72, anceParser::RuleArrayType);
 
   auto onExit = finally([=] {
     exitRule();
@@ -2596,44 +2596,44 @@ anceParser::Array_typeContext* anceParser::array_type() {
   return _localctx;
 }
 
-//----------------- Keyword_typeContext ------------------------------------------------------------------
+//----------------- KeywordTypeContext ------------------------------------------------------------------
 
-anceParser::Keyword_typeContext::Keyword_typeContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::KeywordTypeContext::KeywordTypeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::Floating_point_typeContext* anceParser::Keyword_typeContext::floating_point_type() {
-  return getRuleContext<anceParser::Floating_point_typeContext>(0);
+anceParser::FloatingPointTypeContext* anceParser::KeywordTypeContext::floatingPointType() {
+  return getRuleContext<anceParser::FloatingPointTypeContext>(0);
 }
 
-anceParser::Size_typeContext* anceParser::Keyword_typeContext::size_type() {
-  return getRuleContext<anceParser::Size_typeContext>(0);
+anceParser::SizeTypeContext* anceParser::KeywordTypeContext::sizeType() {
+  return getRuleContext<anceParser::SizeTypeContext>(0);
 }
 
-anceParser::Unsigned_integer_pointer_typeContext* anceParser::Keyword_typeContext::unsigned_integer_pointer_type() {
-  return getRuleContext<anceParser::Unsigned_integer_pointer_typeContext>(0);
+anceParser::UnsignedIntegerPointerTypeContext* anceParser::KeywordTypeContext::unsignedIntegerPointerType() {
+  return getRuleContext<anceParser::UnsignedIntegerPointerTypeContext>(0);
 }
 
-anceParser::Void_typeContext* anceParser::Keyword_typeContext::void_type() {
-  return getRuleContext<anceParser::Void_typeContext>(0);
-}
-
-
-size_t anceParser::Keyword_typeContext::getRuleIndex() const {
-  return anceParser::RuleKeyword_type;
+anceParser::VoidTypeContext* anceParser::KeywordTypeContext::voidType() {
+  return getRuleContext<anceParser::VoidTypeContext>(0);
 }
 
 
-antlrcpp::Any anceParser::Keyword_typeContext::accept(tree::ParseTreeVisitor *visitor) {
+size_t anceParser::KeywordTypeContext::getRuleIndex() const {
+  return anceParser::RuleKeywordType;
+}
+
+
+antlrcpp::Any anceParser::KeywordTypeContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitKeyword_type(this);
+    return parserVisitor->visitKeywordType(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Keyword_typeContext* anceParser::keyword_type() {
-  Keyword_typeContext *_localctx = _tracker.createInstance<Keyword_typeContext>(_ctx, getState());
-  enterRule(_localctx, 74, anceParser::RuleKeyword_type);
+anceParser::KeywordTypeContext* anceParser::keywordType() {
+  KeywordTypeContext *_localctx = _tracker.createInstance<KeywordTypeContext>(_ctx, getState());
+  enterRule(_localctx, 74, anceParser::RuleKeywordType);
 
   auto onExit = finally([=] {
     exitRule();
@@ -2648,28 +2648,28 @@ anceParser::Keyword_typeContext* anceParser::keyword_type() {
       case anceParser::QUAD_TYPE: {
         enterOuterAlt(_localctx, 1);
         setState(290);
-        floating_point_type();
+        floatingPointType();
         break;
       }
 
       case anceParser::SIZE: {
         enterOuterAlt(_localctx, 2);
         setState(291);
-        size_type();
+        sizeType();
         break;
       }
 
       case anceParser::UIPTR: {
         enterOuterAlt(_localctx, 3);
         setState(292);
-        unsigned_integer_pointer_type();
+        unsignedIntegerPointerType();
         break;
       }
 
       case anceParser::VOID: {
         enterOuterAlt(_localctx, 4);
         setState(293);
-        void_type();
+        voidType();
         break;
       }
 
@@ -2687,44 +2687,44 @@ anceParser::Keyword_typeContext* anceParser::keyword_type() {
   return _localctx;
 }
 
-//----------------- Floating_point_typeContext ------------------------------------------------------------------
+//----------------- FloatingPointTypeContext ------------------------------------------------------------------
 
-anceParser::Floating_point_typeContext::Floating_point_typeContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::FloatingPointTypeContext::FloatingPointTypeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Floating_point_typeContext::HALF_TYPE() {
+tree::TerminalNode* anceParser::FloatingPointTypeContext::HALF_TYPE() {
   return getToken(anceParser::HALF_TYPE, 0);
 }
 
-tree::TerminalNode* anceParser::Floating_point_typeContext::SINGLE_TYPE() {
+tree::TerminalNode* anceParser::FloatingPointTypeContext::SINGLE_TYPE() {
   return getToken(anceParser::SINGLE_TYPE, 0);
 }
 
-tree::TerminalNode* anceParser::Floating_point_typeContext::DOUBLE_TYPE() {
+tree::TerminalNode* anceParser::FloatingPointTypeContext::DOUBLE_TYPE() {
   return getToken(anceParser::DOUBLE_TYPE, 0);
 }
 
-tree::TerminalNode* anceParser::Floating_point_typeContext::QUAD_TYPE() {
+tree::TerminalNode* anceParser::FloatingPointTypeContext::QUAD_TYPE() {
   return getToken(anceParser::QUAD_TYPE, 0);
 }
 
 
-size_t anceParser::Floating_point_typeContext::getRuleIndex() const {
-  return anceParser::RuleFloating_point_type;
+size_t anceParser::FloatingPointTypeContext::getRuleIndex() const {
+  return anceParser::RuleFloatingPointType;
 }
 
 
-antlrcpp::Any anceParser::Floating_point_typeContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::FloatingPointTypeContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitFloating_point_type(this);
+    return parserVisitor->visitFloatingPointType(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Floating_point_typeContext* anceParser::floating_point_type() {
-  Floating_point_typeContext *_localctx = _tracker.createInstance<Floating_point_typeContext>(_ctx, getState());
-  enterRule(_localctx, 76, anceParser::RuleFloating_point_type);
+anceParser::FloatingPointTypeContext* anceParser::floatingPointType() {
+  FloatingPointTypeContext *_localctx = _tracker.createInstance<FloatingPointTypeContext>(_ctx, getState());
+  enterRule(_localctx, 76, anceParser::RuleFloatingPointType);
   size_t _la = 0;
 
   auto onExit = finally([=] {
@@ -2756,32 +2756,32 @@ anceParser::Floating_point_typeContext* anceParser::floating_point_type() {
   return _localctx;
 }
 
-//----------------- Size_typeContext ------------------------------------------------------------------
+//----------------- SizeTypeContext ------------------------------------------------------------------
 
-anceParser::Size_typeContext::Size_typeContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::SizeTypeContext::SizeTypeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Size_typeContext::SIZE() {
+tree::TerminalNode* anceParser::SizeTypeContext::SIZE() {
   return getToken(anceParser::SIZE, 0);
 }
 
 
-size_t anceParser::Size_typeContext::getRuleIndex() const {
-  return anceParser::RuleSize_type;
+size_t anceParser::SizeTypeContext::getRuleIndex() const {
+  return anceParser::RuleSizeType;
 }
 
 
-antlrcpp::Any anceParser::Size_typeContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::SizeTypeContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitSize_type(this);
+    return parserVisitor->visitSizeType(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Size_typeContext* anceParser::size_type() {
-  Size_typeContext *_localctx = _tracker.createInstance<Size_typeContext>(_ctx, getState());
-  enterRule(_localctx, 78, anceParser::RuleSize_type);
+anceParser::SizeTypeContext* anceParser::sizeType() {
+  SizeTypeContext *_localctx = _tracker.createInstance<SizeTypeContext>(_ctx, getState());
+  enterRule(_localctx, 78, anceParser::RuleSizeType);
 
   auto onExit = finally([=] {
     exitRule();
@@ -2801,32 +2801,32 @@ anceParser::Size_typeContext* anceParser::size_type() {
   return _localctx;
 }
 
-//----------------- Unsigned_integer_pointer_typeContext ------------------------------------------------------------------
+//----------------- UnsignedIntegerPointerTypeContext ------------------------------------------------------------------
 
-anceParser::Unsigned_integer_pointer_typeContext::Unsigned_integer_pointer_typeContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::UnsignedIntegerPointerTypeContext::UnsignedIntegerPointerTypeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Unsigned_integer_pointer_typeContext::UIPTR() {
+tree::TerminalNode* anceParser::UnsignedIntegerPointerTypeContext::UIPTR() {
   return getToken(anceParser::UIPTR, 0);
 }
 
 
-size_t anceParser::Unsigned_integer_pointer_typeContext::getRuleIndex() const {
-  return anceParser::RuleUnsigned_integer_pointer_type;
+size_t anceParser::UnsignedIntegerPointerTypeContext::getRuleIndex() const {
+  return anceParser::RuleUnsignedIntegerPointerType;
 }
 
 
-antlrcpp::Any anceParser::Unsigned_integer_pointer_typeContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::UnsignedIntegerPointerTypeContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitUnsigned_integer_pointer_type(this);
+    return parserVisitor->visitUnsignedIntegerPointerType(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Unsigned_integer_pointer_typeContext* anceParser::unsigned_integer_pointer_type() {
-  Unsigned_integer_pointer_typeContext *_localctx = _tracker.createInstance<Unsigned_integer_pointer_typeContext>(_ctx, getState());
-  enterRule(_localctx, 80, anceParser::RuleUnsigned_integer_pointer_type);
+anceParser::UnsignedIntegerPointerTypeContext* anceParser::unsignedIntegerPointerType() {
+  UnsignedIntegerPointerTypeContext *_localctx = _tracker.createInstance<UnsignedIntegerPointerTypeContext>(_ctx, getState());
+  enterRule(_localctx, 80, anceParser::RuleUnsignedIntegerPointerType);
 
   auto onExit = finally([=] {
     exitRule();
@@ -2846,32 +2846,32 @@ anceParser::Unsigned_integer_pointer_typeContext* anceParser::unsigned_integer_p
   return _localctx;
 }
 
-//----------------- Void_typeContext ------------------------------------------------------------------
+//----------------- VoidTypeContext ------------------------------------------------------------------
 
-anceParser::Void_typeContext::Void_typeContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::VoidTypeContext::VoidTypeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::Void_typeContext::VOID() {
+tree::TerminalNode* anceParser::VoidTypeContext::VOID() {
   return getToken(anceParser::VOID, 0);
 }
 
 
-size_t anceParser::Void_typeContext::getRuleIndex() const {
-  return anceParser::RuleVoid_type;
+size_t anceParser::VoidTypeContext::getRuleIndex() const {
+  return anceParser::RuleVoidType;
 }
 
 
-antlrcpp::Any anceParser::Void_typeContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::VoidTypeContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitVoid_type(this);
+    return parserVisitor->visitVoidType(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::Void_typeContext* anceParser::void_type() {
-  Void_typeContext *_localctx = _tracker.createInstance<Void_typeContext>(_ctx, getState());
-  enterRule(_localctx, 82, anceParser::RuleVoid_type);
+anceParser::VoidTypeContext* anceParser::voidType() {
+  VoidTypeContext *_localctx = _tracker.createInstance<VoidTypeContext>(_ctx, getState());
+  enterRule(_localctx, 82, anceParser::RuleVoidType);
 
   auto onExit = finally([=] {
     exitRule();
@@ -2920,16 +2920,16 @@ atn::ATN anceParser::_atn;
 std::vector<uint16_t> anceParser::_serializedATN;
 
 std::vector<std::string> anceParser::_ruleNames = {
-  "file", "data", "constant_declaration", "variable_declaration", "code", 
-  "function", "parameters", "parameter", "access_modifier", "statement", 
-  "expression_statement", "local_variable_definition", "variable_assignment", 
-  "print_statement", "delete_statement", "return_statement", "expression", 
-  "independent_expression", "function_call", "arguments", "variable_expression", 
-  "allocation_expression", "allocator", "sizeof_type_expression", "sizeof_exp_expression", 
-  "constant_expression", "string_expression", "byte_expression", "integer_expression", 
-  "unsigned_integer", "signed_integer", "special_integer", "floating_point_expression", 
-  "boolean_expression", "type", "integer_type", "array_type", "keyword_type", 
-  "floating_point_type", "size_type", "unsigned_integer_pointer_type", "void_type"
+  "file", "data", "constantDeclaration", "variableDeclaration", "code", 
+  "function", "parameters", "parameter", "accessModifier", "statement", 
+  "expressionStatement", "localVariableDefinition", "variableAssignment", 
+  "printStatement", "deleteStatement", "returnStatement", "expression", 
+  "independentExpression", "functionCall", "arguments", "variableExpression", 
+  "allocationExpression", "allocator", "sizeofTypeExpression", "sizeofExpExpression", 
+  "literalExpression", "stringLiteral", "byteLiteral", "integerLiteral", 
+  "unsignedInteger", "signedInteger", "specialInteger", "floatingPointLiteral", 
+  "booleanLiteral", "type", "integerType", "arrayType", "keywordType", "floatingPointType", 
+  "sizeType", "unsignedIntegerPointerType", "voidType"
 };
 
 std::vector<std::string> anceParser::_literalNames = {

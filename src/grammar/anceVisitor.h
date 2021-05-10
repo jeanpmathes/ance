@@ -23,9 +23,9 @@ public:
 
     virtual antlrcpp::Any visitData(anceParser::DataContext *context) = 0;
 
-    virtual antlrcpp::Any visitConstant_declaration(anceParser::Constant_declarationContext *context) = 0;
+    virtual antlrcpp::Any visitConstantDeclaration(anceParser::ConstantDeclarationContext *context) = 0;
 
-    virtual antlrcpp::Any visitVariable_declaration(anceParser::Variable_declarationContext *context) = 0;
+    virtual antlrcpp::Any visitVariableDeclaration(anceParser::VariableDeclarationContext *context) = 0;
 
     virtual antlrcpp::Any visitCode(anceParser::CodeContext *context) = 0;
 
@@ -35,57 +35,57 @@ public:
 
     virtual antlrcpp::Any visitParameter(anceParser::ParameterContext *context) = 0;
 
-    virtual antlrcpp::Any visitAccess_modifier(anceParser::Access_modifierContext *context) = 0;
+    virtual antlrcpp::Any visitAccessModifier(anceParser::AccessModifierContext *context) = 0;
 
     virtual antlrcpp::Any visitStatement(anceParser::StatementContext *context) = 0;
 
-    virtual antlrcpp::Any visitExpression_statement(anceParser::Expression_statementContext *context) = 0;
+    virtual antlrcpp::Any visitExpressionStatement(anceParser::ExpressionStatementContext *context) = 0;
 
-    virtual antlrcpp::Any visitLocal_variable_definition(anceParser::Local_variable_definitionContext *context) = 0;
+    virtual antlrcpp::Any visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext *context) = 0;
 
-    virtual antlrcpp::Any visitVariable_assignment(anceParser::Variable_assignmentContext *context) = 0;
+    virtual antlrcpp::Any visitVariableAssignment(anceParser::VariableAssignmentContext *context) = 0;
 
-    virtual antlrcpp::Any visitPrint_statement(anceParser::Print_statementContext *context) = 0;
+    virtual antlrcpp::Any visitPrintStatement(anceParser::PrintStatementContext *context) = 0;
 
-    virtual antlrcpp::Any visitDelete_statement(anceParser::Delete_statementContext *context) = 0;
+    virtual antlrcpp::Any visitDeleteStatement(anceParser::DeleteStatementContext *context) = 0;
 
-    virtual antlrcpp::Any visitReturn_statement(anceParser::Return_statementContext *context) = 0;
+    virtual antlrcpp::Any visitReturnStatement(anceParser::ReturnStatementContext *context) = 0;
 
     virtual antlrcpp::Any visitExpression(anceParser::ExpressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitIndependent_expression(anceParser::Independent_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitIndependentExpression(anceParser::IndependentExpressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitFunction_call(anceParser::Function_callContext *context) = 0;
+    virtual antlrcpp::Any visitFunctionCall(anceParser::FunctionCallContext *context) = 0;
 
     virtual antlrcpp::Any visitArguments(anceParser::ArgumentsContext *context) = 0;
 
-    virtual antlrcpp::Any visitVariable_expression(anceParser::Variable_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitVariableExpression(anceParser::VariableExpressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitAllocation_expression(anceParser::Allocation_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitAllocationExpression(anceParser::AllocationExpressionContext *context) = 0;
 
     virtual antlrcpp::Any visitAllocator(anceParser::AllocatorContext *context) = 0;
 
-    virtual antlrcpp::Any visitSizeof_type_expression(anceParser::Sizeof_type_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitSizeofTypeExpression(anceParser::SizeofTypeExpressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitSizeof_exp_expression(anceParser::Sizeof_exp_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitSizeofExpExpression(anceParser::SizeofExpExpressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitConstant_expression(anceParser::Constant_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitLiteralExpression(anceParser::LiteralExpressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitString_expression(anceParser::String_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitStringLiteral(anceParser::StringLiteralContext *context) = 0;
 
-    virtual antlrcpp::Any visitByte_expression(anceParser::Byte_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitByteLiteral(anceParser::ByteLiteralContext *context) = 0;
 
-    virtual antlrcpp::Any visitInteger_expression(anceParser::Integer_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitIntegerLiteral(anceParser::IntegerLiteralContext *context) = 0;
 
-    virtual antlrcpp::Any visitUnsigned_integer(anceParser::Unsigned_integerContext *context) = 0;
+    virtual antlrcpp::Any visitUnsignedInteger(anceParser::UnsignedIntegerContext *context) = 0;
 
-    virtual antlrcpp::Any visitSigned_integer(anceParser::Signed_integerContext *context) = 0;
+    virtual antlrcpp::Any visitSignedInteger(anceParser::SignedIntegerContext *context) = 0;
 
-    virtual antlrcpp::Any visitSpecial_integer(anceParser::Special_integerContext *context) = 0;
+    virtual antlrcpp::Any visitSpecialInteger(anceParser::SpecialIntegerContext *context) = 0;
 
-    virtual antlrcpp::Any visitFloating_point_expression(anceParser::Floating_point_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext *context) = 0;
 
-    virtual antlrcpp::Any visitBoolean_expression(anceParser::Boolean_expressionContext *context) = 0;
+    virtual antlrcpp::Any visitBooleanLiteral(anceParser::BooleanLiteralContext *context) = 0;
 
     virtual antlrcpp::Any visitInteger(anceParser::IntegerContext *context) = 0;
 
@@ -95,19 +95,19 @@ public:
 
     virtual antlrcpp::Any visitPointer(anceParser::PointerContext *context) = 0;
 
-    virtual antlrcpp::Any visitInteger_type(anceParser::Integer_typeContext *context) = 0;
+    virtual antlrcpp::Any visitIntegerType(anceParser::IntegerTypeContext *context) = 0;
 
-    virtual antlrcpp::Any visitArray_type(anceParser::Array_typeContext *context) = 0;
+    virtual antlrcpp::Any visitArrayType(anceParser::ArrayTypeContext *context) = 0;
 
-    virtual antlrcpp::Any visitKeyword_type(anceParser::Keyword_typeContext *context) = 0;
+    virtual antlrcpp::Any visitKeywordType(anceParser::KeywordTypeContext *context) = 0;
 
-    virtual antlrcpp::Any visitFloating_point_type(anceParser::Floating_point_typeContext *context) = 0;
+    virtual antlrcpp::Any visitFloatingPointType(anceParser::FloatingPointTypeContext *context) = 0;
 
-    virtual antlrcpp::Any visitSize_type(anceParser::Size_typeContext *context) = 0;
+    virtual antlrcpp::Any visitSizeType(anceParser::SizeTypeContext *context) = 0;
 
-    virtual antlrcpp::Any visitUnsigned_integer_pointer_type(anceParser::Unsigned_integer_pointer_typeContext *context) = 0;
+    virtual antlrcpp::Any visitUnsignedIntegerPointerType(anceParser::UnsignedIntegerPointerTypeContext *context) = 0;
 
-    virtual antlrcpp::Any visitVoid_type(anceParser::Void_typeContext *context) = 0;
+    virtual antlrcpp::Any visitVoidType(anceParser::VoidTypeContext *context) = 0;
 
 
 };
