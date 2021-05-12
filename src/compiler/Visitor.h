@@ -47,6 +47,8 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitAllocation(anceParser::AllocationContext *ctx) override;
 
+		antlrcpp::Any visitRoughCast(anceParser::RoughCastContext *ctx) override;
+
 		antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext *ctx) override;
 
 		antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext *ctx) override;

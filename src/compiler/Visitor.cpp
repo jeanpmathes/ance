@@ -30,6 +30,7 @@
 #include "DefaultValueExpression.h"
 #include "VariableAccess.h"
 #include "Allocation.h"
+#include "RoughCast.h"
 
 #include "StringConstant.h"
 #include "ByteConstant.h"
@@ -258,15 +259,25 @@ antlrcpp::Any Visitor::visitAllocation(anceParser::AllocationContext* ctx)
 	return expression;
 }
 
+antlrcpp::Any Visitor::visitRoughCast(anceParser::RoughCastContext* ctx)
+{
+	ance::Type* type = visit(ctx->type());
+	Expression* expr = visit(ctx->expression());
+
+	return static_cast<Expression*>(new RoughCast(type, expr));
+}
+
 antlrcpp::Any Visitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)
 {
 	ance::Type* type = visit(ctx->type());
+
 	return static_cast<Expression*>(new SizeofType(type));
 }
 
 antlrcpp::Any Visitor::visitSizeofExpression(anceParser::SizeofExpressionContext* ctx)
 {
 	Expression* expr = visit(ctx->expression());
+
 	return static_cast<Expression*>(new SizeofExpression(expr));
 }
 

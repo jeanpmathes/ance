@@ -10,4 +10,5 @@ target_sources(ance PRIVATE DefaultValueExpression.cpp
                SizeofExpression.cpp
                SizeofType.cpp
                VariableAccess.cpp
+               RoughCast.cpp
                Allocation.cpp)

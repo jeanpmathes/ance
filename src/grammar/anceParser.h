@@ -30,13 +30,13 @@ public:
     RuleLocalVariableDefinition = 11, RuleVariableAssignment = 12, RulePrintStatement = 13, 
     RuleDeleteStatement = 14, RuleReturnStatement = 15, RuleExpression = 16, 
     RuleIndependentExpression = 17, RuleFunctionCall = 18, RuleArguments = 19, 
-    RuleVariableAccess = 20, RuleAllocation = 21, RuleAllocator = 22, RuleSizeofType = 23, 
-    RuleSizeofExpression = 24, RuleLiteralExpression = 25, RuleStringLiteral = 26, 
-    RuleByteLiteral = 27, RuleIntegerLiteral = 28, RuleUnsignedInteger = 29, 
-    RuleSignedInteger = 30, RuleSpecialInteger = 31, RuleFloatingPointLiteral = 32, 
-    RuleBooleanLiteral = 33, RuleType = 34, RuleIntegerType = 35, RuleArrayType = 36, 
-    RuleKeywordType = 37, RuleFloatingPointType = 38, RuleSizeType = 39, 
-    RuleUnsignedIntegerPointerType = 40, RuleVoidType = 41
+    RuleVariableAccess = 20, RuleAllocation = 21, RuleAllocator = 22, RuleRoughCast = 23, 
+    RuleSizeofType = 24, RuleSizeofExpression = 25, RuleLiteralExpression = 26, 
+    RuleStringLiteral = 27, RuleByteLiteral = 28, RuleIntegerLiteral = 29, 
+    RuleUnsignedInteger = 30, RuleSignedInteger = 31, RuleSpecialInteger = 32, 
+    RuleFloatingPointLiteral = 33, RuleBooleanLiteral = 34, RuleType = 35, 
+    RuleIntegerType = 36, RuleArrayType = 37, RuleKeywordType = 38, RuleFloatingPointType = 39, 
+    RuleSizeType = 40, RuleUnsignedIntegerPointerType = 41, RuleVoidType = 42
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -72,6 +72,7 @@ public:
   class VariableAccessContext;
   class AllocationContext;
   class AllocatorContext;
+  class RoughCastContext;
   class SizeofTypeContext;
   class SizeofExpressionContext;
   class LiteralExpressionContext;
@@ -332,6 +333,7 @@ public:
     virtual size_t getRuleIndex() const override;
     VariableAccessContext *variableAccess();
     AllocationContext *allocation();
+    RoughCastContext *roughCast();
     SizeofTypeContext *sizeofType();
     SizeofExpressionContext *sizeofExpression();
     LiteralExpressionContext *literalExpression();
@@ -425,6 +427,20 @@ public:
   };
 
   AllocatorContext* allocator();
+
+  class  RoughCastContext : public antlr4::ParserRuleContext {
+  public:
+    RoughCastContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    TypeContext *type();
+    ExpressionContext *expression();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  RoughCastContext* roughCast();
 
   class  SizeofTypeContext : public antlr4::ParserRuleContext {
   public:

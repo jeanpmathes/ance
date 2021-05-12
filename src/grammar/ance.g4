@@ -74,6 +74,7 @@ returnStatement
 expression
 	: variableAccess
 	| allocation
+	| roughCast
 	| sizeofType
 	| sizeofExpression
 	| literalExpression
@@ -103,6 +104,10 @@ allocation
 allocator
     : DYNAMIC
     | AUTOMATIC
+    ;
+
+roughCast
+    : '{' type '}' expression
     ;
 
 sizeofType

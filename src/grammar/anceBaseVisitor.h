@@ -107,6 +107,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitRoughCast(anceParser::RoughCastContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext *ctx) override {
     return visitChildren(ctx);
   }

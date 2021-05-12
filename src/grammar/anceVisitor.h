@@ -65,6 +65,8 @@ public:
 
     virtual antlrcpp::Any visitAllocator(anceParser::AllocatorContext *context) = 0;
 
+    virtual antlrcpp::Any visitRoughCast(anceParser::RoughCastContext *context) = 0;
+
     virtual antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext *context) = 0;
 
     virtual antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext *context) = 0;
