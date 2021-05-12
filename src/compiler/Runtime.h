@@ -12,6 +12,7 @@ class CompileState;
 namespace ance
 {
 class Type;
+
 class Value;
 }
 
@@ -51,7 +52,14 @@ class Runtime
 			llvm::DIBuilder* di
 		);
 
-		void deleteDynamic(ance::Value* value, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		void deleteDynamic(
+			ance::Value* value,
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		);
 
 	private:
 		llvm::Value* allocateAutomatic(

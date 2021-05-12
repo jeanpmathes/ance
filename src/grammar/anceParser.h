@@ -3,769 +3,964 @@
 
 #pragma once
 
-
 #include "antlr4-runtime.h"
 
+class anceParser : public antlr4::Parser
+{
+	public:
+		enum
+		{
+				T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7,
+				T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14,
+				T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20,
+				T__20 = 21, NATIVE_INTEGER_TYPE = 22, HALF_TYPE = 23, SINGLE_TYPE = 24,
+				DOUBLE_TYPE = 25, QUAD_TYPE = 26, SIGNED_INTEGER = 27, HEX_INTEGER = 28,
+				BIN_INTEGER = 29, OCT_INTEGER = 30, HALF = 31, SINGLE = 32, DOUBLE = 33,
+				QUAD = 34, DECIMAL = 35, STRING = 36, BYTE = 37, INTEGER = 38, DYNAMIC = 39,
+				AUTOMATIC = 40, TRUE = 41, FALSE = 42, PUBLIC = 43, PRIVATE = 44, IDENTIFIER = 45,
+				WHITESPACE = 46, BLOCK_COMMENT = 47, LINE_COMMENT = 48
+		};
 
+		enum
+		{
+				RuleFile = 0, RuleData = 1, RuleConstantDeclaration = 2, RuleVariableDeclaration = 3,
+				RuleCode = 4, RuleFunction = 5, RuleParameters = 6, RuleParameter = 7,
+				RuleAccessModifier = 8, RuleStatement = 9, RuleExpressionStatement = 10,
+				RuleLocalVariableDefinition = 11, RuleVariableAssignment = 12, RulePrintStatement = 13,
+				RuleDeleteStatement = 14, RuleReturnStatement = 15, RuleExpression = 16,
+				RuleIndependentExpression = 17, RuleFunctionCall = 18, RuleArguments = 19,
+				RuleVariableAccess = 20, RuleAllocation = 21, RuleAllocator = 22, RuleRoughCast = 23,
+				RuleSizeofType = 24, RuleSizeofExpression = 25, RuleLiteralExpression = 26,
+				RuleStringLiteral = 27, RuleByteLiteral = 28, RuleIntegerLiteral = 29,
+				RuleUnsignedInteger = 30, RuleSignedInteger = 31, RuleSpecialInteger = 32,
+				RuleFloatingPointLiteral = 33, RuleBooleanLiteral = 34, RuleType = 35,
+				RuleIntegerType = 36, RuleArrayType = 37, RuleKeywordType = 38, RuleFloatingPointType = 39,
+				RuleSizeType = 40, RuleUnsignedIntegerPointerType = 41, RuleVoidType = 42
+		};
 
+		anceParser(antlr4::TokenStream* input);
 
-class  anceParser : public antlr4::Parser {
-public:
-  enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
-    T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
-    T__20 = 21, NATIVE_INTEGER_TYPE = 22, HALF_TYPE = 23, SINGLE_TYPE = 24, 
-    DOUBLE_TYPE = 25, QUAD_TYPE = 26, SIGNED_INTEGER = 27, HEX_INTEGER = 28, 
-    BIN_INTEGER = 29, OCT_INTEGER = 30, HALF = 31, SINGLE = 32, DOUBLE = 33, 
-    QUAD = 34, DECIMAL = 35, STRING = 36, BYTE = 37, INTEGER = 38, DYNAMIC = 39, 
-    AUTOMATIC = 40, TRUE = 41, FALSE = 42, PUBLIC = 43, PRIVATE = 44, IDENTIFIER = 45, 
-    WHITESPACE = 46, BLOCK_COMMENT = 47, LINE_COMMENT = 48
-  };
-
-  enum {
-    RuleFile = 0, RuleData = 1, RuleConstantDeclaration = 2, RuleVariableDeclaration = 3, 
-    RuleCode = 4, RuleFunction = 5, RuleParameters = 6, RuleParameter = 7, 
-    RuleAccessModifier = 8, RuleStatement = 9, RuleExpressionStatement = 10, 
-    RuleLocalVariableDefinition = 11, RuleVariableAssignment = 12, RulePrintStatement = 13, 
-    RuleDeleteStatement = 14, RuleReturnStatement = 15, RuleExpression = 16, 
-    RuleIndependentExpression = 17, RuleFunctionCall = 18, RuleArguments = 19, 
-    RuleVariableAccess = 20, RuleAllocation = 21, RuleAllocator = 22, RuleRoughCast = 23, 
-    RuleSizeofType = 24, RuleSizeofExpression = 25, RuleLiteralExpression = 26, 
-    RuleStringLiteral = 27, RuleByteLiteral = 28, RuleIntegerLiteral = 29, 
-    RuleUnsignedInteger = 30, RuleSignedInteger = 31, RuleSpecialInteger = 32, 
-    RuleFloatingPointLiteral = 33, RuleBooleanLiteral = 34, RuleType = 35, 
-    RuleIntegerType = 36, RuleArrayType = 37, RuleKeywordType = 38, RuleFloatingPointType = 39, 
-    RuleSizeType = 40, RuleUnsignedIntegerPointerType = 41, RuleVoidType = 42
-  };
-
-  anceParser(antlr4::TokenStream *input);
-  ~anceParser();
-
-  virtual std::string getGrammarFileName() const override;
-  virtual const antlr4::atn::ATN& getATN() const override { return _atn; };
-  virtual const std::vector<std::string>& getTokenNames() const override { return _tokenNames; }; // deprecated: use vocabulary instead.
-  virtual const std::vector<std::string>& getRuleNames() const override;
-  virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
-
-
-  class FileContext;
-  class DataContext;
-  class ConstantDeclarationContext;
-  class VariableDeclarationContext;
-  class CodeContext;
-  class FunctionContext;
-  class ParametersContext;
-  class ParameterContext;
-  class AccessModifierContext;
-  class StatementContext;
-  class ExpressionStatementContext;
-  class LocalVariableDefinitionContext;
-  class VariableAssignmentContext;
-  class PrintStatementContext;
-  class DeleteStatementContext;
-  class ReturnStatementContext;
-  class ExpressionContext;
-  class IndependentExpressionContext;
-  class FunctionCallContext;
-  class ArgumentsContext;
-  class VariableAccessContext;
-  class AllocationContext;
-  class AllocatorContext;
-  class RoughCastContext;
-  class SizeofTypeContext;
-  class SizeofExpressionContext;
-  class LiteralExpressionContext;
-  class StringLiteralContext;
-  class ByteLiteralContext;
-  class IntegerLiteralContext;
-  class UnsignedIntegerContext;
-  class SignedIntegerContext;
-  class SpecialIntegerContext;
-  class FloatingPointLiteralContext;
-  class BooleanLiteralContext;
-  class TypeContext;
-  class IntegerTypeContext;
-  class ArrayTypeContext;
-  class KeywordTypeContext;
-  class FloatingPointTypeContext;
-  class SizeTypeContext;
-  class UnsignedIntegerPointerTypeContext;
-  class VoidTypeContext; 
-
-  class  FileContext : public antlr4::ParserRuleContext {
-  public:
-    FileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<DataContext *> data();
-    DataContext* data(size_t i);
-    std::vector<CodeContext *> code();
-    CodeContext* code(size_t i);
-
-
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
-
-  FileContext* file();
+		~anceParser();
 
-  class  DataContext : public antlr4::ParserRuleContext {
-  public:
-    DataContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ConstantDeclarationContext *constantDeclaration();
-    VariableDeclarationContext *variableDeclaration();
+		virtual std::string getGrammarFileName() const override;
 
+		virtual const antlr4::atn::ATN& getATN() const override
+		{ return _atn; };
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		virtual const std::vector<std::string>& getTokenNames() const override
+		{ return _tokenNames; }; // deprecated: use vocabulary instead.
+		virtual const std::vector<std::string>& getRuleNames() const override;
 
-  DataContext* data();
+		virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
 
-  class  ConstantDeclarationContext : public antlr4::ParserRuleContext {
-  public:
-    ConstantDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    AccessModifierContext *accessModifier();
-    TypeContext *type();
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    LiteralExpressionContext *literalExpression();
+		class FileContext;
 
+		class DataContext;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class ConstantDeclarationContext;
 
-  ConstantDeclarationContext* constantDeclaration();
+		class VariableDeclarationContext;
 
-  class  VariableDeclarationContext : public antlr4::ParserRuleContext {
-  public:
-    VariableDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    AccessModifierContext *accessModifier();
-    TypeContext *type();
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    LiteralExpressionContext *literalExpression();
+		class CodeContext;
 
+		class FunctionContext;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class ParametersContext;
 
-  VariableDeclarationContext* variableDeclaration();
+		class ParameterContext;
 
-  class  CodeContext : public antlr4::ParserRuleContext {
-  public:
-    CodeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    FunctionContext *function();
+		class AccessModifierContext;
 
+		class StatementContext;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class ExpressionStatementContext;
 
-  CodeContext* code();
+		class LocalVariableDefinitionContext;
 
-  class  FunctionContext : public antlr4::ParserRuleContext {
-  public:
-    FunctionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    AccessModifierContext *accessModifier();
-    TypeContext *type();
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    ParametersContext *parameters();
-    std::vector<StatementContext *> statement();
-    StatementContext* statement(size_t i);
+		class VariableAssignmentContext;
 
+		class PrintStatementContext;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class DeleteStatementContext;
 
-  FunctionContext* function();
+		class ReturnStatementContext;
 
-  class  ParametersContext : public antlr4::ParserRuleContext {
-  public:
-    ParametersContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<ParameterContext *> parameter();
-    ParameterContext* parameter(size_t i);
+		class ExpressionContext;
 
+		class IndependentExpressionContext;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class FunctionCallContext;
 
-  ParametersContext* parameters();
+		class ArgumentsContext;
 
-  class  ParameterContext : public antlr4::ParserRuleContext {
-  public:
-    ParameterContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    TypeContext *type();
-    antlr4::tree::TerminalNode *IDENTIFIER();
+		class VariableAccessContext;
 
+		class AllocationContext;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class AllocatorContext;
 
-  ParameterContext* parameter();
+		class RoughCastContext;
 
-  class  AccessModifierContext : public antlr4::ParserRuleContext {
-  public:
-    AccessModifierContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *PUBLIC();
-    antlr4::tree::TerminalNode *PRIVATE();
+		class SizeofTypeContext;
 
+		class SizeofExpressionContext;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class LiteralExpressionContext;
 
-  AccessModifierContext* accessModifier();
+		class StringLiteralContext;
 
-  class  StatementContext : public antlr4::ParserRuleContext {
-  public:
-    StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ExpressionStatementContext *expressionStatement();
-    LocalVariableDefinitionContext *localVariableDefinition();
-    VariableAssignmentContext *variableAssignment();
-    PrintStatementContext *printStatement();
-    DeleteStatementContext *deleteStatement();
-    ReturnStatementContext *returnStatement();
+		class ByteLiteralContext;
 
+		class IntegerLiteralContext;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class UnsignedIntegerContext;
 
-  StatementContext* statement();
+		class SignedIntegerContext;
 
-  class  ExpressionStatementContext : public antlr4::ParserRuleContext {
-  public:
-    ExpressionStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    IndependentExpressionContext *independentExpression();
+		class SpecialIntegerContext;
 
+		class FloatingPointLiteralContext;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class BooleanLiteralContext;
 
-  ExpressionStatementContext* expressionStatement();
+		class TypeContext;
 
-  class  LocalVariableDefinitionContext : public antlr4::ParserRuleContext {
-  public:
-    LocalVariableDefinitionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    TypeContext *type();
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    ExpressionContext *expression();
+		class IntegerTypeContext;
 
+		class ArrayTypeContext;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class KeywordTypeContext;
 
-  LocalVariableDefinitionContext* localVariableDefinition();
+		class FloatingPointTypeContext;
 
-  class  VariableAssignmentContext : public antlr4::ParserRuleContext {
-  public:
-    VariableAssignmentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    ExpressionContext *expression();
+		class SizeTypeContext;
 
+		class UnsignedIntegerPointerTypeContext;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class VoidTypeContext;
 
-  VariableAssignmentContext* variableAssignment();
+		class FileContext : public antlr4::ParserRuleContext
+		{
+			public:
+				FileContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-  class  PrintStatementContext : public antlr4::ParserRuleContext {
-  public:
-    PrintStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ExpressionContext *expression();
+				virtual size_t getRuleIndex() const override;
 
+				std::vector<DataContext*> data();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				DataContext* data(size_t i);
 
-  PrintStatementContext* printStatement();
+				std::vector<CodeContext*> code();
 
-  class  DeleteStatementContext : public antlr4::ParserRuleContext {
-  public:
-    DeleteStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ExpressionContext *expression();
+				CodeContext* code(size_t i);
 
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		};
 
-  DeleteStatementContext* deleteStatement();
+		FileContext* file();
 
-  class  ReturnStatementContext : public antlr4::ParserRuleContext {
-  public:
-    ReturnStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ExpressionContext *expression();
+		class DataContext : public antlr4::ParserRuleContext
+		{
+			public:
+				DataContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
+				virtual size_t getRuleIndex() const override;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				ConstantDeclarationContext* constantDeclaration();
 
-  ReturnStatementContext* returnStatement();
+				VariableDeclarationContext* variableDeclaration();
 
-  class  ExpressionContext : public antlr4::ParserRuleContext {
-  public:
-    ExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    VariableAccessContext *variableAccess();
-    AllocationContext *allocation();
-    RoughCastContext *roughCast();
-    SizeofTypeContext *sizeofType();
-    SizeofExpressionContext *sizeofExpression();
-    LiteralExpressionContext *literalExpression();
-    IndependentExpressionContext *independentExpression();
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
+		};
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		DataContext* data();
 
-  ExpressionContext* expression();
+		class ConstantDeclarationContext : public antlr4::ParserRuleContext
+		{
+			public:
+				ConstantDeclarationContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-  class  IndependentExpressionContext : public antlr4::ParserRuleContext {
-  public:
-    IndependentExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    FunctionCallContext *functionCall();
+				virtual size_t getRuleIndex() const override;
 
+				AccessModifierContext* accessModifier();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				TypeContext* type();
 
-  IndependentExpressionContext* independentExpression();
+				antlr4::tree::TerminalNode* IDENTIFIER();
 
-  class  FunctionCallContext : public antlr4::ParserRuleContext {
-  public:
-    FunctionCallContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    ArgumentsContext *arguments();
+				LiteralExpressionContext* literalExpression();
 
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		};
 
-  FunctionCallContext* functionCall();
+		ConstantDeclarationContext* constantDeclaration();
 
-  class  ArgumentsContext : public antlr4::ParserRuleContext {
-  public:
-    ArgumentsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<ExpressionContext *> expression();
-    ExpressionContext* expression(size_t i);
+		class VariableDeclarationContext : public antlr4::ParserRuleContext
+		{
+			public:
+				VariableDeclarationContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
+				virtual size_t getRuleIndex() const override;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				AccessModifierContext* accessModifier();
 
-  ArgumentsContext* arguments();
+				TypeContext* type();
 
-  class  VariableAccessContext : public antlr4::ParserRuleContext {
-  public:
-    VariableAccessContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *IDENTIFIER();
+				antlr4::tree::TerminalNode* IDENTIFIER();
 
+				LiteralExpressionContext* literalExpression();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-  VariableAccessContext* variableAccess();
+		};
 
-  class  AllocationContext : public antlr4::ParserRuleContext {
-  public:
-    AllocationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    AllocatorContext *allocator();
-    TypeContext *type();
+		VariableDeclarationContext* variableDeclaration();
 
+		class CodeContext : public antlr4::ParserRuleContext
+		{
+			public:
+				CodeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				virtual size_t getRuleIndex() const override;
 
-  AllocationContext* allocation();
+				FunctionContext* function();
 
-  class  AllocatorContext : public antlr4::ParserRuleContext {
-  public:
-    AllocatorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *DYNAMIC();
-    antlr4::tree::TerminalNode *AUTOMATIC();
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
+		};
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		CodeContext* code();
 
-  AllocatorContext* allocator();
+		class FunctionContext : public antlr4::ParserRuleContext
+		{
+			public:
+				FunctionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-  class  RoughCastContext : public antlr4::ParserRuleContext {
-  public:
-    RoughCastContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    TypeContext *type();
-    ExpressionContext *expression();
+				virtual size_t getRuleIndex() const override;
 
+				AccessModifierContext* accessModifier();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				TypeContext* type();
 
-  RoughCastContext* roughCast();
+				antlr4::tree::TerminalNode* IDENTIFIER();
 
-  class  SizeofTypeContext : public antlr4::ParserRuleContext {
-  public:
-    SizeofTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    TypeContext *type();
+				ParametersContext* parameters();
 
+				std::vector<StatementContext*> statement();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				StatementContext* statement(size_t i);
 
-  SizeofTypeContext* sizeofType();
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-  class  SizeofExpressionContext : public antlr4::ParserRuleContext {
-  public:
-    SizeofExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    ExpressionContext *expression();
+		};
 
+		FunctionContext* function();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class ParametersContext : public antlr4::ParserRuleContext
+		{
+			public:
+				ParametersContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-  SizeofExpressionContext* sizeofExpression();
+				virtual size_t getRuleIndex() const override;
 
-  class  LiteralExpressionContext : public antlr4::ParserRuleContext {
-  public:
-    LiteralExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    StringLiteralContext *stringLiteral();
-    ByteLiteralContext *byteLiteral();
-    IntegerLiteralContext *integerLiteral();
-    FloatingPointLiteralContext *floatingPointLiteral();
-    BooleanLiteralContext *booleanLiteral();
+				std::vector<ParameterContext*> parameter();
 
+				ParameterContext* parameter(size_t i);
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-  LiteralExpressionContext* literalExpression();
+		};
 
-  class  StringLiteralContext : public antlr4::ParserRuleContext {
-  public:
-    StringLiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *STRING();
+		ParametersContext* parameters();
 
+		class ParameterContext : public antlr4::ParserRuleContext
+		{
+			public:
+				ParameterContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				virtual size_t getRuleIndex() const override;
 
-  StringLiteralContext* stringLiteral();
+				TypeContext* type();
 
-  class  ByteLiteralContext : public antlr4::ParserRuleContext {
-  public:
-    ByteLiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *BYTE();
+				antlr4::tree::TerminalNode* IDENTIFIER();
 
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		};
 
-  ByteLiteralContext* byteLiteral();
+		ParameterContext* parameter();
 
-  class  IntegerLiteralContext : public antlr4::ParserRuleContext {
-  public:
-    IntegerLiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    UnsignedIntegerContext *unsignedInteger();
-    SignedIntegerContext *signedInteger();
-    SpecialIntegerContext *specialInteger();
+		class AccessModifierContext : public antlr4::ParserRuleContext
+		{
+			public:
+				AccessModifierContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
+				virtual size_t getRuleIndex() const override;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				antlr4::tree::TerminalNode* PUBLIC();
 
-  IntegerLiteralContext* integerLiteral();
+				antlr4::tree::TerminalNode* PRIVATE();
 
-  class  UnsignedIntegerContext : public antlr4::ParserRuleContext {
-  public:
-    UnsignedIntegerContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<antlr4::tree::TerminalNode *> INTEGER();
-    antlr4::tree::TerminalNode* INTEGER(size_t i);
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
+		};
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		AccessModifierContext* accessModifier();
 
-  UnsignedIntegerContext* unsignedInteger();
+		class StatementContext : public antlr4::ParserRuleContext
+		{
+			public:
+				StatementContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-  class  SignedIntegerContext : public antlr4::ParserRuleContext {
-  public:
-    SignedIntegerContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *SIGNED_INTEGER();
-    antlr4::tree::TerminalNode *INTEGER();
+				virtual size_t getRuleIndex() const override;
 
+				ExpressionStatementContext* expressionStatement();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				LocalVariableDefinitionContext* localVariableDefinition();
 
-  SignedIntegerContext* signedInteger();
+				VariableAssignmentContext* variableAssignment();
 
-  class  SpecialIntegerContext : public antlr4::ParserRuleContext {
-  public:
-    SpecialIntegerContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *HEX_INTEGER();
-    antlr4::tree::TerminalNode *INTEGER();
-    antlr4::tree::TerminalNode *BIN_INTEGER();
-    antlr4::tree::TerminalNode *OCT_INTEGER();
+				PrintStatementContext* printStatement();
 
+				DeleteStatementContext* deleteStatement();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				ReturnStatementContext* returnStatement();
 
-  SpecialIntegerContext* specialInteger();
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-  class  FloatingPointLiteralContext : public antlr4::ParserRuleContext {
-  public:
-    FloatingPointLiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *HALF();
-    antlr4::tree::TerminalNode *SINGLE();
-    antlr4::tree::TerminalNode *DOUBLE();
-    antlr4::tree::TerminalNode *QUAD();
+		};
 
+		StatementContext* statement();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class ExpressionStatementContext : public antlr4::ParserRuleContext
+		{
+			public:
+				ExpressionStatementContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-  FloatingPointLiteralContext* floatingPointLiteral();
+				virtual size_t getRuleIndex() const override;
 
-  class  BooleanLiteralContext : public antlr4::ParserRuleContext {
-  public:
-    BooleanLiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *TRUE();
-    antlr4::tree::TerminalNode *FALSE();
+				IndependentExpressionContext* independentExpression();
 
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		};
 
-  BooleanLiteralContext* booleanLiteral();
+		ExpressionStatementContext* expressionStatement();
 
-  class  TypeContext : public antlr4::ParserRuleContext {
-  public:
-    TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-   
-    TypeContext() = default;
-    void copyFrom(TypeContext *context);
-    using antlr4::ParserRuleContext::copyFrom;
+		class LocalVariableDefinitionContext : public antlr4::ParserRuleContext
+		{
+			public:
+				LocalVariableDefinitionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-    virtual size_t getRuleIndex() const override;
+				virtual size_t getRuleIndex() const override;
 
-   
-  };
+				TypeContext* type();
 
-  class  IntegerContext : public TypeContext {
-  public:
-    IntegerContext(TypeContext *ctx);
+				antlr4::tree::TerminalNode* IDENTIFIER();
 
-    IntegerTypeContext *integerType();
+				ExpressionContext* expression();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-  class  ArrayContext : public TypeContext {
-  public:
-    ArrayContext(TypeContext *ctx);
+		};
 
-    ArrayTypeContext *arrayType();
+		LocalVariableDefinitionContext* localVariableDefinition();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
+		class VariableAssignmentContext : public antlr4::ParserRuleContext
+		{
+			public:
+				VariableAssignmentContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-  class  KeywordContext : public TypeContext {
-  public:
-    KeywordContext(TypeContext *ctx);
+				virtual size_t getRuleIndex() const override;
 
-    KeywordTypeContext *keywordType();
+				antlr4::tree::TerminalNode* IDENTIFIER();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
+				ExpressionContext* expression();
 
-  class  PointerContext : public TypeContext {
-  public:
-    PointerContext(TypeContext *ctx);
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-    TypeContext *type();
+		};
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
+		VariableAssignmentContext* variableAssignment();
 
-  TypeContext* type();
-  TypeContext* type(int precedence);
-  class  IntegerTypeContext : public antlr4::ParserRuleContext {
-  public:
-    IntegerTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *NATIVE_INTEGER_TYPE();
+		class PrintStatementContext : public antlr4::ParserRuleContext
+		{
+			public:
+				PrintStatementContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
+				virtual size_t getRuleIndex() const override;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				ExpressionContext* expression();
 
-  IntegerTypeContext* integerType();
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-  class  ArrayTypeContext : public antlr4::ParserRuleContext {
-  public:
-    ArrayTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *INTEGER();
-    TypeContext *type();
+		};
 
+		PrintStatementContext* printStatement();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class DeleteStatementContext : public antlr4::ParserRuleContext
+		{
+			public:
+				DeleteStatementContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-  ArrayTypeContext* arrayType();
+				virtual size_t getRuleIndex() const override;
 
-  class  KeywordTypeContext : public antlr4::ParserRuleContext {
-  public:
-    KeywordTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    FloatingPointTypeContext *floatingPointType();
-    SizeTypeContext *sizeType();
-    UnsignedIntegerPointerTypeContext *unsignedIntegerPointerType();
-    VoidTypeContext *voidType();
+				ExpressionContext* expression();
 
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		};
 
-  KeywordTypeContext* keywordType();
+		DeleteStatementContext* deleteStatement();
 
-  class  FloatingPointTypeContext : public antlr4::ParserRuleContext {
-  public:
-    FloatingPointTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *HALF_TYPE();
-    antlr4::tree::TerminalNode *SINGLE_TYPE();
-    antlr4::tree::TerminalNode *DOUBLE_TYPE();
-    antlr4::tree::TerminalNode *QUAD_TYPE();
+		class ReturnStatementContext : public antlr4::ParserRuleContext
+		{
+			public:
+				ReturnStatementContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
+				virtual size_t getRuleIndex() const override;
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				ExpressionContext* expression();
 
-  FloatingPointTypeContext* floatingPointType();
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
-  class  SizeTypeContext : public antlr4::ParserRuleContext {
-  public:
-    SizeTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
+		};
 
+		ReturnStatementContext* returnStatement();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+		class ExpressionContext : public antlr4::ParserRuleContext
+		{
+			public:
+				ExpressionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-  SizeTypeContext* sizeType();
+				virtual size_t getRuleIndex() const override;
 
-  class  UnsignedIntegerPointerTypeContext : public antlr4::ParserRuleContext {
-  public:
-    UnsignedIntegerPointerTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
+				VariableAccessContext* variableAccess();
 
+				AllocationContext* allocation();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				RoughCastContext* roughCast();
 
-  UnsignedIntegerPointerTypeContext* unsignedIntegerPointerType();
+				SizeofTypeContext* sizeofType();
 
-  class  VoidTypeContext : public antlr4::ParserRuleContext {
-  public:
-    VoidTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
+				SizeofExpressionContext* sizeofExpression();
 
+				LiteralExpressionContext* literalExpression();
 
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
+				IndependentExpressionContext* independentExpression();
 
-  VoidTypeContext* voidType();
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
 
+		};
 
-  virtual bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
-  bool typeSempred(TypeContext *_localctx, size_t predicateIndex);
+		ExpressionContext* expression();
 
-private:
-  static std::vector<antlr4::dfa::DFA> _decisionToDFA;
-  static antlr4::atn::PredictionContextCache _sharedContextCache;
-  static std::vector<std::string> _ruleNames;
-  static std::vector<std::string> _tokenNames;
+		class IndependentExpressionContext : public antlr4::ParserRuleContext
+		{
+			public:
+				IndependentExpressionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-  static std::vector<std::string> _literalNames;
-  static std::vector<std::string> _symbolicNames;
-  static antlr4::dfa::Vocabulary _vocabulary;
-  static antlr4::atn::ATN _atn;
-  static std::vector<uint16_t> _serializedATN;
+				virtual size_t getRuleIndex() const override;
 
+				FunctionCallContext* functionCall();
 
-  struct Initializer {
-    Initializer();
-  };
-  static Initializer _init;
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		IndependentExpressionContext* independentExpression();
+
+		class FunctionCallContext : public antlr4::ParserRuleContext
+		{
+			public:
+				FunctionCallContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* IDENTIFIER();
+
+				ArgumentsContext* arguments();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		FunctionCallContext* functionCall();
+
+		class ArgumentsContext : public antlr4::ParserRuleContext
+		{
+			public:
+				ArgumentsContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				std::vector<ExpressionContext*> expression();
+
+				ExpressionContext* expression(size_t i);
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		ArgumentsContext* arguments();
+
+		class VariableAccessContext : public antlr4::ParserRuleContext
+		{
+			public:
+				VariableAccessContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* IDENTIFIER();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		VariableAccessContext* variableAccess();
+
+		class AllocationContext : public antlr4::ParserRuleContext
+		{
+			public:
+				AllocationContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				AllocatorContext* allocator();
+
+				TypeContext* type();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		AllocationContext* allocation();
+
+		class AllocatorContext : public antlr4::ParserRuleContext
+		{
+			public:
+				AllocatorContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* DYNAMIC();
+
+				antlr4::tree::TerminalNode* AUTOMATIC();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		AllocatorContext* allocator();
+
+		class RoughCastContext : public antlr4::ParserRuleContext
+		{
+			public:
+				RoughCastContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				TypeContext* type();
+
+				ExpressionContext* expression();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		RoughCastContext* roughCast();
+
+		class SizeofTypeContext : public antlr4::ParserRuleContext
+		{
+			public:
+				SizeofTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				TypeContext* type();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		SizeofTypeContext* sizeofType();
+
+		class SizeofExpressionContext : public antlr4::ParserRuleContext
+		{
+			public:
+				SizeofExpressionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				ExpressionContext* expression();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		SizeofExpressionContext* sizeofExpression();
+
+		class LiteralExpressionContext : public antlr4::ParserRuleContext
+		{
+			public:
+				LiteralExpressionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				StringLiteralContext* stringLiteral();
+
+				ByteLiteralContext* byteLiteral();
+
+				IntegerLiteralContext* integerLiteral();
+
+				FloatingPointLiteralContext* floatingPointLiteral();
+
+				BooleanLiteralContext* booleanLiteral();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		LiteralExpressionContext* literalExpression();
+
+		class StringLiteralContext : public antlr4::ParserRuleContext
+		{
+			public:
+				StringLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* STRING();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		StringLiteralContext* stringLiteral();
+
+		class ByteLiteralContext : public antlr4::ParserRuleContext
+		{
+			public:
+				ByteLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* BYTE();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		ByteLiteralContext* byteLiteral();
+
+		class IntegerLiteralContext : public antlr4::ParserRuleContext
+		{
+			public:
+				IntegerLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				UnsignedIntegerContext* unsignedInteger();
+
+				SignedIntegerContext* signedInteger();
+
+				SpecialIntegerContext* specialInteger();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		IntegerLiteralContext* integerLiteral();
+
+		class UnsignedIntegerContext : public antlr4::ParserRuleContext
+		{
+			public:
+				UnsignedIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				std::vector<antlr4::tree::TerminalNode*> INTEGER();
+
+				antlr4::tree::TerminalNode* INTEGER(size_t i);
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		UnsignedIntegerContext* unsignedInteger();
+
+		class SignedIntegerContext : public antlr4::ParserRuleContext
+		{
+			public:
+				SignedIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* SIGNED_INTEGER();
+
+				antlr4::tree::TerminalNode* INTEGER();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		SignedIntegerContext* signedInteger();
+
+		class SpecialIntegerContext : public antlr4::ParserRuleContext
+		{
+			public:
+				SpecialIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* HEX_INTEGER();
+
+				antlr4::tree::TerminalNode* INTEGER();
+
+				antlr4::tree::TerminalNode* BIN_INTEGER();
+
+				antlr4::tree::TerminalNode* OCT_INTEGER();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		SpecialIntegerContext* specialInteger();
+
+		class FloatingPointLiteralContext : public antlr4::ParserRuleContext
+		{
+			public:
+				FloatingPointLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* HALF();
+
+				antlr4::tree::TerminalNode* SINGLE();
+
+				antlr4::tree::TerminalNode* DOUBLE();
+
+				antlr4::tree::TerminalNode* QUAD();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		FloatingPointLiteralContext* floatingPointLiteral();
+
+		class BooleanLiteralContext : public antlr4::ParserRuleContext
+		{
+			public:
+				BooleanLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* TRUE();
+
+				antlr4::tree::TerminalNode* FALSE();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		BooleanLiteralContext* booleanLiteral();
+
+		class TypeContext : public antlr4::ParserRuleContext
+		{
+			public:
+				TypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				TypeContext() = default;
+
+				void copyFrom(TypeContext* context);
+
+				using antlr4::ParserRuleContext::copyFrom;
+
+				virtual size_t getRuleIndex() const override;
+
+		};
+
+		class IntegerContext : public TypeContext
+		{
+			public:
+				IntegerContext(TypeContext* ctx);
+
+				IntegerTypeContext* integerType();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+		};
+
+		class ArrayContext : public TypeContext
+		{
+			public:
+				ArrayContext(TypeContext* ctx);
+
+				ArrayTypeContext* arrayType();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+		};
+
+		class KeywordContext : public TypeContext
+		{
+			public:
+				KeywordContext(TypeContext* ctx);
+
+				KeywordTypeContext* keywordType();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+		};
+
+		class PointerContext : public TypeContext
+		{
+			public:
+				PointerContext(TypeContext* ctx);
+
+				TypeContext* type();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+		};
+
+		TypeContext* type();
+
+		TypeContext* type(int precedence);
+
+		class IntegerTypeContext : public antlr4::ParserRuleContext
+		{
+			public:
+				IntegerTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* NATIVE_INTEGER_TYPE();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		IntegerTypeContext* integerType();
+
+		class ArrayTypeContext : public antlr4::ParserRuleContext
+		{
+			public:
+				ArrayTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* INTEGER();
+
+				TypeContext* type();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		ArrayTypeContext* arrayType();
+
+		class KeywordTypeContext : public antlr4::ParserRuleContext
+		{
+			public:
+				KeywordTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				FloatingPointTypeContext* floatingPointType();
+
+				SizeTypeContext* sizeType();
+
+				UnsignedIntegerPointerTypeContext* unsignedIntegerPointerType();
+
+				VoidTypeContext* voidType();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		KeywordTypeContext* keywordType();
+
+		class FloatingPointTypeContext : public antlr4::ParserRuleContext
+		{
+			public:
+				FloatingPointTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				antlr4::tree::TerminalNode* HALF_TYPE();
+
+				antlr4::tree::TerminalNode* SINGLE_TYPE();
+
+				antlr4::tree::TerminalNode* DOUBLE_TYPE();
+
+				antlr4::tree::TerminalNode* QUAD_TYPE();
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		FloatingPointTypeContext* floatingPointType();
+
+		class SizeTypeContext : public antlr4::ParserRuleContext
+		{
+			public:
+				SizeTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		SizeTypeContext* sizeType();
+
+		class UnsignedIntegerPointerTypeContext : public antlr4::ParserRuleContext
+		{
+			public:
+				UnsignedIntegerPointerTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		UnsignedIntegerPointerTypeContext* unsignedIntegerPointerType();
+
+		class VoidTypeContext : public antlr4::ParserRuleContext
+		{
+			public:
+				VoidTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+				virtual size_t getRuleIndex() const override;
+
+				virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+
+		};
+
+		VoidTypeContext* voidType();
+
+		virtual bool sempred(antlr4::RuleContext* _localctx, size_t ruleIndex, size_t predicateIndex) override;
+
+		bool typeSempred(TypeContext* _localctx, size_t predicateIndex);
+
+	private:
+		static std::vector<antlr4::dfa::DFA> _decisionToDFA;
+		static antlr4::atn::PredictionContextCache _sharedContextCache;
+		static std::vector<std::string> _ruleNames;
+		static std::vector<std::string> _tokenNames;
+
+		static std::vector<std::string> _literalNames;
+		static std::vector<std::string> _symbolicNames;
+		static antlr4::dfa::Vocabulary _vocabulary;
+		static antlr4::atn::ATN _atn;
+		static std::vector<uint16_t> _serializedATN;
+
+		struct Initializer
+		{
+				Initializer();
+		};
+
+		static Initializer _init;
 };
 
