@@ -10,11 +10,11 @@ data
 	;
 
 constantDeclaration
-	: accessModifier CONST type IDENTIFIER DEFINITION literalExpression ';'
+	: accessModifier 'const' type IDENTIFIER ':=' literalExpression ';'
 	;
 
 variableDeclaration
-	: accessModifier type IDENTIFIER ( ASSIGNMENT literalExpression )? ';'
+	: accessModifier type IDENTIFIER ( '<-' literalExpression )? ';'
 	;
 
 code
@@ -52,23 +52,23 @@ expressionStatement
 	;
 
 localVariableDefinition
-	: type IDENTIFIER ( ASSIGNMENT expression )? ';'
+	: type IDENTIFIER ( '<-' expression )? ';'
 	;
 
 variableAssignment
-	: IDENTIFIER ASSIGNMENT expression ';'
+	: IDENTIFIER '<-' expression ';'
 	;
 
 printStatement
-	: PRINT expression ';'
+	: 'print' expression ';'
 	;
 
 deleteStatement
-    : DELETE expression ';'
+    : 'delete' expression ';'
     ;
 
 returnStatement
-	: RETURN ( expression )? ';'
+	: 'return' ( expression )? ';'
 	;
 
 expression
@@ -191,15 +191,15 @@ floatingPointType
 	;
 
 sizeType
-	: SIZE
+	: 'size'
 	;
 
 unsignedIntegerPointerType
-    : UIPTR
+    : 'uiptr'
     ;
 
 voidType
-	: VOID
+	: 'void'
 	;
 
 NATIVE_INTEGER_TYPE : 'u'? 'i' INTEGER ;
@@ -228,15 +228,13 @@ INTEGER : [0-9]+ ;
 DYNAMIC : 'dynamic' ;
 AUTOMATIC : 'automatic' ;
 
+TRUE : 'true' ;
+FALSE : 'false' ;
+
 PUBLIC : 'public' ;
 PRIVATE : 'private' ;
 
-VOID : 'void' ;
-
 IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
-
-DEFINITION : ':=' ;
-ASSIGNMENT : '<-' ;
 
 WHITESPACE : [ \t\r\n]+ -> skip ;
 

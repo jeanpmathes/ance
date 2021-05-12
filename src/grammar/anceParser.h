@@ -13,14 +13,14 @@ class  anceParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, NATIVE_INTEGER_TYPE = 13, 
-    HALF_TYPE = 14, SINGLE_TYPE = 15, DOUBLE_TYPE = 16, QUAD_TYPE = 17, 
-    SIGNED_INTEGER = 18, HEX_INTEGER = 19, BIN_INTEGER = 20, OCT_INTEGER = 21, 
-    HALF = 22, SINGLE = 23, DOUBLE = 24, QUAD = 25, DECIMAL = 26, STRING = 27, 
-    BYTE = 28, INTEGER = 29, DYNAMIC = 30, AUTOMATIC = 31, TRUE = 32, FALSE = 33, 
-    SIZE = 34, UIPTR = 35, PRINT = 36, RETURN = 37, DELETE = 38, CONST = 39, 
-    PUBLIC = 40, PRIVATE = 41, VOID = 42, IDENTIFIER = 43, DEFINITION = 44, 
-    ASSIGNMENT = 45, WHITESPACE = 46, BLOCK_COMMENT = 47, LINE_COMMENT = 48
+    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
+    T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
+    T__20 = 21, NATIVE_INTEGER_TYPE = 22, HALF_TYPE = 23, SINGLE_TYPE = 24, 
+    DOUBLE_TYPE = 25, QUAD_TYPE = 26, SIGNED_INTEGER = 27, HEX_INTEGER = 28, 
+    BIN_INTEGER = 29, OCT_INTEGER = 30, HALF = 31, SINGLE = 32, DOUBLE = 33, 
+    QUAD = 34, DECIMAL = 35, STRING = 36, BYTE = 37, INTEGER = 38, DYNAMIC = 39, 
+    AUTOMATIC = 40, TRUE = 41, FALSE = 42, PUBLIC = 43, PRIVATE = 44, IDENTIFIER = 45, 
+    WHITESPACE = 46, BLOCK_COMMENT = 47, LINE_COMMENT = 48
   };
 
   enum {
@@ -127,10 +127,8 @@ public:
     ConstantDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     AccessModifierContext *accessModifier();
-    antlr4::tree::TerminalNode *CONST();
     TypeContext *type();
     antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *DEFINITION();
     LiteralExpressionContext *literalExpression();
 
 
@@ -147,7 +145,6 @@ public:
     AccessModifierContext *accessModifier();
     TypeContext *type();
     antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *ASSIGNMENT();
     LiteralExpressionContext *literalExpression();
 
 
@@ -267,7 +264,6 @@ public:
     virtual size_t getRuleIndex() const override;
     TypeContext *type();
     antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *ASSIGNMENT();
     ExpressionContext *expression();
 
 
@@ -282,7 +278,6 @@ public:
     VariableAssignmentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IDENTIFIER();
-    antlr4::tree::TerminalNode *ASSIGNMENT();
     ExpressionContext *expression();
 
 
@@ -296,7 +291,6 @@ public:
   public:
     PrintStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *PRINT();
     ExpressionContext *expression();
 
 
@@ -310,7 +304,6 @@ public:
   public:
     DeleteStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *DELETE();
     ExpressionContext *expression();
 
 
@@ -324,7 +317,6 @@ public:
   public:
     ReturnStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *RETURN();
     ExpressionContext *expression();
 
 
@@ -706,7 +698,6 @@ public:
   public:
     SizeTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *SIZE();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -719,7 +710,6 @@ public:
   public:
     UnsignedIntegerPointerTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *UIPTR();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -732,7 +722,6 @@ public:
   public:
     VoidTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *VOID();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
