@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_ANCE_EXPRESSION_VARIABLEEXPRESSION_H_
-#define ANCE_SRC_ANCE_EXPRESSION_VARIABLEEXPRESSION_H_
+#ifndef ANCE_SRC_ANCE_EXPRESSION_VARIABLEACCESS_H_
+#define ANCE_SRC_ANCE_EXPRESSION_VARIABLEACCESS_H_
 
 #include "BuildableExpression.h"
 
@@ -10,10 +10,10 @@ class Variable;
 class Scope;
 }
 
-class VariableExpression : public BuildableExpression
+class VariableAccess : public BuildableExpression
 {
 	public:
-		explicit VariableExpression(std::string identifier);
+		explicit VariableAccess(std::string identifier);
 
 		void setScope(ance::Scope* scope) override;
 
@@ -29,7 +29,7 @@ class VariableExpression : public BuildableExpression
 			llvm::DIBuilder* di
 		) override;
 
-		~VariableExpression() override;
+		~VariableAccess() override;
 
 	private:
 		std::string identifier_;

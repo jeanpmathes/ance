@@ -1,14 +1,14 @@
-#ifndef ANCE_SRC_ANCE_EXPRESSION_ALLOCATIONEXPRESSION_H_
-#define ANCE_SRC_ANCE_EXPRESSION_ALLOCATIONEXPRESSION_H_
+#ifndef ANCE_SRC_ANCE_EXPRESSION_ALLOCATION_H_
+#define ANCE_SRC_ANCE_EXPRESSION_ALLOCATION_H_
 
 #include "BuildableExpression.h"
 #include "Runtime.h"
 #include "Application.h"
 
-class AllocationExpression : public BuildableExpression
+class Allocation : public BuildableExpression
 {
 	public:
-		AllocationExpression(Runtime::Allocator allocation, ance::Type* type, Application& app);
+		Allocation(Runtime::Allocator allocation, ance::Type* type, Application& app);
 
 		ance::Type* getType() override;
 
@@ -22,7 +22,7 @@ class AllocationExpression : public BuildableExpression
 			llvm::DIBuilder* di
 		) override;
 
-		~AllocationExpression() override;
+		~Allocation() override;
 
 	private:
 		Runtime::Allocator allocation_;

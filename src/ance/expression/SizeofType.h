@@ -1,16 +1,14 @@
-#ifndef ANCE_SRC_ANCE_EXPRESSION_SIZEOFEXPREXPRESSION_H_
-#define ANCE_SRC_ANCE_EXPRESSION_SIZEOFEXPREXPRESSION_H_
+#ifndef ANCE_SRC_ANCE_EXPRESSION_SIZEOFTYPE_H_
+#define ANCE_SRC_ANCE_EXPRESSION_SIZEOFTYPE_H_
 
 #include "BuildableExpression.h"
 
 class Application;
 
-class SizeofExprExpression : public BuildableExpression
+class SizeofType : public BuildableExpression
 {
 	public:
-		explicit SizeofExprExpression(Expression* expression);
-
-		void setScope(ance::Scope* scope) override;
+		explicit SizeofType(ance::Type* type);
 
 		ance::Type* getType() override;
 
@@ -26,7 +24,7 @@ class SizeofExprExpression : public BuildableExpression
 
 	private:
 		ance::Value* return_value_;
-		Expression* expression_;
+		ance::Type* type_;
 };
 
 #endif

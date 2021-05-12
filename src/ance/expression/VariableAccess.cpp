@@ -1,4 +1,4 @@
-#include "VariableExpression.h"
+#include "VariableAccess.h"
 
 #include <utility>
 
@@ -6,27 +6,27 @@
 #include "Value.h"
 #include "Scope.h"
 
-VariableExpression::VariableExpression(std::string identifier)
+VariableAccess::VariableAccess(std::string identifier)
 	: identifier_(std::move(identifier)), value_(new ance::ExpressionBackedValue(this))
 {
 }
 
-void VariableExpression::setScope(ance::Scope* scope)
+void VariableAccess::setScope(ance::Scope* scope)
 {
 	variable_ = scope->getVariable(identifier_);
 }
 
-ance::Type* VariableExpression::getType()
+ance::Type* VariableAccess::getType()
 {
 	return variable_->type();
 }
 
-ance::Value* VariableExpression::getValue()
+ance::Value* VariableAccess::getValue()
 {
 	return value_;
 }
 
-llvm::Value* VariableExpression::build(
+llvm::Value* VariableAccess::build(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -37,4 +37,4 @@ llvm::Value* VariableExpression::build(
 	return variable_->getValue(c, m, state, ir, di);
 }
 
-VariableExpression::~VariableExpression() = default;
+VariableAccess::~VariableAccess() = default;

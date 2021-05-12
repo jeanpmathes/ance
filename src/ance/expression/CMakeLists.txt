@@ -6,8 +6,8 @@ target_sources(ance PRIVATE DefaultValueExpression.cpp
                BuildableExpression.cpp
                BuildableConstantExpression.cpp
                FunctionCall.cpp
-               ConstantLiteralExpression.cpp
-               SizeofExprExpression.cpp
-               SizeofTypeExpression.cpp
-               VariableExpression.cpp
-               AllocationExpression.cpp)
+               ConstantLiteral.cpp
+               SizeofExpression.cpp
+               SizeofType.cpp
+               VariableAccess.cpp
+               Allocation.cpp)

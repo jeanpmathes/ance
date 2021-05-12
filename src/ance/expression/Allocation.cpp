@@ -1,10 +1,10 @@
-#include "AllocationExpression.h"
+#include "Allocation.h"
 
 #include "ExpressionBackedValue.h"
 #include "PointerType.h"
 #include "CompileState.h"
 
-AllocationExpression::AllocationExpression(Runtime::Allocator allocation, ance::Type* type, Application& app)
+Allocation::Allocation(Runtime::Allocator allocation, ance::Type* type, Application& app)
 	: allocation_(allocation),
 	  allocated_type_(type),
 	  return_type_(ance::PointerType::get(app, type)),
@@ -13,17 +13,17 @@ AllocationExpression::AllocationExpression(Runtime::Allocator allocation, ance::
 
 }
 
-ance::Type* AllocationExpression::getType()
+ance::Type* Allocation::getType()
 {
 	return return_type_;
 }
 
-ance::Value* AllocationExpression::getValue()
+ance::Value* Allocation::getValue()
 {
 	return value_;
 }
 
-llvm::Value* AllocationExpression::build(
+llvm::Value* Allocation::build(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -34,4 +34,4 @@ llvm::Value* AllocationExpression::build(
 	return state->runtime_->allocate(allocation_, allocated_type_, c, m, state, ir, di);
 }
 
-AllocationExpression::~AllocationExpression() = default;
+Allocation::~Allocation() = default;

@@ -24,12 +24,12 @@
 #include "DeleteStatement.h"
 
 #include "FunctionCall.h"
-#include "SizeofExprExpression.h"
-#include "SizeofTypeExpression.h"
-#include "ConstantLiteralExpression.h"
+#include "SizeofExpression.h"
+#include "SizeofType.h"
+#include "ConstantLiteral.h"
 #include "DefaultValueExpression.h"
-#include "VariableExpression.h"
-#include "AllocationExpression.h"
+#include "VariableAccess.h"
+#include "Allocation.h"
 
 #include "StringConstant.h"
 #include "ByteConstant.h"
@@ -245,7 +245,7 @@ antlrcpp::Any Visitor::visitArguments(anceParser::ArgumentsContext* ctx)
 antlrcpp::Any Visitor::visitVariableAccess(anceParser::VariableAccessContext* ctx)
 {
 	std::string identifier = ctx->IDENTIFIER()->getText();
-	Expression* expression = new VariableExpression(identifier);
+	Expression* expression = new VariableAccess(identifier);
 	return expression;
 }
 
@@ -254,20 +254,20 @@ antlrcpp::Any Visitor::visitAllocation(anceParser::AllocationContext* ctx)
 	Runtime::Allocator allocator = visit(ctx->allocator());
 	ance::Type* type = visit(ctx->type());
 
-	Expression* expression = new AllocationExpression(allocator, type, application_);
+	Expression* expression = new Allocation(allocator, type, application_);
 	return expression;
 }
 
 antlrcpp::Any Visitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)
 {
 	ance::Type* type = visit(ctx->type());
-	return static_cast<Expression*>(new SizeofTypeExpression(type));
+	return static_cast<Expression*>(new SizeofType(type));
 }
 
 antlrcpp::Any Visitor::visitSizeofExpression(anceParser::SizeofExpressionContext* ctx)
 {
 	Expression* expr = visit(ctx->expression());
-	return static_cast<Expression*>(new SizeofExprExpression(expr));
+	return static_cast<Expression*>(new SizeofExpression(expr));
 }
 
 antlrcpp::Any Visitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)
@@ -275,7 +275,7 @@ antlrcpp::Any Visitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)
 	std::string str = ance::StringConstant::parse(ctx->STRING()->getText());
 
 	ance::Constant* string = new ance::StringConstant(str, application_);
-	return static_cast<Expression*>(new ConstantLiteralExpression(string));
+	return static_cast<Expression*>(new ConstantLiteral(string));
 }
 
 antlrcpp::Any Visitor::visitByteLiteral(anceParser::ByteLiteralContext* ctx)
@@ -283,7 +283,7 @@ antlrcpp::Any Visitor::visitByteLiteral(anceParser::ByteLiteralContext* ctx)
 	uint8_t b = ance::ByteConstant::parse(ctx->BYTE()->getText());
 
 	ance::Constant* byte = new ance::ByteConstant(b, application_);
-	return static_cast<Expression*>(new ConstantLiteralExpression(byte));
+	return static_cast<Expression*>(new ConstantLiteral(byte));
 }
 
 antlrcpp::Any Visitor::visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext* ctx)
@@ -316,7 +316,7 @@ antlrcpp::Any Visitor::visitFloatingPointLiteral(anceParser::FloatingPointLitera
 	}
 
 	auto* flt = new ance::FloatConstant(number, type);
-	return static_cast<Expression*>(new ConstantLiteralExpression(flt));
+	return static_cast<Expression*>(new ConstantLiteral(flt));
 }
 
 antlrcpp::Any Visitor::visitBooleanLiteral(anceParser::BooleanLiteralContext* ctx)
@@ -326,7 +326,7 @@ antlrcpp::Any Visitor::visitBooleanLiteral(anceParser::BooleanLiteralContext* ct
 	if (ctx->FALSE()) constant = ance::BooleanConstant::createFalse(application_);
 	if (ctx->TRUE()) constant = ance::BooleanConstant::createTrue(application_);
 
-	return static_cast<Expression*>(new ConstantLiteralExpression(constant));
+	return static_cast<Expression*>(new ConstantLiteral(constant));
 }
 
 antlrcpp::Any Visitor::visitUnsignedInteger(anceParser::UnsignedIntegerContext* ctx)
@@ -340,7 +340,7 @@ antlrcpp::Any Visitor::visitUnsignedInteger(anceParser::UnsignedIntegerContext* 
 
 	const llvm::APInt integer(size, ctx->INTEGER(0)->getText(), 10);
 	auto* integer_constant = new ance::IntegerConstant(integer, false, application_);
-	Expression* expression = new ConstantLiteralExpression(integer_constant);
+	Expression* expression = new ConstantLiteral(integer_constant);
 	return expression;
 }
 
@@ -355,7 +355,7 @@ antlrcpp::Any Visitor::visitSignedInteger(anceParser::SignedIntegerContext* ctx)
 
 	const llvm::APInt integer(size, ctx->SIGNED_INTEGER()->getText(), 10);
 	auto* integer_constant = new ance::IntegerConstant(integer, true, application_);
-	Expression* expression = new ConstantLiteralExpression(integer_constant);
+	Expression* expression = new ConstantLiteral(integer_constant);
 	return expression;
 }
 
@@ -393,7 +393,7 @@ antlrcpp::Any Visitor::visitSpecialInteger(anceParser::SpecialIntegerContext* ct
 
 	const llvm::APInt integer(size, integer_str, radix);
 	auto* integer_constant = new ance::IntegerConstant(integer, false, application_);
-	Expression* expression = new ConstantLiteralExpression(integer_constant);
+	Expression* expression = new ConstantLiteral(integer_constant);
 	return expression;
 }
 
