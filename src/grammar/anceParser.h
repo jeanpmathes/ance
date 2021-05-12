@@ -13,13 +13,13 @@ class  anceParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, NATIVE_INTEGER_TYPE = 12, 
-    HALF_TYPE = 13, SINGLE_TYPE = 14, DOUBLE_TYPE = 15, QUAD_TYPE = 16, 
-    SIGNED_INTEGER = 17, HEX_INTEGER = 18, BIN_INTEGER = 19, OCT_INTEGER = 20, 
-    HALF = 21, SINGLE = 22, DOUBLE = 23, QUAD = 24, DECIMAL = 25, STRING = 26, 
-    BYTE = 27, INTEGER = 28, DYNAMIC = 29, AUTOMATIC = 30, TRUE = 31, FALSE = 32, 
-    SIZEOF = 33, SIZE = 34, UIPTR = 35, PRINT = 36, RETURN = 37, DELETE = 38, 
-    CONST = 39, PUBLIC = 40, PRIVATE = 41, VOID = 42, IDENTIFIER = 43, DEFINITION = 44, 
+    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, NATIVE_INTEGER_TYPE = 13, 
+    HALF_TYPE = 14, SINGLE_TYPE = 15, DOUBLE_TYPE = 16, QUAD_TYPE = 17, 
+    SIGNED_INTEGER = 18, HEX_INTEGER = 19, BIN_INTEGER = 20, OCT_INTEGER = 21, 
+    HALF = 22, SINGLE = 23, DOUBLE = 24, QUAD = 25, DECIMAL = 26, STRING = 27, 
+    BYTE = 28, INTEGER = 29, DYNAMIC = 30, AUTOMATIC = 31, TRUE = 32, FALSE = 33, 
+    SIZE = 34, UIPTR = 35, PRINT = 36, RETURN = 37, DELETE = 38, CONST = 39, 
+    PUBLIC = 40, PRIVATE = 41, VOID = 42, IDENTIFIER = 43, DEFINITION = 44, 
     ASSIGNMENT = 45, WHITESPACE = 46, BLOCK_COMMENT = 47, LINE_COMMENT = 48
   };
 
@@ -30,13 +30,13 @@ public:
     RuleLocalVariableDefinition = 11, RuleVariableAssignment = 12, RulePrintStatement = 13, 
     RuleDeleteStatement = 14, RuleReturnStatement = 15, RuleExpression = 16, 
     RuleIndependentExpression = 17, RuleFunctionCall = 18, RuleArguments = 19, 
-    RuleVariableExpression = 20, RuleAllocationExpression = 21, RuleAllocator = 22, 
-    RuleSizeofTypeExpression = 23, RuleSizeofExpExpression = 24, RuleLiteralExpression = 25, 
-    RuleStringLiteral = 26, RuleByteLiteral = 27, RuleIntegerLiteral = 28, 
-    RuleUnsignedInteger = 29, RuleSignedInteger = 30, RuleSpecialInteger = 31, 
-    RuleFloatingPointLiteral = 32, RuleBooleanLiteral = 33, RuleType = 34, 
-    RuleIntegerType = 35, RuleArrayType = 36, RuleKeywordType = 37, RuleFloatingPointType = 38, 
-    RuleSizeType = 39, RuleUnsignedIntegerPointerType = 40, RuleVoidType = 41
+    RuleVariableAccess = 20, RuleAllocation = 21, RuleAllocator = 22, RuleSizeofType = 23, 
+    RuleSizeofExpression = 24, RuleLiteralExpression = 25, RuleStringLiteral = 26, 
+    RuleByteLiteral = 27, RuleIntegerLiteral = 28, RuleUnsignedInteger = 29, 
+    RuleSignedInteger = 30, RuleSpecialInteger = 31, RuleFloatingPointLiteral = 32, 
+    RuleBooleanLiteral = 33, RuleType = 34, RuleIntegerType = 35, RuleArrayType = 36, 
+    RuleKeywordType = 37, RuleFloatingPointType = 38, RuleSizeType = 39, 
+    RuleUnsignedIntegerPointerType = 40, RuleVoidType = 41
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -69,11 +69,11 @@ public:
   class IndependentExpressionContext;
   class FunctionCallContext;
   class ArgumentsContext;
-  class VariableExpressionContext;
-  class AllocationExpressionContext;
+  class VariableAccessContext;
+  class AllocationContext;
   class AllocatorContext;
-  class SizeofTypeExpressionContext;
-  class SizeofExpExpressionContext;
+  class SizeofTypeContext;
+  class SizeofExpressionContext;
   class LiteralExpressionContext;
   class StringLiteralContext;
   class ByteLiteralContext;
@@ -338,10 +338,10 @@ public:
   public:
     ExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    VariableExpressionContext *variableExpression();
-    AllocationExpressionContext *allocationExpression();
-    SizeofTypeExpressionContext *sizeofTypeExpression();
-    SizeofExpExpressionContext *sizeofExpExpression();
+    VariableAccessContext *variableAccess();
+    AllocationContext *allocation();
+    SizeofTypeContext *sizeofType();
+    SizeofExpressionContext *sizeofExpression();
     LiteralExpressionContext *literalExpression();
     IndependentExpressionContext *independentExpression();
 
@@ -393,9 +393,9 @@ public:
 
   ArgumentsContext* arguments();
 
-  class  VariableExpressionContext : public antlr4::ParserRuleContext {
+  class  VariableAccessContext : public antlr4::ParserRuleContext {
   public:
-    VariableExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    VariableAccessContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IDENTIFIER();
 
@@ -404,11 +404,11 @@ public:
    
   };
 
-  VariableExpressionContext* variableExpression();
+  VariableAccessContext* variableAccess();
 
-  class  AllocationExpressionContext : public antlr4::ParserRuleContext {
+  class  AllocationContext : public antlr4::ParserRuleContext {
   public:
-    AllocationExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    AllocationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     AllocatorContext *allocator();
     TypeContext *type();
@@ -418,7 +418,7 @@ public:
    
   };
 
-  AllocationExpressionContext* allocationExpression();
+  AllocationContext* allocation();
 
   class  AllocatorContext : public antlr4::ParserRuleContext {
   public:
@@ -434,11 +434,10 @@ public:
 
   AllocatorContext* allocator();
 
-  class  SizeofTypeExpressionContext : public antlr4::ParserRuleContext {
+  class  SizeofTypeContext : public antlr4::ParserRuleContext {
   public:
-    SizeofTypeExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    SizeofTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *SIZEOF();
     TypeContext *type();
 
 
@@ -446,13 +445,12 @@ public:
    
   };
 
-  SizeofTypeExpressionContext* sizeofTypeExpression();
+  SizeofTypeContext* sizeofType();
 
-  class  SizeofExpExpressionContext : public antlr4::ParserRuleContext {
+  class  SizeofExpressionContext : public antlr4::ParserRuleContext {
   public:
-    SizeofExpExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    SizeofExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *SIZEOF();
     ExpressionContext *expression();
 
 
@@ -460,7 +458,7 @@ public:
    
   };
 
-  SizeofExpExpressionContext* sizeofExpExpression();
+  SizeofExpressionContext* sizeofExpression();
 
   class  LiteralExpressionContext : public antlr4::ParserRuleContext {
   public:

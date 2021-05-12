@@ -454,7 +454,7 @@ anceParser::FunctionContext* anceParser::function() {
       _errHandler->sync(this);
       _la = _input->LA(1);
     } while ((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << anceParser::T__9)
+      ((1ULL << _la) & ((1ULL << anceParser::T__10)
       | (1ULL << anceParser::NATIVE_INTEGER_TYPE)
       | (1ULL << anceParser::HALF_TYPE)
       | (1ULL << anceParser::SINGLE_TYPE)
@@ -522,7 +522,7 @@ anceParser::ParametersContext* anceParser::parameters() {
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << anceParser::T__9)
+      ((1ULL << _la) & ((1ULL << anceParser::T__10)
       | (1ULL << anceParser::NATIVE_INTEGER_TYPE)
       | (1ULL << anceParser::HALF_TYPE)
       | (1ULL << anceParser::SINGLE_TYPE)
@@ -1104,6 +1104,7 @@ anceParser::ReturnStatementContext* anceParser::returnStatement() {
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & ((1ULL << anceParser::T__6)
+      | (1ULL << anceParser::T__7)
       | (1ULL << anceParser::SIGNED_INTEGER)
       | (1ULL << anceParser::HEX_INTEGER)
       | (1ULL << anceParser::BIN_INTEGER)
@@ -1117,7 +1118,6 @@ anceParser::ReturnStatementContext* anceParser::returnStatement() {
       | (1ULL << anceParser::INTEGER)
       | (1ULL << anceParser::TRUE)
       | (1ULL << anceParser::FALSE)
-      | (1ULL << anceParser::SIZEOF)
       | (1ULL << anceParser::IDENTIFIER))) != 0)) {
       setState(176);
       expression();
@@ -1141,20 +1141,20 @@ anceParser::ExpressionContext::ExpressionContext(ParserRuleContext *parent, size
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::VariableExpressionContext* anceParser::ExpressionContext::variableExpression() {
-  return getRuleContext<anceParser::VariableExpressionContext>(0);
+anceParser::VariableAccessContext* anceParser::ExpressionContext::variableAccess() {
+  return getRuleContext<anceParser::VariableAccessContext>(0);
 }
 
-anceParser::AllocationExpressionContext* anceParser::ExpressionContext::allocationExpression() {
-  return getRuleContext<anceParser::AllocationExpressionContext>(0);
+anceParser::AllocationContext* anceParser::ExpressionContext::allocation() {
+  return getRuleContext<anceParser::AllocationContext>(0);
 }
 
-anceParser::SizeofTypeExpressionContext* anceParser::ExpressionContext::sizeofTypeExpression() {
-  return getRuleContext<anceParser::SizeofTypeExpressionContext>(0);
+anceParser::SizeofTypeContext* anceParser::ExpressionContext::sizeofType() {
+  return getRuleContext<anceParser::SizeofTypeContext>(0);
 }
 
-anceParser::SizeofExpExpressionContext* anceParser::ExpressionContext::sizeofExpExpression() {
-  return getRuleContext<anceParser::SizeofExpExpressionContext>(0);
+anceParser::SizeofExpressionContext* anceParser::ExpressionContext::sizeofExpression() {
+  return getRuleContext<anceParser::SizeofExpressionContext>(0);
 }
 
 anceParser::LiteralExpressionContext* anceParser::ExpressionContext::literalExpression() {
@@ -1192,28 +1192,28 @@ anceParser::ExpressionContext* anceParser::expression() {
     case 1: {
       enterOuterAlt(_localctx, 1);
       setState(181);
-      variableExpression();
+      variableAccess();
       break;
     }
 
     case 2: {
       enterOuterAlt(_localctx, 2);
       setState(182);
-      allocationExpression();
+      allocation();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
       setState(183);
-      sizeofTypeExpression();
+      sizeofType();
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
       setState(184);
-      sizeofExpExpression();
+      sizeofExpression();
       break;
     }
 
@@ -1386,6 +1386,7 @@ anceParser::ArgumentsContext* anceParser::arguments() {
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
       ((1ULL << _la) & ((1ULL << anceParser::T__6)
+      | (1ULL << anceParser::T__7)
       | (1ULL << anceParser::SIGNED_INTEGER)
       | (1ULL << anceParser::HEX_INTEGER)
       | (1ULL << anceParser::BIN_INTEGER)
@@ -1399,7 +1400,6 @@ anceParser::ArgumentsContext* anceParser::arguments() {
       | (1ULL << anceParser::INTEGER)
       | (1ULL << anceParser::TRUE)
       | (1ULL << anceParser::FALSE)
-      | (1ULL << anceParser::SIZEOF)
       | (1ULL << anceParser::IDENTIFIER))) != 0)) {
       setState(196);
       expression();
@@ -1427,32 +1427,32 @@ anceParser::ArgumentsContext* anceParser::arguments() {
   return _localctx;
 }
 
-//----------------- VariableExpressionContext ------------------------------------------------------------------
+//----------------- VariableAccessContext ------------------------------------------------------------------
 
-anceParser::VariableExpressionContext::VariableExpressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::VariableAccessContext::VariableAccessContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::VariableExpressionContext::IDENTIFIER() {
+tree::TerminalNode* anceParser::VariableAccessContext::IDENTIFIER() {
   return getToken(anceParser::IDENTIFIER, 0);
 }
 
 
-size_t anceParser::VariableExpressionContext::getRuleIndex() const {
-  return anceParser::RuleVariableExpression;
+size_t anceParser::VariableAccessContext::getRuleIndex() const {
+  return anceParser::RuleVariableAccess;
 }
 
 
-antlrcpp::Any anceParser::VariableExpressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::VariableAccessContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitVariableExpression(this);
+    return parserVisitor->visitVariableAccess(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::VariableExpressionContext* anceParser::variableExpression() {
-  VariableExpressionContext *_localctx = _tracker.createInstance<VariableExpressionContext>(_ctx, getState());
-  enterRule(_localctx, 40, anceParser::RuleVariableExpression);
+anceParser::VariableAccessContext* anceParser::variableAccess() {
+  VariableAccessContext *_localctx = _tracker.createInstance<VariableAccessContext>(_ctx, getState());
+  enterRule(_localctx, 40, anceParser::RuleVariableAccess);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1472,36 +1472,36 @@ anceParser::VariableExpressionContext* anceParser::variableExpression() {
   return _localctx;
 }
 
-//----------------- AllocationExpressionContext ------------------------------------------------------------------
+//----------------- AllocationContext ------------------------------------------------------------------
 
-anceParser::AllocationExpressionContext::AllocationExpressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::AllocationContext::AllocationContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::AllocatorContext* anceParser::AllocationExpressionContext::allocator() {
+anceParser::AllocatorContext* anceParser::AllocationContext::allocator() {
   return getRuleContext<anceParser::AllocatorContext>(0);
 }
 
-anceParser::TypeContext* anceParser::AllocationExpressionContext::type() {
+anceParser::TypeContext* anceParser::AllocationContext::type() {
   return getRuleContext<anceParser::TypeContext>(0);
 }
 
 
-size_t anceParser::AllocationExpressionContext::getRuleIndex() const {
-  return anceParser::RuleAllocationExpression;
+size_t anceParser::AllocationContext::getRuleIndex() const {
+  return anceParser::RuleAllocation;
 }
 
 
-antlrcpp::Any anceParser::AllocationExpressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::AllocationContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitAllocationExpression(this);
+    return parserVisitor->visitAllocation(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::AllocationExpressionContext* anceParser::allocationExpression() {
-  AllocationExpressionContext *_localctx = _tracker.createInstance<AllocationExpressionContext>(_ctx, getState());
-  enterRule(_localctx, 42, anceParser::RuleAllocationExpression);
+anceParser::AllocationContext* anceParser::allocation() {
+  AllocationContext *_localctx = _tracker.createInstance<AllocationContext>(_ctx, getState());
+  enterRule(_localctx, 42, anceParser::RuleAllocation);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1584,36 +1584,32 @@ anceParser::AllocatorContext* anceParser::allocator() {
   return _localctx;
 }
 
-//----------------- SizeofTypeExpressionContext ------------------------------------------------------------------
+//----------------- SizeofTypeContext ------------------------------------------------------------------
 
-anceParser::SizeofTypeExpressionContext::SizeofTypeExpressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::SizeofTypeContext::SizeofTypeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::SizeofTypeExpressionContext::SIZEOF() {
-  return getToken(anceParser::SIZEOF, 0);
-}
-
-anceParser::TypeContext* anceParser::SizeofTypeExpressionContext::type() {
+anceParser::TypeContext* anceParser::SizeofTypeContext::type() {
   return getRuleContext<anceParser::TypeContext>(0);
 }
 
 
-size_t anceParser::SizeofTypeExpressionContext::getRuleIndex() const {
-  return anceParser::RuleSizeofTypeExpression;
+size_t anceParser::SizeofTypeContext::getRuleIndex() const {
+  return anceParser::RuleSizeofType;
 }
 
 
-antlrcpp::Any anceParser::SizeofTypeExpressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::SizeofTypeContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitSizeofTypeExpression(this);
+    return parserVisitor->visitSizeofType(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::SizeofTypeExpressionContext* anceParser::sizeofTypeExpression() {
-  SizeofTypeExpressionContext *_localctx = _tracker.createInstance<SizeofTypeExpressionContext>(_ctx, getState());
-  enterRule(_localctx, 46, anceParser::RuleSizeofTypeExpression);
+anceParser::SizeofTypeContext* anceParser::sizeofType() {
+  SizeofTypeContext *_localctx = _tracker.createInstance<SizeofTypeContext>(_ctx, getState());
+  enterRule(_localctx, 46, anceParser::RuleSizeofType);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1621,7 +1617,7 @@ anceParser::SizeofTypeExpressionContext* anceParser::sizeofTypeExpression() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(214);
-    match(anceParser::SIZEOF);
+    match(anceParser::T__7);
     setState(215);
     type(0);
    
@@ -1635,36 +1631,32 @@ anceParser::SizeofTypeExpressionContext* anceParser::sizeofTypeExpression() {
   return _localctx;
 }
 
-//----------------- SizeofExpExpressionContext ------------------------------------------------------------------
+//----------------- SizeofExpressionContext ------------------------------------------------------------------
 
-anceParser::SizeofExpExpressionContext::SizeofExpExpressionContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::SizeofExpressionContext::SizeofExpressionContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::SizeofExpExpressionContext::SIZEOF() {
-  return getToken(anceParser::SIZEOF, 0);
-}
-
-anceParser::ExpressionContext* anceParser::SizeofExpExpressionContext::expression() {
+anceParser::ExpressionContext* anceParser::SizeofExpressionContext::expression() {
   return getRuleContext<anceParser::ExpressionContext>(0);
 }
 
 
-size_t anceParser::SizeofExpExpressionContext::getRuleIndex() const {
-  return anceParser::RuleSizeofExpExpression;
+size_t anceParser::SizeofExpressionContext::getRuleIndex() const {
+  return anceParser::RuleSizeofExpression;
 }
 
 
-antlrcpp::Any anceParser::SizeofExpExpressionContext::accept(tree::ParseTreeVisitor *visitor) {
+antlrcpp::Any anceParser::SizeofExpressionContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitSizeofExpExpression(this);
+    return parserVisitor->visitSizeofExpression(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::SizeofExpExpressionContext* anceParser::sizeofExpExpression() {
-  SizeofExpExpressionContext *_localctx = _tracker.createInstance<SizeofExpExpressionContext>(_ctx, getState());
-  enterRule(_localctx, 48, anceParser::RuleSizeofExpExpression);
+anceParser::SizeofExpressionContext* anceParser::sizeofExpression() {
+  SizeofExpressionContext *_localctx = _tracker.createInstance<SizeofExpressionContext>(_ctx, getState());
+  enterRule(_localctx, 48, anceParser::RuleSizeofExpression);
 
   auto onExit = finally([=] {
     exitRule();
@@ -1672,7 +1664,7 @@ anceParser::SizeofExpExpressionContext* anceParser::sizeofExpExpression() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(217);
-    match(anceParser::SIZEOF);
+    match(anceParser::T__7);
     setState(218);
     match(anceParser::T__1);
     setState(219);
@@ -2009,9 +2001,9 @@ anceParser::UnsignedIntegerContext* anceParser::unsignedInteger() {
     _errHandler->sync(this);
 
     _la = _input->LA(1);
-    if (_la == anceParser::T__7) {
+    if (_la == anceParser::T__8) {
       setState(239);
-      match(anceParser::T__7);
+      match(anceParser::T__8);
       setState(240);
       match(anceParser::INTEGER);
     }
@@ -2069,9 +2061,9 @@ anceParser::SignedIntegerContext* anceParser::signedInteger() {
     _errHandler->sync(this);
 
     _la = _input->LA(1);
-    if (_la == anceParser::T__7) {
+    if (_la == anceParser::T__8) {
       setState(244);
-      match(anceParser::T__7);
+      match(anceParser::T__8);
       setState(245);
       match(anceParser::INTEGER);
     }
@@ -2141,9 +2133,9 @@ anceParser::SpecialIntegerContext* anceParser::specialInteger() {
         _errHandler->sync(this);
 
         _la = _input->LA(1);
-        if (_la == anceParser::T__7) {
+        if (_la == anceParser::T__8) {
           setState(249);
-          match(anceParser::T__7);
+          match(anceParser::T__8);
           setState(250);
           match(anceParser::INTEGER);
         }
@@ -2158,9 +2150,9 @@ anceParser::SpecialIntegerContext* anceParser::specialInteger() {
         _errHandler->sync(this);
 
         _la = _input->LA(1);
-        if (_la == anceParser::T__7) {
+        if (_la == anceParser::T__8) {
           setState(254);
-          match(anceParser::T__7);
+          match(anceParser::T__8);
           setState(255);
           match(anceParser::INTEGER);
         }
@@ -2175,9 +2167,9 @@ anceParser::SpecialIntegerContext* anceParser::specialInteger() {
         _errHandler->sync(this);
 
         _la = _input->LA(1);
-        if (_la == anceParser::T__7) {
+        if (_la == anceParser::T__8) {
           setState(259);
-          match(anceParser::T__7);
+          match(anceParser::T__8);
           setState(260);
           match(anceParser::INTEGER);
         }
@@ -2436,7 +2428,7 @@ anceParser::TypeContext* anceParser::type(int precedence) {
         break;
       }
 
-      case anceParser::T__9: {
+      case anceParser::T__10: {
         _localctx = _tracker.createInstance<ArrayContext>(_localctx);
         _ctx = _localctx;
         previousContext = _localctx;
@@ -2479,7 +2471,7 @@ anceParser::TypeContext* anceParser::type(int precedence) {
 
         if (!(precpred(_ctx, 1))) throw FailedPredicateException(this, "precpred(_ctx, 1)");
         setState(276);
-        match(anceParser::T__8); 
+        match(anceParser::T__9); 
       }
       setState(281);
       _errHandler->sync(this);
@@ -2576,15 +2568,15 @@ anceParser::ArrayTypeContext* anceParser::arrayType() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(284);
-    match(anceParser::T__9);
+    match(anceParser::T__10);
     setState(285);
     match(anceParser::INTEGER);
     setState(286);
-    match(anceParser::T__7);
+    match(anceParser::T__8);
     setState(287);
     type(0);
     setState(288);
-    match(anceParser::T__10);
+    match(anceParser::T__11);
    
   }
   catch (RecognitionException &e) {
@@ -2924,29 +2916,29 @@ std::vector<std::string> anceParser::_ruleNames = {
   "function", "parameters", "parameter", "accessModifier", "statement", 
   "expressionStatement", "localVariableDefinition", "variableAssignment", 
   "printStatement", "deleteStatement", "returnStatement", "expression", 
-  "independentExpression", "functionCall", "arguments", "variableExpression", 
-  "allocationExpression", "allocator", "sizeofTypeExpression", "sizeofExpExpression", 
-  "literalExpression", "stringLiteral", "byteLiteral", "integerLiteral", 
-  "unsignedInteger", "signedInteger", "specialInteger", "floatingPointLiteral", 
-  "booleanLiteral", "type", "integerType", "arrayType", "keywordType", "floatingPointType", 
-  "sizeType", "unsignedIntegerPointerType", "voidType"
+  "independentExpression", "functionCall", "arguments", "variableAccess", 
+  "allocation", "allocator", "sizeofType", "sizeofExpression", "literalExpression", 
+  "stringLiteral", "byteLiteral", "integerLiteral", "unsignedInteger", "signedInteger", 
+  "specialInteger", "floatingPointLiteral", "booleanLiteral", "type", "integerType", 
+  "arrayType", "keywordType", "floatingPointType", "sizeType", "unsignedIntegerPointerType", 
+  "voidType"
 };
 
 std::vector<std::string> anceParser::_literalNames = {
-  "", "';'", "'('", "')'", "'{'", "'}'", "','", "'new'", "':'", "'*'", "'['", 
-  "']'", "", "'half'", "'single'", "'double'", "'quad'", "", "", "", "", 
-  "", "", "", "", "", "", "", "", "'dynamic'", "'automatic'", "'true'", 
-  "'false'", "'sizeof'", "'size'", "'uiptr'", "'print'", "'return'", "'delete'", 
+  "", "';'", "'('", "')'", "'{'", "'}'", "','", "'new'", "'sizeof'", "':'", 
+  "'*'", "'['", "']'", "", "'half'", "'single'", "'double'", "'quad'", "", 
+  "", "", "", "", "", "", "", "", "", "", "", "'dynamic'", "'automatic'", 
+  "'true'", "'false'", "'size'", "'uiptr'", "'print'", "'return'", "'delete'", 
   "'const'", "'public'", "'private'", "'void'", "", "':='", "'<-'"
 };
 
 std::vector<std::string> anceParser::_symbolicNames = {
-  "", "", "", "", "", "", "", "", "", "", "", "", "NATIVE_INTEGER_TYPE", 
+  "", "", "", "", "", "", "", "", "", "", "", "", "", "NATIVE_INTEGER_TYPE", 
   "HALF_TYPE", "SINGLE_TYPE", "DOUBLE_TYPE", "QUAD_TYPE", "SIGNED_INTEGER", 
   "HEX_INTEGER", "BIN_INTEGER", "OCT_INTEGER", "HALF", "SINGLE", "DOUBLE", 
   "QUAD", "DECIMAL", "STRING", "BYTE", "INTEGER", "DYNAMIC", "AUTOMATIC", 
-  "TRUE", "FALSE", "SIZEOF", "SIZE", "UIPTR", "PRINT", "RETURN", "DELETE", 
-  "CONST", "PUBLIC", "PRIVATE", "VOID", "IDENTIFIER", "DEFINITION", "ASSIGNMENT", 
+  "TRUE", "FALSE", "SIZE", "UIPTR", "PRINT", "RETURN", "DELETE", "CONST", 
+  "PUBLIC", "PRIVATE", "VOID", "IDENTIFIER", "DEFINITION", "ASSIGNMENT", 
   "WHITESPACE", "BLOCK_COMMENT", "LINE_COMMENT"
 };
 
@@ -3022,8 +3014,8 @@ anceParser::Initializer::Initializer() {
     0xa, 0xc, 0xe, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e, 0x20, 
     0x22, 0x24, 0x26, 0x28, 0x2a, 0x2c, 0x2e, 0x30, 0x32, 0x34, 0x36, 0x38, 
     0x3a, 0x3c, 0x3e, 0x40, 0x42, 0x44, 0x46, 0x48, 0x4a, 0x4c, 0x4e, 0x50, 
-    0x52, 0x54, 0x2, 0x7, 0x3, 0x2, 0x2a, 0x2b, 0x3, 0x2, 0x1f, 0x20, 0x3, 
-    0x2, 0x17, 0x1a, 0x3, 0x2, 0x21, 0x22, 0x3, 0x2, 0xf, 0x12, 0x2, 0x130, 
+    0x52, 0x54, 0x2, 0x7, 0x3, 0x2, 0x2a, 0x2b, 0x3, 0x2, 0x20, 0x21, 0x3, 
+    0x2, 0x18, 0x1b, 0x3, 0x2, 0x22, 0x23, 0x3, 0x2, 0x10, 0x13, 0x2, 0x130, 
     0x2, 0x5a, 0x3, 0x2, 0x2, 0x2, 0x4, 0x5f, 0x3, 0x2, 0x2, 0x2, 0x6, 0x61, 
     0x3, 0x2, 0x2, 0x2, 0x8, 0x69, 0x3, 0x2, 0x2, 0x2, 0xa, 0x72, 0x3, 0x2, 
     0x2, 0x2, 0xc, 0x74, 0x3, 0x2, 0x2, 0x2, 0xe, 0x8a, 0x3, 0x2, 0x2, 0x2, 
@@ -3113,8 +3105,8 @@ anceParser::Initializer::Initializer() {
     0x2, 0x2, 0x2, 0xd2, 0xd3, 0x7, 0x9, 0x2, 0x2, 0xd3, 0xd4, 0x5, 0x2e, 
     0x18, 0x2, 0xd4, 0xd5, 0x5, 0x46, 0x24, 0x2, 0xd5, 0x2d, 0x3, 0x2, 0x2, 
     0x2, 0xd6, 0xd7, 0x9, 0x3, 0x2, 0x2, 0xd7, 0x2f, 0x3, 0x2, 0x2, 0x2, 
-    0xd8, 0xd9, 0x7, 0x23, 0x2, 0x2, 0xd9, 0xda, 0x5, 0x46, 0x24, 0x2, 0xda, 
-    0x31, 0x3, 0x2, 0x2, 0x2, 0xdb, 0xdc, 0x7, 0x23, 0x2, 0x2, 0xdc, 0xdd, 
+    0xd8, 0xd9, 0x7, 0xa, 0x2, 0x2, 0xd9, 0xda, 0x5, 0x46, 0x24, 0x2, 0xda, 
+    0x31, 0x3, 0x2, 0x2, 0x2, 0xdb, 0xdc, 0x7, 0xa, 0x2, 0x2, 0xdc, 0xdd, 
     0x7, 0x4, 0x2, 0x2, 0xdd, 0xde, 0x5, 0x22, 0x12, 0x2, 0xde, 0xdf, 0x7, 
     0x5, 0x2, 0x2, 0xdf, 0x33, 0x3, 0x2, 0x2, 0x2, 0xe0, 0xe6, 0x5, 0x36, 
     0x1c, 0x2, 0xe1, 0xe6, 0x5, 0x38, 0x1d, 0x2, 0xe2, 0xe6, 0x5, 0x3a, 
@@ -3122,24 +3114,24 @@ anceParser::Initializer::Initializer() {
     0x23, 0x2, 0xe5, 0xe0, 0x3, 0x2, 0x2, 0x2, 0xe5, 0xe1, 0x3, 0x2, 0x2, 
     0x2, 0xe5, 0xe2, 0x3, 0x2, 0x2, 0x2, 0xe5, 0xe3, 0x3, 0x2, 0x2, 0x2, 
     0xe5, 0xe4, 0x3, 0x2, 0x2, 0x2, 0xe6, 0x35, 0x3, 0x2, 0x2, 0x2, 0xe7, 
-    0xe8, 0x7, 0x1c, 0x2, 0x2, 0xe8, 0x37, 0x3, 0x2, 0x2, 0x2, 0xe9, 0xea, 
-    0x7, 0x1d, 0x2, 0x2, 0xea, 0x39, 0x3, 0x2, 0x2, 0x2, 0xeb, 0xef, 0x5, 
+    0xe8, 0x7, 0x1d, 0x2, 0x2, 0xe8, 0x37, 0x3, 0x2, 0x2, 0x2, 0xe9, 0xea, 
+    0x7, 0x1e, 0x2, 0x2, 0xea, 0x39, 0x3, 0x2, 0x2, 0x2, 0xeb, 0xef, 0x5, 
     0x3c, 0x1f, 0x2, 0xec, 0xef, 0x5, 0x3e, 0x20, 0x2, 0xed, 0xef, 0x5, 
     0x40, 0x21, 0x2, 0xee, 0xeb, 0x3, 0x2, 0x2, 0x2, 0xee, 0xec, 0x3, 0x2, 
     0x2, 0x2, 0xee, 0xed, 0x3, 0x2, 0x2, 0x2, 0xef, 0x3b, 0x3, 0x2, 0x2, 
-    0x2, 0xf0, 0xf3, 0x7, 0x1e, 0x2, 0x2, 0xf1, 0xf2, 0x7, 0xa, 0x2, 0x2, 
-    0xf2, 0xf4, 0x7, 0x1e, 0x2, 0x2, 0xf3, 0xf1, 0x3, 0x2, 0x2, 0x2, 0xf3, 
+    0x2, 0xf0, 0xf3, 0x7, 0x1f, 0x2, 0x2, 0xf1, 0xf2, 0x7, 0xb, 0x2, 0x2, 
+    0xf2, 0xf4, 0x7, 0x1f, 0x2, 0x2, 0xf3, 0xf1, 0x3, 0x2, 0x2, 0x2, 0xf3, 
     0xf4, 0x3, 0x2, 0x2, 0x2, 0xf4, 0x3d, 0x3, 0x2, 0x2, 0x2, 0xf5, 0xf8, 
-    0x7, 0x13, 0x2, 0x2, 0xf6, 0xf7, 0x7, 0xa, 0x2, 0x2, 0xf7, 0xf9, 0x7, 
-    0x1e, 0x2, 0x2, 0xf8, 0xf6, 0x3, 0x2, 0x2, 0x2, 0xf8, 0xf9, 0x3, 0x2, 
-    0x2, 0x2, 0xf9, 0x3f, 0x3, 0x2, 0x2, 0x2, 0xfa, 0xfd, 0x7, 0x14, 0x2, 
-    0x2, 0xfb, 0xfc, 0x7, 0xa, 0x2, 0x2, 0xfc, 0xfe, 0x7, 0x1e, 0x2, 0x2, 
+    0x7, 0x14, 0x2, 0x2, 0xf6, 0xf7, 0x7, 0xb, 0x2, 0x2, 0xf7, 0xf9, 0x7, 
+    0x1f, 0x2, 0x2, 0xf8, 0xf6, 0x3, 0x2, 0x2, 0x2, 0xf8, 0xf9, 0x3, 0x2, 
+    0x2, 0x2, 0xf9, 0x3f, 0x3, 0x2, 0x2, 0x2, 0xfa, 0xfd, 0x7, 0x15, 0x2, 
+    0x2, 0xfb, 0xfc, 0x7, 0xb, 0x2, 0x2, 0xfc, 0xfe, 0x7, 0x1f, 0x2, 0x2, 
     0xfd, 0xfb, 0x3, 0x2, 0x2, 0x2, 0xfd, 0xfe, 0x3, 0x2, 0x2, 0x2, 0xfe, 
-    0x10a, 0x3, 0x2, 0x2, 0x2, 0xff, 0x102, 0x7, 0x15, 0x2, 0x2, 0x100, 
-    0x101, 0x7, 0xa, 0x2, 0x2, 0x101, 0x103, 0x7, 0x1e, 0x2, 0x2, 0x102, 
+    0x10a, 0x3, 0x2, 0x2, 0x2, 0xff, 0x102, 0x7, 0x16, 0x2, 0x2, 0x100, 
+    0x101, 0x7, 0xb, 0x2, 0x2, 0x101, 0x103, 0x7, 0x1f, 0x2, 0x2, 0x102, 
     0x100, 0x3, 0x2, 0x2, 0x2, 0x102, 0x103, 0x3, 0x2, 0x2, 0x2, 0x103, 
-    0x10a, 0x3, 0x2, 0x2, 0x2, 0x104, 0x107, 0x7, 0x16, 0x2, 0x2, 0x105, 
-    0x106, 0x7, 0xa, 0x2, 0x2, 0x106, 0x108, 0x7, 0x1e, 0x2, 0x2, 0x107, 
+    0x10a, 0x3, 0x2, 0x2, 0x2, 0x104, 0x107, 0x7, 0x17, 0x2, 0x2, 0x105, 
+    0x106, 0x7, 0xb, 0x2, 0x2, 0x106, 0x108, 0x7, 0x1f, 0x2, 0x2, 0x107, 
     0x105, 0x3, 0x2, 0x2, 0x2, 0x107, 0x108, 0x3, 0x2, 0x2, 0x2, 0x108, 
     0x10a, 0x3, 0x2, 0x2, 0x2, 0x109, 0xfa, 0x3, 0x2, 0x2, 0x2, 0x109, 0xff, 
     0x3, 0x2, 0x2, 0x2, 0x109, 0x104, 0x3, 0x2, 0x2, 0x2, 0x10a, 0x41, 0x3, 
@@ -3149,14 +3141,14 @@ anceParser::Initializer::Initializer() {
     0x2, 0x111, 0x114, 0x5, 0x4a, 0x26, 0x2, 0x112, 0x114, 0x5, 0x4c, 0x27, 
     0x2, 0x113, 0x10f, 0x3, 0x2, 0x2, 0x2, 0x113, 0x111, 0x3, 0x2, 0x2, 
     0x2, 0x113, 0x112, 0x3, 0x2, 0x2, 0x2, 0x114, 0x119, 0x3, 0x2, 0x2, 
-    0x2, 0x115, 0x116, 0xc, 0x3, 0x2, 0x2, 0x116, 0x118, 0x7, 0xb, 0x2, 
+    0x2, 0x115, 0x116, 0xc, 0x3, 0x2, 0x2, 0x116, 0x118, 0x7, 0xc, 0x2, 
     0x2, 0x117, 0x115, 0x3, 0x2, 0x2, 0x2, 0x118, 0x11b, 0x3, 0x2, 0x2, 
     0x2, 0x119, 0x117, 0x3, 0x2, 0x2, 0x2, 0x119, 0x11a, 0x3, 0x2, 0x2, 
     0x2, 0x11a, 0x47, 0x3, 0x2, 0x2, 0x2, 0x11b, 0x119, 0x3, 0x2, 0x2, 0x2, 
-    0x11c, 0x11d, 0x7, 0xe, 0x2, 0x2, 0x11d, 0x49, 0x3, 0x2, 0x2, 0x2, 0x11e, 
-    0x11f, 0x7, 0xc, 0x2, 0x2, 0x11f, 0x120, 0x7, 0x1e, 0x2, 0x2, 0x120, 
-    0x121, 0x7, 0xa, 0x2, 0x2, 0x121, 0x122, 0x5, 0x46, 0x24, 0x2, 0x122, 
-    0x123, 0x7, 0xd, 0x2, 0x2, 0x123, 0x4b, 0x3, 0x2, 0x2, 0x2, 0x124, 0x129, 
+    0x11c, 0x11d, 0x7, 0xf, 0x2, 0x2, 0x11d, 0x49, 0x3, 0x2, 0x2, 0x2, 0x11e, 
+    0x11f, 0x7, 0xd, 0x2, 0x2, 0x11f, 0x120, 0x7, 0x1f, 0x2, 0x2, 0x120, 
+    0x121, 0x7, 0xb, 0x2, 0x2, 0x121, 0x122, 0x5, 0x46, 0x24, 0x2, 0x122, 
+    0x123, 0x7, 0xe, 0x2, 0x2, 0x123, 0x4b, 0x3, 0x2, 0x2, 0x2, 0x124, 0x129, 
     0x5, 0x4e, 0x28, 0x2, 0x125, 0x129, 0x5, 0x50, 0x29, 0x2, 0x126, 0x129, 
     0x5, 0x52, 0x2a, 0x2, 0x127, 0x129, 0x5, 0x54, 0x2b, 0x2, 0x128, 0x124, 
     0x3, 0x2, 0x2, 0x2, 0x128, 0x125, 0x3, 0x2, 0x2, 0x2, 0x128, 0x126, 

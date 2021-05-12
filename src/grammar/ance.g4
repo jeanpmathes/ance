@@ -72,10 +72,10 @@ returnStatement
 	;
 
 expression
-	: variableExpression
-	| allocationExpression
-	| sizeofTypeExpression
-	| sizeofExpExpression
+	: variableAccess
+	| allocation
+	| sizeofType
+	| sizeofExpression
 	| literalExpression
 	| independentExpression
 	;
@@ -92,11 +92,11 @@ arguments
 	: (expression (',' expression)* )?
 	;
 
-variableExpression
+variableAccess
 	: IDENTIFIER
 	;
 
-allocationExpression
+allocation
     : 'new' allocator type
     ;
 
@@ -105,12 +105,12 @@ allocator
     | AUTOMATIC
     ;
 
-sizeofTypeExpression
-	: SIZEOF type
+sizeofType
+	: 'sizeof' type
 	;
 
-sizeofExpExpression
-	: SIZEOF '(' expression ')'
+sizeofExpression
+	: 'sizeof' '(' expression ')'
 	;
 
 literalExpression
@@ -227,18 +227,6 @@ INTEGER : [0-9]+ ;
 
 DYNAMIC : 'dynamic' ;
 AUTOMATIC : 'automatic' ;
-
-TRUE : 'true' ;
-FALSE : 'false' ;
-
-SIZEOF : 'sizeof' ;
-SIZE : 'size' ;
-UIPTR : 'uiptr' ;
-
-PRINT : 'print' ;
-RETURN : 'return' ;
-DELETE : 'delete' ;
-CONST : 'const' ;
 
 PUBLIC : 'public' ;
 PRIVATE : 'private' ;

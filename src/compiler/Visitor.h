@@ -43,13 +43,13 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitArguments(anceParser::ArgumentsContext* ctx) override;
 
-		antlrcpp::Any visitVariableExpression(anceParser::VariableExpressionContext* ctx) override;
+		antlrcpp::Any visitVariableAccess(anceParser::VariableAccessContext *ctx) override;
 
-		antlrcpp::Any visitAllocationExpression(anceParser::AllocationExpressionContext* ctx) override;
+		antlrcpp::Any visitAllocation(anceParser::AllocationContext *ctx) override;
 
-		antlrcpp::Any visitSizeofTypeExpression(anceParser::SizeofTypeExpressionContext* ctx) override;
+		antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext *ctx) override;
 
-		antlrcpp::Any visitSizeofExpExpression(anceParser::SizeofExpExpressionContext* ctx) override;
+		antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext *ctx) override;
 
 		// Literals and Types
 

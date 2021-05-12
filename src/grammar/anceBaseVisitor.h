@@ -95,11 +95,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitVariableExpression(anceParser::VariableExpressionContext *ctx) override {
+  virtual antlrcpp::Any visitVariableAccess(anceParser::VariableAccessContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitAllocationExpression(anceParser::AllocationExpressionContext *ctx) override {
+  virtual antlrcpp::Any visitAllocation(anceParser::AllocationContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -107,11 +107,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSizeofTypeExpression(anceParser::SizeofTypeExpressionContext *ctx) override {
+  virtual antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitSizeofExpExpression(anceParser::SizeofExpExpressionContext *ctx) override {
+  virtual antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 

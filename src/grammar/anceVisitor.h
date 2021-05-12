@@ -59,15 +59,15 @@ public:
 
     virtual antlrcpp::Any visitArguments(anceParser::ArgumentsContext *context) = 0;
 
-    virtual antlrcpp::Any visitVariableExpression(anceParser::VariableExpressionContext *context) = 0;
+    virtual antlrcpp::Any visitVariableAccess(anceParser::VariableAccessContext *context) = 0;
 
-    virtual antlrcpp::Any visitAllocationExpression(anceParser::AllocationExpressionContext *context) = 0;
+    virtual antlrcpp::Any visitAllocation(anceParser::AllocationContext *context) = 0;
 
     virtual antlrcpp::Any visitAllocator(anceParser::AllocatorContext *context) = 0;
 
-    virtual antlrcpp::Any visitSizeofTypeExpression(anceParser::SizeofTypeExpressionContext *context) = 0;
+    virtual antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext *context) = 0;
 
-    virtual antlrcpp::Any visitSizeofExpExpression(anceParser::SizeofExpExpressionContext *context) = 0;
+    virtual antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext *context) = 0;
 
     virtual antlrcpp::Any visitLiteralExpression(anceParser::LiteralExpressionContext *context) = 0;
 

@@ -242,14 +242,14 @@ antlrcpp::Any Visitor::visitArguments(anceParser::ArgumentsContext* ctx)
 	return arguments;
 }
 
-antlrcpp::Any Visitor::visitVariableExpression(anceParser::VariableExpressionContext* ctx)
+antlrcpp::Any Visitor::visitVariableAccess(anceParser::VariableAccessContext* ctx)
 {
 	std::string identifier = ctx->IDENTIFIER()->getText();
 	Expression* expression = new VariableExpression(identifier);
 	return expression;
 }
 
-antlrcpp::Any Visitor::visitAllocationExpression(anceParser::AllocationExpressionContext* ctx)
+antlrcpp::Any Visitor::visitAllocation(anceParser::AllocationContext* ctx)
 {
 	Runtime::Allocator allocator = visit(ctx->allocator());
 	ance::Type* type = visit(ctx->type());
@@ -258,13 +258,13 @@ antlrcpp::Any Visitor::visitAllocationExpression(anceParser::AllocationExpressio
 	return expression;
 }
 
-antlrcpp::Any Visitor::visitSizeofTypeExpression(anceParser::SizeofTypeExpressionContext* ctx)
+antlrcpp::Any Visitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)
 {
 	ance::Type* type = visit(ctx->type());
 	return static_cast<Expression*>(new SizeofTypeExpression(type));
 }
 
-antlrcpp::Any Visitor::visitSizeofExpExpression(anceParser::SizeofExpExpressionContext* ctx)
+antlrcpp::Any Visitor::visitSizeofExpression(anceParser::SizeofExpressionContext* ctx)
 {
 	Expression* expr = visit(ctx->expression());
 	return static_cast<Expression*>(new SizeofExprExpression(expr));
