@@ -1,6 +1,7 @@
 #include "AssignmentStatement.h"
 
 #include <utility>
+#include <iostream>
 
 #include "Expression.h"
 #include "Function.h"
@@ -33,13 +34,10 @@ void AssignmentStatement::build(
 	llvm::DIBuilder* di
 )
 {
-	getContainingFunction()
-		->getScope()
-		->getVariable(variable_identifier_)
-		->setValue(
-			assigned_->getValue()->getValue(c, m, state, ir, di),
-			c, m, state, ir, di
-		);
+	ance::Variable* variable = getContainingFunction()->getScope()->getVariable(variable_identifier_);
+	assert(variable->type() == assigned_->getType() && "Assignment types have to match.");
+
+	variable->setValue(assigned_->getValue()->getValue(c, m, state, ir, di), c, m, state, ir, di);
 }
 
 AssignmentStatement::~AssignmentStatement() = default;
