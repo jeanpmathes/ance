@@ -254,9 +254,14 @@ antlrcpp::Any Visitor::visitAllocation(anceParser::AllocationContext* ctx)
 {
 	Runtime::Allocator allocator = visit(ctx->allocator());
 	ance::Type* type = visit(ctx->type());
+	Expression* count = nullptr;
 
-	Expression* expression = new Allocation(allocator, type, application_);
-	return expression;
+	if (ctx->expression())
+	{
+		count = visit(ctx->expression());
+	}
+
+	return static_cast<Expression*>(new Allocation(allocator, type, count, application_));
 }
 
 antlrcpp::Any Visitor::visitRoughCast(anceParser::RoughCastContext* ctx)

@@ -4,13 +4,19 @@
 #include "PointerType.h"
 #include "CompileState.h"
 
-Allocation::Allocation(Runtime::Allocator allocation, ance::Type* type, Application& app)
+Allocation::Allocation(Runtime::Allocator allocation, ance::Type* type, Expression* count, Application& app)
 	: allocation_(allocation),
 	  allocated_type_(type),
+	  count_(count),
 	  return_type_(ance::PointerType::get(app, type)),
 	  value_(new ance::ExpressionBackedValue(this))
 {
 
+}
+
+void Allocation::setScope(ance::Scope* scope)
+{
+	if (count_) count_->setScope(scope);
 }
 
 ance::Type* Allocation::getType()
@@ -31,7 +37,7 @@ llvm::Value* Allocation::build(
 	llvm::DIBuilder* di
 )
 {
-	return state->runtime_->allocate(allocation_, allocated_type_, c, m, state, ir, di);
+	return state->runtime_->allocate(allocation_, allocated_type_, count_, c, m, state, ir, di);
 }
 
 Allocation::~Allocation() = default;

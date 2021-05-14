@@ -7,6 +7,7 @@
 #include "CompileState.h"
 #include "SizeType.h"
 #include "PointerType.h"
+#include "Expression.h"
 
 void Runtime::init(
 	llvm::LLVMContext& c,
@@ -41,6 +42,7 @@ void Runtime::init(
 llvm::Value* Runtime::allocate(
 	Runtime::Allocator allocation,
 	ance::Type* type,
+	Expression* count,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -48,12 +50,17 @@ llvm::Value* Runtime::allocate(
 	llvm::DIBuilder* di
 )
 {
+	if (count)
+	{
+		assert(count->getType() == ance::SizeType::get() && "Count parameter of allocation should be of type size.");
+	}
+
 	switch (allocation)
 	{
 		case AUTOMATIC:
-			return allocateAutomatic(type, c, m, state, ir, di);
+			return allocateAutomatic(type, count, c, m, state, ir, di);
 		case DYNAMIC:
-			return allocateDynamic(type, c, m, state, ir, di);
+			return allocateDynamic(type, count, c, m, state, ir, di);
 		default:
 			throw std::invalid_argument("Unsupported allocation type.");
 	}
@@ -81,30 +88,53 @@ void Runtime::deleteDynamic(
 
 llvm::Value* Runtime::allocateAutomatic(
 	ance::Type* type,
-	llvm::LLVMContext& c,
-	llvm::Module*,
-	CompileState*,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder*
-)
-{
-	return ir.CreateAlloca(type->getNativeType(c));
-}
-
-llvm::Value* Runtime::allocateDynamic(
-	ance::Type* type,
+	Expression* count,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
 	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder*
+	llvm::DIBuilder* di
 )
 {
-	llvm::Value* args[] = {llvm::ConstantInt::get(llvm::Type::getInt32Ty(c), 0x0040, false), llvm::ConstantInt::get(
-		ance::SizeType::get()->getNativeType(c),
-		type->getSize(m).getFixedSize(),
-		false
-	)};
+	llvm::Value* count_value = nullptr;
+
+	if (count)
+	{
+		count_value = count->getValue()->getValue(c, m, state, ir, di);
+	}
+
+	return ir.CreateAlloca(type->getNativeType(c), count_value);
+}
+
+llvm::Value* Runtime::allocateDynamic(
+	ance::Type* type,
+	Expression* count,
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+)
+{
+	// Set the zero init flag.
+	llvm::Value* flags = llvm::ConstantInt::get(llvm::Type::getInt32Ty(c), 0x0040, false);
+
+	// Calculate the size to allocate.
+	llvm::Value* size;
+
+	if (count)
+	{
+		llvm::Value* element_size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c), type->getSize(m).getFixedSize(), false);
+		llvm::Value* element_count = count->getValue()->getValue(c, m, state, ir, di);
+
+		size = ir.CreateMul(element_size, element_count);
+	}
+	else
+	{
+		size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c), type->getSize(m).getFixedSize(), false);
+	}
+
+	llvm::Value* args[] = {flags, size};
 
 	llvm::Value* opaque_ptr = ir.CreateCall(allocate_dynamic_type_, allocate_dynamic_, args);
 	return ir.CreateBitCast(opaque_ptr, ance::PointerType::get(*state->application_, type)->getNativeType(c));

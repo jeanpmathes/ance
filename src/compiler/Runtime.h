@@ -8,6 +8,7 @@
 #include <llvm/IR/DIBuilder.h>
 
 class CompileState;
+class Expression;
 
 namespace ance
 {
@@ -45,6 +46,7 @@ class Runtime
 		llvm::Value* allocate(
 			Allocator allocation,
 			ance::Type* type,
+			Expression* count,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -64,6 +66,7 @@ class Runtime
 	private:
 		llvm::Value* allocateAutomatic(
 			ance::Type* type,
+			Expression* count,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -73,6 +76,7 @@ class Runtime
 
 		llvm::Value* allocateDynamic(
 			ance::Type* type,
+			Expression* count,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,

@@ -8,7 +8,9 @@
 class Allocation : public BuildableExpression
 {
 	public:
-		Allocation(Runtime::Allocator allocation, ance::Type* type, Application& app);
+		Allocation(Runtime::Allocator allocation, ance::Type* type, Expression* count, Application& app);
+
+		void setScope(ance::Scope* scope) override;
 
 		ance::Type* getType() override;
 
@@ -27,6 +29,7 @@ class Allocation : public BuildableExpression
 	private:
 		Runtime::Allocator allocation_;
 		ance::Type* allocated_type_;
+		Expression* count_;
 		ance::Type* return_type_;
 		ance::Value* value_;
 };
