@@ -68,6 +68,7 @@ llvm::Value* Runtime::allocate(
 
 void Runtime::deleteDynamic(
 	ance::Value* value,
+	bool,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,

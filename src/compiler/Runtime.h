@@ -56,6 +56,7 @@ class Runtime
 
 		void deleteDynamic(
 			ance::Value* value,
+			bool delete_buffer,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,

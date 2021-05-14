@@ -196,10 +196,9 @@ antlrcpp::Any Visitor::visitDeleteStatement(anceParser::DeleteStatementContext* 
 	unsigned int column = ctx->getStart()->getCharPositionInLine();
 
 	Expression* expression = visit(ctx->expression());
+	bool delete_buffer = ctx->BUFFER();
 
-	auto* statement = new DeleteStatement(expression, line, column);
-
-	return static_cast<Statement*>(statement);
+	return static_cast<Statement*>(new DeleteStatement(expression, delete_buffer, line, column));
 }
 
 antlrcpp::Any Visitor::visitReturnStatement(anceParser::ReturnStatementContext* ctx)

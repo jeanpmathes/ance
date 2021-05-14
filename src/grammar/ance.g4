@@ -64,7 +64,7 @@ printStatement
 	;
 
 deleteStatement
-    : 'delete' expression ';'
+    : 'delete' expression ( BUFFER )? ';'
     ;
 
 returnStatement
@@ -232,6 +232,8 @@ INTEGER : [0-9]+ ;
 
 DYNAMIC : 'dynamic' ;
 AUTOMATIC : 'automatic' ;
+
+BUFFER : '[]' ;
 
 TRUE : 'true' ;
 FALSE : 'false' ;

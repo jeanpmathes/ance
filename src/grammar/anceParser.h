@@ -19,8 +19,8 @@ public:
     DOUBLE_TYPE = 25, QUAD_TYPE = 26, SIGNED_INTEGER = 27, HEX_INTEGER = 28, 
     BIN_INTEGER = 29, OCT_INTEGER = 30, HALF = 31, SINGLE = 32, DOUBLE = 33, 
     QUAD = 34, DECIMAL = 35, STRING = 36, BYTE = 37, INTEGER = 38, DYNAMIC = 39, 
-    AUTOMATIC = 40, TRUE = 41, FALSE = 42, PUBLIC = 43, PRIVATE = 44, IDENTIFIER = 45, 
-    WHITESPACE = 46, BLOCK_COMMENT = 47, LINE_COMMENT = 48
+    AUTOMATIC = 40, BUFFER = 41, TRUE = 42, FALSE = 43, PUBLIC = 44, PRIVATE = 45, 
+    IDENTIFIER = 46, WHITESPACE = 47, BLOCK_COMMENT = 48, LINE_COMMENT = 49
   };
 
   enum {
@@ -306,6 +306,7 @@ public:
     DeleteStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     ExpressionContext *expression();
+    antlr4::tree::TerminalNode *BUFFER();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
