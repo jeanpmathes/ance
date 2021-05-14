@@ -64,7 +64,7 @@ printStatement
 	;
 
 deleteStatement
-    : 'delete' expression ( BUFFER )? ';'
+    : 'delete' ( BUFFER )? expression ';'
     ;
 
 returnStatement
