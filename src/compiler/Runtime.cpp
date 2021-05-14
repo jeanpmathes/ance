@@ -7,7 +7,6 @@
 #include "CompileState.h"
 #include "SizeType.h"
 #include "PointerType.h"
-#include "Expression.h"
 
 void Runtime::init(
 	llvm::LLVMContext& c,
@@ -42,7 +41,7 @@ void Runtime::init(
 llvm::Value* Runtime::allocate(
 	Runtime::Allocator allocation,
 	ance::Type* type,
-	Expression* count,
+	ance::Value* count,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -89,7 +88,7 @@ void Runtime::deleteDynamic(
 
 llvm::Value* Runtime::allocateAutomatic(
 	ance::Type* type,
-	Expression* count,
+	ance::Value* count,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -101,7 +100,7 @@ llvm::Value* Runtime::allocateAutomatic(
 
 	if (count)
 	{
-		count_value = count->getValue()->getValue(c, m, state, ir, di);
+		count_value = count->getValue(c, m, state, ir, di);
 	}
 
 	return ir.CreateAlloca(type->getNativeType(c), count_value);
@@ -109,7 +108,7 @@ llvm::Value* Runtime::allocateAutomatic(
 
 llvm::Value* Runtime::allocateDynamic(
 	ance::Type* type,
-	Expression* count,
+	ance::Value* count,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -125,8 +124,9 @@ llvm::Value* Runtime::allocateDynamic(
 
 	if (count)
 	{
-		llvm::Value* element_size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c), type->getSize(m).getFixedSize(), false);
-		llvm::Value* element_count = count->getValue()->getValue(c, m, state, ir, di);
+		llvm::Value* element_size =
+			llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c), type->getSize(m).getFixedSize(), false);
+		llvm::Value* element_count = count->getValue(c, m, state, ir, di);
 
 		size = ir.CreateMul(element_size, element_count);
 	}
