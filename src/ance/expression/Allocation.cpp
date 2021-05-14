@@ -37,7 +37,8 @@ llvm::Value* Allocation::build(
 	llvm::DIBuilder* di
 )
 {
-	return state->runtime_->allocate(allocation_, allocated_type_, count_, c, m, state, ir, di);
+	ance::Value* count = count_ ? count_->getValue() : nullptr;
+	return state->runtime_->allocate(allocation_, allocated_type_, count, c, m, state, ir, di);
 }
 
 Allocation::~Allocation() = default;
