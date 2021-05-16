@@ -29,13 +29,17 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx) override;
 
-		antlrcpp::Any visitVariableAssignment(anceParser::VariableAssignmentContext* ctx) override;
+		antlrcpp::Any visitAssignment(anceParser::AssignmentContext* ctx) override;
 
 		antlrcpp::Any visitPrintStatement(anceParser::PrintStatementContext* ctx) override;
 
 		antlrcpp::Any visitDeleteStatement(anceParser::DeleteStatementContext* ctx) override;
 
 		antlrcpp::Any visitReturnStatement(anceParser::ReturnStatementContext* ctx) override;
+
+		// Assignables
+
+		antlrcpp::Any visitVariableAssignable(anceParser::VariableAssignableContext *ctx) override;
 
 		// Expressions
 

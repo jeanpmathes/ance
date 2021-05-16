@@ -2,13 +2,14 @@
 
 #include "Statement.h"
 
+class Assignable;
 class Expression;
 
 class AssignmentStatement : public Statement
 {
 	public:
 		AssignmentStatement(
-			std::string variable_identifier,
+			Assignable* assignable,
 			Expression* assigned,
 			unsigned int l,
 			unsigned int c
@@ -27,6 +28,6 @@ class AssignmentStatement : public Statement
 		~AssignmentStatement() override;
 
 	private:
-		std::string variable_identifier_;
+		Assignable* assignable_;
 		Expression* assigned_;
 };

@@ -27,16 +27,17 @@ public:
     RuleFile = 0, RuleData = 1, RuleConstantDeclaration = 2, RuleVariableDeclaration = 3, 
     RuleCode = 4, RuleFunction = 5, RuleParameters = 6, RuleParameter = 7, 
     RuleAccessModifier = 8, RuleStatement = 9, RuleExpressionStatement = 10, 
-    RuleLocalVariableDefinition = 11, RuleVariableAssignment = 12, RulePrintStatement = 13, 
-    RuleDeleteStatement = 14, RuleReturnStatement = 15, RuleExpression = 16, 
-    RuleIndependentExpression = 17, RuleFunctionCall = 18, RuleArguments = 19, 
-    RuleVariableAccess = 20, RuleAllocation = 21, RuleAllocator = 22, RuleRoughCast = 23, 
-    RuleSizeofType = 24, RuleSizeofExpression = 25, RuleLiteralExpression = 26, 
-    RuleStringLiteral = 27, RuleByteLiteral = 28, RuleIntegerLiteral = 29, 
-    RuleUnsignedInteger = 30, RuleSignedInteger = 31, RuleSpecialInteger = 32, 
-    RuleFloatingPointLiteral = 33, RuleBooleanLiteral = 34, RuleType = 35, 
-    RuleIntegerType = 36, RuleArrayType = 37, RuleKeywordType = 38, RuleFloatingPointType = 39, 
-    RuleSizeType = 40, RuleUnsignedIntegerPointerType = 41, RuleVoidType = 42
+    RuleLocalVariableDefinition = 11, RuleAssignment = 12, RulePrintStatement = 13, 
+    RuleDeleteStatement = 14, RuleReturnStatement = 15, RuleAssignable = 16, 
+    RuleVariableAssignable = 17, RuleExpression = 18, RuleIndependentExpression = 19, 
+    RuleFunctionCall = 20, RuleArguments = 21, RuleVariableAccess = 22, 
+    RuleAllocation = 23, RuleAllocator = 24, RuleRoughCast = 25, RuleSizeofType = 26, 
+    RuleSizeofExpression = 27, RuleLiteralExpression = 28, RuleStringLiteral = 29, 
+    RuleByteLiteral = 30, RuleIntegerLiteral = 31, RuleUnsignedInteger = 32, 
+    RuleSignedInteger = 33, RuleSpecialInteger = 34, RuleFloatingPointLiteral = 35, 
+    RuleBooleanLiteral = 36, RuleType = 37, RuleIntegerType = 38, RuleArrayType = 39, 
+    RuleKeywordType = 40, RuleFloatingPointType = 41, RuleSizeType = 42, 
+    RuleUnsignedIntegerPointerType = 43, RuleVoidType = 44
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -61,10 +62,12 @@ public:
   class StatementContext;
   class ExpressionStatementContext;
   class LocalVariableDefinitionContext;
-  class VariableAssignmentContext;
+  class AssignmentContext;
   class PrintStatementContext;
   class DeleteStatementContext;
   class ReturnStatementContext;
+  class AssignableContext;
+  class VariableAssignableContext;
   class ExpressionContext;
   class IndependentExpressionContext;
   class FunctionCallContext;
@@ -234,7 +237,7 @@ public:
     virtual size_t getRuleIndex() const override;
     ExpressionStatementContext *expressionStatement();
     LocalVariableDefinitionContext *localVariableDefinition();
-    VariableAssignmentContext *variableAssignment();
+    AssignmentContext *assignment();
     PrintStatementContext *printStatement();
     DeleteStatementContext *deleteStatement();
     ReturnStatementContext *returnStatement();
@@ -274,11 +277,11 @@ public:
 
   LocalVariableDefinitionContext* localVariableDefinition();
 
-  class  VariableAssignmentContext : public antlr4::ParserRuleContext {
+  class  AssignmentContext : public antlr4::ParserRuleContext {
   public:
-    VariableAssignmentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    AssignmentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *IDENTIFIER();
+    AssignableContext *assignable();
     ExpressionContext *expression();
 
 
@@ -286,7 +289,7 @@ public:
    
   };
 
-  VariableAssignmentContext* variableAssignment();
+  AssignmentContext* assignment();
 
   class  PrintStatementContext : public antlr4::ParserRuleContext {
   public:
@@ -327,6 +330,32 @@ public:
   };
 
   ReturnStatementContext* returnStatement();
+
+  class  AssignableContext : public antlr4::ParserRuleContext {
+  public:
+    AssignableContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    VariableAssignableContext *variableAssignable();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  AssignableContext* assignable();
+
+  class  VariableAssignableContext : public antlr4::ParserRuleContext {
+  public:
+    VariableAssignableContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *IDENTIFIER();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  VariableAssignableContext* variableAssignable();
 
   class  ExpressionContext : public antlr4::ParserRuleContext {
   public:

@@ -23,6 +23,10 @@
 #include "PrintStatement.h"
 #include "DeleteStatement.h"
 
+#include "Assignable.h"
+#include "VariableAssignable.h"
+
+#include "Expression.h"
 #include "FunctionCall.h"
 #include "SizeofExpression.h"
 #include "SizeofType.h"
@@ -164,16 +168,16 @@ antlrcpp::Any Visitor::visitLocalVariableDefinition(anceParser::LocalVariableDef
 	return static_cast<Statement*>(statement);
 }
 
-antlrcpp::Any Visitor::visitVariableAssignment(anceParser::VariableAssignmentContext* ctx)
+antlrcpp::Any Visitor::visitAssignment(anceParser::AssignmentContext* ctx)
 {
 	unsigned int line = ctx->getStart()->getLine();
 	unsigned int column = ctx->getStart()->getCharPositionInLine();
 
-	std::string identifier = ctx->IDENTIFIER()->getText();
+	Assignable* assignable = visit(ctx->assignable());
 	Expression* assigned = visit(ctx->expression());
 
 	auto* statement =
-		new AssignmentStatement(identifier, assigned, line, column);
+		new AssignmentStatement(assignable, assigned, line, column);
 
 	return static_cast<Statement*>(statement);
 }
@@ -217,6 +221,13 @@ antlrcpp::Any Visitor::visitReturnStatement(anceParser::ReturnStatementContext* 
 		new ReturnStatement(return_value, line, column);
 
 	return static_cast<Statement*>(statement);
+}
+
+antlrcpp::Any Visitor::visitVariableAssignable(anceParser::VariableAssignableContext* ctx)
+{
+	std::string identifier = ctx->IDENTIFIER()->getText();
+
+	return static_cast<Assignable*>(new VariableAssignable(identifier));
 }
 
 antlrcpp::Any Visitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)

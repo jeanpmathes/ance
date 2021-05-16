@@ -5,6 +5,7 @@ add_subdirectory(compiler)
 add_subdirectory(grammar)
 
 include_directories(ance)
+include_directories(ance/assignable)
 include_directories(ance/construct)
 include_directories(ance/expression)
 include_directories(ance/scope)

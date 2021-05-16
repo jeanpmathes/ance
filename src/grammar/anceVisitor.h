@@ -43,13 +43,17 @@ public:
 
     virtual antlrcpp::Any visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext *context) = 0;
 
-    virtual antlrcpp::Any visitVariableAssignment(anceParser::VariableAssignmentContext *context) = 0;
+    virtual antlrcpp::Any visitAssignment(anceParser::AssignmentContext *context) = 0;
 
     virtual antlrcpp::Any visitPrintStatement(anceParser::PrintStatementContext *context) = 0;
 
     virtual antlrcpp::Any visitDeleteStatement(anceParser::DeleteStatementContext *context) = 0;
 
     virtual antlrcpp::Any visitReturnStatement(anceParser::ReturnStatementContext *context) = 0;
+
+    virtual antlrcpp::Any visitAssignable(anceParser::AssignableContext *context) = 0;
+
+    virtual antlrcpp::Any visitVariableAssignable(anceParser::VariableAssignableContext *context) = 0;
 
     virtual antlrcpp::Any visitExpression(anceParser::ExpressionContext *context) = 0;
 

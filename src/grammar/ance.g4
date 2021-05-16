@@ -41,7 +41,7 @@ accessModifier
 statement
 	: expressionStatement
 	| localVariableDefinition
-	| variableAssignment
+	| assignment
 	| printStatement
 	| deleteStatement
 	| returnStatement
@@ -55,8 +55,8 @@ localVariableDefinition
 	: type IDENTIFIER ( '<-' expression )? ';'
 	;
 
-variableAssignment
-	: IDENTIFIER '<-' expression ';'
+assignment
+	: assignable '<-' expression ';'
 	;
 
 printStatement
@@ -70,6 +70,14 @@ deleteStatement
 returnStatement
 	: 'return' ( expression )? ';'
 	;
+
+assignable
+    : variableAssignable
+    ;
+
+variableAssignable
+    : IDENTIFIER
+    ;
 
 expression
 	: variableAccess
