@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ANCE_SRC_COMPILER_VISITOR_H_
+#define ANCE_SRC_COMPILER_VISITOR_H_
 
 #include "anceBaseVisitor.h"
 
@@ -90,3 +91,5 @@ class Visitor : public anceBaseVisitor
 	private:
 		Application application_;
 };
+
+#endif

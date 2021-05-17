@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_LOCALVARIABLE_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_LOCALVARIABLE_H_
 
 #include "Variable.h"
 
@@ -48,3 +49,4 @@ class LocalVariable : public ance::Variable
 		llvm::Value* native_value_{nullptr};
 };
 }
+#endif
