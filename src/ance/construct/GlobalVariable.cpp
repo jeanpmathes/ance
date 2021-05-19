@@ -69,7 +69,9 @@ llvm::Value* ance::GlobalVariable::getValue(
 )
 {
 	auto* const value_type = static_cast<llvm::PointerType*>(native_variable_->getType())->getElementType();
-	return ir.CreateLoad(value_type, native_variable_);
+	llvm::Value* value = ir.CreateLoad(value_type, native_variable_);
+	value->setName(identifier());
+	return value;
 }
 
 void ance::GlobalVariable::setValue(
