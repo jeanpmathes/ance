@@ -24,6 +24,12 @@ void ance::LocalVariable::build(
 )
 {
 	assert(initial_value_);
+
+	if (type()->storage() == InternalStorage::AS_POINTER)
+	{
+		native_value_ = ir.CreateAlloca(type()->getContentType(c), nullptr);
+	}
+
 	setValue(initial_value_, c, m, state, ir, di);
 }
 
@@ -63,7 +69,7 @@ void ance::LocalVariable::setValue(
 		case InternalStorage::AS_POINTER:
 		{
 			llvm::Value* stored = value->getContentValue(c, m, state, ir, di);
-			ir.CreateStore(native_value_, stored);
+			ir.CreateStore(stored, native_value_);
 			break;
 		}
 	}

@@ -36,7 +36,7 @@ void PrintStatement::build(
 
 	ance::Value* char_arr = expression_->getValue();
 	char_arr->build(c, m, state, ir, di);
-	llvm::Value* native_char_arr = char_arr->getNativeValue();
+	llvm::Value* native_char_arr = char_arr->getContentValue(c, m, state, ir, di);
 
 	assert(native_char_arr->getType()->isArrayTy());
 	llvm::Value

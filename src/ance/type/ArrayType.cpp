@@ -56,3 +56,8 @@ ance::Type* ance::ArrayType::get(Application& app, Type* element_type, uint64_t 
 		return type;
 	}
 }
+
+InternalStorage ance::ArrayType::storage()
+{
+	return InternalStorage::AS_POINTER;
+}

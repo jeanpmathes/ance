@@ -25,6 +25,8 @@ class ArrayType : public Type
 
 		llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
+		InternalStorage storage() override;
+
 		~ArrayType() override = default;
 
 	private:
