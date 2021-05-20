@@ -18,8 +18,6 @@ class Constant : public Value
 		virtual llvm::Constant* buildContent(llvm::LLVMContext& c) = 0;
 
 	public:
-		llvm::Constant* getNativeConstant();
-
 		llvm::Constant* getContentConstant();
 
 		void build(
@@ -35,7 +33,7 @@ class Constant : public Value
 		llvm::Value * getContentValue(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) final;
 
 	protected:
-		llvm::Constant* native_constant_{nullptr};
+		llvm::Value* native_value_{nullptr};
 		llvm::Constant* content_constant_{nullptr};
 };
 }

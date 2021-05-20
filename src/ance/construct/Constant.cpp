@@ -5,36 +5,13 @@
 void ance::Constant::build(llvm::LLVMContext& c)
 {
 	assert(!content_constant_ && "A constant may only be built once.");
-	assert(!native_constant_ && "A constant may only be built once.");
 
 	content_constant_ = buildContent(c);
-
-	switch (getType()->storage())
-	{
-		case InternalStorage::AS_TEMPORARY:
-		{
-			native_constant_ = content_constant_;
-			break;
-		}
-		case InternalStorage::AS_POINTER:
-		{
-			llvm::Constant* zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(c), 0);
-			llvm::Constant* indices[] = {zero, zero};
-			native_constant_ = llvm::ConstantExpr::getInBoundsGetElementPtr(getType()->getContentType(c), content_constant_, indices);
-			break;
-		}
-	}
-}
-
-llvm::Constant * ance::Constant::getNativeConstant()
-{
-	assert(native_constant_ && "Constant has to be built before accessing native constant.");
-	return native_constant_;
 }
 
 llvm::Constant * ance::Constant::getContentConstant()
 {
-	assert(content_constant_ && "Constant has to be built before accessing stored constant.");
+	assert(content_constant_ && "Constant has to be built before accessing content constant.");
 	return content_constant_;
 }
 
@@ -42,16 +19,32 @@ void ance::Constant::build(
 	llvm::LLVMContext& c,
 	llvm::Module*,
 	CompileState*,
-	llvm::IRBuilder<>&,
+	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder*
 )
 {
 	build(c);
+
+	switch (getType()->storage())
+	{
+		case InternalStorage::AS_TEMPORARY:
+		{
+			native_value_ = content_constant_;
+			break;
+		}
+		case InternalStorage::AS_POINTER:
+		{
+			native_value_ = ir.CreateAlloca(getType()->getContentType(c), nullptr);
+			ir.CreateStore(content_constant_, native_value_);
+			break;
+		}
+	}
 }
 
 llvm::Value* ance::Constant::getNativeValue()
 {
-	return getNativeConstant();
+	assert(native_value_ && "Constant (as value) has to be built before accessing native value.");
+	return native_value_;
 }
 
 llvm::Value* ance::Constant::getContentValue(
