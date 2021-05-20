@@ -34,14 +34,16 @@ void PrintStatement::build(
 	llvm::Value* handle_ptr = m->getGlobalVariable(ANCE_STD_OUTPUT_HANDLE);
 	llvm::LoadInst* handle = ir.CreateLoad(llvm::Type::getInt8PtrTy(c), handle_ptr, "handle");
 
-	llvm::Value* char_arr = expression_->getValue()->getValue(c, m, state, ir, di);
+	ance::Value* char_arr = expression_->getValue();
+	char_arr->build(c, m, state, ir, di);
+	llvm::Value* native_char_arr = char_arr->getNativeValue();
 
-	assert(char_arr->getType()->isArrayTy());
+	assert(native_char_arr->getType()->isArrayTy());
 	llvm::Value
-		* write_num = llvm::ConstantInt::get(llvm::Type::getInt32Ty(c), char_arr->getType()->getArrayNumElements());
+		* write_num = llvm::ConstantInt::get(llvm::Type::getInt32Ty(c), native_char_arr->getType()->getArrayNumElements());
 
-	llvm::AllocaInst* char_arr_ptr = ir.CreateAlloca(char_arr->getType(), 0, write_num);
-	ir.CreateStore(char_arr, char_arr_ptr);
+	llvm::AllocaInst* char_arr_ptr = ir.CreateAlloca(native_char_arr->getType(), 0, write_num);
+	ir.CreateStore(native_char_arr, char_arr_ptr);
 
 	llvm::Constant* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(c), 0);
 	llvm::Value* char_ptr = ir.CreateGEP(char_arr_ptr, {zero, zero});

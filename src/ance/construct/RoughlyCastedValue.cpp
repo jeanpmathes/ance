@@ -12,7 +12,7 @@ ance::Type* ance::RoughlyCastedValue::getType()
 	return target_type_;
 }
 
-llvm::Value* ance::RoughlyCastedValue::getValue(
+void ance::RoughlyCastedValue::build(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -21,6 +21,10 @@ llvm::Value* ance::RoughlyCastedValue::getValue(
 )
 {
 	assert(target_type_->getNativeType(c) == original_->getType()->getNativeType(c) && "Native type has to be equal.");
+	original_->build(c, m, state, ir, di);
+}
 
-	return original_->getValue(c, m, state, ir, di);
+llvm::Value* ance::RoughlyCastedValue::getNativeValue()
+{
+	return original_->getNativeValue();
 }

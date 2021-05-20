@@ -14,13 +14,15 @@ class WrappedNativeValue : public Value
 
 		ance::Type* getType() override;
 
-		llvm::Value* getValue(
+		void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) override;
+
+		llvm::Value* getNativeValue() override;
 
 	private:
 		ance::Type* type_;

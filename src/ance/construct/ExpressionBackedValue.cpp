@@ -1,7 +1,5 @@
 #include "ExpressionBackedValue.h"
 
-#include "Expression.h"
-
 ance::ExpressionBackedValue::ExpressionBackedValue(BuildableExpression* expression)
 	: expression_(expression)
 {
@@ -12,7 +10,7 @@ ance::Type* ance::ExpressionBackedValue::getType()
 	return expression_->getType();
 }
 
-llvm::Value* ance::ExpressionBackedValue::getValue(
+void ance::ExpressionBackedValue::build(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -20,5 +18,12 @@ llvm::Value* ance::ExpressionBackedValue::getValue(
 	llvm::DIBuilder* di
 )
 {
-	return expression_->build(c, m, state, ir, di);
+	assert(!value_);
+	value_ = expression_->build(c, m, state, ir, di);
+}
+
+llvm::Value* ance::ExpressionBackedValue::getNativeValue()
+{
+	assert(value_);
+	return value_;
 }

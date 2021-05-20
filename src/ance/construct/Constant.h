@@ -16,13 +16,15 @@ class Constant : public Value
 
 		virtual llvm::Constant* getNativeConstant() = 0;
 
-		llvm::Value* getValue(
+		void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
-		) override;
+		) final;
+
+		llvm::Value * getNativeValue() final;
 
 };
 }

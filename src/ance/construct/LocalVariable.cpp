@@ -26,7 +26,8 @@ void ance::LocalVariable::build(
 	assert(value_);
 	assert(type() == value_->getType());
 
-	native_value_ = value_->getValue(c, m, state, ir, di);
+	value_->build(c, m, state, ir, di);
+	native_value_ = value_->getNativeValue();
 	native_value_->setName(identifier());
 }
 

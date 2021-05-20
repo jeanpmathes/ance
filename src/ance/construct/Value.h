@@ -17,13 +17,15 @@ class Value
 	public:
 		virtual ance::Type* getType() = 0;
 
-		virtual llvm::Value* getValue(
+		virtual void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;
+
+		virtual llvm::Value* getNativeValue() = 0;
 };
 }
 #endif

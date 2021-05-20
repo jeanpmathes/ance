@@ -13,7 +13,7 @@ class ExpressionBackedValue : public Value
 
 		ance::Type* getType() override;
 
-		llvm::Value* getValue(
+		void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -21,8 +21,11 @@ class ExpressionBackedValue : public Value
 			llvm::DIBuilder* di
 		) override;
 
+		llvm::Value* getNativeValue() override;
+
 	private:
 		BuildableExpression* expression_;
+		llvm::Value* value_{nullptr};
 };
 }
 #endif

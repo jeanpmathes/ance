@@ -1,6 +1,6 @@
 #include "Constant.h"
 
-llvm::Value* ance::Constant::getValue(
+void ance::Constant::build(
 	llvm::LLVMContext& c,
 	llvm::Module*,
 	CompileState*,
@@ -9,5 +9,9 @@ llvm::Value* ance::Constant::getValue(
 )
 {
 	build(c);
+}
+
+llvm::Value* ance::Constant::getNativeValue()
+{
 	return getNativeConstant();
 }

@@ -133,7 +133,8 @@ void ance::Function::build(
 		{
 			if (return_value_)
 			{
-				ir.CreateRet(return_value_->getValue(c, m, state, ir, di));
+				return_value_->build(c, m, state, ir, di);
+				ir.CreateRet(return_value_->getNativeValue());
 			}
 			else
 			{
@@ -196,7 +197,8 @@ llvm::CallInst* ance::Function::buildCall(
 
 	for (auto* arg : arguments)
 	{
-		args.push_back(arg->getValue(c, m, state, ir, di));
+		arg->build(c, m, state, ir, di);
+		args.push_back(arg->getNativeValue());
 	}
 
 	return ir.CreateCall(native_type_, native_function_, args);
