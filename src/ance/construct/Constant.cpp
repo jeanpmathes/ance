@@ -8,5 +8,6 @@ llvm::Value* ance::Constant::getValue(
 	llvm::DIBuilder*
 )
 {
-	return getConstant(c);
+	build(c);
+	return getNativeConstant();
 }

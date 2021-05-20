@@ -10,11 +10,13 @@ class WrappedNativeConstant : public Constant
 	public:
 		WrappedNativeConstant(ance::Type* type, llvm::Constant* constant = nullptr);
 
-		void setConstant(llvm::Constant* constant);
+		void setNativeConstant(llvm::Constant* constant);
 
 		ance::Type* getType() override;
 
-		llvm::Constant* getConstant(llvm::LLVMContext& c) override;
+		void build(llvm::LLVMContext& c) override;
+
+		llvm::Constant * getNativeConstant() override;
 
 	private:
 		ance::Type* type_;

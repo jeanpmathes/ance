@@ -15,14 +15,16 @@ ance::Type* ance::BooleanConstant::getType()
 	return type_;
 }
 
-llvm::Constant* ance::BooleanConstant::getConstant(llvm::LLVMContext& c)
+void ance::BooleanConstant::build(llvm::LLVMContext& c)
 {
-	if (!constant_)
-	{
-		constant_ = boolean_ ? llvm::ConstantInt::getTrue(type_->getNativeType(c))
-							 : llvm::ConstantInt::getFalse(type_->getNativeType(c));
-	}
+	assert(!constant_);
+	constant_ = boolean_ ? llvm::ConstantInt::getTrue(type_->getNativeType(c))
+						 : llvm::ConstantInt::getFalse(type_->getNativeType(c));
+}
 
+llvm::Constant * ance::BooleanConstant::getNativeConstant()
+{
+	assert(constant_);
 	return constant_;
 }
 

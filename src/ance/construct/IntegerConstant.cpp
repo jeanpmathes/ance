@@ -15,12 +15,14 @@ ance::Type* ance::IntegerConstant::getType()
 	return type_;
 }
 
-llvm::Constant* ance::IntegerConstant::getConstant(llvm::LLVMContext& c)
+void ance::IntegerConstant::build(llvm::LLVMContext& c)
 {
-	if (!constant_)
-	{
-		constant_ = llvm::ConstantInt::get(type_->getNativeType(c), integer_);
-	}
+	assert(!constant_);
+	constant_ = llvm::ConstantInt::get(type_->getNativeType(c), integer_);
+}
 
+llvm::Constant * ance::IntegerConstant::getNativeConstant()
+{
+	assert(constant_);
 	return constant_;
 }

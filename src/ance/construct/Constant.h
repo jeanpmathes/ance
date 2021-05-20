@@ -12,7 +12,9 @@ namespace ance
 class Constant : public Value
 {
 	public:
-		virtual llvm::Constant* getConstant(llvm::LLVMContext& c) = 0;
+		virtual void build(llvm::LLVMContext& c) = 0;
+
+		virtual llvm::Constant* getNativeConstant() = 0;
 
 		llvm::Value* getValue(
 			llvm::LLVMContext& c,

@@ -16,13 +16,15 @@ ance::Type* ance::ByteConstant::getType()
 	return type_;
 }
 
-llvm::Constant* ance::ByteConstant::getConstant(llvm::LLVMContext& c)
+void ance::ByteConstant::build(llvm::LLVMContext& c)
 {
-	if (!constant_)
-	{
-		constant_ = llvm::ConstantInt::get(type_->getNativeType(c), byte_, false);
-	}
+	assert(!constant_);
+	constant_ = llvm::ConstantInt::get(type_->getNativeType(c), byte_, false);
+}
 
+llvm::Constant * ance::ByteConstant::getNativeConstant()
+{
+	assert(constant_);
 	return constant_;
 }
 

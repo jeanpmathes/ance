@@ -18,13 +18,15 @@ ance::Type* ance::StringConstant::getType()
 	return type_;
 }
 
-llvm::Constant* ance::StringConstant::getConstant(llvm::LLVMContext& c)
+void ance::StringConstant::build(llvm::LLVMContext& c)
 {
-	if (!constant_)
-	{
-		constant_ = llvm::ConstantDataArray::getString(c, string_, false);
-	}
+	assert(!constant_);
+	constant_ = llvm::ConstantDataArray::getString(c, string_, false);
+}
 
+llvm::Constant * ance::StringConstant::getNativeConstant()
+{
+	assert(constant_);
 	return constant_;
 }
 

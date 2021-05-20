@@ -10,12 +10,14 @@ ance::Type* ance::FloatConstant::getType()
 	return type_;
 }
 
-llvm::Constant* ance::FloatConstant::getConstant(llvm::LLVMContext& c)
+void ance::FloatConstant::build(llvm::LLVMContext& c)
 {
-	if (!constant_)
-	{
-		constant_ = llvm::ConstantFP::get(type_->getNativeType(c), float_);
-	}
+	assert(!constant_);
+	constant_ = llvm::ConstantFP::get(type_->getNativeType(c), float_);
+}
 
+llvm::Constant * ance::FloatConstant::getNativeConstant()
+{
+	assert(constant_);
 	return constant_;
 }

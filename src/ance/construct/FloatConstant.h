@@ -13,7 +13,9 @@ class FloatConstant : public Constant
 
 		ance::Type* getType() override;
 
-		llvm::Constant* getConstant(llvm::LLVMContext& c) override;
+		void build(llvm::LLVMContext& c) override;
+
+		llvm::Constant * getNativeConstant() override;
 
 	private:
 		ance::Type* type_;
