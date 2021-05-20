@@ -25,7 +25,9 @@ class Type
 
 		virtual llvm::Constant* getDefault(llvm::LLVMContext& c) = 0;
 
-		virtual llvm::Type* getNativeType(llvm::LLVMContext& c) = 0;
+		llvm::Type* getNativeType(llvm::LLVMContext& c);
+
+		virtual llvm::Type* getContentType(llvm::LLVMContext& c) = 0;
 
 		llvm::TypeSize getSize(llvm::Module* m);
 

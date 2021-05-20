@@ -17,7 +17,7 @@ class PointerType : public Type
 
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
 
-		llvm::PointerType* getNativeType(llvm::LLVMContext& c) override;
+		llvm::PointerType* getContentType(llvm::LLVMContext& c) override;
 
 		~PointerType() override = default;
 

@@ -14,7 +14,7 @@ class SingleType : public FloatingPointType
 
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
 
-		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
+		llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
 	private:
 		inline static FloatingPointType* instance_ = nullptr;

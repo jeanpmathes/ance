@@ -12,7 +12,7 @@ class FloatingPointType : public Type
 
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override = 0;
 
-		llvm::Type* getNativeType(llvm::LLVMContext& c) override = 0;
+		llvm::Type* getContentType(llvm::LLVMContext& c) override = 0;
 };
 }
 #endif

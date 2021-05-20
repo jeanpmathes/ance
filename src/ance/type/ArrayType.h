@@ -23,7 +23,7 @@ class ArrayType : public Type
 
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
 
-		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
+		llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
 		~ArrayType() override = default;
 

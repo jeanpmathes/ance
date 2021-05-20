@@ -3,11 +3,11 @@
 #include "Type.h"
 
 llvm::Value* ance::Value::getContentValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileState* state,
+	llvm::LLVMContext&,
+	llvm::Module*,
+	CompileState*,
 	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
+	llvm::DIBuilder*
 )
 {
 	switch (getType()->storage())

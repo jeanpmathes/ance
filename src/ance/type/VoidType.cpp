@@ -10,7 +10,7 @@ llvm::Constant* ance::VoidType::getDefault(llvm::LLVMContext&)
 	throw std::logic_error("Void does not have a default value.");
 }
 
-llvm::Type* ance::VoidType::getNativeType(llvm::LLVMContext& c)
+llvm::Type* ance::VoidType::getContentType(llvm::LLVMContext& c)
 {
 	return llvm::Type::getVoidTy(c);
 }

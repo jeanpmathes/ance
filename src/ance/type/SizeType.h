@@ -14,7 +14,7 @@ class SizeType : public ance::Type
 
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
 
-		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
+		llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
 		static llvm::Value* buildValue(llvm::TypeSize size);
 

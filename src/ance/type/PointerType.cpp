@@ -19,10 +19,10 @@ std::string ance::PointerType::getName()
 
 llvm::Constant* ance::PointerType::getDefault(llvm::LLVMContext& c)
 {
-	return llvm::ConstantPointerNull::get(getNativeType(c));
+	return llvm::ConstantPointerNull::get(getContentType(c));
 }
 
-llvm::PointerType* ance::PointerType::getNativeType(llvm::LLVMContext& c)
+llvm::PointerType* ance::PointerType::getContentType(llvm::LLVMContext& c)
 {
 	llvm::Type* native_type;
 

@@ -15,7 +15,7 @@ llvm::Constant* ance::QuadType::getDefault(llvm::LLVMContext& c)
 	return llvm::ConstantFP::get(getNativeType(c), 0);
 }
 
-llvm::Type* ance::QuadType::getNativeType(llvm::LLVMContext& c)
+llvm::Type* ance::QuadType::getContentType(llvm::LLVMContext& c)
 {
 	return llvm::Type::getFP128Ty(c);
 }

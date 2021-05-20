@@ -30,7 +30,7 @@ llvm::Constant* ance::ArrayType::getDefault(llvm::LLVMContext& c)
 	return llvm::ConstantArray::get(type_, content);
 }
 
-llvm::Type* ance::ArrayType::getNativeType(llvm::LLVMContext& c)
+llvm::Type* ance::ArrayType::getContentType(llvm::LLVMContext& c)
 {
 	if (!type_)
 	{

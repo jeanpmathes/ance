@@ -15,7 +15,7 @@ llvm::Constant* ance::HalfType::getDefault(llvm::LLVMContext& c)
 	return llvm::ConstantFP::get(getNativeType(c), 0);
 }
 
-llvm::Type* ance::HalfType::getNativeType(llvm::LLVMContext& c)
+llvm::Type* ance::HalfType::getContentType(llvm::LLVMContext& c)
 {
 	return llvm::Type::getHalfTy(c);
 }

@@ -13,7 +13,7 @@ llvm::Constant* ance::UnsignedIntegerPointerType::getDefault(llvm::LLVMContext& 
 	return llvm::ConstantInt::get(getNativeType(c), 0, false);
 }
 
-llvm::Type* ance::UnsignedIntegerPointerType::getNativeType(llvm::LLVMContext&)
+llvm::Type* ance::UnsignedIntegerPointerType::getContentType(llvm::LLVMContext&)
 {
 	return native_type_;
 }

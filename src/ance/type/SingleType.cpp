@@ -15,7 +15,7 @@ llvm::Constant* ance::SingleType::getDefault(llvm::LLVMContext& c)
 	return llvm::ConstantFP::get(getNativeType(c), 0);
 }
 
-llvm::Type* ance::SingleType::getNativeType(llvm::LLVMContext& c)
+llvm::Type* ance::SingleType::getContentType(llvm::LLVMContext& c)
 {
 	return llvm::Type::getFloatTy(c);
 }

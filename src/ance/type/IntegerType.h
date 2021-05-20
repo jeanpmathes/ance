@@ -18,7 +18,7 @@ class IntegerType : public Type
 
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
 
-		llvm::Type* getNativeType(llvm::LLVMContext& c) override;
+		llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
 	private:
 		uint64_t bit_size_;

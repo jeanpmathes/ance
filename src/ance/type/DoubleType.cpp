@@ -15,7 +15,7 @@ llvm::Constant* ance::DoubleType::getDefault(llvm::LLVMContext& c)
 	return llvm::ConstantFP::get(getNativeType(c), 0);
 }
 
-llvm::Type* ance::DoubleType::getNativeType(llvm::LLVMContext& c)
+llvm::Type* ance::DoubleType::getContentType(llvm::LLVMContext& c)
 {
 	return llvm::Type::getDoubleTy(c);
 }

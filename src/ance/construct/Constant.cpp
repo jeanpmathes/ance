@@ -18,9 +18,9 @@ void ance::Constant::build(llvm::LLVMContext& c)
 		}
 		case InternalStorage::AS_POINTER:
 		{
-			llvm::Constant* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(c), 0);
+			llvm::Constant* zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(c), 0);
 			llvm::Constant* indices[] = {zero, zero};
-			native_constant_ = llvm::ConstantExpr::getInBoundsGetElementPtr(stored_constant_->getType(), stored_constant_, indices);
+			native_constant_ = llvm::ConstantExpr::getInBoundsGetElementPtr(getType()->getContentType(c), content_constant_, indices);
 			break;
 		}
 	}

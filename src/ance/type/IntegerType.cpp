@@ -22,7 +22,7 @@ llvm::Constant* ance::IntegerType::getDefault(llvm::LLVMContext& c)
 	return llvm::ConstantInt::get(getNativeType(c), 0, is_signed_);
 }
 
-llvm::Type* ance::IntegerType::getNativeType(llvm::LLVMContext& c)
+llvm::Type* ance::IntegerType::getContentType(llvm::LLVMContext& c)
 {
 	if (!type_)
 	{
