@@ -20,6 +20,8 @@ class Scope;
 
 class Type;
 
+class Value;
+
 class Variable
 {
 	protected:
@@ -38,7 +40,7 @@ class Variable
 
 		[[nodiscard]] bool isConstant() const;
 
-		virtual llvm::Value* getValue(
+		virtual ance::Value* getValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -47,7 +49,7 @@ class Variable
 		) = 0;
 
 		virtual void setValue(
-			llvm::Value* value,
+			ance::Value* value,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,

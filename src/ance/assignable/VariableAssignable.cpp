@@ -20,8 +20,5 @@ void VariableAssignable::assign(
 )
 {
 	ance::Variable* variable = scope_->getVariable(variable_identifier_);
-	assert(variable->type() == value->getType() && "Assignment types have to match.");
-
-	value->build(c, m, state, ir, di);
-	variable->setValue(value->getNativeValue(), c, m, state, ir, di);
+	variable->setValue(value, c, m, state, ir, di);
 }

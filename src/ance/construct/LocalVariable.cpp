@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "LocalScope.h"
-#include "Value.h"
+#include "WrappedNativeValue.h"
 
 ance::LocalVariable::LocalVariable(
 	ance::LocalScope* containing_scope,
@@ -11,7 +11,7 @@ ance::LocalVariable::LocalVariable(
 	ance::Type* type,
 	ance::Value* value
 )
-	: Variable(containing_scope, std::move(identifier), type, false), value_(value)
+	: Variable(containing_scope, std::move(identifier), type, false), initial_value_(value)
 {
 }
 
@@ -23,15 +23,15 @@ void ance::LocalVariable::build(
 	llvm::DIBuilder* di
 )
 {
-	assert(value_);
-	assert(type() == value_->getType());
+	assert(initial_value_);
+	assert(type() == initial_value_->getType());
 
-	value_->build(c, m, state, ir, di);
-	native_value_ = value_->getNativeValue();
+	initial_value_->build(c, m, state, ir, di);
+	native_value_ = initial_value_->getNativeValue();
 	native_value_->setName(identifier());
 }
 
-llvm::Value* ance::LocalVariable::getValue(
+ance::Value* ance::LocalVariable::getValue(
 	llvm::LLVMContext&,
 	llvm::Module*,
 	CompileState*,
@@ -39,18 +39,22 @@ llvm::Value* ance::LocalVariable::getValue(
 	llvm::DIBuilder*
 )
 {
-	return native_value_;
+	return new WrappedNativeValue(type(), native_value_);
 }
 
 void ance::LocalVariable::setValue(
-	llvm::Value* value,
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileState*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
+	ance::Value* value,
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
 )
 {
-	native_value_ = value;
+	assert(type() == value->getType() && "Assignment types have to match.");
+
+	value->build(c, m, state, ir, di);
+
+	native_value_ = value->getNativeValue();
 	native_value_->setName(identifier());
 }

@@ -2,12 +2,12 @@
 
 #include <utility>
 
-#include "ExpressionBackedValue.h"
+#include "DelayedValue.h"
 #include "Value.h"
 #include "Scope.h"
 
 VariableAccess::VariableAccess(std::string identifier)
-	: identifier_(std::move(identifier)), value_(new ance::ExpressionBackedValue(this))
+	: identifier_(std::move(identifier)), value_(new ance::DelayedValue(this))
 {
 }
 
@@ -26,7 +26,7 @@ ance::Value* VariableAccess::getValue()
 	return value_;
 }
 
-llvm::Value* VariableAccess::build(
+void VariableAccess::build(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -34,7 +34,8 @@ llvm::Value* VariableAccess::build(
 	llvm::DIBuilder* di
 )
 {
-	return variable_->getValue(c, m, state, ir, di);
+	ance::Value* value = variable_->getValue(c, m, state, ir, di);
+	value_->setValue(value);
 }
 
 VariableAccess::~VariableAccess() = default;

@@ -1,13 +1,14 @@
 #include "GlobalVariable.h"
 
-#include <llvm/IR/GlobalValue.h>
-
 #include <utility>
+
+#include <llvm/IR/GlobalValue.h>
 
 #include "Constant.h"
 #include "AccessModifier.h"
 #include "Type.h"
 #include "VoidType.h"
+#include "WrappedNativeValue.h"
 
 namespace llvm
 {
@@ -61,7 +62,7 @@ void ance::GlobalVariable::buildGlobal(llvm::LLVMContext& c, llvm::Module* m)
 		isConstant(), linkage, native_initializer, identifier());
 }
 
-llvm::Value* ance::GlobalVariable::getValue(
+ance::Value* ance::GlobalVariable::getValue(
 	llvm::LLVMContext&,
 	llvm::Module*,
 	CompileState*,
@@ -72,18 +73,21 @@ llvm::Value* ance::GlobalVariable::getValue(
 	auto* const value_type = static_cast<llvm::PointerType*>(native_variable_->getType())->getElementType();
 	llvm::Value* value = ir.CreateLoad(value_type, native_variable_);
 	value->setName(identifier());
-	return value;
+	return new ance::WrappedNativeValue(type(), value);
 }
 
 void ance::GlobalVariable::setValue(
-	llvm::Value* value,
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileState*,
+	ance::Value* value,
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
 	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder*
+	llvm::DIBuilder* di
 )
 {
 	assert(!isConstant());
-	ir.CreateStore(value, native_variable_);
+	assert(type() == value->getType() && "Assignment types have to match.");
+
+	value->build(c, m, state, ir, di);
+	ir.CreateStore(value->getNativeValue(), native_variable_);
 }

@@ -27,7 +27,7 @@ class LocalVariable : public ance::Variable
 			llvm::DIBuilder* di
 		);
 
-		llvm::Value* getValue(
+		ance::Value* getValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -36,7 +36,7 @@ class LocalVariable : public ance::Variable
 		) override;
 
 		void setValue(
-			llvm::Value* value,
+			ance::Value* value,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -45,7 +45,7 @@ class LocalVariable : public ance::Variable
 		) override;
 
 	private:
-		ance::Value* value_;
+		ance::Value* initial_value_;
 		llvm::Value* native_value_{nullptr};
 };
 }

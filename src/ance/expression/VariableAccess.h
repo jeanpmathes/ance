@@ -1,16 +1,18 @@
 #ifndef ANCE_SRC_ANCE_EXPRESSION_VARIABLEACCESS_H_
 #define ANCE_SRC_ANCE_EXPRESSION_VARIABLEACCESS_H_
 
-#include "BuildableExpression.h"
+#include "DelayableExpression.h"
 
 namespace ance
 {
 class Variable;
 
 class Scope;
+
+class DelayedValue;
 }
 
-class VariableAccess : public BuildableExpression
+class VariableAccess : public DelayableExpression
 {
 	public:
 		explicit VariableAccess(std::string identifier);
@@ -21,7 +23,7 @@ class VariableAccess : public BuildableExpression
 
 		ance::Value* getValue() override;
 
-		llvm::Value* build(
+		void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -33,7 +35,7 @@ class VariableAccess : public BuildableExpression
 
 	private:
 		std::string identifier_;
-		ance::Value* value_;
+		ance::DelayedValue* value_;
 		ance::Variable* variable_{nullptr};
 };
 

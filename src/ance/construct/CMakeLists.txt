@@ -17,4 +17,5 @@ target_sources(ance PRIVATE
                FloatConstant.cpp
                BooleanConstant.cpp
                RoughlyCastedValue.cpp
-               Variable.cpp)
+               Variable.cpp
+               DelayedValue.cpp)

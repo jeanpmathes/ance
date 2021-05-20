@@ -46,7 +46,7 @@ class GlobalVariable : public Variable
 
 		void buildGlobal(llvm::LLVMContext& c, llvm::Module* m);
 
-		llvm::Value* getValue(
+		ance::Value* getValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -55,7 +55,7 @@ class GlobalVariable : public Variable
 		) override;
 
 		void setValue(
-			llvm::Value* value,
+			ance::Value* value,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
