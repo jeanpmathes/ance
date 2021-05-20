@@ -14,4 +14,5 @@ add_subdirectory(scope)
 add_subdirectory(statement)
 add_subdirectory(type)
 
-target_sources(ance PRIVATE AccessModifier.cpp)
+target_sources(ance PRIVATE AccessModifier.cpp
+               InternalStorage.cpp)

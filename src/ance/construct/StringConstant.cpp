@@ -18,16 +18,9 @@ ance::Type* ance::StringConstant::getType()
 	return type_;
 }
 
-void ance::StringConstant::build(llvm::LLVMContext& c)
+llvm::Constant * ance::StringConstant::buildStored(llvm::LLVMContext& c)
 {
-	assert(!constant_);
-	constant_ = llvm::ConstantDataArray::getString(c, string_, false);
-}
-
-llvm::Constant * ance::StringConstant::getNativeConstant()
-{
-	assert(constant_);
-	return constant_;
+	return llvm::ConstantDataArray::getString(c, string_, false);
 }
 
 std::string ance::StringConstant::parse(const std::string& unparsed)

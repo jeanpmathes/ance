@@ -16,16 +16,9 @@ ance::Type* ance::ByteConstant::getType()
 	return type_;
 }
 
-void ance::ByteConstant::build(llvm::LLVMContext& c)
+llvm::Constant * ance::ByteConstant::buildStored(llvm::LLVMContext& c)
 {
-	assert(!constant_);
-	constant_ = llvm::ConstantInt::get(type_->getNativeType(c), byte_, false);
-}
-
-llvm::Constant * ance::ByteConstant::getNativeConstant()
-{
-	assert(constant_);
-	return constant_;
+	return llvm::ConstantInt::get(type_->getNativeType(c), byte_, false);
 }
 
 char ance::ByteConstant::resolveEscaped(char content)

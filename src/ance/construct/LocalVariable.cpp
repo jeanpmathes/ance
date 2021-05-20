@@ -55,6 +55,20 @@ void ance::LocalVariable::setValue(
 
 	value->build(c, m, state, ir, di);
 
-	native_value_ = value->getNativeValue();
-	native_value_->setName(identifier());
+	switch (type()->storage())
+	{
+		case InternalStorage::AS_TEMPORARY:
+		{
+			native_value_ = value->getNativeValue();
+			native_value_->setName(identifier());
+			break;
+		}
+
+		case InternalStorage::AS_POINTER:
+		{
+			llvm::Value* stored = value->getStoredValue(c, m, state, ir, di);
+			ir.CreateStore(native_value_, stored);
+			break;
+		}
+	}
 }

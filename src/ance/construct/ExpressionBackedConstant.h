@@ -18,13 +18,10 @@ class ExpressionBackedConstant : public Constant
 
 		ance::Type* getType() override;
 
-		void build(llvm::LLVMContext& c) override;
-
-		llvm::Constant * getNativeConstant() override;
+		llvm::Constant * buildStored(llvm::LLVMContext &c) override;
 
 	private:
 		BuildableConstantExpression* expression_;
-		llvm::Constant* constant_{nullptr};
 };
 }
 #endif

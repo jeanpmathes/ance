@@ -18,9 +18,7 @@ class ByteConstant : public Constant
 
 		ance::Type* getType() override;
 
-		void build(llvm::LLVMContext& c) override;
-
-		llvm::Constant * getNativeConstant() override;
+		llvm::Constant * buildStored(llvm::LLVMContext &c) override;
 
 		static char resolveEscaped(char content);
 
@@ -29,7 +27,6 @@ class ByteConstant : public Constant
 	private:
 		ance::Type* type_;
 		uint8_t byte_;
-		llvm::Constant* constant_{nullptr};
 };
 }
 

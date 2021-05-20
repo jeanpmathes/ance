@@ -26,6 +26,13 @@ class Value
 		) = 0;
 
 		virtual llvm::Value* getNativeValue() = 0;
+
+		virtual llvm::Value* getStoredValue(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di);
 };
 }
 #endif

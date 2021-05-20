@@ -2,9 +2,12 @@
 #define ANCE_SRC_ANCE_TYPE_TYPE_H_
 
 #include <string>
+
 #include <llvm/IR/Constant.h>
 #include <llvm/IR/DataLayout.h>
 #include <llvm/IR/Module.h>
+
+#include "InternalStorage.h"
 
 namespace llvm
 {
@@ -25,6 +28,8 @@ class Type
 		virtual llvm::Type* getNativeType(llvm::LLVMContext& c) = 0;
 
 		llvm::TypeSize getSize(llvm::Module* m);
+
+		virtual InternalStorage storage();
 
 	protected:
 		virtual ~Type() = default;

@@ -12,9 +12,15 @@ namespace ance
 class Constant : public Value
 {
 	public:
-		virtual void build(llvm::LLVMContext& c) = 0;
+		void build(llvm::LLVMContext& c);
 
-		virtual llvm::Constant* getNativeConstant() = 0;
+	protected:
+		virtual llvm::Constant* buildStored(llvm::LLVMContext& c) = 0;
+
+	public:
+		llvm::Constant* getNativeConstant();
+
+		llvm::Constant* getStoredConstant();
 
 		void build(
 			llvm::LLVMContext& c,
@@ -26,6 +32,11 @@ class Constant : public Value
 
 		llvm::Value * getNativeValue() final;
 
+		llvm::Value * getStoredValue(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) final;
+
+	protected:
+		llvm::Constant* native_constant_{nullptr};
+		llvm::Constant* stored_constant_{nullptr};
 };
 }
 #endif

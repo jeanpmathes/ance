@@ -12,14 +12,7 @@ ance::Type* ance::ExpressionBackedConstant::getType()
 	return expression_->getType();
 }
 
-void ance::ExpressionBackedConstant::build(llvm::LLVMContext& c)
+llvm::Constant * ance::ExpressionBackedConstant::buildStored(llvm::LLVMContext& c)
 {
-	assert(!constant_);
-	constant_ = expression_->buildConstant(c);
-}
-
-llvm::Constant * ance::ExpressionBackedConstant::getNativeConstant()
-{
-	assert(constant_);
-	return constant_;
+	return expression_->buildConstant(c);
 }

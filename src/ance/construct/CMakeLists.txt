@@ -10,7 +10,6 @@ target_sources(ance PRIVATE
                Parameter.cpp
                Value.cpp
                WrappedNativeValue.cpp
-               WrappedNativeConstant.cpp
                StringConstant.cpp
                ByteConstant.cpp
                IntegerConstant.cpp

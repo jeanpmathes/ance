@@ -15,14 +15,7 @@ ance::Type* ance::IntegerConstant::getType()
 	return type_;
 }
 
-void ance::IntegerConstant::build(llvm::LLVMContext& c)
+llvm::Constant * ance::IntegerConstant::buildStored(llvm::LLVMContext& c)
 {
-	assert(!constant_);
-	constant_ = llvm::ConstantInt::get(type_->getNativeType(c), integer_);
-}
-
-llvm::Constant * ance::IntegerConstant::getNativeConstant()
-{
-	assert(constant_);
-	return constant_;
+	return llvm::ConstantInt::get(type_->getNativeType(c), integer_);
 }

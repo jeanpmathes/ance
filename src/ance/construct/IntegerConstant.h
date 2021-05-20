@@ -13,14 +13,11 @@ class IntegerConstant : public Constant
 
 		ance::Type* getType() override;
 
-		void build(llvm::LLVMContext& c) override;
-
-		llvm::Constant * getNativeConstant() override;
+		llvm::Constant * buildStored(llvm::LLVMContext &c) override;
 
 	private:
 		ance::Type* type_;
 		llvm::APInt integer_;
-		llvm::Constant* constant_{nullptr};
 };
 }
 
