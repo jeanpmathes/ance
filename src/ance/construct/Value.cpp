@@ -2,12 +2,12 @@
 
 #include "Type.h"
 
-llvm::Value* ance::Value::getStoredValue(
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileState*,
+llvm::Value* ance::Value::getContentValue(
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
 	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder*
+	llvm::DIBuilder* di
 )
 {
 	switch (getType()->storage())

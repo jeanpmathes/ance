@@ -16,7 +16,7 @@ ance::Type* ance::ByteConstant::getType()
 	return type_;
 }
 
-llvm::Constant * ance::ByteConstant::buildStored(llvm::LLVMContext& c)
+llvm::Constant * ance::ByteConstant::buildContent(llvm::LLVMContext& c)
 {
 	return llvm::ConstantInt::get(type_->getNativeType(c), byte_, false);
 }

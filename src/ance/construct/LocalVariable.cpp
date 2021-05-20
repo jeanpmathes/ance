@@ -66,7 +66,7 @@ void ance::LocalVariable::setValue(
 
 		case InternalStorage::AS_POINTER:
 		{
-			llvm::Value* stored = value->getStoredValue(c, m, state, ir, di);
+			llvm::Value* stored = value->getContentValue(c, m, state, ir, di);
 			ir.CreateStore(native_value_, stored);
 			break;
 		}

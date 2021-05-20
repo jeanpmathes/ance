@@ -27,7 +27,7 @@ class Value
 
 		virtual llvm::Value* getNativeValue() = 0;
 
-		virtual llvm::Value* getStoredValue(
+		virtual llvm::Value* getContentValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,

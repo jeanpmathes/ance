@@ -4,16 +4,16 @@
 
 void ance::Constant::build(llvm::LLVMContext& c)
 {
-	assert(!stored_constant_ && "A constant may only be built once.");
+	assert(!content_constant_ && "A constant may only be built once.");
 	assert(!native_constant_ && "A constant may only be built once.");
 
-	stored_constant_ = buildStored(c);
+	content_constant_ = buildContent(c);
 
 	switch (getType()->storage())
 	{
 		case InternalStorage::AS_TEMPORARY:
 		{
-			native_constant_ = stored_constant_;
+			native_constant_ = content_constant_;
 			break;
 		}
 		case InternalStorage::AS_POINTER:
@@ -32,10 +32,10 @@ llvm::Constant * ance::Constant::getNativeConstant()
 	return native_constant_;
 }
 
-llvm::Constant * ance::Constant::getStoredConstant()
+llvm::Constant * ance::Constant::getContentConstant()
 {
-	assert(stored_constant_ && "Constant has to be built before accessing stored constant.");
-	return stored_constant_;
+	assert(content_constant_ && "Constant has to be built before accessing stored constant.");
+	return content_constant_;
 }
 
 void ance::Constant::build(
@@ -54,7 +54,7 @@ llvm::Value* ance::Constant::getNativeValue()
 	return getNativeConstant();
 }
 
-llvm::Value* ance::Constant::getStoredValue(
+llvm::Value* ance::Constant::getContentValue(
 	llvm::LLVMContext&,
 	llvm::Module*,
 	CompileState*,
@@ -62,5 +62,5 @@ llvm::Value* ance::Constant::getStoredValue(
 	llvm::DIBuilder*
 )
 {
-	return getStoredConstant();
+	return getContentConstant();
 }

@@ -56,7 +56,7 @@ void ance::GlobalVariable::buildGlobal(llvm::LLVMContext& c, llvm::Module* m)
 	llvm::GlobalValue::LinkageTypes linkage = Convert(access_);
 
 	constant_init_->build(c);
-	llvm::Constant* native_initializer = constant_init_->getStoredConstant();
+	llvm::Constant* native_initializer = constant_init_->getContentConstant();
 	native_variable_ = new llvm::GlobalVariable(
 		*m, type()->getNativeType(c),
 		isConstant(), linkage, native_initializer, identifier());
@@ -110,8 +110,8 @@ void ance::GlobalVariable::setValue(
 		}
 		case InternalStorage::AS_POINTER:
 		{
-			llvm::Value* stored = value->getStoredValue(c, m, state, ir, di);
-			ir.CreateStore(stored, native_variable_);
+			llvm::Value* content = value->getContentValue(c, m, state, ir, di);
+			ir.CreateStore(content, native_variable_);
 			break;
 		}
 	}

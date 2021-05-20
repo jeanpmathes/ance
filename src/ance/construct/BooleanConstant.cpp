@@ -15,7 +15,7 @@ ance::Type* ance::BooleanConstant::getType()
 	return type_;
 }
 
-llvm::Constant * ance::BooleanConstant::buildStored(llvm::LLVMContext& c)
+llvm::Constant * ance::BooleanConstant::buildContent(llvm::LLVMContext& c)
 {
 	return boolean_ ? llvm::ConstantInt::getTrue(type_->getNativeType(c))
 					: llvm::ConstantInt::getFalse(type_->getNativeType(c));
