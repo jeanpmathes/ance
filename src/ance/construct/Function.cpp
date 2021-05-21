@@ -153,7 +153,7 @@ void ance::Function::build(
 		}
 		else
 		{
-			assert(true); // return required
+			assert(true && "Functions with return type that is not void require a return statement.");
 		}
 	}
 
