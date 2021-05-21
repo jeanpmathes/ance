@@ -2,8 +2,6 @@
 
 #include <utility>
 
-#include <llvm/IR/GlobalValue.h>
-
 #include "Constant.h"
 #include "AccessModifier.h"
 #include "Type.h"
@@ -101,18 +99,6 @@ void ance::GlobalVariable::setValue(
 
 	value->build(c, m, state, ir, di);
 
-	switch (type()->storage())
-	{
-		case InternalStorage::AS_TEMPORARY:
-		{
-			ir.CreateStore(value->getNativeValue(), native_variable_);
-			break;
-		}
-		case InternalStorage::AS_POINTER:
-		{
-			llvm::Value* content = value->getContentValue(c, m, state, ir, di);
-			ir.CreateStore(content, native_variable_);
-			break;
-		}
-	}
+	llvm::Value* content = value->getContentValue(c, m, state, ir, di);
+	ir.CreateStore(content, native_variable_);
 }
