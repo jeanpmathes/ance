@@ -71,7 +71,7 @@ void ance::Function::buildName(
 		param_types.push_back(param->type()->getNativeType(c));
 	}
 
-	native_type_ = llvm::FunctionType::get(return_type_->getNativeType(c), param_types, false);
+	native_type_ = llvm::FunctionType::get(return_type_->getContentType(c), param_types, false);
 	native_function_ = llvm::Function::Create(native_type_, Convert(access_), name_, m);
 
 	for (auto pair : zip(parameters_, native_function_->args()))
@@ -134,7 +134,7 @@ void ance::Function::build(
 			if (return_value_)
 			{
 				return_value_->build(c, m, state, ir, di);
-				ir.CreateRet(return_value_->getNativeValue());
+				ir.CreateRet(return_value_->getContentValue(c, m, state, ir, di));
 			}
 			else
 			{
@@ -176,7 +176,7 @@ void ance::Function::addReturn(ance::Value* value)
 	}
 }
 
-llvm::CallInst* ance::Function::buildCall(
+llvm::Value* ance::Function::buildCall(
 	const std::vector<ance::Value*>& arguments,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
@@ -201,5 +201,30 @@ llvm::CallInst* ance::Function::buildCall(
 		args.push_back(arg->getNativeValue());
 	}
 
-	return ir.CreateCall(native_type_, native_function_, args);
+	llvm::Value* content_value = ir.CreateCall(native_type_, native_function_, args);
+
+	if (return_type_ == ance::VoidType::get())
+	{
+		return nullptr;
+	}
+
+	// Convert content value that is returned to native value.
+	llvm::Value* native_value;
+
+	switch (return_type_->storage())
+	{
+		case InternalStorage::AS_TEMPORARY:
+		{
+			native_value = content_value;
+			break;
+		}
+		case InternalStorage::AS_POINTER:
+		{
+			native_value = ir.CreateAlloca(return_type_->getContentType(c));
+			ir.CreateStore(content_value, native_value);
+			break;
+		}
+	}
+
+	return native_value;
 }
