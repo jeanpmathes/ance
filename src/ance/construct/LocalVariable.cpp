@@ -28,6 +28,7 @@ void ance::LocalVariable::build(
 	if (type()->storage() == InternalStorage::AS_POINTER)
 	{
 		native_value_ = ir.CreateAlloca(type()->getContentType(c), nullptr);
+		native_value_->setName(identifier());
 	}
 
 	setValue(initial_value_, c, m, state, ir, di);
