@@ -4,33 +4,32 @@
 #include <string>
 
 #include "LocalVariable.h"
+#include "Value.h"
 
 namespace ance
 {
-class WrappedNativeValue;
-
 class Type;
 
-class Parameter
+class Parameter : public ance::Value
 {
 	public:
 		Parameter(ance::Type* type, std::string name);
 
-		ance::Type* type();
+		ance::Type* getType() override;
 
 		std::string name();
 
-		ance::Value* getValue();
-
 		void wrap(llvm::Argument* argument);
 
-		llvm::Argument* getWrapped();
+		void build(llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) override;
+
+		llvm::Value * getNativeValue() override;
+
+		llvm::Value * getContentValue(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) override;
 
 	private:
 		ance::Type* type_;
 		std::string name_;
-
-		ance::WrappedNativeValue* wrapper_;
 
 		llvm::Argument* argument_{nullptr};
 };

@@ -29,8 +29,8 @@ ance::Function::Function(
 	for (auto* parameter : parameters_)
 	{
 		ance::LocalVariable* arg = local_scope_->defineLocalVariable(
-			parameter->name(), parameter->type(),
-			parameter->getValue());
+			parameter->name(), parameter->getType(),
+			parameter);
 		arguments_.push_back(arg);
 	}
 }
@@ -68,7 +68,7 @@ void ance::Function::buildName(
 
 	for (auto* param : parameters_)
 	{
-		param_types.push_back(param->type()->getNativeType(c));
+		param_types.push_back(param->getType()->getContentType(c));
 	}
 
 	native_type_ = llvm::FunctionType::get(return_type_->getContentType(c), param_types, false);
@@ -189,7 +189,7 @@ llvm::Value* ance::Function::buildCall(
 
 	for (auto pair : llvm::zip(parameters_, arguments))
 	{
-		assert(std::get<0>(pair)->type() == std::get<1>(pair)->getType());
+		assert(std::get<0>(pair)->getType() == std::get<1>(pair)->getType());
 	}
 
 	std::vector<llvm::Value*> args;
@@ -198,7 +198,7 @@ llvm::Value* ance::Function::buildCall(
 	for (auto* arg : arguments)
 	{
 		arg->build(c, m, state, ir, di);
-		args.push_back(arg->getNativeValue());
+		args.push_back(arg->getContentValue(c, m, state, ir, di));
 	}
 
 	llvm::Value* content_value = ir.CreateCall(native_type_, native_function_, args);
