@@ -11,6 +11,7 @@ include_directories(ance/expression)
 include_directories(ance/scope)
 include_directories(ance/statement)
 include_directories(ance/type)
+include_directories(ance/utility)
 
 include_directories(compiler)
 include_directories(grammar)
