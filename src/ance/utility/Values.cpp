@@ -45,7 +45,7 @@ llvm::Value* ance::Values::contentToNative(
 		}
 		case InternalStorage::AS_POINTER:
 		{
-			llvm::Value* native = ir.CreateAlloca(type->getNativeType(c));
+			llvm::Value* native = ir.CreateAlloca(type->getContentType(c));
 			ir.CreateStore(content, native);
 			return native;
 		}
