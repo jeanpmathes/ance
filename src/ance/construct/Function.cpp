@@ -4,6 +4,7 @@
 #include <llvm/ADT/SmallVector.h> // critical, missing include will cause linking error
 
 #include "Value.h"
+#include "Values.h"
 #include "AccessModifier.h"
 #include "LocalScope.h"
 #include "VoidType.h"
@@ -208,23 +209,6 @@ llvm::Value* ance::Function::buildCall(
 		return nullptr;
 	}
 
-	// Convert content value that is returned to native value.
-	llvm::Value* native_value;
-
-	switch (return_type_->storage())
-	{
-		case InternalStorage::AS_TEMPORARY:
-		{
-			native_value = content_value;
-			break;
-		}
-		case InternalStorage::AS_POINTER:
-		{
-			native_value = ir.CreateAlloca(return_type_->getContentType(c));
-			ir.CreateStore(content_value, native_value);
-			break;
-		}
-	}
-
+	llvm::Value* native_value = ance::Values::contentToNative(return_type_, content_value, c, m, state, ir, di);
 	return native_value;
 }

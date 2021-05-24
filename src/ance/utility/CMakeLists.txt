@@ -1,3 +1,3 @@
 include_directories(.)
 
-target_sources(ance PRIVATE Values.h)
+target_sources(ance PRIVATE Values.cpp)
