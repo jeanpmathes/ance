@@ -7,7 +7,7 @@
 llvm::Value* ance::Values::nativeToContent(
 	ance::Type* type,
 	llvm::Value* native,
-	llvm::LLVMContext& c,
+	llvm::LLVMContext&,
 	llvm::Module*,
 	CompileState*,
 	llvm::IRBuilder<>& ir,

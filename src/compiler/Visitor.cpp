@@ -41,6 +41,7 @@
 #include "IntegerConstant.h"
 #include "FloatConstant.h"
 #include "BooleanConstant.h"
+#include "SizeConstant.h"
 
 Visitor::Visitor(Application& application)
 	: application_(application)
@@ -351,6 +352,14 @@ antlrcpp::Any Visitor::visitBooleanLiteral(anceParser::BooleanLiteralContext* ct
 
 	if (ctx->FALSE()) constant = ance::BooleanConstant::createFalse(application_);
 	if (ctx->TRUE()) constant = ance::BooleanConstant::createTrue(application_);
+
+	return static_cast<Expression*>(new ConstantLiteral(constant));
+}
+
+antlrcpp::Any Visitor::visitSizeLiteral(anceParser::SizeLiteralContext* ctx)
+{
+	std::string size = ctx->INTEGER()->getText();
+	ance::Constant* constant = new ance::SizeConstant(size, application_);
 
 	return static_cast<Expression*>(new ConstantLiteral(constant));
 }

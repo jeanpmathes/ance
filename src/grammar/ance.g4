@@ -132,6 +132,7 @@ literalExpression
 	| integerLiteral
 	| floatingPointLiteral
 	| booleanLiteral
+	| sizeLiteral
 	;
 
 stringLiteral
@@ -172,6 +173,10 @@ floatingPointLiteral
 booleanLiteral
     : TRUE
     | FALSE
+    ;
+
+sizeLiteral
+    : INTEGER ':' 'size'
     ;
 
 type

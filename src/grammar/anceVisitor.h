@@ -93,6 +93,8 @@ public:
 
     virtual antlrcpp::Any visitBooleanLiteral(anceParser::BooleanLiteralContext *context) = 0;
 
+    virtual antlrcpp::Any visitSizeLiteral(anceParser::SizeLiteralContext *context) = 0;
+
     virtual antlrcpp::Any visitInteger(anceParser::IntegerContext *context) = 0;
 
     virtual antlrcpp::Any visitArray(anceParser::ArrayContext *context) = 0;

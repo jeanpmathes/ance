@@ -21,6 +21,11 @@ class Application
 	public:
 		Application(std::filesystem::path project_file, std::filesystem::path nccode_file);
 
+		Application(const Application&) = delete;
+
+		Application(Application&&) = delete;
+
+	public:
 		void setPointerSize(unsigned size);
 
 		[[nodiscard]] std::string getName() const;
@@ -29,7 +34,7 @@ class Application
 
 		[[nodiscard]] std::filesystem::path getCodeFile() const;
 
-		unsigned getBitness();
+		[[nodiscard]] unsigned getBitness() const;
 
 		bool validate();
 

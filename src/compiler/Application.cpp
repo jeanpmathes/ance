@@ -49,7 +49,7 @@ std::filesystem::path Application::getCodeFile() const
 	return std::filesystem::path(code_file_);
 }
 
-unsigned Application::getBitness()
+unsigned Application::getBitness() const
 {
 	return pointer_size_ * 8;
 }

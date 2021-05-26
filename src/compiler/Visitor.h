@@ -68,6 +68,8 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitBooleanLiteral(anceParser::BooleanLiteralContext* ctx) override;
 
+		antlrcpp::Any visitSizeLiteral(anceParser::SizeLiteralContext *ctx) override;
+
 		antlrcpp::Any visitUnsignedInteger(anceParser::UnsignedIntegerContext* ctx) override;
 
 		antlrcpp::Any visitSignedInteger(anceParser::SignedIntegerContext* ctx) override;
@@ -89,7 +91,7 @@ class Visitor : public anceBaseVisitor
 		antlrcpp::Any visitAllocator(anceParser::AllocatorContext* ctx) override;
 
 	private:
-		Application application_;
+		Application& application_;
 };
 
 #endif

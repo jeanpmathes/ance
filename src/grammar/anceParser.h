@@ -35,9 +35,9 @@ public:
     RuleSizeofExpression = 27, RuleLiteralExpression = 28, RuleStringLiteral = 29, 
     RuleByteLiteral = 30, RuleIntegerLiteral = 31, RuleUnsignedInteger = 32, 
     RuleSignedInteger = 33, RuleSpecialInteger = 34, RuleFloatingPointLiteral = 35, 
-    RuleBooleanLiteral = 36, RuleType = 37, RuleIntegerType = 38, RuleArrayType = 39, 
-    RuleKeywordType = 40, RuleFloatingPointType = 41, RuleSizeType = 42, 
-    RuleUnsignedIntegerPointerType = 43, RuleVoidType = 44
+    RuleBooleanLiteral = 36, RuleSizeLiteral = 37, RuleType = 38, RuleIntegerType = 39, 
+    RuleArrayType = 40, RuleKeywordType = 41, RuleFloatingPointType = 42, 
+    RuleSizeType = 43, RuleUnsignedIntegerPointerType = 44, RuleVoidType = 45
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -87,6 +87,7 @@ public:
   class SpecialIntegerContext;
   class FloatingPointLiteralContext;
   class BooleanLiteralContext;
+  class SizeLiteralContext;
   class TypeContext;
   class IntegerTypeContext;
   class ArrayTypeContext;
@@ -508,6 +509,7 @@ public:
     IntegerLiteralContext *integerLiteral();
     FloatingPointLiteralContext *floatingPointLiteral();
     BooleanLiteralContext *booleanLiteral();
+    SizeLiteralContext *sizeLiteral();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -630,6 +632,19 @@ public:
   };
 
   BooleanLiteralContext* booleanLiteral();
+
+  class  SizeLiteralContext : public antlr4::ParserRuleContext {
+  public:
+    SizeLiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *INTEGER();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  SizeLiteralContext* sizeLiteral();
 
   class  TypeContext : public antlr4::ParserRuleContext {
   public:

@@ -163,6 +163,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitSizeLiteral(anceParser::SizeLiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitInteger(anceParser::IntegerContext *ctx) override {
     return visitChildren(ctx);
   }
