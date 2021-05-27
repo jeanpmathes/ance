@@ -69,7 +69,9 @@ public:
 
     virtual antlrcpp::Any visitAllocation(anceParser::AllocationContext *context) = 0;
 
-    virtual antlrcpp::Any visitAllocator(anceParser::AllocatorContext *context) = 0;
+    virtual antlrcpp::Any visitDynamic(anceParser::DynamicContext *context) = 0;
+
+    virtual antlrcpp::Any visitAutomatic(anceParser::AutomaticContext *context) = 0;
 
     virtual antlrcpp::Any visitRoughCast(anceParser::RoughCastContext *context) = 0;
 

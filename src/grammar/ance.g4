@@ -110,8 +110,8 @@ allocation
     ;
 
 allocator
-    : DYNAMIC
-    | AUTOMATIC
+    : 'dynamic' # Dynamic
+    | 'automatic' # Automatic
     ;
 
 roughCast
@@ -237,9 +237,6 @@ DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ;
 STRING : '"' ('\\'. | .)*? '"' ;
 BYTE : '\'' ( . | '\\' . ) '\'' ;
 INTEGER : [0-9]+ ;
-
-DYNAMIC : 'dynamic' ;
-AUTOMATIC : 'automatic' ;
 
 BUFFER : '[]' ;
 

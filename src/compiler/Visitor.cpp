@@ -482,17 +482,14 @@ antlrcpp::Any Visitor::visitPrivate(anceParser::PrivateContext*)
 	return AccessModifier::PRIVATE_ACCESS;
 }
 
-antlrcpp::Any Visitor::visitAllocator(anceParser::AllocatorContext* ctx)
+antlrcpp::Any Visitor::visitAutomatic(anceParser::AutomaticContext*)
 {
-	if (ctx->AUTOMATIC())
-	{
-		return Runtime::Allocator::AUTOMATIC;
-	}
-
-	if (ctx->DYNAMIC())
-	{
-		return Runtime::Allocator::DYNAMIC;
-	}
-
-	throw std::logic_error("Allocator not defined.");
+	return Runtime::Allocator::AUTOMATIC;
 }
+
+antlrcpp::Any Visitor::visitDynamic(anceParser::DynamicContext*)
+{
+	return Runtime::Allocator::DYNAMIC;
+}
+
+

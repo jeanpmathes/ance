@@ -92,7 +92,9 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitPrivate(anceParser::PrivateContext *ctx) override;
 
-		antlrcpp::Any visitAllocator(anceParser::AllocatorContext* ctx) override;
+		antlrcpp::Any visitAutomatic(anceParser::AutomaticContext *ctx) override;
+
+		antlrcpp::Any visitDynamic(anceParser::DynamicContext *ctx) override;
 
 	private:
 		Application& application_;

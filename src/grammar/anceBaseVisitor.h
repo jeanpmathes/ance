@@ -115,7 +115,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitAllocator(anceParser::AllocatorContext *ctx) override {
+  virtual antlrcpp::Any visitDynamic(anceParser::DynamicContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitAutomatic(anceParser::AutomaticContext *ctx) override {
     return visitChildren(ctx);
   }
 

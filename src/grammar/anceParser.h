@@ -16,10 +16,10 @@ public:
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
     T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
     T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, T__25 = 26, 
-    T__26 = 27, T__27 = 28, T__28 = 29, NATIVE_INTEGER_TYPE = 30, SIGNED_INTEGER = 31, 
-    HEX_INTEGER = 32, BIN_INTEGER = 33, OCT_INTEGER = 34, HALF = 35, SINGLE = 36, 
-    DOUBLE = 37, QUAD = 38, DECIMAL = 39, STRING = 40, BYTE = 41, INTEGER = 42, 
-    DYNAMIC = 43, AUTOMATIC = 44, BUFFER = 45, IDENTIFIER = 46, WHITESPACE = 47, 
+    T__26 = 27, T__27 = 28, T__28 = 29, T__29 = 30, T__30 = 31, NATIVE_INTEGER_TYPE = 32, 
+    SIGNED_INTEGER = 33, HEX_INTEGER = 34, BIN_INTEGER = 35, OCT_INTEGER = 36, 
+    HALF = 37, SINGLE = 38, DOUBLE = 39, QUAD = 40, DECIMAL = 41, STRING = 42, 
+    BYTE = 43, INTEGER = 44, BUFFER = 45, IDENTIFIER = 46, WHITESPACE = 47, 
     BLOCK_COMMENT = 48, LINE_COMMENT = 49
   };
 
@@ -466,13 +466,30 @@ public:
   class  AllocatorContext : public antlr4::ParserRuleContext {
   public:
     AllocatorContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    AllocatorContext() = default;
+    void copyFrom(AllocatorContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *DYNAMIC();
-    antlr4::tree::TerminalNode *AUTOMATIC();
+
+   
+  };
+
+  class  DynamicContext : public AllocatorContext {
+  public:
+    DynamicContext(AllocatorContext *ctx);
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
+  };
+
+  class  AutomaticContext : public AllocatorContext {
+  public:
+    AutomaticContext(AllocatorContext *ctx);
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   AllocatorContext* allocator();
