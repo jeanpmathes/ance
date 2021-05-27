@@ -35,7 +35,9 @@ public:
 
     virtual antlrcpp::Any visitParameter(anceParser::ParameterContext *context) = 0;
 
-    virtual antlrcpp::Any visitAccessModifier(anceParser::AccessModifierContext *context) = 0;
+    virtual antlrcpp::Any visitPublic(anceParser::PublicContext *context) = 0;
+
+    virtual antlrcpp::Any visitPrivate(anceParser::PrivateContext *context) = 0;
 
     virtual antlrcpp::Any visitStatement(anceParser::StatementContext *context) = 0;
 

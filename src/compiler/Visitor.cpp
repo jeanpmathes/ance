@@ -470,14 +470,14 @@ antlrcpp::Any Visitor::visitPointer(anceParser::PointerContext* ctx)
 	return type;
 }
 
-antlrcpp::Any Visitor::visitAccessModifier(anceParser::AccessModifierContext* ctx)
+antlrcpp::Any Visitor::visitPublic(anceParser::PublicContext*)
 {
-	AccessModifier access;
+	return AccessModifier::PUBLIC_ACCESS;
+}
 
-	if (ctx->PUBLIC()) access = AccessModifier::PUBLIC_ACCESS;
-	else if (ctx->PRIVATE()) access = AccessModifier::PRIVATE_ACCESS;
-
-	return access;
+antlrcpp::Any Visitor::visitPrivate(anceParser::PrivateContext*)
+{
+	return AccessModifier::PRIVATE_ACCESS;
 }
 
 antlrcpp::Any Visitor::visitAllocator(anceParser::AllocatorContext* ctx)

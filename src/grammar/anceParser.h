@@ -15,12 +15,12 @@ public:
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
     T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
-    T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, NATIVE_INTEGER_TYPE = 26, 
-    SIGNED_INTEGER = 27, HEX_INTEGER = 28, BIN_INTEGER = 29, OCT_INTEGER = 30, 
-    HALF = 31, SINGLE = 32, DOUBLE = 33, QUAD = 34, DECIMAL = 35, STRING = 36, 
-    BYTE = 37, INTEGER = 38, DYNAMIC = 39, AUTOMATIC = 40, BUFFER = 41, 
-    TRUE = 42, FALSE = 43, PUBLIC = 44, PRIVATE = 45, IDENTIFIER = 46, WHITESPACE = 47, 
-    BLOCK_COMMENT = 48, LINE_COMMENT = 49
+    T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, T__25 = 26, 
+    T__26 = 27, NATIVE_INTEGER_TYPE = 28, SIGNED_INTEGER = 29, HEX_INTEGER = 30, 
+    BIN_INTEGER = 31, OCT_INTEGER = 32, HALF = 33, SINGLE = 34, DOUBLE = 35, 
+    QUAD = 36, DECIMAL = 37, STRING = 38, BYTE = 39, INTEGER = 40, DYNAMIC = 41, 
+    AUTOMATIC = 42, BUFFER = 43, TRUE = 44, FALSE = 45, IDENTIFIER = 46, 
+    WHITESPACE = 47, BLOCK_COMMENT = 48, LINE_COMMENT = 49
   };
 
   enum {
@@ -221,13 +221,30 @@ public:
   class  AccessModifierContext : public antlr4::ParserRuleContext {
   public:
     AccessModifierContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    AccessModifierContext() = default;
+    void copyFrom(AccessModifierContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *PUBLIC();
-    antlr4::tree::TerminalNode *PRIVATE();
+
+   
+  };
+
+  class  PrivateContext : public AccessModifierContext {
+  public:
+    PrivateContext(AccessModifierContext *ctx);
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
+  };
+
+  class  PublicContext : public AccessModifierContext {
+  public:
+    PublicContext(AccessModifierContext *ctx);
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   AccessModifierContext* accessModifier();

@@ -47,7 +47,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitAccessModifier(anceParser::AccessModifierContext *ctx) override {
+  virtual antlrcpp::Any visitPublic(anceParser::PublicContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitPrivate(anceParser::PrivateContext *ctx) override {
     return visitChildren(ctx);
   }
 

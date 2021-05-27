@@ -34,8 +34,8 @@ parameter
 	;
 
 accessModifier
-	: PUBLIC
-	| PRIVATE
+	: 'public' # Public
+	| 'private' # Private
 	;
 
 statement
@@ -245,9 +245,6 @@ BUFFER : '[]' ;
 
 TRUE : 'true' ;
 FALSE : 'false' ;
-
-PUBLIC : 'public' ;
-PRIVATE : 'private' ;
 
 IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
 

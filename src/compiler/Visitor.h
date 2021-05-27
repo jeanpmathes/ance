@@ -86,7 +86,9 @@ class Visitor : public anceBaseVisitor
 
 		// Other
 
-		antlrcpp::Any visitAccessModifier(anceParser::AccessModifierContext* ctx) override;
+		antlrcpp::Any visitPublic(anceParser::PublicContext *ctx) override;
+
+		antlrcpp::Any visitPrivate(anceParser::PrivateContext *ctx) override;
 
 		antlrcpp::Any visitAllocator(anceParser::AllocatorContext* ctx) override;
 
