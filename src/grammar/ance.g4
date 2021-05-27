@@ -202,10 +202,10 @@ keywordType
     ;
 
 floatingPointType
-	: HALF_TYPE
-	| SINGLE_TYPE
-	| DOUBLE_TYPE
-	| QUAD_TYPE
+	: 'half'
+	| 'single'
+	| 'double'
+	| 'quad'
 	;
 
 sizeType
@@ -221,11 +221,6 @@ voidType
 	;
 
 NATIVE_INTEGER_TYPE : 'u'? 'i' INTEGER ;
-
-HALF_TYPE: 'half' ;
-SINGLE_TYPE: 'single' ;
-DOUBLE_TYPE: 'double' ;
-QUAD_TYPE: 'quad' ;
 
 SIGNED_INTEGER : ( '+' | '-' ) INTEGER ;
 HEX_INTEGER : '0' [xX] [0-9a-fA-F]+ ;

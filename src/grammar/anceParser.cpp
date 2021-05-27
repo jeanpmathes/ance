@@ -449,11 +449,11 @@ anceParser::FunctionContext* anceParser::function() {
       | (1ULL << anceParser::T__17)
       | (1ULL << anceParser::T__19)
       | (1ULL << anceParser::T__20)
+      | (1ULL << anceParser::T__21)
+      | (1ULL << anceParser::T__22)
+      | (1ULL << anceParser::T__23)
+      | (1ULL << anceParser::T__24)
       | (1ULL << anceParser::NATIVE_INTEGER_TYPE)
-      | (1ULL << anceParser::HALF_TYPE)
-      | (1ULL << anceParser::SINGLE_TYPE)
-      | (1ULL << anceParser::DOUBLE_TYPE)
-      | (1ULL << anceParser::QUAD_TYPE)
       | (1ULL << anceParser::IDENTIFIER))) != 0));
     setState(134);
     match(anceParser::T__7);
@@ -514,11 +514,11 @@ anceParser::ParametersContext* anceParser::parameters() {
       | (1ULL << anceParser::T__17)
       | (1ULL << anceParser::T__19)
       | (1ULL << anceParser::T__20)
-      | (1ULL << anceParser::NATIVE_INTEGER_TYPE)
-      | (1ULL << anceParser::HALF_TYPE)
-      | (1ULL << anceParser::SINGLE_TYPE)
-      | (1ULL << anceParser::DOUBLE_TYPE)
-      | (1ULL << anceParser::QUAD_TYPE))) != 0)) {
+      | (1ULL << anceParser::T__21)
+      | (1ULL << anceParser::T__22)
+      | (1ULL << anceParser::T__23)
+      | (1ULL << anceParser::T__24)
+      | (1ULL << anceParser::NATIVE_INTEGER_TYPE))) != 0)) {
       setState(136);
       parameter();
       setState(141);
@@ -2646,10 +2646,10 @@ anceParser::TypeContext* anceParser::type(int precedence) {
       case anceParser::T__17:
       case anceParser::T__19:
       case anceParser::T__20:
-      case anceParser::HALF_TYPE:
-      case anceParser::SINGLE_TYPE:
-      case anceParser::DOUBLE_TYPE:
-      case anceParser::QUAD_TYPE: {
+      case anceParser::T__21:
+      case anceParser::T__22:
+      case anceParser::T__23:
+      case anceParser::T__24: {
         _localctx = _tracker.createInstance<KeywordContext>(_localctx);
         _ctx = _localctx;
         previousContext = _localctx;
@@ -2840,10 +2840,10 @@ anceParser::KeywordTypeContext* anceParser::keywordType() {
     setState(325);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case anceParser::HALF_TYPE:
-      case anceParser::SINGLE_TYPE:
-      case anceParser::DOUBLE_TYPE:
-      case anceParser::QUAD_TYPE: {
+      case anceParser::T__19:
+      case anceParser::T__20:
+      case anceParser::T__21:
+      case anceParser::T__22: {
         enterOuterAlt(_localctx, 1);
         setState(321);
         floatingPointType();
@@ -2857,14 +2857,14 @@ anceParser::KeywordTypeContext* anceParser::keywordType() {
         break;
       }
 
-      case anceParser::T__19: {
+      case anceParser::T__23: {
         enterOuterAlt(_localctx, 3);
         setState(323);
         unsignedIntegerPointerType();
         break;
       }
 
-      case anceParser::T__20: {
+      case anceParser::T__24: {
         enterOuterAlt(_localctx, 4);
         setState(324);
         voidType();
@@ -2889,22 +2889,6 @@ anceParser::KeywordTypeContext* anceParser::keywordType() {
 
 anceParser::FloatingPointTypeContext::FloatingPointTypeContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
-}
-
-tree::TerminalNode* anceParser::FloatingPointTypeContext::HALF_TYPE() {
-  return getToken(anceParser::HALF_TYPE, 0);
-}
-
-tree::TerminalNode* anceParser::FloatingPointTypeContext::SINGLE_TYPE() {
-  return getToken(anceParser::SINGLE_TYPE, 0);
-}
-
-tree::TerminalNode* anceParser::FloatingPointTypeContext::DOUBLE_TYPE() {
-  return getToken(anceParser::DOUBLE_TYPE, 0);
-}
-
-tree::TerminalNode* anceParser::FloatingPointTypeContext::QUAD_TYPE() {
-  return getToken(anceParser::QUAD_TYPE, 0);
 }
 
 
@@ -2933,10 +2917,10 @@ anceParser::FloatingPointTypeContext* anceParser::floatingPointType() {
     setState(327);
     _la = _input->LA(1);
     if (!((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << anceParser::HALF_TYPE)
-      | (1ULL << anceParser::SINGLE_TYPE)
-      | (1ULL << anceParser::DOUBLE_TYPE)
-      | (1ULL << anceParser::QUAD_TYPE))) != 0))) {
+      ((1ULL << _la) & ((1ULL << anceParser::T__19)
+      | (1ULL << anceParser::T__20)
+      | (1ULL << anceParser::T__21)
+      | (1ULL << anceParser::T__22))) != 0))) {
     _errHandler->recoverInline(this);
     }
     else {
@@ -3024,7 +3008,7 @@ anceParser::UnsignedIntegerPointerTypeContext* anceParser::unsignedIntegerPointe
   try {
     enterOuterAlt(_localctx, 1);
     setState(331);
-    match(anceParser::T__19);
+    match(anceParser::T__23);
    
   }
   catch (RecognitionException &e) {
@@ -3065,7 +3049,7 @@ anceParser::VoidTypeContext* anceParser::voidType() {
   try {
     enterOuterAlt(_localctx, 1);
     setState(333);
-    match(anceParser::T__20);
+    match(anceParser::T__24);
    
   }
   catch (RecognitionException &e) {
@@ -3121,18 +3105,18 @@ std::vector<std::string> anceParser::_ruleNames = {
 std::vector<std::string> anceParser::_literalNames = {
   "", "'const'", "':='", "';'", "'<-'", "'('", "')'", "'{'", "'}'", "','", 
   "'print'", "'delete'", "'return'", "'new'", "'['", "']'", "'sizeof'", 
-  "':'", "'size'", "'*'", "'uiptr'", "'void'", "", "'half'", "'single'", 
-  "'double'", "'quad'", "", "", "", "", "", "", "", "", "", "", "", "", 
-  "'dynamic'", "'automatic'", "'[]'", "'true'", "'false'", "'public'", "'private'"
+  "':'", "'size'", "'*'", "'half'", "'single'", "'double'", "'quad'", "'uiptr'", 
+  "'void'", "", "", "", "", "", "", "", "", "", "", "", "", "", "'dynamic'", 
+  "'automatic'", "'[]'", "'true'", "'false'", "'public'", "'private'"
 };
 
 std::vector<std::string> anceParser::_symbolicNames = {
   "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-  "", "", "", "", "NATIVE_INTEGER_TYPE", "HALF_TYPE", "SINGLE_TYPE", "DOUBLE_TYPE", 
-  "QUAD_TYPE", "SIGNED_INTEGER", "HEX_INTEGER", "BIN_INTEGER", "OCT_INTEGER", 
-  "HALF", "SINGLE", "DOUBLE", "QUAD", "DECIMAL", "STRING", "BYTE", "INTEGER", 
-  "DYNAMIC", "AUTOMATIC", "BUFFER", "TRUE", "FALSE", "PUBLIC", "PRIVATE", 
-  "IDENTIFIER", "WHITESPACE", "BLOCK_COMMENT", "LINE_COMMENT"
+  "", "", "", "", "", "", "", "", "NATIVE_INTEGER_TYPE", "SIGNED_INTEGER", 
+  "HEX_INTEGER", "BIN_INTEGER", "OCT_INTEGER", "HALF", "SINGLE", "DOUBLE", 
+  "QUAD", "DECIMAL", "STRING", "BYTE", "INTEGER", "DYNAMIC", "AUTOMATIC", 
+  "BUFFER", "TRUE", "FALSE", "PUBLIC", "PRIVATE", "IDENTIFIER", "WHITESPACE", 
+  "BLOCK_COMMENT", "LINE_COMMENT"
 };
 
 dfa::Vocabulary anceParser::_vocabulary(_literalNames, _symbolicNames);
@@ -3214,7 +3198,7 @@ anceParser::Initializer::Initializer() {
     0x3a, 0x3c, 0x3e, 0x40, 0x42, 0x44, 0x46, 0x48, 0x4a, 0x4c, 0x4e, 0x50, 
     0x52, 0x54, 0x56, 0x58, 0x5a, 0x5c, 0x2, 0x7, 0x3, 0x2, 0x2e, 0x2f, 
     0x3, 0x2, 0x29, 0x2a, 0x3, 0x2, 0x21, 0x24, 0x3, 0x2, 0x2c, 0x2d, 0x3, 
-    0x2, 0x19, 0x1c, 0x2, 0x14f, 0x2, 0x62, 0x3, 0x2, 0x2, 0x2, 0x4, 0x67, 
+    0x2, 0x16, 0x19, 0x2, 0x14f, 0x2, 0x62, 0x3, 0x2, 0x2, 0x2, 0x4, 0x67, 
     0x3, 0x2, 0x2, 0x2, 0x6, 0x69, 0x3, 0x2, 0x2, 0x2, 0x8, 0x71, 0x3, 0x2, 
     0x2, 0x2, 0xa, 0x7a, 0x3, 0x2, 0x2, 0x2, 0xc, 0x7c, 0x3, 0x2, 0x2, 0x2, 
     0xe, 0x92, 0x3, 0x2, 0x2, 0x2, 0x10, 0x94, 0x3, 0x2, 0x2, 0x2, 0x12, 
@@ -3359,7 +3343,7 @@ anceParser::Initializer::Initializer() {
     0x135, 0x137, 0x7, 0x15, 0x2, 0x2, 0x136, 0x134, 0x3, 0x2, 0x2, 0x2, 
     0x137, 0x13a, 0x3, 0x2, 0x2, 0x2, 0x138, 0x136, 0x3, 0x2, 0x2, 0x2, 
     0x138, 0x139, 0x3, 0x2, 0x2, 0x2, 0x139, 0x4f, 0x3, 0x2, 0x2, 0x2, 0x13a, 
-    0x138, 0x3, 0x2, 0x2, 0x2, 0x13b, 0x13c, 0x7, 0x18, 0x2, 0x2, 0x13c, 
+    0x138, 0x3, 0x2, 0x2, 0x2, 0x13b, 0x13c, 0x7, 0x1c, 0x2, 0x2, 0x13c, 
     0x51, 0x3, 0x2, 0x2, 0x2, 0x13d, 0x13e, 0x7, 0x10, 0x2, 0x2, 0x13e, 
     0x13f, 0x7, 0x28, 0x2, 0x2, 0x13f, 0x140, 0x7, 0x13, 0x2, 0x2, 0x140, 
     0x141, 0x5, 0x4e, 0x28, 0x2, 0x141, 0x142, 0x7, 0x11, 0x2, 0x2, 0x142, 
@@ -3370,8 +3354,8 @@ anceParser::Initializer::Initializer() {
     0x146, 0x3, 0x2, 0x2, 0x2, 0x148, 0x55, 0x3, 0x2, 0x2, 0x2, 0x149, 0x14a, 
     0x9, 0x6, 0x2, 0x2, 0x14a, 0x57, 0x3, 0x2, 0x2, 0x2, 0x14b, 0x14c, 0x7, 
     0x14, 0x2, 0x2, 0x14c, 0x59, 0x3, 0x2, 0x2, 0x2, 0x14d, 0x14e, 0x7, 
-    0x16, 0x2, 0x2, 0x14e, 0x5b, 0x3, 0x2, 0x2, 0x2, 0x14f, 0x150, 0x7, 
-    0x17, 0x2, 0x2, 0x150, 0x5d, 0x3, 0x2, 0x2, 0x2, 0x1c, 0x60, 0x62, 0x67, 
+    0x1a, 0x2, 0x2, 0x14e, 0x5b, 0x3, 0x2, 0x2, 0x2, 0x14f, 0x150, 0x7, 
+    0x1b, 0x2, 0x2, 0x150, 0x5d, 0x3, 0x2, 0x2, 0x2, 0x1c, 0x60, 0x62, 0x67, 
     0x76, 0x86, 0x8f, 0x92, 0x9f, 0xa8, 0xb7, 0xbe, 0xcd, 0xdb, 0xde, 0xe9, 
     0x100, 0x109, 0x10e, 0x113, 0x118, 0x11d, 0x122, 0x124, 0x132, 0x138, 
     0x147, 
