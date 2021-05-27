@@ -171,8 +171,8 @@ floatingPointLiteral
 	;
 
 booleanLiteral
-    : TRUE
-    | FALSE
+    : 'true' # True
+    | 'false' # False
     ;
 
 sizeLiteral
@@ -242,9 +242,6 @@ DYNAMIC : 'dynamic' ;
 AUTOMATIC : 'automatic' ;
 
 BUFFER : '[]' ;
-
-TRUE : 'true' ;
-FALSE : 'false' ;
 
 IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
 

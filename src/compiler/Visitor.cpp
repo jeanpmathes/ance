@@ -346,13 +346,15 @@ antlrcpp::Any Visitor::visitFloatingPointLiteral(anceParser::FloatingPointLitera
 	return static_cast<Expression*>(new ConstantLiteral(flt));
 }
 
-antlrcpp::Any Visitor::visitBooleanLiteral(anceParser::BooleanLiteralContext* ctx)
+antlrcpp::Any Visitor::visitTrue(anceParser::TrueContext*)
 {
-	ance::Constant* constant = nullptr;
+	ance::Constant* constant = ance::BooleanConstant::createTrue(application_);
+	return static_cast<Expression*>(new ConstantLiteral(constant));
+}
 
-	if (ctx->FALSE()) constant = ance::BooleanConstant::createFalse(application_);
-	if (ctx->TRUE()) constant = ance::BooleanConstant::createTrue(application_);
-
+antlrcpp::Any Visitor::visitFalse(anceParser::FalseContext*)
+{
+	ance::Constant* constant = ance::BooleanConstant::createFalse(application_);
 	return static_cast<Expression*>(new ConstantLiteral(constant));
 }
 

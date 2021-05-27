@@ -66,7 +66,9 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext* ctx) override;
 
-		antlrcpp::Any visitBooleanLiteral(anceParser::BooleanLiteralContext* ctx) override;
+		antlrcpp::Any visitTrue(anceParser::TrueContext *ctx) override;
+
+		antlrcpp::Any visitFalse(anceParser::FalseContext *ctx) override;
 
 		antlrcpp::Any visitSizeLiteral(anceParser::SizeLiteralContext *ctx) override;
 

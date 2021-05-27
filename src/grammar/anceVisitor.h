@@ -93,7 +93,9 @@ public:
 
     virtual antlrcpp::Any visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext *context) = 0;
 
-    virtual antlrcpp::Any visitBooleanLiteral(anceParser::BooleanLiteralContext *context) = 0;
+    virtual antlrcpp::Any visitTrue(anceParser::TrueContext *context) = 0;
+
+    virtual antlrcpp::Any visitFalse(anceParser::FalseContext *context) = 0;
 
     virtual antlrcpp::Any visitSizeLiteral(anceParser::SizeLiteralContext *context) = 0;
 

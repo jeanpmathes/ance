@@ -163,7 +163,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitBooleanLiteral(anceParser::BooleanLiteralContext *ctx) override {
+  virtual antlrcpp::Any visitTrue(anceParser::TrueContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitFalse(anceParser::FalseContext *ctx) override {
     return visitChildren(ctx);
   }
 

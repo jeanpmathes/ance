@@ -16,11 +16,11 @@ public:
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
     T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
     T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, T__25 = 26, 
-    T__26 = 27, NATIVE_INTEGER_TYPE = 28, SIGNED_INTEGER = 29, HEX_INTEGER = 30, 
-    BIN_INTEGER = 31, OCT_INTEGER = 32, HALF = 33, SINGLE = 34, DOUBLE = 35, 
-    QUAD = 36, DECIMAL = 37, STRING = 38, BYTE = 39, INTEGER = 40, DYNAMIC = 41, 
-    AUTOMATIC = 42, BUFFER = 43, TRUE = 44, FALSE = 45, IDENTIFIER = 46, 
-    WHITESPACE = 47, BLOCK_COMMENT = 48, LINE_COMMENT = 49
+    T__26 = 27, T__27 = 28, T__28 = 29, NATIVE_INTEGER_TYPE = 30, SIGNED_INTEGER = 31, 
+    HEX_INTEGER = 32, BIN_INTEGER = 33, OCT_INTEGER = 34, HALF = 35, SINGLE = 36, 
+    DOUBLE = 37, QUAD = 38, DECIMAL = 39, STRING = 40, BYTE = 41, INTEGER = 42, 
+    DYNAMIC = 43, AUTOMATIC = 44, BUFFER = 45, IDENTIFIER = 46, WHITESPACE = 47, 
+    BLOCK_COMMENT = 48, LINE_COMMENT = 49
   };
 
   enum {
@@ -639,13 +639,30 @@ public:
   class  BooleanLiteralContext : public antlr4::ParserRuleContext {
   public:
     BooleanLiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    BooleanLiteralContext() = default;
+    void copyFrom(BooleanLiteralContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
     virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *TRUE();
-    antlr4::tree::TerminalNode *FALSE();
+
+   
+  };
+
+  class  TrueContext : public BooleanLiteralContext {
+  public:
+    TrueContext(BooleanLiteralContext *ctx);
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
+  };
+
+  class  FalseContext : public BooleanLiteralContext {
+  public:
+    FalseContext(BooleanLiteralContext *ctx);
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   BooleanLiteralContext* booleanLiteral();
