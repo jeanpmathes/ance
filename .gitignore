@@ -1,5 +1,16 @@
+# IDE
+.idea
+
+# build files
 cmake-build-debug/
+
+# test files
 ance_output/
 ance_proj/
+
+# antlr
 antlr/
-.idea
+/src/grammar/ance.interp
+/src/grammar/ance.tokens
+/src/grammar/anceLexer.interp
+/src/grammar/anceLexer.tokens
