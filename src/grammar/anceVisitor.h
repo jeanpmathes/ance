@@ -57,7 +57,19 @@ public:
 
     virtual antlrcpp::Any visitVariableAssignable(anceParser::VariableAssignableContext *context) = 0;
 
-    virtual antlrcpp::Any visitExpression(anceParser::ExpressionContext *context) = 0;
+    virtual antlrcpp::Any visitCast(anceParser::CastContext *context) = 0;
+
+    virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext *context) = 0;
+
+    virtual antlrcpp::Any visitVariable(anceParser::VariableContext *context) = 0;
+
+    virtual antlrcpp::Any visitAlloc(anceParser::AllocContext *context) = 0;
+
+    virtual antlrcpp::Any visitLiteral(anceParser::LiteralContext *context) = 0;
+
+    virtual antlrcpp::Any visitSizeOf(anceParser::SizeOfContext *context) = 0;
+
+    virtual antlrcpp::Any visitIndexerGet(anceParser::IndexerGetContext *context) = 0;
 
     virtual antlrcpp::Any visitIndependentExpression(anceParser::IndependentExpressionContext *context) = 0;
 

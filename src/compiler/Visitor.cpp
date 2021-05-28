@@ -35,6 +35,7 @@
 #include "VariableAccess.h"
 #include "Allocation.h"
 #include "RoughCast.h"
+#include "IndexerGet.h"
 
 #include "StringConstant.h"
 #include "ByteConstant.h"
@@ -295,6 +296,14 @@ antlrcpp::Any Visitor::visitSizeofExpression(anceParser::SizeofExpressionContext
 	Expression* expr = visit(ctx->expression());
 
 	return static_cast<Expression*>(new SizeofExpression(expr));
+}
+
+antlrcpp::Any Visitor::visitIndexerGet(anceParser::IndexerGetContext* ctx)
+{
+	Expression* indexed = visit(ctx->indexed);
+	Expression* index = visit(ctx->index);
+
+	return static_cast<Expression*>(new IndexerGet(indexed, index));
 }
 
 antlrcpp::Any Visitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)

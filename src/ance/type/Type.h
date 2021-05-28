@@ -6,6 +6,11 @@
 #include <llvm/IR/Constant.h>
 #include <llvm/IR/DataLayout.h>
 #include <llvm/IR/Module.h>
+#include <llvm/IR/IRBuilder.h>
+
+#include "Indexer.h"
+
+class CompileState;
 
 #include "InternalStorage.h"
 
@@ -14,10 +19,14 @@ namespace llvm
 class LLVMContext;
 
 class Type;
+
+class DIBuilder;
 }
 
 namespace ance
 {
+class Value;
+
 class Type
 {
 	public:
@@ -32,6 +41,12 @@ class Type
 		llvm::TypeSize getSize(llvm::Module* m);
 
 		virtual InternalStorage storage();
+
+		virtual bool isIndexerDefined(Indexer indexer);
+
+		virtual ance::Type* getIndexerReturnType();
+
+		virtual llvm::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
 	protected:
 		virtual ~Type() = default;

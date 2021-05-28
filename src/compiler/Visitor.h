@@ -58,6 +58,8 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext* ctx) override;
 
+		antlrcpp::Any visitIndexerGet(anceParser::IndexerGetContext *ctx) override;
+
 		// Literals and Types
 
 		antlrcpp::Any visitStringLiteral(anceParser::StringLiteralContext* ctx) override;

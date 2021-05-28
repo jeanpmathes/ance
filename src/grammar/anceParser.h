@@ -378,22 +378,85 @@ public:
   class  ExpressionContext : public antlr4::ParserRuleContext {
   public:
     ExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    ExpressionContext() = default;
+    void copyFrom(ExpressionContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
     virtual size_t getRuleIndex() const override;
-    VariableAccessContext *variableAccess();
-    AllocationContext *allocation();
-    RoughCastContext *roughCast();
-    SizeofTypeContext *sizeofType();
-    SizeofExpressionContext *sizeofExpression();
-    LiteralExpressionContext *literalExpression();
-    IndependentExpressionContext *independentExpression();
 
-
-    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
 
-  ExpressionContext* expression();
+  class  CastContext : public ExpressionContext {
+  public:
+    CastContext(ExpressionContext *ctx);
 
+    RoughCastContext *roughCast();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  IndependentContext : public ExpressionContext {
+  public:
+    IndependentContext(ExpressionContext *ctx);
+
+    IndependentExpressionContext *independentExpression();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  VariableContext : public ExpressionContext {
+  public:
+    VariableContext(ExpressionContext *ctx);
+
+    VariableAccessContext *variableAccess();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  AllocContext : public ExpressionContext {
+  public:
+    AllocContext(ExpressionContext *ctx);
+
+    AllocationContext *allocation();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  LiteralContext : public ExpressionContext {
+  public:
+    LiteralContext(ExpressionContext *ctx);
+
+    LiteralExpressionContext *literalExpression();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  SizeOfContext : public ExpressionContext {
+  public:
+    SizeOfContext(ExpressionContext *ctx);
+
+    SizeofTypeContext *sizeofType();
+    SizeofExpressionContext *sizeofExpression();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  IndexerGetContext : public ExpressionContext {
+  public:
+    IndexerGetContext(ExpressionContext *ctx);
+
+    anceParser::ExpressionContext *indexed = nullptr;
+    anceParser::ExpressionContext *index = nullptr;
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  ExpressionContext* expression();
+  ExpressionContext* expression(int precedence);
   class  IndependentExpressionContext : public antlr4::ParserRuleContext {
   public:
     IndependentExpressionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -841,6 +904,7 @@ public:
 
 
   virtual bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
+  bool expressionSempred(ExpressionContext *_localctx, size_t predicateIndex);
   bool typeSempred(TypeContext *_localctx, size_t predicateIndex);
 
 private:

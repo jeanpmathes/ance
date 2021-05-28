@@ -91,7 +91,31 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitExpression(anceParser::ExpressionContext *ctx) override {
+  virtual antlrcpp::Any visitCast(anceParser::CastContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitVariable(anceParser::VariableContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitAlloc(anceParser::AllocContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitLiteral(anceParser::LiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitSizeOf(anceParser::SizeOfContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitIndexerGet(anceParser::IndexerGetContext *ctx) override {
     return visitChildren(ctx);
   }
 

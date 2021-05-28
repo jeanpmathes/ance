@@ -80,13 +80,14 @@ variableAssignable
     ;
 
 expression
-	: variableAccess
-	| allocation
-	| roughCast
-	| sizeofType
-	| sizeofExpression
-	| literalExpression
-	| independentExpression
+	: variableAccess # Variable
+	| allocation # Alloc
+	| roughCast # Cast
+	| sizeofType # SizeOf
+	| sizeofExpression # SizeOf
+	| literalExpression # Literal
+	| indexed=expression '[' index=expression ']' # IndexerGet
+	| independentExpression # Independent
 	;
 
 independentExpression

@@ -5,6 +5,8 @@
 #include "Application.h"
 #include "GlobalScope.h"
 #include "VoidType.h"
+#include "Value.h"
+#include "SizeType.h"
 
 ance::PointerType::PointerType(ance::Type* element_type)
 	: element_type_(element_type)
@@ -53,4 +55,41 @@ ance::Type* ance::PointerType::get(Application& app, ance::Type* element_type)
 		app.globalScope()->registerType(type);
 		return type;
 	}
+}
+
+bool ance::PointerType::isIndexerDefined(Indexer)
+{
+	return true;
+}
+
+ance::Type* ance::PointerType::getIndexerReturnType()
+{
+	return element_type_;
+}
+
+llvm::Value* ance::PointerType::buildGetIndexer(
+	ance::Value* indexed,
+	ance::Value* index,
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+)
+{
+	assert(indexed->getType() == this && "Indexed value has to be of pointer type.");
+	assert(index->getType() == ance::SizeType::get() && "Pointer index has to be size type.");
+
+	indexed->build(c, m, state, ir, di);
+	index->build(c, m, state, ir, di);
+
+	llvm::Value* native_index = index->getContentValue(c, m, state, ir, di);
+	llvm::Value* indices[] = { native_index };
+
+	llvm::Value* ptr = indexed->getNativeValue();
+
+	llvm::Value* element_ptr = ir.CreateGEP(ptr, indices);
+	llvm::Value* native_value = ir.CreateLoad(element_ptr);
+
+	return native_value;
 }
