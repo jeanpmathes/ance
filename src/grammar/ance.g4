@@ -192,7 +192,7 @@ integerType
 	;
 
 arrayType
-	: '[' INTEGER ':' type ']'
+	: '[' type ';' INTEGER ']'
 	;
 
 keywordType
