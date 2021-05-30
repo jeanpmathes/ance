@@ -91,6 +91,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitDiscard(anceParser::DiscardContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitCast(anceParser::CastContext *ctx) override {
     return visitChildren(ctx);
   }

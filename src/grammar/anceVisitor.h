@@ -57,6 +57,8 @@ public:
 
     virtual antlrcpp::Any visitVariableAssignable(anceParser::VariableAssignableContext *context) = 0;
 
+    virtual antlrcpp::Any visitDiscard(anceParser::DiscardContext *context) = 0;
+
     virtual antlrcpp::Any visitCast(anceParser::CastContext *context) = 0;
 
     virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext *context) = 0;

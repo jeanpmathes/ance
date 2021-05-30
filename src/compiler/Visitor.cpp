@@ -25,6 +25,7 @@
 
 #include "Assignable.h"
 #include "VariableAssignable.h"
+#include "Discard.h"
 
 #include "Expression.h"
 #include "FunctionCall.h"
@@ -230,6 +231,11 @@ antlrcpp::Any Visitor::visitVariableAssignable(anceParser::VariableAssignableCon
 	std::string identifier = ctx->IDENTIFIER()->getText();
 
 	return static_cast<Assignable*>(new VariableAssignable(identifier));
+}
+
+antlrcpp::Any Visitor::visitDiscard(anceParser::DiscardContext*)
+{
+	return static_cast<Assignable*>(new Discard());
 }
 
 antlrcpp::Any Visitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
