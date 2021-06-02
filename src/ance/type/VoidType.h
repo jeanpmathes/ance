@@ -8,7 +8,6 @@ namespace ance
 class VoidType : public Type
 {
 	public:
-
 		std::string getName() override;
 
 		llvm::Constant* getDefault(llvm::LLVMContext& c) override;

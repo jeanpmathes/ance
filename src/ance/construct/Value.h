@@ -33,6 +33,8 @@ class Value
 			CompileState* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di);
+
+		virtual ~Value() = default;
 };
 }
 #endif

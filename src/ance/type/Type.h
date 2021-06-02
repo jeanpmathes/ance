@@ -29,7 +29,16 @@ class Value;
 
 class Type
 {
+	protected:
+		Type() = default;
+
+		virtual ~Type() = default;
+
 	public:
+		Type(const Type&) = delete;
+
+		Type(Type&&) = delete;
+
 		virtual std::string getName() = 0;
 
 		virtual llvm::Constant* getDefault(llvm::LLVMContext& c) = 0;
@@ -48,8 +57,6 @@ class Type
 
 		virtual llvm::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
-	protected:
-		virtual ~Type() = default;
 };
 }
 #endif
