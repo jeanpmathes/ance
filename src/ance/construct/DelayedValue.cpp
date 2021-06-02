@@ -2,7 +2,8 @@
 
 #include "DelayableExpression.h"
 
-ance::DelayedValue::DelayedValue(DelayableExpression* expression) : expression_(expression)
+ance::DelayedValue::DelayedValue(DelayableExpression* expression)
+	: expression_(expression)
 {
 
 }

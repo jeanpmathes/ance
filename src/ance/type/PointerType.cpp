@@ -84,7 +84,7 @@ llvm::Value* ance::PointerType::buildGetIndexer(
 	index->build(c, m, state, ir, di);
 
 	llvm::Value* native_index = index->getContentValue(c, m, state, ir, di);
-	llvm::Value* indices[] = { native_index };
+	llvm::Value* indices[] = {native_index};
 
 	llvm::Value* ptr = indexed->getNativeValue();
 

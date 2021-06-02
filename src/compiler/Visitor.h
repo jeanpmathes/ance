@@ -40,9 +40,9 @@ class Visitor : public anceBaseVisitor
 
 		// Assignables
 
-		antlrcpp::Any visitVariableAssignable(anceParser::VariableAssignableContext *ctx) override;
+		antlrcpp::Any visitVariableAssignable(anceParser::VariableAssignableContext* ctx) override;
 
-		antlrcpp::Any visitDiscard(anceParser::DiscardContext *ctx) override;
+		antlrcpp::Any visitDiscard(anceParser::DiscardContext* ctx) override;
 
 		// Expressions
 
@@ -60,7 +60,7 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext* ctx) override;
 
-		antlrcpp::Any visitIndexerGet(anceParser::IndexerGetContext *ctx) override;
+		antlrcpp::Any visitIndexerGet(anceParser::IndexerGetContext* ctx) override;
 
 		// Literals and Types
 
@@ -70,11 +70,11 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext* ctx) override;
 
-		antlrcpp::Any visitTrue(anceParser::TrueContext *ctx) override;
+		antlrcpp::Any visitTrue(anceParser::TrueContext* ctx) override;
 
-		antlrcpp::Any visitFalse(anceParser::FalseContext *ctx) override;
+		antlrcpp::Any visitFalse(anceParser::FalseContext* ctx) override;
 
-		antlrcpp::Any visitSizeLiteral(anceParser::SizeLiteralContext *ctx) override;
+		antlrcpp::Any visitSizeLiteral(anceParser::SizeLiteralContext* ctx) override;
 
 		antlrcpp::Any visitUnsignedInteger(anceParser::UnsignedIntegerContext* ctx) override;
 
@@ -92,13 +92,13 @@ class Visitor : public anceBaseVisitor
 
 		// Other
 
-		antlrcpp::Any visitPublic(anceParser::PublicContext *ctx) override;
+		antlrcpp::Any visitPublic(anceParser::PublicContext* ctx) override;
 
-		antlrcpp::Any visitPrivate(anceParser::PrivateContext *ctx) override;
+		antlrcpp::Any visitPrivate(anceParser::PrivateContext* ctx) override;
 
-		antlrcpp::Any visitAutomatic(anceParser::AutomaticContext *ctx) override;
+		antlrcpp::Any visitAutomatic(anceParser::AutomaticContext* ctx) override;
 
-		antlrcpp::Any visitDynamic(anceParser::DynamicContext *ctx) override;
+		antlrcpp::Any visitDynamic(anceParser::DynamicContext* ctx) override;
 
 	private:
 		Application& application_;

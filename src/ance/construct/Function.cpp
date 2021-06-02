@@ -31,7 +31,8 @@ ance::Function::Function(
 	{
 		ance::LocalVariable* arg = local_scope_->defineLocalVariable(
 			parameter->name(), parameter->getType(),
-			parameter);
+			parameter
+		);
 		arguments_.push_back(arg);
 	}
 }

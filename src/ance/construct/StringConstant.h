@@ -13,7 +13,7 @@ class StringConstant : public Constant
 
 		ance::Type* getType() override;
 
-		llvm::Constant * buildContent(llvm::LLVMContext &c) override;
+		llvm::Constant* buildContent(llvm::LLVMContext& c) override;
 
 		static std::string parse(const std::string& unparsed);
 

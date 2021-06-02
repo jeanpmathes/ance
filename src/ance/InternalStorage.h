@@ -6,5 +6,4 @@ enum class InternalStorage
 		AS_TEMPORARY, AS_POINTER
 };
 
-
 #endif

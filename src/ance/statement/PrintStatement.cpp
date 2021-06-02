@@ -40,7 +40,8 @@ void PrintStatement::build(
 
 	assert(native_char_arr->getType()->isArrayTy());
 	llvm::Value
-		* write_num = llvm::ConstantInt::get(llvm::Type::getInt32Ty(c), native_char_arr->getType()->getArrayNumElements());
+		* write_num =
+		llvm::ConstantInt::get(llvm::Type::getInt32Ty(c), native_char_arr->getType()->getArrayNumElements());
 
 	llvm::AllocaInst* char_arr_ptr = ir.CreateAlloca(native_char_arr->getType(), 0, write_num);
 	ir.CreateStore(native_char_arr, char_arr_ptr);

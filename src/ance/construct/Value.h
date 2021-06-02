@@ -32,7 +32,8 @@ class Value
 			llvm::Module* m,
 			CompileState* state,
 			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di);
+			llvm::DIBuilder* di
+		);
 
 		virtual ~Value() = default;
 };

@@ -14,7 +14,7 @@ class SizeConstant : public Constant
 
 		ance::Type* getType() override;
 
-		llvm::Constant * buildContent(llvm::LLVMContext& c) override;
+		llvm::Constant* buildContent(llvm::LLVMContext& c) override;
 
 	private:
 		Application& app_;

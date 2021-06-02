@@ -87,7 +87,7 @@ llvm::Value* ance::ArrayType::buildGetIndexer(
 
 	llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(c), 0);
 	llvm::Value* native_index = index->getContentValue(c, m, state, ir, di);
-	llvm::Value* indices[] = { zero, native_index };
+	llvm::Value* indices[] = {zero, native_index};
 
 	// This is a pointer as the internal storage of arrays is using pointers.
 	llvm::Value* array_ptr = indexed->getNativeValue();

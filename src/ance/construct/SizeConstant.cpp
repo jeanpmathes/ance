@@ -5,7 +5,8 @@
 #include "SizeType.h"
 #include "Application.h"
 
-ance::SizeConstant::SizeConstant(std::string size, Application& app) : app_(app), type_(ance::SizeType::get()), size_(std::move(size))
+ance::SizeConstant::SizeConstant(std::string size, Application& app)
+	: app_(app), type_(ance::SizeType::get()), size_(std::move(size))
 {
 
 }

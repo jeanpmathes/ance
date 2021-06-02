@@ -1,6 +1,7 @@
 #include "VariableAssignable.h"
 
-VariableAssignable::VariableAssignable(std::string variable_identifier) : variable_identifier_(std::move(variable_identifier))
+VariableAssignable::VariableAssignable(std::string variable_identifier)
+	: variable_identifier_(std::move(variable_identifier))
 {
 
 }

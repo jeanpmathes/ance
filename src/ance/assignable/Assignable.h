@@ -9,7 +9,14 @@ class Assignable
 	public:
 		virtual void setScope(ance::Scope* scope) = 0;
 
-		virtual void assign(ance::Value* value, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) = 0;
+		virtual void assign(
+			ance::Value* value,
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) = 0;
 };
 
 #endif

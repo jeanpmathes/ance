@@ -18,7 +18,7 @@ ance::Type* ance::StringConstant::getType()
 	return type_;
 }
 
-llvm::Constant * ance::StringConstant::buildContent(llvm::LLVMContext& c)
+llvm::Constant* ance::StringConstant::buildContent(llvm::LLVMContext& c)
 {
 	return llvm::ConstantDataArray::getString(c, string_, false);
 }

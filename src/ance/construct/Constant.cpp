@@ -9,7 +9,7 @@ void ance::Constant::build(llvm::LLVMContext& c)
 	content_constant_ = buildContent(c);
 }
 
-llvm::Constant * ance::Constant::getContentConstant()
+llvm::Constant* ance::Constant::getContentConstant()
 {
 	assert(content_constant_ && "Constant has to be built before accessing content constant.");
 	return content_constant_;

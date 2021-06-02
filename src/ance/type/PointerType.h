@@ -21,9 +21,17 @@ class PointerType : public Type
 
 		bool isIndexerDefined(Indexer indexer) override;
 
-		ance::Type * getIndexerReturnType() override;
+		ance::Type* getIndexerReturnType() override;
 
-		llvm::Value * buildGetIndexer(ance::Value* indexed, ance::Value *index, llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) override;
+		llvm::Value* buildGetIndexer(
+			ance::Value* indexed,
+			ance::Value* index,
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) override;
 
 		~PointerType() override = default;
 
