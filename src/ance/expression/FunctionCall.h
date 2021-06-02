@@ -3,6 +3,8 @@
 
 #include "BuildableExpression.h"
 
+#include "ExpressionBackedValue.h"
+
 namespace ance
 {
 class Scope;
@@ -32,7 +34,7 @@ class FunctionCall : public BuildableExpression
 	private:
 		std::string identifier_;
 		std::vector<Expression*> arguments_;
-		ance::Value* return_value_;
+		ance::Value* return_value_{new ance::ExpressionBackedValue(this)};
 		ance::Scope* scope_{nullptr};
 };
 

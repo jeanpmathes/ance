@@ -3,7 +3,6 @@
 #include <utility>
 
 #include "CompileState.h"
-#include "ExpressionBackedValue.h"
 #include "Function.h"
 #include "GlobalScope.h"
 #include "Value.h"
@@ -15,8 +14,7 @@ class Function;
 
 FunctionCall::FunctionCall(std::string identifier, std::vector<Expression*> arguments)
 	: identifier_(std::move(identifier)),
-	  arguments_(std::move(arguments)),
-	  return_value_(new ance::ExpressionBackedValue(this))
+	  arguments_(std::move(arguments))
 {
 }
 

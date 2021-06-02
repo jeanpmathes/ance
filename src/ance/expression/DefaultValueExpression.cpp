@@ -4,10 +4,8 @@
 #include "Constant.h"
 #include "Type.h"
 
-#include "ExpressionBackedConstant.h"
-
 DefaultValueExpression::DefaultValueExpression(ance::Type* type)
-	: type_(type), constant_(new ance::ExpressionBackedConstant(this))
+	: type_(type)
 {
 }
 

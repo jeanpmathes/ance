@@ -3,6 +3,8 @@
 
 #include "BuildableExpression.h"
 
+#include "ExpressionBackedValue.h"
+
 class Application;
 
 class SizeofType : public BuildableExpression
@@ -23,7 +25,7 @@ class SizeofType : public BuildableExpression
 		) override;
 
 	private:
-		ance::Value* return_value_;
+		ance::Value* return_value_{new ance::ExpressionBackedValue(this)};
 		ance::Type* type_;
 };
 

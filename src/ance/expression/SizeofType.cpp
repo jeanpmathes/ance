@@ -1,11 +1,10 @@
 #include "SizeofType.h"
 
 #include "CompileState.h"
-#include "ExpressionBackedValue.h"
 #include "SizeType.h"
 
 SizeofType::SizeofType(ance::Type* type)
-	: return_value_(new ance::ExpressionBackedValue(this)), type_(type)
+	: type_(type)
 {
 }
 
@@ -27,5 +26,5 @@ llvm::Value* SizeofType::build(
 	llvm::DIBuilder*
 )
 {
-	return ance::SizeType::get()->buildValue(type_->getSize(m));
+	return ance::SizeType::buildValue(type_->getSize(m));
 }

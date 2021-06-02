@@ -5,7 +5,7 @@
 #include "SizeType.h"
 
 SizeofExpression::SizeofExpression(Expression* expression)
-	: return_value_(new ance::ExpressionBackedValue(this)), expression_(expression)
+	: expression_(expression)
 {
 }
 

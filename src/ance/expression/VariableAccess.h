@@ -3,13 +3,13 @@
 
 #include "DelayableExpression.h"
 
+#include "DelayedValue.h"
+
 namespace ance
 {
 class Variable;
 
 class Scope;
-
-class DelayedValue;
 }
 
 class VariableAccess : public DelayableExpression
@@ -35,7 +35,7 @@ class VariableAccess : public DelayableExpression
 
 	private:
 		std::string identifier_;
-		ance::DelayedValue* value_;
+		ance::DelayedValue* value_{new ance::DelayedValue(this)};
 		ance::Variable* variable_{nullptr};
 };
 

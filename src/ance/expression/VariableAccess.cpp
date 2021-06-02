@@ -2,12 +2,11 @@
 
 #include <utility>
 
-#include "DelayedValue.h"
 #include "Value.h"
 #include "Scope.h"
 
 VariableAccess::VariableAccess(std::string identifier)
-	: identifier_(std::move(identifier)), value_(new ance::DelayedValue(this))
+	: identifier_(std::move(identifier))
 {
 }
 

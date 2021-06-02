@@ -3,6 +3,8 @@
 
 #include "BuildableConstantExpression.h"
 
+#include "ExpressionBackedConstant.h"
+
 class DefaultValueExpression : public BuildableConstantExpression
 {
 	public:
@@ -28,7 +30,7 @@ class DefaultValueExpression : public BuildableConstantExpression
 
 	private:
 		ance::Type* type_;
-		ance::Constant* constant_;
+		ance::Constant* constant_{new ance::ExpressionBackedConstant(this)};
 };
 
 #endif
