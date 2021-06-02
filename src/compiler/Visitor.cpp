@@ -42,7 +42,7 @@
 #include "ByteConstant.h"
 #include "IntegerConstant.h"
 #include "FloatConstant.h"
-#include "BooleanConstant.h"
+#include "ance/construct/constant/BooleanConstant.h"
 #include "SizeConstant.h"
 
 Visitor::Visitor(Application& application)
