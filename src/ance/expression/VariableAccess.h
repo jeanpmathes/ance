@@ -2,8 +2,8 @@
 #define ANCE_SRC_ANCE_EXPRESSION_VARIABLEACCESS_H_
 
 #include "DelayableExpression.h"
-
 #include "DelayedValue.h"
+#include "AssignableExpression.h"
 
 namespace ance
 {
@@ -12,7 +12,7 @@ class Variable;
 class Scope;
 }
 
-class VariableAccess : public DelayableExpression
+class VariableAccess : public DelayableExpression, public AssignableExpression
 {
 	public:
 		explicit VariableAccess(std::string identifier);

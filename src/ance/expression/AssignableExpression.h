@@ -3,7 +3,7 @@
 
 #include "Expression.h"
 
-class AssignableExpression : public Expression
+class AssignableExpression : public virtual Expression
 {
 
 };

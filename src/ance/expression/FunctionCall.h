@@ -4,13 +4,14 @@
 #include "BuildableExpression.h"
 
 #include "ExpressionBackedValue.h"
+#include "AssignableExpression.h"
 
 namespace ance
 {
 class Scope;
 }
 
-class FunctionCall : public BuildableExpression
+class FunctionCall : public BuildableExpression, public AssignableExpression
 {
 	public:
 		FunctionCall(std::string identifier, std::vector<Expression*> arguments);

@@ -3,7 +3,7 @@
 
 #include "Expression.h"
 
-class DelayableExpression : public Expression
+class DelayableExpression : public virtual Expression
 {
 	public:
 		virtual void build(
