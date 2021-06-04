@@ -13,4 +13,5 @@ target_sources(ance PRIVATE DefaultValueExpression.cpp
                RoughCast.cpp
                Allocation.cpp
                DelayableExpression.cpp
-               IndexerGet.cpp)
+               IndexerGet.cpp
+               AssignableExpression.cpp)
