@@ -42,6 +42,8 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitVariableAssignable(anceParser::VariableAssignableContext* ctx) override;
 
+		antlrcpp::Any visitIndexerSet(anceParser::IndexerSetContext *ctx) override;
+
 		antlrcpp::Any visitDiscard(anceParser::DiscardContext* ctx) override;
 
 		// Expressions

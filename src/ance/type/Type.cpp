@@ -25,6 +25,11 @@ bool ance::Type::isIndexerDefined(Indexer)
 	return false;
 }
 
+InternalStorage ance::Type::storage()
+{
+	return InternalStorage::AS_TEMPORARY;
+}
+
 ance::Type* ance::Type::getIndexerReturnType()
 {
 	return nullptr;
@@ -43,7 +48,16 @@ llvm::Value* ance::Type::buildGetIndexer(
 	return nullptr;
 }
 
-InternalStorage ance::Type::storage()
+void ance::Type::buildSetIndexer(
+	ance::Value*,
+	ance::Value*,
+	ance::Value*,
+	llvm::LLVMContext&,
+	llvm::Module*,
+	CompileState*,
+	llvm::IRBuilder<>&,
+	llvm::DIBuilder*
+)
 {
-	return InternalStorage::AS_TEMPORARY;
+
 }

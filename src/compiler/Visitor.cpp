@@ -25,6 +25,7 @@
 
 #include "Assignable.h"
 #include "VariableAssignable.h"
+#include "IndexerSet.h"
 #include "Discard.h"
 
 #include "Expression.h"
@@ -37,6 +38,8 @@
 #include "Allocation.h"
 #include "RoughCast.h"
 #include "IndexerGet.h"
+#include "BuildableExpression.h"
+#include "AssignableExpression.h"
 
 #include "StringConstant.h"
 #include "ByteConstant.h"
@@ -231,6 +234,16 @@ antlrcpp::Any Visitor::visitVariableAssignable(anceParser::VariableAssignableCon
 	std::string identifier = ctx->IDENTIFIER()->getText();
 
 	return static_cast<Assignable*>(new VariableAssignable(identifier));
+}
+
+antlrcpp::Any Visitor::visitIndexerSet(anceParser::IndexerSetContext* ctx)
+{
+	Expression* assignable_expression = visit(ctx->indexed);
+	Expression* index = visit(ctx->index);
+
+	auto* indexed = dynamic_cast<AssignableExpression*>(assignable_expression);
+
+	return static_cast<Assignable*>(new IndexerSet(indexed, index));
 }
 
 antlrcpp::Any Visitor::visitDiscard(anceParser::DiscardContext*)

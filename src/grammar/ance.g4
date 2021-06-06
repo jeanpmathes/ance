@@ -73,11 +73,16 @@ returnStatement
 
 assignable
     : variableAssignable
+    | indexerSet
     | discard
     ;
 
 variableAssignable
     : IDENTIFIER
+    ;
+
+indexerSet
+    : indexed=expression '[' index=expression ']'
     ;
 
 discard
