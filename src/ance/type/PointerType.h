@@ -33,13 +33,16 @@ class PointerType : public Type
 			llvm::DIBuilder* di
 		) override;
 
+		void buildSetIndexer(ance::Value *indexed, ance::Value *index, ance::Value *value, llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) override;
+
 		~PointerType() override = default;
 
 	private:
 		ance::Type* element_type_;
 
 	public:
-		static ance::Type* get(Application& app, Type* element_type);
+		static ance::Type* get(Application& app, ance::Type* element_type);
+		static bool isPointerType(ance::Type* type);
 };
 }
 
