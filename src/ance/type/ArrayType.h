@@ -41,6 +41,8 @@ class ArrayType : public Type
 			llvm::DIBuilder* di
 		) override;
 
+		void buildSetIndexer(ance::Value *indexed, ance::Value *index, ance::Value *value, llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) override;
+
 		~ArrayType() override = default;
 
 	private:

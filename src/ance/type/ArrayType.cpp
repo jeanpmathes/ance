@@ -1,9 +1,6 @@
 #include "ArrayType.h"
 #include "Scope.h"
 
-#include <llvm/IR/Constants.h>
-#include <llvm/IR/DerivedTypes.h>
-
 #include "GlobalScope.h"
 #include "Value.h"
 #include "SizeType.h"
@@ -96,6 +93,38 @@ llvm::Value* ance::ArrayType::buildGetIndexer(
 	llvm::Value* native_value = ir.CreateLoad(element_ptr);
 
 	return native_value;
+}
+
+void ance::ArrayType::buildSetIndexer(
+	ance::Value* indexed,
+	ance::Value* index,
+	ance::Value* value,
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+)
+{
+	assert(indexed->getType() == this && "Indexed value has to be of native array type.");
+	assert(index->getType() == ance::SizeType::get() && "Native array index has to be size type.");
+	assert(value->getType() == element_type_ && "Assigned value has to be of the element type of this array.");
+
+	indexed->build(c, m, state, ir, di);
+	index->build(c, m, state, ir, di);
+	value->build(c, m, state, ir, di);
+
+	llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(c), 0);
+	llvm::Value* native_index = index->getContentValue(c, m, state, ir, di);
+	llvm::Value* indices[] = {zero, native_index};
+
+	// This is a pointer as the internal storage of arrays is using pointers.
+	llvm::Value* array_ptr = indexed->getNativeValue();
+
+	llvm::Value* element_ptr = ir.CreateGEP(array_ptr, indices);
+	llvm::Value* new_element_value = value->getNativeValue();
+
+	ir.CreateStore(new_element_value, element_ptr);
 }
 
 InternalStorage ance::ArrayType::storage()
