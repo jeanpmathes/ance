@@ -5,7 +5,8 @@
 
 class AssignableExpression : public virtual Expression
 {
-
+	public:
+		virtual bool canAssignToValue();
 };
 
 #endif

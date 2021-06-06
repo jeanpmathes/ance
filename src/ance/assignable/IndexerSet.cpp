@@ -22,6 +22,7 @@ void IndexerSet::assign(
 {
 	ance::Type* indexed_type = indexed_->getType();
 	assert(indexed_type->isIndexerDefined(Indexer::SET) && "Type does not support this indexer.");
+	assert(indexed_->canAssignToValue() && "Cannot assign to the value of the expression.");
 
 	indexed_type->buildSetIndexer(indexed_->getValue(), index_->getValue(), value, c, m, state, ir, di);
 }
