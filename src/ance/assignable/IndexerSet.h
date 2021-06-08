@@ -4,12 +4,11 @@
 #include "Assignable.h"
 
 #include "Expression.h"
-#include "AssignableExpression.h"
 
 class IndexerSet : public Assignable
 {
 	public:
-		explicit IndexerSet(AssignableExpression* indexed, Expression* index);
+		explicit IndexerSet(Expression* indexed, Expression* index);
 
 		void setScope(ance::Scope* scope) override;
 
@@ -23,7 +22,7 @@ class IndexerSet : public Assignable
 		) override;
 
 	private:
-		AssignableExpression* indexed_;
+		Expression* indexed_;
 		Expression* index_;
 };
 

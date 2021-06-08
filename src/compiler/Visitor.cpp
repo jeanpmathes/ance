@@ -39,7 +39,6 @@
 #include "RoughCast.h"
 #include "IndexerGet.h"
 #include "BuildableExpression.h"
-#include "AssignableExpression.h"
 
 #include "StringConstant.h"
 #include "ByteConstant.h"
@@ -238,10 +237,8 @@ antlrcpp::Any Visitor::visitVariableAssignable(anceParser::VariableAssignableCon
 
 antlrcpp::Any Visitor::visitIndexerSet(anceParser::IndexerSetContext* ctx)
 {
-	Expression* assignable_expression = visit(ctx->indexed);
+	Expression* indexed = visit(ctx->indexed);
 	Expression* index = visit(ctx->index);
-
-	auto* indexed = dynamic_cast<AssignableExpression*>(assignable_expression);
 
 	return static_cast<Assignable*>(new IndexerSet(indexed, index));
 }

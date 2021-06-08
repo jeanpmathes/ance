@@ -4,9 +4,8 @@
 #include "BuildableExpression.h"
 #include "Runtime.h"
 #include "Application.h"
-#include "AssignableExpression.h"
 
-class Allocation : public BuildableExpression, public AssignableExpression
+class Allocation : public BuildableExpression
 {
 	public:
 		Allocation(Runtime::Allocator allocation, ance::Type* type, Expression* count, Application& app);

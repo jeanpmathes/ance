@@ -3,9 +3,8 @@
 
 #include "BuildableExpression.h"
 #include "ExpressionBackedValue.h"
-#include "AssignableExpression.h"
 
-class IndexerGet : public BuildableExpression, public AssignableExpression
+class IndexerGet : public BuildableExpression
 {
 	public:
 		IndexerGet(Expression* indexed, Expression* index);
