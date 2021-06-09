@@ -47,7 +47,9 @@ class Type
 
 		virtual llvm::Type* getContentType(llvm::LLVMContext& c) = 0;
 
-		llvm::TypeSize getSize(llvm::Module* m);
+		llvm::TypeSize getNativeSize(llvm::Module* m);
+
+		llvm::TypeSize getContentSize(llvm::Module* m);
 
 		virtual InternalStorage storage();
 

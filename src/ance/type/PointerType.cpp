@@ -6,6 +6,7 @@
 #include "GlobalScope.h"
 #include "VoidType.h"
 #include "Value.h"
+#include "Values.h"
 #include "SizeType.h"
 
 ance::PointerType::PointerType(ance::Type* element_type)
@@ -34,7 +35,7 @@ llvm::PointerType* ance::PointerType::getContentType(llvm::LLVMContext& c)
 	}
 	else
 	{
-		native_type = element_type_->getNativeType(c);
+		native_type = element_type_->getContentType(c);
 	}
 
 	return llvm::PointerType::get(native_type, 0);
@@ -72,7 +73,9 @@ llvm::Value* ance::PointerType::buildGetIndexer(
 	llvm::Value* ptr = indexed->getNativeValue();
 
 	llvm::Value* element_ptr = ir.CreateGEP(ptr, indices);
-	llvm::Value* native_value = ir.CreateLoad(element_ptr);
+	llvm::Value* native_content = ir.CreateLoad(element_ptr);
+
+	llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, c, m, state, ir, di);
 
 	return native_value;
 }
@@ -102,9 +105,9 @@ void ance::PointerType::buildSetIndexer(
 	llvm::Value* ptr = indexed->getNativeValue();
 
 	llvm::Value* element_ptr = ir.CreateGEP(ptr, indices);
-	llvm::Value* new_element_value = value->getNativeValue();
+	llvm::Value* new_element_content = value->getContentValue(c, m, state, ir, di);
 
-	ir.CreateStore(new_element_value, element_ptr);
+	ir.CreateStore(new_element_content, element_ptr);
 }
 
 ance::Type* ance::PointerType::get(Application& app, ance::Type* element_type)

@@ -32,5 +32,5 @@ llvm::Value* SizeofExpression::build(
 	llvm::DIBuilder*
 )
 {
-	return ance::SizeType::buildValue(expression_->getType()->getSize(m));
+	return ance::SizeType::buildValue(expression_->getType()->getNativeSize(m));
 }

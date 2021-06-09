@@ -76,7 +76,7 @@ void Runtime::deleteDynamic(
 )
 {
 	ance::Type* type = value->getType();
-	assert(dynamic_cast<ance::PointerType*>(type) && "Type of value to delete has to be pointer type.");
+	assert(ance::PointerType::isPointerType(type) && "Type of value to delete has to be pointer type.");
 
 	value->build(c, m, state, ir, di);
 
@@ -106,7 +106,7 @@ llvm::Value* Runtime::allocateAutomatic(
 		count_value = count->getNativeValue();
 	}
 
-	return ir.CreateAlloca(type->getNativeType(c), count_value);
+	return ir.CreateAlloca(type->getContentType(c), count_value);
 }
 
 llvm::Value* Runtime::allocateDynamic(
@@ -128,7 +128,7 @@ llvm::Value* Runtime::allocateDynamic(
 	if (count)
 	{
 		llvm::Value* element_size =
-			llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c), type->getSize(m).getFixedSize(), false);
+			llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c), type->getContentSize(m).getFixedSize(), false);
 		count->build(c, m, state, ir, di);
 		llvm::Value* element_count = count->getNativeValue();
 
@@ -136,7 +136,8 @@ llvm::Value* Runtime::allocateDynamic(
 	}
 	else
 	{
-		size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c), type->getSize(m).getFixedSize(), false);
+		size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c),
+									  type->getContentSize(m).getFixedSize(), false);
 	}
 
 	llvm::Value* args[] = {flags, size};

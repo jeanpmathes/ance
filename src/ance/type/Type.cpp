@@ -15,9 +15,14 @@ llvm::Type* ance::Type::getNativeType(llvm::LLVMContext& c)
 	}
 }
 
-llvm::TypeSize ance::Type::getSize(llvm::Module* m)
+llvm::TypeSize ance::Type::getNativeSize(llvm::Module* m)
 {
 	return m->getDataLayout().getTypeAllocSize(getNativeType(m->getContext()));
+}
+
+llvm::TypeSize ance::Type::getContentSize(llvm::Module* m)
+{
+	return m->getDataLayout().getTypeAllocSize(getContentType(m->getContext()));
 }
 
 bool ance::Type::isIndexerDefined(Indexer)

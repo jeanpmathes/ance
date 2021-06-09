@@ -26,5 +26,5 @@ llvm::Value* SizeofType::build(
 	llvm::DIBuilder*
 )
 {
-	return ance::SizeType::buildValue(type_->getSize(m));
+	return ance::SizeType::buildValue(type_->getNativeSize(m));
 }
