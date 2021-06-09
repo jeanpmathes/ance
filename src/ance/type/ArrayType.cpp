@@ -3,6 +3,7 @@
 
 #include "GlobalScope.h"
 #include "Value.h"
+#include "Values.h"
 #include "SizeType.h"
 
 ance::ArrayType::ArrayType(Type* element_type, const uint64_t size)
@@ -27,7 +28,7 @@ llvm::Type* ance::ArrayType::getContentType(llvm::LLVMContext& c)
 {
 	if (!type_)
 	{
-		type_ = llvm::ArrayType::get(element_type_->getNativeType(c), size_);
+		type_ = llvm::ArrayType::get(element_type_->getContentType(c), size_);
 	}
 
 	return type_;
@@ -67,7 +68,9 @@ llvm::Value* ance::ArrayType::buildGetIndexer(
 	llvm::Value* array_ptr = indexed->getNativeValue();
 
 	llvm::Value* element_ptr = ir.CreateGEP(array_ptr, indices);
-	llvm::Value* native_value = ir.CreateLoad(element_ptr);
+	llvm::Value* native_content = ir.CreateLoad(element_ptr);
+
+	llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, c, m, state, ir, di);
 
 	return native_value;
 }
@@ -99,9 +102,9 @@ void ance::ArrayType::buildSetIndexer(
 	llvm::Value* array_ptr = indexed->getNativeValue();
 
 	llvm::Value* element_ptr = ir.CreateGEP(array_ptr, indices);
-	llvm::Value* new_element_value = value->getNativeValue();
+	llvm::Value* new_element_content = value->getContentValue(c, m, state, ir, di);
 
-	ir.CreateStore(new_element_value, element_ptr);
+	ir.CreateStore(new_element_content, element_ptr);
 }
 
 InternalStorage ance::ArrayType::storage()
