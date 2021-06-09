@@ -10,7 +10,7 @@ std::string ance::HalfType::getName()
 	return "half";
 }
 
-llvm::Constant* ance::HalfType::getDefault(llvm::LLVMContext& c)
+llvm::Constant* ance::HalfType::getDefaultContent(llvm::LLVMContext& c)
 {
 	return llvm::ConstantFP::get(getNativeType(c), 0);
 }

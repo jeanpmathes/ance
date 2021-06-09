@@ -17,15 +17,9 @@ std::string ance::ArrayType::getName()
 	return element_type_->getName() + "[" + std::to_string(size_) + "]";
 }
 
-llvm::Constant* ance::ArrayType::getDefault(llvm::LLVMContext& c)
+llvm::Constant* ance::ArrayType::getDefaultContent(llvm::LLVMContext& c)
 {
-	llvm::Constant* consts[size_];
-	std::fill_n(consts, size_, element_type_->getDefault(c));
-
-	if (!type_) getNativeType(c);
-
-	llvm::ArrayRef<llvm::Constant*> content = llvm::ArrayRef<llvm::Constant*>(&consts[0], size_);
-
+	std::vector<llvm::Constant*> content(size_, element_type_->getDefaultContent(c));
 	return llvm::ConstantArray::get(type_, content);
 }
 
@@ -37,23 +31,6 @@ llvm::Type* ance::ArrayType::getContentType(llvm::LLVMContext& c)
 	}
 
 	return type_;
-}
-
-ance::Type* ance::ArrayType::get(Application& app, Type* element_type, uint64_t size)
-{
-	auto* type = new ance::ArrayType(element_type, size);
-	std::string type_name = type->getName();
-
-	if (app.globalScope()->isTypeRegistered(type_name))
-	{
-		delete type;
-		return app.globalScope()->getType(type_name);
-	}
-	else
-	{
-		app.globalScope()->registerType(type);
-		return type;
-	}
 }
 
 bool ance::ArrayType::isIndexerDefined(Indexer)
@@ -130,4 +107,21 @@ void ance::ArrayType::buildSetIndexer(
 InternalStorage ance::ArrayType::storage()
 {
 	return InternalStorage::AS_POINTER;
+}
+
+ance::Type* ance::ArrayType::get(Application& app, Type* element_type, uint64_t size)
+{
+	auto* type = new ance::ArrayType(element_type, size);
+	std::string type_name = type->getName();
+
+	if (app.globalScope()->isTypeRegistered(type_name))
+	{
+		delete type;
+		return app.globalScope()->getType(type_name);
+	}
+	else
+	{
+		app.globalScope()->registerType(type);
+		return type;
+	}
 }

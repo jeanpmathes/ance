@@ -8,7 +8,7 @@ std::string ance::UnsignedIntegerPointerType::getName()
 	return "uiptr";
 }
 
-llvm::Constant* ance::UnsignedIntegerPointerType::getDefault(llvm::LLVMContext& c)
+llvm::Constant* ance::UnsignedIntegerPointerType::getDefaultContent(llvm::LLVMContext& c)
 {
 	return llvm::ConstantInt::get(getNativeType(c), 0, false);
 }

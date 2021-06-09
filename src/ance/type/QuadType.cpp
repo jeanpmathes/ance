@@ -10,7 +10,7 @@ std::string ance::QuadType::getName()
 	return "quad";
 }
 
-llvm::Constant* ance::QuadType::getDefault(llvm::LLVMContext& c)
+llvm::Constant* ance::QuadType::getDefaultContent(llvm::LLVMContext& c)
 {
 	return llvm::ConstantFP::get(getNativeType(c), 0);
 }

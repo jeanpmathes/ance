@@ -10,7 +10,7 @@ std::string ance::DoubleType::getName()
 	return "double";
 }
 
-llvm::Constant* ance::DoubleType::getDefault(llvm::LLVMContext& c)
+llvm::Constant* ance::DoubleType::getDefaultContent(llvm::LLVMContext& c)
 {
 	return llvm::ConstantFP::get(getNativeType(c), 0);
 }

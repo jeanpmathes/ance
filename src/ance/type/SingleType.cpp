@@ -10,7 +10,7 @@ std::string ance::SingleType::getName()
 	return "single";
 }
 
-llvm::Constant* ance::SingleType::getDefault(llvm::LLVMContext& c)
+llvm::Constant* ance::SingleType::getDefaultContent(llvm::LLVMContext& c)
 {
 	return llvm::ConstantFP::get(getNativeType(c), 0);
 }

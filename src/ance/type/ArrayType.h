@@ -21,7 +21,7 @@ class ArrayType : public Type
 	public:
 		std::string getName() override;
 
-		llvm::Constant* getDefault(llvm::LLVMContext& c) override;
+		llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
 		llvm::Type* getContentType(llvm::LLVMContext& c) override;
 

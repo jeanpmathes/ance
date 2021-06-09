@@ -17,7 +17,7 @@ std::string ance::IntegerType::getName()
 	else return "ui" + std::to_string(bit_size_);
 }
 
-llvm::Constant* ance::IntegerType::getDefault(llvm::LLVMContext& c)
+llvm::Constant* ance::IntegerType::getDefaultContent(llvm::LLVMContext& c)
 {
 	return llvm::ConstantInt::get(getNativeType(c), 0, is_signed_);
 }

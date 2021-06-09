@@ -41,7 +41,7 @@ class Type
 
 		virtual std::string getName() = 0;
 
-		virtual llvm::Constant* getDefault(llvm::LLVMContext& c) = 0;
+		virtual llvm::Constant* getDefaultContent(llvm::LLVMContext& c) = 0;
 
 		llvm::Type* getNativeType(llvm::LLVMContext& c);
 

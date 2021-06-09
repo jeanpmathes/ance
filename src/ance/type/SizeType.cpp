@@ -10,7 +10,7 @@ std::string ance::SizeType::getName()
 	return "size";
 }
 
-llvm::Constant* ance::SizeType::getDefault(llvm::LLVMContext& c)
+llvm::Constant* ance::SizeType::getDefaultContent(llvm::LLVMContext& c)
 {
 	return llvm::ConstantInt::get(getNativeType(c), 0, false);
 }

@@ -37,7 +37,7 @@ ance::Constant* DefaultValueExpression::getConstantValue()
 
 llvm::Constant* DefaultValueExpression::buildConstant(llvm::LLVMContext& c)
 {
-	return type_->getDefault(c);
+	return type_->getDefaultContent(c);
 }
 
 DefaultValueExpression::~DefaultValueExpression() = default;

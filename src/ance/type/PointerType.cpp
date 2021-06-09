@@ -19,7 +19,7 @@ std::string ance::PointerType::getName()
 	return element_type_->getName() + "*";
 }
 
-llvm::Constant* ance::PointerType::getDefault(llvm::LLVMContext& c)
+llvm::Constant* ance::PointerType::getDefaultContent(llvm::LLVMContext& c)
 {
 	return llvm::ConstantPointerNull::get(getContentType(c));
 }
