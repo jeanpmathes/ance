@@ -3464,7 +3464,7 @@ std::vector<std::string> anceParser::_ruleNames = {
 };
 
 std::vector<std::string> anceParser::_literalNames = {
-  "", "'const'", "':='", "';'", "'<-'", "'('", "')'", "'{'", "'}'", "','", 
+  "", "'const'", "':='", "';'", "'<:'", "'('", "')'", "'{'", "'}'", "','", 
   "'public'", "'private'", "'print'", "'delete'", "'return'", "'['", "']'", 
   "'discard'", "'new'", "'dynamic'", "'automatic'", "'sizeof'", "':'", "'true'", 
   "'false'", "'size'", "'*'", "'half'", "'single'", "'double'", "'quad'", 

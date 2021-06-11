@@ -14,7 +14,7 @@ constantDeclaration
 	;
 
 variableDeclaration
-	: accessModifier type IDENTIFIER ( '<-' literalExpression )? ';'
+	: accessModifier type IDENTIFIER ( '<:' literalExpression )? ';'
 	;
 
 code
@@ -52,11 +52,11 @@ expressionStatement
 	;
 
 localVariableDefinition
-	: type IDENTIFIER ( '<-' expression )? ';'
+	: type IDENTIFIER ( '<:' expression )? ';'
 	;
 
 assignment
-	: assignable '<-' expression ';'
+	: assignable '<:' expression ';'
 	;
 
 printStatement
