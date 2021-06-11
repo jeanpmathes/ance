@@ -42,7 +42,7 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitVariableAssignable(anceParser::VariableAssignableContext* ctx) override;
 
-		antlrcpp::Any visitIndexerSet(anceParser::IndexerSetContext *ctx) override;
+		antlrcpp::Any visitIndexerSet(anceParser::IndexerSetContext* ctx) override;
 
 		antlrcpp::Any visitDiscard(anceParser::DiscardContext* ctx) override;
 
@@ -102,11 +102,11 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitDynamic(anceParser::DynamicContext* ctx) override;
 
-		antlrcpp::Any visitCopyAssignment(anceParser::CopyAssignmentContext *ctx) override;
+		antlrcpp::Any visitCopyAssignment(anceParser::CopyAssignmentContext* ctx) override;
 
-		antlrcpp::Any visitMoveAssignment(anceParser::MoveAssignmentContext *ctx) override;
+		antlrcpp::Any visitMoveAssignment(anceParser::MoveAssignmentContext* ctx) override;
 
-		antlrcpp::Any visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext *ctx) override;
+		antlrcpp::Any visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext* ctx) override;
 
 	private:
 		Application& application_;

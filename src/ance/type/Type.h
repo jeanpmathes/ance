@@ -67,7 +67,16 @@ class Type
 			llvm::DIBuilder* di
 		);
 
-		virtual void buildSetIndexer(ance::Value* indexed, ance::Value* index, ance::Value* value, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		virtual void buildSetIndexer(
+			ance::Value* indexed,
+			ance::Value* index,
+			ance::Value* value,
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		);
 
 };
 }

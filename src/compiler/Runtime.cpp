@@ -128,7 +128,11 @@ llvm::Value* Runtime::allocateDynamic(
 	if (count)
 	{
 		llvm::Value* element_size =
-			llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c), type->getContentSize(m).getFixedSize(), false);
+			llvm::ConstantInt::get(
+				ance::SizeType::get()->getNativeType(c),
+				type->getContentSize(m).getFixedSize(),
+				false
+			);
 		count->build(c, m, state, ir, di);
 		llvm::Value* element_count = count->getNativeValue();
 
@@ -136,8 +140,10 @@ llvm::Value* Runtime::allocateDynamic(
 	}
 	else
 	{
-		size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c),
-									  type->getContentSize(m).getFixedSize(), false);
+		size = llvm::ConstantInt::get(
+			ance::SizeType::get()->getNativeType(c),
+			type->getContentSize(m).getFixedSize(), false
+		);
 	}
 
 	llvm::Value* args[] = {flags, size};

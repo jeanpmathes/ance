@@ -93,7 +93,15 @@ void ance::ArrayType::buildSetIndexer(
 	ir.CreateStore(new_element_content, element_ptr);
 }
 
-llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value* indexed, ance::Value* index, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) const
+llvm::Value* ance::ArrayType::buildGetElementPointer(
+	ance::Value* indexed,
+	ance::Value* index,
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+) const
 {
 	indexed->build(c, m, state, ir, di);
 	index->build(c, m, state, ir, di);

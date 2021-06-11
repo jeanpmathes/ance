@@ -33,10 +33,27 @@ class PointerType : public Type
 			llvm::DIBuilder* di
 		) override;
 
-		void buildSetIndexer(ance::Value *indexed, ance::Value *index, ance::Value *value, llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) override;
+		void buildSetIndexer(
+			ance::Value* indexed,
+			ance::Value* index,
+			ance::Value* value,
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) override;
 
 	private:
-		static llvm::Value* buildGetElementPointer(ance::Value* indexed, ance::Value* index, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
+		static llvm::Value* buildGetElementPointer(
+			ance::Value* indexed,
+			ance::Value* index,
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		);
 
 	public:
 
@@ -47,6 +64,7 @@ class PointerType : public Type
 
 	public:
 		static ance::Type* get(Application& app, ance::Type* element_type);
+
 		static bool isPointerType(ance::Type* type);
 };
 }
