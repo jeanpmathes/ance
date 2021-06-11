@@ -26,8 +26,6 @@ class AssignmentStatement : public Statement
 			llvm::DIBuilder* di
 		) override;
 
-		~AssignmentStatement() override;
-
 	private:
 		Assignable* assignable_;
 		Expression* assigned_;

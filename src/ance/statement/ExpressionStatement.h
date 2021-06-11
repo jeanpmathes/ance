@@ -19,8 +19,6 @@ class ExpressionStatement : public Statement
 			llvm::DIBuilder* di
 		) override;
 
-		~ExpressionStatement() override;
-
 	private:
 		BuildableExpression* expression_;
 };

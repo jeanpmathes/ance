@@ -34,7 +34,7 @@ class Statement
 			llvm::DIBuilder* di
 		) = 0;
 
-		virtual ~Statement() = 0;
+		virtual ~Statement() = default;
 
 	private:
 		ance::Function* function_{nullptr};

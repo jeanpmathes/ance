@@ -34,5 +34,3 @@ void AssignmentStatement::build(
 {
 	assignable_->assign(assigned_->getValue(), c, m, state, ir, di);
 }
-
-AssignmentStatement::~AssignmentStatement() = default;

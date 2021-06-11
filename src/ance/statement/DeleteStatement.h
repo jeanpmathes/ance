@@ -19,8 +19,6 @@ class DeleteStatement : public Statement
 			llvm::DIBuilder* di
 		) override;
 
-		~DeleteStatement() override;
-
 	private:
 		Expression* to_delete_;
 		bool delete_buffer_;

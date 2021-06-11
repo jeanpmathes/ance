@@ -54,5 +54,3 @@ void PrintStatement::build(
 
 	state->buildnativecall_WriteFile(handle, char_ptr, write_num, written_num_ptr, null);
 }
-
-PrintStatement::~PrintStatement() = default;

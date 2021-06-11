@@ -17,8 +17,6 @@ class PrintStatement : public Statement
 			llvm::DIBuilder* di
 		) override;
 
-		~PrintStatement() override;
-
 	private:
 		Expression* expression_;
 };

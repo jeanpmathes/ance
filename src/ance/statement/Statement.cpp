@@ -25,5 +25,3 @@ unsigned int Statement::getColumn() const
 {
 	return column_;
 }
-
-Statement::~Statement() = default;

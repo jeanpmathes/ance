@@ -19,8 +19,6 @@ class ReturnStatement :
 			llvm::DIBuilder* di
 		) override;
 
-		~ReturnStatement() override;
-
 	private:
 		Expression* return_value_;
 };

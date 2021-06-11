@@ -30,5 +30,3 @@ void ExpressionStatement::build(
 {
 	expression_->build(c, m, state, ir, di);
 }
-
-ExpressionStatement::~ExpressionStatement() = default;

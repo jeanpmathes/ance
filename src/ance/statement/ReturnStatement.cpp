@@ -24,5 +24,3 @@ void ReturnStatement::build(llvm::LLVMContext&, llvm::Module*, CompileState*, ll
 {
 	getContainingFunction()->addReturn(return_value_ ? return_value_->getValue() : nullptr);
 }
-
-ReturnStatement::~ReturnStatement() = default;

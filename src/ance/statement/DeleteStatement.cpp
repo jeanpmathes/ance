@@ -26,5 +26,3 @@ void DeleteStatement::build(
 {
 	state->runtime_->deleteDynamic(to_delete_->getValue(), delete_buffer_, c, m, state, ir, di);
 }
-
-DeleteStatement::~DeleteStatement() = default;
