@@ -34,6 +34,8 @@ class Scope
 		virtual bool validate() = 0;
 
 		virtual ance::Variable* getVariable(std::string identifier) = 0;
+
+		virtual ~Scope() = default;
 };
 }
 #endif

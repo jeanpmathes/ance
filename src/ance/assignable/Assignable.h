@@ -17,6 +17,8 @@ class Assignable
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;
+
+		virtual ~Assignable() = default;
 };
 
 #endif
