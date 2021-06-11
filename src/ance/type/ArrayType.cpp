@@ -93,7 +93,7 @@ void ance::ArrayType::buildSetIndexer(
 	ir.CreateStore(new_element_content, element_ptr);
 }
 
-llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value* indexed, ance::Value* index, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value* indexed, ance::Value* index, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di) const
 {
 	indexed->build(c, m, state, ir, di);
 	index->build(c, m, state, ir, di);
@@ -101,6 +101,12 @@ llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value* indexed, ance:
 	llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(c), 0);
 	llvm::Value* native_index = index->getContentValue(c, m, state, ir, di);
 	llvm::Value* indices[] = {zero, native_index};
+
+	// Check if index smaller size.
+	llvm::Value* native_size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c), size_);
+	[[maybe_unused]] llvm::Value* in_bounds = ir.CreateICmpULT(native_index, native_size);
+
+	// todo: use in_bounds bool to throw exception
 
 	// This is a pointer as the internal storage of arrays is using pointers.
 	llvm::Value* array_ptr = indexed->getNativeValue();
