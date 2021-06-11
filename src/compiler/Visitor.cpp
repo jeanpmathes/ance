@@ -13,6 +13,7 @@
 #include "GlobalScope.h"
 #include "LocalScope.h"
 
+#include "Assigner.h"
 #include "AccessModifier.h"
 #include "Function.h"
 #include "Parameter.h"
@@ -44,7 +45,7 @@
 #include "ByteConstant.h"
 #include "IntegerConstant.h"
 #include "FloatConstant.h"
-#include "ance/construct/constant/BooleanConstant.h"
+#include "BooleanConstant.h"
 #include "SizeConstant.h"
 
 Visitor::Visitor(Application& application)
@@ -57,6 +58,10 @@ antlrcpp::Any Visitor::visitConstantDeclaration(anceParser::ConstantDeclarationC
 	AccessModifier access = visit(ctx->accessModifier());
 	ance::Type* type = visit(ctx->type());
 	std::string identifier = ctx->IDENTIFIER()->getText();
+
+	Assigner assigner = visit(ctx->assigner());
+	assert(assigner == Assigner::FINAL_COPY_ASSIGNMENT && "Constant declaration has to be final.");
+
 	Expression* expr = visit(ctx->literalExpression());
 	auto* const_expr = dynamic_cast<ConstantExpression*>(expr);
 
@@ -75,6 +80,9 @@ antlrcpp::Any Visitor::visitVariableDeclaration(anceParser::VariableDeclarationC
 
 	if (ctx->literalExpression())
 	{
+		Assigner assigner = visit(ctx->assigner());
+		assert(assigner == Assigner::COPY_ASSIGNMENT && "Final declaration not yet supported.");
+
 		Expression* expr = visit(ctx->literalExpression());
 		const_expr = dynamic_cast<ConstantExpression*>(expr);
 	}
@@ -160,6 +168,9 @@ antlrcpp::Any Visitor::visitLocalVariableDefinition(anceParser::LocalVariableDef
 
 	if (ctx->expression())
 	{
+		Assigner assigner = visit(ctx->assigner());
+		assert(assigner == Assigner::COPY_ASSIGNMENT && "Final declaration not yet supported.");
+
 		assigned = visit(ctx->expression());
 	}
 	else
@@ -180,6 +191,9 @@ antlrcpp::Any Visitor::visitAssignment(anceParser::AssignmentContext* ctx)
 
 	Assignable* assignable = visit(ctx->assignable());
 	Expression* assigned = visit(ctx->expression());
+
+	Assigner assigner = visit(ctx->assigner());
+	assert(assigner == Assigner::COPY_ASSIGNMENT && "Assignment to already declared variable cannot be final.");
 
 	auto* statement =
 		new AssignmentStatement(assignable, assigned, line, column);
@@ -515,6 +529,24 @@ antlrcpp::Any Visitor::visitAutomatic(anceParser::AutomaticContext*)
 antlrcpp::Any Visitor::visitDynamic(anceParser::DynamicContext*)
 {
 	return Runtime::Allocator::DYNAMIC;
+}
+
+antlrcpp::Any Visitor::visitCopyAssignment(anceParser::CopyAssignmentContext*)
+{
+	return Assigner::COPY_ASSIGNMENT;
+}
+
+antlrcpp::Any Visitor::visitMoveAssignment(anceParser::MoveAssignmentContext*)
+{
+	assert(false && "Move assignment currently not supported.");
+	// todo: move assignment
+
+	return Assigner::MOVE_ASSIGNMENT;
+}
+
+antlrcpp::Any Visitor::visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext*)
+{
+	return Assigner::FINAL_COPY_ASSIGNMENT;
 }
 
 

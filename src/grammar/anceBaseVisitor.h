@@ -71,6 +71,18 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitCopyAssignment(anceParser::CopyAssignmentContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitMoveAssignment(anceParser::MoveAssignmentContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitPrintStatement(anceParser::PrintStatementContext *ctx) override {
     return visitChildren(ctx);
   }

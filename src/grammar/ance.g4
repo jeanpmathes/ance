@@ -10,11 +10,11 @@ data
 	;
 
 constantDeclaration
-	: accessModifier 'const' type IDENTIFIER ':=' literalExpression ';'
+	: accessModifier 'const' type IDENTIFIER assigner literalExpression ';'
 	;
 
 variableDeclaration
-	: accessModifier type IDENTIFIER ( '<:' literalExpression )? ';'
+	: accessModifier type IDENTIFIER ( assigner literalExpression )? ';'
 	;
 
 code
@@ -52,12 +52,18 @@ expressionStatement
 	;
 
 localVariableDefinition
-	: type IDENTIFIER ( '<:' expression )? ';'
+	: type IDENTIFIER ( assigner expression )? ';'
 	;
 
 assignment
-	: assignable '<:' expression ';'
+	: assignable assigner expression ';'
 	;
+
+assigner
+    : '<:' # CopyAssignment
+    | '<-' # MoveAssignment
+    | ':=' # FinalCopyAssignment
+    ;
 
 printStatement
 	: 'print' expression ';'

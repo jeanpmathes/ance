@@ -47,6 +47,12 @@ public:
 
     virtual antlrcpp::Any visitAssignment(anceParser::AssignmentContext *context) = 0;
 
+    virtual antlrcpp::Any visitCopyAssignment(anceParser::CopyAssignmentContext *context) = 0;
+
+    virtual antlrcpp::Any visitMoveAssignment(anceParser::MoveAssignmentContext *context) = 0;
+
+    virtual antlrcpp::Any visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext *context) = 0;
+
     virtual antlrcpp::Any visitPrintStatement(anceParser::PrintStatementContext *context) = 0;
 
     virtual antlrcpp::Any visitDeleteStatement(anceParser::DeleteStatementContext *context) = 0;

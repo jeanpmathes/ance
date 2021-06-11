@@ -17,28 +17,28 @@ public:
     T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
     T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, T__25 = 26, 
     T__26 = 27, T__27 = 28, T__28 = 29, T__29 = 30, T__30 = 31, T__31 = 32, 
-    NATIVE_INTEGER_TYPE = 33, SIGNED_INTEGER = 34, HEX_INTEGER = 35, BIN_INTEGER = 36, 
-    OCT_INTEGER = 37, HALF = 38, SINGLE = 39, DOUBLE = 40, QUAD = 41, DECIMAL = 42, 
-    STRING = 43, BYTE = 44, INTEGER = 45, BUFFER = 46, IDENTIFIER = 47, 
-    WHITESPACE = 48, BLOCK_COMMENT = 49, LINE_COMMENT = 50
+    T__32 = 33, NATIVE_INTEGER_TYPE = 34, SIGNED_INTEGER = 35, HEX_INTEGER = 36, 
+    BIN_INTEGER = 37, OCT_INTEGER = 38, HALF = 39, SINGLE = 40, DOUBLE = 41, 
+    QUAD = 42, DECIMAL = 43, STRING = 44, BYTE = 45, INTEGER = 46, BUFFER = 47, 
+    IDENTIFIER = 48, WHITESPACE = 49, BLOCK_COMMENT = 50, LINE_COMMENT = 51
   };
 
   enum {
     RuleFile = 0, RuleData = 1, RuleConstantDeclaration = 2, RuleVariableDeclaration = 3, 
     RuleCode = 4, RuleFunction = 5, RuleParameters = 6, RuleParameter = 7, 
     RuleAccessModifier = 8, RuleStatement = 9, RuleExpressionStatement = 10, 
-    RuleLocalVariableDefinition = 11, RuleAssignment = 12, RulePrintStatement = 13, 
-    RuleDeleteStatement = 14, RuleReturnStatement = 15, RuleAssignable = 16, 
-    RuleVariableAssignable = 17, RuleIndexerSet = 18, RuleDiscard = 19, 
-    RuleExpression = 20, RuleIndependentExpression = 21, RuleFunctionCall = 22, 
-    RuleArguments = 23, RuleVariableAccess = 24, RuleAllocation = 25, RuleAllocator = 26, 
-    RuleRoughCast = 27, RuleSizeofType = 28, RuleSizeofExpression = 29, 
-    RuleLiteralExpression = 30, RuleStringLiteral = 31, RuleByteLiteral = 32, 
-    RuleIntegerLiteral = 33, RuleUnsignedInteger = 34, RuleSignedInteger = 35, 
-    RuleSpecialInteger = 36, RuleFloatingPointLiteral = 37, RuleBooleanLiteral = 38, 
-    RuleSizeLiteral = 39, RuleType = 40, RuleIntegerType = 41, RuleArrayType = 42, 
-    RuleKeywordType = 43, RuleFloatingPointType = 44, RuleSizeType = 45, 
-    RuleUnsignedIntegerPointerType = 46, RuleVoidType = 47
+    RuleLocalVariableDefinition = 11, RuleAssignment = 12, RuleAssigner = 13, 
+    RulePrintStatement = 14, RuleDeleteStatement = 15, RuleReturnStatement = 16, 
+    RuleAssignable = 17, RuleVariableAssignable = 18, RuleIndexerSet = 19, 
+    RuleDiscard = 20, RuleExpression = 21, RuleIndependentExpression = 22, 
+    RuleFunctionCall = 23, RuleArguments = 24, RuleVariableAccess = 25, 
+    RuleAllocation = 26, RuleAllocator = 27, RuleRoughCast = 28, RuleSizeofType = 29, 
+    RuleSizeofExpression = 30, RuleLiteralExpression = 31, RuleStringLiteral = 32, 
+    RuleByteLiteral = 33, RuleIntegerLiteral = 34, RuleUnsignedInteger = 35, 
+    RuleSignedInteger = 36, RuleSpecialInteger = 37, RuleFloatingPointLiteral = 38, 
+    RuleBooleanLiteral = 39, RuleSizeLiteral = 40, RuleType = 41, RuleIntegerType = 42, 
+    RuleArrayType = 43, RuleKeywordType = 44, RuleFloatingPointType = 45, 
+    RuleSizeType = 46, RuleUnsignedIntegerPointerType = 47, RuleVoidType = 48
   };
 
   anceParser(antlr4::TokenStream *input);
@@ -64,6 +64,7 @@ public:
   class ExpressionStatementContext;
   class LocalVariableDefinitionContext;
   class AssignmentContext;
+  class AssignerContext;
   class PrintStatementContext;
   class DeleteStatementContext;
   class ReturnStatementContext;
@@ -137,6 +138,7 @@ public:
     AccessModifierContext *accessModifier();
     TypeContext *type();
     antlr4::tree::TerminalNode *IDENTIFIER();
+    AssignerContext *assigner();
     LiteralExpressionContext *literalExpression();
 
 
@@ -153,6 +155,7 @@ public:
     AccessModifierContext *accessModifier();
     TypeContext *type();
     antlr4::tree::TerminalNode *IDENTIFIER();
+    AssignerContext *assigner();
     LiteralExpressionContext *literalExpression();
 
 
@@ -289,6 +292,7 @@ public:
     virtual size_t getRuleIndex() const override;
     TypeContext *type();
     antlr4::tree::TerminalNode *IDENTIFIER();
+    AssignerContext *assigner();
     ExpressionContext *expression();
 
 
@@ -303,6 +307,7 @@ public:
     AssignmentContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     AssignableContext *assignable();
+    AssignerContext *assigner();
     ExpressionContext *expression();
 
 
@@ -311,6 +316,45 @@ public:
   };
 
   AssignmentContext* assignment();
+
+  class  AssignerContext : public antlr4::ParserRuleContext {
+  public:
+    AssignerContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    AssignerContext() = default;
+    void copyFrom(AssignerContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  MoveAssignmentContext : public AssignerContext {
+  public:
+    MoveAssignmentContext(AssignerContext *ctx);
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  FinalCopyAssignmentContext : public AssignerContext {
+  public:
+    FinalCopyAssignmentContext(AssignerContext *ctx);
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  CopyAssignmentContext : public AssignerContext {
+  public:
+    CopyAssignmentContext(AssignerContext *ctx);
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  AssignerContext* assigner();
 
   class  PrintStatementContext : public antlr4::ParserRuleContext {
   public:

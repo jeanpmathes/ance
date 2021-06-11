@@ -220,7 +220,7 @@ void anceCompiler::linkModule(std::filesystem::path& bc, std::filesystem::path& 
 	args.push_back("/entry:_start");
 
 	// ! string copy not wanted, but necessary as bc.string().c_str() did not work - string was corrupted after passing it to link.
-	// todo a more elegant solution should be found!
+	// todo: a more elegant solution should be found!
 	std::string out = "/out:" + exe.string();
 	char output[out.size() + 1];
 	strcpy(output, out.c_str());
