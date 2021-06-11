@@ -64,15 +64,7 @@ llvm::Value* ance::PointerType::buildGetIndexer(
 	assert(indexed->getType() == this && "Indexed value has to be of pointer type.");
 	assert(index->getType() == ance::SizeType::get() && "Pointer index has to be size type.");
 
-	indexed->build(c, m, state, ir, di);
-	index->build(c, m, state, ir, di);
-
-	llvm::Value* native_index = index->getContentValue(c, m, state, ir, di);
-	llvm::Value* indices[] = {native_index};
-
-	llvm::Value* ptr = indexed->getNativeValue();
-
-	llvm::Value* element_ptr = ir.CreateGEP(ptr, indices);
+	llvm::Value* element_ptr = buildGetElementPointer(indexed, index, c, m, state, ir, di);
 	llvm::Value* native_content = ir.CreateLoad(element_ptr);
 
 	llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, c, m, state, ir, di);
@@ -95,19 +87,33 @@ void ance::PointerType::buildSetIndexer(
 	assert(index->getType() == ance::SizeType::get() && "Pointer index has to be size type.");
 	assert(value->getType() == element_type_ && "Assigned value has to be of element type.");
 
+	value->build(c, m, state, ir, di);
+
+	llvm::Value* element_ptr = buildGetElementPointer(indexed, index, c, m, state, ir, di);
+	llvm::Value* new_element_content = value->getContentValue(c, m, state, ir, di);
+
+	ir.CreateStore(new_element_content, element_ptr);
+}
+
+llvm::Value* ance::PointerType::buildGetElementPointer(
+	ance::Value* indexed,
+	ance::Value* index,
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+)
+{
 	indexed->build(c, m, state, ir, di);
 	index->build(c, m, state, ir, di);
-	value->build(c, m, state, ir, di);
 
 	llvm::Value* native_index = index->getContentValue(c, m, state, ir, di);
 	llvm::Value* indices[] = {native_index};
 
 	llvm::Value* ptr = indexed->getNativeValue();
 
-	llvm::Value* element_ptr = ir.CreateGEP(ptr, indices);
-	llvm::Value* new_element_content = value->getContentValue(c, m, state, ir, di);
-
-	ir.CreateStore(new_element_content, element_ptr);
+	return ir.CreateGEP(ptr, indices);
 }
 
 ance::Type* ance::PointerType::get(Application& app, ance::Type* element_type)

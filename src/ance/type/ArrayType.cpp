@@ -34,6 +34,11 @@ llvm::Type* ance::ArrayType::getContentType(llvm::LLVMContext& c)
 	return type_;
 }
 
+InternalStorage ance::ArrayType::storage()
+{
+	return InternalStorage::AS_POINTER;
+}
+
 bool ance::ArrayType::isIndexerDefined(Indexer)
 {
 	return true;
@@ -57,17 +62,7 @@ llvm::Value* ance::ArrayType::buildGetIndexer(
 	assert(indexed->getType() == this && "Indexed value has to be of native array type.");
 	assert(index->getType() == ance::SizeType::get() && "Native array index has to be size type.");
 
-	indexed->build(c, m, state, ir, di);
-	index->build(c, m, state, ir, di);
-
-	llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(c), 0);
-	llvm::Value* native_index = index->getContentValue(c, m, state, ir, di);
-	llvm::Value* indices[] = {zero, native_index};
-
-	// This is a pointer as the internal storage of arrays is using pointers.
-	llvm::Value* array_ptr = indexed->getNativeValue();
-
-	llvm::Value* element_ptr = ir.CreateGEP(array_ptr, indices);
+	llvm::Value* element_ptr = buildGetElementPointer(indexed, index, c, m, state, ir, di);
 	llvm::Value* native_content = ir.CreateLoad(element_ptr);
 
 	llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, c, m, state, ir, di);
@@ -90,9 +85,18 @@ void ance::ArrayType::buildSetIndexer(
 	assert(index->getType() == ance::SizeType::get() && "Native array index has to be size type.");
 	assert(value->getType() == element_type_ && "Assigned value has to be of the element type of this array.");
 
+	value->build(c, m, state, ir, di);
+
+	llvm::Value* element_ptr = buildGetElementPointer(indexed, index, c, m, state, ir, di);
+	llvm::Value* new_element_content = value->getContentValue(c, m, state, ir, di);
+
+	ir.CreateStore(new_element_content, element_ptr);
+}
+
+llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value* indexed, ance::Value* index, llvm::LLVMContext& c, llvm::Module* m, CompileState* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di)
+{
 	indexed->build(c, m, state, ir, di);
 	index->build(c, m, state, ir, di);
-	value->build(c, m, state, ir, di);
 
 	llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(c), 0);
 	llvm::Value* native_index = index->getContentValue(c, m, state, ir, di);
@@ -101,15 +105,7 @@ void ance::ArrayType::buildSetIndexer(
 	// This is a pointer as the internal storage of arrays is using pointers.
 	llvm::Value* array_ptr = indexed->getNativeValue();
 
-	llvm::Value* element_ptr = ir.CreateGEP(array_ptr, indices);
-	llvm::Value* new_element_content = value->getContentValue(c, m, state, ir, di);
-
-	ir.CreateStore(new_element_content, element_ptr);
-}
-
-InternalStorage ance::ArrayType::storage()
-{
-	return InternalStorage::AS_POINTER;
+	return ir.CreateGEP(array_ptr, indices);
 }
 
 ance::Type* ance::ArrayType::get(Application& app, Type* element_type, uint64_t size)
