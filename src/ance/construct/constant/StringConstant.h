@@ -9,7 +9,7 @@ namespace ance
 class StringConstant : public Constant
 {
 	public:
-		StringConstant(std::string string, Application& app);
+		StringConstant(std::string prefix, std::string string, Application& app);
 
 		ance::Type* getType() override;
 
@@ -18,7 +18,11 @@ class StringConstant : public Constant
 		static std::string parse(const std::string& unparsed);
 
 	private:
+		static ance::Type* resolveType(std::string& prefix, std::string& string, Application& app);
+
+	private:
 		ance::Type* type_;
+		std::string prefix_;
 		std::string string_;
 };
 }

@@ -338,9 +338,16 @@ antlrcpp::Any Visitor::visitIndexerGet(anceParser::IndexerGetContext* ctx)
 
 antlrcpp::Any Visitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)
 {
+	std::string prefix;
+
+	if (ctx->STRING_PREFIX())
+	{
+		prefix = ctx->STRING_PREFIX()->getText();
+	}
+
 	std::string str = ance::StringConstant::parse(ctx->STRING()->getText());
 
-	ance::Constant* string = new ance::StringConstant(str, application_);
+	ance::Constant* string = new ance::StringConstant(prefix, str, application_);
 	return static_cast<Expression*>(new ConstantLiteral(string));
 }
 
