@@ -46,17 +46,17 @@ void ance::GlobalVariable::defineGlobal(
 	constant_init_ = constant_init;
 }
 
-void ance::GlobalVariable::buildGlobal(llvm::LLVMContext& c, llvm::Module* m)
+void ance::GlobalVariable::buildGlobal(llvm::Module* m)
 {
 	assert(type() != ance::VoidType::get());
 	assert(type() == constant_init_->getType());
 
 	llvm::GlobalValue::LinkageTypes linkage = Convert(access_);
 
-	constant_init_->build(c);
+	constant_init_->build(m);
 	llvm::Constant* native_initializer = constant_init_->getContentConstant();
 	native_variable_ = new llvm::GlobalVariable(
-		*m, type()->getContentType(c),
+		*m, type()->getContentType(m->getContext()),
 		isConstant(), linkage, native_initializer, identifier());
 }
 

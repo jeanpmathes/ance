@@ -18,9 +18,9 @@ ance::Type* ance::StringConstant::getType()
 	return type_;
 }
 
-llvm::Constant* ance::StringConstant::buildContent(llvm::LLVMContext& c)
+llvm::Constant* ance::StringConstant::buildContent(llvm::Module* m)
 {
-	return llvm::ConstantDataArray::getString(c, string_, false);
+	return llvm::ConstantDataArray::getString(m->getContext(), string_, false);
 }
 
 std::string ance::StringConstant::parse(const std::string& unparsed)

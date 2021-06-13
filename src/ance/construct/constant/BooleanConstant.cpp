@@ -15,10 +15,10 @@ ance::Type* ance::BooleanConstant::getType()
 	return type_;
 }
 
-llvm::Constant* ance::BooleanConstant::buildContent(llvm::LLVMContext& c)
+llvm::Constant* ance::BooleanConstant::buildContent(llvm::Module* m)
 {
-	return boolean_ ? llvm::ConstantInt::getTrue(type_->getNativeType(c))
-					: llvm::ConstantInt::getFalse(type_->getNativeType(c));
+	return boolean_ ? llvm::ConstantInt::getTrue(type_->getNativeType(m->getContext()))
+					: llvm::ConstantInt::getFalse(type_->getNativeType(m->getContext()));
 }
 
 ance::BooleanConstant* ance::BooleanConstant::createFalse(Application& app)

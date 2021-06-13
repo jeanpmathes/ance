@@ -44,7 +44,7 @@ class GlobalVariable : public Variable
 			bool is_constant
 		);
 
-		void buildGlobal(llvm::LLVMContext& c, llvm::Module* m);
+		void buildGlobal(llvm::Module* m);
 
 		ance::Value* getValue(
 			llvm::LLVMContext& c,

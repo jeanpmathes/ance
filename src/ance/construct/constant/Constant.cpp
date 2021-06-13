@@ -2,11 +2,11 @@
 
 #include "Type.h"
 
-void ance::Constant::build(llvm::LLVMContext& c)
+void ance::Constant::build(llvm::Module* m)
 {
 	assert(!content_constant_ && "A constant may only be built once.");
 
-	content_constant_ = buildContent(c);
+	content_constant_ = buildContent(m);
 }
 
 llvm::Constant* ance::Constant::getContentConstant()
@@ -17,13 +17,13 @@ llvm::Constant* ance::Constant::getContentConstant()
 
 void ance::Constant::build(
 	llvm::LLVMContext& c,
-	llvm::Module*,
+	llvm::Module* m,
 	CompileState*,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder*
 )
 {
-	build(c);
+	build(m);
 
 	switch (getType()->storage())
 	{

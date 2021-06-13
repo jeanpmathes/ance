@@ -18,7 +18,7 @@ class ByteConstant : public Constant
 
 		ance::Type* getType() override;
 
-		llvm::Constant* buildContent(llvm::LLVMContext& c) override;
+		llvm::Constant* buildContent(llvm::Module* m) override;
 
 		static char resolveEscaped(char content);
 

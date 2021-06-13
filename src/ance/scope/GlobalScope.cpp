@@ -124,7 +124,7 @@ ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
 }
 
 void ance::GlobalScope::buildVariables(
-	llvm::LLVMContext& c,
+	llvm::LLVMContext&,
 	llvm::Module* m,
 	CompileState*,
 	llvm::IRBuilder<>&,
@@ -134,13 +134,13 @@ void ance::GlobalScope::buildVariables(
 	for (auto const&[identifier, constant] : global_constants_)
 	{
 		if (!constant) continue;
-		constant->buildGlobal(c, m);
+		constant->buildGlobal(m);
 	}
 
 	for (auto const&[identifier, variable] : global_variables_)
 	{
 		if (!variable) continue;
-		variable->buildGlobal(c, m);
+		variable->buildGlobal(m);
 	}
 }
 

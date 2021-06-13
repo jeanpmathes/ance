@@ -12,10 +12,10 @@ namespace ance
 class Constant : public Value
 {
 	public:
-		void build(llvm::LLVMContext& c);
+		void build(llvm::Module* m);
 
 	protected:
-		virtual llvm::Constant* buildContent(llvm::LLVMContext& c) = 0;
+		virtual llvm::Constant* buildContent(llvm::Module* m) = 0;
 
 	public:
 		llvm::Constant* getContentConstant();

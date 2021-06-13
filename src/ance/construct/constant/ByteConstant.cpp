@@ -16,9 +16,9 @@ ance::Type* ance::ByteConstant::getType()
 	return type_;
 }
 
-llvm::Constant* ance::ByteConstant::buildContent(llvm::LLVMContext& c)
+llvm::Constant* ance::ByteConstant::buildContent(llvm::Module* m)
 {
-	return llvm::ConstantInt::get(type_->getNativeType(c), byte_, false);
+	return llvm::ConstantInt::get(type_->getNativeType(m->getContext()), byte_, false);
 }
 
 char ance::ByteConstant::resolveEscaped(char content)

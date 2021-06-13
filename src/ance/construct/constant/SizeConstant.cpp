@@ -16,8 +16,8 @@ ance::Type* ance::SizeConstant::getType()
 	return type_;
 }
 
-llvm::Constant* ance::SizeConstant::buildContent(llvm::LLVMContext& c)
+llvm::Constant* ance::SizeConstant::buildContent(llvm::Module* m)
 {
 	llvm::APInt size(app_.getBitness(), size_, 10);
-	return llvm::ConstantInt::get(type_->getContentType(c), size);
+	return llvm::ConstantInt::get(type_->getContentType(m->getContext()), size);
 }
