@@ -5,7 +5,7 @@ class Expression;
 class PrintStatement : public Statement
 {
 	public:
-		PrintStatement(Expression* expression, unsigned int l, unsigned int c);
+		PrintStatement(Expression* str, Expression* len, unsigned int l, unsigned int c);
 
 		void setContainingFunction(ance::Function* function) override;
 
@@ -18,5 +18,6 @@ class PrintStatement : public Statement
 		) override;
 
 	private:
-		Expression* expression_;
+		Expression* str_;
+		Expression* len_;
 };

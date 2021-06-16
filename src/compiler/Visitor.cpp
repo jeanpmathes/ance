@@ -206,9 +206,10 @@ antlrcpp::Any Visitor::visitPrintStatement(anceParser::PrintStatementContext* ct
 	unsigned int line = ctx->getStart()->getLine();
 	unsigned int column = ctx->getStart()->getCharPositionInLine();
 
-	Expression* expression = visit(ctx->expression());
+	Expression* str = visit(ctx->str);
+	Expression* len = visit(ctx->len);
 
-	auto* statement = new PrintStatement(expression, line, column);
+	auto* statement = new PrintStatement(str, len, line, column);
 
 	return static_cast<Statement*>(statement);
 }

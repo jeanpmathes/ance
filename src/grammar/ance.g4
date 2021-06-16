@@ -66,7 +66,7 @@ assigner
     ;
 
 printStatement
-	: 'print' expression ';'
+	: 'print' str=expression ',' len=expression ';'
 	;
 
 deleteStatement

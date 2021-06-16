@@ -6,13 +6,15 @@
 #include "Value.h"
 #include "Function.h"
 #include "LocalScope.h"
+#include "PointerType.h"
+#include "IntegerType.h"
 
 PrintStatement::PrintStatement(
-	Expression* expression,
+	Expression* str, Expression* len,
 	const unsigned int l,
 	const unsigned int c
 )
-	: Statement(l, c), expression_(expression)
+	: Statement(l, c), str_(str), len_(len)
 {
 }
 
@@ -20,7 +22,8 @@ void PrintStatement::setContainingFunction(ance::Function* function)
 {
 	Statement::setContainingFunction(function);
 
-	expression_->setScope(function->getScope());
+	str_->setScope(function->getScope());
+	len_->setScope(function->getScope());
 }
 
 void PrintStatement::build(
@@ -31,26 +34,22 @@ void PrintStatement::build(
 	llvm::DIBuilder* di
 )
 {
+	assert(ance::PointerType::isPointerType(str_->getType()) && "First argument must be pointer.");
+
 	llvm::Value* handle_ptr = m->getGlobalVariable(ANCE_STD_OUTPUT_HANDLE);
 	llvm::LoadInst* handle = ir.CreateLoad(llvm::Type::getInt8PtrTy(c), handle_ptr, "handle");
 
-	ance::Value* char_arr = expression_->getValue();
-	char_arr->build(c, m, state, ir, di);
-	llvm::Value* native_char_arr = char_arr->getContentValue(c, m, state, ir, di);
+	ance::Value* str_ptr = str_->getValue();
+	ance::Value* str_len = len_->getValue();
 
-	assert(native_char_arr->getType()->isArrayTy());
-	llvm::Value
-		* write_num =
-		llvm::ConstantInt::get(llvm::Type::getInt32Ty(c), native_char_arr->getType()->getArrayNumElements());
+	str_ptr->build(c, m, state, ir, di);
+	str_len->build(c, m, state, ir, di);
 
-	llvm::AllocaInst* char_arr_ptr = ir.CreateAlloca(native_char_arr->getType(), 0, write_num);
-	ir.CreateStore(native_char_arr, char_arr_ptr);
-
-	llvm::Constant* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(c), 0);
-	llvm::Value* char_ptr = ir.CreateGEP(char_arr_ptr, {zero, zero});
+	llvm::Value* native_char_ptr = str_ptr->getContentValue(c, m, state, ir, di);
+	llvm::Value* native_str_len = str_len->getContentValue(c, m, state, ir, di);
 
 	llvm::AllocaInst* written_num_ptr = ir.CreateAlloca(llvm::Type::getInt32Ty(c));
 	llvm::ConstantPointerNull* null = llvm::ConstantPointerNull::get(llvm::PointerType::getInt8PtrTy(c));
 
-	state->buildnativecall_WriteFile(handle, char_ptr, write_num, written_num_ptr, null);
+	state->buildnativecall_WriteFile(handle, native_char_ptr, native_str_len, written_num_ptr, null);
 }
