@@ -14,5 +14,6 @@ ance::Type* ance::ExpressionBackedConstant::getType()
 
 llvm::Constant* ance::ExpressionBackedConstant::buildContent(llvm::Module* m)
 {
-	return expression_->buildConstant(m->getContext());
+	expression_->buildConstant(m->getContext());
+	return expression_->getContentConstant();
 }

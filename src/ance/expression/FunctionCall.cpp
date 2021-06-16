@@ -38,7 +38,7 @@ ance::Value* FunctionCall::getValue()
 	return return_value_;
 }
 
-llvm::Value* FunctionCall::build(
+llvm::Value* FunctionCall::buildNativeValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,

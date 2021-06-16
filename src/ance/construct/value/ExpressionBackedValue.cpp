@@ -18,12 +18,10 @@ void ance::ExpressionBackedValue::build(
 	llvm::DIBuilder* di
 )
 {
-	assert(!value_);
-	value_ = expression_->build(c, m, state, ir, di);
+	expression_->build(c, m, state, ir, di);
 }
 
 llvm::Value* ance::ExpressionBackedValue::getNativeValue()
 {
-	assert(value_);
-	return value_;
+	return expression_->getNativeValue();
 }

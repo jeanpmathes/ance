@@ -14,17 +14,9 @@ class DefaultValueExpression : public BuildableConstantExpression
 
 		ance::Value* getValue() override;
 
-		llvm::Value* build(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileState* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
-
 		ance::Constant* getConstantValue() override;
 
-		llvm::Constant* buildConstant(llvm::LLVMContext& c) override;
+		llvm::Constant* buildContentConstant(llvm::LLVMContext& c) override;
 
 		~DefaultValueExpression() override;
 

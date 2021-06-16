@@ -18,7 +18,7 @@ ance::Value* SizeofType::getValue()
 	return return_value_;
 }
 
-llvm::Value* SizeofType::build(
+llvm::Value* SizeofType::buildNativeValue(
 	llvm::LLVMContext&,
 	llvm::Module* m,
 	CompileState*,

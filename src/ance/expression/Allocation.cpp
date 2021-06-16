@@ -29,7 +29,7 @@ ance::Value* Allocation::getValue()
 	return value_;
 }
 
-llvm::Value* Allocation::build(
+llvm::Value* Allocation::buildNativeValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,

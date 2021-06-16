@@ -6,13 +6,27 @@
 class BuildableExpression : public virtual Expression
 {
 	public:
-		virtual llvm::Value* build(
+		void build(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		);
+
+		llvm::Value* getNativeValue();
+
+	protected:
+		virtual llvm::Value* buildNativeValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;
+
+	private:
+		llvm::Value* native_value_{nullptr};
 };
 
 #endif

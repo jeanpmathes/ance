@@ -25,7 +25,6 @@ class ExpressionBackedValue : public Value
 
 	private:
 		BuildableExpression* expression_;
-		llvm::Value* value_{nullptr};
 };
 }
 #endif

@@ -19,23 +19,12 @@ ance::Value* DefaultValueExpression::getValue()
 	return constant_;
 }
 
-llvm::Value* DefaultValueExpression::build(
-	llvm::LLVMContext& c,
-	llvm::Module*,
-	CompileState*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
-)
-{
-	return buildConstant(c);
-}
-
 ance::Constant* DefaultValueExpression::getConstantValue()
 {
 	return constant_;
 }
 
-llvm::Constant* DefaultValueExpression::buildConstant(llvm::LLVMContext& c)
+llvm::Constant* DefaultValueExpression::buildContentConstant(llvm::LLVMContext& c)
 {
 	return type_->getDefaultContent(c);
 }

@@ -15,7 +15,7 @@ class IndexerGet : public BuildableExpression
 
 		ance::Value* getValue() override;
 
-		llvm::Value* build(
+		llvm::Value* buildNativeValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,

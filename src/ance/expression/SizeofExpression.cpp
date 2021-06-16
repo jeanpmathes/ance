@@ -24,7 +24,7 @@ ance::Value* SizeofExpression::getValue()
 	return return_value_;
 }
 
-llvm::Value* SizeofExpression::build(
+llvm::Value* SizeofExpression::buildNativeValue(
 	llvm::LLVMContext&,
 	llvm::Module* m,
 	CompileState*,

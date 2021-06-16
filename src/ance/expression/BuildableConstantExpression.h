@@ -7,19 +7,21 @@
 class BuildableConstantExpression : public ConstantExpression, public BuildableExpression
 {
 	public:
-		virtual llvm::Constant* buildConstant(llvm::LLVMContext& c) = 0;
+		void buildConstant(llvm::LLVMContext& c);
 
 		ance::Type* getType() override = 0;
 
 		ance::Constant* getConstantValue() override = 0;
 
-		llvm::Value* build(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileState* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		llvm::Constant* getContentConstant();
+
+	protected:
+		virtual llvm::Constant* buildContentConstant(llvm::LLVMContext& c) = 0;
+
+		llvm::Value* buildNativeValue(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) final;
+
+	private:
+		llvm::Constant* content_constant_{nullptr};
 };
 
 #endif

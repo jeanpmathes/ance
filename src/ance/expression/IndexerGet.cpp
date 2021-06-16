@@ -24,7 +24,7 @@ ance::Value* IndexerGet::getValue()
 	return value_;
 }
 
-llvm::Value* IndexerGet::build(
+llvm::Value* IndexerGet::buildNativeValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
