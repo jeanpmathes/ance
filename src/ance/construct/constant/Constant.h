@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_H_
-#define ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_H_
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_CONSTANT_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_CONSTANT_H_
 
 #include "ConstantExpression.h"
 #include "ExpressionBackedValue.h"

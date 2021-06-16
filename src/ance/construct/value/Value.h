@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_ANCE_CONSTRUCT_VALUE_H_
-#define ANCE_SRC_ANCE_CONSTRUCT_VALUE_H_
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_VALUE_VALUE_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_VALUE_VALUE_H_
 
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
