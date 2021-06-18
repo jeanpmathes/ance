@@ -53,7 +53,7 @@ void ance::GlobalVariable::buildGlobal(llvm::Module* m)
 
 	llvm::GlobalValue::LinkageTypes linkage = Convert(access_);
 
-	constant_init_->build(m);
+	constant_init_->buildContentConstant(m);
 	llvm::Constant* native_initializer = constant_init_->getContentConstant();
 	native_variable_ = new llvm::GlobalVariable(
 		*m, type()->getContentType(m->getContext()),

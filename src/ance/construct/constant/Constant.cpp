@@ -3,7 +3,7 @@
 #include "Type.h"
 #include "Values.h"
 
-void ance::Constant::build(llvm::Module* m)
+void ance::Constant::buildContentConstant(llvm::Module* m)
 {
 	assert(!content_constant_ && "A constant may only be built once.");
 	content_constant_ = buildContent(m);
@@ -23,7 +23,7 @@ void ance::Constant::buildNativeValue(
 	llvm::DIBuilder* di
 )
 {
-	build(m);
+	buildContentConstant(m);
 	native_value_ = ance::Values::contentToNative(getType(), content_constant_, c, m, state, ir, di);
 }
 
@@ -35,7 +35,7 @@ void ance::Constant::buildContentValue(
 	llvm::DIBuilder*
 )
 {
-	build(m);
+	buildContentConstant(m);
 }
 
 llvm::Value* ance::Constant::getNativeValue()
