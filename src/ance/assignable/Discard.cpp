@@ -16,7 +16,7 @@ void Discard::assign(
 	llvm::DIBuilder* di
 )
 {
-	value->build(c, m, state, ir, di);
+	value->buildNativeValue(c, m, state, ir, di);
 }
 
 

@@ -1,25 +1,21 @@
 #include "Value.h"
 
-#include "Type.h"
+#include "Values.h"
 
-llvm::Value* ance::Value::getContentValue(
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileState*,
+void ance::Value::buildContentValue(
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
 	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder*
+	llvm::DIBuilder* di
 )
 {
-	switch (getType()->storage())
-	{
-		case InternalStorage::AS_TEMPORARY:
-		{
-			return getNativeValue();
-		}
+	buildNativeValue(c, m, state, ir, di);
+	content_value_ = ance::Values::nativeToContent(getType(), getNativeValue(), c, m, state, ir, di);
+}
 
-		case InternalStorage::AS_POINTER:
-		{
-			return ir.CreateLoad(getNativeValue());
-		}
-	}
+llvm::Value* ance::Value::getContentValue()
+{
+	assert(content_value_ && "Content value must be built before accessing it.");
+	return content_value_;
 }

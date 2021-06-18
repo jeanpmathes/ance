@@ -56,12 +56,12 @@ void ance::LocalVariable::setValue(
 {
 	assert(type() == value->getType() && "Assignment types have to match.");
 
-	value->build(c, m, state, ir, di);
-
 	switch (type()->storage())
 	{
 		case InternalStorage::AS_TEMPORARY:
 		{
+			value->buildNativeValue(c, m, state, ir, di);
+
 			native_value_ = value->getNativeValue();
 			native_value_->setName(identifier());
 			break;
@@ -69,7 +69,9 @@ void ance::LocalVariable::setValue(
 
 		case InternalStorage::AS_POINTER:
 		{
-			llvm::Value* stored = value->getContentValue(c, m, state, ir, di);
+			value->buildContentValue(c, m, state, ir, di);
+
+			llvm::Value* stored = value->getContentValue();
 			ir.CreateStore(stored, native_value_);
 			break;
 		}

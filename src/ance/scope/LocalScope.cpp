@@ -39,6 +39,7 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(
 )
 {
 	assert(local_variables.find(identifier) == local_variables.end());
+
 	auto* variable = new LocalVariable(this, identifier, type, value);
 	local_variables[identifier] = variable;
 

@@ -20,7 +20,7 @@ void ance::DelayedValue::setValue(ance::Value* value)
 	value_ = value;
 }
 
-void ance::DelayedValue::build(
+void ance::DelayedValue::buildNativeValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -29,7 +29,7 @@ void ance::DelayedValue::build(
 )
 {
 	expression_->build(c, m, state, ir, di);
-	value_->build(c, m, state, ir, di);
+	value_->buildNativeValue(c, m, state, ir, di);
 }
 
 llvm::Value* ance::DelayedValue::getNativeValue()

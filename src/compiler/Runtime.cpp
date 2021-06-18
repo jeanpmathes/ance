@@ -78,7 +78,7 @@ void Runtime::deleteDynamic(
 	ance::Type* type = value->getType();
 	assert(ance::PointerType::isPointerType(type) && "Type of value to delete has to be pointer type.");
 
-	value->build(c, m, state, ir, di);
+	value->buildNativeValue(c, m, state, ir, di);
 
 	llvm::Value* ptr = value->getNativeValue();
 	llvm::Value* opaque_ptr = ir.CreateBitCast(ptr, llvm::Type::getInt8PtrTy(c));
@@ -102,7 +102,7 @@ llvm::Value* Runtime::allocateAutomatic(
 
 	if (count)
 	{
-		count->build(c, m, state, ir, di);
+		count->buildNativeValue(c, m, state, ir, di);
 		count_value = count->getNativeValue();
 	}
 
@@ -133,7 +133,7 @@ llvm::Value* Runtime::allocateDynamic(
 				type->getContentSize(m).getFixedSize(),
 				false
 			);
-		count->build(c, m, state, ir, di);
+		count->buildNativeValue(c, m, state, ir, di);
 		llvm::Value* element_count = count->getNativeValue();
 
 		size = ir.CreateMul(element_size, element_count);

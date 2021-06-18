@@ -85,10 +85,10 @@ void ance::ArrayType::buildSetIndexer(
 	assert(index->getType() == ance::SizeType::get() && "Native array index has to be size type.");
 	assert(value->getType() == element_type_ && "Assigned value has to be of the element type of this array.");
 
-	value->build(c, m, state, ir, di);
+	value->buildContentValue(c, m, state, ir, di);
 
 	llvm::Value* element_ptr = buildGetElementPointer(indexed, index, c, m, state, ir, di);
-	llvm::Value* new_element_content = value->getContentValue(c, m, state, ir, di);
+	llvm::Value* new_element_content = value->getContentValue();
 
 	ir.CreateStore(new_element_content, element_ptr);
 }
@@ -103,11 +103,11 @@ llvm::Value* ance::ArrayType::buildGetElementPointer(
 	llvm::DIBuilder* di
 ) const
 {
-	indexed->build(c, m, state, ir, di);
-	index->build(c, m, state, ir, di);
+	indexed->buildNativeValue(c, m, state, ir, di);
+	index->buildContentValue(c, m, state, ir, di);
 
 	llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(c), 0);
-	llvm::Value* native_index = index->getContentValue(c, m, state, ir, di);
+	llvm::Value* native_index = index->getContentValue();
 	llvm::Value* indices[] = {zero, native_index};
 
 	// Check if index smaller size.

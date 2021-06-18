@@ -42,11 +42,11 @@ void PrintStatement::build(
 	ance::Value* str_ptr = str_->getValue();
 	ance::Value* str_len = len_->getValue();
 
-	str_ptr->build(c, m, state, ir, di);
-	str_len->build(c, m, state, ir, di);
+	str_ptr->buildContentValue(c, m, state, ir, di);
+	str_len->buildContentValue(c, m, state, ir, di);
 
-	llvm::Value* native_char_ptr = str_ptr->getContentValue(c, m, state, ir, di);
-	llvm::Value* native_str_len = str_len->getContentValue(c, m, state, ir, di);
+	llvm::Value* native_char_ptr = str_ptr->getContentValue();
+	llvm::Value* native_str_len = str_len->getContentValue();
 
 	llvm::AllocaInst* written_num_ptr = ir.CreateAlloca(llvm::Type::getInt32Ty(c));
 	llvm::ConstantPointerNull* null = llvm::ConstantPointerNull::get(llvm::PointerType::getInt8PtrTy(c));

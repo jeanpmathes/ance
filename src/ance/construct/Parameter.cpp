@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "Type.h"
+#include "Values.h"
 
 ance::Parameter::Parameter(ance::Type* type, std::string name)
 	: type_(type), name_(std::move(name))
@@ -21,47 +22,57 @@ std::string ance::Parameter::name()
 
 void ance::Parameter::wrap(llvm::Argument* argument)
 {
-	argument_ = argument;
-
 	switch (type_->storage())
 	{
 		case InternalStorage::AS_TEMPORARY:
 		{
-			argument_->setName(name_);
+			native_value_ = argument;
+			native_value_->setName(name_);
 			break;
 		}
 		case InternalStorage::AS_POINTER:
 		{
-			argument_->setName(name_ + ".content");
+			content_value_ = argument;
+			content_value_->setName(name_ + ".content");
 			break;
 		}
 	}
 }
 
-void ance::Parameter::build(
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileState*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
+void ance::Parameter::buildNativeValue(
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
 )
 {
+	if (!native_value_)
+	{
+		native_value_ = ance::Values::contentToNative(getType(), content_value_, c, m, state, ir, di);
+	}
+}
+
+void ance::Parameter::buildContentValue(
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+)
+{
+	if (!content_value_)
+	{
+		content_value_ = ance::Values::nativeToContent(getType(), native_value_, c, m, state, ir, di);
+	}
 }
 
 llvm::Value* ance::Parameter::getNativeValue()
 {
-	assert(type_->storage() == InternalStorage::AS_TEMPORARY && "Native argument has to be native value.");
-	return argument_;
+	return native_value_;
 }
 
-llvm::Value* ance::Parameter::getContentValue(
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileState*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
-)
+llvm::Value* ance::Parameter::getContentValue()
 {
-	assert(type_->storage() == InternalStorage::AS_POINTER && "Native argument has to be content value.");
-	return argument_;
+	return content_value_;
 }

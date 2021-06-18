@@ -10,7 +10,7 @@ ance::Type* ance::ExpressionBackedValue::getType()
 	return expression_->getType();
 }
 
-void ance::ExpressionBackedValue::build(
+void ance::ExpressionBackedValue::buildNativeValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,

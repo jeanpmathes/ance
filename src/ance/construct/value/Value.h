@@ -17,7 +17,7 @@ class Value
 	public:
 		virtual ance::Type* getType() = 0;
 
-		virtual void build(
+		virtual void buildNativeValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -25,9 +25,7 @@ class Value
 			llvm::DIBuilder* di
 		) = 0;
 
-		virtual llvm::Value* getNativeValue() = 0;
-
-		virtual llvm::Value* getContentValue(
+		virtual void buildContentValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -35,7 +33,14 @@ class Value
 			llvm::DIBuilder* di
 		);
 
+		virtual llvm::Value* getNativeValue() = 0;
+
+		virtual llvm::Value* getContentValue();
+
 		virtual ~Value() = default;
+
+	private:
+		llvm::Value* content_value_{nullptr};
 };
 }
 #endif

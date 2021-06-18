@@ -87,10 +87,10 @@ void ance::PointerType::buildSetIndexer(
 	assert(index->getType() == ance::SizeType::get() && "Pointer index has to be size type.");
 	assert(value->getType() == element_type_ && "Assigned value has to be of element type.");
 
-	value->build(c, m, state, ir, di);
+	value->buildContentValue(c, m, state, ir, di);
 
 	llvm::Value* element_ptr = buildGetElementPointer(indexed, index, c, m, state, ir, di);
-	llvm::Value* new_element_content = value->getContentValue(c, m, state, ir, di);
+	llvm::Value* new_element_content = value->getContentValue();
 
 	ir.CreateStore(new_element_content, element_ptr);
 }
@@ -105,10 +105,10 @@ llvm::Value* ance::PointerType::buildGetElementPointer(
 	llvm::DIBuilder* di
 )
 {
-	indexed->build(c, m, state, ir, di);
-	index->build(c, m, state, ir, di);
+	indexed->buildContentValue(c, m, state, ir, di);
+	index->buildNativeValue(c, m, state, ir, di);
 
-	llvm::Value* native_index = index->getContentValue(c, m, state, ir, di);
+	llvm::Value* native_index = index->getContentValue();
 	llvm::Value* indices[] = {native_index};
 
 	llvm::Value* ptr = indexed->getNativeValue();

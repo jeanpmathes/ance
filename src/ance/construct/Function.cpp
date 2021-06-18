@@ -135,8 +135,8 @@ void ance::Function::build(
 		{
 			if (return_value_)
 			{
-				return_value_->build(c, m, state, ir, di);
-				ir.CreateRet(return_value_->getContentValue(c, m, state, ir, di));
+				return_value_->buildContentValue(c, m, state, ir, di);
+				ir.CreateRet(return_value_->getContentValue());
 			}
 			else
 			{
@@ -199,8 +199,8 @@ llvm::Value* ance::Function::buildCall(
 
 	for (auto* arg : arguments)
 	{
-		arg->build(c, m, state, ir, di);
-		args.push_back(arg->getContentValue(c, m, state, ir, di));
+		arg->buildContentValue(c, m, state, ir, di);
+		args.push_back(arg->getContentValue());
 	}
 
 	llvm::Value* content_value = ir.CreateCall(native_type_, native_function_, args);

@@ -1,11 +1,11 @@
 #include "Constant.h"
 
 #include "Type.h"
+#include "Values.h"
 
 void ance::Constant::build(llvm::Module* m)
 {
 	assert(!content_constant_ && "A constant may only be built once.");
-
 	content_constant_ = buildContent(m);
 }
 
@@ -15,45 +15,37 @@ llvm::Constant* ance::Constant::getContentConstant()
 	return content_constant_;
 }
 
-void ance::Constant::build(
+void ance::Constant::buildNativeValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState*,
+	CompileState* state,
 	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder*
+	llvm::DIBuilder* di
 )
 {
 	build(m);
-
-	switch (getType()->storage())
-	{
-		case InternalStorage::AS_TEMPORARY:
-		{
-			native_value_ = content_constant_;
-			break;
-		}
-		case InternalStorage::AS_POINTER:
-		{
-			native_value_ = ir.CreateAlloca(getType()->getContentType(c), nullptr);
-			ir.CreateStore(content_constant_, native_value_);
-			break;
-		}
-	}
+	native_value_ = ance::Values::contentToNative(getType(), content_constant_, c, m, state, ir, di);
 }
 
-llvm::Value* ance::Constant::getNativeValue()
-{
-	assert(native_value_ && "Constant (as value) has to be built before accessing native value.");
-	return native_value_;
-}
-
-llvm::Value* ance::Constant::getContentValue(
+void ance::Constant::buildContentValue(
 	llvm::LLVMContext&,
-	llvm::Module*,
+	llvm::Module* m,
 	CompileState*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )
 {
-	return getContentConstant();
+	build(m);
+}
+
+llvm::Value* ance::Constant::getNativeValue()
+{
+	assert(native_value_ && "Value has to be built before accessing native value.");
+	return native_value_;
+}
+
+llvm::Value* ance::Constant::getContentValue()
+{
+	assert(content_constant_ && "Value has to be built before accessing content value.");
+	return content_constant_;
 }

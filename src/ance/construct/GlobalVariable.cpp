@@ -97,8 +97,8 @@ void ance::GlobalVariable::setValue(
 	assert(!isConstant());
 	assert(type() == value->getType() && "Assignment types have to match.");
 
-	value->build(c, m, state, ir, di);
+	value->buildContentValue(c, m, state, ir, di);
 
-	llvm::Value* content = value->getContentValue(c, m, state, ir, di);
+	llvm::Value* content = value->getContentValue();
 	ir.CreateStore(content, native_variable_);
 }

@@ -21,29 +21,26 @@ class Parameter : public ance::Value
 
 		void wrap(llvm::Argument* argument);
 
-		void build(
+		void buildNativeValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) override;
+
+		void buildContentValue(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) override;
 
 		llvm::Value* getNativeValue() override;
 
-		llvm::Value* getContentValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileState* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		llvm::Value* getContentValue() override;
 
 	private:
 		ance::Type* type_;
 		std::string name_;
 
-		llvm::Argument* argument_{nullptr};
+		llvm::Value* native_value_{nullptr};
+		llvm::Value* content_value_{nullptr};
 };
 }
 #endif
