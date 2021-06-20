@@ -28,7 +28,7 @@ void ance::DelayedValue::buildNativeValue(
 	llvm::DIBuilder* di
 )
 {
-	expression_->build(c, m, state, ir, di);
+	expression_->buildValue(c, m, state, ir, di);
 	value_->buildNativeValue(c, m, state, ir, di);
 }
 

@@ -2,7 +2,6 @@
 #define ANCE_SRC_ANCE_EXPRESSION_VARIABLEACCESS_H_
 
 #include "DelayableExpression.h"
-#include "DelayedValue.h"
 
 namespace ance
 {
@@ -20,9 +19,7 @@ class VariableAccess : public DelayableExpression
 
 		ance::Type* getType() override;
 
-		ance::Value* getValue() override;
-
-		void build(
+		void buildValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -34,7 +31,6 @@ class VariableAccess : public DelayableExpression
 
 	private:
 		std::string identifier_;
-		ance::DelayedValue* value_{new ance::DelayedValue(this)};
 		ance::Variable* variable_{nullptr};
 };
 
