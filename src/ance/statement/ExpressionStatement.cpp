@@ -1,11 +1,11 @@
 #include "ExpressionStatement.h"
 
-#include "BackingExpression.h"
+#include "BuildableExpression.h"
 #include "Function.h"
 #include "LocalScope.h"
 
 ExpressionStatement::ExpressionStatement(
-	BackingExpression* expression,
+	BuildableExpression* expression,
 	unsigned l,
 	unsigned c
 )

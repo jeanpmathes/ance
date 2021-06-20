@@ -2,9 +2,11 @@
 #define ANCE_SRC_ANCE_EXPRESSION_DELAYABLEEXPRESSION_H_
 
 #include "Expression.h"
-#include "DelayedValue.h"
 
-class DelayableExpression : public virtual Expression
+#include "DelayedValue.h"
+#include "BuildableExpression.h"
+
+class DelayableExpression : public virtual Expression, public BuildableExpression
 {
 	public:
 		virtual void buildValue(
@@ -14,6 +16,8 @@ class DelayableExpression : public virtual Expression
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;
+
+		void build(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) final;
 
 		ance::Value* getValue() override;
 

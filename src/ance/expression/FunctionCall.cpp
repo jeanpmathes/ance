@@ -33,12 +33,7 @@ ance::Type* FunctionCall::getType()
 	return scope_->getGlobalScope()->getFunction(identifier_)->getReturnType();
 }
 
-ance::Value* FunctionCall::getValue()
-{
-	return return_value_;
-}
-
-llvm::Value* FunctionCall::buildNativeValue(
+void FunctionCall::buildValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -55,7 +50,12 @@ llvm::Value* FunctionCall::buildNativeValue(
 		arg_values.push_back(arg->getValue());
 	}
 
-	return fn->buildCall(arg_values, c, m, state, ir, di);
+	ance::Value* return_value = fn->buildCall(arg_values, c, m, state, ir, di);
+
+	if (return_value != nullptr) // Not every function returns a value.
+	{
+		setValue(return_value);
+	}
 }
 
 FunctionCall::~FunctionCall() = default;

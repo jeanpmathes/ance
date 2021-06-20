@@ -8,6 +8,7 @@
 #include "AccessModifier.h"
 #include "LocalScope.h"
 #include "VoidType.h"
+#include "WrappedNativeValue.h"
 
 ance::Function::Function(
 	AccessModifier access,
@@ -178,7 +179,7 @@ void ance::Function::addReturn(ance::Value* value)
 	}
 }
 
-llvm::Value* ance::Function::buildCall(
+ance::Value* ance::Function::buildCall(
 	const std::vector<ance::Value*>& arguments,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
@@ -211,5 +212,5 @@ llvm::Value* ance::Function::buildCall(
 	}
 
 	llvm::Value* native_value = ance::Values::contentToNative(return_type_, content_value, c, m, state, ir, di);
-	return native_value;
+	return new ance::WrappedNativeValue(return_type_, native_value);
 }

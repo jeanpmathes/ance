@@ -12,6 +12,17 @@ void BackingExpression::buildBackingValue(
 	native_value_ = buildNativeValue(c, m, state, ir, di);
 }
 
+void BackingExpression::build(
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+)
+{
+	buildBackingValue(c, m, state, ir, di);
+}
+
 llvm::Value* BackingExpression::getNativeValue()
 {
 	assert(native_value_ && "Expressions must be built before accessing value.");

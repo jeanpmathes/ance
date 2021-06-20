@@ -63,7 +63,7 @@ class Function
 
 		void addReturn(ance::Value* value = nullptr);
 
-		llvm::Value* buildCall(
+		ance::Value* buildCall(
 			const std::vector<ance::Value*>& arguments,
 			llvm::LLVMContext& c,
 			llvm::Module* m,

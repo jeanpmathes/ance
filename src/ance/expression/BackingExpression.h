@@ -2,8 +2,9 @@
 #define ANCE_SRC_ANCE_EXPRESSION_BACKINGEXPRESSION_H_
 
 #include "Expression.h"
+#include "BuildableExpression.h"
 
-class BackingExpression : public virtual Expression
+class BackingExpression : public virtual Expression, public BuildableExpression
 {
 	public:
 		void buildBackingValue(
@@ -13,6 +14,8 @@ class BackingExpression : public virtual Expression
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);
+
+		void build(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) final;
 
 		llvm::Value* getNativeValue();
 

@@ -1,16 +1,14 @@
 #ifndef ANCE_SRC_ANCE_EXPRESSION_FUNCTIONCALL_H_
 #define ANCE_SRC_ANCE_EXPRESSION_FUNCTIONCALL_H_
 
-#include "BackingExpression.h"
-
-#include "ExpressionBackedValue.h"
+#include "DelayableExpression.h"
 
 namespace ance
 {
 class Scope;
 }
 
-class FunctionCall : public BackingExpression
+class FunctionCall : public DelayableExpression
 {
 	public:
 		FunctionCall(std::string identifier, std::vector<Expression*> arguments);
@@ -19,9 +17,7 @@ class FunctionCall : public BackingExpression
 
 		ance::Type* getType() override;
 
-		ance::Value* getValue() override;
-
-		llvm::Value* buildNativeValue(
+		void buildValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -34,7 +30,6 @@ class FunctionCall : public BackingExpression
 	private:
 		std::string identifier_;
 		std::vector<Expression*> arguments_;
-		ance::Value* return_value_{new ance::ExpressionBackedValue(this)};
 		ance::Scope* scope_{nullptr};
 };
 
