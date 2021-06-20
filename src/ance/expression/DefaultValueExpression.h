@@ -1,11 +1,11 @@
 #ifndef ANCE_SRC_ANCE_EXPRESSION_DEFAULTVALUEEXPRESSION_H_
 #define ANCE_SRC_ANCE_EXPRESSION_DEFAULTVALUEEXPRESSION_H_
 
-#include "BuildableConstantExpression.h"
+#include "BackingConstantExpression.h"
 
 #include "ExpressionBackedConstant.h"
 
-class DefaultValueExpression : public BuildableConstantExpression
+class DefaultValueExpression : public BackingConstantExpression
 {
 	public:
 		explicit DefaultValueExpression(ance::Type* type);

@@ -1,10 +1,10 @@
-#ifndef ANCE_SRC_ANCE_EXPRESSION_BUILDABLECONSTANTEXPRESSION_H_
-#define ANCE_SRC_ANCE_EXPRESSION_BUILDABLECONSTANTEXPRESSION_H_
+#ifndef ANCE_SRC_ANCE_EXPRESSION_BACKINGCONSTANTEXPRESSION_H_
+#define ANCE_SRC_ANCE_EXPRESSION_BACKINGCONSTANTEXPRESSION_H_
 
 #include "ConstantExpression.h"
-#include "BuildableExpression.h"
+#include "BackingExpression.h"
 
-class BuildableConstantExpression : public ConstantExpression, public BuildableExpression
+class BackingConstantExpression : public ConstantExpression, public BackingExpression
 {
 	public:
 		void buildConstant(llvm::LLVMContext& c);

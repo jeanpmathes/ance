@@ -1,13 +1,13 @@
 #ifndef ANCE_SRC_ANCE_EXPRESSION_SIZEOFTYPE_H_
 #define ANCE_SRC_ANCE_EXPRESSION_SIZEOFTYPE_H_
 
-#include "BuildableExpression.h"
+#include "BackingExpression.h"
 
 #include "ExpressionBackedValue.h"
 
 class Application;
 
-class SizeofType : public BuildableExpression
+class SizeofType : public BackingExpression
 {
 	public:
 		explicit SizeofType(ance::Type* type);

@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_ANCE_EXPRESSION_FUNCTIONCALL_H_
 #define ANCE_SRC_ANCE_EXPRESSION_FUNCTIONCALL_H_
 
-#include "BuildableExpression.h"
+#include "BackingExpression.h"
 
 #include "ExpressionBackedValue.h"
 
@@ -10,7 +10,7 @@ namespace ance
 class Scope;
 }
 
-class FunctionCall : public BuildableExpression
+class FunctionCall : public BackingExpression
 {
 	public:
 		FunctionCall(std::string identifier, std::vector<Expression*> arguments);

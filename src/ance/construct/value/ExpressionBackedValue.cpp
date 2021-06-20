@@ -1,6 +1,6 @@
 #include "ExpressionBackedValue.h"
 
-ance::ExpressionBackedValue::ExpressionBackedValue(BuildableExpression* expression)
+ance::ExpressionBackedValue::ExpressionBackedValue(BackingExpression* expression)
 	: expression_(expression)
 {
 }

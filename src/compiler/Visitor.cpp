@@ -39,7 +39,7 @@
 #include "Allocation.h"
 #include "RoughCast.h"
 #include "IndexerGet.h"
-#include "BuildableExpression.h"
+#include "BackingExpression.h"
 
 #include "StringConstant.h"
 #include "ByteConstant.h"
@@ -148,7 +148,7 @@ antlrcpp::Any Visitor::visitExpressionStatement(anceParser::ExpressionStatementC
 	unsigned int column = ctx->getStart()->getCharPositionInLine();
 
 	Expression* expression = visit(ctx->independentExpression());
-	auto* buildable_expression = dynamic_cast<BuildableExpression*>(expression);
+	auto* buildable_expression = dynamic_cast<BackingExpression*>(expression);
 
 	auto* statement =
 		new ExpressionStatement(buildable_expression, line, column);

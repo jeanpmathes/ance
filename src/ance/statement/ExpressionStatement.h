@@ -2,12 +2,12 @@
 
 #include "Statement.h"
 
-class BuildableExpression;
+class BackingExpression;
 
 class ExpressionStatement : public Statement
 {
 	public:
-		ExpressionStatement(BuildableExpression* expression, unsigned int l, unsigned int c);
+		ExpressionStatement(BackingExpression* expression, unsigned int l, unsigned int c);
 
 		void setContainingFunction(ance::Function* function) override;
 
@@ -20,5 +20,5 @@ class ExpressionStatement : public Statement
 		) override;
 
 	private:
-		BuildableExpression* expression_;
+		BackingExpression* expression_;
 };

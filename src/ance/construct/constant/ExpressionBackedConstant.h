@@ -4,7 +4,7 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "BuildableConstantExpression.h"
+#include "BackingConstantExpression.h"
 #include "Constant.h"
 
 class ConstantExpression;
@@ -14,14 +14,14 @@ namespace ance
 class ExpressionBackedConstant : public Constant
 {
 	public:
-		explicit ExpressionBackedConstant(BuildableConstantExpression* expression);
+		explicit ExpressionBackedConstant(BackingConstantExpression* expression);
 
 		ance::Type* getType() override;
 
 		llvm::Constant* buildContent(llvm::Module* m) override;
 
 	private:
-		BuildableConstantExpression* expression_;
+		BackingConstantExpression* expression_;
 };
 }
 #endif

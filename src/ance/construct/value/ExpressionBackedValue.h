@@ -2,14 +2,14 @@
 #define ANCE_SRC_ANCE_CONSTRUCT_VALUE_EXPRESSIONBACKEDVALUE_H_
 
 #include "Value.h"
-#include "BuildableExpression.h"
+#include "BackingExpression.h"
 
 namespace ance
 {
 class ExpressionBackedValue : public Value
 {
 	public:
-		explicit ExpressionBackedValue(BuildableExpression* expression);
+		explicit ExpressionBackedValue(BackingExpression* expression);
 
 		ance::Type* getType() override;
 
@@ -24,7 +24,7 @@ class ExpressionBackedValue : public Value
 		llvm::Value* getNativeValue() override;
 
 	private:
-		BuildableExpression* expression_;
+		BackingExpression* expression_;
 };
 }
 #endif

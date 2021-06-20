@@ -1,6 +1,6 @@
 #include "ExpressionBackedConstant.h"
 
-ance::ExpressionBackedConstant::ExpressionBackedConstant(BuildableConstantExpression* expression)
+ance::ExpressionBackedConstant::ExpressionBackedConstant(BackingConstantExpression* expression)
 	: expression_(
 	expression
 )

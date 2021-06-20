@@ -1,6 +1,6 @@
-#include "BuildableExpression.h"
+#include "BackingExpression.h"
 
-void BuildableExpression::build(
+void BackingExpression::build(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -12,7 +12,7 @@ void BuildableExpression::build(
 	native_value_ = buildNativeValue(c, m, state, ir, di);
 }
 
-llvm::Value* BuildableExpression::getNativeValue()
+llvm::Value* BackingExpression::getNativeValue()
 {
 	assert(native_value_ && "Expressions must be built before accessing value.");
 	return native_value_;

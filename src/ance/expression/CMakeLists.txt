@@ -3,8 +3,8 @@ include_directories(.)
 target_sources(ance PRIVATE DefaultValueExpression.cpp
                Expression.cpp
                ConstantExpression.cpp
-               BuildableExpression.cpp
-               BuildableConstantExpression.cpp
+               BackingExpression.cpp
+               BackingConstantExpression.cpp
                FunctionCall.cpp
                ConstantLiteral.cpp
                SizeofExpression.cpp

@@ -1,9 +1,9 @@
-#ifndef ANCE_SRC_ANCE_EXPRESSION_BUILDABLEEXPRESSION_H_
-#define ANCE_SRC_ANCE_EXPRESSION_BUILDABLEEXPRESSION_H_
+#ifndef ANCE_SRC_ANCE_EXPRESSION_BACKINGEXPRESSION_H_
+#define ANCE_SRC_ANCE_EXPRESSION_BACKINGEXPRESSION_H_
 
 #include "Expression.h"
 
-class BuildableExpression : public virtual Expression
+class BackingExpression : public virtual Expression
 {
 	public:
 		void build(
