@@ -23,7 +23,7 @@ class PointerType : public Type
 
 		ance::Type* getIndexerReturnType() override;
 
-		llvm::Value* buildGetIndexer(
+		ance::Value* buildGetIndexer(
 			ance::Value* indexed,
 			ance::Value* index,
 			llvm::LLVMContext& c,

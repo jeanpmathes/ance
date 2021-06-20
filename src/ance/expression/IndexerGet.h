@@ -1,10 +1,10 @@
 #ifndef ANCE_SRC_ANCE_EXPRESSION_INDEXERGET_H_
 #define ANCE_SRC_ANCE_EXPRESSION_INDEXERGET_H_
 
-#include "BuildableExpression.h"
+#include "DelayableExpression.h"
 #include "ExpressionBackedValue.h"
 
-class IndexerGet : public BuildableExpression
+class IndexerGet : public DelayableExpression
 {
 	public:
 		IndexerGet(Expression* indexed, Expression* index);
@@ -13,9 +13,7 @@ class IndexerGet : public BuildableExpression
 
 		ance::Type* getType() override;
 
-		ance::Value* getValue() override;
-
-		llvm::Value* buildNativeValue(
+		void buildValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,
@@ -28,7 +26,6 @@ class IndexerGet : public BuildableExpression
 	private:
 		Expression* indexed_;
 		Expression* index_;
-		ance::Value* value_{new ance::ExpressionBackedValue(this)};
 };
 
 #endif

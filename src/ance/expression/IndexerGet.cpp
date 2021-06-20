@@ -19,12 +19,7 @@ ance::Type* IndexerGet::getType()
 	return indexed_->getType()->getIndexerReturnType();
 }
 
-ance::Value* IndexerGet::getValue()
-{
-	return value_;
-}
-
-llvm::Value* IndexerGet::buildNativeValue(
+void IndexerGet::buildValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -35,7 +30,8 @@ llvm::Value* IndexerGet::buildNativeValue(
 	ance::Type* indexed_type = indexed_->getType();
 	assert(indexed_type->isIndexerDefined(Indexer::GET) && "Type does not support this indexer.");
 
-	return indexed_type->buildGetIndexer(indexed_->getValue(), index_->getValue(), c, m, state, ir, di);
+	ance::Value* return_value = indexed_type->buildGetIndexer(indexed_->getValue(), index_->getValue(), c, m, state, ir, di);
+	setValue(return_value);
 }
 
 IndexerGet::~IndexerGet() = default;

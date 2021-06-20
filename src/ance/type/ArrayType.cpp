@@ -5,6 +5,7 @@
 #include "Value.h"
 #include "Values.h"
 #include "SizeType.h"
+#include "WrappedNativeValue.h"
 
 ance::ArrayType::ArrayType(Type* element_type, const uint64_t size)
 	:
@@ -49,7 +50,7 @@ ance::Type* ance::ArrayType::getIndexerReturnType()
 	return element_type_;
 }
 
-llvm::Value* ance::ArrayType::buildGetIndexer(
+ance::Value* ance::ArrayType::buildGetIndexer(
 	ance::Value* indexed,
 	ance::Value* index,
 	llvm::LLVMContext& c,
@@ -67,7 +68,7 @@ llvm::Value* ance::ArrayType::buildGetIndexer(
 
 	llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, c, m, state, ir, di);
 
-	return native_value;
+	return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
 }
 
 void ance::ArrayType::buildSetIndexer(

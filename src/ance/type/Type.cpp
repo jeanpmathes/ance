@@ -40,7 +40,7 @@ ance::Type* ance::Type::getIndexerReturnType()
 	return nullptr;
 }
 
-llvm::Value* ance::Type::buildGetIndexer(
+ance::Value* ance::Type::buildGetIndexer(
 	ance::Value*,
 	ance::Value*,
 	llvm::LLVMContext&,
