@@ -6,7 +6,7 @@
 class BackingExpression : public virtual Expression
 {
 	public:
-		void build(
+		void buildBackingValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
 			CompileState* state,

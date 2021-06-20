@@ -18,7 +18,7 @@ void ance::ExpressionBackedValue::buildNativeValue(
 	llvm::DIBuilder* di
 )
 {
-	expression_->build(c, m, state, ir, di);
+	expression_->buildBackingValue(c, m, state, ir, di);
 }
 
 llvm::Value* ance::ExpressionBackedValue::getNativeValue()

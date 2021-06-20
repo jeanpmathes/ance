@@ -1,6 +1,6 @@
 #include "BackingExpression.h"
 
-void BackingExpression::build(
+void BackingExpression::buildBackingValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
