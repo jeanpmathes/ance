@@ -1,11 +1,11 @@
 #ifndef ANCE_SRC_ANCE_EXPRESSION_ALLOCATION_H_
 #define ANCE_SRC_ANCE_EXPRESSION_ALLOCATION_H_
 
-#include "BuildableExpression.h"
+#include "DelayableExpression.h"
 #include "Runtime.h"
 #include "Application.h"
 
-class Allocation : public BuildableExpression
+class Allocation : public DelayableExpression
 {
 	public:
 		Allocation(Runtime::Allocator allocation, ance::Type* type, Expression* count, Application& app);
@@ -14,15 +14,7 @@ class Allocation : public BuildableExpression
 
 		ance::Type* getType() override;
 
-		ance::Value* getValue() override;
-
-		llvm::Value* buildNativeValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileState* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		void buildValue(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) override;
 
 		~Allocation() override;
 
@@ -31,7 +23,6 @@ class Allocation : public BuildableExpression
 		ance::Type* allocated_type_;
 		Expression* count_;
 		ance::Type* return_type_;
-		ance::Value* value_;
 };
 
 #endif

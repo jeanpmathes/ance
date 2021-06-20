@@ -42,7 +42,7 @@ class Runtime
 				DYNAMIC
 		};
 
-		llvm::Value* allocate(
+		ance::Value* allocate(
 			Allocator allocation,
 			ance::Type* type,
 			ance::Value* count,

@@ -7,6 +7,7 @@
 #include "CompileState.h"
 #include "SizeType.h"
 #include "PointerType.h"
+#include "WrappedNativeValue.h"
 
 void Runtime::init(
 	llvm::LLVMContext& c,
@@ -38,7 +39,7 @@ void Runtime::init(
 	);
 }
 
-llvm::Value* Runtime::allocate(
+ance::Value* Runtime::allocate(
 	Runtime::Allocator allocation,
 	ance::Type* type,
 	ance::Value* count,
@@ -54,15 +55,23 @@ llvm::Value* Runtime::allocate(
 		assert(count->getType() == ance::SizeType::get() && "Count parameter of allocation should be of type size.");
 	}
 
+	llvm::Value* native_ptr;
+
 	switch (allocation)
 	{
 		case AUTOMATIC:
-			return allocateAutomatic(type, count, c, m, state, ir, di);
+			native_ptr = allocateAutomatic(type, count, c, m, state, ir, di);
+			break;
+
 		case DYNAMIC:
-			return allocateDynamic(type, count, c, m, state, ir, di);
+			native_ptr = allocateDynamic(type, count, c, m, state, ir, di);
+			break;
+
 		default:
 			throw std::invalid_argument("Unsupported allocation type.");
 	}
+
+	return new ance::WrappedNativeValue(ance::PointerType::get(*state->application_, type), native_ptr);
 }
 
 void Runtime::deleteDynamic(

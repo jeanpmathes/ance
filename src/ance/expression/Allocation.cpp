@@ -1,6 +1,5 @@
 #include "Allocation.h"
 
-#include "ExpressionBackedValue.h"
 #include "PointerType.h"
 #include "CompileState.h"
 
@@ -8,8 +7,7 @@ Allocation::Allocation(Runtime::Allocator allocation, ance::Type* type, Expressi
 	: allocation_(allocation),
 	  allocated_type_(type),
 	  count_(count),
-	  return_type_(ance::PointerType::get(app, type)),
-	  value_(new ance::ExpressionBackedValue(this))
+	  return_type_(ance::PointerType::get(app, type))
 {
 
 }
@@ -24,12 +22,7 @@ ance::Type* Allocation::getType()
 	return return_type_;
 }
 
-ance::Value* Allocation::getValue()
-{
-	return value_;
-}
-
-llvm::Value* Allocation::buildNativeValue(
+void Allocation::buildValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
 	CompileState* state,
@@ -38,7 +31,8 @@ llvm::Value* Allocation::buildNativeValue(
 )
 {
 	ance::Value* count = count_ ? count_->getValue() : nullptr;
-	return state->runtime_->allocate(allocation_, allocated_type_, count, c, m, state, ir, di);
+	ance::Value* ptr = state->runtime_->allocate(allocation_, allocated_type_, count, c, m, state, ir, di);
+	setValue(ptr);
 }
 
 Allocation::~Allocation() = default;
