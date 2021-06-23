@@ -16,6 +16,7 @@
 #include "Assigner.h"
 #include "AccessModifier.h"
 #include "Function.h"
+#include "DefinedFunction.h"
 #include "Parameter.h"
 
 #include "AssignmentStatement.h"
@@ -107,7 +108,7 @@ antlrcpp::Any Visitor::visitFunction(anceParser::FunctionContext* ctx)
 
 	std::vector<ance::Parameter*> parameters = visit(ctx->parameters());
 
-	auto* function = new ance::Function(
+	auto* function = new ance::DefinedFunction(
 		access, ctx->IDENTIFIER()->getText(), return_type, parameters,
 		application_.globalScope(), line, column
 	);

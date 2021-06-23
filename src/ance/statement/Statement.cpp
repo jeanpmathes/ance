@@ -5,13 +5,13 @@ Statement::Statement(unsigned int l, unsigned int c)
 {
 }
 
-void Statement::setContainingFunction(ance::Function* function)
+void Statement::setContainingFunction(ance::DefinedFunction* function)
 {
 	assert(!function_);
 	function_ = function;
 }
 
-ance::Function* Statement::getContainingFunction() const
+ance::DefinedFunction* Statement::getContainingFunction() const
 {
 	return function_;
 }

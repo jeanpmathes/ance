@@ -1,18 +1,15 @@
 #ifndef ANCE_SRC_ANCE_CONSTRUCT_FUNCTION_H_
 #define ANCE_SRC_ANCE_CONSTRUCT_FUNCTION_H_
 
-#include <list>
 #include <string>
 
-#include "Parameter.h"
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/DIBuilder.h"
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/DIBuilder.h>
 
-#include "Statement.h"
+#include "Parameter.h"
+
 #include "CompileState.h"
 #include "Expression.h"
-
-class Statement;
 
 class CompileState;
 
@@ -26,69 +23,37 @@ class LocalScope;
 
 class Function
 {
-	public:
-		Function(
-			AccessModifier access,
-			std::string fn_name,
-			ance::Type* return_type,
-			std::vector<ance::Parameter*> parameters,
-			ance::Scope* scope,
-			unsigned int l,
-			unsigned int c
-		);
+public:
+	[[nodiscard]] virtual std::string getName() const = 0;
 
-		[[nodiscard]] std::string getName() const;
+	[[nodiscard]] virtual ance::Type* getReturnType() const = 0;
 
-		[[nodiscard]] ance::Type* getReturnType() const;
+	[[nodiscard]] virtual ance::LocalScope* getScope() const = 0;
 
-		[[nodiscard]] ance::LocalScope* getScope() const;
+	virtual void buildName(
+		llvm::LLVMContext& c,
+		llvm::Module* m,
+		CompileState* state,
+		llvm::IRBuilder<>& ir,
+		llvm::DIBuilder* di
+	) = 0;
 
-		void pushStatement(Statement* statement);
+	virtual void build(
+		llvm::LLVMContext& c,
+		llvm::Module* m,
+		CompileState* state,
+		llvm::IRBuilder<>& ir,
+		llvm::DIBuilder* di
+	) = 0;
 
-		void buildName(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileState* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
-
-		void build(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileState* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
-
-		void addReturn(ance::Value* value = nullptr);
-
-		ance::Value* buildCall(
-			const std::vector<ance::Value*>& arguments,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileState* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) const;
-
-	private:
-		AccessModifier access_;
-		std::string name_;
-		std::vector<ance::Parameter*> parameters_;
-		unsigned int line_;
-		[[maybe_unused]] unsigned int column_;
-		ance::LocalScope* local_scope_;
-
-		std::vector<ance::LocalVariable*> arguments_;
-		std::list<Statement*> statements_;
-
-		ance::Type* return_type_{nullptr};
-		llvm::FunctionType* native_type_{nullptr};
-		llvm::Function* native_function_{nullptr};
-
-		ance::Value* return_value_{nullptr};
-		bool has_return_{false};
+	virtual ance::Value* buildCall(
+		const std::vector<ance::Value*>& arguments,
+		llvm::LLVMContext& c,
+		llvm::Module* m,
+		CompileState* state,
+		llvm::IRBuilder<>& ir,
+		llvm::DIBuilder* di
+	) const = 0;
 };
 }
 

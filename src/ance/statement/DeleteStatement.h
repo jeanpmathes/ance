@@ -9,7 +9,7 @@ class DeleteStatement : public Statement
 	public:
 		DeleteStatement(Expression* to_delete, bool delete_buffer, unsigned int l, unsigned int c);
 
-		void setContainingFunction(ance::Function* function) override;
+		void setContainingFunction(ance::DefinedFunction* function) override;
 
 		void build(
 			llvm::LLVMContext& c,

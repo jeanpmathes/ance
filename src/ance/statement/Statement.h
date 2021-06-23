@@ -10,7 +10,7 @@ class CompileState;
 
 namespace ance
 {
-class Function;
+class DefinedFunction;
 }
 
 class Statement
@@ -18,9 +18,9 @@ class Statement
 	public:
 		Statement(unsigned int l, unsigned int c);
 
-		virtual void setContainingFunction(ance::Function* function);
+		virtual void setContainingFunction(ance::DefinedFunction* function);
 
-		[[nodiscard]] ance::Function* getContainingFunction() const;
+		[[nodiscard]] ance::DefinedFunction* getContainingFunction() const;
 
 		[[nodiscard]] unsigned int getLine() const;
 
@@ -37,7 +37,7 @@ class Statement
 		virtual ~Statement() = default;
 
 	private:
-		ance::Function* function_{nullptr};
+		ance::DefinedFunction* function_{nullptr};
 		unsigned int line_;
 		unsigned int column_;
 };

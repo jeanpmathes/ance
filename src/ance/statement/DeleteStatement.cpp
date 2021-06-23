@@ -1,6 +1,6 @@
 #include "DeleteStatement.h"
 
-#include "Function.h"
+#include "DefinedFunction.h"
 #include "LocalScope.h"
 
 DeleteStatement::DeleteStatement(Expression* to_delete, bool delete_buffer, unsigned int l, unsigned int c)
@@ -9,7 +9,7 @@ DeleteStatement::DeleteStatement(Expression* to_delete, bool delete_buffer, unsi
 
 }
 
-void DeleteStatement::setContainingFunction(ance::Function* function)
+void DeleteStatement::setContainingFunction(ance::DefinedFunction* function)
 {
 	Statement::setContainingFunction(function);
 

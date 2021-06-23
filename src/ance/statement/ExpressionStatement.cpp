@@ -1,7 +1,7 @@
 #include "ExpressionStatement.h"
 
 #include "BuildableExpression.h"
-#include "Function.h"
+#include "DefinedFunction.h"
 #include "LocalScope.h"
 
 ExpressionStatement::ExpressionStatement(
@@ -13,7 +13,7 @@ ExpressionStatement::ExpressionStatement(
 {
 }
 
-void ExpressionStatement::setContainingFunction(ance::Function* function)
+void ExpressionStatement::setContainingFunction(ance::DefinedFunction* function)
 {
 	Statement::setContainingFunction(function);
 

@@ -8,6 +8,7 @@ add_subdirectory(value)
 
 target_sources(ance PRIVATE
                Function.cpp
+               DefinedFunction.cpp
                GlobalVariable.cpp
                LocalVariable.cpp
                Parameter.cpp

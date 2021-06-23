@@ -1,7 +1,7 @@
 #include "ReturnStatement.h"
 
 #include "Value.h"
-#include "Function.h"
+#include "DefinedFunction.h"
 #include "LocalScope.h"
 
 ReturnStatement::ReturnStatement(
@@ -13,7 +13,7 @@ ReturnStatement::ReturnStatement(
 {
 }
 
-void ReturnStatement::setContainingFunction(ance::Function* function)
+void ReturnStatement::setContainingFunction(ance::DefinedFunction* function)
 {
 	Statement::setContainingFunction(function);
 

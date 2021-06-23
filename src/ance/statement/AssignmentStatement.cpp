@@ -2,7 +2,7 @@
 
 #include "Assignable.h"
 #include "Expression.h"
-#include "Function.h"
+#include "DefinedFunction.h"
 #include "LocalScope.h"
 
 AssignmentStatement::AssignmentStatement(
@@ -16,7 +16,7 @@ AssignmentStatement::AssignmentStatement(
 {
 }
 
-void AssignmentStatement::setContainingFunction(ance::Function* function)
+void AssignmentStatement::setContainingFunction(ance::DefinedFunction* function)
 {
 	Statement::setContainingFunction(function);
 

@@ -4,7 +4,7 @@
 
 #include "Expression.h"
 #include "Value.h"
-#include "Function.h"
+#include "DefinedFunction.h"
 #include "LocalScope.h"
 #include "PointerType.h"
 #include "IntegerType.h"
@@ -18,7 +18,7 @@ PrintStatement::PrintStatement(
 {
 }
 
-void PrintStatement::setContainingFunction(ance::Function* function)
+void PrintStatement::setContainingFunction(ance::DefinedFunction* function)
 {
 	Statement::setContainingFunction(function);
 

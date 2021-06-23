@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "Expression.h"
-#include "Function.h"
+#include "DefinedFunction.h"
 #include "LocalScope.h"
 
 LocalVariableDefinition::LocalVariableDefinition(
@@ -17,7 +17,7 @@ LocalVariableDefinition::LocalVariableDefinition(
 {
 }
 
-void LocalVariableDefinition::setContainingFunction(ance::Function* function)
+void LocalVariableDefinition::setContainingFunction(ance::DefinedFunction* function)
 {
 	Statement::setContainingFunction(function);
 
