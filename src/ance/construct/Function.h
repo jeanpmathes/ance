@@ -24,11 +24,16 @@ class LocalScope;
 class Function
 {
 public:
-	[[nodiscard]] virtual std::string getName() const = 0;
+	Function(std::string fn_name,
+			 ance::Type* return_type,
+			 unsigned int l,
+			 unsigned int c);
 
-	[[nodiscard]] virtual ance::Type* getReturnType() const = 0;
+	[[nodiscard]] std::string getName() const;
 
-	[[nodiscard]] virtual ance::LocalScope* getScope() const = 0;
+	[[nodiscard]] ance::Type* getReturnType() const;
+
+	[[nodiscard]] unsigned int getLine() const;
 
 	virtual void buildName(
 		llvm::LLVMContext& c,
@@ -54,6 +59,12 @@ public:
 		llvm::IRBuilder<>& ir,
 		llvm::DIBuilder* di
 	) const = 0;
+
+	private:
+		std::string name_;
+		ance::Type* return_type_;
+		unsigned int line_;
+		[[maybe_unused]] unsigned int column_;
 };
 }
 

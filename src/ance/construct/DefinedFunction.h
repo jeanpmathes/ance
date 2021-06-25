@@ -32,11 +32,7 @@ class DefinedFunction : public ance::Function
 		unsigned int c
 		);
 
-		[[nodiscard]] std::string getName() const override;
-
-		[[nodiscard]] ance::Type* getReturnType() const override;
-
-		[[nodiscard]] ance::LocalScope* getScope() const override;
+		[[nodiscard]] ance::LocalScope* getScope() const;
 
 		void pushStatement(Statement* statement);
 
@@ -69,16 +65,13 @@ class DefinedFunction : public ance::Function
 
 	private:
 		AccessModifier access_;
-		std::string name_;
+
 		std::vector<ance::Parameter*> parameters_;
-		unsigned int line_;
-		[[maybe_unused]] unsigned int column_;
 		ance::LocalScope* local_scope_;
 
 		std::vector<ance::LocalVariable*> arguments_;
 		std::list<Statement*> statements_;
 
-		ance::Type* return_type_{nullptr};
 		llvm::FunctionType* native_type_{nullptr};
 		llvm::Function* native_function_{nullptr};
 
