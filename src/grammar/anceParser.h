@@ -196,7 +196,6 @@ public:
   public:
     ExternFunctionDeclarationContext(FunctionContext *ctx);
 
-    antlr4::tree::TerminalNode *STRING();
     TypeContext *type();
     antlr4::tree::TerminalNode *IDENTIFIER();
     ParametersContext *parameters();

@@ -20,6 +20,8 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitFunctionDefinition(anceParser::FunctionDefinitionContext *ctx) override;
 
+		antlrcpp::Any visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext *ctx) override;
+
 		antlrcpp::Any visitParameters(anceParser::ParametersContext* ctx) override;
 
 		antlrcpp::Any visitParameter(anceParser::ParameterContext* ctx) override;

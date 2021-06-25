@@ -70,7 +70,7 @@ void ance::DefinedFunction::buildName(
 	}
 
 	llvm::SmallVector<llvm::Metadata*, 1> tys;
-	tys.push_back(state->ui_32_);
+	tys.push_back(state->ui_32_); // todo: use the correct types
 	llvm::DISubroutineType* debug_type = di->createSubroutineType(di->getOrCreateTypeArray(tys));
 	llvm::DISubprogram* debug = di->createFunction(
 		state->unit_,

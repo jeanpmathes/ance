@@ -17,6 +17,7 @@
 #include "AccessModifier.h"
 #include "Function.h"
 #include "DefinedFunction.h"
+#include "ExternFunction.h"
 #include "Parameter.h"
 
 #include "AssignmentStatement.h"
@@ -120,6 +121,22 @@ antlrcpp::Any Visitor::visitFunctionDefinition(anceParser::FunctionDefinitionCon
 		Statement* statement = visit(statement_context);
 		function->pushStatement(statement);
 	}
+
+	return this->visitChildren(ctx);
+}
+
+antlrcpp::Any Visitor::visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx)
+{
+	unsigned int line = ctx->getStart()->getLine();
+	unsigned int column = ctx->getStart()->getCharPositionInLine();
+
+	ance::Type* return_type = visit(ctx->type());
+
+	std::vector<ance::Parameter*> parameters = visit(ctx->parameters());
+
+	auto* function = new ance::ExternFunction(ctx->IDENTIFIER()->getText(), return_type, parameters, line, column);
+
+	application_.globalScope()->addFunction(function);
 
 	return this->visitChildren(ctx);
 }
