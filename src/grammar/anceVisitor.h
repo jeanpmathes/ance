@@ -29,7 +29,9 @@ public:
 
     virtual antlrcpp::Any visitCode(anceParser::CodeContext *context) = 0;
 
-    virtual antlrcpp::Any visitFunction(anceParser::FunctionContext *context) = 0;
+    virtual antlrcpp::Any visitFunctionDefinition(anceParser::FunctionDefinitionContext *context) = 0;
+
+    virtual antlrcpp::Any visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext *context) = 0;
 
     virtual antlrcpp::Any visitParameters(anceParser::ParametersContext *context) = 0;
 

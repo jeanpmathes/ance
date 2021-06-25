@@ -35,7 +35,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitFunction(anceParser::FunctionContext *ctx) override {
+  virtual antlrcpp::Any visitFunctionDefinition(anceParser::FunctionDefinitionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext *ctx) override {
     return visitChildren(ctx);
   }
 

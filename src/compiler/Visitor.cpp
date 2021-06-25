@@ -98,7 +98,7 @@ antlrcpp::Any Visitor::visitVariableDeclaration(anceParser::VariableDeclarationC
 	return this->visitChildren(ctx);
 }
 
-antlrcpp::Any Visitor::visitFunction(anceParser::FunctionContext* ctx)
+antlrcpp::Any Visitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)
 {
 	unsigned int line = ctx->getStart()->getLine();
 	unsigned int column = ctx->getStart()->getCharPositionInLine();

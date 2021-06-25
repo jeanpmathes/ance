@@ -22,7 +22,8 @@ code
 	;
 
 function
-	: accessModifier type IDENTIFIER '(' parameters ')' '{' ( statement )+ '}'
+	: accessModifier type IDENTIFIER '(' parameters ')' '{' ( statement )+ '}' # FunctionDefinition
+	| 'extern' '(' STRING ')' type IDENTIFIER '(' parameters ')' ';' # ExternFunctionDeclaration
 	;
 
 parameters
