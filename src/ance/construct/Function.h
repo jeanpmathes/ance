@@ -60,8 +60,15 @@ public:
 		llvm::DIBuilder* di
 	) const = 0;
 
-	protected:
+protected:
 		std::pair<llvm::FunctionType*, llvm::Function*> createNativeFunction(const std::vector<ance::Parameter*>& parameters, llvm::GlobalValue::LinkageTypes linkage, llvm::LLVMContext& c, llvm::Module* m);
+
+		llvm::CallInst* buildCall(const std::vector<ance::Value*>& arguments, llvm::FunctionType* native_type, llvm::Function* native_function,
+								  llvm::LLVMContext& c,
+								  llvm::Module* m,
+								  CompileState* state,
+								  llvm::IRBuilder<>& ir,
+								  llvm::DIBuilder* di) const;
 
 	private:
 		std::string name_;

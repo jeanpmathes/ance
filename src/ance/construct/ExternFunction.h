@@ -22,6 +22,9 @@ class ExternFunction : public ance::Function
 
 		ance::Value * buildCall(const std::vector<ance::Value *> &arguments, llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) const override;
 
+	protected:
+		using Function::buildCall;
+
 	private:
 		std::vector<ance::Parameter*> parameters_;
 

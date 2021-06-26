@@ -63,6 +63,9 @@ class DefinedFunction : public ance::Function
 			llvm::DIBuilder* di
 		) const override;
 
+	protected:
+		using Function::buildCall;
+
 	private:
 		AccessModifier access_;
 

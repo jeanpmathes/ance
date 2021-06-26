@@ -60,16 +60,7 @@ ance::Value* ance::ExternFunction::buildCall(
 		assert(std::get<0>(pair)->getType() == std::get<1>(pair)->getType());
 	}
 
-	std::vector<llvm::Value*> args;
-	args.reserve(arguments.size());
-
-	for (auto* arg : arguments)
-	{
-		arg->buildContentValue(c, m, state, ir, di);
-		args.push_back(arg->getContentValue());
-	}
-
-	llvm::Value* content_value = ir.CreateCall(native_type_, native_function_, args);
+	llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, c, m, state, ir, di);
 
 	if (getReturnType() == ance::VoidType::get())
 	{

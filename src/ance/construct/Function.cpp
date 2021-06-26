@@ -37,3 +37,27 @@ std::pair<llvm::FunctionType*, llvm::Function*> ance::Function::createNativeFunc
 
 	return {native_type, native_function};
 }
+
+llvm::CallInst* ance::Function::buildCall(
+	const std::vector<ance::Value*>& arguments,
+	llvm::FunctionType* native_type,
+	llvm::Function* native_function,
+	llvm::LLVMContext& c,
+	llvm::Module* m,
+	CompileState* state,
+	llvm::IRBuilder<>& ir,
+	llvm::DIBuilder* di
+) const
+{
+	std::vector<llvm::Value*> args;
+	args.reserve(arguments.size());
+
+	for (auto* arg : arguments)
+	{
+		arg->buildContentValue(c, m, state, ir, di);
+		args.push_back(arg->getContentValue());
+	}
+
+	auto* content_value = ir.CreateCall(native_type, native_function, args);
+	return content_value;
+}
