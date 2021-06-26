@@ -25,15 +25,7 @@ void ance::ExternFunction::buildName(
 	llvm::DIBuilder*
 )
 {
-	std::vector<llvm::Type*> param_types;
-
-	for (auto* param : parameters_)
-	{
-		param_types.push_back(param->getType()->getContentType(c));
-	}
-
-	native_type_ = llvm::FunctionType::get(getReturnType()->getContentType(c), param_types, false);
-	native_function_ = llvm::Function::Create(native_type_, llvm::GlobalValue::LinkageTypes::ExternalLinkage, getName(), m);
+	std::tie(native_type_, native_function_) = createNativeFunction(parameters_, llvm::GlobalValue::LinkageTypes::ExternalLinkage, c, m);
 
 	for (auto pair : zip(parameters_, native_function_->args()))
 	{

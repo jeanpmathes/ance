@@ -60,6 +60,9 @@ public:
 		llvm::DIBuilder* di
 	) const = 0;
 
+	protected:
+		std::pair<llvm::FunctionType*, llvm::Function*> createNativeFunction(const std::vector<ance::Parameter*>& parameters, llvm::GlobalValue::LinkageTypes linkage, llvm::LLVMContext& c, llvm::Module* m);
+
 	private:
 		std::string name_;
 		ance::Type* return_type_;

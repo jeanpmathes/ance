@@ -21,3 +21,19 @@ unsigned int ance::Function::getLine() const
 {
 	return line_;
 }
+
+std::pair<llvm::FunctionType*, llvm::Function*> ance::Function::createNativeFunction(const std::vector<ance::Parameter*>& parameters, llvm::GlobalValue::LinkageTypes linkage, llvm::LLVMContext& c, llvm::Module* m)
+{
+	std::vector<llvm::Type*> param_types;
+	param_types.reserve(parameters.size());
+
+	for (auto* param : parameters)
+	{
+		param_types.push_back(param->getType()->getContentType(c));
+	}
+
+	llvm::FunctionType* native_type = llvm::FunctionType::get(getReturnType()->getContentType(c), param_types, false);
+	llvm::Function* native_function = llvm::Function::Create(native_type, linkage, getName(), m);
+
+	return {native_type, native_function};
+}
