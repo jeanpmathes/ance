@@ -24,10 +24,10 @@ class LocalScope;
 class Function
 {
 public:
-	Function(std::string fn_name,
+	Function(std::string function_name,
 			 ance::Type* return_type,
-			 unsigned int l,
-			 unsigned int c);
+			 unsigned int line,
+			 unsigned int column);
 
 	[[nodiscard]] std::string getName() const;
 

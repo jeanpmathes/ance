@@ -9,11 +9,11 @@ class ExternFunction : public ance::Function
 {
 	public:
 		ExternFunction(
-			std::string fn_name,
+			std::string function_name,
 			ance::Type* return_type,
 			std::vector<ance::Parameter*> parameters,
-			unsigned int l,
-			unsigned int c
+			unsigned int line,
+			unsigned int column
 		);
 
 		void buildName(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) override;

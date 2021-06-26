@@ -2,7 +2,7 @@
 
 #include <utility>
 
-ance::Function::Function(std::string fn_name, ance::Type* return_type, unsigned int l, unsigned int c) : name_(std::move(fn_name)), return_type_(return_type), line_(l), column_(c)
+ance::Function::Function(std::string function_name, ance::Type* return_type, unsigned int line, unsigned int column) : name_(std::move(function_name)), return_type_(return_type), line_(line), column_(column)
 {
 
 }

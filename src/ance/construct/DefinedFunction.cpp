@@ -12,15 +12,15 @@
 
 ance::DefinedFunction::DefinedFunction(
 	AccessModifier access,
-	std::string fn_name,
+	std::string function_name,
 	ance::Type* return_type,
 	std::vector<ance::Parameter*> parameters,
 	ance::Scope* scope,
-	unsigned int l,
-	unsigned int c
+	unsigned int line,
+	unsigned int column
 )
 	:
-	ance::Function(std::move(fn_name), return_type, l, c),
+	ance::Function(std::move(function_name), return_type, line, column),
 	access_(access),
 	parameters_(std::move(parameters)),
 	local_scope_(new ance::LocalScope(scope))

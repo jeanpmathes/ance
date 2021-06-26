@@ -7,12 +7,12 @@
 #include "WrappedNativeValue.h"
 
 ance::ExternFunction::ExternFunction(
-	std::string fn_name,
+	std::string function_name,
 	ance::Type* return_type,
 	std::vector<ance::Parameter*> parameters,
-	unsigned int l,
-	unsigned int c
-) : ance::Function(std::move(fn_name), return_type, l, c), parameters_(std::move(parameters))
+	unsigned int line,
+	unsigned int column
+) : ance::Function(std::move(function_name), return_type, line, column), parameters_(std::move(parameters))
 {
 
 }
@@ -20,9 +20,9 @@ ance::ExternFunction::ExternFunction(
 void ance::ExternFunction::buildName(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileState*,
 	llvm::IRBuilder<>&,
-	llvm::DIBuilder* di
+	llvm::DIBuilder*
 )
 {
 	std::vector<llvm::Type*> param_types;

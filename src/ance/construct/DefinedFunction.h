@@ -24,12 +24,12 @@ class DefinedFunction : public ance::Function
 	public:
 		DefinedFunction(
 		AccessModifier access,
-		std::string fn_name,
+		std::string function_name,
 		ance::Type* return_type,
 		std::vector<ance::Parameter*> parameters,
 		ance::Scope* scope,
-		unsigned int l,
-		unsigned int c
+		unsigned int line,
+		unsigned int column
 		);
 
 		[[nodiscard]] ance::LocalScope* getScope() const;
