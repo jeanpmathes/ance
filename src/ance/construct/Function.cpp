@@ -2,7 +2,8 @@
 
 #include <utility>
 
-ance::Function::Function(std::string function_name, ance::Type* return_type, unsigned int line, unsigned int column) : name_(std::move(function_name)), return_type_(return_type), line_(line), column_(column)
+ance::Function::Function(std::string function_name, ance::Type* return_type, unsigned int line, unsigned int column)
+	: name_(std::move(function_name)), return_type_(return_type), line_(line), column_(column)
 {
 
 }
@@ -22,7 +23,13 @@ unsigned int ance::Function::getLine() const
 	return line_;
 }
 
-std::pair<llvm::FunctionType*, llvm::Function*> ance::Function::createNativeFunction(const std::vector<ance::Parameter*>& parameters, llvm::GlobalValue::LinkageTypes linkage, llvm::LLVMContext& c, llvm::Module* m)
+std::pair<llvm::FunctionType*,
+		  llvm::Function*> ance::Function::createNativeFunction(
+	const std::vector<ance::Parameter*>& parameters,
+	llvm::GlobalValue::LinkageTypes linkage,
+	llvm::LLVMContext& c,
+	llvm::Module* m
+)
 {
 	std::vector<llvm::Type*> param_types;
 	param_types.reserve(parameters.size());

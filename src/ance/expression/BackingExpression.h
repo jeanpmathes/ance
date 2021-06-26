@@ -15,7 +15,13 @@ class BackingExpression : public virtual Expression, public BuildableExpression
 			llvm::DIBuilder* di
 		);
 
-		void build(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) final;
+		void build(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) final;
 
 		llvm::Value* getNativeValue();
 

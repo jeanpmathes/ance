@@ -28,7 +28,13 @@ class Constant : public Value
 			llvm::DIBuilder* di
 		) final;
 
-		void buildContentValue(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) final;
+		void buildContentValue(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) final;
 
 		llvm::Value* getNativeValue() final;
 

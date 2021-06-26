@@ -12,7 +12,8 @@ ance::ExternFunction::ExternFunction(
 	std::vector<ance::Parameter*> parameters,
 	unsigned int line,
 	unsigned int column
-) : ance::Function(std::move(function_name), return_type, line, column), parameters_(std::move(parameters))
+)
+	: ance::Function(std::move(function_name), return_type, line, column), parameters_(std::move(parameters))
 {
 
 }
@@ -25,7 +26,8 @@ void ance::ExternFunction::buildName(
 	llvm::DIBuilder*
 )
 {
-	std::tie(native_type_, native_function_) = createNativeFunction(parameters_, llvm::GlobalValue::LinkageTypes::ExternalLinkage, c, m);
+	std::tie(native_type_, native_function_) =
+		createNativeFunction(parameters_, llvm::GlobalValue::LinkageTypes::ExternalLinkage, c, m);
 
 	for (auto pair : zip(parameters_, native_function_->args()))
 	{

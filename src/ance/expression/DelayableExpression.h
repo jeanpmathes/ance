@@ -17,7 +17,13 @@ class DelayableExpression : public virtual Expression, public BuildableExpressio
 			llvm::DIBuilder* di
 		) = 0;
 
-		void build(llvm::LLVMContext &c, llvm::Module *m, CompileState *state, llvm::IRBuilder<> &ir, llvm::DIBuilder *di) final;
+		void build(
+			llvm::LLVMContext& c,
+			llvm::Module* m,
+			CompileState* state,
+			llvm::IRBuilder<>& ir,
+			llvm::DIBuilder* di
+		) final;
 
 		ance::Value* getValue() override;
 

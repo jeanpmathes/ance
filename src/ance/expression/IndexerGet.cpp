@@ -30,7 +30,8 @@ void IndexerGet::buildValue(
 	ance::Type* indexed_type = indexed_->getType();
 	assert(indexed_type->isIndexerDefined(Indexer::GET) && "Type does not support this indexer.");
 
-	ance::Value* return_value = indexed_type->buildGetIndexer(indexed_->getValue(), index_->getValue(), c, m, state, ir, di);
+	ance::Value
+		* return_value = indexed_type->buildGetIndexer(indexed_->getValue(), index_->getValue(), c, m, state, ir, di);
 	setValue(return_value);
 }
 

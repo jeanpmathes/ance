@@ -10,7 +10,7 @@
 #include "ByteConstant.h"
 
 ance::StringConstant::StringConstant(std::string prefix, std::string string, Application& app)
-	: type_(resolveType(prefix, string, app)),  prefix_(prefix),
+	: type_(resolveType(prefix, string, app)), prefix_(prefix),
 	  string_(string)
 {
 }
@@ -25,7 +25,14 @@ llvm::Constant* ance::StringConstant::buildContent(llvm::Module* m)
 	if (prefix_ == "c")
 	{
 		llvm::Constant* content = llvm::ConstantDataArray::getString(m->getContext(), string_, true);
-		auto* str_arr_ptr = new llvm::GlobalVariable(*m, content->getType(), true, llvm::GlobalValue::PrivateLinkage, content, "data.str");
+		auto* str_arr_ptr = new llvm::GlobalVariable(
+			*m,
+			content->getType(),
+			true,
+			llvm::GlobalValue::PrivateLinkage,
+			content,
+			"data.str"
+		);
 
 		llvm::Constant* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(m->getContext()), 0);
 		llvm::Constant* indices[] = {zero, zero};
