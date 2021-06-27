@@ -22,7 +22,7 @@ code
 	;
 
 function
-	: accessModifier type IDENTIFIER '(' parameters ')' '{' ( statement )+ '}' # FunctionDefinition
+	: accessModifier type IDENTIFIER '(' parameters ')' '{' ( statement )* '}' # FunctionDefinition
 	| 'extern' type IDENTIFIER '(' parameters ')' ';' # ExternFunctionDeclaration
 	;
 
