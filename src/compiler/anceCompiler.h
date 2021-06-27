@@ -17,8 +17,6 @@ class anceCompiler
 		void compile(const std::filesystem::path& output_dir);
 
 	private:
-		void setupGlobals();
-
 		void buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
 
 		void buildStart(

@@ -27,57 +27,6 @@ class CompileState
 		llvm::DIFile* code_file_{nullptr};
 		llvm::DIBasicType* ui_32_{nullptr};
 
-		// native: AllocConsole
-
-	public:
-		llvm::Value* buildnativecall_AllocConsole() const;
-
-	private:
-		llvm::FunctionType* alloc_console_type_;
-		llvm::Function* alloc_console_;
-
-		// native: AttachConsole
-
-	public:
-		llvm::Value* buildnativecall_AttachConsole(int32_t pid) const;
-
-	private:
-		llvm::FunctionType* attach_console_type_;
-		llvm::Function* attach_console_;
-
-		// native: FreeConsole
-
-	public:
-		llvm::Value* buildnativecall_FreeConsole() const;
-
-	private:
-		llvm::FunctionType* free_console_type_;
-		llvm::Function* free_console_;
-
-		// native: GetStdHandle
-
-	public:
-		llvm::Value* buildnativecall_GetStdHandle(int32_t nStdHandle) const;
-
-	private:
-		llvm::FunctionType* get_std_handle_type_;
-		llvm::Function* get_std_handle_;
-
-		// native: WriteFile (Kernel32)
-
-	public:
-		llvm::Value* buildnativecall_WriteFile(
-			llvm::Value* hFile,
-			llvm::Value* lpBuffer,
-			llvm::Value* nNumberOfBytesToWrite,
-			llvm::Value* lpNumberOfBytesWritten,
-			llvm::Value* lpOverlapped
-		) const;
-
-	private:
-		llvm::FunctionType* write_file_type_;
-		llvm::Function* write_file_;
-
 		// native: ExitProcess (Kernel32)
 
 	public:

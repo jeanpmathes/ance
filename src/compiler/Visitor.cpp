@@ -23,7 +23,6 @@
 #include "AssignmentStatement.h"
 #include "ExpressionStatement.h"
 #include "LocalVariableDefinition.h"
-#include "PrintStatement.h"
 #include "DeleteStatement.h"
 
 #include "Assignable.h"
@@ -216,19 +215,6 @@ antlrcpp::Any Visitor::visitAssignment(anceParser::AssignmentContext* ctx)
 
 	auto* statement =
 		new AssignmentStatement(assignable, assigned, line, column);
-
-	return static_cast<Statement*>(statement);
-}
-
-antlrcpp::Any Visitor::visitPrintStatement(anceParser::PrintStatementContext* ctx)
-{
-	unsigned int line = ctx->getStart()->getLine();
-	unsigned int column = ctx->getStart()->getCharPositionInLine();
-
-	Expression* str = visit(ctx->str);
-	Expression* len = visit(ctx->len);
-
-	auto* statement = new PrintStatement(str, len, line, column);
 
 	return static_cast<Statement*>(statement);
 }

@@ -34,8 +34,6 @@ class Visitor : public anceBaseVisitor
 
 		antlrcpp::Any visitAssignment(anceParser::AssignmentContext* ctx) override;
 
-		antlrcpp::Any visitPrintStatement(anceParser::PrintStatementContext* ctx) override;
-
 		antlrcpp::Any visitDeleteStatement(anceParser::DeleteStatementContext* ctx) override;
 
 		antlrcpp::Any visitReturnStatement(anceParser::ReturnStatementContext* ctx) override;

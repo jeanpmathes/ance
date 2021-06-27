@@ -43,7 +43,6 @@ statement
 	: expressionStatement
 	| localVariableDefinition
 	| assignment
-	| printStatement
 	| deleteStatement
 	| returnStatement
 	;
@@ -65,10 +64,6 @@ assigner
     | '<-' # MoveAssignment
     | ':=' # FinalCopyAssignment
     ;
-
-printStatement
-	: 'print' str=expression ',' len=expression ';'
-	;
 
 deleteStatement
     : 'delete' ( BUFFER )? expression ';'
