@@ -110,12 +110,15 @@ void anceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& ex
 	llvm::Type* exit_params[] = {llvm::Type::getInt32Ty(context_)};
 	exit_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context_), exit_params, false);
 	exit = llvm::Function::Create(exit_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_exit", module_);
-	exit->getArg(0)->setName("exitcode");
+
+	llvm::Value* exitcode = exit->getArg(0);
+	exitcode->setName("exitcode");
 
 	llvm::BasicBlock* exit_block = llvm::BasicBlock::Create(context_, "entry", exit);
 	ir_.SetInsertPoint(exit_block);
 
-	state_->buildnativecall_ExitProcess(exit->getArg(0));
+	llvm::Function* user_exit = module_->getFunction("exit");
+	ir_.CreateCall(exit_type, user_exit, {exitcode});
 
 	ir_.CreateRetVoid();
 }

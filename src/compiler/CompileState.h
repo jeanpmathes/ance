@@ -26,15 +26,6 @@ class CompileState
 		llvm::DICompileUnit* unit_{nullptr};
 		llvm::DIFile* code_file_{nullptr};
 		llvm::DIBasicType* ui_32_{nullptr};
-
-		// native: ExitProcess (Kernel32)
-
-	public:
-		void buildnativecall_ExitProcess(llvm::Value* uExitCode) const;
-
-	private:
-		llvm::FunctionType* exit_process_type_;
-		llvm::Function* exit_process_;
 };
 
 #endif

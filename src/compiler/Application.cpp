@@ -65,6 +65,13 @@ bool Application::validate()
 		valid = false;
 	}
 
+	if (!global_scope_->hasFunction("exit"))
+	{
+		std::cout << "No exit function was found!" << std::endl;
+
+		valid = false;
+	}
+
 	return valid;
 }
 
