@@ -10,7 +10,5 @@ ance_proj/
 
 # antlr
 antlr/
-/src/grammar/ance.interp
-/src/grammar/ance.tokens
-/src/grammar/anceLexer.interp
-/src/grammar/anceLexer.tokens
+*.interp
+*.tokens

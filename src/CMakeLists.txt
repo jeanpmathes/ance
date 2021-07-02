@@ -3,6 +3,7 @@ add_executable(ance main.cpp)
 add_subdirectory(ance)
 add_subdirectory(compiler)
 add_subdirectory(grammar)
+add_subdirectory(management)
 
 include_directories(ance)
 include_directories(ance/assignable)
@@ -17,6 +18,9 @@ include_directories(ance/construct/value)
 
 include_directories(compiler)
 include_directories(grammar)
+
+include_directories(management)
+include_directories(management/grammar)
 
 set(LLD_AVAILABLE_LIBS lldCOFF;lldCommon;lldCore;lldDriver;lldELF;lldMachO;lldMachO2;lldMinGW;lldReaderWriter;lldWasm;lldYAML)
 target_link_libraries(ance PRIVATE ${ANTLR4_LIB} ${LLVM_AVAILABLE_LIBS} ${LLD_AVAILABLE_LIBS})
