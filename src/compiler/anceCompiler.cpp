@@ -52,7 +52,7 @@ anceCompiler::anceCompiler(Application& app)
 	proj_file_ =
 		di_->createFile(application_.getProjectFile().filename().string(), application_.getProjectFile().string());
 	unit_ = di_->createCompileUnit(llvm::dwarf::DW_LANG_C, proj_file_, "ancec-0", false, "", 0);
-	code_file_ = di_->createFile(application_.getCodeFile().filename().string(), application_.getCodeFile().string());
+	code_file_ = di_->createFile(application_.getSourceFile().filename().string(), application_.getSourceFile().string());
 
 	state_ = new CompileState(&context_, module_, &ir_, di_);
 	state_->application_ = &application_;

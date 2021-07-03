@@ -8,6 +8,7 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/ManagedStatic.h>
 
+#include "File.h"
 #include "anceCompiler.h"
 #include "Visitor.h"
 
@@ -20,24 +21,22 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	std::filesystem::path proj_file(argv[1]);
+	std::filesystem::path project_file(argv[1]);
+	data::File project(project_file);
+	project.read();
 
-	std::ifstream t(proj_file);
-	std::stringstream buffer;
-	buffer << t.rdbuf();
+	Application application(project);
 
-	std::filesystem::path code_file = std::filesystem::path(proj_file);
-	code_file.replace_filename(buffer.str());
+	std::cout << "====== Build [ " << application.getName() << " ] ======" << std::endl;
 
 	std::fstream code;
-	code.open(code_file);
+	code.open(application.getSourceFile());
 
 	antlr4::ANTLRInputStream input(code);
 	anceLexer lexer(&input);
 	antlr4::CommonTokenStream tokens(&lexer);
 	anceParser parser(&tokens);
 
-	Application application(proj_file, code_file);
 	auto visitor = new Visitor(application);
 
 	antlr4::tree::ParseTree* tree = parser.file();
@@ -54,7 +53,9 @@ int main(int argc, char** argv)
 	if (application.validate())
 	{
 		anceCompiler compiler(application);
-		compiler.compile(std::filesystem::path(argv[2]));
+
+		std::filesystem::path out_file(argv[2]);
+		compiler.compile(out_file);
 
 		e = EXIT_SUCCESS;
 	}

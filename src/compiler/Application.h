@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "Scope.h"
+#include "File.h"
 
 class Statement;
 
@@ -19,7 +20,7 @@ class Function;
 class Application
 {
 	public:
-		Application(std::filesystem::path project_file, std::filesystem::path nccode_file);
+		explicit Application(data::File& project);
 
 		Application(const Application&) = delete;
 
@@ -32,7 +33,7 @@ class Application
 
 		[[nodiscard]] std::filesystem::path getProjectFile() const;
 
-		[[nodiscard]] std::filesystem::path getCodeFile() const;
+		[[nodiscard]] std::filesystem::path getSourceFile() const;
 
 		[[nodiscard]] unsigned getBitness() const;
 
@@ -41,8 +42,7 @@ class Application
 		ance::GlobalScope* globalScope();
 
 	private:
-		std::filesystem::path proj_file_;
-		std::filesystem::path code_file_;
+		data::File& project_;
 
 		ance::GlobalScope* global_scope_;
 

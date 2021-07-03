@@ -1,7 +1,8 @@
 #include "Application.h"
 
 #include <iostream>
-#include <utility>
+
+#include "Element.h"
 
 #include "GlobalScope.h"
 
@@ -14,8 +15,8 @@
 #include "SizeType.h"
 #include "UnsignedIntegerPointerType.h"
 
-Application::Application(std::filesystem::path project_file, std::filesystem::path nccode_file)
-	: proj_file_(std::move(project_file)), code_file_(std::move(nccode_file)), global_scope_(new ance::GlobalScope())
+Application::Application(data::File& project)
+	: project_(project), global_scope_(new ance::GlobalScope())
 {
 	// Register keyword types
 
@@ -36,17 +37,25 @@ void Application::setPointerSize(unsigned size)
 
 std::string Application::getName() const
 {
-	return proj_file_.stem().string();
+	return project_.root()["name"].asString();
 }
 
 std::filesystem::path Application::getProjectFile() const
 {
-	return std::filesystem::path(proj_file_);
+	return project_.path();
 }
 
-std::filesystem::path Application::getCodeFile() const
+std::filesystem::path Application::getSourceFile() const
 {
-	return std::filesystem::path(code_file_);
+	for (const auto* src : project_.root()["src"])
+	{
+		std::filesystem::path path_to_src(src->asString());
+		std::filesystem::path path_to_project = getProjectFile();
+
+		return path_to_project.replace_filename(path_to_src);
+	}
+
+	return std::filesystem::path();
 }
 
 unsigned Application::getBitness() const
