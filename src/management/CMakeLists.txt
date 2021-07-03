@@ -1,7 +1,11 @@
 include_directories(.)
 
 include_directories(grammar)
+include_directories(elements)
 
 add_subdirectory(grammar)
+add_subdirectory(elements)
 
-target_sources(ance PRIVATE)
+target_sources(ance PRIVATE File.cpp
+               DataVisitor.cpp
+               content_exception.cpp)
