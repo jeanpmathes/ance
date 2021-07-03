@@ -11,18 +11,18 @@ class Element
 	public:
 		virtual const Element& operator[] (const std::string& key) const;
 
-		[[nodiscard]] virtual std::vector<Element>::const_iterator begin() const;
+		[[nodiscard]] virtual std::vector<const data::Element*>::const_iterator begin() const;
 
-		[[nodiscard]] virtual std::vector<Element>::const_iterator end() const;
+		[[nodiscard]] virtual std::vector<const data::Element*>::const_iterator end() const;
 
 		[[nodiscard]] virtual const std::string& asString() const;
 
 		[[nodiscard]] virtual bool asBool() const;
 
-		virtual ~Element() = default;
+		virtual ~Element() = 0;
 
 	private:
-		inline static std::vector<Element> empty_vector_;
+		inline static std::vector<const data::Element*> empty_vector_;
 };
 }
 

@@ -1,6 +1,8 @@
 #include "StringElement.h"
 
-data::StringElement::StringElement(const std::string& string) : string_(string)
+#include <utility>
+
+data::StringElement::StringElement(std::string string) : string_(std::move(string))
 {
 
 }

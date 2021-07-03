@@ -10,11 +10,11 @@ namespace data
 class StringElement : public data::Element
 {
 	public:
-		explicit StringElement(const std::string& string);
+		explicit StringElement(std::string string);
 		[[nodiscard]] const std::string & asString() const override;
 
 	private:
-		const std::string& string_;
+		std::string string_;
 };
 }
 

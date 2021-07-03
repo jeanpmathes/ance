@@ -7,12 +7,12 @@ const data::Element& data::Element::operator[](const std::string& key) const
 	throw data::content_exception("No element with key: " + key);
 }
 
-std::vector<data::Element>::const_iterator data::Element::begin() const
+std::vector<const data::Element*>::const_iterator data::Element::begin() const
 {
 	return empty_vector_.cend();
 }
 
-std::vector<data::Element>::const_iterator data::Element::end() const
+std::vector<const data::Element*>::const_iterator data::Element::end() const
 {
 	return empty_vector_.cend();
 }
@@ -26,4 +26,6 @@ bool data::Element::asBool() const
 {
 	throw data::content_exception("Element is not of bool type.");
 }
+
+data::Element::~Element() { }
 

@@ -13,6 +13,11 @@ data::File::File(const std::filesystem::path& path) : path_(path)
 
 }
 
+const std::filesystem::path & data::File::path()
+{
+	return path_;
+}
+
 void data::File::read()
 {
 	std::fstream code;

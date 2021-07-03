@@ -11,6 +11,7 @@ class File
 {
 	public:
 		explicit File(const std::filesystem::path& path);
+		const std::filesystem::path& path();
 		void read();
 		const data::Element& root();
 

@@ -1,19 +1,19 @@
 #include "ListElement.h"
 
-std::vector<data::Element>::const_iterator data::ListElement::begin() const
+std::vector<const data::Element*>::const_iterator data::ListElement::begin() const
 {
-	return list_.cbegin();
+	return const_list_.begin();
 }
 
-std::vector<data::Element>::const_iterator data::ListElement::end() const
+std::vector<const data::Element*>::const_iterator data::ListElement::end() const
 {
-	return list_.cend();
+	return const_list_.end();
 }
 
 void data::ListElement::put(std::unique_ptr<data::Element> element)
 {
-	data::Element& e = *element.release();
-	list_.push_back(std::move(e));
+	const_list_.push_back(element.get());
+	list_.push_back(std::move(element));
 }
 
 
