@@ -11,12 +11,12 @@ namespace data
 class ListElement : public data::Element
 {
 	public:
-		[[nodiscard]] std::vector<const data::Element*>::const_iterator begin() const override;
-		[[nodiscard]] std::vector<const data::Element*>::const_iterator end() const override;
+		[[nodiscard]] std::vector<std::reference_wrapper<const data::Element>>::const_iterator begin() const override;
+		[[nodiscard]] std::vector<std::reference_wrapper<const data::Element>>::const_iterator end() const override;
 		void put(std::unique_ptr<data::Element> element);
 
 	private:
-		std::vector<const Element*> const_list_;
+		std::vector<std::reference_wrapper<const data::Element>> const_list_;
 		std::vector<std::unique_ptr<Element>> list_;
 };
 }

@@ -5,7 +5,7 @@ data::BooleanElement::BooleanElement(bool b) : b_(b)
 
 }
 
-bool data::BooleanElement::asBool() const
+std::optional<bool> data::BooleanElement::asBool() const
 {
 	return b_;
 }

@@ -11,7 +11,7 @@ class StringElement : public data::Element
 {
 	public:
 		explicit StringElement(std::string string);
-		[[nodiscard]] const std::string & asString() const override;
+		[[nodiscard]] std::optional<std::reference_wrapper<const std::string>> asString() const override;
 
 	private:
 		std::string string_;

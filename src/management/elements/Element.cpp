@@ -1,30 +1,28 @@
 #include "Element.h"
 
-#include "content_exception.h"
-
-const data::Element& data::Element::operator[](const std::string& key) const
+std::optional<std::reference_wrapper<const data::Element>> data::Element::operator[](const std::string&) const
 {
-	throw data::content_exception("No element with key: " + key);
+	return {};
 }
 
-std::vector<const data::Element*>::const_iterator data::Element::begin() const
+std::vector<std::reference_wrapper<const data::Element>>::const_iterator data::Element::begin() const
 {
 	return empty_vector_.cend();
 }
 
-std::vector<const data::Element*>::const_iterator data::Element::end() const
+std::vector<std::reference_wrapper<const data::Element>>::const_iterator data::Element::end() const
 {
 	return empty_vector_.cend();
 }
 
-const std::string& data::Element::asString() const
+std::optional<std::reference_wrapper<const std::string>> data::Element::asString() const
 {
-	throw data::content_exception("Element is not of string type.");
+	return {};
 }
 
-bool data::Element::asBool() const
+std::optional<bool> data::Element::asBool() const
 {
-	throw data::content_exception("Element is not of bool type.");
+	return {};
 }
 
 data::Element::~Element() { }

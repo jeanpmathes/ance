@@ -7,7 +7,7 @@ data::StringElement::StringElement(std::string string) : string_(std::move(strin
 
 }
 
-const std::string& data::StringElement::asString() const
+std::optional<std::reference_wrapper<const std::string>> data::StringElement::asString() const
 {
 	return string_;
 }
