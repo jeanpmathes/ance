@@ -60,7 +60,7 @@ AnceCompiler::AnceCompiler(Application& app)
 	state_->code_file_ = code_file_;
 }
 
-void AnceCompiler::compile(const std::filesystem::path& output_dir)
+void AnceCompiler::compile(const std::filesystem::path& bc)
 {
 	state_->runtime_ = new Runtime();
 	state_->runtime_->init(context_, module_, state_, ir_, di_);
@@ -85,24 +85,13 @@ void AnceCompiler::compile(const std::filesystem::path& output_dir)
 	llvm::verifyModule(*module_, &llvm::errs());
 	module_->print(llvm::outs(), nullptr);
 
-	std::filesystem::path bc_dir = output_dir / "bc";
-	std::filesystem::path bin_dir = output_dir / "bin";
-
-	std::filesystem::create_directory(bc_dir);
-	std::filesystem::create_directory(bin_dir);
-
-	std::filesystem::path bc = bc_dir / (application_.getName() + ".bc");
 	std::ofstream ofs(bc.string());
 	ofs.close();
-
-	std::filesystem::path exe = bin_dir / (application_.getName() + ".exe");
 
 	std::error_code ec;
 	llvm::raw_fd_ostream os(bc.string(), ec);
 	llvm::WriteBitcodeToFile(*module_, os);
 	os.close();
-
-	linkModule(bc, exe);
 }
 
 void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit)
@@ -144,37 +133,4 @@ void AnceCompiler::buildStart(
 	ir_.CreateCall(exit_type, exit, exit_args);
 
 	ir_.CreateRetVoid();
-}
-
-void AnceCompiler::linkModule(std::filesystem::path& bc, std::filesystem::path& exe)
-{
-	std::vector<const char*> args;
-	args.push_back("lld");
-
-	args.push_back("/verbose");
-
-	args.push_back("/debug:FULL");
-
-	args.push_back("/machine:x64");
-	args.push_back("/subsystem:windows");
-
-	args.push_back("/defaultlib:kernel32");
-
-	args.push_back(R"(/libpath:C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64)");
-
-	args.push_back("/entry:_start");
-
-	// ! string copy not wanted, but necessary as bc.string().c_str() did not work - string was corrupted after passing it to link.
-	// todo: a more elegant solution should be found!
-	std::string out = "/out:" + exe.string();
-	char output[out.size() + 1];
-	strcpy(output, out.c_str());
-
-	char input[bc.string().size() + 1];
-	strcpy(input, bc.string().c_str());
-
-	args.push_back(output);
-	args.push_back(input);
-
-	lld::coff::link(args, false, llvm::outs(), llvm::errs());
 }

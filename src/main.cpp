@@ -10,6 +10,7 @@
 
 #include "File.h"
 #include "AnceCompiler.h"
+#include "AnceLinker.h"
 #include "Visitor.h"
 
 int main(int argc, char** argv)
@@ -53,9 +54,21 @@ int main(int argc, char** argv)
 	if (application.validate())
 	{
 		AnceCompiler compiler(application);
+		AnceLinker linker(project.root()["link"]);
 
 		std::filesystem::path out_file(argv[2]);
-		compiler.compile(out_file);
+
+		std::filesystem::path bc_dir = out_file / "bc";
+		std::filesystem::path bin_dir = out_file / "bin";
+
+		std::filesystem::create_directory(bc_dir);
+		std::filesystem::create_directory(bin_dir);
+
+		std::filesystem::path bc = bc_dir / (application.getName() + ".bc");
+		std::filesystem::path exe = bin_dir / (application.getName() + ".exe");
+
+		compiler.compile(bc);
+		linker.link(bc, exe);
 
 		e = EXIT_SUCCESS;
 	}

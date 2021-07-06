@@ -14,7 +14,7 @@ class AnceCompiler
 	public:
 		explicit AnceCompiler(Application& app);
 
-		void compile(const std::filesystem::path& output_dir);
+		void compile(const std::filesystem::path& bc);
 
 	private:
 		void buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
@@ -25,8 +25,6 @@ class AnceCompiler
 			llvm::FunctionType* exit_type,
 			llvm::Function* exit
 		);
-
-		void linkModule(std::filesystem::path& bc, std::filesystem::path& exe);
 
 	private:
 		Application& application_;
