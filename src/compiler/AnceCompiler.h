@@ -9,10 +9,10 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
 
-class anceCompiler
+class AnceCompiler
 {
 	public:
-		explicit anceCompiler(Application& app);
+		explicit AnceCompiler(Application& app);
 
 		void compile(const std::filesystem::path& output_dir);
 

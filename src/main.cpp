@@ -9,7 +9,7 @@
 #include <llvm/Support/ManagedStatic.h>
 
 #include "File.h"
-#include "anceCompiler.h"
+#include "AnceCompiler.h"
 #include "Visitor.h"
 
 int main(int argc, char** argv)
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 
 	if (application.validate())
 	{
-		anceCompiler compiler(application);
+		AnceCompiler compiler(application);
 
 		std::filesystem::path out_file(argv[2]);
 		compiler.compile(out_file);

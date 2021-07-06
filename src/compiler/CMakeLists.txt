@@ -1,6 +1,6 @@
 include_directories(.)
 
-target_sources(ance PRIVATE anceCompiler.cpp
+target_sources(ance PRIVATE AnceCompiler.cpp
                Application.cpp
                CompileState.cpp
                Runtime.cpp

@@ -1,4 +1,4 @@
-#include "anceCompiler.h"
+#include "AnceCompiler.h"
 
 #include <filesystem>
 #include <iostream>
@@ -17,7 +17,7 @@
 #include "SizeType.h"
 #include "UnsignedIntegerPointerType.h"
 
-anceCompiler::anceCompiler(Application& app)
+AnceCompiler::AnceCompiler(Application& app)
 	: application_(app), ir_(context_)
 {
 	module_ = new llvm::Module(application_.getName(), context_);
@@ -60,7 +60,7 @@ anceCompiler::anceCompiler(Application& app)
 	state_->code_file_ = code_file_;
 }
 
-void anceCompiler::compile(const std::filesystem::path& output_dir)
+void AnceCompiler::compile(const std::filesystem::path& output_dir)
 {
 	state_->runtime_ = new Runtime();
 	state_->runtime_->init(context_, module_, state_, ir_, di_);
@@ -105,7 +105,7 @@ void anceCompiler::compile(const std::filesystem::path& output_dir)
 	linkModule(bc, exe);
 }
 
-void anceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit)
+void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit)
 {
 	llvm::Type* exit_params[] = {llvm::Type::getInt32Ty(context_)};
 	exit_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context_), exit_params, false);
@@ -123,7 +123,7 @@ void anceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& ex
 	ir_.CreateRetVoid();
 }
 
-void anceCompiler::buildStart(
+void AnceCompiler::buildStart(
 	llvm::FunctionType* main_type,
 	llvm::Function* main,
 	llvm::FunctionType* exit_type,
@@ -146,7 +146,7 @@ void anceCompiler::buildStart(
 	ir_.CreateRetVoid();
 }
 
-void anceCompiler::linkModule(std::filesystem::path& bc, std::filesystem::path& exe)
+void AnceCompiler::linkModule(std::filesystem::path& bc, std::filesystem::path& exe)
 {
 	std::vector<const char*> args;
 	args.push_back("lld");
