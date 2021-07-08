@@ -1,9 +1,39 @@
-#include <lld/Common/Driver.h>
 #include "AnceLinker.h"
+
+#include <lld/Common/Driver.h>
 
 AnceLinker::AnceLinker(std::optional<std::reference_wrapper<const data::Element>> link_config)
 {
+	if (link_config)
+	{
+		const auto& link_config_root = link_config->get();
 
+		auto libpath_list = link_config_root["libpath"];
+
+		if (libpath_list)
+		{
+			for (auto libpath : libpath_list->get())
+			{
+				auto libpath_str = libpath.get().asString();
+				if (!libpath_str) continue;
+
+				lib_paths_.push_back("/libpath:" + libpath_str->get());
+			}
+		}
+
+		auto lib_list = link_config_root["lib"];
+
+		if (lib_list)
+		{
+			for (auto lib : lib_list->get())
+			{
+				auto lib_str = lib.get().asString();
+				if (!lib_str) continue;
+
+				lib_paths_.push_back("/defaultlib:" + lib_str->get());
+			}
+		}
+	}
 }
 
 void AnceLinker::link(const std::filesystem::path& bc, const std::filesystem::path& exe)
@@ -18,23 +48,23 @@ void AnceLinker::link(const std::filesystem::path& bc, const std::filesystem::pa
 	args.push_back("/machine:x64");
 	args.push_back("/subsystem:windows");
 
-	args.push_back("/defaultlib:kernel32");
-
-	args.push_back(R"(/libpath:C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64)");
-
 	args.push_back("/entry:_start");
 
-	// string copy not wanted, but necessary as bc.string().c_str() did not work - string was corrupted after passing it to link.
-	// todo: a more elegant solution should be found!
 	std::string out = "/out:" + exe.string();
-	char output[out.size() + 1];
-	strcpy(output, out.c_str());
+	args.push_back(out.c_str());
 
-	char input[bc.string().size() + 1];
-	strcpy(input, bc.string().c_str());
+	std::string in = bc.string();
+	args.push_back(in.c_str());
 
-	args.push_back(output);
-	args.push_back(input);
+	for (const auto& libpath : lib_paths_)
+	{
+		args.push_back(libpath.c_str());
+	}
+
+	for (const auto& lib : libs_)
+	{
+		args.push_back(lib.c_str());
+	}
 
 	lld::coff::link(args, false, llvm::outs(), llvm::errs());
 }
