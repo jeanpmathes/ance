@@ -63,13 +63,13 @@ std::filesystem::path Application::getSourceFile() const
 
 	if (!src) return std::filesystem::path();
 
-	for (auto src_file : (*src).get())
+	for (auto src_file : src->get())
 	{
 		auto src_file_str = src_file.get().asString();
 
 		if (!src_file_str) continue;
 
-		std::filesystem::path path_to_src((*src_file_str).get());
+		std::filesystem::path path_to_src(src_file_str->get());
 		std::filesystem::path path_to_project = getProjectFile();
 
 		return path_to_project.replace_filename(path_to_src);
