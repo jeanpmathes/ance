@@ -31,7 +31,7 @@ Runtime* CompileContext::runtime()
 	return runtime_;
 }
 
-llvm::LLVMContext* CompileContext::context()
+llvm::LLVMContext* CompileContext::llvmContext()
 {
 	return context_;
 }

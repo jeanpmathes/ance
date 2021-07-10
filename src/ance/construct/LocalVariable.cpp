@@ -22,7 +22,7 @@ void ance::LocalVariable::build(CompileContext* context)
 
 	if (type()->storage() == InternalStorage::AS_POINTER)
 	{
-		native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->context()), nullptr);
+		native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr);
 		native_value_->setName(identifier());
 	}
 

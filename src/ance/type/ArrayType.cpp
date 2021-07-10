@@ -92,12 +92,12 @@ llvm::Value* ance::ArrayType::buildGetElementPointer(
 	indexed->buildNativeValue(context);
 	index->buildContentValue(context);
 
-	llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context->context()), 0);
+	llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context->llvmContext()), 0);
 	llvm::Value* native_index = index->getContentValue();
 	llvm::Value* indices[] = {zero, native_index};
 
 	// Check if index smaller size.
-	llvm::Value* native_size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(*context->context()), size_);
+	llvm::Value* native_size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(*context->llvmContext()), size_);
 	[[maybe_unused]] llvm::Value* in_bounds = context->ir()->CreateICmpULT(native_index, native_size);
 
 	// todo: use in_bounds bool to throw exception

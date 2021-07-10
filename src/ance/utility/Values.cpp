@@ -29,7 +29,7 @@ llvm::Value* ance::Values::contentToNative(ance::Type* type, llvm::Value* conten
 		}
 		case InternalStorage::AS_POINTER:
 		{
-			llvm::Value* native = context->ir()->CreateAlloca(type->getContentType(*context->context()));
+			llvm::Value* native = context->ir()->CreateAlloca(type->getContentType(*context->llvmContext()));
 			context->ir()->CreateStore(content, native);
 			return native;
 		}

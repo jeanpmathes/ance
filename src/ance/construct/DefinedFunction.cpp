@@ -49,7 +49,7 @@ void ance::DefinedFunction::pushStatement(Statement* statement)
 void ance::DefinedFunction::buildName(CompileContext* context)
 {
 	std::tie(native_type_, native_function_) =
-		createNativeFunction(parameters_, Convert(access_), *context->context(), context->module());
+		createNativeFunction(parameters_, Convert(access_), *context->llvmContext(), context->module());
 
 	for (auto pair : zip(parameters_, native_function_->args()))
 	{
@@ -82,7 +82,7 @@ void ance::DefinedFunction::buildName(CompileContext* context)
 
 void ance::DefinedFunction::build(CompileContext* context)
 {
-	llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->context(), "entry", native_function_);
+	llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "entry", native_function_);
 
 	context->ir()->SetInsertPoint(block);
 
@@ -95,7 +95,7 @@ void ance::DefinedFunction::build(CompileContext* context)
 	{
 		context->ir()->SetCurrentDebugLocation(
 			llvm::DILocation::get(
-				*context->context(),
+				*context->llvmContext(),
 				statement->getLine(),
 				statement->getColumn(),
 				native_function_->getSubprogram()));

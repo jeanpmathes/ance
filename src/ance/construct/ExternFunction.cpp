@@ -24,7 +24,7 @@ void ance::ExternFunction::buildName(CompileContext* context)
 		createNativeFunction(
 			parameters_,
 			llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-			*context->context(),
+			*context->llvmContext(),
 			context->module());
 
 	for (auto pair : zip(parameters_, native_function_->args()))

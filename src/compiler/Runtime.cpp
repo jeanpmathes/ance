@@ -73,7 +73,7 @@ void Runtime::deleteDynamic(ance::Value* value, bool delete_buffer, CompileConte
 	value->buildNativeValue(context);
 
 	llvm::Value* ptr = value->getNativeValue();
-	llvm::Value* opaque_ptr = context->ir()->CreateBitCast(ptr, llvm::Type::getInt8PtrTy(*context->context()));
+	llvm::Value* opaque_ptr = context->ir()->CreateBitCast(ptr, llvm::Type::getInt8PtrTy(*context->llvmContext()));
 
 	llvm::Value* args[] = {opaque_ptr};
 
@@ -90,13 +90,13 @@ llvm::Value* Runtime::allocateAutomatic(ance::Type* type, ance::Value* count, Co
 		count_value = count->getNativeValue();
 	}
 
-	return context->ir()->CreateAlloca(type->getContentType(*context->context()), count_value);
+	return context->ir()->CreateAlloca(type->getContentType(*context->llvmContext()), count_value);
 }
 
 llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, CompileContext* context)
 {
 	// Set the zero init flag.
-	llvm::Value* flags = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context->context()), 0x0040, false);
+	llvm::Value* flags = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context->llvmContext()), 0x0040, false);
 
 	// Calculate the size to allocate.
 	llvm::Value* size;
@@ -105,7 +105,7 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
 	{
 		llvm::Value* element_size =
 			llvm::ConstantInt::get(
-				ance::SizeType::get()->getNativeType(*context->context()),
+				ance::SizeType::get()->getNativeType(*context->llvmContext()),
 				type->getContentSize(context->module()).getFixedSize(),
 				false
 			);
@@ -117,7 +117,7 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
 	else
 	{
 		size = llvm::ConstantInt::get(
-			ance::SizeType::get()->getNativeType(*context->context()),
+			ance::SizeType::get()->getNativeType(*context->llvmContext()),
 			type->getContentSize(context->module()).getFixedSize(), false
 		);
 	}
@@ -128,5 +128,5 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
 	return context->ir()
 				  ->CreateBitCast(
 					  opaque_ptr,
-					  ance::PointerType::get(*context->application(), type)->getNativeType(*context->context()));
+					  ance::PointerType::get(*context->application(), type)->getNativeType(*context->llvmContext()));
 }

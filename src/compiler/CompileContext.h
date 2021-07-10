@@ -27,7 +27,7 @@ class CompileContext
 
 		Runtime* runtime();
 
-		llvm::LLVMContext* context();
+		llvm::LLVMContext* llvmContext();
 
 		llvm::Module* module();
 

@@ -1911,7 +1911,7 @@ anceParser::ExpressionContext* anceParser::expression(int precedence)
 	size_t parentState = getState();
 	anceParser::ExpressionContext* _localctx = _tracker.createInstance<ExpressionContext>(_ctx, parentState);
 	anceParser::ExpressionContext* previousContext = _localctx;
-	(void)previousContext; // Silence compiler, in case the context is not used by generated code.
+	(void)previousContext; // Silence compiler, in case the llvmContext is not used by generated code.
 	size_t startState = 40;
 	enterRecursionRule(_localctx, 40, anceParser::RuleExpression, precedence);
 
@@ -3626,7 +3626,7 @@ anceParser::TypeContext* anceParser::type(int precedence)
 	size_t parentState = getState();
 	anceParser::TypeContext* _localctx = _tracker.createInstance<TypeContext>(_ctx, parentState);
 	anceParser::TypeContext* previousContext = _localctx;
-	(void)previousContext; // Silence compiler, in case the context is not used by generated code.
+	(void)previousContext; // Silence compiler, in case the llvmContext is not used by generated code.
 	size_t startState = 80;
 	enterRecursionRule(_localctx, 80, anceParser::RuleType, precedence);
 
