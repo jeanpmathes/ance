@@ -15,7 +15,7 @@ void VariableAssignable::assign(
 	ance::Value* value,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )

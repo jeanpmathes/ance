@@ -21,7 +21,7 @@ ance::ExternFunction::ExternFunction(
 void ance::ExternFunction::buildName(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )
@@ -38,7 +38,7 @@ void ance::ExternFunction::buildName(
 void ance::ExternFunction::build(
 	llvm::LLVMContext&,
 	llvm::Module*,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )
@@ -50,7 +50,7 @@ ance::Value* ance::ExternFunction::buildCall(
 	const std::vector<ance::Value*>& arguments,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 ) const

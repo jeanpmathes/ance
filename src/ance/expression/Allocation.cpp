@@ -1,7 +1,7 @@
 #include "Allocation.h"
 
 #include "PointerType.h"
-#include "CompileState.h"
+#include "CompileContext.h"
 
 Allocation::Allocation(Runtime::Allocator allocation, ance::Type* type, Expression* count, Application& app)
 	: allocation_(allocation),
@@ -25,7 +25,7 @@ ance::Type* Allocation::getType()
 void Allocation::buildValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )

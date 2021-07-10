@@ -10,7 +10,7 @@ class BackingExpression : public virtual Expression, public BuildableExpression
 		void buildBackingValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);
@@ -18,7 +18,7 @@ class BackingExpression : public virtual Expression, public BuildableExpression
 		void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) final;
@@ -29,7 +29,7 @@ class BackingExpression : public virtual Expression, public BuildableExpression
 		virtual llvm::Value* buildNativeValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;

@@ -22,7 +22,7 @@ class LocalVariable : public ance::Variable
 		void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);
@@ -30,7 +30,7 @@ class LocalVariable : public ance::Variable
 		ance::Value* getValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) override;
@@ -39,7 +39,7 @@ class LocalVariable : public ance::Variable
 			ance::Value* value,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) override;

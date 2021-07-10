@@ -16,7 +16,7 @@ ance::Type* ance::RoughlyCastedValue::getType()
 void ance::RoughlyCastedValue::buildNativeValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )

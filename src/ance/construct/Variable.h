@@ -5,7 +5,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
 
-class CompileState;
+class CompileContext;
 
 namespace llvm
 {
@@ -43,7 +43,7 @@ class Variable
 		virtual ance::Value* getValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;
@@ -52,7 +52,7 @@ class Variable
 			ance::Value* value,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;

@@ -42,7 +42,7 @@ void ance::Parameter::wrap(llvm::Argument* argument)
 void ance::Parameter::buildNativeValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )
@@ -56,7 +56,7 @@ void ance::Parameter::buildNativeValue(
 void ance::Parameter::buildContentValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )

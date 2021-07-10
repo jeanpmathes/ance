@@ -37,7 +37,7 @@ class GlobalScope : public Scope
 		void buildVariables(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);
@@ -57,7 +57,7 @@ class GlobalScope : public Scope
 		void buildFunctionNames(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);
@@ -65,7 +65,7 @@ class GlobalScope : public Scope
 		void buildFunctions(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);

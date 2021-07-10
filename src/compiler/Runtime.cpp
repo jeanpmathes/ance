@@ -4,7 +4,7 @@
 
 #include "Type.h"
 #include "Value.h"
-#include "CompileState.h"
+#include "CompileContext.h"
 #include "SizeType.h"
 #include "PointerType.h"
 #include "WrappedNativeValue.h"
@@ -12,7 +12,7 @@
 void Runtime::init(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )
@@ -45,7 +45,7 @@ ance::Value* Runtime::allocate(
 	ance::Value* count,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )
@@ -79,7 +79,7 @@ void Runtime::deleteDynamic(
 	bool,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )
@@ -102,7 +102,7 @@ llvm::Value* Runtime::allocateAutomatic(
 	ance::Value* count,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )
@@ -123,7 +123,7 @@ llvm::Value* Runtime::allocateDynamic(
 	ance::Value* count,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )

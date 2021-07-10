@@ -23,7 +23,7 @@ void ExpressionStatement::setContainingFunction(ance::DefinedFunction* function)
 void ExpressionStatement::build(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )

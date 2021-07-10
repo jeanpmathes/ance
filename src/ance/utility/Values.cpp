@@ -2,14 +2,14 @@
 
 #include "Value.h"
 #include "Type.h"
-#include "CompileState.h"
+#include "CompileContext.h"
 
 llvm::Value* ance::Values::nativeToContent(
 	ance::Type* type,
 	llvm::Value* native,
 	llvm::LLVMContext&,
 	llvm::Module*,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder*
 )
@@ -32,7 +32,7 @@ llvm::Value* ance::Values::contentToNative(
 	llvm::Value* content,
 	llvm::LLVMContext& c,
 	llvm::Module*,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder*
 )

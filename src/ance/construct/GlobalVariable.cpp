@@ -63,7 +63,7 @@ void ance::GlobalVariable::buildGlobal(llvm::Module* m)
 ance::Value* ance::GlobalVariable::getValue(
 	llvm::LLVMContext&,
 	llvm::Module*,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder*
 )
@@ -89,7 +89,7 @@ void ance::GlobalVariable::setValue(
 	ance::Value* value,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )

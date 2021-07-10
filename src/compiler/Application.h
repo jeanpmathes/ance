@@ -8,7 +8,7 @@
 
 class Statement;
 
-class CompileState;
+class CompileContext;
 
 namespace ance
 {

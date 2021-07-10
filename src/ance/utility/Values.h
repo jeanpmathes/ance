@@ -5,7 +5,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/DIBuilder.h>
 
-class CompileState;
+class CompileContext;
 
 namespace ance
 {
@@ -20,7 +20,7 @@ class Values
 			llvm::Value* native,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);
@@ -30,7 +30,7 @@ class Values
 			llvm::Value* content,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);

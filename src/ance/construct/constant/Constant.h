@@ -23,7 +23,7 @@ class Constant : public Value
 		void buildNativeValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) final;
@@ -31,7 +31,7 @@ class Constant : public Value
 		void buildContentValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) final;

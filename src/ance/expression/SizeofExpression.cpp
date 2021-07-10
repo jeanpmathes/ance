@@ -1,6 +1,6 @@
 #include "SizeofExpression.h"
 
-#include "CompileState.h"
+#include "CompileContext.h"
 #include "ExpressionBackedValue.h"
 #include "SizeType.h"
 
@@ -27,7 +27,7 @@ ance::Value* SizeofExpression::getValue()
 llvm::Value* SizeofExpression::buildNativeValue(
 	llvm::LLVMContext&,
 	llvm::Module* m,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )

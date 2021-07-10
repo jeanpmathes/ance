@@ -55,7 +55,7 @@ ance::Value* ance::ArrayType::buildGetIndexer(
 	ance::Value* index,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )
@@ -77,7 +77,7 @@ void ance::ArrayType::buildSetIndexer(
 	ance::Value* value,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )
@@ -99,7 +99,7 @@ llvm::Value* ance::ArrayType::buildGetElementPointer(
 	ance::Value* index,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 ) const

@@ -12,10 +12,10 @@
 #include "Parameter.h"
 
 #include "Statement.h"
-#include "CompileState.h"
+#include "CompileContext.h"
 #include "Expression.h"
 
-class CompileState;
+class CompileContext;
 
 namespace ance
 {
@@ -39,7 +39,7 @@ class DefinedFunction : public ance::Function
 		void buildName(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) override;
@@ -47,7 +47,7 @@ class DefinedFunction : public ance::Function
 		void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) override;
@@ -58,7 +58,7 @@ class DefinedFunction : public ance::Function
 			const std::vector<ance::Value*>& arguments,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) const override;

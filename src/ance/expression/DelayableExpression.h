@@ -12,7 +12,7 @@ class DelayableExpression : public virtual Expression, public BuildableExpressio
 		virtual void buildValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;
@@ -20,7 +20,7 @@ class DelayableExpression : public virtual Expression, public BuildableExpressio
 		void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) final;

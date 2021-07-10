@@ -14,7 +14,7 @@ enum class AccessModifier;
 
 class Statement;
 
-class CompileState;
+class CompileContext;
 
 namespace ance
 {

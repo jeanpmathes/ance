@@ -10,7 +10,7 @@
 
 #include "Indexer.h"
 
-class CompileState;
+class CompileContext;
 
 #include "InternalStorage.h"
 
@@ -62,7 +62,7 @@ class Type
 			ance::Value* index,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);
@@ -73,7 +73,7 @@ class Type
 			ance::Value* value,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);

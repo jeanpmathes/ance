@@ -13,7 +13,7 @@ ance::Type* ance::ExpressionBackedValue::getType()
 void ance::ExpressionBackedValue::buildNativeValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )

@@ -126,7 +126,7 @@ ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
 void ance::GlobalScope::buildVariables(
 	llvm::LLVMContext&,
 	llvm::Module* m,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )
@@ -180,7 +180,7 @@ ance::Function* ance::GlobalScope::getFunction(const std::string& identifier)
 void ance::GlobalScope::buildFunctionNames(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )
@@ -194,7 +194,7 @@ void ance::GlobalScope::buildFunctionNames(
 void ance::GlobalScope::buildFunctions(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )

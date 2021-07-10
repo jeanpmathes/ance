@@ -4,9 +4,9 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
 
-#include "CompileState.h"
+#include "CompileContext.h"
 
-class CompileState;
+class CompileContext;
 
 namespace ance
 {
@@ -29,7 +29,7 @@ class Statement
 		virtual void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;

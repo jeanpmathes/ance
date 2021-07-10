@@ -8,7 +8,7 @@
 
 class Application;
 
-class CompileState;
+class CompileContext;
 
 namespace ance
 {
@@ -25,7 +25,7 @@ class UnsignedIntegerPointerType : public Type
 			llvm::Value* pointer,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);

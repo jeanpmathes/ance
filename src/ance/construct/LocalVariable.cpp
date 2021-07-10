@@ -18,7 +18,7 @@ ance::LocalVariable::LocalVariable(
 void ance::LocalVariable::build(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )
@@ -37,7 +37,7 @@ void ance::LocalVariable::build(
 ance::Value* ance::LocalVariable::getValue(
 	llvm::LLVMContext&,
 	llvm::Module*,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )
@@ -49,7 +49,7 @@ void ance::LocalVariable::setValue(
 	ance::Value* value,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )

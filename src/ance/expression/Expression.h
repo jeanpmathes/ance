@@ -4,7 +4,7 @@
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
 
-class CompileState;
+class CompileContext;
 
 namespace ance
 {

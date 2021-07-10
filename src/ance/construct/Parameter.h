@@ -24,7 +24,7 @@ class Parameter : public ance::Value
 		void buildNativeValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) override;
@@ -32,7 +32,7 @@ class Parameter : public ance::Value
 		void buildContentValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) override;

@@ -18,7 +18,7 @@ llvm::Constant* ance::Constant::getContentConstant()
 void ance::Constant::buildNativeValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )
@@ -30,7 +30,7 @@ void ance::Constant::buildNativeValue(
 void ance::Constant::buildContentValue(
 	llvm::LLVMContext&,
 	llvm::Module* m,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )

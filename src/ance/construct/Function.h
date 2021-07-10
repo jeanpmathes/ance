@@ -8,10 +8,10 @@
 
 #include "Parameter.h"
 
-#include "CompileState.h"
+#include "CompileContext.h"
 #include "Expression.h"
 
-class CompileState;
+class CompileContext;
 
 namespace ance
 {
@@ -40,7 +40,7 @@ class Function
 		virtual void buildName(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;
@@ -48,7 +48,7 @@ class Function
 		virtual void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;
@@ -57,7 +57,7 @@ class Function
 			const std::vector<ance::Value*>& arguments,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) const = 0;
@@ -77,7 +77,7 @@ class Function
 			llvm::Function* native_function,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) const;

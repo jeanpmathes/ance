@@ -45,7 +45,7 @@ ance::Value* ance::Type::buildGetIndexer(
 	ance::Value*,
 	llvm::LLVMContext&,
 	llvm::Module*,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )
@@ -59,7 +59,7 @@ void ance::Type::buildSetIndexer(
 	ance::Value*,
 	llvm::LLVMContext&,
 	llvm::Module*,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )

@@ -1,6 +1,6 @@
 #include "SizeofType.h"
 
-#include "CompileState.h"
+#include "CompileContext.h"
 #include "SizeType.h"
 
 SizeofType::SizeofType(ance::Type* type)
@@ -21,7 +21,7 @@ ance::Value* SizeofType::getValue()
 llvm::Value* SizeofType::buildNativeValue(
 	llvm::LLVMContext&,
 	llvm::Module* m,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder*
 )

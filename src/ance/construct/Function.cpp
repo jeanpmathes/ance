@@ -51,7 +51,7 @@ llvm::CallInst* ance::Function::buildCall(
 	llvm::Function* native_function,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 ) const

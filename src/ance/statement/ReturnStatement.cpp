@@ -20,7 +20,7 @@ void ReturnStatement::setContainingFunction(ance::DefinedFunction* function)
 	return_value_->setScope(function->getScope());
 }
 
-void ReturnStatement::build(llvm::LLVMContext&, llvm::Module*, CompileState*, llvm::IRBuilder<>&, llvm::DIBuilder*)
+void ReturnStatement::build(llvm::LLVMContext&, llvm::Module*, CompileContext*, llvm::IRBuilder<>&, llvm::DIBuilder*)
 {
 	getContainingFunction()->addReturn(return_value_ ? return_value_->getValue() : nullptr);
 }

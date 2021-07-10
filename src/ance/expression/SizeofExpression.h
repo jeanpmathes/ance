@@ -21,7 +21,7 @@ class SizeofExpression : public BackingExpression
 		llvm::Value* buildNativeValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) override;

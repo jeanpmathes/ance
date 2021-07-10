@@ -19,7 +19,7 @@ class ExternFunction : public ance::Function
 		void buildName(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) override;
@@ -27,7 +27,7 @@ class ExternFunction : public ance::Function
 		void build(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) override;
@@ -36,7 +36,7 @@ class ExternFunction : public ance::Function
 			const std::vector<ance::Value*>& arguments,
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) const override;

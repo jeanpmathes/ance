@@ -4,7 +4,7 @@
 #include <filesystem>
 
 #include "Application.h"
-#include "CompileState.h"
+#include "CompileContext.h"
 
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/DIBuilder.h"
@@ -39,7 +39,7 @@ class AnceCompiler
 		llvm::DICompileUnit* unit_;
 		llvm::DIFile* code_file_;
 
-		CompileState* state_;
+		CompileContext* state_;
 };
 
 #endif

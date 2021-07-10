@@ -54,7 +54,7 @@ AnceCompiler::AnceCompiler(Application& app)
 	unit_ = di_->createCompileUnit(llvm::dwarf::DW_LANG_C, proj_file_, "ancec-0", false, "", 0);
 	code_file_ = di_->createFile(application_.getSourceFile().filename().string(), application_.getSourceFile().string());
 
-	state_ = new CompileState(&context_, module_, &ir_, di_);
+	state_ = new CompileContext(&context_, module_, &ir_, di_);
 	state_->application_ = &application_;
 	state_->unit_ = unit_;
 	state_->code_file_ = code_file_;

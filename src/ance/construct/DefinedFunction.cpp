@@ -49,7 +49,7 @@ void ance::DefinedFunction::pushStatement(Statement* statement)
 void ance::DefinedFunction::buildName(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>&,
 	llvm::DIBuilder* di
 )
@@ -86,7 +86,7 @@ void ance::DefinedFunction::buildName(
 void ance::DefinedFunction::build(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )
@@ -162,7 +162,7 @@ ance::Value* ance::DefinedFunction::buildCall(
 	const std::vector<ance::Value*>& arguments,
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 ) const

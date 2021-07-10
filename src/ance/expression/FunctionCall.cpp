@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "CompileState.h"
+#include "CompileContext.h"
 #include "Function.h"
 #include "GlobalScope.h"
 #include "Value.h"
@@ -36,7 +36,7 @@ ance::Type* FunctionCall::getType()
 void FunctionCall::buildValue(
 	llvm::LLVMContext& c,
 	llvm::Module* m,
-	CompileState* state,
+	CompileContext* state,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder* di
 )

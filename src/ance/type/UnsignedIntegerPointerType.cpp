@@ -22,7 +22,7 @@ llvm::Value* ance::UnsignedIntegerPointerType::buildValue(
 	llvm::Value* pointer,
 	llvm::LLVMContext&,
 	llvm::Module*,
-	CompileState*,
+	CompileContext*,
 	llvm::IRBuilder<>& ir,
 	llvm::DIBuilder*
 )

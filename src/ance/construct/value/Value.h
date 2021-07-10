@@ -6,7 +6,7 @@
 
 class Expression;
 
-class CompileState;
+class CompileContext;
 
 namespace ance
 {
@@ -20,7 +20,7 @@ class Value
 		virtual void buildNativeValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		) = 0;
@@ -28,7 +28,7 @@ class Value
 		virtual void buildContentValue(
 			llvm::LLVMContext& c,
 			llvm::Module* m,
-			CompileState* state,
+			CompileContext* state,
 			llvm::IRBuilder<>& ir,
 			llvm::DIBuilder* di
 		);

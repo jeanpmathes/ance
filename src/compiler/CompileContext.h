@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_COMPILER_COMPILESTATE_H_
-#define ANCE_SRC_COMPILER_COMPILESTATE_H_
+#ifndef ANCE_SRC_COMPILER_COMPILECONTEXT_H_
+#define ANCE_SRC_COMPILER_COMPILECONTEXT_H_
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/DIBuilder.h>
@@ -9,10 +9,10 @@
 
 class Application;
 
-class CompileState
+class CompileContext
 {
 	public:
-		CompileState(llvm::LLVMContext* c, llvm::Module* m, llvm::IRBuilder<>* ir, llvm::DIBuilder* di);
+		CompileContext(llvm::LLVMContext* c, llvm::Module* m, llvm::IRBuilder<>* ir, llvm::DIBuilder* di);
 
 	private:
 		llvm::LLVMContext* context_;
