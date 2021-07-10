@@ -10,6 +10,7 @@ class AnceLinker
 {
 	public:
 		explicit AnceLinker(std::optional<std::reference_wrapper<const data::Element>> link_config);
+
 		void link(const std::filesystem::path& bc, const std::filesystem::path& exe);
 
 	private:

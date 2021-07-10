@@ -51,7 +51,8 @@ AnceCompiler::AnceCompiler(Application& app)
 	llvm::DIFile* proj_file =
 		di_->createFile(application_.getProjectFile().filename().string(), application_.getProjectFile().string());
 	llvm::DICompileUnit* unit = di_->createCompileUnit(llvm::dwarf::DW_LANG_C, proj_file, "ancec-0", false, "", 0);
-	llvm::DIFile* code_file = di_->createFile(application_.getSourceFile().filename().string(), application_.getSourceFile().string());
+	llvm::DIFile* code_file =
+		di_->createFile(application_.getSourceFile().filename().string(), application_.getSourceFile().string());
 
 	context_ = new CompileContext(&application_, new Runtime(), &llvm_context_, module_, &ir_, di_, unit, code_file);
 }

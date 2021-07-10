@@ -125,5 +125,8 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
 	llvm::Value* args[] = {flags, size};
 
 	llvm::Value* opaque_ptr = context->ir()->CreateCall(allocate_dynamic_type_, allocate_dynamic_, args);
-	return context->ir()->CreateBitCast(opaque_ptr, ance::PointerType::get(*context->application(), type)->getNativeType(*context->context()));
+	return context->ir()
+				  ->CreateBitCast(
+					  opaque_ptr,
+					  ance::PointerType::get(*context->application(), type)->getNativeType(*context->context()));
 }

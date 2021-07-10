@@ -10,7 +10,7 @@ namespace data
 class Element
 {
 	public:
-		virtual std::optional<std::reference_wrapper<const data::Element>> operator[] (const std::string& key) const;
+		virtual std::optional<std::reference_wrapper<const data::Element>> operator[](const std::string& key) const;
 
 		[[nodiscard]] virtual std::vector<std::reference_wrapper<const data::Element>>::const_iterator begin() const;
 

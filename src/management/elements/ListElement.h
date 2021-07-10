@@ -12,7 +12,9 @@ class ListElement : public data::Element
 {
 	public:
 		[[nodiscard]] std::vector<std::reference_wrapper<const data::Element>>::const_iterator begin() const override;
+
 		[[nodiscard]] std::vector<std::reference_wrapper<const data::Element>>::const_iterator end() const override;
+
 		void put(std::unique_ptr<data::Element> element);
 
 	private:

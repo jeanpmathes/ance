@@ -11,7 +11,8 @@ namespace data
 class DictionaryElement : public data::Element
 {
 	public:
-		std::optional<std::reference_wrapper<const data::Element>> operator[] (const std::string& key) const override;
+		std::optional<std::reference_wrapper<const data::Element>> operator[](const std::string& key) const override;
+
 		void put(const std::string& key, std::unique_ptr<data::Element> element);
 
 	private:

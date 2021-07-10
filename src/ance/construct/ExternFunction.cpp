@@ -21,7 +21,11 @@ ance::ExternFunction::ExternFunction(
 void ance::ExternFunction::buildName(CompileContext* context)
 {
 	std::tie(native_type_, native_function_) =
-		createNativeFunction(parameters_, llvm::GlobalValue::LinkageTypes::ExternalLinkage, *context->context(), context->module());
+		createNativeFunction(
+			parameters_,
+			llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+			*context->context(),
+			context->module());
 
 	for (auto pair : zip(parameters_, native_function_->args()))
 	{

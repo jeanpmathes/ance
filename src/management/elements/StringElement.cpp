@@ -2,7 +2,8 @@
 
 #include <utility>
 
-data::StringElement::StringElement(std::string string) : string_(std::move(string))
+data::StringElement::StringElement(std::string string)
+	: string_(std::move(string))
 {
 
 }

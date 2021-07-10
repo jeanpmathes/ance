@@ -14,7 +14,8 @@ antlrcpp::Any DataVisitor::visitDictionary(dataParser::DictionaryContext* ctx)
 	{
 		std::pair<std::string, data::Element*> p = visit(entry);
 
-		std::string key; data::Element* value;
+		std::string key;
+		data::Element* value;
 		std::tie(key, value) = p;
 
 		element->put(key, std::unique_ptr<data::Element>(value));

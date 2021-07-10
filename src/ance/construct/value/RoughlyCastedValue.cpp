@@ -16,7 +16,8 @@ ance::Type* ance::RoughlyCastedValue::getType()
 
 void ance::RoughlyCastedValue::buildNativeValue(CompileContext* context)
 {
-	assert(target_type_->getNativeType(*context->context()) == original_->getType()->getNativeType(*context->context()) && "Native type has to be equal.");
+	assert(target_type_->getNativeType(*context->context()) == original_->getType()->getNativeType(*context->context())
+			   && "Native type has to be equal.");
 	original_->buildNativeValue(context);
 }
 

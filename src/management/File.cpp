@@ -8,12 +8,13 @@
 
 #include "DataVisitor.h"
 
-data::File::File(const std::filesystem::path& path) : path_(path)
+data::File::File(const std::filesystem::path& path)
+	: path_(path)
 {
 
 }
 
-const std::filesystem::path & data::File::path()
+const std::filesystem::path& data::File::path()
 {
 	return path_;
 }

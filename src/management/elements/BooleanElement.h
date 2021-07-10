@@ -11,6 +11,7 @@ class BooleanElement : public data::Element
 {
 	public:
 		explicit BooleanElement(bool b);
+
 		[[nodiscard]] std::optional<bool> asBool() const override;
 
 	private:

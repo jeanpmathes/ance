@@ -48,7 +48,8 @@ void ance::DefinedFunction::pushStatement(Statement* statement)
 
 void ance::DefinedFunction::buildName(CompileContext* context)
 {
-	std::tie(native_type_, native_function_) = createNativeFunction(parameters_, Convert(access_), *context->context(), context->module());
+	std::tie(native_type_, native_function_) =
+		createNativeFunction(parameters_, Convert(access_), *context->context(), context->module());
 
 	for (auto pair : zip(parameters_, native_function_->args()))
 	{
@@ -56,7 +57,9 @@ void ance::DefinedFunction::buildName(CompileContext* context)
 	}
 
 	llvm::SmallVector<llvm::Metadata*, 1> tys;
-	tys.push_back(context->di()->createBasicType("ui32", 32, llvm::dwarf::DW_ATE_unsigned)); // todo: use the correct types
+	tys.push_back(
+		context->di()
+			   ->createBasicType("ui32", 32, llvm::dwarf::DW_ATE_unsigned)); // todo: use the correct types
 	llvm::DISubroutineType* debug_type = context->di()->createSubroutineType(context->di()->getOrCreateTypeArray(tys));
 	llvm::DISubprogram* debug = context->di()->createFunction(
 		context->unit(),
