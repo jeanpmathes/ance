@@ -25,13 +25,7 @@ void LocalVariableDefinition::setContainingFunction(ance::DefinedFunction* funct
 	assigned_->setScope(function->getScope());
 }
 
-void LocalVariableDefinition::build(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void LocalVariableDefinition::build(CompileContext* context)
 {
-	variable_->build(c, m, state, ir, di);
+	variable_->build(context);
 }

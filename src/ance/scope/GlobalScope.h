@@ -54,21 +54,9 @@ class GlobalScope : public Scope
 
 		ance::Function* getFunction(const std::string& identifier);
 
-		void buildFunctionNames(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
+		void buildFunctionNames(CompileContext* context);
 
-		void buildFunctions(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
+		void buildFunctions(CompileContext* context);
 
 	private:
 		std::map<std::string, ance::Type*> types_;

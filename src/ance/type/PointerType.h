@@ -23,36 +23,20 @@ class PointerType : public Type
 
 		ance::Type* getIndexerReturnType() override;
 
-		ance::Value* buildGetIndexer(
-			ance::Value* indexed,
-			ance::Value* index,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
 
 		void buildSetIndexer(
 			ance::Value* indexed,
 			ance::Value* index,
 			ance::Value* value,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
+			CompileContext* context
 		) override;
 
 	private:
 		static llvm::Value* buildGetElementPointer(
 			ance::Value* indexed,
 			ance::Value* index,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
+			CompileContext* context
 		);
 
 	public:

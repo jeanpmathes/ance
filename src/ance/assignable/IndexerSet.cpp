@@ -12,17 +12,10 @@ void IndexerSet::setScope(ance::Scope* scope)
 	index_->setScope(scope);
 }
 
-void IndexerSet::assign(
-	ance::Value* value,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void IndexerSet::assign(ance::Value* value, CompileContext* context)
 {
 	ance::Type* indexed_type = indexed_->getType();
 	assert(indexed_type->isIndexerDefined(Indexer::SET) && "Type does not support this indexer.");
 
-	indexed_type->buildSetIndexer(indexed_->getValue(), index_->getValue(), value, c, m, state, ir, di);
+	indexed_type->buildSetIndexer(indexed_->getValue(), index_->getValue(), value, context);
 }

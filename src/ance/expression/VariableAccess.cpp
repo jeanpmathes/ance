@@ -20,15 +20,9 @@ ance::Type* VariableAccess::getType()
 	return variable_->type();
 }
 
-void VariableAccess::buildValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void VariableAccess::buildValue(CompileContext* context)
 {
-	ance::Value* value = variable_->getValue(c, m, state, ir, di);
+	ance::Value* value = variable_->getValue(context);
 	setValue(value);
 }
 

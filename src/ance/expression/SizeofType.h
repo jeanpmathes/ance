@@ -16,13 +16,7 @@ class SizeofType : public BackingExpression
 
 		ance::Value* getValue() override;
 
-		llvm::Value* buildNativeValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		llvm::Value* buildNativeValue(CompileContext* context) override;
 
 	private:
 		ance::Value* return_value_{new ance::ExpressionBackedValue(this)};

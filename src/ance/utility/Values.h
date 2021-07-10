@@ -15,25 +15,9 @@ class Type;
 class Values
 {
 	public:
-		static llvm::Value* nativeToContent(
-			ance::Type* type,
-			llvm::Value* native,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
+		static llvm::Value* nativeToContent(ance::Type* type, llvm::Value* native, CompileContext* context);
 
-		static llvm::Value* contentToNative(
-			ance::Type* type,
-			llvm::Value* content,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
+		static llvm::Value* contentToNative(ance::Type* type, llvm::Value* content, CompileContext* context);
 };
 }
 

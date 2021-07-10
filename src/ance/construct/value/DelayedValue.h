@@ -16,13 +16,7 @@ class DelayedValue : public Value
 
 		void setValue(ance::Value* value);
 
-		void buildNativeValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		void buildNativeValue(CompileContext* context) override;
 
 		llvm::Value* getNativeValue() override;
 

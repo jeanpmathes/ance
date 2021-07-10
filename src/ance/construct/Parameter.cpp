@@ -39,31 +39,19 @@ void ance::Parameter::wrap(llvm::Argument* argument)
 	}
 }
 
-void ance::Parameter::buildNativeValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::Parameter::buildNativeValue(CompileContext* context)
 {
 	if (!native_value_)
 	{
-		native_value_ = ance::Values::contentToNative(getType(), content_value_, c, m, state, ir, di);
+		native_value_ = ance::Values::contentToNative(getType(), content_value_, context);
 	}
 }
 
-void ance::Parameter::buildContentValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::Parameter::buildContentValue(CompileContext* context)
 {
 	if (!content_value_)
 	{
-		content_value_ = ance::Values::nativeToContent(getType(), native_value_, c, m, state, ir, di);
+		content_value_ = ance::Values::nativeToContent(getType(), native_value_, context);
 	}
 }
 

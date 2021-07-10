@@ -12,20 +12,26 @@ class Application;
 class CompileContext
 {
 	public:
-		CompileContext(llvm::LLVMContext* c, llvm::Module* m, llvm::IRBuilder<>* ir, llvm::DIBuilder* di);
+		CompileContext(Application* app, Runtime* runtime, llvm::LLVMContext* c, llvm::Module* m, llvm::IRBuilder<>* ir, llvm::DIBuilder* di, llvm::DICompileUnit* unit, llvm::DIFile* code_file);
+
+		Application* application();
+		Runtime* runtime();
+		llvm::LLVMContext* context();
+		llvm::Module* module();
+		llvm::IRBuilder<>* ir();
+		llvm::DIBuilder* di();
+		llvm::DICompileUnit* unit();
+		llvm::DIFile* codeFile();
 
 	private:
+		Application* application_;
+		Runtime* runtime_;
 		llvm::LLVMContext* context_;
 		llvm::Module* module_;
 		llvm::IRBuilder<>* ir_builder_;
 		llvm::DIBuilder* di_builder_;
-
-	public:
-		Application* application_;
-		Runtime* runtime_;
-		llvm::DICompileUnit* unit_{nullptr};
-		llvm::DIFile* code_file_{nullptr};
-		llvm::DIBasicType* ui_32_{nullptr};
+		llvm::DICompileUnit* unit_;
+		llvm::DIFile* code_file_;
 };
 
 #endif

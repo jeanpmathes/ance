@@ -4,6 +4,7 @@
 
 #include "LocalScope.h"
 #include "WrappedNativeValue.h"
+#include "CompileContext.h"
 
 ance::LocalVariable::LocalVariable(
 	ance::LocalScope* containing_scope,
@@ -15,44 +16,25 @@ ance::LocalVariable::LocalVariable(
 {
 }
 
-void ance::LocalVariable::build(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::LocalVariable::build(CompileContext* context)
 {
 	assert(initial_value_);
 
 	if (type()->storage() == InternalStorage::AS_POINTER)
 	{
-		native_value_ = ir.CreateAlloca(type()->getContentType(c), nullptr);
+		native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->context()), nullptr);
 		native_value_->setName(identifier());
 	}
 
-	setValue(initial_value_, c, m, state, ir, di);
+	setValue(initial_value_, context);
 }
 
-ance::Value* ance::LocalVariable::getValue(
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileContext*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
-)
+ance::Value* ance::LocalVariable::getValue(CompileContext*)
 {
 	return new WrappedNativeValue(type(), native_value_);
 }
 
-void ance::LocalVariable::setValue(
-	ance::Value* value,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::LocalVariable::setValue(ance::Value* value, CompileContext* context)
 {
 	assert(type() == value->getType() && "Assignment types have to match.");
 
@@ -60,7 +42,7 @@ void ance::LocalVariable::setValue(
 	{
 		case InternalStorage::AS_TEMPORARY:
 		{
-			value->buildNativeValue(c, m, state, ir, di);
+			value->buildNativeValue(context);
 
 			native_value_ = value->getNativeValue();
 			native_value_->setName(identifier());
@@ -69,10 +51,10 @@ void ance::LocalVariable::setValue(
 
 		case InternalStorage::AS_POINTER:
 		{
-			value->buildContentValue(c, m, state, ir, di);
+			value->buildContentValue(context);
 
 			llvm::Value* stored = value->getContentValue();
-			ir.CreateStore(stored, native_value_);
+			context->ir()->CreateStore(stored, native_value_);
 			break;
 		}
 	}

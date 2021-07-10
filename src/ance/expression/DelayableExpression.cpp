@@ -5,15 +5,9 @@ ance::Value* DelayableExpression::getValue()
 	return value_;
 }
 
-void DelayableExpression::build(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void DelayableExpression::build(CompileContext* context)
 {
-	buildValue(c, m, state, ir, di);
+	buildValue(context);
 }
 
 void DelayableExpression::setValue(ance::Value* value)

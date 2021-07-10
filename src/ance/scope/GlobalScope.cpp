@@ -177,30 +177,18 @@ ance::Function* ance::GlobalScope::getFunction(const std::string& identifier)
 	return functions_.at(identifier);
 }
 
-void ance::GlobalScope::buildFunctionNames(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::GlobalScope::buildFunctionNames(CompileContext* context)
 {
 	for (auto const&[key, val] : functions_)
 	{
-		val->buildName(c, m, state, ir, di);
+		val->buildName(context);
 	}
 }
 
-void ance::GlobalScope::buildFunctions(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::GlobalScope::buildFunctions(CompileContext* context)
 {
 	for (auto const&[key, val] : functions_)
 	{
-		val->build(c, m, state, ir, di);
+		val->build(context);
 	}
 }

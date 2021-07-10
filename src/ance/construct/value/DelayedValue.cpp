@@ -20,16 +20,10 @@ void ance::DelayedValue::setValue(ance::Value* value)
 	value_ = value;
 }
 
-void ance::DelayedValue::buildNativeValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::DelayedValue::buildNativeValue(CompileContext* context)
 {
-	expression_->buildValue(c, m, state, ir, di);
-	value_->buildNativeValue(c, m, state, ir, di);
+	expression_->buildValue(context);
+	value_->buildNativeValue(context);
 }
 
 llvm::Value* ance::DelayedValue::getNativeValue()

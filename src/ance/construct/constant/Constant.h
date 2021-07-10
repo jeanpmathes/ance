@@ -20,21 +20,9 @@ class Constant : public Value
 	public:
 		llvm::Constant* getContentConstant();
 
-		void buildNativeValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) final;
+		void buildNativeValue(CompileContext* context) final;
 
-		void buildContentValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) final;
+		void buildContentValue(CompileContext* context) final;
 
 		llvm::Value* getNativeValue() final;
 

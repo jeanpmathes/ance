@@ -33,15 +33,9 @@ ance::Type* FunctionCall::getType()
 	return scope_->getGlobalScope()->getFunction(identifier_)->getReturnType();
 }
 
-void FunctionCall::buildValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void FunctionCall::buildValue(CompileContext* context)
 {
-	ance::Function* fn = state->application_->globalScope()->getFunction(identifier_);
+	ance::Function* fn = context->application()->globalScope()->getFunction(identifier_);
 
 	std::vector<ance::Value*> arg_values;
 
@@ -50,7 +44,7 @@ void FunctionCall::buildValue(
 		arg_values.push_back(arg->getValue());
 	}
 
-	ance::Value* return_value = fn->buildCall(arg_values, c, m, state, ir, di);
+	ance::Value* return_value = fn->buildCall(arg_values, context);
 
 	if (return_value != nullptr) // Not every function returns a value.
 	{

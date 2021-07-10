@@ -12,14 +12,7 @@ class VariableAssignable : public Assignable
 
 		void setScope(ance::Scope* scope) override;
 
-		void assign(
-			ance::Value* value,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		void assign(ance::Value* value, CompileContext* context) override;
 
 	private:
 		std::string variable_identifier_;

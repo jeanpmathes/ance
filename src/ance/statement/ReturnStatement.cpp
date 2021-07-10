@@ -1,6 +1,5 @@
 #include "ReturnStatement.h"
 
-#include "Value.h"
 #include "DefinedFunction.h"
 #include "LocalScope.h"
 
@@ -20,7 +19,7 @@ void ReturnStatement::setContainingFunction(ance::DefinedFunction* function)
 	return_value_->setScope(function->getScope());
 }
 
-void ReturnStatement::build(llvm::LLVMContext&, llvm::Module*, CompileContext*, llvm::IRBuilder<>&, llvm::DIBuilder*)
+void ReturnStatement::build(CompileContext*)
 {
 	getContainingFunction()->addReturn(return_value_ ? return_value_->getValue() : nullptr);
 }

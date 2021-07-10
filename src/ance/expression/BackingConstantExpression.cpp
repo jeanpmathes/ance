@@ -2,6 +2,7 @@
 
 #include "Constant.h"
 #include "Values.h"
+#include "CompileContext.h"
 
 void BackingConstantExpression::buildConstant(llvm::LLVMContext& c)
 {
@@ -15,14 +16,8 @@ llvm::Constant* BackingConstantExpression::getContentConstant()
 	return content_constant_;
 }
 
-llvm::Value* BackingConstantExpression::buildNativeValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+llvm::Value* BackingConstantExpression::buildNativeValue(CompileContext* context)
 {
-	buildConstant(c);
-	return ance::Values::contentToNative(getType(), content_constant_, c, m, state, ir, di);
+	buildConstant(*context->context());
+	return ance::Values::contentToNative(getType(), content_constant_, context);
 }

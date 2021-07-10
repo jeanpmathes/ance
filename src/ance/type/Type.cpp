@@ -40,29 +40,12 @@ ance::Type* ance::Type::getIndexerReturnType()
 	return nullptr;
 }
 
-ance::Value* ance::Type::buildGetIndexer(
-	ance::Value*,
-	ance::Value*,
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileContext*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
-)
+ance::Value* ance::Type::buildGetIndexer(ance::Value*, ance::Value*, CompileContext*)
 {
 	return nullptr;
 }
 
-void ance::Type::buildSetIndexer(
-	ance::Value*,
-	ance::Value*,
-	ance::Value*,
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileContext*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
-)
+void ance::Type::buildSetIndexer(ance::Value*, ance::Value*, ance::Value*, CompileContext*)
 {
 
 }

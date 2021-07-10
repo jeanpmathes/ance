@@ -49,11 +49,7 @@ llvm::CallInst* ance::Function::buildCall(
 	const std::vector<ance::Value*>& arguments,
 	llvm::FunctionType* native_type,
 	llvm::Function* native_function,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
+	CompileContext* context
 ) const
 {
 	std::vector<llvm::Value*> args;
@@ -61,10 +57,10 @@ llvm::CallInst* ance::Function::buildCall(
 
 	for (auto* arg : arguments)
 	{
-		arg->buildContentValue(c, m, state, ir, di);
+		arg->buildContentValue(context);
 		args.push_back(arg->getContentValue());
 	}
 
-	auto* content_value = ir.CreateCall(native_type, native_function, args);
+	auto* content_value = context->ir()->CreateCall(native_type, native_function, args);
 	return content_value;
 }

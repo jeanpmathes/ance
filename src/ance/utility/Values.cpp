@@ -4,15 +4,7 @@
 #include "Type.h"
 #include "CompileContext.h"
 
-llvm::Value* ance::Values::nativeToContent(
-	ance::Type* type,
-	llvm::Value* native,
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileContext*,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder*
-)
+llvm::Value* ance::Values::nativeToContent(ance::Type* type, llvm::Value* native, CompileContext* context)
 {
 	switch (type->storage())
 	{
@@ -22,20 +14,12 @@ llvm::Value* ance::Values::nativeToContent(
 		}
 		case InternalStorage::AS_POINTER:
 		{
-			return ir.CreateLoad(native);
+			return context->ir()->CreateLoad(native);
 		}
 	}
 }
 
-llvm::Value* ance::Values::contentToNative(
-	ance::Type* type,
-	llvm::Value* content,
-	llvm::LLVMContext& c,
-	llvm::Module*,
-	CompileContext*,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder*
-)
+llvm::Value* ance::Values::contentToNative(ance::Type* type, llvm::Value* content, CompileContext* context)
 {
 	switch (type->storage())
 	{
@@ -45,8 +29,8 @@ llvm::Value* ance::Values::contentToNative(
 		}
 		case InternalStorage::AS_POINTER:
 		{
-			llvm::Value* native = ir.CreateAlloca(type->getContentType(c));
-			ir.CreateStore(content, native);
+			llvm::Value* native = context->ir()->CreateAlloca(type->getContentType(*context->context()));
+			context->ir()->CreateStore(content, native);
 			return native;
 		}
 	}

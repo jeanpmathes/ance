@@ -20,13 +20,7 @@ void ExpressionStatement::setContainingFunction(ance::DefinedFunction* function)
 	expression_->setScope(function->getScope());
 }
 
-void ExpressionStatement::build(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ExpressionStatement::build(CompileContext* context)
 {
-	expression_->build(c, m, state, ir, di);
+	expression_->build(context);
 }

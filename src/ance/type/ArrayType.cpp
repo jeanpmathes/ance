@@ -6,6 +6,7 @@
 #include "Values.h"
 #include "SizeType.h"
 #include "WrappedNativeValue.h"
+#include "CompileContext.h"
 
 ance::ArrayType::ArrayType(Type* element_type, const uint64_t size)
 	:
@@ -50,23 +51,15 @@ ance::Type* ance::ArrayType::getIndexerReturnType()
 	return element_type_;
 }
 
-ance::Value* ance::ArrayType::buildGetIndexer(
-	ance::Value* indexed,
-	ance::Value* index,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
 {
 	assert(indexed->getType() == this && "Indexed value has to be of native array type.");
 	assert(index->getType() == ance::SizeType::get() && "Native array index has to be size type.");
 
-	llvm::Value* element_ptr = buildGetElementPointer(indexed, index, c, m, state, ir, di);
-	llvm::Value* native_content = ir.CreateLoad(element_ptr);
+	llvm::Value* element_ptr = buildGetElementPointer(indexed, index, context);
+	llvm::Value* native_content = context->ir()->CreateLoad(element_ptr);
 
-	llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, c, m, state, ir, di);
+	llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, context);
 
 	return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
 }
@@ -75,52 +68,44 @@ void ance::ArrayType::buildSetIndexer(
 	ance::Value* indexed,
 	ance::Value* index,
 	ance::Value* value,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
+	CompileContext* context
 )
 {
 	assert(indexed->getType() == this && "Indexed value has to be of native array type.");
 	assert(index->getType() == ance::SizeType::get() && "Native array index has to be size type.");
 	assert(value->getType() == element_type_ && "Assigned value has to be of the element type of this array.");
 
-	value->buildContentValue(c, m, state, ir, di);
+	value->buildContentValue(context);
 
-	llvm::Value* element_ptr = buildGetElementPointer(indexed, index, c, m, state, ir, di);
+	llvm::Value* element_ptr = buildGetElementPointer(indexed, index, context);
 	llvm::Value* new_element_content = value->getContentValue();
 
-	ir.CreateStore(new_element_content, element_ptr);
+	context->ir()->CreateStore(new_element_content, element_ptr);
 }
 
 llvm::Value* ance::ArrayType::buildGetElementPointer(
 	ance::Value* indexed,
 	ance::Value* index,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
+	CompileContext* context
 ) const
 {
-	indexed->buildNativeValue(c, m, state, ir, di);
-	index->buildContentValue(c, m, state, ir, di);
+	indexed->buildNativeValue(context);
+	index->buildContentValue(context);
 
-	llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(c), 0);
+	llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context->context()), 0);
 	llvm::Value* native_index = index->getContentValue();
 	llvm::Value* indices[] = {zero, native_index};
 
 	// Check if index smaller size.
-	llvm::Value* native_size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(c), size_);
-	[[maybe_unused]] llvm::Value* in_bounds = ir.CreateICmpULT(native_index, native_size);
+	llvm::Value* native_size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(*context->context()), size_);
+	[[maybe_unused]] llvm::Value* in_bounds = context->ir()->CreateICmpULT(native_index, native_size);
 
 	// todo: use in_bounds bool to throw exception
 
 	// This is a pointer as the internal storage of arrays is using pointers.
 	llvm::Value* array_ptr = indexed->getNativeValue();
 
-	return ir.CreateGEP(array_ptr, indices);
+	return context->ir()->CreateGEP(array_ptr, indices);
 }
 
 ance::Type* ance::ArrayType::get(Application& app, Type* element_type, uint64_t size)

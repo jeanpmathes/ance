@@ -7,6 +7,7 @@
 #include "Type.h"
 #include "VoidType.h"
 #include "WrappedNativeValue.h"
+#include "CompileContext.h"
 
 namespace llvm
 {
@@ -60,20 +61,14 @@ void ance::GlobalVariable::buildGlobal(llvm::Module* m)
 		isConstant(), linkage, native_initializer, identifier());
 }
 
-ance::Value* ance::GlobalVariable::getValue(
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileContext*,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder*
-)
+ance::Value* ance::GlobalVariable::getValue(CompileContext* context)
 {
 	switch (type()->storage())
 	{
 		case InternalStorage::AS_TEMPORARY:
 		{
 			auto* const value_type = static_cast<llvm::PointerType*>(native_variable_->getType())->getElementType();
-			llvm::Value* value = ir.CreateLoad(value_type, native_variable_);
+			llvm::Value* value = context->ir()->CreateLoad(value_type, native_variable_);
 			value->setName(identifier());
 			return new ance::WrappedNativeValue(type(), value);
 		}
@@ -85,20 +80,13 @@ ance::Value* ance::GlobalVariable::getValue(
 	}
 }
 
-void ance::GlobalVariable::setValue(
-	ance::Value* value,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::GlobalVariable::setValue(ance::Value* value, CompileContext* context)
 {
 	assert(!isConstant());
 	assert(type() == value->getType() && "Assignment types have to match.");
 
-	value->buildContentValue(c, m, state, ir, di);
+	value->buildContentValue(context);
 
 	llvm::Value* content = value->getContentValue();
-	ir.CreateStore(content, native_variable_);
+	context->ir()->CreateStore(content, native_variable_);
 }

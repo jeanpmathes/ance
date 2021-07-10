@@ -18,13 +18,7 @@ class BackingConstantExpression : public ConstantExpression, public BackingExpre
 	protected:
 		virtual llvm::Constant* buildContentConstant(llvm::LLVMContext& c) = 0;
 
-		llvm::Value* buildNativeValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) final;
+		llvm::Value* buildNativeValue(CompileContext* context) final;
 
 	private:
 		llvm::Constant* content_constant_{nullptr};

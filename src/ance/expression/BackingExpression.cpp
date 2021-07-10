@@ -1,26 +1,14 @@
 #include "BackingExpression.h"
 
-void BackingExpression::buildBackingValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void BackingExpression::buildBackingValue(CompileContext* context)
 {
 	assert(!native_value_ && "Expressions must be built only once.");
-	native_value_ = buildNativeValue(c, m, state, ir, di);
+	native_value_ = buildNativeValue(context);
 }
 
-void BackingExpression::build(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void BackingExpression::build(CompileContext* context)
 {
-	buildBackingValue(c, m, state, ir, di);
+	buildBackingValue(context);
 }
 
 llvm::Value* BackingExpression::getNativeValue()

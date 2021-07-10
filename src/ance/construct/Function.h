@@ -37,30 +37,11 @@ class Function
 
 		[[nodiscard]] unsigned int getLine() const;
 
-		virtual void buildName(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) = 0;
+		virtual void buildName(CompileContext* context) = 0;
 
-		virtual void build(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) = 0;
+		virtual void build(CompileContext* context) = 0;
 
-		virtual ance::Value* buildCall(
-			const std::vector<ance::Value*>& arguments,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) const = 0;
+		virtual ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const = 0;
 
 	protected:
 		std::pair<llvm::FunctionType*,
@@ -75,11 +56,7 @@ class Function
 			const std::vector<ance::Value*>& arguments,
 			llvm::FunctionType* native_type,
 			llvm::Function* native_function,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
+			CompileContext* state
 		) const;
 
 	private:

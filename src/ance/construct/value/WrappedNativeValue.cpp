@@ -15,13 +15,7 @@ ance::Type* ance::WrappedNativeValue::getType()
 	return type_;
 }
 
-void ance::WrappedNativeValue::buildNativeValue(
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileContext*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
-)
+void ance::WrappedNativeValue::buildNativeValue(CompileContext*)
 {
 }
 

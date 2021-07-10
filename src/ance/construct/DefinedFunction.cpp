@@ -46,15 +46,9 @@ void ance::DefinedFunction::pushStatement(Statement* statement)
 	statement->setContainingFunction(this);
 }
 
-void ance::DefinedFunction::buildName(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder* di
-)
+void ance::DefinedFunction::buildName(CompileContext* context)
 {
-	std::tie(native_type_, native_function_) = createNativeFunction(parameters_, Convert(access_), c, m);
+	std::tie(native_type_, native_function_) = createNativeFunction(parameters_, Convert(access_), *context->context(), context->module());
 
 	for (auto pair : zip(parameters_, native_function_->args()))
 	{
@@ -62,13 +56,13 @@ void ance::DefinedFunction::buildName(
 	}
 
 	llvm::SmallVector<llvm::Metadata*, 1> tys;
-	tys.push_back(state->ui_32_); // todo: use the correct types
-	llvm::DISubroutineType* debug_type = di->createSubroutineType(di->getOrCreateTypeArray(tys));
-	llvm::DISubprogram* debug = di->createFunction(
-		state->unit_,
+	tys.push_back(context->di()->createBasicType("ui32", 32, llvm::dwarf::DW_ATE_unsigned)); // todo: use the correct types
+	llvm::DISubroutineType* debug_type = context->di()->createSubroutineType(context->di()->getOrCreateTypeArray(tys));
+	llvm::DISubprogram* debug = context->di()->createFunction(
+		context->unit(),
 		getName(),
 		getName(),
-		state->code_file_,
+		context->codeFile(),
 		getLine(),
 		debug_type,
 		0,
@@ -83,44 +77,38 @@ void ance::DefinedFunction::buildName(
 	native_function_->setSubprogram(debug);
 }
 
-void ance::DefinedFunction::build(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::DefinedFunction::build(CompileContext* context)
 {
-	llvm::BasicBlock* block = llvm::BasicBlock::Create(c, "entry", native_function_);
+	llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->context(), "entry", native_function_);
 
-	ir.SetInsertPoint(block);
+	context->ir()->SetInsertPoint(block);
 
 	for (auto* arg : arguments_)
 	{
-		arg->build(c, m, state, ir, di);
+		arg->build(context);
 	}
 
 	for (auto* statement : statements_)
 	{
-		ir.SetCurrentDebugLocation(
+		context->ir()->SetCurrentDebugLocation(
 			llvm::DILocation::get(
-				c,
+				*context->context(),
 				statement->getLine(),
 				statement->getColumn(),
 				native_function_->getSubprogram()));
 
-		statement->build(c, m, state, ir, di);
+		statement->build(context);
 
 		if (has_return_)
 		{
 			if (return_value_)
 			{
-				return_value_->buildContentValue(c, m, state, ir, di);
-				ir.CreateRet(return_value_->getContentValue());
+				return_value_->buildContentValue(context);
+				context->ir()->CreateRet(return_value_->getContentValue());
 			}
 			else
 			{
-				ir.CreateRetVoid();
+				context->ir()->CreateRetVoid();
 			}
 
 			break;
@@ -131,7 +119,7 @@ void ance::DefinedFunction::build(
 	{
 		if (getReturnType() == ance::VoidType::get())
 		{
-			ir.CreateRetVoid();
+			context->ir()->CreateRetVoid();
 		}
 		else
 		{
@@ -139,7 +127,7 @@ void ance::DefinedFunction::build(
 		}
 	}
 
-	ir.SetCurrentDebugLocation(nullptr);
+	context->ir()->SetCurrentDebugLocation(nullptr);
 }
 
 void ance::DefinedFunction::addReturn(ance::Value* value)
@@ -158,14 +146,7 @@ void ance::DefinedFunction::addReturn(ance::Value* value)
 	}
 }
 
-ance::Value* ance::DefinedFunction::buildCall(
-	const std::vector<ance::Value*>& arguments,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-) const
+ance::Value* ance::DefinedFunction::buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const
 {
 	assert(arguments.size() == native_type_->getNumParams());
 
@@ -174,13 +155,13 @@ ance::Value* ance::DefinedFunction::buildCall(
 		assert(std::get<0>(pair)->getType() == std::get<1>(pair)->getType() && "Input parameter types must match.");
 	}
 
-	llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, c, m, state, ir, di);
+	llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
 
 	if (getReturnType() == ance::VoidType::get())
 	{
 		return nullptr;
 	}
 
-	llvm::Value* native_value = ance::Values::contentToNative(getReturnType(), content_value, c, m, state, ir, di);
+	llvm::Value* native_value = ance::Values::contentToNative(getReturnType(), content_value, context);
 	return new ance::WrappedNativeValue(getReturnType(), native_value);
 }

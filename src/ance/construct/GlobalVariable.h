@@ -46,22 +46,9 @@ class GlobalVariable : public Variable
 
 		void buildGlobal(llvm::Module* m);
 
-		ance::Value* getValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		ance::Value* getValue(CompileContext* context) override;
 
-		void setValue(
-			ance::Value* value,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		void setValue(ance::Value* value, CompileContext* context) override;
 
 	private:
 		AccessModifier access_;

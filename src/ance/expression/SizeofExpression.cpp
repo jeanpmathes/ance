@@ -24,13 +24,7 @@ ance::Value* SizeofExpression::getValue()
 	return return_value_;
 }
 
-llvm::Value* SizeofExpression::buildNativeValue(
-	llvm::LLVMContext&,
-	llvm::Module* m,
-	CompileContext*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
-)
+llvm::Value* SizeofExpression::buildNativeValue(CompileContext* context)
 {
-	return ance::SizeType::buildValue(expression_->getType()->getContentSize(m));
+	return ance::SizeType::buildValue(expression_->getType()->getContentSize(context->module()));
 }

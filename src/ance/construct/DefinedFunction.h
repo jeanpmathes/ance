@@ -36,32 +36,13 @@ class DefinedFunction : public ance::Function
 
 		void pushStatement(Statement* statement);
 
-		void buildName(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		void buildName(CompileContext* context) override;
 
-		void build(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		void build(CompileContext* context) override;
 
 		void addReturn(ance::Value* value = nullptr);
 
-		ance::Value* buildCall(
-			const std::vector<ance::Value*>& arguments,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) const override;
+		ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
 
 	protected:
 		using Function::buildCall;

@@ -26,13 +26,7 @@ class Statement
 
 		[[nodiscard]] unsigned int getColumn() const;
 
-		virtual void build(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) = 0;
+		virtual void build(CompileContext* context) = 0;
 
 		virtual ~Statement() = default;
 

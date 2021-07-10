@@ -22,16 +22,10 @@ ance::Type* Allocation::getType()
 	return return_type_;
 }
 
-void Allocation::buildValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void Allocation::buildValue(CompileContext* context)
 {
 	ance::Value* count = count_ ? count_->getValue() : nullptr;
-	ance::Value* ptr = state->runtime_->allocate(allocation_, allocated_type_, count, c, m, state, ir, di);
+	ance::Value* ptr = context->runtime()->allocate(allocation_, allocated_type_, count, context);
 	setValue(ptr);
 }
 

@@ -28,18 +28,13 @@ class AnceCompiler
 
 	private:
 		Application& application_;
-		llvm::LLVMContext context_;
+		llvm::LLVMContext llvm_context_;
 		llvm::IRBuilder<> ir_;
 
 	private:
 		llvm::Module* module_;
-
 		llvm::DIBuilder* di_;
-		llvm::DIFile* proj_file_;
-		llvm::DICompileUnit* unit_;
-		llvm::DIFile* code_file_;
-
-		CompileContext* state_;
+		CompileContext* context_;
 };
 
 #endif

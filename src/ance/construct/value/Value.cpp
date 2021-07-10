@@ -2,16 +2,10 @@
 
 #include "Values.h"
 
-void ance::Value::buildContentValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::Value::buildContentValue(CompileContext* context)
 {
-	buildNativeValue(c, m, state, ir, di);
-	content_value_ = ance::Values::nativeToContent(getType(), getNativeValue(), c, m, state, ir, di);
+	buildNativeValue(context);
+	content_value_ = ance::Values::nativeToContent(getType(), getNativeValue(), context);
 }
 
 llvm::Value* ance::Value::getContentValue()

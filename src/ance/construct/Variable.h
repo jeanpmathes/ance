@@ -40,22 +40,9 @@ class Variable
 
 		[[nodiscard]] bool isConstant() const;
 
-		virtual ance::Value* getValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) = 0;
+		virtual ance::Value* getValue(CompileContext* context) = 0;
 
-		virtual void setValue(
-			ance::Value* value,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) = 0;
+		virtual void setValue(ance::Value* value, CompileContext* context) = 0;
 
 	private:
 		std::string identifier_;

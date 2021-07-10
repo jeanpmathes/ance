@@ -11,13 +11,7 @@ class ReturnStatement :
 
 		void setContainingFunction(ance::DefinedFunction* function) override;
 
-		void build(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		void build(CompileContext* context) override;
 
 	private:
 		Expression* return_value_;

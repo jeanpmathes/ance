@@ -57,25 +57,13 @@ class Type
 
 		virtual ance::Type* getIndexerReturnType();
 
-		virtual ance::Value* buildGetIndexer(
-			ance::Value* indexed,
-			ance::Value* index,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
+		virtual ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context);
 
 		virtual void buildSetIndexer(
 			ance::Value* indexed,
 			ance::Value* index,
 			ance::Value* value,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
+			CompileContext* context
 		);
 
 };

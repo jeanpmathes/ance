@@ -19,30 +19,11 @@ class LocalVariable : public ance::Variable
 			ance::Value* value
 		);
 
-		void build(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
+		void build(CompileContext* context);
 
-		ance::Value* getValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		ance::Value* getValue(CompileContext* context) override;
 
-		void setValue(
-			ance::Value* value,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		void setValue(ance::Value* value, CompileContext* context) override;
 
 	private:
 		ance::Value* initial_value_;

@@ -31,36 +31,20 @@ class ArrayType : public Type
 
 		ance::Type* getIndexerReturnType() override;
 
-		ance::Value* buildGetIndexer(
-			ance::Value* indexed,
-			ance::Value* index,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
 
 		void buildSetIndexer(
 			ance::Value* indexed,
 			ance::Value* index,
 			ance::Value* value,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
+			CompileContext* context
 		) override;
 
 	private:
 		llvm::Value* buildGetElementPointer(
 			ance::Value* indexed,
 			ance::Value* index,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
+			CompileContext* context
 		) const;
 
 	public:

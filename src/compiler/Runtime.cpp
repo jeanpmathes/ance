@@ -39,16 +39,7 @@ void Runtime::init(
 	);
 }
 
-ance::Value* Runtime::allocate(
-	Runtime::Allocator allocation,
-	ance::Type* type,
-	ance::Value* count,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+ance::Value* Runtime::allocate(Allocator allocation, ance::Type* type, ance::Value* count, CompileContext* context)
 {
 	if (count)
 	{
@@ -60,76 +51,52 @@ ance::Value* Runtime::allocate(
 	switch (allocation)
 	{
 		case AUTOMATIC:
-			native_ptr = allocateAutomatic(type, count, c, m, state, ir, di);
+			native_ptr = allocateAutomatic(type, count, context);
 			break;
 
 		case DYNAMIC:
-			native_ptr = allocateDynamic(type, count, c, m, state, ir, di);
+			native_ptr = allocateDynamic(type, count, context);
 			break;
 
 		default:
 			throw std::invalid_argument("Unsupported allocation type.");
 	}
 
-	return new ance::WrappedNativeValue(ance::PointerType::get(*state->application_, type), native_ptr);
+	return new ance::WrappedNativeValue(ance::PointerType::get(*context->application(), type), native_ptr);
 }
 
-void Runtime::deleteDynamic(
-	ance::Value* value,
-	bool,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void Runtime::deleteDynamic(ance::Value* value, bool delete_buffer, CompileContext* context)
 {
 	ance::Type* type = value->getType();
 	assert(ance::PointerType::isPointerType(type) && "Type of value to delete has to be pointer type.");
 
-	value->buildNativeValue(c, m, state, ir, di);
+	value->buildNativeValue(context);
 
 	llvm::Value* ptr = value->getNativeValue();
-	llvm::Value* opaque_ptr = ir.CreateBitCast(ptr, llvm::Type::getInt8PtrTy(c));
+	llvm::Value* opaque_ptr = context->ir()->CreateBitCast(ptr, llvm::Type::getInt8PtrTy(*context->context()));
 
 	llvm::Value* args[] = {opaque_ptr};
 
-	ir.CreateCall(delete_dynamic_type_, delete_dynamic_, args);
+	context->ir()->CreateCall(delete_dynamic_type_, delete_dynamic_, args);
 }
 
-llvm::Value* Runtime::allocateAutomatic(
-	ance::Type* type,
-	ance::Value* count,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+llvm::Value* Runtime::allocateAutomatic(ance::Type* type, ance::Value* count, CompileContext* context)
 {
 	llvm::Value* count_value = nullptr;
 
 	if (count)
 	{
-		count->buildNativeValue(c, m, state, ir, di);
+		count->buildNativeValue(context);
 		count_value = count->getNativeValue();
 	}
 
-	return ir.CreateAlloca(type->getContentType(c), count_value);
+	return context->ir()->CreateAlloca(type->getContentType(*context->context()), count_value);
 }
 
-llvm::Value* Runtime::allocateDynamic(
-	ance::Type* type,
-	ance::Value* count,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, CompileContext* context)
 {
 	// Set the zero init flag.
-	llvm::Value* flags = llvm::ConstantInt::get(llvm::Type::getInt32Ty(c), 0x0040, false);
+	llvm::Value* flags = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context->context()), 0x0040, false);
 
 	// Calculate the size to allocate.
 	llvm::Value* size;
@@ -138,25 +105,25 @@ llvm::Value* Runtime::allocateDynamic(
 	{
 		llvm::Value* element_size =
 			llvm::ConstantInt::get(
-				ance::SizeType::get()->getNativeType(c),
-				type->getContentSize(m).getFixedSize(),
+				ance::SizeType::get()->getNativeType(*context->context()),
+				type->getContentSize(context->module()).getFixedSize(),
 				false
 			);
-		count->buildNativeValue(c, m, state, ir, di);
+		count->buildNativeValue(context);
 		llvm::Value* element_count = count->getNativeValue();
 
-		size = ir.CreateMul(element_size, element_count);
+		size = context->ir()->CreateMul(element_size, element_count);
 	}
 	else
 	{
 		size = llvm::ConstantInt::get(
-			ance::SizeType::get()->getNativeType(c),
-			type->getContentSize(m).getFixedSize(), false
+			ance::SizeType::get()->getNativeType(*context->context()),
+			type->getContentSize(context->module()).getFixedSize(), false
 		);
 	}
 
 	llvm::Value* args[] = {flags, size};
 
-	llvm::Value* opaque_ptr = ir.CreateCall(allocate_dynamic_type_, allocate_dynamic_, args);
-	return ir.CreateBitCast(opaque_ptr, ance::PointerType::get(*state->application_, type)->getNativeType(c));
+	llvm::Value* opaque_ptr = context->ir()->CreateCall(allocate_dynamic_type_, allocate_dynamic_, args);
+	return context->ir()->CreateBitCast(opaque_ptr, ance::PointerType::get(*context->application(), type)->getNativeType(*context->context()));
 }

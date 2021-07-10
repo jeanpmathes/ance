@@ -13,13 +13,7 @@ class IndexerGet : public DelayableExpression
 
 		ance::Type* getType() override;
 
-		void buildValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		void buildValue(CompileContext* context) override;
 
 		~IndexerGet() override;
 

@@ -24,13 +24,7 @@ void AssignmentStatement::setContainingFunction(ance::DefinedFunction* function)
 	assigned_->setScope(function->getScope());
 }
 
-void AssignmentStatement::build(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void AssignmentStatement::build(CompileContext* context)
 {
-	assignable_->assign(assigned_->getValue(), c, m, state, ir, di);
+	assignable_->assign(assigned_->getValue(), context);
 }

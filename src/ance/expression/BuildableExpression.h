@@ -6,13 +6,7 @@
 class BuildableExpression : public virtual Expression
 {
 	public:
-		virtual void build(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) = 0;
+		virtual void build(CompileContext* context) = 0;
 };
 
 #endif

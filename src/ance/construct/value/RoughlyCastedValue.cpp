@@ -1,6 +1,7 @@
 #include "RoughlyCastedValue.h"
 
 #include "Type.h"
+#include "CompileContext.h"
 
 ance::RoughlyCastedValue::RoughlyCastedValue(ance::Type* target_type, ance::Value* original)
 	: target_type_(target_type), original_(original)
@@ -13,16 +14,10 @@ ance::Type* ance::RoughlyCastedValue::getType()
 	return target_type_;
 }
 
-void ance::RoughlyCastedValue::buildNativeValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::RoughlyCastedValue::buildNativeValue(CompileContext* context)
 {
-	assert(target_type_->getNativeType(c) == original_->getType()->getNativeType(c) && "Native type has to be equal.");
-	original_->buildNativeValue(c, m, state, ir, di);
+	assert(target_type_->getNativeType(*context->context()) == original_->getType()->getNativeType(*context->context()) && "Native type has to be equal.");
+	original_->buildNativeValue(context);
 }
 
 llvm::Value* ance::RoughlyCastedValue::getNativeValue()

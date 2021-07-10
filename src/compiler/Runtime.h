@@ -42,47 +42,14 @@ class Runtime
 				DYNAMIC
 		};
 
-		ance::Value* allocate(
-			Allocator allocation,
-			ance::Type* type,
-			ance::Value* count,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
+		ance::Value* allocate(Allocator allocation, ance::Type* type, ance::Value* count, CompileContext* context);
 
-		void deleteDynamic(
-			ance::Value* value,
-			bool delete_buffer,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
+		void deleteDynamic(ance::Value* value, bool delete_buffer, CompileContext* context);
 
 	private:
-		llvm::Value* allocateAutomatic(
-			ance::Type* type,
-			ance::Value* count,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
+		llvm::Value* allocateAutomatic(ance::Type* type, ance::Value* count, CompileContext* context);
 
-		llvm::Value* allocateDynamic(
-			ance::Type* type,
-			ance::Value* count,
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		);
+		llvm::Value* allocateDynamic(ance::Type* type, ance::Value* count, CompileContext* context);
 };
 
 #endif

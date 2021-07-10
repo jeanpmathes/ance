@@ -11,15 +11,8 @@ void VariableAssignable::setScope(ance::Scope* scope)
 	scope_ = scope;
 }
 
-void VariableAssignable::assign(
-	ance::Value* value,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void VariableAssignable::assign(ance::Value* value, CompileContext* context)
 {
 	ance::Variable* variable = scope_->getVariable(variable_identifier_);
-	variable->setValue(value, c, m, state, ir, di);
+	variable->setValue(value, context);
 }

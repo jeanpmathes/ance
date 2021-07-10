@@ -18,16 +18,10 @@ ance::ExternFunction::ExternFunction(
 
 }
 
-void ance::ExternFunction::buildName(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
-)
+void ance::ExternFunction::buildName(CompileContext* context)
 {
 	std::tie(native_type_, native_function_) =
-		createNativeFunction(parameters_, llvm::GlobalValue::LinkageTypes::ExternalLinkage, c, m);
+		createNativeFunction(parameters_, llvm::GlobalValue::LinkageTypes::ExternalLinkage, *context->context(), context->module());
 
 	for (auto pair : zip(parameters_, native_function_->args()))
 	{
@@ -35,25 +29,12 @@ void ance::ExternFunction::buildName(
 	}
 }
 
-void ance::ExternFunction::build(
-	llvm::LLVMContext&,
-	llvm::Module*,
-	CompileContext*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
-)
+void ance::ExternFunction::build(CompileContext*)
 {
 
 }
 
-ance::Value* ance::ExternFunction::buildCall(
-	const std::vector<ance::Value*>& arguments,
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-) const
+ance::Value* ance::ExternFunction::buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const
 {
 	assert(arguments.size() == native_type_->getNumParams());
 
@@ -62,13 +43,13 @@ ance::Value* ance::ExternFunction::buildCall(
 		assert(std::get<0>(pair)->getType() == std::get<1>(pair)->getType() && "Input parameter types must match.");
 	}
 
-	llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, c, m, state, ir, di);
+	llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
 
 	if (getReturnType() == ance::VoidType::get())
 	{
 		return nullptr;
 	}
 
-	llvm::Value* native_value = ance::Values::contentToNative(getReturnType(), content_value, c, m, state, ir, di);
+	llvm::Value* native_value = ance::Values::contentToNative(getReturnType(), content_value, context);
 	return new ance::WrappedNativeValue(getReturnType(), native_value);
 }

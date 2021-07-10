@@ -3,6 +3,8 @@
 #include "Type.h"
 #include "Values.h"
 
+#include "CompileContext.h"
+
 void ance::Constant::buildContentConstant(llvm::Module* m)
 {
 	assert(!content_constant_ && "A constant may only be built once.");
@@ -15,27 +17,15 @@ llvm::Constant* ance::Constant::getContentConstant()
 	return content_constant_;
 }
 
-void ance::Constant::buildNativeValue(
-	llvm::LLVMContext& c,
-	llvm::Module* m,
-	CompileContext* state,
-	llvm::IRBuilder<>& ir,
-	llvm::DIBuilder* di
-)
+void ance::Constant::buildNativeValue(CompileContext* context)
 {
-	buildContentConstant(m);
-	native_value_ = ance::Values::contentToNative(getType(), content_constant_, c, m, state, ir, di);
+	buildContentConstant(context->module());
+	native_value_ = ance::Values::contentToNative(getType(), content_constant_, context);
 }
 
-void ance::Constant::buildContentValue(
-	llvm::LLVMContext&,
-	llvm::Module* m,
-	CompileContext*,
-	llvm::IRBuilder<>&,
-	llvm::DIBuilder*
-)
+void ance::Constant::buildContentValue(CompileContext* context)
 {
-	buildContentConstant(m);
+	buildContentConstant(context->module());
 }
 
 llvm::Value* ance::Constant::getNativeValue()

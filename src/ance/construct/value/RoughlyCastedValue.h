@@ -12,13 +12,7 @@ class RoughlyCastedValue : public Value
 
 		ance::Type* getType() override;
 
-		void buildNativeValue(
-			llvm::LLVMContext& c,
-			llvm::Module* m,
-			CompileContext* state,
-			llvm::IRBuilder<>& ir,
-			llvm::DIBuilder* di
-		) override;
+		void buildNativeValue(CompileContext* context) override;
 
 		llvm::Value* getNativeValue() override;
 
