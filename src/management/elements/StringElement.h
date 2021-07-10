@@ -7,16 +7,16 @@
 
 namespace data
 {
-class StringElement : public data::Element
-{
-	public:
-		explicit StringElement(std::string string);
+    class StringElement : public data::Element
+    {
+      public:
+        explicit StringElement(std::string string);
 
-		[[nodiscard]] std::optional<std::reference_wrapper<const std::string>> asString() const override;
+        [[nodiscard]] std::optional<std::reference_wrapper<const std::string>> asString() const override;
 
-	private:
-		std::string string_;
-};
+      private:
+        std::string string_;
+    };
 }
 
 #endif

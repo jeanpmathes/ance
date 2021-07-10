@@ -1,21 +1,21 @@
 #include "ExpressionBackedValue.h"
 
 ance::ExpressionBackedValue::ExpressionBackedValue(BackingExpression* expression)
-	: expression_(expression)
+    : expression_(expression)
 {
 }
 
 ance::Type* ance::ExpressionBackedValue::getType()
 {
-	return expression_->getType();
+    return expression_->getType();
 }
 
 void ance::ExpressionBackedValue::buildNativeValue(CompileContext* context)
 {
-	expression_->buildBackingValue(context);
+    expression_->buildBackingValue(context);
 }
 
 llvm::Value* ance::ExpressionBackedValue::getNativeValue()
 {
-	return expression_->getNativeValue();
+    return expression_->getNativeValue();
 }

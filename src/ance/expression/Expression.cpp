@@ -2,5 +2,4 @@
 
 void Expression::setScope(ance::Scope*)
 {
-
 }

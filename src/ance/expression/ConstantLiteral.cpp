@@ -4,17 +4,16 @@
 #include "Scope.h"
 
 ConstantLiteral::ConstantLiteral(ance::Constant* constant)
-	: constant_(constant)
+    : constant_(constant)
 {
-
 }
 
 ance::Type* ConstantLiteral::getType()
 {
-	return constant_->getType();
+    return constant_->getType();
 }
 
 ance::Constant* ConstantLiteral::getConstantValue()
 {
-	return constant_;
+    return constant_;
 }

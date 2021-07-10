@@ -7,16 +7,16 @@
 
 class VariableAssignable : public Assignable
 {
-	public:
-		explicit VariableAssignable(std::string variable_identifier);
+  public:
+    explicit VariableAssignable(std::string variable_identifier);
 
-		void setScope(ance::Scope* scope) override;
+    void setScope(ance::Scope* scope) override;
 
-		void assign(ance::Value* value, CompileContext* context) override;
+    void assign(ance::Value* value, CompileContext* context) override;
 
-	private:
-		std::string variable_identifier_;
-		ance::Scope* scope_{nullptr};
+  private:
+    std::string  variable_identifier_;
+    ance::Scope* scope_ {nullptr};
 };
 
 #endif

@@ -5,23 +5,23 @@
 
 namespace ance
 {
-class VoidType : public Type
-{
-	public:
-		std::string getName() override;
+    class VoidType : public Type
+    {
+      public:
+        std::string getName() override;
 
-		llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
-		llvm::Type* getContentType(llvm::LLVMContext& c) override;
+        llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
-	private:
-		VoidType() = default;
+      private:
+        VoidType() = default;
 
-	public:
-		static VoidType* get();
+      public:
+        static VoidType* get();
 
-	private:
-		inline static VoidType* instance_ = nullptr;
-};
+      private:
+        inline static VoidType* instance_ = nullptr;
+    };
 }
 #endif

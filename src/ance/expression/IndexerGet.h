@@ -6,20 +6,20 @@
 
 class IndexerGet : public DelayableExpression
 {
-	public:
-		IndexerGet(Expression* indexed, Expression* index);
+  public:
+    IndexerGet(Expression* indexed, Expression* index);
 
-		void setScope(ance::Scope* scope) override;
+    void setScope(ance::Scope* scope) override;
 
-		ance::Type* getType() override;
+    ance::Type* getType() override;
 
-		void buildValue(CompileContext* context) override;
+    void buildValue(CompileContext* context) override;
 
-		~IndexerGet() override;
+    ~IndexerGet() override;
 
-	private:
-		Expression* indexed_;
-		Expression* index_;
+  private:
+    Expression* indexed_;
+    Expression* index_;
 };
 
 #endif

@@ -12,42 +12,39 @@
  */
 class dataBaseVisitor : public dataVisitor
 {
-	public:
+  public:
+    virtual antlrcpp::Any visitElement(dataParser::ElementContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
 
-		virtual antlrcpp::Any visitElement(dataParser::ElementContext* ctx) override
-		{
-			return visitChildren(ctx);
-		}
+    virtual antlrcpp::Any visitDictionary(dataParser::DictionaryContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
 
-		virtual antlrcpp::Any visitDictionary(dataParser::DictionaryContext* ctx) override
-		{
-			return visitChildren(ctx);
-		}
+    virtual antlrcpp::Any visitEntry(dataParser::EntryContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
 
-		virtual antlrcpp::Any visitEntry(dataParser::EntryContext* ctx) override
-		{
-			return visitChildren(ctx);
-		}
+    virtual antlrcpp::Any visitList(dataParser::ListContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
 
-		virtual antlrcpp::Any visitList(dataParser::ListContext* ctx) override
-		{
-			return visitChildren(ctx);
-		}
+    virtual antlrcpp::Any visitString(dataParser::StringContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
 
-		virtual antlrcpp::Any visitString(dataParser::StringContext* ctx) override
-		{
-			return visitChildren(ctx);
-		}
+    virtual antlrcpp::Any visitTrue(dataParser::TrueContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
 
-		virtual antlrcpp::Any visitTrue(dataParser::TrueContext* ctx) override
-		{
-			return visitChildren(ctx);
-		}
-
-		virtual antlrcpp::Any visitFalse(dataParser::FalseContext* ctx) override
-		{
-			return visitChildren(ctx);
-		}
-
+    virtual antlrcpp::Any visitFalse(dataParser::FalseContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
 };
-

@@ -1,56 +1,56 @@
 #ifndef ANCE_SRC_ANCE_CONSTRUCT_VARIABLE_H_
 #define ANCE_SRC_ANCE_CONSTRUCT_VARIABLE_H_
 
-#include <string>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
+#include <string>
 
 class CompileContext;
 
 namespace llvm
 {
-class DIBuilder;
+    class DIBuilder;
 
-class LLVMContext;
-}
+    class LLVMContext;
+}// namespace llvm
 
 namespace ance
 {
-class Scope;
+    class Scope;
 
-class Type;
+    class Type;
 
-class Value;
+    class Value;
 
-class Variable
-{
-	protected:
-		Variable(ance::Scope* containing_scope, std::string identifier, ance::Type* type, bool is_constant);
+    class Variable
+    {
+      protected:
+        Variable(ance::Scope* containing_scope, std::string identifier, ance::Type* type, bool is_constant);
 
-		explicit Variable(std::string identifier);
+        explicit Variable(std::string identifier);
 
-		void define(ance::Scope* containing_scope, ance::Type* type, bool is_constant);
+        void define(ance::Scope* containing_scope, ance::Type* type, bool is_constant);
 
-		bool isDefined();
+        bool isDefined();
 
-	public:
-		[[nodiscard]] std::string identifier() const;
+      public:
+        [[nodiscard]] std::string identifier() const;
 
-		[[nodiscard]] ance::Type* type() const;
+        [[nodiscard]] ance::Type* type() const;
 
-		[[nodiscard]] bool isConstant() const;
+        [[nodiscard]] bool isConstant() const;
 
-		virtual ance::Value* getValue(CompileContext* context) = 0;
+        virtual ance::Value* getValue(CompileContext* context) = 0;
 
-		virtual void setValue(ance::Value* value, CompileContext* context) = 0;
+        virtual void setValue(ance::Value* value, CompileContext* context) = 0;
 
-	private:
-		std::string identifier_;
-		bool is_defined_;
+      private:
+        std::string identifier_;
+        bool        is_defined_;
 
-		ance::Scope* scope_;
-		ance::Type* type_;
-		bool is_constant_;
-};
+        ance::Scope* scope_;
+        ance::Type*  type_;
+        bool         is_constant_;
+    };
 }
 #endif

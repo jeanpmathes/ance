@@ -7,22 +7,22 @@
 
 class DefaultValueExpression : public BackingConstantExpression
 {
-	public:
-		explicit DefaultValueExpression(ance::Type* type);
+  public:
+    explicit DefaultValueExpression(ance::Type* type);
 
-		ance::Type* getType() override;
+    ance::Type* getType() override;
 
-		ance::Value* getValue() override;
+    ance::Value* getValue() override;
 
-		ance::Constant* getConstantValue() override;
+    ance::Constant* getConstantValue() override;
 
-		llvm::Constant* buildContentConstant(llvm::LLVMContext& c) override;
+    llvm::Constant* buildContentConstant(llvm::LLVMContext& c) override;
 
-		~DefaultValueExpression() override;
+    ~DefaultValueExpression() override;
 
-	private:
-		ance::Type* type_;
-		ance::Constant* constant_{new ance::ExpressionBackedConstant(this)};
+  private:
+    ance::Type*     type_;
+    ance::Constant* constant_ {new ance::ExpressionBackedConstant(this)};
 };
 
 #endif

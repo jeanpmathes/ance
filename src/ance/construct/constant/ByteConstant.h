@@ -3,31 +3,31 @@
 
 #include <string>
 
-#include "Constant.h"
 #include "Application.h"
+#include "Constant.h"
 
 namespace ance
 {
 
-class Type;
+    class Type;
 
-class ByteConstant : public Constant
-{
-	public:
-		explicit ByteConstant(uint8_t byte, Application& app);
+    class ByteConstant : public Constant
+    {
+      public:
+        explicit ByteConstant(uint8_t byte, Application& app);
 
-		ance::Type* getType() override;
+        ance::Type* getType() override;
 
-		llvm::Constant* buildContent(llvm::Module* m) override;
+        llvm::Constant* buildContent(llvm::Module* m) override;
 
-		static char resolveEscaped(char content);
+        static char resolveEscaped(char content);
 
-		static uint8_t parse(const std::string& unparsed);
+        static uint8_t parse(const std::string& unparsed);
 
-	private:
-		ance::Type* type_;
-		uint8_t byte_;
-};
+      private:
+        ance::Type* type_;
+        uint8_t     byte_;
+    };
 }
 
 #endif

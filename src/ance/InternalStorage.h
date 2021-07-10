@@ -3,7 +3,8 @@
 
 enum class InternalStorage
 {
-		AS_TEMPORARY, AS_POINTER
+    AS_TEMPORARY,
+    AS_POINTER
 };
 
 #endif

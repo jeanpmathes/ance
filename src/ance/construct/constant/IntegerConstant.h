@@ -6,19 +6,19 @@
 
 namespace ance
 {
-class IntegerConstant : public Constant
-{
-	public:
-		IntegerConstant(llvm::APInt integer, bool is_signed, Application& app);
+    class IntegerConstant : public Constant
+    {
+      public:
+        IntegerConstant(llvm::APInt integer, bool is_signed, Application& app);
 
-		ance::Type* getType() override;
+        ance::Type* getType() override;
 
-		llvm::Constant* buildContent(llvm::Module* m) override;
+        llvm::Constant* buildContent(llvm::Module* m) override;
 
-	private:
-		ance::Type* type_;
-		llvm::APInt integer_;
-};
+      private:
+        ance::Type* type_;
+        llvm::APInt integer_;
+    };
 }
 
 #endif

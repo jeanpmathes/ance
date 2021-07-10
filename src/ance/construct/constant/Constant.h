@@ -9,28 +9,28 @@
 
 namespace ance
 {
-class Constant : public Value
-{
-	public:
-		void buildContentConstant(llvm::Module* m);
+    class Constant : public Value
+    {
+      public:
+        void buildContentConstant(llvm::Module* m);
 
-	protected:
-		virtual llvm::Constant* buildContent(llvm::Module* m) = 0;
+      protected:
+        virtual llvm::Constant* buildContent(llvm::Module* m) = 0;
 
-	public:
-		llvm::Constant* getContentConstant();
+      public:
+        llvm::Constant* getContentConstant();
 
-		void buildNativeValue(CompileContext* context) final;
+        void buildNativeValue(CompileContext* context) final;
 
-		void buildContentValue(CompileContext* context) final;
+        void buildContentValue(CompileContext* context) final;
 
-		llvm::Value* getNativeValue() final;
+        llvm::Value* getNativeValue() final;
 
-		llvm::Value* getContentValue() final;
+        llvm::Value* getContentValue() final;
 
-	protected:
-		llvm::Value* native_value_{nullptr};
-		llvm::Constant* content_constant_{nullptr};
-};
+      protected:
+        llvm::Value*    native_value_ {nullptr};
+        llvm::Constant* content_constant_ {nullptr};
+    };
 }
 #endif

@@ -6,22 +6,22 @@
 
 namespace ance
 {
-class Scope;
+    class Scope;
 
-class HalfType : public FloatingPointType
-{
-	public:
-		std::string getName() override;
+    class HalfType : public FloatingPointType
+    {
+      public:
+        std::string getName() override;
 
-		llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
-		llvm::Type* getContentType(llvm::LLVMContext& c) override;
+        llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
-	private:
-		inline static FloatingPointType* instance_ = nullptr;
+      private:
+        inline static FloatingPointType* instance_ = nullptr;
 
-	public:
-		static ance::FloatingPointType* get();
-};
+      public:
+        static ance::FloatingPointType* get();
+    };
 }
 #endif

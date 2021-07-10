@@ -7,23 +7,23 @@ class DelayableExpression;
 
 namespace ance
 {
-class DelayedValue : public Value
-{
-	public:
-		explicit DelayedValue(DelayableExpression* expression);
+    class DelayedValue : public Value
+    {
+      public:
+        explicit DelayedValue(DelayableExpression* expression);
 
-		ance::Type* getType() override;
+        ance::Type* getType() override;
 
-		void setValue(ance::Value* value);
+        void setValue(ance::Value* value);
 
-		void buildNativeValue(CompileContext* context) override;
+        void buildNativeValue(CompileContext* context) override;
 
-		llvm::Value* getNativeValue() override;
+        llvm::Value* getNativeValue() override;
 
-	private:
-		DelayableExpression* expression_;
-		ance::Value* value_{nullptr};
-};
+      private:
+        DelayableExpression* expression_;
+        ance::Value*         value_ {nullptr};
+    };
 }
 
 #endif

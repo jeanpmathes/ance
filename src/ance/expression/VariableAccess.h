@@ -5,27 +5,27 @@
 
 namespace ance
 {
-class Variable;
+    class Variable;
 
-class Scope;
+    class Scope;
 }
 
 class VariableAccess : public DelayableExpression
 {
-	public:
-		explicit VariableAccess(std::string identifier);
+  public:
+    explicit VariableAccess(std::string identifier);
 
-		void setScope(ance::Scope* scope) override;
+    void setScope(ance::Scope* scope) override;
 
-		ance::Type* getType() override;
+    ance::Type* getType() override;
 
-		void buildValue(CompileContext* context) override;
+    void buildValue(CompileContext* context) override;
 
-		~VariableAccess() override;
+    ~VariableAccess() override;
 
-	private:
-		std::string identifier_;
-		ance::Variable* variable_{nullptr};
+  private:
+    std::string     identifier_;
+    ance::Variable* variable_ {nullptr};
 };
 
 #endif

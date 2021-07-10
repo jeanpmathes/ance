@@ -7,16 +7,16 @@
 
 namespace data
 {
-class BooleanElement : public data::Element
-{
-	public:
-		explicit BooleanElement(bool b);
+    class BooleanElement : public data::Element
+    {
+      public:
+        explicit BooleanElement(bool b);
 
-		[[nodiscard]] std::optional<bool> asBool() const override;
+        [[nodiscard]] std::optional<bool> asBool() const override;
 
-	private:
-		bool b_;
-};
+      private:
+        bool b_;
+    };
 }
 
 #endif

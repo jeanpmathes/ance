@@ -7,25 +7,25 @@
 
 std::string ance::DoubleType::getName()
 {
-	return "double";
+    return "double";
 }
 
 llvm::Constant* ance::DoubleType::getDefaultContent(llvm::LLVMContext& c)
 {
-	return llvm::ConstantFP::get(getNativeType(c), 0);
+    return llvm::ConstantFP::get(getNativeType(c), 0);
 }
 
 llvm::Type* ance::DoubleType::getContentType(llvm::LLVMContext& c)
 {
-	return llvm::Type::getDoubleTy(c);
+    return llvm::Type::getDoubleTy(c);
 }
 
 ance::FloatingPointType* ance::DoubleType::get()
 {
-	if (!instance_)
-	{
-		instance_ = new DoubleType();
-	}
+    if (!instance_)
+    {
+        instance_ = new DoubleType();
+    }
 
-	return instance_;
+    return instance_;
 }

@@ -6,12 +6,12 @@
 
 class Assignable
 {
-	public:
-		virtual void setScope(ance::Scope* scope) = 0;
+  public:
+    virtual void setScope(ance::Scope* scope) = 0;
 
-		virtual void assign(ance::Value* value, CompileContext* context) = 0;
+    virtual void assign(ance::Value* value, CompileContext* context) = 0;
 
-		virtual ~Assignable() = default;
+    virtual ~Assignable() = default;
 };
 
 #endif

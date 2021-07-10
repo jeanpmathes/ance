@@ -11,17 +11,17 @@ class ConstantExpression;
 
 namespace ance
 {
-class ExpressionBackedConstant : public Constant
-{
-	public:
-		explicit ExpressionBackedConstant(BackingConstantExpression* expression);
+    class ExpressionBackedConstant : public Constant
+    {
+      public:
+        explicit ExpressionBackedConstant(BackingConstantExpression* expression);
 
-		ance::Type* getType() override;
+        ance::Type* getType() override;
 
-		llvm::Constant* buildContent(llvm::Module* m) override;
+        llvm::Constant* buildContent(llvm::Module* m) override;
 
-	private:
-		BackingConstantExpression* expression_;
-};
+      private:
+        BackingConstantExpression* expression_;
+    };
 }
 #endif

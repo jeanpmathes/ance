@@ -5,26 +5,26 @@
 
 namespace ance
 {
-class Scope;
+    class Scope;
 }
 
 class FunctionCall : public DelayableExpression
 {
-	public:
-		FunctionCall(std::string identifier, std::vector<Expression*> arguments);
+  public:
+    FunctionCall(std::string identifier, std::vector<Expression*> arguments);
 
-		void setScope(ance::Scope* scope) override;
+    void setScope(ance::Scope* scope) override;
 
-		ance::Type* getType() override;
+    ance::Type* getType() override;
 
-		void buildValue(CompileContext* context) override;
+    void buildValue(CompileContext* context) override;
 
-		~FunctionCall() override;
+    ~FunctionCall() override;
 
-	private:
-		std::string identifier_;
-		std::vector<Expression*> arguments_;
-		ance::Scope* scope_{nullptr};
+  private:
+    std::string              identifier_;
+    std::vector<Expression*> arguments_;
+    ance::Scope*             scope_ {nullptr};
 };
 
 #endif

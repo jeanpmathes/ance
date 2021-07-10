@@ -9,20 +9,20 @@ class Application;
 
 class SizeofExpression : public BackingExpression
 {
-	public:
-		explicit SizeofExpression(Expression* expression);
+  public:
+    explicit SizeofExpression(Expression* expression);
 
-		void setScope(ance::Scope* scope) override;
+    void setScope(ance::Scope* scope) override;
 
-		ance::Type* getType() override;
+    ance::Type* getType() override;
 
-		ance::Value* getValue() override;
+    ance::Value* getValue() override;
 
-		llvm::Value* buildNativeValue(CompileContext* context) override;
+    llvm::Value* buildNativeValue(CompileContext* context) override;
 
-	private:
-		ance::Value* return_value_{new ance::ExpressionBackedValue(this)};
-		Expression* expression_;
+  private:
+    ance::Value* return_value_ {new ance::ExpressionBackedValue(this)};
+    Expression*  expression_;
 };
 
 #endif

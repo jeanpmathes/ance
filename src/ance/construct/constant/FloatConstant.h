@@ -6,19 +6,19 @@
 
 namespace ance
 {
-class FloatConstant : public Constant
-{
-	public:
-		FloatConstant(llvm::APFloat number, ance::FloatingPointType* type);
+    class FloatConstant : public Constant
+    {
+      public:
+        FloatConstant(llvm::APFloat number, ance::FloatingPointType* type);
 
-		ance::Type* getType() override;
+        ance::Type* getType() override;
 
-		llvm::Constant* buildContent(llvm::Module* m) override;
+        llvm::Constant* buildContent(llvm::Module* m) override;
 
-	private:
-		ance::Type* type_;
-		llvm::APFloat float_;
-};
+      private:
+        ance::Type*   type_;
+        llvm::APFloat float_;
+    };
 }
 
 #endif

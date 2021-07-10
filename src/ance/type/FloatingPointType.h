@@ -5,14 +5,14 @@
 
 namespace ance
 {
-class FloatingPointType : public Type
-{
-	public:
-		std::string getName() override = 0;
+    class FloatingPointType : public Type
+    {
+      public:
+        std::string getName() override = 0;
 
-		llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override = 0;
+        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override = 0;
 
-		llvm::Type* getContentType(llvm::LLVMContext& c) override = 0;
-};
+        llvm::Type* getContentType(llvm::LLVMContext& c) override = 0;
+    };
 }
 #endif

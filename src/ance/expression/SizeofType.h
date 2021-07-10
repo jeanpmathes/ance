@@ -9,18 +9,18 @@ class Application;
 
 class SizeofType : public BackingExpression
 {
-	public:
-		explicit SizeofType(ance::Type* type);
+  public:
+    explicit SizeofType(ance::Type* type);
 
-		ance::Type* getType() override;
+    ance::Type* getType() override;
 
-		ance::Value* getValue() override;
+    ance::Value* getValue() override;
 
-		llvm::Value* buildNativeValue(CompileContext* context) override;
+    llvm::Value* buildNativeValue(CompileContext* context) override;
 
-	private:
-		ance::Value* return_value_{new ance::ExpressionBackedValue(this)};
-		ance::Type* type_;
+  private:
+    ance::Value* return_value_ {new ance::ExpressionBackedValue(this)};
+    ance::Type*  type_;
 };
 
 #endif

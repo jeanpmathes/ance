@@ -1,27 +1,28 @@
 #ifndef ANCE_SRC_ANCE_EXPRESSION_BACKINGCONSTANTEXPRESSION_H_
 #define ANCE_SRC_ANCE_EXPRESSION_BACKINGCONSTANTEXPRESSION_H_
 
-#include "ConstantExpression.h"
 #include "BackingExpression.h"
+#include "ConstantExpression.h"
 
-class BackingConstantExpression : public ConstantExpression, public BackingExpression
+class BackingConstantExpression : public ConstantExpression
+    , public BackingExpression
 {
-	public:
-		void buildConstant(llvm::LLVMContext& c);
+  public:
+    void buildConstant(llvm::LLVMContext& c);
 
-		ance::Type* getType() override = 0;
+    ance::Type* getType() override = 0;
 
-		ance::Constant* getConstantValue() override = 0;
+    ance::Constant* getConstantValue() override = 0;
 
-		llvm::Constant* getContentConstant();
+    llvm::Constant* getContentConstant();
 
-	protected:
-		virtual llvm::Constant* buildContentConstant(llvm::LLVMContext& c) = 0;
+  protected:
+    virtual llvm::Constant* buildContentConstant(llvm::LLVMContext& c) = 0;
 
-		llvm::Value* buildNativeValue(CompileContext* context) final;
+    llvm::Value* buildNativeValue(CompileContext* context) final;
 
-	private:
-		llvm::Constant* content_constant_{nullptr};
+  private:
+    llvm::Constant* content_constant_ {nullptr};
 };
 
 #endif

@@ -5,22 +5,22 @@
 
 namespace ance
 {
-class WrappedNativeValue : public Value
-{
-	public:
-		explicit WrappedNativeValue(ance::Type* type, llvm::Value* value = nullptr);
+    class WrappedNativeValue : public Value
+    {
+      public:
+        explicit WrappedNativeValue(ance::Type* type, llvm::Value* value = nullptr);
 
-		void setValue(llvm::Value* value);
+        void setValue(llvm::Value* value);
 
-		ance::Type* getType() override;
+        ance::Type* getType() override;
 
-		void buildNativeValue(CompileContext* context) override;
+        void buildNativeValue(CompileContext* context) override;
 
-		llvm::Value* getNativeValue() override;
+        llvm::Value* getNativeValue() override;
 
-	private:
-		ance::Type* type_;
-		llvm::Value* value_;
-};
+      private:
+        ance::Type*  type_;
+        llvm::Value* value_;
+    };
 }
 #endif

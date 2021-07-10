@@ -7,21 +7,21 @@
 
 namespace data
 {
-class File
-{
-	public:
-		explicit File(const std::filesystem::path& path);
+    class File
+    {
+      public:
+        explicit File(const std::filesystem::path& path);
 
-		const std::filesystem::path& path();
+        const std::filesystem::path& path();
 
-		void read();
+        void read();
 
-		const data::Element& root();
+        const data::Element& root();
 
-	private:
-		const std::filesystem::path& path_;
-		std::unique_ptr<data::Element> element_;
-};
+      private:
+        const std::filesystem::path&   path_;
+        std::unique_ptr<data::Element> element_;
+    };
 }
 
 #endif

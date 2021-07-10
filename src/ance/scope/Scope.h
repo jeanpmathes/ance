@@ -4,8 +4,8 @@
 #include <map>
 #include <string>
 
-#include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/IRBuilder.h>
 
 #include "GlobalVariable.h"
 #include "Type.h"
@@ -18,24 +18,24 @@ class CompileContext;
 
 namespace ance
 {
-class Constant;
+    class Constant;
 
-class Function;
+    class Function;
 
-class Value;
+    class Value;
 
-class GlobalScope;
+    class GlobalScope;
 
-class Scope
-{
-	public:
-		virtual ance::GlobalScope* getGlobalScope() = 0;
+    class Scope
+    {
+      public:
+        virtual ance::GlobalScope* getGlobalScope() = 0;
 
-		virtual bool validate() = 0;
+        virtual bool validate() = 0;
 
-		virtual ance::Variable* getVariable(std::string identifier) = 0;
+        virtual ance::Variable* getVariable(std::string identifier) = 0;
 
-		virtual ~Scope() = default;
-};
+        virtual ~Scope() = default;
+    };
 }
 #endif

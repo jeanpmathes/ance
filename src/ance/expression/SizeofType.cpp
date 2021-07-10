@@ -4,21 +4,21 @@
 #include "SizeType.h"
 
 SizeofType::SizeofType(ance::Type* type)
-	: type_(type)
+    : type_(type)
 {
 }
 
 ance::Type* SizeofType::getType()
 {
-	return ance::SizeType::get();
+    return ance::SizeType::get();
 }
 
 ance::Value* SizeofType::getValue()
 {
-	return return_value_;
+    return return_value_;
 }
 
 llvm::Value* SizeofType::buildNativeValue(CompileContext* context)
 {
-	return ance::SizeType::buildValue(type_->getContentSize(context->module()));
+    return ance::SizeType::buildValue(type_->getContentSize(context->module()));
 }

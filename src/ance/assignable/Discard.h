@@ -5,10 +5,10 @@
 
 class Discard : public Assignable
 {
-	public:
-		void setScope(ance::Scope* scope) override;
+  public:
+    void setScope(ance::Scope* scope) override;
 
-		void assign(ance::Value* value, CompileContext* context) override;
+    void assign(ance::Value* value, CompileContext* context) override;
 };
 
 #endif

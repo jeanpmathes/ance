@@ -6,25 +6,25 @@
 
 namespace ance
 {
-class StringConstant : public Constant
-{
-	public:
-		StringConstant(std::string prefix, std::string string, Application& app);
+    class StringConstant : public Constant
+    {
+      public:
+        StringConstant(std::string prefix, std::string string, Application& app);
 
-		ance::Type* getType() override;
+        ance::Type* getType() override;
 
-		llvm::Constant* buildContent(llvm::Module* m) override;
+        llvm::Constant* buildContent(llvm::Module* m) override;
 
-		static std::string parse(const std::string& unparsed);
+        static std::string parse(const std::string& unparsed);
 
-	private:
-		static ance::Type* resolveType(std::string& prefix, std::string& string, Application& app);
+      private:
+        static ance::Type* resolveType(std::string& prefix, std::string& string, Application& app);
 
-	private:
-		ance::Type* type_;
-		std::string prefix_;
-		std::string string_;
-};
+      private:
+        ance::Type* type_;
+        std::string prefix_;
+        std::string string_;
+    };
 }
 
 #endif

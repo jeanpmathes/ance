@@ -7,24 +7,24 @@ class Application;
 
 namespace ance
 {
-class BooleanConstant : public Constant
-{
-	private:
-		explicit BooleanConstant(bool boolean, Application& app);
+    class BooleanConstant : public Constant
+    {
+      private:
+        explicit BooleanConstant(bool boolean, Application& app);
 
-	public:
-		ance::Type* getType() override;
+      public:
+        ance::Type* getType() override;
 
-		llvm::Constant* buildContent(llvm::Module* m) override;
+        llvm::Constant* buildContent(llvm::Module* m) override;
 
-		static ance::BooleanConstant* createFalse(Application& app);
+        static ance::BooleanConstant* createFalse(Application& app);
 
-		static ance::BooleanConstant* createTrue(Application& app);
+        static ance::BooleanConstant* createTrue(Application& app);
 
-	private:
-		ance::Type* type_;
-		bool boolean_;
-};
+      private:
+        ance::Type* type_;
+        bool        boolean_;
+    };
 }
 
 #endif

@@ -7,25 +7,25 @@
 
 std::string ance::QuadType::getName()
 {
-	return "quad";
+    return "quad";
 }
 
 llvm::Constant* ance::QuadType::getDefaultContent(llvm::LLVMContext& c)
 {
-	return llvm::ConstantFP::get(getNativeType(c), 0);
+    return llvm::ConstantFP::get(getNativeType(c), 0);
 }
 
 llvm::Type* ance::QuadType::getContentType(llvm::LLVMContext& c)
 {
-	return llvm::Type::getFP128Ty(c);
+    return llvm::Type::getFP128Ty(c);
 }
 
 ance::FloatingPointType* ance::QuadType::get()
 {
-	if (!instance_)
-	{
-		instance_ = new QuadType();
-	}
+    if (!instance_)
+    {
+        instance_ = new QuadType();
+    }
 
-	return instance_;
+    return instance_;
 }

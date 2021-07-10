@@ -8,33 +8,33 @@
 
 namespace ance
 {
-class Type;
+    class Type;
 
-class Parameter : public ance::Value
-{
-	public:
-		Parameter(ance::Type* type, std::string name);
+    class Parameter : public ance::Value
+    {
+      public:
+        Parameter(ance::Type* type, std::string name);
 
-		ance::Type* getType() override;
+        ance::Type* getType() override;
 
-		std::string name();
+        std::string name();
 
-		void wrap(llvm::Argument* argument);
+        void wrap(llvm::Argument* argument);
 
-		void buildNativeValue(CompileContext* context) override;
+        void buildNativeValue(CompileContext* context) override;
 
-		void buildContentValue(CompileContext* context) override;
+        void buildContentValue(CompileContext* context) override;
 
-		llvm::Value* getNativeValue() override;
+        llvm::Value* getNativeValue() override;
 
-		llvm::Value* getContentValue() override;
+        llvm::Value* getContentValue() override;
 
-	private:
-		ance::Type* type_;
-		std::string name_;
+      private:
+        ance::Type* type_;
+        std::string name_;
 
-		llvm::Value* native_value_{nullptr};
-		llvm::Value* content_value_{nullptr};
-};
+        llvm::Value* native_value_ {nullptr};
+        llvm::Value* content_value_ {nullptr};
+    };
 }
 #endif

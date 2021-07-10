@@ -5,21 +5,21 @@
 
 namespace ance
 {
-class RoughlyCastedValue : public Value
-{
-	public:
-		RoughlyCastedValue(ance::Type* target_type, ance::Value* original);
+    class RoughlyCastedValue : public Value
+    {
+      public:
+        RoughlyCastedValue(ance::Type* target_type, ance::Value* original);
 
-		ance::Type* getType() override;
+        ance::Type* getType() override;
 
-		void buildNativeValue(CompileContext* context) override;
+        void buildNativeValue(CompileContext* context) override;
 
-		llvm::Value* getNativeValue() override;
+        llvm::Value* getNativeValue() override;
 
-	private:
-		ance::Type* target_type_;
-		ance::Value* original_;
-};
+      private:
+        ance::Type*  target_type_;
+        ance::Value* original_;
+    };
 }
 
 #endif

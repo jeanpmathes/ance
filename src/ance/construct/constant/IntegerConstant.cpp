@@ -5,17 +5,17 @@
 #include "IntegerType.h"
 
 ance::IntegerConstant::IntegerConstant(llvm::APInt integer, bool is_signed, Application& app)
-	: type_(ance::IntegerType::get(app, integer.getBitWidth(), is_signed)),
-	  integer_(std::move(integer))
+    : type_(ance::IntegerType::get(app, integer.getBitWidth(), is_signed)),
+      integer_(std::move(integer))
 {
 }
 
 ance::Type* ance::IntegerConstant::getType()
 {
-	return type_;
+    return type_;
 }
 
 llvm::Constant* ance::IntegerConstant::buildContent(llvm::Module* m)
 {
-	return llvm::ConstantInt::get(type_->getNativeType(m->getContext()), integer_);
+    return llvm::ConstantInt::get(type_->getNativeType(m->getContext()), integer_);
 }

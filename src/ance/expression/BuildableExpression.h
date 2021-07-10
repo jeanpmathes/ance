@@ -5,8 +5,8 @@
 
 class BuildableExpression : public virtual Expression
 {
-	public:
-		virtual void build(CompileContext* context) = 0;
+  public:
+    virtual void build(CompileContext* context) = 0;
 };
 
 #endif

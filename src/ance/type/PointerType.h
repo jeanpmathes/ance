@@ -7,50 +7,47 @@ class Application;
 
 namespace ance
 {
-class PointerType : public Type
-{
-	private:
-		explicit PointerType(Type* element_type);
+    class PointerType : public Type
+    {
+      private:
+        explicit PointerType(Type* element_type);
 
-	public:
-		std::string getName() override;
+      public:
+        std::string getName() override;
 
-		llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
-		llvm::PointerType* getContentType(llvm::LLVMContext& c) override;
+        llvm::PointerType* getContentType(llvm::LLVMContext& c) override;
 
-		bool isIndexerDefined(Indexer indexer) override;
+        bool isIndexerDefined(Indexer indexer) override;
 
-		ance::Type* getIndexerReturnType() override;
+        ance::Type* getIndexerReturnType() override;
 
-		ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
+        ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
 
-		void buildSetIndexer(
-			ance::Value* indexed,
-			ance::Value* index,
-			ance::Value* value,
-			CompileContext* context
-		) override;
+        void buildSetIndexer(
+            ance::Value*    indexed,
+            ance::Value*    index,
+            ance::Value*    value,
+            CompileContext* context) override;
 
-	private:
-		static llvm::Value* buildGetElementPointer(
-			ance::Value* indexed,
-			ance::Value* index,
-			CompileContext* context
-		);
+      private:
+        static llvm::Value* buildGetElementPointer(
+            ance::Value*    indexed,
+            ance::Value*    index,
+            CompileContext* context);
 
-	public:
+      public:
+        ~PointerType() override = default;
 
-		~PointerType() override = default;
+      private:
+        ance::Type* element_type_;
 
-	private:
-		ance::Type* element_type_;
+      public:
+        static ance::Type* get(Application& app, ance::Type* element_type);
 
-	public:
-		static ance::Type* get(Application& app, ance::Type* element_type);
-
-		static bool isPointerType(ance::Type* type);
-};
+        static bool isPointerType(ance::Type* type);
+    };
 }
 
 #endif

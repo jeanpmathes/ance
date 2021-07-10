@@ -7,25 +7,25 @@ class Application;
 
 namespace ance
 {
-class SizeType : public ance::Type
-{
-	public:
-		std::string getName() override;
+    class SizeType : public ance::Type
+    {
+      public:
+        std::string getName() override;
 
-		llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
-		llvm::Type* getContentType(llvm::LLVMContext& c) override;
+        llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
-		static llvm::Value* buildValue(llvm::TypeSize size);
+        static llvm::Value* buildValue(llvm::TypeSize size);
 
-	private:
-		inline static SizeType* instance_ = nullptr;
-		inline static llvm::Type* native_type_ = nullptr;
+      private:
+        inline static SizeType*   instance_    = nullptr;
+        inline static llvm::Type* native_type_ = nullptr;
 
-	public:
-		static void init(llvm::LLVMContext& c, Application& app);
+      public:
+        static void init(llvm::LLVMContext& c, Application& app);
 
-		static ance::SizeType* get();
-};
+        static ance::SizeType* get();
+    };
 }
 #endif

@@ -4,19 +4,18 @@
 #include "LocalScope.h"
 
 DeleteStatement::DeleteStatement(Expression* to_delete, bool delete_buffer, unsigned int l, unsigned int c)
-	: Statement(l, c), to_delete_(to_delete), delete_buffer_(delete_buffer)
+    : Statement(l, c), to_delete_(to_delete), delete_buffer_(delete_buffer)
 {
-
 }
 
 void DeleteStatement::setContainingFunction(ance::DefinedFunction* function)
 {
-	Statement::setContainingFunction(function);
+    Statement::setContainingFunction(function);
 
-	to_delete_->setScope(function->getScope());
+    to_delete_->setScope(function->getScope());
 }
 
 void DeleteStatement::build(CompileContext* context)
 {
-	context->runtime()->deleteDynamic(to_delete_->getValue(), delete_buffer_, context);
+    context->runtime()->deleteDynamic(to_delete_->getValue(), delete_buffer_, context);
 }

@@ -8,19 +8,18 @@ class Expression;
 
 class AssignmentStatement : public Statement
 {
-	public:
-		AssignmentStatement(
-			Assignable* assignable,
-			Expression* assigned,
-			unsigned int l,
-			unsigned int c
-		);
+  public:
+    AssignmentStatement(
+        Assignable*  assignable,
+        Expression*  assigned,
+        unsigned int l,
+        unsigned int c);
 
-		void setContainingFunction(ance::DefinedFunction* function) override;
+    void setContainingFunction(ance::DefinedFunction* function) override;
 
-		void build(CompileContext* context) override;
+    void build(CompileContext* context) override;
 
-	private:
-		Assignable* assignable_;
-		Expression* assigned_;
+  private:
+    Assignable* assignable_;
+    Expression* assigned_;
 };

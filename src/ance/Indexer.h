@@ -3,7 +3,8 @@
 
 enum class Indexer
 {
-		GET, SET
+    GET,
+    SET
 };
 
 #endif
