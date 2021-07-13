@@ -55,45 +55,33 @@ Visitor::Visitor(Application& application)
 {
 }
 
-antlrcpp::Any Visitor::visitConstantDeclaration(anceParser::ConstantDeclarationContext* ctx)
-{
-    AccessModifier access     = visit(ctx->accessModifier());
-    ance::Type*    type       = visit(ctx->type());
-    std::string    identifier = ctx->IDENTIFIER()->getText();
-
-    Assigner assigner = visit(ctx->assigner());
-    assert(assigner == Assigner::FINAL_COPY_ASSIGNMENT && "Constant declaration has to be final.");
-
-    Expression* expr       = visit(ctx->literalExpression());
-    auto*       const_expr = dynamic_cast<ConstantExpression*>(expr);
-
-    application_.globalScope()->defineGlobalConstant(access, identifier, type, const_expr->getConstantValue());
-
-    return this->visitChildren(ctx);
-}
-
 antlrcpp::Any Visitor::visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx)
 {
     AccessModifier access     = visit(ctx->accessModifier());
+    bool is_constant = ctx->CONST();
     ance::Type*    type       = visit(ctx->type());
     std::string    identifier = ctx->IDENTIFIER()->getText();
 
     ConstantExpression* const_expr;
+    Assigner assigner = Assigner::COPY_ASSIGNMENT;
 
     if (ctx->literalExpression())
     {
-        Assigner assigner = visit(ctx->assigner());
-        assert(assigner == Assigner::COPY_ASSIGNMENT && "Final declaration not yet supported.");
+        assigner = visit(ctx->assigner());
 
         Expression* expr = visit(ctx->literalExpression());
         const_expr       = dynamic_cast<ConstantExpression*>(expr);
+    }
+    else if (is_constant)
+    {
+        const_expr = nullptr;
     }
     else
     {
         const_expr = new DefaultValueExpression(type);
     }
 
-    application_.globalScope()->defineGlobalVariable(access, identifier, type, const_expr->getConstantValue());
+    application_.globalScope()->defineGlobalVariable(access, is_constant, identifier, type, assigner, const_expr->getConstantValue());
 
     return this->visitChildren(ctx);
 }

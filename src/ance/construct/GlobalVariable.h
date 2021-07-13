@@ -12,7 +12,7 @@ namespace llvm
     class Module;
 
     class GlobalVariable;
-}// namespace llvm
+}
 
 enum class AccessModifier;
 

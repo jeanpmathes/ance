@@ -21,7 +21,7 @@ namespace llvm
     class Type;
 
     class DIBuilder;
-}// namespace llvm
+}
 
 namespace ance
 {

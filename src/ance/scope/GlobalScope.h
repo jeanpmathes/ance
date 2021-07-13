@@ -3,6 +3,8 @@
 
 #include "Scope.h"
 
+#include "Assigner.h"
+
 namespace ance
 {
     class GlobalScope : public Scope
@@ -18,17 +20,13 @@ namespace ance
 
         void registerType(ance::Type* type);
 
-        void defineGlobalConstant(
-            AccessModifier     access,
-            const std::string& identifier,
-            ance::Type*        type,
-            ance::Constant*    constant);
-
         void defineGlobalVariable(
             AccessModifier     access,
+            bool is_constant,
             const std::string& identifier,
             ance::Type*        type,
-            ance::Constant*    value);
+            Assigner assigner,
+            ance::Constant*    initial_value);
 
         ance::Variable* getVariable(std::string identifier) override;
 
@@ -39,7 +37,7 @@ namespace ance
             llvm::IRBuilder<>& ir,
             llvm::DIBuilder*   di);
 
-        size_t functionCount() const;
+        [[nodiscard]] size_t functionCount() const;
 
         void addFunctionName(const std::string& name);
 

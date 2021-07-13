@@ -23,12 +23,7 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(
     ance::Type*        type,
     Expression*        expression)
 {
-    assert(local_variables.find(identifier) == local_variables.end());
-
-    auto* variable              = new LocalVariable(this, identifier, type, expression->getValue());
-    local_variables[identifier] = variable;
-
-    return variable;
+    return defineLocalVariable(identifier, type, expression->getValue());
 }
 
 ance::LocalVariable* ance::LocalScope::defineLocalVariable(
@@ -36,19 +31,19 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(
     ance::Type*        type,
     ance::Value*       value)
 {
-    assert(local_variables.find(identifier) == local_variables.end());
+    assert(local_variables_.find(identifier) == local_variables_.end());
 
     auto* variable              = new LocalVariable(this, identifier, type, value);
-    local_variables[identifier] = variable;
+    local_variables_[identifier] = variable;
 
     return variable;
 }
 
 ance::Variable* ance::LocalScope::getVariable(std::string identifier)
 {
-    if (local_variables.find(identifier) != local_variables.end())
+    if (local_variables_.find(identifier) != local_variables_.end())
     {
-        return local_variables[identifier];
+        return local_variables_[identifier];
     }
 
     return getGlobalScope()->getVariable(identifier);

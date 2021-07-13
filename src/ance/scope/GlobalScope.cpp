@@ -50,51 +50,44 @@ void ance::GlobalScope::registerType(ance::Type* type)
     types_[type->getName()] = type;
 }
 
-void ance::GlobalScope::defineGlobalConstant(
-    AccessModifier     access,
-    const std::string& identifier,
-    ance::Type*        type,
-    ance::Constant*    constant)
+void ance::GlobalScope::defineGlobalVariable(AccessModifier access, bool is_constant, const std::string& identifier, ance::Type* type, Assigner assigner, ance::Constant* initial_value)
 {
-    assert(global_variables_.find(identifier) == global_variables_.end());
-    assert(global_constants_.find(identifier) == global_constants_.end());
+    assert(global_variables_.find(identifier) == global_variables_.end() && "A variable identifier may be used just once.");
+    assert(global_constants_.find(identifier) == global_constants_.end() && "A constant identifier may be used just once.");
+
+    assert(initial_value && "Variables require an initial value, which has to be explicit for constants.");
+
+    bool is_final = IsFinal(assigner);
 
     if (global_undefined_.find(identifier) != global_undefined_.end())
     {
-        GlobalVariable* undefined = global_undefined_[identifier];
+        ance::GlobalVariable* undefined = global_undefined_[identifier];
 
-        undefined->defineGlobal(this, access, type, constant, true);
-        global_constants_[identifier] = undefined;
+        undefined->defineGlobal(this, access, type, initial_value, is_constant);
+
+        if (is_constant)
+        {
+            global_constants_[identifier] = undefined;
+        }
+        else
+        {
+            global_variables_[identifier] = undefined;
+        }
 
         global_undefined_.erase(identifier);
     }
     else
     {
-        global_constants_[identifier] = new ance::GlobalVariable(this, access, identifier, type, constant, true);
-    }
-}
+        auto* defined = new ance::GlobalVariable(this, access, identifier, type, initial_value, is_constant);
 
-void ance::GlobalScope::defineGlobalVariable(
-    AccessModifier     access,
-    const std::string& identifier,
-    ance::Type*        type,
-    ance::Constant*    value)
-{
-    assert(global_variables_.find(identifier) == global_variables_.end());
-    assert(global_constants_.find(identifier) == global_constants_.end());
-
-    if (global_undefined_.find(identifier) != global_undefined_.end())
-    {
-        GlobalVariable* undefined = global_undefined_[identifier];
-
-        undefined->defineGlobal(this, access, type, value, false);
-        global_variables_[identifier] = undefined;
-
-        global_undefined_.erase(identifier);
-    }
-    else
-    {
-        global_variables_[identifier] = new ance::GlobalVariable(this, access, identifier, type, value, false);
+        if (is_constant)
+        {
+            global_constants_[identifier] = defined;
+        }
+        else
+        {
+            global_variables_[identifier] = defined;
+        }
     }
 }
 

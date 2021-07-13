@@ -32,7 +32,7 @@ namespace ance
       private:
         ance::Scope* parent_;
 
-        std::map<std::string, ance::LocalVariable*> local_variables;
+        std::map<std::string, ance::LocalVariable*> local_variables_;
     };
 }
 #endif

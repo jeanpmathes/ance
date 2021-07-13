@@ -8,4 +8,6 @@ enum class Assigner
     FINAL_COPY_ASSIGNMENT
 };
 
+bool IsFinal(Assigner assigner);
+
 #endif

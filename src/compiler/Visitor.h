@@ -12,8 +12,6 @@ class Visitor : public anceBaseVisitor
 
     // Declarations
 
-    antlrcpp::Any visitConstantDeclaration(anceParser::ConstantDeclarationContext* ctx) override;
-
     antlrcpp::Any visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx) override;
 
     // Functions

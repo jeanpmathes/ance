@@ -12,7 +12,7 @@ namespace llvm
     class DIBuilder;
 
     class LLVMContext;
-}// namespace llvm
+}
 
 namespace ance
 {

@@ -5,16 +5,11 @@ file
 	;
 
 data
-	: constantDeclaration
-	| variableDeclaration
-	;
-
-constantDeclaration
-	: accessModifier 'const' type IDENTIFIER assigner literalExpression ';'
+	: variableDeclaration
 	;
 
 variableDeclaration
-	: accessModifier type IDENTIFIER ( assigner literalExpression )? ';'
+	: accessModifier ( CONST )? type IDENTIFIER ( assigner literalExpression )? ';'
 	;
 
 code
@@ -254,6 +249,7 @@ BYTE : '\'' ( . | '\\' . ) '\'' ;
 INTEGER : [0-9]+ ;
 
 BUFFER : '[]' ;
+CONST : 'const' ;
 
 IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
 
