@@ -4,6 +4,7 @@
 #include <ostream>
 
 #include "AccessModifier.h"
+#include "ConstantExpression.h"
 #include "Function.h"
 
 ance::GlobalScope* ance::GlobalScope::getGlobalScope()
@@ -50,20 +51,22 @@ void ance::GlobalScope::registerType(ance::Type* type)
     types_[type->getName()] = type;
 }
 
-void ance::GlobalScope::defineGlobalVariable(AccessModifier access, bool is_constant, const std::string& identifier, ance::Type* type, Assigner assigner, ance::Constant* initial_value)
+void ance::GlobalScope::defineGlobalVariable(AccessModifier access, bool is_constant, const std::string& identifier, ance::Type* type, Assigner assigner, ConstantExpression* initializer)
 {
     assert(global_variables_.find(identifier) == global_variables_.end() && "A variable identifier may be used just once.");
     assert(global_constants_.find(identifier) == global_constants_.end() && "A constant identifier may be used just once.");
 
-    assert(initial_value && "Variables require an initial value, which has to be explicit for constants.");
+    assert(initializer && "Variables require an initial value, which has to be explicit for constants.");
 
     bool is_final = IsFinal(assigner);
+
+    assert((!is_constant || is_final) && "A constant must be final.");
 
     if (global_undefined_.find(identifier) != global_undefined_.end())
     {
         ance::GlobalVariable* undefined = global_undefined_[identifier];
 
-        undefined->defineGlobal(this, access, type, initial_value, is_constant);
+        undefined->defineGlobal(this, access, type, initializer, is_final, is_constant);
 
         if (is_constant)
         {
@@ -78,7 +81,7 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier access, bool is_cons
     }
     else
     {
-        auto* defined = new ance::GlobalVariable(this, access, identifier, type, initial_value, is_constant);
+        auto* defined = new ance::GlobalVariable(this, access, identifier, type, initializer, is_final, is_constant);
 
         if (is_constant)
         {

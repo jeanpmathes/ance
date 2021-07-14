@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ANCE_SRC_ANCE_STATEMENT_ASSIGNMENTSTATEMENT_H_
+#define ANCE_SRC_ANCE_STATEMENT_ASSIGNMENTSTATEMENT_H_
 
 #include "Statement.h"
 
@@ -23,3 +24,4 @@ class AssignmentStatement : public Statement
     Assignable* assignable_;
     Expression* assigned_;
 };
+#endif

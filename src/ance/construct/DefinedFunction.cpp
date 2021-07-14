@@ -26,7 +26,7 @@ ance::DefinedFunction::DefinedFunction(
     for (auto* parameter : parameters_)
     {
         ance::LocalVariable* arg = local_scope_->defineLocalVariable(
-            parameter->name(), parameter->getType(),
+            parameter->name(), parameter->getType(), Assigner::COPY_ASSIGNMENT,
             parameter);
         arguments_.push_back(arg);
     }

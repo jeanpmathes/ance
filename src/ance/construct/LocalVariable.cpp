@@ -10,8 +10,9 @@ ance::LocalVariable::LocalVariable(
     ance::LocalScope* containing_scope,
     std::string       identifier,
     ance::Type*       type,
-    ance::Value*      value)
-    : Variable(containing_scope, std::move(identifier), type, false), initial_value_(value)
+    ance::Value*      value,
+    bool              is_final)
+    : Variable(containing_scope, std::move(identifier), type, is_final), initial_value_(value)
 {
 }
 
@@ -25,7 +26,7 @@ void ance::LocalVariable::build(CompileContext* context)
         native_value_->setName(identifier());
     }
 
-    setValue(initial_value_, context);
+    store(initial_value_, context);
 }
 
 ance::Value* ance::LocalVariable::getValue(CompileContext*)
@@ -34,6 +35,12 @@ ance::Value* ance::LocalVariable::getValue(CompileContext*)
 }
 
 void ance::LocalVariable::setValue(ance::Value* value, CompileContext* context)
+{
+    assert(!isFinal() && "Cannot assign to final variable.");
+    store(value, context);
+}
+
+void ance::LocalVariable::store(ance::Value* value, CompileContext* context)
 {
     assert(type() == value->getType() && "Assignment types have to match.");
 

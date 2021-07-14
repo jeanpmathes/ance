@@ -1,6 +1,9 @@
-#pragma once
+#ifndef ANCE_SRC_ANCE_STATEMENT_LOCALVARIABLEDEFINITION_H_
+#define ANCE_SRC_ANCE_STATEMENT_LOCALVARIABLEDEFINITION_H_
 
 #include "Statement.h"
+
+#include "Assigner.h"
 
 namespace ance
 {
@@ -15,6 +18,7 @@ class LocalVariableDefinition : public Statement
     LocalVariableDefinition(
         std::string  identifier,
         ance::Type*  type,
+        Assigner     assigner,
         Expression*  assigned,
         unsigned int l,
         unsigned int c);
@@ -26,7 +30,10 @@ class LocalVariableDefinition : public Statement
   private:
     std::string identifier_;
     ance::Type* type_;
+    Assigner    assigner_;
     Expression* assigned_;
 
     ance::LocalVariable* variable_ {nullptr};
 };
+
+#endif

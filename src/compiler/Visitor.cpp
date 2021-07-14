@@ -57,13 +57,13 @@ Visitor::Visitor(Application& application)
 
 antlrcpp::Any Visitor::visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx)
 {
-    AccessModifier access     = visit(ctx->accessModifier());
-    bool is_constant = ctx->CONST();
-    ance::Type*    type       = visit(ctx->type());
-    std::string    identifier = ctx->IDENTIFIER()->getText();
+    AccessModifier access      = visit(ctx->accessModifier());
+    bool           is_constant = ctx->CONST();
+    ance::Type*    type        = visit(ctx->type());
+    std::string    identifier  = ctx->IDENTIFIER()->getText();
 
     ConstantExpression* const_expr;
-    Assigner assigner = Assigner::COPY_ASSIGNMENT;
+    Assigner            assigner = Assigner::COPY_ASSIGNMENT;
 
     if (ctx->literalExpression())
     {
@@ -81,7 +81,7 @@ antlrcpp::Any Visitor::visitVariableDeclaration(anceParser::VariableDeclarationC
         const_expr = new DefaultValueExpression(type);
     }
 
-    application_.globalScope()->defineGlobalVariable(access, is_constant, identifier, type, assigner, const_expr->getConstantValue());
+    application_.globalScope()->defineGlobalVariable(access, is_constant, identifier, type, assigner, const_expr);
 
     return this->visitChildren(ctx);
 }
@@ -169,22 +169,22 @@ antlrcpp::Any Visitor::visitLocalVariableDefinition(anceParser::LocalVariableDef
     ance::Type* type       = visit(ctx->type());
     std::string identifier = ctx->IDENTIFIER()->getText();
 
+    Assigner    assigner;
     Expression* assigned;
 
     if (ctx->expression())
     {
-        Assigner assigner = visit(ctx->assigner());
-        assert(assigner == Assigner::COPY_ASSIGNMENT && "Final declaration not yet supported.");
-
+        assigner = visit(ctx->assigner());
         assigned = visit(ctx->expression());
     }
     else
     {
+        assigner = Assigner::COPY_ASSIGNMENT;
         assigned = new DefaultValueExpression(type);
     }
 
     auto* statement =
-        new LocalVariableDefinition(identifier, type, assigned, line, column);
+        new LocalVariableDefinition(identifier, type, assigner, assigned, line, column);
 
     return static_cast<Statement*>(statement);
 }

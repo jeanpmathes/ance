@@ -16,6 +16,8 @@ namespace llvm
 
 enum class AccessModifier;
 
+class ConstantExpression;
+
 namespace ance
 {
     class Constant;
@@ -26,21 +28,23 @@ namespace ance
     {
       public:
         GlobalVariable(
-            ance::Scope*    containing_scope,
-            AccessModifier  access,
-            std::string     identifier,
-            ance::Type*     type,
-            ance::Constant* constant_init,
-            bool            is_constant);
+            ance::Scope*        containing_scope,
+            AccessModifier      access,
+            std::string         identifier,
+            ance::Type*         type,
+            ConstantExpression* constant_init,
+            bool                is_final,
+            bool                is_constant);
 
         explicit GlobalVariable(std::string identifier);
 
         void defineGlobal(
-            ance::Scope*    containing_scope,
-            AccessModifier  access,
-            ance::Type*     type,
-            ance::Constant* constant_init,
-            bool            is_constant);
+            ance::Scope*        containing_scope,
+            AccessModifier      access,
+            ance::Type*         type,
+            ConstantExpression* constant_init,
+            bool                is_final,
+            bool                is_constant);
 
         void buildGlobal(llvm::Module* m);
 
@@ -50,8 +54,11 @@ namespace ance
 
       private:
         AccessModifier        access_;
-        ance::Constant*       constant_init_ {nullptr};
+        bool                  is_constant_ {false};
+        ConstantExpression*   constant_init_ {nullptr};
         llvm::GlobalVariable* native_variable_ {nullptr};
+
+        ance::Constant* initial_value_ {nullptr};
     };
 }
 

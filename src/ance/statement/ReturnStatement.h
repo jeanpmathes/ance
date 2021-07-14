@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ANCE_SRC_ANCE_STATEMENT_RETURNSTATEMENT_H_
+#define ANCE_SRC_ANCE_STATEMENT_RETURNSTATEMENT_H_
 
 #include "Expression.h"
 #include "Statement.h"
@@ -15,3 +16,4 @@ class ReturnStatement : public Statement
   private:
     Expression* return_value_;
 };
+#endif

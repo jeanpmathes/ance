@@ -2,6 +2,8 @@
 #define ANCE_SRC_ANCE_SCOPE_LOCALSCOPE_H_
 
 #include "LocalVariable.h"
+
+#include "Assigner.h"
 #include "Scope.h"
 
 class Expression;
@@ -20,11 +22,13 @@ namespace ance
         ance::LocalVariable* defineLocalVariable(
             const std::string& identifier,
             ance::Type*        type,
+            Assigner           assigner,
             Expression*        expression);
 
         ance::LocalVariable* defineLocalVariable(
             const std::string& identifier,
             ance::Type*        type,
+            Assigner           assigner,
             ance::Value*       value);
 
         ance::Variable* getVariable(std::string identifier) override;

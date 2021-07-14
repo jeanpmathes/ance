@@ -5,6 +5,8 @@
 
 #include "Assigner.h"
 
+class ConstantExpression;
+
 namespace ance
 {
     class GlobalScope : public Scope
@@ -21,12 +23,12 @@ namespace ance
         void registerType(ance::Type* type);
 
         void defineGlobalVariable(
-            AccessModifier     access,
-            bool is_constant,
-            const std::string& identifier,
-            ance::Type*        type,
-            Assigner assigner,
-            ance::Constant*    initial_value);
+            AccessModifier      access,
+            bool                is_constant,
+            const std::string&  identifier,
+            ance::Type*         type,
+            Assigner            assigner,
+            ConstantExpression* initializer);
 
         ance::Variable* getVariable(std::string identifier) override;
 

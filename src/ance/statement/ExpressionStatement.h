@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ANCE_SRC_ANCE_STATEMENT_EXPRESSIONSTATEMENT_H_
+#define ANCE_SRC_ANCE_STATEMENT_EXPRESSIONSTATEMENT_H_
 
 #include "Statement.h"
 
@@ -16,3 +17,4 @@ class ExpressionStatement : public Statement
   private:
     BuildableExpression* expression_;
 };
+#endif

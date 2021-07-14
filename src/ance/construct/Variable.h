@@ -25,11 +25,11 @@ namespace ance
     class Variable
     {
       protected:
-        Variable(ance::Scope* containing_scope, std::string identifier, ance::Type* type, bool is_constant);
+        Variable(ance::Scope* containing_scope, std::string identifier, ance::Type* type, bool is_final);
 
         explicit Variable(std::string identifier);
 
-        void define(ance::Scope* containing_scope, ance::Type* type, bool is_constant);
+        void define(ance::Scope* containing_scope, ance::Type* type, bool is_final);
 
         bool isDefined();
 
@@ -38,7 +38,7 @@ namespace ance
 
         [[nodiscard]] ance::Type* type() const;
 
-        [[nodiscard]] bool isConstant() const;
+        [[nodiscard]] bool isFinal() const;
 
         virtual ance::Value* getValue(CompileContext* context) = 0;
 
@@ -50,7 +50,7 @@ namespace ance
 
         ance::Scope* scope_;
         ance::Type*  type_;
-        bool         is_constant_;
+        bool         is_final_;
     };
 }
 #endif
