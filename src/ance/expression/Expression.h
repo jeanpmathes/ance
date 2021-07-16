@@ -20,7 +20,7 @@ class Expression
   public:
     virtual void setScope(ance::Scope* scope);
 
-    virtual ance::Type* getType() = 0;
+    virtual ance::Type* type() = 0;
 
     virtual ance::Value* getValue() = 0;
 

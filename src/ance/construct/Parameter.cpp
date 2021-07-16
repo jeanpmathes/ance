@@ -10,7 +10,7 @@ ance::Parameter::Parameter(ance::Type* type, std::string name)
 {
 }
 
-ance::Type* ance::Parameter::getType()
+ance::Type* ance::Parameter::type()
 {
     return type_;
 }
@@ -41,7 +41,7 @@ void ance::Parameter::buildNativeValue(CompileContext* context)
 {
     if (!native_value_)
     {
-        native_value_ = ance::Values::contentToNative(getType(), content_value_, context);
+        native_value_ = ance::Values::contentToNative(type(), content_value_, context);
     }
 }
 
@@ -49,7 +49,7 @@ void ance::Parameter::buildContentValue(CompileContext* context)
 {
     if (!content_value_)
     {
-        content_value_ = ance::Values::nativeToContent(getType(), native_value_, context);
+        content_value_ = ance::Values::nativeToContent(type(), native_value_, context);
     }
 }
 

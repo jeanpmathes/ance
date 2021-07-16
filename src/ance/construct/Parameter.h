@@ -15,7 +15,7 @@ namespace ance
       public:
         Parameter(ance::Type* type, std::string name);
 
-        ance::Type* getType() override;
+        ance::Type* type() override;
 
         std::string name();
 

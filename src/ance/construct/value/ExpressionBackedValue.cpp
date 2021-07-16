@@ -5,9 +5,9 @@ ance::ExpressionBackedValue::ExpressionBackedValue(BackingExpression* expression
 {
 }
 
-ance::Type* ance::ExpressionBackedValue::getType()
+ance::Type* ance::ExpressionBackedValue::type()
 {
-    return expression_->getType();
+    return expression_->type();
 }
 
 void ance::ExpressionBackedValue::buildNativeValue(CompileContext* context)

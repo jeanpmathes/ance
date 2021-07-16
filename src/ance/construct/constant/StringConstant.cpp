@@ -15,7 +15,7 @@ ance::StringConstant::StringConstant(std::string prefix, std::string string, App
 {
 }
 
-ance::Type* ance::StringConstant::getType()
+ance::Type* ance::StringConstant::type()
 {
     return type_;
 }

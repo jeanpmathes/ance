@@ -10,7 +10,7 @@ ance::ByteConstant::ByteConstant(uint8_t byte, Application& app)
 {
 }
 
-ance::Type* ance::ByteConstant::getType()
+ance::Type* ance::ByteConstant::type()
 {
     return type_;
 }

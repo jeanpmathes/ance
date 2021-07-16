@@ -10,7 +10,7 @@ ance::SizeConstant::SizeConstant(std::string size, Application& app)
 {
 }
 
-ance::Type* ance::SizeConstant::getType()
+ance::Type* ance::SizeConstant::type()
 {
     return type_;
 }

@@ -8,9 +8,9 @@ ConstantLiteral::ConstantLiteral(ance::Constant* constant)
 {
 }
 
-ance::Type* ConstantLiteral::getType()
+ance::Type* ConstantLiteral::type()
 {
-    return constant_->getType();
+    return constant_->type();
 }
 
 ance::Constant* ConstantLiteral::getConstantValue()

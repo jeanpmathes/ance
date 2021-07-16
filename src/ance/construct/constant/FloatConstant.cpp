@@ -5,7 +5,7 @@ ance::FloatConstant::FloatConstant(llvm::APFloat number, ance::FloatingPointType
 {
 }
 
-ance::Type* ance::FloatConstant::getType()
+ance::Type* ance::FloatConstant::type()
 {
     return type_;
 }

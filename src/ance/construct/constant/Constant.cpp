@@ -20,7 +20,7 @@ llvm::Constant* ance::Constant::getContentConstant()
 void ance::Constant::buildNativeValue(CompileContext* context)
 {
     buildContentConstant(context->module());
-    native_value_ = ance::Values::contentToNative(getType(), content_constant_, context);
+    native_value_ = ance::Values::contentToNative(type(), content_constant_, context);
 }
 
 void ance::Constant::buildContentValue(CompileContext* context)

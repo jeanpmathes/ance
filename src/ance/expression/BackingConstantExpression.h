@@ -10,7 +10,7 @@ class BackingConstantExpression : public ConstantExpression
   public:
     void buildConstant(llvm::LLVMContext& c);
 
-    ance::Type* getType() override = 0;
+    ance::Type* type() override = 0;
 
     ance::Constant* getConstantValue() override = 0;
 

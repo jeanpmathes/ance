@@ -7,15 +7,15 @@ ance::DelayedValue::DelayedValue(DelayableExpression* expression)
 {
 }
 
-ance::Type* ance::DelayedValue::getType()
+ance::Type* ance::DelayedValue::type()
 {
-    return expression_->getType();
+    return expression_->type();
 }
 
 void ance::DelayedValue::setValue(ance::Value* value)
 {
     assert(!value_);
-    assert(value->getType() == getType() && "Type has to match.");
+    assert(value->type() == type() && "Type has to match.");
     value_ = value;
 }
 

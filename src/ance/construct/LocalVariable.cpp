@@ -42,7 +42,7 @@ void ance::LocalVariable::setValue(ance::Value* value, CompileContext* context)
 
 void ance::LocalVariable::store(ance::Value* value, CompileContext* context)
 {
-    assert(type() == value->getType() && "Assignment types have to match.");
+    assert(type() == value->type() && "Assignment types have to match.");
 
     switch (type()->storage())
     {

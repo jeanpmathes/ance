@@ -41,7 +41,7 @@ ance::Value* ance::ExternFunction::buildCall(const std::vector<ance::Value*>& ar
 
     for (auto pair : llvm::zip(parameters_, arguments))
     {
-        assert(std::get<0>(pair)->getType() == std::get<1>(pair)->getType() && "Input parameter types must match.");
+        assert(std::get<0>(pair)->type() == std::get<1>(pair)->type() && "Input parameter types must match.");
     }
 
     llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);

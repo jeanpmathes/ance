@@ -12,7 +12,7 @@ namespace ance
       public:
         explicit DelayedValue(DelayableExpression* expression);
 
-        ance::Type* getType() override;
+        ance::Type* type() override;
 
         void setValue(ance::Value* value);
 

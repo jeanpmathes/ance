@@ -16,7 +16,7 @@ void Allocation::setScope(ance::Scope* scope)
     if (count_) count_->setScope(scope);
 }
 
-ance::Type* Allocation::getType()
+ance::Type* Allocation::type()
 {
     return return_type_;
 }

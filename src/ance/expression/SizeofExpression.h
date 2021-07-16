@@ -14,7 +14,7 @@ class SizeofExpression : public BackingExpression
 
     void setScope(ance::Scope* scope) override;
 
-    ance::Type* getType() override;
+    ance::Type* type() override;
 
     ance::Value* getValue() override;
 

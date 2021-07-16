@@ -17,7 +17,7 @@ class VariableAccess : public DelayableExpression
 
     void setScope(ance::Scope* scope) override;
 
-    ance::Type* getType() override;
+    ance::Type* type() override;
 
     void buildValue(CompileContext* context) override;
 

@@ -12,7 +12,7 @@ namespace ance
 
         void setValue(llvm::Value* value);
 
-        ance::Type* getType() override;
+        ance::Type* type() override;
 
         void buildNativeValue(CompileContext* context) override;
 

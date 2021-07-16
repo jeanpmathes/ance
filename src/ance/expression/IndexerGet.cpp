@@ -13,14 +13,14 @@ void IndexerGet::setScope(ance::Scope* scope)
     index_->setScope(scope);
 }
 
-ance::Type* IndexerGet::getType()
+ance::Type* IndexerGet::type()
 {
-    return indexed_->getType()->getIndexerReturnType();
+    return indexed_->type()->getIndexerReturnType();
 }
 
 void IndexerGet::buildValue(CompileContext* context)
 {
-    ance::Type* indexed_type = indexed_->getType();
+    ance::Type* indexed_type = indexed_->type();
     assert(indexed_type->isIndexerDefined(Indexer::GET) && "Type does not support this indexer.");
 
     ance::Value* return_value = indexed_type->buildGetIndexer(indexed_->getValue(), index_->getValue(), context);

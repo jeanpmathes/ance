@@ -19,5 +19,5 @@ llvm::Constant* BackingConstantExpression::getContentConstant()
 llvm::Value* BackingConstantExpression::buildNativeValue(CompileContext* context)
 {
     buildConstant(*context->llvmContext());
-    return ance::Values::contentToNative(getType(), content_constant_, context);
+    return ance::Values::contentToNative(type(), content_constant_, context);
 }

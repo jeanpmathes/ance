@@ -52,8 +52,8 @@ ance::Type* ance::ArrayType::getIndexerReturnType()
 
 ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
 {
-    assert(indexed->getType() == this && "Indexed value has to be of native array type.");
-    assert(index->getType() == ance::SizeType::get() && "Native array index has to be size type.");
+    assert(indexed->type() == this && "Indexed value has to be of native array type.");
+    assert(index->type() == ance::SizeType::get() && "Native array index has to be size type.");
 
     llvm::Value* element_ptr    = buildGetElementPointer(indexed, index, context);
     llvm::Value* native_content = context->ir()->CreateLoad(element_ptr);
@@ -69,9 +69,9 @@ void ance::ArrayType::buildSetIndexer(
     ance::Value*    value,
     CompileContext* context)
 {
-    assert(indexed->getType() == this && "Indexed value has to be of native array type.");
-    assert(index->getType() == ance::SizeType::get() && "Native array index has to be size type.");
-    assert(value->getType() == element_type_ && "Assigned value has to be of the element type of this array.");
+    assert(indexed->type() == this && "Indexed value has to be of native array type.");
+    assert(index->type() == ance::SizeType::get() && "Native array index has to be size type.");
+    assert(value->type() == element_type_ && "Assigned value has to be of the element type of this array.");
 
     value->buildContentValue(context);
 

@@ -5,7 +5,7 @@
 void ance::Value::buildContentValue(CompileContext* context)
 {
     buildNativeValue(context);
-    content_value_ = ance::Values::nativeToContent(getType(), getNativeValue(), context);
+    content_value_ = ance::Values::nativeToContent(type(), getNativeValue(), context);
 }
 
 llvm::Value* ance::Value::getContentValue()

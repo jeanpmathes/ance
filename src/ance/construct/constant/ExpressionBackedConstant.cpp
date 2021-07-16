@@ -6,9 +6,9 @@ ance::ExpressionBackedConstant::ExpressionBackedConstant(BackingConstantExpressi
 {
 }
 
-ance::Type* ance::ExpressionBackedConstant::getType()
+ance::Type* ance::ExpressionBackedConstant::type()
 {
-    return expression_->getType();
+    return expression_->type();
 }
 
 llvm::Constant* ance::ExpressionBackedConstant::buildContent(llvm::Module* m)

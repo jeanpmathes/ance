@@ -35,7 +35,7 @@ ance::Function::createNativeFunction(
 
     for (auto* param : parameters)
     {
-        param_types.push_back(param->getType()->getContentType(c));
+        param_types.push_back(param->type()->getContentType(c));
     }
 
     llvm::FunctionType* native_type     = llvm::FunctionType::get(getReturnType()->getContentType(c), param_types, false);

@@ -10,7 +10,7 @@ void ance::WrappedNativeValue::setValue(llvm::Value* value)
     value_ = value;
 }
 
-ance::Type* ance::WrappedNativeValue::getType()
+ance::Type* ance::WrappedNativeValue::type()
 {
     return type_;
 }

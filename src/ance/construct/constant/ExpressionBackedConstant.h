@@ -16,7 +16,7 @@ namespace ance
       public:
         explicit ExpressionBackedConstant(BackingConstantExpression* expression);
 
-        ance::Type* getType() override;
+        ance::Type* type() override;
 
         llvm::Constant* buildContent(llvm::Module* m) override;
 

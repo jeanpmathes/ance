@@ -13,7 +13,7 @@ namespace ance
         explicit BooleanConstant(bool boolean, Application& app);
 
       public:
-        ance::Type* getType() override;
+        ance::Type* type() override;
 
         llvm::Constant* buildContent(llvm::Module* m) override;
 

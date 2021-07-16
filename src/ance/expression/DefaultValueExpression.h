@@ -10,7 +10,7 @@ class DefaultValueExpression : public BackingConstantExpression
   public:
     explicit DefaultValueExpression(ance::Type* type);
 
-    ance::Type* getType() override;
+    ance::Type* type() override;
 
     ance::Value* getValue() override;
 

@@ -10,7 +10,7 @@ namespace ance
       public:
         RoughlyCastedValue(ance::Type* target_type, ance::Value* original);
 
-        ance::Type* getType() override;
+        ance::Type* type() override;
 
         void buildNativeValue(CompileContext* context) override;
 

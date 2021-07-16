@@ -15,7 +15,7 @@ namespace ance
     class Value
     {
       public:
-        virtual ance::Type* getType() = 0;
+        virtual ance::Type* type() = 0;
 
         virtual void buildNativeValue(CompileContext* context) = 0;
 

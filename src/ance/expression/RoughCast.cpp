@@ -14,7 +14,7 @@ void RoughCast::setScope(ance::Scope* scope)
     expression_->setScope(scope);
 }
 
-ance::Type* RoughCast::getType()
+ance::Type* RoughCast::type()
 {
     return target_type_;
 }

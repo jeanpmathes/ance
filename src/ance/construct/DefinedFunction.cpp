@@ -26,7 +26,7 @@ ance::DefinedFunction::DefinedFunction(
     for (auto* parameter : parameters_)
     {
         ance::LocalVariable* arg = local_scope_->defineLocalVariable(
-            parameter->name(), parameter->getType(), Assigner::COPY_ASSIGNMENT,
+            parameter->name(), parameter->type(), Assigner::COPY_ASSIGNMENT,
             parameter);
         arguments_.push_back(arg);
     }
@@ -133,7 +133,7 @@ void ance::DefinedFunction::addReturn(ance::Value* value)
 {
     if (value)
     {
-        assert(value->getType() == getReturnType());
+        assert(value->type() == getReturnType());
         return_value_ = value;
         has_return_   = true;
     }
@@ -151,7 +151,7 @@ ance::Value* ance::DefinedFunction::buildCall(const std::vector<ance::Value*>& a
 
     for (auto pair : llvm::zip(parameters_, arguments))
     {
-        assert(std::get<0>(pair)->getType() == std::get<1>(pair)->getType() && "Input parameter types must match.");
+        assert(std::get<0>(pair)->type() == std::get<1>(pair)->type() && "Input parameter types must match.");
     }
 
     llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);

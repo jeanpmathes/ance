@@ -8,7 +8,7 @@ class ConstantLiteral : public ConstantExpression
   public:
     explicit ConstantLiteral(ance::Constant* constant);
 
-    ance::Type* getType() override;
+    ance::Type* type() override;
 
     ance::Constant* getConstantValue() override;
 

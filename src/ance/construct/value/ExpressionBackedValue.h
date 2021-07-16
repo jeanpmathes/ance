@@ -11,7 +11,7 @@ namespace ance
       public:
         explicit ExpressionBackedValue(BackingExpression* expression);
 
-        ance::Type* getType() override;
+        ance::Type* type() override;
 
         void buildNativeValue(CompileContext* context) override;
 

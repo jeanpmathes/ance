@@ -9,7 +9,7 @@ ance::BooleanConstant::BooleanConstant(bool boolean, Application& app)
 {
 }
 
-ance::Type* ance::BooleanConstant::getType()
+ance::Type* ance::BooleanConstant::type()
 {
     return type_;
 }

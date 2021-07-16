@@ -10,7 +10,7 @@ ance::IntegerConstant::IntegerConstant(llvm::APInt integer, bool is_signed, Appl
 {
 }
 
-ance::Type* ance::IntegerConstant::getType()
+ance::Type* ance::IntegerConstant::type()
 {
     return type_;
 }

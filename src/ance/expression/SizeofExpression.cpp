@@ -14,7 +14,7 @@ void SizeofExpression::setScope(ance::Scope* scope)
     expression_->setScope(scope);
 }
 
-ance::Type* SizeofExpression::getType()
+ance::Type* SizeofExpression::type()
 {
     return ance::SizeType::get();
 }
@@ -26,5 +26,5 @@ ance::Value* SizeofExpression::getValue()
 
 llvm::Value* SizeofExpression::buildNativeValue(CompileContext* context)
 {
-    return ance::SizeType::buildValue(expression_->getType()->getContentSize(context->module()));
+    return ance::SizeType::buildValue(expression_->type()->getContentSize(context->module()));
 }

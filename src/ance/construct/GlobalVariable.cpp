@@ -55,7 +55,7 @@ void ance::GlobalVariable::defineGlobal(
 void ance::GlobalVariable::buildGlobal(llvm::Module* m)
 {
     assert(type() != ance::VoidType::get());
-    assert(type() == initial_value_->getType());
+    assert(type() == initial_value_->type());
 
     llvm::GlobalValue::LinkageTypes linkage = Convert(access_);
 
@@ -86,7 +86,7 @@ ance::Value* ance::GlobalVariable::getValue(CompileContext* context)
 void ance::GlobalVariable::setValue(ance::Value* value, CompileContext* context)
 {
     assert(!isFinal() && "Cannot assign to final variable.");
-    assert(type() == value->getType() && "Assignment types have to match.");
+    assert(type() == value->type() && "Assignment types have to match.");
 
     value->buildContentValue(context);
 

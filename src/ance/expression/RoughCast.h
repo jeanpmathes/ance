@@ -15,7 +15,7 @@ class RoughCast : public Expression
 
     void setScope(ance::Scope* scope) override;
 
-    ance::Type* getType() override;
+    ance::Type* type() override;
 
     ance::Value* getValue() override;
 

@@ -9,7 +9,7 @@ DefaultValueExpression::DefaultValueExpression(ance::Type* type)
 {
 }
 
-ance::Type* DefaultValueExpression::getType()
+ance::Type* DefaultValueExpression::type()
 {
     return type_;
 }

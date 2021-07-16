@@ -8,7 +8,7 @@ SizeofType::SizeofType(ance::Type* type)
 {
 }
 
-ance::Type* SizeofType::getType()
+ance::Type* SizeofType::type()
 {
     return ance::SizeType::get();
 }

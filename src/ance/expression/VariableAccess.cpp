@@ -15,7 +15,7 @@ void VariableAccess::setScope(ance::Scope* scope)
     variable_ = scope->getVariable(identifier_);
 }
 
-ance::Type* VariableAccess::getType()
+ance::Type* VariableAccess::type()
 {
     return variable_->type();
 }

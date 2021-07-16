@@ -12,7 +12,7 @@ class SizeofType : public BackingExpression
   public:
     explicit SizeofType(ance::Type* type);
 
-    ance::Type* getType() override;
+    ance::Type* type() override;
 
     ance::Value* getValue() override;
 
