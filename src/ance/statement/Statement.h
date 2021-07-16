@@ -18,12 +18,15 @@ class Statement
   public:
     Statement(unsigned int l, unsigned int c);
 
-    virtual void setContainingFunction(ance::DefinedFunction* function);
+    void setContainingFunction(ance::DefinedFunction* function);
 
+  protected:
+    virtual void setFunction(ance::DefinedFunction* function);
+
+  public:
     [[nodiscard]] ance::DefinedFunction* getContainingFunction() const;
 
     [[nodiscard]] unsigned int getLine() const;
-
     [[nodiscard]] unsigned int getColumn() const;
 
     virtual void build(CompileContext* context) = 0;
@@ -31,9 +34,10 @@ class Statement
     virtual ~Statement() = default;
 
   private:
-    ance::DefinedFunction* function_ {nullptr};
     unsigned int           line_;
     unsigned int           column_;
+
+    ance::DefinedFunction* function_ {nullptr};
 };
 
 #endif

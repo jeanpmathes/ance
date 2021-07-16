@@ -9,7 +9,14 @@ void Statement::setContainingFunction(ance::DefinedFunction* function)
 {
     assert(!function_);
     function_ = function;
+
+    setFunction(function);
 }
+
+void Statement::setFunction(ance::DefinedFunction*)
+{
+}
+
 
 ance::DefinedFunction* Statement::getContainingFunction() const
 {

@@ -17,10 +17,8 @@ LocalVariableDefinition::LocalVariableDefinition(
 {
 }
 
-void LocalVariableDefinition::setContainingFunction(ance::DefinedFunction* function)
+void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
 {
-    Statement::setContainingFunction(function);
-
     variable_ = function->getScope()->defineLocalVariable(identifier_, type_, assigner_, assigned_);
     assigned_->setScope(function->getScope());
 }

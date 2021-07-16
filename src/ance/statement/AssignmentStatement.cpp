@@ -14,10 +14,8 @@ AssignmentStatement::AssignmentStatement(
 {
 }
 
-void AssignmentStatement::setContainingFunction(ance::DefinedFunction* function)
+void AssignmentStatement::setFunction(ance::DefinedFunction* function)
 {
-    Statement::setContainingFunction(function);
-
     assignable_->setScope(function->getScope());
     assigned_->setScope(function->getScope());
 }

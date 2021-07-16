@@ -8,10 +8,8 @@ DeleteStatement::DeleteStatement(Expression* to_delete, bool delete_buffer, unsi
 {
 }
 
-void DeleteStatement::setContainingFunction(ance::DefinedFunction* function)
+void DeleteStatement::setFunction(ance::DefinedFunction* function)
 {
-    Statement::setContainingFunction(function);
-
     to_delete_->setScope(function->getScope());
 }
 

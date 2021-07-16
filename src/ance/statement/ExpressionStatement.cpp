@@ -12,10 +12,8 @@ ExpressionStatement::ExpressionStatement(
 {
 }
 
-void ExpressionStatement::setContainingFunction(ance::DefinedFunction* function)
+void ExpressionStatement::setFunction(ance::DefinedFunction* function)
 {
-    Statement::setContainingFunction(function);
-
     expression_->setScope(function->getScope());
 }
 

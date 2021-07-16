@@ -11,10 +11,8 @@ ReturnStatement::ReturnStatement(
 {
 }
 
-void ReturnStatement::setContainingFunction(ance::DefinedFunction* function)
+void ReturnStatement::setFunction(ance::DefinedFunction* function)
 {
-    Statement::setContainingFunction(function);
-
     return_value_->setScope(function->getScope());
 }
 
