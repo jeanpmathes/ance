@@ -114,7 +114,7 @@ variableAccess
 	;
 
 allocation
-    : 'new' allocator type ( '[' expression ']' )?
+    : 'new' ( '[' expression ']' )? allocator type
     ;
 
 allocator
