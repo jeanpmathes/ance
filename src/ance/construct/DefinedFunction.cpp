@@ -92,8 +92,8 @@ void ance::DefinedFunction::build(CompileContext* context)
         context->ir()->SetCurrentDebugLocation(
             llvm::DILocation::get(
                 *context->llvmContext(),
-                statement->getLine(),
-                statement->getColumn(),
+                statement->line(),
+                statement->column(),
                 native_function_->getSubprogram()));
 
         statement->build(context);

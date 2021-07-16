@@ -26,8 +26,8 @@ class Statement
   public:
     [[nodiscard]] ance::DefinedFunction* getContainingFunction() const;
 
-    [[nodiscard]] unsigned int getLine() const;
-    [[nodiscard]] unsigned int getColumn() const;
+    [[nodiscard]] unsigned int line() const;
+    [[nodiscard]] unsigned int column() const;
 
     virtual void build(CompileContext* context) = 0;
 
