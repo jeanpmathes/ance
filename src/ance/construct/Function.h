@@ -31,15 +31,12 @@ namespace ance
             unsigned int column);
 
         [[nodiscard]] std::string getName() const;
-
         [[nodiscard]] ance::Type* getReturnType() const;
 
-        [[nodiscard]] unsigned int getLine() const;
+        [[nodiscard]] unsigned int line() const;
 
         virtual void buildName(CompileContext* context) = 0;
-
         virtual void build(CompileContext* context) = 0;
-
         virtual ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const = 0;
 
       protected:

@@ -17,7 +17,7 @@ ance::Type* ance::Function::getReturnType() const
     return return_type_;
 }
 
-unsigned int ance::Function::getLine() const
+unsigned int ance::Function::line() const
 {
     return line_;
 }

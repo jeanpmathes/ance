@@ -63,7 +63,7 @@ void ance::DefinedFunction::buildName(CompileContext* context)
         getName(),
         getName(),
         context->codeFile(),
-        getLine(),
+        line(),
         debug_type,
         0,
         llvm::DINode::DIFlags::FlagZero,
