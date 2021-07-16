@@ -3,8 +3,8 @@
 #include "DefinedFunction.h"
 #include "LocalScope.h"
 
-DeleteStatement::DeleteStatement(Expression* to_delete, bool delete_buffer, unsigned int l, unsigned int c)
-    : Statement(l, c), to_delete_(to_delete), delete_buffer_(delete_buffer)
+DeleteStatement::DeleteStatement(Expression* to_delete, bool delete_buffer, unsigned int line, unsigned int column)
+    : Statement(line, column), to_delete_(to_delete), delete_buffer_(delete_buffer)
 {
 }
 

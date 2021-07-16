@@ -5,9 +5,9 @@
 
 ReturnStatement::ReturnStatement(
     Expression*        return_value,
-    const unsigned int l,
-    const unsigned int c)
-    : Statement(l, c), return_value_(return_value)
+    unsigned int line,
+    unsigned int column)
+    : Statement(line, column), return_value_(return_value)
 {
 }
 

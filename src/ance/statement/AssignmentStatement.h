@@ -13,8 +13,8 @@ class AssignmentStatement : public Statement
     AssignmentStatement(
         Assignable*  assignable,
         Expression*  assigned,
-        unsigned int l,
-        unsigned int c);
+        unsigned int line,
+        unsigned int column);
 
     void setFunction(ance::DefinedFunction* function) override;
 

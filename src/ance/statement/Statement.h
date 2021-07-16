@@ -16,7 +16,7 @@ namespace ance
 class Statement
 {
   public:
-    Statement(unsigned int l, unsigned int c);
+    Statement(unsigned int line, unsigned int column);
 
     void setContainingFunction(ance::DefinedFunction* function);
 

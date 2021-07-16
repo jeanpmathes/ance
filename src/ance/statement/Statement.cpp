@@ -1,7 +1,7 @@
 #include "Statement.h"
 
-Statement::Statement(unsigned int l, unsigned int c)
-    : line_(l), column_(c)
+Statement::Statement(unsigned int line, unsigned int column)
+    : line_(line), column_(column)
 {
 }
 

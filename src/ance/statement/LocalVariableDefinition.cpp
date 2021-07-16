@@ -11,9 +11,9 @@ LocalVariableDefinition::LocalVariableDefinition(
     ance::Type* type,
     Assigner    assigner,
     Expression* assigned,
-    unsigned    l,
-    unsigned    c)
-    : Statement(l, c), identifier_(std::move(identifier)), type_(type), assigner_(assigner), assigned_(assigned)
+    unsigned    line,
+    unsigned    column)
+    : Statement(line, column), identifier_(std::move(identifier)), type_(type), assigner_(assigner), assigned_(assigned)
 {
 }
 

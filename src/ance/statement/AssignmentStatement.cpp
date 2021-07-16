@@ -8,9 +8,9 @@
 AssignmentStatement::AssignmentStatement(
     Assignable*  assignable,
     Expression*  assigned,
-    unsigned int l,
-    unsigned int c)
-    : Statement(l, c), assignable_(assignable), assigned_(assigned)
+    unsigned int line,
+    unsigned int column)
+    : Statement(line, column), assignable_(assignable), assigned_(assigned)
 {
 }
 

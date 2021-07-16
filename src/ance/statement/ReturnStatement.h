@@ -7,7 +7,7 @@
 class ReturnStatement : public Statement
 {
   public:
-    ReturnStatement(Expression* return_value, unsigned int l, unsigned int c);
+    ReturnStatement(Expression* return_value, unsigned int line, unsigned int column);
 
     void setFunction(ance::DefinedFunction* function) override;
 

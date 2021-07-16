@@ -6,9 +6,9 @@
 
 ExpressionStatement::ExpressionStatement(
     BuildableExpression* expression,
-    unsigned             l,
-    unsigned             c)
-    : Statement(l, c), expression_(expression)
+    unsigned             line,
+    unsigned             column)
+    : Statement(line, column), expression_(expression)
 {
 }
 
