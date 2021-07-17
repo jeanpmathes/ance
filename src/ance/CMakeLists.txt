@@ -1,5 +1,3 @@
-include_directories(.)
-
 include_directories(assignable)
 include_directories(expression)
 include_directories(scope)

@@ -1,5 +1,3 @@
-include_directories(.)
-
 include_directories(constant)
 include_directories(value)
 

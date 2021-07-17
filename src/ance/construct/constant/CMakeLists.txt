@@ -1,5 +1,3 @@
-include_directories(.)
-
 target_sources(ance PRIVATE
                BooleanConstant.cpp
                ByteConstant.cpp

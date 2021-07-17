@@ -1,7 +1,5 @@
 #include "Discard.h"
 
-#include "Value.h"
-
 void Discard::setScope(ance::Scope*)
 {
 }

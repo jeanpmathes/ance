@@ -1,5 +1,3 @@
-include_directories(.)
-
 target_sources(ance PRIVATE
                ArrayType.cpp
                DoubleType.cpp

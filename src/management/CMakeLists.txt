@@ -1,5 +1,3 @@
-include_directories(.)
-
 include_directories(grammar)
 include_directories(elements)
 
