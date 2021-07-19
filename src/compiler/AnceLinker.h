@@ -3,8 +3,8 @@
 
 #include <filesystem>
 
-#include "Application.h"
-#include "Element.h"
+#include "compiler/Application.h"
+#include "management/elements/Element.h"
 
 class AnceLinker
 {

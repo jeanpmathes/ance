@@ -2,7 +2,6 @@
 #define ANCE_SRC_ANCE_TYPE_HALFTYPE_H_
 
 #include "FloatingPointType.h"
-#include "Type.h"
 
 namespace ance
 {

@@ -3,12 +3,12 @@
 #include <llvm/ADT/SmallVector.h>// critical, missing include will cause linking error
 #include <utility>
 
-#include "AccessModifier.h"
-#include "LocalScope.h"
-#include "Value.h"
-#include "Values.h"
-#include "VoidType.h"
-#include "WrappedNativeValue.h"
+#include "ance/AccessModifier.h"
+#include "ance/scope/LocalScope.h"
+#include "ance/construct/value/Value.h"
+#include "ance/utility/Values.h"
+#include "ance/type/VoidType.h"
+#include "ance/construct/value/WrappedNativeValue.h"
 
 ance::DefinedFunction::DefinedFunction(
     AccessModifier                access,

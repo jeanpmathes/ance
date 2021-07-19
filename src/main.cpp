@@ -1,17 +1,17 @@
 #include <filesystem>
 #include <iostream>
 
-#include "anceLexer.h"
-#include "anceParser.h"
+#include "grammar/anceLexer.h"
+#include "grammar/anceParser.h"
 #include <antlr4-runtime.h>
 
 #include <llvm/Support/ManagedStatic.h>
 #include <llvm/Support/TargetSelect.h>
 
-#include "AnceCompiler.h"
-#include "AnceLinker.h"
-#include "File.h"
-#include "Visitor.h"
+#include "compiler/AnceCompiler.h"
+#include "compiler/AnceLinker.h"
+#include "compiler/Visitor.h"
+#include "management/File.h"
 
 int main(int argc, char** argv)
 {

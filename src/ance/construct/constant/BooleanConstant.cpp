@@ -2,7 +2,7 @@
 
 #include <llvm/IR/Constant.h>
 
-#include "IntegerType.h"
+#include "ance/type/IntegerType.h"
 
 ance::BooleanConstant::BooleanConstant(bool boolean, Application& app)
     : type_(ance::IntegerType::get(app, 1, true)), boolean_(boolean)

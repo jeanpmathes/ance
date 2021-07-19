@@ -9,11 +9,11 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "Parameter.h"
+#include "ance/construct/Parameter.h"
 
-#include "CompileContext.h"
-#include "Expression.h"
-#include "Statement.h"
+#include "compiler/CompileContext.h"
+#include "ance/expression/Expression.h"
+#include "ance/statement/Statement.h"
 
 class CompileContext;
 

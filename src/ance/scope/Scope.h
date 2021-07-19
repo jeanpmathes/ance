@@ -7,8 +7,8 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "GlobalVariable.h"
-#include "Type.h"
+#include "ance/construct/GlobalVariable.h"
+#include "ance/type/Type.h"
 
 enum class AccessModifier;
 

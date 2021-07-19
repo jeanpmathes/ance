@@ -2,9 +2,9 @@
 
 #include <utility>
 
-#include "CompileContext.h"
-#include "LocalScope.h"
-#include "WrappedNativeValue.h"
+#include "compiler/CompileContext.h"
+#include "ance/scope/LocalScope.h"
+#include "ance/construct/value/WrappedNativeValue.h"
 
 ance::LocalVariable::LocalVariable(
     ance::LocalScope* containing_scope,

@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "IntegerType.h"
+#include "ance/type/IntegerType.h"
 
 ance::IntegerConstant::IntegerConstant(llvm::APInt integer, bool is_signed, Application& app)
     : type_(ance::IntegerType::get(app, integer.getBitWidth(), is_signed)),

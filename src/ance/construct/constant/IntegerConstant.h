@@ -1,8 +1,9 @@
 #ifndef ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_INTEGERCONSTANT_H_
 #define ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_INTEGERCONSTANT_H_
 
-#include "Application.h"
 #include "Constant.h"
+
+#include "compiler/Application.h"
 
 namespace ance
 {

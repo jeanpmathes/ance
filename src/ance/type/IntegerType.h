@@ -1,8 +1,9 @@
 #ifndef ANCE_SRC_ANCE_TYPE_INTEGERTYPE_H_
 #define ANCE_SRC_ANCE_TYPE_INTEGERTYPE_H_
 
-#include "Application.h"
 #include "Type.h"
+
+#include "compiler/Application.h"
 
 namespace ance
 {

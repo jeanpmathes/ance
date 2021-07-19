@@ -1,9 +1,10 @@
 #ifndef ANCE_SRC_ANCE_CONSTRUCT_VARIABLE_H_
 #define ANCE_SRC_ANCE_CONSTRUCT_VARIABLE_H_
 
+#include <string>
+
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
-#include <string>
 
 class CompileContext;
 

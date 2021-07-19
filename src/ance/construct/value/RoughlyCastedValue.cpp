@@ -1,7 +1,7 @@
 #include "RoughlyCastedValue.h"
 
-#include "CompileContext.h"
-#include "Type.h"
+#include "compiler/CompileContext.h"
+#include "ance/type/Type.h"
 
 ance::RoughlyCastedValue::RoughlyCastedValue(ance::Type* target_type, ance::Value* original)
     : target_type_(target_type), original_(original)

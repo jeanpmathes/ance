@@ -4,10 +4,10 @@
 
 #include <llvm/IR/GlobalVariable.h>
 
-#include "ArrayType.h"
-#include "ByteConstant.h"
-#include "IntegerType.h"
-#include "PointerType.h"
+#include "ance/construct/constant/ByteConstant.h"
+#include "ance/type/ArrayType.h"
+#include "ance/type/IntegerType.h"
+#include "ance/type/PointerType.h"
 
 ance::StringConstant::StringConstant(std::string prefix, std::string string, Application& app)
     : type_(resolveType(prefix, string, app)), prefix_(prefix),

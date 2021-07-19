@@ -2,9 +2,9 @@
 
 #include <utility>
 
-#include "Values.h"
-#include "VoidType.h"
-#include "WrappedNativeValue.h"
+#include "ance/utility/Values.h"
+#include "ance/type/VoidType.h"
+#include "ance/construct/value/WrappedNativeValue.h"
 
 ance::ExternFunction::ExternFunction(
     std::string                   function_name,

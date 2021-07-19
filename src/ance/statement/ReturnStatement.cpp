@@ -1,7 +1,7 @@
 #include "ReturnStatement.h"
 
-#include "DefinedFunction.h"
-#include "LocalScope.h"
+#include "ance/construct/DefinedFunction.h"
+#include "ance/scope/LocalScope.h"
 
 ReturnStatement::ReturnStatement(
     Expression*        return_value,

@@ -3,9 +3,9 @@
 #include <iostream>
 #include <ostream>
 
-#include "AccessModifier.h"
-#include "ConstantExpression.h"
-#include "Function.h"
+#include "ance/AccessModifier.h"
+#include "ance/expression/ConstantExpression.h"
+#include "ance/construct/Function.h"
 
 ance::GlobalScope* ance::GlobalScope::getGlobalScope()
 {

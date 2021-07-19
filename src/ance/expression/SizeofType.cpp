@@ -1,7 +1,7 @@
 #include "SizeofType.h"
 
-#include "CompileContext.h"
-#include "SizeType.h"
+#include "compiler/CompileContext.h"
+#include "ance/type/SizeType.h"
 
 SizeofType::SizeofType(ance::Type* type)
     : type_(type)

@@ -2,12 +2,12 @@
 
 #include <stdexcept>
 
-#include "CompileContext.h"
-#include "PointerType.h"
-#include "SizeType.h"
-#include "Type.h"
-#include "Value.h"
-#include "WrappedNativeValue.h"
+#include "compiler/CompileContext.h"
+#include "ance/type/PointerType.h"
+#include "ance/type/SizeType.h"
+#include "ance/type/Type.h"
+#include "ance/construct/value/Value.h"
+#include "ance/construct/value/WrappedNativeValue.h"
 
 void Runtime::init(
     llvm::LLVMContext& c,

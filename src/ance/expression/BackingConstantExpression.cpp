@@ -1,8 +1,8 @@
 #include "BackingConstantExpression.h"
 
-#include "CompileContext.h"
-#include "Constant.h"
-#include "Values.h"
+#include "compiler/CompileContext.h"
+#include "ance/construct/constant/Constant.h"
+#include "ance/utility/Values.h"
 
 void BackingConstantExpression::buildConstant(llvm::LLVMContext& c)
 {

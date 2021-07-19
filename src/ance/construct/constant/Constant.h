@@ -1,11 +1,10 @@
 #ifndef ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_CONSTANT_H_
 #define ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_CONSTANT_H_
 
-#include "ConstantExpression.h"
-#include "ExpressionBackedValue.h"
+#include "ance/construct/value/Value.h"
 
-#include "llvm/IR/DIBuilder.h"
-#include "llvm/IR/IRBuilder.h"
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/IRBuilder.h>
 
 namespace ance
 {

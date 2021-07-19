@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "Application.h"
-#include "Constant.h"
+#include "compiler/Application.h"
+#include "ance/construct/constant/Constant.h"
 
 namespace ance
 {

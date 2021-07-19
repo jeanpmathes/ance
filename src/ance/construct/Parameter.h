@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "LocalVariable.h"
-#include "Value.h"
+#include "ance/construct/LocalVariable.h"
+#include "ance/construct/value/Value.h"
 
 namespace ance
 {

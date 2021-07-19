@@ -1,7 +1,7 @@
 #include "Allocation.h"
 
-#include "CompileContext.h"
-#include "PointerType.h"
+#include "compiler/CompileContext.h"
+#include "ance/type/PointerType.h"
 
 Allocation::Allocation(Runtime::Allocator allocation, ance::Type* type, Expression* count, Application& app)
     : allocation_(allocation),

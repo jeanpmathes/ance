@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "Application.h"
-#include "SizeType.h"
+#include "compiler/Application.h"
+#include "ance/type/SizeType.h"
 
 ance::SizeConstant::SizeConstant(std::string size, Application& app)
     : app_(app), type_(ance::SizeType::get()), size_(std::move(size))

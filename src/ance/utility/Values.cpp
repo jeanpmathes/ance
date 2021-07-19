@@ -1,8 +1,8 @@
 #include "Values.h"
 
-#include "CompileContext.h"
-#include "Type.h"
-#include "Value.h"
+#include "compiler/CompileContext.h"
+#include "ance/type/Type.h"
+#include "ance/construct/value/Value.h"
 
 llvm::Value* ance::Values::nativeToContent(ance::Type* type, llvm::Value* native, CompileContext* context)
 {

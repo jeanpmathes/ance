@@ -1,7 +1,7 @@
 #include "ConstantLiteral.h"
 
-#include "Constant.h"
-#include "Scope.h"
+#include "ance/construct/constant/Constant.h"
+#include "ance/scope/Scope.h"
 
 ConstantLiteral::ConstantLiteral(ance::Constant* constant)
     : constant_(constant)

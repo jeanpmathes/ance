@@ -2,12 +2,13 @@
 
 #include <utility>
 
-#include "AccessModifier.h"
-#include "CompileContext.h"
-#include "Constant.h"
-#include "Type.h"
-#include "VoidType.h"
-#include "WrappedNativeValue.h"
+#include "ance/AccessModifier.h"
+#include "compiler/CompileContext.h"
+#include "ance/construct/constant/Constant.h"
+#include "ance/construct/value/WrappedNativeValue.h"
+#include "ance/type/Type.h"
+#include "ance/type/VoidType.h"
+#include "ance/expression/ConstantExpression.h"
 
 namespace llvm
 {

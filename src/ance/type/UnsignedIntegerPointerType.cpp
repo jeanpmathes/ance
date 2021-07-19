@@ -1,7 +1,7 @@
 #include "UnsignedIntegerPointerType.h"
 
-#include "Application.h"
-#include "GlobalScope.h"
+#include "compiler/Application.h"
+#include "ance/scope/GlobalScope.h"
 
 std::string ance::UnsignedIntegerPointerType::getName()
 {

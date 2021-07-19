@@ -3,8 +3,8 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/Type.h>
 
-#include "GlobalScope.h"
-#include "Scope.h"
+#include "ance/scope/GlobalScope.h"
+#include "ance/scope/Scope.h"
 
 ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed)
     : bit_size_(bit_size), is_signed_(is_signed)

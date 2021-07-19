@@ -8,11 +8,10 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 
-#include "Indexer.h"
+#include "ance/Indexer.h"
+#include "ance/InternalStorage.h"
 
 class CompileContext;
-
-#include "InternalStorage.h"
 
 namespace llvm
 {

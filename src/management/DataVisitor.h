@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_MANAGEMENT_DATAVISITOR_H_
 #define ANCE_SRC_MANAGEMENT_DATAVISITOR_H_
 
-#include "dataBaseVisitor.h"
+#include "management/grammar/dataBaseVisitor.h"
 
 class DataVisitor : public dataBaseVisitor
 {

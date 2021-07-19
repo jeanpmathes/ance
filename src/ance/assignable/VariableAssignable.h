@@ -2,8 +2,8 @@
 #define ANCE_SRC_ANCE_ASSIGNABLE_VARIABLEASSIGNABLE_H_
 
 #include "Assignable.h"
-#include "Scope.h"
-#include "Value.h"
+#include "ance/scope/Scope.h"
+#include "ance/construct/value/Value.h"
 
 class VariableAssignable : public Assignable
 {

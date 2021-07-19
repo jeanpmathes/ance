@@ -1,8 +1,8 @@
 #include "SizeofExpression.h"
 
-#include "CompileContext.h"
-#include "ExpressionBackedValue.h"
-#include "SizeType.h"
+#include "compiler/CompileContext.h"
+#include "ance/construct/value/ExpressionBackedValue.h"
+#include "ance/type/SizeType.h"
 
 SizeofExpression::SizeofExpression(Expression* expression)
     : expression_(expression)

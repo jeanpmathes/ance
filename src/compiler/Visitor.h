@@ -1,9 +1,8 @@
 #ifndef ANCE_SRC_COMPILER_VISITOR_H_
 #define ANCE_SRC_COMPILER_VISITOR_H_
 
-#include "anceBaseVisitor.h"
-
-#include "ReturnStatement.h"
+#include "compiler/Application.h"
+#include "grammar/anceBaseVisitor.h"
 
 class Visitor : public anceBaseVisitor
 {

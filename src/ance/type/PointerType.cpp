@@ -1,13 +1,13 @@
 #include "PointerType.h"
 
-#include "Application.h"
-#include "CompileContext.h"
-#include "GlobalScope.h"
-#include "SizeType.h"
-#include "Value.h"
-#include "Values.h"
-#include "VoidType.h"
-#include "WrappedNativeValue.h"
+#include "compiler/Application.h"
+#include "compiler/CompileContext.h"
+#include "ance/scope/GlobalScope.h"
+#include "ance/type/SizeType.h"
+#include "ance/construct/value/Value.h"
+#include "ance/utility/Values.h"
+#include "ance/type/VoidType.h"
+#include "ance/construct/value/WrappedNativeValue.h"
 
 ance::PointerType::PointerType(ance::Type* element_type)
     : element_type_(element_type)

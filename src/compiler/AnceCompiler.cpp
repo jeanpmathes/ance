@@ -12,9 +12,9 @@
 
 #include <llvm/Bitcode/BitcodeWriter.h>
 
-#include "GlobalScope.h"
-#include "SizeType.h"
-#include "UnsignedIntegerPointerType.h"
+#include "ance/scope/GlobalScope.h"
+#include "ance/type/SizeType.h"
+#include "ance/type/UnsignedIntegerPointerType.h"
 
 AnceCompiler::AnceCompiler(Application& app)
     : application_(app), ir_(llvm_context_)

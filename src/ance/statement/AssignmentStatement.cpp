@@ -1,9 +1,9 @@
 #include "AssignmentStatement.h"
 
-#include "Assignable.h"
-#include "DefinedFunction.h"
-#include "Expression.h"
-#include "LocalScope.h"
+#include "ance/assignable/Assignable.h"
+#include "ance/construct/DefinedFunction.h"
+#include "ance/expression/Expression.h"
+#include "ance/scope/LocalScope.h"
 
 AssignmentStatement::AssignmentStatement(
     Assignable*  assignable,

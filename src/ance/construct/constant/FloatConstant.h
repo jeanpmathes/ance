@@ -2,7 +2,8 @@
 #define ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_FLOATCONSTANT_H_
 
 #include "Constant.h"
-#include "FloatingPointType.h"
+
+#include "ance/type/FloatingPointType.h"
 
 namespace ance
 {

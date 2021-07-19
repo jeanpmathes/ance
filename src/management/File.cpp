@@ -2,8 +2,8 @@
 
 #include <fstream>
 
-#include "dataLexer.h"
-#include "dataParser.h"
+#include "management/grammar/dataLexer.h"
+#include "management/grammar/dataParser.h"
 #include <antlr4-runtime.h>
 
 #include "DataVisitor.h"

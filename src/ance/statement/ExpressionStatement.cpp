@@ -1,8 +1,8 @@
 #include "ExpressionStatement.h"
 
-#include "BuildableExpression.h"
-#include "DefinedFunction.h"
-#include "LocalScope.h"
+#include "ance/expression/BuildableExpression.h"
+#include "ance/construct/DefinedFunction.h"
+#include "ance/scope/LocalScope.h"
 
 ExpressionStatement::ExpressionStatement(
     BuildableExpression* expression,

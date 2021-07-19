@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "Scope.h"
-#include "Value.h"
+#include "ance/scope/Scope.h"
+#include "ance/construct/value/Value.h"
 
 VariableAccess::VariableAccess(std::string identifier)
     : identifier_(std::move(identifier))

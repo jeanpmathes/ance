@@ -2,9 +2,9 @@
 
 #include <utility>
 
-#include "DefinedFunction.h"
-#include "Expression.h"
-#include "LocalScope.h"
+#include "ance/construct/DefinedFunction.h"
+#include "ance/expression/Expression.h"
+#include "ance/scope/LocalScope.h"
 
 LocalVariableDefinition::LocalVariableDefinition(
     std::string identifier,

@@ -2,10 +2,10 @@
 
 #include <utility>
 
-#include "CompileContext.h"
-#include "Function.h"
-#include "GlobalScope.h"
-#include "Value.h"
+#include "compiler/CompileContext.h"
+#include "ance/construct/Function.h"
+#include "ance/scope/GlobalScope.h"
+#include "ance/construct/value/Value.h"
 
 namespace ance
 {

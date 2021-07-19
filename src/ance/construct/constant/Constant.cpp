@@ -1,9 +1,9 @@
 #include "Constant.h"
 
-#include "Type.h"
-#include "Values.h"
+#include "ance/type/Type.h"
+#include "ance/utility/Values.h"
 
-#include "CompileContext.h"
+#include "compiler/CompileContext.h"
 
 void ance::Constant::buildContentConstant(llvm::Module* m)
 {

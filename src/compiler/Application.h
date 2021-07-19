@@ -3,8 +3,8 @@
 
 #include <filesystem>
 
-#include "File.h"
-#include "Scope.h"
+#include "management/File.h"
+#include "ance/scope/Scope.h"
 
 class Statement;
 

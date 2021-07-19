@@ -4,8 +4,8 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "Application.h"
-#include "Runtime.h"
+#include "compiler/Application.h"
+#include "compiler/Runtime.h"
 
 class Application;
 

@@ -1,6 +1,6 @@
 #include "RoughCast.h"
 
-#include "RoughlyCastedValue.h"
+#include "ance/construct/value/RoughlyCastedValue.h"
 
 RoughCast::RoughCast(ance::Type* target_type, Expression* expression)
     : target_type_(target_type),

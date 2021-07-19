@@ -1,6 +1,6 @@
 #include "ConstantExpression.h"
 
-#include "Constant.h"
+#include "ance/construct/constant/Constant.h"
 
 ance::Value* ConstantExpression::getValue()
 {

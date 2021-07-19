@@ -1,7 +1,7 @@
 #include "DeleteStatement.h"
 
-#include "DefinedFunction.h"
-#include "LocalScope.h"
+#include "ance/construct/DefinedFunction.h"
+#include "ance/scope/LocalScope.h"
 
 DeleteStatement::DeleteStatement(Expression* to_delete, bool delete_buffer, unsigned int line, unsigned int column)
     : Statement(line, column), to_delete_(to_delete), delete_buffer_(delete_buffer)

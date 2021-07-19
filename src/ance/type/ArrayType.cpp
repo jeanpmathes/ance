@@ -1,12 +1,12 @@
 #include "ArrayType.h"
-#include "Scope.h"
 
-#include "CompileContext.h"
-#include "GlobalScope.h"
-#include "SizeType.h"
-#include "Value.h"
-#include "Values.h"
-#include "WrappedNativeValue.h"
+#include "ance/scope/Scope.h"
+#include "compiler/CompileContext.h"
+#include "ance/scope/GlobalScope.h"
+#include "ance/type/SizeType.h"
+#include "ance/construct/value/Value.h"
+#include "ance/utility/Values.h"
+#include "ance/construct/value/WrappedNativeValue.h"
 
 ance::ArrayType::ArrayType(Type* element_type, const uint64_t size)
     : size_(size),

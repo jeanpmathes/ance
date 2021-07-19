@@ -1,6 +1,3 @@
-include_directories(constant)
-include_directories(value)
-
 add_subdirectory(constant)
 add_subdirectory(value)
 

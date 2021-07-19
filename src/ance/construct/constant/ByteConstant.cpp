@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "Application.h"
-#include "IntegerType.h"
+#include "compiler/Application.h"
+#include "ance/type/IntegerType.h"
 
 ance::ByteConstant::ByteConstant(uint8_t byte, Application& app)
     : type_(ance::IntegerType::get(app, 8, false)), byte_(byte)

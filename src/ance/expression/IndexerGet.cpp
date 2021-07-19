@@ -1,6 +1,6 @@
 #include "IndexerGet.h"
 
-#include "Type.h"
+#include "ance/type/Type.h"
 
 IndexerGet::IndexerGet(Expression* indexed, Expression* index)
     : indexed_(indexed), index_(index)

@@ -1,10 +1,10 @@
 #include "DataVisitor.h"
 
-#include "BooleanElement.h"
-#include "DictionaryElement.h"
-#include "Element.h"
-#include "ListElement.h"
-#include "StringElement.h"
+#include "management/elements/BooleanElement.h"
+#include "management/elements/DictionaryElement.h"
+#include "management/elements/Element.h"
+#include "management/elements/ListElement.h"
+#include "management/elements/StringElement.h"
 
 antlrcpp::Any DataVisitor::visitDictionary(dataParser::DictionaryContext* ctx)
 {

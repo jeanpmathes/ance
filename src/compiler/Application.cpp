@@ -2,18 +2,18 @@
 
 #include <iostream>
 
-#include "Element.h"
+#include "management/elements/Element.h"
 
-#include "GlobalScope.h"
+#include "ance/scope/GlobalScope.h"
 
-#include "DoubleType.h"
-#include "HalfType.h"
-#include "QuadType.h"
-#include "SingleType.h"
+#include "ance/type/DoubleType.h"
+#include "ance/type/HalfType.h"
+#include "ance/type/QuadType.h"
+#include "ance/type/SingleType.h"
 
-#include "SizeType.h"
-#include "UnsignedIntegerPointerType.h"
-#include "VoidType.h"
+#include "ance/type/SizeType.h"
+#include "ance/type/UnsignedIntegerPointerType.h"
+#include "ance/type/VoidType.h"
 
 Application::Application(data::File& project)
     : project_(project), global_scope_(new ance::GlobalScope())
