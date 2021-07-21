@@ -1,10 +1,15 @@
 #include "AccessModifier.h"
 
-llvm::GlobalValue::LinkageTypes Convert(AccessModifier access)
+AccessModifier::operator Value() const
+{
+    return value_;
+}
+
+llvm::GlobalValue::LinkageTypes AccessModifier::linkage()
 {
     llvm::GlobalValue::LinkageTypes linkage;
 
-    switch (access)
+    switch (value_)
     {
         case AccessModifier::PRIVATE_ACCESS:
             linkage = llvm::GlobalValue::LinkageTypes::PrivateLinkage;

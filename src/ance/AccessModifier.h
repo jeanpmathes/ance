@@ -3,12 +3,24 @@
 
 #include <llvm/IR/GlobalValue.h>
 
-enum class AccessModifier
-{
-    PUBLIC_ACCESS,
-    PRIVATE_ACCESS
-};
+class AccessModifier {
+  public:
+    enum Value
+    {
+        PUBLIC_ACCESS,
+        PRIVATE_ACCESS
+    };
 
-llvm::GlobalValue::LinkageTypes Convert(AccessModifier access);
+    AccessModifier() = default;
+    constexpr AccessModifier(Value val) : value_(val) { } // NOLINT(google-explicit-constructor)
+
+    operator Value() const; // NOLINT(google-explicit-constructor)
+    explicit operator bool() = delete;
+
+    llvm::GlobalValue::LinkageTypes linkage();
+
+  private:
+    Value value_;
+};
 
 #endif

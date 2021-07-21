@@ -1,6 +1,11 @@
 #include "Assigner.h"
 
-bool IsFinal(Assigner assigner)
+Assigner::operator Value() const
 {
-    return assigner == Assigner::FINAL_COPY_ASSIGNMENT;
+    return value_;
+}
+
+bool Assigner::isFinal()
+{
+    return value_ == FINAL_COPY_ASSIGNMENT;
 }

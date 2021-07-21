@@ -515,27 +515,32 @@ antlrcpp::Any Visitor::visitPointer(anceParser::PointerContext* ctx)
 
 antlrcpp::Any Visitor::visitPublic(anceParser::PublicContext*)
 {
-    return AccessModifier::PUBLIC_ACCESS;
+    AccessModifier access_modifier = AccessModifier::PUBLIC_ACCESS;
+    return access_modifier;
 }
 
 antlrcpp::Any Visitor::visitPrivate(anceParser::PrivateContext*)
 {
-    return AccessModifier::PRIVATE_ACCESS;
+    AccessModifier access_modifier = AccessModifier::PRIVATE_ACCESS;
+    return access_modifier;
 }
 
 antlrcpp::Any Visitor::visitAutomatic(anceParser::AutomaticContext*)
 {
-    return Runtime::Allocator::AUTOMATIC;
+    Runtime::Allocator allocator = Runtime::Allocator::AUTOMATIC;
+    return allocator;
 }
 
 antlrcpp::Any Visitor::visitDynamic(anceParser::DynamicContext*)
 {
-    return Runtime::Allocator::DYNAMIC;
+    Runtime::Allocator allocator = Runtime::Allocator::DYNAMIC;
+    return allocator;
 }
 
 antlrcpp::Any Visitor::visitCopyAssignment(anceParser::CopyAssignmentContext*)
 {
-    return Assigner::COPY_ASSIGNMENT;
+    Assigner assigner = Assigner::COPY_ASSIGNMENT;
+    return assigner;
 }
 
 antlrcpp::Any Visitor::visitMoveAssignment(anceParser::MoveAssignmentContext*)
@@ -543,10 +548,12 @@ antlrcpp::Any Visitor::visitMoveAssignment(anceParser::MoveAssignmentContext*)
     assert(false && "Move assignment currently not supported.");
     // todo: move assignment
 
-    return Assigner::MOVE_ASSIGNMENT;
+    Assigner assigner = Assigner::MOVE_ASSIGNMENT;
+    return assigner;
 }
 
 antlrcpp::Any Visitor::visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext*)
 {
-    return Assigner::FINAL_COPY_ASSIGNMENT;
+    Assigner assigner = Assigner::FINAL_COPY_ASSIGNMENT;
+    return assigner;
 }

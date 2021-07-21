@@ -58,7 +58,7 @@ void ance::GlobalVariable::buildGlobal(llvm::Module* m)
     assert(type() != ance::VoidType::get());
     assert(type() == initial_value_->type());
 
-    llvm::GlobalValue::LinkageTypes linkage = Convert(access_);
+    llvm::GlobalValue::LinkageTypes linkage = access_.linkage();
 
     initial_value_->buildContentConstant(m);
     llvm::Constant* native_initializer = initial_value_->getContentConstant();

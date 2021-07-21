@@ -37,7 +37,7 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(
 {
     assert(local_variables_.find(identifier) == local_variables_.end());
 
-    bool is_final = IsFinal(assigner);
+    bool is_final = assigner.isFinal();
 
     auto* variable               = new LocalVariable(this, identifier, type, value, is_final);
     local_variables_[identifier] = variable;

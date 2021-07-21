@@ -46,7 +46,7 @@ void ance::DefinedFunction::pushStatement(Statement* statement)
 void ance::DefinedFunction::buildName(CompileContext* context)
 {
     std::tie(native_type_, native_function_) =
-        createNativeFunction(parameters_, Convert(access_), *context->llvmContext(), context->module());
+        createNativeFunction(parameters_, access_.linkage(), *context->llvmContext(), context->module());
 
     for (auto pair : zip(parameters_, native_function_->args()))
     {

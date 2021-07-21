@@ -1,9 +1,11 @@
 #ifndef ANCE_SRC_ANCE_CONSTRUCT_GLOBALVARIABLE_H_
 #define ANCE_SRC_ANCE_CONSTRUCT_GLOBALVARIABLE_H_
 
+#include "Variable.h"
+
 #include <string>
 
-#include "Variable.h"
+#include "ance/AccessModifier.h"
 
 namespace llvm
 {
@@ -13,8 +15,6 @@ namespace llvm
 
     class GlobalVariable;
 }
-
-enum class AccessModifier;
 
 class ConstantExpression;
 

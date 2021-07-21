@@ -58,7 +58,7 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier access, bool is_cons
 
     assert(initializer && "Variables require an initial value, which has to be explicit for constants.");
 
-    bool is_final = IsFinal(assigner);
+    bool is_final = assigner.isFinal();
 
     assert((!is_constant || is_final) && "A constant must be final.");
 

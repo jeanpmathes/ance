@@ -9,8 +9,7 @@
 
 #include "ance/construct/GlobalVariable.h"
 #include "ance/type/Type.h"
-
-enum class AccessModifier;
+#include "ance/AccessModifier.h"
 
 class Statement;
 

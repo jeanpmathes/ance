@@ -14,6 +14,7 @@
 #include "compiler/CompileContext.h"
 #include "ance/expression/Expression.h"
 #include "ance/statement/Statement.h"
+#include "ance/AccessModifier.h"
 
 class CompileContext;
 
