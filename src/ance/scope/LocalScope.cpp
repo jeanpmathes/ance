@@ -2,7 +2,6 @@
 
 #include "ance/construct/constant/Constant.h"
 #include "ance/scope/GlobalScope.h"
-#include "ance/construct/value//WrappedNativeValue.h"
 #include "ance/expression/Expression.h"
 
 ance::LocalScope::LocalScope(ance::Scope* parent)
@@ -18,6 +17,21 @@ ance::GlobalScope* ance::LocalScope::getGlobalScope()
 bool ance::LocalScope::validate()
 {
     return true;
+}
+
+bool ance::LocalScope::isTypeRegistered(const std::string& type_name)
+{
+    return getGlobalScope()->isTypeRegistered(type_name);
+}
+
+ance::Type * ance::LocalScope::getType(const std::string& type_name)
+{
+    return getGlobalScope()->getType(type_name);
+}
+
+void ance::LocalScope::registerType(ance::Type* type)
+{
+    getGlobalScope()->registerType(type);
 }
 
 ance::LocalVariable* ance::LocalScope::defineLocalVariable(

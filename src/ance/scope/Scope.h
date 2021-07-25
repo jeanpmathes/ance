@@ -34,6 +34,10 @@ namespace ance
 
         virtual ance::Variable* getVariable(std::string identifier) = 0;
 
+        virtual bool isTypeRegistered(const std::string& type_name) = 0;
+        virtual ance::Type* getType(const std::string& type_name) = 0;
+        virtual void registerType(ance::Type* type) = 0;
+
         virtual ~Scope() = default;
     };
 }

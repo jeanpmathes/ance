@@ -19,6 +19,10 @@ namespace ance
 
         bool validate() override;
 
+        bool isTypeRegistered(const std::string& type_name) override;
+        ance::Type* getType(const std::string& type_name) override;
+        void registerType(ance::Type* type) override;
+
         ance::LocalVariable* defineLocalVariable(
             const std::string& identifier,
             ance::Type*        type,

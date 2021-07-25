@@ -16,11 +16,9 @@ namespace ance
 
         bool validate() override;
 
-        bool isTypeRegistered(const std::string& type_name);
-
-        ance::Type* getType(const std::string& type_name);
-
-        void registerType(ance::Type* type);
+        bool isTypeRegistered(const std::string& type_name) override;
+        ance::Type* getType(const std::string& type_name) override;
+        void registerType(ance::Type* type) override;
 
         void defineGlobalVariable(
             AccessModifier      access,
@@ -42,17 +40,14 @@ namespace ance
         [[nodiscard]] size_t functionCount() const;
 
         void addFunctionName(const std::string& name);
-
         void addFunction(ance::Function* function);
 
         bool hasFunction(const std::string& identifier);
-
         bool isFunctionDefined(const std::string& identifier);
 
         ance::Function* getFunction(const std::string& identifier);
 
         void buildFunctionNames(CompileContext* context);
-
         void buildFunctions(CompileContext* context);
 
       private:
