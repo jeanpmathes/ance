@@ -58,6 +58,8 @@ ance::Value* ance::PointerType::buildGetIndexer(ance::Value* indexed, ance::Valu
     llvm::Value* element_ptr    = buildGetElementPointer(indexed, index, context);
     llvm::Value* native_content = context->ir()->CreateLoad(element_ptr);
 
+    native_content->setName(element_ptr->getName() + ".content");
+
     llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, context);
 
     return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
@@ -94,7 +96,10 @@ llvm::Value* ance::PointerType::buildGetElementPointer(
 
     llvm::Value* ptr = indexed->getNativeValue();
 
-    return context->ir()->CreateGEP(ptr, indices);
+    llvm::Value* element_ptr = context->ir()->CreateGEP(ptr, indices);
+    element_ptr->setName(ptr->getName() + ".idx.element");
+
+    return element_ptr;
 }
 
 ance::Type* ance::PointerType::get(Application& app, ance::Type* element_type)
