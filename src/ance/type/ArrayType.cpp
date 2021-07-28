@@ -58,7 +58,7 @@ ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value*
     llvm::Value* element_ptr    = buildGetElementPointer(indexed, index, context);
     llvm::Value* native_content = context->ir()->CreateLoad(element_ptr);
 
-    native_content->setName(element_ptr->getName() + ".content");
+    native_content->setName(element_ptr->getName());
 
     llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, context);
 
@@ -102,13 +102,11 @@ llvm::Value* ance::ArrayType::buildGetElementPointer(
     llvm::Value*                  native_size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(*context->llvmContext()), size_);
     llvm::Value* in_bounds   = context->ir()->CreateICmpULT(native_index, native_size);
 
-    in_bounds->setName(array_ptr->getName() + ".idx.inbounds");
+    in_bounds->setName("..inbounds");
 
     // todo: use in_bounds bool to throw exception
 
     llvm::Value* element_ptr = context->ir()->CreateGEP(array_ptr, indices);
-    element_ptr->setName(array_ptr->getName() + ".idx.element");
-
     return element_ptr;
 }
 

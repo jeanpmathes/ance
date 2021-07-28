@@ -74,7 +74,8 @@ void Runtime::deleteDynamic(ance::Value* value, bool delete_buffer, CompileConte
 
     llvm::Value* args[] = {opaque_ptr};
 
-    context->ir()->CreateCall(delete_dynamic_type_, delete_dynamic_, args);
+    llvm::Value* success = context->ir()->CreateCall(delete_dynamic_type_, delete_dynamic_, args);
+    success->setName("..free");
 }
 
 llvm::Value* Runtime::allocateAutomatic(ance::Type* type, ance::Value* count, CompileContext* context)

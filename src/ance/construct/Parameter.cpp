@@ -31,7 +31,7 @@ void ance::Parameter::wrap(llvm::Argument* argument)
         }
         case InternalStorage::AS_POINTER: {
             content_value_ = argument;
-            content_value_->setName(name_ + ".content");
+            content_value_->setName(name_ + ".arg");
             break;
         }
     }
