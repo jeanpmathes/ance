@@ -37,12 +37,13 @@ namespace ance
         void pushStatement(Statement* statement);
 
         void buildName(CompileContext* context) override;
-
         void build(CompileContext* context) override;
 
         void addReturn(ance::Value* value = nullptr);
 
         ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
+
+        llvm::DISubprogram* debugSubprogram();
 
       protected:
         using Function::buildCall;
