@@ -2,19 +2,18 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
-#include "ance/scope/LocalScope.h"
 #include "ance/construct/value/WrappedNativeValue.h"
+#include "ance/scope/LocalScope.h"
+#include "compiler/CompileContext.h"
 
-ance::LocalVariable::LocalVariable(
-    ance::LocalScope* containing_scope,
-    std::string       identifier,
-    ance::Type*       type,
-    ance::Value*      value,
-    bool              is_final)
-    : Variable(containing_scope, std::move(identifier), type, is_final), initial_value_(value)
-{
-}
+ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope,
+                                   std::string       identifier,
+                                   ance::Type*       type,
+                                   ance::Value*      value,
+                                   bool              is_final)
+    : Variable(containing_scope, std::move(identifier), type, is_final)
+    , initial_value_(value)
+{}
 
 void ance::LocalVariable::build(CompileContext* context)
 {
@@ -46,7 +45,8 @@ void ance::LocalVariable::store(ance::Value* value, CompileContext* context)
 
     switch (type()->storage())
     {
-        case InternalStorage::AS_TEMPORARY: {
+        case InternalStorage::AS_TEMPORARY:
+        {
             value->buildNativeValue(context);
 
             native_value_ = value->getNativeValue();
@@ -54,7 +54,8 @@ void ance::LocalVariable::store(ance::Value* value, CompileContext* context)
             break;
         }
 
-        case InternalStorage::AS_POINTER: {
+        case InternalStorage::AS_POINTER:
+        {
             value->buildContentValue(context);
 
             llvm::Value* stored = value->getContentValue();

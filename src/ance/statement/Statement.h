@@ -34,8 +34,8 @@ class Statement
     virtual ~Statement() = default;
 
   private:
-    unsigned int           line_;
-    unsigned int           column_;
+    unsigned int line_;
+    unsigned int column_;
 
     ance::DefinedFunction* function_ {nullptr};
 };

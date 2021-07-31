@@ -19,12 +19,7 @@ namespace ance
 class Runtime
 {
   public:
-    void init(
-        llvm::LLVMContext& c,
-        llvm::Module*      m,
-        CompileContext*    state,
-        llvm::IRBuilder<>& ir,
-        llvm::DIBuilder*   di);
+    void init(llvm::LLVMContext& c, llvm::Module* m, CompileContext* state, llvm::IRBuilder<>& ir, llvm::DIBuilder* di);
 
   private:
     llvm::FunctionType* allocate_dynamic_type_;

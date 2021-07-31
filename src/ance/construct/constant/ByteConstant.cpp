@@ -2,13 +2,13 @@
 
 #include <utility>
 
-#include "compiler/Application.h"
 #include "ance/type/IntegerType.h"
+#include "compiler/Application.h"
 
 ance::ByteConstant::ByteConstant(uint8_t byte, Application& app)
-    : type_(ance::IntegerType::get(app, 8, false)), byte_(byte)
-{
-}
+    : type_(ance::IntegerType::get(app, 8, false))
+    , byte_(byte)
+{}
 
 ance::Type* ance::ByteConstant::type()
 {
@@ -49,10 +49,7 @@ uint8_t ance::ByteConstant::parse(const std::string& unparsed)
         }
         else
         {
-            if (c == '\\')
-            {
-                escaped = true;
-            }
+            if (c == '\\') { escaped = true; }
             else if (c != '\'')
             {
                 byte = c;

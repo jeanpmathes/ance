@@ -16,8 +16,7 @@
 #include "ance/type/SizeType.h"
 #include "ance/type/UnsignedIntegerPointerType.h"
 
-AnceCompiler::AnceCompiler(Application& app)
-    : application_(app), ir_(llvm_context_)
+AnceCompiler::AnceCompiler(Application& app) : application_(app), ir_(llvm_context_)
 {
     module_ = new llvm::Module(application_.getName(), llvm_context_);
 
@@ -92,7 +91,7 @@ void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& ex
 {
     llvm::Type* exit_params[] = {llvm::Type::getInt32Ty(llvm_context_)};
     exit_type                 = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), exit_params, false);
-    exit                      = llvm::Function::Create(exit_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_exit", module_);
+    exit = llvm::Function::Create(exit_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_exit", module_);
 
     llvm::Value* exitcode = exit->getArg(0);
     exitcode->setName("exitcode");
@@ -106,11 +105,10 @@ void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& ex
     ir_.CreateRetVoid();
 }
 
-void AnceCompiler::buildStart(
-    llvm::FunctionType* main_type,
-    llvm::Function*     main,
-    llvm::FunctionType* exit_type,
-    llvm::Function*     exit)
+void AnceCompiler::buildStart(llvm::FunctionType* main_type,
+                              llvm::Function*     main,
+                              llvm::FunctionType* exit_type,
+                              llvm::Function*     exit)
 {
     llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
     llvm::Function*     start =

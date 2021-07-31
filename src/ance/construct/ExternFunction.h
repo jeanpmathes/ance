@@ -8,12 +8,11 @@ namespace ance
     class ExternFunction : public ance::Function
     {
       public:
-        ExternFunction(
-            std::string                   function_name,
-            ance::Type*                   return_type,
-            std::vector<ance::Parameter*> parameters,
-            unsigned int                  line,
-            unsigned int                  column);
+        ExternFunction(std::string                   function_name,
+                       ance::Type*                   return_type,
+                       std::vector<ance::Parameter*> parameters,
+                       unsigned int                  line,
+                       unsigned int                  column);
 
         void buildName(CompileContext* context) override;
 

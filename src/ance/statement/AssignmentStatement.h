@@ -10,11 +10,7 @@ class Expression;
 class AssignmentStatement : public Statement
 {
   public:
-    AssignmentStatement(
-        Assignable*  assignable,
-        Expression*  assigned,
-        unsigned int line,
-        unsigned int column);
+    AssignmentStatement(Assignable* assignable, Expression* assigned, unsigned int line, unsigned int column);
 
     void setFunction(ance::DefinedFunction* function) override;
 

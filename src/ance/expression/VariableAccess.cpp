@@ -2,13 +2,10 @@
 
 #include <utility>
 
-#include "ance/scope/Scope.h"
 #include "ance/construct/value/Value.h"
+#include "ance/scope/Scope.h"
 
-VariableAccess::VariableAccess(std::string identifier)
-    : identifier_(std::move(identifier))
-{
-}
+VariableAccess::VariableAccess(std::string identifier) : identifier_(std::move(identifier)) {}
 
 void VariableAccess::setScope(ance::Scope* scope)
 {

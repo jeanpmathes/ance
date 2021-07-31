@@ -5,14 +5,14 @@
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
 
-AssignmentStatement::AssignmentStatement(
-    Assignable*  assignable,
-    Expression*  assigned,
-    unsigned int line,
-    unsigned int column)
-    : Statement(line, column), assignable_(assignable), assigned_(assigned)
-{
-}
+AssignmentStatement::AssignmentStatement(Assignable*  assignable,
+                                         Expression*  assigned,
+                                         unsigned int line,
+                                         unsigned int column)
+    : Statement(line, column)
+    , assignable_(assignable)
+    , assigned_(assigned)
+{}
 
 void AssignmentStatement::setFunction(ance::DefinedFunction* function)
 {

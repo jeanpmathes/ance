@@ -3,55 +3,61 @@
 
 #pragma once
 
-
 #include "antlr4-runtime.h"
 
+class dataLexer : public antlr4::Lexer
+{
+  public:
+    enum
+    {
+        T__0         = 1,
+        T__1         = 2,
+        T__2         = 3,
+        T__3         = 4,
+        T__4         = 5,
+        T__5         = 6,
+        T__6         = 7,
+        T__7         = 8,
+        KEY          = 9,
+        STRING       = 10,
+        WHITESPACE   = 11,
+        LINE_COMMENT = 12
+    };
 
+    dataLexer(antlr4::CharStream* input);
+    ~dataLexer();
 
+    virtual std::string                     getGrammarFileName() const override;
+    virtual const std::vector<std::string>& getRuleNames() const override;
 
-class  dataLexer : public antlr4::Lexer {
-public:
-  enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    T__7 = 8, KEY = 9, STRING = 10, WHITESPACE = 11, LINE_COMMENT = 12
-  };
+    virtual const std::vector<std::string>& getChannelNames() const override;
+    virtual const std::vector<std::string>& getModeNames() const override;
+    virtual const std::vector<std::string>& getTokenNames() const override;// deprecated, use vocabulary instead
+    virtual antlr4::dfa::Vocabulary&        getVocabulary() const override;
 
-  dataLexer(antlr4::CharStream *input);
-  ~dataLexer();
+    virtual const std::vector<uint16_t> getSerializedATN() const override;
+    virtual const antlr4::atn::ATN&     getATN() const override;
 
-  virtual std::string getGrammarFileName() const override;
-  virtual const std::vector<std::string>& getRuleNames() const override;
+  private:
+    static std::vector<antlr4::dfa::DFA>       _decisionToDFA;
+    static antlr4::atn::PredictionContextCache _sharedContextCache;
+    static std::vector<std::string>            _ruleNames;
+    static std::vector<std::string>            _tokenNames;
+    static std::vector<std::string>            _channelNames;
+    static std::vector<std::string>            _modeNames;
 
-  virtual const std::vector<std::string>& getChannelNames() const override;
-  virtual const std::vector<std::string>& getModeNames() const override;
-  virtual const std::vector<std::string>& getTokenNames() const override; // deprecated, use vocabulary instead
-  virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
+    static std::vector<std::string> _literalNames;
+    static std::vector<std::string> _symbolicNames;
+    static antlr4::dfa::Vocabulary  _vocabulary;
+    static antlr4::atn::ATN         _atn;
+    static std::vector<uint16_t>    _serializedATN;
 
-  virtual const std::vector<uint16_t> getSerializedATN() const override;
-  virtual const antlr4::atn::ATN& getATN() const override;
+    // Individual action functions triggered by action() above.
 
-private:
-  static std::vector<antlr4::dfa::DFA> _decisionToDFA;
-  static antlr4::atn::PredictionContextCache _sharedContextCache;
-  static std::vector<std::string> _ruleNames;
-  static std::vector<std::string> _tokenNames;
-  static std::vector<std::string> _channelNames;
-  static std::vector<std::string> _modeNames;
+    // Individual semantic predicate functions triggered by sempred() above.
 
-  static std::vector<std::string> _literalNames;
-  static std::vector<std::string> _symbolicNames;
-  static antlr4::dfa::Vocabulary _vocabulary;
-  static antlr4::atn::ATN _atn;
-  static std::vector<uint16_t> _serializedATN;
-
-
-  // Individual action functions triggered by action() above.
-
-  // Individual semantic predicate functions triggered by sempred() above.
-
-  struct Initializer {
-    Initializer();
-  };
-  static Initializer _init;
+    struct Initializer {
+        Initializer();
+    };
+    static Initializer _init;
 };
-

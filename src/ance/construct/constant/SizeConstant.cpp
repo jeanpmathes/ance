@@ -2,13 +2,14 @@
 
 #include <utility>
 
-#include "compiler/Application.h"
 #include "ance/type/SizeType.h"
+#include "compiler/Application.h"
 
 ance::SizeConstant::SizeConstant(std::string size, Application& app)
-    : app_(app), type_(ance::SizeType::get()), size_(std::move(size))
-{
-}
+    : app_(app)
+    , type_(ance::SizeType::get())
+    , size_(std::move(size))
+{}
 
 ance::Type* ance::SizeConstant::type()
 {

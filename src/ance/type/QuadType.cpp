@@ -22,10 +22,7 @@ llvm::Type* ance::QuadType::getContentType(llvm::LLVMContext& c)
 
 ance::FloatingPointType* ance::QuadType::get()
 {
-    if (!instance_)
-    {
-        instance_ = new QuadType();
-    }
+    if (!instance_) { instance_ = new QuadType(); }
 
     return instance_;
 }

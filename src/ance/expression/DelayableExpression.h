@@ -3,10 +3,11 @@
 
 #include "Expression.h"
 
-#include "ance/expression/BuildableExpression.h"
 #include "ance/construct/value/DelayedValue.h"
+#include "ance/expression/BuildableExpression.h"
 
-class DelayableExpression : public virtual Expression
+class DelayableExpression
+    : public virtual Expression
     , public BuildableExpression
 {
   public:

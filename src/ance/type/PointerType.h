@@ -25,17 +25,13 @@ namespace ance
 
         ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
 
-        void buildSetIndexer(
-            ance::Value*    indexed,
-            ance::Value*    index,
-            ance::Value*    value,
-            CompileContext* context) override;
+        void buildSetIndexer(ance::Value*    indexed,
+                             ance::Value*    index,
+                             ance::Value*    value,
+                             CompileContext* context) override;
 
       private:
-        static llvm::Value* buildGetElementPointer(
-            ance::Value*    indexed,
-            ance::Value*    index,
-            CompileContext* context);
+        static llvm::Value* buildGetElementPointer(ance::Value* indexed, ance::Value* index, CompileContext* context);
 
       public:
         ~PointerType() override = default;

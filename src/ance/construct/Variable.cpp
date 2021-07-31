@@ -3,18 +3,20 @@
 #include <utility>
 
 ance::Variable::Variable(ance::Scope* containing_scope, std::string identifier, ance::Type* type, bool is_final)
-    : identifier_(std::move(identifier)),
-      is_defined_(true),
-      scope_(containing_scope),
-      type_(type),
-      is_final_(is_final)
-{
-}
+    : identifier_(std::move(identifier))
+    , is_defined_(true)
+    , scope_(containing_scope)
+    , type_(type)
+    , is_final_(is_final)
+{}
 
 ance::Variable::Variable(std::string identifier)
-    : identifier_(std::move(identifier)), is_defined_(false), scope_(nullptr), type_(nullptr), is_final_(true)
-{
-}
+    : identifier_(std::move(identifier))
+    , is_defined_(false)
+    , scope_(nullptr)
+    , type_(nullptr)
+    , is_final_(true)
+{}
 
 void ance::Variable::define(ance::Scope* containing_scope, ance::Type* type, bool is_final)
 {

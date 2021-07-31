@@ -1,15 +1,14 @@
 #include "Allocation.h"
 
-#include "compiler/CompileContext.h"
 #include "ance/type/PointerType.h"
+#include "compiler/CompileContext.h"
 
 Allocation::Allocation(Runtime::Allocator allocation, ance::Type* type, Expression* count, Application& app)
-    : allocation_(allocation),
-      allocated_type_(type),
-      count_(count),
-      return_type_(ance::PointerType::get(app, type))
-{
-}
+    : allocation_(allocation)
+    , allocated_type_(type)
+    , count_(count)
+    , return_type_(ance::PointerType::get(app, type))
+{}
 
 void Allocation::setScope(ance::Scope* scope)
 {

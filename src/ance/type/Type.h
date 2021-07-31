@@ -29,40 +29,33 @@ namespace ance
     class Type
     {
       protected:
-        Type() = default;
-
+        Type()          = default;
         virtual ~Type() = default;
 
       public:
         Type(const Type&) = delete;
-
-        Type(Type&&) = delete;
+        Type(Type&&)      = delete;
 
         virtual std::string getName() = 0;
 
         virtual llvm::Constant* getDefaultContent(llvm::LLVMContext& c) = 0;
 
-        llvm::Type* getNativeType(llvm::LLVMContext& c);
-
+        llvm::Type*         getNativeType(llvm::LLVMContext& c);
         virtual llvm::Type* getContentType(llvm::LLVMContext& c) = 0;
 
         llvm::TypeSize getNativeSize(llvm::Module* m);
-
         llvm::TypeSize getContentSize(llvm::Module* m);
 
         virtual InternalStorage storage();
 
-        virtual bool isIndexerDefined(Indexer indexer);
-
-        virtual ance::Type* getIndexerReturnType();
-
+        virtual bool         isIndexerDefined(Indexer indexer);
+        virtual ance::Type*  getIndexerReturnType();
         virtual ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context);
 
-        virtual void buildSetIndexer(
-            ance::Value*    indexed,
-            ance::Value*    index,
-            ance::Value*    value,
-            CompileContext* context);
+        virtual void buildSetIndexer(ance::Value*    indexed,
+                                     ance::Value*    index,
+                                     ance::Value*    value,
+                                     CompileContext* context);
     };
 }
 #endif

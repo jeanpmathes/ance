@@ -1,18 +1,14 @@
 #include "ArrayType.h"
 
-#include "ance/scope/Scope.h"
-#include "compiler/CompileContext.h"
-#include "ance/scope/GlobalScope.h"
-#include "ance/type/SizeType.h"
 #include "ance/construct/value/Value.h"
-#include "ance/utility/Values.h"
 #include "ance/construct/value/WrappedNativeValue.h"
+#include "ance/scope/GlobalScope.h"
+#include "ance/scope/Scope.h"
+#include "ance/type/SizeType.h"
+#include "ance/utility/Values.h"
+#include "compiler/CompileContext.h"
 
-ance::ArrayType::ArrayType(Type* element_type, const uint64_t size)
-    : size_(size),
-      element_type_(element_type)
-{
-}
+ance::ArrayType::ArrayType(Type* element_type, const uint64_t size) : size_(size), element_type_(element_type) {}
 
 std::string ance::ArrayType::getName()
 {
@@ -27,10 +23,7 @@ llvm::Constant* ance::ArrayType::getDefaultContent(llvm::LLVMContext& c)
 
 llvm::Type* ance::ArrayType::getContentType(llvm::LLVMContext& c)
 {
-    if (!type_)
-    {
-        type_ = llvm::ArrayType::get(element_type_->getContentType(c), size_);
-    }
+    if (!type_) { type_ = llvm::ArrayType::get(element_type_->getContentType(c), size_); }
 
     return type_;
 }
@@ -65,11 +58,10 @@ ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value*
     return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
 }
 
-void ance::ArrayType::buildSetIndexer(
-    ance::Value*    indexed,
-    ance::Value*    index,
-    ance::Value*    value,
-    CompileContext* context)
+void ance::ArrayType::buildSetIndexer(ance::Value*    indexed,
+                                      ance::Value*    index,
+                                      ance::Value*    value,
+                                      CompileContext* context)
 {
     assert(indexed->type() == this && "Indexed value has to be of native array type.");
     assert(index->type() == ance::SizeType::get() && "Native array index has to be size type.");
@@ -83,10 +75,9 @@ void ance::ArrayType::buildSetIndexer(
     context->ir()->CreateStore(new_element_content, element_ptr);
 }
 
-llvm::Value* ance::ArrayType::buildGetElementPointer(
-    ance::Value*    indexed,
-    ance::Value*    index,
-    CompileContext* context) const
+llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value*    indexed,
+                                                     ance::Value*    index,
+                                                     CompileContext* context) const
 {
     indexed->buildNativeValue(context);
     index->buildContentValue(context);
@@ -99,8 +90,9 @@ llvm::Value* ance::ArrayType::buildGetElementPointer(
     llvm::Value* array_ptr = indexed->getNativeValue();
 
     // Check if index is smaller than size.
-    llvm::Value*                  native_size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(*context->llvmContext()), size_);
-    llvm::Value* in_bounds   = context->ir()->CreateICmpULT(native_index, native_size);
+    llvm::Value* native_size =
+        llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(*context->llvmContext()), size_);
+    llvm::Value* in_bounds = context->ir()->CreateICmpULT(native_index, native_size);
 
     in_bounds->setName("..inbounds");
 

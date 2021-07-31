@@ -12,12 +12,11 @@ namespace ance
     class LocalVariable : public ance::Variable
     {
       public:
-        LocalVariable(
-            ance::LocalScope* containing_scope,
-            std::string       identifier,
-            ance::Type*       type,
-            ance::Value*      value,
-            bool              is_final);
+        LocalVariable(ance::LocalScope* containing_scope,
+                      std::string       identifier,
+                      ance::Type*       type,
+                      ance::Value*      value,
+                      bool              is_final);
 
         void build(CompileContext* context);
 

@@ -1,10 +1,8 @@
 #include "ExpressionBackedConstant.h"
 
 ance::ExpressionBackedConstant::ExpressionBackedConstant(BackingConstantExpression* expression)
-    : expression_(
-        expression)
-{
-}
+    : expression_(expression)
+{}
 
 ance::Type* ance::ExpressionBackedConstant::type()
 {

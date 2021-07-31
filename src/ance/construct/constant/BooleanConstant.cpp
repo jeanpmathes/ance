@@ -5,9 +5,9 @@
 #include "ance/type/IntegerType.h"
 
 ance::BooleanConstant::BooleanConstant(bool boolean, Application& app)
-    : type_(ance::IntegerType::get(app, 1, true)), boolean_(boolean)
-{
-}
+    : type_(ance::IntegerType::get(app, 1, true))
+    , boolean_(boolean)
+{}
 
 ance::Type* ance::BooleanConstant::type()
 {

@@ -56,15 +56,9 @@ void AnceLinker::link(const std::filesystem::path& bc, const std::filesystem::pa
     std::string in = bc.string();
     args.push_back(in.c_str());
 
-    for (const auto& libpath : lib_paths_)
-    {
-        args.push_back(libpath.c_str());
-    }
+    for (const auto& libpath : lib_paths_) { args.push_back(libpath.c_str()); }
 
-    for (const auto& lib : libs_)
-    {
-        args.push_back(lib.c_str());
-    }
+    for (const auto& lib : libs_) { args.push_back(lib.c_str()); }
 
     lld::coff::link(args, false, llvm::outs(), llvm::errs());
 }

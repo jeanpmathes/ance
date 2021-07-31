@@ -17,10 +17,7 @@ llvm::Type* ance::VoidType::getContentType(llvm::LLVMContext& c)
 
 ance::VoidType* ance::VoidType::get()
 {
-    if (!instance_)
-    {
-        instance_ = new ance::VoidType();
-    }
+    if (!instance_) { instance_ = new ance::VoidType(); }
 
     return instance_;
 }

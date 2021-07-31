@@ -12,15 +12,14 @@ class Application;
 class CompileContext
 {
   public:
-    CompileContext(
-        Application*         app,
-        Runtime*             runtime,
-        llvm::LLVMContext*   c,
-        llvm::Module*        m,
-        llvm::IRBuilder<>*   ir,
-        llvm::DIBuilder*     di,
-        llvm::DICompileUnit* unit,
-        llvm::DIFile*        code_file);
+    CompileContext(Application*         app,
+                   Runtime*             runtime,
+                   llvm::LLVMContext*   c,
+                   llvm::Module*        m,
+                   llvm::IRBuilder<>*   ir,
+                   llvm::DIBuilder*     di,
+                   llvm::DICompileUnit* unit,
+                   llvm::DIFile*        code_file);
 
     Application* application();
 

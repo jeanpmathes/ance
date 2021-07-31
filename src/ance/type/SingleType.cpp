@@ -22,10 +22,7 @@ llvm::Type* ance::SingleType::getContentType(llvm::LLVMContext& c)
 
 ance::FloatingPointType* ance::SingleType::get()
 {
-    if (!instance_)
-    {
-        instance_ = new SingleType();
-    }
+    if (!instance_) { instance_ = new SingleType(); }
 
     return instance_;
 }

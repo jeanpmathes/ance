@@ -22,10 +22,7 @@ llvm::Type* ance::HalfType::getContentType(llvm::LLVMContext& c)
 
 ance::FloatingPointType* ance::HalfType::get()
 {
-    if (!instance_)
-    {
-        instance_ = new HalfType();
-    }
+    if (!instance_) { instance_ = new HalfType(); }
 
     return instance_;
 }

@@ -21,13 +21,12 @@ namespace ance
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
-        static llvm::Value* buildValue(
-            llvm::Value*       pointer,
-            llvm::LLVMContext& c,
-            llvm::Module*      m,
-            CompileContext*    state,
-            llvm::IRBuilder<>& ir,
-            llvm::DIBuilder*   di);
+        static llvm::Value* buildValue(llvm::Value*       pointer,
+                                       llvm::LLVMContext& c,
+                                       llvm::Module*      m,
+                                       CompileContext*    state,
+                                       llvm::IRBuilder<>& ir,
+                                       llvm::DIBuilder*   di);
 
       private:
         inline static UnsignedIntegerPointerType* instance_    = nullptr;

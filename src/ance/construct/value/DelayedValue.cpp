@@ -2,10 +2,7 @@
 
 #include "ance/expression/DelayableExpression.h"
 
-ance::DelayedValue::DelayedValue(DelayableExpression* expression)
-    : expression_(expression)
-{
-}
+ance::DelayedValue::DelayedValue(DelayableExpression* expression) : expression_(expression) {}
 
 ance::Type* ance::DelayedValue::type()
 {

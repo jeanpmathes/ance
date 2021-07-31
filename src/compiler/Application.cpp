@@ -15,8 +15,7 @@
 #include "ance/type/UnsignedIntegerPointerType.h"
 #include "ance/type/VoidType.h"
 
-Application::Application(data::File& project)
-    : project_(project), global_scope_(new ance::GlobalScope())
+Application::Application(data::File& project) : project_(project), global_scope_(new ance::GlobalScope())
 {
     // Register keyword types
 
@@ -43,10 +42,7 @@ std::string Application::getName() const
     {
         auto str = name->get().asString();
 
-        if (str)
-        {
-            return str->get();
-        }
+        if (str) { return str->get(); }
     }
 
     return "unnamed";

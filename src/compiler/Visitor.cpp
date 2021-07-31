@@ -52,10 +52,7 @@
 #include "ance/construct/constant/SizeConstant.h"
 #include "ance/construct/constant/StringConstant.h"
 
-Visitor::Visitor(Application& application)
-    : application_(application)
-{
-}
+Visitor::Visitor(Application& application) : application_(application) {}
 
 antlrcpp::Any Visitor::visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx)
 {
@@ -98,9 +95,13 @@ antlrcpp::Any Visitor::visitFunctionDefinition(anceParser::FunctionDefinitionCon
 
     std::vector<ance::Parameter*> parameters = visit(ctx->parameters());
 
-    auto* function = new ance::DefinedFunction(
-        access, ctx->IDENTIFIER()->getText(), return_type, parameters,
-        application_.globalScope(), line, column);
+    auto* function = new ance::DefinedFunction(access,
+                                               ctx->IDENTIFIER()->getText(),
+                                               return_type,
+                                               parameters,
+                                               application_.globalScope(),
+                                               line,
+                                               column);
 
     application_.globalScope()->addFunction(function);
 
@@ -133,10 +134,7 @@ antlrcpp::Any Visitor::visitParameters(anceParser::ParametersContext* ctx)
 {
     std::vector<ance::Parameter*> params;
 
-    for (auto* param : ctx->parameter())
-    {
-        params.push_back(visit(param));
-    }
+    for (auto* param : ctx->parameter()) { params.push_back(visit(param)); }
 
     return params;
 }
@@ -157,8 +155,7 @@ antlrcpp::Any Visitor::visitExpressionStatement(anceParser::ExpressionStatementC
     Expression* expression           = visit(ctx->independentExpression());
     auto*       buildable_expression = dynamic_cast<BuildableExpression*>(expression);
 
-    auto* statement =
-        new ExpressionStatement(buildable_expression, line, column);
+    auto* statement = new ExpressionStatement(buildable_expression, line, column);
 
     return static_cast<Statement*>(statement);
 }
@@ -185,8 +182,7 @@ antlrcpp::Any Visitor::visitLocalVariableDefinition(anceParser::LocalVariableDef
         assigned = new DefaultValueExpression(type);
     }
 
-    auto* statement =
-        new LocalVariableDefinition(identifier, type, assigner, assigned, line, column);
+    auto* statement = new LocalVariableDefinition(identifier, type, assigner, assigned, line, column);
 
     return static_cast<Statement*>(statement);
 }
@@ -202,8 +198,7 @@ antlrcpp::Any Visitor::visitAssignment(anceParser::AssignmentContext* ctx)
     Assigner assigner = visit(ctx->assigner());
     assert(assigner == Assigner::COPY_ASSIGNMENT && "Assignment to already declared variable cannot be final.");
 
-    auto* statement =
-        new AssignmentStatement(assignable, assigned, line, column);
+    auto* statement = new AssignmentStatement(assignable, assigned, line, column);
 
     return static_cast<Statement*>(statement);
 }
@@ -226,13 +221,9 @@ antlrcpp::Any Visitor::visitReturnStatement(anceParser::ReturnStatementContext* 
 
     Expression* return_value = nullptr;
 
-    if (ctx->expression() != nullptr)
-    {
-        return_value = visit(ctx->expression());
-    }
+    if (ctx->expression() != nullptr) { return_value = visit(ctx->expression()); }
 
-    auto* statement =
-        new ReturnStatement(return_value, line, column);
+    auto* statement = new ReturnStatement(return_value, line, column);
 
     return static_cast<Statement*>(statement);
 }
@@ -272,10 +263,7 @@ antlrcpp::Any Visitor::visitArguments(anceParser::ArgumentsContext* ctx)
 {
     std::vector<Expression*> arguments;
 
-    for (auto* argument : ctx->expression())
-    {
-        arguments.push_back(visit(argument));
-    }
+    for (auto* argument : ctx->expression()) { arguments.push_back(visit(argument)); }
 
     return arguments;
 }
@@ -293,10 +281,7 @@ antlrcpp::Any Visitor::visitAllocation(anceParser::AllocationContext* ctx)
     ance::Type*        type      = visit(ctx->type());
     Expression*        count     = nullptr;
 
-    if (ctx->expression())
-    {
-        count = visit(ctx->expression());
-    }
+    if (ctx->expression()) { count = visit(ctx->expression()); }
 
     return static_cast<Expression*>(new Allocation(allocator, type, count, application_));
 }
@@ -335,10 +320,7 @@ antlrcpp::Any Visitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)
 {
     std::string prefix;
 
-    if (ctx->STRING_PREFIX())
-    {
-        prefix = ctx->STRING_PREFIX()->getText();
-    }
+    if (ctx->STRING_PREFIX()) { prefix = ctx->STRING_PREFIX()->getText(); }
 
     std::string str = ance::StringConstant::parse(ctx->STRING()->getText());
 
@@ -411,10 +393,7 @@ antlrcpp::Any Visitor::visitUnsignedInteger(anceParser::UnsignedIntegerContext* 
 {
     uint64_t size = 64;
 
-    if (ctx->INTEGER(1))
-    {
-        size = std::stoi(ctx->INTEGER(1)->getText());
-    }
+    if (ctx->INTEGER(1)) { size = std::stoi(ctx->INTEGER(1)->getText()); }
 
     const llvm::APInt integer(size, ctx->INTEGER(0)->getText(), 10);
     auto*             integer_constant = new ance::IntegerConstant(integer, false, application_);
@@ -426,10 +405,7 @@ antlrcpp::Any Visitor::visitSignedInteger(anceParser::SignedIntegerContext* ctx)
 {
     uint64_t size = 64;
 
-    if (ctx->INTEGER())
-    {
-        size = std::stoi(ctx->INTEGER()->getText());
-    }
+    if (ctx->INTEGER()) { size = std::stoi(ctx->INTEGER()->getText()); }
 
     const llvm::APInt integer(size, ctx->SIGNED_INTEGER()->getText(), 10);
     auto*             integer_constant = new ance::IntegerConstant(integer, true, application_);
@@ -441,10 +417,7 @@ antlrcpp::Any Visitor::visitSpecialInteger(anceParser::SpecialIntegerContext* ct
 {
     uint64_t size = 64;
 
-    if (ctx->INTEGER())
-    {
-        size = std::stoi(ctx->INTEGER()->getText());
-    }
+    if (ctx->INTEGER()) { size = std::stoi(ctx->INTEGER()->getText()); }
 
     std::string integer_str;
     int         radix;

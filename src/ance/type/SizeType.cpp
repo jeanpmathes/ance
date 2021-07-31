@@ -2,8 +2,8 @@
 
 #include <llvm/IR/Constants.h>
 
-#include "compiler/Application.h"
 #include "ance/scope/GlobalScope.h"
+#include "compiler/Application.h"
 
 std::string ance::SizeType::getName()
 {
@@ -33,10 +33,7 @@ void ance::SizeType::init(llvm::LLVMContext& c, Application& app)
 
 ance::SizeType* ance::SizeType::get()
 {
-    if (!instance_)
-    {
-        instance_ = new SizeType();
-    }
+    if (!instance_) { instance_ = new SizeType(); }
 
     return instance_;
 }

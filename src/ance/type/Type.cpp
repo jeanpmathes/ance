@@ -4,10 +4,12 @@ llvm::Type* ance::Type::getNativeType(llvm::LLVMContext& c)
 {
     switch (storage())
     {
-        case InternalStorage::AS_TEMPORARY: {
+        case InternalStorage::AS_TEMPORARY:
+        {
             return getContentType(c);
         }
-        case InternalStorage::AS_POINTER: {
+        case InternalStorage::AS_POINTER:
+        {
             return llvm::PointerType::get(getContentType(c), 0);
         }
     }
@@ -43,6 +45,4 @@ ance::Value* ance::Type::buildGetIndexer(ance::Value*, ance::Value*, CompileCont
     return nullptr;
 }
 
-void ance::Type::buildSetIndexer(ance::Value*, ance::Value*, ance::Value*, CompileContext*)
-{
-}
+void ance::Type::buildSetIndexer(ance::Value*, ance::Value*, ance::Value*, CompileContext*) {}

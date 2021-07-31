@@ -10,10 +10,10 @@
 #include "ance/type/PointerType.h"
 
 ance::StringConstant::StringConstant(std::string prefix, std::string string, Application& app)
-    : type_(resolveType(prefix, string, app)), prefix_(prefix),
-      string_(string)
-{
-}
+    : type_(resolveType(prefix, string, app))
+    , prefix_(prefix)
+    , string_(string)
+{}
 
 ance::Type* ance::StringConstant::type()
 {
@@ -25,13 +25,12 @@ llvm::Constant* ance::StringConstant::buildContent(llvm::Module* m)
     if (prefix_ == "c")
     {
         llvm::Constant* content     = llvm::ConstantDataArray::getString(m->getContext(), string_, true);
-        auto*           str_arr_ptr = new llvm::GlobalVariable(
-            *m,
-            content->getType(),
-            true,
-            llvm::GlobalValue::PrivateLinkage,
-            content,
-            "data.str");
+        auto*           str_arr_ptr = new llvm::GlobalVariable(*m,
+                                                     content->getType(),
+                                                     true,
+                                                     llvm::GlobalValue::PrivateLinkage,
+                                                     content,
+                                                     "data.str");
 
         llvm::Constant* zero      = llvm::ConstantInt::get(llvm::Type::getInt64Ty(m->getContext()), 0);
         llvm::Constant* indices[] = {zero, zero};
@@ -59,10 +58,7 @@ std::string ance::StringConstant::parse(const std::string& unparsed)
         }
         else
         {
-            if (c == '\\')
-            {
-                escaped = true;
-            }
+            if (c == '\\') { escaped = true; }
             else if (c != '"')
             {
                 builder << c;
@@ -75,10 +71,7 @@ std::string ance::StringConstant::parse(const std::string& unparsed)
 
 ance::Type* ance::StringConstant::resolveType(std::string& prefix, std::string& string, Application& app)
 {
-    if (prefix == "c")
-    {
-        return ance::PointerType::get(app, ance::IntegerType::get(app, 8, false));
-    }
+    if (prefix == "c") { return ance::PointerType::get(app, ance::IntegerType::get(app, 8, false)); }
 
     return ance::ArrayType::get(app, ance::IntegerType::get(app, 8, false), string.size());
 }

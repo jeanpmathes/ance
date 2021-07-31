@@ -1,8 +1,6 @@
 #include "Discard.h"
 
-void Discard::setScope(ance::Scope*)
-{
-}
+void Discard::setScope(ance::Scope*) {}
 
 void Discard::assign(ance::Value* value, CompileContext* context)
 {

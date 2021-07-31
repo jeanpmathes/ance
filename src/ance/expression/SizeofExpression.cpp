@@ -1,13 +1,10 @@
 #include "SizeofExpression.h"
 
-#include "compiler/CompileContext.h"
 #include "ance/construct/value/ExpressionBackedValue.h"
 #include "ance/type/SizeType.h"
+#include "compiler/CompileContext.h"
 
-SizeofExpression::SizeofExpression(Expression* expression)
-    : expression_(expression)
-{
-}
+SizeofExpression::SizeofExpression(Expression* expression) : expression_(expression) {}
 
 void SizeofExpression::setScope(ance::Scope* scope)
 {

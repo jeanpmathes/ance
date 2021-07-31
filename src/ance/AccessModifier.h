@@ -3,7 +3,8 @@
 
 #include <llvm/IR/GlobalValue.h>
 
-class AccessModifier {
+class AccessModifier
+{
   public:
     enum Value
     {
@@ -12,9 +13,9 @@ class AccessModifier {
     };
 
     AccessModifier() = default;
-    constexpr AccessModifier(Value val) : value_(val) { } // NOLINT(google-explicit-constructor)
+    constexpr AccessModifier(Value val) : value_(val) {}// NOLINT(google-explicit-constructor)
 
-    operator Value() const; // NOLINT(google-explicit-constructor)
+             operator Value() const;// NOLINT(google-explicit-constructor)
     explicit operator bool() = delete;
 
     llvm::GlobalValue::LinkageTypes linkage();

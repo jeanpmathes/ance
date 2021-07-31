@@ -5,7 +5,8 @@
 
 #include "ance/expression/BuildableExpression.h"
 
-class BackingExpression : public virtual Expression
+class BackingExpression
+    : public virtual Expression
     , public BuildableExpression
 {
   public:

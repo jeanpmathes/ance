@@ -1,9 +1,6 @@
 #include "WrappedNativeValue.h"
 
-ance::WrappedNativeValue::WrappedNativeValue(ance::Type* type, llvm::Value* value)
-    : type_(type), value_(value)
-{
-}
+ance::WrappedNativeValue::WrappedNativeValue(ance::Type* type, llvm::Value* value) : type_(type), value_(value) {}
 
 void ance::WrappedNativeValue::setValue(llvm::Value* value)
 {
@@ -15,9 +12,7 @@ ance::Type* ance::WrappedNativeValue::type()
     return type_;
 }
 
-void ance::WrappedNativeValue::buildNativeValue(CompileContext*)
-{
-}
+void ance::WrappedNativeValue::buildNativeValue(CompileContext*) {}
 
 llvm::Value* ance::WrappedNativeValue::getNativeValue()
 {

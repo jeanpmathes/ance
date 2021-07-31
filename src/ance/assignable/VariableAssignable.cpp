@@ -2,8 +2,7 @@
 
 VariableAssignable::VariableAssignable(std::string variable_identifier)
     : variable_identifier_(std::move(variable_identifier))
-{
-}
+{}
 
 void VariableAssignable::setScope(ance::Scope* scope)
 {

@@ -1,13 +1,10 @@
 #include "DefaultValueExpression.h"
 
 #include "ance/construct/constant/Constant.h"
-#include "ance/type/Type.h"
 #include "ance/construct/value/Value.h"
+#include "ance/type/Type.h"
 
-DefaultValueExpression::DefaultValueExpression(ance::Type* type)
-    : type_(type)
-{
-}
+DefaultValueExpression::DefaultValueExpression(ance::Type* type) : type_(type) {}
 
 ance::Type* DefaultValueExpression::type()
 {

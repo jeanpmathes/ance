@@ -22,10 +22,7 @@ llvm::Type* ance::DoubleType::getContentType(llvm::LLVMContext& c)
 
 ance::FloatingPointType* ance::DoubleType::get()
 {
-    if (!instance_)
-    {
-        instance_ = new DoubleType();
-    }
+    if (!instance_) { instance_ = new DoubleType(); }
 
     return instance_;
 }

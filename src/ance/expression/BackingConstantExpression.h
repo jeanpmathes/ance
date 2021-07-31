@@ -5,7 +5,8 @@
 
 #include "ance/expression/BackingExpression.h"
 
-class BackingConstantExpression : public ConstantExpression
+class BackingConstantExpression
+    : public ConstantExpression
     , public BackingExpression
 {
   public:

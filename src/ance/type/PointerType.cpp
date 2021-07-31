@@ -1,18 +1,15 @@
 #include "PointerType.h"
 
-#include "compiler/Application.h"
-#include "compiler/CompileContext.h"
+#include "ance/construct/value/Value.h"
+#include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
 #include "ance/type/SizeType.h"
-#include "ance/construct/value/Value.h"
-#include "ance/utility/Values.h"
 #include "ance/type/VoidType.h"
-#include "ance/construct/value/WrappedNativeValue.h"
+#include "ance/utility/Values.h"
+#include "compiler/Application.h"
+#include "compiler/CompileContext.h"
 
-ance::PointerType::PointerType(ance::Type* element_type)
-    : element_type_(element_type)
-{
-}
+ance::PointerType::PointerType(ance::Type* element_type) : element_type_(element_type) {}
 
 std::string ance::PointerType::getName()
 {
@@ -28,10 +25,7 @@ llvm::PointerType* ance::PointerType::getContentType(llvm::LLVMContext& c)
 {
     llvm::Type* native_type;
 
-    if (element_type_ == ance::VoidType::get())
-    {
-        native_type = llvm::Type::getInt8PtrTy(c);
-    }
+    if (element_type_ == ance::VoidType::get()) { native_type = llvm::Type::getInt8PtrTy(c); }
     else
     {
         native_type = element_type_->getContentType(c);
@@ -62,11 +56,10 @@ ance::Value* ance::PointerType::buildGetIndexer(ance::Value* indexed, ance::Valu
     return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
 }
 
-void ance::PointerType::buildSetIndexer(
-    ance::Value*    indexed,
-    ance::Value*    index,
-    ance::Value*    value,
-    CompileContext* context)
+void ance::PointerType::buildSetIndexer(ance::Value*    indexed,
+                                        ance::Value*    index,
+                                        ance::Value*    value,
+                                        CompileContext* context)
 {
     assert(indexed->type() == this && "Indexed value has to be of pointer type.");
     assert(index->type() == ance::SizeType::get() && "Pointer index has to be size type.");
@@ -80,10 +73,9 @@ void ance::PointerType::buildSetIndexer(
     context->ir()->CreateStore(new_element_content, element_ptr);
 }
 
-llvm::Value* ance::PointerType::buildGetElementPointer(
-    ance::Value*    indexed,
-    ance::Value*    index,
-    CompileContext* context)
+llvm::Value* ance::PointerType::buildGetElementPointer(ance::Value*    indexed,
+                                                       ance::Value*    index,
+                                                       CompileContext* context)
 {
     indexed->buildContentValue(context);
     index->buildNativeValue(context);

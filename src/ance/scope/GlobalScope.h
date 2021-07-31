@@ -16,26 +16,24 @@ namespace ance
 
         bool validate() override;
 
-        bool isTypeRegistered(const std::string& type_name) override;
+        bool        isTypeRegistered(const std::string& type_name) override;
         ance::Type* getType(const std::string& type_name) override;
-        void registerType(ance::Type* type) override;
+        void        registerType(ance::Type* type) override;
 
-        void defineGlobalVariable(
-            AccessModifier      access,
-            bool                is_constant,
-            const std::string&  identifier,
-            ance::Type*         type,
-            Assigner            assigner,
-            ConstantExpression* initializer);
+        void defineGlobalVariable(AccessModifier      access,
+                                  bool                is_constant,
+                                  const std::string&  identifier,
+                                  ance::Type*         type,
+                                  Assigner            assigner,
+                                  ConstantExpression* initializer);
 
         ance::Variable* getVariable(std::string identifier) override;
 
-        void buildVariables(
-            llvm::LLVMContext& c,
-            llvm::Module*      m,
-            CompileContext*    state,
-            llvm::IRBuilder<>& ir,
-            llvm::DIBuilder*   di);
+        void buildVariables(llvm::LLVMContext& c,
+                            llvm::Module*      m,
+                            CompileContext*    state,
+                            llvm::IRBuilder<>& ir,
+                            llvm::DIBuilder*   di);
 
         [[nodiscard]] size_t functionCount() const;
 

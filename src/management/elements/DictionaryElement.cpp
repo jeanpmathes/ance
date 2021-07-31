@@ -1,6 +1,7 @@
 #include "DictionaryElement.h"
 
-std::optional<std::reference_wrapper<const data::Element>> data::DictionaryElement::operator[](const std::string& key) const
+std::optional<std::reference_wrapper<const data::Element>> data::DictionaryElement::operator[](
+    const std::string& key) const
 {
     if (dict_.find(key) != dict_.end())
     {

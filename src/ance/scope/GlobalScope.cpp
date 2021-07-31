@@ -4,8 +4,8 @@
 #include <ostream>
 
 #include "ance/AccessModifier.h"
-#include "ance/expression/ConstantExpression.h"
 #include "ance/construct/Function.h"
+#include "ance/expression/ConstantExpression.h"
 
 ance::GlobalScope* ance::GlobalScope::getGlobalScope()
 {
@@ -51,10 +51,17 @@ void ance::GlobalScope::registerType(ance::Type* type)
     types_[type->getName()] = type;
 }
 
-void ance::GlobalScope::defineGlobalVariable(AccessModifier access, bool is_constant, const std::string& identifier, ance::Type* type, Assigner assigner, ConstantExpression* initializer)
+void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
+                                             bool                is_constant,
+                                             const std::string&  identifier,
+                                             ance::Type*         type,
+                                             Assigner            assigner,
+                                             ConstantExpression* initializer)
 {
-    assert(global_variables_.find(identifier) == global_variables_.end() && "A variable identifier may be used just once.");
-    assert(global_constants_.find(identifier) == global_constants_.end() && "A constant identifier may be used just once.");
+    assert(global_variables_.find(identifier) == global_variables_.end()
+           && "A variable identifier may be used just once.");
+    assert(global_constants_.find(identifier) == global_constants_.end()
+           && "A constant identifier may be used just once.");
 
     assert(initializer && "Variables require an initial value, which has to be explicit for constants.");
 
@@ -68,10 +75,7 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier access, bool is_cons
 
         undefined->defineGlobal(this, access, type, initializer, is_final, is_constant);
 
-        if (is_constant)
-        {
-            global_constants_[identifier] = undefined;
-        }
+        if (is_constant) { global_constants_[identifier] = undefined; }
         else
         {
             global_variables_[identifier] = undefined;
@@ -83,10 +87,7 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier access, bool is_cons
     {
         auto* defined = new ance::GlobalVariable(this, access, identifier, type, initializer, is_final, is_constant);
 
-        if (is_constant)
-        {
-            global_constants_[identifier] = defined;
-        }
+        if (is_constant) { global_constants_[identifier] = defined; }
         else
         {
             global_variables_[identifier] = defined;
@@ -96,20 +97,11 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier access, bool is_cons
 
 ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
 {
-    if (global_variables_.find(identifier) != global_variables_.end())
-    {
-        return global_variables_[identifier];
-    }
+    if (global_variables_.find(identifier) != global_variables_.end()) { return global_variables_[identifier]; }
 
-    if (global_constants_.find(identifier) != global_constants_.end())
-    {
-        return global_constants_[identifier];
-    }
+    if (global_constants_.find(identifier) != global_constants_.end()) { return global_constants_[identifier]; }
 
-    if (global_undefined_.find(identifier) != global_undefined_.end())
-    {
-        return global_undefined_[identifier];
-    }
+    if (global_undefined_.find(identifier) != global_undefined_.end()) { return global_undefined_[identifier]; }
 
     // Create an undefined global variable.
     auto* undefined               = new GlobalVariable(identifier);
@@ -117,12 +109,11 @@ ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
     return undefined;
 }
 
-void ance::GlobalScope::buildVariables(
-    llvm::LLVMContext&,
-    llvm::Module* m,
-    CompileContext*,
-    llvm::IRBuilder<>&,
-    llvm::DIBuilder*)
+void ance::GlobalScope::buildVariables(llvm::LLVMContext&,
+                                       llvm::Module* m,
+                                       CompileContext*,
+                                       llvm::IRBuilder<>&,
+                                       llvm::DIBuilder*)
 {
     for (auto const& [identifier, constant] : global_constants_)
     {
@@ -155,8 +146,7 @@ void ance::GlobalScope::addFunction(ance::Function* function)
 
 bool ance::GlobalScope::hasFunction(const std::string& identifier)
 {
-    if (functions_.find(identifier) != functions_.end())
-        return true;
+    if (functions_.find(identifier) != functions_.end()) return true;
     return false;
 }
 
@@ -172,16 +162,10 @@ ance::Function* ance::GlobalScope::getFunction(const std::string& identifier)
 
 void ance::GlobalScope::buildFunctionNames(CompileContext* context)
 {
-    for (auto const& [key, val] : functions_)
-    {
-        val->buildName(context);
-    }
+    for (auto const& [key, val] : functions_) { val->buildName(context); }
 }
 
 void ance::GlobalScope::buildFunctions(CompileContext* context)
 {
-    for (auto const& [key, val] : functions_)
-    {
-        val->build(context);
-    }
+    for (auto const& [key, val] : functions_) { val->build(context); }
 }

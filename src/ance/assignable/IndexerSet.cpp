@@ -1,9 +1,6 @@
 #include "IndexerSet.h"
 
-IndexerSet::IndexerSet(Expression* indexed, Expression* index)
-    : indexed_(indexed), index_(index)
-{
-}
+IndexerSet::IndexerSet(Expression* indexed, Expression* index) : indexed_(indexed), index_(index) {}
 
 void IndexerSet::setScope(ance::Scope* scope)
 {

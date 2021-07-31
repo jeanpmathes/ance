@@ -1,7 +1,7 @@
 #include "UnsignedIntegerPointerType.h"
 
-#include "compiler/Application.h"
 #include "ance/scope/GlobalScope.h"
+#include "compiler/Application.h"
 
 std::string ance::UnsignedIntegerPointerType::getName()
 {
@@ -18,13 +18,12 @@ llvm::Type* ance::UnsignedIntegerPointerType::getContentType(llvm::LLVMContext&)
     return native_type_;
 }
 
-llvm::Value* ance::UnsignedIntegerPointerType::buildValue(
-    llvm::Value* pointer,
-    llvm::LLVMContext&,
-    llvm::Module*,
-    CompileContext*,
-    llvm::IRBuilder<>& ir,
-    llvm::DIBuilder*)
+llvm::Value* ance::UnsignedIntegerPointerType::buildValue(llvm::Value* pointer,
+                                                          llvm::LLVMContext&,
+                                                          llvm::Module*,
+                                                          CompileContext*,
+                                                          llvm::IRBuilder<>& ir,
+                                                          llvm::DIBuilder*)
 {
     return ir.CreatePtrToInt(pointer, native_type_);
 }
@@ -37,10 +36,7 @@ void ance::UnsignedIntegerPointerType::init(llvm::LLVMContext& c, Application& a
 
 ance::UnsignedIntegerPointerType* ance::UnsignedIntegerPointerType::get()
 {
-    if (!instance_)
-    {
-        instance_ = new UnsignedIntegerPointerType();
-    }
+    if (!instance_) { instance_ = new UnsignedIntegerPointerType(); }
 
     return instance_;
 }

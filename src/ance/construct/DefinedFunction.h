@@ -11,10 +11,10 @@
 
 #include "ance/construct/Parameter.h"
 
-#include "compiler/CompileContext.h"
+#include "ance/AccessModifier.h"
 #include "ance/expression/Expression.h"
 #include "ance/statement/Statement.h"
-#include "ance/AccessModifier.h"
+#include "compiler/CompileContext.h"
 
 class CompileContext;
 
@@ -23,14 +23,13 @@ namespace ance
     class DefinedFunction : public ance::Function
     {
       public:
-        DefinedFunction(
-            AccessModifier                access,
-            std::string                   function_name,
-            ance::Type*                   return_type,
-            std::vector<ance::Parameter*> parameters,
-            ance::Scope*                  scope,
-            unsigned int                  line,
-            unsigned int                  column);
+        DefinedFunction(AccessModifier                access,
+                        std::string                   function_name,
+                        ance::Type*                   return_type,
+                        std::vector<ance::Parameter*> parameters,
+                        ance::Scope*                  scope,
+                        unsigned int                  line,
+                        unsigned int                  column);
 
         [[nodiscard]] ance::LocalScope* getScope() const;
 

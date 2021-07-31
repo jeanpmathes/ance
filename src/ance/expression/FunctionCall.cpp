@@ -2,10 +2,10 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "ance/construct/Function.h"
-#include "ance/scope/GlobalScope.h"
 #include "ance/construct/value/Value.h"
+#include "ance/scope/GlobalScope.h"
+#include "compiler/CompileContext.h"
 
 namespace ance
 {
@@ -13,19 +13,15 @@ namespace ance
 }
 
 FunctionCall::FunctionCall(std::string identifier, std::vector<Expression*> arguments)
-    : identifier_(std::move(identifier)),
-      arguments_(std::move(arguments))
-{
-}
+    : identifier_(std::move(identifier))
+    , arguments_(std::move(arguments))
+{}
 
 void FunctionCall::setScope(ance::Scope* scope)
 {
     scope_ = scope;
 
-    for (auto* arg : arguments_)
-    {
-        arg->setScope(scope);
-    }
+    for (auto* arg : arguments_) { arg->setScope(scope); }
 }
 
 ance::Type* FunctionCall::type()
@@ -39,10 +35,7 @@ void FunctionCall::buildValue(CompileContext* context)
 
     std::vector<ance::Value*> arg_values;
 
-    for (auto* arg : arguments_)
-    {
-        arg_values.push_back(arg->getValue());
-    }
+    for (auto* arg : arguments_) { arg_values.push_back(arg->getValue()); }
 
     ance::Value* return_value = fn->buildCall(arg_values, context);
 

@@ -6,16 +6,18 @@
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
 
-LocalVariableDefinition::LocalVariableDefinition(
-    std::string identifier,
-    ance::Type* type,
-    Assigner    assigner,
-    Expression* assigned,
-    unsigned    line,
-    unsigned    column)
-    : Statement(line, column), identifier_(std::move(identifier)), type_(type), assigner_(assigner), assigned_(assigned)
-{
-}
+LocalVariableDefinition::LocalVariableDefinition(std::string identifier,
+                                                 ance::Type* type,
+                                                 Assigner    assigner,
+                                                 Expression* assigned,
+                                                 unsigned    line,
+                                                 unsigned    column)
+    : Statement(line, column)
+    , identifier_(std::move(identifier))
+    , type_(type)
+    , assigner_(assigner)
+    , assigned_(assigned)
+{}
 
 void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
 {

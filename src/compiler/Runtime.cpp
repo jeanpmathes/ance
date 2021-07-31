@@ -2,38 +2,28 @@
 
 #include <stdexcept>
 
-#include "compiler/CompileContext.h"
+#include "ance/construct/value/Value.h"
+#include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/SizeType.h"
 #include "ance/type/Type.h"
-#include "ance/construct/value/Value.h"
-#include "ance/construct/value/WrappedNativeValue.h"
+#include "compiler/CompileContext.h"
 
-void Runtime::init(
-    llvm::LLVMContext& c,
-    llvm::Module*      m,
-    CompileContext*,
-    llvm::IRBuilder<>&,
-    llvm::DIBuilder*)
+void Runtime::init(llvm::LLVMContext& c, llvm::Module* m, CompileContext*, llvm::IRBuilder<>&, llvm::DIBuilder*)
 {
     // Setup dynamic memory allocation call.
-    llvm::Type* allocate_dynamic_params[] =
-        {llvm::Type::getInt32Ty(c), ance::SizeType::get()->getNativeType(c)};
+    llvm::Type* allocate_dynamic_params[] = {llvm::Type::getInt32Ty(c), ance::SizeType::get()->getNativeType(c)};
     allocate_dynamic_type_ = llvm::FunctionType::get(llvm::Type::getInt8PtrTy(c), allocate_dynamic_params, false);
-    allocate_dynamic_      = llvm::Function::Create(
-        allocate_dynamic_type_,
-        llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-        "GlobalAlloc",
-        m);
+    allocate_dynamic_      = llvm::Function::Create(allocate_dynamic_type_,
+                                               llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+                                               "GlobalAlloc",
+                                               m);
 
     // Setup dynamic memory delete call.
     llvm::Type* delete_dynamic_params[] = {llvm::Type::getInt8PtrTy(c)};
-    delete_dynamic_type_                = llvm::FunctionType::get(llvm::Type::getInt8PtrTy(c), delete_dynamic_params, false);
-    delete_dynamic_                     = llvm::Function::Create(
-        delete_dynamic_type_,
-        llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-        "GlobalFree",
-        m);
+    delete_dynamic_type_ = llvm::FunctionType::get(llvm::Type::getInt8PtrTy(c), delete_dynamic_params, false);
+    delete_dynamic_ =
+        llvm::Function::Create(delete_dynamic_type_, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "GlobalFree", m);
 }
 
 ance::Value* Runtime::allocate(Allocator allocation, ance::Type* type, ance::Value* count, CompileContext* context)
@@ -102,10 +92,9 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
     if (count)
     {
         llvm::Value* element_size =
-            llvm::ConstantInt::get(
-                ance::SizeType::get()->getNativeType(*context->llvmContext()),
-                type->getContentSize(context->module()).getFixedSize(),
-                false);
+            llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(*context->llvmContext()),
+                                   type->getContentSize(context->module()).getFixedSize(),
+                                   false);
         count->buildNativeValue(context);
         llvm::Value* element_count = count->getNativeValue();
 
@@ -113,16 +102,15 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
     }
     else
     {
-        size = llvm::ConstantInt::get(
-            ance::SizeType::get()->getNativeType(*context->llvmContext()),
-            type->getContentSize(context->module()).getFixedSize(), false);
+        size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(*context->llvmContext()),
+                                      type->getContentSize(context->module()).getFixedSize(),
+                                      false);
     }
 
     llvm::Value* args[] = {flags, size};
 
     llvm::Value* opaque_ptr = context->ir()->CreateCall(allocate_dynamic_type_, allocate_dynamic_, args);
-    return context->ir()
-        ->CreateBitCast(
-            opaque_ptr,
-            ance::PointerType::get(*context->application(), type)->getNativeType(*context->llvmContext()));
+    return context->ir()->CreateBitCast(
+        opaque_ptr,
+        ance::PointerType::get(*context->application(), type)->getNativeType(*context->llvmContext()));
 }

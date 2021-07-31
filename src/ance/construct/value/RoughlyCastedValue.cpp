@@ -1,10 +1,11 @@
 #include "RoughlyCastedValue.h"
 
-#include "compiler/CompileContext.h"
 #include "ance/type/Type.h"
+#include "compiler/CompileContext.h"
 
 ance::RoughlyCastedValue::RoughlyCastedValue(ance::Type* target_type, ance::Value* original)
-    : target_type_(target_type), original_(original)
+    : target_type_(target_type)
+    , original_(original)
 {
     assert(target_type->storage() == original->type()->storage());
 }
@@ -16,7 +17,8 @@ ance::Type* ance::RoughlyCastedValue::type()
 
 void ance::RoughlyCastedValue::buildNativeValue(CompileContext* context)
 {
-    assert(target_type_->getNativeType(*context->llvmContext()) == original_->type()->getNativeType(*context->llvmContext())
+    assert(target_type_->getNativeType(*context->llvmContext())
+               == original_->type()->getNativeType(*context->llvmContext())
            && "Native type has to be equal.");
     original_->buildNativeValue(context);
 }

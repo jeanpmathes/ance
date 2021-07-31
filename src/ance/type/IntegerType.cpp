@@ -6,14 +6,12 @@
 #include "ance/scope/GlobalScope.h"
 #include "ance/scope/Scope.h"
 
-ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed)
-    : bit_size_(bit_size), is_signed_(is_signed)
-{
-}
+ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed) : bit_size_(bit_size), is_signed_(is_signed) {}
 
 std::string ance::IntegerType::getName()
 {
-    if (is_signed_) return "i" + std::to_string(bit_size_);
+    if (is_signed_)
+        return "i" + std::to_string(bit_size_);
     else
         return "ui" + std::to_string(bit_size_);
 }
@@ -25,10 +23,7 @@ llvm::Constant* ance::IntegerType::getDefaultContent(llvm::LLVMContext& c)
 
 llvm::Type* ance::IntegerType::getContentType(llvm::LLVMContext& c)
 {
-    if (!type_)
-    {
-        type_ = llvm::Type::getIntNTy(c, bit_size_);
-    }
+    if (!type_) { type_ = llvm::Type::getIntNTy(c, bit_size_); }
 
     return type_;
 }

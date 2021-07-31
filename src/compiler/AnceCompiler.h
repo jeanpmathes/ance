@@ -19,11 +19,10 @@ class AnceCompiler
   private:
     void buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
 
-    void buildStart(
-        llvm::FunctionType* main_type,
-        llvm::Function*     main,
-        llvm::FunctionType* exit_type,
-        llvm::Function*     exit);
+    void buildStart(llvm::FunctionType* main_type,
+                    llvm::Function*     main,
+                    llvm::FunctionType* exit_type,
+                    llvm::Function*     exit);
 
   private:
     Application&      application_;

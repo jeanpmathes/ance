@@ -2,10 +2,7 @@
 
 #include "ance/type/Type.h"
 
-IndexerGet::IndexerGet(Expression* indexed, Expression* index)
-    : indexed_(indexed), index_(index)
-{
-}
+IndexerGet::IndexerGet(Expression* indexed, Expression* index) : indexed_(indexed), index_(index) {}
 
 void IndexerGet::setScope(ance::Scope* scope)
 {

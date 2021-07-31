@@ -27,24 +27,22 @@ namespace ance
     class GlobalVariable : public Variable
     {
       public:
-        GlobalVariable(
-            ance::Scope*        containing_scope,
-            AccessModifier      access,
-            std::string         identifier,
-            ance::Type*         type,
-            ConstantExpression* constant_init,
-            bool                is_final,
-            bool                is_constant);
+        GlobalVariable(ance::Scope*        containing_scope,
+                       AccessModifier      access,
+                       std::string         identifier,
+                       ance::Type*         type,
+                       ConstantExpression* constant_init,
+                       bool                is_final,
+                       bool                is_constant);
 
         explicit GlobalVariable(std::string identifier);
 
-        void defineGlobal(
-            ance::Scope*        containing_scope,
-            AccessModifier      access,
-            ance::Type*         type,
-            ConstantExpression* constant_init,
-            bool                is_final,
-            bool                is_constant);
+        void defineGlobal(ance::Scope*        containing_scope,
+                          AccessModifier      access,
+                          ance::Type*         type,
+                          ConstantExpression* constant_init,
+                          bool                is_final,
+                          bool                is_constant);
 
         void buildGlobal(llvm::Module* m);
 
