@@ -144,7 +144,7 @@ literalExpression
 	;
 
 stringLiteral
-	: ( STRING_PREFIX )? STRING
+	: ( prefix=IDENTIFIER )? STRING
 	;
 
 byteLiteral
@@ -241,8 +241,6 @@ DOUBLE : DECIMAL 'd' ;
 QUAD : DECIMAL 'q' ;
 
 DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ;
-
-STRING_PREFIX : 'c' ;
 
 STRING : '"' ('\\'. | .)*? '"' ;
 BYTE : '\'' ( . | '\\' . ) '\'' ;

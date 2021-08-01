@@ -320,7 +320,7 @@ antlrcpp::Any Visitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)
 {
     std::string prefix;
 
-    if (ctx->STRING_PREFIX()) { prefix = ctx->STRING_PREFIX()->getText(); }
+    if (ctx->prefix) { prefix = ctx->prefix->getText(); }
 
     std::string str = ance::StringConstant::parse(ctx->STRING()->getText());
 
