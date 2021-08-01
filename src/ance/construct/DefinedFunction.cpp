@@ -48,18 +48,19 @@ void ance::DefinedFunction::buildName(CompileContext* context)
     std::tie(native_type_, native_function_) =
         createNativeFunction(parameters_, access_.linkage(), *context->llvmContext(), context->module());
 
+    std::vector<llvm::Metadata*> di_types;
+
     for (const auto& pair : zip(parameters_, native_function_->args()))
     {
         const auto& [parameter, argument] = pair;
         parameter->wrap(&argument);
+
+        di_types.push_back(parameter->type()->getDebugType(context));
     }
 
-    auto dummy = context->di()->createBasicType("ui32", 32, llvm::dwarf::DW_ATE_unsigned);// todo: use the correct types
-
-    llvm::SmallVector<llvm::Metadata*, 1> tys;
-    tys.push_back(dummy);
-    llvm::DISubroutineType* debug_type = context->di()->createSubroutineType(context->di()->getOrCreateTypeArray(tys));
-    llvm::DISubprogram*     debug =
+    llvm::DISubroutineType* debug_type =
+        context->di()->createSubroutineType(context->di()->getOrCreateTypeArray(di_types));
+    llvm::DISubprogram* debug =
         context->di()->createFunction(context->unit(),
                                       getName(),
                                       getName(),
@@ -75,8 +76,13 @@ void ance::DefinedFunction::buildName(CompileContext* context)
     unsigned no = 1;
     for (auto parameter : parameters_)
     {
-        context->di()
-            ->createParameterVariable(debug, parameter->name(), no++, context->codeFile(), line(), dummy, true);
+        context->di()->createParameterVariable(debug,
+                                               parameter->name(),
+                                               no++,
+                                               context->codeFile(),
+                                               line(),
+                                               parameter->type()->getDebugType(context),
+                                               true);
     }
 }
 
