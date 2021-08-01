@@ -63,7 +63,7 @@ namespace ance
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
 
       private:
-        llvm::DIType* debug_type_;
+        llvm::DIType* debug_type_{nullptr};
     };
 }
 #endif
