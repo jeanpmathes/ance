@@ -2,6 +2,7 @@
 
 #include "ance/scope/GlobalScope.h"
 #include "compiler/Application.h"
+#include "compiler/CompileContext.h"
 
 std::string ance::UnsignedIntegerPointerType::getName()
 {
@@ -26,6 +27,17 @@ llvm::Value* ance::UnsignedIntegerPointerType::buildValue(llvm::Value* pointer,
                                                           llvm::DIBuilder*)
 {
     return ir.CreatePtrToInt(pointer, native_type_);
+}
+
+llvm::DIType* ance::UnsignedIntegerPointerType::createDebugType(CompileContext* context)
+{
+    const llvm::DataLayout& dl = context->module()->getDataLayout();
+
+    std::string name = getName();
+    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
+    auto encoding = llvm::dwarf::DW_ATE_unsigned;
+
+    return context->di()->createBasicType(name, size_in_bits, encoding);
 }
 
 void ance::UnsignedIntegerPointerType::init(llvm::LLVMContext& c, Application& app)

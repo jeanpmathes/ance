@@ -5,6 +5,7 @@
 
 #include "ance/scope/GlobalScope.h"
 #include "ance/scope/Scope.h"
+#include "compiler/CompileContext.h"
 
 ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed) : bit_size_(bit_size), is_signed_(is_signed) {}
 
@@ -26,6 +27,17 @@ llvm::Type* ance::IntegerType::getContentType(llvm::LLVMContext& c)
     if (!type_) { type_ = llvm::Type::getIntNTy(c, bit_size_); }
 
     return type_;
+}
+
+llvm::DIType* ance::IntegerType::createDebugType(CompileContext* context)
+{
+    const llvm::DataLayout& dl = context->module()->getDataLayout();
+
+    std::string name = getName();
+    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
+    auto encoding = is_signed_ ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned;
+
+    return context->di()->createBasicType(name, size_in_bits, encoding);
 }
 
 ance::Type* ance::IntegerType::get(Application& app, uint64_t bit_size, bool is_signed)

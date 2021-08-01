@@ -15,6 +15,13 @@ llvm::Type* ance::Type::getNativeType(llvm::LLVMContext& c)
     }
 }
 
+llvm::DIType* ance::Type::getDebugType(CompileContext* context)
+{
+    if (!debug_type_) { debug_type_ = createDebugType(context); }
+
+    return debug_type_;
+}
+
 llvm::TypeSize ance::Type::getNativeSize(llvm::Module* m)
 {
     return m->getDataLayout().getTypeAllocSize(getNativeType(m->getContext()));

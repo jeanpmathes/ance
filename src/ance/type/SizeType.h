@@ -22,6 +22,9 @@ namespace ance
         inline static SizeType*   instance_    = nullptr;
         inline static llvm::Type* native_type_ = nullptr;
 
+      protected:
+        llvm::DIType * createDebugType(CompileContext *context) override;
+
       public:
         static void init(llvm::LLVMContext& c, Application& app);
 

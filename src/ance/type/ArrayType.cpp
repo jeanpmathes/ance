@@ -102,6 +102,21 @@ llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value*    indexed,
     return element_ptr;
 }
 
+llvm::DIType* ance::ArrayType::createDebugType(CompileContext* context)
+{
+    const llvm::DataLayout& dl         = context->module()->getDataLayout();
+    llvm::Type*             array_type = getContentType(*context->llvmContext());
+
+    uint64_t      size            = dl.getTypeSizeInBits(array_type) * 8;
+    uint32_t      alignment       = dl.getABITypeAlignment(array_type);
+    llvm::DIType* element_di_type = element_type_->getDebugType(context);
+
+    llvm::SmallVector<llvm::Metadata*, 1> subscripts;
+    subscripts.push_back(context->di()->getOrCreateSubrange(0, (int64_t) size_));
+
+    return context->di()->createArrayType(size, alignment, element_di_type, context->di()->getOrCreateArray(subscripts));
+}
+
 ance::Type* ance::ArrayType::get(Application& app, Type* element_type, uint64_t size)
 {
     auto*       type      = new ance::ArrayType(element_type, size);

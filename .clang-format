@@ -53,7 +53,7 @@ ObjCSpaceBeforeProtocolList: false
 PointerAlignment: Left
 PenaltyReturnTypeOnItsOwnLine: 9999
 ReflowComments: false
-SpaceAfterCStyleCast: false
+SpaceAfterCStyleCast: true
 SpaceAfterLogicalNot: false
 SpaceAfterTemplateKeyword: false
 SpaceBeforeAssignmentOperators: true

@@ -39,6 +39,9 @@ namespace ance
       private:
         ance::Type* element_type_;
 
+      protected:
+        llvm::DIType * createDebugType(CompileContext *context) override;
+
       public:
         static ance::Type* get(Application& app, ance::Type* element_type);
 

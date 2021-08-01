@@ -89,6 +89,31 @@ llvm::Value* ance::PointerType::buildGetElementPointer(ance::Value*    indexed,
     return element_ptr;
 }
 
+llvm::DIType* ance::PointerType::createDebugType(CompileContext* context)
+{
+    const llvm::DataLayout& dl = context->module()->getDataLayout();
+
+    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
+
+    llvm::DIType* di_type;
+
+    if (element_type_ == ance::VoidType::get())
+    {
+         std::string name = getName();
+         auto encoding = llvm::dwarf::DW_ATE_address;
+
+         di_type = context->di()->createBasicType(name, size_in_bits, encoding);
+    }
+    else
+    {
+        llvm::DIType* element_di_type = element_type_->getDebugType(context);
+
+        di_type = context->di()->createPointerType(element_di_type, size_in_bits);
+    }
+
+    return di_type;
+}
+
 ance::Type* ance::PointerType::get(Application& app, ance::Type* element_type)
 {
     auto*       type      = new ance::PointerType(element_type);

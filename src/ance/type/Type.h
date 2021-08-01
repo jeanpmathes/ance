@@ -43,6 +43,8 @@ namespace ance
         llvm::Type*         getNativeType(llvm::LLVMContext& c);
         virtual llvm::Type* getContentType(llvm::LLVMContext& c) = 0;
 
+        llvm::DIType* getDebugType(CompileContext* context);
+
         llvm::TypeSize getNativeSize(llvm::Module* m);
         llvm::TypeSize getContentSize(llvm::Module* m);
 
@@ -56,6 +58,12 @@ namespace ance
                                      ance::Value*    index,
                                      ance::Value*    value,
                                      CompileContext* context);
+
+      protected:
+        virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
+
+      private:
+        llvm::DIType* debug_type_;
     };
 }
 #endif

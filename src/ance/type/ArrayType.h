@@ -31,9 +31,7 @@ namespace ance
         bool isIndexerDefined(Indexer indexer) override;
 
         ance::Type* getIndexerReturnType() override;
-
         ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
-
         void buildSetIndexer(ance::Value*    indexed,
                              ance::Value*    index,
                              ance::Value*    value,
@@ -44,6 +42,9 @@ namespace ance
 
       public:
         ~ArrayType() override = default;
+
+      protected:
+        llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:
         uint64_t         size_;
