@@ -19,6 +19,8 @@ namespace ance
 
         bool validate() override;
 
+        ance::Variable* getVariable(std::string identifier) override;
+
         bool        isTypeRegistered(const std::string& type_name) override;
         ance::Type* getType(const std::string& type_name) override;
         void        registerType(ance::Type* type) override;
@@ -27,8 +29,6 @@ namespace ance
                                                  ance::Type*        type,
                                                  Assigner           assigner,
                                                  ance::Value*       value);
-
-        ance::Variable* getVariable(std::string identifier) override;
 
       private:
         ance::Scope* parent_;

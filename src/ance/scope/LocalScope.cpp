@@ -16,6 +16,13 @@ bool ance::LocalScope::validate()
     return true;
 }
 
+ance::Variable* ance::LocalScope::getVariable(std::string identifier)
+{
+    if (local_variables_.find(identifier) != local_variables_.end()) { return local_variables_[identifier]; }
+
+    return getGlobalScope()->getVariable(identifier);
+}
+
 bool ance::LocalScope::isTypeRegistered(const std::string& type_name)
 {
     return getGlobalScope()->isTypeRegistered(type_name);
@@ -44,11 +51,4 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& id
     local_variables_[identifier] = variable;
 
     return variable;
-}
-
-ance::Variable* ance::LocalScope::getVariable(std::string identifier)
-{
-    if (local_variables_.find(identifier) != local_variables_.end()) { return local_variables_[identifier]; }
-
-    return getGlobalScope()->getVariable(identifier);
 }
