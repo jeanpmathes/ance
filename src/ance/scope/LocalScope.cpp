@@ -11,6 +11,11 @@ ance::GlobalScope* ance::LocalScope::getGlobalScope()
     return parent_->getGlobalScope();
 }
 
+llvm::DIScope* ance::LocalScope::getDebugScope(CompileContext* context)
+{
+    return parent_->getDebugScope(context);
+}
+
 bool ance::LocalScope::validate()
 {
     return true;

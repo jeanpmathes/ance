@@ -21,7 +21,6 @@ namespace ance
         void build(CompileContext* context);
 
         ance::Value* getValue(CompileContext* context) override;
-
         void setValue(ance::Value* value, CompileContext* context) override;
 
       private:

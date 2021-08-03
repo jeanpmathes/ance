@@ -12,6 +12,11 @@ ance::GlobalScope* ance::GlobalScope::getGlobalScope()
     return this;
 }
 
+llvm::DIScope* ance::GlobalScope::getDebugScope(CompileContext* context)
+{
+    return context->unit();
+}
+
 bool ance::GlobalScope::validate()
 {
     auto valid = true;

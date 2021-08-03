@@ -175,6 +175,11 @@ ance::LocalScope* ance::DefinedFunction::getFunctionScope()
     return function_scope_;
 }
 
+llvm::DIScope* ance::DefinedFunction::getDebugScope(CompileContext*)
+{
+    return debugSubprogram();
+}
+
 bool ance::DefinedFunction::validate()
 {
     return function_scope_->validate();
@@ -197,5 +202,5 @@ ance::Type* ance::DefinedFunction::getType(const std::string& type_name)
 
 void ance::DefinedFunction::registerType(ance::Type* type)
 {
-    return;function_scope_->registerType(type);
+    function_scope_->registerType(type);
 }

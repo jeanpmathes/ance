@@ -16,6 +16,7 @@ namespace ance
         explicit LocalScope(ance::Scope* parent);
 
         ance::GlobalScope* getGlobalScope() override;
+        llvm::DIScope * getDebugScope(CompileContext *context) override;
 
         bool validate() override;
 

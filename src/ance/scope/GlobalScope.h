@@ -13,6 +13,7 @@ namespace ance
     {
       public:
         ance::GlobalScope* getGlobalScope() override;
+        llvm::DIScope * getDebugScope(CompileContext *context) override;
 
         bool validate() override;
 

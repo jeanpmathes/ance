@@ -44,6 +44,7 @@ namespace ance
 
         ance::GlobalScope* getGlobalScope() override;
         ance::LocalScope* getFunctionScope();
+        llvm::DIScope* getDebugScope(CompileContext *context) override;
 
         bool validate() override;
 
