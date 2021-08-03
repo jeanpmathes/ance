@@ -17,7 +17,7 @@ namespace ance
                       ance::Type*       type,
                       ance::Value*      value,
                       bool              is_final,
-                      bool              is_parameter,
+                      unsigned parameter_no,
                       unsigned          line);
 
         void build(CompileContext* context);
@@ -32,7 +32,7 @@ namespace ance
         ance::Value*      initial_value_;
         ance::LocalScope* containing_scope_;
 
-        bool     is_parameter_;
+        unsigned parameter_no_;
         unsigned line_;
 
         llvm::Value* native_value_ {nullptr};

@@ -23,12 +23,14 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                access,
     , containing_scope_(scope)
     , function_scope_(new ance::LocalScope(this))
 {
+    unsigned no = 1;
     for (auto* parameter : parameters_)
     {
         ance::LocalVariable* arg = function_scope_->defineParameterVariable(parameter->name(),
                                                                             parameter->type(),
                                                                             Assigner::COPY_ASSIGNMENT,
                                                                             parameter,
+                                                                            no++,
                                                                             line);
         arguments_.push_back(arg);
     }
@@ -69,18 +71,6 @@ void ance::DefinedFunction::buildName(CompileContext* context)
                                       llvm::DISubprogram::toSPFlags(true, true, false, 0U, getName() == "main"));
 
     native_function_->setSubprogram(debug);
-
-    unsigned no = 1;
-    for (auto parameter : parameters_)
-    {
-        context->di()->createParameterVariable(debug,
-                                               parameter->name(),
-                                               no++,
-                                               context->codeFile(),
-                                               line(),
-                                               parameter->type()->getDebugType(context),
-                                               true);
-    }
 }
 
 void ance::DefinedFunction::build(CompileContext* context)

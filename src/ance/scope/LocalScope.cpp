@@ -49,30 +49,31 @@ ance::LocalVariable* ance::LocalScope::defineAutoVariable(const std::string& ide
                                                           ance::Value*       value,
                                                           unsigned           line)
 {
-    return defineLocalVariable(identifier, type, assigner, value, line, false);
+    return defineLocalVariable(identifier, type, assigner, value, 0, line);
 }
 
 ance::LocalVariable* ance::LocalScope::defineParameterVariable(const std::string& identifier,
                                                                ance::Type*        type,
                                                                Assigner           assigner,
                                                                ance::Value*       value,
+                                                               unsigned parameter_no,
                                                                unsigned           line)
 {
-    return defineLocalVariable(identifier, type, assigner, value, line, true);
+    return defineLocalVariable(identifier, type, assigner, value, parameter_no, line);
 }
 
 ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& identifier,
                                                            ance::Type*        type,
                                                            Assigner           assigner,
                                                            ance::Value*       value,
-                                                           unsigned           line,
-                                                           bool               is_parameter)
+                                                           unsigned parameter_no,
+                                                           unsigned           line)
 {
     assert(local_variables_.find(identifier) == local_variables_.end());
 
     bool is_final = assigner.isFinal();
 
-    auto* variable               = new LocalVariable(this, identifier, type, value, is_final, is_parameter, line);
+    auto* variable               = new LocalVariable(this, identifier, type, value, is_final, parameter_no, line);
     local_variables_[identifier] = variable;
 
     return variable;

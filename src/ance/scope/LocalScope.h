@@ -37,6 +37,7 @@ namespace ance
                                                      ance::Type*        type,
                                                      Assigner           assigner,
                                                      ance::Value*       value,
+                                                     unsigned parameter_no,
                                                      unsigned           line);
 
       private:
@@ -44,8 +45,8 @@ namespace ance
                                                  ance::Type*        type,
                                                  Assigner           assigner,
                                                  ance::Value*       value,
-                                                 unsigned           line,
-                                                 bool               is_parameter);
+                                                 unsigned parameter_no,
+                                                 unsigned               line);
 
       private:
         ance::Scope* parent_;
