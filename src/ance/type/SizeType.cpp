@@ -30,9 +30,9 @@ llvm::DIType* ance::SizeType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
 
-    std::string name = getName();
-    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
-    auto encoding = llvm::dwarf::DW_ATE_unsigned;
+    std::string name         = getName();
+    uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
+    auto        encoding     = llvm::dwarf::DW_ATE_unsigned;
 
     return context->di()->createBasicType(name, size_in_bits, encoding);
 }

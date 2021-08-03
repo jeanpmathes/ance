@@ -27,7 +27,7 @@ namespace ance
         llvm::Type* type_ {nullptr};
 
       protected:
-        llvm::DIType * createDebugType(CompileContext *context) override;
+        llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:
         static ance::Type* get(Application& app, uint64_t bit_size, bool is_signed);

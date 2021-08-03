@@ -18,7 +18,7 @@ namespace ance
         VoidType() = default;
 
       protected:
-        llvm::DIType * createDebugType(CompileContext *context) override;
+        llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:
         static VoidType* get();

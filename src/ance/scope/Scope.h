@@ -28,8 +28,8 @@ namespace ance
     class Scope
     {
       public:
-        virtual ance::GlobalScope* getGlobalScope() = 0;
-        virtual llvm::DIScope* getDebugScope(CompileContext* context) = 0;
+        virtual ance::GlobalScope* getGlobalScope()                       = 0;
+        virtual llvm::DIScope*     getDebugScope(CompileContext* context) = 0;
 
         virtual bool validate() = 0;
 

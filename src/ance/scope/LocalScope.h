@@ -16,7 +16,7 @@ namespace ance
         explicit LocalScope(ance::Scope* parent);
 
         ance::GlobalScope* getGlobalScope() override;
-        llvm::DIScope * getDebugScope(CompileContext *context) override;
+        llvm::DIScope*     getDebugScope(CompileContext* context) override;
 
         bool validate() override;
 
@@ -28,21 +28,24 @@ namespace ance
         void        registerType(ance::Type* type) override;
 
         ance::LocalVariable* defineAutoVariable(const std::string& identifier,
-                                                 ance::Type*        type,
-                                                 Assigner           assigner,
-                                                 ance::Value*       value);
+                                                ance::Type*        type,
+                                                Assigner           assigner,
+                                                ance::Value*       value,
+                                                unsigned           line);
 
         ance::LocalVariable* defineParameterVariable(const std::string& identifier,
-                                                 ance::Type*        type,
-                                                 Assigner           assigner,
-                                                 ance::Value*       value);
+                                                     ance::Type*        type,
+                                                     Assigner           assigner,
+                                                     ance::Value*       value,
+                                                     unsigned           line);
 
       private:
         ance::LocalVariable* defineLocalVariable(const std::string& identifier,
                                                  ance::Type*        type,
                                                  Assigner           assigner,
                                                  ance::Value*       value,
-                                                 bool is_parameter);
+                                                 unsigned           line,
+                                                 bool               is_parameter);
 
       private:
         ance::Scope* parent_;

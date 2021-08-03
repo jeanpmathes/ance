@@ -114,7 +114,10 @@ llvm::DIType* ance::ArrayType::createDebugType(CompileContext* context)
     llvm::SmallVector<llvm::Metadata*, 1> subscripts;
     subscripts.push_back(context->di()->getOrCreateSubrange(0, (int64_t) size_));
 
-    return context->di()->createArrayType(size, alignment, element_di_type, context->di()->getOrCreateArray(subscripts));
+    return context->di()->createArrayType(size,
+                                          alignment,
+                                          element_di_type,
+                                          context->di()->getOrCreateArray(subscripts));
 }
 
 ance::Type* ance::ArrayType::get(Application& app, Type* element_type, uint64_t size)

@@ -99,10 +99,10 @@ llvm::DIType* ance::PointerType::createDebugType(CompileContext* context)
 
     if (element_type_ == ance::VoidType::get())
     {
-         std::string name = getName();
-         auto encoding = llvm::dwarf::DW_ATE_address;
+        std::string name     = getName();
+        auto        encoding = llvm::dwarf::DW_ATE_address;
 
-         di_type = context->di()->createBasicType(name, size_in_bits, encoding);
+        di_type = context->di()->createBasicType(name, size_in_bits, encoding);
     }
     else
     {

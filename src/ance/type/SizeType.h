@@ -23,7 +23,7 @@ namespace ance
         inline static llvm::Type* native_type_ = nullptr;
 
       protected:
-        llvm::DIType * createDebugType(CompileContext *context) override;
+        llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:
         static void init(llvm::LLVMContext& c, Application& app);

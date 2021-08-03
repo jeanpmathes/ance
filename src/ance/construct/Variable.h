@@ -35,10 +35,10 @@ namespace ance
         bool isDefined();
 
       public:
-        [[nodiscard]] std::string identifier() const;
+        [[nodiscard]] std::string  identifier() const;
         [[nodiscard]] ance::Scope* scope() const;
-        [[nodiscard]] ance::Type* type() const;
-        [[nodiscard]] bool isFinal() const;
+        [[nodiscard]] ance::Type*  type() const;
+        [[nodiscard]] bool         isFinal() const;
 
         virtual ance::Value* getValue(CompileContext* context) = 0;
 

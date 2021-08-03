@@ -30,12 +30,12 @@ namespace ance
 
         bool isIndexerDefined(Indexer indexer) override;
 
-        ance::Type* getIndexerReturnType() override;
+        ance::Type*  getIndexerReturnType() override;
         ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
-        void buildSetIndexer(ance::Value*    indexed,
-                             ance::Value*    index,
-                             ance::Value*    value,
-                             CompileContext* context) override;
+        void         buildSetIndexer(ance::Value*    indexed,
+                                     ance::Value*    index,
+                                     ance::Value*    value,
+                                     CompileContext* context) override;
 
       private:
         llvm::Value* buildGetElementPointer(ance::Value* indexed, ance::Value* index, CompileContext* context) const;

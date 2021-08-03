@@ -17,20 +17,23 @@ namespace ance
                       ance::Type*       type,
                       ance::Value*      value,
                       bool              is_final,
-                      bool is_parameter);
+                      bool              is_parameter,
+                      unsigned          line);
 
         void build(CompileContext* context);
 
         ance::Value* getValue(CompileContext* context) override;
-        void setValue(ance::Value* value, CompileContext* context) override;
+        void         setValue(ance::Value* value, CompileContext* context) override;
 
       private:
         void store(Value* value, CompileContext* context);
 
       private:
-        ance::Value* initial_value_;
+        ance::Value*      initial_value_;
         ance::LocalScope* containing_scope_;
-        bool is_parameter_;
+
+        bool     is_parameter_;
+        unsigned line_;
 
         llvm::Value* native_value_ {nullptr};
     };

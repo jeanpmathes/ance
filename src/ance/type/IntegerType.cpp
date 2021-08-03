@@ -33,9 +33,9 @@ llvm::DIType* ance::IntegerType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
 
-    std::string name = getName();
-    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
-    auto encoding = is_signed_ ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned;
+    std::string name         = getName();
+    uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
+    auto        encoding     = is_signed_ ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned;
 
     return context->di()->createBasicType(name, size_in_bits, encoding);
 }

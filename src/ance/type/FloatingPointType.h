@@ -15,7 +15,7 @@ namespace ance
         llvm::Type* getContentType(llvm::LLVMContext& c) override = 0;
 
       protected:
-        llvm::DIType * createDebugType(CompileContext *context) override;
+        llvm::DIType* createDebugType(CompileContext* context) override;
     };
 }
 #endif
