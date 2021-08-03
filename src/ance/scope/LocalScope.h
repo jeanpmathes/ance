@@ -26,11 +26,6 @@ namespace ance
         ance::LocalVariable* defineLocalVariable(const std::string& identifier,
                                                  ance::Type*        type,
                                                  Assigner           assigner,
-                                                 Expression*        expression);
-
-        ance::LocalVariable* defineLocalVariable(const std::string& identifier,
-                                                 ance::Type*        type,
-                                                 Assigner           assigner,
                                                  ance::Value*       value);
 
         ance::Variable* getVariable(std::string identifier) override;

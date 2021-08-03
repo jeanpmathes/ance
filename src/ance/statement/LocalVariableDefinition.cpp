@@ -21,7 +21,7 @@ LocalVariableDefinition::LocalVariableDefinition(std::string identifier,
 
 void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
 {
-    variable_ = function->getScope()->defineLocalVariable(identifier_, type_, assigner_, assigned_);
+    variable_ = function->getScope()->defineLocalVariable(identifier_, type_, assigner_, assigned_->getValue());
     assigned_->setScope(function->getScope());
 }
 

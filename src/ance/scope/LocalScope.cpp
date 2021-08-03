@@ -34,14 +34,6 @@ void ance::LocalScope::registerType(ance::Type* type)
 ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& identifier,
                                                            ance::Type*        type,
                                                            Assigner           assigner,
-                                                           Expression*        expression)
-{
-    return defineLocalVariable(identifier, type, assigner, expression->getValue());
-}
-
-ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& identifier,
-                                                           ance::Type*        type,
-                                                           Assigner           assigner,
                                                            ance::Value*       value)
 {
     assert(local_variables_.find(identifier) == local_variables_.end());
