@@ -16,8 +16,8 @@ AssignmentStatement::AssignmentStatement(Assignable*  assignable,
 
 void AssignmentStatement::setFunction(ance::DefinedFunction* function)
 {
-    assignable_->setScope(function->getScope());
-    assigned_->setScope(function->getScope());
+    assignable_->setScope(function);
+    assigned_->setScope(function);
 }
 
 void AssignmentStatement::build(CompileContext* context)

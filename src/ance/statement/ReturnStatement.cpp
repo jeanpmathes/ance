@@ -10,7 +10,7 @@ ReturnStatement::ReturnStatement(Expression* return_value, unsigned int line, un
 
 void ReturnStatement::setFunction(ance::DefinedFunction* function)
 {
-    return_value_->setScope(function->getScope());
+    return_value_->setScope(function);
 }
 
 void ReturnStatement::build(CompileContext*)

@@ -20,21 +20,17 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                access,
     : ance::Function(std::move(function_name), return_type, line, column)
     , access_(access)
     , parameters_(std::move(parameters))
-    , local_scope_(new ance::LocalScope(scope))
+    , containing_scope_(scope)
+    , function_scope_(new ance::LocalScope(this))
 {
     for (auto* parameter : parameters_)
     {
-        ance::LocalVariable* arg = local_scope_->defineLocalVariable(parameter->name(),
+        ance::LocalVariable* arg = function_scope_->defineLocalVariable(parameter->name(),
                                                                      parameter->type(),
                                                                      Assigner::COPY_ASSIGNMENT,
                                                                      parameter);
         arguments_.push_back(arg);
     }
-}
-
-ance::LocalScope* ance::DefinedFunction::getScope() const
-{
-    return local_scope_;
 }
 
 void ance::DefinedFunction::pushStatement(Statement* statement)
@@ -167,4 +163,39 @@ ance::Value* ance::DefinedFunction::buildCall(const std::vector<ance::Value*>& a
 llvm::DISubprogram* ance::DefinedFunction::debugSubprogram()
 {
     return native_function_->getSubprogram();
+}
+
+ance::GlobalScope* ance::DefinedFunction::getGlobalScope()
+{
+    return containing_scope_->getGlobalScope();
+}
+
+ance::LocalScope* ance::DefinedFunction::getFunctionScope()
+{
+    return function_scope_;
+}
+
+bool ance::DefinedFunction::validate()
+{
+    return function_scope_->validate();
+}
+
+ance::Variable* ance::DefinedFunction::getVariable(std::string identifier)
+{
+    return function_scope_->getVariable(identifier);
+}
+
+bool ance::DefinedFunction::isTypeRegistered(const std::string& type_name)
+{
+    return function_scope_->isTypeRegistered(type_name);
+}
+
+ance::Type* ance::DefinedFunction::getType(const std::string& type_name)
+{
+    return function_scope_->getType(type_name);
+}
+
+void ance::DefinedFunction::registerType(ance::Type* type)
+{
+    return;function_scope_->registerType(type);
 }

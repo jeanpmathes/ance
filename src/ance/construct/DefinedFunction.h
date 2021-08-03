@@ -20,7 +20,7 @@ class CompileContext;
 
 namespace ance
 {
-    class DefinedFunction : public ance::Function
+    class DefinedFunction : public virtual ance::Function, public virtual ance::Scope
     {
       public:
         DefinedFunction(AccessModifier                access,
@@ -30,8 +30,6 @@ namespace ance
                         ance::Scope*                  scope,
                         unsigned int                  line,
                         unsigned int                  column);
-
-        [[nodiscard]] ance::LocalScope* getScope() const;
 
         void pushStatement(Statement* statement);
 
@@ -44,6 +42,17 @@ namespace ance
 
         llvm::DISubprogram* debugSubprogram();
 
+        ance::GlobalScope* getGlobalScope() override;
+        ance::LocalScope* getFunctionScope();
+
+        bool validate() override;
+
+        ance::Variable* getVariable(std::string identifier) override;
+
+        bool        isTypeRegistered(const std::string& type_name) override;
+        ance::Type* getType(const std::string& type_name) override;
+        void        registerType(ance::Type* type) override;
+
       protected:
         using Function::buildCall;
 
@@ -51,7 +60,9 @@ namespace ance
         AccessModifier access_;
 
         std::vector<ance::Parameter*> parameters_;
-        ance::LocalScope*             local_scope_;
+
+        ance::Scope* containing_scope_;
+        ance::LocalScope*             function_scope_;
 
         std::vector<ance::LocalVariable*> arguments_;
         std::list<Statement*>             statements_;
