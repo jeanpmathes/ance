@@ -16,7 +16,8 @@ namespace ance
                       std::string       identifier,
                       ance::Type*       type,
                       ance::Value*      value,
-                      bool              is_final);
+                      bool              is_final,
+                      bool is_parameter);
 
         void build(CompileContext* context);
 
@@ -28,6 +29,9 @@ namespace ance
 
       private:
         ance::Value* initial_value_;
+        ance::LocalScope* containing_scope_;
+        bool is_parameter_;
+
         llvm::Value* native_value_ {nullptr};
     };
 }

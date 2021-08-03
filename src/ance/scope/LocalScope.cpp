@@ -43,16 +43,33 @@ void ance::LocalScope::registerType(ance::Type* type)
     getGlobalScope()->registerType(type);
 }
 
+ance::LocalVariable* ance::LocalScope::defineAutoVariable(const std::string& identifier,
+                                                          ance::Type*        type,
+                                                          Assigner           assigner,
+                                                          ance::Value*       value)
+{
+    return defineLocalVariable(identifier, type, assigner, value, false);
+}
+
+ance::LocalVariable* ance::LocalScope::defineParameterVariable(const std::string& identifier,
+                                                               ance::Type*        type,
+                                                               Assigner           assigner,
+                                                               ance::Value*       value)
+{
+    return defineLocalVariable(identifier, type, assigner, value, true);
+}
+
 ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& identifier,
                                                            ance::Type*        type,
                                                            Assigner           assigner,
-                                                           ance::Value*       value)
+                                                           ance::Value*       value,
+                                                           bool is_parameter)
 {
     assert(local_variables_.find(identifier) == local_variables_.end());
 
     bool is_final = assigner.isFinal();
 
-    auto* variable               = new LocalVariable(this, identifier, type, value, is_final);
+    auto* variable               = new LocalVariable(this, identifier, type, value, is_final, is_parameter);
     local_variables_[identifier] = variable;
 
     return variable;

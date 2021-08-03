@@ -20,16 +20,29 @@ namespace ance
 
         bool validate() override;
 
+      public:
         ance::Variable* getVariable(std::string identifier) override;
 
         bool        isTypeRegistered(const std::string& type_name) override;
         ance::Type* getType(const std::string& type_name) override;
         void        registerType(ance::Type* type) override;
 
-        ance::LocalVariable* defineLocalVariable(const std::string& identifier,
+        ance::LocalVariable* defineAutoVariable(const std::string& identifier,
                                                  ance::Type*        type,
                                                  Assigner           assigner,
                                                  ance::Value*       value);
+
+        ance::LocalVariable* defineParameterVariable(const std::string& identifier,
+                                                 ance::Type*        type,
+                                                 Assigner           assigner,
+                                                 ance::Value*       value);
+
+      private:
+        ance::LocalVariable* defineLocalVariable(const std::string& identifier,
+                                                 ance::Type*        type,
+                                                 Assigner           assigner,
+                                                 ance::Value*       value,
+                                                 bool is_parameter);
 
       private:
         ance::Scope* parent_;

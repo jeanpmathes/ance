@@ -40,6 +40,12 @@ std::string ance::Variable::identifier() const
     return identifier_;
 }
 
+ance::Scope * ance::Variable::scope() const
+{
+    assert(is_defined_);
+    return scope_;
+}
+
 ance::Type* ance::Variable::type() const
 {
     assert(is_defined_);

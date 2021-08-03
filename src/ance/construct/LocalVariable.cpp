@@ -10,14 +10,22 @@ ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope,
                                    std::string       identifier,
                                    ance::Type*       type,
                                    ance::Value*      value,
-                                   bool              is_final)
+                                   bool              is_final,
+                                   bool is_parameter)
     : Variable(containing_scope, std::move(identifier), type, is_final)
     , initial_value_(value)
+    , containing_scope_(containing_scope)
+    , is_parameter_(is_parameter)
 {}
 
 void ance::LocalVariable::build(CompileContext* context)
 {
     assert(initial_value_);
+
+    if (!is_parameter_)
+    {
+        context->di()->createAutoVariable(containing_scope_->getDebugScope(context), identifier(), context->codeFile(), 0, type()->getDebugType(context), true);
+    }
 
     if (type()->storage() == InternalStorage::AS_POINTER)
     {

@@ -25,7 +25,7 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                access,
 {
     for (auto* parameter : parameters_)
     {
-        ance::LocalVariable* arg = function_scope_->defineLocalVariable(parameter->name(),
+        ance::LocalVariable* arg = function_scope_->defineParameterVariable(parameter->name(),
                                                                      parameter->type(),
                                                                      Assigner::COPY_ASSIGNMENT,
                                                                      parameter);
