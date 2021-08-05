@@ -36,6 +36,7 @@ namespace ance
         unsigned line_;
 
         llvm::Value* native_value_ {nullptr};
+        llvm::DILocalVariable* local_debug_variable_{nullptr};
     };
 }
 #endif

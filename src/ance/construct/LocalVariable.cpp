@@ -26,7 +26,7 @@ void ance::LocalVariable::build(CompileContext* context)
 
     if (parameter_no_ == 0)
     {
-        context->di()->createAutoVariable(containing_scope_->getDebugScope(context),
+        local_debug_variable_ = context->di()->createAutoVariable(containing_scope_->getDebugScope(context),
                                           identifier(),
                                           context->codeFile(),
                                           line_,
@@ -35,7 +35,7 @@ void ance::LocalVariable::build(CompileContext* context)
     }
     else
     {
-        context->di()->createParameterVariable(containing_scope_->getDebugScope(context),
+        local_debug_variable_ = context->di()->createParameterVariable(containing_scope_->getDebugScope(context),
                                                identifier(),
                                                parameter_no_,
                                                context->codeFile(),
@@ -48,6 +48,8 @@ void ance::LocalVariable::build(CompileContext* context)
     {
         native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr);
         native_value_->setName(identifier());
+
+        context->di()->insertDeclare(native_value_, local_debug_variable_, context->di()->createExpression(), llvm::DebugLoc::get(line_, 0, containing_scope_->getDebugScope(context)), context->ir()->GetInsertBlock());
     }
 
     store(initial_value_, context);
