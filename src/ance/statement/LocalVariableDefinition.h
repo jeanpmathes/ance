@@ -19,8 +19,7 @@ class LocalVariableDefinition : public Statement
                             ance::Type*  type,
                             Assigner     assigner,
                             Expression*  assigned,
-                            unsigned int line,
-                            unsigned int column);
+                            ance::Location location);
 
     void setFunction(ance::DefinedFunction* function) override;
 

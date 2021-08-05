@@ -8,7 +8,7 @@
 class ReturnStatement : public Statement
 {
   public:
-    ReturnStatement(Expression* return_value, unsigned int line, unsigned int column);
+    ReturnStatement(Expression* return_value, ance::Location location);
 
     void setFunction(ance::DefinedFunction* function) override;
 

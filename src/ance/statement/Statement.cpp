@@ -1,6 +1,6 @@
 #include "Statement.h"
 
-Statement::Statement(unsigned int line, unsigned int column) : line_(line), column_(column) {}
+Statement::Statement(ance::Location location) : location_(location) {}
 
 void Statement::setContainingFunction(ance::DefinedFunction* function)
 {
@@ -17,12 +17,7 @@ ance::DefinedFunction* Statement::getContainingFunction() const
     return function_;
 }
 
-unsigned int Statement::line() const
+ance::Location Statement::location() const
 {
-    return line_;
-}
-
-unsigned int Statement::column() const
-{
-    return column_;
+    return location_;
 }

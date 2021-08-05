@@ -47,9 +47,9 @@ ance::LocalVariable* ance::LocalScope::defineAutoVariable(const std::string& ide
                                                           ance::Type*        type,
                                                           Assigner           assigner,
                                                           ance::Value*       value,
-                                                          unsigned           line)
+                                                          ance::Location location)
 {
-    return defineLocalVariable(identifier, type, assigner, value, 0, line);
+    return defineLocalVariable(identifier, type, assigner, value, 0, location);
 }
 
 ance::LocalVariable* ance::LocalScope::defineParameterVariable(const std::string& identifier,
@@ -57,9 +57,9 @@ ance::LocalVariable* ance::LocalScope::defineParameterVariable(const std::string
                                                                Assigner           assigner,
                                                                ance::Value*       value,
                                                                unsigned parameter_no,
-                                                               unsigned           line)
+                                                               ance::Location location)
 {
-    return defineLocalVariable(identifier, type, assigner, value, parameter_no, line);
+    return defineLocalVariable(identifier, type, assigner, value, parameter_no, location);
 }
 
 ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& identifier,
@@ -67,13 +67,13 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& id
                                                            Assigner           assigner,
                                                            ance::Value*       value,
                                                            unsigned parameter_no,
-                                                           unsigned           line)
+                                                           ance::Location location)
 {
     assert(local_variables_.find(identifier) == local_variables_.end());
 
     bool is_final = assigner.isFinal();
 
-    auto* variable               = new LocalVariable(this, identifier, type, value, is_final, parameter_no, line);
+    auto* variable               = new LocalVariable(this, identifier, type, value, is_final, parameter_no, location);
     local_variables_[identifier] = variable;
 
     return variable;

@@ -4,8 +4,8 @@
 #include "ance/expression/BuildableExpression.h"
 #include "ance/scope/LocalScope.h"
 
-ExpressionStatement::ExpressionStatement(BuildableExpression* expression, unsigned line, unsigned column)
-    : Statement(line, column)
+ExpressionStatement::ExpressionStatement(BuildableExpression* expression, ance::Location location)
+    : Statement(location)
     , expression_(expression)
 {}
 

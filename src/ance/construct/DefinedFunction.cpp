@@ -31,7 +31,7 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                access,
                                                                             Assigner::COPY_ASSIGNMENT,
                                                                             parameter,
                                                                             no++,
-                                                                            line);
+                                                                            parameter->location());
         arguments_.push_back(arg);
     }
 }
@@ -83,10 +83,8 @@ void ance::DefinedFunction::build(CompileContext* context)
 
     for (auto* statement : statements_)
     {
-        context->ir()->SetCurrentDebugLocation(llvm::DILocation::get(*context->llvmContext(),
-                                                                     statement->line(),
-                                                                     statement->column(),
-                                                                     function_scope_->getDebugScope(context)));
+        context->ir()->SetCurrentDebugLocation(
+            statement->location().getDebugLoc(context->llvmContext(), function_scope_->getDebugScope(context)));
 
         statement->build(context);
 

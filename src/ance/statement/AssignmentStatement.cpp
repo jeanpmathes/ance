@@ -7,9 +7,8 @@
 
 AssignmentStatement::AssignmentStatement(Assignable*  assignable,
                                          Expression*  assigned,
-                                         unsigned int line,
-                                         unsigned int column)
-    : Statement(line, column)
+                                         ance::Location location)
+    : Statement(location)
     , assignable_(assignable)
     , assigned_(assigned)
 {}

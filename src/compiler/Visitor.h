@@ -105,6 +105,9 @@ class Visitor : public anceBaseVisitor
 
     antlrcpp::Any visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext* ctx) override;
 
+  protected:
+    static ance::Location location(antlr4::ParserRuleContext* ctx);
+
   private:
     Application& application_;
 };

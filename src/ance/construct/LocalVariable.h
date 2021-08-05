@@ -18,7 +18,7 @@ namespace ance
                       ance::Value*      value,
                       bool              is_final,
                       unsigned parameter_no,
-                      unsigned          line);
+                      ance::Location location);
 
         void build(CompileContext* context);
 
@@ -33,7 +33,7 @@ namespace ance
         ance::LocalScope* containing_scope_;
 
         unsigned parameter_no_;
-        unsigned line_;
+        ance::Location location_;
 
         llvm::Value* native_value_ {nullptr};
         llvm::DILocalVariable* local_debug_variable_{nullptr};

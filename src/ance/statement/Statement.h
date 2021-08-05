@@ -5,6 +5,7 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "compiler/CompileContext.h"
+#include "ance/utility/Location.h"
 
 class CompileContext;
 
@@ -16,7 +17,7 @@ namespace ance
 class Statement
 {
   public:
-    Statement(unsigned int line, unsigned int column);
+    Statement(ance::Location location);
 
     void setContainingFunction(ance::DefinedFunction* function);
 
@@ -26,16 +27,14 @@ class Statement
   public:
     [[nodiscard]] ance::DefinedFunction* getContainingFunction() const;
 
-    [[nodiscard]] unsigned int line() const;
-    [[nodiscard]] unsigned int column() const;
+    [[nodiscard]] ance::Location location() const;
 
     virtual void build(CompileContext* context) = 0;
 
     virtual ~Statement() = default;
 
   private:
-    unsigned int line_;
-    unsigned int column_;
+    ance::Location location_;
 
     ance::DefinedFunction* function_ {nullptr};
 };

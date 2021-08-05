@@ -6,6 +6,8 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
 
+#include "ance/utility/Location.h"
+
 class CompileContext;
 
 namespace llvm

@@ -8,7 +8,7 @@ class BuildableExpression;
 class ExpressionStatement : public Statement
 {
   public:
-    ExpressionStatement(BuildableExpression* expression, unsigned int line, unsigned int column);
+    ExpressionStatement(BuildableExpression* expression, ance::Location location);
 
     void setFunction(ance::DefinedFunction* function) override;
 

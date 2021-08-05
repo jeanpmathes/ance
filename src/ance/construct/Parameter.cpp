@@ -5,7 +5,7 @@
 #include "ance/type/Type.h"
 #include "ance/utility/Values.h"
 
-ance::Parameter::Parameter(ance::Type* type, std::string name) : type_(type), name_(std::move(name)) {}
+ance::Parameter::Parameter(ance::Type* type, std::string name, ance::Location location) : type_(type), name_(std::move(name)), location_(location) {}
 
 ance::Type* ance::Parameter::type()
 {
@@ -15,6 +15,11 @@ ance::Type* ance::Parameter::type()
 std::string ance::Parameter::name()
 {
     return name_;
+}
+
+ance::Location ance::Parameter::location() const
+{
+    return location_;
 }
 
 void ance::Parameter::wrap(llvm::Argument* argument)

@@ -12,12 +12,12 @@ ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope,
                                    ance::Value*      value,
                                    bool              is_final,
                                    unsigned parameter_no,
-                                   unsigned          line)
+                                   ance::Location location)
     : Variable(containing_scope, std::move(identifier), type, is_final)
     , initial_value_(value)
     , containing_scope_(containing_scope)
     , parameter_no_(parameter_no)
-    , line_(line)
+    , location_(location)
 {}
 
 void ance::LocalVariable::build(CompileContext* context)
@@ -29,7 +29,7 @@ void ance::LocalVariable::build(CompileContext* context)
         local_debug_variable_ = context->di()->createAutoVariable(containing_scope_->getDebugScope(context),
                                           identifier(),
                                           context->codeFile(),
-                                          line_,
+                                          location_.line(),
                                           type()->getDebugType(context),
                                           true);
     }
@@ -39,7 +39,7 @@ void ance::LocalVariable::build(CompileContext* context)
                                                identifier(),
                                                parameter_no_,
                                                context->codeFile(),
-                                               line_,
+                                               location_.line(),
                                                type()->getDebugType(context),
                                                true);
     }
@@ -49,7 +49,7 @@ void ance::LocalVariable::build(CompileContext* context)
         native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr);
         native_value_->setName(identifier());
 
-        context->di()->insertDeclare(native_value_, local_debug_variable_, context->di()->createExpression(), llvm::DebugLoc::get(line_, 0, containing_scope_->getDebugScope(context)), context->ir()->GetInsertBlock());
+        context->di()->insertDeclare(native_value_, local_debug_variable_, context->di()->createExpression(), location_.getDebugLoc(context->llvmContext(), containing_scope_->getDebugScope(context)), context->ir()->GetInsertBlock());
     }
 
     store(initial_value_, context);

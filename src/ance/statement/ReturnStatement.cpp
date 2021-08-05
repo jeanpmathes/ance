@@ -3,8 +3,8 @@
 #include "ance/construct/DefinedFunction.h"
 #include "ance/scope/LocalScope.h"
 
-ReturnStatement::ReturnStatement(Expression* return_value, unsigned int line, unsigned int column)
-    : Statement(line, column)
+ReturnStatement::ReturnStatement(Expression* return_value, ance::Location location)
+    : Statement(location)
     , return_value_(return_value)
 {}
 

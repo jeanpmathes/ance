@@ -5,6 +5,7 @@
 
 #include "ance/Assigner.h"
 #include "ance/construct/LocalVariable.h"
+#include "ance/utility/Location.h"
 
 class Expression;
 
@@ -31,14 +32,14 @@ namespace ance
                                                 ance::Type*        type,
                                                 Assigner           assigner,
                                                 ance::Value*       value,
-                                                unsigned           line);
+                                                ance::Location location);
 
         ance::LocalVariable* defineParameterVariable(const std::string& identifier,
                                                      ance::Type*        type,
                                                      Assigner           assigner,
                                                      ance::Value*       value,
                                                      unsigned parameter_no,
-                                                     unsigned           line);
+                                                     ance::Location location);
 
       private:
         ance::LocalVariable* defineLocalVariable(const std::string& identifier,
@@ -46,7 +47,7 @@ namespace ance
                                                  Assigner           assigner,
                                                  ance::Value*       value,
                                                  unsigned parameter_no,
-                                                 unsigned               line);
+                                                 ance::Location location);
 
       private:
         ance::Scope* parent_;

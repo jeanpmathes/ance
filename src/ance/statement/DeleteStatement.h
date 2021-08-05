@@ -8,7 +8,7 @@
 class DeleteStatement : public Statement
 {
   public:
-    DeleteStatement(Expression* to_delete, bool delete_buffer, unsigned int line, unsigned int column);
+    DeleteStatement(Expression* to_delete, bool delete_buffer, ance::Location location);
 
     void setFunction(ance::DefinedFunction* function) override;
 

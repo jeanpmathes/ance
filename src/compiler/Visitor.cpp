@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+#include "ance/utility/Location.h"
+
 #include "ance/type/ArrayType.h"
 #include "ance/type/DoubleType.h"
 #include "ance/type/HalfType.h"
@@ -144,27 +146,21 @@ antlrcpp::Any Visitor::visitParameter(anceParser::ParameterContext* ctx)
     ance::Type*       type         = visit(ctx->type());
     const std::string k_identifier = ctx->IDENTIFIER()->getText();
 
-    return new ance::Parameter(type, k_identifier);
+    return new ance::Parameter(type, k_identifier, location(ctx));
 }
 
 antlrcpp::Any Visitor::visitExpressionStatement(anceParser::ExpressionStatementContext* ctx)
 {
-    unsigned int line   = ctx->getStart()->getLine();
-    unsigned int column = ctx->getStart()->getCharPositionInLine();
-
     Expression* expression           = visit(ctx->independentExpression());
     auto*       buildable_expression = dynamic_cast<BuildableExpression*>(expression);
 
-    auto* statement = new ExpressionStatement(buildable_expression, line, column);
+    auto* statement = new ExpressionStatement(buildable_expression, location(ctx));
 
     return static_cast<Statement*>(statement);
 }
 
 antlrcpp::Any Visitor::visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx)
 {
-    unsigned int line   = ctx->getStart()->getLine();
-    unsigned int column = ctx->getStart()->getCharPositionInLine();
-
     ance::Type* type       = visit(ctx->type());
     std::string identifier = ctx->IDENTIFIER()->getText();
 
@@ -182,48 +178,39 @@ antlrcpp::Any Visitor::visitLocalVariableDefinition(anceParser::LocalVariableDef
         assigned = new DefaultValueExpression(type);
     }
 
-    auto* statement = new LocalVariableDefinition(identifier, type, assigner, assigned, line, column);
+    auto* statement = new LocalVariableDefinition(identifier, type, assigner, assigned, location(ctx));
 
     return static_cast<Statement*>(statement);
 }
 
 antlrcpp::Any Visitor::visitAssignment(anceParser::AssignmentContext* ctx)
 {
-    unsigned int line   = ctx->getStart()->getLine();
-    unsigned int column = ctx->getStart()->getCharPositionInLine();
-
     Assignable* assignable = visit(ctx->assignable());
     Expression* assigned   = visit(ctx->expression());
 
     Assigner assigner = visit(ctx->assigner());
     assert(assigner == Assigner::COPY_ASSIGNMENT && "Assignment to already declared variable cannot be final.");
 
-    auto* statement = new AssignmentStatement(assignable, assigned, line, column);
+    auto* statement = new AssignmentStatement(assignable, assigned, location(ctx));
 
     return static_cast<Statement*>(statement);
 }
 
 antlrcpp::Any Visitor::visitDeleteStatement(anceParser::DeleteStatementContext* ctx)
 {
-    unsigned int line   = ctx->getStart()->getLine();
-    unsigned int column = ctx->getStart()->getCharPositionInLine();
-
     Expression* expression    = visit(ctx->expression());
     bool        delete_buffer = ctx->BUFFER();
 
-    return static_cast<Statement*>(new DeleteStatement(expression, delete_buffer, line, column));
+    return static_cast<Statement*>(new DeleteStatement(expression, delete_buffer, location(ctx)));
 }
 
 antlrcpp::Any Visitor::visitReturnStatement(anceParser::ReturnStatementContext* ctx)
 {
-    unsigned int line   = ctx->getStart()->getLine();
-    unsigned int column = ctx->getStart()->getCharPositionInLine();
-
     Expression* return_value = nullptr;
 
     if (ctx->expression() != nullptr) { return_value = visit(ctx->expression()); }
 
-    auto* statement = new ReturnStatement(return_value, line, column);
+    auto* statement = new ReturnStatement(return_value, location(ctx));
 
     return static_cast<Statement*>(statement);
 }
@@ -529,4 +516,12 @@ antlrcpp::Any Visitor::visitFinalCopyAssignment(anceParser::FinalCopyAssignmentC
 {
     Assigner assigner = Assigner::FINAL_COPY_ASSIGNMENT;
     return assigner;
+}
+
+ance::Location Visitor::location(antlr4::ParserRuleContext* ctx)
+{
+    unsigned line = ctx->getStart()->getLine();
+    unsigned column = ctx->getStart()->getCharPositionInLine();
+
+    return ance::Location(line, column);
 }

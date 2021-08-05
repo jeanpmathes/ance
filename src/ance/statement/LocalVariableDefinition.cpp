@@ -10,9 +10,8 @@ LocalVariableDefinition::LocalVariableDefinition(std::string identifier,
                                                  ance::Type* type,
                                                  Assigner    assigner,
                                                  Expression* assigned,
-                                                 unsigned    line,
-                                                 unsigned    column)
-    : Statement(line, column)
+                                                 ance::Location location)
+    : Statement(location)
     , identifier_(std::move(identifier))
     , type_(type)
     , assigner_(assigner)
@@ -22,7 +21,7 @@ LocalVariableDefinition::LocalVariableDefinition(std::string identifier,
 void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
 {
     variable_ =
-        function->getFunctionScope()->defineAutoVariable(identifier_, type_, assigner_, assigned_->getValue(), line());
+        function->getFunctionScope()->defineAutoVariable(identifier_, type_, assigner_, assigned_->getValue(), location());
     assigned_->setScope(function);
 }
 
