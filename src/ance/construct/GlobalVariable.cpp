@@ -21,9 +21,11 @@ ance::GlobalVariable::GlobalVariable(ance::Scope*        containing_scope,
                                      ance::Type*         type,
                                      ConstantExpression* constant_init,
                                      bool                is_final,
-                                     bool                is_constant)
+                                     bool                is_constant,
+                                     ance::Location location)
     : Variable(containing_scope, std::move(identifier), type, is_final)
     , access_(access)
+    , location_(location)
     , is_constant_(is_constant)
     , constant_init_(constant_init)
 {
@@ -34,6 +36,7 @@ ance::GlobalVariable::GlobalVariable(ance::Scope*        containing_scope,
 ance::GlobalVariable::GlobalVariable(std::string identifier)
     : Variable(std::move(identifier))
     , access_(AccessModifier::PRIVATE_ACCESS)
+    , location_(0, 0)
 {}
 
 void ance::GlobalVariable::defineGlobal(ance::Scope*        containing_scope,
@@ -41,33 +44,37 @@ void ance::GlobalVariable::defineGlobal(ance::Scope*        containing_scope,
                                         ance::Type*         type,
                                         ConstantExpression* constant_init,
                                         bool                is_final,
-                                        bool                is_constant)
+                                        bool                is_constant,
+                                        ance::Location location)
 {
     this->define(containing_scope, type, is_final);
 
     is_constant_   = is_constant;
     access_        = access;
     constant_init_ = constant_init;
+    location_ = location;
 
     constant_init_->setScope(containing_scope);
     initial_value_ = constant_init_->getConstantValue();
 }
 
-void ance::GlobalVariable::buildGlobal(llvm::Module* m)
+void ance::GlobalVariable::buildGlobal(CompileContext* context)
 {
     assert(type() != ance::VoidType::get());
     assert(type() == initial_value_->type());
 
     llvm::GlobalValue::LinkageTypes linkage = access_.linkage();
 
-    initial_value_->buildContentConstant(m);
+    initial_value_->buildContentConstant(context->module());
     llvm::Constant* native_initializer = initial_value_->getContentConstant();
-    native_variable_                   = new llvm::GlobalVariable(*m,
-                                                type()->getContentType(m->getContext()),
+    native_variable_                   = new llvm::GlobalVariable(*context->module(),
+                                                type()->getContentType(context->module()->getContext()),
                                                 is_constant_,
                                                 linkage,
                                                 native_initializer,
                                                 identifier());
+
+    context->di()->createGlobalVariableExpression(context->unit(), identifier(), identifier(), context->codeFile(), location_.line(), type()->getDebugType(context), true);
 }
 
 ance::Value* ance::GlobalVariable::getValue(CompileContext* context)

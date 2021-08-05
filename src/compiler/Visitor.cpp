@@ -82,7 +82,7 @@ antlrcpp::Any Visitor::visitVariableDeclaration(anceParser::VariableDeclarationC
         const_expr = new DefaultValueExpression(type);
     }
 
-    application_.globalScope()->defineGlobalVariable(access, is_constant, identifier, type, assigner, const_expr);
+    application_.globalScope()->defineGlobalVariable(access, is_constant, identifier, type, assigner, const_expr, location(ctx));
 
     return this->visitChildren(ctx);
 }

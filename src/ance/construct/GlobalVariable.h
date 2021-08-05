@@ -33,7 +33,8 @@ namespace ance
                        ance::Type*         type,
                        ConstantExpression* constant_init,
                        bool                is_final,
-                       bool                is_constant);
+                       bool                is_constant,
+                       ance::Location location);
 
         explicit GlobalVariable(std::string identifier);
 
@@ -42,9 +43,10 @@ namespace ance
                           ance::Type*         type,
                           ConstantExpression* constant_init,
                           bool                is_final,
-                          bool                is_constant);
+                          bool                is_constant,
+                          ance::Location location);
 
-        void buildGlobal(llvm::Module* m);
+        void buildGlobal(CompileContext* context);
 
         ance::Value* getValue(CompileContext* context) override;
 
@@ -52,10 +54,11 @@ namespace ance
 
       private:
         AccessModifier        access_;
+        ance::Location location_;
         bool                  is_constant_ {false};
         ConstantExpression*   constant_init_ {nullptr};
-        llvm::GlobalVariable* native_variable_ {nullptr};
 
+        llvm::GlobalVariable* native_variable_ {nullptr};
         ance::Constant* initial_value_ {nullptr};
     };
 }

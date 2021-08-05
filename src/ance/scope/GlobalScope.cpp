@@ -61,7 +61,8 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
                                              const std::string&  identifier,
                                              ance::Type*         type,
                                              Assigner            assigner,
-                                             ConstantExpression* initializer)
+                                             ConstantExpression* initializer,
+                                             ance::Location location)
 {
     assert(global_variables_.find(identifier) == global_variables_.end()
            && "A variable identifier may be used just once.");
@@ -78,7 +79,7 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
     {
         ance::GlobalVariable* undefined = global_undefined_[identifier];
 
-        undefined->defineGlobal(this, access, type, initializer, is_final, is_constant);
+        undefined->defineGlobal(this, access, type, initializer, is_final, is_constant, location);
 
         if (is_constant) { global_constants_[identifier] = undefined; }
         else
@@ -90,7 +91,7 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
     }
     else
     {
-        auto* defined = new ance::GlobalVariable(this, access, identifier, type, initializer, is_final, is_constant);
+        auto* defined = new ance::GlobalVariable(this, access, identifier, type, initializer, is_final, is_constant, location);
 
         if (is_constant) { global_constants_[identifier] = defined; }
         else
@@ -114,22 +115,18 @@ ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
     return undefined;
 }
 
-void ance::GlobalScope::buildVariables(llvm::LLVMContext&,
-                                       llvm::Module* m,
-                                       CompileContext*,
-                                       llvm::IRBuilder<>&,
-                                       llvm::DIBuilder*)
+void ance::GlobalScope::buildVariables(CompileContext* context)
 {
     for (auto const& [identifier, constant] : global_constants_)
     {
         if (!constant) continue;
-        constant->buildGlobal(m);
+        constant->buildGlobal(context);
     }
 
     for (auto const& [identifier, variable] : global_variables_)
     {
         if (!variable) continue;
-        variable->buildGlobal(m);
+        variable->buildGlobal(context);
     }
 }
 

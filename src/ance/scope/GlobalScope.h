@@ -26,15 +26,12 @@ namespace ance
                                   const std::string&  identifier,
                                   ance::Type*         type,
                                   Assigner            assigner,
-                                  ConstantExpression* initializer);
+                                  ConstantExpression* initializer,
+                                  ance::Location location);
 
         ance::Variable* getVariable(std::string identifier) override;
 
-        void buildVariables(llvm::LLVMContext& c,
-                            llvm::Module*      m,
-                            CompileContext*    state,
-                            llvm::IRBuilder<>& ir,
-                            llvm::DIBuilder*   di);
+        void buildVariables(CompileContext* context);
 
         [[nodiscard]] size_t functionCount() const;
 
