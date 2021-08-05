@@ -58,7 +58,7 @@ AnceCompiler::AnceCompiler(Application& app) : application_(app), ir_(llvm_conte
 
 void AnceCompiler::compile(const std::filesystem::path& bc)
 {
-    context_->runtime()->init(llvm_context_, module_, context_, ir_, di_);
+    context_->runtime()->init(context_);
 
     application_.globalScope()->buildVariables(context_);
     application_.globalScope()->buildFunctionNames(context_);

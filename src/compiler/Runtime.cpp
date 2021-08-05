@@ -9,21 +9,24 @@
 #include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
-void Runtime::init(llvm::LLVMContext& c, llvm::Module* m, CompileContext*, llvm::IRBuilder<>&, llvm::DIBuilder*)
+void Runtime::init(CompileContext* context)
 {
+    llvm::LLVMContext& llvm_context = *context->llvmContext();
+    llvm::Module& module = *context->module();
+
     // Setup dynamic memory allocation call.
-    llvm::Type* allocate_dynamic_params[] = {llvm::Type::getInt32Ty(c), ance::SizeType::get()->getNativeType(c)};
-    allocate_dynamic_type_ = llvm::FunctionType::get(llvm::Type::getInt8PtrTy(c), allocate_dynamic_params, false);
+    llvm::Type* allocate_dynamic_params[] = {llvm::Type::getInt32Ty(llvm_context), ance::SizeType::get()->getNativeType(llvm_context)};
+    allocate_dynamic_type_ = llvm::FunctionType::get(llvm::Type::getInt8PtrTy(llvm_context), allocate_dynamic_params, false);
     allocate_dynamic_      = llvm::Function::Create(allocate_dynamic_type_,
                                                llvm::GlobalValue::LinkageTypes::ExternalLinkage,
                                                "GlobalAlloc",
-                                               m);
+                                                    module);
 
     // Setup dynamic memory delete call.
-    llvm::Type* delete_dynamic_params[] = {llvm::Type::getInt8PtrTy(c)};
-    delete_dynamic_type_ = llvm::FunctionType::get(llvm::Type::getInt8PtrTy(c), delete_dynamic_params, false);
+    llvm::Type* delete_dynamic_params[] = {llvm::Type::getInt8PtrTy(llvm_context)};
+    delete_dynamic_type_ = llvm::FunctionType::get(llvm::Type::getInt8PtrTy(llvm_context), delete_dynamic_params, false);
     delete_dynamic_ =
-        llvm::Function::Create(delete_dynamic_type_, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "GlobalFree", m);
+        llvm::Function::Create(delete_dynamic_type_, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "GlobalFree", module);
 }
 
 ance::Value* Runtime::allocate(Allocator allocation, ance::Type* type, ance::Value* count, CompileContext* context)
