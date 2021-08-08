@@ -62,7 +62,7 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
                                              ance::Type*         type,
                                              Assigner            assigner,
                                              ConstantExpression* initializer,
-                                             ance::Location location)
+                                             ance::Location      location)
 {
     assert(global_variables_.find(identifier) == global_variables_.end()
            && "A variable identifier may be used just once.");
@@ -91,7 +91,8 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
     }
     else
     {
-        auto* defined = new ance::GlobalVariable(this, access, identifier, type, initializer, is_final, is_constant, location);
+        auto* defined =
+            new ance::GlobalVariable(this, access, identifier, type, initializer, is_final, is_constant, location);
 
         if (is_constant) { global_constants_[identifier] = defined; }
         else

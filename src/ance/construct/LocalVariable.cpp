@@ -11,8 +11,8 @@ ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope,
                                    ance::Type*       type,
                                    ance::Value*      value,
                                    bool              is_final,
-                                   unsigned parameter_no,
-                                   ance::Location location)
+                                   unsigned          parameter_no,
+                                   ance::Location    location)
     : Variable(containing_scope, std::move(identifier), type, is_final)
     , initial_value_(value)
     , containing_scope_(containing_scope)
@@ -27,21 +27,21 @@ void ance::LocalVariable::build(CompileContext* context)
     if (parameter_no_ == 0)
     {
         local_debug_variable_ = context->di()->createAutoVariable(containing_scope_->getDebugScope(context),
-                                          identifier(),
-                                          context->codeFile(),
-                                          location_.line(),
-                                          type()->getDebugType(context),
-                                          true);
+                                                                  identifier(),
+                                                                  context->codeFile(),
+                                                                  location_.line(),
+                                                                  type()->getDebugType(context),
+                                                                  true);
     }
     else
     {
         local_debug_variable_ = context->di()->createParameterVariable(containing_scope_->getDebugScope(context),
-                                               identifier(),
-                                               parameter_no_,
-                                               context->codeFile(),
-                                               location_.line(),
-                                               type()->getDebugType(context),
-                                               true);
+                                                                       identifier(),
+                                                                       parameter_no_,
+                                                                       context->codeFile(),
+                                                                       location_.line(),
+                                                                       type()->getDebugType(context),
+                                                                       true);
     }
 
     if (type()->storage() == InternalStorage::AS_POINTER)
@@ -49,7 +49,12 @@ void ance::LocalVariable::build(CompileContext* context)
         native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr);
         native_value_->setName(identifier());
 
-        context->di()->insertDeclare(native_value_, local_debug_variable_, context->di()->createExpression(), location_.getDebugLoc(context->llvmContext(), containing_scope_->getDebugScope(context)), context->ir()->GetInsertBlock());
+        context->di()->insertDeclare(
+            native_value_,
+            local_debug_variable_,
+            context->di()->createExpression(),
+            location_.getDebugLoc(context->llvmContext(), containing_scope_->getDebugScope(context)),
+            context->ir()->GetInsertBlock());
     }
 
     store(initial_value_, context);

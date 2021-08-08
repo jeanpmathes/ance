@@ -27,7 +27,7 @@ namespace ance
                                   ance::Type*         type,
                                   Assigner            assigner,
                                   ConstantExpression* initializer,
-                                  ance::Location location);
+                                  ance::Location      location);
 
         ance::Variable* getVariable(std::string identifier) override;
 

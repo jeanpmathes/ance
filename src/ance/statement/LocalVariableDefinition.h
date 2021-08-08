@@ -15,10 +15,10 @@ class Expression;
 class LocalVariableDefinition : public Statement
 {
   public:
-    LocalVariableDefinition(std::string  identifier,
-                            ance::Type*  type,
-                            Assigner     assigner,
-                            Expression*  assigned,
+    LocalVariableDefinition(std::string    identifier,
+                            ance::Type*    type,
+                            Assigner       assigner,
+                            Expression*    assigned,
                             ance::Location location);
 
     void setFunction(ance::DefinedFunction* function) override;

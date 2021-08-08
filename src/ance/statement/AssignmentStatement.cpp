@@ -5,9 +5,7 @@
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
 
-AssignmentStatement::AssignmentStatement(Assignable*  assignable,
-                                         Expression*  assigned,
-                                         ance::Location location)
+AssignmentStatement::AssignmentStatement(Assignable* assignable, Expression* assigned, ance::Location location)
     : Statement(location)
     , assignable_(assignable)
     , assigned_(assigned)

@@ -6,10 +6,10 @@
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
 
-LocalVariableDefinition::LocalVariableDefinition(std::string identifier,
-                                                 ance::Type* type,
-                                                 Assigner    assigner,
-                                                 Expression* assigned,
+LocalVariableDefinition::LocalVariableDefinition(std::string    identifier,
+                                                 ance::Type*    type,
+                                                 Assigner       assigner,
+                                                 Expression*    assigned,
                                                  ance::Location location)
     : Statement(location)
     , identifier_(std::move(identifier))
@@ -20,8 +20,11 @@ LocalVariableDefinition::LocalVariableDefinition(std::string identifier,
 
 void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
 {
-    variable_ =
-        function->getFunctionScope()->defineAutoVariable(identifier_, type_, assigner_, assigned_->getValue(), location());
+    variable_ = function->getFunctionScope()->defineAutoVariable(identifier_,
+                                                                 type_,
+                                                                 assigner_,
+                                                                 assigned_->getValue(),
+                                                                 location());
     assigned_->setScope(function);
 }
 

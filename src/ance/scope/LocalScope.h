@@ -32,22 +32,22 @@ namespace ance
                                                 ance::Type*        type,
                                                 Assigner           assigner,
                                                 ance::Value*       value,
-                                                ance::Location location);
+                                                ance::Location     location);
 
         ance::LocalVariable* defineParameterVariable(const std::string& identifier,
                                                      ance::Type*        type,
                                                      Assigner           assigner,
                                                      ance::Value*       value,
-                                                     unsigned parameter_no,
-                                                     ance::Location location);
+                                                     unsigned           parameter_no,
+                                                     ance::Location     location);
 
       private:
         ance::LocalVariable* defineLocalVariable(const std::string& identifier,
                                                  ance::Type*        type,
                                                  Assigner           assigner,
                                                  ance::Value*       value,
-                                                 unsigned parameter_no,
-                                                 ance::Location location);
+                                                 unsigned           parameter_no,
+                                                 ance::Location     location);
 
       private:
         ance::Scope* parent_;

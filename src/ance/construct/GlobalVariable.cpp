@@ -22,7 +22,7 @@ ance::GlobalVariable::GlobalVariable(ance::Scope*        containing_scope,
                                      ConstantExpression* constant_init,
                                      bool                is_final,
                                      bool                is_constant,
-                                     ance::Location location)
+                                     ance::Location      location)
     : Variable(containing_scope, std::move(identifier), type, is_final)
     , access_(access)
     , location_(location)
@@ -45,14 +45,14 @@ void ance::GlobalVariable::defineGlobal(ance::Scope*        containing_scope,
                                         ConstantExpression* constant_init,
                                         bool                is_final,
                                         bool                is_constant,
-                                        ance::Location location)
+                                        ance::Location      location)
 {
     this->define(containing_scope, type, is_final);
 
     is_constant_   = is_constant;
     access_        = access;
     constant_init_ = constant_init;
-    location_ = location;
+    location_      = location;
 
     constant_init_->setScope(containing_scope);
     initial_value_ = constant_init_->getConstantValue();
@@ -74,7 +74,13 @@ void ance::GlobalVariable::buildGlobal(CompileContext* context)
                                                 native_initializer,
                                                 identifier());
 
-    context->di()->createGlobalVariableExpression(context->unit(), identifier(), identifier(), context->codeFile(), location_.line(), type()->getDebugType(context), true);
+    context->di()->createGlobalVariableExpression(context->unit(),
+                                                  identifier(),
+                                                  identifier(),
+                                                  context->codeFile(),
+                                                  location_.line(),
+                                                  type()->getDebugType(context),
+                                                  true);
 }
 
 ance::Value* ance::GlobalVariable::getValue(CompileContext* context)

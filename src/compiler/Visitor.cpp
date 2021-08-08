@@ -82,7 +82,8 @@ antlrcpp::Any Visitor::visitVariableDeclaration(anceParser::VariableDeclarationC
         const_expr = new DefaultValueExpression(type);
     }
 
-    application_.globalScope()->defineGlobalVariable(access, is_constant, identifier, type, assigner, const_expr, location(ctx));
+    application_.globalScope()
+        ->defineGlobalVariable(access, is_constant, identifier, type, assigner, const_expr, location(ctx));
 
     return this->visitChildren(ctx);
 }
@@ -520,7 +521,7 @@ antlrcpp::Any Visitor::visitFinalCopyAssignment(anceParser::FinalCopyAssignmentC
 
 ance::Location Visitor::location(antlr4::ParserRuleContext* ctx)
 {
-    unsigned line = ctx->getStart()->getLine();
+    unsigned line   = ctx->getStart()->getLine();
     unsigned column = ctx->getStart()->getCharPositionInLine();
 
     return ance::Location(line, column);

@@ -4,8 +4,8 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "compiler/CompileContext.h"
 #include "ance/utility/Location.h"
+#include "compiler/CompileContext.h"
 
 class CompileContext;
 
