@@ -47,8 +47,25 @@ antlrcpp::Any DataVisitor::visitList(dataParser::ListContext* ctx)
 
 antlrcpp::Any DataVisitor::visitString(dataParser::StringContext* ctx)
 {
-    std::string str_with_quotes = ctx->getText();
-    std::string str             = str_with_quotes.substr(1, str_with_quotes.size() - 2);
+    std::string raw_string = ctx->getText();
+    std::string str;
+
+    bool escaped = false;
+
+    for (size_t i = 1; i < raw_string.length() - 1; ++i)
+    {
+        char c = raw_string[i];
+
+        if (!escaped && c == '\\')
+        {
+            escaped = true;
+        }
+        else
+        {
+            str.push_back(c);
+            escaped = false;
+        }
+    }
 
     auto* element = new data::StringElement(str);
     return static_cast<data::Element*>(element);
