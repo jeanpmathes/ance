@@ -28,7 +28,7 @@ void ance::LocalVariable::build(CompileContext* context)
     {
         local_debug_variable_ = context->di()->createAutoVariable(containing_scope_->getDebugScope(context),
                                                                   identifier(),
-                                                                  context->codeFile(),
+                                                                  context->sourceFile(),
                                                                   location_.line(),
                                                                   type()->getDebugType(context),
                                                                   true);
@@ -38,7 +38,7 @@ void ance::LocalVariable::build(CompileContext* context)
         local_debug_variable_ = context->di()->createParameterVariable(containing_scope_->getDebugScope(context),
                                                                        identifier(),
                                                                        parameter_no_,
-                                                                       context->codeFile(),
+                                                                       context->sourceFile(),
                                                                        location_.line(),
                                                                        type()->getDebugType(context),
                                                                        true);

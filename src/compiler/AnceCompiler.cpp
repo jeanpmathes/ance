@@ -19,6 +19,7 @@
 AnceCompiler::AnceCompiler(Application& app) : application_(app), ir_(llvm_context_)
 {
     module_ = new llvm::Module(application_.getName(), llvm_context_);
+    module_->setSourceFileName(application_.getSourceFile().filename().string());
 
     llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
 
@@ -43,17 +44,17 @@ AnceCompiler::AnceCompiler(Application& app) : application_(app), ir_(llvm_conte
     module_->setDataLayout(dl);
     module_->setTargetTriple(triple.str());
 
+    module_->addModuleFlag(llvm::Module::Warning, "Dwarf Version", llvm::dwarf::DWARF_VERSION);
     module_->addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
 
     di_ = new llvm::DIBuilder(*module_);
 
-    llvm::DIFile* proj_file =
-        di_->createFile(application_.getProjectFile().filename().string(), application_.getProjectFile().string());
-    llvm::DICompileUnit* unit = di_->createCompileUnit(llvm::dwarf::DW_LANG_C, proj_file, "ancec-0", false, "", 0);
-    llvm::DIFile*        code_file =
-        di_->createFile(application_.getSourceFile().filename().string(), application_.getSourceFile().string());
+    llvm::DIFile* src_file = di_->createFile(application_.getSourceFile().filename().generic_string(),
+                                             application_.getSourceFile().parent_path().generic_string());
 
-    context_ = new CompileContext(&application_, new Runtime(), &llvm_context_, module_, &ir_, di_, unit, code_file);
+    llvm::DICompileUnit* unit = di_->createCompileUnit(llvm::dwarf::DW_LANG_C, src_file, "ancec-0", false, "", 0);
+
+    context_ = new CompileContext(&application_, new Runtime(), &llvm_context_, module_, &ir_, di_, unit, src_file);
 }
 
 void AnceCompiler::compile(const std::filesystem::path& bc)
@@ -69,8 +70,8 @@ void AnceCompiler::compile(const std::filesystem::path& bc)
 
     llvm::FunctionType* exit_type;
     llvm::Function*     exit;
-    buildExit(exit_type, exit);
 
+    buildExit(exit_type, exit);
     buildStart(main_type, main, exit_type, exit);
 
     di_->finalize();

@@ -2,11 +2,10 @@
 
 #include <utility>
 
-ance::Function::Function(std::string function_name, ance::Type* return_type, unsigned int line, unsigned int column)
+ance::Function::Function(std::string function_name, ance::Type* return_type, ance::Location location)
     : name_(std::move(function_name))
     , return_type_(return_type)
-    , line_(line)
-    , column_(column)
+    , location_(location)
 {}
 
 std::string ance::Function::getName() const
@@ -14,14 +13,14 @@ std::string ance::Function::getName() const
     return name_;
 }
 
-ance::Type* ance::Function::getReturnType() const
+ance::Type* ance::Function::returnType() const
 {
     return return_type_;
 }
 
-unsigned int ance::Function::line() const
+ance::Location ance::Function::location() const
 {
-    return line_;
+    return location_;
 }
 
 std::pair<llvm::FunctionType*, llvm::Function*> ance::Function::createNativeFunction(
@@ -35,7 +34,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> ance::Function::createNativeFunc
 
     for (auto* param : parameters) { param_types.push_back(param->type()->getContentType(c)); }
 
-    llvm::FunctionType* native_type = llvm::FunctionType::get(getReturnType()->getContentType(c), param_types, false);
+    llvm::FunctionType* native_type     = llvm::FunctionType::get(returnType()->getContentType(c), param_types, false);
     llvm::Function*     native_function = llvm::Function::Create(native_type, linkage, getName(), m);
 
     return {native_type, native_function};

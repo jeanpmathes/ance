@@ -11,8 +11,7 @@ namespace ance
         ExternFunction(std::string                   function_name,
                        ance::Type*                   return_type,
                        std::vector<ance::Parameter*> parameters,
-                       unsigned int                  line,
-                       unsigned int                  column);
+                       ance::Location                location);
 
         void buildName(CompileContext* context) override;
 

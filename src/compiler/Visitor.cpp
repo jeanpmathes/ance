@@ -90,11 +90,12 @@ antlrcpp::Any Visitor::visitVariableDeclaration(anceParser::VariableDeclarationC
 
 antlrcpp::Any Visitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)
 {
-    unsigned int line   = ctx->getStart()->getLine();
-    unsigned int column = ctx->getStart()->getCharPositionInLine();
-
     AccessModifier access      = visit(ctx->accessModifier());
     ance::Type*    return_type = visit(ctx->type());
+
+    ance::Location declaration_location = location(ctx);
+    ance::Location definition_location =
+        ctx->statement().empty() ? declaration_location : location(ctx->statement()[0]);
 
     std::vector<ance::Parameter*> parameters = visit(ctx->parameters());
 
@@ -103,8 +104,8 @@ antlrcpp::Any Visitor::visitFunctionDefinition(anceParser::FunctionDefinitionCon
                                                return_type,
                                                parameters,
                                                application_.globalScope(),
-                                               line,
-                                               column);
+                                               declaration_location,
+                                               definition_location);
 
     application_.globalScope()->addFunction(function);
 
@@ -119,15 +120,10 @@ antlrcpp::Any Visitor::visitFunctionDefinition(anceParser::FunctionDefinitionCon
 
 antlrcpp::Any Visitor::visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx)
 {
-    unsigned int line   = ctx->getStart()->getLine();
-    unsigned int column = ctx->getStart()->getCharPositionInLine();
+    ance::Type*                   return_type = visit(ctx->type());
+    std::vector<ance::Parameter*> parameters  = visit(ctx->parameters());
 
-    ance::Type* return_type = visit(ctx->type());
-
-    std::vector<ance::Parameter*> parameters = visit(ctx->parameters());
-
-    auto* function = new ance::ExternFunction(ctx->IDENTIFIER()->getText(), return_type, parameters, line, column);
-
+    auto* function = new ance::ExternFunction(ctx->IDENTIFIER()->getText(), return_type, parameters, location(ctx));
     application_.globalScope()->addFunction(function);
 
     return this->visitChildren(ctx);

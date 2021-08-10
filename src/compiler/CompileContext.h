@@ -19,7 +19,7 @@ class CompileContext
                    llvm::IRBuilder<>*   ir,
                    llvm::DIBuilder*     di,
                    llvm::DICompileUnit* unit,
-                   llvm::DIFile*        code_file);
+                   llvm::DIFile*        src_file);
 
     Application* application();
 
@@ -35,7 +35,7 @@ class CompileContext
 
     llvm::DICompileUnit* unit();
 
-    llvm::DIFile* codeFile();
+    llvm::DIFile* sourceFile();
 
   private:
     Application*         application_;
@@ -45,7 +45,7 @@ class CompileContext
     llvm::IRBuilder<>*   ir_builder_;
     llvm::DIBuilder*     di_builder_;
     llvm::DICompileUnit* unit_;
-    llvm::DIFile*        code_file_;
+    llvm::DIFile*        src_file_;
 };
 
 #endif

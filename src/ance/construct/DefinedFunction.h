@@ -26,12 +26,12 @@ namespace ance
     {
       public:
         DefinedFunction(AccessModifier                access,
-                        std::string                   function_name,
+                        const std::string&            function_name,
                         ance::Type*                   return_type,
                         std::vector<ance::Parameter*> parameters,
                         ance::Scope*                  scope,
-                        unsigned int                  line,
-                        unsigned int                  column);
+                        ance::Location                declaration_location,
+                        ance::Location                definition_location);
 
         void pushStatement(Statement* statement);
 
@@ -61,6 +61,7 @@ namespace ance
 
       private:
         AccessModifier access_;
+        ance::Location definition_location_;
 
         std::vector<ance::Parameter*> parameters_;
 

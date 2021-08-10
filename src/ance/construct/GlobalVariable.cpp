@@ -75,12 +75,12 @@ void ance::GlobalVariable::buildGlobal(CompileContext* context)
                                                 identifier());
 
     auto* debug_info = context->di()->createGlobalVariableExpression(context->unit(),
-                                                  identifier(),
-                                                  identifier(),
-                                                  context->codeFile(),
-                                                  location_.line(),
-                                                  type()->getDebugType(context),
-                                                  true);
+                                                                     identifier(),
+                                                                     identifier(),
+                                                                     context->sourceFile(),
+                                                                     location_.line(),
+                                                                     type()->getDebugType(context),
+                                                                     true);
 
     native_variable_->addDebugInfo(debug_info);
 }

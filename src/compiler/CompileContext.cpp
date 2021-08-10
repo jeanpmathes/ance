@@ -7,7 +7,7 @@ CompileContext::CompileContext(Application*         app,
                                llvm::IRBuilder<>*   ir,
                                llvm::DIBuilder*     di,
                                llvm::DICompileUnit* unit,
-                               llvm::DIFile*        code_file)
+                               llvm::DIFile*        src_file)
     : application_(app)
     , runtime_(runtime)
     , context_(c)
@@ -15,7 +15,7 @@ CompileContext::CompileContext(Application*         app,
     , ir_builder_(ir)
     , di_builder_(di)
     , unit_(unit)
-    , code_file_(code_file)
+    , src_file_(src_file)
 {}
 
 Application* CompileContext::application()
@@ -53,7 +53,7 @@ llvm::DICompileUnit* CompileContext::unit()
     return unit_;
 }
 
-llvm::DIFile* CompileContext::codeFile()
+llvm::DIFile* CompileContext::sourceFile()
 {
-    return code_file_;
+    return src_file_;
 }

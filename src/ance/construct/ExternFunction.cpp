@@ -9,9 +9,8 @@
 ance::ExternFunction::ExternFunction(std::string                   function_name,
                                      ance::Type*                   return_type,
                                      std::vector<ance::Parameter*> parameters,
-                                     unsigned int                  line,
-                                     unsigned int                  column)
-    : ance::Function(std::move(function_name), return_type, line, column)
+                                     ance::Location                location)
+    : ance::Function(std::move(function_name), return_type, location)
     , parameters_(std::move(parameters))
 {}
 
@@ -38,8 +37,8 @@ ance::Value* ance::ExternFunction::buildCall(const std::vector<ance::Value*>& ar
 
     llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
 
-    if (getReturnType() == ance::VoidType::get()) { return nullptr; }
+    if (returnType() == ance::VoidType::get()) { return nullptr; }
 
-    llvm::Value* native_value = ance::Values::contentToNative(getReturnType(), content_value, context);
-    return new ance::WrappedNativeValue(getReturnType(), native_value);
+    llvm::Value* native_value = ance::Values::contentToNative(returnType(), content_value, context);
+    return new ance::WrappedNativeValue(returnType(), native_value);
 }

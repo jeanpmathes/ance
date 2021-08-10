@@ -26,7 +26,7 @@ void FunctionCall::setScope(ance::Scope* scope)
 
 ance::Type* FunctionCall::type()
 {
-    return scope_->getGlobalScope()->getFunction(identifier_)->getReturnType();
+    return scope_->getGlobalScope()->getFunction(identifier_)->returnType();
 }
 
 void FunctionCall::buildValue(CompileContext* context)

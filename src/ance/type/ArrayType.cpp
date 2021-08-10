@@ -12,7 +12,7 @@ ance::ArrayType::ArrayType(Type* element_type, const uint64_t size) : size_(size
 
 std::string ance::ArrayType::getName()
 {
-    return element_type_->getName() + "[" + std::to_string(size_) + "]";
+    return "[" + element_type_->getName() + "; " + std::to_string(size_) + "]";
 }
 
 llvm::Constant* ance::ArrayType::getDefaultContent(llvm::LLVMContext& c)

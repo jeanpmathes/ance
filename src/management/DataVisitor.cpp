@@ -56,10 +56,7 @@ antlrcpp::Any DataVisitor::visitString(dataParser::StringContext* ctx)
     {
         char c = raw_string[i];
 
-        if (!escaped && c == '\\')
-        {
-            escaped = true;
-        }
+        if (!escaped && c == '\\') { escaped = true; }
         else
         {
             str.push_back(c);

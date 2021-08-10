@@ -24,12 +24,12 @@ namespace ance
     class Function
     {
       public:
-        Function(std::string function_name, ance::Type* return_type, unsigned int line, unsigned int column);
+        Function(std::string function_name, ance::Type* return_type, ance::Location location);
 
         [[nodiscard]] std::string getName() const;
-        [[nodiscard]] ance::Type* getReturnType() const;
+        [[nodiscard]] ance::Type* returnType() const;
 
-        [[nodiscard]] unsigned int line() const;
+        [[nodiscard]] ance::Location location() const;
 
         virtual void         buildName(CompileContext* context)                                                   = 0;
         virtual void         build(CompileContext* context)                                                       = 0;
@@ -48,10 +48,9 @@ namespace ance
                                   CompileContext*                  state) const;
 
       private:
-        std::string                   name_;
-        ance::Type*                   return_type_;
-        unsigned int                  line_;
-        [[maybe_unused]] unsigned int column_;
+        std::string    name_;
+        ance::Type*    return_type_;
+        ance::Location location_;
     };
 }
 

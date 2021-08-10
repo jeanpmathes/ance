@@ -11,14 +11,15 @@
 #include "ance/utility/Values.h"
 
 ance::DefinedFunction::DefinedFunction(AccessModifier                access,
-                                       std::string                   function_name,
+                                       const std::string&            function_name,
                                        ance::Type*                   return_type,
                                        std::vector<ance::Parameter*> parameters,
                                        ance::Scope*                  scope,
-                                       unsigned int                  line,
-                                       unsigned int                  column)
-    : ance::Function(std::move(function_name), return_type, line, column)
+                                       ance::Location                declaration_location,
+                                       ance::Location                definition_location)
+    : ance::Function(std::move(function_name), return_type, declaration_location)
     , access_(access)
+    , definition_location_(definition_location)
     , parameters_(std::move(parameters))
     , containing_scope_(scope)
     , function_scope_(new ance::LocalScope(this))
@@ -48,6 +49,7 @@ void ance::DefinedFunction::buildName(CompileContext* context)
         createNativeFunction(parameters_, access_.linkage(), *context->llvmContext(), context->module());
 
     std::vector<llvm::Metadata*> di_types;
+    di_types.push_back(returnType()->getDebugType(context));
 
     for (const auto& pair : zip(parameters_, native_function_->args()))
     {
@@ -59,18 +61,18 @@ void ance::DefinedFunction::buildName(CompileContext* context)
 
     llvm::DISubroutineType* debug_type =
         context->di()->createSubroutineType(context->di()->getOrCreateTypeArray(di_types));
-    llvm::DISubprogram* debug =
-        context->di()->createFunction(context->unit(),
+    llvm::DISubprogram* subprogram =
+        context->di()->createFunction(context->sourceFile(),
                                       getName(),
-                                      getName(),
-                                      context->codeFile(),
-                                      line(),
+                                      llvm::StringRef(),
+                                      context->sourceFile(),
+                                      location().line(),
                                       debug_type,
-                                      0,
-                                      llvm::DINode::DIFlags::FlagZero,
-                                      llvm::DISubprogram::toSPFlags(true, true, false, 0U, getName() == "main"));
+                                      definition_location_.line(),
+                                      llvm::DINode::DIFlags::FlagPrototyped,
+                                      llvm::DISubprogram::toSPFlags(false, true, false, 0U, getName() == "main"));
 
-    native_function_->setSubprogram(debug);
+    native_function_->setSubprogram(subprogram);
 }
 
 void ance::DefinedFunction::build(CompileContext* context)
@@ -106,7 +108,7 @@ void ance::DefinedFunction::build(CompileContext* context)
 
     if (!has_return_)
     {
-        if (getReturnType() == ance::VoidType::get()) { context->ir()->CreateRetVoid(); }
+        if (returnType() == ance::VoidType::get()) { context->ir()->CreateRetVoid(); }
         else
         {
             assert(true && "Functions with return type that is not void require a return statement.");
@@ -114,19 +116,20 @@ void ance::DefinedFunction::build(CompileContext* context)
     }
 
     context->ir()->SetCurrentDebugLocation(nullptr);
+    context->di()->finalizeSubprogram(native_function_->getSubprogram());
 }
 
 void ance::DefinedFunction::addReturn(ance::Value* value)
 {
     if (value)
     {
-        assert(value->type() == getReturnType());
+        assert(value->type() == returnType());
         return_value_ = value;
         has_return_   = true;
     }
     else
     {
-        assert(getReturnType() == ance::VoidType::get());
+        assert(returnType() == ance::VoidType::get());
         return_value_ = nullptr;
         has_return_   = true;
     }
@@ -143,10 +146,10 @@ ance::Value* ance::DefinedFunction::buildCall(const std::vector<ance::Value*>& a
 
     llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
 
-    if (getReturnType() == ance::VoidType::get()) { return nullptr; }
+    if (returnType() == ance::VoidType::get()) { return nullptr; }
 
-    llvm::Value* native_value = ance::Values::contentToNative(getReturnType(), content_value, context);
-    return new ance::WrappedNativeValue(getReturnType(), native_value);
+    llvm::Value* native_value = ance::Values::contentToNative(returnType(), content_value, context);
+    return new ance::WrappedNativeValue(returnType(), native_value);
 }
 
 llvm::DISubprogram* ance::DefinedFunction::debugSubprogram()
