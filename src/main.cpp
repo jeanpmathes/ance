@@ -58,17 +58,19 @@ int main(int argc, char** argv)
 
         std::filesystem::path out_file(argv[2]);
 
-        std::filesystem::path bc_dir  = out_file / "bc";
+        std::filesystem::path obj_dir = out_file / "obj";
         std::filesystem::path bin_dir = out_file / "bin";
 
-        std::filesystem::create_directory(bc_dir);
+        std::filesystem::create_directory(obj_dir);
         std::filesystem::create_directory(bin_dir);
 
-        std::filesystem::path bc  = bc_dir / (application.getName() + ".bc");
+        std::filesystem::path obj = obj_dir / (application.getName() + ".o");
         std::filesystem::path exe = bin_dir / (application.getName() + ".exe");
 
-        compiler.compile(bc);
-        linker.link(bc, exe);
+        compiler.compile();
+        compiler.emitObject(obj);
+
+        linker.link(obj, exe);
 
         e = EXIT_SUCCESS;
     }

@@ -8,9 +8,8 @@
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Support/TargetRegistry.h>
-#include <llvm/Target/TargetMachine.h>
-
-#include <llvm/Bitcode/BitcodeWriter.h>
+#include <llvm/Support/FileSystem.h>
+#include <llvm/IR/LegacyPassManager.h>
 
 #include "ance/scope/GlobalScope.h"
 #include "ance/type/SizeType.h"
@@ -34,9 +33,9 @@ AnceCompiler::AnceCompiler(Application& app) : application_(app), ir_(llvm_conte
 
     llvm::TargetOptions opt;
 
-    llvm::TargetMachine* tm = t->createTargetMachine(triple.str(), "generic", "", opt, rm, cm, llvm::CodeGenOpt::None);
+    target_machine_ = t->createTargetMachine(triple.str(), "generic", "", opt, rm, cm, llvm::CodeGenOpt::None);
 
-    llvm::DataLayout dl = tm->createDataLayout();
+    llvm::DataLayout dl = target_machine_->createDataLayout();
     application_.setPointerSize(dl.getPointerSize());
     ance::SizeType::init(llvm_context_, app);
     ance::UnsignedIntegerPointerType::init(llvm_context_, app);
@@ -57,7 +56,7 @@ AnceCompiler::AnceCompiler(Application& app) : application_(app), ir_(llvm_conte
     context_ = new CompileContext(&application_, new Runtime(), &llvm_context_, module_, &ir_, di_, unit, src_file);
 }
 
-void AnceCompiler::compile(const std::filesystem::path& bc)
+void AnceCompiler::compile()
 {
     context_->runtime()->init(context_);
 
@@ -78,14 +77,28 @@ void AnceCompiler::compile(const std::filesystem::path& bc)
 
     llvm::verifyModule(*module_, &llvm::errs());
     module_->print(llvm::outs(), nullptr);
+}
 
-    std::ofstream ofs(bc.string());
-    ofs.close();
+void AnceCompiler::emitObject(const std::filesystem::path& out)
+{
+    std::error_code ec;
+    llvm::raw_fd_ostream s(out.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
 
-    std::error_code      ec;
-    llvm::raw_fd_ostream os(bc.string(), ec);
-    llvm::WriteBitcodeToFile(*module_, os);
-    os.close();
+    if (ec)
+    {
+        std::cerr << "IO error while creating object file stream: " << ec.message() << std::endl;
+    }
+
+    llvm::legacy::PassManager pass;
+    auto type = llvm::CGFT_ObjectFile;
+
+    if (target_machine_->addPassesToEmitFile(pass, s, nullptr, type))
+    {
+        std::cerr << "Cannot emit object files for current target." << std::endl;
+    }
+
+    pass.run(*module_);
+    s.flush();
 }
 
 void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit)

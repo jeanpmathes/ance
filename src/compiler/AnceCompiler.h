@@ -5,6 +5,7 @@
 
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
+#include <llvm/Target/TargetMachine.h>
 
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
@@ -14,7 +15,8 @@ class AnceCompiler
   public:
     explicit AnceCompiler(Application& app);
 
-    void compile(const std::filesystem::path& bc);
+    void compile();
+    void emitObject(const std::filesystem::path& out);
 
   private:
     void buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
@@ -28,6 +30,8 @@ class AnceCompiler
     Application&      application_;
     llvm::LLVMContext llvm_context_;
     llvm::IRBuilder<> ir_;
+
+    llvm::TargetMachine* target_machine_{nullptr};
 
   private:
     llvm::Module*    module_;
