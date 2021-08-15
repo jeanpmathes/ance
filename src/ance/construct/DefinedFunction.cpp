@@ -62,7 +62,7 @@ void ance::DefinedFunction::buildName(CompileContext* context)
     llvm::DISubroutineType* debug_type =
         context->di()->createSubroutineType(context->di()->getOrCreateTypeArray(di_types));
     llvm::DISubprogram* subprogram =
-        context->di()->createFunction(context->sourceFile(),
+        context->di()->createFunction(containing_scope_->getDebugScope(context),
                                       getName(),
                                       llvm::StringRef(),
                                       context->sourceFile(),
@@ -115,7 +115,7 @@ void ance::DefinedFunction::build(CompileContext* context)
         }
     }
 
-    context->ir()->SetCurrentDebugLocation(nullptr);
+    context->ir()->SetCurrentDebugLocation(llvm::DebugLoc());
     context->di()->finalizeSubprogram(native_function_->getSubprogram());
 }
 
