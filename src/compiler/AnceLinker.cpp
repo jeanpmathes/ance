@@ -17,7 +17,8 @@ AnceLinker::AnceLinker(std::optional<std::reference_wrapper<const data::Element>
                 auto libpath_str = libpath.get().asString();
                 if (!libpath_str) continue;
 
-                lib_paths_.push_back("/libpath:" + libpath_str->get());
+                std::filesystem::path path(libpath_str->get());
+                lib_paths_.push_back("/libpath:" + path.string());
             }
         }
 
@@ -30,7 +31,7 @@ AnceLinker::AnceLinker(std::optional<std::reference_wrapper<const data::Element>
                 auto lib_str = lib.get().asString();
                 if (!lib_str) continue;
 
-                lib_paths_.push_back("/defaultlib:" + lib_str->get());
+                libs_.push_back("/defaultlib:" + lib_str->get());
             }
         }
     }
@@ -53,12 +54,12 @@ void AnceLinker::link(const std::filesystem::path& obj, const std::filesystem::p
     std::string out = "/out:" + exe.string();
     args.push_back(out.c_str());
 
-    std::string in = obj.string();
-    args.push_back(in.c_str());
-
     for (const auto& libpath : lib_paths_) { args.push_back(libpath.c_str()); }
 
     for (const auto& lib : libs_) { args.push_back(lib.c_str()); }
+
+    std::string in = obj.string();
+    args.push_back(in.c_str());
 
     lld::mingw::link(args, false, llvm::outs(), llvm::errs());
 }
