@@ -107,7 +107,7 @@ llvm::DIType* ance::ArrayType::createDebugType(CompileContext* context)
     const llvm::DataLayout& dl         = context->module()->getDataLayout();
     llvm::Type*             array_type = getContentType(*context->llvmContext());
 
-    uint64_t      size            = dl.getTypeSizeInBits(array_type) * 8;
+    uint64_t      size            = dl.getTypeSizeInBits(array_type) / 8;
     uint32_t      alignment       = dl.getABITypeAlignment(array_type);
     llvm::DIType* element_di_type = element_type_->getDebugType(context);
 
