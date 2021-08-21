@@ -63,14 +63,14 @@ void ance::DefinedFunction::buildName(CompileContext* context)
         context->di()->createSubroutineType(context->di()->getOrCreateTypeArray(di_types));
     llvm::DISubprogram* subprogram =
         context->di()->createFunction(containing_scope_->getDebugScope(context),
-                                      getName(),
+                                      name(),
                                       llvm::StringRef(),
                                       context->sourceFile(),
                                       location().line(),
                                       debug_type,
                                       definition_location_.line(),
                                       llvm::DINode::DIFlags::FlagPrototyped,
-                                      llvm::DISubprogram::toSPFlags(false, true, false, 0U, getName() == "main"));
+                                      llvm::DISubprogram::toSPFlags(false, true, false, 0U, name() == "main"));
 
     native_function_->setSubprogram(subprogram);
 }

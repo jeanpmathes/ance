@@ -26,7 +26,7 @@ namespace ance
       public:
         Function(std::string function_name, ance::Type* return_type, ance::Location location);
 
-        [[nodiscard]] std::string getName() const;
+        [[nodiscard]] std::string name() const;
         [[nodiscard]] ance::Type* returnType() const;
 
         [[nodiscard]] ance::Location location() const;

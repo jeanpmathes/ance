@@ -143,8 +143,8 @@ void ance::GlobalScope::addFunctionName(const std::string& name)
 
 void ance::GlobalScope::addFunction(ance::Function* function)
 {
-    assert(!isFunctionDefined(function->getName()));
-    functions_[function->getName()] = function;
+    assert(!isFunctionDefined(function->name()));
+    functions_[function->name()] = function;
 }
 
 bool ance::GlobalScope::hasFunction(const std::string& identifier)

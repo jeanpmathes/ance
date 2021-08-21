@@ -8,7 +8,7 @@ ance::Function::Function(std::string function_name, ance::Type* return_type, anc
     , location_(location)
 {}
 
-std::string ance::Function::getName() const
+std::string ance::Function::name() const
 {
     return name_;
 }
@@ -35,7 +35,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> ance::Function::createNativeFunc
     for (auto* param : parameters) { param_types.push_back(param->type()->getContentType(c)); }
 
     llvm::FunctionType* native_type     = llvm::FunctionType::get(returnType()->getContentType(c), param_types, false);
-    llvm::Function*     native_function = llvm::Function::Create(native_type, linkage, getName(), m);
+    llvm::Function*     native_function = llvm::Function::Create(native_type, linkage, name(), m);
 
     return {native_type, native_function};
 }
