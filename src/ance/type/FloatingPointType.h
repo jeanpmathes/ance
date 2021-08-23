@@ -5,6 +5,9 @@
 
 namespace ance
 {
+    /**
+     * The base class of all floating point types.
+     */
     class FloatingPointType : public Type
     {
       public:

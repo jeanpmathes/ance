@@ -5,9 +5,17 @@
 
 #include "ance/expression/Expression.h"
 
+/**
+ * Adds a return value to the containing function.
+ */
 class ReturnStatement : public Statement
 {
   public:
+    /**
+     * Create a return statement.
+     * @param return_value An expression producing the return value.
+     * @param location The source location.
+     */
     ReturnStatement(Expression* return_value, ance::Location location);
 
     void setFunction(ance::DefinedFunction* function) override;

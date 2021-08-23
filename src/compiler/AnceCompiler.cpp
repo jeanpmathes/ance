@@ -5,11 +5,11 @@
 #include <iostream>
 #include <string>
 
+#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Verifier.h>
+#include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Support/TargetRegistry.h>
-#include <llvm/Support/FileSystem.h>
-#include <llvm/IR/LegacyPassManager.h>
 
 #include "ance/scope/GlobalScope.h"
 #include "ance/type/SizeType.h"
@@ -81,16 +81,13 @@ void AnceCompiler::compile()
 
 void AnceCompiler::emitObject(const std::filesystem::path& out)
 {
-    std::error_code ec;
+    std::error_code      ec;
     llvm::raw_fd_ostream s(out.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
 
-    if (ec)
-    {
-        std::cerr << "IO error while creating object file stream: " << ec.message() << std::endl;
-    }
+    if (ec) { std::cerr << "IO error while creating object file stream: " << ec.message() << std::endl; }
 
     llvm::legacy::PassManager pass;
-    auto type = llvm::CGFT_ObjectFile;
+    auto                      type = llvm::CGFT_ObjectFile;
 
     if (target_machine_->addPassesToEmitFile(pass, s, nullptr, type))
     {

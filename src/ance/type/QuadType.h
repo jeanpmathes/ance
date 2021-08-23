@@ -7,6 +7,9 @@ namespace ance
 {
     class Scope;
 
+    /**
+     * Represents the quadruple precision floating point type.
+     */
     class QuadType : public FloatingPointType
     {
       public:
@@ -20,6 +23,10 @@ namespace ance
         inline static FloatingPointType* instance_ = nullptr;
 
       public:
+        /**
+         * Get the quad type instance.
+         * @return The instance.
+         */
         static ance::FloatingPointType* get();
     };
 }

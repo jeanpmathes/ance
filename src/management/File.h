@@ -7,15 +7,33 @@
 
 namespace data
 {
+    /**
+     * Represents a data file.
+     */
     class File
     {
       public:
+        /**
+         * Create a new data file from a file in the filesystem. No actual reading occurs.
+         * @param path The path to the file.
+         */
         explicit File(const std::filesystem::path& path);
 
+        /**
+         * Get the path to the file.
+         * @return The path.
+         */
         const std::filesystem::path& path();
 
+        /**
+         * Read the element structure from the file.
+         */
         void read();
 
+        /**
+         * Get the root element of the element structure stored in the file.
+         * @return The root element.
+         */
         const data::Element& root();
 
       private:

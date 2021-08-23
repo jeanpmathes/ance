@@ -6,11 +6,18 @@
 #include "ance/construct/value/DelayedValue.h"
 #include "ance/expression/BuildableExpression.h"
 
+/**
+ * Interface of expressions providing the value for delayed values.
+ */
 class DelayableExpression
     : public virtual Expression
     , public BuildableExpression
 {
   public:
+    /**
+     * Build the expression, and set the value if necessary.
+     * @param context The current compile context.
+     */
     virtual void buildValue(CompileContext* context) = 0;
 
     void build(CompileContext* context) final;
@@ -18,6 +25,10 @@ class DelayableExpression
     ance::Value* getValue() override;
 
   protected:
+    /**
+     * Set the value of the delayable value.
+     * @param value The value to use.
+     */
     void setValue(ance::Value* value);
 
   private:

@@ -7,9 +7,16 @@
 
 class Application;
 
+/**
+ * Provides the size of a type.
+ */
 class SizeofType : public BackingExpression
 {
   public:
+    /**
+     * Create a new sizeof type expression.
+     * @param type The type to provide the size of.
+     */
     explicit SizeofType(ance::Type* type);
 
     ance::Type* type() override;

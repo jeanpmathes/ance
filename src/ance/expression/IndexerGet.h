@@ -5,9 +5,17 @@
 
 #include "ance/construct/value/ExpressionBackedValue.h"
 
+/**
+ * An indexer (subscript) get operation.
+ */
 class IndexerGet : public DelayableExpression
 {
   public:
+    /**
+     * Create a new indexer get.
+     * @param indexed The indexed value.
+     * @param index The index to use.
+     */
     IndexerGet(Expression* indexed, Expression* index);
 
     void setScope(ance::Scope* scope) override;

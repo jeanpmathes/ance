@@ -7,6 +7,9 @@ class Application;
 
 namespace ance
 {
+    /**
+     * Represents a pointer type. A pointer type has an element type, which is the type of the value pointed too.
+     */
     class PointerType : public Type
     {
       private:
@@ -43,6 +46,12 @@ namespace ance
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:
+        /**
+         * Get a pointer type instance.
+         * @param app The current application.
+         * @param element_type The element type.
+         * @return The instance.
+         */
         static ance::Type* get(Application& app, ance::Type* element_type);
 
         static bool isPointerType(ance::Type* type);

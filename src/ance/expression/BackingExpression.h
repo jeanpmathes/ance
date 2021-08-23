@@ -5,18 +5,34 @@
 
 #include "ance/expression/BuildableExpression.h"
 
+/**
+ * An interface for expressions that can back a value.
+ */
 class BackingExpression
     : public virtual Expression
     , public BuildableExpression
 {
   public:
+    /**
+     * Build the backing value.
+     * @param context The current compile context.
+     */
     void buildBackingValue(CompileContext* context);
 
     void build(CompileContext* context) final;
 
+    /**
+     * Get the native value. Must be built before.
+     * @return The native value.
+     */
     llvm::Value* getNativeValue();
 
   protected:
+    /**
+     * Build the native value.
+     * @param context The current compile context.
+     * @return The native value.
+     */
     virtual llvm::Value* buildNativeValue(CompileContext* context) = 0;
 
   private:

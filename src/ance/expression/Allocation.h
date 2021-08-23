@@ -6,9 +6,19 @@
 #include "compiler/Application.h"
 #include "compiler/Runtime.h"
 
+/**
+ * An allocation expression.
+ */
 class Allocation : public DelayableExpression
 {
   public:
+    /**
+     * Create a new allocation.
+     * @param allocation The allocation type.
+     * @param type The type of the value to allocate.
+     * @param count An expression providing the number of elements to allocate.
+     * @param app The current application.
+     */
     Allocation(Runtime::Allocator allocation, ance::Type* type, Expression* count, Application& app);
 
     void setScope(ance::Scope* scope) override;

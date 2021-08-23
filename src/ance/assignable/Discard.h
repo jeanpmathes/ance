@@ -3,6 +3,9 @@
 
 #include "Assignable.h"
 
+/**
+ * An assignable that does nothing with the assigned value.
+ */
 class Discard : public Assignable
 {
   public:

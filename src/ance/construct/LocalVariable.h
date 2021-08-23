@@ -9,9 +9,22 @@ namespace ance
 
     class LocalScope;
 
+    /**
+     * A local variable or function parameter.
+     */
     class LocalVariable : public ance::Variable
     {
       public:
+        /**
+         * Create a new local variable.
+         * @param containing_scope The containing scope.
+         * @param identifier The identifier of the variable.
+         * @param type The type.
+         * @param value The initial value.
+         * @param is_final Whether the variable is final.
+         * @param parameter_no The parameter number. Use zero if this is not a parameter.
+         * @param location The source location.
+         */
         LocalVariable(ance::LocalScope* containing_scope,
                       std::string       identifier,
                       ance::Type*       type,
@@ -20,6 +33,10 @@ namespace ance
                       unsigned          parameter_no,
                       ance::Location    location);
 
+        /**
+         * Build the local variable.
+         * @param context The current compile context.
+         */
         void build(CompileContext* context);
 
         ance::Value* getValue(CompileContext* context) override;

@@ -11,9 +11,16 @@ class Expression;
 
 namespace ance
 {
+    /**
+     * A local scope with local variables. Can be used by functions and similar constructs.
+     */
     class LocalScope : public Scope
     {
       public:
+        /**
+         * Create a new local scope.
+         * @param parent The parent scope containing this scope.
+         */
         explicit LocalScope(ance::Scope* parent);
 
         ance::GlobalScope* getGlobalScope() override;
@@ -28,12 +35,31 @@ namespace ance
         ance::Type* getType(const std::string& type_name) override;
         void        registerType(ance::Type* type) override;
 
+        /**
+         * Define a local variable that is not a parameter.
+         * @param identifier The identifier.
+         * @param type The type.
+         * @param assigner The assigner to use for initial assignment.
+         * @param value The initial value.
+         * @param location The source location.
+         * @return The defined variable.
+         */
         ance::LocalVariable* defineAutoVariable(const std::string& identifier,
                                                 ance::Type*        type,
                                                 Assigner           assigner,
                                                 ance::Value*       value,
                                                 ance::Location     location);
 
+        /**
+         * Define a local variable that is a parameter.
+         * @param identifier The identifier.
+         * @param type The type.
+         * @param assigner The assigner to use for initial assignment.
+         * @param value The initial value.
+         * @param parameter_no The number of the parameter. Counting starts with one.
+         * @param location The source location.
+         * @return The defined variable.
+         */
         ance::LocalVariable* defineParameterVariable(const std::string& identifier,
                                                      ance::Type*        type,
                                                      Assigner           assigner,

@@ -9,6 +9,9 @@ namespace ance
 {
     class Scope;
 
+    /**
+     * Represents an integer type. Integers can have any precision and can be both signed or unsigned.
+     */
     class IntegerType : public Type
     {
       private:
@@ -30,6 +33,13 @@ namespace ance
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:
+        /**
+         * Get an integer type instance.
+         * @param app The current application.
+         * @param bit_size The size of the integer.
+         * @param is_signed Whether the integer should be signed.
+         * @return The instance.
+         */
         static ance::Type* get(Application& app, uint64_t bit_size, bool is_signed);
     };
 }

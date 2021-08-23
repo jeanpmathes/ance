@@ -7,6 +7,9 @@ class Application;
 
 namespace ance
 {
+    /**
+     * Represents an unsigned integer capable of holding the size of the largest possible array.
+     */
     class SizeType : public ance::Type
     {
       public:
@@ -26,8 +29,17 @@ namespace ance
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:
+        /**
+         * Initialize the size type.
+         * @param c The llvm context.
+         * @param app The current application.
+         */
         static void init(llvm::LLVMContext& c, Application& app);
 
+        /**
+         * Get the size type instance.
+         * @return The instance.
+         */
         static ance::SizeType* get();
     };
 }

@@ -10,12 +10,26 @@
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
+/**
+ * Represents the compile step, which transforms an application into a llvm module.
+ */
 class AnceCompiler
 {
   public:
+    /**
+     * Create a new compiler for an application.
+     * @param app The application.
+     */
     explicit AnceCompiler(Application& app);
 
+    /**
+     * Compile the application.
+     */
     void compile();
+    /**
+     * Emit object files.
+     * @param out The path of the object files.
+     */
     void emitObject(const std::filesystem::path& out);
 
   private:
@@ -31,7 +45,7 @@ class AnceCompiler
     llvm::LLVMContext llvm_context_;
     llvm::IRBuilder<> ir_;
 
-    llvm::TargetMachine* target_machine_{nullptr};
+    llvm::TargetMachine* target_machine_ {nullptr};
 
   private:
     llvm::Module*    module_;

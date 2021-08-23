@@ -7,9 +7,16 @@
 
 class Application;
 
+/**
+ * Gives the size of a value returned by an expression.
+ */
 class SizeofExpression : public BackingExpression
 {
   public:
+    /**
+     * Create a new sizeof expression expression.
+     * @param expression The expression to get the size of.
+     */
     explicit SizeofExpression(Expression* expression);
 
     void setScope(ance::Scope* scope) override;

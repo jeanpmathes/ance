@@ -7,6 +7,9 @@ namespace ance
 {
     class Scope;
 
+    /**
+     * Represents the double precision floating point type.
+     */
     class DoubleType : public FloatingPointType
     {
       public:
@@ -20,6 +23,10 @@ namespace ance
         inline static FloatingPointType* instance_ = nullptr;
 
       public:
+        /**
+         * Get the double type instance.
+         * @return The double type instance.
+         */
         static ance::FloatingPointType* get();
     };
 }

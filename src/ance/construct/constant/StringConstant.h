@@ -7,15 +7,28 @@
 
 namespace ance
 {
+    /**
+     * A string constant for the different string representations.
+     */
     class StringConstant : public Constant
     {
       public:
+        /**
+         * Create a new string constant.
+         * @param prefix The prefix determining the type.
+         * @param string The string content, used directly without any parsing.
+         * @param app The current application.
+         */
         StringConstant(std::string prefix, std::string string, Application& app);
 
         ance::Type* type() override;
-
         llvm::Constant* buildContent(llvm::Module* m) override;
 
+        /**
+         * Parse a given string to remove quotes and resolve escape sequences.
+         * @param unparsed The unparsed string.
+         * @return The parsed string.
+         */
         static std::string parse(const std::string& unparsed);
 
       private:

@@ -7,13 +7,20 @@
 
 namespace ance
 {
+    /**
+     * A floating point constant of any of the floating point types.
+     */
     class FloatConstant : public Constant
     {
       public:
+        /**
+         * Create a new floating point constant.
+         * @param number The number to use as value.
+         * @param type The type of float to use.
+         */
         FloatConstant(llvm::APFloat number, ance::FloatingPointType* type);
 
         ance::Type* type() override;
-
         llvm::Constant* buildContent(llvm::Module* m) override;
 
       private:

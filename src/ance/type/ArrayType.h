@@ -14,6 +14,9 @@ namespace ance
 {
     class Scope;
 
+    /**
+     * Represents array types. Array types have an element type and a length.
+     */
     class ArrayType : public Type
     {
       private:
@@ -52,6 +55,13 @@ namespace ance
         llvm::ArrayType* type_ {nullptr};
 
       public:
+        /**
+         * Get an array type instance.
+         * @param app The current application.
+         * @param element_type The element type of the array.
+         * @param size The size of the array. Must be greater than zero.
+         * @return The array type instance.
+         */
         static ance::Type* get(Application& app, Type* element_type, uint64_t size);
     };
 }

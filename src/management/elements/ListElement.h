@@ -8,6 +8,9 @@
 
 namespace data
 {
+    /**
+     * Represents an element containing a list.
+     */
     class ListElement : public data::Element
     {
       public:
@@ -15,6 +18,10 @@ namespace data
 
         [[nodiscard]] std::vector<std::reference_wrapper<const data::Element>>::const_iterator end() const override;
 
+        /**
+         * Add an element to the list.
+         * @param element The element to add.
+         */
         void put(std::unique_ptr<data::Element> element);
 
       private:

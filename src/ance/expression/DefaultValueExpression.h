@@ -5,17 +5,22 @@
 
 #include "ance/construct/constant/ExpressionBackedConstant.h"
 
+/**
+ * Provides the default value for a type.
+ */
 class DefaultValueExpression : public BackingConstantExpression
 {
   public:
+    /**
+     * Create a new default value expression.
+     * @param type The type to use the default value of.
+     */
     explicit DefaultValueExpression(ance::Type* type);
 
     ance::Type* type() override;
 
     ance::Value* getValue() override;
-
     ance::Constant* getConstantValue() override;
-
     llvm::Constant* buildContentConstant(llvm::LLVMContext& c) override;
 
     ~DefaultValueExpression() override;

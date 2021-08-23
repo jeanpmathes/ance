@@ -3,6 +3,9 @@
 
 #include "management/grammar/dataBaseVisitor.h"
 
+/**
+ * Reads a data file and builds the element structure. Base class is generated.
+ */
 class DataVisitor : public dataBaseVisitor
 {
   public:

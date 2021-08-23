@@ -12,6 +12,9 @@ class CompileContext;
 
 namespace ance
 {
+    /**
+     * Represents the unsigned integer pointer type. It is capable of holding any pointer as an integer.
+     */
     class UnsignedIntegerPointerType : public Type
     {
       public:
@@ -36,8 +39,17 @@ namespace ance
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:
+        /**
+         * Initialize the type.
+         * @param c The llvm context.
+         * @param app The current application.
+         */
         static void init(llvm::LLVMContext& c, Application& app);
 
+        /**
+         * Get the uiptr type instance.
+         * @return The instance.
+         */
         static ance::UnsignedIntegerPointerType* get();
     };
 }

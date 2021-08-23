@@ -13,6 +13,7 @@ void ance::DelayedValue::setValue(ance::Value* value)
 {
     assert(!value_);
     assert(value->type() == type() && "Type has to match.");
+
     value_ = value;
 }
 

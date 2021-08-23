@@ -12,13 +12,19 @@ class ConstantExpression;
 
 namespace ance
 {
+    /**
+     * An interface for constants that use expressions to provide their value.
+     */
     class ExpressionBackedConstant : public Constant
     {
       public:
+        /**
+         * Create a new expression backed constant.
+         * @param expression The backing constant expression.
+         */
         explicit ExpressionBackedConstant(BackingConstantExpression* expression);
 
         ance::Type* type() override;
-
         llvm::Constant* buildContent(llvm::Module* m) override;
 
       private:

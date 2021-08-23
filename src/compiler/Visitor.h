@@ -4,9 +4,16 @@
 #include "compiler/Application.h"
 #include "grammar/anceBaseVisitor.h"
 
+/**
+ * The ance visitor creating the application. Base class is generated.
+ */
 class Visitor : public anceBaseVisitor
 {
   public:
+    /**
+     * Create a new visitor.
+     * @param application The application to fill.
+     */
     explicit Visitor(Application& application);
 
     // Declarations

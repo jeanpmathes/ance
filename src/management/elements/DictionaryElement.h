@@ -8,11 +8,19 @@
 
 namespace data
 {
+    /**
+     * Represents an element that contains a dictionary.
+     */
     class DictionaryElement : public data::Element
     {
       public:
         std::optional<std::reference_wrapper<const data::Element>> operator[](const std::string& key) const override;
 
+        /**
+         * Add an element to the dictionary.
+         * @param key The key of the element.
+         * @param element The element.
+         */
         void put(const std::string& key, std::unique_ptr<data::Element> element);
 
       private:

@@ -5,6 +5,9 @@
 
 namespace ance
 {
+    /**
+     * Represents the void type. The void type is a special type representing no type or no value.
+     */
     class VoidType : public Type
     {
       public:
@@ -21,6 +24,10 @@ namespace ance
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:
+        /**
+         * Get the void type instance.
+         * @return The instance.
+         */
         static VoidType* get();
 
       private:

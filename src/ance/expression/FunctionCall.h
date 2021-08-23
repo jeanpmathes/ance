@@ -8,9 +8,17 @@ namespace ance
     class Scope;
 }
 
+/**
+ * A call to a function.
+ */
 class FunctionCall : public DelayableExpression
 {
   public:
+    /**
+     * Create a new function call.
+     * @param identifier The identifier of the function to call.
+     * @param arguments The arguments to pass to the called function.
+     */
     FunctionCall(std::string identifier, std::vector<Expression*> arguments);
 
     void setScope(ance::Scope* scope) override;
