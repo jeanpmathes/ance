@@ -24,7 +24,7 @@ namespace ance
          */
         explicit ByteConstant(uint8_t byte, Application& app);
 
-        ance::Type* type() override;
+        ance::Type*     type() override;
         llvm::Constant* buildContent(llvm::Module* m) override;
 
         /**

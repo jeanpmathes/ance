@@ -27,7 +27,7 @@ namespace ance
          */
         void setValue(ance::Value* value);
 
-        void buildNativeValue(CompileContext* context) override;
+        void         buildNativeValue(CompileContext* context) override;
         llvm::Value* getNativeValue() override;
 
       private:

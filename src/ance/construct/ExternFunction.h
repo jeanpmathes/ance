@@ -23,8 +23,8 @@ namespace ance
                        std::vector<ance::Parameter*> parameters,
                        ance::Location                location);
 
-        void buildName(CompileContext* context) override;
-        void build(CompileContext* context) override;
+        void         buildName(CompileContext* context) override;
+        void         build(CompileContext* context) override;
         ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
 
       protected:

@@ -28,7 +28,7 @@ class Application
     explicit Application(data::File& project);
 
     Application(const Application&) = delete;
-    Application(Application&&) = delete;
+    Application(Application&&)      = delete;
 
   public:
     /**

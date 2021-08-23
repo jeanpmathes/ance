@@ -32,13 +32,13 @@ namespace ance
          * Get the global scope.
          * @return The global scope.
          */
-        virtual ance::GlobalScope* getGlobalScope()                       = 0;
+        virtual ance::GlobalScope* getGlobalScope() = 0;
         /**
          * Get the debug scope for this scope.
          * @param context The current compile context.
          * @return The debug scope.
          */
-        virtual llvm::DIScope*     getDebugScope(CompileContext* context) = 0;
+        virtual llvm::DIScope* getDebugScope(CompileContext* context) = 0;
 
         /**
          * Validate this scope.
@@ -58,18 +58,18 @@ namespace ance
          * @param type_name The name of the type.
          * @return True if it is registered.
          */
-        virtual bool        isTypeRegistered(const std::string& type_name) = 0;
+        virtual bool isTypeRegistered(const std::string& type_name) = 0;
         /**
          * Get a type by name.
          * @param type_name The name of the type.
          * @return The type with the given name.
          */
-        virtual ance::Type* getType(const std::string& type_name)          = 0;
+        virtual ance::Type* getType(const std::string& type_name) = 0;
         /**
          * Register a type in this scope.
          * @param type The type to register.
          */
-        virtual void        registerType(ance::Type* type)                 = 0;
+        virtual void registerType(ance::Type* type) = 0;
 
         virtual ~Scope() = default;
     };

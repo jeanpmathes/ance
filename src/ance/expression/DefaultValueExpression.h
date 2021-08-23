@@ -19,7 +19,7 @@ class DefaultValueExpression : public BackingConstantExpression
 
     ance::Type* type() override;
 
-    ance::Value* getValue() override;
+    ance::Value*    getValue() override;
     ance::Constant* getConstantValue() override;
     llvm::Constant* buildContentConstant(llvm::LLVMContext& c) override;
 

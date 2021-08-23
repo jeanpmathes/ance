@@ -56,12 +56,12 @@ namespace ance
          * Build the declaration of this function, allowing it to be called.
          * @param context The current compile context.
          */
-        virtual void         buildName(CompileContext* context)                                                   = 0;
+        virtual void buildName(CompileContext* context) = 0;
         /**
          * Build the function definition. This will be called after building the name.
          * @param context The current compile context.
          */
-        virtual void         build(CompileContext* context)                                                       = 0;
+        virtual void build(CompileContext* context) = 0;
         /**
          * Build a call to this function.
          * @param arguments The arguments to pass to the function.

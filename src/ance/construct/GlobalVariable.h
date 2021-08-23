@@ -78,7 +78,7 @@ namespace ance
         void buildGlobal(CompileContext* context);
 
         ance::Value* getValue(CompileContext* context) override;
-        void setValue(ance::Value* value, CompileContext* context) override;
+        void         setValue(ance::Value* value, CompileContext* context) override;
 
       private:
         AccessModifier      access_;

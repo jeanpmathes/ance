@@ -55,7 +55,7 @@ namespace ance
          * @param c The llvm context.
          * @return The native type.
          */
-        llvm::Type*         getNativeType(llvm::LLVMContext& c);
+        llvm::Type* getNativeType(llvm::LLVMContext& c);
         /**
          * Get the content type. The semantic meaning of this type uses the content type.
          * @param c The llvm context.
@@ -94,13 +94,13 @@ namespace ance
          * @param indexer The indexer to check.
          * @return True if the indexer is defined.
          */
-        virtual bool         isIndexerDefined(Indexer indexer);
+        virtual bool isIndexerDefined(Indexer indexer);
 
         /**
          * Get the return type of the get indexer.
          * @return The return type.
          */
-        virtual ance::Type*  getIndexerReturnType();
+        virtual ance::Type* getIndexerReturnType();
 
         /**
          * Build a get indexer access.

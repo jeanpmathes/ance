@@ -20,7 +20,7 @@ namespace ance
          */
         SizeConstant(std::string size, Application& app);
 
-        ance::Type* type() override;
+        ance::Type*     type() override;
         llvm::Constant* buildContent(llvm::Module* m) override;
 
       private:

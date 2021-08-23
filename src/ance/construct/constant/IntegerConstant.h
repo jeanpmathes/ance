@@ -21,7 +21,7 @@ namespace ance
          */
         IntegerConstant(llvm::APInt integer, bool is_signed, Application& app);
 
-        ance::Type* type() override;
+        ance::Type*     type() override;
         llvm::Constant* buildContent(llvm::Module* m) override;
 
       private:

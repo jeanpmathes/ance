@@ -28,11 +28,11 @@ class Runtime
     void init(CompileContext* context);
 
   private:
-    llvm::FunctionType* allocate_dynamic_type_{nullptr};
-    llvm::Function*     allocate_dynamic_{nullptr};
+    llvm::FunctionType* allocate_dynamic_type_ {nullptr};
+    llvm::Function*     allocate_dynamic_ {nullptr};
 
-    llvm::FunctionType* delete_dynamic_type_{nullptr};
-    llvm::Function*     delete_dynamic_{nullptr};
+    llvm::FunctionType* delete_dynamic_type_ {nullptr};
+    llvm::Function*     delete_dynamic_ {nullptr};
 
   public:
     /**

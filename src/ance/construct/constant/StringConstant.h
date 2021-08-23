@@ -21,7 +21,7 @@ namespace ance
          */
         StringConstant(std::string prefix, std::string string, Application& app);
 
-        ance::Type* type() override;
+        ance::Type*     type() override;
         llvm::Constant* buildContent(llvm::Module* m) override;
 
         /**

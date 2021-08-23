@@ -20,7 +20,7 @@ namespace ance
          */
         FloatConstant(llvm::APFloat number, ance::FloatingPointType* type);
 
-        ance::Type* type() override;
+        ance::Type*     type() override;
         llvm::Constant* buildContent(llvm::Module* m) override;
 
       private:

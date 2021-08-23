@@ -74,8 +74,8 @@ namespace ance
          * Get the function scope of this function, in which the statements live.
          * @return The scope of this function. It is the child scope of the function.
          */
-        ance::LocalScope*  getFunctionScope();
-        llvm::DIScope*     getDebugScope(CompileContext* context) override;
+        ance::LocalScope* getFunctionScope();
+        llvm::DIScope*    getDebugScope(CompileContext* context) override;
 
         bool validate() override;
 
