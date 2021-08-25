@@ -8,9 +8,9 @@ RoughCast::RoughCast(ance::Type* target_type, Expression* expression)
     , return_value_(new ance::RoughlyCastedValue(target_type, expression->getValue()))
 {}
 
-void RoughCast::setScope(ance::Scope* scope)
+void RoughCast::setContainingScope(ance::Scope* scope)
 {
-    expression_->setScope(scope);
+    expression_->setContainingScope(scope);
 }
 
 ance::Type* RoughCast::type()

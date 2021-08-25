@@ -21,7 +21,7 @@ class RoughCast : public Expression
      */
     RoughCast(ance::Type* target_type, Expression* expression);
 
-    void setScope(ance::Scope* scope) override;
+    void setContainingScope(ance::Scope* scope) override;
 
     ance::Type* type() override;
 

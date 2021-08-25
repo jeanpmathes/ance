@@ -22,8 +22,10 @@ class VariableAccess : public DelayableExpression
      */
     explicit VariableAccess(std::string identifier, ance::Location location);
 
+  protected:
     void setScope(ance::Scope* scope) override;
 
+  public:
     ance::Type* type() override;
 
     void buildValue(CompileContext* context) override;

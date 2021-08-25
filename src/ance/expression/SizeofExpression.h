@@ -20,8 +20,10 @@ class SizeofExpression : public BackingExpression
      */
     explicit SizeofExpression(Expression* expression, ance::Location location);
 
+  protected:
     void setScope(ance::Scope* scope) override;
 
+  public:
     ance::Type* type() override;
 
     ance::Value* getValue() override;

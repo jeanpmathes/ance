@@ -26,8 +26,10 @@ class Allocation : public DelayableExpression
                Application&       app,
                ance::Location     location);
 
+  protected:
     void setScope(ance::Scope* scope) override;
 
+  public:
     ance::Type* type() override;
 
     void buildValue(CompileContext* context) override;

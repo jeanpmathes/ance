@@ -10,7 +10,7 @@ ReturnStatement::ReturnStatement(Expression* return_value, ance::Location locati
 
 void ReturnStatement::setFunction(ance::DefinedFunction* function)
 {
-    return_value_->setScope(function);
+    return_value_->setContainingScope(function);
 }
 
 void ReturnStatement::build(CompileContext*)

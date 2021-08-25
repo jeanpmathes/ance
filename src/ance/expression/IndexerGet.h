@@ -19,8 +19,10 @@ class IndexerGet : public DelayableExpression
      */
     IndexerGet(Expression* indexed, Expression* index, ance::Location location);
 
+  protected:
     void setScope(ance::Scope* scope) override;
 
+  public:
     ance::Type* type() override;
 
     void buildValue(CompileContext* context) override;

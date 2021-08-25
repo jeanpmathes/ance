@@ -29,7 +29,7 @@ ance::GlobalVariable::GlobalVariable(ance::Scope*        containing_scope,
     , is_constant_(is_constant)
     , constant_init_(constant_init)
 {
-    constant_init_->setScope(containing_scope);
+    constant_init_->setContainingScope(containing_scope);
     initial_value_ = constant_init_->getConstantValue();
 }
 
@@ -54,7 +54,7 @@ void ance::GlobalVariable::defineGlobal(ance::Scope*        containing_scope,
     constant_init_ = constant_init;
     location_      = location;
 
-    constant_init_->setScope(containing_scope);
+    constant_init_->setContainingScope(containing_scope);
     initial_value_ = constant_init_->getConstantValue();
 }
 

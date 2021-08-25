@@ -17,7 +17,7 @@ Allocation::Allocation(Runtime::Allocator allocation,
 
 void Allocation::setScope(ance::Scope* scope)
 {
-    if (count_) count_->setScope(scope);
+    if (count_) count_->setContainingScope(scope);
 }
 
 ance::Type* Allocation::type()

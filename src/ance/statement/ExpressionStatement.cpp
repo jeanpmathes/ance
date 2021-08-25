@@ -11,7 +11,7 @@ ExpressionStatement::ExpressionStatement(BuildableExpression* expression, ance::
 
 void ExpressionStatement::setFunction(ance::DefinedFunction* function)
 {
-    expression_->setScope(function);
+    expression_->setContainingScope(function);
 }
 
 void ExpressionStatement::build(CompileContext* context)

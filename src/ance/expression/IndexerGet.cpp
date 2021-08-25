@@ -10,8 +10,8 @@ IndexerGet::IndexerGet(Expression* indexed, Expression* index, ance::Location lo
 
 void IndexerGet::setScope(ance::Scope* scope)
 {
-    indexed_->setScope(scope);
-    index_->setScope(scope);
+    indexed_->setContainingScope(scope);
+    index_->setContainingScope(scope);
 }
 
 ance::Type* IndexerGet::type()

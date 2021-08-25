@@ -22,8 +22,10 @@ class FunctionCall : public DelayableExpression
      */
     FunctionCall(std::string identifier, std::vector<Expression*> arguments, ance::Location location);
 
+  protected:
     void setScope(ance::Scope* scope) override;
 
+  public:
     ance::Type* type() override;
 
     void buildValue(CompileContext* context) override;

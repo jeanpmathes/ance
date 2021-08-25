@@ -22,7 +22,7 @@ void FunctionCall::setScope(ance::Scope* scope)
 {
     scope_ = scope;
 
-    for (auto* arg : arguments_) { arg->setScope(scope); }
+    for (auto* arg : arguments_) { arg->setContainingScope(scope); }
 }
 
 ance::Type* FunctionCall::type()

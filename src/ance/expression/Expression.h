@@ -23,7 +23,7 @@ class Expression
      * Set the scope containing this expression.
      * @param scope The containing scope.
      */
-    virtual void setScope(ance::Scope* scope);
+    virtual void setContainingScope(ance::Scope* scope);
 
     /**
      * Get the return type of this expression.

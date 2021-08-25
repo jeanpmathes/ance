@@ -11,7 +11,7 @@ SizeofExpression::SizeofExpression(Expression* expression, ance::Location locati
 
 void SizeofExpression::setScope(ance::Scope* scope)
 {
-    expression_->setScope(scope);
+    expression_->setContainingScope(scope);
 }
 
 ance::Type* SizeofExpression::type()

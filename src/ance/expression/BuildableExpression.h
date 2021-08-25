@@ -24,8 +24,18 @@ class BuildableExpression : public virtual Expression
      */
     virtual void build(CompileContext* context) = 0;
 
+    void setContainingScope(ance::Scope* scope) final;
+
+  protected:
+    /**
+     * Override this method to receive the containing scope.
+     * @param scope The containing scope.
+     */
+    virtual void setScope(ance::Scope* scope);
+
   private:
     ance::Location location_;
+    ance::Scope*   containing_scope_;
 };
 
 #endif

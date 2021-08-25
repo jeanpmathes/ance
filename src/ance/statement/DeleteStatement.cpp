@@ -11,7 +11,7 @@ DeleteStatement::DeleteStatement(Expression* to_delete, bool delete_buffer, ance
 
 void DeleteStatement::setFunction(ance::DefinedFunction* function)
 {
-    to_delete_->setScope(function);
+    to_delete_->setContainingScope(function);
 }
 
 void DeleteStatement::build(CompileContext* context)

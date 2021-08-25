@@ -4,8 +4,8 @@ IndexerSet::IndexerSet(Expression* indexed, Expression* index) : indexed_(indexe
 
 void IndexerSet::setScope(ance::Scope* scope)
 {
-    indexed_->setScope(scope);
-    index_->setScope(scope);
+    indexed_->setContainingScope(scope);
+    index_->setContainingScope(scope);
 }
 
 void IndexerSet::assign(ance::Value* value, CompileContext* context)
