@@ -86,8 +86,8 @@ llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value*    indexed,
     llvm::Value* native_index = index->getContentValue();
     llvm::Value* indices[]    = {zero, native_index};
 
-    // This is a pointer as the internal storage of arrays is using pointers.
-    llvm::Value* array_ptr = indexed->getNativeValue();
+    llvm::Value* array_ptr =
+        indexed->getNativeValue();// This is a pointer as the internal storage of arrays is using pointers.
 
     // Check if index is smaller than size.
     llvm::Value* native_size =

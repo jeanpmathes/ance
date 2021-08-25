@@ -65,9 +65,10 @@ void Runtime::deleteDynamic(ance::Value* value, bool delete_buffer, CompileConte
     ance::Type* type = value->type();
     assert(ance::PointerType::isPointerType(type) && "Type of value to delete has to be pointer type.");
 
-    value->buildNativeValue(context);
+    value->buildContentValue(context);
 
-    llvm::Value* ptr        = value->getNativeValue();
+    llvm::Value* ptr =
+        value->getContentValue();// While native value is a pointer too, it might not be the pointer we need.
     llvm::Value* opaque_ptr = context->ir()->CreateBitCast(ptr, llvm::Type::getInt8PtrTy(*context->llvmContext()));
 
     llvm::Value* args[] = {opaque_ptr};
@@ -82,8 +83,8 @@ llvm::Value* Runtime::allocateAutomatic(ance::Type* type, ance::Value* count, Co
 
     if (count)
     {
-        count->buildNativeValue(context);
-        count_value = count->getNativeValue();
+        count->buildContentValue(context);
+        count_value = count->getContentValue();
     }
 
     return context->ir()->CreateAlloca(type->getContentType(*context->llvmContext()), count_value);
@@ -104,7 +105,7 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
                                    type->getContentSize(context->module()).getFixedSize(),
                                    false);
         count->buildNativeValue(context);
-        llvm::Value* element_count = count->getNativeValue();
+        llvm::Value* element_count = count->getContentValue();
 
         size = context->ir()->CreateMul(element_size, element_count);
     }

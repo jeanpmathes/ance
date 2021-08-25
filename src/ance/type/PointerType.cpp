@@ -78,12 +78,12 @@ llvm::Value* ance::PointerType::buildGetElementPointer(ance::Value*    indexed,
                                                        CompileContext* context)
 {
     indexed->buildContentValue(context);
-    index->buildNativeValue(context);
+    index->buildContentValue(context);
 
     llvm::Value* native_index = index->getContentValue();
     llvm::Value* indices[]    = {native_index};
 
-    llvm::Value* ptr = indexed->getNativeValue();
+    llvm::Value* ptr = indexed->getContentValue();//Pointer to content is instead of pointer to pointer is required.
 
     llvm::Value* element_ptr = context->ir()->CreateGEP(ptr, indices);
     return element_ptr;
