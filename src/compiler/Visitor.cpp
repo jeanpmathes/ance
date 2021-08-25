@@ -518,7 +518,7 @@ antlrcpp::Any Visitor::visitFinalCopyAssignment(anceParser::FinalCopyAssignmentC
 ance::Location Visitor::location(antlr4::ParserRuleContext* ctx)
 {
     unsigned line   = ctx->getStart()->getLine();
-    unsigned column = ctx->getStart()->getCharPositionInLine();
+    unsigned column = ctx->getStart()->getCharPositionInLine() + 1;
 
     return ance::Location(line, column);
 }
