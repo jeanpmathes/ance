@@ -21,7 +21,8 @@ class DeleteStatement : public Statement
 
     void setFunction(ance::DefinedFunction* function) override;
 
-    void build(CompileContext* context) override;
+  protected:
+    void doBuild(CompileContext* context) override;
 
   private:
     Expression* to_delete_;

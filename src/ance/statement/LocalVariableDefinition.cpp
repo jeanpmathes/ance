@@ -28,7 +28,7 @@ void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
     assigned_->setContainingScope(function);
 }
 
-void LocalVariableDefinition::build(CompileContext* context)
+void LocalVariableDefinition::doBuild(CompileContext* context)
 {
     variable_->build(context);
 }

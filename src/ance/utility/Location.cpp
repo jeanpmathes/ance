@@ -14,7 +14,7 @@ unsigned ance::Location::column() const
     return column_;
 }
 
-llvm::DebugLoc ance::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope)
+llvm::DebugLoc ance::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope) const
 {
     return llvm::DILocation::get(*llvm_context, line_, column_, scope);
 }

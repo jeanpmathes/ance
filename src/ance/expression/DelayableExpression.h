@@ -21,14 +21,6 @@ class DelayableExpression
     explicit DelayableExpression(ance::Location location);
 
   public:
-    /**
-     * Build the expression, and set the value if necessary.
-     * @param context The current compile context.
-     */
-    virtual void buildValue(CompileContext* context) = 0;
-
-    void build(CompileContext* context) final;
-
     ance::Value* getValue() override;
 
   protected:

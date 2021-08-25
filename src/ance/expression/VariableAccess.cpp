@@ -20,7 +20,7 @@ ance::Type* VariableAccess::type()
     return variable_->type();
 }
 
-void VariableAccess::buildValue(CompileContext* context)
+void VariableAccess::doBuild(CompileContext* context)
 {
     ance::Value* value = variable_->getValue(context);
     setValue(value);

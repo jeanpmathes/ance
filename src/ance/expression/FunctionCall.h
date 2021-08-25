@@ -28,8 +28,10 @@ class FunctionCall : public DelayableExpression
   public:
     ance::Type* type() override;
 
-    void buildValue(CompileContext* context) override;
+  protected:
+    void doBuild(CompileContext* context) override;
 
+  public:
     ~FunctionCall() override;
 
   private:

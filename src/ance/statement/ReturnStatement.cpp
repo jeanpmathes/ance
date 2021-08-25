@@ -13,7 +13,7 @@ void ReturnStatement::setFunction(ance::DefinedFunction* function)
     return_value_->setContainingScope(function);
 }
 
-void ReturnStatement::build(CompileContext*)
+void ReturnStatement::doBuild(CompileContext*)
 {
     getContainingFunction()->addReturn(return_value_ ? return_value_->getValue() : nullptr);
 }

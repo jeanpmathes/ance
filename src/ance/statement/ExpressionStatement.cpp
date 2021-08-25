@@ -14,7 +14,7 @@ void ExpressionStatement::setFunction(ance::DefinedFunction* function)
     expression_->setContainingScope(function);
 }
 
-void ExpressionStatement::build(CompileContext* context)
+void ExpressionStatement::doBuild(CompileContext* context)
 {
     expression_->build(context);
 }

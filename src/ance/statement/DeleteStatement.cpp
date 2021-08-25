@@ -14,7 +14,7 @@ void DeleteStatement::setFunction(ance::DefinedFunction* function)
     to_delete_->setContainingScope(function);
 }
 
-void DeleteStatement::build(CompileContext* context)
+void DeleteStatement::doBuild(CompileContext* context)
 {
     context->runtime()->deleteDynamic(to_delete_->getValue(), delete_buffer_, context);
 }

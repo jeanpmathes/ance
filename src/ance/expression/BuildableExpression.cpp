@@ -1,6 +1,8 @@
 #include "BuildableExpression.h"
 
-BuildableExpression::BuildableExpression(ance::Location location) : location_(location) {}
+#include "compiler/CompileContext.h"
+
+BuildableExpression::BuildableExpression(ance::Location location) : location_(location), containing_scope_ {nullptr} {}
 
 void BuildableExpression::setContainingScope(ance::Scope* scope)
 {
@@ -9,3 +11,10 @@ void BuildableExpression::setContainingScope(ance::Scope* scope)
 }
 
 void BuildableExpression::setScope(ance::Scope*) {}
+
+void BuildableExpression::build(CompileContext* context)
+{
+    context->setDebugLocation(location_, containing_scope_);
+    doBuild(context);
+    context->resetDebugLocation();
+}

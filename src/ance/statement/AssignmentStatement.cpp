@@ -17,7 +17,7 @@ void AssignmentStatement::setFunction(ance::DefinedFunction* function)
     assigned_->setContainingScope(function);
 }
 
-void AssignmentStatement::build(CompileContext* context)
+void AssignmentStatement::doBuild(CompileContext* context)
 {
     assignable_->assign(assigned_->getValue(), context);
 }

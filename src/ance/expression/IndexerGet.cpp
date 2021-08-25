@@ -19,7 +19,7 @@ ance::Type* IndexerGet::type()
     return indexed_->type()->getIndexerReturnType();
 }
 
-void IndexerGet::buildValue(CompileContext* context)
+void IndexerGet::doBuild(CompileContext* context)
 {
     ance::Type* indexed_type = indexed_->type();
     assert(indexed_type->isIndexerDefined(Indexer::GET) && "Type does not support this indexer.");

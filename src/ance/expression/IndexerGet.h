@@ -25,8 +25,10 @@ class IndexerGet : public DelayableExpression
   public:
     ance::Type* type() override;
 
-    void buildValue(CompileContext* context) override;
+  protected:
+    void doBuild(CompileContext* context) override;
 
+  public:
     ~IndexerGet() override;
 
   private:

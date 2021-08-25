@@ -85,9 +85,6 @@ void ance::DefinedFunction::build(CompileContext* context)
 
     for (auto* statement : statements_)
     {
-        context->ir()->SetCurrentDebugLocation(
-            statement->location().getDebugLoc(context->llvmContext(), function_scope_->getDebugScope(context)));
-
         statement->build(context);
 
         if (has_return_)

@@ -9,7 +9,7 @@ ance::Type* ance::ExpressionBackedValue::type()
 
 void ance::ExpressionBackedValue::buildNativeValue(CompileContext* context)
 {
-    expression_->buildBackingValue(context);
+    expression_->build(context);
 }
 
 llvm::Value* ance::ExpressionBackedValue::getNativeValue()

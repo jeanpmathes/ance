@@ -19,15 +19,10 @@ class BackingExpression
      */
     explicit BackingExpression(ance::Location location);
 
+  protected:
+    void doBuild(CompileContext* context) final;
+
   public:
-    /**
-     * Build the backing value.
-     * @param context The current compile context.
-     */
-    void buildBackingValue(CompileContext* context);
-
-    void build(CompileContext* context) final;
-
     /**
      * Get the native value. Must be built before.
      * @return The native value.

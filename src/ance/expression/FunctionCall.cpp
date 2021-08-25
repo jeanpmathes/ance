@@ -30,7 +30,7 @@ ance::Type* FunctionCall::type()
     return scope_->getGlobalScope()->getFunction(identifier_)->returnType();
 }
 
-void FunctionCall::buildValue(CompileContext* context)
+void FunctionCall::doBuild(CompileContext* context)
 {
     ance::Function* fn = context->application()->globalScope()->getFunction(identifier_);
 

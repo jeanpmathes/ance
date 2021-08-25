@@ -1,5 +1,7 @@
 #include "Statement.h"
 
+#include "ance/construct/DefinedFunction.h"
+
 Statement::Statement(ance::Location location) : location_(location) {}
 
 void Statement::setContainingFunction(ance::DefinedFunction* function)
@@ -20,4 +22,11 @@ ance::DefinedFunction* Statement::getContainingFunction() const
 ance::Location Statement::location() const
 {
     return location_;
+}
+
+void Statement::build(CompileContext* context)
+{
+    context->setDebugLocation(location(), getContainingFunction());
+    doBuild(context);
+    context->resetDebugLocation();
 }

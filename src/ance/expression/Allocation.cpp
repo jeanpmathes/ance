@@ -25,7 +25,7 @@ ance::Type* Allocation::type()
     return return_type_;
 }
 
-void Allocation::buildValue(CompileContext* context)
+void Allocation::doBuild(CompileContext* context)
 {
     ance::Value* count = count_ ? count_->getValue() : nullptr;
     ance::Value* ptr   = context->runtime()->allocate(allocation_, allocated_type_, count, context);

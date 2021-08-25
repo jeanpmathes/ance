@@ -64,6 +64,8 @@ void AnceCompiler::compile()
     application_.globalScope()->buildFunctionNames(context_);
     application_.globalScope()->buildFunctions(context_);
 
+    assert(context_->allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
+
     llvm::FunctionType* main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(llvm_context_), false);
     llvm::Function*     main      = module_->getFunction("main");
 

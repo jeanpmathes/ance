@@ -56,8 +56,16 @@ class Statement
      * Build this statement.
      * @param context The current compile context.
      */
-    virtual void build(CompileContext* context) = 0;
+    void build(CompileContext* context);
 
+  protected:
+    /**
+     * Build this statement. Do not call this method, use build instead.
+     * @param context The current compile context.
+     */
+    virtual void doBuild(CompileContext* context) = 0;
+
+  public:
     virtual ~Statement() = default;
 
   private:

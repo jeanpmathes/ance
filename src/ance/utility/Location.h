@@ -35,7 +35,7 @@ namespace ance
          * @param scope The containing debug scope.
          * @return The debug location.
          */
-        llvm::DebugLoc getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope);
+        llvm::DebugLoc getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope) const;
 
       private:
         unsigned line_;

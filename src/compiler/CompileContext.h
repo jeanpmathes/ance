@@ -1,6 +1,8 @@
 #ifndef ANCE_SRC_COMPILER_COMPILECONTEXT_H_
 #define ANCE_SRC_COMPILER_COMPILECONTEXT_H_
 
+#include <stack>
+
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
@@ -83,6 +85,24 @@ class CompileContext
      */
     llvm::DIFile* sourceFile();
 
+    /**
+     * Set the current debug location.
+     * @param location The source location.
+     * @param scope The current scope.
+     */
+    void setDebugLocation(ance::Location location, ance::Scope* scope);
+
+    /**
+     * Reset the previous debug location.
+     */
+    void resetDebugLocation();
+
+    /**
+     * Get whether all debug locations were popped.
+     * @return True if all locations were popped correctly.
+     */
+    bool allDebugLocationsPopped();
+
   private:
     Application*         application_;
     Runtime*             runtime_;
@@ -92,6 +112,8 @@ class CompileContext
     llvm::DIBuilder*     di_builder_;
     llvm::DICompileUnit* unit_;
     llvm::DIFile*        src_file_;
+
+    std::stack<llvm::DebugLoc, std::vector<llvm::DebugLoc>> debug_loc_stack_;
 };
 
 #endif

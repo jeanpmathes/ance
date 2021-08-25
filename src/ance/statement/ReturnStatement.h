@@ -20,7 +20,8 @@ class ReturnStatement : public Statement
 
     void setFunction(ance::DefinedFunction* function) override;
 
-    void build(CompileContext* context) override;
+  protected:
+    void doBuild(CompileContext* context) override;
 
   private:
     Expression* return_value_;

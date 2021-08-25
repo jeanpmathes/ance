@@ -28,6 +28,7 @@ class SizeofExpression : public BackingExpression
 
     ance::Value* getValue() override;
 
+  protected:
     llvm::Value* buildNativeValue(CompileContext* context) override;
 
   private:

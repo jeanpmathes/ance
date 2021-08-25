@@ -2,15 +2,10 @@
 
 BackingExpression::BackingExpression(ance::Location location) : BuildableExpression(location) {}
 
-void BackingExpression::buildBackingValue(CompileContext* context)
+void BackingExpression::doBuild(CompileContext* context)
 {
     assert(!native_value_ && "Expressions must be built only once.");
     native_value_ = buildNativeValue(context);
-}
-
-void BackingExpression::build(CompileContext* context)
-{
-    buildBackingValue(context);
 }
 
 llvm::Value* BackingExpression::getNativeValue()

@@ -19,7 +19,7 @@ void ance::DelayedValue::setValue(ance::Value* value)
 
 void ance::DelayedValue::buildNativeValue(CompileContext* context)
 {
-    expression_->buildValue(context);
+    expression_->build(context);
     value_->buildNativeValue(context);
 }
 

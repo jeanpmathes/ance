@@ -57,3 +57,24 @@ llvm::DIFile* CompileContext::sourceFile()
 {
     return src_file_;
 }
+
+void CompileContext::setDebugLocation(ance::Location location, ance::Scope* scope)
+{
+    llvm::DebugLoc previous_location = ir()->getCurrentDebugLocation();
+    ir()->SetCurrentDebugLocation(location.getDebugLoc(llvmContext(), scope->getDebugScope(this)));
+
+    debug_loc_stack_.push(previous_location);
+}
+
+void CompileContext::resetDebugLocation()
+{
+    llvm::DebugLoc previous_location = debug_loc_stack_.top();
+    ir()->SetCurrentDebugLocation(previous_location);
+
+    debug_loc_stack_.pop();
+}
+
+bool CompileContext::allDebugLocationsPopped()
+{
+    return debug_loc_stack_.empty();
+}

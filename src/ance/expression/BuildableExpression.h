@@ -18,13 +18,13 @@ class BuildableExpression : public virtual Expression
     explicit BuildableExpression(ance::Location location);
 
   public:
+    void setContainingScope(ance::Scope* scope) final;
+
     /**
      * Build the expression.
      * @param context The current compile context.
      */
-    virtual void build(CompileContext* context) = 0;
-
-    void setContainingScope(ance::Scope* scope) final;
+    void build(CompileContext* context);
 
   protected:
     /**
@@ -32,6 +32,12 @@ class BuildableExpression : public virtual Expression
      * @param scope The containing scope.
      */
     virtual void setScope(ance::Scope* scope);
+
+    /**
+    * Build the expression. This method should not be called, use build instead.
+    * @param context The current compile context.
+    */
+    virtual void doBuild(CompileContext* context) = 0;
 
   private:
     ance::Location location_;
