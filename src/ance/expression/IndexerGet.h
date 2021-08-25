@@ -15,8 +15,9 @@ class IndexerGet : public DelayableExpression
      * Create a new indexer get.
      * @param indexed The indexed value.
      * @param index The index to use.
+     * @param location The source location.
      */
-    IndexerGet(Expression* indexed, Expression* index);
+    IndexerGet(Expression* indexed, Expression* index, ance::Location location);
 
     void setScope(ance::Scope* scope) override;
 

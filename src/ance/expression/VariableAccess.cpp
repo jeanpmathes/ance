@@ -5,7 +5,10 @@
 #include "ance/construct/value/Value.h"
 #include "ance/scope/Scope.h"
 
-VariableAccess::VariableAccess(std::string identifier) : identifier_(std::move(identifier)) {}
+VariableAccess::VariableAccess(std::string identifier, ance::Location location)
+    : DelayableExpression(location)
+    , identifier_(std::move(identifier))
+{}
 
 void VariableAccess::setScope(ance::Scope* scope)
 {

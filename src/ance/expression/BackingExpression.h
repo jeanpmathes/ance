@@ -12,6 +12,13 @@ class BackingExpression
     : public virtual Expression
     , public BuildableExpression
 {
+  protected:
+    /**
+     * Create a new backing expression with a given source location.
+     * @param location The source location.
+     */
+    explicit BackingExpression(ance::Location location);
+
   public:
     /**
      * Build the backing value.

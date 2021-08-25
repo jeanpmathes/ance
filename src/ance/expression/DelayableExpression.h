@@ -13,6 +13,13 @@ class DelayableExpression
     : public virtual Expression
     , public BuildableExpression
 {
+  protected:
+    /**
+     * Create a new delayable expression with a given source location.
+     * @param location The source location.
+     */
+    explicit DelayableExpression(ance::Location location);
+
   public:
     /**
      * Build the expression, and set the value if necessary.

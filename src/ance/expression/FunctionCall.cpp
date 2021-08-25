@@ -12,8 +12,9 @@ namespace ance
     class Function;
 }
 
-FunctionCall::FunctionCall(std::string identifier, std::vector<Expression*> arguments)
-    : identifier_(std::move(identifier))
+FunctionCall::FunctionCall(std::string identifier, std::vector<Expression*> arguments, ance::Location location)
+    : DelayableExpression(location)
+    , identifier_(std::move(identifier))
     , arguments_(std::move(arguments))
 {}
 

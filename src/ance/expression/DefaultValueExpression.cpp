@@ -4,7 +4,10 @@
 #include "ance/construct/value/Value.h"
 #include "ance/type/Type.h"
 
-DefaultValueExpression::DefaultValueExpression(ance::Type* type) : type_(type) {}
+DefaultValueExpression::DefaultValueExpression(ance::Type* type, ance::Location location)
+    : BackingConstantExpression(location)
+    , type_(type)
+{}
 
 ance::Type* DefaultValueExpression::type()
 {

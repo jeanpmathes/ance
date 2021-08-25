@@ -4,7 +4,10 @@
 #include "ance/type/SizeType.h"
 #include "compiler/CompileContext.h"
 
-SizeofExpression::SizeofExpression(Expression* expression) : expression_(expression) {}
+SizeofExpression::SizeofExpression(Expression* expression, ance::Location location)
+    : BackingExpression(location)
+    , expression_(expression)
+{}
 
 void SizeofExpression::setScope(ance::Scope* scope)
 {

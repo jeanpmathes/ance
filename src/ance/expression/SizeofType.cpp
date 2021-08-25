@@ -3,7 +3,7 @@
 #include "ance/type/SizeType.h"
 #include "compiler/CompileContext.h"
 
-SizeofType::SizeofType(ance::Type* type) : type_(type) {}
+SizeofType::SizeofType(ance::Type* type, ance::Location location) : BackingExpression(location), type_(type) {}
 
 ance::Type* SizeofType::type()
 {

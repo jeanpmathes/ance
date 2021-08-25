@@ -16,8 +16,9 @@ class SizeofType : public BackingExpression
     /**
      * Create a new sizeof type expression.
      * @param type The type to provide the size of.
+     * @param location The source location.
      */
-    explicit SizeofType(ance::Type* type);
+    explicit SizeofType(ance::Type* type, ance::Location location);
 
     ance::Type* type() override;
 

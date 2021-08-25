@@ -79,7 +79,7 @@ antlrcpp::Any Visitor::visitVariableDeclaration(anceParser::VariableDeclarationC
     }
     else
     {
-        const_expr = new DefaultValueExpression(type);
+        const_expr = new DefaultValueExpression(type, location(ctx));
     }
 
     application_.globalScope()
@@ -172,7 +172,7 @@ antlrcpp::Any Visitor::visitLocalVariableDefinition(anceParser::LocalVariableDef
     else
     {
         assigner = Assigner::COPY_ASSIGNMENT;
-        assigned = new DefaultValueExpression(type);
+        assigned = new DefaultValueExpression(type, location(ctx));
     }
 
     auto* statement = new LocalVariableDefinition(identifier, type, assigner, assigned, location(ctx));
@@ -240,7 +240,7 @@ antlrcpp::Any Visitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
     // Call to highest scope intentional, as actual scope of called function is not known.
     application_.globalScope()->addFunctionName(identifier);
 
-    return static_cast<Expression*>(new FunctionCall(identifier, arguments));
+    return static_cast<Expression*>(new FunctionCall(identifier, arguments, location(ctx)));
 }
 
 antlrcpp::Any Visitor::visitArguments(anceParser::ArgumentsContext* ctx)
@@ -255,7 +255,7 @@ antlrcpp::Any Visitor::visitArguments(anceParser::ArgumentsContext* ctx)
 antlrcpp::Any Visitor::visitVariableAccess(anceParser::VariableAccessContext* ctx)
 {
     std::string identifier = ctx->IDENTIFIER()->getText();
-    Expression* expression = new VariableAccess(identifier);
+    Expression* expression = new VariableAccess(identifier, location(ctx));
     return expression;
 }
 
@@ -267,7 +267,7 @@ antlrcpp::Any Visitor::visitAllocation(anceParser::AllocationContext* ctx)
 
     if (ctx->expression()) { count = visit(ctx->expression()); }
 
-    return static_cast<Expression*>(new Allocation(allocator, type, count, application_));
+    return static_cast<Expression*>(new Allocation(allocator, type, count, application_, location(ctx)));
 }
 
 antlrcpp::Any Visitor::visitRoughCast(anceParser::RoughCastContext* ctx)
@@ -282,14 +282,14 @@ antlrcpp::Any Visitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)
 {
     ance::Type* type = visit(ctx->type());
 
-    return static_cast<Expression*>(new SizeofType(type));
+    return static_cast<Expression*>(new SizeofType(type, location(ctx)));
 }
 
 antlrcpp::Any Visitor::visitSizeofExpression(anceParser::SizeofExpressionContext* ctx)
 {
     Expression* expr = visit(ctx->expression());
 
-    return static_cast<Expression*>(new SizeofExpression(expr));
+    return static_cast<Expression*>(new SizeofExpression(expr, location(ctx)));
 }
 
 antlrcpp::Any Visitor::visitIndexerGet(anceParser::IndexerGetContext* ctx)
@@ -297,7 +297,7 @@ antlrcpp::Any Visitor::visitIndexerGet(anceParser::IndexerGetContext* ctx)
     Expression* indexed = visit(ctx->indexed);
     Expression* index   = visit(ctx->index);
 
-    return static_cast<Expression*>(new IndexerGet(indexed, index));
+    return static_cast<Expression*>(new IndexerGet(indexed, index, location(ctx)));
 }
 
 antlrcpp::Any Visitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)

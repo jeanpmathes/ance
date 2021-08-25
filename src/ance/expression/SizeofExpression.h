@@ -16,8 +16,9 @@ class SizeofExpression : public BackingExpression
     /**
      * Create a new sizeof expression expression.
      * @param expression The expression to get the size of.
+     * @param location The source location.
      */
-    explicit SizeofExpression(Expression* expression);
+    explicit SizeofExpression(Expression* expression, ance::Location location);
 
     void setScope(ance::Scope* scope) override;
 

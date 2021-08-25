@@ -1,5 +1,7 @@
 #include "DelayableExpression.h"
 
+DelayableExpression::DelayableExpression(ance::Location location) : BuildableExpression(location) {}
+
 ance::Value* DelayableExpression::getValue()
 {
     return value_;

@@ -3,8 +3,13 @@
 #include "ance/type/PointerType.h"
 #include "compiler/CompileContext.h"
 
-Allocation::Allocation(Runtime::Allocator allocation, ance::Type* type, Expression* count, Application& app)
-    : allocation_(allocation)
+Allocation::Allocation(Runtime::Allocator allocation,
+                       ance::Type*        type,
+                       Expression*        count,
+                       Application&       app,
+                       ance::Location     location)
+    : DelayableExpression(location)
+    , allocation_(allocation)
     , allocated_type_(type)
     , count_(count)
     , return_type_(ance::PointerType::get(app, type))

@@ -14,8 +14,9 @@ class DefaultValueExpression : public BackingConstantExpression
     /**
      * Create a new default value expression.
      * @param type The type to use the default value of.
+     * @param location The source location.
      */
-    explicit DefaultValueExpression(ance::Type* type);
+    explicit DefaultValueExpression(ance::Type* type, ance::Location location);
 
     ance::Type* type() override;
 

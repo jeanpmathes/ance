@@ -18,8 +18,9 @@ class FunctionCall : public DelayableExpression
      * Create a new function call.
      * @param identifier The identifier of the function to call.
      * @param arguments The arguments to pass to the called function.
+     * @param location The source location.
      */
-    FunctionCall(std::string identifier, std::vector<Expression*> arguments);
+    FunctionCall(std::string identifier, std::vector<Expression*> arguments, ance::Location location);
 
     void setScope(ance::Scope* scope) override;
 

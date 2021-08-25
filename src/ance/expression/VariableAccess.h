@@ -18,8 +18,9 @@ class VariableAccess : public DelayableExpression
     /**
      * Create a new variable access.
      * @param identifier The identifier of the variable to access.
+     * @param location The source location.
      */
-    explicit VariableAccess(std::string identifier);
+    explicit VariableAccess(std::string identifier, ance::Location location);
 
     void setScope(ance::Scope* scope) override;
 

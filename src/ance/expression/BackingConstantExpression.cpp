@@ -4,6 +4,8 @@
 #include "ance/utility/Values.h"
 #include "compiler/CompileContext.h"
 
+BackingConstantExpression::BackingConstantExpression(ance::Location location) : BackingExpression(location) {}
+
 void BackingConstantExpression::buildConstant(llvm::LLVMContext& c)
 {
     assert(!content_constant_ && "Content may only be built once.");
