@@ -36,7 +36,7 @@ ance::GlobalVariable::GlobalVariable(ance::Scope*        containing_scope,
 ance::GlobalVariable::GlobalVariable(std::string identifier)
     : Variable(std::move(identifier))
     , access_(AccessModifier::PRIVATE_ACCESS)
-    , location_(0, 0)
+    , location_(0, 0, 0, 0)
 {}
 
 void ance::GlobalVariable::defineGlobal(ance::Scope*        containing_scope,

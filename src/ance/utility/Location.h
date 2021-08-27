@@ -13,10 +13,12 @@ namespace ance
       public:
         /**
          * Create a source file location.
-         * @param line The line number.
-         * @param column The column number.
+         * @param start_line The line number of the start of the location.
+         * @param start_column The column number of the start of the location.
+         * @param end_line The line end of the location.
+         * @param end_column The column end of the location.
          */
-        Location(unsigned line, unsigned column);
+        Location(unsigned int start_line, unsigned int start_column, unsigned int end_line, unsigned int end_column);
 
         /**
          * Get the line number.
@@ -38,8 +40,10 @@ namespace ance
         llvm::DebugLoc getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope) const;
 
       private:
-        unsigned line_;
-        unsigned column_;
+        unsigned                  start_line_;
+        unsigned                  start_column_;
+        [[maybe_unused]] unsigned end_line_;
+        [[maybe_unused]] unsigned end_column_;
     };
 }
 

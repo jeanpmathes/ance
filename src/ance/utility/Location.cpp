@@ -2,19 +2,27 @@
 
 #include "llvm/IR/DIBuilder.h"
 
-ance::Location::Location(unsigned int line, unsigned int column) : line_(line), column_(column) {}
+ance::Location::Location(unsigned int start_line,
+                         unsigned int start_column,
+                         unsigned int end_line,
+                         unsigned int end_column)
+    : start_line_(start_line)
+    , start_column_(start_column)
+    , end_line_(end_line)
+    , end_column_(end_column)
+{}
 
 unsigned ance::Location::line() const
 {
-    return line_;
+    return start_line_;
 }
 
 unsigned ance::Location::column() const
 {
-    return column_;
+    return start_column_;
 }
 
 llvm::DebugLoc ance::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope) const
 {
-    return llvm::DILocation::get(*llvm_context, line_, column_, scope);
+    return llvm::DILocation::get(*llvm_context, line(), column(), scope);
 }
