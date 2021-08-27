@@ -216,7 +216,7 @@ antlrcpp::Any Visitor::visitVariableAssignable(anceParser::VariableAssignableCon
 {
     std::string identifier = ctx->IDENTIFIER()->getText();
 
-    return static_cast<Assignable*>(new VariableAssignable(identifier));
+    return static_cast<Assignable*>(new VariableAssignable(identifier, location(ctx)));
 }
 
 antlrcpp::Any Visitor::visitIndexerSet(anceParser::IndexerSetContext* ctx)
@@ -224,12 +224,12 @@ antlrcpp::Any Visitor::visitIndexerSet(anceParser::IndexerSetContext* ctx)
     Expression* indexed = visit(ctx->indexed);
     Expression* index   = visit(ctx->index);
 
-    return static_cast<Assignable*>(new IndexerSet(indexed, index));
+    return static_cast<Assignable*>(new IndexerSet(indexed, index, location(ctx)));
 }
 
-antlrcpp::Any Visitor::visitDiscard(anceParser::DiscardContext*)
+antlrcpp::Any Visitor::visitDiscard(anceParser::DiscardContext* ctx)
 {
-    return static_cast<Assignable*>(new Discard());
+    return static_cast<Assignable*>(new Discard(location(ctx)));
 }
 
 antlrcpp::Any Visitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)

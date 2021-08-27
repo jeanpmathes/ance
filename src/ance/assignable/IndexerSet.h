@@ -15,11 +15,13 @@ class IndexerSet : public Assignable
      * Create a new IndexerSet.
      * @param indexed The expression providing the value to be indexed.
      * @param index The expression providing the value to use as index.
+     * @param location The source location.
      */
-    explicit IndexerSet(Expression* indexed, Expression* index);
+    explicit IndexerSet(Expression* indexed, Expression* index, ance::Location location);
 
+  protected:
     void setScope(ance::Scope* scope) override;
-    void assign(ance::Value* value, CompileContext* context) override;
+    void buildAssignment(ance::Value* value, CompileContext* context) override;
 
   private:
     Expression* indexed_;

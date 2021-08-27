@@ -14,11 +14,13 @@ class VariableAssignable : public Assignable
     /**
      * Create a new VariableAssignable.
      * @param variable_identifier The identifier of the variable to assign.
+     * @param location The source location.
      */
-    explicit VariableAssignable(std::string variable_identifier);
+    explicit VariableAssignable(std::string variable_identifier, ance::Location location);
 
+  protected:
     void setScope(ance::Scope* scope) override;
-    void assign(ance::Value* value, CompileContext* context) override;
+    void buildAssignment(ance::Value* value, CompileContext* context) override;
 
   private:
     std::string  variable_identifier_;

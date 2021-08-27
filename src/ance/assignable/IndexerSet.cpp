@@ -1,6 +1,10 @@
 #include "IndexerSet.h"
 
-IndexerSet::IndexerSet(Expression* indexed, Expression* index) : indexed_(indexed), index_(index) {}
+IndexerSet::IndexerSet(Expression* indexed, Expression* index, ance::Location location)
+    : Assignable(location)
+    , indexed_(indexed)
+    , index_(index)
+{}
 
 void IndexerSet::setScope(ance::Scope* scope)
 {
@@ -8,7 +12,7 @@ void IndexerSet::setScope(ance::Scope* scope)
     index_->setContainingScope(scope);
 }
 
-void IndexerSet::assign(ance::Value* value, CompileContext* context)
+void IndexerSet::buildAssignment(ance::Value* value, CompileContext* context)
 {
     ance::Type* indexed_type = indexed_->type();
     assert(indexed_type->isIndexerDefined(Indexer::SET) && "Type does not support this indexer.");

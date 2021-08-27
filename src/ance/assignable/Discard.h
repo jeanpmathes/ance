@@ -9,8 +9,15 @@
 class Discard : public Assignable
 {
   public:
+    /**
+     * Create a new discard assignable.
+     * @param location The source location.
+     */
+    explicit Discard(ance::Location location);
+
+  protected:
     void setScope(ance::Scope* scope) override;
-    void assign(ance::Value* value, CompileContext* context) override;
+    void buildAssignment(ance::Value* value, CompileContext* context) override;
 };
 
 #endif

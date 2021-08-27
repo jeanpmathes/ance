@@ -13,7 +13,7 @@ AssignmentStatement::AssignmentStatement(Assignable* assignable, Expression* ass
 
 void AssignmentStatement::setFunction(ance::DefinedFunction* function)
 {
-    assignable_->setScope(function);
+    assignable_->setContainingScope(function);
     assigned_->setContainingScope(function);
 }
 
