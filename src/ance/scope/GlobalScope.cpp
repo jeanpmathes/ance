@@ -17,7 +17,7 @@ llvm::DIScope* ance::GlobalScope::getDebugScope(CompileContext* context)
     return context->unit();
 }
 
-bool ance::GlobalScope::validate()
+void ance::GlobalScope::validate()
 {
     auto valid = true;
 
@@ -29,6 +29,10 @@ bool ance::GlobalScope::validate()
 
             valid = false;
         }
+        else
+        {
+            val->validate();
+        }
     }
 
     if (!global_undefined_.empty())
@@ -38,7 +42,11 @@ bool ance::GlobalScope::validate()
         valid = false;
     }
 
-    return valid;
+    for (auto const& [key, val] : global_constants_) { val->validate(); }
+
+    for (auto const& [key, val] : global_variables_) { val->validate(); }
+
+    assert(valid);
 }
 
 bool ance::GlobalScope::isTypeRegistered(const std::string& type_name)

@@ -28,6 +28,11 @@ void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
     assigned_->setContainingScope(function);
 }
 
+void LocalVariableDefinition::validate()
+{
+    assigned_->validate();
+}
+
 void LocalVariableDefinition::doBuild(CompileContext* context)
 {
     variable_->build(context);

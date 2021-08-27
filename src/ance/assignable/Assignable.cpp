@@ -10,6 +10,8 @@ void Assignable::setContainingScope(ance::Scope* scope)
     setScope(scope);
 }
 
+void Assignable::validate() {}
+
 void Assignable::assign(ance::Value* value, CompileContext* context)
 {
     context->setDebugLocation(location_, containing_scope_);

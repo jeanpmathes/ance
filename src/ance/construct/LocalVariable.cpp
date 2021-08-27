@@ -20,6 +20,8 @@ ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope,
     , location_(location)
 {}
 
+void ance::LocalVariable::validate() {}
+
 void ance::LocalVariable::build(CompileContext* context)
 {
     assert(initial_value_);

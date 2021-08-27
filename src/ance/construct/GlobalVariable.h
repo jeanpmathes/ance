@@ -71,6 +71,8 @@ namespace ance
                           bool                is_constant,
                           ance::Location      location);
 
+        void validate() override;
+
         /**
          * Build the global variable.
          * @param context The current compile context.

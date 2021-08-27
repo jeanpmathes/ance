@@ -58,6 +58,11 @@ namespace ance
 
       public:
         /**
+         * Validate this variable.
+         */
+        virtual void validate() = 0;
+
+        /**
          * Get the identifier.
          * @return The identifier.
          */

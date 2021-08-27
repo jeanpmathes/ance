@@ -13,6 +13,11 @@ void ReturnStatement::setFunction(ance::DefinedFunction* function)
     return_value_->setContainingScope(function);
 }
 
+void ReturnStatement::validate()
+{
+    return_value_->validate();
+}
+
 void ReturnStatement::doBuild(CompileContext*)
 {
     getContainingFunction()->addReturn(return_value_ ? return_value_->getValue() : nullptr);

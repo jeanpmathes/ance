@@ -33,6 +33,8 @@ namespace ance
                       unsigned          parameter_no,
                       ance::Location    location);
 
+        void validate() override;
+
         /**
          * Build the local variable.
          * @param context The current compile context.

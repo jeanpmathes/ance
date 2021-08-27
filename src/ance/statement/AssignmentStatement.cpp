@@ -17,6 +17,12 @@ void AssignmentStatement::setFunction(ance::DefinedFunction* function)
     assigned_->setContainingScope(function);
 }
 
+void AssignmentStatement::validate()
+{
+    assignable_->validate();
+    assigned_->validate();
+}
+
 void AssignmentStatement::doBuild(CompileContext* context)
 {
     assignable_->assign(assigned_->getValue(), context);

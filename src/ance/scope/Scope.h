@@ -42,9 +42,8 @@ namespace ance
 
         /**
          * Validate this scope.
-         * @return True if the scope and its content is valid.
          */
-        virtual bool validate() = 0;
+        virtual void validate() = 0;
 
         /**
          * Get a variable by name.

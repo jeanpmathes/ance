@@ -26,6 +26,11 @@ class Expression
     virtual void setContainingScope(ance::Scope* scope);
 
     /**
+     * Validate this expression.
+     */
+    virtual void validate();
+
+    /**
      * Get the return type of this expression.
      * @return The type of the value of this expression.
      */

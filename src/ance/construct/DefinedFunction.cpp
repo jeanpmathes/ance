@@ -169,9 +169,11 @@ llvm::DIScope* ance::DefinedFunction::getDebugScope(CompileContext*)
     return debugSubprogram();
 }
 
-bool ance::DefinedFunction::validate()
+void ance::DefinedFunction::validate()
 {
-    return function_scope_->validate();
+    function_scope_->validate();
+
+    for (auto statement : statements_) { statement->validate(); }
 }
 
 ance::Variable* ance::DefinedFunction::getVariable(std::string identifier)

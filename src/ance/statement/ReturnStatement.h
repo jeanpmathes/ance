@@ -20,6 +20,8 @@ class ReturnStatement : public Statement
 
     void setFunction(ance::DefinedFunction* function) override;
 
+    void validate() override;
+
   protected:
     void doBuild(CompileContext* context) override;
 

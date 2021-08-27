@@ -77,7 +77,7 @@ namespace ance
         ance::LocalScope* getFunctionScope();
         llvm::DIScope*    getDebugScope(CompileContext* context) override;
 
-        bool validate() override;
+        void validate() override;
 
         ance::Variable* getVariable(std::string identifier) override;
 

@@ -14,6 +14,8 @@ ance::ExternFunction::ExternFunction(std::string                   function_name
     , parameters_(std::move(parameters))
 {}
 
+void ance::ExternFunction::validate() {}
+
 void ance::ExternFunction::buildName(CompileContext* context)
 {
     std::tie(native_type_, native_function_) = createNativeFunction(parameters_,

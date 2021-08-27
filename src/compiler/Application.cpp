@@ -79,9 +79,11 @@ unsigned Application::getBitness() const
     return pointer_size_ * 8;
 }
 
-bool Application::validate()
+void Application::validate()
 {
-    bool valid = global_scope_->validate();
+    global_scope_->validate();
+
+    bool valid = true;
 
     if (!global_scope_->hasFunction("main"))
     {
@@ -97,7 +99,7 @@ bool Application::validate()
         valid = false;
     }
 
-    return valid;
+    assert(valid);
 }
 
 ance::GlobalScope* Application::globalScope()

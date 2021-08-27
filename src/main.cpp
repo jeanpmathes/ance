@@ -51,7 +51,10 @@ int main(int argc, char** argv)
 
     int e;
 
-    if (application.validate())
+    application.validate();
+    bool is_valid = true;
+
+    if (is_valid)
     {
         AnceCompiler compiler(application);
         AnceLinker   linker(project.root()["link"]);

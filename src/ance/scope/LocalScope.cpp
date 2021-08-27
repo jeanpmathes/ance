@@ -16,9 +16,9 @@ llvm::DIScope* ance::LocalScope::getDebugScope(CompileContext* context)
     return parent_->getDebugScope(context);
 }
 
-bool ance::LocalScope::validate()
+void ance::LocalScope::validate()
 {
-    return true;
+    for (auto const& [key, val] : local_variables_) { val->validate(); }
 }
 
 ance::Variable* ance::LocalScope::getVariable(std::string identifier)

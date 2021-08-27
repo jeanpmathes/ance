@@ -61,10 +61,9 @@ class Application
     [[nodiscard]] unsigned getBitness() const;
 
     /**
-     * Validate if the application can be compiled.
-     * @return True if it can be compiled.
+     * Validate the application before compilation.
      */
-    bool validate();
+    void validate();
 
     /**
      * Get the top level scope of this application.

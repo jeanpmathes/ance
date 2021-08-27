@@ -18,6 +18,12 @@ class Assignable
      * @param scope The containing scope.
      */
     void setContainingScope(ance::Scope* scope);
+
+    /**
+     * Validate this assignable.
+     */
+    virtual void validate();
+
     /**
      * Build a value assignment to this assignable.
      * @param value The value that should be assigned.

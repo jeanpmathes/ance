@@ -53,6 +53,11 @@ class Statement
     [[nodiscard]] ance::Location location() const;
 
     /**
+     * Validate this statement.
+     */
+    virtual void validate() = 0;
+
+    /**
      * Build this statement.
      * @param context The current compile context.
      */

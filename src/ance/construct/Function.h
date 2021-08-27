@@ -16,9 +16,7 @@ class CompileContext;
 namespace ance
 {
     class LocalScope;
-
     class Type;
-
     class LocalScope;
 
     /**
@@ -51,6 +49,11 @@ namespace ance
          * @return The source location.
          */
         [[nodiscard]] ance::Location location() const;
+
+        /**
+         * Validate this function.
+         */
+        virtual void validate() = 0;
 
         /**
          * Build the declaration of this function, allowing it to be called.
