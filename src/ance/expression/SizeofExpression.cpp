@@ -19,7 +19,7 @@ ance::Type* SizeofExpression::type()
     return ance::SizeType::get();
 }
 
-ance::Value* SizeofExpression::getValue()
+ance::Value* SizeofExpression::getValue() const
 {
     return return_value_;
 }

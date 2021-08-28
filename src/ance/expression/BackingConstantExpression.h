@@ -28,7 +28,7 @@ class BackingConstantExpression
 
     ance::Type* type() override = 0;
 
-    ance::Constant* getConstantValue() override = 0;
+    [[nodiscard]] ance::Constant* getConstantValue() const override = 0;
 
     /**
      * Get the content constant. Must be built before.

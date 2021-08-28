@@ -18,7 +18,7 @@ ance::Type* RoughCast::type()
     return target_type_;
 }
 
-ance::Value* RoughCast::getValue()
+ance::Value* RoughCast::getValue() const
 {
     return return_value_;
 }

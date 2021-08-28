@@ -14,12 +14,12 @@ ance::Type* DefaultValueExpression::type()
     return type_;
 }
 
-ance::Value* DefaultValueExpression::getValue()
+ance::Value* DefaultValueExpression::getValue() const
 {
     return constant_;
 }
 
-ance::Constant* DefaultValueExpression::getConstantValue()
+ance::Constant* DefaultValueExpression::getConstantValue() const
 {
     return constant_;
 }

@@ -17,7 +17,7 @@ class ConstantLiteral : public ConstantExpression
 
     ance::Type* type() override;
 
-    ance::Constant* getConstantValue() override;
+    ance::Constant* getConstantValue() const override;
 
   private:
     ance::Constant* constant_;

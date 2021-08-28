@@ -21,7 +21,7 @@ class DelayableExpression
     explicit DelayableExpression(ance::Location location);
 
   public:
-    ance::Value* getValue() override;
+    [[nodiscard]] ance::Value* getValue() const override;
 
   protected:
     /**

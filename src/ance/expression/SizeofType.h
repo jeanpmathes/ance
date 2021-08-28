@@ -22,7 +22,7 @@ class SizeofType : public BackingExpression
 
     ance::Type* type() override;
 
-    ance::Value* getValue() override;
+    [[nodiscard]] ance::Value* getValue() const override;
 
   protected:
     llvm::Value* buildNativeValue(CompileContext* context) override;

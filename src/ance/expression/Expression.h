@@ -39,7 +39,7 @@ class Expression
      * Get the value returned by this expression.
      * @return The value.
      */
-    virtual ance::Value* getValue() = 0;
+    [[nodiscard]] virtual ance::Value* getValue() const = 0;
 
     virtual ~Expression() = default;
 };

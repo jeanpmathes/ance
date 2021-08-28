@@ -10,7 +10,7 @@ ance::Type* ConstantLiteral::type()
     return constant_->type();
 }
 
-ance::Constant* ConstantLiteral::getConstantValue()
+ance::Constant* ConstantLiteral::getConstantValue() const
 {
     return constant_;
 }

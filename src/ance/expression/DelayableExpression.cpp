@@ -2,7 +2,7 @@
 
 DelayableExpression::DelayableExpression(ance::Location location) : BuildableExpression(location) {}
 
-ance::Value* DelayableExpression::getValue()
+ance::Value* DelayableExpression::getValue() const
 {
     return value_;
 }
