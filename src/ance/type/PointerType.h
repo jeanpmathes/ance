@@ -26,8 +26,10 @@ namespace ance
 
         ance::Type* getIndexerReturnType() override;
 
+        void         validateGetIndexer(ance::Value* indexed, ance::Value* index) override;
         ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
 
+        void validateSetIndexer(ance::Value* indexed, ance::Value* index, ance::Value* value) override;
         void buildSetIndexer(ance::Value*    indexed,
                              ance::Value*    index,
                              ance::Value*    value,

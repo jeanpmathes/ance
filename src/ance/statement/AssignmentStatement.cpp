@@ -9,7 +9,9 @@ AssignmentStatement::AssignmentStatement(Assignable* assignable, Expression* ass
     : Statement(location)
     , assignable_(assignable)
     , assigned_(assigned)
-{}
+{
+    assignable_->assign(assigned->getValue());
+}
 
 void AssignmentStatement::setFunction(ance::DefinedFunction* function)
 {
@@ -25,5 +27,5 @@ void AssignmentStatement::validate()
 
 void AssignmentStatement::doBuild(CompileContext* context)
 {
-    assignable_->assign(assigned_->getValue(), context);
+    assignable_->build(context);
 }

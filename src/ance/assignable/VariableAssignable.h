@@ -18,9 +18,11 @@ class VariableAssignable : public Assignable
      */
     explicit VariableAssignable(std::string variable_identifier, ance::Location location);
 
+    void validate() override;
+
   protected:
     void setScope(ance::Scope* scope) override;
-    void buildAssignment(ance::Value* value, CompileContext* context) override;
+    void doBuild(CompileContext* context) override;
 
   private:
     std::string  variable_identifier_;

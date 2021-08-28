@@ -103,6 +103,21 @@ namespace ance
         virtual ance::Type* getIndexerReturnType();
 
         /**
+         * Validate an indexer get access.
+         * @param indexed The indexed value.
+         * @param index The used index.
+         */
+        virtual void validateGetIndexer(ance::Value* indexed, ance::Value* index);
+
+        /**
+         * Validate an indexer set access.
+         * @param indexed The indexed value.
+         * @param index The used index.
+         * @param value The assigned value.
+         */
+        virtual void validateSetIndexer(ance::Value* indexed, ance::Value* index, ance::Value* value);
+
+        /**
          * Build a get indexer access.
          * @param indexed The indexed value.
          * @param index The index to use.

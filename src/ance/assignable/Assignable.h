@@ -20,18 +20,29 @@ class Assignable
     void setContainingScope(ance::Scope* scope);
 
     /**
-     * Validate this assignable.
+     * Assign a value to this assignable.
+     * @param value The value to assign.
      */
-    virtual void validate();
+    void assign(ance::Value* value);
 
     /**
-     * Build a value assignment to this assignable.
-     * @param value The value that should be assigned.
-     * @param context The compile context.
+     * Validate this assignable.
      */
-    void assign(ance::Value* value, CompileContext* context);
+    virtual void validate() = 0;
+
+    /**
+     * Build this assignable and the contained assignment.
+     * @param context The current compile context.
+     */
+    void build(CompileContext* context);
 
   protected:
+    /**
+     * Get the assigned value.
+     * @return The assigned value.
+     */
+    ance::Value* assigned();
+
     /**
      * Override to receive the containing scope.
      * @param scope The containing scope.
@@ -39,11 +50,10 @@ class Assignable
     virtual void setScope(ance::Scope* scope) = 0;
 
     /**
-     * Build an assignment to this assignable.
-     * @param value The value to assign.
+     * Build the assignment of this assignable.
      * @param context The current compile context.
      */
-    virtual void buildAssignment(ance::Value* value, CompileContext* context) = 0;
+    virtual void doBuild(CompileContext* context) = 0;
 
   public:
     virtual ~Assignable() = default;
@@ -51,6 +61,7 @@ class Assignable
   private:
     ance::Location location_;
     ance::Scope*   containing_scope_ {nullptr};
+    ance::Value*   assigned_value_ {nullptr};
 };
 
 #endif

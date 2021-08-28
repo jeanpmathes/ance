@@ -108,9 +108,6 @@ ance::Value* ance::GlobalVariable::getValue(CompileContext* context)
 
 void ance::GlobalVariable::setValue(ance::Value* value, CompileContext* context)
 {
-    assert(!isFinal() && "Cannot assign to final variable.");
-    assert(type() == value->type() && "Assignment types have to match.");
-
     value->buildContentValue(context);
 
     llvm::Value* content = value->getContentValue();

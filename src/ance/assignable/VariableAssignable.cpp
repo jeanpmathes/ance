@@ -10,8 +10,14 @@ void VariableAssignable::setScope(ance::Scope* scope)
     scope_ = scope;
 }
 
-void VariableAssignable::buildAssignment(ance::Value* value, CompileContext* context)
+void VariableAssignable::validate()
 {
     ance::Variable* variable = scope_->getVariable(variable_identifier_);
-    variable->setValue(value, context);
+    variable->validateSetValue(assigned());
+}
+
+void VariableAssignable::doBuild(CompileContext* context)
+{
+    ance::Variable* variable = scope_->getVariable(variable_identifier_);
+    variable->setValue(assigned(), context);
 }

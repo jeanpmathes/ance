@@ -44,11 +44,14 @@ ance::Type* ance::PointerType::getIndexerReturnType()
     return element_type_;
 }
 
-ance::Value* ance::PointerType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
+void ance::PointerType::validateGetIndexer(ance::Value* indexed, ance::Value* index)
 {
     assert(indexed->type() == this && "Indexed value has to be of pointer type.");
     assert(index->type() == ance::SizeType::get() && "Pointer index has to be size type.");
+}
 
+ance::Value* ance::PointerType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
+{
     llvm::Value* element_ptr    = buildGetElementPointer(indexed, index, context);
     llvm::Value* native_content = context->ir()->CreateLoad(element_ptr);
 
@@ -56,15 +59,18 @@ ance::Value* ance::PointerType::buildGetIndexer(ance::Value* indexed, ance::Valu
     return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
 }
 
+void ance::PointerType::validateSetIndexer(ance::Value* indexed, ance::Value* index, ance::Value* value)
+{
+    assert(indexed->type() == this && "Indexed value has to be of pointer type.");
+    assert(index->type() == ance::SizeType::get() && "Pointer index has to be size type.");
+    assert(value->type() == element_type_ && "Assigned value has to be of element type.");
+}
+
 void ance::PointerType::buildSetIndexer(ance::Value*    indexed,
                                         ance::Value*    index,
                                         ance::Value*    value,
                                         CompileContext* context)
 {
-    assert(indexed->type() == this && "Indexed value has to be of pointer type.");
-    assert(index->type() == ance::SizeType::get() && "Pointer index has to be size type.");
-    assert(value->type() == element_type_ && "Assigned value has to be of element type.");
-
     value->buildContentValue(context);
 
     llvm::Value* element_ptr         = buildGetElementPointer(indexed, index, context);

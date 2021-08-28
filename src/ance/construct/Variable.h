@@ -84,6 +84,12 @@ namespace ance
         [[nodiscard]] bool isFinal() const;
 
         /**
+         * Validate setting a value.
+         * @param value The value to set.
+         */
+        void validateSetValue(ance::Value* value);
+
+        /**
          * Get the current value of the variable.
          * @param context The current compile context.
          * @return The current value.

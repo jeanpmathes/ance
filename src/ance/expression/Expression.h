@@ -37,7 +37,7 @@ class Expression
     virtual ance::Type* type() = 0;
     /**
      * Get the value returned by this expression.
-     * @return The value.
+     * @return The value. One expression always returns the value.
      */
     [[nodiscard]] virtual ance::Value* getValue() const = 0;
 

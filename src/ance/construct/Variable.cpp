@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "ance/construct/value/Value.h"
+
 ance::Variable::Variable(ance::Scope* containing_scope, std::string identifier, ance::Type* type, bool is_final)
     : identifier_(std::move(identifier))
     , is_defined_(true)
@@ -56,4 +58,10 @@ bool ance::Variable::isFinal() const
 {
     assert(is_defined_);
     return is_final_;
+}
+
+void ance::Variable::validateSetValue(ance::Value* value)
+{
+    assert(!isFinal() && "Cannot assign to final variable.");
+    assert(type() == value->type() && "Assignment types have to match.");
 }

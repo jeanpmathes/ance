@@ -19,9 +19,11 @@ class IndexerSet : public Assignable
      */
     explicit IndexerSet(Expression* indexed, Expression* index, ance::Location location);
 
+    void validate() override;
+
   protected:
     void setScope(ance::Scope* scope) override;
-    void buildAssignment(ance::Value* value, CompileContext* context) override;
+    void doBuild(CompileContext* context) override;
 
   private:
     Expression* indexed_;

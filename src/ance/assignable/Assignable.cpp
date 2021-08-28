@@ -10,11 +10,20 @@ void Assignable::setContainingScope(ance::Scope* scope)
     setScope(scope);
 }
 
-void Assignable::validate() {}
+void Assignable::assign(ance::Value* value)
+{
+    assert(!assigned_value_ && "There may be only one value assigned to an assignable.");
+    assigned_value_ = value;
+}
 
-void Assignable::assign(ance::Value* value, CompileContext* context)
+void Assignable::build(CompileContext* context)
 {
     context->setDebugLocation(location_, containing_scope_);
-    buildAssignment(value, context);
+    doBuild(context);
     context->resetDebugLocation();
+}
+
+ance::Value* Assignable::assigned()
+{
+    return assigned_value_;
 }

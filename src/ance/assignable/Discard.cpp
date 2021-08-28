@@ -4,7 +4,9 @@ Discard::Discard(ance::Location location) : Assignable(location) {}
 
 void Discard::setScope(ance::Scope*) {}
 
-void Discard::buildAssignment(ance::Value* value, CompileContext* context)
+void Discard::validate() {}
+
+void Discard::doBuild(CompileContext* context)
 {
-    value->buildNativeValue(context);
+    assigned()->buildNativeValue(context);
 }

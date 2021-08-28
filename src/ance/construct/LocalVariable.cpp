@@ -59,6 +59,8 @@ void ance::LocalVariable::build(CompileContext* context)
             context->ir()->GetInsertBlock());
     }
 
+    assert(type() == initial_value_->type() && "Assignment types have to match.");
+
     store(initial_value_, context);
 }
 
@@ -69,14 +71,11 @@ ance::Value* ance::LocalVariable::getValue(CompileContext*)
 
 void ance::LocalVariable::setValue(ance::Value* value, CompileContext* context)
 {
-    assert(!isFinal() && "Cannot assign to final variable.");
     store(value, context);
 }
 
 void ance::LocalVariable::store(ance::Value* value, CompileContext* context)
 {
-    assert(type() == value->type() && "Assignment types have to match.");
-
     switch (type()->storage())
     {
         case InternalStorage::AS_TEMPORARY:

@@ -43,11 +43,14 @@ ance::Type* ance::ArrayType::getIndexerReturnType()
     return element_type_;
 }
 
-ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
+void ance::ArrayType::validateGetIndexer(ance::Value* indexed, ance::Value* index)
 {
     assert(indexed->type() == this && "Indexed value has to be of native array type.");
     assert(index->type() == ance::SizeType::get() && "Native array index has to be size type.");
+}
 
+ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
+{
     llvm::Value* element_ptr    = buildGetElementPointer(indexed, index, context);
     llvm::Value* native_content = context->ir()->CreateLoad(element_ptr);
 
@@ -58,15 +61,18 @@ ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value*
     return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
 }
 
+void ance::ArrayType::validateSetIndexer(ance::Value* indexed, ance::Value* index, ance::Value* value)
+{
+    assert(indexed->type() == this && "Indexed value has to be of native array type.");
+    assert(index->type() == ance::SizeType::get() && "Native array index has to be size type.");
+    assert(value->type() == element_type_ && "Assigned value has to be of the element type of this array.");
+}
+
 void ance::ArrayType::buildSetIndexer(ance::Value*    indexed,
                                       ance::Value*    index,
                                       ance::Value*    value,
                                       CompileContext* context)
 {
-    assert(indexed->type() == this && "Indexed value has to be of native array type.");
-    assert(index->type() == ance::SizeType::get() && "Native array index has to be size type.");
-    assert(value->type() == element_type_ && "Assigned value has to be of the element type of this array.");
-
     value->buildContentValue(context);
 
     llvm::Value* element_ptr         = buildGetElementPointer(indexed, index, context);
