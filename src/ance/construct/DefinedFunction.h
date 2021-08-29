@@ -61,6 +61,7 @@ namespace ance
          */
         void addReturn(ance::Value* value = nullptr);
 
+        void         validateCall(const std::vector<ance::Value*>& arguments) override;
         ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
 
         /**

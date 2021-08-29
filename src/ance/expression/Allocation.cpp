@@ -25,6 +25,11 @@ ance::Type* Allocation::type()
     return return_type_;
 }
 
+void Allocation::validate()
+{
+    if (count_) count_->validate();
+}
+
 void Allocation::doBuild(CompileContext* context)
 {
     ance::Value* count = count_ ? count_->getValue() : nullptr;

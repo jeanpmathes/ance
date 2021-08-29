@@ -21,8 +21,8 @@ void AssignmentStatement::setFunction(ance::DefinedFunction* function)
 
 void AssignmentStatement::validate()
 {
-    assignable_->validate();
     assigned_->validate();
+    assignable_->validate();
 }
 
 void AssignmentStatement::doBuild(CompileContext* context)

@@ -132,15 +132,18 @@ void ance::DefinedFunction::addReturn(ance::Value* value)
     }
 }
 
-ance::Value* ance::DefinedFunction::buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const
+void ance::DefinedFunction::validateCall(const std::vector<ance::Value*>& arguments)
 {
-    assert(arguments.size() == native_type_->getNumParams());
+    assert(arguments.size() == parameters_.size());
 
     for (auto pair : llvm::zip(parameters_, arguments))
     {
         assert(std::get<0>(pair)->type() == std::get<1>(pair)->type() && "Input parameter types must match.");
     }
+}
 
+ance::Value* ance::DefinedFunction::buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const
+{
     llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
 
     if (returnType() == ance::VoidType::get()) { return nullptr; }

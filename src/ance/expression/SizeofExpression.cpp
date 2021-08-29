@@ -19,6 +19,11 @@ ance::Type* SizeofExpression::type()
     return ance::SizeType::get();
 }
 
+void SizeofExpression::validate()
+{
+    expression_->validate();
+}
+
 ance::Value* SizeofExpression::getValue() const
 {
     return return_value_;

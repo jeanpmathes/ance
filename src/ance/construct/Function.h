@@ -65,6 +65,13 @@ namespace ance
          * @param context The current compile context.
          */
         virtual void build(CompileContext* context) = 0;
+
+        /**
+         * Validate a call to this function.
+         * @param arguments The arguments that will be passed to the function.
+         */
+        virtual void validateCall(const std::vector<ance::Value*>& arguments) = 0;
+
         /**
          * Build a call to this function.
          * @param arguments The arguments to pass to the function.

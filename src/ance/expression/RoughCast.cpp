@@ -1,6 +1,7 @@
 #include "RoughCast.h"
 
 #include "ance/construct/value/RoughlyCastedValue.h"
+#include "ance/type/Type.h"
 
 RoughCast::RoughCast(ance::Type* target_type, Expression* expression)
     : target_type_(target_type)
@@ -16,6 +17,11 @@ void RoughCast::setContainingScope(ance::Scope* scope)
 ance::Type* RoughCast::type()
 {
     return target_type_;
+}
+
+void RoughCast::validate()
+{
+    expression_->validate();
 }
 
 ance::Value* RoughCast::getValue() const

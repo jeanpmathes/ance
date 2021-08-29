@@ -22,6 +22,8 @@ class SizeofType : public BackingExpression
 
     ance::Type* type() override;
 
+    void validate() override;
+
     [[nodiscard]] ance::Value* getValue() const override;
 
   protected:

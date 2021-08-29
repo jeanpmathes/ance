@@ -19,12 +19,20 @@ ance::Type* IndexerGet::type()
     return indexed_->type()->getIndexerReturnType();
 }
 
-void IndexerGet::doBuild(CompileContext* context)
+void IndexerGet::validate()
 {
+    indexed_->validate();
+    index_->validate();
+
     ance::Type* indexed_type = indexed_->type();
     assert(indexed_type->isIndexerDefined(Indexer::GET) && "Type does not support this indexer.");
 
-    ance::Value* return_value = indexed_type->buildGetIndexer(indexed_->getValue(), index_->getValue(), context);
+    indexed_type->validateGetIndexer(indexed_->getValue(), index_->getValue());
+}
+
+void IndexerGet::doBuild(CompileContext* context)
+{
+    ance::Value* return_value = indexed_->type()->buildGetIndexer(indexed_->getValue(), index_->getValue(), context);
     setValue(return_value);
 }
 

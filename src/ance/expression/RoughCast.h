@@ -25,6 +25,8 @@ class RoughCast : public Expression
 
     ance::Type* type() override;
 
+    void validate() override;
+
     [[nodiscard]] ance::Value* getValue() const override;
 
     ~RoughCast() override;

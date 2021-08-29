@@ -25,8 +25,10 @@ namespace ance
 
         void validate() override;
 
-        void         buildName(CompileContext* context) override;
-        void         build(CompileContext* context) override;
+        void buildName(CompileContext* context) override;
+        void build(CompileContext* context) override;
+
+        void         validateCall(const std::vector<ance::Value*>& arguments) override;
         ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
 
       protected:

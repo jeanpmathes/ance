@@ -28,7 +28,7 @@ class Expression
     /**
      * Validate this expression.
      */
-    virtual void validate();
+    virtual void validate() = 0;
 
     /**
      * Get the return type of this expression.

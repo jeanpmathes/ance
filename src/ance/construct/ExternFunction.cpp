@@ -28,15 +28,18 @@ void ance::ExternFunction::buildName(CompileContext* context)
 
 void ance::ExternFunction::build(CompileContext*) {}
 
-ance::Value* ance::ExternFunction::buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const
+void ance::ExternFunction::validateCall(const std::vector<ance::Value*>& arguments)
 {
-    assert(arguments.size() == native_type_->getNumParams());
+    assert(arguments.size() == parameters_.size());
 
     for (auto pair : llvm::zip(parameters_, arguments))
     {
         assert(std::get<0>(pair)->type() == std::get<1>(pair)->type() && "Input parameter types must match.");
     }
+}
 
+ance::Value* ance::ExternFunction::buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const
+{
     llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
 
     if (returnType() == ance::VoidType::get()) { return nullptr; }

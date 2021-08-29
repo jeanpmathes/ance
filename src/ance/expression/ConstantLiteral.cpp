@@ -10,6 +10,8 @@ ance::Type* ConstantLiteral::type()
     return constant_->type();
 }
 
+void ConstantLiteral::validate() {}
+
 ance::Constant* ConstantLiteral::getConstantValue() const
 {
     return constant_;

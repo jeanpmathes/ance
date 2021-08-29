@@ -50,13 +50,13 @@ namespace ance
          */
         void define(ance::Scope* containing_scope, ance::Type* type, bool is_final);
 
+      public:
         /**
          * Check if this variable is defined.
          * @return Whether it is defined.
          */
-        bool isDefined();
+        bool isDefined() const;
 
-      public:
         /**
          * Validate this variable.
          */
