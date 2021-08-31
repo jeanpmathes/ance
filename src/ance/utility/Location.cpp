@@ -31,6 +31,11 @@ llvm::DebugLoc ance::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm
 
 std::ostream& ance::operator<<(std::ostream& os, const ance::Location& location)
 {
-    os << "(" << location.start_line_ << ", " << location.start_column_ << ")";
+    if (location.start_line_ != 0) { os << "(" << location.start_line_ << ", " << location.start_column_ << ")"; }
+    else// Line numbers begin with 1 so this location refers to no place.
+    {
+        os << "()";
+    }
+
     return os;
 }

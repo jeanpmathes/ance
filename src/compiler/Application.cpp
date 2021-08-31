@@ -83,23 +83,15 @@ void Application::validate(ValidationLogger& validation_logger)
 {
     global_scope_->validate(validation_logger);
 
-    bool valid = true;
-
     if (!global_scope_->hasFunction("main"))
     {
-        std::cout << "No main function was found!" << std::endl;
-
-        valid = false;
+        validation_logger.logError("Entry point 'main' could not be found", ance::Location(0, 0, 0, 0));
     }
 
     if (!global_scope_->hasFunction("exit"))
     {
-        std::cout << "No exit function was found!" << std::endl;
-
-        valid = false;
+        validation_logger.logError("Exit point 'exit' could not be found", ance::Location(0, 0, 0, 0));
     }
-
-    assert(valid);
 }
 
 ance::GlobalScope* Application::globalScope()
