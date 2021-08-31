@@ -27,3 +27,8 @@ ance::Value* Assignable::assigned()
 {
     return assigned_value_;
 }
+
+ance::Location Assignable::location()
+{
+    return location_;
+}

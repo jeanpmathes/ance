@@ -57,6 +57,12 @@ class Assignable
      */
     virtual void doBuild(CompileContext* context) = 0;
 
+    /**
+     * Get the location of this assignable.
+     * @return The source location.
+     */
+    ance::Location location();
+
   public:
     virtual ~Assignable() = default;
 
