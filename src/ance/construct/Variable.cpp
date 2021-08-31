@@ -60,7 +60,7 @@ bool ance::Variable::isFinal() const
     return is_final_;
 }
 
-void ance::Variable::validateSetValue(ance::Value* value)
+void ance::Variable::validateSetValue(ance::Value* value, ValidationLogger&)
 {
     assert(!isFinal() && "Cannot assign to final variable.");
     assert(type() == value->type() && "Assignment types have to match.");

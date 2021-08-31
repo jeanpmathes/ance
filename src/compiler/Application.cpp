@@ -79,9 +79,9 @@ unsigned Application::getBitness() const
     return pointer_size_ * 8;
 }
 
-void Application::validate()
+void Application::validate(ValidationLogger& validation_logger)
 {
-    global_scope_->validate();
+    global_scope_->validate(validation_logger);
 
     bool valid = true;
 

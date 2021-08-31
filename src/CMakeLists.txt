@@ -4,6 +4,7 @@ add_subdirectory(ance)
 add_subdirectory(compiler)
 add_subdirectory(grammar)
 add_subdirectory(management)
+add_subdirectory(validation)
 
 include_directories(.)
 

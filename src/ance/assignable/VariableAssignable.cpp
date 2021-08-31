@@ -10,10 +10,10 @@ void VariableAssignable::setScope(ance::Scope* scope)
     scope_ = scope;
 }
 
-void VariableAssignable::validate()
+void VariableAssignable::validate(ValidationLogger& validation_logger)
 {
     ance::Variable* variable = scope_->getVariable(variable_identifier_);
-    variable->validateSetValue(assigned());
+    variable->validateSetValue(assigned(), validation_logger);
 }
 
 void VariableAssignable::doBuild(CompileContext* context)

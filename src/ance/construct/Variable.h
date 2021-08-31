@@ -7,6 +7,7 @@
 #include <llvm/IR/Value.h>
 
 #include "ance/utility/Location.h"
+#include "validation/ValidationLogger.h"
 
 class CompileContext;
 
@@ -59,8 +60,9 @@ namespace ance
 
         /**
          * Validate this variable.
+         * @param validation_logger A logger to log validation messages.
          */
-        virtual void validate() = 0;
+        virtual void validate(ValidationLogger& validation_logger) = 0;
 
         /**
          * Get the identifier.
@@ -86,8 +88,9 @@ namespace ance
         /**
          * Validate setting a value.
          * @param value The value to set.
+         * @param validation_logger A logger to log validation messages.
          */
-        void validateSetValue(ance::Value* value);
+        void validateSetValue(ance::Value* value, ValidationLogger& validation_logger);
 
         /**
          * Get the current value of the variable.

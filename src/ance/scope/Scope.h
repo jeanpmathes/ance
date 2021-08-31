@@ -10,6 +10,7 @@
 #include "ance/AccessModifier.h"
 #include "ance/construct/GlobalVariable.h"
 #include "ance/type/Type.h"
+#include "validation/ValidationLogger.h"
 
 class Statement;
 
@@ -42,8 +43,9 @@ namespace ance
 
         /**
          * Validate this scope.
+         * @param validation_logger A logger to log validation messages to.
          */
-        virtual void validate() = 0;
+        virtual void validate(ValidationLogger& validation_logger) = 0;
 
         /**
          * Get a variable by name.

@@ -33,7 +33,7 @@ namespace ance
                       unsigned          parameter_no,
                       ance::Location    location);
 
-        void validate() override;
+        void validate(ValidationLogger& validation_logger) override;
 
         /**
          * Build the local variable.

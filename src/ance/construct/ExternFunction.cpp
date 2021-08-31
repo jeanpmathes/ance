@@ -14,7 +14,7 @@ ance::ExternFunction::ExternFunction(std::string                   function_name
     , parameters_(std::move(parameters))
 {}
 
-void ance::ExternFunction::validate() {}
+void ance::ExternFunction::validate(ValidationLogger&) {}
 
 void ance::ExternFunction::buildName(CompileContext* context)
 {
@@ -28,7 +28,7 @@ void ance::ExternFunction::buildName(CompileContext* context)
 
 void ance::ExternFunction::build(CompileContext*) {}
 
-void ance::ExternFunction::validateCall(const std::vector<ance::Value*>& arguments)
+void ance::ExternFunction::validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger&)
 {
     assert(arguments.size() == parameters_.size());
 

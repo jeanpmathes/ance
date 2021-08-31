@@ -44,7 +44,7 @@ ance::Type* ance::PointerType::getIndexerReturnType()
     return element_type_;
 }
 
-void ance::PointerType::validateGetIndexer(ance::Value* indexed, ance::Value* index)
+void ance::PointerType::validateGetIndexer(ance::Value* indexed, ance::Value* index, ValidationLogger&)
 {
     assert(indexed->type() == this && "Indexed value has to be of pointer type.");
     assert(index->type() == ance::SizeType::get() && "Pointer index has to be size type.");
@@ -59,7 +59,10 @@ ance::Value* ance::PointerType::buildGetIndexer(ance::Value* indexed, ance::Valu
     return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
 }
 
-void ance::PointerType::validateSetIndexer(ance::Value* indexed, ance::Value* index, ance::Value* value)
+void ance::PointerType::validateSetIndexer(ance::Value* indexed,
+                                           ance::Value* index,
+                                           ance::Value* value,
+                                           ValidationLogger&)
 {
     assert(indexed->type() == this && "Indexed value has to be of pointer type.");
     assert(index->type() == ance::SizeType::get() && "Pointer index has to be size type.");

@@ -14,7 +14,7 @@ ance::Type* DefaultValueExpression::type()
     return type_;
 }
 
-void DefaultValueExpression::validate() {}
+void DefaultValueExpression::validate(ValidationLogger&) {}
 
 ance::Value* DefaultValueExpression::getValue() const
 {

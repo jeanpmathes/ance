@@ -19,10 +19,10 @@ void AssignmentStatement::setFunction(ance::DefinedFunction* function)
     assigned_->setContainingScope(function);
 }
 
-void AssignmentStatement::validate()
+void AssignmentStatement::validate(ValidationLogger& validation_logger)
 {
-    assigned_->validate();
-    assignable_->validate();
+    assigned_->validate(validation_logger);
+    assignable_->validate(validation_logger);
 }
 
 void AssignmentStatement::doBuild(CompileContext* context)

@@ -12,16 +12,16 @@ void IndexerSet::setScope(ance::Scope* scope)
     index_->setContainingScope(scope);
 }
 
-void IndexerSet::validate()
+void IndexerSet::validate(ValidationLogger& validation_logger)
 {
-    indexed_->validate();
-    index_->validate();
+    indexed_->validate(validation_logger);
+    index_->validate(validation_logger);
 
     ance::Type* indexed_type = indexed_->type();
 
     assert(indexed_type->isIndexerDefined(Indexer::SET) && "Type does not support this indexer.");
 
-    indexed_type->validateSetIndexer(indexed_->getValue(), index_->getValue(), assigned());
+    indexed_type->validateSetIndexer(indexed_->getValue(), index_->getValue(), assigned(), validation_logger);
 }
 
 void IndexerSet::doBuild(CompileContext* context)

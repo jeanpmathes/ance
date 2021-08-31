@@ -23,7 +23,7 @@ class AssignmentStatement : public Statement
 
     void setFunction(ance::DefinedFunction* function) override;
 
-    void validate() override;
+    void validate(ValidationLogger& validation_logger) override;
 
   protected:
     void doBuild(CompileContext* context) override;

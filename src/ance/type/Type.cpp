@@ -47,8 +47,8 @@ ance::Type* ance::Type::getIndexerReturnType()
     return nullptr;
 }
 
-void ance::Type::validateGetIndexer(ance::Value*, ance::Value*) {}
-void ance::Type::validateSetIndexer(ance::Value*, ance::Value*, ance::Value*) {}
+void ance::Type::validateGetIndexer(ance::Value*, ance::Value*, ValidationLogger&) {}
+void ance::Type::validateSetIndexer(ance::Value*, ance::Value*, ance::Value*, ValidationLogger&) {}
 
 ance::Value* ance::Type::buildGetIndexer(ance::Value*, ance::Value*, CompileContext*)
 {

@@ -13,9 +13,9 @@ void ReturnStatement::setFunction(ance::DefinedFunction* function)
     return_value_->setContainingScope(function);
 }
 
-void ReturnStatement::validate()
+void ReturnStatement::validate(ValidationLogger& validation_logger)
 {
-    return_value_->validate();
+    return_value_->validate(validation_logger);
 }
 
 void ReturnStatement::doBuild(CompileContext*)

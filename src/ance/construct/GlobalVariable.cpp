@@ -58,7 +58,7 @@ void ance::GlobalVariable::defineGlobal(ance::Scope*        containing_scope,
     initial_value_ = constant_init_->getConstantValue();
 }
 
-void ance::GlobalVariable::validate() {}
+void ance::GlobalVariable::validate(ValidationLogger&) {}
 
 void ance::GlobalVariable::buildGlobal(CompileContext* context)
 {

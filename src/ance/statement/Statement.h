@@ -6,6 +6,7 @@
 
 #include "ance/utility/Location.h"
 #include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 class CompileContext;
 
@@ -54,8 +55,9 @@ class Statement
 
     /**
      * Validate this statement.
+     * @param validation_logger A logger to log validation messages.
      */
-    virtual void validate() = 0;
+    virtual void validate(ValidationLogger& validation_logger) = 0;
 
     /**
      * Build this statement.

@@ -18,7 +18,7 @@ namespace ance
         ance::GlobalScope* getGlobalScope() override;
         llvm::DIScope*     getDebugScope(CompileContext* context) override;
 
-        void validate() override;
+        void validate(ValidationLogger& validation_logger) override;
 
         bool        isTypeRegistered(const std::string& type_name) override;
         ance::Type* getType(const std::string& type_name) override;

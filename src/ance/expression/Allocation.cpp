@@ -25,9 +25,9 @@ ance::Type* Allocation::type()
     return return_type_;
 }
 
-void Allocation::validate()
+void Allocation::validate(ValidationLogger& validation_logger)
 {
-    if (count_) count_->validate();
+    if (count_) count_->validate(validation_logger);
 }
 
 void Allocation::doBuild(CompileContext* context)

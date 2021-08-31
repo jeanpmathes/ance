@@ -18,7 +18,7 @@ class VariableAssignable : public Assignable
      */
     explicit VariableAssignable(std::string variable_identifier, ance::Location location);
 
-    void validate() override;
+    void validate(ValidationLogger& validation_logger) override;
 
   protected:
     void setScope(ance::Scope* scope) override;

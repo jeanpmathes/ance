@@ -30,18 +30,18 @@ ance::Type* FunctionCall::type()
     return scope_->getGlobalScope()->getFunction(identifier_)->returnType();
 }
 
-void FunctionCall::validate()
+void FunctionCall::validate(ValidationLogger& validation_logger)
 {
     std::vector<ance::Value*> arg_values;
     for (auto* arg : arguments_)
     {
-        arg->validate();
+        arg->validate(validation_logger);
         arg_values.push_back(arg->getValue());
     }
 
     ance::Function* fn = scope_->getGlobalScope()->getFunction(identifier_);
 
-    fn->validateCall(arg_values);
+    fn->validateCall(arg_values, validation_logger);
 }
 
 void FunctionCall::doBuild(CompileContext* context)

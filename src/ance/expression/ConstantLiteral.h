@@ -17,7 +17,7 @@ class ConstantLiteral : public ConstantExpression
 
     ance::Type* type() override;
 
-    void validate() override;
+    void validate(ValidationLogger& validation_logger) override;
 
     [[nodiscard]] ance::Constant* getConstantValue() const override;
 

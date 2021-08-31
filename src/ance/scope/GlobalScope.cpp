@@ -17,7 +17,7 @@ llvm::DIScope* ance::GlobalScope::getDebugScope(CompileContext* context)
     return context->unit();
 }
 
-void ance::GlobalScope::validate()
+void ance::GlobalScope::validate(ValidationLogger& validation_logger)
 {
     auto valid = true;
 
@@ -31,7 +31,7 @@ void ance::GlobalScope::validate()
         }
         else
         {
-            val->validate();
+            val->validate(validation_logger);
         }
     }
 
@@ -42,9 +42,9 @@ void ance::GlobalScope::validate()
         valid = false;
     }
 
-    for (auto const& [key, val] : global_constants_) { val->validate(); }
+    for (auto const& [key, val] : global_constants_) { val->validate(validation_logger); }
 
-    for (auto const& [key, val] : global_variables_) { val->validate(); }
+    for (auto const& [key, val] : global_variables_) { val->validate(validation_logger); }
 
     assert(valid);
 }

@@ -14,9 +14,9 @@ void ExpressionStatement::setFunction(ance::DefinedFunction* function)
     expression_->setContainingScope(function);
 }
 
-void ExpressionStatement::validate()
+void ExpressionStatement::validate(ValidationLogger& validation_logger)
 {
-    expression_->validate();
+    expression_->validate(validation_logger);
 }
 
 void ExpressionStatement::doBuild(CompileContext* context)

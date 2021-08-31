@@ -14,9 +14,9 @@ void DeleteStatement::setFunction(ance::DefinedFunction* function)
     to_delete_->setContainingScope(function);
 }
 
-void DeleteStatement::validate()
+void DeleteStatement::validate(ValidationLogger& validation_logger)
 {
-    to_delete_->validate();
+    to_delete_->validate(validation_logger);
 }
 
 void DeleteStatement::doBuild(CompileContext* context)

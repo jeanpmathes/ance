@@ -28,9 +28,9 @@ void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
     assigned_->setContainingScope(function);
 }
 
-void LocalVariableDefinition::validate()
+void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
 {
-    assigned_->validate();
+    assigned_->validate(validation_logger);
 }
 
 void LocalVariableDefinition::doBuild(CompileContext* context)

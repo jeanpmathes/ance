@@ -132,7 +132,7 @@ void ance::DefinedFunction::addReturn(ance::Value* value)
     }
 }
 
-void ance::DefinedFunction::validateCall(const std::vector<ance::Value*>& arguments)
+void ance::DefinedFunction::validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger&)
 {
     assert(arguments.size() == parameters_.size());
 
@@ -172,11 +172,11 @@ llvm::DIScope* ance::DefinedFunction::getDebugScope(CompileContext*)
     return debugSubprogram();
 }
 
-void ance::DefinedFunction::validate()
+void ance::DefinedFunction::validate(ValidationLogger& validation_logger)
 {
-    function_scope_->validate();
+    function_scope_->validate(validation_logger);
 
-    for (auto statement : statements_) { statement->validate(); }
+    for (auto statement : statements_) { statement->validate(validation_logger); }
 }
 
 ance::Variable* ance::DefinedFunction::getVariable(std::string identifier)

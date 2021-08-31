@@ -3,6 +3,7 @@
 
 #include "ance/construct/value/Value.h"
 #include "ance/scope/Scope.h"
+#include "validation/ValidationLogger.h"
 
 /**
  * Represents a construct that values can be assigned to.
@@ -27,8 +28,9 @@ class Assignable
 
     /**
      * Validate this assignable.
+     * @param validation_logger A logger to log validation messages.
      */
-    virtual void validate() = 0;
+    virtual void validate(ValidationLogger& validation_logger) = 0;
 
     /**
      * Build this assignable and the contained assignment.

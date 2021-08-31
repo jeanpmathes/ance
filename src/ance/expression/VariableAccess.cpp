@@ -20,7 +20,7 @@ ance::Type* VariableAccess::type()
     return variable_->type();
 }
 
-void VariableAccess::validate()
+void VariableAccess::validate(ValidationLogger&)
 {
     assert(variable_->isDefined() && "Variable must be defined to access it.");
 }

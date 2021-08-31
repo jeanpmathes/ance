@@ -62,8 +62,9 @@ class Application
 
     /**
      * Validate the application before compilation.
+     * @param validation_logger A logger to log validation messages.
      */
-    void validate();
+    void validate(ValidationLogger& validation_logger);
 
     /**
      * Get the top level scope of this application.

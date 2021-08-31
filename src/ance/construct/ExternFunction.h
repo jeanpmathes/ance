@@ -23,12 +23,12 @@ namespace ance
                        std::vector<ance::Parameter*> parameters,
                        ance::Location                location);
 
-        void validate() override;
+        void validate(ValidationLogger& validation_logger) override;
 
         void buildName(CompileContext* context) override;
         void build(CompileContext* context) override;
 
-        void         validateCall(const std::vector<ance::Value*>& arguments) override;
+        void validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger& validation_logger) override;
         ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
 
       protected:

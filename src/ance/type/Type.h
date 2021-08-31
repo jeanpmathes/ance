@@ -10,6 +10,7 @@
 
 #include "ance/Indexer.h"
 #include "ance/InternalStorage.h"
+#include "validation/ValidationLogger.h"
 
 class CompileContext;
 
@@ -106,16 +107,21 @@ namespace ance
          * Validate an indexer get access.
          * @param indexed The indexed value.
          * @param index The used index.
+         * @param validation_logger A logger to log validation messages.
          */
-        virtual void validateGetIndexer(ance::Value* indexed, ance::Value* index);
+        virtual void validateGetIndexer(ance::Value* indexed, ance::Value* index, ValidationLogger& validation_logger);
 
         /**
          * Validate an indexer set access.
          * @param indexed The indexed value.
          * @param index The used index.
          * @param value The assigned value.
+         * @param validation_logger A logger to log validation messages.
          */
-        virtual void validateSetIndexer(ance::Value* indexed, ance::Value* index, ance::Value* value);
+        virtual void validateSetIndexer(ance::Value*      indexed,
+                                        ance::Value*      index,
+                                        ance::Value*      value,
+                                        ValidationLogger& validation_logger);
 
         /**
          * Build a get indexer access.

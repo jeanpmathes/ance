@@ -71,7 +71,7 @@ namespace ance
                           bool                is_constant,
                           ance::Location      location);
 
-        void validate() override;
+        void validate(ValidationLogger& validation_logger) override;
 
         /**
          * Build the global variable.

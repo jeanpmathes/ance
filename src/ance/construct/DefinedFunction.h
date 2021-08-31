@@ -61,7 +61,7 @@ namespace ance
          */
         void addReturn(ance::Value* value = nullptr);
 
-        void         validateCall(const std::vector<ance::Value*>& arguments) override;
+        void validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger& validation_logger) override;
         ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
 
         /**
@@ -78,7 +78,7 @@ namespace ance
         ance::LocalScope* getFunctionScope();
         llvm::DIScope*    getDebugScope(CompileContext* context) override;
 
-        void validate() override;
+        void validate(ValidationLogger& validation_logger) override;
 
         ance::Variable* getVariable(std::string identifier) override;
 

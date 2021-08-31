@@ -19,7 +19,7 @@ class IndexerSet : public Assignable
      */
     explicit IndexerSet(Expression* indexed, Expression* index, ance::Location location);
 
-    void validate() override;
+    void validate(ValidationLogger& validation_logger) override;
 
   protected:
     void setScope(ance::Scope* scope) override;

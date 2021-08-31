@@ -12,6 +12,7 @@
 #include "compiler/AnceLinker.h"
 #include "compiler/Visitor.h"
 #include "management/File.h"
+#include "validation/ValidationLogger.h"
 
 int main(int argc, char** argv)
 {
@@ -49,12 +50,14 @@ int main(int argc, char** argv)
     llvm::InitializeAllAsmPrinters();
     llvm::InitializeAllAsmPrinters();
 
-    int e;
+    int exit_code;
 
-    application.validate();
-    bool is_valid = true;
+    ValidationLogger validation_logger;
+    application.validate(validation_logger);
 
-    if (is_valid)
+    validation_logger.emitMessages();
+
+    if (validation_logger.errorCount() == 0)
     {
         AnceCompiler compiler(application);
         AnceLinker   linker(project.root()["link"]);
@@ -75,14 +78,14 @@ int main(int argc, char** argv)
 
         linker.link(obj, exe);
 
-        e = EXIT_SUCCESS;
+        exit_code = EXIT_SUCCESS;
     }
     else
     {
-        e = EXIT_FAILURE;
+        exit_code = EXIT_FAILURE;
     }
 
     llvm::llvm_shutdown();
 
-    return e;
+    return exit_code;
 }

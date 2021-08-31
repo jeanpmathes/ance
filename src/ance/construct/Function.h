@@ -10,6 +10,7 @@
 
 #include "ance/expression/Expression.h"
 #include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 class CompileContext;
 
@@ -52,8 +53,9 @@ namespace ance
 
         /**
          * Validate this function.
+         * @param validation_logger A logger to log validation messages.
          */
-        virtual void validate() = 0;
+        virtual void validate(ValidationLogger& validation_logger) = 0;
 
         /**
          * Build the declaration of this function, allowing it to be called.
@@ -69,8 +71,9 @@ namespace ance
         /**
          * Validate a call to this function.
          * @param arguments The arguments that will be passed to the function.
+         * @param validation_logger A logger to log validation messages.
          */
-        virtual void validateCall(const std::vector<ance::Value*>& arguments) = 0;
+        virtual void validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger& validation_logger) = 0;
 
         /**
          * Build a call to this function.

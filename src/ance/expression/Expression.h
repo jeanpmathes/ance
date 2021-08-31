@@ -4,6 +4,8 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
+#include "validation/ValidationLogger.h"
+
 class CompileContext;
 
 namespace ance
@@ -27,8 +29,9 @@ class Expression
 
     /**
      * Validate this expression.
+     * @param validation_logger A logger to log validation messages.
      */
-    virtual void validate() = 0;
+    virtual void validate(ValidationLogger& validation_logger) = 0;
 
     /**
      * Get the return type of this expression.

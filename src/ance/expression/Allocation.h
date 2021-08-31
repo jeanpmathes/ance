@@ -32,7 +32,7 @@ class Allocation : public DelayableExpression
   public:
     ance::Type* type() override;
 
-    void validate() override;
+    void validate(ValidationLogger& validation_logger) override;
 
   protected:
     void doBuild(CompileContext* context) override;
