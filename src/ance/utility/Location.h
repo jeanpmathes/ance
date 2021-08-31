@@ -39,6 +39,8 @@ namespace ance
          */
         llvm::DebugLoc getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope) const;
 
+        friend std::ostream& operator<<(std::ostream& os, const ance::Location& location);
+
       private:
         unsigned                  start_line_;
         unsigned                  start_column_;

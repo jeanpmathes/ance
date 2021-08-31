@@ -1,6 +1,8 @@
 #include "Location.h"
 
-#include "llvm/IR/DIBuilder.h"
+#include <iostream>
+
+#include <llvm/IR/DIBuilder.h>
 
 ance::Location::Location(unsigned int start_line,
                          unsigned int start_column,
@@ -25,4 +27,10 @@ unsigned ance::Location::column() const
 llvm::DebugLoc ance::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope) const
 {
     return llvm::DILocation::get(*llvm_context, line(), column(), scope);
+}
+
+std::ostream& ance::operator<<(std::ostream& os, const ance::Location& location)
+{
+    os << "(" << location.start_line_ << ", " << location.start_column_ << ")";
+    return os;
 }
