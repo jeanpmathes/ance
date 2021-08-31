@@ -62,18 +62,19 @@ int main(int argc, char** argv)
         AnceCompiler compiler(application);
         AnceLinker   linker(project.root()["link"]);
 
-        std::filesystem::path out_file(argv[2]);
+        std::filesystem::path out_dir(argv[2]);
 
-        std::filesystem::path obj_dir = out_file / "obj";
-        std::filesystem::path bin_dir = out_file / "bin";
+        std::filesystem::path obj_dir = out_dir / "obj";
+        std::filesystem::path bin_dir = out_dir / "bin";
 
         std::filesystem::create_directory(obj_dir);
         std::filesystem::create_directory(bin_dir);
 
+        std::filesystem::path ilr = obj_dir / (application.getName() + ".ll");
         std::filesystem::path obj = obj_dir / (application.getName() + ".o");
         std::filesystem::path exe = bin_dir / (application.getName() + ".exe");
 
-        compiler.compile();
+        compiler.compile(ilr);
         compiler.emitObject(obj);
 
         linker.link(obj, exe);

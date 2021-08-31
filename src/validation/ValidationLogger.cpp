@@ -16,5 +16,5 @@ size_t ValidationLogger::errorCount() const
 
 void ValidationLogger::emitMessages()
 {
-    std::cout << "Report: " << warningCount() << " warnings, " << errorCount() << " errors." << std::endl;
+    std::cout << "ance-c: validation: " << warningCount() << " warnings, " << errorCount() << " errors" << std::endl;
 }

@@ -24,8 +24,9 @@ class AnceCompiler
 
     /**
      * Compile the application.
+     * @param out Path to emit the llvm IR at.
      */
-    void compile();
+    void compile(const std::filesystem::path& out);
     /**
      * Emit object files.
      * @param out The path of the object files.

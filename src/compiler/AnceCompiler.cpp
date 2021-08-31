@@ -56,7 +56,7 @@ AnceCompiler::AnceCompiler(Application& app) : application_(app), ir_(llvm_conte
     context_ = new CompileContext(&application_, new Runtime(), &llvm_context_, module_, &ir_, di_, unit, src_file);
 }
 
-void AnceCompiler::compile()
+void AnceCompiler::compile(const std::filesystem::path& out)
 {
     context_->runtime()->init(context_);
 
@@ -78,7 +78,15 @@ void AnceCompiler::compile()
     di_->finalize();
 
     llvm::verifyModule(*module_, &llvm::errs());
-    module_->print(llvm::outs(), nullptr);
+
+    // Emit llvm IR to file.
+
+    std::error_code      ec;
+    llvm::raw_fd_ostream out_stream(out.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
+
+    if (ec) { std::cerr << "IO error while creating IR file stream: " << ec.message() << std::endl; }
+
+    module_->print(out_stream, nullptr);
 }
 
 void AnceCompiler::emitObject(const std::filesystem::path& out)
