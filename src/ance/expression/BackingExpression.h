@@ -13,13 +13,6 @@ class BackingExpression
     , public BuildableExpression
 {
   protected:
-    /**
-     * Create a new backing expression with a given source location.
-     * @param location The source location.
-     */
-    explicit BackingExpression(ance::Location location);
-
-  protected:
     void doBuild(CompileContext* context) final;
 
   public:

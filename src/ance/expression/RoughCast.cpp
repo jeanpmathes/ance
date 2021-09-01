@@ -3,8 +3,9 @@
 #include "ance/construct/value/RoughlyCastedValue.h"
 #include "ance/type/Type.h"
 
-RoughCast::RoughCast(ance::Type* target_type, Expression* expression)
-    : target_type_(target_type)
+RoughCast::RoughCast(ance::Type* target_type, Expression* expression, ance::Location location)
+    : Expression(location)
+    , target_type_(target_type)
     , expression_(expression)
     , return_value_(new ance::RoughlyCastedValue(target_type, expression->getValue()))
 {}

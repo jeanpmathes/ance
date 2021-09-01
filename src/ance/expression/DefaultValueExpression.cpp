@@ -5,7 +5,7 @@
 #include "ance/type/Type.h"
 
 DefaultValueExpression::DefaultValueExpression(ance::Type* type, ance::Location location)
-    : BackingConstantExpression(location)
+    : Expression(location)
     , type_(type)
 {}
 

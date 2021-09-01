@@ -12,13 +12,6 @@ class BackingConstantExpression
     : public ConstantExpression
     , public BackingExpression
 {
-  protected:
-    /**
-     * Create a new backing constant expression with a given source location.
-     * @param location The source location.
-     */
-    explicit BackingConstantExpression(ance::Location location);
-
   public:
     /**
      * Build the constant.

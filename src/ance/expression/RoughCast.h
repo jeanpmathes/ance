@@ -18,8 +18,9 @@ class RoughCast : public Expression
      * Create a new rough cast.
      * @param target_type The target type.
      * @param expression The expression providing the value to cast.
+     * @param location The source location.
      */
-    RoughCast(ance::Type* target_type, Expression* expression);
+    RoughCast(ance::Type* target_type, Expression* expression, ance::Location location);
 
     void setContainingScope(ance::Scope* scope) override;
 

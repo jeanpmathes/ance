@@ -6,7 +6,7 @@
 #include "ance/scope/Scope.h"
 
 VariableAccess::VariableAccess(std::string identifier, ance::Location location)
-    : DelayableExpression(location)
+    : Expression(location)
     , identifier_(std::move(identifier))
 {}
 

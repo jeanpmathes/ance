@@ -20,7 +20,20 @@ namespace ance
  */
 class Expression
 {
+  protected:
+    /**
+     * Create an expression.
+     * @param location The source location of this expression. Use the zero location if the expression has no source location.
+     */
+    explicit Expression(ance::Location location);
+
   public:
+    /**
+     * Get the source location.
+     * @return The source location. Might not refer to an actual location.
+     */
+    [[nodiscard]] ance::Location location() const;
+
     /**
      * Set the scope containing this expression.
      * @param scope The containing scope.
@@ -45,6 +58,9 @@ class Expression
     [[nodiscard]] virtual ance::Value* getValue() const = 0;
 
     virtual ~Expression() = default;
+
+  private:
+    ance::Location location_;
 };
 
 #endif

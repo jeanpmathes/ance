@@ -1,7 +1,5 @@
 #include "BackingExpression.h"
 
-BackingExpression::BackingExpression(ance::Location location) : BuildableExpression(location) {}
-
 void BackingExpression::doBuild(CompileContext* context)
 {
     assert(!native_value_ && "Expressions must be built only once.");

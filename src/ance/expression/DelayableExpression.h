@@ -13,13 +13,6 @@ class DelayableExpression
     : public virtual Expression
     , public BuildableExpression
 {
-  protected:
-    /**
-     * Create a new delayable expression with a given source location.
-     * @param location The source location.
-     */
-    explicit DelayableExpression(ance::Location location);
-
   public:
     [[nodiscard]] ance::Value* getValue() const override;
 

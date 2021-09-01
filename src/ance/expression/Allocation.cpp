@@ -8,7 +8,7 @@ Allocation::Allocation(Runtime::Allocator allocation,
                        Expression*        count,
                        Application&       app,
                        ance::Location     location)
-    : DelayableExpression(location)
+    : Expression(location)
     , allocation_(allocation)
     , allocated_type_(type)
     , count_(count)

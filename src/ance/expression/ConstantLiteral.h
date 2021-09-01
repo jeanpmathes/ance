@@ -12,8 +12,9 @@ class ConstantLiteral : public ConstantExpression
     /**
      * Create a new constant literal.
      * @param constant The constant to wrap.
+     * @param location The source location.
      */
-    explicit ConstantLiteral(ance::Constant* constant);
+    explicit ConstantLiteral(ance::Constant* constant, ance::Location location);
 
     ance::Type* type() override;
 

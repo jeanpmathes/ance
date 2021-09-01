@@ -3,7 +3,7 @@
 #include "ance/type/Type.h"
 
 IndexerGet::IndexerGet(Expression* indexed, Expression* index, ance::Location location)
-    : DelayableExpression(location)
+    : Expression(location)
     , indexed_(indexed)
     , index_(index)
 {}

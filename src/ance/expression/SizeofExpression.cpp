@@ -5,7 +5,7 @@
 #include "compiler/CompileContext.h"
 
 SizeofExpression::SizeofExpression(Expression* expression, ance::Location location)
-    : BackingExpression(location)
+    : Expression(location)
     , expression_(expression)
 {}
 
