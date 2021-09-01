@@ -60,13 +60,17 @@ ance::Value* ance::PointerType::buildGetIndexer(ance::Value* indexed, ance::Valu
 }
 
 void ance::PointerType::validateSetIndexer(ance::Value* indexed,
-                                           ance::Value* index,
-                                           ance::Value* value,
-                                           ValidationLogger&)
+                                           ance::Location,
+                                           ance::Value*      index,
+                                           ance::Location    index_location,
+                                           ance::Value*      value,
+                                           ance::Location    value_location,
+                                           ValidationLogger& validation_logger)
 {
-    assert(indexed->type() == this && "Indexed value has to be of pointer type.");
-    assert(index->type() == ance::SizeType::get() && "Pointer index has to be size type.");
-    assert(value->type() == element_type_ && "Assigned value has to be of element type.");
+    assert(indexed->type() == this && "Method call on wrong type.");
+
+    checkMismatch(ance::SizeType::get(), index->type(), index_location, validation_logger);
+    checkMismatch(element_type_, value->type(), value_location, validation_logger);
 }
 
 void ance::PointerType::buildSetIndexer(ance::Value*    indexed,

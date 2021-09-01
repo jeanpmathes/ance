@@ -10,10 +10,11 @@ void Assignable::setContainingScope(ance::Scope* scope)
     setScope(scope);
 }
 
-void Assignable::assign(ance::Value* value)
+void Assignable::assign(ance::Value* value, ance::Location location)
 {
     assert(!assigned_value_ && "There may be only one value assigned to an assignable.");
-    assigned_value_ = value;
+    assigned_value_    = value;
+    assigned_location_ = location;
 }
 
 void Assignable::build(CompileContext* context)
@@ -23,12 +24,17 @@ void Assignable::build(CompileContext* context)
     context->resetDebugLocation();
 }
 
-ance::Value* Assignable::assigned()
+ance::Value* Assignable::assigned() const
 {
     return assigned_value_;
 }
 
-ance::Location Assignable::location()
+ance::Location Assignable::assignedLocation() const
+{
+    return assigned_location_;
+}
+
+ance::Location Assignable::location() const
 {
     return location_;
 }

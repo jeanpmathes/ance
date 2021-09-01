@@ -48,7 +48,14 @@ ance::Type* ance::Type::getIndexerReturnType()
 }
 
 void ance::Type::validateGetIndexer(ance::Value*, ance::Value*, ValidationLogger&) {}
-void ance::Type::validateSetIndexer(ance::Value*, ance::Value*, ance::Value*, ValidationLogger&) {}
+void ance::Type::validateSetIndexer(ance::Value*,
+                                    ance::Location,
+                                    ance::Value*,
+                                    ance::Location,
+                                    ance::Value*,
+                                    ance::Location,
+                                    ValidationLogger&)
+{}
 
 ance::Value* ance::Type::buildGetIndexer(ance::Value*, ance::Value*, CompileContext*)
 {
@@ -56,3 +63,16 @@ ance::Value* ance::Type::buildGetIndexer(ance::Value*, ance::Value*, CompileCont
 }
 
 void ance::Type::buildSetIndexer(ance::Value*, ance::Value*, ance::Value*, CompileContext*) {}
+
+void ance::Type::checkMismatch(ance::Type*       expected,
+                               ance::Type*       actual,
+                               ance::Location    location,
+                               ValidationLogger& validation_logger)
+{
+    if (expected != actual)
+    {
+        validation_logger.logError("Cannot implicitly convert '" + actual->getName() + "' to '" + expected->getName()
+                                       + "'",
+                                   location);
+    }
+}

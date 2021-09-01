@@ -19,9 +19,20 @@ void IndexerSet::validate(ValidationLogger& validation_logger)
 
     ance::Type* indexed_type = indexed_->type();
 
-    assert(indexed_type->isIndexerDefined(Indexer::SET) && "Type does not support this indexer.");
-
-    indexed_type->validateSetIndexer(indexed_->getValue(), index_->getValue(), assigned(), validation_logger);
+    if (indexed_type->isIndexerDefined(Indexer::SET))
+    {
+        indexed_type->validateSetIndexer(indexed_->getValue(),
+                                         indexed_->location(),
+                                         index_->getValue(),
+                                         index_->location(),
+                                         assigned(),
+                                         assignedLocation(),
+                                         validation_logger);
+    }
+    else
+    {
+        validation_logger.logError("Type '" + indexed_type->getName() + "' does not provide set indexer", location());
+    }
 }
 
 void IndexerSet::doBuild(CompileContext* context)

@@ -10,7 +10,7 @@ AssignmentStatement::AssignmentStatement(Assignable* assignable, Expression* ass
     , assignable_(assignable)
     , assigned_(assigned)
 {
-    assignable_->assign(assigned->getValue());
+    assignable_->assign(assigned->getValue(), assigned->location());
 }
 
 void AssignmentStatement::setFunction(ance::DefinedFunction* function)

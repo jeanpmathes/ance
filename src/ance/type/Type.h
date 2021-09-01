@@ -114,13 +114,19 @@ namespace ance
         /**
          * Validate an indexer set access.
          * @param indexed The indexed value.
+         * @param indexed_location The source location of the indexed value.
          * @param index The used index.
+         * @param index_location The source location of the index.
          * @param value The assigned value.
+         * @param value_location The source location of the assigned value.
          * @param validation_logger A logger to log validation messages.
          */
         virtual void validateSetIndexer(ance::Value*      indexed,
+                                        ance::Location    indexed_location,
                                         ance::Value*      index,
+                                        ance::Location    index_location,
                                         ance::Value*      value,
+                                        ance::Location    value_location,
                                         ValidationLogger& validation_logger);
 
         /**
@@ -146,6 +152,11 @@ namespace ance
 
       protected:
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
+
+        static void checkMismatch(ance::Type*       expected,
+                                  ance::Type*       actual,
+                                  ance::Location    location,
+                                  ValidationLogger& validation_logger);
 
       private:
         llvm::DIType* debug_type_ {nullptr};

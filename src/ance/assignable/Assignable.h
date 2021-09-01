@@ -23,8 +23,9 @@ class Assignable
     /**
      * Assign a value to this assignable.
      * @param value The value to assign.
+     * @param location The source location
      */
-    void assign(ance::Value* value);
+    void assign(ance::Value* value, ance::Location location);
 
     /**
      * Validate this assignable.
@@ -43,7 +44,13 @@ class Assignable
      * Get the assigned value.
      * @return The assigned value.
      */
-    ance::Value* assigned();
+    [[nodiscard]] ance::Value* assigned() const;
+
+    /**
+     * Get the location of the assigned value.
+     * @return The assigned value source location.
+     */
+    [[nodiscard]] ance::Location assignedLocation() const;
 
     /**
      * Override to receive the containing scope.
@@ -61,7 +68,7 @@ class Assignable
      * Get the location of this assignable.
      * @return The source location.
      */
-    ance::Location location();
+    [[nodiscard]] ance::Location location() const;
 
   public:
     virtual ~Assignable() = default;
@@ -69,7 +76,9 @@ class Assignable
   private:
     ance::Location location_;
     ance::Scope*   containing_scope_ {nullptr};
+
     ance::Value*   assigned_value_ {nullptr};
+    ance::Location assigned_location_ {ance::Location(0, 0, 0, 0)};
 };
 
 #endif
