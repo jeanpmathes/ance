@@ -73,12 +73,27 @@ namespace ance
          * @return True if the function exists in this scope.
          */
         bool hasFunction(const std::string& identifier);
+
         /**
          * Check if a given function is defined.
          * @param identifier The name of the function.
          * @return True if it is defined.
          */
         bool isFunctionDefined(const std::string& identifier);
+
+        /**
+         * Check if this global scope has an entry point.
+         * The default entry point is a main method returning ui32.
+         * @return True if there is an entry point.
+         */
+        bool hasEntry();
+
+        /**
+         * Check if this global scope has an exit point
+         * The default exit point is an exit method taking a ui32.
+         * @return True if there is an exit point.
+         */
+        bool hasExit();
 
         /**
          * Get a function by its identifier.

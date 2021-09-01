@@ -56,3 +56,11 @@ ance::Type* ance::IntegerType::get(Application& app, uint64_t bit_size, bool is_
         return type;
     }
 }
+
+bool ance::IntegerType::isIntegerType(ance::Type* type, uint64_t bit_size, bool is_signed)
+{
+    auto* integer_type = dynamic_cast<ance::IntegerType*>(type);
+    if (!integer_type) return false;
+
+    return integer_type->bit_size_ == bit_size && integer_type->is_signed_ == is_signed;
+}

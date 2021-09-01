@@ -61,7 +61,6 @@ namespace ance
          */
         void addReturn(ance::Value* value = nullptr);
 
-        void validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger& validation_logger) override;
         ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
 
         /**
@@ -92,8 +91,6 @@ namespace ance
       private:
         AccessModifier access_;
         ance::Location definition_location_;
-
-        std::vector<ance::Parameter*> parameters_;
 
         ance::Scope*      containing_scope_;
         ance::LocalScope* function_scope_;

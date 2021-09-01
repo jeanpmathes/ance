@@ -30,20 +30,38 @@ namespace ance
          * Create a new function.
          * @param function_name The function name.
          * @param return_type The return type of the function.
+         * @param parameters The function parameters.
          * @param location The location of the function in the source code.
          */
-        Function(std::string function_name, ance::Type* return_type, ance::Location location);
+        Function(std::string                   function_name,
+                 ance::Type*                   return_type,
+                 std::vector<ance::Parameter*> parameters,
+                 ance::Location                location);
 
         /**
          * Get the name of this function.
          * @return The name.
          */
         [[nodiscard]] std::string name() const;
+
         /**
          * Get the return type of this function.
          * @return The return type.
          */
         [[nodiscard]] ance::Type* returnType() const;
+
+        /**
+         * Get the type of a parameter.
+         * @param index The index of the parameter. Must be smaller than the parameter count.
+         * @return The type of the selected parameter.
+         */
+        [[nodiscard]] ance::Type* parameterType(size_t index) const;
+
+        /**
+         * Get the parameter count.
+         * @return The number of parameters this function is called with.
+         */
+        [[nodiscard]] size_t parameterCount() const;
 
         /**
          * Get the source location.
@@ -73,7 +91,7 @@ namespace ance
          * @param arguments The arguments that will be passed to the function.
          * @param validation_logger A logger to log validation messages.
          */
-        virtual void validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger& validation_logger) = 0;
+        virtual void validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger& validation_logger);
 
         /**
          * Build a call to this function.
@@ -85,17 +103,20 @@ namespace ance
 
       protected:
         /**
+         * Get the function parameters.
+         * @return A vector containing the parameters.
+         */
+        std::vector<ance::Parameter*>& parameters();
+
+        /**
          * A helper to create a native function.
-         * @param parameters The parameters.
          * @param linkage The linkage type.
          * @param c The llvm context.
          * @param m The llvm module.
          * @return The native function type and the native function.
          */
-        std::pair<llvm::FunctionType*, llvm::Function*> createNativeFunction(
-            const std::vector<ance::Parameter*>& parameters,
-            llvm::GlobalValue::LinkageTypes      linkage,
-            llvm::LLVMContext&                   c,
+        std::pair<llvm::FunctionType*, llvm::Function*> createNativeFunction(llvm::GlobalValue::LinkageTypes linkage,
+                                                                             llvm::LLVMContext&                   c,
             llvm::Module*                        m);
 
         /**
@@ -113,8 +134,9 @@ namespace ance
 
       private:
         std::string    name_;
-        ance::Type*    return_type_;
-        ance::Location location_;
+        ance::Type*                   return_type_;
+        std::vector<ance::Parameter*> parameters_;
+        ance::Location                location_;
     };
 }
 

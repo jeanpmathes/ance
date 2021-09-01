@@ -83,14 +83,14 @@ void Application::validate(ValidationLogger& validation_logger)
 {
     global_scope_->validate(validation_logger);
 
-    if (!global_scope_->hasFunction("main"))
+    if (!global_scope_->hasEntry())
     {
-        validation_logger.logError("Entry point 'main' could not be found", ance::Location(0, 0, 0, 0));
+        validation_logger.logError("Entry point 'ui32 main()' could not be found", ance::Location(0, 0, 0, 0));
     }
 
-    if (!global_scope_->hasFunction("exit"))
+    if (!global_scope_->hasExit())
     {
-        validation_logger.logError("Exit point 'exit' could not be found", ance::Location(0, 0, 0, 0));
+        validation_logger.logError("Exit point 'void exit(ui32)' could not be found", ance::Location(0, 0, 0, 0));
     }
 }
 

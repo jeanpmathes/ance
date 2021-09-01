@@ -17,15 +17,14 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                access,
                                        ance::Scope*                  scope,
                                        ance::Location                declaration_location,
                                        ance::Location                definition_location)
-    : ance::Function(std::move(function_name), return_type, declaration_location)
+    : ance::Function(function_name, return_type, std::move(parameters), declaration_location)
     , access_(access)
     , definition_location_(definition_location)
-    , parameters_(std::move(parameters))
     , containing_scope_(scope)
     , function_scope_(new ance::LocalScope(this))
 {
     unsigned no = 1;
-    for (auto* parameter : parameters_)
+    for (auto* parameter : this->parameters())
     {
         ance::LocalVariable* arg = function_scope_->defineParameterVariable(parameter->name(),
                                                                             parameter->type(),
@@ -46,12 +45,12 @@ void ance::DefinedFunction::pushStatement(Statement* statement)
 void ance::DefinedFunction::buildName(CompileContext* context)
 {
     std::tie(native_type_, native_function_) =
-        createNativeFunction(parameters_, access_.linkage(), *context->llvmContext(), context->module());
+        createNativeFunction(access_.linkage(), *context->llvmContext(), context->module());
 
     std::vector<llvm::Metadata*> di_types;
     di_types.push_back(returnType()->getDebugType(context));
 
-    for (const auto& pair : zip(parameters_, native_function_->args()))
+    for (const auto& pair : zip(parameters(), native_function_->args()))
     {
         const auto& [parameter, argument] = pair;
         parameter->wrap(&argument);
@@ -129,16 +128,6 @@ void ance::DefinedFunction::addReturn(ance::Value* value)
         assert(returnType() == ance::VoidType::get());
         return_value_ = nullptr;
         has_return_   = true;
-    }
-}
-
-void ance::DefinedFunction::validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger&)
-{
-    assert(arguments.size() == parameters_.size());
-
-    for (auto pair : llvm::zip(parameters_, arguments))
-    {
-        assert(std::get<0>(pair)->type() == std::get<1>(pair)->type() && "Input parameter types must match.");
     }
 }
 

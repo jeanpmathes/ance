@@ -59,6 +59,11 @@ namespace ance
          */
         static ance::Type* get(Application& app, ance::Type* element_type);
 
+        /**
+         * Check if a given type is a pointer type.
+         * @param type The type.
+         * @return True if it is a pointer type.
+         */
         static bool isPointerType(ance::Type* type);
     };
 }

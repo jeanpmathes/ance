@@ -6,6 +6,8 @@
 #include "ance/AccessModifier.h"
 #include "ance/construct/Function.h"
 #include "ance/expression/ConstantExpression.h"
+#include "ance/type/IntegerType.h"
+#include "ance/type/VoidType.h"
 
 ance::GlobalScope* ance::GlobalScope::getGlobalScope()
 {
@@ -21,9 +23,9 @@ void ance::GlobalScope::validate(ValidationLogger& validation_logger)
 {
     auto valid = true;
 
-    for (auto const& [key, val] : functions_)
+    for (auto const& [key, fn] : functions_)
     {
-        if (val == nullptr)
+        if (fn == nullptr)
         {
             std::cout << "A function is used but not defined: " << key << std::endl;
 
@@ -31,7 +33,7 @@ void ance::GlobalScope::validate(ValidationLogger& validation_logger)
         }
         else
         {
-            val->validate(validation_logger);
+            fn->validate(validation_logger);
         }
     }
 
@@ -164,6 +166,27 @@ bool ance::GlobalScope::hasFunction(const std::string& identifier)
 bool ance::GlobalScope::isFunctionDefined(const std::string& identifier)
 {
     return hasFunction(identifier) && functions_[identifier] != nullptr;
+}
+
+bool ance::GlobalScope::hasEntry()
+{
+    auto c = functions_.find("main");
+    if (c == functions_.end()) return false;
+
+    ance::Function* function = c->second;
+
+    return function->parameterCount() == 0 && ance::IntegerType::isIntegerType(function->returnType(), 32, false);
+}
+
+bool ance::GlobalScope::hasExit()
+{
+    auto c = functions_.find("exit");
+    if (c == functions_.end()) return false;
+
+    ance::Function* function = c->second;
+
+    return function->parameterCount() == 1 && ance::IntegerType::isIntegerType(function->parameterType(0), 32, false)
+        && function->returnType() == ance::VoidType::get();
 }
 
 ance::Function* ance::GlobalScope::getFunction(const std::string& identifier)

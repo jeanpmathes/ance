@@ -27,16 +27,12 @@ namespace ance
 
         void buildName(CompileContext* context) override;
         void build(CompileContext* context) override;
-
-        void validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger& validation_logger) override;
         ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
 
       protected:
         using Function::buildCall;
 
       private:
-        std::vector<ance::Parameter*> parameters_;
-
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};
     };

@@ -41,6 +41,15 @@ namespace ance
          * @return The instance.
          */
         static ance::Type* get(Application& app, uint64_t bit_size, bool is_signed);
+
+        /**
+         * Check if a given type is an integer type with the given attributes.
+         * @param type The type to check.
+         * @param bit_size The size attribute.
+         * @param is_signed The sign attribute.
+         * @return True if the given type is as specified.
+         */
+        static bool isIntegerType(ance::Type* type, uint64_t bit_size, bool is_signed);
     };
 }
 

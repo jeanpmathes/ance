@@ -10,33 +10,21 @@ ance::ExternFunction::ExternFunction(std::string                   function_name
                                      ance::Type*                   return_type,
                                      std::vector<ance::Parameter*> parameters,
                                      ance::Location                location)
-    : ance::Function(std::move(function_name), return_type, location)
-    , parameters_(std::move(parameters))
+    : ance::Function(std::move(function_name), return_type, std::move(parameters), location)
 {}
 
 void ance::ExternFunction::validate(ValidationLogger&) {}
 
 void ance::ExternFunction::buildName(CompileContext* context)
 {
-    std::tie(native_type_, native_function_) = createNativeFunction(parameters_,
-                                                                    llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+    std::tie(native_type_, native_function_) = createNativeFunction(llvm::GlobalValue::LinkageTypes::ExternalLinkage,
                                                                     *context->llvmContext(),
                                                                     context->module());
 
-    for (auto pair : zip(parameters_, native_function_->args())) { std::get<0>(pair)->wrap(&std::get<1>(pair)); }
+    for (auto pair : zip(parameters(), native_function_->args())) { std::get<0>(pair)->wrap(&std::get<1>(pair)); }
 }
 
 void ance::ExternFunction::build(CompileContext*) {}
-
-void ance::ExternFunction::validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger&)
-{
-    assert(arguments.size() == parameters_.size());
-
-    for (auto pair : llvm::zip(parameters_, arguments))
-    {
-        assert(std::get<0>(pair)->type() == std::get<1>(pair)->type() && "Input parameter types must match.");
-    }
-}
 
 ance::Value* ance::ExternFunction::buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const
 {
