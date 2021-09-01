@@ -107,7 +107,8 @@ void ance::DefinedFunction::build(CompileContext* context)
         if (returnType() == ance::VoidType::get()) { context->ir()->CreateRetVoid(); }
         else
         {
-            assert(true && "Functions with return type that is not void require a return statement.");
+            // todo should actually be part of validation step
+            assert(false && "Functions with return type that is not void require a return statement.");
         }
     }
 
@@ -119,13 +120,13 @@ void ance::DefinedFunction::addReturn(ance::Value* value)
 {
     if (value)
     {
-        assert(value->type() == returnType());
+        assert(value->type() == returnType() && "Returned value does not match function return type.");
         return_value_ = value;
         has_return_   = true;
     }
     else
     {
-        assert(returnType() == ance::VoidType::get());
+        assert(returnType() == ance::VoidType::get() && "Cannot return value from void function.");
         return_value_ = nullptr;
         has_return_   = true;
     }
