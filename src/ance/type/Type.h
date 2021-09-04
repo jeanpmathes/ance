@@ -153,6 +153,14 @@ namespace ance
       protected:
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
 
+      public:
+        /**
+         * Validate that a type matches the expected type.
+         * @param expected The expected type.
+         * @param actual The actual type.
+         * @param location The source location to use for logging.
+         * @param validation_logger The validation logger.
+         */
         static void checkMismatch(ance::Type*       expected,
                                   ance::Type*       actual,
                                   ance::Location    location,

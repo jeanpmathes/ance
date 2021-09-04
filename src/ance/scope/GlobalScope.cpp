@@ -21,15 +21,11 @@ llvm::DIScope* ance::GlobalScope::getDebugScope(CompileContext* context)
 
 void ance::GlobalScope::validate(ValidationLogger& validation_logger)
 {
-    auto valid = true;
-
     for (auto const& [key, fn] : functions_)
     {
         if (fn == nullptr)
         {
             std::cout << "A function is used but not defined: " << key << std::endl;
-
-            valid = false;
         }
         else
         {
@@ -37,18 +33,9 @@ void ance::GlobalScope::validate(ValidationLogger& validation_logger)
         }
     }
 
-    if (!global_undefined_.empty())
-    {
-        std::cout << "Undefined global variables." << std::endl;
-
-        valid = false;
-    }
-
     for (auto const& [key, val] : global_constants_) { val->validate(validation_logger); }
 
     for (auto const& [key, val] : global_variables_) { val->validate(validation_logger); }
-
-    assert(valid);
 }
 
 bool ance::GlobalScope::isTypeRegistered(const std::string& type_name)

@@ -89,8 +89,9 @@ namespace ance
          * Validate setting a value.
          * @param value The value to set.
          * @param validation_logger A logger to log validation messages.
+         * @param location The source location.
          */
-        void validateSetValue(ance::Value* value, ValidationLogger& validation_logger);
+        void validateSetValue(ance::Value* value, ValidationLogger& validation_logger, ance::Location location) const;
 
         /**
          * Get the current value of the variable.

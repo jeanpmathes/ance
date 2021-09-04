@@ -58,13 +58,14 @@ void ance::GlobalVariable::defineGlobal(ance::Scope*        containing_scope,
     initial_value_ = constant_init_->getConstantValue();
 }
 
-void ance::GlobalVariable::validate(ValidationLogger&) {}
-
-void ance::GlobalVariable::buildGlobal(CompileContext* context)
+void ance::GlobalVariable::validate(ValidationLogger&)
 {
     assert(type() != ance::VoidType::get());
     assert(type() == initial_value_->type());
+}
 
+void ance::GlobalVariable::buildGlobal(CompileContext* context)
+{
     llvm::GlobalValue::LinkageTypes linkage = access_.linkage();
 
     initial_value_->buildContentConstant(context->module());

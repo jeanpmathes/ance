@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "ance/construct/value/Value.h"
+#include "ance/type/Type.h"
 
 ance::Variable::Variable(ance::Scope* containing_scope, std::string identifier, ance::Type* type, bool is_final)
     : identifier_(std::move(identifier))
@@ -38,7 +39,6 @@ bool ance::Variable::isDefined() const
 
 std::string ance::Variable::identifier() const
 {
-    assert(is_defined_);
     return identifier_;
 }
 
@@ -60,8 +60,21 @@ bool ance::Variable::isFinal() const
     return is_final_;
 }
 
-void ance::Variable::validateSetValue(ance::Value* value, ValidationLogger&)
+void ance::Variable::validateSetValue(ance::Value*      value,
+                                      ValidationLogger& validation_logger,
+                                      ance::Location    location) const
 {
-    assert(!isFinal() && "Cannot assign to final variable.");
-    assert(type() == value->type() && "Assignment types have to match.");
+    if (!isDefined())
+    {
+        validation_logger.logError("Name '" + identifier() + "' is not defined in the current context", location);
+        return;// The following variable methods require that the variable is defined.
+    }
+
+    if (isFinal())
+    {
+        validation_logger.logError("Cannot assign to final variable '" + identifier() + "'", location);
+        return;// Type mismatch is not relevant if assignment is not allowed no matter what.
+    }
+
+    ance::Type::checkMismatch(type(), value->type(), location, validation_logger);
 }

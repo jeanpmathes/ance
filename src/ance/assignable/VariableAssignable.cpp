@@ -13,7 +13,7 @@ void VariableAssignable::setScope(ance::Scope* scope)
 void VariableAssignable::validate(ValidationLogger& validation_logger)
 {
     ance::Variable* variable = scope_->getVariable(variable_identifier_);
-    variable->validateSetValue(assigned(), validation_logger);
+    variable->validateSetValue(assigned(), validation_logger, ance::Location(0, 0, 0, 0));
 }
 
 void VariableAssignable::doBuild(CompileContext* context)

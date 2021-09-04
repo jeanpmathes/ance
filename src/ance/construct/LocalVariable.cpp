@@ -20,7 +20,10 @@ ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope,
     , location_(location)
 {}
 
-void ance::LocalVariable::validate(ValidationLogger&) {}
+void ance::LocalVariable::validate(ValidationLogger&)
+{
+    assert(type() == initial_value_->type() && "Assignment types have to match.");
+}
 
 void ance::LocalVariable::build(CompileContext* context)
 {
@@ -58,8 +61,6 @@ void ance::LocalVariable::build(CompileContext* context)
             location_.getDebugLoc(context->llvmContext(), containing_scope_->getDebugScope(context)),
             context->ir()->GetInsertBlock());
     }
-
-    assert(type() == initial_value_->type() && "Assignment types have to match.");
 
     store(initial_value_, context);
 }
