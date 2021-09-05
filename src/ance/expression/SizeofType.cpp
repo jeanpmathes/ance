@@ -10,7 +10,10 @@ ance::Type* SizeofType::type()
     return ance::SizeType::get();
 }
 
-void SizeofType::validate(ValidationLogger&) {}
+bool SizeofType::validate(ValidationLogger&)
+{
+    return true;
+}
 
 ance::Value* SizeofType::getValue() const
 {

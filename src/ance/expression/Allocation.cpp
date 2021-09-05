@@ -26,14 +26,16 @@ ance::Type* Allocation::type()
     return return_type_;
 }
 
-void Allocation::validate(ValidationLogger& validation_logger)
+bool Allocation::validate(ValidationLogger& validation_logger)
 {
     if (count_)
     {
         count_->validate(validation_logger);
 
-        ance::Type::checkMismatch(ance::SizeType::get(), count_->type(), location(), validation_logger);
+        return ance::Type::checkMismatch(ance::SizeType::get(), count_->type(), location(), validation_logger);
     }
+
+    return true;
 }
 
 void Allocation::doBuild(CompileContext* context)

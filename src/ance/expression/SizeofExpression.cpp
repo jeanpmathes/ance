@@ -19,9 +19,9 @@ ance::Type* SizeofExpression::type()
     return ance::SizeType::get();
 }
 
-void SizeofExpression::validate(ValidationLogger& validation_logger)
+bool SizeofExpression::validate(ValidationLogger& validation_logger)
 {
-    expression_->validate(validation_logger);
+    return expression_->validate(validation_logger);
 }
 
 ance::Value* SizeofExpression::getValue() const

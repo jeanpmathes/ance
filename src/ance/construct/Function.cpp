@@ -37,7 +37,7 @@ ance::Location ance::Function::location() const
     return location_;
 }
 
-void ance::Function::validateCall(const std::vector<std::pair<ance::Value*, ance::Location>>& arguments,
+bool ance::Function::validateCall(const std::vector<std::pair<ance::Value*, ance::Location>>& arguments,
                                   ance::Location                                              location,
                                   ValidationLogger&                                           validation_logger)
 {
@@ -46,14 +46,18 @@ void ance::Function::validateCall(const std::vector<std::pair<ance::Value*, ance
         validation_logger.logError("No overload of '" + name() + "' takes " + std::to_string(arguments.size())
                                        + " arguments",
                                    location);
-        return;
+        return false;
     }
+
+    bool valid = true;
 
     for (const auto& [param, arg] : llvm::zip(parameters_, arguments))
     {
         auto [arg_value, arg_location] = arg;
-        ance::Type::checkMismatch(param->type(), arg_value->type(), arg_location, validation_logger);
+        valid &= ance::Type::checkMismatch(param->type(), arg_value->type(), arg_location, validation_logger);
     }
+
+    return valid;
 }
 
 std::vector<ance::Parameter*>& ance::Function::parameters()

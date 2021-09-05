@@ -64,7 +64,7 @@ ance::Value* ance::Type::buildGetIndexer(ance::Value*, ance::Value*, CompileCont
 
 void ance::Type::buildSetIndexer(ance::Value*, ance::Value*, ance::Value*, CompileContext*) {}
 
-void ance::Type::checkMismatch(ance::Type*       expected,
+bool ance::Type::checkMismatch(ance::Type*       expected,
                                ance::Type*       actual,
                                ance::Location    location,
                                ValidationLogger& validation_logger)
@@ -74,5 +74,9 @@ void ance::Type::checkMismatch(ance::Type*       expected,
         validation_logger.logError("Cannot implicitly convert '" + actual->getName() + "' to '" + expected->getName()
                                        + "'",
                                    location);
+
+        return false;
     }
+
+    return true;
 }

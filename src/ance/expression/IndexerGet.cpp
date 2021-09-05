@@ -19,7 +19,7 @@ ance::Type* IndexerGet::type()
     return indexed_->type()->getIndexerReturnType();
 }
 
-void IndexerGet::validate(ValidationLogger& validation_logger)
+bool IndexerGet::validate(ValidationLogger& validation_logger)
 {
     indexed_->validate(validation_logger);
     index_->validate(validation_logger);
@@ -28,6 +28,8 @@ void IndexerGet::validate(ValidationLogger& validation_logger)
     assert(indexed_type->isIndexerDefined(Indexer::GET) && "Type does not support this indexer.");
 
     indexed_type->validateGetIndexer(indexed_->getValue(), index_->getValue(), validation_logger);
+
+    return true;
 }
 
 void IndexerGet::doBuild(CompileContext* context)

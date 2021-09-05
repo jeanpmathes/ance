@@ -14,7 +14,10 @@ ance::Type* DefaultValueExpression::type()
     return type_;
 }
 
-void DefaultValueExpression::validate(ValidationLogger&) {}
+bool DefaultValueExpression::validate(ValidationLogger&)
+{
+    return true;
+}
 
 ance::Value* DefaultValueExpression::getValue() const
 {

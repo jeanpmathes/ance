@@ -20,9 +20,11 @@ ance::Type* VariableAccess::type()
     return variable_->type();
 }
 
-void VariableAccess::validate(ValidationLogger&)
+bool VariableAccess::validate(ValidationLogger&)
 {
     assert(variable_->isDefined() && "Variable must be defined to access it.");
+
+    return true;
 }
 
 void VariableAccess::doBuild(CompileContext* context)

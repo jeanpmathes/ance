@@ -43,8 +43,9 @@ class Expression
     /**
      * Validate this expression.
      * @param validation_logger A logger to log validation messages.
+     * @return Whether this expression is valid and dependent entities can be validated too.
      */
-    virtual void validate(ValidationLogger& validation_logger) = 0;
+    virtual bool validate(ValidationLogger& validation_logger) = 0;
 
     /**
      * Get the return type of this expression.

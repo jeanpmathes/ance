@@ -160,8 +160,9 @@ namespace ance
          * @param actual The actual type.
          * @param location The source location to use for logging.
          * @param validation_logger The validation logger.
+         * @return True if the types match.
          */
-        static void checkMismatch(ance::Type*       expected,
+        static bool checkMismatch(ance::Type*       expected,
                                   ance::Type*       actual,
                                   ance::Location    location,
                                   ValidationLogger& validation_logger);

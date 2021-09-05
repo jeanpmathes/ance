@@ -20,9 +20,9 @@ ance::Type* RoughCast::type()
     return target_type_;
 }
 
-void RoughCast::validate(ValidationLogger& validation_logger)
+bool RoughCast::validate(ValidationLogger& validation_logger)
 {
-    expression_->validate(validation_logger);
+    return expression_->validate(validation_logger);
 }
 
 ance::Value* RoughCast::getValue() const

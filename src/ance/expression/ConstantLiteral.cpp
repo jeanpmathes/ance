@@ -13,7 +13,10 @@ ance::Type* ConstantLiteral::type()
     return constant_->type();
 }
 
-void ConstantLiteral::validate(ValidationLogger&) {}
+bool ConstantLiteral::validate(ValidationLogger&)
+{
+    return true;
+}
 
 ance::Constant* ConstantLiteral::getConstantValue() const
 {
