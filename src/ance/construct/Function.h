@@ -88,10 +88,13 @@ namespace ance
 
         /**
          * Validate a call to this function.
-         * @param arguments The arguments that will be passed to the function.
+         * @param arguments The arguments that will be passed to the function and their source location.
+         * @param location The source location of the function call.
          * @param validation_logger A logger to log validation messages.
          */
-        virtual void validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger& validation_logger);
+        virtual void validateCall(const std::vector<std::pair<ance::Value*, ance::Location>>& arguments,
+                                  ance::Location                                              location,
+                                  ValidationLogger&                                           validation_logger);
 
         /**
          * Build a call to this function.

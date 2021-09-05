@@ -37,13 +37,22 @@ ance::Location ance::Function::location() const
     return location_;
 }
 
-void ance::Function::validateCall(const std::vector<ance::Value*>& arguments, ValidationLogger&)
+void ance::Function::validateCall(const std::vector<std::pair<ance::Value*, ance::Location>>& arguments,
+                                  ance::Location                                              location,
+                                  ValidationLogger&                                           validation_logger)
 {
-    assert(arguments.size() == parameters_.size());
-
-    for (auto pair : llvm::zip(parameters_, arguments))
+    if (arguments.size() != parameters_.size())
     {
-        assert(std::get<0>(pair)->type() == std::get<1>(pair)->type() && "Input parameter types must match.");
+        validation_logger.logError("No overload of '" + name() + "' takes " + std::to_string(arguments.size())
+                                       + " arguments",
+                                   location);
+        return;
+    }
+
+    for (const auto& [param, arg] : llvm::zip(parameters_, arguments))
+    {
+        auto [arg_value, arg_location] = arg;
+        ance::Type::checkMismatch(param->type(), arg_value->type(), arg_location, validation_logger);
     }
 }
 
