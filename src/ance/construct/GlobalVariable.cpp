@@ -58,10 +58,15 @@ void ance::GlobalVariable::defineGlobal(ance::Scope*        containing_scope,
     initial_value_ = constant_init_->getConstantValue();
 }
 
-void ance::GlobalVariable::validate(ValidationLogger&)
+void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
 {
-    assert(type() != ance::VoidType::get());
-    assert(type() == initial_value_->type());
+    if (type() == ance::VoidType::get())
+    {
+        validation_logger.logError("Global variable cannot have 'void' type", location_);
+        return;
+    }
+
+    ance::Type::checkMismatch(type(), initial_value_->type(), location_, validation_logger);
 }
 
 void ance::GlobalVariable::buildGlobal(CompileContext* context)

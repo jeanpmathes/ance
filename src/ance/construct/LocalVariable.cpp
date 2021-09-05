@@ -22,7 +22,7 @@ ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope,
 
 void ance::LocalVariable::validate(ValidationLogger&)
 {
-    assert(type() == initial_value_->type() && "Assignment types have to match.");
+    // Validation of initial value in declaring statement.
 }
 
 void ance::LocalVariable::build(CompileContext* context)
