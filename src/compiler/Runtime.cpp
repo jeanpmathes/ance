@@ -36,10 +36,7 @@ void Runtime::init(CompileContext* context)
 
 ance::Value* Runtime::allocate(Allocator allocation, ance::Type* type, ance::Value* count, CompileContext* context)
 {
-    if (count)
-    {
-        assert(count->type() == ance::SizeType::get() && "Count parameter of allocation should be of type size.");
-    }
+    if (count) { assert(count->type() == ance::SizeType::get()); }
 
     llvm::Value* native_ptr;
 
@@ -60,10 +57,9 @@ ance::Value* Runtime::allocate(Allocator allocation, ance::Type* type, ance::Val
     return new ance::WrappedNativeValue(ance::PointerType::get(*context->application(), type), native_ptr);
 }
 
-void Runtime::deleteDynamic(ance::Value* value, bool delete_buffer, CompileContext* context)
+void Runtime::deleteDynamic(ance::Value* value, bool, CompileContext* context)
 {
-    ance::Type* type = value->type();
-    assert(ance::PointerType::isPointerType(type) && "Type of value to delete has to be pointer type.");
+    assert(ance::PointerType::isPointerType(value->type()));
 
     value->buildContentValue(context);
 

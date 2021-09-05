@@ -1,6 +1,7 @@
 #include "Allocation.h"
 
 #include "ance/type/PointerType.h"
+#include "ance/type/SizeType.h"
 #include "compiler/CompileContext.h"
 
 Allocation::Allocation(Runtime::Allocator allocation,
@@ -27,7 +28,12 @@ ance::Type* Allocation::type()
 
 void Allocation::validate(ValidationLogger& validation_logger)
 {
-    if (count_) count_->validate(validation_logger);
+    if (count_)
+    {
+        count_->validate(validation_logger);
+
+        ance::Type::checkMismatch(ance::SizeType::get(), count_->type(), location(), validation_logger);
+    }
 }
 
 void Allocation::doBuild(CompileContext* context)
