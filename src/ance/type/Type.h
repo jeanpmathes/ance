@@ -106,10 +106,17 @@ namespace ance
         /**
          * Validate an indexer get access.
          * @param indexed The indexed value.
+         * @param indexed_location The source location of the indexed value.
          * @param index The used index.
+         * @param index_location The source location of the index.
          * @param validation_logger A logger to log validation messages.
+         * @return True if the get indexer is valid.
          */
-        virtual void validateGetIndexer(ance::Value* indexed, ance::Value* index, ValidationLogger& validation_logger);
+        virtual bool validateGetIndexer(ance::Value*      indexed,
+                                        ance::Location    indexed_location,
+                                        ance::Value*      index,
+                                        ance::Location    index_location,
+                                        ValidationLogger& validation_logger);
 
         /**
          * Validate an indexer set access.

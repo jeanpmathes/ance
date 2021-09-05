@@ -25,11 +25,21 @@ bool IndexerGet::validate(ValidationLogger& validation_logger)
     index_->validate(validation_logger);
 
     ance::Type* indexed_type = indexed_->type();
-    assert(indexed_type->isIndexerDefined(Indexer::GET) && "Type does not support this indexer.");
 
-    indexed_type->validateGetIndexer(indexed_->getValue(), index_->getValue(), validation_logger);
+    if (indexed_type->isIndexerDefined(Indexer::GET))
+    {
+        return indexed_type->validateGetIndexer(indexed_->getValue(),
+                                                indexed_->location(),
+                                                index_->getValue(),
+                                                index_->location(),
+                                                validation_logger);
+    }
+    else
+    {
+        validation_logger.logError("Type '" + indexed_type->getName() + "' does not provide get indexer", location());
 
-    return true;
+        return false;
+    }
 }
 
 void IndexerGet::doBuild(CompileContext* context)

@@ -43,10 +43,15 @@ ance::Type* ance::ArrayType::getIndexerReturnType()
     return element_type_;
 }
 
-void ance::ArrayType::validateGetIndexer(ance::Value* indexed, ance::Value* index, ValidationLogger&)
+bool ance::ArrayType::validateGetIndexer(ance::Value* indexed,
+                                         ance::Location,
+                                         ance::Value*      index,
+                                         ance::Location    index_location,
+                                         ValidationLogger& validation_logger)
 {
-    assert(indexed->type() == this && "Indexed value has to be of native array type.");
-    assert(index->type() == ance::SizeType::get() && "Native array index has to be size type.");
+    assert(indexed->type() == this && "Method call on wrong type.");
+
+    return checkMismatch(ance::SizeType::get(), index->type(), index_location, validation_logger);
 }
 
 ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)

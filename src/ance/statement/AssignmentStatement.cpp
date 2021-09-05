@@ -21,8 +21,7 @@ void AssignmentStatement::setFunction(ance::DefinedFunction* function)
 
 void AssignmentStatement::validate(ValidationLogger& validation_logger)
 {
-    assigned_->validate(validation_logger);
-    assignable_->validate(validation_logger);
+    if (assigned_->validate(validation_logger)) { assignable_->validate(validation_logger); }
 }
 
 void AssignmentStatement::doBuild(CompileContext* context)
