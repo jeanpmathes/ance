@@ -2,6 +2,7 @@
 
 #include "ance/construct/DefinedFunction.h"
 #include "ance/scope/LocalScope.h"
+#include "ance/type/VoidType.h"
 
 ReturnStatement::ReturnStatement(Expression* return_value, ance::Location location)
     : Statement(location)
@@ -15,7 +16,21 @@ void ReturnStatement::setFunction(ance::DefinedFunction* function)
 
 void ReturnStatement::validate(ValidationLogger& validation_logger)
 {
-    return_value_->validate(validation_logger);
+    if (return_value_)
+    {
+        if (getContainingFunction()->returnType() == ance::VoidType::get())
+        {
+            validation_logger.logError("Cannot return value in void function '" + getContainingFunction()->name() + "'",
+                                       location());
+        }
+        else if (return_value_->validate(validation_logger))
+        {
+            ance::Type::checkMismatch(getContainingFunction()->returnType(),
+                                      return_value_->type(),
+                                      location(),
+                                      validation_logger);
+        }
+    }
 }
 
 void ReturnStatement::doBuild(CompileContext*)
