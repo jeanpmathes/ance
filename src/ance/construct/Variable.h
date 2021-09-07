@@ -86,6 +86,14 @@ namespace ance
         [[nodiscard]] bool isFinal() const;
 
         /**
+         * Validate getting a value.
+         * @param validation_logger A validation logger to log messages.
+         * @param location The source location.
+         * @return True if getting the value is valid.
+         */
+        bool validateGetValue(ValidationLogger& validation_logger, ance::Location location) const;
+
+        /**
          * Validate setting a value.
          * @param value The value to set.
          * @param validation_logger A logger to log validation messages.

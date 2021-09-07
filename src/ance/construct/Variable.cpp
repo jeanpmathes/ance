@@ -60,13 +60,24 @@ bool ance::Variable::isFinal() const
     return is_final_;
 }
 
+bool ance::Variable::validateGetValue(ValidationLogger& validation_logger, ance::Location location) const
+{
+    if (!isDefined())
+    {
+        validation_logger.logError("Name '" + identifier() + "' not defined in the current context", location);
+        return false;
+    }
+
+    return true;
+}
+
 void ance::Variable::validateSetValue(ance::Value*      value,
                                       ValidationLogger& validation_logger,
                                       ance::Location    location) const
 {
     if (!isDefined())
     {
-        validation_logger.logError("Name '" + identifier() + "' is not defined in the current context", location);
+        validation_logger.logError("Name '" + identifier() + "' not defined in the current context", location);
         return;// The following variable methods require that the variable is defined.
     }
 
