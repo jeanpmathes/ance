@@ -42,7 +42,7 @@ namespace ance
          * @param assigner The assigner to use for initial assignment.
          * @param value The initial value.
          * @param location The source location.
-         * @return The defined variable.
+         * @return The defined variable or null if defining is not possible.
          */
         ance::LocalVariable* defineAutoVariable(const std::string& identifier,
                                                 ance::Type*        type,
@@ -58,7 +58,7 @@ namespace ance
          * @param value The initial value.
          * @param parameter_no The number of the parameter. Counting starts with one.
          * @param location The source location.
-         * @return The defined variable.
+         * @return The defined variable or null if defining is not possible.
          */
         ance::LocalVariable* defineParameterVariable(const std::string& identifier,
                                                      ance::Type*        type,

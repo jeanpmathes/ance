@@ -30,7 +30,11 @@ void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
 
 void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
 {
-    assigned_->validate(validation_logger);
+    if (variable_) { assigned_->validate(validation_logger); }
+    else
+    {
+        validation_logger.logError("Name '" + identifier_ + "' already defined in the current context", location());
+    }
 }
 
 void LocalVariableDefinition::doBuild(CompileContext* context)

@@ -69,12 +69,17 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& id
                                                            unsigned           parameter_no,
                                                            ance::Location     location)
 {
-    assert(local_variables_.find(identifier) == local_variables_.end());
+    if (local_variables_.find(identifier) == local_variables_.end())
+    {
+        bool is_final = assigner.isFinal();
 
-    bool is_final = assigner.isFinal();
+        auto* variable = new LocalVariable(this, identifier, type, value, is_final, parameter_no, location);
+        local_variables_[identifier] = variable;
 
-    auto* variable               = new LocalVariable(this, identifier, type, value, is_final, parameter_no, location);
-    local_variables_[identifier] = variable;
-
-    return variable;
+        return variable;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
