@@ -3,6 +3,8 @@
 
 #include "Scope.h"
 
+#include <vector>
+
 #include "ance/Assigner.h"
 
 class ConstantExpression;
@@ -114,6 +116,8 @@ namespace ance
         void buildFunctions(CompileContext* context);
 
       private:
+        std::vector<std::pair<std::string, ance::Location>> errors_;
+
         std::map<std::string, ance::Type*> types_;
 
         std::map<std::string, ance::GlobalVariable*> global_constants_;

@@ -120,13 +120,13 @@ void ance::DefinedFunction::addReturn(ance::Value* value)
 {
     if (value)
     {
-        assert(value->type() == returnType() && "Returned value does not match function return type.");
+        assert(value->type() == returnType());
         return_value_ = value;
         has_return_   = true;
     }
     else
     {
-        assert(returnType() == ance::VoidType::get() && "Cannot return value from void function.");
+        assert(returnType() == ance::VoidType::get());
         return_value_ = nullptr;
         has_return_   = true;
     }

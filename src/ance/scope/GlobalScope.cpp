@@ -21,6 +21,8 @@ llvm::DIScope* ance::GlobalScope::getDebugScope(CompileContext* context)
 
 void ance::GlobalScope::validate(ValidationLogger& validation_logger)
 {
+    for (auto [message, location] : errors_) { validation_logger.logError(message, location); }
+
     for (auto const& [key, fn] : functions_)
     {
         if (fn) { fn->validate(validation_logger); }
@@ -54,16 +56,26 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
                                              ConstantExpression* initializer,
                                              ance::Location      location)
 {
-    assert(global_variables_.find(identifier) == global_variables_.end()
-           && "A variable identifier may be used just once.");
-    assert(global_constants_.find(identifier) == global_constants_.end()
-           && "A constant identifier may be used just once.");
+    if (global_variables_.find(identifier) != global_variables_.end()
+        || global_constants_.find(identifier) != global_constants_.end())
+    {
+        errors_.emplace_back("Name '" + identifier + "' already defined in the current context", location);
+        return;
+    }
 
-    assert(initializer && "Variables require an initial value, which has to be explicit for constants.");
+    if (!initializer)
+    {
+        errors_.emplace_back("Constants require an explicit initializer", location);
+        return;
+    }
 
     bool is_final = assigner.isFinal();
 
-    assert((!is_constant || is_final) && "A constant must be final.");
+    if (is_constant && !is_final)
+    {
+        errors_.emplace_back("Assignment to constants must be final", location);
+        return;
+    }
 
     if (global_undefined_.find(identifier) != global_undefined_.end())
     {
