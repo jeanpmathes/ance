@@ -23,14 +23,7 @@ void ance::GlobalScope::validate(ValidationLogger& validation_logger)
 {
     for (auto const& [key, fn] : functions_)
     {
-        if (fn == nullptr)
-        {
-            std::cout << "A function is used but not defined: " << key << std::endl;
-        }
-        else
-        {
-            fn->validate(validation_logger);
-        }
+        if (fn) { fn->validate(validation_logger); }
     }
 
     for (auto const& [key, val] : global_constants_) { val->validate(validation_logger); }

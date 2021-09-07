@@ -45,6 +45,13 @@ bool FunctionCall::validate(ValidationLogger& validation_logger)
     if (!valid) return false;
 
     ance::Function* fn = scope_->getGlobalScope()->getFunction(identifier_);
+
+    if (!fn)
+    {
+        validation_logger.logError("Name '" + identifier_ + "' not defined in the current context", location());
+        return false;
+    }
+
     return fn->validateCall(arguments, location(), validation_logger);
 }
 
