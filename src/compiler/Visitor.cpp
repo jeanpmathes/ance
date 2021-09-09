@@ -161,7 +161,7 @@ antlrcpp::Any Visitor::visitLocalVariableDefinition(anceParser::LocalVariableDef
     ance::Type* type       = visit(ctx->type());
     std::string identifier = ctx->IDENTIFIER()->getText();
 
-    Assigner    assigner;
+    Assigner    assigner {};
     Expression* assigned;
 
     if (ctx->expression())
@@ -176,20 +176,16 @@ antlrcpp::Any Visitor::visitLocalVariableDefinition(anceParser::LocalVariableDef
     }
 
     auto* statement = new LocalVariableDefinition(identifier, type, assigner, assigned, location(ctx));
-
     return static_cast<Statement*>(statement);
 }
 
 antlrcpp::Any Visitor::visitAssignment(anceParser::AssignmentContext* ctx)
 {
     Assignable* assignable = visit(ctx->assignable());
+    Assigner    assigner   = visit(ctx->assigner());
     Expression* assigned   = visit(ctx->expression());
 
-    Assigner assigner = visit(ctx->assigner());
-    assert(assigner == Assigner::COPY_ASSIGNMENT && "Assignment to already declared variable cannot be final.");
-
-    auto* statement = new AssignmentStatement(assignable, assigned, location(ctx));
-
+    auto* statement = new AssignmentStatement(assignable, assigner, assigned, location(ctx));
     return static_cast<Statement*>(statement);
 }
 
@@ -208,7 +204,6 @@ antlrcpp::Any Visitor::visitReturnStatement(anceParser::ReturnStatementContext* 
     if (ctx->expression() != nullptr) { return_value = visit(ctx->expression()); }
 
     auto* statement = new ReturnStatement(return_value, location(ctx));
-
     return static_cast<Statement*>(statement);
 }
 

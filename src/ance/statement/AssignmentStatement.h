@@ -2,6 +2,7 @@
 #define ANCE_SRC_ANCE_STATEMENT_ASSIGNMENTSTATEMENT_H_
 
 #include "Statement.h"
+#include <ance/Assigner.h>
 
 class Assignable;
 
@@ -16,10 +17,11 @@ class AssignmentStatement : public Statement
     /**
      * Create a new assignment statement.
      * @param assignable The assignable that is assigned too.
+     * @param assigner The used assigner.
      * @param assigned An expression producing the value that is assigned.
      * @param location The source location.
      */
-    AssignmentStatement(Assignable* assignable, Expression* assigned, ance::Location location);
+    AssignmentStatement(Assignable* assignable, Assigner assigner, Expression* assigned, ance::Location location);
 
     void setFunction(ance::DefinedFunction* function) override;
 
@@ -30,6 +32,7 @@ class AssignmentStatement : public Statement
 
   private:
     Assignable* assignable_;
+    Assigner    assigner_;
     Expression* assigned_;
 };
 #endif
