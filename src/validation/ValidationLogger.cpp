@@ -52,6 +52,15 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
         }
 
         std::cout << entry.location << " " << entry.message << std::endl;
-        std::cout << '\t' << source_file.getLine(entry.location.line()) << std::endl;
+        std::cout << '\t' << trim(source_file.getLine(entry.location.line())) << std::endl;
     }
+}
+
+std::string_view ValidationLogger::trim(std::string_view str)
+{
+    const auto begin = str.find_first_not_of(" \t");
+    const auto end   = str.find_last_not_of(" \t");
+
+    const auto range = end - begin + 1;
+    return str.substr(begin, range);
 }

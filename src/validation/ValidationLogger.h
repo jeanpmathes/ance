@@ -71,6 +71,9 @@ class ValidationLogger
     void emitMessages(const SourceFile& source_file);
 
   private:
+    static std::string_view trim(std::string_view str);
+
+  private:
     std::vector<LogEntry> entries_;
 
     size_t warning_count_ {0};

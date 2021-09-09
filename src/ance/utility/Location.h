@@ -32,6 +32,18 @@ namespace ance
         [[nodiscard]] unsigned column() const;
 
         /**
+         * Get the last column of this location.
+         * @return The last column number.
+         */
+        [[nodiscard]] unsigned columnEnd() const;
+
+        /**
+         * Get whether this location is global, meaning not an actual source location.
+         * @return True if it is global.
+         */
+        bool isGlobal() const;
+
+        /**
          * Get the debug location for this source location.
          * @param llvm_context The llvm context.
          * @param scope The containing debug scope.
