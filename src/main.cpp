@@ -55,7 +55,8 @@ int main(int argc, char** argv)
     ValidationLogger validation_logger;
     application.validate(validation_logger);
 
-    validation_logger.emitMessages();
+    SourceFile source_file(application.getSourceFile());
+    validation_logger.emitMessages(source_file);
 
     if (validation_logger.errorCount() == 0)
     {

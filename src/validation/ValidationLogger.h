@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "ance/utility/Location.h"
+#include "validation/SourceFile.h"
 
 class ValidationLogger
 {
@@ -63,7 +64,11 @@ class ValidationLogger
      */
     [[nodiscard]] size_t errorCount() const;
 
-    void emitMessages();
+    /**
+     * Emit all logged messages.
+     * @param source_file The source file containing the code that was validated with this logger.
+     */
+    void emitMessages(const SourceFile& source_file);
 
   private:
     std::vector<LogEntry> entries_;

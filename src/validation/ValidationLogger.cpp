@@ -31,7 +31,7 @@ size_t ValidationLogger::errorCount() const
     return error_count_;
 }
 
-void ValidationLogger::emitMessages()
+void ValidationLogger::emitMessages(const SourceFile& source_file)
 {
     std::cout << "ance-c: validation: " << warningCount() << " warnings, " << errorCount() << " errors" << std::endl;
 
@@ -52,5 +52,6 @@ void ValidationLogger::emitMessages()
         }
 
         std::cout << entry.location << " " << entry.message << std::endl;
+        std::cout << '\t' << source_file.getLine(entry.location.line()) << std::endl;
     }
 }

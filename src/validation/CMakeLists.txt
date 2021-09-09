@@ -1,1 +1,2 @@
-target_sources(ance PRIVATE ValidationLogger.cpp)
+target_sources(ance PRIVATE ValidationLogger.cpp
+               SourceFile.cpp)
