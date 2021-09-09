@@ -31,7 +31,7 @@ unsigned ance::Location::columnEnd() const
 
 bool ance::Location::isGlobal() const
 {
-    return start_line_ != 0;
+    return start_line_ == 0;
 }
 
 llvm::DebugLoc ance::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope) const
@@ -41,8 +41,8 @@ llvm::DebugLoc ance::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm
 
 std::ostream& ance::operator<<(std::ostream& os, const ance::Location& location)
 {
-    if (location.isGlobal()) { os << "(" << location.start_line_ << ", " << location.start_column_ << ")"; }
-    else// Line numbers begin with 1 so this location refers to no place.
+    if (!location.isGlobal()) { os << "(" << location.start_line_ << ", " << location.start_column_ << ")"; }
+    else
     {
         os << "()";
     }

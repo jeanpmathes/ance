@@ -515,8 +515,9 @@ ance::Location Visitor::location(antlr4::ParserRuleContext* ctx)
     unsigned start_line   = ctx->getStart()->getLine();
     unsigned start_column = ctx->getStart()->getCharPositionInLine() + 1;
 
-    unsigned end_line   = ctx->getStop()->getLine();
-    unsigned end_column = ctx->getStop()->getCharPositionInLine() + 1;
+    unsigned end_line = ctx->getStop()->getLine();
+
+    unsigned end_column = ctx->getStop()->getCharPositionInLine() + 1 + ctx->getStop()->getText().size();
 
     return ance::Location(start_line, start_column, end_line, end_column);
 }

@@ -71,7 +71,7 @@ class ValidationLogger
     void emitMessages(const SourceFile& source_file);
 
   private:
-    static std::string_view trim(std::string_view str);
+    static std::string_view trim(std::string_view str, unsigned int& start);
 
   private:
     std::vector<LogEntry> entries_;

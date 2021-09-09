@@ -37,6 +37,8 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
 
     for (auto& entry : entries_)
     {
+        unsigned int start = 0;
+
         std::cout << "ance-c: ";
 
         switch (entry.level)
@@ -52,14 +54,24 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
         }
 
         std::cout << entry.location << " " << entry.message << std::endl;
-        std::cout << '\t' << trim(source_file.getLine(entry.location.line())) << std::endl;
+
+        if (entry.location.isGlobal()) continue;
+
+        std::cout << '\t' << trim(source_file.getLine(entry.location.line()), start) << std::endl;
+
+        unsigned int marker_start  = entry.location.column() - start;
+        unsigned int marker_length = entry.location.columnEnd() - entry.location.column();
+
+        std::cout << '\t' << std::string(marker_start - 1, ' ') << std::string(marker_length, '~') << std::endl;
     }
 }
 
-std::string_view ValidationLogger::trim(std::string_view str)
+std::string_view ValidationLogger::trim(std::string_view str, unsigned int& start)
 {
     const auto begin = str.find_first_not_of(" \t");
     const auto end   = str.find_last_not_of(" \t");
+
+    start = begin;
 
     const auto range = end - begin + 1;
     return str.substr(begin, range);
