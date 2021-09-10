@@ -27,7 +27,7 @@ void ReturnStatement::validate(ValidationLogger& validation_logger)
         {
             ance::Type::checkMismatch(getContainingFunction()->returnType(),
                                       return_value_->type(),
-                                      location(),
+                                      return_value_->location(),
                                       validation_logger);
         }
     }

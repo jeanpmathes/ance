@@ -23,7 +23,7 @@ void DeleteStatement::validate(ValidationLogger& validation_logger)
         {
             validation_logger.logError("Value of type '" + to_delete_->type()->getName()
                                            + "' given to 'delete' cannot be used as pointer type",
-                                       location());
+                                       to_delete_->location());
         }
     }
 }

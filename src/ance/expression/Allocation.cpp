@@ -32,7 +32,7 @@ bool Allocation::validate(ValidationLogger& validation_logger)
     {
         count_->validate(validation_logger);
 
-        return ance::Type::checkMismatch(ance::SizeType::get(), count_->type(), location(), validation_logger);
+        return ance::Type::checkMismatch(ance::SizeType::get(), count_->type(), count_->location(), validation_logger);
     }
 
     return true;

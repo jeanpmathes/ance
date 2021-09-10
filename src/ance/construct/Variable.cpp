@@ -73,19 +73,21 @@ bool ance::Variable::validateGetValue(ValidationLogger& validation_logger, ance:
 
 void ance::Variable::validateSetValue(ance::Value*      value,
                                       ValidationLogger& validation_logger,
-                                      ance::Location    location) const
+                                      ance::Location    assignable_location,
+                                      ance::Location    assigned_location) const
 {
     if (!isDefined())
     {
-        validation_logger.logError("Name '" + identifier() + "' not defined in the current context", location);
+        validation_logger.logError("Name '" + identifier() + "' not defined in the current context",
+                                   assignable_location);
         return;// The following variable methods require that the variable is defined.
     }
 
     if (isFinal())
     {
-        validation_logger.logError("Cannot assign to final variable '" + identifier() + "'", location);
+        validation_logger.logError("Cannot assign to final variable '" + identifier() + "'", assignable_location);
         return;// Type mismatch is not relevant if assignment is not allowed no matter what.
     }
 
-    ance::Type::checkMismatch(type(), value->type(), location, validation_logger);
+    ance::Type::checkMismatch(type(), value->type(), assigned_location, validation_logger);
 }

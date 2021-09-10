@@ -66,7 +66,7 @@ void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
         return;
     }
 
-    ance::Type::checkMismatch(type(), initial_value_->type(), location_, validation_logger);
+    ance::Type::checkMismatch(type(), initial_value_->type(), constant_init_->location(), validation_logger);
 }
 
 void ance::GlobalVariable::buildGlobal(CompileContext* context)
