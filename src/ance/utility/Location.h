@@ -25,6 +25,7 @@ namespace ance
          * @return The line number.
          */
         [[nodiscard]] unsigned line() const;
+
         /**
          * Get the column number.
          * @return The column number.
@@ -33,7 +34,7 @@ namespace ance
 
         /**
          * Get the last column of this location.
-         * @return The last column number.
+         * @return The last column number. Can be equal to column for single character locations.
          */
         [[nodiscard]] unsigned columnEnd() const;
 
@@ -41,7 +42,13 @@ namespace ance
          * Get whether this location is global, meaning not an actual source location.
          * @return True if it is global.
          */
-        bool isGlobal() const;
+        [[nodiscard]] bool isGlobal() const;
+
+        /**
+         * Get whether this location is on a single line.
+         * @return True if it is on a single line.
+         */
+        [[nodiscard]] bool isSingleLine() const;
 
         /**
          * Get the debug location for this source location.

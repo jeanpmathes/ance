@@ -34,6 +34,11 @@ bool ance::Location::isGlobal() const
     return start_line_ == 0;
 }
 
+bool ance::Location::isSingleLine() const
+{
+    return start_line_ == end_line_;
+}
+
 llvm::DebugLoc ance::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope) const
 {
     return llvm::DILocation::get(*llvm_context, line(), column(), scope);

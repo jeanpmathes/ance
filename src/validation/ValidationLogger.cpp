@@ -59,10 +59,13 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
 
         std::cout << '\t' << trim(source_file.getLine(entry.location.line()), start) << std::endl;
 
-        unsigned int marker_start  = entry.location.column() - start;
-        unsigned int marker_length = entry.location.columnEnd() - entry.location.column();
+        if (entry.location.isSingleLine())
+        {
+            unsigned int marker_start  = entry.location.column() - start;
+            unsigned int marker_length = entry.location.columnEnd() - entry.location.column() + 1;
 
-        std::cout << '\t' << std::string(marker_start - 1, ' ') << std::string(marker_length, '~') << std::endl;
+            std::cout << '\t' << std::string(marker_start - 1, ' ') << std::string(marker_length, '~') << std::endl;
+        }
     }
 }
 
