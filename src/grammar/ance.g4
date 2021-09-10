@@ -1,19 +1,11 @@
 grammar ance;
 
 file
-	: ( data | code )*
-	;
-
-data
-	: variableDeclaration
+	: ( variableDeclaration | function )*
 	;
 
 variableDeclaration
 	: accessModifier ( CONST )? type IDENTIFIER ( assigner literalExpression )? ';'
-	;
-
-code
-	: function
 	;
 
 function

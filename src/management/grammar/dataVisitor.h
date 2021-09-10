@@ -30,3 +30,4 @@ class dataVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitFalse(dataParser::FalseContext* context) = 0;
 };
+

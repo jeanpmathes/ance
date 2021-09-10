@@ -15,14 +15,10 @@ class anceBaseVisitor : public anceVisitor
   public:
     virtual antlrcpp::Any visitFile(anceParser::FileContext* ctx) override { return visitChildren(ctx); }
 
-    virtual antlrcpp::Any visitData(anceParser::DataContext* ctx) override { return visitChildren(ctx); }
-
     virtual antlrcpp::Any visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx) override
     {
         return visitChildren(ctx);
     }
-
-    virtual antlrcpp::Any visitCode(anceParser::CodeContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx) override
     {
@@ -209,3 +205,4 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitVoidType(anceParser::VoidTypeContext* ctx) override { return visitChildren(ctx); }
 };
+

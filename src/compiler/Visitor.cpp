@@ -152,7 +152,6 @@ antlrcpp::Any Visitor::visitExpressionStatement(anceParser::ExpressionStatementC
     auto*       buildable_expression = dynamic_cast<BuildableExpression*>(expression);
 
     auto* statement = new ExpressionStatement(buildable_expression, location(ctx));
-
     return static_cast<Statement*>(statement);
 }
 

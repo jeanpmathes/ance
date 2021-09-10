@@ -18,11 +18,7 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
    */
     virtual antlrcpp::Any visitFile(anceParser::FileContext* context) = 0;
 
-    virtual antlrcpp::Any visitData(anceParser::DataContext* context) = 0;
-
     virtual antlrcpp::Any visitVariableDeclaration(anceParser::VariableDeclarationContext* context) = 0;
-
-    virtual antlrcpp::Any visitCode(anceParser::CodeContext* context) = 0;
 
     virtual antlrcpp::Any visitFunctionDefinition(anceParser::FunctionDefinitionContext* context) = 0;
 
@@ -140,3 +136,4 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitVoidType(anceParser::VoidTypeContext* context) = 0;
 };
+

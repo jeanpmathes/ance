@@ -66,52 +66,50 @@ class anceParser : public antlr4::Parser
     enum
     {
         RuleFile                       = 0,
-        RuleData                       = 1,
-        RuleVariableDeclaration        = 2,
-        RuleCode                       = 3,
-        RuleFunction                   = 4,
-        RuleParameters                 = 5,
-        RuleParameter                  = 6,
-        RuleAccessModifier             = 7,
-        RuleStatement                  = 8,
-        RuleExpressionStatement        = 9,
-        RuleLocalVariableDefinition    = 10,
-        RuleAssignment                 = 11,
-        RuleAssigner                   = 12,
-        RuleDeleteStatement            = 13,
-        RuleReturnStatement            = 14,
-        RuleAssignable                 = 15,
-        RuleVariableAssignable         = 16,
-        RuleIndexerSet                 = 17,
-        RuleDiscard                    = 18,
-        RuleExpression                 = 19,
-        RuleIndependentExpression      = 20,
-        RuleFunctionCall               = 21,
-        RuleArguments                  = 22,
-        RuleVariableAccess             = 23,
-        RuleAllocation                 = 24,
-        RuleAllocator                  = 25,
-        RuleRoughCast                  = 26,
-        RuleSizeofType                 = 27,
-        RuleSizeofExpression           = 28,
-        RuleLiteralExpression          = 29,
-        RuleStringLiteral              = 30,
-        RuleByteLiteral                = 31,
-        RuleIntegerLiteral             = 32,
-        RuleUnsignedInteger            = 33,
-        RuleSignedInteger              = 34,
-        RuleSpecialInteger             = 35,
-        RuleFloatingPointLiteral       = 36,
-        RuleBooleanLiteral             = 37,
-        RuleSizeLiteral                = 38,
-        RuleType                       = 39,
-        RuleIntegerType                = 40,
-        RuleArrayType                  = 41,
-        RuleKeywordType                = 42,
-        RuleFloatingPointType          = 43,
-        RuleSizeType                   = 44,
-        RuleUnsignedIntegerPointerType = 45,
-        RuleVoidType                   = 46
+        RuleVariableDeclaration        = 1,
+        RuleFunction                   = 2,
+        RuleParameters                 = 3,
+        RuleParameter                  = 4,
+        RuleAccessModifier             = 5,
+        RuleStatement                  = 6,
+        RuleExpressionStatement        = 7,
+        RuleLocalVariableDefinition    = 8,
+        RuleAssignment                 = 9,
+        RuleAssigner                   = 10,
+        RuleDeleteStatement            = 11,
+        RuleReturnStatement            = 12,
+        RuleAssignable                 = 13,
+        RuleVariableAssignable         = 14,
+        RuleIndexerSet                 = 15,
+        RuleDiscard                    = 16,
+        RuleExpression                 = 17,
+        RuleIndependentExpression      = 18,
+        RuleFunctionCall               = 19,
+        RuleArguments                  = 20,
+        RuleVariableAccess             = 21,
+        RuleAllocation                 = 22,
+        RuleAllocator                  = 23,
+        RuleRoughCast                  = 24,
+        RuleSizeofType                 = 25,
+        RuleSizeofExpression           = 26,
+        RuleLiteralExpression          = 27,
+        RuleStringLiteral              = 28,
+        RuleByteLiteral                = 29,
+        RuleIntegerLiteral             = 30,
+        RuleUnsignedInteger            = 31,
+        RuleSignedInteger              = 32,
+        RuleSpecialInteger             = 33,
+        RuleFloatingPointLiteral       = 34,
+        RuleBooleanLiteral             = 35,
+        RuleSizeLiteral                = 36,
+        RuleType                       = 37,
+        RuleIntegerType                = 38,
+        RuleArrayType                  = 39,
+        RuleKeywordType                = 40,
+        RuleFloatingPointType          = 41,
+        RuleSizeType                   = 42,
+        RuleUnsignedIntegerPointerType = 43,
+        RuleVoidType                   = 44
     };
 
     anceParser(antlr4::TokenStream* input);
@@ -127,9 +125,7 @@ class anceParser : public antlr4::Parser
     virtual antlr4::dfa::Vocabulary&        getVocabulary() const override;
 
     class FileContext;
-    class DataContext;
     class VariableDeclarationContext;
-    class CodeContext;
     class FunctionContext;
     class ParametersContext;
     class ParameterContext;
@@ -178,28 +174,16 @@ class anceParser : public antlr4::Parser
     {
       public:
         FileContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t            getRuleIndex() const override;
-        std::vector<DataContext*> data();
-        DataContext*              data(size_t i);
-        std::vector<CodeContext*> code();
-        CodeContext*              code(size_t i);
+        virtual size_t                           getRuleIndex() const override;
+        std::vector<VariableDeclarationContext*> variableDeclaration();
+        VariableDeclarationContext*              variableDeclaration(size_t i);
+        std::vector<FunctionContext*>            function();
+        FunctionContext*                         function(size_t i);
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
     FileContext* file();
-
-    class DataContext : public antlr4::ParserRuleContext
-    {
-      public:
-        DataContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t              getRuleIndex() const override;
-        VariableDeclarationContext* variableDeclaration();
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    DataContext* data();
 
     class VariableDeclarationContext : public antlr4::ParserRuleContext
     {
@@ -217,18 +201,6 @@ class anceParser : public antlr4::Parser
     };
 
     VariableDeclarationContext* variableDeclaration();
-
-    class CodeContext : public antlr4::ParserRuleContext
-    {
-      public:
-        CodeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t   getRuleIndex() const override;
-        FunctionContext* function();
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    CodeContext* code();
 
     class FunctionContext : public antlr4::ParserRuleContext
     {
@@ -1035,3 +1007,4 @@ class anceParser : public antlr4::Parser
     };
     static Initializer _init;
 };
+
