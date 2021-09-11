@@ -241,7 +241,7 @@ INTEGER : [0-9]+ ;
 BUFFER : '[]' ;
 CONST : 'const' ;
 
-IDENTIFIER : [_a-zA-Z] [_a-zA-Z0-9]* ;
+IDENTIFIER : [_]* [a-zA-Z] [_a-zA-Z0-9]* ;
 
 WHITESPACE : [ \t\r\n]+ -> skip ;
 
