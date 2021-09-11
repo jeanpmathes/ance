@@ -1,20 +1,20 @@
-#ifndef ANCE_SRC_COMPILER_VISITOR_H_
-#define ANCE_SRC_COMPILER_VISITOR_H_
+#ifndef ANCE_SRC_COMPILER_SOURCEVISITOR_H_
+#define ANCE_SRC_COMPILER_SOURCEVISITOR_H_
 
 #include "compiler/Application.h"
 #include "grammar/anceBaseVisitor.h"
 
 /**
- * The ance visitor creating the application. Base class is generated.
+ * The ance syntax visitor creating the application. Base class is generated.
  */
-class Visitor : public anceBaseVisitor
+class SourceVisitor : public anceBaseVisitor
 {
   public:
     /**
      * Create a new visitor.
      * @param application The application to fill.
      */
-    explicit Visitor(Application& application);
+    explicit SourceVisitor(Application& application);
 
     // Declarations
 

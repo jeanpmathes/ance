@@ -10,7 +10,7 @@
 
 #include "compiler/AnceCompiler.h"
 #include "compiler/AnceLinker.h"
-#include "compiler/Visitor.h"
+#include "compiler/SourceVisitor.h"
 #include "management/File.h"
 #include "validation/ValidationLogger.h"
 
@@ -39,10 +39,10 @@ int main(int argc, char** argv)
     antlr4::CommonTokenStream tokens(&lexer);
     anceParser                parser(&tokens);
 
-    auto visitor = new Visitor(application);
+    auto source_visitor = new SourceVisitor(application);
 
     antlr4::tree::ParseTree* tree = parser.file();
-    visitor->visit(tree);
+    source_visitor->visit(tree);
 
     llvm::InitializeAllTargetInfos();
     llvm::InitializeAllTargets();

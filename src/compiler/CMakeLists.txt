@@ -3,4 +3,4 @@ target_sources(ance PRIVATE AnceCompiler.cpp
                Application.cpp
                CompileContext.cpp
                Runtime.cpp
-               Visitor.cpp)
+               SourceVisitor.cpp)
