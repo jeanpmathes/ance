@@ -1,7 +1,7 @@
 grammar ance;
 
 file
-	: ( variableDeclaration | function )*
+	: ( variableDeclaration | function )* EOF
 	;
 
 variableDeclaration
