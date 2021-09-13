@@ -10,3 +10,8 @@ void Discard::doBuild(CompileContext* context)
 {
     assigned()->buildNativeValue(context);
 }
+
+bool Discard::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitDiscard(*this);
+}

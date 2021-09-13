@@ -21,3 +21,8 @@ void VariableAssignable::doBuild(CompileContext* context)
     ance::Variable* variable = scope_->getVariable(variable_identifier_);
     variable->setValue(assigned(), context);
 }
+
+bool VariableAssignable::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitVariableAssignable(*this);
+}

@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_ANCE_EXPRESSION_DEFAULTVALUEEXPRESSION_H_
-#define ANCE_SRC_ANCE_EXPRESSION_DEFAULTVALUEEXPRESSION_H_
+#ifndef ANCE_SRC_ANCE_EXPRESSION_DEFAULTVALUE_H_
+#define ANCE_SRC_ANCE_EXPRESSION_DEFAULTVALUE_H_
 
 #include "BackingConstantExpression.h"
 
@@ -8,7 +8,7 @@
 /**
  * Provides the default value for a type.
  */
-class DefaultValueExpression : public BackingConstantExpression
+class DefaultValue : public BackingConstantExpression
 {
   public:
     /**
@@ -16,7 +16,7 @@ class DefaultValueExpression : public BackingConstantExpression
      * @param type The type to use the default value of.
      * @param location The source location.
      */
-    explicit DefaultValueExpression(ance::Type* type, ance::Location location);
+    explicit DefaultValue(ance::Type* type, ance::Location location);
 
     ance::Type* type() override;
 
@@ -26,7 +26,9 @@ class DefaultValueExpression : public BackingConstantExpression
     [[nodiscard]] ance::Constant* getConstantValue() const override;
     llvm::Constant*               buildContentConstant(llvm::LLVMContext& c) override;
 
-    ~DefaultValueExpression() override;
+    bool accept(ance::ApplicationVisitor& visitor) override;
+
+    ~DefaultValue() override;
 
   private:
     ance::Type*     type_;

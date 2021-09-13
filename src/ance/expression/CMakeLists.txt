@@ -1,4 +1,4 @@
-target_sources(ance PRIVATE DefaultValueExpression.cpp
+target_sources(ance PRIVATE DefaultValue.cpp
                Expression.cpp
                ConstantExpression.cpp
                BackingExpression.cpp

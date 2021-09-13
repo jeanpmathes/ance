@@ -14,6 +14,9 @@ AssignmentStatement::AssignmentStatement(Assignable*    assignable,
     , assigner_(assigner)
     , assigned_(assigned)
 {
+    addChild(*assigned);
+    addChild(*assignable);
+
     assignable_->assign(assigned->getValue(), assigned->location());
 }
 
@@ -37,4 +40,9 @@ void AssignmentStatement::validate(ValidationLogger& validation_logger)
 void AssignmentStatement::doBuild(CompileContext* context)
 {
     assignable_->build(context);
+}
+
+bool AssignmentStatement::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitAssignmentStatement(*this);
 }

@@ -77,23 +77,26 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
         return;
     }
 
+    GlobalVariable* defined;
+
     if (global_undefined_.find(identifier) != global_undefined_.end())
     {
         ance::GlobalVariable* undefined = global_undefined_[identifier];
-
         undefined->defineGlobal(this, access, type, initializer, is_final, is_constant, location);
 
-        if (is_constant) { global_constants_[identifier] = undefined; }
+        defined = undefined;
+
+        if (is_constant) { global_constants_[identifier] = defined; }
         else
         {
-            global_variables_[identifier] = undefined;
+            global_variables_[identifier] = defined;
         }
 
         global_undefined_.erase(identifier);
     }
     else
     {
-        auto* defined =
+        defined =
             new ance::GlobalVariable(this, access, identifier, type, initializer, is_final, is_constant, location);
 
         if (is_constant) { global_constants_[identifier] = defined; }
@@ -102,6 +105,8 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
             global_variables_[identifier] = defined;
         }
     }
+
+    addChild(*defined);
 }
 
 ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
@@ -147,6 +152,8 @@ void ance::GlobalScope::addFunction(ance::Function* function)
 {
     assert(!isFunctionDefined(function->name()));
     functions_[function->name()] = function;
+
+    addChild(*function);
 }
 
 bool ance::GlobalScope::hasFunction(const std::string& identifier)
@@ -194,4 +201,9 @@ void ance::GlobalScope::buildFunctionNames(CompileContext* context)
 void ance::GlobalScope::buildFunctions(CompileContext* context)
 {
     for (auto const& [key, val] : functions_) { val->build(context); }
+}
+
+bool ance::GlobalScope::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitGlobalScope(*this);
 }

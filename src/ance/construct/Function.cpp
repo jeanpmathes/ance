@@ -99,4 +99,3 @@ llvm::CallInst* ance::Function::buildCall(const std::vector<ance::Value*>& argum
     if (!native_type->getReturnType()->isVoidTy()) content_value->setName(native_function->getName() + ".ret");
     return content_value;
 }
-

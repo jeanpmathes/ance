@@ -18,7 +18,7 @@ namespace ance
 /**
  * Base class of all statements. Statements are building blocks of code and are ordered parts of functions.
  */
-class Statement
+class Statement : public ance::Element
 {
   public:
     /**

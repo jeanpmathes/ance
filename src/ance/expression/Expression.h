@@ -4,6 +4,7 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
+#include "ance/Element.h"
 #include "validation/ValidationLogger.h"
 
 class CompileContext;
@@ -18,7 +19,7 @@ namespace ance
 /**
  * The base class of all expressions.
  */
-class Expression
+class Expression : public ance::Element
 {
   protected:
     /**

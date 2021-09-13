@@ -8,7 +8,9 @@ RoughCast::RoughCast(ance::Type* target_type, Expression* expression, ance::Loca
     , target_type_(target_type)
     , expression_(expression)
     , return_value_(new ance::RoughlyCastedValue(target_type, expression->getValue()))
-{}
+{
+    addChild(*expression);
+}
 
 void RoughCast::setContainingScope(ance::Scope* scope)
 {
@@ -28,6 +30,11 @@ bool RoughCast::validate(ValidationLogger& validation_logger)
 ance::Value* RoughCast::getValue() const
 {
     return return_value_;
+}
+
+bool RoughCast::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitRoughCast(*this);
 }
 
 RoughCast::~RoughCast() = default;

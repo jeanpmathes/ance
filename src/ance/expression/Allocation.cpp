@@ -14,7 +14,9 @@ Allocation::Allocation(Runtime::Allocator allocation,
     , allocated_type_(type)
     , count_(count)
     , return_type_(ance::PointerType::get(app, type))
-{}
+{
+    addChild(*count);
+}
 
 void Allocation::setScope(ance::Scope* scope)
 {
@@ -43,6 +45,11 @@ void Allocation::doBuild(CompileContext* context)
     ance::Value* count = count_ ? count_->getValue() : nullptr;
     ance::Value* ptr   = context->runtime()->allocate(allocation_, allocated_type_, count, context);
     setValue(ptr);
+}
+
+bool Allocation::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitAllocation(*this);
 }
 
 Allocation::~Allocation() = default;

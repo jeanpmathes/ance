@@ -16,6 +16,7 @@ class Discard : public Assignable
     explicit Discard(ance::Location location);
 
     void validate(ValidationLogger& validation_logger) override;
+    bool accept(ance::ApplicationVisitor& visitor) override;
 
   protected:
     void setScope(ance::Scope* scope) override;

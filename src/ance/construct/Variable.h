@@ -6,6 +6,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
 
+#include "ance/Element.h"
 #include "ance/utility/Location.h"
 #include "validation/ValidationLogger.h"
 
@@ -26,7 +27,7 @@ namespace ance
     /**
      * The base class of all variables.
      */
-    class Variable
+    class Variable : public ance::Element
     {
       protected:
         /**

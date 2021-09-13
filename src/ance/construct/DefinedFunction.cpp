@@ -23,6 +23,8 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                access,
     , containing_scope_(scope)
     , function_scope_(new ance::LocalScope(this))
 {
+    addChild(*function_scope_);
+
     unsigned no = 1;
     for (auto* parameter : this->parameters())
     {
@@ -40,6 +42,8 @@ void ance::DefinedFunction::pushStatement(Statement* statement)
 {
     statements_.push_back(statement);
     statement->setContainingFunction(this);
+
+    addChild(*statement);
 }
 
 void ance::DefinedFunction::buildName(CompileContext* context)
@@ -187,4 +191,9 @@ ance::Type* ance::DefinedFunction::getType(const std::string& type_name)
 void ance::DefinedFunction::registerType(ance::Type* type)
 {
     function_scope_->registerType(type);
+}
+
+bool ance::DefinedFunction::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitDefinedFunction(*this);
 }

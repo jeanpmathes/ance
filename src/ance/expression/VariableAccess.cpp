@@ -31,4 +31,9 @@ void VariableAccess::doBuild(CompileContext* context)
     setValue(value);
 }
 
+bool VariableAccess::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitVariableAccess(*this);
+}
+
 VariableAccess::~VariableAccess() = default;

@@ -7,7 +7,9 @@
 ReturnStatement::ReturnStatement(Expression* return_value, ance::Location location)
     : Statement(location)
     , return_value_(return_value)
-{}
+{
+    addChild(*return_value);
+}
 
 void ReturnStatement::setFunction(ance::DefinedFunction* function)
 {
@@ -36,4 +38,9 @@ void ReturnStatement::validate(ValidationLogger& validation_logger)
 void ReturnStatement::doBuild(CompileContext*)
 {
     getContainingFunction()->addReturn(return_value_ ? return_value_->getValue() : nullptr);
+}
+
+bool ReturnStatement::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitReturnStatement(*this);
 }

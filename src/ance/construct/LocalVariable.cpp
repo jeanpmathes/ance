@@ -98,3 +98,8 @@ void ance::LocalVariable::store(ance::Value* value, CompileContext* context)
         }
     }
 }
+
+bool ance::LocalVariable::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitLocalVariable(*this);
+}

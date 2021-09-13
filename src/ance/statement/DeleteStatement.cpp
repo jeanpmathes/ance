@@ -8,7 +8,9 @@ DeleteStatement::DeleteStatement(Expression* to_delete, bool delete_buffer, ance
     : Statement(location)
     , to_delete_(to_delete)
     , delete_buffer_(delete_buffer)
-{}
+{
+    addChild(*to_delete);
+}
 
 void DeleteStatement::setFunction(ance::DefinedFunction* function)
 {
@@ -31,4 +33,9 @@ void DeleteStatement::validate(ValidationLogger& validation_logger)
 void DeleteStatement::doBuild(CompileContext* context)
 {
     context->runtime()->deleteDynamic(to_delete_->getValue(), delete_buffer_, context);
+}
+
+bool DeleteStatement::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitDeleteStatement(*this);
 }

@@ -7,7 +7,9 @@
 SizeofExpression::SizeofExpression(Expression* expression, ance::Location location)
     : Expression(location)
     , expression_(expression)
-{}
+{
+    addChild(*expression);
+}
 
 void SizeofExpression::setScope(ance::Scope* scope)
 {
@@ -32,4 +34,9 @@ ance::Value* SizeofExpression::getValue() const
 llvm::Value* SizeofExpression::buildNativeValue(CompileContext* context)
 {
     return ance::SizeType::buildValue(expression_->type()->getContentSize(context->module()));
+}
+
+bool SizeofExpression::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitSizeofExpression(*this);
 }

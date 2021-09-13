@@ -34,6 +34,8 @@ class Allocation : public DelayableExpression
 
     bool validate(ValidationLogger& validation_logger) override;
 
+    bool accept(ance::ApplicationVisitor& visitor) override;
+
   protected:
     void doBuild(CompileContext* context) override;
 

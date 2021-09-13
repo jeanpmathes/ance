@@ -23,7 +23,7 @@ namespace ance
     /**
      * The abstract base class of all functions.
      */
-    class Function
+    class Function : public virtual ance::Element
     {
       public:
         /**

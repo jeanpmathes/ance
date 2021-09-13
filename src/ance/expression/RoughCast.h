@@ -30,6 +30,8 @@ class RoughCast : public Expression
 
     [[nodiscard]] ance::Value* getValue() const override;
 
+    bool accept(ance::ApplicationVisitor& visitor) override;
+
     ~RoughCast() override;
 
   private:

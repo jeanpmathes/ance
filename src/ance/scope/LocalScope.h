@@ -28,7 +28,8 @@ namespace ance
 
         void validate(ValidationLogger& validation_logger) override;
 
-      public:
+        bool accept(ance::ApplicationVisitor& visitor) override;
+
         ance::Variable* getVariable(std::string identifier) override;
 
         bool        isTypeRegistered(const std::string& type_name) override;

@@ -76,10 +76,17 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& id
         auto* variable = new LocalVariable(this, identifier, type, value, is_final, parameter_no, location);
         local_variables_[identifier] = variable;
 
+        addChild(*variable);
+
         return variable;
     }
     else
     {
         return nullptr;
     }
+}
+
+bool ance::LocalScope::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitLocalScope(*this);
 }

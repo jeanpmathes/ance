@@ -8,6 +8,7 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "ance/AccessModifier.h"
+#include "ance/Element.h"
 #include "ance/construct/GlobalVariable.h"
 #include "ance/type/Type.h"
 #include "validation/ValidationLogger.h"
@@ -26,7 +27,7 @@ namespace ance
     /**
      * The base class for scopes, which contain variables and functions.
      */
-    class Scope
+    class Scope : public virtual ance::Element
     {
       public:
         /**

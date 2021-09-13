@@ -119,3 +119,8 @@ void ance::GlobalVariable::setValue(ance::Value* value, CompileContext* context)
     llvm::Value* content = value->getContentValue();
     context->ir()->CreateStore(content, native_variable_);
 }
+
+bool ance::GlobalVariable::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitGlobalVariable(*this);
+}

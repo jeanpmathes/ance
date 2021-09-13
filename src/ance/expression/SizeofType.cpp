@@ -24,3 +24,8 @@ llvm::Value* SizeofType::buildNativeValue(CompileContext* context)
 {
     return ance::SizeType::buildValue(type_->getContentSize(context->module()));
 }
+
+bool SizeofType::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitSizeofType(*this);
+}

@@ -4,7 +4,10 @@ IndexerSet::IndexerSet(Expression* indexed, Expression* index, ance::Location lo
     : Assignable(location)
     , indexed_(indexed)
     , index_(index)
-{}
+{
+    addChild(*index);
+    addChild(*indexed);
+}
 
 void IndexerSet::setScope(ance::Scope* scope)
 {
@@ -38,4 +41,9 @@ void IndexerSet::validate(ValidationLogger& validation_logger)
 void IndexerSet::doBuild(CompileContext* context)
 {
     indexed_->type()->buildSetIndexer(indexed_->getValue(), index_->getValue(), assigned(), context);
+}
+
+bool IndexerSet::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitIndexerSet(*this);
 }

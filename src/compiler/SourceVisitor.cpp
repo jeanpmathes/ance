@@ -38,7 +38,7 @@
 #include "ance/expression/BackingExpression.h"
 #include "ance/expression/BuildableExpression.h"
 #include "ance/expression/ConstantLiteral.h"
-#include "ance/expression/DefaultValueExpression.h"
+#include "ance/expression/DefaultValue.h"
 #include "ance/expression/Expression.h"
 #include "ance/expression/FunctionCall.h"
 #include "ance/expression/IndexerGet.h"
@@ -79,7 +79,7 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
     }
     else
     {
-        const_expr = new DefaultValueExpression(type, location(ctx));
+        const_expr = new DefaultValue(type, location(ctx));
     }
 
     application_.globalScope()
@@ -171,7 +171,7 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
     else
     {
         assigner = Assigner::COPY_ASSIGNMENT;
-        assigned = new DefaultValueExpression(type, location(ctx));
+        assigned = new DefaultValue(type, location(ctx));
     }
 
     auto* statement = new LocalVariableDefinition(identifier, type, assigner, assigned, location(ctx));

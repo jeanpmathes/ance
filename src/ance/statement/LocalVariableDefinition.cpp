@@ -16,7 +16,9 @@ LocalVariableDefinition::LocalVariableDefinition(std::string    identifier,
     , type_(type)
     , assigner_(assigner)
     , assigned_(assigned)
-{}
+{
+    addChild(*assigned);
+}
 
 void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
 {
@@ -40,4 +42,9 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
 void LocalVariableDefinition::doBuild(CompileContext* context)
 {
     variable_->build(context);
+}
+
+bool LocalVariableDefinition::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitLocalVariableDefinition(*this);
 }

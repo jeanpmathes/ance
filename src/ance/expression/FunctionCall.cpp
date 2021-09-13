@@ -16,7 +16,9 @@ FunctionCall::FunctionCall(std::string identifier, std::vector<Expression*> argu
     : Expression(location)
     , identifier_(std::move(identifier))
     , arguments_(std::move(arguments))
-{}
+{
+    for (auto* arg : arguments_) { addChild(*arg); }
+}
 
 void FunctionCall::setScope(ance::Scope* scope)
 {
@@ -69,6 +71,11 @@ void FunctionCall::doBuild(CompileContext* context)
     {
         setValue(return_value);
     }
+}
+
+bool FunctionCall::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitFunctionCall(*this);
 }
 
 FunctionCall::~FunctionCall() = default;

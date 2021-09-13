@@ -3,6 +3,7 @@
 
 #include <filesystem>
 
+#include "ance/Element.h"
 #include "ance/scope/Scope.h"
 #include "management/File.h"
 
@@ -18,7 +19,7 @@ namespace ance
 /**
  * The application that is described by the source and will be compiled.
  */
-class Application
+class Application : public ance::Element
 {
   public:
     /**
@@ -71,6 +72,8 @@ class Application
      * @return The global scope.
      */
     ance::GlobalScope* globalScope();
+
+    bool accept(ance::ApplicationVisitor& visitor) override;
 
   private:
     data::File& project_;

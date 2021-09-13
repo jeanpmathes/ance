@@ -35,3 +35,8 @@ ance::Value* ance::ExternFunction::buildCall(const std::vector<ance::Value*>& ar
     llvm::Value* native_value = ance::Values::contentToNative(returnType(), content_value, context);
     return new ance::WrappedNativeValue(returnType(), native_value);
 }
+
+bool ance::ExternFunction::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitExternFunction(*this);
+}

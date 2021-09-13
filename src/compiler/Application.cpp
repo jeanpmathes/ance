@@ -27,6 +27,8 @@ Application::Application(data::File& project) : project_(project), global_scope_
     global_scope_->registerType(ance::VoidType::get());
     global_scope_->registerType(ance::SizeType::get());
     global_scope_->registerType(ance::UnsignedIntegerPointerType::get());
+
+    addChild(*global_scope_);
 }
 
 void Application::setPointerSize(unsigned size)
@@ -97,4 +99,9 @@ void Application::validate(ValidationLogger& validation_logger)
 ance::GlobalScope* Application::globalScope()
 {
     return global_scope_;
+}
+
+bool Application::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitApplication(*this);
 }

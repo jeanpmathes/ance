@@ -22,6 +22,8 @@ class ConstantLiteral : public ConstantExpression
 
     [[nodiscard]] ance::Constant* getConstantValue() const override;
 
+    bool accept(ance::ApplicationVisitor& visitor) override;
+
   private:
     ance::Constant* constant_;
 };

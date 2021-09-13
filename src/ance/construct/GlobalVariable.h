@@ -82,6 +82,8 @@ namespace ance
         ance::Value* getValue(CompileContext* context) override;
         void         setValue(ance::Value* value, CompileContext* context) override;
 
+        bool accept(ance::ApplicationVisitor& visitor) override;
+
       private:
         AccessModifier      access_;
         ance::Location      location_;

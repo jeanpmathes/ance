@@ -20,6 +20,8 @@ class VariableAssignable : public Assignable
 
     void validate(ValidationLogger& validation_logger) override;
 
+    bool accept(ance::ApplicationVisitor& visitor) override;
+
   protected:
     void setScope(ance::Scope* scope) override;
     void doBuild(CompileContext* context) override;

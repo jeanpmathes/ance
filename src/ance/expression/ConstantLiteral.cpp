@@ -22,3 +22,8 @@ ance::Constant* ConstantLiteral::getConstantValue() const
 {
     return constant_;
 }
+
+bool ConstantLiteral::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitConstantLiteral(*this);
+}

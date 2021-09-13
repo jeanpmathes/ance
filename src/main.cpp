@@ -14,6 +14,8 @@
 #include "management/File.h"
 #include "validation/ValidationLogger.h"
 
+#include "ance/ApplicationVisitor.h"
+
 int main(int argc, char** argv)
 {
     if (argc != 3)

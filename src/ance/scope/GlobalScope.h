@@ -115,6 +115,8 @@ namespace ance
          */
         void buildFunctions(CompileContext* context);
 
+        bool accept(ance::ApplicationVisitor& visitor) override;
+
       private:
         std::vector<std::pair<std::string, ance::Location>> errors_;
 

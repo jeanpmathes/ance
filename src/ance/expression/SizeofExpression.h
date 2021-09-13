@@ -30,6 +30,8 @@ class SizeofExpression : public BackingExpression
 
     [[nodiscard]] ance::Value* getValue() const override;
 
+    bool accept(ance::ApplicationVisitor& visitor) override;
+
   protected:
     llvm::Value* buildNativeValue(CompileContext* context) override;
 

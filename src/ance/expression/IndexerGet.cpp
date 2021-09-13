@@ -6,7 +6,10 @@ IndexerGet::IndexerGet(Expression* indexed, Expression* index, ance::Location lo
     : Expression(location)
     , indexed_(indexed)
     , index_(index)
-{}
+{
+    addChild(*index);
+    addChild(*indexed);
+}
 
 void IndexerGet::setScope(ance::Scope* scope)
 {
@@ -46,6 +49,11 @@ void IndexerGet::doBuild(CompileContext* context)
 {
     ance::Value* return_value = indexed_->type()->buildGetIndexer(indexed_->getValue(), index_->getValue(), context);
     setValue(return_value);
+}
+
+bool IndexerGet::accept(ance::ApplicationVisitor& visitor)
+{
+    return visitor.visitIndexerGet(*this);
 }
 
 IndexerGet::~IndexerGet() = default;

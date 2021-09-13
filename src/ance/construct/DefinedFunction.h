@@ -85,6 +85,8 @@ namespace ance
         ance::Type* getType(const std::string& type_name) override;
         void        registerType(ance::Type* type) override;
 
+        bool accept(ance::ApplicationVisitor& visitor) override;
+
       protected:
         using Function::buildCall;
 
