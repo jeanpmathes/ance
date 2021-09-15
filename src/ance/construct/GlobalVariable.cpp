@@ -69,7 +69,7 @@ void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
     ance::Type::checkMismatch(type(), initial_value_->type(), constant_init_->location(), validation_logger);
 }
 
-void ance::GlobalVariable::buildGlobal(CompileContext* context)
+void ance::GlobalVariable::createNativeBacking(CompileContext* context)
 {
     llvm::GlobalValue::LinkageTypes linkage = access_.linkage();
 

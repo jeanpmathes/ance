@@ -46,7 +46,7 @@ void ance::DefinedFunction::pushStatement(Statement* statement)
     addChild(*statement);
 }
 
-void ance::DefinedFunction::buildName(CompileContext* context)
+void ance::DefinedFunction::createNativeBacking(CompileContext* context)
 {
     std::tie(native_type_, native_function_) =
         createNativeFunction(access_.linkage(), *context->llvmContext(), context->module());

@@ -47,12 +47,6 @@ namespace ance
         ance::Variable* getVariable(std::string identifier) override;
 
         /**
-         * Build all variables in this scope.
-         * @param context The current compile context.
-         */
-        void buildVariables(CompileContext* context);
-
-        /**
          * Get the number of functions in this scope.
          * @return The function count.
          */
@@ -105,10 +99,11 @@ namespace ance
         ance::Function* getFunction(const std::string& identifier);
 
         /**
-         * Build all function names in this scope.
+         * Create the native content backing methods and functions. It is required for the actual build.
          * @param context The current compile context.
          */
-        void buildFunctionNames(CompileContext* context);
+        void createNativeBacking(CompileContext* context);
+
         /**
          * Build all functions in this scope.
          * @param context The current compile context.

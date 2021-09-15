@@ -123,21 +123,6 @@ ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
     return undefined;
 }
 
-void ance::GlobalScope::buildVariables(CompileContext* context)
-{
-    for (auto const& [identifier, constant] : global_constants_)
-    {
-        if (!constant) continue;
-        constant->buildGlobal(context);
-    }
-
-    for (auto const& [identifier, variable] : global_variables_)
-    {
-        if (!variable) continue;
-        variable->buildGlobal(context);
-    }
-}
-
 size_t ance::GlobalScope::functionCount() const
 {
     return functions_.size();
@@ -193,9 +178,21 @@ ance::Function* ance::GlobalScope::getFunction(const std::string& identifier)
     return functions_.at(identifier);
 }
 
-void ance::GlobalScope::buildFunctionNames(CompileContext* context)
+void ance::GlobalScope::createNativeBacking(CompileContext* context)
 {
-    for (auto const& [key, val] : functions_) { val->buildName(context); }
+    for (auto const& [key, val] : functions_) { val->createNativeBacking(context); }
+
+    for (auto const& [identifier, constant] : global_constants_)
+    {
+        if (!constant) continue;
+        constant->createNativeBacking(context);
+    }
+
+    for (auto const& [identifier, variable] : global_variables_)
+    {
+        if (!variable) continue;
+        variable->createNativeBacking(context);
+    }
 }
 
 void ance::GlobalScope::buildFunctions(CompileContext* context)

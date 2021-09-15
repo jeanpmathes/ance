@@ -74,10 +74,10 @@ namespace ance
         void validate(ValidationLogger& validation_logger) override;
 
         /**
-         * Build the global variable.
+         * Create the native content backing the variable.
          * @param context The current compile context.
          */
-        void buildGlobal(CompileContext* context);
+        void createNativeBacking(CompileContext* context);
 
         ance::Value* getValue(CompileContext* context) override;
         void         setValue(ance::Value* value, CompileContext* context) override;

@@ -76,10 +76,11 @@ namespace ance
         virtual void validate(ValidationLogger& validation_logger) = 0;
 
         /**
-         * Build the declaration of this function, allowing it to be called.
+         * Create the native content of this function, allowing building function code and calling this function.
          * @param context The current compile context.
          */
-        virtual void buildName(CompileContext* context) = 0;
+        virtual void createNativeBacking(CompileContext* context) = 0;
+
         /**
          * Build the function definition. This will be called after building the name.
          * @param context The current compile context.

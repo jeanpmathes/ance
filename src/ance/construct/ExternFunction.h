@@ -25,7 +25,7 @@ namespace ance
 
         void validate(ValidationLogger& validation_logger) override;
 
-        void         buildName(CompileContext* context) override;
+        void         createNativeBacking(CompileContext* context) override;
         void         build(CompileContext* context) override;
         ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
 

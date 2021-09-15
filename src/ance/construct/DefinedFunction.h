@@ -52,7 +52,7 @@ namespace ance
          */
         void pushStatement(Statement* statement);
 
-        void buildName(CompileContext* context) override;
+        void createNativeBacking(CompileContext* context) override;
         void build(CompileContext* context) override;
 
         /**

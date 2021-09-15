@@ -15,7 +15,7 @@ ance::ExternFunction::ExternFunction(std::string                   function_name
 
 void ance::ExternFunction::validate(ValidationLogger&) {}
 
-void ance::ExternFunction::buildName(CompileContext* context)
+void ance::ExternFunction::createNativeBacking(CompileContext* context)
 {
     std::tie(native_type_, native_function_) = createNativeFunction(llvm::GlobalValue::LinkageTypes::ExternalLinkage,
                                                                     *context->llvmContext(),
