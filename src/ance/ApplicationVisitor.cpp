@@ -42,7 +42,7 @@ bool ance::ApplicationVisitor::visitChildren(ance::Element& element)
 {
     bool ret = true;
 
-    for (size_t i = 0; i < element.childCount(); i++) { ret &= element.getChild(i).accept(*this); }
+    for (size_t i = 0; i < element.childCount(); i++) { ret &= visit(element.getChild(i)); }
 
     return ret;
 }
