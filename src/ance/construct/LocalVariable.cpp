@@ -20,6 +20,11 @@ ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope,
     , location_(location)
 {}
 
+ance::Location ance::LocalVariable::location() const
+{
+    return location_;
+}
+
 void ance::LocalVariable::validate(ValidationLogger&)
 {
     // Validation of initial value in declaring statement.

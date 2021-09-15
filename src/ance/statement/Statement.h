@@ -47,11 +47,7 @@ class Statement : public ance::Element
      */
     [[nodiscard]] ance::DefinedFunction* getContainingFunction() const;
 
-    /**
-     * Get the source location of this statement.
-     * @return The source location.
-     */
-    [[nodiscard]] ance::Location location() const;
+    [[nodiscard]] ance::Location location() const override;
 
     /**
      * Validate this statement.

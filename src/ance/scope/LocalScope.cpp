@@ -16,6 +16,11 @@ llvm::DIScope* ance::LocalScope::getDebugScope(CompileContext* context)
     return parent_->getDebugScope(context);
 }
 
+ance::Location ance::LocalScope::location() const
+{
+    return parent_->location();
+}
+
 void ance::LocalScope::validate(ValidationLogger& validation_logger)
 {
     for (auto const& [key, val] : local_variables_) { val->validate(validation_logger); }

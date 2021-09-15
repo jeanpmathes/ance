@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ance/ApplicationVisitor.h"
+#include "ance/utility/Location.h"
 
 namespace ance
 {
@@ -13,6 +14,12 @@ namespace ance
     class Element
     {
       public:
+        /**
+         * Get the source location of this element.
+         * @return The source location.
+         */
+        [[nodiscard]] virtual ance::Location location() const = 0;
+
         /**
          * The accept method of the visitor pattern, the element will call the corresponding visit method.
          * @param visitor The visitor to accept.

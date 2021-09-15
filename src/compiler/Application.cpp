@@ -31,6 +31,11 @@ Application::Application(data::File& project) : project_(project), global_scope_
     addChild(*global_scope_);
 }
 
+ance::Location Application::location() const
+{
+    return ance::Location(0, 0, 0, 0);
+}
+
 void Application::setPointerSize(unsigned size)
 {
     pointer_size_ = size;

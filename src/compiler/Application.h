@@ -32,6 +32,8 @@ class Application : public ance::Element
     Application(Application&&)      = delete;
 
   public:
+    [[nodiscard]] ance::Location location() const override;
+
     /**
      * Set the pointer size to use.
      * @param size The pointer size.

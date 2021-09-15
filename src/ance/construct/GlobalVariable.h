@@ -71,6 +71,8 @@ namespace ance
                           bool                is_constant,
                           ance::Location      location);
 
+        [[nodiscard]] ance::Location location() const override;
+
         void validate(ValidationLogger& validation_logger) override;
 
         /**

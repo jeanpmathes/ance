@@ -65,11 +65,7 @@ class Assignable : public ance::Element
      */
     virtual void doBuild(CompileContext* context) = 0;
 
-    /**
-     * Get the location of this assignable.
-     * @return The source location.
-     */
-    [[nodiscard]] ance::Location location() const;
+    [[nodiscard]] ance::Location location() const override;
 
   public:
     virtual ~Assignable() = default;

@@ -58,6 +58,11 @@ void ance::GlobalVariable::defineGlobal(ance::Scope*        containing_scope,
     initial_value_ = constant_init_->getConstantValue();
 }
 
+ance::Location ance::GlobalVariable::location() const
+{
+    return location_;
+}
+
 void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
 {
     if (type() == ance::VoidType::get())

@@ -63,11 +63,7 @@ namespace ance
          */
         [[nodiscard]] size_t parameterCount() const;
 
-        /**
-         * Get the source location.
-         * @return The source location.
-         */
-        [[nodiscard]] ance::Location location() const;
+        [[nodiscard]] ance::Location location() const override;
 
         /**
          * Validate this function.

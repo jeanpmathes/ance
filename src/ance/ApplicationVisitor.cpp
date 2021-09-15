@@ -53,8 +53,8 @@ bool ance::ApplicationVisitor::visitChildren(ance::Element& element)
     return ret;
 }
 
-void ance::ApplicationVisitor::preVisit(ance::Element& element) {}
-void ance::ApplicationVisitor::postVisit(ance::Element& element) {}
+void ance::ApplicationVisitor::preVisit(ance::Element&) {}
+void ance::ApplicationVisitor::postVisit(ance::Element&) {}
 
 bool ance::ApplicationVisitor::visitApplication(Application& application)
 {

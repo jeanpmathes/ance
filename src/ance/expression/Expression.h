@@ -29,11 +29,7 @@ class Expression : public ance::Element
     explicit Expression(ance::Location location);
 
   public:
-    /**
-     * Get the source location.
-     * @return The source location. Might not refer to an actual location.
-     */
-    [[nodiscard]] ance::Location location() const;
+    [[nodiscard]] ance::Location location() const override;
 
     /**
      * Set the scope containing this expression.

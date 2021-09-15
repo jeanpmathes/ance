@@ -19,6 +19,11 @@ llvm::DIScope* ance::GlobalScope::getDebugScope(CompileContext* context)
     return context->unit();
 }
 
+ance::Location ance::GlobalScope::location() const
+{
+    return ance::Location(0, 0, 0, 0);
+}
+
 void ance::GlobalScope::validate(ValidationLogger& validation_logger)
 {
     for (auto [message, location] : errors_) { validation_logger.logError(message, location); }
