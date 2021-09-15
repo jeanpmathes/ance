@@ -35,7 +35,13 @@
 
 bool ance::ApplicationVisitor::visit(ance::Element& element)
 {
-    return element.accept(*this);
+    bool result;
+
+    preVisit(element);
+    result = element.accept(*this);
+    postVisit(element);
+
+    return result;
 }
 
 bool ance::ApplicationVisitor::visitChildren(ance::Element& element)
@@ -46,6 +52,9 @@ bool ance::ApplicationVisitor::visitChildren(ance::Element& element)
 
     return ret;
 }
+
+void ance::ApplicationVisitor::preVisit(ance::Element& element) {}
+void ance::ApplicationVisitor::postVisit(ance::Element& element) {}
 
 bool ance::ApplicationVisitor::visitApplication(Application& application)
 {

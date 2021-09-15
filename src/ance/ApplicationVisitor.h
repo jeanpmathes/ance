@@ -48,9 +48,32 @@ namespace ance
     class ApplicationVisitor
     {
       public:
+        /**
+         * Visit a given element.
+         * @param element The element to visit.
+         * @return The result.
+         */
         bool visit(ance::Element& element);
+        /**
+         * Visit all children of a given element.
+         * @param element The element to visit the children of. The element itself is not visited.
+         * @return The result.
+         */
         bool visitChildren(ance::Element& element);
 
+      protected:
+        /**
+         * Called before an element is visited.
+         * @param element The element that will be visited.
+         */
+        virtual void preVisit(ance::Element& element);
+        /**
+         * Called after an element was visited.
+         * @param element The element that was visited.
+         */
+        virtual void postVisit(ance::Element& element);
+
+      public:
         virtual bool visitApplication(Application& application);
 
         virtual bool visitDiscard(Discard& discard);
