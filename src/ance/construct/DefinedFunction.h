@@ -46,6 +46,8 @@ namespace ance
                         ance::Location                declaration_location,
                         ance::Location                definition_location);
 
+        [[nodiscard]] ance::Scope* scope() const override;
+
         /**
          * Push a statement to the end of the statement list.
          * @param statement The statement to add.

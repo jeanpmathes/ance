@@ -53,6 +53,11 @@ class Assignable : public ance::Element
      */
     [[nodiscard]] ance::Location assignedLocation() const;
 
+  public:
+    [[nodiscard]] ance::Location location() const override;
+    [[nodiscard]] ance::Scope*   scope() const override;
+
+  protected:
     /**
      * Override to receive the containing scope.
      * @param scope The containing scope.
@@ -64,8 +69,6 @@ class Assignable : public ance::Element
      * @param context The current compile context.
      */
     virtual void doBuild(CompileContext* context) = 0;
-
-    [[nodiscard]] ance::Location location() const override;
 
   public:
     virtual ~Assignable() = default;

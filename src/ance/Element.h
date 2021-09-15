@@ -8,6 +8,11 @@
 
 namespace ance
 {
+    class Scope;
+}
+
+namespace ance
+{
     /**
      * The base class of all language elements.
      */
@@ -19,6 +24,12 @@ namespace ance
          * @return The source location.
          */
         [[nodiscard]] virtual ance::Location location() const = 0;
+
+        /**
+         * Get the containing scope of this element.
+         * @return The containing scope, or null if there is no containing scope.
+         */
+        [[nodiscard]] virtual ance::Scope* scope() const;
 
         /**
          * The accept method of the visitor pattern, the element will call the corresponding visit method.

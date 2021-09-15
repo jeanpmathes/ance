@@ -1,5 +1,10 @@
 #include "Element.h"
 
+ance::Scope* ance::Element::scope() const
+{
+    return nullptr;
+}
+
 void ance::Element::addChild(ance::Element& child)
 {
     children_.emplace_back(child);

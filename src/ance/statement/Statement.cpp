@@ -14,6 +14,11 @@ void Statement::setContainingFunction(ance::DefinedFunction* function)
 
 void Statement::setFunction(ance::DefinedFunction*) {}
 
+ance::Scope* Statement::scope() const
+{
+    return function_;
+}
+
 ance::DefinedFunction* Statement::getContainingFunction() const
 {
     return function_;

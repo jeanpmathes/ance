@@ -13,8 +13,14 @@ void Assignable::setContainingScope(ance::Scope* scope)
 void Assignable::assign(ance::Value* value, ance::Location location)
 {
     assert(!assigned_value_ && "There may be only one value assigned to an assignable.");
+
     assigned_value_    = value;
     assigned_location_ = location;
+}
+
+ance::Scope* Assignable::scope() const
+{
+    return containing_scope_;
 }
 
 void Assignable::build(CompileContext* context)

@@ -13,6 +13,8 @@ class BuildableExpression : public virtual Expression
   public:
     void setContainingScope(ance::Scope* scope) final;
 
+    [[nodiscard]] ance::Scope* scope() const override;
+
     /**
      * Build the expression.
      * @param context The current compile context.

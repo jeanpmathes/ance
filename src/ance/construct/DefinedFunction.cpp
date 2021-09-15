@@ -38,6 +38,11 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                access,
     }
 }
 
+ance::Scope* ance::DefinedFunction::scope() const
+{
+    return containing_scope_;
+}
+
 void ance::DefinedFunction::pushStatement(Statement* statement)
 {
     statements_.push_back(statement);

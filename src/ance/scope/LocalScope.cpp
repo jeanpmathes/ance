@@ -16,6 +16,11 @@ llvm::DIScope* ance::LocalScope::getDebugScope(CompileContext* context)
     return parent_->getDebugScope(context);
 }
 
+ance::Scope* ance::LocalScope::scope() const
+{
+    return parent_;
+}
+
 ance::Location ance::LocalScope::location() const
 {
     return parent_->location();

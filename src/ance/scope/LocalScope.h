@@ -26,6 +26,8 @@ namespace ance
         ance::GlobalScope* getGlobalScope() override;
         llvm::DIScope*     getDebugScope(CompileContext* context) override;
 
+        [[nodiscard]] ance::Scope* scope() const override;
+
         [[nodiscard]] ance::Location location() const override;
 
         void validate(ValidationLogger& validation_logger) override;

@@ -33,6 +33,8 @@ class Statement : public ance::Element
      */
     void setContainingFunction(ance::DefinedFunction* function);
 
+    [[nodiscard]] ance::Scope* scope() const override;
+
   protected:
     /**
      * Override this to receive the containing function.
