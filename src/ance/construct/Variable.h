@@ -38,6 +38,7 @@ namespace ance
          * @param is_final Whether the variable is final.
          */
         Variable(ance::Scope* containing_scope, std::string identifier, ance::Type* type, bool is_final);
+
         /**
          * Create an undefined variable.
          * @param identifier The identifier.

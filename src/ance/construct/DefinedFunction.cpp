@@ -59,7 +59,7 @@ void ance::DefinedFunction::createNativeBacking(CompileContext* context)
     std::vector<llvm::Metadata*> di_types;
     di_types.push_back(returnType()->getDebugType(context));
 
-    for (const auto& pair : zip(parameters(), native_function_->args()))
+    for (const auto& pair : llvm::zip(parameters(), native_function_->args()))
     {
         const auto& [parameter, argument] = pair;
         parameter->wrap(&argument);
@@ -173,6 +173,15 @@ llvm::DIScope* ance::DefinedFunction::getDebugScope(CompileContext*)
 
 void ance::DefinedFunction::validate(ValidationLogger& validation_logger)
 {
+    for (const auto& [parameter, argument] : llvm::zip(parameters(), arguments_))
+    {
+        if (!argument)
+        {
+            validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
+                                       parameter->location());
+        }
+    }
+
     function_scope_->validate(validation_logger);
 
     for (auto statement : statements_) { statement->validate(validation_logger); }
