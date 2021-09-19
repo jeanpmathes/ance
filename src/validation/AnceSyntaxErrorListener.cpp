@@ -2,11 +2,6 @@
 
 #include "validation/Strings.h"
 
-size_t AnceSyntaxErrorListener::fatalSyntaxErrorCount() const
-{
-    return fatal_syntax_error_count_;
-}
-
 void AnceSyntaxErrorListener::syntaxError(antlr4::Recognizer* recognizer,
                                           antlr4::Token*      offending_symbol,
                                           size_t              line,

@@ -8,8 +8,6 @@
 class AnceSyntaxErrorListener : public antlr4::BaseErrorListener
 {
   public:
-    [[nodiscard]] size_t fatalSyntaxErrorCount() const;
-
     void syntaxError(antlr4::Recognizer* recognizer,
                      antlr4::Token*      offending_symbol,
                      size_t              line,
@@ -28,7 +26,6 @@ class AnceSyntaxErrorListener : public antlr4::BaseErrorListener
     void emitMessages(const SourceFile& source_file);
 
   private:
-    size_t                                                         fatal_syntax_error_count_ {0};
     std::vector<std::pair<std::string, std::pair<size_t, size_t>>> syntax_errors_;
 };
 
