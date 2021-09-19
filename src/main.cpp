@@ -41,12 +41,12 @@ int main(int argc, char** argv)
     antlr4::ANTLRInputStream input(code);
     anceLexer                lexer(&input);
     lexer.removeErrorListeners();
-    lexer.addErrorListener(&syntax_error_listener);
+    lexer.addErrorListener(syntax_error_listener.lexerErrorListener());
 
     antlr4::CommonTokenStream tokens(&lexer);
     anceParser                parser(&tokens);
     parser.removeErrorListeners();
-    parser.addErrorListener(&syntax_error_listener);
+    parser.addErrorListener(syntax_error_listener.parserErrorListener());
 
     auto source_visitor = new SourceVisitor(application);
 

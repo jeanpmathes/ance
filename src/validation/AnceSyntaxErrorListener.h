@@ -5,15 +5,42 @@
 
 #include "validation/SourceFile.h"
 
-class AnceSyntaxErrorListener : public antlr4::BaseErrorListener
+class AnceSyntaxErrorListener
 {
+  private:
+    class LexerErrorListener : public antlr4::BaseErrorListener
+    {
+      public:
+        explicit LexerErrorListener(AnceSyntaxErrorListener& parent);
+
+        void syntaxError(antlr4::Recognizer* recognizer,
+                         antlr4::Token*      offending_symbol,
+                         size_t              line,
+                         size_t              char_position_in_line,
+                         const std::string&  msg,
+                         std::exception_ptr  e) override;
+
+        AnceSyntaxErrorListener& parent_;
+    };
+
+    class ParserErrorListener : public antlr4::BaseErrorListener
+    {
+      public:
+        explicit ParserErrorListener(AnceSyntaxErrorListener& parent);
+
+        void syntaxError(antlr4::Recognizer* recognizer,
+                         antlr4::Token*      offending_symbol,
+                         size_t              line,
+                         size_t              char_position_in_line,
+                         const std::string&  msg,
+                         std::exception_ptr  e) override;
+
+        AnceSyntaxErrorListener& parent_;
+    };
+
   public:
-    void syntaxError(antlr4::Recognizer* recognizer,
-                     antlr4::Token*      offending_symbol,
-                     size_t              line,
-                     size_t              char_position_in_line,
-                     const std::string&  msg,
-                     std::exception_ptr  e) override;
+    antlr4::BaseErrorListener* lexerErrorListener();
+    antlr4::BaseErrorListener* parserErrorListener();
 
   private:
     void log(const std::string& message, size_t line, size_t char_position);
@@ -26,6 +53,9 @@ class AnceSyntaxErrorListener : public antlr4::BaseErrorListener
     void emitMessages(const SourceFile& source_file);
 
   private:
+    LexerErrorListener  lexer_error_listener_ {*this};
+    ParserErrorListener parser_error_listener_ {*this};
+
     std::vector<std::pair<std::string, std::pair<size_t, size_t>>> syntax_errors_;
 };
 

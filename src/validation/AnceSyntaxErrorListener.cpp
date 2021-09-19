@@ -2,14 +2,38 @@
 
 #include "validation/Strings.h"
 
-void AnceSyntaxErrorListener::syntaxError(antlr4::Recognizer* recognizer,
-                                          antlr4::Token*      offending_symbol,
-                                          size_t              line,
-                                          size_t              char_position_in_line,
-                                          const std::string&  msg,
-                                          std::exception_ptr  e)
+AnceSyntaxErrorListener::LexerErrorListener::LexerErrorListener(AnceSyntaxErrorListener& parent) : parent_(parent) {}
+
+void AnceSyntaxErrorListener::LexerErrorListener::syntaxError(antlr4::Recognizer* recognizer,
+                                                              antlr4::Token*      offending_symbol,
+                                                              size_t              line,
+                                                              size_t              char_position_in_line,
+                                                              const std::string&  msg,
+                                                              std::exception_ptr  e)
 {
-    log("Cannot understand code", line, char_position_in_line);
+    parent_.log("Cannot understand code", line, char_position_in_line);
+}
+
+AnceSyntaxErrorListener::ParserErrorListener::ParserErrorListener(AnceSyntaxErrorListener& parent) : parent_(parent) {}
+
+void AnceSyntaxErrorListener::ParserErrorListener::syntaxError(antlr4::Recognizer* recognizer,
+                                                               antlr4::Token*      offending_symbol,
+                                                               size_t              line,
+                                                               size_t              char_position_in_line,
+                                                               const std::string&  msg,
+                                                               std::exception_ptr  e)
+{
+    parent_.log("Cannot understand code", line, char_position_in_line);
+}
+
+antlr4::BaseErrorListener* AnceSyntaxErrorListener::lexerErrorListener()
+{
+    return &lexer_error_listener_;
+}
+
+antlr4::BaseErrorListener* AnceSyntaxErrorListener::parserErrorListener()
+{
+    return &parser_error_listener_;
 }
 
 void AnceSyntaxErrorListener::log(const std::string& message, size_t line, size_t char_position)
