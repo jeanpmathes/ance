@@ -11,7 +11,13 @@ void AnceSyntaxErrorListener::LexerErrorListener::syntaxError(antlr4::Recognizer
                                                               const std::string&  msg,
                                                               std::exception_ptr  e)
 {
-    parent_.log("Cannot understand code", line, char_position_in_line);
+    auto [previous_line, previous_column] = previous_position_;
+    previous_position_                    = std::make_pair(line, char_position_in_line + 1);
+
+    bool continuing_previous_error = (line == previous_line && char_position_in_line == previous_column);
+    if (continuing_previous_error && previous_column != 0) return;
+
+    parent_.log("Cannot recognize tokens", line, char_position_in_line);
 }
 
 AnceSyntaxErrorListener::ParserErrorListener::ParserErrorListener(AnceSyntaxErrorListener& parent) : parent_(parent) {}

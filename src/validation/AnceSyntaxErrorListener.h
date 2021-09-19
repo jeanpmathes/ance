@@ -21,6 +21,9 @@ class AnceSyntaxErrorListener
                          std::exception_ptr  e) override;
 
         AnceSyntaxErrorListener& parent_;
+
+      private:
+        std::pair<size_t, size_t> previous_position_ {0, 0};
     };
 
     class ParserErrorListener : public antlr4::BaseErrorListener
