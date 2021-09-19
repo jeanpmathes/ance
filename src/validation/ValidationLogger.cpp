@@ -2,11 +2,18 @@
 
 #include <iostream>
 
+#include "validation/Strings.h"
+
 ValidationLogger::ValidationLogger() = default;
 
 size_t ValidationLogger::warningCount() const
 {
     return warning_count_;
+}
+
+size_t ValidationLogger::errorCount() const
+{
+    return error_count_;
 }
 
 void ValidationLogger::logWarning(const std::string& message, ance::Location location)
@@ -24,11 +31,6 @@ void ValidationLogger::logError(const std::string& message, ance::Location locat
 void ValidationLogger::log(ValidationLogger::LogLevel level, const std::string& message, ance::Location location)
 {
     entries_.emplace_back(level, message, location);
-}
-
-size_t ValidationLogger::errorCount() const
-{
-    return error_count_;
 }
 
 void ValidationLogger::emitMessages(const SourceFile& source_file)
@@ -67,15 +69,4 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
             std::cout << '\t' << std::string(marker_start - 1, ' ') << std::string(marker_length, '~') << std::endl;
         }
     }
-}
-
-std::string_view ValidationLogger::trim(std::string_view str, unsigned int& start)
-{
-    const auto begin = str.find_first_not_of(" \t");
-    const auto end   = str.find_last_not_of(" \t");
-
-    start = begin;
-
-    const auto range = end - begin + 1;
-    return str.substr(begin, range);
 }

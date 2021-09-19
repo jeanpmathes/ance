@@ -12,9 +12,8 @@
 #include "compiler/AnceLinker.h"
 #include "compiler/SourceVisitor.h"
 #include "management/File.h"
+#include "validation/AnceSyntaxErrorListener.h"
 #include "validation/ValidationLogger.h"
-
-#include "ance/ApplicationVisitor.h"
 
 int main(int argc, char** argv)
 {
@@ -30,38 +29,46 @@ int main(int argc, char** argv)
     project.read();
 
     Application application(project);
+    SourceFile  source_file(application.getSourceFile());
 
     std::cout << "========== Build [ " << application.getName() << " ] ==========" << std::endl;
 
     std::fstream code;
     code.open(application.getSourceFile());
 
-    antlr4::ANTLRInputStream  input(code);
-    anceLexer                 lexer(&input);
+    AnceSyntaxErrorListener syntax_error_listener;
+
+    antlr4::ANTLRInputStream input(code);
+    anceLexer                lexer(&input);
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(&syntax_error_listener);
+
     antlr4::CommonTokenStream tokens(&lexer);
     anceParser                parser(&tokens);
+    parser.removeErrorListeners();
+    parser.addErrorListener(&syntax_error_listener);
 
     auto source_visitor = new SourceVisitor(application);
 
     antlr4::tree::ParseTree* tree = parser.file();
     source_visitor->visit(tree);
 
-    llvm::InitializeAllTargetInfos();
-    llvm::InitializeAllTargets();
-    llvm::InitializeAllTargetMCs();
-    llvm::InitializeAllAsmPrinters();
-    llvm::InitializeAllAsmPrinters();
+    syntax_error_listener.emitMessages(source_file);
 
     int exit_code;
 
     ValidationLogger validation_logger;
     application.validate(validation_logger);
-
-    SourceFile source_file(application.getSourceFile());
     validation_logger.emitMessages(source_file);
 
     if (validation_logger.errorCount() == 0)
     {
+        llvm::InitializeAllTargetInfos();
+        llvm::InitializeAllTargets();
+        llvm::InitializeAllTargetMCs();
+        llvm::InitializeAllAsmPrinters();
+        llvm::InitializeAllAsmPrinters();
+
         AnceCompiler compiler(application);
         AnceLinker   linker(project.root()["link"]);
 
