@@ -1,4 +1,4 @@
 target_sources(ance PRIVATE ValidationLogger.cpp
                SourceFile.cpp
-               AnceSyntaxErrorListener.cpp
+               AnceSyntaxErrorHandler.cpp
                Strings.cpp)

@@ -12,7 +12,7 @@
 #include "compiler/AnceLinker.h"
 #include "compiler/SourceVisitor.h"
 #include "management/File.h"
-#include "validation/AnceSyntaxErrorListener.h"
+#include "validation/AnceSyntaxErrorHandler.h"
 #include "validation/ValidationLogger.h"
 
 int main(int argc, char** argv)
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     std::fstream code;
     code.open(application.getSourceFile());
 
-    AnceSyntaxErrorListener syntax_error_listener;
+    AnceSyntaxErrorHandler syntax_error_listener;
 
     antlr4::ANTLRInputStream input(code);
     anceLexer                lexer(&input);

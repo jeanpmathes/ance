@@ -41,23 +41,23 @@ class anceParser : public antlr4::Parser
         T__28               = 29,
         T__29               = 30,
         T__30               = 31,
-        T__31               = 32,
-        NATIVE_INTEGER_TYPE = 33,
-        SIGNED_INTEGER      = 34,
-        HEX_INTEGER         = 35,
-        BIN_INTEGER         = 36,
-        OCT_INTEGER         = 37,
-        HALF                = 38,
-        SINGLE              = 39,
-        DOUBLE              = 40,
-        QUAD                = 41,
-        DECIMAL             = 42,
-        STRING              = 43,
-        BYTE                = 44,
-        INTEGER             = 45,
-        BUFFER              = 46,
-        CONST               = 47,
-        IDENTIFIER          = 48,
+        NATIVE_INTEGER_TYPE = 32,
+        SIGNED_INTEGER      = 33,
+        HEX_INTEGER         = 34,
+        BIN_INTEGER         = 35,
+        OCT_INTEGER         = 36,
+        HALF                = 37,
+        SINGLE              = 38,
+        DOUBLE              = 39,
+        QUAD                = 40,
+        DECIMAL             = 41,
+        STRING              = 42,
+        BYTE                = 43,
+        INTEGER             = 44,
+        BUFFER              = 45,
+        CONST               = 46,
+        IDENTIFIER          = 47,
+        SEMICOLON           = 48,
         WHITESPACE          = 49,
         BLOCK_COMMENT       = 50,
         LINE_COMMENT        = 51
@@ -194,6 +194,7 @@ class anceParser : public antlr4::Parser
         AccessModifierContext*      accessModifier();
         TypeContext*                type();
         antlr4::tree::TerminalNode* IDENTIFIER();
+        antlr4::tree::TerminalNode* SEMICOLON();
         antlr4::tree::TerminalNode* CONST();
         AssignerContext*            assigner();
         LiteralExpressionContext*   literalExpression();
@@ -223,6 +224,7 @@ class anceParser : public antlr4::Parser
         TypeContext*                type();
         antlr4::tree::TerminalNode* IDENTIFIER();
         ParametersContext*          parameters();
+        antlr4::tree::TerminalNode* SEMICOLON();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -322,6 +324,7 @@ class anceParser : public antlr4::Parser
         ExpressionStatementContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t                getRuleIndex() const override;
         IndependentExpressionContext* independentExpression();
+        antlr4::tree::TerminalNode*   SEMICOLON();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -335,6 +338,7 @@ class anceParser : public antlr4::Parser
         virtual size_t              getRuleIndex() const override;
         TypeContext*                type();
         antlr4::tree::TerminalNode* IDENTIFIER();
+        antlr4::tree::TerminalNode* SEMICOLON();
         AssignerContext*            assigner();
         ExpressionContext*          expression();
 
@@ -347,10 +351,11 @@ class anceParser : public antlr4::Parser
     {
       public:
         AssignmentContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t     getRuleIndex() const override;
-        AssignableContext* assignable();
-        AssignerContext*   assigner();
-        ExpressionContext* expression();
+        virtual size_t              getRuleIndex() const override;
+        AssignableContext*          assignable();
+        AssignerContext*            assigner();
+        ExpressionContext*          expression();
+        antlr4::tree::TerminalNode* SEMICOLON();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -401,6 +406,7 @@ class anceParser : public antlr4::Parser
         DeleteStatementContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
         ExpressionContext*          expression();
+        antlr4::tree::TerminalNode* SEMICOLON();
         antlr4::tree::TerminalNode* BUFFER();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
@@ -412,8 +418,9 @@ class anceParser : public antlr4::Parser
     {
       public:
         ReturnStatementContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t     getRuleIndex() const override;
-        ExpressionContext* expression();
+        virtual size_t              getRuleIndex() const override;
+        antlr4::tree::TerminalNode* SEMICOLON();
+        ExpressionContext*          expression();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -921,6 +928,7 @@ class anceParser : public antlr4::Parser
         ArrayTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
         TypeContext*                type();
+        antlr4::tree::TerminalNode* SEMICOLON();
         antlr4::tree::TerminalNode* INTEGER();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;

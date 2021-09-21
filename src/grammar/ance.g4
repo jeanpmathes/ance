@@ -243,6 +243,8 @@ CONST : 'const' ;
 
 IDENTIFIER : [_]* [a-zA-Z] [_a-zA-Z0-9]* ;
 
+SEMICOLON : ';' ;
+
 WHITESPACE : [ \t\r\n]+ -> skip ;
 
 BLOCK_COMMENT : '/*' .*? '*/' -> skip;
