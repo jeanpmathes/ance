@@ -51,52 +51,49 @@ int main(int argc, char** argv)
     auto source_visitor = new SourceVisitor(application);
 
     antlr4::tree::ParseTree* tree = parser.file();
-    source_visitor->visit(tree);
-
     syntax_error_listener.emitMessages(source_file);
 
-    int exit_code;
-
-    ValidationLogger validation_logger;
-    application.validate(validation_logger);
-    validation_logger.emitMessages(source_file);
-
-    if (validation_logger.errorCount() == 0)
+    if (syntax_error_listener.fatalSyntaxErrorCount() == 0)
     {
-        llvm::InitializeAllTargetInfos();
-        llvm::InitializeAllTargets();
-        llvm::InitializeAllTargetMCs();
-        llvm::InitializeAllAsmPrinters();
-        llvm::InitializeAllAsmPrinters();
+        source_visitor->visit(tree);
 
-        AnceCompiler compiler(application);
-        AnceLinker   linker(project.root()["link"]);
+        ValidationLogger validation_logger;
+        application.validate(validation_logger);
+        validation_logger.emitMessages(source_file);
 
-        std::filesystem::path out_dir(argv[2]);
+        if (validation_logger.errorCount() == 0)
+        {
+            llvm::InitializeAllTargetInfos();
+            llvm::InitializeAllTargets();
+            llvm::InitializeAllTargetMCs();
+            llvm::InitializeAllAsmPrinters();
+            llvm::InitializeAllAsmPrinters();
 
-        std::filesystem::path obj_dir = out_dir / "obj";
-        std::filesystem::path bin_dir = out_dir / "bin";
+            AnceCompiler compiler(application);
+            AnceLinker   linker(project.root()["link"]);
 
-        std::filesystem::create_directory(obj_dir);
-        std::filesystem::create_directory(bin_dir);
+            std::filesystem::path out_dir(argv[2]);
 
-        std::filesystem::path ilr = obj_dir / (application.getName() + ".ll");
-        std::filesystem::path obj = obj_dir / (application.getName() + ".o");
-        std::filesystem::path exe = bin_dir / (application.getName() + ".exe");
+            std::filesystem::path obj_dir = out_dir / "obj";
+            std::filesystem::path bin_dir = out_dir / "bin";
 
-        compiler.compile(ilr);
-        compiler.emitObject(obj);
+            std::filesystem::create_directory(obj_dir);
+            std::filesystem::create_directory(bin_dir);
 
-        linker.link(obj, exe);
+            std::filesystem::path ilr = obj_dir / (application.getName() + ".ll");
+            std::filesystem::path obj = obj_dir / (application.getName() + ".o");
+            std::filesystem::path exe = bin_dir / (application.getName() + ".exe");
 
-        exit_code = EXIT_SUCCESS;
+            compiler.compile(ilr);
+            compiler.emitObject(obj);
+
+            linker.link(obj, exe);
+
+            llvm::llvm_shutdown();
+
+            return EXIT_SUCCESS;
+        }
     }
-    else
-    {
-        exit_code = EXIT_FAILURE;
-    }
 
-    llvm::llvm_shutdown();
-
-    return exit_code;
+    return EXIT_FAILURE;
 }

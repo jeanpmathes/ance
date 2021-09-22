@@ -29,8 +29,8 @@ void AnceSyntaxErrorHandler::ParserErrorListener::syntaxError(antlr4::Recognizer
                                                               antlr4::Token*      offending_symbol,
                                                               size_t              line,
                                                               size_t              char_position_in_line,
-                                                              const std::string&  msg,
-                                                              std::exception_ptr  e)
+                                                              const std::string&,
+                                                              std::exception_ptr)
 {
     auto* parser = dynamic_cast<anceParser*>(recognizer);
     if (!parser) return;
@@ -61,6 +61,7 @@ void AnceSyntaxErrorHandler::ParserErrorListener::syntaxError(antlr4::Recognizer
     }
 
     parent_.log("Cannot understand code", line, char_position_in_line);
+    parent_.fatal_error_count_++;
 }
 
 antlr4::BaseErrorListener* AnceSyntaxErrorHandler::lexerErrorListener()
@@ -94,4 +95,9 @@ void AnceSyntaxErrorHandler::emitMessages(const SourceFile& source_file)
 
         std::cout << '\t' << std::string(marker_position, ' ') << '^' << std::endl;
     }
+}
+
+size_t AnceSyntaxErrorHandler::fatalSyntaxErrorCount() const
+{
+    return fatal_error_count_;
 }

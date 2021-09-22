@@ -55,9 +55,17 @@ class AnceSyntaxErrorHandler
      */
     void emitMessages(const SourceFile& source_file);
 
+    /**
+     * Get the number of fatal syntax errors. Visiting the parse tree is not safe if fatal syntax errors occured.
+     * @return The number of fatal syntax errors.
+     */
+    [[nodiscard]] size_t fatalSyntaxErrorCount() const;
+
   private:
     LexerErrorListener  lexer_error_listener_ {*this};
     ParserErrorListener parser_error_listener_ {*this};
+
+    size_t fatal_error_count_ {0};
 
     std::vector<std::pair<std::string, std::pair<size_t, size_t>>> syntax_errors_;
 };
