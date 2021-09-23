@@ -103,13 +103,14 @@ class anceParser : public antlr4::Parser
         RuleFloatingPointLiteral    = 34,
         RuleBooleanLiteral          = 35,
         RuleSizeLiteral             = 36,
-        RuleType                    = 37,
-        RuleIntegerType             = 38,
-        RuleArrayType               = 39,
-        RuleKeywordType             = 40,
-        RuleFloatingPointType       = 41,
-        RuleTargetDependentType     = 42,
-        RuleVoidType                = 43
+        RuleDiffLiteral             = 37,
+        RuleType                    = 38,
+        RuleIntegerType             = 39,
+        RuleArrayType               = 40,
+        RuleKeywordType             = 41,
+        RuleFloatingPointType       = 42,
+        RuleTargetDependentType     = 43,
+        RuleVoidType                = 44
     };
 
     anceParser(antlr4::TokenStream* input);
@@ -161,6 +162,7 @@ class anceParser : public antlr4::Parser
     class FloatingPointLiteralContext;
     class BooleanLiteralContext;
     class SizeLiteralContext;
+    class DiffLiteralContext;
     class TypeContext;
     class IntegerTypeContext;
     class ArrayTypeContext;
@@ -710,6 +712,7 @@ class anceParser : public antlr4::Parser
         FloatingPointLiteralContext* floatingPointLiteral();
         BooleanLiteralContext*       booleanLiteral();
         SizeLiteralContext*          sizeLiteral();
+        DiffLiteralContext*          diffLiteral();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -854,6 +857,18 @@ class anceParser : public antlr4::Parser
     };
 
     SizeLiteralContext* sizeLiteral();
+
+    class DiffLiteralContext : public antlr4::ParserRuleContext
+    {
+      public:
+        DiffLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t              getRuleIndex() const override;
+        antlr4::tree::TerminalNode* SIGNED_INTEGER();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    DiffLiteralContext* diffLiteral();
 
     class TypeContext : public antlr4::ParserRuleContext
     {

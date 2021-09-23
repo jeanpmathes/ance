@@ -177,6 +177,8 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitSizeLiteral(anceParser::SizeLiteralContext* ctx) override { return visitChildren(ctx); }
 
+    virtual antlrcpp::Any visitDiffLiteral(anceParser::DiffLiteralContext* ctx) override { return visitChildren(ctx); }
+
     virtual antlrcpp::Any visitInteger(anceParser::IntegerContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitArray(anceParser::ArrayContext* ctx) override { return visitChildren(ctx); }

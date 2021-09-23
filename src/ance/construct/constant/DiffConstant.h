@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_SIZECONSTANT_H_
-#define ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_SIZECONSTANT_H_
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_DIFFCONSTANT_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_CONSTANT_DIFFCONSTANT_H_
 
 #include "Constant.h"
 
@@ -8,16 +8,16 @@ class Application;
 namespace ance
 {
     /**
-     * A size constant for size literals.
+     * An integer constant for diff literals.
      */
-    class SizeConstant : public Constant
+    class DiffConstant : public Constant
     {
       public:
         /**
          * Create a new size constant.
-         * @param value The string containing the literal.
+         * @param value The string containing the literal value.
          */
-        explicit SizeConstant(std::string value);
+        DiffConstant(std::string value);
 
         ance::Type*     type() override;
         llvm::Constant* buildContent(llvm::Module* m) override;

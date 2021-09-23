@@ -133,6 +133,7 @@ literalExpression
 	| floatingPointLiteral
 	| booleanLiteral
 	| sizeLiteral
+	| diffLiteral
 	;
 
 stringLiteral
@@ -177,6 +178,10 @@ booleanLiteral
 
 sizeLiteral
     : INTEGER ':' 'size'
+    ;
+
+diffLiteral
+    : SIGNED_INTEGER ':' 'diff'
     ;
 
 type

@@ -49,6 +49,7 @@
 
 #include "ance/construct/constant/BooleanConstant.h"
 #include "ance/construct/constant/ByteConstant.h"
+#include "ance/construct/constant/DiffConstant.h"
 #include "ance/construct/constant/FloatConstant.h"
 #include "ance/construct/constant/IntegerConstant.h"
 #include "ance/construct/constant/SizeConstant.h"
@@ -361,8 +362,16 @@ antlrcpp::Any SourceVisitor::visitFalse(anceParser::FalseContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitSizeLiteral(anceParser::SizeLiteralContext* ctx)
 {
-    std::string     size     = ctx->INTEGER()->getText();
-    ance::Constant* constant = new ance::SizeConstant(size, application_);
+    std::string     value    = ctx->INTEGER()->getText();
+    ance::Constant* constant = new ance::SizeConstant(value);
+
+    return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ctx)
+{
+    std::string     value    = ctx->SIGNED_INTEGER()->getText();
+    ance::Constant* constant = new ance::DiffConstant(value);
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }

@@ -48,10 +48,13 @@ llvm::DIType* ance::SizeType::createDebugType(CompileContext* context)
 void ance::SizeType::init(llvm::LLVMContext& c, Application& app)
 {
     assert(!size_backing_type_);
-    size_backing_type_ = llvm::Type::getIntNTy(c, app.getBitness());
-
     assert(!diff_backing_type_);
-    diff_backing_type_ = llvm::Type::getIntNTy(c, app.getBitness() * 2);
+
+    size_width_ = app.getBitness();
+    diff_width_ = size_width_ * 2;
+
+    size_backing_type_ = llvm::Type::getIntNTy(c, size_width_);
+    diff_backing_type_ = llvm::Type::getIntNTy(c, diff_width_);
 }
 
 ance::SizeType* ance::SizeType::getSize()
@@ -61,9 +64,19 @@ ance::SizeType* ance::SizeType::getSize()
     return size_instance_;
 }
 
+unsigned int ance::SizeType::getSizeWidth()
+{
+    return size_width_;
+}
+
 ance::SizeType* ance::SizeType::getDiff()
 {
     if (!diff_instance_) { diff_instance_ = new SizeType("diff"); }
 
     return diff_instance_;
+}
+
+unsigned int ance::SizeType::getDiffWidth()
+{
+    return diff_width_;
 }

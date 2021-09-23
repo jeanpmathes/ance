@@ -32,10 +32,12 @@ namespace ance
         static llvm::Value* buildValue(llvm::TypeSize size);
 
       private:
-        inline static SizeType*   size_instance_     = nullptr;
+        inline static unsigned int size_width_        = 0;
+        inline static SizeType*    size_instance_     = nullptr;
         inline static llvm::Type* size_backing_type_ = nullptr;
 
-        inline static SizeType*   diff_instance_     = nullptr;
+        inline static unsigned int diff_width_        = 0;
+        inline static SizeType*    diff_instance_     = nullptr;
         inline static llvm::Type* diff_backing_type_ = nullptr;
 
       protected:
@@ -56,10 +58,20 @@ namespace ance
         static ance::SizeType* getSize();
 
         /**
+         * Get the width of the size type.
+         */
+        static unsigned int getSizeWidth();
+
+        /**
          * Get the diff type instance.
          * @return The instance.
          */
         static ance::SizeType* getDiff();
+
+        /**
+         * Get the width of the diff type.
+         */
+        static unsigned int getDiffWidth();
     };
 }
 #endif

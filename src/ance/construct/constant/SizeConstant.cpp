@@ -5,11 +5,7 @@
 #include "ance/type/SizeType.h"
 #include "compiler/Application.h"
 
-ance::SizeConstant::SizeConstant(std::string size, Application& app)
-    : app_(app)
-    , type_(ance::SizeType::getSize())
-    , size_(std::move(size))
-{}
+ance::SizeConstant::SizeConstant(std::string value) : type_(ance::SizeType::getSize()), value_(std::move(value)) {}
 
 ance::Type* ance::SizeConstant::type()
 {
@@ -18,6 +14,6 @@ ance::Type* ance::SizeConstant::type()
 
 llvm::Constant* ance::SizeConstant::buildContent(llvm::Module* m)
 {
-    llvm::APInt size(app_.getBitness(), size_, 10);
+    llvm::APInt size(ance::SizeType::getSizeWidth(), value_, 10);
     return llvm::ConstantInt::get(type_->getContentType(m->getContext()), size);
 }
