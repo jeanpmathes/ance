@@ -37,8 +37,9 @@ AnceCompiler::AnceCompiler(Application& app) : application_(app), ir_(llvm_conte
 
     llvm::DataLayout dl = target_machine_->createDataLayout();
     application_.setPointerSize(dl.getPointerSize());
+
     ance::SizeType::init(llvm_context_, app);
-    ance::UnsignedIntegerPointerType::init(llvm_context_, app);
+    ance::UnsignedIntegerPointerType::init(llvm_context_, dl);
 
     module_->setDataLayout(dl);
     module_->setTargetTriple(triple.str());

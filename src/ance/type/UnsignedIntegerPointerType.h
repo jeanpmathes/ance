@@ -41,10 +41,10 @@ namespace ance
       public:
         /**
          * Initialize the type.
-         * @param c The llvm context.
-         * @param app The current application.
+         * @param llvm_context The llvm context.
+         * @param data_layout The data layout of the current build target.
          */
-        static void init(llvm::LLVMContext& c, Application& app);
+        static void init(llvm::LLVMContext& llvm_context, llvm::DataLayout& data_layout);
 
         /**
          * Get the uiptr type instance.
