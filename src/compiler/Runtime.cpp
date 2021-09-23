@@ -16,7 +16,7 @@ void Runtime::init(CompileContext* context)
 
     // Setup dynamic memory allocation call.
     llvm::Type* allocate_dynamic_params[] = {llvm::Type::getInt32Ty(llvm_context),
-                                             ance::SizeType::get()->getNativeType(llvm_context)};
+                                             ance::SizeType::getSize()->getNativeType(llvm_context)};
     allocate_dynamic_type_ =
         llvm::FunctionType::get(llvm::Type::getInt8PtrTy(llvm_context), allocate_dynamic_params, false);
     allocate_dynamic_ = llvm::Function::Create(allocate_dynamic_type_,
@@ -36,7 +36,7 @@ void Runtime::init(CompileContext* context)
 
 ance::Value* Runtime::allocate(Allocator allocation, ance::Type* type, ance::Value* count, CompileContext* context)
 {
-    if (count) { assert(count->type() == ance::SizeType::get()); }
+    if (count) { assert(count->type() == ance::SizeType::getSize()); }
 
     llvm::Value* native_ptr;
 
@@ -97,7 +97,7 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
     if (count)
     {
         llvm::Value* element_size =
-            llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(*context->llvmContext()),
+            llvm::ConstantInt::get(ance::SizeType::getSize()->getNativeType(*context->llvmContext()),
                                    type->getContentSize(context->module()).getFixedSize(),
                                    false);
         count->buildNativeValue(context);
@@ -107,7 +107,7 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
     }
     else
     {
-        size = llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(*context->llvmContext()),
+        size = llvm::ConstantInt::get(ance::SizeType::getSize()->getNativeType(*context->llvmContext()),
                                       type->getContentSize(context->module()).getFixedSize(),
                                       false);
     }

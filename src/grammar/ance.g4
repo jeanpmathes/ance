@@ -196,8 +196,7 @@ arrayType
 
 keywordType
     : floatingPointType
-    | sizeType
-    | unsignedIntegerPointerType
+    | targetDependentType
     | voidType
     ;
 
@@ -208,12 +207,10 @@ floatingPointType
 	| 'quad'
 	;
 
-sizeType
-	: 'size'
-	;
-
-unsignedIntegerPointerType
-    : 'uiptr'
+targetDependentType
+    : 'size'
+    | 'diff'
+    | 'uiptr'
     ;
 
 voidType

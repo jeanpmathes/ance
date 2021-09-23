@@ -52,7 +52,7 @@ bool ance::PointerType::validateGetIndexer(ance::Value* indexed,
 {
     assert(indexed->type() == this && "Method call on wrong type.");
 
-    return checkMismatch(ance::SizeType::get(), index->type(), index_location, validation_logger);
+    return checkMismatch(ance::SizeType::getSize(), index->type(), index_location, validation_logger);
 }
 
 ance::Value* ance::PointerType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
@@ -74,7 +74,7 @@ void ance::PointerType::validateSetIndexer(ance::Value* indexed,
 {
     assert(indexed->type() == this && "Method call on wrong type.");
 
-    checkMismatch(ance::SizeType::get(), index->type(), index_location, validation_logger);
+    checkMismatch(ance::SizeType::getSize(), index->type(), index_location, validation_logger);
     checkMismatch(element_type_, value->type(), value_location, validation_logger);
 }
 

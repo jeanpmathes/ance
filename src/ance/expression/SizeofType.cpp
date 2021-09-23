@@ -7,7 +7,7 @@ SizeofType::SizeofType(ance::Type* type, ance::Location location) : Expression(l
 
 ance::Type* SizeofType::type()
 {
-    return ance::SizeType::get();
+    return ance::SizeType::getSize();
 }
 
 bool SizeofType::validate(ValidationLogger&)

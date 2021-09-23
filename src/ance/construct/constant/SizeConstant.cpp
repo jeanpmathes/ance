@@ -7,7 +7,7 @@
 
 ance::SizeConstant::SizeConstant(std::string size, Application& app)
     : app_(app)
-    , type_(ance::SizeType::get())
+    , type_(ance::SizeType::getSize())
     , size_(std::move(size))
 {}
 

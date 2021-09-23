@@ -51,7 +51,7 @@ bool ance::ArrayType::validateGetIndexer(ance::Value* indexed,
 {
     assert(indexed->type() == this && "Method call on wrong type.");
 
-    return checkMismatch(ance::SizeType::get(), index->type(), index_location, validation_logger);
+    return checkMismatch(ance::SizeType::getSize(), index->type(), index_location, validation_logger);
 }
 
 ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
@@ -76,7 +76,7 @@ void ance::ArrayType::validateSetIndexer(ance::Value* indexed,
 {
     assert(indexed->type() == this && "Method call on wrong type.");
 
-    checkMismatch(ance::SizeType::get(), index->type(), index_location, validation_logger);
+    checkMismatch(ance::SizeType::getSize(), index->type(), index_location, validation_logger);
     checkMismatch(element_type_, value->type(), value_location, validation_logger);
 }
 
@@ -109,7 +109,7 @@ llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value*    indexed,
 
     // Check if index is smaller than size.
     llvm::Value* native_size =
-        llvm::ConstantInt::get(ance::SizeType::get()->getNativeType(*context->llvmContext()), size_);
+        llvm::ConstantInt::get(ance::SizeType::getSize()->getNativeType(*context->llvmContext()), size_);
     llvm::Value* in_bounds = context->ir()->CreateICmpULT(native_index, native_size);
 
     in_bounds->setName("..inbounds");

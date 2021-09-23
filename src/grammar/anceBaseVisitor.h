@@ -196,9 +196,7 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
-    virtual antlrcpp::Any visitSizeType(anceParser::SizeTypeContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitUnsignedIntegerPointerType(anceParser::UnsignedIntegerPointerTypeContext* ctx) override
+    virtual antlrcpp::Any visitTargetDependentType(anceParser::TargetDependentTypeContext* ctx) override
     {
         return visitChildren(ctx);
     }

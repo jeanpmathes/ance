@@ -25,7 +25,8 @@ Application::Application(data::File& project) : project_(project), global_scope_
     global_scope_->registerType(ance::QuadType::get());
 
     global_scope_->registerType(ance::VoidType::get());
-    global_scope_->registerType(ance::SizeType::get());
+    global_scope_->registerType(ance::SizeType::getSize());
+    global_scope_->registerType(ance::SizeType::getDiff());
     global_scope_->registerType(ance::UnsignedIntegerPointerType::get());
 
     addChild(*global_scope_);

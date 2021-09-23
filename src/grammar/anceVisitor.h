@@ -130,9 +130,7 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitFloatingPointType(anceParser::FloatingPointTypeContext* context) = 0;
 
-    virtual antlrcpp::Any visitSizeType(anceParser::SizeTypeContext* context) = 0;
-
-    virtual antlrcpp::Any visitUnsignedIntegerPointerType(anceParser::UnsignedIntegerPointerTypeContext* context) = 0;
+    virtual antlrcpp::Any visitTargetDependentType(anceParser::TargetDependentTypeContext* context) = 0;
 
     virtual antlrcpp::Any visitVoidType(anceParser::VoidTypeContext* context) = 0;
 };

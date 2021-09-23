@@ -18,7 +18,7 @@ void SizeofExpression::setScope(ance::Scope* scope)
 
 ance::Type* SizeofExpression::type()
 {
-    return ance::SizeType::get();
+    return ance::SizeType::getSize();
 }
 
 bool SizeofExpression::validate(ValidationLogger& validation_logger)
