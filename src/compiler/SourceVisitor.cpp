@@ -378,11 +378,9 @@ antlrcpp::Any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ct
 
 antlrcpp::Any SourceVisitor::visitUnsignedInteger(anceParser::UnsignedIntegerContext* ctx)
 {
-    uint64_t size = 64;
+    uint64_t size = std::stoi(ctx->width->getText());
 
-    if (ctx->INTEGER(1)) { size = std::stoi(ctx->INTEGER(1)->getText()); }
-
-    const llvm::APInt integer(size, ctx->INTEGER(0)->getText(), 10);
+    const llvm::APInt integer(size, ctx->value->getText(), 10);
     auto*             integer_constant = new ance::IntegerConstant(integer, false, application_);
     Expression*       expression       = new ConstantLiteral(integer_constant, location(ctx));
     return expression;
@@ -390,11 +388,9 @@ antlrcpp::Any SourceVisitor::visitUnsignedInteger(anceParser::UnsignedIntegerCon
 
 antlrcpp::Any SourceVisitor::visitSignedInteger(anceParser::SignedIntegerContext* ctx)
 {
-    uint64_t size = 64;
+    uint64_t size = std::stoi(ctx->width->getText());
 
-    if (ctx->INTEGER()) { size = std::stoi(ctx->INTEGER()->getText()); }
-
-    const llvm::APInt integer(size, ctx->SIGNED_INTEGER()->getText(), 10);
+    const llvm::APInt integer(size, ctx->value->getText(), 10);
     auto*             integer_constant = new ance::IntegerConstant(integer, true, application_);
     Expression*       expression       = new ConstantLiteral(integer_constant, location(ctx));
     return expression;
@@ -402,9 +398,7 @@ antlrcpp::Any SourceVisitor::visitSignedInteger(anceParser::SignedIntegerContext
 
 antlrcpp::Any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerContext* ctx)
 {
-    uint64_t size = 64;
-
-    if (ctx->INTEGER()) { size = std::stoi(ctx->INTEGER()->getText()); }
+    uint64_t size = std::stoi(ctx->width->getText());
 
     std::string integer_str;
     int         radix;

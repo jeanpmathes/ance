@@ -763,6 +763,10 @@ class anceParser : public antlr4::Parser
     class UnsignedIntegerContext : public antlr4::ParserRuleContext
     {
       public:
+        antlr4::Token* value = nullptr;
+        ;
+        antlr4::Token* width = nullptr;
+        ;
         UnsignedIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t                           getRuleIndex() const override;
         std::vector<antlr4::tree::TerminalNode*> INTEGER();
@@ -776,6 +780,10 @@ class anceParser : public antlr4::Parser
     class SignedIntegerContext : public antlr4::ParserRuleContext
     {
       public:
+        antlr4::Token* value = nullptr;
+        ;
+        antlr4::Token* width = nullptr;
+        ;
         SignedIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
         antlr4::tree::TerminalNode* SIGNED_INTEGER();
@@ -789,6 +797,8 @@ class anceParser : public antlr4::Parser
     class SpecialIntegerContext : public antlr4::ParserRuleContext
     {
       public:
+        antlr4::Token* width = nullptr;
+        ;
         SpecialIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
         antlr4::tree::TerminalNode* HEX_INTEGER();

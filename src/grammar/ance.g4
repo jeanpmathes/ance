@@ -151,17 +151,17 @@ integerLiteral
 	;
 
 unsignedInteger
-	: INTEGER ( ':' INTEGER )?
+	: value=INTEGER ':' width=INTEGER
 	;
 
 signedInteger
-	: SIGNED_INTEGER ( ':' INTEGER )?
+	: value=SIGNED_INTEGER ':' width=INTEGER
 	;
 
 specialInteger
-	: HEX_INTEGER ( ':' INTEGER )?
-	| BIN_INTEGER ( ':' INTEGER )?
-	| OCT_INTEGER ( ':' INTEGER )?
+	: HEX_INTEGER ':' width=INTEGER
+	| BIN_INTEGER ':' width=INTEGER
+	| OCT_INTEGER ':' width=INTEGER
 	;
 
 floatingPointLiteral
@@ -177,11 +177,11 @@ booleanLiteral
     ;
 
 sizeLiteral
-    : INTEGER ':' 'size'
+    : INTEGER ( ':' 'size' )?
     ;
 
 diffLiteral
-    : SIGNED_INTEGER ':' 'diff'
+    : SIGNED_INTEGER ( ':' 'diff' )?
     ;
 
 type
