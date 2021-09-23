@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 {
     if (argc != 3)
     {
-        std::cout << "Requires exactly two parameters." << std::endl;
+        std::cout << "ance-c: command: Requires exactly two parameters." << std::endl;
 
         return EXIT_FAILURE;
     }
