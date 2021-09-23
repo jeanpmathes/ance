@@ -32,7 +32,11 @@ void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
 
 void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
 {
-    if (variable_) { assigned_->validate(validation_logger); }
+    if (variable_)
+    {
+        assigned_->validate(validation_logger);
+        ance::Type::checkMismatch(variable_->type(), assigned_->type(), assigned_->location(), validation_logger);
+    }
     else
     {
         validation_logger.logError("Name '" + identifier_ + "' already defined in the current context", location());
