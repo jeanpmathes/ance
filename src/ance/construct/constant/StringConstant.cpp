@@ -2,8 +2,6 @@
 
 #include <sstream>
 
-#include <llvm/IR/GlobalVariable.h>
-
 #include "ance/construct/constant/ByteConstant.h"
 #include "ance/type/ArrayType.h"
 #include "ance/type/IntegerType.h"

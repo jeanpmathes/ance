@@ -4,16 +4,17 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ance/utility/Location.h"
-#include "compiler/CompileContext.h"
-#include "validation/ValidationLogger.h"
+#include "ance/Element.h"
 
-class CompileContext;
+#include "ance/utility/Location.h"
 
 namespace ance
 {
     class DefinedFunction;
 }
+
+class CompileContext;
+class ValidationLogger;
 
 /**
  * Base class of all statements. Statements are building blocks of code and are ordered parts of functions.

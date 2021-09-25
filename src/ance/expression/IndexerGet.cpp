@@ -1,6 +1,8 @@
 #include "IndexerGet.h"
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/type/Type.h"
+#include "validation/ValidationLogger.h"
 
 IndexerGet::IndexerGet(Expression* indexed, Expression* index, ance::Location location)
     : Expression(location)

@@ -7,6 +7,11 @@
 
 #include "ance/Assigner.h"
 
+namespace ance
+{
+    class GlobalVariable;
+}
+
 class ConstantExpression;
 
 namespace ance

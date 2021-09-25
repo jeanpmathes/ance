@@ -3,12 +3,12 @@
 
 #include <vector>
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/utility/Location.h"
 
 namespace ance
 {
     class Scope;
+    class ApplicationVisitor;
 }
 
 namespace ance

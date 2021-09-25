@@ -1,5 +1,7 @@
 #include "ExpressionBackedValue.h"
 
+#include "ance/expression/BackingExpression.h"
+
 ance::ExpressionBackedValue::ExpressionBackedValue(BackingExpression* expression) : expression_(expression) {}
 
 ance::Type* ance::ExpressionBackedValue::type()

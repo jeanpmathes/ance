@@ -5,22 +5,20 @@
 
 #include <string>
 
+#include <llvm/IR/LLVMContext.h>
+
 #include "ance/AccessModifier.h"
 
-namespace llvm
+namespace ance
 {
-    class LLVMContext;
-    class Module;
-    class GlobalVariable;
+    class Constant;
+    class Type;
 }
 
 class ConstantExpression;
 
 namespace ance
 {
-    class Constant;
-    class Type;
-
     /**
      * A global variable.
      */

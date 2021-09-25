@@ -6,10 +6,15 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "compiler/Application.h"
-#include "compiler/Runtime.h"
+#include "ance/utility/Location.h"
+
+namespace ance
+{
+    class Scope;
+}
 
 class Application;
+class Runtime;
 
 /**
  * A class to simplify passing around the objects required for building the application.

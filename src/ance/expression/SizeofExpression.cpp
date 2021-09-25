@@ -1,6 +1,6 @@
 #include "SizeofExpression.h"
 
-#include "ance/construct/value/ExpressionBackedValue.h"
+#include "ance/ApplicationVisitor.h"
 #include "ance/type/SizeType.h"
 #include "compiler/CompileContext.h"
 

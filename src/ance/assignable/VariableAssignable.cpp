@@ -1,5 +1,9 @@
 #include "VariableAssignable.h"
 
+#include "ance/ApplicationVisitor.h"
+#include "ance/construct/Variable.h"
+#include "ance/scope/Scope.h"
+
 VariableAssignable::VariableAssignable(std::string variable_identifier, ance::Location location)
     : Assignable(location)
     , variable_identifier_(std::move(variable_identifier))

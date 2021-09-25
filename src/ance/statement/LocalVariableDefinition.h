@@ -8,6 +8,7 @@
 namespace ance
 {
     class LocalVariable;
+    class Type;
 }
 
 class Expression;

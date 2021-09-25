@@ -10,21 +10,19 @@
 
 #include "ance/Indexer.h"
 #include "ance/InternalStorage.h"
-#include "validation/ValidationLogger.h"
-
-class CompileContext;
-
-namespace llvm
-{
-    class LLVMContext;
-    class Type;
-    class DIBuilder;
-}
+#include "ance/utility/Location.h"
 
 namespace ance
 {
+    class Scope;
     class Value;
+}
 
+class CompileContext;
+class ValidationLogger;
+
+namespace ance
+{
     /**
      * Represents types in the ance language.
      */

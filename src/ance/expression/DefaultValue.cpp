@@ -1,5 +1,6 @@
 #include "DefaultValue.h"
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/construct/constant/Constant.h"
 #include "ance/construct/value/Value.h"
 #include "ance/type/Type.h"

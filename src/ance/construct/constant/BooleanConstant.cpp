@@ -1,7 +1,5 @@
 #include "BooleanConstant.h"
 
-#include <llvm/IR/Constant.h>
-
 #include "ance/type/IntegerType.h"
 
 ance::BooleanConstant::BooleanConstant(bool boolean, Application& app)

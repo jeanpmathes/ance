@@ -1,5 +1,10 @@
 #include "IndexerSet.h"
 
+#include "ance/ApplicationVisitor.h"
+#include "ance/expression/Expression.h"
+#include "ance/type/Type.h"
+#include "validation/ValidationLogger.h"
+
 IndexerSet::IndexerSet(Expression* indexed, Expression* index, ance::Location location)
     : Assignable(location)
     , indexed_(indexed)

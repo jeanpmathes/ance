@@ -1,5 +1,7 @@
 #include "CompileContext.h"
 
+#include "ance/scope/Scope.h"
+
 CompileContext::CompileContext(Application*         app,
                                Runtime*             runtime,
                                llvm::LLVMContext*   c,

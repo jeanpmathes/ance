@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "validation/SourceFile.h"
 #include "validation/Strings.h"
 
 ValidationLogger::ValidationLogger() = default;

@@ -11,9 +11,12 @@
 #include "ance/type/QuadType.h"
 #include "ance/type/SingleType.h"
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/type/SizeType.h"
 #include "ance/type/UnsignedIntegerPointerType.h"
 #include "ance/type/VoidType.h"
+#include "management/File.h"
+#include "validation/ValidationLogger.h"
 
 Application::Application(data::File& project) : project_(project), global_scope_(new ance::GlobalScope())
 {

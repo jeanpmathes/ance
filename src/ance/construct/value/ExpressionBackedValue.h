@@ -3,7 +3,7 @@
 
 #include "Value.h"
 
-#include "ance/expression/BackingExpression.h"
+class BackingExpression;
 
 namespace ance
 {

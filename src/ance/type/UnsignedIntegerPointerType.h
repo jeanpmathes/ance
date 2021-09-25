@@ -7,7 +7,6 @@
 #include "Type.h"
 
 class Application;
-
 class CompileContext;
 
 namespace ance

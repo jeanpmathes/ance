@@ -1,5 +1,8 @@
 #include "Discard.h"
 
+#include "ance/ApplicationVisitor.h"
+#include "ance/construct/value/Value.h"
+
 Discard::Discard(ance::Location location) : Assignable(location) {}
 
 void Discard::setScope(ance::Scope*) {}

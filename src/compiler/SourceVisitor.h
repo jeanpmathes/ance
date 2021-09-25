@@ -1,8 +1,11 @@
 #ifndef ANCE_SRC_COMPILER_SOURCEVISITOR_H_
 #define ANCE_SRC_COMPILER_SOURCEVISITOR_H_
 
-#include "compiler/Application.h"
 #include "grammar/anceBaseVisitor.h"
+
+#include "ance/utility/Location.h"
+
+class Application;
 
 /**
  * The ance syntax visitor creating the application. Base class is generated.

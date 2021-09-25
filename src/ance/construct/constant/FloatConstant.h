@@ -3,7 +3,10 @@
 
 #include "Constant.h"
 
-#include "ance/type/FloatingPointType.h"
+namespace ance
+{
+    class FloatingPointType;
+}
 
 namespace ance
 {

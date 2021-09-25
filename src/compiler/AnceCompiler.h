@@ -7,8 +7,8 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Target/TargetMachine.h>
 
-#include "compiler/Application.h"
-#include "compiler/CompileContext.h"
+class Application;
+class CompileContext;
 
 /**
  * Represents the compile step, which transforms an application into a llvm module.

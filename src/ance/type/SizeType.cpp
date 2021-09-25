@@ -1,7 +1,5 @@
 #include "SizeType.h"
 
-#include <llvm/IR/Constants.h>
-
 #include "ance/scope/GlobalScope.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"

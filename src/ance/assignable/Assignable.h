@@ -2,9 +2,15 @@
 #define ANCE_SRC_ANCE_ASSIGNABLE_ASSIGNABLE_H_
 
 #include "ance/Element.h"
-#include "ance/construct/value/Value.h"
-#include "ance/scope/Scope.h"
-#include "validation/ValidationLogger.h"
+
+namespace ance
+{
+    class Scope;
+    class Value;
+}
+
+class CompileContext;
+class ValidationLogger;
 
 /**
  * Represents a construct that values can be assigned to.

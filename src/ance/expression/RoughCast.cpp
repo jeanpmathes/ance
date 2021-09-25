@@ -1,5 +1,6 @@
 #include "RoughCast.h"
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/construct/value/RoughlyCastedValue.h"
 #include "ance/type/Type.h"
 

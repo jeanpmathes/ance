@@ -1,5 +1,7 @@
 #include "Type.h"
 
+#include "validation/ValidationLogger.h"
+
 llvm::Type* ance::Type::getNativeType(llvm::LLVMContext& c)
 {
     switch (storage())

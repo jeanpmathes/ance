@@ -6,6 +6,7 @@
 #include "ance/scope/Scope.h"
 #include "ance/type/SizeType.h"
 #include "ance/utility/Values.h"
+#include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
 ance::ArrayType::ArrayType(Type* element_type, const uint64_t size) : size_(size), element_type_(element_type) {}

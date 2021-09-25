@@ -3,7 +3,7 @@
 
 #include <antlr4-runtime.h>
 
-#include "validation/SourceFile.h"
+class SourceFile;
 
 class AnceSyntaxErrorHandler
 {

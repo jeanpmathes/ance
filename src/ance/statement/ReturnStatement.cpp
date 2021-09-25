@@ -1,8 +1,11 @@
 #include "ReturnStatement.h"
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/construct/DefinedFunction.h"
+#include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/VoidType.h"
+#include "validation/ValidationLogger.h"
 
 ReturnStatement::ReturnStatement(Expression* return_value, ance::Location location)
     : Statement(location)

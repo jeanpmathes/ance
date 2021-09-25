@@ -6,9 +6,11 @@
 namespace ance
 {
     class Value;
-
     class LocalScope;
+}
 
+namespace ance
+{
     /**
      * A local variable or function parameter.
      */

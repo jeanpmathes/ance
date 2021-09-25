@@ -1,6 +1,7 @@
 #include "Statement.h"
 
 #include "ance/construct/DefinedFunction.h"
+#include "compiler/CompileContext.h"
 
 Statement::Statement(ance::Location location) : location_(location) {}
 

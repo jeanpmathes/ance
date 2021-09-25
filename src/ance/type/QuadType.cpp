@@ -1,9 +1,6 @@
 #include "QuadType.h"
 
-#include <llvm/IR/Constants.h>
-
 #include "ance/scope/GlobalScope.h"
-#include "ance/scope/Scope.h"
 
 std::string ance::QuadType::getName()
 {

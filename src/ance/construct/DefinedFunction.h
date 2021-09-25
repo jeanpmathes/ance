@@ -2,6 +2,7 @@
 #define ANCE_SRC_ANCE_CONSTRUCT_DEFINEDFUNCTION_H_
 
 #include "Function.h"
+#include "ance/scope/Scope.h"
 
 #include <list>
 #include <string>
@@ -9,13 +10,14 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ance/construct/Parameter.h"
-
 #include "ance/AccessModifier.h"
-#include "ance/expression/Expression.h"
-#include "ance/statement/Statement.h"
-#include "compiler/CompileContext.h"
 
+namespace ance
+{
+    class LocalVariable;
+}
+
+class Statement;
 class CompileContext;
 
 namespace ance

@@ -1,10 +1,10 @@
 #ifndef ANCE_SRC_ANCE_EXPRESSION_DELAYABLEEXPRESSION_H_
 #define ANCE_SRC_ANCE_EXPRESSION_DELAYABLEEXPRESSION_H_
 
+#include "BuildableExpression.h"
 #include "Expression.h"
 
 #include "ance/construct/value/DelayedValue.h"
-#include "ance/expression/BuildableExpression.h"
 
 /**
  * Interface of expressions providing the value for delayed values.

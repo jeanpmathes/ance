@@ -3,8 +3,6 @@
 
 #include "DelayableExpression.h"
 
-#include "ance/construct/value/ExpressionBackedValue.h"
-
 /**
  * An indexer (subscript) get operation.
  */

@@ -1,5 +1,6 @@
 #include "SizeofType.h"
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/type/SizeType.h"
 #include "compiler/CompileContext.h"
 

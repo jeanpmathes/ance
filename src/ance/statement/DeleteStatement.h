@@ -3,7 +3,7 @@
 
 #include "Statement.h"
 
-#include "ance/expression/Expression.h"
+class Expression;
 
 /**
  * A statement performing a delete operation.

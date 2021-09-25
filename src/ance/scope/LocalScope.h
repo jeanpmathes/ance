@@ -4,8 +4,12 @@
 #include "Scope.h"
 
 #include "ance/Assigner.h"
-#include "ance/construct/LocalVariable.h"
 #include "ance/utility/Location.h"
+
+namespace ance
+{
+    class LocalVariable;
+}
 
 class Expression;
 

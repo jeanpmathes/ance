@@ -17,7 +17,7 @@ namespace ance
          * Create a new size constant.
          * @param value The string containing the literal value.
          */
-        DiffConstant(std::string value);
+        explicit DiffConstant(std::string value);
 
         ance::Type*     type() override;
         llvm::Constant* buildContent(llvm::Module* m) override;

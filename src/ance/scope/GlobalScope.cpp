@@ -1,13 +1,15 @@
 #include "GlobalScope.h"
 
-#include <iostream>
 #include <ostream>
 
-#include "ance/AccessModifier.h"
+#include "ance/ApplicationVisitor.h"
 #include "ance/construct/Function.h"
+#include "ance/construct/GlobalVariable.h"
 #include "ance/expression/ConstantExpression.h"
 #include "ance/type/IntegerType.h"
 #include "ance/type/VoidType.h"
+#include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 ance::GlobalScope* ance::GlobalScope::getGlobalScope()
 {

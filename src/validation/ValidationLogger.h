@@ -5,8 +5,12 @@
 #include <vector>
 
 #include "ance/utility/Location.h"
-#include "validation/SourceFile.h"
 
+class SourceFile;
+
+/**
+ * A logger-like handler for validation messages.
+ */
 class ValidationLogger
 {
   public:

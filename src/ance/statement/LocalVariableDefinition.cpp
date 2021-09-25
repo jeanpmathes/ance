@@ -2,9 +2,13 @@
 
 #include <utility>
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/construct/DefinedFunction.h"
+#include "ance/construct/LocalVariable.h"
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
+#include "ance/type/Type.h"
+#include "validation/ValidationLogger.h"
 
 LocalVariableDefinition::LocalVariableDefinition(std::string    identifier,
                                                  ance::Type*    type,

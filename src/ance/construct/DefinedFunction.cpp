@@ -1,14 +1,20 @@
 #include "DefinedFunction.h"
 
-#include <llvm/ADT/SmallVector.h>// critical, missing include will cause linking error
 #include <utility>
 
-#include "ance/AccessModifier.h"
+#include <llvm/ADT/SmallVector.h>// critical, missing include will cause linking error
+
+#include "ance/ApplicationVisitor.h"
+#include "ance/construct/LocalVariable.h"
+#include "ance/construct/Parameter.h"
 #include "ance/construct/value/Value.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
+#include "ance/statement/Statement.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
+#include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 ance::DefinedFunction::DefinedFunction(AccessModifier                access,
                                        const std::string&            function_name,

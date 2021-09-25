@@ -2,8 +2,6 @@
 #define ANCE_SRC_ANCE_ASSIGNABLE_VARIABLEASSIGNABLE_H_
 
 #include "Assignable.h"
-#include "ance/construct/value/Value.h"
-#include "ance/scope/Scope.h"
 
 /**
  * Represents an assignable variable.

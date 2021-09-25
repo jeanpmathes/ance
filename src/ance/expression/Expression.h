@@ -5,9 +5,6 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "ance/Element.h"
-#include "validation/ValidationLogger.h"
-
-class CompileContext;
 
 namespace ance
 {
@@ -15,6 +12,9 @@ namespace ance
     class Type;
     class Scope;
 }
+
+class CompileContext;
+class ValidationLogger;
 
 /**
  * The base class of all expressions.

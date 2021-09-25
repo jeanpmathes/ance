@@ -2,9 +2,16 @@
 
 #include <utility>
 
+#include "ance/ApplicationVisitor.h"
+#include "ance/construct/LocalVariable.h"
+#include "ance/construct/Parameter.h"
 #include "ance/construct/value/WrappedNativeValue.h"
+#include "ance/scope/LocalScope.h"
+#include "ance/statement/Statement.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
+#include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 ance::ExternFunction::ExternFunction(std::string                   function_name,
                                      ance::Type*                   return_type,

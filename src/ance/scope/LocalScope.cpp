@@ -1,7 +1,8 @@
 #include "LocalScope.h"
 
+#include "ance/ApplicationVisitor.h"
+#include "ance/construct/LocalVariable.h"
 #include "ance/construct/constant/Constant.h"
-#include "ance/expression/Expression.h"
 #include "ance/scope/GlobalScope.h"
 
 ance::LocalScope::LocalScope(ance::Scope* parent) : parent_(parent) {}

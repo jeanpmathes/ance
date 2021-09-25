@@ -3,13 +3,16 @@
 
 #include <string>
 
-#include "ance/construct/LocalVariable.h"
 #include "ance/construct/value/Value.h"
+#include "ance/utility/Location.h"
 
 namespace ance
 {
     class Type;
+}
 
+namespace ance
+{
     /**
      * A function parameter value.
      */

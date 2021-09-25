@@ -3,7 +3,7 @@
 
 #include "Constant.h"
 
-#include "compiler/Application.h"
+class Application;
 
 namespace ance
 {

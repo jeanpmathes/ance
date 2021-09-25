@@ -3,17 +3,17 @@
 
 #include "Type.h"
 
-#include "compiler/Application.h"
-
-namespace llvm
-{
-    class ArrayType;
-}
+#include <llvm/IR/DerivedTypes.h>
 
 namespace ance
 {
     class Scope;
+}
 
+class Application;
+
+namespace ance
+{
     /**
      * Represents array types. Array types have an element type and a length.
      */

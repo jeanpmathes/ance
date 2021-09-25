@@ -5,8 +5,6 @@
 
 namespace ance
 {
-    class Scope;
-
     /**
      * Represents the half precision floating point type.
      */

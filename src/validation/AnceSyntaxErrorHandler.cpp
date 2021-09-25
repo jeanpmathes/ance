@@ -1,9 +1,9 @@
 #include "AnceSyntaxErrorHandler.h"
 
-#include "validation/Strings.h"
-
 #include "grammar/anceLexer.h"
 #include "grammar/anceParser.h"
+#include "validation/SourceFile.h"
+#include "validation/Strings.h"
 
 AnceSyntaxErrorHandler::LexerErrorListener::LexerErrorListener(AnceSyntaxErrorHandler& parent) : parent_(parent) {}
 

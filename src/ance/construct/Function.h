@@ -6,20 +6,21 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ance/construct/Parameter.h"
-
-#include "ance/expression/Expression.h"
-#include "compiler/CompileContext.h"
-#include "validation/ValidationLogger.h"
-
-class CompileContext;
+#include "ance/Element.h"
 
 namespace ance
 {
+    class Parameter;
+    class Value;
     class LocalScope;
     class Type;
-    class LocalScope;
+}
 
+class CompileContext;
+class ValidationLogger;
+
+namespace ance
+{
     /**
      * The abstract base class of all functions.
      */

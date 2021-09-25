@@ -4,7 +4,8 @@
 #include <string>
 
 #include "ance/construct/constant/Constant.h"
-#include "compiler/Application.h"
+
+class Application;
 
 namespace ance
 {

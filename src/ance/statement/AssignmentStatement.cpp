@@ -1,9 +1,11 @@
 #include "AssignmentStatement.h"
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/assignable/Assignable.h"
 #include "ance/construct/DefinedFunction.h"
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
+#include "validation/ValidationLogger.h"
 
 AssignmentStatement::AssignmentStatement(Assignable*    assignable,
                                          Assigner       assigner,

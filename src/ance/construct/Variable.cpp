@@ -2,8 +2,15 @@
 
 #include <utility>
 
+#include "ance/ApplicationVisitor.h"
+#include "ance/construct/LocalVariable.h"
+#include "ance/construct/Parameter.h"
 #include "ance/construct/value/Value.h"
+#include "ance/scope/LocalScope.h"
+#include "ance/statement/Statement.h"
 #include "ance/type/Type.h"
+#include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 ance::Variable::Variable(ance::Scope* containing_scope, std::string identifier, ance::Type* type, bool is_final)
     : identifier_(std::move(identifier))

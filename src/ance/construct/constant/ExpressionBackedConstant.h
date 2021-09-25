@@ -6,9 +6,7 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ance/expression/BackingConstantExpression.h"
-
-class ConstantExpression;
+class BackingConstantExpression;
 
 namespace ance
 {

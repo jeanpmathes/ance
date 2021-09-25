@@ -3,12 +3,10 @@
 
 #include "Type.h"
 
-#include "compiler/Application.h"
+class Application;
 
 namespace ance
 {
-    class Scope;
-
     /**
      * Represents an integer type. Integers can have any precision and can be both signed or unsigned.
      */

@@ -3,8 +3,9 @@
 
 #include "DelayableExpression.h"
 
-#include "compiler/Application.h"
 #include "compiler/Runtime.h"
+
+class Application;
 
 /**
  * An allocation expression.

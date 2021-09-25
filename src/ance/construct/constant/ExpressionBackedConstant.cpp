@@ -1,5 +1,7 @@
 #include "ExpressionBackedConstant.h"
 
+#include "ance/expression/BackingConstantExpression.h"
+
 ance::ExpressionBackedConstant::ExpressionBackedConstant(BackingConstantExpression* expression)
     : expression_(expression)
 {}

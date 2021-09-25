@@ -1,5 +1,6 @@
 #include "ExpressionStatement.h"
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/construct/DefinedFunction.h"
 #include "ance/expression/BuildableExpression.h"
 #include "ance/scope/LocalScope.h"

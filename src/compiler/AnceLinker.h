@@ -3,7 +3,6 @@
 
 #include <filesystem>
 
-#include "compiler/Application.h"
 #include "management/elements/Element.h"
 
 /**

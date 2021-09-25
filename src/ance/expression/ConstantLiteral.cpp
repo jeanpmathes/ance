@@ -1,5 +1,6 @@
 #include "ConstantLiteral.h"
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/construct/constant/Constant.h"
 #include "ance/scope/Scope.h"
 

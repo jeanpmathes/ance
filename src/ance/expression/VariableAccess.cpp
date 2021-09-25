@@ -2,8 +2,10 @@
 
 #include <utility>
 
-#include "ance/construct/value/Value.h"
+#include "ance/ApplicationVisitor.h"
+#include "ance/construct/Variable.h"
 #include "ance/scope/Scope.h"
+#include "validation/ValidationLogger.h"
 
 VariableAccess::VariableAccess(std::string identifier, ance::Location location)
     : Expression(location)

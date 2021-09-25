@@ -3,27 +3,25 @@
 
 #include <string>
 
+#include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
 
 #include "ance/Element.h"
 #include "ance/utility/Location.h"
-#include "validation/ValidationLogger.h"
-
-class CompileContext;
-
-namespace llvm
-{
-    class DIBuilder;
-    class LLVMContext;
-}
 
 namespace ance
 {
     class Scope;
     class Type;
     class Value;
+}
 
+class CompileContext;
+class ValidationLogger;
+
+namespace ance
+{
     /**
      * The base class of all variables.
      */

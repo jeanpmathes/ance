@@ -10,9 +10,11 @@
 
 #include "compiler/AnceCompiler.h"
 #include "compiler/AnceLinker.h"
+#include "compiler/Application.h"
 #include "compiler/SourceVisitor.h"
 #include "management/File.h"
 #include "validation/AnceSyntaxErrorHandler.h"
+#include "validation/SourceFile.h"
 #include "validation/ValidationLogger.h"
 
 int main(int argc, char** argv)

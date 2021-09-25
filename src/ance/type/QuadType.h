@@ -5,8 +5,6 @@
 
 namespace ance
 {
-    class Scope;
-
     /**
      * Represents the quadruple precision floating point type.
      */

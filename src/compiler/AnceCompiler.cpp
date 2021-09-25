@@ -14,6 +14,9 @@
 #include "ance/scope/GlobalScope.h"
 #include "ance/type/SizeType.h"
 #include "ance/type/UnsignedIntegerPointerType.h"
+#include "compiler/Application.h"
+#include "compiler/CompileContext.h"
+#include "compiler/Runtime.h"
 
 AnceCompiler::AnceCompiler(Application& app) : application_(app), ir_(llvm_context_)
 {

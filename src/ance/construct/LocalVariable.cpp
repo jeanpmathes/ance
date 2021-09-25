@@ -2,9 +2,14 @@
 
 #include <utility>
 
+#include "ance/ApplicationVisitor.h"
+#include "ance/construct/Parameter.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
+#include "ance/statement/Statement.h"
+#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope,
                                    std::string       identifier,

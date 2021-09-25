@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-#include "ance/utility/Location.h"
+#include "compiler/Application.h"
 
 #include "ance/type/ArrayType.h"
 #include "ance/type/DoubleType.h"
@@ -15,12 +15,8 @@
 #include "ance/scope/GlobalScope.h"
 #include "ance/scope/LocalScope.h"
 
-#include "ance/AccessModifier.h"
-#include "ance/Assigner.h"
-
 #include "ance/construct/DefinedFunction.h"
 #include "ance/construct/ExternFunction.h"
-#include "ance/construct/Function.h"
 #include "ance/construct/Parameter.h"
 
 #include "ance/statement/AssignmentStatement.h"
@@ -36,10 +32,8 @@
 
 #include "ance/expression/Allocation.h"
 #include "ance/expression/BackingExpression.h"
-#include "ance/expression/BuildableExpression.h"
 #include "ance/expression/ConstantLiteral.h"
 #include "ance/expression/DefaultValue.h"
-#include "ance/expression/Expression.h"
 #include "ance/expression/FunctionCall.h"
 #include "ance/expression/IndexerGet.h"
 #include "ance/expression/RoughCast.h"

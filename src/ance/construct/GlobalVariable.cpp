@@ -2,13 +2,18 @@
 
 #include <utility>
 
-#include "ance/AccessModifier.h"
+#include "ance/ApplicationVisitor.h"
+#include "ance/construct/LocalVariable.h"
+#include "ance/construct/Parameter.h"
 #include "ance/construct/constant/Constant.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/expression/ConstantExpression.h"
+#include "ance/scope/LocalScope.h"
+#include "ance/statement/Statement.h"
 #include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 namespace llvm
 {

@@ -3,7 +3,7 @@
 
 #include "Assignable.h"
 
-#include "ance/expression/Expression.h"
+class Expression;
 
 /**
  * Assign via the set indexer of a type.

@@ -1,7 +1,5 @@
 #include "ByteConstant.h"
 
-#include <utility>
-
 #include "ance/type/IntegerType.h"
 #include "compiler/Application.h"
 

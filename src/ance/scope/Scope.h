@@ -7,15 +7,9 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ance/AccessModifier.h"
 #include "ance/Element.h"
-#include "ance/construct/GlobalVariable.h"
-#include "ance/type/Type.h"
-#include "validation/ValidationLogger.h"
 
-class Statement;
-
-class CompileContext;
+#include "ance/AccessModifier.h"
 
 namespace ance
 {
@@ -23,7 +17,16 @@ namespace ance
     class Function;
     class Value;
     class GlobalScope;
+    class Variable;
+    class Type;
+}
 
+class Statement;
+class CompileContext;
+class ValidationLogger;
+
+namespace ance
+{
     /**
      * The base class for scopes, which contain variables and functions.
      */

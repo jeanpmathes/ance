@@ -1,8 +1,13 @@
 #include "DeleteStatement.h"
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/construct/DefinedFunction.h"
+#include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/PointerType.h"
+#include "compiler/CompileContext.h"
+#include "compiler/Runtime.h"
+#include "validation/ValidationLogger.h"
 
 DeleteStatement::DeleteStatement(Expression* to_delete, bool delete_buffer, ance::Location location)
     : Statement(location)

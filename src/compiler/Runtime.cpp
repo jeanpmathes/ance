@@ -6,7 +6,6 @@
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/SizeType.h"
-#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
 void Runtime::init(CompileContext* context)

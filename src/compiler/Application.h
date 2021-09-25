@@ -4,17 +4,22 @@
 #include <filesystem>
 
 #include "ance/Element.h"
-#include "ance/scope/Scope.h"
-#include "management/File.h"
-
-class Statement;
-class CompileContext;
 
 namespace ance
 {
     class Scope;
+    class GlobalScope;
     class Function;
 }
+
+namespace data
+{
+    class File;
+}
+
+class Statement;
+class CompileContext;
+class ValidationLogger;
 
 /**
  * The application that is described by the source and will be compiled.

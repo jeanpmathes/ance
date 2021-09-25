@@ -13,7 +13,7 @@ namespace ance
     class SizeType : public ance::Type
     {
       private:
-        SizeType(std::string name);
+        explicit SizeType(std::string name);
 
         std::string name_;
 

@@ -2,10 +2,13 @@
 
 #include <utility>
 
+#include "ance/ApplicationVisitor.h"
 #include "ance/construct/Function.h"
 #include "ance/construct/value/Value.h"
 #include "ance/scope/GlobalScope.h"
+#include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 namespace ance
 {

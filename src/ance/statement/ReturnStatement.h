@@ -3,7 +3,7 @@
 
 #include "Statement.h"
 
-#include "ance/expression/Expression.h"
+class Expression;
 
 /**
  * Adds a return value to the containing function.
