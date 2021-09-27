@@ -16,5 +16,5 @@ ance::Type* ance::IntegerConstant::type()
 
 llvm::Constant* ance::IntegerConstant::buildContent(llvm::Module* m)
 {
-    return llvm::ConstantInt::get(type_->getNativeType(m->getContext()), integer_);
+    return llvm::ConstantInt::get(type_->getContentType(m->getContext()), integer_);
 }

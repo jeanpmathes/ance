@@ -9,7 +9,6 @@
 #include <llvm/IR/Module.h>
 
 #include "ance/Indexer.h"
-#include "ance/InternalStorage.h"
 #include "ance/utility/Location.h"
 
 namespace ance
@@ -81,12 +80,6 @@ namespace ance
          * @return The content size.
          */
         llvm::TypeSize getContentSize(llvm::Module* m);
-
-        /**
-         * Get the storage classification.
-         * @return The internal storage classification.
-         */
-        virtual InternalStorage storage();
 
         /**
          * See if the given indexer is defined for this type.

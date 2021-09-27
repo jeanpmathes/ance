@@ -26,13 +26,9 @@ namespace ance
         std::string getName() override;
 
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
-
         llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
-        InternalStorage storage() override;
-
         bool isIndexerDefined(Indexer indexer) override;
-
         ance::Type* getIndexerReturnType() override;
 
         bool         validateGetIndexer(ance::Value*      indexed,

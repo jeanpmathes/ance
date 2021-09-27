@@ -11,7 +11,7 @@ std::string ance::UnsignedIntegerPointerType::getName()
 
 llvm::Constant* ance::UnsignedIntegerPointerType::getDefaultContent(llvm::LLVMContext& c)
 {
-    return llvm::ConstantInt::get(getNativeType(c), 0, false);
+    return llvm::ConstantInt::get(getContentType(c), 0, false);
 }
 
 llvm::Type* ance::UnsignedIntegerPointerType::getContentType(llvm::LLVMContext&)

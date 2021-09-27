@@ -16,7 +16,7 @@ std::string ance::IntegerType::getName()
 
 llvm::Constant* ance::IntegerType::getDefaultContent(llvm::LLVMContext& c)
 {
-    return llvm::ConstantInt::get(getNativeType(c), 0, is_signed_);
+    return llvm::ConstantInt::get(getContentType(c), 0, is_signed_);
 }
 
 llvm::Type* ance::IntegerType::getContentType(llvm::LLVMContext& c)

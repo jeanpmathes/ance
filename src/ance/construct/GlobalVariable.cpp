@@ -103,23 +103,9 @@ void ance::GlobalVariable::createNativeBacking(CompileContext* context)
     native_variable_->addDebugInfo(debug_info);
 }
 
-ance::Value* ance::GlobalVariable::getValue(CompileContext* context)
+ance::Value* ance::GlobalVariable::getValue(CompileContext*)
 {
-    switch (type()->storage())
-    {
-        case InternalStorage::AS_TEMPORARY:
-        {
-            auto* const  value_type = static_cast<llvm::PointerType*>(native_variable_->getType())->getElementType();
-            llvm::Value* value      = context->ir()->CreateLoad(value_type, native_variable_);
-            value->setName(identifier());
-            return new ance::WrappedNativeValue(type(), value);
-        }
-
-        case InternalStorage::AS_POINTER:
-        {
-            return new ance::WrappedNativeValue(type(), native_variable_);
-        }
-    }
+    return new ance::WrappedNativeValue(type(), native_variable_);
 }
 
 void ance::GlobalVariable::setValue(ance::Value* value, CompileContext* context)

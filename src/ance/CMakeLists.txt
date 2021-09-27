@@ -7,7 +7,6 @@ add_subdirectory(type)
 add_subdirectory(utility)
 
 target_sources(ance PRIVATE AccessModifier.cpp
-               InternalStorage.cpp
                Indexer.cpp
                Assigner.cpp
                ApplicationVisitor.cpp

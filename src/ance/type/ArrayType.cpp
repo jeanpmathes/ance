@@ -29,11 +29,6 @@ llvm::Type* ance::ArrayType::getContentType(llvm::LLVMContext& c)
     return type_;
 }
 
-InternalStorage ance::ArrayType::storage()
-{
-    return InternalStorage::AS_POINTER;
-}
-
 bool ance::ArrayType::isIndexerDefined(Indexer)
 {
     return true;
@@ -110,7 +105,7 @@ llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value*    indexed,
 
     // Check if index is smaller than size.
     llvm::Value* native_size =
-        llvm::ConstantInt::get(ance::SizeType::getSize()->getNativeType(*context->llvmContext()), size_);
+        llvm::ConstantInt::get(ance::SizeType::getSize()->getContentType(*context->llvmContext()), size_);
     llvm::Value* in_bounds = context->ir()->CreateICmpULT(native_index, native_size);
 
     in_bounds->setName("..inbounds");

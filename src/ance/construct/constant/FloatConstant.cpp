@@ -14,5 +14,5 @@ ance::Type* ance::FloatConstant::type()
 
 llvm::Constant* ance::FloatConstant::buildContent(llvm::Module* m)
 {
-    return llvm::ConstantFP::get(type_->getNativeType(m->getContext()), float_);
+    return llvm::ConstantFP::get(type_->getContentType(m->getContext()), float_);
 }

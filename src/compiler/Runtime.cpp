@@ -6,6 +6,7 @@
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/SizeType.h"
+#include "ance/utility/Values.h"
 #include "compiler/CompileContext.h"
 
 void Runtime::init(CompileContext* context)
@@ -15,7 +16,7 @@ void Runtime::init(CompileContext* context)
 
     // Setup dynamic memory allocation call.
     llvm::Type* allocate_dynamic_params[] = {llvm::Type::getInt32Ty(llvm_context),
-                                             ance::SizeType::getSize()->getNativeType(llvm_context)};
+                                             ance::SizeType::getSize()->getContentType(llvm_context)};
     allocate_dynamic_type_ =
         llvm::FunctionType::get(llvm::Type::getInt8PtrTy(llvm_context), allocate_dynamic_params, false);
     allocate_dynamic_ = llvm::Function::Create(allocate_dynamic_type_,
@@ -37,23 +38,26 @@ ance::Value* Runtime::allocate(Allocator allocation, ance::Type* type, ance::Val
 {
     if (count) { assert(count->type() == ance::SizeType::getSize()); }
 
-    llvm::Value* native_ptr;
+    llvm::Value* ptr_to_allocated;
 
     switch (allocation)
     {
         case AUTOMATIC:
-            native_ptr = allocateAutomatic(type, count, context);
+            ptr_to_allocated = allocateAutomatic(type, count, context);
             break;
 
         case DYNAMIC:
-            native_ptr = allocateDynamic(type, count, context);
+            ptr_to_allocated = allocateDynamic(type, count, context);
             break;
 
         default:
             throw std::invalid_argument("Unsupported allocation type.");
     }
 
-    return new ance::WrappedNativeValue(ance::PointerType::get(*context->application(), type), native_ptr);
+    ance::Type*  ptr_type   = ance::PointerType::get(*context->application(), type);
+    llvm::Value* native_ptr = ance::Values::contentToNative(ptr_type, ptr_to_allocated, context);
+
+    return new ance::WrappedNativeValue(ptr_type, native_ptr);
 }
 
 void Runtime::deleteDynamic(ance::Value* value, bool, CompileContext* context)
@@ -96,17 +100,18 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
     if (count)
     {
         llvm::Value* element_size =
-            llvm::ConstantInt::get(ance::SizeType::getSize()->getNativeType(*context->llvmContext()),
+            llvm::ConstantInt::get(ance::SizeType::getSize()->getContentType(*context->llvmContext()),
                                    type->getContentSize(context->module()).getFixedSize(),
                                    false);
-        count->buildNativeValue(context);
+
+        count->buildContentValue(context);
         llvm::Value* element_count = count->getContentValue();
 
         size = context->ir()->CreateMul(element_size, element_count);
     }
     else
     {
-        size = llvm::ConstantInt::get(ance::SizeType::getSize()->getNativeType(*context->llvmContext()),
+        size = llvm::ConstantInt::get(ance::SizeType::getSize()->getContentType(*context->llvmContext()),
                                       type->getContentSize(context->module()).getFixedSize(),
                                       false);
     }
@@ -116,5 +121,5 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
     llvm::Value* opaque_ptr = context->ir()->CreateCall(allocate_dynamic_type_, allocate_dynamic_, args);
     return context->ir()->CreateBitCast(
         opaque_ptr,
-        ance::PointerType::get(*context->application(), type)->getNativeType(*context->llvmContext()));
+        ance::PointerType::get(*context->application(), type)->getContentType(*context->llvmContext()));
 }

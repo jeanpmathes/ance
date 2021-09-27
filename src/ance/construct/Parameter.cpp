@@ -28,21 +28,8 @@ ance::Location ance::Parameter::location() const
 
 void ance::Parameter::wrap(llvm::Argument* argument)
 {
-    switch (type_->storage())
-    {
-        case InternalStorage::AS_TEMPORARY:
-        {
-            native_value_ = argument;
-            native_value_->setName(name_);
-            break;
-        }
-        case InternalStorage::AS_POINTER:
-        {
-            content_value_ = argument;
-            content_value_->setName(name_ + ".arg");
-            break;
-        }
-    }
+    content_value_ = argument;
+    content_value_->setName(name_ + ".arg");
 }
 
 void ance::Parameter::buildNativeValue(CompileContext* context)

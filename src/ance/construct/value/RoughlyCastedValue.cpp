@@ -6,9 +6,7 @@
 ance::RoughlyCastedValue::RoughlyCastedValue(ance::Type* target_type, ance::Value* original)
     : target_type_(target_type)
     , original_(original)
-{
-    assert(target_type->storage() == original->type()->storage());
-}
+{}
 
 ance::Type* ance::RoughlyCastedValue::type()
 {

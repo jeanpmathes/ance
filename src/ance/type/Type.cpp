@@ -4,17 +4,7 @@
 
 llvm::Type* ance::Type::getNativeType(llvm::LLVMContext& c)
 {
-    switch (storage())
-    {
-        case InternalStorage::AS_TEMPORARY:
-        {
-            return getContentType(c);
-        }
-        case InternalStorage::AS_POINTER:
-        {
-            return llvm::PointerType::get(getContentType(c), 0);
-        }
-    }
+    return llvm::PointerType::get(getContentType(c), 0);
 }
 
 llvm::DIType* ance::Type::getDebugType(CompileContext* context)
@@ -37,11 +27,6 @@ llvm::TypeSize ance::Type::getContentSize(llvm::Module* m)
 bool ance::Type::isIndexerDefined(Indexer)
 {
     return false;
-}
-
-InternalStorage ance::Type::storage()
-{
-    return InternalStorage::AS_TEMPORARY;
 }
 
 ance::Type* ance::Type::getIndexerReturnType()

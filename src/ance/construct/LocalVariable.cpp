@@ -59,18 +59,15 @@ void ance::LocalVariable::build(CompileContext* context)
                                                                        true);
     }
 
-    if (type()->storage() == InternalStorage::AS_POINTER)
-    {
-        native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr);
-        native_value_->setName(identifier());
+    native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr);
+    native_value_->setName(identifier());
 
-        context->di()->insertDeclare(
-            native_value_,
-            local_debug_variable_,
-            context->di()->createExpression(),
-            location_.getDebugLoc(context->llvmContext(), containing_scope_->getDebugScope(context)),
-            context->ir()->GetInsertBlock());
-    }
+    context->di()->insertDeclare(
+        native_value_,
+        local_debug_variable_,
+        context->di()->createExpression(),
+        location_.getDebugLoc(context->llvmContext(), containing_scope_->getDebugScope(context)),
+        context->ir()->GetInsertBlock());
 
     store(initial_value_, context);
 }
@@ -87,26 +84,10 @@ void ance::LocalVariable::setValue(ance::Value* value, CompileContext* context)
 
 void ance::LocalVariable::store(ance::Value* value, CompileContext* context)
 {
-    switch (type()->storage())
-    {
-        case InternalStorage::AS_TEMPORARY:
-        {
-            value->buildNativeValue(context);
+    value->buildContentValue(context);
+    llvm::Value* stored = value->getContentValue();
 
-            native_value_ = value->getNativeValue();
-            native_value_->setName(identifier());
-            break;
-        }
-
-        case InternalStorage::AS_POINTER:
-        {
-            value->buildContentValue(context);
-
-            llvm::Value* stored = value->getContentValue();
-            context->ir()->CreateStore(stored, native_value_);
-            break;
-        }
-    }
+    context->ir()->CreateStore(stored, native_value_);
 }
 
 bool ance::LocalVariable::accept(ance::ApplicationVisitor& visitor)

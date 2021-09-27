@@ -14,8 +14,8 @@ ance::Type* ance::BooleanConstant::type()
 
 llvm::Constant* ance::BooleanConstant::buildContent(llvm::Module* m)
 {
-    return boolean_ ? llvm::ConstantInt::getTrue(type_->getNativeType(m->getContext()))
-                    : llvm::ConstantInt::getFalse(type_->getNativeType(m->getContext()));
+    return boolean_ ? llvm::ConstantInt::getTrue(type_->getContentType(m->getContext()))
+                    : llvm::ConstantInt::getFalse(type_->getContentType(m->getContext()));
 }
 
 ance::BooleanConstant* ance::BooleanConstant::createFalse(Application& app)
