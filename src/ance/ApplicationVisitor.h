@@ -22,6 +22,7 @@ class DefaultValue;
 class FunctionCall;
 class IndexerGet;
 class RoughCast;
+class Addressof;
 class SizeofExpression;
 class SizeofType;
 class VariableAccess;
@@ -92,6 +93,7 @@ namespace ance
         virtual bool visitFunctionCall(FunctionCall& function_call);
         virtual bool visitIndexerGet(IndexerGet& indexer_get);
         virtual bool visitRoughCast(RoughCast& rough_cast);
+        virtual bool visitAddressof(Addressof& addressof);
         virtual bool visitSizeofExpression(SizeofExpression& sizeof_expression);
         virtual bool visitSizeofType(SizeofType& sizeof_type);
         virtual bool visitVariableAccess(VariableAccess& variable_access);

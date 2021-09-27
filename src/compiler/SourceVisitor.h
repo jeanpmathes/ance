@@ -51,6 +51,7 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitVariableAccess(anceParser::VariableAccessContext* ctx) override;
     antlrcpp::Any visitAllocation(anceParser::AllocationContext* ctx) override;
     antlrcpp::Any visitRoughCast(anceParser::RoughCastContext* ctx) override;
+    antlrcpp::Any visitAddressof(anceParser::AddressofContext* ctx) override;
     antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext* ctx) override;
     antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext* ctx) override;
     antlrcpp::Any visitIndexerGet(anceParser::IndexerGetContext* ctx) override;

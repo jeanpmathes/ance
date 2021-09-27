@@ -30,6 +30,7 @@
 #include "ance/assignable/IndexerSet.h"
 #include "ance/assignable/VariableAssignable.h"
 
+#include "ance/expression/Addressof.h"
 #include "ance/expression/Allocation.h"
 #include "ance/expression/BackingExpression.h"
 #include "ance/expression/ConstantLiteral.h"
@@ -265,6 +266,13 @@ antlrcpp::Any SourceVisitor::visitRoughCast(anceParser::RoughCastContext* ctx)
     Expression* expr = visit(ctx->expression());
 
     return static_cast<Expression*>(new RoughCast(type, expr, location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitAddressof(anceParser::AddressofContext* ctx)
+{
+    Expression* arg = visit(ctx->expression());
+
+    return static_cast<Expression*>(new Addressof(arg, application_, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)

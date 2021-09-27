@@ -42,26 +42,27 @@ class anceParser : public antlr4::Parser
         T__29               = 30,
         T__30               = 31,
         T__31               = 32,
-        NATIVE_INTEGER_TYPE = 33,
-        SIGNED_INTEGER      = 34,
-        HEX_INTEGER         = 35,
-        BIN_INTEGER         = 36,
-        OCT_INTEGER         = 37,
-        HALF                = 38,
-        SINGLE              = 39,
-        DOUBLE              = 40,
-        QUAD                = 41,
-        DECIMAL             = 42,
-        STRING              = 43,
-        BYTE                = 44,
-        INTEGER             = 45,
-        BUFFER              = 46,
-        CONST               = 47,
-        IDENTIFIER          = 48,
-        SEMICOLON           = 49,
-        WHITESPACE          = 50,
-        BLOCK_COMMENT       = 51,
-        LINE_COMMENT        = 52
+        T__32               = 33,
+        NATIVE_INTEGER_TYPE = 34,
+        SIGNED_INTEGER      = 35,
+        HEX_INTEGER         = 36,
+        BIN_INTEGER         = 37,
+        OCT_INTEGER         = 38,
+        HALF                = 39,
+        SINGLE              = 40,
+        DOUBLE              = 41,
+        QUAD                = 42,
+        DECIMAL             = 43,
+        STRING              = 44,
+        BYTE                = 45,
+        INTEGER             = 46,
+        BUFFER              = 47,
+        CONST               = 48,
+        IDENTIFIER          = 49,
+        SEMICOLON           = 50,
+        WHITESPACE          = 51,
+        BLOCK_COMMENT       = 52,
+        LINE_COMMENT        = 53
     };
 
     enum
@@ -91,26 +92,27 @@ class anceParser : public antlr4::Parser
         RuleAllocation              = 22,
         RuleAllocator               = 23,
         RuleRoughCast               = 24,
-        RuleSizeofType              = 25,
-        RuleSizeofExpression        = 26,
-        RuleLiteralExpression       = 27,
-        RuleStringLiteral           = 28,
-        RuleByteLiteral             = 29,
-        RuleIntegerLiteral          = 30,
-        RuleUnsignedInteger         = 31,
-        RuleSignedInteger           = 32,
-        RuleSpecialInteger          = 33,
-        RuleFloatingPointLiteral    = 34,
-        RuleBooleanLiteral          = 35,
-        RuleSizeLiteral             = 36,
-        RuleDiffLiteral             = 37,
-        RuleType                    = 38,
-        RuleIntegerType             = 39,
-        RuleArrayType               = 40,
-        RuleKeywordType             = 41,
-        RuleFloatingPointType       = 42,
-        RuleTargetDependentType     = 43,
-        RuleVoidType                = 44
+        RuleAddressof               = 25,
+        RuleSizeofType              = 26,
+        RuleSizeofExpression        = 27,
+        RuleLiteralExpression       = 28,
+        RuleStringLiteral           = 29,
+        RuleByteLiteral             = 30,
+        RuleIntegerLiteral          = 31,
+        RuleUnsignedInteger         = 32,
+        RuleSignedInteger           = 33,
+        RuleSpecialInteger          = 34,
+        RuleFloatingPointLiteral    = 35,
+        RuleBooleanLiteral          = 36,
+        RuleSizeLiteral             = 37,
+        RuleDiffLiteral             = 38,
+        RuleType                    = 39,
+        RuleIntegerType             = 40,
+        RuleArrayType               = 41,
+        RuleKeywordType             = 42,
+        RuleFloatingPointType       = 43,
+        RuleTargetDependentType     = 44,
+        RuleVoidType                = 45
     };
 
     anceParser(antlr4::TokenStream* input);
@@ -150,6 +152,7 @@ class anceParser : public antlr4::Parser
     class AllocationContext;
     class AllocatorContext;
     class RoughCastContext;
+    class AddressofContext;
     class SizeofTypeContext;
     class SizeofExpressionContext;
     class LiteralExpressionContext;
@@ -534,6 +537,16 @@ class anceParser : public antlr4::Parser
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class AdressOfContext : public ExpressionContext
+    {
+      public:
+        AdressOfContext(ExpressionContext* ctx);
+
+        AddressofContext* addressof();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     class LiteralContext : public ExpressionContext
     {
       public:
@@ -676,6 +689,18 @@ class anceParser : public antlr4::Parser
     };
 
     RoughCastContext* roughCast();
+
+    class AddressofContext : public antlr4::ParserRuleContext
+    {
+      public:
+        AddressofContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t     getRuleIndex() const override;
+        ExpressionContext* expression();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    AddressofContext* addressof();
 
     class SizeofTypeContext : public antlr4::ParserRuleContext
     {

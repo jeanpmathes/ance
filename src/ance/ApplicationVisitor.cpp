@@ -14,6 +14,7 @@
 #include "ance/construct/GlobalVariable.h"
 #include "ance/construct/LocalVariable.h"
 
+#include "ance/expression/Addressof.h"
 #include "ance/expression/Allocation.h"
 #include "ance/expression/ConstantLiteral.h"
 #include "ance/expression/DefaultValue.h"
@@ -124,6 +125,11 @@ bool ance::ApplicationVisitor::visitIndexerGet(IndexerGet& indexer_get)
 bool ance::ApplicationVisitor::visitRoughCast(RoughCast& rough_cast)
 {
     return visitChildren(rough_cast);
+}
+
+bool ance::ApplicationVisitor::visitAddressof(Addressof& addressof)
+{
+    return visitChildren(addressof);
 }
 
 bool ance::ApplicationVisitor::visitSizeofExpression(SizeofExpression& sizeof_expression)

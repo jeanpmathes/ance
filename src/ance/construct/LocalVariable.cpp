@@ -6,7 +6,6 @@
 #include "ance/construct/Parameter.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
-#include "ance/statement/Statement.h"
 #include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"

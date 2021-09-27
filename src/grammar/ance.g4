@@ -82,6 +82,7 @@ expression
 	: variableAccess # Variable
 	| allocation # Alloc
 	| roughCast # Cast
+	| addressof # AdressOf
 	| sizeofType # SizeOf
 	| sizeofExpression # SizeOf
 	| literalExpression # Literal
@@ -116,6 +117,10 @@ allocator
 
 roughCast
     : '{' type '}' expression
+    ;
+
+addressof
+    : 'addressof' expression
     ;
 
 sizeofType
