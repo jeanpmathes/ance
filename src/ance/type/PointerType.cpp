@@ -13,7 +13,7 @@ ance::PointerType::PointerType(ance::Type* element_type) : element_type_(element
 
 std::string ance::PointerType::getName()
 {
-    return element_type_->getName() + "*";
+    return "*" + element_type_->getName();
 }
 
 llvm::Constant* ance::PointerType::getDefaultContent(llvm::LLVMContext& c)

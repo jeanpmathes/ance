@@ -933,7 +933,7 @@ class anceParser : public antlr4::Parser
     };
 
     TypeContext* type();
-    TypeContext* type(int precedence);
+
     class IntegerTypeContext : public antlr4::ParserRuleContext
     {
       public:
@@ -1009,7 +1009,6 @@ class anceParser : public antlr4::Parser
 
     virtual bool sempred(antlr4::RuleContext* _localctx, size_t ruleIndex, size_t predicateIndex) override;
     bool         expressionSempred(ExpressionContext* _localctx, size_t predicateIndex);
-    bool         typeSempred(TypeContext* _localctx, size_t predicateIndex);
 
   private:
     static std::vector<antlr4::dfa::DFA>       _decisionToDFA;

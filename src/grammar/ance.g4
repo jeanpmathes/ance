@@ -188,7 +188,7 @@ type
 	: integerType # Integer
 	| arrayType # Array
 	| keywordType # Keyword
-	| type '*' # Pointer
+	| '*' type # Pointer
 	;
 
 integerType
