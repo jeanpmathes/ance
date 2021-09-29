@@ -72,6 +72,13 @@ namespace ance
          * @return True if it is a pointer type.
          */
         static bool isPointerType(ance::Type* type);
+
+        /**
+         * Get the pointee type of a given pointer type.
+         * @param type The pointer type.
+         * @return The pointee type or nullptr if the given type is not a pointer type.
+         */
+        static ance::Type* getPointeeType(ance::Type* type);
     };
 }
 

@@ -81,8 +81,6 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& id
                                                            unsigned           parameter_no,
                                                            ance::Location     location)
 {
-    assert((assigner == Assigner::REFERENCE_BINDING) == (ance::ReferenceType::isReferenceType(type)));
-
     if (local_variables_.find(identifier) == local_variables_.end())
     {
 

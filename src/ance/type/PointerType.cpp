@@ -159,3 +159,9 @@ bool ance::PointerType::isPointerType(ance::Type* type)
     ance::Type* ptr_type = dynamic_cast<ance::PointerType*>(type);
     return ptr_type != nullptr;
 }
+
+ance::Type* ance::PointerType::getPointeeType(ance::Type* type)
+{
+    auto ptr_type = dynamic_cast<ance::PointerType*>(type);
+    return ptr_type ? ptr_type->element_type_ : nullptr;
+}
