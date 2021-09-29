@@ -3,6 +3,7 @@
 #include "ance/ApplicationVisitor.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/type/PointerType.h"
+#include "ance/type/ReferenceType.h"
 #include "ance/utility/Values.h"
 
 Addressof::Addressof(Expression* arg, Application& app, ance::Location location)
@@ -20,7 +21,17 @@ void Addressof::setScope(ance::Scope* scope)
 
 ance::Type* Addressof::type()
 {
-    if (!return_type_) { return_type_ = ance::PointerType::get(application_, arg_->type()); }
+    if (!return_type_)
+    {
+        ance::Type* value_type = arg_->type();
+
+        if (ance::ReferenceType::isReferenceType(value_type))
+        {
+            value_type = ance::ReferenceType::getReferencedType(value_type);
+        }
+
+        return_type_ = ance::PointerType::get(application_, value_type);
+    }
 
     return return_type_;
 }
@@ -36,9 +47,10 @@ void Addressof::doBuild(CompileContext* context)
     value->buildNativeValue(context);
 
     llvm::Value* address        = value->getNativeValue();
-    llvm::Value* stored_address = ance::Values::contentToNative(type(), address, context);
+    if (!ance::ReferenceType::isReferenceType(arg_->type()))
+        address = ance::Values::contentToNative(type(), address, context);
 
-    setValue(new ance::WrappedNativeValue(type(), stored_address));
+    setValue(new ance::WrappedNativeValue(type(), address));
 }
 
 bool Addressof::accept(ance::ApplicationVisitor& visitor)
