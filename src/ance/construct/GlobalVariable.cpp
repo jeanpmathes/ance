@@ -9,7 +9,7 @@
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/expression/ConstantExpression.h"
 #include "ance/scope/LocalScope.h"
-#include "ance/statement/Statement.h"
+#include "ance/type/ReferenceType.h"
 #include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "compiler/CompileContext.h"
@@ -73,6 +73,12 @@ void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
     if (type() == ance::VoidType::get())
     {
         validation_logger.logError("Global variable cannot have 'void' type", location_);
+        return;
+    }
+
+    if (ance::ReferenceType::isReferenceType(type()))
+    {
+        validation_logger.logError("Global variable cannot have reference type", location_);
         return;
     }
 

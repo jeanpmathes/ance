@@ -7,6 +7,7 @@
 #include "ance/construct/LocalVariable.h"
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
+#include "ance/type/ReferenceType.h"
 #include "ance/type/Type.h"
 #include "validation/ValidationLogger.h"
 
@@ -42,6 +43,13 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
     {
         bool assigned_is_valid = assigned_->validate(validation_logger);
         if (!assigned_is_valid) return;
+
+        if (ance::ReferenceType::isReferenceType(type_))
+        {
+            validation_logger.logError("Cannot declare variable of reference type without binding to a value",
+                                       location());
+            return;
+        }
 
         ance::Type::checkMismatch(variable_->type(), assigned_->type(), assigned_->location(), validation_logger);
     }
