@@ -23,6 +23,8 @@ ance::ExternFunction::ExternFunction(std::string                   function_name
 
 void ance::ExternFunction::validate(ValidationLogger& validation_logger)
 {
+    returnType()->validate(validation_logger, location());
+
     std::set<std::string> names;
 
     for (const auto& parameter : parameters())

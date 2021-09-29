@@ -22,6 +22,8 @@ namespace ance
 
         llvm::PointerType* getContentType(llvm::LLVMContext& c) override;
 
+        bool validate(ValidationLogger& validation_logger, ance::Location location) override;
+
         bool isIndexerDefined(Indexer indexer) override;
 
         ance::Type* getIndexerReturnType() override;

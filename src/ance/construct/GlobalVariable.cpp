@@ -70,6 +70,8 @@ ance::Location ance::GlobalVariable::location() const
 
 void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
 {
+    if (!type()->validate(validation_logger, location())) return;
+
     if (type() == ance::VoidType::get())
     {
         validation_logger.logError("Global variable cannot have 'void' type", location_);

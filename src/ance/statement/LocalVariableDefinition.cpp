@@ -44,6 +44,8 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
         bool assigned_is_valid = assigned_->validate(validation_logger);
         if (!assigned_is_valid) return;
 
+        if (!variable_->type()->validate(validation_logger, location())) return;
+
         if (ance::ReferenceType::isReferenceType(type_))
         {
             validation_logger.logError("Cannot declare variable of reference type without binding to a value",

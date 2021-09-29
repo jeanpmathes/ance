@@ -11,9 +11,9 @@ ance::Type* SizeofType::type()
     return ance::SizeType::getSize();
 }
 
-bool SizeofType::validate(ValidationLogger&)
+bool SizeofType::validate(ValidationLogger& validation_logger)
 {
-    return true;
+    return type_->validate(validation_logger, location());
 }
 
 ance::Value* SizeofType::getValue() const

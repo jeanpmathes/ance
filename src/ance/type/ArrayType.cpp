@@ -4,10 +4,12 @@
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
 #include "ance/scope/Scope.h"
+#include "ance/type/ReferenceType.h"
 #include "ance/type/SizeType.h"
 #include "ance/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 ance::ArrayType::ArrayType(Type* element_type, const uint64_t size) : size_(size), element_type_(element_type) {}
 
@@ -27,6 +29,17 @@ llvm::Type* ance::ArrayType::getContentType(llvm::LLVMContext& c)
     if (!type_) { type_ = llvm::ArrayType::get(element_type_->getContentType(c), size_); }
 
     return type_;
+}
+
+bool ance::ArrayType::validate(ValidationLogger& validation_logger, ance::Location location)
+{
+    if (ance::ReferenceType::isReferenceType(element_type_))
+    {
+        validation_logger.logError("Cannot declare arrays of reference types", location);
+        return false;
+    }
+
+    return true;
 }
 
 bool ance::ArrayType::isIndexerDefined(Indexer)

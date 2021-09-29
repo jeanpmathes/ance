@@ -182,6 +182,8 @@ llvm::DIScope* ance::DefinedFunction::getDebugScope(CompileContext*)
 
 void ance::DefinedFunction::validate(ValidationLogger& validation_logger)
 {
+    returnType()->validate(validation_logger, location());
+
     for (const auto& [parameter, argument] : llvm::zip(parameters(), arguments_))
     {
         if (!argument)

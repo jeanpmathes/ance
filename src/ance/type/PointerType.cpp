@@ -3,11 +3,13 @@
 #include "ance/construct/value/Value.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/ReferenceType.h"
 #include "ance/type/SizeType.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 ance::PointerType::PointerType(ance::Type* element_type) : element_type_(element_type) {}
 
@@ -32,6 +34,17 @@ llvm::PointerType* ance::PointerType::getContentType(llvm::LLVMContext& c)
     }
 
     return llvm::PointerType::get(native_type, 0);
+}
+
+bool ance::PointerType::validate(ValidationLogger& validation_logger, ance::Location location)
+{
+    if (ance::ReferenceType::isReferenceType(element_type_))
+    {
+        validation_logger.logError("Cannot declare pointers to reference types", location);
+        return false;
+    }
+
+    return true;
 }
 
 bool ance::PointerType::isIndexerDefined(Indexer)
