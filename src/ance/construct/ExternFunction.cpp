@@ -1,5 +1,6 @@
 #include "ExternFunction.h"
 
+#include <set>
 #include <utility>
 
 #include "ance/ApplicationVisitor.h"
@@ -8,6 +9,7 @@
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/statement/Statement.h"
+#include "ance/type/ReferenceType.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/CompileContext.h"
@@ -20,7 +22,23 @@ ance::ExternFunction::ExternFunction(std::string                   function_name
     : ance::Function(std::move(function_name), return_type, std::move(parameters), location)
 {}
 
-void ance::ExternFunction::validate(ValidationLogger&) {}
+void ance::ExternFunction::validate(ValidationLogger& validation_logger)
+{
+    std::set<std::string> names;
+
+    for (const auto& parameter : parameters())
+    {
+        auto [it, inserted] = names.insert(parameter->name());
+
+        if (!inserted)
+        {
+            validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
+                                       parameter->location());
+        }
+
+        ance::ReferenceType::validateReferenceType(parameter->type(), validation_logger, parameter->location());
+    }
+}
 
 void ance::ExternFunction::createNativeBacking(CompileContext* context)
 {

@@ -79,6 +79,14 @@ namespace ance
         static ance::Type* get(Application& app, ance::Type* element_type);
 
         /**
+         * Validate a reference type.
+         * @param type The type to validate. If it is not a reference type, no validation is performed.
+         */
+        static bool validateReferenceType(ance::Type*       type,
+                                          ValidationLogger& validation_logger,
+                                          ance::Location    location);
+
+        /**
          * Check if a given type is a reference type.
          * @param type The type.
          * @return True if it is a reference type.

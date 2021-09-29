@@ -189,6 +189,8 @@ void ance::DefinedFunction::validate(ValidationLogger& validation_logger)
             validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
                                        parameter->location());
         }
+
+        ance::ReferenceType::validateReferenceType(parameter->type(), validation_logger, parameter->location());
     }
 
     function_scope_->validate(validation_logger);

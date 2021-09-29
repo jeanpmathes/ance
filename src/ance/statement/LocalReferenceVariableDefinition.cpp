@@ -68,6 +68,8 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
             return;
         }
 
+        if (!ance::ReferenceType::validateReferenceType(type_, validation_logger, location())) return;
+
         ance::Type* address_type = address_->type();
 
         if (!ance::PointerType::isPointerType(address_type))

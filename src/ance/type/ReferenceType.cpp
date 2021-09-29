@@ -6,8 +6,10 @@
 #include "ance/construct/value/Value.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/VoidType.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 ance::ReferenceType::ReferenceType(ance::Type* element_type) : element_type_(element_type) {}
 
@@ -121,6 +123,28 @@ ance::Type* ance::ReferenceType::get(Application& app, ance::Type* element_type)
         app.globalScope()->registerType(type);
         return type;
     }
+}
+
+bool ance::ReferenceType::validateReferenceType(ance::Type*       type,
+                                                ValidationLogger& validation_logger,
+                                                ance::Location    location)
+{
+    auto reference_type = dynamic_cast<ance::ReferenceType*>(type);
+    if (!reference_type) return true;
+
+    if (reference_type->element_type_ == ance::VoidType::get())
+    {
+        validation_logger.logError("Cannot declare reference to '" + ance::VoidType::get()->getName() + "'", location);
+        return false;
+    }
+
+    if (ance::ReferenceType::isReferenceType(reference_type->element_type_))
+    {
+        validation_logger.logError("Cannot declare reference to reference", location);
+        return false;
+    }
+
+    return true;
 }
 
 bool ance::ReferenceType::isReferenceType(ance::Type* type)
