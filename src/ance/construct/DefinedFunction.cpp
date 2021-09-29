@@ -7,7 +7,6 @@
 #include "ance/ApplicationVisitor.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/construct/Parameter.h"
-#include "ance/construct/value/Value.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/statement/Statement.h"

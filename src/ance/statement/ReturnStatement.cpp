@@ -38,9 +38,17 @@ void ReturnStatement::validate(ValidationLogger& validation_logger)
     }
 }
 
-void ReturnStatement::doBuild(CompileContext*)
+void ReturnStatement::doBuild(CompileContext* context)
 {
-    getContainingFunction()->addReturn(return_value_ ? return_value_->getValue() : nullptr);
+    ance::Value* return_value = nullptr;
+
+    if (return_value_)
+    {
+        return_value = return_value_->getValue();
+        return_value = ance::Type::makeMatching(getContainingFunction()->returnType(), return_value, context);
+    }
+
+    getContainingFunction()->addReturn(return_value);
 }
 
 bool ReturnStatement::accept(ance::ApplicationVisitor& visitor)

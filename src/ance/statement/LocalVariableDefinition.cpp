@@ -40,7 +40,9 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
 {
     if (variable_)
     {
-        assigned_->validate(validation_logger);
+        bool assigned_is_valid = assigned_->validate(validation_logger);
+        if (!assigned_is_valid) return;
+
         ance::Type::checkMismatch(variable_->type(), assigned_->type(), assigned_->location(), validation_logger);
     }
     else

@@ -165,6 +165,15 @@ namespace ance
                                   ance::Location    location,
                                   ValidationLogger& validation_logger);
 
+        /**
+         * Transform a value so it matches an expected type.
+         * @param expected The expected type.
+         * @param value The value to transform.
+         * @param context The current compile context.
+         * @return A value with the expected type. It can be the same value as passed in.
+         */
+        static ance::Value* makeMatching(ance::Type* expected, ance::Value* value, CompileContext* context);
+
       private:
         llvm::DIType* debug_type_ {nullptr};
     };

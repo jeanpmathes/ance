@@ -5,6 +5,7 @@
 #include "ance/ApplicationVisitor.h"
 #include "ance/construct/DefinedFunction.h"
 #include "ance/construct/LocalVariable.h"
+#include "ance/construct/value/RoughlyCastedValue.h"
 #include "ance/expression/Addressof.h"
 #include "ance/scope/LocalScope.h"
 
@@ -40,15 +41,19 @@ LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string  
 
 void LocalReferenceVariableDefinition::setFunction(ance::DefinedFunction* function)
 {
-    variable_ = function->getFunctionScope()->defineAutoVariable(identifier_,
-                                                                 type_,
-                                                                 Assigner::REFERENCE_BINDING,
-                                                                 address_->getValue(),
-                                                                 location());
+    variable_ =
+        function->getFunctionScope()->defineAutoVariable(identifier_,
+                                                         type_,
+                                                         Assigner::REFERENCE_BINDING,
+                                                         new ance::RoughlyCastedValue(type_, address_->getValue()),
+                                                         location());
 
     address_->setContainingScope(function);
 }
-void LocalReferenceVariableDefinition::validate(ValidationLogger&) {}
+void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger)
+{
+    address_->validate(validation_logger);
+}
 
 void LocalReferenceVariableDefinition::doBuild(CompileContext* context)
 {

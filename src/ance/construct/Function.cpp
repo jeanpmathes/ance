@@ -99,10 +99,12 @@ llvm::CallInst* ance::Function::buildCall(const std::vector<ance::Value*>& argum
     std::vector<llvm::Value*> args;
     args.reserve(arguments.size());
 
-    for (auto* arg : arguments)
+    for (const auto& [param, arg] : llvm::zip(parameters_, arguments))
     {
-        arg->buildContentValue(context);
-        args.push_back(arg->getContentValue());
+        ance::Value* matched_arg = ance::Type::makeMatching(param->type(), arg, context);
+
+        matched_arg->buildContentValue(context);
+        args.push_back(matched_arg->getContentValue());
     }
 
     auto* content_value = context->ir()->CreateCall(native_type, native_function, args);

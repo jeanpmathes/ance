@@ -25,9 +25,9 @@ ance::Type* Addressof::type()
     return return_type_;
 }
 
-bool Addressof::validate(ValidationLogger&)
+bool Addressof::validate(ValidationLogger& validation_logger)
 {
-    return true;
+    return arg_->validate(validation_logger);
 }
 
 void Addressof::doBuild(CompileContext* context)

@@ -46,8 +46,11 @@ bool Allocation::validate(ValidationLogger& validation_logger)
 
 void Allocation::doBuild(CompileContext* context)
 {
-    ance::Value* count = count_ ? count_->getValue() : nullptr;
-    ance::Value* ptr   = context->runtime()->allocate(allocation_, allocated_type_, count, context);
+    ance::Value* count = nullptr;
+
+    if (count_) { count = ance::Type::makeMatching(ance::SizeType::getSize(), count_->getValue(), context); }
+
+    ance::Value* ptr = context->runtime()->allocate(allocation_, allocated_type_, count, context);
     setValue(ptr);
 }
 

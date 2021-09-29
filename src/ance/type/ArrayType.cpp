@@ -52,6 +52,8 @@ bool ance::ArrayType::validateGetIndexer(ance::Value* indexed,
 
 ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
 {
+    index = ance::Type::makeMatching(ance::SizeType::getSize(), index, context);
+
     llvm::Value* element_ptr    = buildGetElementPointer(indexed, index, context);
     llvm::Value* native_content = context->ir()->CreateLoad(element_ptr);
 
@@ -81,6 +83,9 @@ void ance::ArrayType::buildSetIndexer(ance::Value*    indexed,
                                       ance::Value*    value,
                                       CompileContext* context)
 {
+    index = ance::Type::makeMatching(ance::SizeType::getSize(), index, context);
+    value = ance::Type::makeMatching(element_type_, value, context);
+
     value->buildContentValue(context);
 
     llvm::Value* element_ptr         = buildGetElementPointer(indexed, index, context);

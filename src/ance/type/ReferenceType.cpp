@@ -89,19 +89,19 @@ llvm::DIType* ance::ReferenceType::createDebugType(CompileContext* context)
 
     return di_type;
 }
-llvm::Value* ance::ReferenceType::dereference(llvm::Value* value, CompileContext* context)
+llvm::Value* ance::ReferenceType::getReferenced(llvm::Value* value, CompileContext* context)
 {
     return context->ir()->CreateLoad(value);
 }
 
-ance::Value* ance::ReferenceType::dereference(ance::Value* value, CompileContext* context)
+ance::Value* ance::ReferenceType::getReferenced(ance::Value* value, CompileContext* context)
 {
     assert(value->type() == this);
 
     value->buildNativeValue(context);
 
     llvm::Value* native_reference = value->getNativeValue();
-    llvm::Value* native_referred  = dereference(native_reference, context);
+    llvm::Value* native_referred  = getReferenced(native_reference, context);
 
     return new ance::WrappedNativeValue(element_type_, native_referred);
 }
@@ -127,4 +127,10 @@ bool ance::ReferenceType::isReferenceType(ance::Type* type)
 {
     ance::Type* ref_type = dynamic_cast<ance::ReferenceType*>(type);
     return ref_type != nullptr;
+}
+
+ance::Type* ance::ReferenceType::getReferencedType(ance::Type* type)
+{
+    auto ref_type = dynamic_cast<ance::ReferenceType*>(type);
+    return ref_type ? ref_type->element_type_ : nullptr;
 }

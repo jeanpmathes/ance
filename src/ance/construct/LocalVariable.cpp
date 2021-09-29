@@ -83,6 +83,8 @@ void ance::LocalVariable::setValue(ance::Value* value, CompileContext* context)
 
 void ance::LocalVariable::store(ance::Value* value, CompileContext* context)
 {
+    value = ance::Type::makeMatching(type(), value, context);
+
     value->buildContentValue(context);
     llvm::Value* stored = value->getContentValue();
 

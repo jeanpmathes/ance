@@ -55,20 +55,20 @@ namespace ance
 
       public:
         /**
-         * Dereference a backing value.
+         * Get the referenced backing value.
          * @param value A native value for a reference-type variable.
          * @param context The current compile context.
          * @return A native value for the referenced value.
          */
-        static llvm::Value* dereference(llvm::Value* value, CompileContext* context);
+        static llvm::Value* getReferenced(llvm::Value* value, CompileContext* context);
 
         /**
-         * Dereference a value.
+         * Get the referenced value.
          * @param value A value of reference type.
          * @param context The current compile context.
          * @return The referenced value.
          */
-        ance::Value* dereference(ance::Value* value, CompileContext* context);
+        ance::Value* getReferenced(ance::Value* value, CompileContext* context);
 
         /**
          * Get a reference type instance.
@@ -84,6 +84,12 @@ namespace ance
          * @return True if it is a reference type.
          */
         static bool isReferenceType(ance::Type* type);
+
+        /**
+         * Get the referenced type of a reference type.
+         * @return The element type, or null if the given type is not a reference type.
+         */
+        static ance::Type* getReferencedType(ance::Type* type);
     };
 }
 

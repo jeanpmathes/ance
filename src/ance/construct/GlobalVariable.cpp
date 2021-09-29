@@ -110,6 +110,8 @@ ance::Value* ance::GlobalVariable::getValue(CompileContext*)
 
 void ance::GlobalVariable::setValue(ance::Value* value, CompileContext* context)
 {
+    value = ance::Type::makeMatching(type(), value, context);
+
     value->buildContentValue(context);
 
     llvm::Value* content = value->getContentValue();

@@ -1,5 +1,7 @@
 #include "Type.h"
 
+#include "ance/construct/value/Value.h"
+#include "ance/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
 llvm::Type* ance::Type::getNativeType(llvm::LLVMContext& c)
@@ -61,6 +63,8 @@ bool ance::Type::checkMismatch(ance::Type*       expected,
 {
     if (expected != actual)
     {
+        if (ance::ReferenceType::getReferencedType(actual) == expected) return true;
+
         validation_logger.logError("Cannot implicitly convert '" + actual->getName() + "' to '" + expected->getName()
                                        + "'",
                                    location);
@@ -69,4 +73,18 @@ bool ance::Type::checkMismatch(ance::Type*       expected,
     }
 
     return true;
+}
+
+ance::Value* ance::Type::makeMatching(ance::Type* expected, ance::Value* value, CompileContext* context)
+{
+    if (value->type() == expected) return value;
+
+    if (ance::ReferenceType::getReferencedType(value->type()) == expected)
+    {
+        auto reference_type = dynamic_cast<ance::ReferenceType*>(value->type());
+        return reference_type->getReferenced(value, context);
+    }
+
+    assert(false && "Cannot make the value matching, was isMismatch checked before?");
+    return nullptr;
 }
