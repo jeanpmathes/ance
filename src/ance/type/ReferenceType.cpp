@@ -29,6 +29,23 @@ llvm::PointerType* ance::ReferenceType::getContentType(llvm::LLVMContext& c)
     return llvm::PointerType::get(element_type_->getContentType(c), 0);
 }
 
+bool ance::ReferenceType::validate(ValidationLogger& validation_logger, ance::Location location)
+{
+    if (element_type_ == ance::VoidType::get())
+    {
+        validation_logger.logError("Cannot declare reference to '" + ance::VoidType::get()->getName() + "'", location);
+        return false;
+    }
+
+    if (ance::ReferenceType::isReferenceType(element_type_))
+    {
+        validation_logger.logError("Cannot declare reference to reference", location);
+        return false;
+    }
+
+    return true;
+}
+
 bool ance::ReferenceType::isIndexerDefined(Indexer indexer)
 {
     return element_type_->isIndexerDefined(indexer);
@@ -123,28 +140,6 @@ ance::Type* ance::ReferenceType::get(Application& app, ance::Type* element_type)
         app.globalScope()->registerType(type);
         return type;
     }
-}
-
-bool ance::ReferenceType::validateReferenceType(ance::Type*       type,
-                                                ValidationLogger& validation_logger,
-                                                ance::Location    location)
-{
-    auto reference_type = dynamic_cast<ance::ReferenceType*>(type);
-    if (!reference_type) return true;
-
-    if (reference_type->element_type_ == ance::VoidType::get())
-    {
-        validation_logger.logError("Cannot declare reference to '" + ance::VoidType::get()->getName() + "'", location);
-        return false;
-    }
-
-    if (ance::ReferenceType::isReferenceType(reference_type->element_type_))
-    {
-        validation_logger.logError("Cannot declare reference to reference", location);
-        return false;
-    }
-
-    return true;
 }
 
 bool ance::ReferenceType::isReferenceType(ance::Type* type)

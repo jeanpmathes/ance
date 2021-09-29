@@ -26,6 +26,8 @@ namespace ance
 
         ance::Type* getIndexerReturnType() override;
 
+        bool validate(ValidationLogger& validation_logger, ance::Location location) override;
+
         bool         validateGetIndexer(ance::Value*      indexed,
                                         ance::Location    indexed_location,
                                         ance::Value*      index,
@@ -77,14 +79,6 @@ namespace ance
          * @return The instance.
          */
         static ance::Type* get(Application& app, ance::Type* element_type);
-
-        /**
-         * Validate a reference type.
-         * @param type The type to validate. If it is not a reference type, no validation is performed.
-         */
-        static bool validateReferenceType(ance::Type*       type,
-                                          ValidationLogger& validation_logger,
-                                          ance::Location    location);
 
         /**
          * Check if a given type is a reference type.

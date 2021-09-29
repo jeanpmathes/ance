@@ -190,7 +190,7 @@ void ance::DefinedFunction::validate(ValidationLogger& validation_logger)
                                        parameter->location());
         }
 
-        ance::ReferenceType::validateReferenceType(parameter->type(), validation_logger, parameter->location());
+        parameter->type()->validate(validation_logger, parameter->location());
     }
 
     function_scope_->validate(validation_logger);

@@ -8,7 +8,6 @@
 #include "ance/construct/Parameter.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
-#include "ance/statement/Statement.h"
 #include "ance/type/ReferenceType.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
@@ -36,7 +35,7 @@ void ance::ExternFunction::validate(ValidationLogger& validation_logger)
                                        parameter->location());
         }
 
-        ance::ReferenceType::validateReferenceType(parameter->type(), validation_logger, parameter->location());
+        parameter->type()->validate(validation_logger, parameter->location());
     }
 }
 

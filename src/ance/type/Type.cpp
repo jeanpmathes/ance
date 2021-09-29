@@ -36,6 +36,11 @@ ance::Type* ance::Type::getIndexerReturnType()
     return nullptr;
 }
 
+bool ance::Type::validate(ValidationLogger&, ance::Location)
+{
+    return true;
+}
+
 bool ance::Type::validateGetIndexer(ance::Value*, ance::Location, ance::Value*, ance::Location, ValidationLogger&)
 {
     return false;

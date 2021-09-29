@@ -95,6 +95,14 @@ namespace ance
         virtual ance::Type* getIndexerReturnType();
 
         /**
+         * Validate if this type is well-formed.
+         * @param validation_logger The validation logger to use.
+         * @param location The source location of the type declaration.
+         * @return True if the type is valid.
+         */
+        virtual bool validate(ValidationLogger& validation_logger, ance::Location location);
+
+        /**
          * Validate an indexer get access.
          * @param indexed The indexed value.
          * @param indexed_location The source location of the indexed value.
