@@ -11,6 +11,7 @@
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/statement/Statement.h"
+#include "ance/type/ReferenceType.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/CompileContext.h"
@@ -34,9 +35,12 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                access,
     unsigned no = 1;
     for (auto* parameter : this->parameters())
     {
+        Assigner assigner = ance::ReferenceType::isReferenceType(parameter->type()) ? Assigner::REFERENCE_BINDING
+                                                                                    : Assigner::COPY_ASSIGNMENT;
+
         ance::LocalVariable* arg = function_scope_->defineParameterVariable(parameter->name(),
                                                                             parameter->type(),
-                                                                            Assigner::COPY_ASSIGNMENT,
+                                                                            assigner,
                                                                             parameter,
                                                                             no++,
                                                                             parameter->location());
