@@ -50,6 +50,18 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
+    virtual antlrcpp::Any visitLocalReferenceToValueDefinition(
+        anceParser::LocalReferenceToValueDefinitionContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
+    virtual antlrcpp::Any visitLocalReferenceToPointerDefinition(
+        anceParser::LocalReferenceToPointerDefinitionContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
     virtual antlrcpp::Any visitAssignment(anceParser::AssignmentContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitCopyAssignment(anceParser::CopyAssignmentContext* ctx) override
@@ -190,6 +202,8 @@ class anceBaseVisitor : public anceVisitor
     virtual antlrcpp::Any visitKeyword(anceParser::KeywordContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitPointer(anceParser::PointerContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitReference(anceParser::ReferenceContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitIntegerType(anceParser::IntegerTypeContext* ctx) override { return visitChildren(ctx); }
 

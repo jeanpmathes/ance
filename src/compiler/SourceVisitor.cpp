@@ -10,6 +10,7 @@
 #include "ance/type/IntegerType.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/QuadType.h"
+#include "ance/type/ReferenceType.h"
 #include "ance/type/SingleType.h"
 
 #include "ance/scope/GlobalScope.h"
@@ -22,6 +23,7 @@
 #include "ance/statement/AssignmentStatement.h"
 #include "ance/statement/DeleteStatement.h"
 #include "ance/statement/ExpressionStatement.h"
+#include "ance/statement/LocalReferenceVariableDefinition.h"
 #include "ance/statement/LocalVariableDefinition.h"
 #include "ance/statement/ReturnStatement.h"
 
@@ -172,6 +174,29 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
 
     auto* statement = new LocalVariableDefinition(identifier, type, assigner, assigned, location(ctx));
     return static_cast<Statement*>(statement);
+}
+
+antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
+    anceParser::LocalReferenceToValueDefinitionContext* ctx)
+{
+    ance::Type* type       = visit(ctx->type());
+    std::string identifier = ctx->IDENTIFIER()->getText();
+
+    Expression* value = visit(ctx->expression());
+
+    return static_cast<Statement*>(
+        LocalReferenceVariableDefinition::refer(identifier, type, value, application_, location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
+    anceParser::LocalReferenceToPointerDefinitionContext* ctx)
+{
+    ance::Type* type       = visit(ctx->type());
+    std::string identifier = ctx->IDENTIFIER()->getText();
+
+    Expression* address = visit(ctx->expression());
+
+    return static_cast<Statement*>(LocalReferenceVariableDefinition::referTo(identifier, type, address, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
@@ -466,6 +491,15 @@ antlrcpp::Any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)
 {
     ance::Type* element_type = visit(ctx->type());
     ance::Type* type         = ance::PointerType::get(application_, element_type);
+
+    return type;
+}
+
+antlrcpp::Any SourceVisitor::visitReference(anceParser::ReferenceContext* ctx)
+{
+    ance::Type* element_type = visit(ctx->type());
+    ance::Type* type         = ance::ReferenceType::get(application_, element_type);
+
     return type;
 }
 

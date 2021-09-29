@@ -29,6 +29,7 @@ accessModifier
 statement
 	: expressionStatement
 	| localVariableDefinition
+	| localReferenceDefinition
 	| assignment
 	| deleteStatement
 	| returnStatement
@@ -41,6 +42,11 @@ expressionStatement
 localVariableDefinition
 	: type IDENTIFIER ( assigner expression )? ';'
 	;
+
+localReferenceDefinition
+    : 'let' IDENTIFIER ':' type 'ref' expression ';' # LocalReferenceToValueDefinition
+    | 'let' IDENTIFIER ':' type 'ref' 'to' expression ';' # LocalReferenceToPointerDefinition
+    ;
 
 assignment
 	: assignable assigner expression ';'
@@ -194,6 +200,7 @@ type
 	| arrayType # Array
 	| keywordType # Keyword
 	| '*' type # Pointer
+	| '&' type # Reference
 	;
 
 integerType

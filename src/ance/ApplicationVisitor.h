@@ -37,6 +37,7 @@ class AssignmentStatement;
 class DeleteStatement;
 class ExpressionStatement;
 class LocalVariableDefinition;
+class LocalReferenceVariableDefinition;
 class ReturnStatement;
 
 namespace ance
@@ -105,6 +106,7 @@ namespace ance
         virtual bool visitDeleteStatement(DeleteStatement& delete_statement);
         virtual bool visitExpressionStatement(ExpressionStatement& expression_statement);
         virtual bool visitLocalVariableDefinition(LocalVariableDefinition& local_variable_definition);
+        virtual bool visitLocalReferenceVariableDefinition(LocalReferenceVariableDefinition& reference_definition);
         virtual bool visitReturnStatement(ReturnStatement& return_statement);
     };
 }

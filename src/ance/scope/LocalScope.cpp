@@ -4,6 +4,7 @@
 #include "ance/construct/LocalVariable.h"
 #include "ance/construct/constant/Constant.h"
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/ReferenceType.h"
 
 ance::LocalScope::LocalScope(ance::Scope* parent) : parent_(parent) {}
 
@@ -80,8 +81,11 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& id
                                                            unsigned           parameter_no,
                                                            ance::Location     location)
 {
+    assert((assigner == Assigner::REFERENCE_BINDING) == (ance::ReferenceType::isReferenceType(type)));
+
     if (local_variables_.find(identifier) == local_variables_.end())
     {
+
         bool is_final = assigner.isFinal();
 
         auto* variable = new LocalVariable(this, identifier, type, value, is_final, parameter_no, location);

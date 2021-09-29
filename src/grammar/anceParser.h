@@ -43,76 +43,81 @@ class anceParser : public antlr4::Parser
         T__30               = 31,
         T__31               = 32,
         T__32               = 33,
-        NATIVE_INTEGER_TYPE = 34,
-        SIGNED_INTEGER      = 35,
-        HEX_INTEGER         = 36,
-        BIN_INTEGER         = 37,
-        OCT_INTEGER         = 38,
-        HALF                = 39,
-        SINGLE              = 40,
-        DOUBLE              = 41,
-        QUAD                = 42,
-        DECIMAL             = 43,
-        STRING              = 44,
-        BYTE                = 45,
-        INTEGER             = 46,
-        BUFFER              = 47,
-        CONST               = 48,
-        IDENTIFIER          = 49,
-        SEMICOLON           = 50,
-        WHITESPACE          = 51,
-        BLOCK_COMMENT       = 52,
-        LINE_COMMENT        = 53
+        T__33               = 34,
+        T__34               = 35,
+        T__35               = 36,
+        T__36               = 37,
+        NATIVE_INTEGER_TYPE = 38,
+        SIGNED_INTEGER      = 39,
+        HEX_INTEGER         = 40,
+        BIN_INTEGER         = 41,
+        OCT_INTEGER         = 42,
+        HALF                = 43,
+        SINGLE              = 44,
+        DOUBLE              = 45,
+        QUAD                = 46,
+        DECIMAL             = 47,
+        STRING              = 48,
+        BYTE                = 49,
+        INTEGER             = 50,
+        BUFFER              = 51,
+        CONST               = 52,
+        IDENTIFIER          = 53,
+        SEMICOLON           = 54,
+        WHITESPACE          = 55,
+        BLOCK_COMMENT       = 56,
+        LINE_COMMENT        = 57
     };
 
     enum
     {
-        RuleFile                    = 0,
-        RuleVariableDeclaration     = 1,
-        RuleFunction                = 2,
-        RuleParameters              = 3,
-        RuleParameter               = 4,
-        RuleAccessModifier          = 5,
-        RuleStatement               = 6,
-        RuleExpressionStatement     = 7,
-        RuleLocalVariableDefinition = 8,
-        RuleAssignment              = 9,
-        RuleAssigner                = 10,
-        RuleDeleteStatement         = 11,
-        RuleReturnStatement         = 12,
-        RuleAssignable              = 13,
-        RuleVariableAssignable      = 14,
-        RuleIndexerSet              = 15,
-        RuleDiscard                 = 16,
-        RuleExpression              = 17,
-        RuleIndependentExpression   = 18,
-        RuleFunctionCall            = 19,
-        RuleArguments               = 20,
-        RuleVariableAccess          = 21,
-        RuleAllocation              = 22,
-        RuleAllocator               = 23,
-        RuleRoughCast               = 24,
-        RuleAddressof               = 25,
-        RuleSizeofType              = 26,
-        RuleSizeofExpression        = 27,
-        RuleLiteralExpression       = 28,
-        RuleStringLiteral           = 29,
-        RuleByteLiteral             = 30,
-        RuleIntegerLiteral          = 31,
-        RuleUnsignedInteger         = 32,
-        RuleSignedInteger           = 33,
-        RuleSpecialInteger          = 34,
-        RuleFloatingPointLiteral    = 35,
-        RuleBooleanLiteral          = 36,
-        RuleSizeLiteral             = 37,
-        RuleDiffLiteral             = 38,
-        RuleType                    = 39,
-        RuleIntegerType             = 40,
-        RuleArrayType               = 41,
-        RuleKeywordType             = 42,
-        RuleFloatingPointType       = 43,
-        RuleTargetDependentType     = 44,
-        RuleVoidType                = 45
+        RuleFile                     = 0,
+        RuleVariableDeclaration      = 1,
+        RuleFunction                 = 2,
+        RuleParameters               = 3,
+        RuleParameter                = 4,
+        RuleAccessModifier           = 5,
+        RuleStatement                = 6,
+        RuleExpressionStatement      = 7,
+        RuleLocalVariableDefinition  = 8,
+        RuleLocalReferenceDefinition = 9,
+        RuleAssignment               = 10,
+        RuleAssigner                 = 11,
+        RuleDeleteStatement          = 12,
+        RuleReturnStatement          = 13,
+        RuleAssignable               = 14,
+        RuleVariableAssignable       = 15,
+        RuleIndexerSet               = 16,
+        RuleDiscard                  = 17,
+        RuleExpression               = 18,
+        RuleIndependentExpression    = 19,
+        RuleFunctionCall             = 20,
+        RuleArguments                = 21,
+        RuleVariableAccess           = 22,
+        RuleAllocation               = 23,
+        RuleAllocator                = 24,
+        RuleRoughCast                = 25,
+        RuleAddressof                = 26,
+        RuleSizeofType               = 27,
+        RuleSizeofExpression         = 28,
+        RuleLiteralExpression        = 29,
+        RuleStringLiteral            = 30,
+        RuleByteLiteral              = 31,
+        RuleIntegerLiteral           = 32,
+        RuleUnsignedInteger          = 33,
+        RuleSignedInteger            = 34,
+        RuleSpecialInteger           = 35,
+        RuleFloatingPointLiteral     = 36,
+        RuleBooleanLiteral           = 37,
+        RuleSizeLiteral              = 38,
+        RuleDiffLiteral              = 39,
+        RuleType                     = 40,
+        RuleIntegerType              = 41,
+        RuleArrayType                = 42,
+        RuleKeywordType              = 43,
+        RuleFloatingPointType        = 44,
+        RuleTargetDependentType      = 45,
+        RuleVoidType                 = 46
     };
 
     anceParser(antlr4::TokenStream* input);
@@ -136,6 +141,7 @@ class anceParser : public antlr4::Parser
     class StatementContext;
     class ExpressionStatementContext;
     class LocalVariableDefinitionContext;
+    class LocalReferenceDefinitionContext;
     class AssignmentContext;
     class AssignerContext;
     class DeleteStatementContext;
@@ -310,12 +316,13 @@ class anceParser : public antlr4::Parser
     {
       public:
         StatementContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t                  getRuleIndex() const override;
-        ExpressionStatementContext*     expressionStatement();
-        LocalVariableDefinitionContext* localVariableDefinition();
-        AssignmentContext*              assignment();
-        DeleteStatementContext*         deleteStatement();
-        ReturnStatementContext*         returnStatement();
+        virtual size_t                   getRuleIndex() const override;
+        ExpressionStatementContext*      expressionStatement();
+        LocalVariableDefinitionContext*  localVariableDefinition();
+        LocalReferenceDefinitionContext* localReferenceDefinition();
+        AssignmentContext*               assignment();
+        DeleteStatementContext*          deleteStatement();
+        ReturnStatementContext*          returnStatement();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -350,6 +357,46 @@ class anceParser : public antlr4::Parser
     };
 
     LocalVariableDefinitionContext* localVariableDefinition();
+
+    class LocalReferenceDefinitionContext : public antlr4::ParserRuleContext
+    {
+      public:
+        LocalReferenceDefinitionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+        LocalReferenceDefinitionContext() = default;
+        void copyFrom(LocalReferenceDefinitionContext* context);
+        using antlr4::ParserRuleContext::copyFrom;
+
+        virtual size_t getRuleIndex() const override;
+    };
+
+    class LocalReferenceToValueDefinitionContext : public LocalReferenceDefinitionContext
+    {
+      public:
+        LocalReferenceToValueDefinitionContext(LocalReferenceDefinitionContext* ctx);
+
+        antlr4::tree::TerminalNode* IDENTIFIER();
+        TypeContext*                type();
+        ExpressionContext*          expression();
+        antlr4::tree::TerminalNode* SEMICOLON();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class LocalReferenceToPointerDefinitionContext : public LocalReferenceDefinitionContext
+    {
+      public:
+        LocalReferenceToPointerDefinitionContext(LocalReferenceDefinitionContext* ctx);
+
+        antlr4::tree::TerminalNode* IDENTIFIER();
+        TypeContext*                type();
+        ExpressionContext*          expression();
+        antlr4::tree::TerminalNode* SEMICOLON();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    LocalReferenceDefinitionContext* localReferenceDefinition();
 
     class AssignmentContext : public antlr4::ParserRuleContext
     {
@@ -943,6 +990,16 @@ class anceParser : public antlr4::Parser
         KeywordContext(TypeContext* ctx);
 
         KeywordTypeContext* keywordType();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class ReferenceContext : public TypeContext
+    {
+      public:
+        ReferenceContext(TypeContext* ctx);
+
+        TypeContext* type();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };

@@ -63,6 +63,8 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
                                              ConstantExpression* initializer,
                                              ance::Location      location)
 {
+    assert(assigner != Assigner::REFERENCE_BINDING);
+
     if (global_variables_.find(identifier) != global_variables_.end()
         || global_constants_.find(identifier) != global_constants_.end())
     {

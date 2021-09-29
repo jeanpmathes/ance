@@ -10,4 +10,5 @@ target_sources(ance PRIVATE
                Type.cpp
                VoidType.cpp
                PointerType.cpp
+               ReferenceType.cpp
                FloatingPointType.cpp)

@@ -20,7 +20,11 @@ class Assigner
         /**
          * A final copy assignment.
          */
-        FINAL_COPY_ASSIGNMENT
+        FINAL_COPY_ASSIGNMENT,
+        /**
+         * A reference binding assignment.
+         */
+        REFERENCE_BINDING
     };
 
     Assigner() = default;

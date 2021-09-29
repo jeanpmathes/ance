@@ -36,9 +36,9 @@ void Addressof::doBuild(CompileContext* context)
     value->buildNativeValue(context);
 
     llvm::Value* address        = value->getNativeValue();
-    llvm::Value* stored_address = ance::Values::contentToNative(return_type_, address, context);
+    llvm::Value* stored_address = ance::Values::contentToNative(type(), address, context);
 
-    setValue(new ance::WrappedNativeValue(return_type_, stored_address));
+    setValue(new ance::WrappedNativeValue(type(), stored_address));
 }
 
 bool Addressof::accept(ance::ApplicationVisitor& visitor)

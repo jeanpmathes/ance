@@ -21,6 +21,8 @@ LocalVariableDefinition::LocalVariableDefinition(std::string    identifier,
     , assigner_(assigner)
     , assigned_(assigned)
 {
+    assert(assigner != Assigner::REFERENCE_BINDING);
+
     addChild(*assigned);
 }
 

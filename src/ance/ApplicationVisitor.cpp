@@ -31,6 +31,7 @@
 #include "ance/statement/AssignmentStatement.h"
 #include "ance/statement/DeleteStatement.h"
 #include "ance/statement/ExpressionStatement.h"
+#include "ance/statement/LocalReferenceVariableDefinition.h"
 #include "ance/statement/LocalVariableDefinition.h"
 #include "ance/statement/ReturnStatement.h"
 
@@ -175,6 +176,12 @@ bool ance::ApplicationVisitor::visitExpressionStatement(ExpressionStatement& exp
 bool ance::ApplicationVisitor::visitLocalVariableDefinition(LocalVariableDefinition& local_variable_definition)
 {
     return visitChildren(local_variable_definition);
+}
+
+bool ance::ApplicationVisitor::visitLocalReferenceVariableDefinition(
+    LocalReferenceVariableDefinition& reference_definition)
+{
+    return visitChildren(reference_definition);
 }
 
 bool ance::ApplicationVisitor::visitReturnStatement(ReturnStatement& return_statement)

@@ -38,6 +38,12 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* context) = 0;
 
+    virtual antlrcpp::Any visitLocalReferenceToValueDefinition(
+        anceParser::LocalReferenceToValueDefinitionContext* context) = 0;
+
+    virtual antlrcpp::Any visitLocalReferenceToPointerDefinition(
+        anceParser::LocalReferenceToPointerDefinitionContext* context) = 0;
+
     virtual antlrcpp::Any visitAssignment(anceParser::AssignmentContext* context) = 0;
 
     virtual antlrcpp::Any visitCopyAssignment(anceParser::CopyAssignmentContext* context) = 0;
@@ -127,6 +133,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
     virtual antlrcpp::Any visitKeyword(anceParser::KeywordContext* context) = 0;
 
     virtual antlrcpp::Any visitPointer(anceParser::PointerContext* context) = 0;
+
+    virtual antlrcpp::Any visitReference(anceParser::ReferenceContext* context) = 0;
 
     virtual antlrcpp::Any visitIntegerType(anceParser::IntegerTypeContext* context) = 0;
 

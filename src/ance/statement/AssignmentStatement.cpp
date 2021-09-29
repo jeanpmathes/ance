@@ -16,6 +16,8 @@ AssignmentStatement::AssignmentStatement(Assignable*    assignable,
     , assigner_(assigner)
     , assigned_(assigned)
 {
+    assert(assigner != Assigner::REFERENCE_BINDING);
+
     addChild(*assigned);
     addChild(*assignable);
 
