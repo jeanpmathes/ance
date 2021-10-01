@@ -47,25 +47,12 @@ bool BindRef::validate(ValidationLogger& validation_logger)
     bool address_is_valid = address_->validate(validation_logger);
     if (!address_is_valid) return false;
 
-    if (!type()->validate(validation_logger, location())) return false;
-
     ance::Type* address_type = address_->type();
 
     if (!ance::PointerType::isPointerType(address_type))
     {
         validation_logger.logError("Value of type '" + address_type->getName()
                                        + "' cannot be used as pointer type for reference binding",
-                                   address_->location());
-        return false;
-    }
-
-    ance::Type* referenced_type = ance::ReferenceType::getReferencedType(type_);
-    ance::Type* pointee_type    = ance::PointerType::getPointeeType(address_type);
-
-    if (referenced_type != pointee_type)
-    {
-        validation_logger.logError("Cannot bind '" + referenced_type->getName() + "' reference to value of type '"
-                                       + pointee_type->getName() + "'",
                                    address_->location());
         return false;
     }
