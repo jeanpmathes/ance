@@ -66,6 +66,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitCast(anceParser::CastContext* context) = 0;
 
+    virtual antlrcpp::Any visitRef(anceParser::RefContext* context) = 0;
+
     virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* context) = 0;
 
     virtual antlrcpp::Any visitVariable(anceParser::VariableContext* context) = 0;
@@ -97,6 +99,10 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
     virtual antlrcpp::Any visitRoughCast(anceParser::RoughCastContext* context) = 0;
 
     virtual antlrcpp::Any visitAddressof(anceParser::AddressofContext* context) = 0;
+
+    virtual antlrcpp::Any visitBindReference(anceParser::BindReferenceContext* context) = 0;
+
+    virtual antlrcpp::Any visitBindReferenceToAddress(anceParser::BindReferenceToAddressContext* context) = 0;
 
     virtual antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext* context) = 0;
 

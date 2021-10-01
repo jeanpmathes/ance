@@ -23,6 +23,7 @@ class FunctionCall;
 class IndexerGet;
 class RoughCast;
 class Addressof;
+class BindRef;
 class SizeofExpression;
 class SizeofType;
 class VariableAccess;
@@ -95,6 +96,7 @@ namespace ance
         virtual bool visitIndexerGet(IndexerGet& indexer_get);
         virtual bool visitRoughCast(RoughCast& rough_cast);
         virtual bool visitAddressof(Addressof& addressof);
+        virtual bool visitBindRef(BindRef& bind_ref);
         virtual bool visitSizeofExpression(SizeofExpression& sizeof_expression);
         virtual bool visitSizeofType(SizeofType& sizeof_type);
         virtual bool visitVariableAccess(VariableAccess& variable_access);

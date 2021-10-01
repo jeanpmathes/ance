@@ -98,26 +98,27 @@ class anceParser : public antlr4::Parser
         RuleAllocator                = 24,
         RuleRoughCast                = 25,
         RuleAddressof                = 26,
-        RuleSizeofType               = 27,
-        RuleSizeofExpression         = 28,
-        RuleLiteralExpression        = 29,
-        RuleStringLiteral            = 30,
-        RuleByteLiteral              = 31,
-        RuleIntegerLiteral           = 32,
-        RuleUnsignedInteger          = 33,
-        RuleSignedInteger            = 34,
-        RuleSpecialInteger           = 35,
-        RuleFloatingPointLiteral     = 36,
-        RuleBooleanLiteral           = 37,
-        RuleSizeLiteral              = 38,
-        RuleDiffLiteral              = 39,
-        RuleType                     = 40,
-        RuleIntegerType              = 41,
-        RuleArrayType                = 42,
-        RuleKeywordType              = 43,
-        RuleFloatingPointType        = 44,
-        RuleTargetDependentType      = 45,
-        RuleVoidType                 = 46
+        RuleBindRef                  = 27,
+        RuleSizeofType               = 28,
+        RuleSizeofExpression         = 29,
+        RuleLiteralExpression        = 30,
+        RuleStringLiteral            = 31,
+        RuleByteLiteral              = 32,
+        RuleIntegerLiteral           = 33,
+        RuleUnsignedInteger          = 34,
+        RuleSignedInteger            = 35,
+        RuleSpecialInteger           = 36,
+        RuleFloatingPointLiteral     = 37,
+        RuleBooleanLiteral           = 38,
+        RuleSizeLiteral              = 39,
+        RuleDiffLiteral              = 40,
+        RuleType                     = 41,
+        RuleIntegerType              = 42,
+        RuleArrayType                = 43,
+        RuleKeywordType              = 44,
+        RuleFloatingPointType        = 45,
+        RuleTargetDependentType      = 46,
+        RuleVoidType                 = 47
     };
 
     anceParser(antlr4::TokenStream* input);
@@ -159,6 +160,7 @@ class anceParser : public antlr4::Parser
     class AllocatorContext;
     class RoughCastContext;
     class AddressofContext;
+    class BindRefContext;
     class SizeofTypeContext;
     class SizeofExpressionContext;
     class LiteralExpressionContext;
@@ -554,6 +556,16 @@ class anceParser : public antlr4::Parser
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class RefContext : public ExpressionContext
+    {
+      public:
+        RefContext(ExpressionContext* ctx);
+
+        BindRefContext* bindRef();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     class IndependentContext : public ExpressionContext
     {
       public:
@@ -748,6 +760,40 @@ class anceParser : public antlr4::Parser
     };
 
     AddressofContext* addressof();
+
+    class BindRefContext : public antlr4::ParserRuleContext
+    {
+      public:
+        BindRefContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+        BindRefContext() = default;
+        void copyFrom(BindRefContext* context);
+        using antlr4::ParserRuleContext::copyFrom;
+
+        virtual size_t getRuleIndex() const override;
+    };
+
+    class BindReferenceToAddressContext : public BindRefContext
+    {
+      public:
+        BindReferenceToAddressContext(BindRefContext* ctx);
+
+        ExpressionContext* expression();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class BindReferenceContext : public BindRefContext
+    {
+      public:
+        BindReferenceContext(BindRefContext* ctx);
+
+        ExpressionContext* expression();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    BindRefContext* bindRef();
 
     class SizeofTypeContext : public antlr4::ParserRuleContext
     {

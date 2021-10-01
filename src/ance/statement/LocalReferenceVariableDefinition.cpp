@@ -12,20 +12,20 @@
 #include "ance/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
-LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::refer(std::string    identifier,
-                                                                          ance::Type*    type,
-                                                                          Expression*    value,
-                                                                          Application&   app,
-                                                                          ance::Location location)
+LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferring(std::string    identifier,
+                                                                                    ance::Type*    type,
+                                                                                    Expression*    value,
+                                                                                    Application&   app,
+                                                                                    ance::Location location)
 {
     auto* addressof = new Addressof(value, app, location);
     return new LocalReferenceVariableDefinition(std::move(identifier), type, addressof, location);
 }
 
-LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::referTo(std::string    identifier,
-                                                                            ance::Type*    type,
-                                                                            Expression*    address,
-                                                                            ance::Location location)
+LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferringTo(std::string    identifier,
+                                                                                      ance::Type*    type,
+                                                                                      Expression*    address,
+                                                                                      ance::Location location)
 {
     return new LocalReferenceVariableDefinition(std::move(identifier), type, address, location);
 }

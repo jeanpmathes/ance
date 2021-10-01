@@ -89,6 +89,7 @@ expression
 	| allocation # Alloc
 	| roughCast # Cast
 	| addressof # AdressOf
+	| bindRef # Ref
 	| sizeofType # SizeOf
 	| sizeofExpression # SizeOf
 	| literalExpression # Literal
@@ -128,6 +129,12 @@ roughCast
 addressof
     : 'addressof' expression
     ;
+
+bindRef
+    : 'ref' expression # BindReference
+    | 'ref' 'to' expression # BindReferenceToAddress
+    ;
+
 
 sizeofType
 	: 'sizeof' type

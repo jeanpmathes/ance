@@ -21,24 +21,24 @@ class LocalReferenceVariableDefinition : public Statement
 {
   public:
     /**
-     * Declare a local variable referring to another value.
+     * Define a local variable referring to another value.
      * @param value The value to refer.
      * @return The created statement.
      */
-    static LocalReferenceVariableDefinition* refer(std::string    identifier,
-                                                   ance::Type*    type,
-                                                   Expression*    value,
-                                                   Application&   app,
-                                                   ance::Location location);
+    static LocalReferenceVariableDefinition* defineReferring(std::string    identifier,
+                                                             ance::Type*    type,
+                                                             Expression*    value,
+                                                             Application&   app,
+                                                             ance::Location location);
     /**
-     * Declare a local variable referring to a given address.
+     * Define a local variable referring to a given address.
      * @param address The address to refer to.
      * @return The created statement.
      */
-    static LocalReferenceVariableDefinition* referTo(std::string    identifier,
-                                                     ance::Type*    type,
-                                                     Expression*    address,
-                                                     ance::Location location);
+    static LocalReferenceVariableDefinition* defineReferringTo(std::string    identifier,
+                                                               ance::Type*    type,
+                                                               Expression*    address,
+                                                               ance::Location location);
 
   private:
     LocalReferenceVariableDefinition(std::string    identifier,

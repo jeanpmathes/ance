@@ -35,6 +35,7 @@
 #include "ance/expression/Addressof.h"
 #include "ance/expression/Allocation.h"
 #include "ance/expression/BackingExpression.h"
+#include "ance/expression/BindRef.h"
 #include "ance/expression/ConstantLiteral.h"
 #include "ance/expression/DefaultValue.h"
 #include "ance/expression/FunctionCall.h"
@@ -185,7 +186,7 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
     Expression* value = visit(ctx->expression());
 
     return static_cast<Statement*>(
-        LocalReferenceVariableDefinition::refer(identifier, type, value, application_, location(ctx)));
+        LocalReferenceVariableDefinition::defineReferring(identifier, type, value, application_, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
@@ -196,7 +197,8 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
 
     Expression* address = visit(ctx->expression());
 
-    return static_cast<Statement*>(LocalReferenceVariableDefinition::referTo(identifier, type, address, location(ctx)));
+    return static_cast<Statement*>(
+        LocalReferenceVariableDefinition::defineReferringTo(identifier, type, address, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
@@ -298,6 +300,20 @@ antlrcpp::Any SourceVisitor::visitAddressof(anceParser::AddressofContext* ctx)
     Expression* arg = visit(ctx->expression());
 
     return static_cast<Expression*>(new Addressof(arg, application_, location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitBindReference(anceParser::BindReferenceContext* ctx)
+{
+    Expression* value = visit(ctx->expression());
+
+    return static_cast<Expression*>(BindRef::refer(value, application_, location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitBindReferenceToAddress(anceParser::BindReferenceToAddressContext* ctx)
+{
+    Expression* address = visit(ctx->expression());
+
+    return static_cast<Expression*>(BindRef::referTo(address, application_, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)

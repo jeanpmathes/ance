@@ -13,4 +13,5 @@ target_sources(ance PRIVATE DefaultValue.cpp
                DelayableExpression.cpp
                IndexerGet.cpp
                BuildableExpression.cpp
-               Addressof.cpp)
+               Addressof.cpp
+               BindRef.cpp)

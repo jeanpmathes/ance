@@ -16,6 +16,7 @@
 
 #include "ance/expression/Addressof.h"
 #include "ance/expression/Allocation.h"
+#include "ance/expression/BindRef.h"
 #include "ance/expression/ConstantLiteral.h"
 #include "ance/expression/DefaultValue.h"
 #include "ance/expression/FunctionCall.h"
@@ -131,6 +132,11 @@ bool ance::ApplicationVisitor::visitRoughCast(RoughCast& rough_cast)
 bool ance::ApplicationVisitor::visitAddressof(Addressof& addressof)
 {
     return visitChildren(addressof);
+}
+
+bool ance::ApplicationVisitor::visitBindRef(BindRef& bind_ref)
+{
+    return visitChildren(bind_ref);
 }
 
 bool ance::ApplicationVisitor::visitSizeofExpression(SizeofExpression& sizeof_expression)
