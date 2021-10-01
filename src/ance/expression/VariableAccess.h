@@ -28,8 +28,8 @@ class VariableAccess : public DelayableExpression
   public:
     ance::Type* type() override;
 
-    bool validate(ValidationLogger& validation_logger) override;
-
+    [[nodiscard]] bool isNamed() override;
+    bool               validate(ValidationLogger& validation_logger) override;
     bool accept(ance::ApplicationVisitor& visitor) override;
 
   protected:

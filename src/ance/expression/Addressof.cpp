@@ -5,6 +5,7 @@
 #include "ance/type/PointerType.h"
 #include "ance/type/ReferenceType.h"
 #include "ance/utility/Values.h"
+#include "validation/ValidationLogger.h"
 
 Addressof::Addressof(Expression* arg, Application& app, ance::Location location)
     : Expression(location)
@@ -38,7 +39,16 @@ ance::Type* Addressof::type()
 
 bool Addressof::validate(ValidationLogger& validation_logger)
 {
-    return arg_->validate(validation_logger);
+    bool is_arg_valid = arg_->validate(validation_logger);
+    if (!is_arg_valid) return false;
+
+    if (!arg_->isNamed())
+    {
+        validation_logger.logError("Cannot get address of unnamed value", arg_->location());
+        return false;
+    }
+
+    return true;
 }
 
 void Addressof::doBuild(CompileContext* context)

@@ -38,6 +38,11 @@ class Expression : public ance::Element
     virtual void setContainingScope(ance::Scope* scope);
 
     /**
+     * Get whether this expression is a named value source.
+     */
+    [[nodiscard]] virtual bool isNamed();
+
+    /**
      * Validate this expression.
      * @param validation_logger A logger to log validation messages.
      * @return Whether this expression is valid and dependent entities can be validated too.

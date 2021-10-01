@@ -22,6 +22,11 @@ ance::Type* VariableAccess::type()
     return variable_->type();
 }
 
+bool VariableAccess::isNamed()
+{
+    return true;
+}
+
 bool VariableAccess::validate(ValidationLogger& validation_logger)
 {
     return variable_->validateGetValue(validation_logger, location());
