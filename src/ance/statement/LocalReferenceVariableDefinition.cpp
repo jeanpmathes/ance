@@ -7,6 +7,7 @@
 #include "ance/construct/LocalVariable.h"
 #include "ance/construct/value/RoughlyCastedValue.h"
 #include "ance/expression/Addressof.h"
+#include "ance/expression/BindRef.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/ReferenceType.h"
@@ -18,47 +19,49 @@ LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferr
                                                                                     Application&   app,
                                                                                     ance::Location location)
 {
-    auto* addressof = new Addressof(value, app, location);
-    return new LocalReferenceVariableDefinition(std::move(identifier), type, addressof, location);
+    Expression* reference = BindRef::refer(value, app, location);
+    return new LocalReferenceVariableDefinition(std::move(identifier), type, reference, location);
 }
 
 LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferringTo(std::string    identifier,
                                                                                       ance::Type*    type,
                                                                                       Expression*    address,
+                                                                                      Application&   app,
                                                                                       ance::Location location)
 {
-    return new LocalReferenceVariableDefinition(std::move(identifier), type, address, location);
+    Expression* reference = BindRef::referTo(address, app, location);
+    return new LocalReferenceVariableDefinition(std::move(identifier), type, reference, location);
 }
 
 LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string    identifier,
                                                                    ance::Type*    type,
-                                                                   Expression*    address,
+                                                                   Expression*    reference,
                                                                    ance::Location location)
     : Statement(location)
     , identifier_(std::move(identifier))
     , type_(type)
-    , address_(address)
+    , reference_(reference)
 {
-    addChild(*address);
+    addChild(*reference);
 }
 
 void LocalReferenceVariableDefinition::setFunction(ance::DefinedFunction* function)
 {
     variable_ =
         function->getFunctionScope()->defineAutoVariable(identifier_,
-                                                         type_,
-                                                         Assigner::REFERENCE_BINDING,
-                                                         new ance::RoughlyCastedValue(type_, address_->getValue()),
-                                                         location());
+                                                                 type_,
+                                                                 Assigner::REFERENCE_BINDING,
+                                                                 reference_->getValue(),
+                                                                 location());
 
-    address_->setContainingScope(function);
+    reference_->setContainingScope(function);
 }
 void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger)
 {
     if (variable_)
     {
-        bool address_is_valid = address_->validate(validation_logger);
-        if (!address_is_valid) return;
+        bool reference_is_valid = reference_->validate(validation_logger);
+        if (!reference_is_valid) return;
 
         if (!ance::ReferenceType::isReferenceType(type_))
         {
@@ -70,24 +73,17 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
 
         if (!type_->validate(validation_logger, location())) return;
 
-        ance::Type* address_type = address_->type();
+        ance::Type* reference_type = reference_->type();
 
-        if (!ance::PointerType::isPointerType(address_type))
+        ance::Type* declared_referenced_type = ance::ReferenceType::getReferencedType(type_);
+        ance::Type* provided_referenced_type = ance::ReferenceType::getReferencedType(reference_type);
+
+        if (declared_referenced_type != provided_referenced_type)
         {
-            validation_logger.logError("Value of type '" + address_type->getName()
-                                           + "' cannot be used as pointer type for reference binding",
-                                       address_->location());
-            return;
-        }
-
-        ance::Type* referenced_type = ance::ReferenceType::getReferencedType(type_);
-        ance::Type* pointee_type    = ance::PointerType::getPointeeType(address_type);
-
-        if (referenced_type != pointee_type)
-        {
-            validation_logger.logError("Cannot bind '" + referenced_type->getName() + "' reference to value of type '"
-                                           + pointee_type->getName() + "'",
-                                       address_->location());
+            validation_logger.logError("Cannot bind '" + declared_referenced_type->getName()
+                                           + "' reference to value of type '" + provided_referenced_type->getName()
+                                           + "'",
+                                       reference_->location());
             return;
         }
     }

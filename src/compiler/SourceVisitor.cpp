@@ -198,7 +198,7 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
     Expression* address = visit(ctx->expression());
 
     return static_cast<Statement*>(
-        LocalReferenceVariableDefinition::defineReferringTo(identifier, type, address, location(ctx)));
+        LocalReferenceVariableDefinition::defineReferringTo(identifier, type, address, application_, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)

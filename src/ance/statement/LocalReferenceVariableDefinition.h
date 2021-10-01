@@ -38,12 +38,13 @@ class LocalReferenceVariableDefinition : public Statement
     static LocalReferenceVariableDefinition* defineReferringTo(std::string    identifier,
                                                                ance::Type*    type,
                                                                Expression*    address,
+                                                               Application&   app,
                                                                ance::Location location);
 
   private:
     LocalReferenceVariableDefinition(std::string    identifier,
                                      ance::Type*    type,
-                                     Expression*    address,
+                                     Expression*    reference,
                                      ance::Location location);
 
   public:
@@ -59,7 +60,7 @@ class LocalReferenceVariableDefinition : public Statement
   private:
     std::string identifier_;
     ance::Type* type_;
-    Expression* address_;
+    Expression* reference_;
 
     ance::LocalVariable* variable_ {nullptr};
 };
