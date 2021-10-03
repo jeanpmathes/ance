@@ -29,7 +29,6 @@
 
 #include "ance/assignable/Assignable.h"
 #include "ance/assignable/Discard.h"
-#include "ance/assignable/IndexerSet.h"
 #include "ance/assignable/VariableAssignable.h"
 
 #include "ance/expression/Addressof.h"
@@ -234,14 +233,6 @@ antlrcpp::Any SourceVisitor::visitVariableAssignable(anceParser::VariableAssigna
     std::string identifier = ctx->IDENTIFIER()->getText();
 
     return static_cast<Assignable*>(new VariableAssignable(identifier, location(ctx)));
-}
-
-antlrcpp::Any SourceVisitor::visitIndexerSet(anceParser::IndexerSetContext* ctx)
-{
-    Expression* indexed = visit(ctx->indexed);
-    Expression* index   = visit(ctx->index);
-
-    return static_cast<Assignable*>(new IndexerSet(indexed, index, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitDiscard(anceParser::DiscardContext* ctx)

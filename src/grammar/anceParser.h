@@ -87,38 +87,37 @@ class anceParser : public antlr4::Parser
         RuleReturnStatement          = 13,
         RuleAssignable               = 14,
         RuleVariableAssignable       = 15,
-        RuleIndexerSet               = 16,
-        RuleDiscard                  = 17,
-        RuleExpression               = 18,
-        RuleIndependentExpression    = 19,
-        RuleFunctionCall             = 20,
-        RuleArguments                = 21,
-        RuleVariableAccess           = 22,
-        RuleAllocation               = 23,
-        RuleAllocator                = 24,
-        RuleRoughCast                = 25,
-        RuleAddressof                = 26,
-        RuleBindRef                  = 27,
-        RuleSizeofType               = 28,
-        RuleSizeofExpression         = 29,
-        RuleLiteralExpression        = 30,
-        RuleStringLiteral            = 31,
-        RuleByteLiteral              = 32,
-        RuleIntegerLiteral           = 33,
-        RuleUnsignedInteger          = 34,
-        RuleSignedInteger            = 35,
-        RuleSpecialInteger           = 36,
-        RuleFloatingPointLiteral     = 37,
-        RuleBooleanLiteral           = 38,
-        RuleSizeLiteral              = 39,
-        RuleDiffLiteral              = 40,
-        RuleType                     = 41,
-        RuleIntegerType              = 42,
-        RuleArrayType                = 43,
-        RuleKeywordType              = 44,
-        RuleFloatingPointType        = 45,
-        RuleTargetDependentType      = 46,
-        RuleVoidType                 = 47
+        RuleDiscard                  = 16,
+        RuleExpression               = 17,
+        RuleIndependentExpression    = 18,
+        RuleFunctionCall             = 19,
+        RuleArguments                = 20,
+        RuleVariableAccess           = 21,
+        RuleAllocation               = 22,
+        RuleAllocator                = 23,
+        RuleRoughCast                = 24,
+        RuleAddressof                = 25,
+        RuleBindRef                  = 26,
+        RuleSizeofType               = 27,
+        RuleSizeofExpression         = 28,
+        RuleLiteralExpression        = 29,
+        RuleStringLiteral            = 30,
+        RuleByteLiteral              = 31,
+        RuleIntegerLiteral           = 32,
+        RuleUnsignedInteger          = 33,
+        RuleSignedInteger            = 34,
+        RuleSpecialInteger           = 35,
+        RuleFloatingPointLiteral     = 36,
+        RuleBooleanLiteral           = 37,
+        RuleSizeLiteral              = 38,
+        RuleDiffLiteral              = 39,
+        RuleType                     = 40,
+        RuleIntegerType              = 41,
+        RuleArrayType                = 42,
+        RuleKeywordType              = 43,
+        RuleFloatingPointType        = 44,
+        RuleTargetDependentType      = 45,
+        RuleVoidType                 = 46
     };
 
     anceParser(antlr4::TokenStream* input);
@@ -149,7 +148,6 @@ class anceParser : public antlr4::Parser
     class ReturnStatementContext;
     class AssignableContext;
     class VariableAssignableContext;
-    class IndexerSetContext;
     class DiscardContext;
     class ExpressionContext;
     class IndependentExpressionContext;
@@ -486,7 +484,6 @@ class anceParser : public antlr4::Parser
         AssignableContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t             getRuleIndex() const override;
         VariableAssignableContext* variableAssignable();
-        IndexerSetContext*         indexerSet();
         DiscardContext*            discard();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
@@ -505,23 +502,6 @@ class anceParser : public antlr4::Parser
     };
 
     VariableAssignableContext* variableAssignable();
-
-    class IndexerSetContext : public antlr4::ParserRuleContext
-    {
-      public:
-        anceParser::ExpressionContext* indexed = nullptr;
-        ;
-        anceParser::ExpressionContext* index = nullptr;
-        ;
-        IndexerSetContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t                  getRuleIndex() const override;
-        std::vector<ExpressionContext*> expression();
-        ExpressionContext*              expression(size_t i);
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    IndexerSetContext* indexerSet();
 
     class DiscardContext : public antlr4::ParserRuleContext
     {

@@ -47,7 +47,7 @@ bool ance::PointerType::validate(ValidationLogger& validation_logger, ance::Loca
     return true;
 }
 
-bool ance::PointerType::isIndexerDefined(Indexer)
+bool ance::PointerType::isIndexerDefined()
 {
     return true;
 }
@@ -77,36 +77,6 @@ ance::Value* ance::PointerType::buildGetIndexer(ance::Value* indexed, ance::Valu
 
     llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, context);
     return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
-}
-
-void ance::PointerType::validateSetIndexer(ance::Value* indexed,
-                                           ance::Location,
-                                           ance::Value*      index,
-                                           ance::Location    index_location,
-                                           ance::Value*      value,
-                                           ance::Location    value_location,
-                                           ValidationLogger& validation_logger)
-{
-    assert(indexed->type() == this && "Method call on wrong type.");
-
-    checkMismatch(ance::SizeType::getSize(), index->type(), index_location, validation_logger);
-    checkMismatch(element_type_, value->type(), value_location, validation_logger);
-}
-
-void ance::PointerType::buildSetIndexer(ance::Value*    indexed,
-                                        ance::Value*    index,
-                                        ance::Value*    value,
-                                        CompileContext* context)
-{
-    index = ance::Type::makeMatching(ance::SizeType::getSize(), index, context);
-    value = ance::Type::makeMatching(element_type_, value, context);
-
-    value->buildContentValue(context);
-
-    llvm::Value* element_ptr         = buildGetElementPointer(indexed, index, context);
-    llvm::Value* new_element_content = value->getContentValue();
-
-    context->ir()->CreateStore(new_element_content, element_ptr);
 }
 
 llvm::Value* ance::PointerType::buildGetElementPointer(ance::Value*    indexed,

@@ -26,7 +26,7 @@ llvm::TypeSize ance::Type::getContentSize(llvm::Module* m)
     return m->getDataLayout().getTypeAllocSize(getContentType(m->getContext()));
 }
 
-bool ance::Type::isIndexerDefined(Indexer)
+bool ance::Type::isIndexerDefined()
 {
     return false;
 }
@@ -45,21 +45,11 @@ bool ance::Type::validateGetIndexer(ance::Value*, ance::Location, ance::Value*, 
 {
     return false;
 }
-void ance::Type::validateSetIndexer(ance::Value*,
-                                    ance::Location,
-                                    ance::Value*,
-                                    ance::Location,
-                                    ance::Value*,
-                                    ance::Location,
-                                    ValidationLogger&)
-{}
 
 ance::Value* ance::Type::buildGetIndexer(ance::Value*, ance::Value*, CompileContext*)
 {
     return nullptr;
 }
-
-void ance::Type::buildSetIndexer(ance::Value*, ance::Value*, ance::Value*, CompileContext*) {}
 
 bool ance::Type::checkMismatch(ance::Type*       expected,
                                ance::Type*       actual,

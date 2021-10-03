@@ -5,7 +5,6 @@
 #include "compiler/Application.h"
 
 #include "ance/assignable/Discard.h"
-#include "ance/assignable/IndexerSet.h"
 #include "ance/assignable/VariableAssignable.h"
 
 #include "ance/construct/DefinedFunction.h"
@@ -67,11 +66,6 @@ bool ance::ApplicationVisitor::visitApplication(Application& application)
 bool ance::ApplicationVisitor::visitDiscard(Discard& discard)
 {
     return visitChildren(discard);
-}
-
-bool ance::ApplicationVisitor::visitIndexerSet(IndexerSet& indexer_set)
-{
-    return visitChildren(indexer_set);
 }
 
 bool ance::ApplicationVisitor::visitVariableAssignable(VariableAssignable& variable_assignable)

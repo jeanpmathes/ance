@@ -24,7 +24,7 @@ namespace ance
 
         bool validate(ValidationLogger& validation_logger, ance::Location location) override;
 
-        bool isIndexerDefined(Indexer indexer) override;
+        bool isIndexerDefined() override;
 
         ance::Type* getIndexerReturnType() override;
 
@@ -34,18 +34,6 @@ namespace ance
                                         ance::Location    index_location,
                                         ValidationLogger& validation_logger) override;
         ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
-
-        void validateSetIndexer(ance::Value*      indexed,
-                                ance::Location    indexed_location,
-                                ance::Value*      index,
-                                ance::Location    index_location,
-                                ance::Value*      value,
-                                ance::Location    value_location,
-                                ValidationLogger& validation_logger) override;
-        void buildSetIndexer(ance::Value*    indexed,
-                             ance::Value*    index,
-                             ance::Value*    value,
-                             CompileContext* context) override;
 
       private:
         static llvm::Value* buildGetElementPointer(ance::Value* indexed, ance::Value* index, CompileContext* context);

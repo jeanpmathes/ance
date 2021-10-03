@@ -1,8 +1,5 @@
 #include "ReferenceType.h"
 
-#include <llvm/IR/DerivedTypes.h>
-#include <llvm/IR/IRBuilder.h>
-
 #include "ance/construct/value/Value.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
@@ -46,9 +43,9 @@ bool ance::ReferenceType::validate(ValidationLogger& validation_logger, ance::Lo
     return true;
 }
 
-bool ance::ReferenceType::isIndexerDefined(Indexer indexer)
+bool ance::ReferenceType::isIndexerDefined()
 {
-    return element_type_->isIndexerDefined(indexer);
+    return element_type_->isIndexerDefined();
 }
 
 ance::Type* ance::ReferenceType::getIndexerReturnType()
@@ -68,31 +65,6 @@ bool ance::ReferenceType::validateGetIndexer(ance::Value*      indexed,
 ance::Value* ance::ReferenceType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
 {
     return element_type_->buildGetIndexer(indexed, index, context);
-}
-
-void ance::ReferenceType::validateSetIndexer(ance::Value*      indexed,
-                                             ance::Location    indexed_location,
-                                             ance::Value*      index,
-                                             ance::Location    index_location,
-                                             ance::Value*      value,
-                                             ance::Location    value_location,
-                                             ValidationLogger& validation_logger)
-{
-    element_type_->validateSetIndexer(indexed,
-                                      indexed_location,
-                                      index,
-                                      index_location,
-                                      value,
-                                      value_location,
-                                      validation_logger);
-}
-
-void ance::ReferenceType::buildSetIndexer(ance::Value*    indexed,
-                                          ance::Value*    index,
-                                          ance::Value*    value,
-                                          CompileContext* context)
-{
-    element_type_->buildSetIndexer(indexed, index, value, context);
 }
 
 llvm::DIType* ance::ReferenceType::createDebugType(CompileContext* context)

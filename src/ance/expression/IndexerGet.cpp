@@ -31,7 +31,7 @@ bool IndexerGet::validate(ValidationLogger& validation_logger)
 
     ance::Type* indexed_type = indexed_->type();
 
-    if (indexed_type->isIndexerDefined(Indexer::GET))
+    if (indexed_type->isIndexerDefined())
     {
         return indexed_type->validateGetIndexer(indexed_->getValue(),
                                                 indexed_->location(),

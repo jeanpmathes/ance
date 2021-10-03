@@ -3,7 +3,6 @@
 #include "ance/construct/value/Value.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
-#include "ance/scope/Scope.h"
 #include "ance/type/ReferenceType.h"
 #include "ance/type/SizeType.h"
 #include "ance/utility/Values.h"
@@ -42,7 +41,7 @@ bool ance::ArrayType::validate(ValidationLogger& validation_logger, ance::Locati
     return true;
 }
 
-bool ance::ArrayType::isIndexerDefined(Indexer)
+bool ance::ArrayType::isIndexerDefined()
 {
     return true;
 }
@@ -75,36 +74,6 @@ ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value*
     llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, context);
 
     return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
-}
-
-void ance::ArrayType::validateSetIndexer(ance::Value* indexed,
-                                         ance::Location,
-                                         ance::Value*      index,
-                                         ance::Location    index_location,
-                                         ance::Value*      value,
-                                         ance::Location    value_location,
-                                         ValidationLogger& validation_logger)
-{
-    assert(indexed->type() == this && "Method call on wrong type.");
-
-    checkMismatch(ance::SizeType::getSize(), index->type(), index_location, validation_logger);
-    checkMismatch(element_type_, value->type(), value_location, validation_logger);
-}
-
-void ance::ArrayType::buildSetIndexer(ance::Value*    indexed,
-                                      ance::Value*    index,
-                                      ance::Value*    value,
-                                      CompileContext* context)
-{
-    index = ance::Type::makeMatching(ance::SizeType::getSize(), index, context);
-    value = ance::Type::makeMatching(element_type_, value, context);
-
-    value->buildContentValue(context);
-
-    llvm::Value* element_ptr         = buildGetElementPointer(indexed, index, context);
-    llvm::Value* new_element_content = value->getContentValue();
-
-    context->ir()->CreateStore(new_element_content, element_ptr);
 }
 
 llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value*    indexed,

@@ -4,7 +4,6 @@
 class Application;
 
 class Discard;
-class IndexerSet;
 class VariableAssignable;
 
 namespace ance
@@ -80,7 +79,6 @@ namespace ance
         virtual bool visitApplication(Application& application);
 
         virtual bool visitDiscard(Discard& discard);
-        virtual bool visitIndexerSet(IndexerSet& indexer_set);
         virtual bool visitVariableAssignable(VariableAssignable& variable_assignable);
 
         virtual bool visitDefinedFunction(ance::DefinedFunction& defined_function);

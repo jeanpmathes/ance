@@ -8,7 +8,6 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 
-#include "ance/Indexer.h"
 #include "ance/utility/Location.h"
 
 namespace ance
@@ -82,11 +81,10 @@ namespace ance
         llvm::TypeSize getContentSize(llvm::Module* m);
 
         /**
-         * See if the given indexer is defined for this type.
-         * @param indexer The indexer to check.
-         * @return True if the indexer is defined.
+         * See if the subscript operation is defined for this type.
+         * @return True if the subscript is defined.
          */
-        virtual bool isIndexerDefined(Indexer indexer);
+        virtual bool isIndexerDefined();
 
         /**
          * Get the return type of the get indexer.
@@ -118,24 +116,6 @@ namespace ance
                                         ValidationLogger& validation_logger);
 
         /**
-         * Validate an indexer set access.
-         * @param indexed The indexed value.
-         * @param indexed_location The source location of the indexed value.
-         * @param index The used index.
-         * @param index_location The source location of the index.
-         * @param value The assigned value.
-         * @param value_location The source location of the assigned value.
-         * @param validation_logger A logger to log validation messages.
-         */
-        virtual void validateSetIndexer(ance::Value*      indexed,
-                                        ance::Location    indexed_location,
-                                        ance::Value*      index,
-                                        ance::Location    index_location,
-                                        ance::Value*      value,
-                                        ance::Location    value_location,
-                                        ValidationLogger& validation_logger);
-
-        /**
          * Build a get indexer access.
          * @param indexed The indexed value.
          * @param index The index to use.
@@ -143,18 +123,6 @@ namespace ance
          * @return The return value.
          */
         virtual ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context);
-
-        /**
-         * Build a set indexer access.
-         * @param indexed The indexed value.
-         * @param index The used index.
-         * @param value The value to set.
-         * @param context The current compile context.
-         */
-        virtual void buildSetIndexer(ance::Value*    indexed,
-                                     ance::Value*    index,
-                                     ance::Value*    value,
-                                     CompileContext* context);
 
       protected:
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
