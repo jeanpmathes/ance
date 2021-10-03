@@ -38,10 +38,10 @@
 #include "ance/expression/ConstantLiteral.h"
 #include "ance/expression/DefaultValue.h"
 #include "ance/expression/FunctionCall.h"
-#include "ance/expression/IndexerGet.h"
 #include "ance/expression/RoughCast.h"
 #include "ance/expression/SizeofExpression.h"
 #include "ance/expression/SizeofType.h"
+#include "ance/expression/Subscript.h"
 #include "ance/expression/VariableAccess.h"
 
 #include "ance/construct/constant/BooleanConstant.h"
@@ -321,12 +321,12 @@ antlrcpp::Any SourceVisitor::visitSizeofExpression(anceParser::SizeofExpressionC
     return static_cast<Expression*>(new SizeofExpression(expr, location(ctx)));
 }
 
-antlrcpp::Any SourceVisitor::visitIndexerGet(anceParser::IndexerGetContext* ctx)
+antlrcpp::Any SourceVisitor::visitSubscript(anceParser::SubscriptContext* ctx)
 {
     Expression* indexed = visit(ctx->indexed);
     Expression* index   = visit(ctx->index);
 
-    return static_cast<Expression*>(new IndexerGet(indexed, index, location(ctx)));
+    return static_cast<Expression*>(new Subscript(indexed, index, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)

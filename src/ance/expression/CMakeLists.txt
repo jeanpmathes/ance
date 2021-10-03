@@ -11,7 +11,7 @@ target_sources(ance PRIVATE DefaultValue.cpp
                RoughCast.cpp
                Allocation.cpp
                DelayableExpression.cpp
-               IndexerGet.cpp
+               Subscript.cpp
                BuildableExpression.cpp
                Addressof.cpp
                BindRef.cpp)

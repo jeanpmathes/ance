@@ -88,7 +88,7 @@ expression
 	| sizeofType # SizeOf
 	| sizeofExpression # SizeOf
 	| literalExpression # Literal
-	| indexed=expression '[' index=expression ']' # IndexerGet
+	| indexed=expression '[' index=expression ']' # Subscript
 	| independentExpression # Independent
 	;
 

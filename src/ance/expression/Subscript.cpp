@@ -1,10 +1,10 @@
-#include "IndexerGet.h"
+#include "Subscript.h"
 
 #include "ance/ApplicationVisitor.h"
 #include "ance/type/Type.h"
 #include "validation/ValidationLogger.h"
 
-IndexerGet::IndexerGet(Expression* indexed, Expression* index, ance::Location location)
+Subscript::Subscript(Expression* indexed, Expression* index, ance::Location location)
     : Expression(location)
     , indexed_(indexed)
     , index_(index)
@@ -13,18 +13,18 @@ IndexerGet::IndexerGet(Expression* indexed, Expression* index, ance::Location lo
     addChild(*indexed);
 }
 
-void IndexerGet::setScope(ance::Scope* scope)
+void Subscript::setScope(ance::Scope* scope)
 {
     indexed_->setContainingScope(scope);
     index_->setContainingScope(scope);
 }
 
-ance::Type* IndexerGet::type()
+ance::Type* Subscript::type()
 {
     return indexed_->type()->getIndexerReturnType();
 }
 
-bool IndexerGet::validate(ValidationLogger& validation_logger)
+bool Subscript::validate(ValidationLogger& validation_logger)
 {
     indexed_->validate(validation_logger);
     index_->validate(validation_logger);
@@ -47,15 +47,15 @@ bool IndexerGet::validate(ValidationLogger& validation_logger)
     }
 }
 
-void IndexerGet::doBuild(CompileContext* context)
+void Subscript::doBuild(CompileContext* context)
 {
     ance::Value* return_value = indexed_->type()->buildGetIndexer(indexed_->getValue(), index_->getValue(), context);
     setValue(return_value);
 }
 
-bool IndexerGet::accept(ance::ApplicationVisitor& visitor)
+bool Subscript::accept(ance::ApplicationVisitor& visitor)
 {
-    return visitor.visitIndexerGet(*this);
+    return visitor.visitSubscript(*this);
 }
 
-IndexerGet::~IndexerGet() = default;
+Subscript::~Subscript() = default;

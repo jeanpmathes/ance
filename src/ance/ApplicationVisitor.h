@@ -19,7 +19,7 @@ class Allocation;
 class ConstantLiteral;
 class DefaultValue;
 class FunctionCall;
-class IndexerGet;
+class Subscript;
 class RoughCast;
 class Addressof;
 class BindRef;
@@ -91,7 +91,7 @@ namespace ance
         virtual bool visitConstantLiteral(ConstantLiteral& constant_literal);
         virtual bool visitDefaultValue(DefaultValue& default_value);
         virtual bool visitFunctionCall(FunctionCall& function_call);
-        virtual bool visitIndexerGet(IndexerGet& indexer_get);
+        virtual bool visitSubscript(Subscript& indexer_get);
         virtual bool visitRoughCast(RoughCast& rough_cast);
         virtual bool visitAddressof(Addressof& addressof);
         virtual bool visitBindRef(BindRef& bind_ref);

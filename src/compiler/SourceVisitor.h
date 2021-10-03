@@ -59,7 +59,7 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitBindReferenceToAddress(anceParser::BindReferenceToAddressContext* ctx) override;
     antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext* ctx) override;
     antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext* ctx) override;
-    antlrcpp::Any visitIndexerGet(anceParser::IndexerGetContext* ctx) override;
+    antlrcpp::Any visitSubscript(anceParser::SubscriptContext* ctx) override;
 
     // Literals and Types
 

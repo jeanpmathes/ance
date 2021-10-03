@@ -19,10 +19,10 @@
 #include "ance/expression/ConstantLiteral.h"
 #include "ance/expression/DefaultValue.h"
 #include "ance/expression/FunctionCall.h"
-#include "ance/expression/IndexerGet.h"
 #include "ance/expression/RoughCast.h"
 #include "ance/expression/SizeofExpression.h"
 #include "ance/expression/SizeofType.h"
+#include "ance/expression/Subscript.h"
 #include "ance/expression/VariableAccess.h"
 
 #include "ance/scope/GlobalScope.h"
@@ -113,7 +113,7 @@ bool ance::ApplicationVisitor::visitFunctionCall(FunctionCall& function_call)
     return visitChildren(function_call);
 }
 
-bool ance::ApplicationVisitor::visitIndexerGet(IndexerGet& indexer_get)
+bool ance::ApplicationVisitor::visitSubscript(Subscript& indexer_get)
 {
     return visitChildren(indexer_get);
 }

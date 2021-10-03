@@ -607,10 +607,10 @@ class anceParser : public antlr4::Parser
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    class IndexerGetContext : public ExpressionContext
+    class SubscriptContext : public ExpressionContext
     {
       public:
-        IndexerGetContext(ExpressionContext* ctx);
+        SubscriptContext(ExpressionContext* ctx);
 
         anceParser::ExpressionContext*  indexed = nullptr;
         anceParser::ExpressionContext*  index   = nullptr;

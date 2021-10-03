@@ -1716,27 +1716,27 @@ antlrcpp::Any anceParser::SizeOfContext::accept(tree::ParseTreeVisitor* visitor)
     else
         return visitor->visitChildren(this);
 }
-//----------------- IndexerGetContext ------------------------------------------------------------------
+//----------------- SubscriptContext ------------------------------------------------------------------
 
-std::vector<anceParser::ExpressionContext*> anceParser::IndexerGetContext::expression()
+std::vector<anceParser::ExpressionContext*> anceParser::SubscriptContext::expression()
 {
     return getRuleContexts<anceParser::ExpressionContext>();
 }
 
-anceParser::ExpressionContext* anceParser::IndexerGetContext::expression(size_t i)
+anceParser::ExpressionContext* anceParser::SubscriptContext::expression(size_t i)
 {
     return getRuleContext<anceParser::ExpressionContext>(i);
 }
 
-anceParser::IndexerGetContext::IndexerGetContext(ExpressionContext* ctx)
+anceParser::SubscriptContext::SubscriptContext(ExpressionContext* ctx)
 {
     copyFrom(ctx);
 }
 
-antlrcpp::Any anceParser::IndexerGetContext::accept(tree::ParseTreeVisitor* visitor)
+antlrcpp::Any anceParser::SubscriptContext::accept(tree::ParseTreeVisitor* visitor)
 {
     if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitIndexerGet(this);
+        return parserVisitor->visitSubscript(this);
     else
         return visitor->visitChildren(this);
 }
@@ -1866,7 +1866,7 @@ anceParser::ExpressionContext* anceParser::expression(int precedence)
             {
                 if (!_parseListeners.empty()) triggerExitRuleEvent();
                 previousContext = _localctx;
-                auto newContext = _tracker.createInstance<IndexerGetContext>(
+                auto newContext = _tracker.createInstance<SubscriptContext>(
                     _tracker.createInstance<ExpressionContext>(parentContext, parentState));
                 _localctx           = newContext;
                 newContext->indexed = previousContext;
@@ -1877,7 +1877,7 @@ anceParser::ExpressionContext* anceParser::expression(int precedence)
                 setState(241);
                 match(anceParser::T__18);
                 setState(242);
-                dynamic_cast<IndexerGetContext*>(_localctx)->index = expression(0);
+                dynamic_cast<SubscriptContext*>(_localctx)->index = expression(0);
                 setState(243);
                 match(anceParser::T__19);
             }

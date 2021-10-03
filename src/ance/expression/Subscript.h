@@ -1,21 +1,21 @@
-#ifndef ANCE_SRC_ANCE_EXPRESSION_INDEXERGET_H_
-#define ANCE_SRC_ANCE_EXPRESSION_INDEXERGET_H_
+#ifndef ANCE_SRC_ANCE_EXPRESSION_SUBSCRIPT_H_
+#define ANCE_SRC_ANCE_EXPRESSION_SUBSCRIPT_H_
 
 #include "DelayableExpression.h"
 
 /**
- * An indexer (subscript) get operation.
+ * A subscript operation.
  */
-class IndexerGet : public DelayableExpression
+class Subscript : public DelayableExpression
 {
   public:
     /**
-     * Create a new indexer get.
+     * Create a new subscript access.
      * @param indexed The indexed value.
      * @param index The index to use.
      * @param location The source location.
      */
-    IndexerGet(Expression* indexed, Expression* index, ance::Location location);
+    Subscript(Expression* indexed, Expression* index, ance::Location location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -31,7 +31,7 @@ class IndexerGet : public DelayableExpression
     void doBuild(CompileContext* context) override;
 
   public:
-    ~IndexerGet() override;
+    ~Subscript() override;
 
   private:
     Expression* indexed_;
