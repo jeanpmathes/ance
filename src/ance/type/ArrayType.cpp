@@ -45,35 +45,35 @@ bool ance::ArrayType::validate(ValidationLogger& validation_logger, ance::Locati
     return true;
 }
 
-bool ance::ArrayType::isIndexerDefined()
+bool ance::ArrayType::isSubscriptDefined()
 {
     return true;
 }
 
-ance::Type* ance::ArrayType::getIndexerReturnType()
+ance::Type* ance::ArrayType::getSubscriptReturnType()
 {
     return element_reference_;
 }
 
-bool ance::ArrayType::validateGetIndexer(ance::Value* indexed,
-                                         ance::Location,
-                                         ance::Value*      index,
-                                         ance::Location    index_location,
-                                         ValidationLogger& validation_logger)
+bool ance::ArrayType::validateSubscript(Type* indexed_type,
+                                        ance::Location,
+                                        Type*             index_type,
+                                        ance::Location    index_location,
+                                        ValidationLogger& validation_logger)
 {
-    assert(indexed->type() == this && "Method call on wrong type.");
+    assert(indexed_type == this && "Method call on wrong type.");
 
-    return checkMismatch(ance::SizeType::getSize(), index->type(), index_location, validation_logger);
+    return checkMismatch(ance::SizeType::getSize(), index_type, index_location, validation_logger);
 }
 
-ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
+ance::Value* ance::ArrayType::buildSubscript(ance::Value* indexed, ance::Value* index, CompileContext* context)
 {
     index = ance::Type::makeMatching(ance::SizeType::getSize(), index, context);
 
     llvm::Value* element_ptr  = buildGetElementPointer(indexed, index, context);
     llvm::Value* native_value = ance::Values::contentToNative(element_reference_, element_ptr, context);
 
-    return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
+    return new ance::WrappedNativeValue(getSubscriptReturnType(), native_value);
 }
 
 llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value*    indexed,

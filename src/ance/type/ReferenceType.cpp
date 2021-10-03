@@ -43,28 +43,32 @@ bool ance::ReferenceType::validate(ValidationLogger& validation_logger, ance::Lo
     return true;
 }
 
-bool ance::ReferenceType::isIndexerDefined()
+bool ance::ReferenceType::isSubscriptDefined()
 {
-    return element_type_->isIndexerDefined();
+    return element_type_->isSubscriptDefined();
 }
 
-ance::Type* ance::ReferenceType::getIndexerReturnType()
+ance::Type* ance::ReferenceType::getSubscriptReturnType()
 {
-    return element_type_->getIndexerReturnType();
+    return element_type_->getSubscriptReturnType();
 }
 
-bool ance::ReferenceType::validateGetIndexer(ance::Value*      indexed,
-                                             ance::Location    indexed_location,
-                                             ance::Value*      index,
-                                             ance::Location    index_location,
-                                             ValidationLogger& validation_logger)
+bool ance::ReferenceType::validateSubscript(Type*             indexed_type,
+                                            ance::Location    indexed_location,
+                                            Type*             index_type,
+                                            ance::Location    index_location,
+                                            ValidationLogger& validation_logger)
 {
-    return element_type_->validateGetIndexer(indexed, indexed_location, index, index_location, validation_logger);
+    return element_type_->validateSubscript(indexed_type,
+                                            indexed_location,
+                                            index_type,
+                                            index_location,
+                                            validation_logger);
 }
 
-ance::Value* ance::ReferenceType::buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context)
+ance::Value* ance::ReferenceType::buildSubscript(ance::Value* indexed, ance::Value* index, CompileContext* context)
 {
-    return element_type_->buildGetIndexer(indexed, index, context);
+    return element_type_->buildSubscript(indexed, index, context);
 }
 
 llvm::DIType* ance::ReferenceType::createDebugType(CompileContext* context)

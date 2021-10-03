@@ -84,13 +84,13 @@ namespace ance
          * See if the subscript operation is defined for this type.
          * @return True if the subscript is defined.
          */
-        virtual bool isIndexerDefined();
+        virtual bool isSubscriptDefined();
 
         /**
          * Get the return type of the get indexer.
          * @return The return type.
          */
-        virtual ance::Type* getIndexerReturnType();
+        virtual ance::Type* getSubscriptReturnType();
 
         /**
          * Validate if this type is well-formed.
@@ -101,28 +101,28 @@ namespace ance
         virtual bool validate(ValidationLogger& validation_logger, ance::Location location);
 
         /**
-         * Validate an indexer get access.
-         * @param indexed The indexed value.
+         * Validate a subscript access.
+         * @param indexed_type The type of the indexed value.
          * @param indexed_location The source location of the indexed value.
-         * @param index The used index.
+         * @param index_type The type of the used index.
          * @param index_location The source location of the index.
          * @param validation_logger A logger to log validation messages.
          * @return True if the get indexer is valid.
          */
-        virtual bool validateGetIndexer(ance::Value*      indexed,
-                                        ance::Location    indexed_location,
-                                        ance::Value*      index,
-                                        ance::Location    index_location,
-                                        ValidationLogger& validation_logger);
+        virtual bool validateSubscript(Type*             indexed_type,
+                                       ance::Location    indexed_location,
+                                       Type*             index_type,
+                                       ance::Location    index_location,
+                                       ValidationLogger& validation_logger);
 
         /**
-         * Build a get indexer access.
+         * Build a subscript access.
          * @param indexed The indexed value.
          * @param index The index to use.
          * @param context The current compile context.
          * @return The return value.
          */
-        virtual ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context);
+        virtual ance::Value* buildSubscript(ance::Value* indexed, ance::Value* index, CompileContext* context);
 
       protected:
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;

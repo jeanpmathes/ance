@@ -26,12 +26,12 @@ llvm::TypeSize ance::Type::getContentSize(llvm::Module* m)
     return m->getDataLayout().getTypeAllocSize(getContentType(m->getContext()));
 }
 
-bool ance::Type::isIndexerDefined()
+bool ance::Type::isSubscriptDefined()
 {
     return false;
 }
 
-ance::Type* ance::Type::getIndexerReturnType()
+ance::Type* ance::Type::getSubscriptReturnType()
 {
     return nullptr;
 }
@@ -41,12 +41,12 @@ bool ance::Type::validate(ValidationLogger&, ance::Location)
     return true;
 }
 
-bool ance::Type::validateGetIndexer(ance::Value*, ance::Location, ance::Value*, ance::Location, ValidationLogger&)
+bool ance::Type::validateSubscript(Type*, ance::Location, Type*, ance::Location, ValidationLogger&)
 {
     return false;
 }
 
-ance::Value* ance::Type::buildGetIndexer(ance::Value*, ance::Value*, CompileContext*)
+ance::Value* ance::Type::buildSubscript(ance::Value*, ance::Value*, CompileContext*)
 {
     return nullptr;
 }

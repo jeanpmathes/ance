@@ -24,16 +24,16 @@ namespace ance
 
         bool validate(ValidationLogger& validation_logger, ance::Location location) override;
 
-        bool isIndexerDefined() override;
+        bool isSubscriptDefined() override;
 
-        ance::Type* getIndexerReturnType() override;
+        ance::Type* getSubscriptReturnType() override;
 
-        bool         validateGetIndexer(ance::Value*      indexed,
-                                        ance::Location    indexed_location,
-                                        ance::Value*      index,
-                                        ance::Location    index_location,
-                                        ValidationLogger& validation_logger) override;
-        ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
+        bool         validateSubscript(Type*             indexed_type,
+                                       ance::Location    indexed_location,
+                                       Type*             index_type,
+                                       ance::Location    index_location,
+                                       ValidationLogger& validation_logger) override;
+        ance::Value* buildSubscript(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
 
       private:
         static llvm::Value* buildGetElementPointer(ance::Value* indexed, ance::Value* index, CompileContext* context);

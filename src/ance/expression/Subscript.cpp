@@ -21,7 +21,7 @@ void Subscript::setScope(ance::Scope* scope)
 
 ance::Type* Subscript::type()
 {
-    return indexed_->type()->getIndexerReturnType();
+    return indexed_->type()->getSubscriptReturnType();
 }
 
 bool Subscript::validate(ValidationLogger& validation_logger)
@@ -31,13 +31,13 @@ bool Subscript::validate(ValidationLogger& validation_logger)
 
     ance::Type* indexed_type = indexed_->type();
 
-    if (indexed_type->isIndexerDefined())
+    if (indexed_type->isSubscriptDefined())
     {
-        return indexed_type->validateGetIndexer(indexed_->getValue(),
-                                                indexed_->location(),
-                                                index_->getValue(),
-                                                index_->location(),
-                                                validation_logger);
+        return indexed_type->validateSubscript(indexed_->type(),
+                                               indexed_->location(),
+                                               index_->type(),
+                                               index_->location(),
+                                               validation_logger);
     }
     else
     {
@@ -49,7 +49,7 @@ bool Subscript::validate(ValidationLogger& validation_logger)
 
 void Subscript::doBuild(CompileContext* context)
 {
-    ance::Value* return_value = indexed_->type()->buildGetIndexer(indexed_->getValue(), index_->getValue(), context);
+    ance::Value* return_value = indexed_->type()->buildSubscript(indexed_->getValue(), index_->getValue(), context);
     setValue(return_value);
 }
 

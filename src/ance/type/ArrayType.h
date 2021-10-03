@@ -28,17 +28,17 @@ namespace ance
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
-        bool        isIndexerDefined() override;
-        ance::Type* getIndexerReturnType() override;
+        bool        isSubscriptDefined() override;
+        ance::Type* getSubscriptReturnType() override;
 
         bool validate(ValidationLogger& validation_logger, ance::Location location) override;
 
-        bool         validateGetIndexer(ance::Value*      indexed,
-                                        ance::Location    indexed_location,
-                                        ance::Value*      index,
-                                        ance::Location    index_location,
-                                        ValidationLogger& validation_logger) override;
-        ance::Value* buildGetIndexer(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
+        bool         validateSubscript(Type*             indexed_type,
+                                       ance::Location    indexed_location,
+                                       Type*             index_type,
+                                       ance::Location    index_location,
+                                       ValidationLogger& validation_logger) override;
+        ance::Value* buildSubscript(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
 
       private:
         llvm::Value* buildGetElementPointer(ance::Value* indexed, ance::Value* index, CompileContext* context) const;
