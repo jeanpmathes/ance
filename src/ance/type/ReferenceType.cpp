@@ -53,13 +53,13 @@ ance::Type* ance::ReferenceType::getSubscriptReturnType()
     return element_type_->getSubscriptReturnType();
 }
 
-bool ance::ReferenceType::validateSubscript(Type*             indexed_type,
+bool ance::ReferenceType::validateSubscript(Type*,
                                             ance::Location    indexed_location,
                                             Type*             index_type,
                                             ance::Location    index_location,
                                             ValidationLogger& validation_logger)
 {
-    return element_type_->validateSubscript(indexed_type,
+    return element_type_->validateSubscript(element_type_,
                                             indexed_location,
                                             index_type,
                                             index_location,
@@ -68,7 +68,7 @@ bool ance::ReferenceType::validateSubscript(Type*             indexed_type,
 
 ance::Value* ance::ReferenceType::buildSubscript(ance::Value* indexed, ance::Value* index, CompileContext* context)
 {
-    return element_type_->buildSubscript(indexed, index, context);
+    return element_type_->buildSubscript(getReferenced(indexed, context), index, context);
 }
 
 llvm::DIType* ance::ReferenceType::createDebugType(CompileContext* context)
