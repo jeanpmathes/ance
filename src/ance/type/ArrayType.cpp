@@ -10,7 +10,11 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::ArrayType::ArrayType(Type* element_type, const uint64_t size) : size_(size), element_type_(element_type) {}
+ance::ArrayType::ArrayType(Application& app, Type* element_type, const uint64_t size)
+    : size_(size)
+    , element_type_(element_type)
+    , element_reference_(ance::ReferenceType::get(app, element_type))
+{}
 
 std::string ance::ArrayType::getName()
 {
@@ -48,7 +52,7 @@ bool ance::ArrayType::isIndexerDefined()
 
 ance::Type* ance::ArrayType::getIndexerReturnType()
 {
-    return element_type_;
+    return element_reference_;
 }
 
 bool ance::ArrayType::validateGetIndexer(ance::Value* indexed,
@@ -66,12 +70,8 @@ ance::Value* ance::ArrayType::buildGetIndexer(ance::Value* indexed, ance::Value*
 {
     index = ance::Type::makeMatching(ance::SizeType::getSize(), index, context);
 
-    llvm::Value* element_ptr    = buildGetElementPointer(indexed, index, context);
-    llvm::Value* native_content = context->ir()->CreateLoad(element_ptr);
-
-    native_content->setName(element_ptr->getName());
-
-    llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, context);
+    llvm::Value* element_ptr  = buildGetElementPointer(indexed, index, context);
+    llvm::Value* native_value = ance::Values::contentToNative(element_reference_, element_ptr, context);
 
     return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
 }
@@ -123,7 +123,7 @@ llvm::DIType* ance::ArrayType::createDebugType(CompileContext* context)
 
 ance::Type* ance::ArrayType::get(Application& app, Type* element_type, uint64_t size)
 {
-    auto*       type      = new ance::ArrayType(element_type, size);
+    auto*       type      = new ance::ArrayType(app, element_type, size);
     std::string type_name = type->getName();
 
     if (app.globalScope()->isTypeRegistered(type_name))

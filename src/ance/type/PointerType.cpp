@@ -11,7 +11,10 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::PointerType::PointerType(ance::Type* element_type) : element_type_(element_type) {}
+ance::PointerType::PointerType(Application& app, ance::Type* element_type)
+    : element_type_(element_type)
+    , element_reference_(ance::ReferenceType::get(app, element_type))
+{}
 
 std::string ance::PointerType::getName()
 {
@@ -54,7 +57,7 @@ bool ance::PointerType::isIndexerDefined()
 
 ance::Type* ance::PointerType::getIndexerReturnType()
 {
-    return element_type_;
+    return element_reference_;
 }
 
 bool ance::PointerType::validateGetIndexer(ance::Value* indexed,
@@ -72,10 +75,9 @@ ance::Value* ance::PointerType::buildGetIndexer(ance::Value* indexed, ance::Valu
 {
     index = ance::Type::makeMatching(ance::SizeType::getSize(), index, context);
 
-    llvm::Value* element_ptr    = buildGetElementPointer(indexed, index, context);
-    llvm::Value* native_content = context->ir()->CreateLoad(element_ptr);
+    llvm::Value* element_ptr  = buildGetElementPointer(indexed, index, context);
+    llvm::Value* native_value = ance::Values::contentToNative(element_reference_, element_ptr, context);
 
-    llvm::Value* native_value = ance::Values::contentToNative(element_type_, native_content, context);
     return new ance::WrappedNativeValue(getIndexerReturnType(), native_value);
 }
 
@@ -122,7 +124,7 @@ llvm::DIType* ance::PointerType::createDebugType(CompileContext* context)
 
 ance::Type* ance::PointerType::get(Application& app, ance::Type* element_type)
 {
-    auto*       type      = new ance::PointerType(element_type);
+    auto*       type      = new ance::PointerType(app, element_type);
     std::string type_name = type->getName();
 
     if (app.globalScope()->isTypeRegistered(type_name))

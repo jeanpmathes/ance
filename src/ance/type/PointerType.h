@@ -13,7 +13,7 @@ namespace ance
     class PointerType : public Type
     {
       private:
-        explicit PointerType(Type* element_type);
+        PointerType(Application& app, Type* element_type);
 
       public:
         std::string getName() override;
@@ -43,6 +43,7 @@ namespace ance
 
       private:
         ance::Type* element_type_;
+        ance::Type* element_reference_;
 
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;
