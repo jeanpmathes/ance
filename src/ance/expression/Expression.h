@@ -30,12 +30,13 @@ class Expression : public ance::Element
 
   public:
     [[nodiscard]] ance::Location location() const override;
+    [[nodiscard]] ance::Scope*   scope() const override;
 
     /**
      * Set the scope containing this expression.
      * @param scope The containing scope.
      */
-    virtual void setContainingScope(ance::Scope* scope);
+    void setContainingScope(ance::Scope* scope);
 
     /**
      * Get whether this expression is a named value source.
@@ -50,6 +51,25 @@ class Expression : public ance::Element
     virtual bool validate(ValidationLogger& validation_logger) = 0;
 
     /**
+     * Validate an assignment to this expression.
+     * @param value The value that would be assigned.
+     * @param value_location The source location of the value.
+     * @param validation_logger The validation logger to use.
+     * @return True if assigning is valid.
+     */
+    virtual bool validateAssignment(ance::Value*      value,
+                                    ance::Location    value_location,
+                                    ValidationLogger& validation_logger);
+
+    /**
+     * Build an assignment to this expression. The value should not be retrieved if assignment took place.
+     * @param value The value to assign.
+     * @param value_location The source location of the value.
+     * @param context The current compile context.
+     */
+    void assign(ance::Value* value, ance::Location value_location, CompileContext* context);
+
+    /**
      * Get the return type of this expression.
      * @return The type of the value of this expression.
      */
@@ -62,8 +82,18 @@ class Expression : public ance::Element
 
     virtual ~Expression() = default;
 
+  protected:
+    /**
+     * Override this method to receive the containing scope.
+     * @param scope The containing scope.
+     */
+    virtual void setScope(ance::Scope* scope);
+
+    virtual void doAssign(ance::Value* value, ance::Location value_location, CompileContext* context);
+
   private:
     ance::Location location_;
+    ance::Scope*   containing_scope_ {nullptr};
 };
 
 #endif

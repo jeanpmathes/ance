@@ -32,10 +32,24 @@ bool VariableAccess::validate(ValidationLogger& validation_logger)
     return variable_->validateGetValue(validation_logger, location());
 }
 
+bool VariableAccess::validateAssignment(ance::Value*      value,
+                                        ance::Location    value_location,
+                                        ValidationLogger& validation_logger)
+{
+    variable_->validateSetValue(value, validation_logger, location(), value_location);
+
+    return true;
+}
+
 void VariableAccess::doBuild(CompileContext* context)
 {
     ance::Value* value = variable_->getValue(context);
     setValue(value);
+}
+
+void VariableAccess::doAssign(ance::Value* value, ance::Location, CompileContext* context)
+{
+    variable_->setValue(value, context);
 }
 
 bool VariableAccess::accept(ance::ApplicationVisitor& visitor)

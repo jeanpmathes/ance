@@ -84,38 +84,36 @@ class anceParser : public antlr4::Parser
         RuleAssigner                 = 11,
         RuleDeleteStatement          = 12,
         RuleReturnStatement          = 13,
-        RuleAssignable               = 14,
-        RuleVariableAssignable       = 15,
-        RuleExpression               = 16,
-        RuleIndependentExpression    = 17,
-        RuleFunctionCall             = 18,
-        RuleArguments                = 19,
-        RuleVariableAccess           = 20,
-        RuleAllocation               = 21,
-        RuleAllocator                = 22,
-        RuleRoughCast                = 23,
-        RuleAddressof                = 24,
-        RuleBindRef                  = 25,
-        RuleSizeofType               = 26,
-        RuleSizeofExpression         = 27,
-        RuleLiteralExpression        = 28,
-        RuleStringLiteral            = 29,
-        RuleByteLiteral              = 30,
-        RuleIntegerLiteral           = 31,
-        RuleUnsignedInteger          = 32,
-        RuleSignedInteger            = 33,
-        RuleSpecialInteger           = 34,
-        RuleFloatingPointLiteral     = 35,
-        RuleBooleanLiteral           = 36,
-        RuleSizeLiteral              = 37,
-        RuleDiffLiteral              = 38,
-        RuleType                     = 39,
-        RuleIntegerType              = 40,
-        RuleArrayType                = 41,
-        RuleKeywordType              = 42,
-        RuleFloatingPointType        = 43,
-        RuleTargetDependentType      = 44,
-        RuleVoidType                 = 45
+        RuleExpression               = 14,
+        RuleIndependentExpression    = 15,
+        RuleFunctionCall             = 16,
+        RuleArguments                = 17,
+        RuleVariableAccess           = 18,
+        RuleAllocation               = 19,
+        RuleAllocator                = 20,
+        RuleRoughCast                = 21,
+        RuleAddressof                = 22,
+        RuleBindRef                  = 23,
+        RuleSizeofType               = 24,
+        RuleSizeofExpression         = 25,
+        RuleLiteralExpression        = 26,
+        RuleStringLiteral            = 27,
+        RuleByteLiteral              = 28,
+        RuleIntegerLiteral           = 29,
+        RuleUnsignedInteger          = 30,
+        RuleSignedInteger            = 31,
+        RuleSpecialInteger           = 32,
+        RuleFloatingPointLiteral     = 33,
+        RuleBooleanLiteral           = 34,
+        RuleSizeLiteral              = 35,
+        RuleDiffLiteral              = 36,
+        RuleType                     = 37,
+        RuleIntegerType              = 38,
+        RuleArrayType                = 39,
+        RuleKeywordType              = 40,
+        RuleFloatingPointType        = 41,
+        RuleTargetDependentType      = 42,
+        RuleVoidType                 = 43
     };
 
     anceParser(antlr4::TokenStream* input);
@@ -144,8 +142,6 @@ class anceParser : public antlr4::Parser
     class AssignerContext;
     class DeleteStatementContext;
     class ReturnStatementContext;
-    class AssignableContext;
-    class VariableAssignableContext;
     class ExpressionContext;
     class IndependentExpressionContext;
     class FunctionCallContext;
@@ -398,12 +394,16 @@ class anceParser : public antlr4::Parser
     class AssignmentContext : public antlr4::ParserRuleContext
     {
       public:
+        anceParser::ExpressionContext* assignable = nullptr;
+        ;
+        anceParser::ExpressionContext* assigned = nullptr;
+        ;
         AssignmentContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t              getRuleIndex() const override;
-        AssignableContext*          assignable();
-        AssignerContext*            assigner();
-        ExpressionContext*          expression();
-        antlr4::tree::TerminalNode* SEMICOLON();
+        virtual size_t                  getRuleIndex() const override;
+        AssignerContext*                assigner();
+        antlr4::tree::TerminalNode*     SEMICOLON();
+        std::vector<ExpressionContext*> expression();
+        ExpressionContext*              expression(size_t i);
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -474,30 +474,6 @@ class anceParser : public antlr4::Parser
     };
 
     ReturnStatementContext* returnStatement();
-
-    class AssignableContext : public antlr4::ParserRuleContext
-    {
-      public:
-        AssignableContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t             getRuleIndex() const override;
-        VariableAssignableContext* variableAssignable();
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    AssignableContext* assignable();
-
-    class VariableAssignableContext : public antlr4::ParserRuleContext
-    {
-      public:
-        VariableAssignableContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t              getRuleIndex() const override;
-        antlr4::tree::TerminalNode* IDENTIFIER();
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    VariableAssignableContext* variableAssignable();
 
     class ExpressionContext : public antlr4::ParserRuleContext
     {

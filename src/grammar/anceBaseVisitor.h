@@ -89,13 +89,6 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
-    virtual antlrcpp::Any visitAssignable(anceParser::AssignableContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitVariableAssignable(anceParser::VariableAssignableContext* ctx) override
-    {
-        return visitChildren(ctx);
-    }
-
     virtual antlrcpp::Any visitCast(anceParser::CastContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitRef(anceParser::RefContext* ctx) override { return visitChildren(ctx); }

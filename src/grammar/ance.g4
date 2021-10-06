@@ -49,7 +49,7 @@ localReferenceDefinition
     ;
 
 assignment
-	: assignable assigner expression ';'
+	: assignable=expression assigner assigned=expression ';'
 	;
 
 assigner
@@ -65,14 +65,6 @@ deleteStatement
 returnStatement
 	: 'return' ( expression )? ';'
 	;
-
-assignable
-    : variableAssignable
-    ;
-
-variableAssignable
-    : IDENTIFIER
-    ;
 
 expression
 	: variableAccess # Variable

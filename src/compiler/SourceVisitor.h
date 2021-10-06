@@ -42,10 +42,6 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitDeleteStatement(anceParser::DeleteStatementContext* ctx) override;
     antlrcpp::Any visitReturnStatement(anceParser::ReturnStatementContext* ctx) override;
 
-    // Assignables
-
-    antlrcpp::Any visitVariableAssignable(anceParser::VariableAssignableContext* ctx) override;
-
     // Expressions
 
     antlrcpp::Any visitFunctionCall(anceParser::FunctionCallContext* ctx) override;

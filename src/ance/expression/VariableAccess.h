@@ -10,7 +10,7 @@ namespace ance
 }
 
 /**
- * Access a variable and get its current value.
+ * Access a variable and get or set its current value.
  */
 class VariableAccess : public DelayableExpression
 {
@@ -29,11 +29,17 @@ class VariableAccess : public DelayableExpression
     ance::Type* type() override;
 
     [[nodiscard]] bool isNamed() override;
-    bool               validate(ValidationLogger& validation_logger) override;
+
+    bool validate(ValidationLogger& validation_logger) override;
+    bool validateAssignment(ance::Value*      value,
+                            ance::Location    value_location,
+                            ValidationLogger& validation_logger) override;
+
     bool accept(ance::ApplicationVisitor& visitor) override;
 
   protected:
     void doBuild(CompileContext* context) override;
+    void doAssign(ance::Value* value, ance::Location value_location, CompileContext* context) override;
 
   public:
     ~VariableAccess() override;

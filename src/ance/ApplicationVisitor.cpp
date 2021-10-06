@@ -4,8 +4,6 @@
 
 #include "compiler/Application.h"
 
-#include "ance/assignable/VariableAssignable.h"
-
 #include "ance/construct/DefinedFunction.h"
 #include "ance/construct/ExternFunction.h"
 
@@ -60,11 +58,6 @@ void ance::ApplicationVisitor::postVisit(ance::Element&) {}
 bool ance::ApplicationVisitor::visitApplication(Application& application)
 {
     return visitChildren(application);
-}
-
-bool ance::ApplicationVisitor::visitVariableAssignable(VariableAssignable& variable_assignable)
-{
-    return visitChildren(variable_assignable);
 }
 
 bool ance::ApplicationVisitor::visitDefinedFunction(ance::DefinedFunction& defined_function)

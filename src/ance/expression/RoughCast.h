@@ -22,8 +22,6 @@ class RoughCast : public Expression
      */
     RoughCast(ance::Type* target_type, Expression* expression, ance::Location location);
 
-    void setContainingScope(ance::Scope* scope) override;
-
     ance::Type* type() override;
 
     bool validate(ValidationLogger& validation_logger) override;
@@ -33,6 +31,9 @@ class RoughCast : public Expression
     bool accept(ance::ApplicationVisitor& visitor) override;
 
     ~RoughCast() override;
+
+  protected:
+    void setScope(ance::Scope* scope) override;
 
   private:
     ance::Type*  target_type_;

@@ -77,8 +77,6 @@ namespace ance
       public:
         virtual bool visitApplication(Application& application);
 
-        virtual bool visitVariableAssignable(VariableAssignable& variable_assignable);
-
         virtual bool visitDefinedFunction(ance::DefinedFunction& defined_function);
         virtual bool visitExternFunction(ance::ExternFunction& extern_function);
 

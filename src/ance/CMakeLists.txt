@@ -1,4 +1,3 @@
-add_subdirectory(assignable)
 add_subdirectory(construct)
 add_subdirectory(expression)
 add_subdirectory(scope)

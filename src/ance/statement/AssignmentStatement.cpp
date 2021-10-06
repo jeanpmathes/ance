@@ -1,13 +1,12 @@
 #include "AssignmentStatement.h"
 
 #include "ance/ApplicationVisitor.h"
-#include "ance/assignable/Assignable.h"
 #include "ance/construct/DefinedFunction.h"
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
 
-AssignmentStatement::AssignmentStatement(Assignable*    assignable,
+AssignmentStatement::AssignmentStatement(Expression*    assignable,
                                          Assigner       assigner,
                                          Expression*    assigned,
                                          ance::Location location)
@@ -20,8 +19,6 @@ AssignmentStatement::AssignmentStatement(Assignable*    assignable,
 
     addChild(*assigned);
     addChild(*assignable);
-
-    assignable_->assign(assigned->getValue(), assigned->location());
 }
 
 void AssignmentStatement::setFunction(ance::DefinedFunction* function)
@@ -38,12 +35,15 @@ void AssignmentStatement::validate(ValidationLogger& validation_logger)
         return;
     }
 
-    if (assigned_->validate(validation_logger)) { assignable_->validate(validation_logger); }
+    if (assigned_->validate(validation_logger))
+    {
+        assignable_->validateAssignment(assigned_->getValue(), assigned_->location(), validation_logger);
+    }
 }
 
 void AssignmentStatement::doBuild(CompileContext* context)
 {
-    assignable_->build(context);
+    assignable_->assign(assigned_->getValue(), assigned_->location(), context);
 }
 
 bool AssignmentStatement::accept(ance::ApplicationVisitor& visitor)

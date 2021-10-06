@@ -5,7 +5,6 @@
 
 #include "ance/Assigner.h"
 
-class Assignable;
 class Expression;
 
 /**
@@ -21,7 +20,7 @@ class AssignmentStatement : public Statement
      * @param assigned An expression producing the value that is assigned.
      * @param location The source location.
      */
-    AssignmentStatement(Assignable* assignable, Assigner assigner, Expression* assigned, ance::Location location);
+    AssignmentStatement(Expression* assignable, Assigner assigner, Expression* assigned, ance::Location location);
 
     void setFunction(ance::DefinedFunction* function) override;
 
@@ -33,7 +32,7 @@ class AssignmentStatement : public Statement
     void doBuild(CompileContext* context) override;
 
   private:
-    Assignable* assignable_;
+    Expression* assignable_;
     Assigner    assigner_;
     Expression* assigned_;
 };

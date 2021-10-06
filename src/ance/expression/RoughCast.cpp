@@ -13,7 +13,7 @@ RoughCast::RoughCast(ance::Type* target_type, Expression* expression, ance::Loca
     addChild(*expression);
 }
 
-void RoughCast::setContainingScope(ance::Scope* scope)
+void RoughCast::setScope(ance::Scope* scope)
 {
     expression_->setContainingScope(scope);
 }

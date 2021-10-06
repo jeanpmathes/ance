@@ -27,9 +27,6 @@
 #include "ance/statement/LocalVariableDefinition.h"
 #include "ance/statement/ReturnStatement.h"
 
-#include "ance/assignable/Assignable.h"
-#include "ance/assignable/VariableAssignable.h"
-
 #include "ance/expression/Addressof.h"
 #include "ance/expression/Allocation.h"
 #include "ance/expression/BackingExpression.h"
@@ -201,9 +198,9 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
 
 antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
 {
-    Assignable* assignable = visit(ctx->assignable());
+    Expression* assignable = visit(ctx->assignable);
     Assigner    assigner   = visit(ctx->assigner());
-    Expression* assigned   = visit(ctx->expression());
+    Expression* assigned   = visit(ctx->assigned);
 
     auto* statement = new AssignmentStatement(assignable, assigner, assigned, location(ctx));
     return static_cast<Statement*>(statement);
@@ -225,13 +222,6 @@ antlrcpp::Any SourceVisitor::visitReturnStatement(anceParser::ReturnStatementCon
 
     auto* statement = new ReturnStatement(return_value, location(ctx));
     return static_cast<Statement*>(statement);
-}
-
-antlrcpp::Any SourceVisitor::visitVariableAssignable(anceParser::VariableAssignableContext* ctx)
-{
-    std::string identifier = ctx->IDENTIFIER()->getText();
-
-    return static_cast<Assignable*>(new VariableAssignable(identifier, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
