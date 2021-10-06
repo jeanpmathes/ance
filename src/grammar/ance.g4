@@ -68,15 +68,10 @@ returnStatement
 
 assignable
     : variableAssignable
-    | discard
     ;
 
 variableAssignable
     : IDENTIFIER
-    ;
-
-discard
-    : 'discard'
     ;
 
 expression

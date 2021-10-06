@@ -60,8 +60,6 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitVariableAssignable(anceParser::VariableAssignableContext* context) = 0;
 
-    virtual antlrcpp::Any visitDiscard(anceParser::DiscardContext* context) = 0;
-
     virtual antlrcpp::Any visitCast(anceParser::CastContext* context) = 0;
 
     virtual antlrcpp::Any visitRef(anceParser::RefContext* context) = 0;

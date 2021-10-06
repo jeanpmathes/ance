@@ -28,7 +28,6 @@
 #include "ance/statement/ReturnStatement.h"
 
 #include "ance/assignable/Assignable.h"
-#include "ance/assignable/Discard.h"
 #include "ance/assignable/VariableAssignable.h"
 
 #include "ance/expression/Addressof.h"
@@ -233,11 +232,6 @@ antlrcpp::Any SourceVisitor::visitVariableAssignable(anceParser::VariableAssigna
     std::string identifier = ctx->IDENTIFIER()->getText();
 
     return static_cast<Assignable*>(new VariableAssignable(identifier, location(ctx)));
-}
-
-antlrcpp::Any SourceVisitor::visitDiscard(anceParser::DiscardContext* ctx)
-{
-    return static_cast<Assignable*>(new Discard(location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
