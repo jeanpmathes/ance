@@ -43,7 +43,7 @@ void AssignmentStatement::validate(ValidationLogger& validation_logger)
 
 void AssignmentStatement::doBuild(CompileContext* context)
 {
-    assignable_->assign(assigned_->getValue(), assigned_->location(), context);
+    assignable_->assign(assigned_->getValue(), context);
 }
 
 bool AssignmentStatement::accept(ance::ApplicationVisitor& visitor)

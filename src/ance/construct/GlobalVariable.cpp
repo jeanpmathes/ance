@@ -116,7 +116,7 @@ ance::Value* ance::GlobalVariable::getValue(CompileContext*)
     return new ance::WrappedNativeValue(type(), native_variable_);
 }
 
-void ance::GlobalVariable::setValue(ance::Value* value, CompileContext* context)
+void ance::GlobalVariable::storeValue(ance::Value* value, CompileContext* context)
 {
     value = ance::Type::makeMatching(type(), value, context);
 

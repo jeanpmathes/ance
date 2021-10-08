@@ -37,7 +37,6 @@ bool VariableAccess::validateAssignment(ance::Value*      value,
                                         ValidationLogger& validation_logger)
 {
     variable_->validateSetValue(value, validation_logger, location(), value_location);
-
     return true;
 }
 
@@ -47,7 +46,7 @@ void VariableAccess::doBuild(CompileContext* context)
     setValue(value);
 }
 
-void VariableAccess::doAssign(ance::Value* value, ance::Location, CompileContext* context)
+void VariableAccess::doAssign(ance::Value* value, CompileContext* context)
 {
     variable_->setValue(value, context);
 }

@@ -76,7 +76,7 @@ ance::Value* ance::LocalVariable::getValue(CompileContext*)
     return new WrappedNativeValue(type(), native_value_);
 }
 
-void ance::LocalVariable::setValue(ance::Value* value, CompileContext* context)
+void ance::LocalVariable::storeValue(ance::Value* value, CompileContext* context)
 {
     store(value, context);
 }

@@ -46,9 +46,11 @@ namespace ance
         void build(CompileContext* context);
 
         ance::Value* getValue(CompileContext* context) override;
-        void         setValue(ance::Value* value, CompileContext* context) override;
 
         bool accept(ance::ApplicationVisitor& visitor) override;
+
+      protected:
+        void storeValue(ance::Value* value, CompileContext* context) override;
 
       private:
         void store(Value* value, CompileContext* context);

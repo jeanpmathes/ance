@@ -8,6 +8,7 @@
 #include "ance/construct/value/Value.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/statement/Statement.h"
+#include "ance/type/ReferenceType.h"
 #include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
@@ -96,5 +97,25 @@ void ance::Variable::validateSetValue(ance::Value*      value,
         return;// Type mismatch is not relevant if assignment is not allowed no matter what.
     }
 
-    ance::Type::checkMismatch(type(), value->type(), assigned_location, validation_logger);
+    ance::Type* target_type = type();
+
+    if (ance::ReferenceType::isReferenceType(type())) { target_type = ance::ReferenceType::getReferencedType(type()); }
+
+    ance::Type::checkMismatch(target_type, value->type(), assigned_location, validation_logger);
+}
+void ance::Variable::setValue(ance::Value* value, CompileContext* context)
+{
+    if (ance::ReferenceType::isReferenceType(type()))
+    {
+        ance::Value* reference = getValue(context);
+
+        reference->buildContentValue(context);
+        value->buildContentValue(context);
+
+        context->ir()->CreateStore(value->getContentValue(), reference->getContentValue());
+    }
+    else
+    {
+        storeValue(value, context);
+    }
 }

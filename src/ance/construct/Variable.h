@@ -116,7 +116,10 @@ namespace ance
          * @param value The new value.
          * @param context The current compile context.
          */
-        virtual void setValue(ance::Value* value, CompileContext* context) = 0;
+        void setValue(ance::Value* value, CompileContext* context);
+
+      protected:
+        virtual void storeValue(ance::Value* value, CompileContext* context) = 0;
 
       private:
         std::string identifier_;

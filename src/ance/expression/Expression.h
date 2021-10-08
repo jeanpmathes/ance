@@ -64,10 +64,9 @@ class Expression : public ance::Element
     /**
      * Build an assignment to this expression. The value should not be retrieved if assignment took place.
      * @param value The value to assign.
-     * @param value_location The source location of the value.
      * @param context The current compile context.
      */
-    void assign(ance::Value* value, ance::Location value_location, CompileContext* context);
+    void assign(ance::Value* value, CompileContext* context);
 
     /**
      * Get the return type of this expression.
@@ -89,7 +88,7 @@ class Expression : public ance::Element
      */
     virtual void setScope(ance::Scope* scope);
 
-    virtual void doAssign(ance::Value* value, ance::Location value_location, CompileContext* context);
+    virtual void doAssign(ance::Value* value, CompileContext* context);
 
   private:
     ance::Location location_;

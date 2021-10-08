@@ -39,7 +39,7 @@ class VariableAccess : public DelayableExpression
 
   protected:
     void doBuild(CompileContext* context) override;
-    void doAssign(ance::Value* value, ance::Location value_location, CompileContext* context) override;
+    void doAssign(ance::Value* value, CompileContext* context) override;
 
   public:
     ~VariableAccess() override;
