@@ -17,9 +17,8 @@ namespace ance
          * Create a new string constant.
          * @param prefix The prefix determining the type.
          * @param string The string content, used directly without any parsing.
-         * @param app The current application.
          */
-        StringConstant(std::string prefix, std::string string, Application& app);
+        StringConstant(std::string prefix, std::string string);
 
         ance::Type*     type() override;
         llvm::Constant* buildContent(llvm::Module* m) override;
@@ -32,7 +31,7 @@ namespace ance
         static std::string parse(const std::string& unparsed);
 
       private:
-        static ance::Type* resolveType(std::string& prefix, std::string& string, Application& app);
+        static ance::Type* resolveType(std::string& prefix, std::string& string);
 
       private:
         ance::Type* type_;

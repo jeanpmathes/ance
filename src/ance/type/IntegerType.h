@@ -30,15 +30,17 @@ namespace ance
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;
 
+      private:
+        static std::map<std::pair<uint64_t, bool>, ance::IntegerType*>& getIntegerTypes();
+
       public:
         /**
          * Get an integer type instance.
-         * @param app The current application.
          * @param bit_size The size of the integer.
          * @param is_signed Whether the integer should be signed.
          * @return The instance.
          */
-        static ance::Type* get(Application& app, uint64_t bit_size, bool is_signed);
+        static ance::Type* get(uint64_t bit_size, bool is_signed);
 
         /**
          * Check if a given type is an integer type with the given attributes.

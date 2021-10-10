@@ -21,9 +21,8 @@ namespace ance
         /**
          * Create a new byte constant.
          * @param byte The byte value.
-         * @param app The current application.
          */
-        explicit ByteConstant(uint8_t byte, Application& app);
+        explicit ByteConstant(uint8_t byte);
 
         ance::Type*     type() override;
         llvm::Constant* buildContent(llvm::Module* m) override;

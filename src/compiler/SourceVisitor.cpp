@@ -321,7 +321,7 @@ antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext
 
     std::string str = ance::StringConstant::parse(ctx->STRING()->getText());
 
-    ance::Constant* string = new ance::StringConstant(prefix, str, application_);
+    ance::Constant* string = new ance::StringConstant(prefix, str);
     return static_cast<Expression*>(new ConstantLiteral(string, location(ctx)));
 }
 
@@ -329,7 +329,7 @@ antlrcpp::Any SourceVisitor::visitByteLiteral(anceParser::ByteLiteralContext* ct
 {
     uint8_t b = ance::ByteConstant::parse(ctx->BYTE()->getText());
 
-    ance::Constant* byte = new ance::ByteConstant(b, application_);
+    ance::Constant* byte = new ance::ByteConstant(b);
     return static_cast<Expression*>(new ConstantLiteral(byte, location(ctx)));
 }
 
@@ -368,13 +368,13 @@ antlrcpp::Any SourceVisitor::visitFloatingPointLiteral(anceParser::FloatingPoint
 
 antlrcpp::Any SourceVisitor::visitTrue(anceParser::TrueContext* ctx)
 {
-    ance::Constant* constant = ance::BooleanConstant::createTrue(application_);
+    ance::Constant* constant = ance::BooleanConstant::createTrue();
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFalse(anceParser::FalseContext* ctx)
 {
-    ance::Constant* constant = ance::BooleanConstant::createFalse(application_);
+    ance::Constant* constant = ance::BooleanConstant::createFalse();
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
@@ -399,7 +399,7 @@ antlrcpp::Any SourceVisitor::visitUnsignedInteger(anceParser::UnsignedIntegerCon
     uint64_t size = std::stoi(ctx->width->getText());
 
     const llvm::APInt integer(size, ctx->value->getText(), 10);
-    auto*             integer_constant = new ance::IntegerConstant(integer, false, application_);
+    auto*             integer_constant = new ance::IntegerConstant(integer, false);
     Expression*       expression       = new ConstantLiteral(integer_constant, location(ctx));
     return expression;
 }
@@ -409,7 +409,7 @@ antlrcpp::Any SourceVisitor::visitSignedInteger(anceParser::SignedIntegerContext
     uint64_t size = std::stoi(ctx->width->getText());
 
     const llvm::APInt integer(size, ctx->value->getText(), 10);
-    auto*             integer_constant = new ance::IntegerConstant(integer, true, application_);
+    auto*             integer_constant = new ance::IntegerConstant(integer, true);
     Expression*       expression       = new ConstantLiteral(integer_constant, location(ctx));
     return expression;
 }
@@ -442,7 +442,7 @@ antlrcpp::Any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerConte
     integer_str.erase(0, 2);
 
     const llvm::APInt integer(size, integer_str, radix);
-    auto*             integer_constant = new ance::IntegerConstant(integer, false, application_);
+    auto*             integer_constant = new ance::IntegerConstant(integer, false);
     Expression*       expression       = new ConstantLiteral(integer_constant, location(ctx));
     return expression;
 }
@@ -456,7 +456,7 @@ antlrcpp::Any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ct
     bool     is_unsigned = integer_type_str[0] == 'u';
     uint64_t size        = std::stoi(integer_type_str.substr(1 + integer_type_str.find('i')));
 
-    type = ance::IntegerType::get(application_, size, !is_unsigned);
+    type = ance::IntegerType::get(size, !is_unsigned);
 
     return type;
 }

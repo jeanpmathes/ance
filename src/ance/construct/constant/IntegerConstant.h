@@ -17,9 +17,8 @@ namespace ance
          * Create a new integer constant.
          * @param integer The integer value to use. The bit width determines the used type.
          * @param is_signed Whether the integer should be signed or unsigned.
-         * @param app The current application.
          */
-        IntegerConstant(llvm::APInt integer, bool is_signed, Application& app);
+        IntegerConstant(llvm::APInt integer, bool is_signed);
 
         ance::Type*     type() override;
         llvm::Constant* buildContent(llvm::Module* m) override;

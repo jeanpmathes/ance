@@ -13,7 +13,7 @@ namespace ance
     class BooleanConstant : public Constant
     {
       private:
-        explicit BooleanConstant(bool boolean, Application& app);
+        explicit BooleanConstant(bool boolean);
 
       public:
         ance::Type* type() override;
@@ -22,16 +22,14 @@ namespace ance
 
         /**
          * Create a boolean constant with the false value.
-         * @param app The current application.
          * @return The new boolean constant.
          */
-        static ance::BooleanConstant* createFalse(Application& app);
+        static ance::BooleanConstant* createFalse();
         /**
          * Create a boolean constant with the true value.
-         * @param app The current application.
          * @return The new boolean constant.
          */
-        static ance::BooleanConstant* createTrue(Application& app);
+        static ance::BooleanConstant* createTrue();
 
       private:
         ance::Type* type_;

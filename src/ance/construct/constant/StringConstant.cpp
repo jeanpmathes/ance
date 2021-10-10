@@ -7,8 +7,8 @@
 #include "ance/type/IntegerType.h"
 #include "ance/type/PointerType.h"
 
-ance::StringConstant::StringConstant(std::string prefix, std::string string, Application& app)
-    : type_(resolveType(prefix, string, app))
+ance::StringConstant::StringConstant(std::string prefix, std::string string)
+    : type_(resolveType(prefix, string))
     , prefix_(prefix)
     , string_(string)
 {}
@@ -67,9 +67,9 @@ std::string ance::StringConstant::parse(const std::string& unparsed)
     return builder.str();
 }
 
-ance::Type* ance::StringConstant::resolveType(std::string& prefix, std::string& string, Application& app)
+ance::Type* ance::StringConstant::resolveType(std::string& prefix, std::string& string)
 {
-    if (prefix == "c") { return ance::PointerType::get(ance::IntegerType::get(app, 8, false)); }
+    if (prefix == "c") { return ance::PointerType::get(ance::IntegerType::get(8, false)); }
 
-    return ance::ArrayType::get(ance::IntegerType::get(app, 8, false), string.size());
+    return ance::ArrayType::get(ance::IntegerType::get(8, false), string.size());
 }

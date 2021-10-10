@@ -3,10 +3,7 @@
 #include "ance/type/IntegerType.h"
 #include "compiler/Application.h"
 
-ance::ByteConstant::ByteConstant(uint8_t byte, Application& app)
-    : type_(ance::IntegerType::get(app, 8, false))
-    , byte_(byte)
-{}
+ance::ByteConstant::ByteConstant(uint8_t byte) : type_(ance::IntegerType::get(8, false)), byte_(byte) {}
 
 ance::Type* ance::ByteConstant::type()
 {
