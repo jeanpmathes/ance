@@ -71,5 +71,5 @@ ance::Type* ance::StringConstant::resolveType(std::string& prefix, std::string& 
 {
     if (prefix == "c") { return ance::PointerType::get(app, ance::IntegerType::get(app, 8, false)); }
 
-    return ance::ArrayType::get(app, ance::IntegerType::get(app, 8, false), string.size());
+    return ance::ArrayType::get(ance::IntegerType::get(app, 8, false), string.size());
 }

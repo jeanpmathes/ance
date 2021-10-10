@@ -121,19 +121,26 @@ llvm::DIType* ance::ArrayType::createDebugType(CompileContext* context)
                                           context->di()->getOrCreateArray(subscripts));
 }
 
-ance::Type* ance::ArrayType::get(Application& app, Type* element_type, uint64_t size)
+std::map<std::pair<ance::Type*, uint64_t>, ance::ArrayType*>& ance::ArrayType::getArrayTypes()
 {
-    auto*       type      = new ance::ArrayType(element_type, size);
-    std::string type_name = type->getName();
+    static std::map<std::pair<ance::Type*, uint64_t>, ance::ArrayType*> array_types;
+    return array_types;
+}
 
-    if (app.globalScope()->isTypeRegistered(type_name))
+ance::Type* ance::ArrayType::get(ance::Type* element_type, uint64_t size)
+{
+    auto             it         = getArrayTypes().find(std::make_pair(element_type, size));
+    ance::ArrayType* array_type = nullptr;
+
+    if (it == getArrayTypes().end())
     {
-        delete type;
-        return app.globalScope()->getType(type_name);
+        array_type = new ance::ArrayType(element_type, size);
+        getArrayTypes().insert(std::make_pair(std::make_pair(element_type, size), array_type));
     }
     else
     {
-        app.globalScope()->registerType(type);
-        return type;
+        array_type = it->second;
     }
+
+    return array_type;
 }

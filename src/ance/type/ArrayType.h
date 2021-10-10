@@ -55,15 +55,17 @@ namespace ance
         ance::Type*      element_reference_;
         llvm::ArrayType* type_ {nullptr};
 
+      private:
+        static std::map<std::pair<ance::Type*, uint64_t>, ance::ArrayType*>& getArrayTypes();
+
       public:
         /**
          * Get an array type instance.
-         * @param app The current application.
          * @param element_type The element type of the array.
          * @param size The size of the array. Must be greater than zero.
          * @return The array type instance.
          */
-        static ance::Type* get(Application& app, Type* element_type, uint64_t size);
+        static ance::Type* get(ance::Type* element_type, uint64_t size);
     };
 }
 

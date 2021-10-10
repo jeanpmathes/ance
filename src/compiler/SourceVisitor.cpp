@@ -467,7 +467,7 @@ antlrcpp::Any SourceVisitor::visitArrayType(anceParser::ArrayTypeContext* ctx)
 
     ance::Type* element_type = visit(ctx->type());
     uint64_t    size         = std::stoi(ctx->INTEGER()->getText());
-    type                     = ance::ArrayType::get(application_, element_type, size);
+    type                     = ance::ArrayType::get(element_type, size);
 
     return type;
 }
