@@ -84,6 +84,13 @@ llvm::DIType* ance::ReferenceType::createDebugType(CompileContext* context)
 
     return di_type;
 }
+
+std::map<ance::Type*, ance::ReferenceType*>& ance::ReferenceType::getReferenceTypes()
+{
+    static std::map<ance::Type*, ance::ReferenceType*> reference_types;
+    return reference_types;
+}
+
 llvm::Value* ance::ReferenceType::getReferenced(llvm::Value* value, CompileContext* context)
 {
     return context->ir()->CreateLoad(value);
@@ -101,21 +108,22 @@ ance::Value* ance::ReferenceType::getReferenced(ance::Value* value, CompileConte
     return new ance::WrappedNativeValue(element_type_, native_referred);
 }
 
-ance::Type* ance::ReferenceType::get(Application& app, ance::Type* element_type)
+ance::Type* ance::ReferenceType::get(ance::Type* element_type)
 {
-    auto*       type      = new ance::ReferenceType(element_type);
-    std::string type_name = type->getName();
+    auto                 it             = getReferenceTypes().find(element_type);
+    ance::ReferenceType* reference_type = nullptr;
 
-    if (app.globalScope()->isTypeRegistered(type_name))
+    if (it == getReferenceTypes().end())
     {
-        delete type;
-        return app.globalScope()->getType(type_name);
+        reference_type = new ance::ReferenceType(element_type);
+        getReferenceTypes().insert(std::make_pair(element_type, reference_type));
     }
     else
     {
-        app.globalScope()->registerType(type);
-        return type;
+        reference_type = it->second;
     }
+
+    return reference_type;
 }
 
 bool ance::ReferenceType::isReferenceType(ance::Type* type)

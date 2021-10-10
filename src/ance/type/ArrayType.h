@@ -20,7 +20,7 @@ namespace ance
     class ArrayType : public Type
     {
       private:
-        ArrayType(Application& app, Type* element_type, uint64_t size);
+        ArrayType(Type* element_type, uint64_t size);
 
       public:
         std::string getName() override;

@@ -193,7 +193,7 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
     Expression* address = visit(ctx->expression());
 
     return static_cast<Statement*>(
-        LocalReferenceVariableDefinition::defineReferringTo(identifier, type, address, application_, location(ctx)));
+        LocalReferenceVariableDefinition::defineReferringTo(identifier, type, address, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
@@ -288,7 +288,7 @@ antlrcpp::Any SourceVisitor::visitBindReferenceToAddress(anceParser::BindReferen
 {
     Expression* address = visit(ctx->expression());
 
-    return static_cast<Expression*>(BindRef::referTo(address, application_, location(ctx)));
+    return static_cast<Expression*>(BindRef::referTo(address, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)
@@ -489,7 +489,7 @@ antlrcpp::Any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)
 antlrcpp::Any SourceVisitor::visitReference(anceParser::ReferenceContext* ctx)
 {
     ance::Type* element_type = visit(ctx->type());
-    ance::Type* type         = ance::ReferenceType::get(application_, element_type);
+    ance::Type* type         = ance::ReferenceType::get(element_type);
 
     return type;
 }

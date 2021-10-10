@@ -10,10 +10,10 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::ArrayType::ArrayType(Application& app, Type* element_type, const uint64_t size)
+ance::ArrayType::ArrayType(Type* element_type, const uint64_t size)
     : size_(size)
     , element_type_(element_type)
-    , element_reference_(ance::ReferenceType::get(app, element_type))
+    , element_reference_(ance::ReferenceType::get(element_type))
 {}
 
 std::string ance::ArrayType::getName()
@@ -123,7 +123,7 @@ llvm::DIType* ance::ArrayType::createDebugType(CompileContext* context)
 
 ance::Type* ance::ArrayType::get(Application& app, Type* element_type, uint64_t size)
 {
-    auto*       type      = new ance::ArrayType(app, element_type, size);
+    auto*       type      = new ance::ArrayType(element_type, size);
     std::string type_name = type->getName();
 
     if (app.globalScope()->isTypeRegistered(type_name))

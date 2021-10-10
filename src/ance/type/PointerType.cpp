@@ -11,9 +11,9 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::PointerType::PointerType(Application& app, ance::Type* element_type)
+ance::PointerType::PointerType(ance::Type* element_type)
     : element_type_(element_type)
-    , element_reference_(ance::ReferenceType::get(app, element_type))
+    , element_reference_(ance::ReferenceType::get(element_type))
 {}
 
 std::string ance::PointerType::getName()
@@ -124,7 +124,7 @@ llvm::DIType* ance::PointerType::createDebugType(CompileContext* context)
 
 ance::Type* ance::PointerType::get(Application& app, ance::Type* element_type)
 {
-    auto*       type      = new ance::PointerType(app, element_type);
+    auto*       type      = new ance::PointerType(element_type);
     std::string type_name = type->getName();
 
     if (app.globalScope()->isTypeRegistered(type_name))

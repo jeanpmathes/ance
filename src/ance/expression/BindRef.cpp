@@ -10,18 +10,15 @@
 BindRef* BindRef::refer(Expression* value, Application& app, ance::Location location)
 {
     auto* addressof = new Addressof(value, app, location);
-    return new BindRef(addressof, app, location);
+    return new BindRef(addressof, location);
 }
 
-BindRef* BindRef::referTo(Expression* address, Application& app, ance::Location location)
+BindRef* BindRef::referTo(Expression* address, ance::Location location)
 {
-    return new BindRef(address, app, location);
+    return new BindRef(address, location);
 }
 
-BindRef::BindRef(Expression* address, Application& application, ance::Location location)
-    : Expression(location)
-    , address_(address)
-    , application_(application)
+BindRef::BindRef(Expression* address, ance::Location location) : Expression(location), address_(address)
 {
     addChild(*address);
 }
@@ -36,7 +33,7 @@ ance::Type* BindRef::type()
     if (!type_)
     {
         ance::Type* element_type = ance::PointerType::getPointeeType(address_->type());
-        type_                    = ance::ReferenceType::get(application_, element_type);
+        type_                    = ance::ReferenceType::get(element_type);
     }
 
     return type_;

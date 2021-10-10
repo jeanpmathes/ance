@@ -15,10 +15,10 @@ class BindRef : public DelayableExpression
     /**
      * Get an expression returning a reference to a value at a given address.
      */
-    static BindRef* referTo(Expression* address, Application& app, ance::Location location);
+    static BindRef* referTo(Expression* address, ance::Location location);
 
   private:
-    BindRef(Expression* address, Application& application, ance::Location location);
+    BindRef(Expression* address, ance::Location location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -38,7 +38,6 @@ class BindRef : public DelayableExpression
 
   private:
     Expression*  address_;
-    Application& application_;
 
     ance::Type* type_ {nullptr};
 };
