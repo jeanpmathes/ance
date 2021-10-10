@@ -16,10 +16,9 @@
 LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferring(std::string    identifier,
                                                                                     ance::Type*    type,
                                                                                     Expression*    value,
-                                                                                    Application&   app,
                                                                                     ance::Location location)
 {
-    Expression* reference = BindRef::refer(value, app, location);
+    Expression* reference = BindRef::refer(value, location);
     return new LocalReferenceVariableDefinition(std::move(identifier), type, reference, location);
 }
 

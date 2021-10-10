@@ -18,13 +18,11 @@ class Allocation : public DelayableExpression
      * @param allocation The allocation type.
      * @param type The type of the value to allocate.
      * @param count An expression providing the number of elements to allocate.
-     * @param app The current application.
      * @param location The source location.
      */
     Allocation(Runtime::Allocator allocation,
                ance::Type*        type,
                Expression*        count,
-               Application&       app,
                ance::Location     location);
 
   protected:

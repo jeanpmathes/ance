@@ -28,7 +28,6 @@ class LocalReferenceVariableDefinition : public Statement
     static LocalReferenceVariableDefinition* defineReferring(std::string    identifier,
                                                              ance::Type*    type,
                                                              Expression*    value,
-                                                             Application&   app,
                                                              ance::Location location);
     /**
      * Define a local variable referring to a given address.

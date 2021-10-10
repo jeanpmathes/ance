@@ -7,9 +7,9 @@
 #include "ance/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
-BindRef* BindRef::refer(Expression* value, Application& app, ance::Location location)
+BindRef* BindRef::refer(Expression* value, ance::Location location)
 {
-    auto* addressof = new Addressof(value, app, location);
+    auto* addressof = new Addressof(value, location);
     return new BindRef(addressof, location);
 }
 

@@ -11,7 +11,7 @@ class BindRef : public DelayableExpression
     /**
      * Get an expression returning a reference to a given value.
      */
-    static BindRef* refer(Expression* value, Application& app, ance::Location location);
+    static BindRef* refer(Expression* value, ance::Location location);
     /**
      * Get an expression returning a reference to a value at a given address.
      */

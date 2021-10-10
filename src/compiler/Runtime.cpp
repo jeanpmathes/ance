@@ -54,7 +54,7 @@ ance::Value* Runtime::allocate(Allocator allocation, ance::Type* type, ance::Val
             throw std::invalid_argument("Unsupported allocation type.");
     }
 
-    ance::Type*  ptr_type   = ance::PointerType::get(*context->application(), type);
+    ance::Type*  ptr_type   = ance::PointerType::get(type);
     llvm::Value* native_ptr = ance::Values::contentToNative(ptr_type, ptr_to_allocated, context);
 
     return new ance::WrappedNativeValue(ptr_type, native_ptr);
@@ -119,7 +119,6 @@ llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, Comp
     llvm::Value* args[] = {flags, size};
 
     llvm::Value* opaque_ptr = context->ir()->CreateCall(allocate_dynamic_type_, allocate_dynamic_, args);
-    return context->ir()->CreateBitCast(
-        opaque_ptr,
-        ance::PointerType::get(*context->application(), type)->getContentType(*context->llvmContext()));
+    return context->ir()->CreateBitCast(opaque_ptr,
+                                        ance::PointerType::get(type)->getContentType(*context->llvmContext()));
 }

@@ -181,7 +181,7 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
     Expression* value = visit(ctx->expression());
 
     return static_cast<Statement*>(
-        LocalReferenceVariableDefinition::defineReferring(identifier, type, value, application_, location(ctx)));
+        LocalReferenceVariableDefinition::defineReferring(identifier, type, value, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
@@ -259,7 +259,7 @@ antlrcpp::Any SourceVisitor::visitAllocation(anceParser::AllocationContext* ctx)
 
     if (ctx->expression()) { count = visit(ctx->expression()); }
 
-    return static_cast<Expression*>(new Allocation(allocator, type, count, application_, location(ctx)));
+    return static_cast<Expression*>(new Allocation(allocator, type, count, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitRoughCast(anceParser::RoughCastContext* ctx)
@@ -274,14 +274,14 @@ antlrcpp::Any SourceVisitor::visitAddressof(anceParser::AddressofContext* ctx)
 {
     Expression* arg = visit(ctx->expression());
 
-    return static_cast<Expression*>(new Addressof(arg, application_, location(ctx)));
+    return static_cast<Expression*>(new Addressof(arg, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitBindReference(anceParser::BindReferenceContext* ctx)
 {
     Expression* value = visit(ctx->expression());
 
-    return static_cast<Expression*>(BindRef::refer(value, application_, location(ctx)));
+    return static_cast<Expression*>(BindRef::refer(value, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitBindReferenceToAddress(anceParser::BindReferenceToAddressContext* ctx)
@@ -481,7 +481,7 @@ antlrcpp::Any SourceVisitor::visitKeywordType(anceParser::KeywordTypeContext* ct
 antlrcpp::Any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)
 {
     ance::Type* element_type = visit(ctx->type());
-    ance::Type* type         = ance::PointerType::get(application_, element_type);
+    ance::Type* type         = ance::PointerType::get(element_type);
 
     return type;
 }

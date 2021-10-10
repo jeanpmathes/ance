@@ -69,7 +69,7 @@ std::string ance::StringConstant::parse(const std::string& unparsed)
 
 ance::Type* ance::StringConstant::resolveType(std::string& prefix, std::string& string, Application& app)
 {
-    if (prefix == "c") { return ance::PointerType::get(app, ance::IntegerType::get(app, 8, false)); }
+    if (prefix == "c") { return ance::PointerType::get(ance::IntegerType::get(app, 8, false)); }
 
     return ance::ArrayType::get(ance::IntegerType::get(app, 8, false), string.size());
 }

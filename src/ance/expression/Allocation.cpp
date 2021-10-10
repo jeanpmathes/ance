@@ -8,13 +8,12 @@
 Allocation::Allocation(Runtime::Allocator allocation,
                        ance::Type*        type,
                        Expression*        count,
-                       Application&       app,
                        ance::Location     location)
     : Expression(location)
     , allocation_(allocation)
     , allocated_type_(type)
     , count_(count)
-    , return_type_(ance::PointerType::get(app, type))
+    , return_type_(ance::PointerType::get(type))
 {
     addChild(*count);
 }

@@ -48,14 +48,16 @@ namespace ance
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;
 
+      private:
+        static std::map<ance::Type*, ance::PointerType*>& getPointerTypes();
+
       public:
         /**
          * Get a pointer type instance.
-         * @param app The current application.
          * @param element_type The element type.
          * @return The instance.
          */
-        static ance::Type* get(Application& app, ance::Type* element_type);
+        static ance::Type* get(ance::Type* element_type);
 
         /**
          * Check if a given type is a pointer type.

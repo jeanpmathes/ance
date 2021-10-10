@@ -14,12 +14,11 @@ class Addressof : public DelayableExpression
 {
   public:
     /**
-     * Create an adressof expression that provides the address of the arg.
+     * Create an addressof expression that provides the address of the arg.
      * @param arg The argument to get the address of.
-     * @param app The current application.
      * @param location The source location of the expression.
      */
-    Addressof(Expression* arg, Application& app, ance::Location location);
+    Addressof(Expression* arg, ance::Location location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -39,7 +38,6 @@ class Addressof : public DelayableExpression
 
   private:
     Expression*  arg_;
-    Application& application_;
     ance::Type*  return_type_ {nullptr};
 };
 #endif

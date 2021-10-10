@@ -122,21 +122,28 @@ llvm::DIType* ance::PointerType::createDebugType(CompileContext* context)
     return di_type;
 }
 
-ance::Type* ance::PointerType::get(Application& app, ance::Type* element_type)
+std::map<ance::Type*, ance::PointerType*>& ance::PointerType::getPointerTypes()
 {
-    auto*       type      = new ance::PointerType(element_type);
-    std::string type_name = type->getName();
+    static std::map<ance::Type*, ance::PointerType*> pointer_types;
+    return pointer_types;
+}
 
-    if (app.globalScope()->isTypeRegistered(type_name))
+ance::Type* ance::PointerType::get(ance::Type* element_type)
+{
+    auto               it           = getPointerTypes().find(element_type);
+    ance::PointerType* pointer_type = nullptr;
+
+    if (it == getPointerTypes().end())
     {
-        delete type;
-        return app.globalScope()->getType(type_name);
+        pointer_type = new ance::PointerType(element_type);
+        getPointerTypes().insert(std::make_pair(element_type, pointer_type));
     }
     else
     {
-        app.globalScope()->registerType(type);
-        return type;
+        pointer_type = it->second;
     }
+
+    return pointer_type;
 }
 
 bool ance::PointerType::isPointerType(ance::Type* type)

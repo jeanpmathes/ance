@@ -7,10 +7,7 @@
 #include "ance/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
-Addressof::Addressof(Expression* arg, Application& app, ance::Location location)
-    : Expression(location)
-    , arg_(arg)
-    , application_(app)
+Addressof::Addressof(Expression* arg, ance::Location location) : Expression(location), arg_(arg)
 {
     addChild(*arg);
 }
@@ -31,7 +28,7 @@ ance::Type* Addressof::type()
             value_type = ance::ReferenceType::getReferencedType(value_type);
         }
 
-        return_type_ = ance::PointerType::get(application_, value_type);
+        return_type_ = ance::PointerType::get(value_type);
     }
 
     return return_type_;
