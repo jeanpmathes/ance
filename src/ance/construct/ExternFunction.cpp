@@ -38,6 +38,11 @@ void ance::ExternFunction::validate(ValidationLogger& validation_logger)
         }
 
         parameter->type()->validate(validation_logger, parameter->location());
+
+        if (parameter->type() == ance::VoidType::get())
+        {
+            validation_logger.logError("Parameter cannot have 'void' type", parameter->location());
+        }
     }
 }
 

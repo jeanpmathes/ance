@@ -8,7 +8,7 @@
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/ReferenceType.h"
-#include "ance/type/Type.h"
+#include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
 LocalVariableDefinition::LocalVariableDefinition(std::string    identifier,
@@ -45,6 +45,12 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
         if (!assigned_is_valid) return;
 
         if (!variable_->type()->validate(validation_logger, location())) return;
+
+        if (type_ == ance::VoidType::get())
+        {
+            validation_logger.logError("Local variable cannot have 'void' type", location());
+            return;
+        }
 
         if (ance::ReferenceType::isReferenceType(type_))
         {
