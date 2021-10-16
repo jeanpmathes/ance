@@ -10,9 +10,10 @@ namespace ance
      */
     class SingleType : public FloatingPointType
     {
-      public:
-        std::string getName() override;
+      private:
+        SingleType();
 
+      public:
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;

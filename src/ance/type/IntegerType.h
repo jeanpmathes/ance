@@ -16,8 +16,6 @@ namespace ance
         IntegerType(uint64_t bit_size, bool is_signed);
 
       public:
-        std::string getName() override;
-
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;

@@ -2,10 +2,7 @@
 
 #include "ance/scope/GlobalScope.h"
 
-std::string ance::HalfType::getName()
-{
-    return "half";
-}
+ance::HalfType::HalfType() : Type("half") {}
 
 llvm::Constant* ance::HalfType::getDefaultContent(llvm::LLVMContext& c)
 {

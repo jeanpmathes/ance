@@ -2,10 +2,7 @@
 
 #include "ance/scope/GlobalScope.h"
 
-std::string ance::SingleType::getName()
-{
-    return "single";
-}
+ance::SingleType::SingleType() : Type("single") {}
 
 llvm::Constant* ance::SingleType::getDefaultContent(llvm::LLVMContext& c)
 {

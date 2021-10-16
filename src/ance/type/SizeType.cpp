@@ -4,12 +4,7 @@
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
-ance::SizeType::SizeType(std::string name) : name_(std::move(name)) {}
-
-std::string ance::SizeType::getName()
-{
-    return name_;
-}
+ance::SizeType::SizeType(std::string name) : Type(std::move(name)) {}
 
 llvm::Constant* ance::SizeType::getDefaultContent(llvm::LLVMContext& c)
 {

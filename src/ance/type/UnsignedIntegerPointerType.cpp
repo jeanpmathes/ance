@@ -4,10 +4,7 @@
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
-std::string ance::UnsignedIntegerPointerType::getName()
-{
-    return "uiptr";
-}
+ance::UnsignedIntegerPointerType::UnsignedIntegerPointerType() : Type("uiptr") {}
 
 llvm::Constant* ance::UnsignedIntegerPointerType::getDefaultContent(llvm::LLVMContext& c)
 {

@@ -15,11 +15,7 @@ namespace ance
       private:
         explicit SizeType(std::string name);
 
-        std::string name_;
-
       public:
-        std::string getName() override;
-
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;

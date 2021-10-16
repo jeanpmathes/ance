@@ -8,15 +8,8 @@ namespace ance
     /**
      * The base class of all floating point types.
      */
-    class FloatingPointType : public Type
+    class FloatingPointType : virtual public Type
     {
-      public:
-        std::string getName() override = 0;
-
-        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override = 0;
-
-        llvm::Type* getContentType(llvm::LLVMContext& c) override = 0;
-
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;
     };

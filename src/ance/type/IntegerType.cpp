@@ -4,15 +4,11 @@
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
-ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed) : bit_size_(bit_size), is_signed_(is_signed) {}
-
-std::string ance::IntegerType::getName()
-{
-    if (is_signed_)
-        return "i" + std::to_string(bit_size_);
-    else
-        return "ui" + std::to_string(bit_size_);
-}
+ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed)
+    : Type((is_signed ? "i" : "ui") + std::to_string(bit_size))
+    , bit_size_(bit_size)
+    , is_signed_(is_signed)
+{}
 
 llvm::Constant* ance::IntegerType::getDefaultContent(llvm::LLVMContext& c)
 {

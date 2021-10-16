@@ -2,10 +2,7 @@
 
 #include "compiler/CompileContext.h"
 
-std::string ance::VoidType::getName()
-{
-    return "void";
-}
+ance::VoidType::VoidType() : Type("void") {}
 
 llvm::Constant* ance::VoidType::getDefaultContent(llvm::LLVMContext&)
 {

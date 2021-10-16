@@ -4,6 +4,13 @@
 #include "ance/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
+ance::Type::Type(std::string name) : name_(std::move(name)) {}
+
+const std::string& ance::Type::getName() const
+{
+    return name_;
+}
+
 llvm::Type* ance::Type::getNativeType(llvm::LLVMContext& c)
 {
     return llvm::PointerType::get(getContentType(c), 0);

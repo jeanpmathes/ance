@@ -2,10 +2,7 @@
 
 #include "ance/scope/GlobalScope.h"
 
-std::string ance::DoubleType::getName()
-{
-    return "double";
-}
+ance::DoubleType::DoubleType() : Type("double") {}
 
 llvm::Constant* ance::DoubleType::getDefaultContent(llvm::LLVMContext& c)
 {

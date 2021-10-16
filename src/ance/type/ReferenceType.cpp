@@ -8,12 +8,10 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::ReferenceType::ReferenceType(ance::Type* element_type) : element_type_(element_type) {}
-
-std::string ance::ReferenceType::getName()
-{
-    return "&" + element_type_->getName();
-}
+ance::ReferenceType::ReferenceType(ance::Type* element_type)
+    : Type("&" + element_type->getName())
+    , element_type_(element_type)
+{}
 
 llvm::Constant* ance::ReferenceType::getDefaultContent(llvm::LLVMContext&)
 {

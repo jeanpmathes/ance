@@ -16,9 +16,10 @@ namespace ance
      */
     class UnsignedIntegerPointerType : public Type
     {
-      public:
-        std::string getName() override;
+      private:
+        UnsignedIntegerPointerType();
 
+      public:
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;

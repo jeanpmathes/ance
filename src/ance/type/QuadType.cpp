@@ -2,10 +2,7 @@
 
 #include "ance/scope/GlobalScope.h"
 
-std::string ance::QuadType::getName()
-{
-    return "quad";
-}
+ance::QuadType::QuadType() : Type("quad") {}
 
 llvm::Constant* ance::QuadType::getDefaultContent(llvm::LLVMContext& c)
 {

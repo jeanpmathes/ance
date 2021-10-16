@@ -16,8 +16,6 @@ namespace ance
         explicit ReferenceType(ance::Type* element_type);
 
       public:
-        std::string getName() override;
-
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
         llvm::PointerType* getContentType(llvm::LLVMContext& c) override;

@@ -12,14 +12,10 @@
 #include "validation/ValidationLogger.h"
 
 ance::PointerType::PointerType(ance::Type* element_type)
-    : element_type_(element_type)
+    : Type("*" + element_type->getName())
+    , element_type_(element_type)
     , element_reference_(ance::ReferenceType::get(element_type))
 {}
-
-std::string ance::PointerType::getName()
-{
-    return "*" + element_type_->getName();
-}
 
 llvm::Constant* ance::PointerType::getDefaultContent(llvm::LLVMContext& c)
 {

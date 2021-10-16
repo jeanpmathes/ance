@@ -11,15 +11,11 @@
 #include "validation/ValidationLogger.h"
 
 ance::ArrayType::ArrayType(Type* element_type, const uint64_t size)
-    : size_(size)
+    : Type("[" + element_type->getName() + "; " + std::to_string(size) + "]")
+    , size_(size)
     , element_type_(element_type)
     , element_reference_(ance::ReferenceType::get(element_type))
 {}
-
-std::string ance::ArrayType::getName()
-{
-    return "[" + element_type_->getName() + "; " + std::to_string(size_) + "]";
-}
 
 llvm::Constant* ance::ArrayType::getDefaultContent(llvm::LLVMContext& c)
 {

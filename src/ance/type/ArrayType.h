@@ -23,8 +23,6 @@ namespace ance
         ArrayType(Type* element_type, uint64_t size);
 
       public:
-        std::string getName() override;
-
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 

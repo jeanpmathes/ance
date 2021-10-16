@@ -10,15 +10,13 @@ namespace ance
      */
     class VoidType : public Type
     {
-      public:
-        std::string getName() override;
+      private:
+        VoidType();
 
+      public:
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;
-
-      private:
-        VoidType() = default;
 
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;

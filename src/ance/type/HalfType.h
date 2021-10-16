@@ -10,9 +10,10 @@ namespace ance
      */
     class HalfType : public FloatingPointType
     {
-      public:
-        std::string getName() override;
+      private:
+        HalfType();
 
+      public:
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;

@@ -27,7 +27,11 @@ namespace ance
     class Type
     {
       protected:
-        Type()          = default;
+        /**
+         * Create a new type with a given name.
+         * @param name The name of the type.
+         */
+        explicit Type(std::string name);
         virtual ~Type() = default;
 
       public:
@@ -38,7 +42,7 @@ namespace ance
          * Get the name of this type.
          * @return The name.
          */
-        virtual std::string getName() = 0;
+        [[nodiscard]] virtual const std::string& getName() const;
 
         /**
          * Get the default content of a value of this type.
@@ -151,6 +155,7 @@ namespace ance
         static ance::Value* makeMatching(ance::Type* expected, ance::Value* value, CompileContext* context);
 
       private:
+        std::string   name_;
         llvm::DIType* debug_type_ {nullptr};
     };
 }
