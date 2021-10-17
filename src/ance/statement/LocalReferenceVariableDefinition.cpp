@@ -13,34 +13,35 @@
 #include "ance/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
-LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferring(std::string    identifier,
-                                                                                    ance::Type*    type,
-                                                                                    Expression*    value,
+LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferring(std::string identifier,
+                                                                                    ance::Type* type,
+                                                                                    std::unique_ptr<Expression> value,
                                                                                     ance::Location location)
 {
-    Expression* reference = BindRef::refer(value, location);
-    return new LocalReferenceVariableDefinition(std::move(identifier), type, reference, location);
+    std::unique_ptr<Expression> reference = BindRef::refer(std::move(value), location);
+    return new LocalReferenceVariableDefinition(std::move(identifier), type, std::move(reference), location);
 }
 
-LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferringTo(std::string    identifier,
-                                                                                      ance::Type*    type,
-                                                                                      Expression*    address,
-                                                                                      ance::Location location)
+LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferringTo(
+    std::string                 identifier,
+    ance::Type*                 type,
+    std::unique_ptr<Expression> address,
+    ance::Location              location)
 {
-    Expression* reference = BindRef::referTo(address, location);
-    return new LocalReferenceVariableDefinition(std::move(identifier), type, reference, location);
+    std::unique_ptr<Expression> reference = BindRef::referTo(std::move(address), location);
+    return new LocalReferenceVariableDefinition(std::move(identifier), type, std::move(reference), location);
 }
 
-LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string    identifier,
-                                                                   ance::Type*    type,
-                                                                   Expression*    reference,
-                                                                   ance::Location location)
+LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string                 identifier,
+                                                                   ance::Type*                 type,
+                                                                   std::unique_ptr<Expression> reference,
+                                                                   ance::Location              location)
     : Statement(location)
     , identifier_(std::move(identifier))
     , type_(type)
-    , reference_(reference)
+    , reference_(std::move(reference))
 {
-    addChild(*reference);
+    addChild(*reference_);
 }
 
 void LocalReferenceVariableDefinition::setFunction(ance::DefinedFunction* function)

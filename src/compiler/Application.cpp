@@ -18,7 +18,7 @@
 #include "management/File.h"
 #include "validation/ValidationLogger.h"
 
-Application::Application(data::File& project) : project_(project), global_scope_(new ance::GlobalScope())
+Application::Application(data::File& project) : project_(project), global_scope_(std::make_unique<ance::GlobalScope>())
 {
     // Register keyword types
 
@@ -105,9 +105,9 @@ void Application::validate(ValidationLogger& validation_logger)
     }
 }
 
-ance::GlobalScope* Application::globalScope()
+ance::GlobalScope& Application::globalScope()
 {
-    return global_scope_;
+    return *global_scope_;
 }
 
 bool Application::accept(ance::ApplicationVisitor& visitor)

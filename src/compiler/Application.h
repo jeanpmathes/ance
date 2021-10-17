@@ -4,11 +4,10 @@
 #include <filesystem>
 
 #include "ance/Element.h"
+#include "ance/scope/GlobalScope.h"
 
 namespace ance
 {
-    class Scope;
-    class GlobalScope;
     class Function;
 }
 
@@ -78,14 +77,14 @@ class Application : public ance::Element
      * Get the top level scope of this application.
      * @return The global scope.
      */
-    ance::GlobalScope* globalScope();
+    ance::GlobalScope& globalScope();
 
     bool accept(ance::ApplicationVisitor& visitor) override;
 
   private:
     data::File& project_;
 
-    ance::GlobalScope* global_scope_;
+    std::unique_ptr<ance::GlobalScope> global_scope_;
 
     unsigned pointer_size_ {0};
 };

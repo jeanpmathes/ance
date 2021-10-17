@@ -18,10 +18,10 @@ namespace ance
          * @param parameters The parameters.
          * @param location The location of the function declaration.
          */
-        ExternFunction(std::string                   function_name,
-                       ance::Type*                   return_type,
-                       std::vector<ance::Parameter*> parameters,
-                       ance::Location                location);
+        ExternFunction(std::string                                   function_name,
+                       ance::Type*                                   return_type,
+                       std::vector<std::unique_ptr<ance::Parameter>> parameters,
+                       ance::Location                                location);
 
         void validate(ValidationLogger& validation_logger) override;
 

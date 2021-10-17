@@ -40,13 +40,13 @@ namespace ance
          * @param declaration_location The location of the function declaration.
          * @param definition_location The location of the function definition, meaning its code.
          */
-        DefinedFunction(AccessModifier                access,
-                        const std::string&            function_name,
-                        ance::Type*                   return_type,
-                        std::vector<ance::Parameter*> parameters,
-                        ance::Scope*                  scope,
-                        ance::Location                declaration_location,
-                        ance::Location                definition_location);
+        DefinedFunction(AccessModifier                                access,
+                        const std::string&                            function_name,
+                        ance::Type*                                   return_type,
+                        std::vector<std::unique_ptr<ance::Parameter>> parameters,
+                        ance::Scope*                                  scope,
+                        ance::Location                                declaration_location,
+                        ance::Location                                definition_location);
 
         [[nodiscard]] ance::Scope* scope() const override;
 

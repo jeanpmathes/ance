@@ -6,7 +6,6 @@
 
 #include "ance/ApplicationVisitor.h"
 #include "ance/construct/LocalVariable.h"
-#include "ance/construct/Parameter.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/statement/Statement.h"
@@ -16,13 +15,13 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::DefinedFunction::DefinedFunction(AccessModifier                access,
-                                       const std::string&            function_name,
-                                       ance::Type*                   return_type,
-                                       std::vector<ance::Parameter*> parameters,
-                                       ance::Scope*                  scope,
-                                       ance::Location                declaration_location,
-                                       ance::Location                definition_location)
+ance::DefinedFunction::DefinedFunction(AccessModifier                                access,
+                                       const std::string&                            function_name,
+                                       ance::Type*                                   return_type,
+                                       std::vector<std::unique_ptr<ance::Parameter>> parameters,
+                                       ance::Scope*                                  scope,
+                                       ance::Location                                declaration_location,
+                                       ance::Location                                definition_location)
     : ance::Function(function_name, return_type, std::move(parameters), declaration_location)
     , access_(access)
     , definition_location_(definition_location)

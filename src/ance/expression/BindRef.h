@@ -11,14 +11,14 @@ class BindRef : public DelayableExpression
     /**
      * Get an expression returning a reference to a given value.
      */
-    static BindRef* refer(Expression* value, ance::Location location);
+    static std::unique_ptr<BindRef> refer(std::unique_ptr<Expression> value, ance::Location location);
     /**
      * Get an expression returning a reference to a value at a given address.
      */
-    static BindRef* referTo(Expression* address, ance::Location location);
+    static std::unique_ptr<BindRef> referTo(std::unique_ptr<Expression> address, ance::Location location);
 
   private:
-    BindRef(Expression* address, ance::Location location);
+    BindRef(std::unique_ptr<Expression> address, ance::Location location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -37,7 +37,7 @@ class BindRef : public DelayableExpression
     ~BindRef() override;
 
   private:
-    Expression*  address_;
+    std::unique_ptr<Expression> address_;
 
     ance::Type* type_ {nullptr};
 };

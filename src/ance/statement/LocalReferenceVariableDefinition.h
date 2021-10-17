@@ -25,25 +25,25 @@ class LocalReferenceVariableDefinition : public Statement
      * @param value The value to refer.
      * @return The created statement.
      */
-    static LocalReferenceVariableDefinition* defineReferring(std::string    identifier,
-                                                             ance::Type*    type,
-                                                             Expression*    value,
-                                                             ance::Location location);
+    static LocalReferenceVariableDefinition* defineReferring(std::string                 identifier,
+                                                             ance::Type*                 type,
+                                                             std::unique_ptr<Expression> value,
+                                                             ance::Location              location);
     /**
      * Define a local variable referring to a given address.
      * @param address The address to refer to.
      * @return The created statement.
      */
-    static LocalReferenceVariableDefinition* defineReferringTo(std::string    identifier,
-                                                               ance::Type*    type,
-                                                               Expression*    address,
-                                                               ance::Location location);
+    static LocalReferenceVariableDefinition* defineReferringTo(std::string                 identifier,
+                                                               ance::Type*                 type,
+                                                               std::unique_ptr<Expression> address,
+                                                               ance::Location              location);
 
   private:
-    LocalReferenceVariableDefinition(std::string    identifier,
-                                     ance::Type*    type,
-                                     Expression*    reference,
-                                     ance::Location location);
+    LocalReferenceVariableDefinition(std::string                 identifier,
+                                     ance::Type*                 type,
+                                     std::unique_ptr<Expression> reference,
+                                     ance::Location              location);
 
   public:
     void setFunction(ance::DefinedFunction* function) override;
@@ -57,8 +57,8 @@ class LocalReferenceVariableDefinition : public Statement
 
   private:
     std::string identifier_;
-    ance::Type* type_;
-    Expression* reference_;
+    ance::Type*                 type_;
+    std::unique_ptr<Expression> reference_;
 
     ance::LocalVariable* variable_ {nullptr};
 };

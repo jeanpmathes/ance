@@ -7,11 +7,11 @@
 #include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
-ReturnStatement::ReturnStatement(Expression* return_value, ance::Location location)
+ReturnStatement::ReturnStatement(std::unique_ptr<Expression> return_value, ance::Location location)
     : Statement(location)
-    , return_value_(return_value)
+    , return_value_(std::move(return_value))
 {
-    addChild(*return_value);
+    addChild(*return_value_);
 }
 
 void ReturnStatement::setFunction(ance::DefinedFunction* function)

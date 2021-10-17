@@ -17,7 +17,7 @@ class DeleteStatement : public Statement
      * @param delete_buffer Whether to delete a single element or a buffer.
      * @param location The source location.
      */
-    DeleteStatement(Expression* to_delete, bool delete_buffer, ance::Location location);
+    DeleteStatement(std::unique_ptr<Expression> to_delete, bool delete_buffer, ance::Location location);
 
     void setFunction(ance::DefinedFunction* function) override;
 
@@ -29,8 +29,8 @@ class DeleteStatement : public Statement
     void doBuild(CompileContext* context) override;
 
   private:
-    Expression* to_delete_;
-    bool        delete_buffer_;
+    std::unique_ptr<Expression> to_delete_;
+    bool                        delete_buffer_;
 };
 
 #endif

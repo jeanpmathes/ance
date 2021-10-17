@@ -86,50 +86,49 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
         return;
     }
 
-    GlobalVariable* defined;
+    std::unique_ptr<ance::GlobalVariable> defined;
 
     if (global_undefined_.find(identifier) != global_undefined_.end())
     {
-        ance::GlobalVariable* undefined = global_undefined_[identifier];
+        std::unique_ptr<ance::GlobalVariable> undefined = std::move(global_undefined_[identifier]);
         undefined->defineGlobal(this, access, type, initializer, is_final, is_constant, location);
 
-        defined = undefined;
-
-        if (is_constant) { global_constants_[identifier] = defined; }
-        else
-        {
-            global_variables_[identifier] = defined;
-        }
+        defined = std::move(undefined);
 
         global_undefined_.erase(identifier);
     }
     else
     {
-        defined =
-            new ance::GlobalVariable(this, access, identifier, type, initializer, is_final, is_constant, location);
-
-        if (is_constant) { global_constants_[identifier] = defined; }
-        else
-        {
-            global_variables_[identifier] = defined;
-        }
+        defined = std::make_unique<ance::GlobalVariable>(this,
+                                                         access,
+                                                         identifier,
+                                                         type,
+                                                         initializer,
+                                                         is_final,
+                                                         is_constant,
+                                                         location);
     }
 
     addChild(*defined);
+
+    if (is_constant) { global_constants_[identifier] = std::move(defined); }
+    else
+    {
+        global_variables_[identifier] = std::move(defined);
+    }
 }
 
 ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
 {
-    if (global_variables_.find(identifier) != global_variables_.end()) { return global_variables_[identifier]; }
+    if (global_variables_.find(identifier) != global_variables_.end()) { return global_variables_[identifier].get(); }
 
-    if (global_constants_.find(identifier) != global_constants_.end()) { return global_constants_[identifier]; }
+    if (global_constants_.find(identifier) != global_constants_.end()) { return global_constants_[identifier].get(); }
 
-    if (global_undefined_.find(identifier) != global_undefined_.end()) { return global_undefined_[identifier]; }
+    if (global_undefined_.find(identifier) != global_undefined_.end()) { return global_undefined_[identifier].get(); }
 
     // Create an undefined global variable.
-    auto* undefined               = new GlobalVariable(identifier);
-    global_undefined_[identifier] = undefined;
-    return undefined;
+    global_undefined_[identifier] = std::make_unique<ance::GlobalVariable>(identifier);
+    return global_undefined_[identifier].get();
 }
 
 size_t ance::GlobalScope::functionCount() const

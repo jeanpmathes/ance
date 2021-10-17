@@ -18,7 +18,7 @@ class SizeofExpression : public BackingExpression
      * @param expression The expression to get the size of.
      * @param location The source location.
      */
-    explicit SizeofExpression(Expression* expression, ance::Location location);
+    SizeofExpression(std::unique_ptr<Expression> expression, ance::Location location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -36,8 +36,8 @@ class SizeofExpression : public BackingExpression
     llvm::Value* buildNativeValue(CompileContext* context) override;
 
   private:
-    ance::Value* return_value_ {new ance::ExpressionBackedValue(this)};
-    Expression*  expression_;
+    ance::Value*                return_value_ {new ance::ExpressionBackedValue(this)};
+    std::unique_ptr<Expression> expression_;
 };
 
 #endif

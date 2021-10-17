@@ -16,7 +16,7 @@ class ReturnStatement : public Statement
      * @param return_value An expression producing the return value.
      * @param location The source location.
      */
-    ReturnStatement(Expression* return_value, ance::Location location);
+    ReturnStatement(std::unique_ptr<Expression> return_value, ance::Location location);
 
     void setFunction(ance::DefinedFunction* function) override;
 
@@ -28,6 +28,6 @@ class ReturnStatement : public Statement
     void doBuild(CompileContext* context) override;
 
   private:
-    Expression* return_value_;
+    std::unique_ptr<Expression> return_value_;
 };
 #endif

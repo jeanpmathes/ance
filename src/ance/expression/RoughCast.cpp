@@ -4,13 +4,13 @@
 #include "ance/construct/value/RoughlyCastedValue.h"
 #include "ance/type/Type.h"
 
-RoughCast::RoughCast(ance::Type* target_type, Expression* expression, ance::Location location)
+RoughCast::RoughCast(ance::Type* target_type, std::unique_ptr<Expression> expression, ance::Location location)
     : Expression(location)
     , target_type_(target_type)
-    , expression_(expression)
-    , return_value_(new ance::RoughlyCastedValue(target_type, expression->getValue()))
+    , expression_(std::move(expression))
+    , return_value_(new ance::RoughlyCastedValue(target_type, expression_->getValue()))
 {
-    addChild(*expression);
+    addChild(*expression_);
 }
 
 void RoughCast::setScope(ance::Scope* scope)

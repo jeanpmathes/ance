@@ -13,12 +13,10 @@
 #include "ance/type/ReferenceType.h"
 #include "ance/type/SingleType.h"
 
-#include "ance/scope/GlobalScope.h"
 #include "ance/scope/LocalScope.h"
 
 #include "ance/construct/DefinedFunction.h"
 #include "ance/construct/ExternFunction.h"
-#include "ance/construct/Parameter.h"
 
 #include "ance/statement/AssignmentStatement.h"
 #include "ance/statement/DeleteStatement.h"
@@ -77,7 +75,7 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
     }
 
     application_.globalScope()
-        ->defineGlobalVariable(access, is_constant, identifier, type, assigner, const_expr, location(ctx));
+        .defineGlobalVariable(access, is_constant, identifier, type, assigner, const_expr, location(ctx));
 
     return this->visitChildren(ctx);
 }
@@ -93,15 +91,19 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
 
     std::vector<ance::Parameter*> parameters = visit(ctx->parameters());
 
+    std::vector<std::unique_ptr<ance::Parameter>> unique_parameters;
+    unique_parameters.reserve(parameters.size());
+    for (ance::Parameter* parameter_ptr : parameters) { unique_parameters.emplace_back(parameter_ptr); }
+
     auto* function = new ance::DefinedFunction(access,
                                                ctx->IDENTIFIER()->getText(),
                                                return_type,
-                                               parameters,
-                                               application_.globalScope(),
+                                               std::move(unique_parameters),
+                                               &application_.globalScope(),
                                                declaration_location,
                                                definition_location);
 
-    application_.globalScope()->addFunction(function);
+    application_.globalScope().addFunction(function);
 
     for (auto statement_context : ctx->statement())
     {
@@ -117,8 +119,15 @@ antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFu
     ance::Type*                   return_type = visit(ctx->type());
     std::vector<ance::Parameter*> parameters  = visit(ctx->parameters());
 
-    auto* function = new ance::ExternFunction(ctx->IDENTIFIER()->getText(), return_type, parameters, location(ctx));
-    application_.globalScope()->addFunction(function);
+    std::vector<std::unique_ptr<ance::Parameter>> unique_parameters;
+    unique_parameters.reserve(parameters.size());
+    for (ance::Parameter* parameter_ptr : parameters) { unique_parameters.emplace_back(parameter_ptr); }
+
+    auto* function = new ance::ExternFunction(ctx->IDENTIFIER()->getText(),
+                                              return_type,
+                                              std::move(unique_parameters),
+                                              location(ctx));
+    application_.globalScope().addFunction(function);
 
     return this->visitChildren(ctx);
 }
@@ -142,10 +151,10 @@ antlrcpp::Any SourceVisitor::visitParameter(anceParser::ParameterContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitExpressionStatement(anceParser::ExpressionStatementContext* ctx)
 {
-    Expression* expression           = visit(ctx->independentExpression());
-    auto*       buildable_expression = dynamic_cast<BuildableExpression*>(expression);
+    Expression*                          expression = visit(ctx->independentExpression());
+    std::unique_ptr<BuildableExpression> buildable_expression(dynamic_cast<BuildableExpression*>(expression));
 
-    auto* statement = new ExpressionStatement(buildable_expression, location(ctx));
+    auto* statement = new ExpressionStatement(std::move(buildable_expression), location(ctx));
     return static_cast<Statement*>(statement);
 }
 
@@ -168,8 +177,8 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
         assigned = new DefaultValue(type, location(ctx));
     }
 
-    auto* statement = new LocalVariableDefinition(identifier, type, assigner, assigned, location(ctx));
-    return static_cast<Statement*>(statement);
+    return static_cast<Statement*>(
+        new LocalVariableDefinition(identifier, type, assigner, std::unique_ptr<Expression>(assigned), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
@@ -180,8 +189,10 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
 
     Expression* value = visit(ctx->expression());
 
-    return static_cast<Statement*>(
-        LocalReferenceVariableDefinition::defineReferring(identifier, type, value, location(ctx)));
+    return static_cast<Statement*>(LocalReferenceVariableDefinition::defineReferring(identifier,
+                                                                                     type,
+                                                                                     std::unique_ptr<Expression>(value),
+                                                                                     location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
@@ -193,7 +204,10 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
     Expression* address = visit(ctx->expression());
 
     return static_cast<Statement*>(
-        LocalReferenceVariableDefinition::defineReferringTo(identifier, type, address, location(ctx)));
+        LocalReferenceVariableDefinition::defineReferringTo(identifier,
+                                                            type,
+                                                            std::unique_ptr<Expression>(address),
+                                                            location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
@@ -202,8 +216,10 @@ antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
     Assigner    assigner   = visit(ctx->assigner());
     Expression* assigned   = visit(ctx->assigned);
 
-    auto* statement = new AssignmentStatement(assignable, assigner, assigned, location(ctx));
-    return static_cast<Statement*>(statement);
+    return static_cast<Statement*>(new AssignmentStatement(std::unique_ptr<Expression>(assignable),
+                                                           assigner,
+                                                           std::unique_ptr<Expression>(assigned),
+                                                           location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitDeleteStatement(anceParser::DeleteStatementContext* ctx)
@@ -211,7 +227,8 @@ antlrcpp::Any SourceVisitor::visitDeleteStatement(anceParser::DeleteStatementCon
     Expression* expression    = visit(ctx->expression());
     bool        delete_buffer = ctx->BUFFER();
 
-    return static_cast<Statement*>(new DeleteStatement(expression, delete_buffer, location(ctx)));
+    return static_cast<Statement*>(
+        new DeleteStatement(std::unique_ptr<Expression>(expression), delete_buffer, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitReturnStatement(anceParser::ReturnStatementContext* ctx)
@@ -220,8 +237,7 @@ antlrcpp::Any SourceVisitor::visitReturnStatement(anceParser::ReturnStatementCon
 
     if (ctx->expression() != nullptr) { return_value = visit(ctx->expression()); }
 
-    auto* statement = new ReturnStatement(return_value, location(ctx));
-    return static_cast<Statement*>(statement);
+    return static_cast<Statement*>(new ReturnStatement(std::unique_ptr<Expression>(return_value), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
@@ -230,9 +246,13 @@ antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* 
     std::vector<Expression*> arguments  = visit(ctx->arguments());
 
     // Call to highest scope intentional, as actual scope of called function is not known.
-    application_.globalScope()->addFunctionName(identifier);
+    application_.globalScope().addFunctionName(identifier);
 
-    return static_cast<Expression*>(new FunctionCall(identifier, arguments, location(ctx)));
+    std::vector<std::unique_ptr<Expression>> unique_expressions;
+    unique_expressions.reserve(arguments.size());
+    for (Expression* argument_ptr : arguments) { unique_expressions.emplace_back(argument_ptr); }
+
+    return static_cast<Expression*>(new FunctionCall(identifier, std::move(unique_expressions), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitArguments(anceParser::ArgumentsContext* ctx)
@@ -259,7 +279,7 @@ antlrcpp::Any SourceVisitor::visitAllocation(anceParser::AllocationContext* ctx)
 
     if (ctx->expression()) { count = visit(ctx->expression()); }
 
-    return static_cast<Expression*>(new Allocation(allocator, type, count, location(ctx)));
+    return static_cast<Expression*>(new Allocation(allocator, type, std::unique_ptr<Expression>(count), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitRoughCast(anceParser::RoughCastContext* ctx)
@@ -267,28 +287,28 @@ antlrcpp::Any SourceVisitor::visitRoughCast(anceParser::RoughCastContext* ctx)
     ance::Type* type = visit(ctx->type());
     Expression* expr = visit(ctx->expression());
 
-    return static_cast<Expression*>(new RoughCast(type, expr, location(ctx)));
+    return static_cast<Expression*>(new RoughCast(type, std::unique_ptr<Expression>(expr), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitAddressof(anceParser::AddressofContext* ctx)
 {
     Expression* arg = visit(ctx->expression());
 
-    return static_cast<Expression*>(new Addressof(arg, location(ctx)));
+    return static_cast<Expression*>(new Addressof(std::unique_ptr<Expression>(arg), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitBindReference(anceParser::BindReferenceContext* ctx)
 {
     Expression* value = visit(ctx->expression());
 
-    return static_cast<Expression*>(BindRef::refer(value, location(ctx)));
+    return static_cast<Expression*>(BindRef::refer(std::unique_ptr<Expression>(value), location(ctx)).release());
 }
 
 antlrcpp::Any SourceVisitor::visitBindReferenceToAddress(anceParser::BindReferenceToAddressContext* ctx)
 {
     Expression* address = visit(ctx->expression());
 
-    return static_cast<Expression*>(BindRef::referTo(address, location(ctx)));
+    return static_cast<Expression*>(BindRef::referTo(std::unique_ptr<Expression>(address), location(ctx)).release());
 }
 
 antlrcpp::Any SourceVisitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)
@@ -302,7 +322,7 @@ antlrcpp::Any SourceVisitor::visitSizeofExpression(anceParser::SizeofExpressionC
 {
     Expression* expr = visit(ctx->expression());
 
-    return static_cast<Expression*>(new SizeofExpression(expr, location(ctx)));
+    return static_cast<Expression*>(new SizeofExpression(std::unique_ptr<Expression>(expr), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSubscript(anceParser::SubscriptContext* ctx)
@@ -310,7 +330,8 @@ antlrcpp::Any SourceVisitor::visitSubscript(anceParser::SubscriptContext* ctx)
     Expression* indexed = visit(ctx->indexed);
     Expression* index   = visit(ctx->index);
 
-    return static_cast<Expression*>(new Subscript(indexed, index, location(ctx)));
+    return static_cast<Expression*>(
+        new Subscript(std::unique_ptr<Expression>(indexed), std::unique_ptr<Expression>(index), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)
@@ -474,7 +495,7 @@ antlrcpp::Any SourceVisitor::visitArrayType(anceParser::ArrayTypeContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitKeywordType(anceParser::KeywordTypeContext* ctx)
 {
-    ance::Type* type = application_.globalScope()->getType(ctx->getText());
+    ance::Type* type = application_.globalScope().getType(ctx->getText());
     return type;
 }
 

@@ -6,11 +6,7 @@
 #include <vector>
 
 #include "ance/Assigner.h"
-
-namespace ance
-{
-    class GlobalVariable;
-}
+#include "ance/construct/GlobalVariable.h"
 
 class ConstantExpression;
 
@@ -124,9 +120,9 @@ namespace ance
 
         std::map<std::string, ance::Type*> types_;
 
-        std::map<std::string, ance::GlobalVariable*> global_constants_;
-        std::map<std::string, ance::GlobalVariable*> global_variables_;
-        std::map<std::string, ance::GlobalVariable*> global_undefined_;
+        std::map<std::string, std::unique_ptr<ance::GlobalVariable>> global_constants_;
+        std::map<std::string, std::unique_ptr<ance::GlobalVariable>> global_variables_;
+        std::map<std::string, std::unique_ptr<ance::GlobalVariable>> global_undefined_;
 
         std::map<std::string, ance::Function*> functions_;
     };

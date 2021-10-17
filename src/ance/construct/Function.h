@@ -7,10 +7,10 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "ance/Element.h"
+#include "ance/construct/Parameter.h"
 
 namespace ance
 {
-    class Parameter;
     class Value;
     class LocalScope;
     class Type;
@@ -34,10 +34,10 @@ namespace ance
          * @param parameters The function parameters.
          * @param location The location of the function in the source code.
          */
-        Function(std::string                   function_name,
-                 ance::Type*                   return_type,
-                 std::vector<ance::Parameter*> parameters,
-                 ance::Location                location);
+        Function(std::string                                   function_name,
+                 ance::Type*                                   return_type,
+                 std::vector<std::unique_ptr<ance::Parameter>> parameters,
+                 ance::Location                                location);
 
         /**
          * Get the name of this function.
@@ -135,10 +135,11 @@ namespace ance
                                   CompileContext*                  context) const;
 
       private:
-        std::string    name_;
-        ance::Type*                   return_type_;
-        std::vector<ance::Parameter*> parameters_;
-        ance::Location                location_;
+        std::string                                   name_;
+        ance::Type*                                   return_type_;
+        std::vector<std::unique_ptr<ance::Parameter>> parameters_;
+        std::vector<ance::Parameter*>                 parameters_iterator_;
+        ance::Location                                location_;
     };
 }
 

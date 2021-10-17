@@ -4,13 +4,13 @@
 #include "ance/type/Type.h"
 #include "validation/ValidationLogger.h"
 
-Subscript::Subscript(Expression* indexed, Expression* index, ance::Location location)
+Subscript::Subscript(std::unique_ptr<Expression> indexed, std::unique_ptr<Expression> index, ance::Location location)
     : Expression(location)
-    , indexed_(indexed)
-    , index_(index)
+    , indexed_(std::move(indexed))
+    , index_(std::move(index))
 {
-    addChild(*index);
-    addChild(*indexed);
+    addChild(*index_);
+    addChild(*indexed_);
 }
 
 void Subscript::setScope(ance::Scope* scope)

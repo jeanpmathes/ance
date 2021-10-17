@@ -118,6 +118,8 @@ namespace ance
          */
         void setValue(ance::Value* value, CompileContext* context);
 
+        virtual ~Variable() = default;
+
       protected:
         virtual void storeValue(ance::Value* value, CompileContext* context) = 0;
 

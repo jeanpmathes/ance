@@ -5,11 +5,11 @@
 #include "ance/expression/BuildableExpression.h"
 #include "ance/scope/LocalScope.h"
 
-ExpressionStatement::ExpressionStatement(BuildableExpression* expression, ance::Location location)
+ExpressionStatement::ExpressionStatement(std::unique_ptr<BuildableExpression> expression, ance::Location location)
     : Statement(location)
-    , expression_(expression)
+    , expression_(std::move(expression))
 {
-    addChild(*expression);
+    addChild(*expression_);
 }
 
 void ExpressionStatement::setFunction(ance::DefinedFunction* function)

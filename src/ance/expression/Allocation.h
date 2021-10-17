@@ -20,10 +20,10 @@ class Allocation : public DelayableExpression
      * @param count An expression providing the number of elements to allocate.
      * @param location The source location.
      */
-    Allocation(Runtime::Allocator allocation,
-               ance::Type*        type,
-               Expression*        count,
-               ance::Location     location);
+    Allocation(Runtime::Allocator          allocation,
+               ance::Type*                 type,
+               std::unique_ptr<Expression> count,
+               ance::Location              location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -43,9 +43,9 @@ class Allocation : public DelayableExpression
 
   private:
     Runtime::Allocator allocation_;
-    ance::Type*        allocated_type_;
-    Expression*        count_;
-    ance::Type*        return_type_;
+    ance::Type*                 allocated_type_;
+    std::unique_ptr<Expression> count_;
+    ance::Type*                 return_type_;
 };
 
 #endif

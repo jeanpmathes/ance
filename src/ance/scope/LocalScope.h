@@ -4,12 +4,8 @@
 #include "Scope.h"
 
 #include "ance/Assigner.h"
+#include "ance/construct/LocalVariable.h"
 #include "ance/utility/Location.h"
-
-namespace ance
-{
-    class LocalVariable;
-}
 
 class Expression;
 
@@ -87,7 +83,7 @@ namespace ance
       private:
         ance::Scope* parent_;
 
-        std::map<std::string, ance::LocalVariable*> local_variables_;
+        std::map<std::string, std::unique_ptr<ance::LocalVariable>> local_variables_;
     };
 }
 #endif

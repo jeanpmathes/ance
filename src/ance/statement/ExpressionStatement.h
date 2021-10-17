@@ -16,7 +16,7 @@ class ExpressionStatement : public Statement
      * @param expression The expression to use for this statement.
      * @param location The source location.
      */
-    ExpressionStatement(BuildableExpression* expression, ance::Location location);
+    ExpressionStatement(std::unique_ptr<BuildableExpression> expression, ance::Location location);
 
     void setFunction(ance::DefinedFunction* function) override;
 
@@ -28,6 +28,6 @@ class ExpressionStatement : public Statement
     void doBuild(CompileContext* context) override;
 
   private:
-    BuildableExpression* expression_;
+    std::unique_ptr<BuildableExpression> expression_;
 };
 #endif

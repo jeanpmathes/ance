@@ -11,20 +11,20 @@
 #include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
-LocalVariableDefinition::LocalVariableDefinition(std::string    identifier,
-                                                 ance::Type*    type,
-                                                 Assigner       assigner,
-                                                 Expression*    assigned,
-                                                 ance::Location location)
+LocalVariableDefinition::LocalVariableDefinition(std::string                 identifier,
+                                                 ance::Type*                 type,
+                                                 Assigner                    assigner,
+                                                 std::unique_ptr<Expression> assigned,
+                                                 ance::Location              location)
     : Statement(location)
     , identifier_(std::move(identifier))
     , type_(type)
     , assigner_(assigner)
-    , assigned_(assigned)
+    , assigned_(std::move(assigned))
 {
     assert(assigner != Assigner::REFERENCE_BINDING);
 
-    addChild(*assigned);
+    addChild(*assigned_);
 }
 
 void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)

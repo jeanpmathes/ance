@@ -18,7 +18,7 @@ class Addressof : public DelayableExpression
      * @param arg The argument to get the address of.
      * @param location The source location of the expression.
      */
-    Addressof(Expression* arg, ance::Location location);
+    Addressof(std::unique_ptr<Expression> arg, ance::Location location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -37,7 +37,7 @@ class Addressof : public DelayableExpression
     ~Addressof() override;
 
   private:
-    Expression*  arg_;
-    ance::Type*  return_type_ {nullptr};
+    std::unique_ptr<Expression> arg_;
+    ance::Type*                 return_type_ {nullptr};
 };
 #endif

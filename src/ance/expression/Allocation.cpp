@@ -5,17 +5,17 @@
 #include "ance/type/SizeType.h"
 #include "compiler/CompileContext.h"
 
-Allocation::Allocation(Runtime::Allocator allocation,
-                       ance::Type*        type,
-                       Expression*        count,
-                       ance::Location     location)
+Allocation::Allocation(Runtime::Allocator          allocation,
+                       ance::Type*                 type,
+                       std::unique_ptr<Expression> count,
+                       ance::Location              location)
     : Expression(location)
     , allocation_(allocation)
     , allocated_type_(type)
-    , count_(count)
+    , count_(std::move(count))
     , return_type_(ance::PointerType::get(type))
 {
-    addChild(*count);
+    addChild(*count_);
 }
 
 void Allocation::setScope(ance::Scope* scope)

@@ -35,7 +35,7 @@ void ance::LocalScope::validate(ValidationLogger& validation_logger)
 
 ance::Variable* ance::LocalScope::getVariable(std::string identifier)
 {
-    if (local_variables_.find(identifier) != local_variables_.end()) { return local_variables_[identifier]; }
+    if (local_variables_.find(identifier) != local_variables_.end()) { return local_variables_[identifier].get(); }
 
     return getGlobalScope()->getVariable(identifier);
 }
@@ -86,12 +86,11 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& id
 
         bool is_final = assigner.isFinal();
 
-        auto* variable = new LocalVariable(this, identifier, type, value, is_final, parameter_no, location);
-        local_variables_[identifier] = variable;
+        local_variables_[identifier] =
+            std::make_unique<ance::LocalVariable>(this, identifier, type, value, is_final, parameter_no, location);
+        addChild(*local_variables_[identifier]);
 
-        addChild(*variable);
-
-        return variable;
+        return local_variables_[identifier].get();
     }
     else
     {

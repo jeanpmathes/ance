@@ -9,12 +9,12 @@
 #include "compiler/Runtime.h"
 #include "validation/ValidationLogger.h"
 
-DeleteStatement::DeleteStatement(Expression* to_delete, bool delete_buffer, ance::Location location)
+DeleteStatement::DeleteStatement(std::unique_ptr<Expression> to_delete, bool delete_buffer, ance::Location location)
     : Statement(location)
-    , to_delete_(to_delete)
+    , to_delete_(std::move(to_delete))
     , delete_buffer_(delete_buffer)
 {
-    addChild(*to_delete);
+    addChild(*to_delete_);
 }
 
 void DeleteStatement::setFunction(ance::DefinedFunction* function)

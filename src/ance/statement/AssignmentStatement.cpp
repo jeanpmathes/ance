@@ -6,19 +6,19 @@
 #include "ance/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
 
-AssignmentStatement::AssignmentStatement(Expression*    assignable,
-                                         Assigner       assigner,
-                                         Expression*    assigned,
-                                         ance::Location location)
+AssignmentStatement::AssignmentStatement(std::unique_ptr<Expression> assignable,
+                                         Assigner                    assigner,
+                                         std::unique_ptr<Expression> assigned,
+                                         ance::Location              location)
     : Statement(location)
-    , assignable_(assignable)
+    , assignable_(std::move(assignable))
     , assigner_(assigner)
-    , assigned_(assigned)
+    , assigned_(std::move(assigned))
 {
     assert(assigner != Assigner::REFERENCE_BINDING);
 
-    addChild(*assigned);
-    addChild(*assignable);
+    addChild(*assigned_);
+    addChild(*assignable_);
 }
 
 void AssignmentStatement::setFunction(ance::DefinedFunction* function)

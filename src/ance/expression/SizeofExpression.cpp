@@ -4,11 +4,11 @@
 #include "ance/type/SizeType.h"
 #include "compiler/CompileContext.h"
 
-SizeofExpression::SizeofExpression(Expression* expression, ance::Location location)
+SizeofExpression::SizeofExpression(std::unique_ptr<Expression> expression, ance::Location location)
     : Expression(location)
-    , expression_(expression)
+    , expression_(std::move(expression))
 {
-    addChild(*expression);
+    addChild(*expression_);
 }
 
 void SizeofExpression::setScope(ance::Scope* scope)

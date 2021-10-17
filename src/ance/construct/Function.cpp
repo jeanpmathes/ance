@@ -10,13 +10,14 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::Function::Function(std::string                   function_name,
-                         ance::Type*                   return_type,
-                         std::vector<ance::Parameter*> parameters,
-                         ance::Location                location)
+ance::Function::Function(std::string                                   function_name,
+                         ance::Type*                                   return_type,
+                         std::vector<std::unique_ptr<ance::Parameter>> parameters,
+                         ance::Location                                location)
     : name_(std::move(function_name))
     , return_type_(return_type)
     , parameters_(std::move(parameters))
+    , parameters_iterator_()
     , location_(location)
 {}
 
@@ -70,7 +71,12 @@ bool ance::Function::validateCall(const std::vector<std::pair<ance::Value*, ance
 
 std::vector<ance::Parameter*>& ance::Function::parameters()
 {
-    return parameters_;
+    if (parameters_.size() != parameters_iterator_.size())
+    {
+        for (auto& parameter : parameters_) { parameters_iterator_.push_back(parameter.get()); }
+    }
+
+    return parameters_iterator_;
 }
 
 std::pair<llvm::FunctionType*, llvm::Function*> ance::Function::createNativeFunction(
@@ -81,7 +87,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> ance::Function::createNativeFunc
     std::vector<llvm::Type*> param_types;
     param_types.reserve(parameters_.size());
 
-    for (auto* param : parameters_) { param_types.push_back(param->type()->getContentType(c)); }
+    for (auto& param : parameters_) { param_types.push_back(param->type()->getContentType(c)); }
 
     llvm::FunctionType* native_type     = llvm::FunctionType::get(returnType()->getContentType(c), param_types, false);
     llvm::Function*     native_function = llvm::Function::Create(native_type, linkage, name(), m);

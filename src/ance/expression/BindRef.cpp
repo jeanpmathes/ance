@@ -7,20 +7,22 @@
 #include "ance/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
-BindRef* BindRef::refer(Expression* value, ance::Location location)
+std::unique_ptr<BindRef> BindRef::refer(std::unique_ptr<Expression> value, ance::Location location)
 {
-    auto* addressof = new Addressof(value, location);
-    return new BindRef(addressof, location);
+    auto addressof = std::make_unique<Addressof>(std::move(value), location);
+    return std::unique_ptr<BindRef>(new BindRef(std::move(addressof), location));
 }
 
-BindRef* BindRef::referTo(Expression* address, ance::Location location)
+std::unique_ptr<BindRef> BindRef::referTo(std::unique_ptr<Expression> address, ance::Location location)
 {
-    return new BindRef(address, location);
+    return std::unique_ptr<BindRef>(new BindRef(std::move(address), location));
 }
 
-BindRef::BindRef(Expression* address, ance::Location location) : Expression(location), address_(address)
+BindRef::BindRef(std::unique_ptr<Expression> address, ance::Location location)
+    : Expression(location)
+    , address_(std::move(address))
 {
-    addChild(*address);
+    addChild(*address_);
 }
 
 void BindRef::setScope(ance::Scope* scope)

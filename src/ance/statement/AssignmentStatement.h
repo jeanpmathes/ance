@@ -20,7 +20,10 @@ class AssignmentStatement : public Statement
      * @param assigned An expression producing the value that is assigned.
      * @param location The source location.
      */
-    AssignmentStatement(Expression* assignable, Assigner assigner, Expression* assigned, ance::Location location);
+    AssignmentStatement(std::unique_ptr<Expression> assignable,
+                        Assigner                    assigner,
+                        std::unique_ptr<Expression> assigned,
+                        ance::Location              location);
 
     void setFunction(ance::DefinedFunction* function) override;
 
@@ -32,8 +35,8 @@ class AssignmentStatement : public Statement
     void doBuild(CompileContext* context) override;
 
   private:
-    Expression* assignable_;
-    Assigner    assigner_;
-    Expression* assigned_;
+    std::unique_ptr<Expression> assignable_;
+    Assigner                    assigner_;
+    std::unique_ptr<Expression> assigned_;
 };
 #endif

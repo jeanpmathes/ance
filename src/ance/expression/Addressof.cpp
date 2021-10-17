@@ -7,9 +7,11 @@
 #include "ance/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
-Addressof::Addressof(Expression* arg, ance::Location location) : Expression(location), arg_(arg)
+Addressof::Addressof(std::unique_ptr<Expression> arg, ance::Location location)
+    : Expression(location)
+    , arg_(std::move(arg))
 {
-    addChild(*arg);
+    addChild(*arg_);
 }
 
 void Addressof::setScope(ance::Scope* scope)

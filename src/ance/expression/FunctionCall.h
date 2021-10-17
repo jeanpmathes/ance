@@ -20,7 +20,7 @@ class FunctionCall : public DelayableExpression
      * @param arguments The arguments to pass to the called function.
      * @param location The source location.
      */
-    FunctionCall(std::string identifier, std::vector<Expression*> arguments, ance::Location location);
+    FunctionCall(std::string identifier, std::vector<std::unique_ptr<Expression>> arguments, ance::Location location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -39,9 +39,9 @@ class FunctionCall : public DelayableExpression
     ~FunctionCall() override;
 
   private:
-    std::string              identifier_;
-    std::vector<Expression*> arguments_;
-    ance::Scope*             scope_ {nullptr};
+    std::string                              identifier_;
+    std::vector<std::unique_ptr<Expression>> arguments_;
+    ance::Scope*                             scope_ {nullptr};
 };
 
 #endif

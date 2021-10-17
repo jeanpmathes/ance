@@ -5,7 +5,6 @@
 
 #include "ance/ApplicationVisitor.h"
 #include "ance/construct/LocalVariable.h"
-#include "ance/construct/Parameter.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/ReferenceType.h"
@@ -14,10 +13,10 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::ExternFunction::ExternFunction(std::string                   function_name,
-                                     ance::Type*                   return_type,
-                                     std::vector<ance::Parameter*> parameters,
-                                     ance::Location                location)
+ance::ExternFunction::ExternFunction(std::string                                   function_name,
+                                     ance::Type*                                   return_type,
+                                     std::vector<std::unique_ptr<ance::Parameter>> parameters,
+                                     ance::Location                                location)
     : ance::Function(std::move(function_name), return_type, std::move(parameters), location)
 {}
 

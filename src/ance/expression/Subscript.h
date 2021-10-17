@@ -15,7 +15,7 @@ class Subscript : public DelayableExpression
      * @param index The index to use.
      * @param location The source location.
      */
-    Subscript(Expression* indexed, Expression* index, ance::Location location);
+    Subscript(std::unique_ptr<Expression> indexed, std::unique_ptr<Expression> index, ance::Location location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -34,8 +34,8 @@ class Subscript : public DelayableExpression
     ~Subscript() override;
 
   private:
-    Expression* indexed_;
-    Expression* index_;
+    std::unique_ptr<Expression> indexed_;
+    std::unique_ptr<Expression> index_;
 };
 
 #endif
