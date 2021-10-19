@@ -141,12 +141,14 @@ void ance::GlobalScope::addFunctionName(const std::string& name)
     if (functions_.find(name) == functions_.end()) functions_[name] = nullptr;
 }
 
-void ance::GlobalScope::addFunction(ance::Function* function)
+void ance::GlobalScope::addFunction(std::unique_ptr<ance::Function> function)
 {
     assert(!isFunctionDefined(function->name()));
-    functions_[function->name()] = function;
 
-    addChild(*function);
+    const std::string& name = function->name();
+
+    functions_[name] = std::move(function);
+    addChild(*functions_[name]);
 }
 
 bool ance::GlobalScope::hasFunction(const std::string& identifier)
@@ -165,7 +167,7 @@ bool ance::GlobalScope::hasEntry()
     auto c = functions_.find("main");
     if (c == functions_.end()) return false;
 
-    ance::Function* function = c->second;
+    ance::Function* function = c->second.get();
 
     return function->parameterCount() == 0 && ance::IntegerType::isIntegerType(function->returnType(), 32, false);
 }
@@ -175,7 +177,7 @@ bool ance::GlobalScope::hasExit()
     auto c = functions_.find("exit");
     if (c == functions_.end()) return false;
 
-    ance::Function* function = c->second;
+    ance::Function* function = c->second.get();
 
     return function->parameterCount() == 1 && ance::IntegerType::isIntegerType(function->parameterType(0), 32, false)
         && function->returnType() == ance::VoidType::get();
@@ -183,7 +185,7 @@ bool ance::GlobalScope::hasExit()
 
 ance::Function* ance::GlobalScope::getFunction(const std::string& identifier)
 {
-    return functions_.at(identifier);
+    return functions_.at(identifier).get();
 }
 
 void ance::GlobalScope::createNativeBacking(CompileContext* context)

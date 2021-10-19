@@ -95,21 +95,22 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
     shared_parameters.reserve(parameters.size());
     for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
-    auto* function = new ance::DefinedFunction(access,
-                                               ctx->IDENTIFIER()->getText(),
-                                               return_type,
-                                               std::move(shared_parameters),
-                                               &application_.globalScope(),
-                                               declaration_location,
-                                               definition_location);
-
-    application_.globalScope().addFunction(function);
+    std::unique_ptr<ance::DefinedFunction> function =
+        std::make_unique<ance::DefinedFunction>(access,
+                                                ctx->IDENTIFIER()->getText(),
+                                                return_type,
+                                                std::move(shared_parameters),
+                                                &application_.globalScope(),
+                                                declaration_location,
+                                                definition_location);
 
     for (auto statement_context : ctx->statement())
     {
         Statement* statement = visit(statement_context);
         function->pushStatement(statement);
     }
+
+    application_.globalScope().addFunction(std::move(function));
 
     return this->visitChildren(ctx);
 }
@@ -123,11 +124,12 @@ antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFu
     shared_parameters.reserve(parameters.size());
     for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
-    auto* function = new ance::ExternFunction(ctx->IDENTIFIER()->getText(),
-                                              return_type,
-                                              std::move(shared_parameters),
-                                              location(ctx));
-    application_.globalScope().addFunction(function);
+    std::unique_ptr<ance::Function> function = std::make_unique<ance::ExternFunction>(ctx->IDENTIFIER()->getText(),
+                                                                                      return_type,
+                                                                                      std::move(shared_parameters),
+                                                                                      location(ctx));
+
+    application_.globalScope().addFunction(std::move(function));
 
     return this->visitChildren(ctx);
 }

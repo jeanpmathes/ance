@@ -104,6 +104,8 @@ namespace ance
         virtual std::shared_ptr<ance::Value> buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
                                                        CompileContext* context) const = 0;
 
+        virtual ~Function() = default;
+
       protected:
         /**
          * Get the function parameters.

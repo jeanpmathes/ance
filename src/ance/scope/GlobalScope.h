@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "ance/Assigner.h"
+#include "ance/construct/Function.h"
 #include "ance/construct/GlobalVariable.h"
 
 class ConstantExpression;
@@ -64,7 +65,7 @@ namespace ance
          * Add a defined function to this scope.
          * @param function The function.
          */
-        void addFunction(ance::Function* function);
+        void addFunction(std::unique_ptr<ance::Function> function);
 
         /**
          * Check if this scope contains a function.
@@ -124,7 +125,7 @@ namespace ance
         std::map<std::string, std::unique_ptr<ance::GlobalVariable>> global_variables_;
         std::map<std::string, std::unique_ptr<ance::GlobalVariable>> global_undefined_;
 
-        std::map<std::string, ance::Function*> functions_;
+        std::map<std::string, std::unique_ptr<ance::Function>> functions_;
     };
 }
 #endif
