@@ -18,7 +18,7 @@
 ance::DefinedFunction::DefinedFunction(AccessModifier                                access,
                                        const std::string&                            function_name,
                                        ance::Type*                                   return_type,
-                                       std::vector<std::unique_ptr<ance::Parameter>> parameters,
+                                       std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                        ance::Scope*                                  scope,
                                        ance::Location                                declaration_location,
                                        ance::Location                                definition_location)
@@ -31,7 +31,7 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                           
     addChild(*function_scope_);
 
     unsigned no = 1;
-    for (auto* parameter : this->parameters())
+    for (const auto& parameter : this->parameters())
     {
         Assigner assigner = ance::ReferenceType::isReferenceType(parameter->type()) ? Assigner::REFERENCE_BINDING
                                                                                     : Assigner::COPY_ASSIGNMENT;
@@ -133,7 +133,7 @@ void ance::DefinedFunction::build(CompileContext* context)
     context->di()->finalizeSubprogram(native_function_->getSubprogram());
 }
 
-void ance::DefinedFunction::addReturn(ance::Value* value)
+void ance::DefinedFunction::addReturn(const std::shared_ptr<ance::Value>& value)
 {
     if (value)
     {
@@ -149,14 +149,16 @@ void ance::DefinedFunction::addReturn(ance::Value* value)
     }
 }
 
-ance::Value* ance::DefinedFunction::buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const
+std::shared_ptr<ance::Value> ance::DefinedFunction::buildCall(
+    const std::vector<std::shared_ptr<ance::Value>>& arguments,
+    CompileContext*                                  context) const
 {
     llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
 
     if (returnType() == ance::VoidType::get()) { return nullptr; }
 
     llvm::Value* native_value = ance::Values::contentToNative(returnType(), content_value, context);
-    return new ance::WrappedNativeValue(returnType(), native_value);
+    return std::make_shared<ance::WrappedNativeValue>(returnType(), native_value);
 }
 
 llvm::DISubprogram* ance::DefinedFunction::debugSubprogram()

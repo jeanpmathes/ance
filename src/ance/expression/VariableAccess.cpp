@@ -32,9 +32,9 @@ bool VariableAccess::validate(ValidationLogger& validation_logger)
     return variable_->validateGetValue(validation_logger, location());
 }
 
-bool VariableAccess::validateAssignment(ance::Value*      value,
-                                        ance::Location    value_location,
-                                        ValidationLogger& validation_logger)
+bool VariableAccess::validateAssignment(const std::shared_ptr<ance::Value>& value,
+                                        ance::Location                      value_location,
+                                        ValidationLogger&                   validation_logger)
 {
     variable_->validateSetValue(value, validation_logger, location(), value_location);
     return true;
@@ -42,11 +42,11 @@ bool VariableAccess::validateAssignment(ance::Value*      value,
 
 void VariableAccess::doBuild(CompileContext* context)
 {
-    ance::Value* value = variable_->getValue(context);
+    std::shared_ptr<ance::Value> value = variable_->getValue(context);
     setValue(value);
 }
 
-void VariableAccess::doAssign(ance::Value* value, CompileContext* context)
+void VariableAccess::doAssign(std::shared_ptr<ance::Value> value, CompileContext* context)
 {
     variable_->setValue(value, context);
 }

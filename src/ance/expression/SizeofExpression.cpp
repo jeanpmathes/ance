@@ -26,7 +26,7 @@ bool SizeofExpression::validate(ValidationLogger& validation_logger)
     return expression_->validate(validation_logger);
 }
 
-ance::Value* SizeofExpression::getValue() const
+std::shared_ptr<ance::Value> SizeofExpression::getValue() const
 {
     return return_value_;
 }

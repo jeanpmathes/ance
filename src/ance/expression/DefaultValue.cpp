@@ -1,8 +1,6 @@
 #include "DefaultValue.h"
 
 #include "ance/ApplicationVisitor.h"
-#include "ance/construct/constant/Constant.h"
-#include "ance/construct/value/Value.h"
 #include "ance/type/Type.h"
 
 DefaultValue::DefaultValue(ance::Type* type, ance::Location location) : Expression(location), type_(type) {}
@@ -17,12 +15,12 @@ bool DefaultValue::validate(ValidationLogger&)
     return true;
 }
 
-ance::Value* DefaultValue::getValue() const
+std::shared_ptr<ance::Value> DefaultValue::getValue() const
 {
     return constant_;
 }
 
-ance::Constant* DefaultValue::getConstantValue() const
+std::shared_ptr<ance::Constant> DefaultValue::getConstantValue() const
 {
     return constant_;
 }

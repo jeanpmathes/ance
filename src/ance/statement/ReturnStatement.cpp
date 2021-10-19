@@ -40,7 +40,7 @@ void ReturnStatement::validate(ValidationLogger& validation_logger)
 
 void ReturnStatement::doBuild(CompileContext* context)
 {
-    ance::Value* return_value = nullptr;
+    std::shared_ptr<ance::Value> return_value = nullptr;
 
     if (return_value_)
     {

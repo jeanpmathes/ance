@@ -56,7 +56,7 @@ namespace ance
          * Check if this variable is defined.
          * @return Whether it is defined.
          */
-        bool isDefined() const;
+        [[nodiscard]] bool isDefined() const;
 
         /**
          * Validate this variable.
@@ -73,7 +73,7 @@ namespace ance
          * Get the containing scope.
          * @return The scope.
          */
-        [[nodiscard]] ance::Scope* scope() const;
+        [[nodiscard]] ance::Scope* scope() const override;
         /**
          * Get the value type.
          * @return The type.
@@ -100,28 +100,28 @@ namespace ance
          * @param assignable_location The source location of the assignable.
          * @param assigned_location The source location of the value that is assigned to the assignable.
          */
-        void validateSetValue(ance::Value*      value,
-                              ValidationLogger& validation_logger,
-                              ance::Location    assignable_location,
-                              ance::Location    assigned_location) const;
+        void validateSetValue(const std::shared_ptr<ance::Value>& value,
+                              ValidationLogger&                   validation_logger,
+                              ance::Location                      assignable_location,
+                              ance::Location                      assigned_location) const;
 
         /**
          * Get the current value of the variable.
          * @param context The current compile context.
          * @return The current value.
          */
-        virtual ance::Value* getValue(CompileContext* context) = 0;
+        virtual std::shared_ptr<ance::Value> getValue(CompileContext* context) = 0;
         /**
          * Set the current value of the variable.
          * @param value The new value.
          * @param context The current compile context.
          */
-        void setValue(ance::Value* value, CompileContext* context);
+        void setValue(const std::shared_ptr<ance::Value>& value, CompileContext* context);
 
         virtual ~Variable() = default;
 
       protected:
-        virtual void storeValue(ance::Value* value, CompileContext* context) = 0;
+        virtual void storeValue(std::shared_ptr<ance::Value> value, CompileContext* context) = 0;
 
       private:
         std::string identifier_;

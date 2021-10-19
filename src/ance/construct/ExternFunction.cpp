@@ -15,7 +15,7 @@
 
 ance::ExternFunction::ExternFunction(std::string                                   function_name,
                                      ance::Type*                                   return_type,
-                                     std::vector<std::unique_ptr<ance::Parameter>> parameters,
+                                     std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                      ance::Location                                location)
     : ance::Function(std::move(function_name), return_type, std::move(parameters), location)
 {}
@@ -56,14 +56,15 @@ void ance::ExternFunction::createNativeBacking(CompileContext* context)
 
 void ance::ExternFunction::build(CompileContext*) {}
 
-ance::Value* ance::ExternFunction::buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const
+std::shared_ptr<ance::Value> ance::ExternFunction::buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
+                                                             CompileContext* context) const
 {
     llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
 
     if (returnType() == ance::VoidType::get()) { return nullptr; }
 
     llvm::Value* native_value = ance::Values::contentToNative(returnType(), content_value, context);
-    return new ance::WrappedNativeValue(returnType(), native_value);
+    return std::make_shared<ance::WrappedNativeValue>(returnType(), native_value);
 }
 
 bool ance::ExternFunction::accept(ance::ApplicationVisitor& visitor)

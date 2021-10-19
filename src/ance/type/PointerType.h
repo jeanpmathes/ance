@@ -26,15 +26,19 @@ namespace ance
 
         ance::Type* getSubscriptReturnType() override;
 
-        bool         validateSubscript(Type*             indexed_type,
-                                       ance::Location    indexed_location,
-                                       Type*             index_type,
-                                       ance::Location    index_location,
-                                       ValidationLogger& validation_logger) override;
-        ance::Value* buildSubscript(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
+        bool                         validateSubscript(Type*             indexed_type,
+                                                       ance::Location    indexed_location,
+                                                       Type*             index_type,
+                                                       ance::Location    index_location,
+                                                       ValidationLogger& validation_logger) override;
+        std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
+                                                    std::shared_ptr<Value> index,
+                                                    CompileContext*        context) override;
 
       private:
-        static llvm::Value* buildGetElementPointer(ance::Value* indexed, ance::Value* index, CompileContext* context);
+        static llvm::Value* buildGetElementPointer(const std::shared_ptr<ance::Value>& indexed,
+                                                   const std::shared_ptr<ance::Value>& index,
+                                                   CompileContext*                     context);
 
       public:
         ~PointerType() override = default;

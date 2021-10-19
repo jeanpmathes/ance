@@ -2,7 +2,7 @@
 
 #include "ance/construct/constant/Constant.h"
 
-ance::Value* ConstantExpression::getValue() const
+std::shared_ptr<ance::Value> ConstantExpression::getValue() const
 {
     return getConstantValue();
 }

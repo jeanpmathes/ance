@@ -16,7 +16,7 @@ bool SizeofType::validate(ValidationLogger& validation_logger)
     return type_->validate(validation_logger, location());
 }
 
-ance::Value* SizeofType::getValue() const
+std::shared_ptr<ance::Value> SizeofType::getValue() const
 {
     return return_value_;
 }

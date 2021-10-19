@@ -27,13 +27,13 @@ namespace ance
          * @param parameter_no The parameter number. Use zero if this is not a parameter.
          * @param location The source location.
          */
-        LocalVariable(ance::LocalScope* containing_scope,
-                      std::string       identifier,
-                      ance::Type*       type,
-                      ance::Value*      value,
-                      bool              is_final,
-                      unsigned          parameter_no,
-                      ance::Location    location);
+        LocalVariable(ance::LocalScope*            containing_scope,
+                      std::string                  identifier,
+                      ance::Type*                  type,
+                      std::shared_ptr<ance::Value> value,
+                      bool                         is_final,
+                      unsigned                     parameter_no,
+                      ance::Location               location);
 
         [[nodiscard]] ance::Location location() const override;
 
@@ -45,24 +45,24 @@ namespace ance
          */
         void build(CompileContext* context);
 
-        ance::Value* getValue(CompileContext* context) override;
+        std::shared_ptr<ance::Value> getValue(CompileContext* context) override;
 
         bool accept(ance::ApplicationVisitor& visitor) override;
 
       protected:
-        void storeValue(ance::Value* value, CompileContext* context) override;
+        void storeValue(std::shared_ptr<ance::Value> value, CompileContext* context) override;
 
       private:
-        void store(Value* value, CompileContext* context);
+        void store(std::shared_ptr<ance::Value> value, CompileContext* context);
 
       private:
-        ance::Value*      initial_value_;
-        ance::LocalScope* containing_scope_;
+        std::shared_ptr<ance::Value> initial_value_;
+        ance::LocalScope*            containing_scope_;
 
         unsigned       parameter_no_;
         ance::Location location_;
 
-        llvm::Value*           native_value_ {nullptr};
+        llvm::Value*           native_value_ {};
         llvm::DILocalVariable* local_debug_variable_ {nullptr};
     };
 }

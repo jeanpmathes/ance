@@ -28,7 +28,7 @@ class SizeofExpression : public BackingExpression
 
     bool validate(ValidationLogger& validation_logger) override;
 
-    [[nodiscard]] ance::Value* getValue() const override;
+    [[nodiscard]] std::shared_ptr<ance::Value> getValue() const override;
 
     bool accept(ance::ApplicationVisitor& visitor) override;
 
@@ -36,8 +36,8 @@ class SizeofExpression : public BackingExpression
     llvm::Value* buildNativeValue(CompileContext* context) override;
 
   private:
-    ance::Value*                return_value_ {new ance::ExpressionBackedValue(this)};
-    std::unique_ptr<Expression> expression_;
+    std::shared_ptr<ance::Value> return_value_ {std::make_shared<ance::ExpressionBackedValue>(this)};
+    std::unique_ptr<Expression>  expression_;
 };
 
 #endif

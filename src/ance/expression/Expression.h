@@ -57,16 +57,16 @@ class Expression : public ance::Element
      * @param validation_logger The validation logger to use.
      * @return True if assigning is valid.
      */
-    virtual bool validateAssignment(ance::Value*      value,
-                                    ance::Location    value_location,
-                                    ValidationLogger& validation_logger);
+    virtual bool validateAssignment(const std::shared_ptr<ance::Value>& value,
+                                    ance::Location                      value_location,
+                                    ValidationLogger&                   validation_logger);
 
     /**
      * Build an assignment to this expression. The value should not be retrieved if assignment took place.
      * @param value The value to assign.
      * @param context The current compile context.
      */
-    void assign(ance::Value* value, CompileContext* context);
+    void assign(std::shared_ptr<ance::Value> value, CompileContext* context);
 
     /**
      * Get the return type of this expression.
@@ -77,7 +77,7 @@ class Expression : public ance::Element
      * Get the value returned by this expression.
      * @return The value. One expression always returns the value.
      */
-    [[nodiscard]] virtual ance::Value* getValue() const = 0;
+    [[nodiscard]] virtual std::shared_ptr<ance::Value> getValue() const = 0;
 
     virtual ~Expression() = default;
 
@@ -88,7 +88,7 @@ class Expression : public ance::Element
      */
     virtual void setScope(ance::Scope* scope);
 
-    virtual void doAssign(ance::Value* value, CompileContext* context);
+    virtual void doAssign(std::shared_ptr<ance::Value> value, CompileContext* context);
 
   private:
     ance::Location location_;

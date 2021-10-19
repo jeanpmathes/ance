@@ -4,7 +4,6 @@
 
 #include "ance/ApplicationVisitor.h"
 #include "ance/construct/Function.h"
-#include "ance/construct/value/Value.h"
 #include "ance/scope/GlobalScope.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
@@ -39,7 +38,7 @@ ance::Type* FunctionCall::type()
 
 bool FunctionCall::validate(ValidationLogger& validation_logger)
 {
-    std::vector<std::pair<ance::Value*, ance::Location>> arguments;
+    std::vector<std::pair<std::shared_ptr<ance::Value>, ance::Location>> arguments;
 
     bool valid = true;
 
@@ -66,11 +65,11 @@ void FunctionCall::doBuild(CompileContext* context)
 {
     ance::Function* fn = context->application()->globalScope().getFunction(identifier_);
 
-    std::vector<ance::Value*> arg_values;
+    std::vector<std::shared_ptr<ance::Value>> arg_values;
 
     for (auto& arg : arguments_) { arg_values.push_back(arg->getValue()); }
 
-    ance::Value* return_value = fn->buildCall(arg_values, context);
+    std::shared_ptr<ance::Value> return_value = fn->buildCall(arg_values, context);
 
     if (return_value != nullptr)// Not every function returns a value.
     {

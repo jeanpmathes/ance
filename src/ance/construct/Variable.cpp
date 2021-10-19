@@ -5,11 +5,8 @@
 #include "ance/ApplicationVisitor.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/construct/Parameter.h"
-#include "ance/construct/value/Value.h"
 #include "ance/scope/LocalScope.h"
-#include "ance/statement/Statement.h"
 #include "ance/type/ReferenceType.h"
-#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
@@ -79,10 +76,10 @@ bool ance::Variable::validateGetValue(ValidationLogger& validation_logger, ance:
     return true;
 }
 
-void ance::Variable::validateSetValue(ance::Value*      value,
-                                      ValidationLogger& validation_logger,
-                                      ance::Location    assignable_location,
-                                      ance::Location    assigned_location) const
+void ance::Variable::validateSetValue(const std::shared_ptr<ance::Value>& value,
+                                      ValidationLogger&                   validation_logger,
+                                      ance::Location                      assignable_location,
+                                      ance::Location                      assigned_location) const
 {
     if (!isDefined())
     {
@@ -103,11 +100,11 @@ void ance::Variable::validateSetValue(ance::Value*      value,
 
     ance::Type::checkMismatch(target_type, value->type(), assigned_location, validation_logger);
 }
-void ance::Variable::setValue(ance::Value* value, CompileContext* context)
+void ance::Variable::setValue(const std::shared_ptr<ance::Value>& value, CompileContext* context)
 {
     if (ance::ReferenceType::isReferenceType(type()))
     {
-        ance::Value* reference = getValue(context);
+        std::shared_ptr<ance::Value> reference = getValue(context);
 
         reference->buildContentValue(context);
         value->buildContentValue(context);

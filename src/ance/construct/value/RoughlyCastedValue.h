@@ -16,7 +16,7 @@ namespace ance
          * @param target_type The target type.
          * @param original The original value.
          */
-        RoughlyCastedValue(ance::Type* target_type, ance::Value* original);
+        RoughlyCastedValue(ance::Type* target_type, std::shared_ptr<ance::Value> original);
 
         ance::Type* type() override;
 
@@ -24,8 +24,8 @@ namespace ance
         llvm::Value* getNativeValue() override;
 
       private:
-        ance::Type*  target_type_;
-        ance::Value* original_;
+        ance::Type*                  target_type_;
+        std::shared_ptr<ance::Value> original_;
     };
 }
 

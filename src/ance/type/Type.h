@@ -126,7 +126,9 @@ namespace ance
          * @param context The current compile context.
          * @return The return value.
          */
-        virtual ance::Value* buildSubscript(ance::Value* indexed, ance::Value* index, CompileContext* context);
+        virtual std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
+                                                            std::shared_ptr<Value> index,
+                                                            CompileContext*        context);
 
       protected:
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
@@ -152,7 +154,9 @@ namespace ance
          * @param context The current compile context.
          * @return A value with the expected type. It can be the same value as passed in.
          */
-        static ance::Value* makeMatching(ance::Type* expected, ance::Value* value, CompileContext* context);
+        static std::shared_ptr<ance::Value> makeMatching(ance::Type*                  expected,
+                                                         std::shared_ptr<ance::Value> value,
+                                                         CompileContext*              context);
 
       private:
         std::string   name_;

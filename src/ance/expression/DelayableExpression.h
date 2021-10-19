@@ -14,17 +14,17 @@ class DelayableExpression
     , public BuildableExpression
 {
   public:
-    [[nodiscard]] ance::Value* getValue() const override;
+    [[nodiscard]] std::shared_ptr<ance::Value> getValue() const override;
 
   protected:
     /**
      * Set the value of the delayable value.
      * @param value The value to use.
      */
-    void setValue(ance::Value* value);
+    void setValue(const std::shared_ptr<ance::Value>& value);
 
   private:
-    ance::DelayedValue* value_ {new ance::DelayedValue(this)};
+    std::shared_ptr<ance::DelayedValue> value_ {std::make_shared<ance::DelayedValue>(this)};
 };
 
 #endif

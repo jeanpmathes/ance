@@ -45,11 +45,11 @@ bool Allocation::validate(ValidationLogger& validation_logger)
 
 void Allocation::doBuild(CompileContext* context)
 {
-    ance::Value* count = nullptr;
+    std::shared_ptr<ance::Value> count = {};
 
     if (count_) { count = ance::Type::makeMatching(ance::SizeType::getSize(), count_->getValue(), context); }
 
-    ance::Value* ptr = context->runtime()->allocate(allocation_, allocated_type_, count, context);
+    std::shared_ptr<ance::Value> ptr = context->runtime()->allocate(allocation_, allocated_type_, count, context);
     setValue(ptr);
 }
 

@@ -36,7 +36,7 @@ namespace ance
          */
         Function(std::string                                   function_name,
                  ance::Type*                                   return_type,
-                 std::vector<std::unique_ptr<ance::Parameter>> parameters,
+                 std::vector<std::shared_ptr<ance::Parameter>> parameters,
                  ance::Location                                location);
 
         /**
@@ -91,9 +91,9 @@ namespace ance
          * @param validation_logger A logger to log validation messages.
          * @return True if the call is valid.
          */
-        virtual bool validateCall(const std::vector<std::pair<ance::Value*, ance::Location>>& arguments,
-                                  ance::Location                                              location,
-                                  ValidationLogger&                                           validation_logger);
+        virtual bool validateCall(const std::vector<std::pair<std::shared_ptr<ance::Value>, ance::Location>>& arguments,
+                                  ance::Location                                                              location,
+                                  ValidationLogger& validation_logger);
 
         /**
          * Build a call to this function.
@@ -101,14 +101,15 @@ namespace ance
          * @param context The current compile context.
          * @return The return value. Will be null for return type void.
          */
-        virtual ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const = 0;
+        virtual std::shared_ptr<ance::Value> buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
+                                                       CompileContext* context) const = 0;
 
       protected:
         /**
          * Get the function parameters.
          * @return A vector containing the parameters.
          */
-        std::vector<ance::Parameter*>& parameters();
+        std::vector<std::shared_ptr<ance::Parameter>>& parameters();
 
         /**
          * A helper to create a native function.
@@ -129,16 +130,15 @@ namespace ance
          * @param context The current compile context.
          * @return The return value.
          */
-        llvm::CallInst* buildCall(const std::vector<ance::Value*>& arguments,
-                                  llvm::FunctionType*              native_type,
-                                  llvm::Function*                  native_function,
-                                  CompileContext*                  context) const;
+        llvm::CallInst* buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
+                                  llvm::FunctionType*                              native_type,
+                                  llvm::Function*                                  native_function,
+                                  CompileContext*                                  context) const;
 
       private:
         std::string                                   name_;
         ance::Type*                                   return_type_;
-        std::vector<std::unique_ptr<ance::Parameter>> parameters_;
-        std::vector<ance::Parameter*>                 parameters_iterator_;
+        std::vector<std::shared_ptr<ance::Parameter>> parameters_;
         ance::Location                                location_;
     };
 }

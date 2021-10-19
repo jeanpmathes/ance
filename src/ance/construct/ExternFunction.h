@@ -20,14 +20,15 @@ namespace ance
          */
         ExternFunction(std::string                                   function_name,
                        ance::Type*                                   return_type,
-                       std::vector<std::unique_ptr<ance::Parameter>> parameters,
+                       std::vector<std::shared_ptr<ance::Parameter>> parameters,
                        ance::Location                                location);
 
         void validate(ValidationLogger& validation_logger) override;
 
         void         createNativeBacking(CompileContext* context) override;
-        void         build(CompileContext* context) override;
-        ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
+        void                         build(CompileContext* context) override;
+        std::shared_ptr<ance::Value> buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
+                                               CompileContext*                                  context) const override;
 
         bool accept(ance::ApplicationVisitor& visitor) override;
 

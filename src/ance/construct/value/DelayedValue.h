@@ -25,14 +25,14 @@ namespace ance
          * Set the value to use. This method should be called once or never by the delayable expression.
          * @param value The value.
          */
-        void setValue(ance::Value* value);
+        void setValue(const std::shared_ptr<ance::Value>& value);
 
         void         buildNativeValue(CompileContext* context) override;
         llvm::Value* getNativeValue() override;
 
       private:
-        DelayableExpression* expression_;
-        ance::Value*         value_ {nullptr};
+        DelayableExpression*         expression_;
+        std::shared_ptr<ance::Value> value_ {};
     };
 }
 

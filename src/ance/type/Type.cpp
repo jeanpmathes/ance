@@ -53,7 +53,7 @@ bool ance::Type::validateSubscript(Type*, ance::Location, Type*, ance::Location,
     return false;
 }
 
-ance::Value* ance::Type::buildSubscript(ance::Value*, ance::Value*, CompileContext*)
+std::shared_ptr<ance::Value> ance::Type::buildSubscript(std::shared_ptr<Value>, std::shared_ptr<Value>, CompileContext*)
 {
     return nullptr;
 }
@@ -77,7 +77,9 @@ bool ance::Type::checkMismatch(ance::Type*       expected,
     return true;
 }
 
-ance::Value* ance::Type::makeMatching(ance::Type* expected, ance::Value* value, CompileContext* context)
+std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::Type*                  expected,
+                                                      std::shared_ptr<ance::Value> value,
+                                                      CompileContext*              context)
 {
     if (value->type() == expected) return value;
 

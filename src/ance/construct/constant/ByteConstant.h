@@ -9,7 +9,6 @@ class Application;
 
 namespace ance
 {
-
     class Type;
 
     /**

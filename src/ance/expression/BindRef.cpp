@@ -61,7 +61,7 @@ bool BindRef::validate(ValidationLogger& validation_logger)
 
 void BindRef::doBuild(CompileContext*)
 {
-    setValue(new ance::RoughlyCastedValue(type(), address_->getValue()));
+    setValue(std::make_shared<ance::RoughlyCastedValue>(type(), address_->getValue()));
 }
 
 BindRef::~BindRef() = default;

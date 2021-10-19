@@ -111,12 +111,12 @@ void ance::GlobalVariable::createNativeBacking(CompileContext* context)
     native_variable_->addDebugInfo(debug_info);
 }
 
-ance::Value* ance::GlobalVariable::getValue(CompileContext*)
+std::shared_ptr<ance::Value> ance::GlobalVariable::getValue(CompileContext*)
 {
-    return new ance::WrappedNativeValue(type(), native_variable_);
+    return std::make_shared<ance::WrappedNativeValue>(type(), native_variable_);
 }
 
-void ance::GlobalVariable::storeValue(ance::Value* value, CompileContext* context)
+void ance::GlobalVariable::storeValue(std::shared_ptr<ance::Value> value, CompileContext* context)
 {
     value = ance::Type::makeMatching(type(), value, context);
 

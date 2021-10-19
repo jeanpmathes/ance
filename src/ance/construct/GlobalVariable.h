@@ -79,12 +79,12 @@ namespace ance
          */
         void createNativeBacking(CompileContext* context);
 
-        ance::Value* getValue(CompileContext* context) override;
+        std::shared_ptr<ance::Value> getValue(CompileContext* context) override;
 
         bool accept(ance::ApplicationVisitor& visitor) override;
 
       protected:
-        void storeValue(ance::Value* value, CompileContext* context) override;
+        void storeValue(std::shared_ptr<ance::Value> value, CompileContext* context) override;
 
       private:
         AccessModifier      access_;
@@ -92,8 +92,8 @@ namespace ance
         bool                is_constant_ {false};
         ConstantExpression* constant_init_ {nullptr};
 
-        llvm::GlobalVariable* native_variable_ {nullptr};
-        ance::Constant*       initial_value_ {nullptr};
+        llvm::GlobalVariable*           native_variable_ {nullptr};
+        std::shared_ptr<ance::Constant> initial_value_ {nullptr};
     };
 }
 

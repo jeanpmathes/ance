@@ -62,19 +62,21 @@ bool ance::ArrayType::validateSubscript(Type* indexed_type,
     return checkMismatch(ance::SizeType::getSize(), index_type, index_location, validation_logger);
 }
 
-ance::Value* ance::ArrayType::buildSubscript(ance::Value* indexed, ance::Value* index, CompileContext* context)
+std::shared_ptr<ance::Value> ance::ArrayType::buildSubscript(std::shared_ptr<Value> indexed,
+                                                             std::shared_ptr<Value> index,
+                                                             CompileContext*        context)
 {
     index = ance::Type::makeMatching(ance::SizeType::getSize(), index, context);
 
     llvm::Value* element_ptr  = buildGetElementPointer(indexed, index, context);
     llvm::Value* native_value = ance::Values::contentToNative(element_reference_, element_ptr, context);
 
-    return new ance::WrappedNativeValue(getSubscriptReturnType(), native_value);
+    return std::make_shared<ance::WrappedNativeValue>(getSubscriptReturnType(), native_value);
 }
 
-llvm::Value* ance::ArrayType::buildGetElementPointer(ance::Value*    indexed,
-                                                     ance::Value*    index,
-                                                     CompileContext* context) const
+llvm::Value* ance::ArrayType::buildGetElementPointer(const std::shared_ptr<ance::Value>& indexed,
+                                                     const std::shared_ptr<ance::Value>& index,
+                                                     CompileContext*                     context) const
 {
     indexed->buildNativeValue(context);
     index->buildContentValue(context);

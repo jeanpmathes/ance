@@ -26,7 +26,7 @@ class RoughCast : public Expression
 
     bool validate(ValidationLogger& validation_logger) override;
 
-    [[nodiscard]] ance::Value* getValue() const override;
+    [[nodiscard]] std::shared_ptr<ance::Value> getValue() const override;
 
     bool accept(ance::ApplicationVisitor& visitor) override;
 
@@ -37,8 +37,8 @@ class RoughCast : public Expression
 
   private:
     ance::Type*                 target_type_;
-    std::unique_ptr<Expression> expression_;
-    ance::Value*                return_value_;
+    std::unique_ptr<Expression>  expression_;
+    std::shared_ptr<ance::Value> return_value_;
 };
 
 #endif

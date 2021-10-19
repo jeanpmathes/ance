@@ -34,7 +34,10 @@ void Runtime::init(CompileContext* context)
                                              module);
 }
 
-ance::Value* Runtime::allocate(Allocator allocation, ance::Type* type, ance::Value* count, CompileContext* context)
+std::shared_ptr<ance::Value> Runtime::allocate(Allocator                           allocation,
+                                               ance::Type*                         type,
+                                               const std::shared_ptr<ance::Value>& count,
+                                               CompileContext*                     context)
 {
     if (count) { assert(count->type() == ance::SizeType::getSize()); }
 
@@ -57,10 +60,10 @@ ance::Value* Runtime::allocate(Allocator allocation, ance::Type* type, ance::Val
     ance::Type*  ptr_type   = ance::PointerType::get(type);
     llvm::Value* native_ptr = ance::Values::contentToNative(ptr_type, ptr_to_allocated, context);
 
-    return new ance::WrappedNativeValue(ptr_type, native_ptr);
+    return std::make_shared<ance::WrappedNativeValue>(ptr_type, native_ptr);
 }
 
-void Runtime::deleteDynamic(ance::Value* value, bool, CompileContext* context)
+void Runtime::deleteDynamic(const std::shared_ptr<ance::Value>& value, bool, CompileContext* context)
 {
     assert(ance::PointerType::isPointerType(value->type()));
 
@@ -76,7 +79,9 @@ void Runtime::deleteDynamic(ance::Value* value, bool, CompileContext* context)
     success->setName("..free");
 }
 
-llvm::Value* Runtime::allocateAutomatic(ance::Type* type, ance::Value* count, CompileContext* context)
+llvm::Value* Runtime::allocateAutomatic(ance::Type*                         type,
+                                        const std::shared_ptr<ance::Value>& count,
+                                        CompileContext*                     context)
 {
     llvm::Value* count_value = nullptr;
 
@@ -89,7 +94,9 @@ llvm::Value* Runtime::allocateAutomatic(ance::Type* type, ance::Value* count, Co
     return context->ir()->CreateAlloca(type->getContentType(*context->llvmContext()), count_value);
 }
 
-llvm::Value* Runtime::allocateDynamic(ance::Type* type, ance::Value* count, CompileContext* context)
+llvm::Value* Runtime::allocateDynamic(ance::Type*                         type,
+                                      const std::shared_ptr<ance::Value>& count,
+                                      CompileContext*                     context)
 {
     // Set the zero init flag.
     llvm::Value* flags = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context->llvmContext()), 0x0040, false);

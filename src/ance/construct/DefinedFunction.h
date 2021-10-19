@@ -43,7 +43,7 @@ namespace ance
         DefinedFunction(AccessModifier                                access,
                         const std::string&                            function_name,
                         ance::Type*                                   return_type,
-                        std::vector<std::unique_ptr<ance::Parameter>> parameters,
+                        std::vector<std::shared_ptr<ance::Parameter>> parameters,
                         ance::Scope*                                  scope,
                         ance::Location                                declaration_location,
                         ance::Location                                definition_location);
@@ -63,9 +63,10 @@ namespace ance
          * Add a return. Call this method in the build method of a statement.
          * @param value The value to return or nullptr if nothing is returned.
          */
-        void addReturn(ance::Value* value = nullptr);
+        void addReturn(const std::shared_ptr<ance::Value>& value = nullptr);
 
-        ance::Value* buildCall(const std::vector<ance::Value*>& arguments, CompileContext* context) const override;
+        std::shared_ptr<ance::Value> buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
+                                               CompileContext*                                  context) const override;
 
         /**
          * Get the debug subprogram.
@@ -107,8 +108,8 @@ namespace ance
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};
 
-        ance::Value* return_value_ {nullptr};
-        bool         has_return_ {false};
+        std::shared_ptr<ance::Value> return_value_ {};
+        bool                         has_return_ {false};
     };
 }
 

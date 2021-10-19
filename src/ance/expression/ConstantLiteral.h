@@ -3,6 +3,8 @@
 
 #include "ConstantExpression.h"
 
+#include "ance/construct/constant/Constant.h"
+
 /**
  * Wraps a constant.
  */
@@ -14,18 +16,18 @@ class ConstantLiteral : public ConstantExpression
      * @param constant The constant to wrap.
      * @param location The source location.
      */
-    explicit ConstantLiteral(ance::Constant* constant, ance::Location location);
+    ConstantLiteral(std::shared_ptr<ance::Constant> constant, ance::Location location);
 
     ance::Type* type() override;
 
     bool validate(ValidationLogger& validation_logger) override;
 
-    [[nodiscard]] ance::Constant* getConstantValue() const override;
+    [[nodiscard]] std::shared_ptr<ance::Constant> getConstantValue() const override;
 
     bool accept(ance::ApplicationVisitor& visitor) override;
 
   private:
-    ance::Constant* constant_;
+    std::shared_ptr<ance::Constant> constant_;
 };
 
 #endif

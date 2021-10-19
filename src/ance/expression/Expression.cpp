@@ -1,5 +1,7 @@
 #include "Expression.h"
 
+#include <utility>
+
 #include "ance/construct/value/Value.h"
 #include "ance/type/ReferenceType.h"
 #include "compiler/CompileContext.h"
@@ -30,9 +32,9 @@ bool Expression::isNamed()
     return ance::ReferenceType::isReferenceType(type());
 }
 
-bool Expression::validateAssignment(ance::Value*      value,
-                                    ance::Location    value_location,
-                                    ValidationLogger& validation_logger)
+bool Expression::validateAssignment(const std::shared_ptr<ance::Value>& value,
+                                    ance::Location                      value_location,
+                                    ValidationLogger&                   validation_logger)
 {
     if (ance::ReferenceType::isReferenceType(type()))
     {
@@ -46,21 +48,21 @@ bool Expression::validateAssignment(ance::Value*      value,
     }
 }
 
-void Expression::assign(ance::Value* value, CompileContext* context)
+void Expression::assign(std::shared_ptr<ance::Value> value, CompileContext* context)
 {
     context->setDebugLocation(location(), containing_scope_);
-    doAssign(value, context);
+    doAssign(std::move(value), context);
     context->resetDebugLocation();
 }
 
-void Expression::doAssign(ance::Value* value, CompileContext* context)
+void Expression::doAssign(std::shared_ptr<ance::Value> value, CompileContext* context)
 {
     assert(ance::ReferenceType::isReferenceType(type()));
 
     ance::Type* target_type = ance::ReferenceType::getReferencedType(type());
     value                   = ance::Type::makeMatching(target_type, value, context);
 
-    ance::Value* expression_return = getValue();
+    std::shared_ptr<ance::Value> expression_return = getValue();
 
     expression_return->buildContentValue(context);
     value->buildContentValue(context);

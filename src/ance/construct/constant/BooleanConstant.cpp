@@ -15,12 +15,12 @@ llvm::Constant* ance::BooleanConstant::buildContent(llvm::Module* m)
                     : llvm::ConstantInt::getFalse(type_->getContentType(m->getContext()));
 }
 
-ance::BooleanConstant* ance::BooleanConstant::createFalse()
+std::shared_ptr<ance::BooleanConstant> ance::BooleanConstant::createFalse()
 {
-    return new BooleanConstant(false);
+    return std::shared_ptr<ance::BooleanConstant>(new BooleanConstant(false));
 }
 
-ance::BooleanConstant* ance::BooleanConstant::createTrue()
+std::shared_ptr<ance::BooleanConstant> ance::BooleanConstant::createTrue()
 {
-    return new BooleanConstant(true);
+    return std::shared_ptr<ance::BooleanConstant>(new BooleanConstant(true));
 }

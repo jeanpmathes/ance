@@ -64,7 +64,9 @@ bool ance::ReferenceType::validateSubscript(Type*,
                                             validation_logger);
 }
 
-ance::Value* ance::ReferenceType::buildSubscript(ance::Value* indexed, ance::Value* index, CompileContext* context)
+std::shared_ptr<ance::Value> ance::ReferenceType::buildSubscript(std::shared_ptr<Value> indexed,
+                                                                 std::shared_ptr<Value> index,
+                                                                 CompileContext*        context)
 {
     return element_type_->buildSubscript(getReferenced(indexed, context), index, context);
 }
@@ -94,7 +96,8 @@ llvm::Value* ance::ReferenceType::getReferenced(llvm::Value* value, CompileConte
     return context->ir()->CreateLoad(value);
 }
 
-ance::Value* ance::ReferenceType::getReferenced(ance::Value* value, CompileContext* context)
+std::shared_ptr<ance::Value> ance::ReferenceType::getReferenced(const std::shared_ptr<ance::Value>& value,
+                                                                CompileContext*                     context)
 {
     assert(value->type() == this);
 
@@ -103,7 +106,7 @@ ance::Value* ance::ReferenceType::getReferenced(ance::Value* value, CompileConte
     llvm::Value* native_reference = value->getNativeValue();
     llvm::Value* native_referred  = getReferenced(native_reference, context);
 
-    return new ance::WrappedNativeValue(element_type_, native_referred);
+    return std::make_shared<ance::WrappedNativeValue>(element_type_, native_referred);
 }
 
 ance::Type* ance::ReferenceType::get(ance::Type* element_type)

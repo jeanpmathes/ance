@@ -52,14 +52,14 @@ bool Addressof::validate(ValidationLogger& validation_logger)
 
 void Addressof::doBuild(CompileContext* context)
 {
-    ance::Value* value = arg_->getValue();
+    std::shared_ptr<ance::Value> value = arg_->getValue();
     value->buildNativeValue(context);
 
     llvm::Value* address        = value->getNativeValue();
     if (!ance::ReferenceType::isReferenceType(arg_->type()))
         address = ance::Values::contentToNative(type(), address, context);
 
-    setValue(new ance::WrappedNativeValue(type(), address));
+    setValue(std::make_shared<ance::WrappedNativeValue>(type(), address));
 }
 
 bool Addressof::accept(ance::ApplicationVisitor& visitor)

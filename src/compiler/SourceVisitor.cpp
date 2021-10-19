@@ -91,14 +91,14 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
 
     std::vector<ance::Parameter*> parameters = visit(ctx->parameters());
 
-    std::vector<std::unique_ptr<ance::Parameter>> unique_parameters;
-    unique_parameters.reserve(parameters.size());
-    for (ance::Parameter* parameter_ptr : parameters) { unique_parameters.emplace_back(parameter_ptr); }
+    std::vector<std::shared_ptr<ance::Parameter>> shared_parameters;
+    shared_parameters.reserve(parameters.size());
+    for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
     auto* function = new ance::DefinedFunction(access,
                                                ctx->IDENTIFIER()->getText(),
                                                return_type,
-                                               std::move(unique_parameters),
+                                               std::move(shared_parameters),
                                                &application_.globalScope(),
                                                declaration_location,
                                                definition_location);
@@ -119,13 +119,13 @@ antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFu
     ance::Type*                   return_type = visit(ctx->type());
     std::vector<ance::Parameter*> parameters  = visit(ctx->parameters());
 
-    std::vector<std::unique_ptr<ance::Parameter>> unique_parameters;
-    unique_parameters.reserve(parameters.size());
-    for (ance::Parameter* parameter_ptr : parameters) { unique_parameters.emplace_back(parameter_ptr); }
+    std::vector<std::shared_ptr<ance::Parameter>> shared_parameters;
+    shared_parameters.reserve(parameters.size());
+    for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
     auto* function = new ance::ExternFunction(ctx->IDENTIFIER()->getText(),
                                               return_type,
-                                              std::move(unique_parameters),
+                                              std::move(shared_parameters),
                                               location(ctx));
     application_.globalScope().addFunction(function);
 
@@ -342,7 +342,7 @@ antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext
 
     std::string str = ance::StringConstant::parse(ctx->STRING()->getText());
 
-    ance::Constant* string = new ance::StringConstant(prefix, str);
+    std::shared_ptr<ance::Constant> string = std::make_shared<ance::StringConstant>(prefix, str);
     return static_cast<Expression*>(new ConstantLiteral(string, location(ctx)));
 }
 
@@ -350,7 +350,7 @@ antlrcpp::Any SourceVisitor::visitByteLiteral(anceParser::ByteLiteralContext* ct
 {
     uint8_t b = ance::ByteConstant::parse(ctx->BYTE()->getText());
 
-    ance::Constant* byte = new ance::ByteConstant(b);
+    std::shared_ptr<ance::Constant> byte = std::make_shared<ance::ByteConstant>(b);
     return static_cast<Expression*>(new ConstantLiteral(byte, location(ctx)));
 }
 
@@ -383,34 +383,34 @@ antlrcpp::Any SourceVisitor::visitFloatingPointLiteral(anceParser::FloatingPoint
         type   = ance::QuadType::get();
     }
 
-    auto* flt = new ance::FloatConstant(number, type);
+    std::shared_ptr<ance::Constant> flt = std::make_shared<ance::FloatConstant>(number, type);
     return static_cast<Expression*>(new ConstantLiteral(flt, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitTrue(anceParser::TrueContext* ctx)
 {
-    ance::Constant* constant = ance::BooleanConstant::createTrue();
+    std::shared_ptr<ance::Constant> constant = ance::BooleanConstant::createTrue();
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFalse(anceParser::FalseContext* ctx)
 {
-    ance::Constant* constant = ance::BooleanConstant::createFalse();
+    std::shared_ptr<ance::Constant> constant = ance::BooleanConstant::createFalse();
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSizeLiteral(anceParser::SizeLiteralContext* ctx)
 {
-    std::string     value    = ctx->INTEGER()->getText();
-    ance::Constant* constant = new ance::SizeConstant(value);
+    std::string                     value    = ctx->INTEGER()->getText();
+    std::shared_ptr<ance::Constant> constant = std::make_shared<ance::SizeConstant>(value);
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ctx)
 {
-    std::string     value    = ctx->SIGNED_INTEGER()->getText();
-    ance::Constant* constant = new ance::DiffConstant(value);
+    std::string                     value    = ctx->SIGNED_INTEGER()->getText();
+    std::shared_ptr<ance::Constant> constant = std::make_shared<ance::DiffConstant>(value);
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
@@ -419,20 +419,18 @@ antlrcpp::Any SourceVisitor::visitUnsignedInteger(anceParser::UnsignedIntegerCon
 {
     uint64_t size = std::stoi(ctx->width->getText());
 
-    const llvm::APInt integer(size, ctx->value->getText(), 10);
-    auto*             integer_constant = new ance::IntegerConstant(integer, false);
-    Expression*       expression       = new ConstantLiteral(integer_constant, location(ctx));
-    return expression;
+    const llvm::APInt               integer(size, ctx->value->getText(), 10);
+    std::shared_ptr<ance::Constant> integer_constant = std::make_shared<ance::IntegerConstant>(integer, false);
+    return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSignedInteger(anceParser::SignedIntegerContext* ctx)
 {
     uint64_t size = std::stoi(ctx->width->getText());
 
-    const llvm::APInt integer(size, ctx->value->getText(), 10);
-    auto*             integer_constant = new ance::IntegerConstant(integer, true);
-    Expression*       expression       = new ConstantLiteral(integer_constant, location(ctx));
-    return expression;
+    const llvm::APInt               integer(size, ctx->value->getText(), 10);
+    std::shared_ptr<ance::Constant> integer_constant = std::make_shared<ance::IntegerConstant>(integer, true);
+    return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerContext* ctx)
@@ -462,10 +460,9 @@ antlrcpp::Any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerConte
 
     integer_str.erase(0, 2);
 
-    const llvm::APInt integer(size, integer_str, radix);
-    auto*             integer_constant = new ance::IntegerConstant(integer, false);
-    Expression*       expression       = new ConstantLiteral(integer_constant, location(ctx));
-    return expression;
+    const llvm::APInt               integer(size, integer_str, radix);
+    std::shared_ptr<ance::Constant> integer_constant = std::make_shared<ance::IntegerConstant>(integer, false);
+    return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ctx)

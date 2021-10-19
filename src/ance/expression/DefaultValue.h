@@ -22,17 +22,17 @@ class DefaultValue : public BackingConstantExpression
 
     bool validate(ValidationLogger& validation_logger) override;
 
-    [[nodiscard]] ance::Value*    getValue() const override;
-    [[nodiscard]] ance::Constant* getConstantValue() const override;
-    llvm::Constant*               buildContentConstant(llvm::LLVMContext& c) override;
+    [[nodiscard]] std::shared_ptr<ance::Value>    getValue() const override;
+    [[nodiscard]] std::shared_ptr<ance::Constant> getConstantValue() const override;
+    llvm::Constant*                               buildContentConstant(llvm::LLVMContext& c) override;
 
     bool accept(ance::ApplicationVisitor& visitor) override;
 
     ~DefaultValue() override;
 
   private:
-    ance::Type*     type_;
-    ance::Constant* constant_ {new ance::ExpressionBackedConstant(this)};
+    ance::Type*                     type_;
+    std::shared_ptr<ance::Constant> constant_ {std::make_shared<ance::ExpressionBackedConstant>(this)};
 };
 
 #endif

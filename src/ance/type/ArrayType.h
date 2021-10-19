@@ -31,15 +31,19 @@ namespace ance
 
         bool validate(ValidationLogger& validation_logger, ance::Location location) override;
 
-        bool         validateSubscript(Type*             indexed_type,
-                                       ance::Location    indexed_location,
-                                       Type*             index_type,
-                                       ance::Location    index_location,
-                                       ValidationLogger& validation_logger) override;
-        ance::Value* buildSubscript(ance::Value* indexed, ance::Value* index, CompileContext* context) override;
+        bool                         validateSubscript(Type*             indexed_type,
+                                                       ance::Location    indexed_location,
+                                                       Type*             index_type,
+                                                       ance::Location    index_location,
+                                                       ValidationLogger& validation_logger) override;
+        std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
+                                                    std::shared_ptr<Value> index,
+                                                    CompileContext*        context) override;
 
       private:
-        llvm::Value* buildGetElementPointer(ance::Value* indexed, ance::Value* index, CompileContext* context) const;
+        llvm::Value* buildGetElementPointer(const std::shared_ptr<ance::Value>& indexed,
+                                            const std::shared_ptr<ance::Value>& index,
+                                            CompileContext*                     context) const;
 
       public:
         ~ArrayType() override = default;

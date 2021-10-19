@@ -49,7 +49,8 @@ bool Subscript::validate(ValidationLogger& validation_logger)
 
 void Subscript::doBuild(CompileContext* context)
 {
-    ance::Value* return_value = indexed_->type()->buildSubscript(indexed_->getValue(), index_->getValue(), context);
+    std::shared_ptr<ance::Value> return_value =
+        indexed_->type()->buildSubscript(indexed_->getValue(), index_->getValue(), context);
     setValue(return_value);
 }
 

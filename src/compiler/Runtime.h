@@ -58,7 +58,10 @@ class Runtime
      * @param context The current compile context.
      * @return A pointer to the allocated memory.
      */
-    ance::Value* allocate(Allocator allocation, ance::Type* type, ance::Value* count, CompileContext* context);
+    std::shared_ptr<ance::Value> allocate(Allocator                           allocation,
+                                          ance::Type*                         type,
+                                          const std::shared_ptr<ance::Value>& count,
+                                          CompileContext*                     context);
 
     /**
      * Free dynamically allocated memory.
@@ -66,12 +69,14 @@ class Runtime
      * @param delete_buffer Whether the memory is a single element or a buffer of multiple elements.
      * @param context The current compile context.
      */
-    void deleteDynamic(ance::Value* value, bool delete_buffer, CompileContext* context);
+    void deleteDynamic(const std::shared_ptr<ance::Value>& value, bool delete_buffer, CompileContext* context);
 
   private:
-    llvm::Value* allocateAutomatic(ance::Type* type, ance::Value* count, CompileContext* context);
+    llvm::Value* allocateAutomatic(ance::Type*                         type,
+                                   const std::shared_ptr<ance::Value>& count,
+                                   CompileContext*                     context);
 
-    llvm::Value* allocateDynamic(ance::Type* type, ance::Value* count, CompileContext* context);
+    llvm::Value* allocateDynamic(ance::Type* type, const std::shared_ptr<ance::Value>& count, CompileContext* context);
 };
 
 #endif

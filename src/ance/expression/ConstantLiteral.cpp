@@ -1,12 +1,13 @@
 #include "ConstantLiteral.h"
 
+#include <utility>
+
 #include "ance/ApplicationVisitor.h"
-#include "ance/construct/constant/Constant.h"
 #include "ance/scope/Scope.h"
 
-ConstantLiteral::ConstantLiteral(ance::Constant* constant, ance::Location location)
+ConstantLiteral::ConstantLiteral(std::shared_ptr<ance::Constant> constant, ance::Location location)
     : Expression(location)
-    , constant_(constant)
+    , constant_(std::move(constant))
 {}
 
 ance::Type* ConstantLiteral::type()
@@ -19,7 +20,7 @@ bool ConstantLiteral::validate(ValidationLogger&)
     return true;
 }
 
-ance::Constant* ConstantLiteral::getConstantValue() const
+std::shared_ptr<ance::Constant> ConstantLiteral::getConstantValue() const
 {
     return constant_;
 }

@@ -21,9 +21,9 @@ class ConstantExpression : public virtual Expression
      * Get the constant value of this expression.
      * @return The constant value.
      */
-    [[nodiscard]] virtual ance::Constant* getConstantValue() const = 0;
+    [[nodiscard]] virtual std::shared_ptr<ance::Constant> getConstantValue() const = 0;
 
-    [[nodiscard]] ance::Value* getValue() const override;
+    [[nodiscard]] std::shared_ptr<ance::Value> getValue() const override;
 };
 
 #endif

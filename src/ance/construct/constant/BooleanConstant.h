@@ -24,12 +24,12 @@ namespace ance
          * Create a boolean constant with the false value.
          * @return The new boolean constant.
          */
-        static ance::BooleanConstant* createFalse();
+        static std::shared_ptr<ance::BooleanConstant> createFalse();
         /**
          * Create a boolean constant with the true value.
          * @return The new boolean constant.
          */
-        static ance::BooleanConstant* createTrue();
+        static std::shared_ptr<ance::BooleanConstant> createTrue();
 
       private:
         ance::Type* type_;

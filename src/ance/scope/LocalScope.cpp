@@ -1,5 +1,7 @@
 #include "LocalScope.h"
 
+#include <utility>
+
 #include "ance/ApplicationVisitor.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/construct/constant/Constant.h"
@@ -55,31 +57,31 @@ void ance::LocalScope::registerType(ance::Type* type)
     getGlobalScope()->registerType(type);
 }
 
-ance::LocalVariable* ance::LocalScope::defineAutoVariable(const std::string& identifier,
-                                                          ance::Type*        type,
-                                                          Assigner           assigner,
-                                                          ance::Value*       value,
-                                                          ance::Location     location)
+ance::LocalVariable* ance::LocalScope::defineAutoVariable(const std::string&                  identifier,
+                                                          ance::Type*                         type,
+                                                          Assigner                            assigner,
+                                                          const std::shared_ptr<ance::Value>& value,
+                                                          ance::Location                      location)
 {
     return defineLocalVariable(identifier, type, assigner, value, 0, location);
 }
 
-ance::LocalVariable* ance::LocalScope::defineParameterVariable(const std::string& identifier,
-                                                               ance::Type*        type,
-                                                               Assigner           assigner,
-                                                               ance::Value*       value,
-                                                               unsigned           parameter_no,
-                                                               ance::Location     location)
+ance::LocalVariable* ance::LocalScope::defineParameterVariable(const std::string&                  identifier,
+                                                               ance::Type*                         type,
+                                                               Assigner                            assigner,
+                                                               const std::shared_ptr<ance::Value>& value,
+                                                               unsigned                            parameter_no,
+                                                               ance::Location                      location)
 {
     return defineLocalVariable(identifier, type, assigner, value, parameter_no, location);
 }
 
-ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string& identifier,
-                                                           ance::Type*        type,
-                                                           Assigner           assigner,
-                                                           ance::Value*       value,
-                                                           unsigned           parameter_no,
-                                                           ance::Location     location)
+ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string&                  identifier,
+                                                           ance::Type*                         type,
+                                                           Assigner                            assigner,
+                                                           const std::shared_ptr<ance::Value>& value,
+                                                           unsigned                            parameter_no,
+                                                           ance::Location                      location)
 {
     if (local_variables_.find(identifier) == local_variables_.end())
     {

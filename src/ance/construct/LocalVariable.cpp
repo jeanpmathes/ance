@@ -10,15 +10,15 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::LocalVariable::LocalVariable(ance::LocalScope* containing_scope,
-                                   std::string       identifier,
-                                   ance::Type*       type,
-                                   ance::Value*      value,
-                                   bool              is_final,
-                                   unsigned          parameter_no,
-                                   ance::Location    location)
+ance::LocalVariable::LocalVariable(ance::LocalScope*            containing_scope,
+                                   std::string                  identifier,
+                                   ance::Type*                  type,
+                                   std::shared_ptr<ance::Value> value,
+                                   bool                         is_final,
+                                   unsigned                     parameter_no,
+                                   ance::Location               location)
     : Variable(containing_scope, std::move(identifier), type, is_final)
-    , initial_value_(value)
+    , initial_value_(std::move(value))
     , containing_scope_(containing_scope)
     , parameter_no_(parameter_no)
     , location_(location)
@@ -71,17 +71,17 @@ void ance::LocalVariable::build(CompileContext* context)
     store(initial_value_, context);
 }
 
-ance::Value* ance::LocalVariable::getValue(CompileContext*)
+std::shared_ptr<ance::Value> ance::LocalVariable::getValue(CompileContext*)
 {
-    return new WrappedNativeValue(type(), native_value_);
+    return std::make_shared<ance::WrappedNativeValue>(type(), native_value_);
 }
 
-void ance::LocalVariable::storeValue(ance::Value* value, CompileContext* context)
+void ance::LocalVariable::storeValue(std::shared_ptr<ance::Value> value, CompileContext* context)
 {
     store(value, context);
 }
 
-void ance::LocalVariable::store(ance::Value* value, CompileContext* context)
+void ance::LocalVariable::store(std::shared_ptr<ance::Value> value, CompileContext* context)
 {
     value = ance::Type::makeMatching(type(), value, context);
 

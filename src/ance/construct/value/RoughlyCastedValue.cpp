@@ -1,11 +1,13 @@
 #include "RoughlyCastedValue.h"
 
+#include <utility>
+
 #include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
-ance::RoughlyCastedValue::RoughlyCastedValue(ance::Type* target_type, ance::Value* original)
+ance::RoughlyCastedValue::RoughlyCastedValue(ance::Type* target_type, std::shared_ptr<ance::Value> original)
     : target_type_(target_type)
-    , original_(original)
+    , original_(std::move(original))
 {}
 
 ance::Type* ance::RoughlyCastedValue::type()

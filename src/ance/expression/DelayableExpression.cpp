@@ -1,11 +1,11 @@
 #include "DelayableExpression.h"
 
-ance::Value* DelayableExpression::getValue() const
+std::shared_ptr<ance::Value> DelayableExpression::getValue() const
 {
     return value_;
 }
 
-void DelayableExpression::setValue(ance::Value* value)
+void DelayableExpression::setValue(const std::shared_ptr<ance::Value>& value)
 {
     value_->setValue(value);
 }

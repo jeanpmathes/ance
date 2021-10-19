@@ -9,7 +9,7 @@ ance::Type* ance::DelayedValue::type()
     return expression_->type();
 }
 
-void ance::DelayedValue::setValue(ance::Value* value)
+void ance::DelayedValue::setValue(const std::shared_ptr<ance::Value>& value)
 {
     assert(!value_);
     assert(value->type() == type() && "Type has to match.");
