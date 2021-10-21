@@ -40,10 +40,16 @@ namespace ance
         void validate(ValidationLogger& validation_logger) override;
 
         /**
-         * Build the local variable.
+         * Build the local variable declaration which prepares the storage.
          * @param context The current compile context.
          */
-        void build(CompileContext* context);
+        void buildDeclaration(CompileContext* context);
+
+        /**
+         * Build the local variable definition which initializes the storage.
+         * @param context The current compile context.
+         */
+        void buildDefinition(CompileContext* context);
 
         std::shared_ptr<ance::Value> getValue(CompileContext* context) override;
 

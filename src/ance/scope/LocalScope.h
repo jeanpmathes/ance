@@ -32,9 +32,13 @@ namespace ance
 
         void validate(ValidationLogger& validation_logger) override;
 
-        bool accept(ance::ApplicationVisitor& visitor) override;
-
         ance::Variable* getVariable(std::string identifier) override;
+
+        /**
+         * Build all variable declarations.
+         * @param context The current compile context.
+         */
+        void buildDeclarations(CompileContext* context);
 
         bool        isTypeRegistered(const std::string& type_name) override;
         ance::Type* getType(const std::string& type_name) override;
@@ -71,6 +75,8 @@ namespace ance
                                                      const std::shared_ptr<ance::Value>& value,
                                                      unsigned                            parameter_no,
                                                      ance::Location                      location);
+
+        bool accept(ance::ApplicationVisitor& visitor) override;
 
       private:
         ance::LocalVariable* defineLocalVariable(const std::string&                  identifier,

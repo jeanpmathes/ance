@@ -69,7 +69,7 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
 
 void LocalVariableDefinition::doBuild(CompileContext* context)
 {
-    variable_->build(context);
+    variable_->buildDefinition(context);
 }
 
 bool LocalVariableDefinition::accept(ance::ApplicationVisitor& visitor)

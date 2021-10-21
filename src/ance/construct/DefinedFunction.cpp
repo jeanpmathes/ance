@@ -93,11 +93,17 @@ void ance::DefinedFunction::createNativeBacking(CompileContext* context)
 
 void ance::DefinedFunction::build(CompileContext* context)
 {
-    llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "entry", native_function_);
+    llvm::BasicBlock* entry = llvm::BasicBlock::Create(*context->llvmContext(), "entry", native_function_);
+    llvm::BasicBlock* code  = llvm::BasicBlock::Create(*context->llvmContext(), "code", native_function_);
 
-    context->ir()->SetInsertPoint(block);
+    context->ir()->SetInsertPoint(entry);
 
-    for (auto* arg : arguments_) { arg->build(context); }
+    function_scope_->buildDeclarations(context);// Arguments are also local variables in the function scope.
+
+    context->ir()->CreateBr(code);
+    context->ir()->SetInsertPoint(code);
+
+    for (auto* arg : arguments_) { arg->buildDefinition(context); }
 
     for (auto* statement : statements_)
     {

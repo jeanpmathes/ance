@@ -42,6 +42,11 @@ ance::Variable* ance::LocalScope::getVariable(std::string identifier)
     return getGlobalScope()->getVariable(identifier);
 }
 
+void ance::LocalScope::buildDeclarations(CompileContext* context)
+{
+    for (auto& [identifier, variable] : local_variables_) { variable->buildDeclaration(context); }
+}
+
 bool ance::LocalScope::isTypeRegistered(const std::string& type_name)
 {
     return getGlobalScope()->isTypeRegistered(type_name);

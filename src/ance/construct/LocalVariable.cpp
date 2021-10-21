@@ -34,7 +34,15 @@ void ance::LocalVariable::validate(ValidationLogger&)
     // Validation of initial value in declaring statement.
 }
 
-void ance::LocalVariable::build(CompileContext* context)
+void ance::LocalVariable::buildDeclaration(CompileContext* context)
+{
+    assert(initial_value_);
+
+    native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr);
+    native_value_->setName(identifier());
+}
+
+void ance::LocalVariable::buildDefinition(CompileContext* context)
 {
     assert(initial_value_);
 
@@ -57,9 +65,6 @@ void ance::LocalVariable::build(CompileContext* context)
                                                                        type()->getDebugType(context),
                                                                        true);
     }
-
-    native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr);
-    native_value_->setName(identifier());
 
     context->di()->insertDeclare(
         native_value_,

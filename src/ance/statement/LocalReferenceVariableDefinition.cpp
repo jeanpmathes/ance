@@ -94,7 +94,7 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
 
 void LocalReferenceVariableDefinition::doBuild(CompileContext* context)
 {
-    variable_->build(context);
+    variable_->buildDefinition(context);
 }
 
 bool LocalReferenceVariableDefinition::accept(ance::ApplicationVisitor& visitor)
