@@ -26,7 +26,7 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                           
     , access_(access)
     , definition_location_(definition_location)
     , containing_scope_(scope)
-    , function_scope_(new ance::LocalScope(this))
+    , function_scope_(std::make_unique<ance::LocalScope>(this))
 {
     addChild(*function_scope_);
 
@@ -173,7 +173,7 @@ ance::GlobalScope* ance::DefinedFunction::getGlobalScope()
 
 ance::LocalScope* ance::DefinedFunction::getFunctionScope()
 {
-    return function_scope_;
+    return function_scope_.get();
 }
 
 llvm::DIScope* ance::DefinedFunction::getDebugScope(CompileContext*)

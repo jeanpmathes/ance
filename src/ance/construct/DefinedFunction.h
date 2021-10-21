@@ -99,8 +99,8 @@ namespace ance
         AccessModifier access_;
         ance::Location definition_location_;
 
-        ance::Scope*      containing_scope_;
-        ance::LocalScope* function_scope_;
+        ance::Scope*                      containing_scope_;
+        std::unique_ptr<ance::LocalScope> function_scope_;
 
         std::vector<ance::LocalVariable*> arguments_;
         std::list<Statement*>             statements_;
