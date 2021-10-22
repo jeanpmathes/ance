@@ -7,6 +7,7 @@
 
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Verifier.h>
+#include <llvm/Passes/PassBuilder.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Support/TargetRegistry.h>
@@ -15,13 +16,14 @@
 #include "ance/type/SizeType.h"
 #include "ance/type/UnsignedIntegerPointerType.h"
 #include "compiler/Application.h"
-#include "compiler/CompileContext.h"
-#include "compiler/Runtime.h"
 
-AnceCompiler::AnceCompiler(Application& app) : application_(app), ir_(llvm_context_)
+AnceCompiler::AnceCompiler(Application& app)
+    : application_(app)
+    , module_(application_.getName(), llvm_context_)
+    , ir_(llvm_context_)
+    , di_(module_)
 {
-    module_ = new llvm::Module(application_.getName(), llvm_context_);
-    module_->setSourceFileName(application_.getSourceFile().filename().string());
+    module_.setSourceFileName(application_.getSourceFile().filename().string());
 
     llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
 
@@ -44,33 +46,39 @@ AnceCompiler::AnceCompiler(Application& app) : application_(app), ir_(llvm_conte
     ance::SizeType::init(llvm_context_, app);
     ance::UnsignedIntegerPointerType::init(llvm_context_, dl);
 
-    module_->setDataLayout(dl);
-    module_->setTargetTriple(triple.str());
+    module_.setDataLayout(dl);
+    module_.setTargetTriple(triple.str());
 
-    module_->addModuleFlag(llvm::Module::Warning, "Dwarf Version", llvm::dwarf::DWARF_VERSION);
-    module_->addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
+    module_.addModuleFlag(llvm::Module::Warning, "Dwarf Version", llvm::dwarf::DWARF_VERSION);
+    module_.addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
 
-    di_ = new llvm::DIBuilder(*module_);
+    llvm::DIFile* src_file = di_.createFile(application_.getSourceFile().filename().generic_string(),
+                                            application_.getSourceFile().parent_path().generic_string());
 
-    llvm::DIFile* src_file = di_->createFile(application_.getSourceFile().filename().generic_string(),
-                                             application_.getSourceFile().parent_path().generic_string());
+    llvm::DICompileUnit* unit = di_.createCompileUnit(llvm::dwarf::DW_LANG_C, src_file, "ancec-0", false, "", 0);
 
-    llvm::DICompileUnit* unit = di_->createCompileUnit(llvm::dwarf::DW_LANG_C, src_file, "ancec-0", false, "", 0);
-
-    context_ = new CompileContext(&application_, new Runtime(), &llvm_context_, module_, &ir_, di_, unit, src_file);
+    runtime_ = std::make_unique<Runtime>();
+    context_ = std::make_unique<CompileContext>(&application_,
+                                                runtime_.get(),
+                                                &llvm_context_,
+                                                &module_,
+                                                &ir_,
+                                                &di_,
+                                                unit,
+                                                src_file);
 }
 
 void AnceCompiler::compile(const std::filesystem::path& out)
 {
-    context_->runtime()->init(context_);
+    context_->runtime()->init(context_.get());
 
-    application_.globalScope().createNativeBacking(context_);
-    application_.globalScope().buildFunctions(context_);
+    application_.globalScope().createNativeBacking(context_.get());
+    application_.globalScope().buildFunctions(context_.get());
 
     assert(context_->allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
 
     llvm::FunctionType* main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(llvm_context_), false);
-    llvm::Function*     main      = module_->getFunction("main");
+    llvm::Function*     main      = module_.getFunction("main");
 
     llvm::FunctionType* exit_type;
     llvm::Function*     exit;
@@ -78,9 +86,37 @@ void AnceCompiler::compile(const std::filesystem::path& out)
     buildExit(exit_type, exit);
     buildStart(main_type, main, exit_type, exit);
 
-    di_->finalize();
+    // Passes.
 
-    llvm::verifyModule(*module_, &llvm::errs());
+    llvm::PassBuilder pass_builder(target_machine_);
+
+    llvm::LoopAnalysisManager     loop_analysis_manager;
+    llvm::FunctionAnalysisManager function_analysis_manager;
+    llvm::CGSCCAnalysisManager    cgscc_analysis_manager;
+    llvm::ModuleAnalysisManager   module_analysis_manager;
+
+    pass_builder.registerModuleAnalyses(module_analysis_manager);
+    pass_builder.registerFunctionAnalyses(function_analysis_manager);
+    pass_builder.registerCGSCCAnalyses(cgscc_analysis_manager);
+    pass_builder.registerLoopAnalyses(loop_analysis_manager);
+    pass_builder.crossRegisterProxies(loop_analysis_manager,
+                                      function_analysis_manager,
+                                      cgscc_analysis_manager,
+                                      module_analysis_manager);
+
+    auto opt_level = llvm::PassBuilder::OptimizationLevel::O1;
+
+    if (opt_level != llvm::PassBuilder::OptimizationLevel::O0)
+    {
+        llvm::ModulePassManager pass_manager =
+            pass_builder.buildModuleSimplificationPipeline(opt_level, llvm::ThinOrFullLTOPhase::None);
+        pass_manager.run(module_, module_analysis_manager);
+    }
+
+    // Finish up.
+
+    di_.finalize();
+    llvm::verifyModule(module_, &llvm::errs());
 
     // Emit llvm IR to file.
 
@@ -89,7 +125,7 @@ void AnceCompiler::compile(const std::filesystem::path& out)
 
     if (ec) { std::cerr << "IO error while creating IR file stream: " << ec.message() << std::endl; }
 
-    module_->print(out_stream, nullptr);
+    module_.print(out_stream, nullptr);
 }
 
 void AnceCompiler::emitObject(const std::filesystem::path& out)
@@ -107,7 +143,7 @@ void AnceCompiler::emitObject(const std::filesystem::path& out)
         std::cerr << "Cannot emit object files for current target." << std::endl;
     }
 
-    pass.run(*module_);
+    pass.run(module_);
     s.flush();
 }
 
@@ -123,7 +159,7 @@ void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& ex
     llvm::BasicBlock* exit_block = llvm::BasicBlock::Create(llvm_context_, "entry", exit);
     ir_.SetInsertPoint(exit_block);
 
-    llvm::Function* user_exit = module_->getFunction("exit");
+    llvm::Function* user_exit = module_.getFunction("exit");
     ir_.CreateCall(exit_type, user_exit, {exitcode});
 
     ir_.CreateRetVoid();

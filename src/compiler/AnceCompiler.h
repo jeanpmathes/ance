@@ -7,8 +7,10 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Target/TargetMachine.h>
 
+#include "compiler/CompileContext.h"
+#include "compiler/Runtime.h"
+
 class Application;
-class CompileContext;
 
 /**
  * Represents the compile step, which transforms an application into a llvm module.
@@ -44,14 +46,13 @@ class AnceCompiler
   private:
     Application&      application_;
     llvm::LLVMContext llvm_context_;
+    llvm::Module      module_;
     llvm::IRBuilder<> ir_;
+    llvm::DIBuilder   di_;
 
-    llvm::TargetMachine* target_machine_ {nullptr};
-
-  private:
-    llvm::Module*    module_;
-    llvm::DIBuilder* di_;
-    CompileContext*  context_;
+    llvm::TargetMachine*            target_machine_ {nullptr};
+    std::unique_ptr<CompileContext> context_ {};
+    std::unique_ptr<Runtime>        runtime_ {};
 };
 
 #endif

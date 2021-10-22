@@ -68,7 +68,7 @@ int main(int argc, char** argv)
             llvm::InitializeAllTargetInfos();
             llvm::InitializeAllTargets();
             llvm::InitializeAllTargetMCs();
-            llvm::InitializeAllAsmPrinters();
+            llvm::InitializeAllAsmParsers();
             llvm::InitializeAllAsmPrinters();
 
             AnceCompiler compiler(application);
