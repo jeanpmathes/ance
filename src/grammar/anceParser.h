@@ -195,8 +195,8 @@ class anceParser : public antlr4::Parser
         VariableDeclarationContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
         AccessModifierContext*      accessModifier();
-        TypeContext*                type();
         antlr4::tree::TerminalNode* IDENTIFIER();
+        TypeContext*                type();
         antlr4::tree::TerminalNode* SEMICOLON();
         antlr4::tree::TerminalNode* CONST();
         AssignerContext*            assigner();
@@ -224,9 +224,9 @@ class anceParser : public antlr4::Parser
       public:
         ExternFunctionDeclarationContext(FunctionContext* ctx);
 
-        TypeContext*                type();
         antlr4::tree::TerminalNode* IDENTIFIER();
         ParametersContext*          parameters();
+        TypeContext*                type();
         antlr4::tree::TerminalNode* SEMICOLON();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
@@ -238,9 +238,9 @@ class anceParser : public antlr4::Parser
         FunctionDefinitionContext(FunctionContext* ctx);
 
         AccessModifierContext*         accessModifier();
-        TypeContext*                   type();
         antlr4::tree::TerminalNode*    IDENTIFIER();
         ParametersContext*             parameters();
+        TypeContext*                   type();
         std::vector<StatementContext*> statement();
         StatementContext*              statement(size_t i);
 
@@ -267,8 +267,8 @@ class anceParser : public antlr4::Parser
       public:
         ParameterContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
-        TypeContext*                type();
         antlr4::tree::TerminalNode* IDENTIFIER();
+        TypeContext*                type();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -340,8 +340,8 @@ class anceParser : public antlr4::Parser
       public:
         LocalVariableDefinitionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
-        TypeContext*                type();
         antlr4::tree::TerminalNode* IDENTIFIER();
+        TypeContext*                type();
         antlr4::tree::TerminalNode* SEMICOLON();
         AssignerContext*            assigner();
         ExpressionContext*          expression();

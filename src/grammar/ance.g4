@@ -5,12 +5,12 @@ file
 	;
 
 variableDeclaration
-	: accessModifier ( CONST )? type IDENTIFIER ( assigner literalExpression )? ';'
+	: accessModifier ( CONST )? IDENTIFIER ':' type ( assigner literalExpression )? ';'
 	;
 
 function
-	: accessModifier type IDENTIFIER '(' parameters ')' '{' ( statement )* '}' # FunctionDefinition
-	| 'extern' type IDENTIFIER '(' parameters ')' ';' # ExternFunctionDeclaration
+	: accessModifier IDENTIFIER '(' parameters ')' ':' type '{' ( statement )* '}' # FunctionDefinition
+	| 'extern' IDENTIFIER '(' parameters ')' ':' type ';' # ExternFunctionDeclaration
 	;
 
 parameters
@@ -18,7 +18,7 @@ parameters
 	;
 
 parameter
-	: type IDENTIFIER
+	: IDENTIFIER ':' type
 	;
 
 accessModifier
@@ -40,7 +40,7 @@ expressionStatement
 	;
 
 localVariableDefinition
-	: type IDENTIFIER ( assigner expression )? ';'
+	: 'let' IDENTIFIER ':' type ( assigner expression )? ';'
 	;
 
 localReferenceDefinition
