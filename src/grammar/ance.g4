@@ -9,8 +9,8 @@ variableDeclaration
 	;
 
 function
-	: accessModifier IDENTIFIER '(' parameters ')' ':' type '{' ( statement )* '}' # FunctionDefinition
-	| 'extern' IDENTIFIER '(' parameters ')' ':' type ';' # ExternFunctionDeclaration
+	: accessModifier IDENTIFIER '(' parameters ')' (':' type)? '{' ( statement )* '}' # FunctionDefinition
+	| 'extern' IDENTIFIER '(' parameters ')' (':' type)? ';' # ExternFunctionDeclaration
 	;
 
 parameters

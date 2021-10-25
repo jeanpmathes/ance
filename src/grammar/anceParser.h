@@ -226,8 +226,8 @@ class anceParser : public antlr4::Parser
 
         antlr4::tree::TerminalNode* IDENTIFIER();
         ParametersContext*          parameters();
-        TypeContext*                type();
         antlr4::tree::TerminalNode* SEMICOLON();
+        TypeContext*                type();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };

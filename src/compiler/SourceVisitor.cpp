@@ -12,6 +12,7 @@
 #include "ance/type/QuadType.h"
 #include "ance/type/ReferenceType.h"
 #include "ance/type/SingleType.h"
+#include "ance/type/VoidType.h"
 
 #include "ance/scope/LocalScope.h"
 
@@ -83,7 +84,7 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
 antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)
 {
     AccessModifier access      = visit(ctx->accessModifier());
-    ance::Type*    return_type = visit(ctx->type());
+    ance::Type*    return_type = ctx->type() ? (ance::Type*) visit(ctx->type()) : ance::VoidType::get();
 
     ance::Location declaration_location = location(ctx);
     ance::Location definition_location =
@@ -117,7 +118,7 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
 
 antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx)
 {
-    ance::Type*                   return_type = visit(ctx->type());
+    ance::Type*                   return_type = ctx->type() ? (ance::Type*) visit(ctx->type()) : ance::VoidType::get();
     std::vector<ance::Parameter*> parameters  = visit(ctx->parameters());
 
     std::vector<std::shared_ptr<ance::Parameter>> shared_parameters;
