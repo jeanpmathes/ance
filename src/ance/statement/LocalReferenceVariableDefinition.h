@@ -7,7 +7,7 @@
 
 namespace ance
 {
-    class LocalVariable;
+    class Variable;
     class Type;
 }
 
@@ -58,7 +58,7 @@ class LocalReferenceVariableDefinition : public Statement
     ance::Type*                 type_;
     std::unique_ptr<Expression> reference_;
 
-    ance::LocalVariable* variable_ {nullptr};
+    ance::Variable* variable_ {nullptr};
 };
 
 #endif

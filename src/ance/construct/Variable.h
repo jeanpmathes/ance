@@ -7,15 +7,21 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
 
+#include "ance/AccessModifier.h"
+#include "ance/construct/VariableDefinition.h"
 #include "ance/utility/Location.h"
 
 namespace ance
 {
     class Scope;
+    class GlobalScope;
+    class LocalScope;
+
     class Type;
     class Value;
 }
 
+class ConstantExpression;
 class CompileContext;
 class ValidationLogger;
 
@@ -26,16 +32,7 @@ namespace ance
      */
     class Variable
     {
-      protected:
-        /**
-         * Create a new defined variable.
-         * @param containing_scope The containing scope.
-         * @param identifier The identifier.
-         * @param type The value type.
-         * @param is_final Whether the variable is final.
-         */
-        Variable(ance::Scope* containing_scope, std::string identifier, ance::Type* type, bool is_final);
-
+      public:
         /**
          * Create an undefined variable.
          * @param identifier The identifier.
@@ -43,31 +40,50 @@ namespace ance
         explicit Variable(std::string identifier);
 
         /**
-         * Define this variable.
-         * @param containing_scope The containing scope.
-         * @param type The value type.
-         * @param is_final Whether the variable is final.
-         */
-        void define(ance::Scope* containing_scope, ance::Type* type, bool is_final);
-
-      public:
-        /**
          * Check if this variable is defined.
          * @return Whether it is defined.
          */
         [[nodiscard]] bool isDefined() const;
 
         /**
-         * Validate this variable.
-         * @param validation_logger A logger to log validation messages.
+         * Define this variable as a global variable.
+         * @param type The type.
+         * @param containing_scope The containing scope.
+         * @param access The access modifier.
+         * @param constant_init The constant used for initialization.
+         * @param is_final Whether the variable is final.
+         * @param is_constant Whether the variable is constant.
+         * @param location The source location.
          */
-        virtual void validate(ValidationLogger& validation_logger) = 0;
+        void defineAsGlobal(ance::Type*         type,
+                            ance::GlobalScope*  containing_scope,
+                            AccessModifier      access,
+                            ConstantExpression* constant_init,
+                            bool                is_final,
+                            bool                is_constant,
+                            ance::Location      location);
+
+        /**
+         * Define this variable as a local variable.
+         * @param type The type.
+         * @param containing_scope The containing scope.
+         * @param is_final Whether the variable is final.
+         * @param value The initial value.
+         * @param parameter_no The parameter number. Use zero if this is not a parameter.
+         * @param location The source location.
+         */
+        void defineAsLocal(ance::Type*                         type,
+                           ance::LocalScope*                   containing_scope,
+                           bool                                is_final,
+                           const std::shared_ptr<ance::Value>& value,
+                           unsigned                            parameter_no,
+                           ance::Location                      location);
 
         /**
          * Get the identifier.
          * @return The identifier.
          */
-        [[nodiscard]] std::string identifier() const;
+        [[nodiscard]] const std::string& identifier() const;
         /**
          * Get the containing scope.
          * @return The scope.
@@ -83,6 +99,24 @@ namespace ance
          * @return Whether it is final.
          */
         [[nodiscard]] bool isFinal() const;
+
+        /**
+         * Validate this variable.
+         * @param validation_logger A logger to log validation messages.
+         */
+        void validate(ValidationLogger& validation_logger);
+
+        /**
+         * Build the variable declaration which prepares the storage.
+         * @param context The current compile context.
+         */
+        void buildDeclaration(CompileContext* context);
+
+        /**
+         * Build the variable definition which initializes the storage.
+         * @param context The current compile context.
+         */
+        void buildDefinition(CompileContext* context);
 
         /**
          * Validate getting a value.
@@ -109,7 +143,7 @@ namespace ance
          * @param context The current compile context.
          * @return The current value.
          */
-        virtual std::shared_ptr<ance::Value> getValue(CompileContext* context) = 0;
+        std::shared_ptr<ance::Value> getValue(CompileContext* context);
         /**
          * Set the current value of the variable.
          * @param value The new value.
@@ -117,18 +151,9 @@ namespace ance
          */
         void setValue(const std::shared_ptr<ance::Value>& value, CompileContext* context);
 
-        virtual ~Variable() = default;
-
-      protected:
-        virtual void storeValue(std::shared_ptr<ance::Value> value, CompileContext* context) = 0;
-
       private:
-        std::string identifier_;
-        bool        is_defined_;
-
-        ance::Scope* scope_;
-        ance::Type*  type_;
-        bool         is_final_;
+        std::string                               identifier_;
+        std::unique_ptr<ance::VariableDefinition> definition_ {};
     };
 }
 #endif

@@ -6,6 +6,7 @@
 #include "ance/construct/constant/Constant.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/expression/ConstantExpression.h"
+#include "ance/scope/GlobalScope.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/ReferenceType.h"
 #include "ance/type/VoidType.h"
@@ -17,52 +18,21 @@ namespace llvm
     class Constant;
 }
 
-ance::GlobalVariable::GlobalVariable(ance::Scope*        containing_scope,
-                                     AccessModifier      access,
-                                     std::string         identifier,
+ance::GlobalVariable::GlobalVariable(const std::string&  identifier,
                                      ance::Type*         type,
+                                     ance::GlobalScope*  containing_scope,
+                                     AccessModifier      access,
                                      ConstantExpression* constant_init,
                                      bool                is_final,
                                      bool                is_constant,
                                      ance::Location      location)
-    : Variable(containing_scope, std::move(identifier), type, is_final)
+    : VariableDefinition(identifier, type, containing_scope, is_final, location)
     , access_(access)
-    , location_(location)
     , is_constant_(is_constant)
     , constant_init_(constant_init)
 {
     constant_init_->setContainingScope(containing_scope);
     initial_value_ = constant_init_->getConstantValue();
-}
-
-ance::GlobalVariable::GlobalVariable(std::string identifier)
-    : Variable(std::move(identifier))
-    , access_(AccessModifier::PRIVATE_ACCESS)
-    , location_(0, 0, 0, 0)
-{}
-
-void ance::GlobalVariable::defineGlobal(ance::Scope*        containing_scope,
-                                        AccessModifier      access,
-                                        ance::Type*         type,
-                                        ConstantExpression* constant_init,
-                                        bool                is_final,
-                                        bool                is_constant,
-                                        ance::Location      location)
-{
-    this->define(containing_scope, type, is_final);
-
-    is_constant_   = is_constant;
-    access_        = access;
-    constant_init_ = constant_init;
-    location_      = location;
-
-    constant_init_->setContainingScope(containing_scope);
-    initial_value_ = constant_init_->getConstantValue();
-}
-
-ance::Location ance::GlobalVariable::location() const
-{
-    return location_;
 }
 
 void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
@@ -71,20 +41,21 @@ void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
 
     if (type() == ance::VoidType::get())
     {
-        validation_logger.logError("Global variable cannot have 'void' type", location_);
+        validation_logger.logError("Global variable cannot have 'void' type", location());
         return;
     }
 
     if (ance::ReferenceType::isReferenceType(type()))
     {
-        validation_logger.logError("Global variable cannot have reference type", location_);
+        validation_logger.logError("Global variable cannot have reference type", location());
         return;
     }
 
     ance::Type::checkMismatch(type(), initial_value_->type(), constant_init_->location(), validation_logger);
 }
 
-void ance::GlobalVariable::createNativeBacking(CompileContext* context)
+void ance::GlobalVariable::buildDeclaration(CompileContext*) {}
+void ance::GlobalVariable::buildDefinition(CompileContext* context)
 {
     llvm::GlobalValue::LinkageTypes linkage = access_.linkage();
 
@@ -101,7 +72,7 @@ void ance::GlobalVariable::createNativeBacking(CompileContext* context)
                                                                      identifier(),
                                                                      identifier(),
                                                                      context->sourceFile(),
-                                                                     location_.line(),
+                                                                     location().line(),
                                                                      type()->getDebugType(context),
                                                                      true);
 

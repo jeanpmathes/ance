@@ -103,8 +103,8 @@ namespace ance
         ance::Scope*                      containing_scope_;
         std::unique_ptr<ance::LocalScope> function_scope_;
 
-        std::vector<ance::LocalVariable*> arguments_;
-        std::list<Statement*>             statements_;
+        std::vector<ance::Variable*> arguments_;
+        std::list<Statement*>        statements_;
 
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};

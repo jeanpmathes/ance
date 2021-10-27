@@ -4,7 +4,7 @@
 
 #include <llvm/ADT/SmallVector.h>// critical, missing include will cause linking error
 
-#include "ance/construct/LocalVariable.h"
+#include "ance/construct/Variable.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/statement/Statement.h"
@@ -33,12 +33,12 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                           
         Assigner assigner = ance::ReferenceType::isReferenceType(parameter->type()) ? Assigner::REFERENCE_BINDING
                                                                                     : Assigner::COPY_ASSIGNMENT;
 
-        ance::LocalVariable* arg = function_scope_->defineParameterVariable(parameter->name(),
-                                                                            parameter->type(),
-                                                                            assigner,
-                                                                            parameter,
-                                                                            no++,
-                                                                            parameter->location());
+        ance::Variable* arg = function_scope_->defineParameterVariable(parameter->name(),
+                                                                       parameter->type(),
+                                                                       assigner,
+                                                                       parameter,
+                                                                       no++,
+                                                                       parameter->location());
         arguments_.push_back(arg);
     }
 }

@@ -9,24 +9,17 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::LocalVariable::LocalVariable(ance::LocalScope*            containing_scope,
-                                   std::string                  identifier,
+ance::LocalVariable::LocalVariable(const std::string&           identifier,
                                    ance::Type*                  type,
-                                   std::shared_ptr<ance::Value> value,
+                                   ance::LocalScope*            containing_scope,
                                    bool                         is_final,
+                                   std::shared_ptr<ance::Value> value,
                                    unsigned                     parameter_no,
                                    ance::Location               location)
-    : Variable(containing_scope, std::move(identifier), type, is_final)
+    : VariableDefinition(identifier, type, containing_scope, is_final, location)
     , initial_value_(std::move(value))
-    , containing_scope_(containing_scope)
     , parameter_no_(parameter_no)
-    , location_(location)
 {}
-
-ance::Location ance::LocalVariable::location() const
-{
-    return location_;
-}
 
 void ance::LocalVariable::validate(ValidationLogger&)
 {
@@ -47,30 +40,29 @@ void ance::LocalVariable::buildDefinition(CompileContext* context)
 
     if (parameter_no_ == 0)
     {
-        local_debug_variable_ = context->di()->createAutoVariable(containing_scope_->getDebugScope(context),
+        local_debug_variable_ = context->di()->createAutoVariable(scope()->getDebugScope(context),
                                                                   identifier(),
                                                                   context->sourceFile(),
-                                                                  location_.line(),
+                                                                  location().line(),
                                                                   type()->getDebugType(context),
                                                                   true);
     }
     else
     {
-        local_debug_variable_ = context->di()->createParameterVariable(containing_scope_->getDebugScope(context),
+        local_debug_variable_ = context->di()->createParameterVariable(scope()->getDebugScope(context),
                                                                        identifier(),
                                                                        parameter_no_,
                                                                        context->sourceFile(),
-                                                                       location_.line(),
+                                                                       location().line(),
                                                                        type()->getDebugType(context),
                                                                        true);
     }
 
-    context->di()->insertDeclare(
-        native_value_,
-        local_debug_variable_,
-        context->di()->createExpression(),
-        location_.getDebugLoc(context->llvmContext(), containing_scope_->getDebugScope(context)),
-        context->ir()->GetInsertBlock());
+    context->di()->insertDeclare(native_value_,
+                                 local_debug_variable_,
+                                 context->di()->createExpression(),
+                                 location().getDebugLoc(context->llvmContext(), scope()->getDebugScope(context)),
+                                 context->ir()->GetInsertBlock());
 
     store(initial_value_, context);
 }
@@ -94,3 +86,4 @@ void ance::LocalVariable::store(std::shared_ptr<ance::Value> value, CompileConte
 
     context->ir()->CreateStore(stored, native_value_);
 }
+

@@ -7,7 +7,7 @@
 
 #include "ance/Assigner.h"
 #include "ance/construct/Function.h"
-#include "ance/construct/GlobalVariable.h"
+#include "ance/construct/Variable.h"
 
 class ConstantExpression;
 
@@ -117,9 +117,9 @@ namespace ance
 
         std::map<std::string, ance::Type*> types_;
 
-        std::map<std::string, std::unique_ptr<ance::GlobalVariable>> global_constants_;
-        std::map<std::string, std::unique_ptr<ance::GlobalVariable>> global_variables_;
-        std::map<std::string, std::unique_ptr<ance::GlobalVariable>> global_undefined_;
+        std::map<std::string, std::unique_ptr<ance::Variable>> global_constants_;
+        std::map<std::string, std::unique_ptr<ance::Variable>> global_variables_;
+        std::map<std::string, std::unique_ptr<ance::Variable>> global_undefined_;
 
         std::map<std::string, std::unique_ptr<ance::Function>> functions_;
     };

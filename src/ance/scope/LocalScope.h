@@ -51,11 +51,11 @@ namespace ance
          * @param location The source location.
          * @return The defined variable or null if defining is not possible.
          */
-        ance::LocalVariable* defineAutoVariable(const std::string&                  identifier,
-                                                ance::Type*                         type,
-                                                Assigner                            assigner,
-                                                const std::shared_ptr<ance::Value>& value,
-                                                ance::Location                      location);
+        ance::Variable* defineAutoVariable(const std::string&                  identifier,
+                                           ance::Type*                         type,
+                                           Assigner                            assigner,
+                                           const std::shared_ptr<ance::Value>& value,
+                                           ance::Location                      location);
 
         /**
          * Define a local variable that is a parameter.
@@ -67,25 +67,25 @@ namespace ance
          * @param location The source location.
          * @return The defined variable or null if defining is not possible.
          */
-        ance::LocalVariable* defineParameterVariable(const std::string&                  identifier,
-                                                     ance::Type*                         type,
-                                                     Assigner                            assigner,
-                                                     const std::shared_ptr<ance::Value>& value,
-                                                     unsigned                            parameter_no,
-                                                     ance::Location                      location);
+        ance::Variable* defineParameterVariable(const std::string&                  identifier,
+                                                ance::Type*                         type,
+                                                Assigner                            assigner,
+                                                const std::shared_ptr<ance::Value>& value,
+                                                unsigned                            parameter_no,
+                                                ance::Location                      location);
 
       private:
-        ance::LocalVariable* defineLocalVariable(const std::string&                  identifier,
-                                                 ance::Type*                         type,
-                                                 Assigner                            assigner,
-                                                 const std::shared_ptr<ance::Value>& value,
-                                                 unsigned                            parameter_no,
-                                                 ance::Location                      location);
+        ance::Variable* defineLocalVariable(const std::string&                  identifier,
+                                            ance::Type*                         type,
+                                            Assigner                            assigner,
+                                            const std::shared_ptr<ance::Value>& value,
+                                            unsigned                            parameter_no,
+                                            ance::Location                      location);
 
       private:
         ance::Scope* parent_;
 
-        std::map<std::string, std::unique_ptr<ance::LocalVariable>> local_variables_;
+        std::map<std::string, std::unique_ptr<ance::Variable>> local_variables_;
     };
 }
 #endif

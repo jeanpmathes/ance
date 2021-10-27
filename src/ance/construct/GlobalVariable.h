@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_ANCE_CONSTRUCT_GLOBALVARIABLE_H_
 #define ANCE_SRC_ANCE_CONSTRUCT_GLOBALVARIABLE_H_
 
-#include "Variable.h"
+#include "VariableDefinition.h"
 
 #include <string>
 
@@ -13,6 +13,7 @@ namespace ance
 {
     class Constant;
     class Type;
+    class GlobalScope;
 }
 
 class ConstantExpression;
@@ -22,62 +23,25 @@ namespace ance
     /**
      * A global variable.
      */
-    class GlobalVariable : public Variable
+    class GlobalVariable : public VariableDefinition
     {
       public:
         /**
-         * Create a new global variable with complete definition.
-         * @param containing_scope The containing scope.
-         * @param access The access type.
-         * @param identifier The identifier.
-         * @param type The type.
-         * @param constant_init The constant used for initialization.
-         * @param is_final Whether the variable is final.
-         * @param is_constant Whether the variable is constant.
-         * @param location The source location.
+         * Create a new global variable definition.
          */
-        GlobalVariable(ance::Scope*        containing_scope,
-                       AccessModifier      access,
-                       std::string         identifier,
+        GlobalVariable(const std::string&  identifier,
                        ance::Type*         type,
+                       ance::GlobalScope*  containing_scope,
+                       AccessModifier      access,
                        ConstantExpression* constant_init,
                        bool                is_final,
                        bool                is_constant,
                        ance::Location      location);
 
-        /**
-         * Create an undefined global variable.
-         * @param identifier The identifier of the variable.
-         */
-        explicit GlobalVariable(std::string identifier);
-
-        /**
-         * Define an undefined global variable.
-         * @param containing_scope The containing scope.
-         * @param access The access type.
-         * @param type The type.
-         * @param constant_init The constant used for initialization.
-         * @param is_final Whether the variable is final.
-         * @param is_constant Whether the variable is constant.
-         * @param location The source location.
-         */
-        void defineGlobal(ance::Scope*        containing_scope,
-                          AccessModifier      access,
-                          ance::Type*         type,
-                          ConstantExpression* constant_init,
-                          bool                is_final,
-                          bool                is_constant,
-                          ance::Location      location);
-
-        [[nodiscard]] ance::Location location() const;
-
         void validate(ValidationLogger& validation_logger) override;
 
-        /**
-         * Create the native content backing the variable.
-         * @param context The current compile context.
-         */
-        void createNativeBacking(CompileContext* context);
+        void buildDeclaration(CompileContext* context) override;
+        void buildDefinition(CompileContext* context) override;
 
         std::shared_ptr<ance::Value> getValue(CompileContext* context) override;
 
@@ -86,7 +50,6 @@ namespace ance
 
       private:
         AccessModifier      access_;
-        ance::Location      location_;
         bool                is_constant_ {false};
         ConstantExpression* constant_init_ {nullptr};
 

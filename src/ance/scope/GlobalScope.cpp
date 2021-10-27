@@ -78,28 +78,20 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
         return;
     }
 
-    std::unique_ptr<ance::GlobalVariable> defined;
+    std::unique_ptr<ance::Variable> undefined;
 
     if (global_undefined_.find(identifier) != global_undefined_.end())
     {
-        std::unique_ptr<ance::GlobalVariable> undefined = std::move(global_undefined_[identifier]);
-        undefined->defineGlobal(this, access, type, initializer, is_final, is_constant, location);
-
-        defined = std::move(undefined);
-
+        undefined = std::move(global_undefined_[identifier]);
         global_undefined_.erase(identifier);
     }
     else
     {
-        defined = std::make_unique<ance::GlobalVariable>(this,
-                                                         access,
-                                                         identifier,
-                                                         type,
-                                                         initializer,
-                                                         is_final,
-                                                         is_constant,
-                                                         location);
+        undefined = std::make_unique<ance::Variable>(identifier);
     }
+
+    undefined->defineAsGlobal(type, this, access, initializer, is_final, is_constant, location);
+    std::unique_ptr<ance::Variable> defined = std::move(undefined);
 
     if (is_constant) { global_constants_[identifier] = std::move(defined); }
     else
@@ -117,7 +109,7 @@ ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
     if (global_undefined_.find(identifier) != global_undefined_.end()) { return global_undefined_[identifier].get(); }
 
     // Create an undefined global variable.
-    global_undefined_[identifier] = std::make_unique<ance::GlobalVariable>(identifier);
+    global_undefined_[identifier] = std::make_unique<ance::Variable>(identifier);
     return global_undefined_[identifier].get();
 }
 
@@ -184,13 +176,17 @@ void ance::GlobalScope::createNativeBacking(CompileContext* context)
     for (auto const& [identifier, constant] : global_constants_)
     {
         if (!constant) continue;
-        constant->createNativeBacking(context);
+
+        constant->buildDeclaration(context);
+        constant->buildDefinition(context);
     }
 
     for (auto const& [identifier, variable] : global_variables_)
     {
         if (!variable) continue;
-        variable->createNativeBacking(context);
+
+        variable->buildDeclaration(context);
+        variable->buildDefinition(context);
     }
 }
 

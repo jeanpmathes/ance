@@ -8,4 +8,5 @@ target_sources(ance PRIVATE
                GlobalVariable.cpp
                LocalVariable.cpp
                Parameter.cpp
-               Variable.cpp)
+               Variable.cpp
+               VariableDefinition.cpp)

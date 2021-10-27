@@ -3,8 +3,7 @@
 #include <utility>
 
 #include "ance/construct/DefinedFunction.h"
-#include "ance/construct/LocalVariable.h"
-#include "ance/construct/value/RoughlyCastedValue.h"
+#include "ance/construct/Variable.h"
 #include "ance/expression/Addressof.h"
 #include "ance/expression/BindRef.h"
 #include "ance/scope/LocalScope.h"
