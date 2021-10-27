@@ -1,6 +1,5 @@
 #include "DeleteStatement.h"
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/DefinedFunction.h"
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
@@ -13,9 +12,7 @@ DeleteStatement::DeleteStatement(std::unique_ptr<Expression> to_delete, bool del
     : Statement(location)
     , to_delete_(std::move(to_delete))
     , delete_buffer_(delete_buffer)
-{
-    addChild(*to_delete_);
-}
+{}
 
 void DeleteStatement::setFunction(ance::DefinedFunction* function)
 {
@@ -38,9 +35,4 @@ void DeleteStatement::validate(ValidationLogger& validation_logger)
 void DeleteStatement::doBuild(CompileContext* context)
 {
     context->runtime()->deleteDynamic(to_delete_->getValue(), delete_buffer_, context);
-}
-
-bool DeleteStatement::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitDeleteStatement(*this);
 }

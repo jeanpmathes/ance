@@ -1,6 +1,5 @@
 #include "BindRef.h"
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/value/RoughlyCastedValue.h"
 #include "ance/expression/Addressof.h"
 #include "ance/type/PointerType.h"
@@ -21,9 +20,7 @@ std::unique_ptr<BindRef> BindRef::referTo(std::unique_ptr<Expression> address, a
 BindRef::BindRef(std::unique_ptr<Expression> address, ance::Location location)
     : Expression(location)
     , address_(std::move(address))
-{
-    addChild(*address_);
-}
+{}
 
 void BindRef::setScope(ance::Scope* scope)
 {
@@ -65,8 +62,3 @@ void BindRef::doBuild(CompileContext*)
 }
 
 BindRef::~BindRef() = default;
-
-bool BindRef::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitBindRef(*this);
-}

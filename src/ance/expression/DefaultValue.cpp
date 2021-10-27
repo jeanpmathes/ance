@@ -1,6 +1,5 @@
 #include "DefaultValue.h"
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/type/Type.h"
 
 DefaultValue::DefaultValue(ance::Type* type, ance::Location location) : Expression(location), type_(type) {}
@@ -28,11 +27,6 @@ std::shared_ptr<ance::Constant> DefaultValue::getConstantValue() const
 llvm::Constant* DefaultValue::buildContentConstant(llvm::LLVMContext& c)
 {
     return type_->getDefaultContent(c);
-}
-
-bool DefaultValue::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitDefaultValue(*this);
 }
 
 DefaultValue::~DefaultValue() = default;

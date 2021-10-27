@@ -1,15 +1,12 @@
 #include "SizeofExpression.h"
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/type/SizeType.h"
 #include "compiler/CompileContext.h"
 
 SizeofExpression::SizeofExpression(std::unique_ptr<Expression> expression, ance::Location location)
     : Expression(location)
     , expression_(std::move(expression))
-{
-    addChild(*expression_);
-}
+{}
 
 void SizeofExpression::setScope(ance::Scope* scope)
 {
@@ -34,9 +31,4 @@ std::shared_ptr<ance::Value> SizeofExpression::getValue() const
 llvm::Value* SizeofExpression::buildNativeValue(CompileContext* context)
 {
     return ance::SizeType::buildValue(expression_->type()->getContentSize(context->module()));
-}
-
-bool SizeofExpression::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitSizeofExpression(*this);
 }

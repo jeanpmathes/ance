@@ -1,6 +1,5 @@
 #include "Addressof.h"
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/ReferenceType.h"
@@ -10,9 +9,7 @@
 Addressof::Addressof(std::unique_ptr<Expression> arg, ance::Location location)
     : Expression(location)
     , arg_(std::move(arg))
-{
-    addChild(*arg_);
-}
+{}
 
 void Addressof::setScope(ance::Scope* scope)
 {
@@ -60,11 +57,6 @@ void Addressof::doBuild(CompileContext* context)
         address = ance::Values::contentToNative(type(), address, context);
 
     setValue(std::make_shared<ance::WrappedNativeValue>(type(), address));
-}
-
-bool Addressof::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitAddressof(*this);
 }
 
 Addressof::~Addressof() = default;

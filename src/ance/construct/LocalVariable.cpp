@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/Parameter.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
@@ -94,9 +93,4 @@ void ance::LocalVariable::store(std::shared_ptr<ance::Value> value, CompileConte
     llvm::Value* stored = value->getContentValue();
 
     context->ir()->CreateStore(stored, native_value_);
-}
-
-bool ance::LocalVariable::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitLocalVariable(*this);
 }

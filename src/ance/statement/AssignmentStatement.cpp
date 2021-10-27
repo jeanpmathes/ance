@@ -1,6 +1,5 @@
 #include "AssignmentStatement.h"
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/DefinedFunction.h"
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
@@ -16,9 +15,6 @@ AssignmentStatement::AssignmentStatement(std::unique_ptr<Expression> assignable,
     , assigned_(std::move(assigned))
 {
     assert(assigner != Assigner::REFERENCE_BINDING);
-
-    addChild(*assigned_);
-    addChild(*assignable_);
 }
 
 void AssignmentStatement::setFunction(ance::DefinedFunction* function)
@@ -44,9 +40,4 @@ void AssignmentStatement::validate(ValidationLogger& validation_logger)
 void AssignmentStatement::doBuild(CompileContext* context)
 {
     assignable_->assign(assigned_->getValue(), context);
-}
-
-bool AssignmentStatement::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitAssignmentStatement(*this);
 }

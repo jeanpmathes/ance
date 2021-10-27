@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/scope/Scope.h"
 
 ConstantLiteral::ConstantLiteral(std::shared_ptr<ance::Constant> constant, ance::Location location)
@@ -23,9 +22,4 @@ bool ConstantLiteral::validate(ValidationLogger&)
 std::shared_ptr<ance::Constant> ConstantLiteral::getConstantValue() const
 {
     return constant_;
-}
-
-bool ConstantLiteral::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitConstantLiteral(*this);
 }

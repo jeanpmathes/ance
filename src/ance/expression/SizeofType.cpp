@@ -1,6 +1,5 @@
 #include "SizeofType.h"
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/type/SizeType.h"
 #include "compiler/CompileContext.h"
 
@@ -24,9 +23,4 @@ std::shared_ptr<ance::Value> SizeofType::getValue() const
 llvm::Value* SizeofType::buildNativeValue(CompileContext* context)
 {
     return ance::SizeType::buildValue(type_->getContentSize(context->module()));
-}
-
-bool SizeofType::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitSizeofType(*this);
 }

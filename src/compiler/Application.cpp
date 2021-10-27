@@ -11,7 +11,6 @@
 #include "ance/type/QuadType.h"
 #include "ance/type/SingleType.h"
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/type/SizeType.h"
 #include "ance/type/UnsignedIntegerPointerType.h"
 #include "ance/type/VoidType.h"
@@ -31,13 +30,6 @@ Application::Application(data::File& project) : project_(project), global_scope_
     global_scope_->registerType(ance::SizeType::getSize());
     global_scope_->registerType(ance::SizeType::getDiff());
     global_scope_->registerType(ance::UnsignedIntegerPointerType::get());
-
-    addChild(*global_scope_);
-}
-
-ance::Location Application::location() const
-{
-    return ance::Location(0, 0, 0, 0);
 }
 
 void Application::setPointerSize(unsigned size)
@@ -108,9 +100,4 @@ void Application::validate(ValidationLogger& validation_logger)
 ance::GlobalScope& Application::globalScope()
 {
     return *global_scope_;
-}
-
-bool Application::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitApplication(*this);
 }

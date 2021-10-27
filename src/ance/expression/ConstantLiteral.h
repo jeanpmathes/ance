@@ -24,8 +24,6 @@ class ConstantLiteral : public ConstantExpression
 
     [[nodiscard]] std::shared_ptr<ance::Constant> getConstantValue() const override;
 
-    bool accept(ance::ApplicationVisitor& visitor) override;
-
   private:
     std::shared_ptr<ance::Constant> constant_;
 };

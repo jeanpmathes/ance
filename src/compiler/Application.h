@@ -3,7 +3,6 @@
 
 #include <filesystem>
 
-#include "ance/Element.h"
 #include "ance/scope/GlobalScope.h"
 
 namespace ance
@@ -23,7 +22,7 @@ class ValidationLogger;
 /**
  * The application that is described by the source and will be compiled.
  */
-class Application : public ance::Element
+class Application
 {
   public:
     /**
@@ -36,8 +35,6 @@ class Application : public ance::Element
     Application(Application&&)      = delete;
 
   public:
-    [[nodiscard]] ance::Location location() const override;
-
     /**
      * Set the pointer size to use.
      * @param size The pointer size.
@@ -78,8 +75,6 @@ class Application : public ance::Element
      * @return The global scope.
      */
     ance::GlobalScope& globalScope();
-
-    bool accept(ance::ApplicationVisitor& visitor) override;
 
   private:
     data::File& project_;

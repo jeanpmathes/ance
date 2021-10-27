@@ -1,6 +1,5 @@
 #include "ReturnStatement.h"
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/DefinedFunction.h"
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
@@ -10,9 +9,7 @@
 ReturnStatement::ReturnStatement(std::unique_ptr<Expression> return_value, ance::Location location)
     : Statement(location)
     , return_value_(std::move(return_value))
-{
-    addChild(*return_value_);
-}
+{}
 
 void ReturnStatement::setFunction(ance::DefinedFunction* function)
 {
@@ -49,9 +46,4 @@ void ReturnStatement::doBuild(CompileContext* context)
     }
 
     getContainingFunction()->addReturn(return_value);
-}
-
-bool ReturnStatement::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitReturnStatement(*this);
 }

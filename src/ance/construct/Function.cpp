@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/VoidType.h"

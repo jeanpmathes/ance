@@ -3,7 +3,6 @@
 #include <set>
 #include <utility>
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
@@ -65,9 +64,4 @@ std::shared_ptr<ance::Value> ance::ExternFunction::buildCall(const std::vector<s
 
     llvm::Value* native_value = ance::Values::contentToNative(returnType(), content_value, context);
     return std::make_shared<ance::WrappedNativeValue>(returnType(), native_value);
-}
-
-bool ance::ExternFunction::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitExternFunction(*this);
 }

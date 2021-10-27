@@ -4,13 +4,12 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ance/Element.h"
-
 #include "ance/utility/Location.h"
 
 namespace ance
 {
     class DefinedFunction;
+    class Scope;
 }
 
 class CompileContext;
@@ -19,7 +18,7 @@ class ValidationLogger;
 /**
  * Base class of all statements. Statements are building blocks of code and are ordered parts of functions.
  */
-class Statement : public ance::Element
+class Statement
 {
   public:
     /**
@@ -34,7 +33,10 @@ class Statement : public ance::Element
      */
     void setContainingFunction(ance::DefinedFunction* function);
 
-    [[nodiscard]] ance::Scope* scope() const override;
+    /**
+     * Get the containing scope.
+     */
+    [[nodiscard]] ance::Scope* scope() const;
 
   protected:
     /**
@@ -50,7 +52,10 @@ class Statement : public ance::Element
      */
     [[nodiscard]] ance::DefinedFunction* getContainingFunction() const;
 
-    [[nodiscard]] ance::Location location() const override;
+    /**
+     * Get the source location of this statement.
+     */
+    [[nodiscard]] ance::Location location() const;
 
     /**
      * Validate this statement.

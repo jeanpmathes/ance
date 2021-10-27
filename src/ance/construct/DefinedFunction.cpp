@@ -4,7 +4,6 @@
 
 #include <llvm/ADT/SmallVector.h>// critical, missing include will cause linking error
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
@@ -28,8 +27,6 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                           
     , containing_scope_(scope)
     , function_scope_(std::make_unique<ance::LocalScope>(this))
 {
-    addChild(*function_scope_);
-
     unsigned no = 1;
     for (const auto& parameter : this->parameters())
     {
@@ -55,8 +52,6 @@ void ance::DefinedFunction::pushStatement(Statement* statement)
 {
     statements_.push_back(statement);
     statement->setContainingFunction(this);
-
-    addChild(*statement);
 }
 
 void ance::DefinedFunction::createNativeBacking(CompileContext* context)
@@ -230,9 +225,4 @@ ance::Type* ance::DefinedFunction::getType(const std::string& type_name)
 void ance::DefinedFunction::registerType(ance::Type* type)
 {
     function_scope_->registerType(type);
-}
-
-bool ance::DefinedFunction::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitDefinedFunction(*this);
 }

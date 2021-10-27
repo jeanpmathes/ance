@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/Function.h"
 #include "ance/scope/GlobalScope.h"
 #include "compiler/Application.h"
@@ -20,9 +19,7 @@ FunctionCall::FunctionCall(std::string                              identifier,
     : Expression(location)
     , identifier_(std::move(identifier))
     , arguments_(std::move(arguments))
-{
-    for (auto& arg : arguments_) { addChild(*arg); }
-}
+{}
 
 void FunctionCall::setScope(ance::Scope* scope)
 {
@@ -75,11 +72,6 @@ void FunctionCall::doBuild(CompileContext* context)
     {
         setValue(return_value);
     }
-}
-
-bool FunctionCall::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitFunctionCall(*this);
 }
 
 FunctionCall::~FunctionCall() = default;

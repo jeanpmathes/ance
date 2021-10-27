@@ -4,7 +4,7 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ance/Element.h"
+#include "ance/utility/Location.h"
 
 namespace ance
 {
@@ -19,7 +19,7 @@ class ValidationLogger;
 /**
  * The base class of all expressions.
  */
-class Expression : public ance::Element
+class Expression
 {
   protected:
     /**
@@ -29,8 +29,8 @@ class Expression : public ance::Element
     explicit Expression(ance::Location location);
 
   public:
-    [[nodiscard]] ance::Location location() const override;
-    [[nodiscard]] ance::Scope*   scope() const override;
+    [[nodiscard]] ance::Location location() const;
+    [[nodiscard]] ance::Scope*   scope() const;
 
     /**
      * Set the scope containing this expression.

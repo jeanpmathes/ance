@@ -26,7 +26,7 @@ class DefaultValue : public BackingConstantExpression
     [[nodiscard]] std::shared_ptr<ance::Constant> getConstantValue() const override;
     llvm::Constant*                               buildContentConstant(llvm::LLVMContext& c) override;
 
-    bool accept(ance::ApplicationVisitor& visitor) override;
+
 
     ~DefaultValue() override;
 

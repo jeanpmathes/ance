@@ -1,6 +1,5 @@
 #include "Subscript.h"
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/type/Type.h"
 #include "validation/ValidationLogger.h"
 
@@ -8,10 +7,7 @@ Subscript::Subscript(std::unique_ptr<Expression> indexed, std::unique_ptr<Expres
     : Expression(location)
     , indexed_(std::move(indexed))
     , index_(std::move(index))
-{
-    addChild(*index_);
-    addChild(*indexed_);
-}
+{}
 
 void Subscript::setScope(ance::Scope* scope)
 {
@@ -52,11 +48,6 @@ void Subscript::doBuild(CompileContext* context)
     std::shared_ptr<ance::Value> return_value =
         indexed_->type()->buildSubscript(indexed_->getValue(), index_->getValue(), context);
     setValue(return_value);
-}
-
-bool Subscript::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitSubscript(*this);
 }
 
 Subscript::~Subscript() = default;

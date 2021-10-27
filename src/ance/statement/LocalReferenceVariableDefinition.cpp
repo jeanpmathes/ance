@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/DefinedFunction.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/construct/value/RoughlyCastedValue.h"
@@ -40,9 +39,7 @@ LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string  
     , identifier_(std::move(identifier))
     , type_(type)
     , reference_(std::move(reference))
-{
-    addChild(*reference_);
-}
+{}
 
 void LocalReferenceVariableDefinition::setFunction(ance::DefinedFunction* function)
 {
@@ -95,9 +92,4 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
 void LocalReferenceVariableDefinition::doBuild(CompileContext* context)
 {
     variable_->buildDefinition(context);
-}
-
-bool LocalReferenceVariableDefinition::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitLocalReferenceVariableDefinition(*this);
 }

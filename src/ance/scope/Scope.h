@@ -7,9 +7,8 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ance/Element.h"
-
 #include "ance/AccessModifier.h"
+#include "ance/utility/Location.h"
 
 namespace ance
 {
@@ -30,7 +29,7 @@ namespace ance
     /**
      * The base class for scopes, which contain variables and functions.
      */
-    class Scope : public virtual ance::Element
+    class Scope
     {
       public:
         /**

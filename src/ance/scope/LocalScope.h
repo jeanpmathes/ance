@@ -26,9 +26,7 @@ namespace ance
         ance::GlobalScope* getGlobalScope() override;
         llvm::DIScope*     getDebugScope(CompileContext* context) override;
 
-        [[nodiscard]] ance::Scope* scope() const override;
-
-        [[nodiscard]] ance::Location location() const override;
+        [[nodiscard]] ance::Scope* scope() const;
 
         void validate(ValidationLogger& validation_logger) override;
 
@@ -75,8 +73,6 @@ namespace ance
                                                      const std::shared_ptr<ance::Value>& value,
                                                      unsigned                            parameter_no,
                                                      ance::Location                      location);
-
-        bool accept(ance::ApplicationVisitor& visitor) override;
 
       private:
         ance::LocalVariable* defineLocalVariable(const std::string&                  identifier,

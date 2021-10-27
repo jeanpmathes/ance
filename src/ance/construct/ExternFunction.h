@@ -30,8 +30,6 @@ namespace ance
         std::shared_ptr<ance::Value> buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
                                                CompileContext*                                  context) const override;
 
-        bool accept(ance::ApplicationVisitor& visitor) override;
-
       protected:
         using Function::buildCall;
 

@@ -35,8 +35,6 @@ class VariableAccess : public DelayableExpression
                             ance::Location                      value_location,
                             ValidationLogger&                   validation_logger) override;
 
-    bool accept(ance::ApplicationVisitor& visitor) override;
-
   protected:
     void doBuild(CompileContext* context) override;
     void doAssign(std::shared_ptr<ance::Value> value, CompileContext* context) override;

@@ -35,7 +35,7 @@ namespace ance
                       unsigned                     parameter_no,
                       ance::Location               location);
 
-        [[nodiscard]] ance::Location location() const override;
+        [[nodiscard]] ance::Location location() const;
 
         void validate(ValidationLogger& validation_logger) override;
 
@@ -52,8 +52,6 @@ namespace ance
         void buildDefinition(CompileContext* context);
 
         std::shared_ptr<ance::Value> getValue(CompileContext* context) override;
-
-        bool accept(ance::ApplicationVisitor& visitor) override;
 
       protected:
         void storeValue(std::shared_ptr<ance::Value> value, CompileContext* context) override;

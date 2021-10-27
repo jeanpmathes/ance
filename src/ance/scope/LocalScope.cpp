@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/construct/constant/Constant.h"
 #include "ance/scope/GlobalScope.h"
@@ -23,11 +22,6 @@ llvm::DIScope* ance::LocalScope::getDebugScope(CompileContext* context)
 ance::Scope* ance::LocalScope::scope() const
 {
     return parent_;
-}
-
-ance::Location ance::LocalScope::location() const
-{
-    return parent_->location();
 }
 
 void ance::LocalScope::validate(ValidationLogger& validation_logger)
@@ -95,7 +89,6 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string&   
 
         local_variables_[identifier] =
             std::make_unique<ance::LocalVariable>(this, identifier, type, value, is_final, parameter_no, location);
-        addChild(*local_variables_[identifier]);
 
         return local_variables_[identifier].get();
     }
@@ -103,9 +96,4 @@ ance::LocalVariable* ance::LocalScope::defineLocalVariable(const std::string&   
     {
         return nullptr;
     }
-}
-
-bool ance::LocalScope::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitLocalScope(*this);
 }

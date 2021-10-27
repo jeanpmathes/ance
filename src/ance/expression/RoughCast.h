@@ -28,7 +28,7 @@ class RoughCast : public Expression
 
     [[nodiscard]] std::shared_ptr<ance::Value> getValue() const override;
 
-    bool accept(ance::ApplicationVisitor& visitor) override;
+
 
     ~RoughCast() override;
 

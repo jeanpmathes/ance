@@ -2,9 +2,6 @@
 
 #include <ostream>
 
-#include "ance/ApplicationVisitor.h"
-#include "ance/construct/Function.h"
-#include "ance/construct/GlobalVariable.h"
 #include "ance/expression/ConstantExpression.h"
 #include "ance/type/IntegerType.h"
 #include "ance/type/VoidType.h"
@@ -19,11 +16,6 @@ ance::GlobalScope* ance::GlobalScope::getGlobalScope()
 llvm::DIScope* ance::GlobalScope::getDebugScope(CompileContext* context)
 {
     return context->unit();
-}
-
-ance::Location ance::GlobalScope::location() const
-{
-    return ance::Location(0, 0, 0, 0);
 }
 
 void ance::GlobalScope::validate(ValidationLogger& validation_logger)
@@ -109,8 +101,6 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
                                                          location);
     }
 
-    addChild(*defined);
-
     if (is_constant) { global_constants_[identifier] = std::move(defined); }
     else
     {
@@ -148,7 +138,6 @@ void ance::GlobalScope::addFunction(std::unique_ptr<ance::Function> function)
     const std::string& name = function->name();
 
     functions_[name] = std::move(function);
-    addChild(*functions_[name]);
 }
 
 bool ance::GlobalScope::hasFunction(const std::string& identifier)
@@ -208,9 +197,4 @@ void ance::GlobalScope::createNativeBacking(CompileContext* context)
 void ance::GlobalScope::buildFunctions(CompileContext* context)
 {
     for (auto const& [key, val] : functions_) { val->build(context); }
-}
-
-bool ance::GlobalScope::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitGlobalScope(*this);
 }

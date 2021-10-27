@@ -23,8 +23,6 @@ class DeleteStatement : public Statement
 
     void validate(ValidationLogger& validation_logger) override;
 
-    bool accept(ance::ApplicationVisitor& visitor) override;
-
   protected:
     void doBuild(CompileContext* context) override;
 

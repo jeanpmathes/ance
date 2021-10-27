@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/DefinedFunction.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/expression/Expression.h"
@@ -23,8 +22,6 @@ LocalVariableDefinition::LocalVariableDefinition(std::string                 ide
     , assigned_(std::move(assigned))
 {
     assert(assigner != Assigner::REFERENCE_BINDING);
-
-    addChild(*assigned_);
 }
 
 void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
@@ -72,7 +69,3 @@ void LocalVariableDefinition::doBuild(CompileContext* context)
     variable_->buildDefinition(context);
 }
 
-bool LocalVariableDefinition::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitLocalVariableDefinition(*this);
-}

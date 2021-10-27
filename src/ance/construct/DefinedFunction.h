@@ -48,7 +48,10 @@ namespace ance
                         ance::Location                                declaration_location,
                         ance::Location                                definition_location);
 
-        [[nodiscard]] ance::Scope* scope() const override;
+        /**
+         * Get the scope containing this function.
+         */
+        [[nodiscard]] ance::Scope* scope() const;
 
         /**
          * Push a statement to the end of the statement list.
@@ -89,8 +92,6 @@ namespace ance
         bool        isTypeRegistered(const std::string& type_name) override;
         ance::Type* getType(const std::string& type_name) override;
         void        registerType(ance::Type* type) override;
-
-        bool accept(ance::ApplicationVisitor& visitor) override;
 
       protected:
         using Function::buildCall;

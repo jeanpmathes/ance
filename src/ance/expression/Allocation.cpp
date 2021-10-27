@@ -1,6 +1,5 @@
 #include "Allocation.h"
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/SizeType.h"
 #include "compiler/CompileContext.h"
@@ -14,9 +13,7 @@ Allocation::Allocation(Runtime::Allocator          allocation,
     , allocated_type_(type)
     , count_(std::move(count))
     , return_type_(ance::PointerType::get(type))
-{
-    addChild(*count_);
-}
+{}
 
 void Allocation::setScope(ance::Scope* scope)
 {
@@ -51,11 +48,6 @@ void Allocation::doBuild(CompileContext* context)
 
     std::shared_ptr<ance::Value> ptr = context->runtime()->allocate(allocation_, allocated_type_, count, context);
     setValue(ptr);
-}
-
-bool Allocation::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitAllocation(*this);
 }
 
 Allocation::~Allocation() = default;

@@ -7,7 +7,6 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
 
-#include "ance/Element.h"
 #include "ance/utility/Location.h"
 
 namespace ance
@@ -25,7 +24,7 @@ namespace ance
     /**
      * The base class of all variables.
      */
-    class Variable : public ance::Element
+    class Variable
     {
       protected:
         /**
@@ -73,7 +72,7 @@ namespace ance
          * Get the containing scope.
          * @return The scope.
          */
-        [[nodiscard]] ance::Scope* scope() const override;
+        [[nodiscard]] ance::Scope* scope() const;
         /**
          * Get the value type.
          * @return The type.

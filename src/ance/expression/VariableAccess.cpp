@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "ance/ApplicationVisitor.h"
 #include "ance/construct/Variable.h"
 #include "ance/scope/Scope.h"
 #include "validation/ValidationLogger.h"
@@ -49,11 +48,6 @@ void VariableAccess::doBuild(CompileContext* context)
 void VariableAccess::doAssign(std::shared_ptr<ance::Value> value, CompileContext* context)
 {
     variable_->setValue(value, context);
-}
-
-bool VariableAccess::accept(ance::ApplicationVisitor& visitor)
-{
-    return visitor.visitVariableAccess(*this);
 }
 
 VariableAccess::~VariableAccess() = default;

@@ -6,7 +6,6 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ance/Element.h"
 #include "ance/construct/Parameter.h"
 
 namespace ance
@@ -24,7 +23,7 @@ namespace ance
     /**
      * The abstract base class of all functions.
      */
-    class Function : public virtual ance::Element
+    class Function
     {
       public:
         /**
@@ -64,7 +63,11 @@ namespace ance
          */
         [[nodiscard]] size_t parameterCount() const;
 
-        [[nodiscard]] ance::Location location() const override;
+        /**
+         * Get the source location of this function.
+         * @return The source location.
+         */
+        [[nodiscard]] ance::Location location() const;
 
         /**
          * Validate this function.
