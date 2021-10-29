@@ -19,6 +19,8 @@ namespace ance
     class GlobalScope : public Scope
     {
       public:
+        ance::Scope* scope() override;
+
         ance::GlobalScope* getGlobalScope() override;
         llvm::DIScope*     getDebugScope(CompileContext* context) override;
 

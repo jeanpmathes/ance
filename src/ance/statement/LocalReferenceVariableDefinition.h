@@ -46,7 +46,7 @@ class LocalReferenceVariableDefinition : public Statement
                                      ance::Location              location);
 
   public:
-    void setFunction(ance::DefinedFunction* function) override;
+    void setFunction(ance::Function* function) override;
 
     void validate(ValidationLogger& validation_logger) override;
 

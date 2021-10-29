@@ -2,108 +2,148 @@
 
 #include <utility>
 
+#include "ance/construct/DefinedFunction.h"
+#include "ance/construct/ExternFunction.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/VoidType.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::Function::Function(std::string                                   function_name,
-                         ance::Type*                                   return_type,
-                         std::vector<std::shared_ptr<ance::Parameter>> parameters,
-                         ance::Location                                location)
-    : name_(std::move(function_name))
-    , return_type_(return_type)
-    , parameters_(std::move(parameters))
-    , location_(location)
-{}
+ance::Function::Function(std::string function_name) : name_(std::move(function_name)) {}
 
-std::string ance::Function::name() const
+const std::string& ance::Function::name() const
 {
     return name_;
 }
 
+bool ance::Function::isDefined() const
+{
+    return (definition_ != nullptr);
+}
+
+void ance::Function::defineAsExtern(ance::Scope*                                         containing_scope,
+                                    ance::Type*                                          return_type,
+                                    const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
+                                    ance::Location                                       location)
+{
+    definition_ = std::make_unique<ance::ExternFunction>(this, containing_scope, return_type, parameters, location);
+}
+
+void ance::Function::defineAsCustom(AccessModifier                                       access,
+                                    ance::Type*                                          return_type,
+                                    const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
+                                    ance::Scope*                                         containing_scope,
+                                    ance::Location                                       declaration_location,
+                                    ance::Location                                       definition_location)
+{
+    definition_ = std::make_unique<ance::DefinedFunction>(this,
+                                                          access,
+                                                          return_type,
+                                                          parameters,
+                                                          containing_scope,
+                                                          declaration_location,
+                                                          definition_location);
+}
+
 ance::Type* ance::Function::returnType() const
 {
-    return return_type_;
+    assert(isDefined());
+    return definition_->returnType();
 }
 
 ance::Type* ance::Function::parameterType(size_t index) const
 {
-    return parameters_[index]->type();
+    assert(isDefined());
+    return definition_->parameterType(index);
 }
 
 size_t ance::Function::parameterCount() const
 {
-    return parameters_.size();
+    assert(isDefined());
+    return definition_->parameterCount();
 }
 
 ance::Location ance::Function::location() const
 {
-    return location_;
+    assert(isDefined());
+    return definition_->location();
+}
+
+void ance::Function::pushStatement(Statement* statement)
+{
+    definition_->pushStatement(statement);
+}
+
+void ance::Function::addReturn(const std::shared_ptr<ance::Value>& value)
+{
+    definition_->addReturn(value);
+}
+
+void ance::Function::validate(ValidationLogger& validation_logger)
+{
+    definition_->validate(validation_logger);
+}
+
+void ance::Function::createNativeBacking(CompileContext* context)
+{
+    definition_->createNativeBacking(context);
+}
+
+void ance::Function::build(CompileContext* context)
+{
+    definition_->build(context);
 }
 
 bool ance::Function::validateCall(const std::vector<std::pair<std::shared_ptr<ance::Value>, ance::Location>>& arguments,
                                   ance::Location                                                              location,
                                   ValidationLogger& validation_logger)
 {
-    if (arguments.size() != parameters_.size())
-    {
-        validation_logger.logError("No overload of '" + name() + "' takes " + std::to_string(arguments.size())
-                                       + " arguments",
-                                   location);
-        return false;
-    }
-
-    bool valid = true;
-
-    for (const auto& [param, arg] : llvm::zip(parameters_, arguments))
-    {
-        auto [arg_value, arg_location] = arg;
-        valid &= ance::Type::checkMismatch(param->type(), arg_value->type(), arg_location, validation_logger);
-    }
-
-    return valid;
+    return definition_->validateCall(arguments, location, validation_logger);
 }
 
-std::vector<std::shared_ptr<ance::Parameter>>& ance::Function::parameters()
+std::shared_ptr<ance::Value> ance::Function::buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
+                                                       CompileContext*                                  context) const
 {
-    return parameters_;
+    return definition_->buildCall(arguments, context);
 }
 
-std::pair<llvm::FunctionType*, llvm::Function*> ance::Function::createNativeFunction(
-    llvm::GlobalValue::LinkageTypes linkage,
-    llvm::LLVMContext&              c,
-    llvm::Module*                   m)
+ance::Scope* ance::Function::scope()
 {
-    std::vector<llvm::Type*> param_types;
-    param_types.reserve(parameters_.size());
-
-    for (auto& param : parameters_) { param_types.push_back(param->type()->getContentType(c)); }
-
-    llvm::FunctionType* native_type     = llvm::FunctionType::get(returnType()->getContentType(c), param_types, false);
-    llvm::Function*     native_function = llvm::Function::Create(native_type, linkage, name(), m);
-
-    return {native_type, native_function};
+    return definition_->scope();
 }
 
-llvm::CallInst* ance::Function::buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
-                                          llvm::FunctionType*                              native_type,
-                                          llvm::Function*                                  native_function,
-                                          CompileContext*                                  context) const
+ance::GlobalScope* ance::Function::getGlobalScope()
 {
-    std::vector<llvm::Value*> args;
-    args.reserve(arguments.size());
+    return definition_->getGlobalScope();
+}
 
-    for (const auto& [param, arg] : llvm::zip(parameters_, arguments))
-    {
-        std::shared_ptr<ance::Value> matched_arg = ance::Type::makeMatching(param->type(), arg, context);
+llvm::DIScope* ance::Function::getDebugScope(CompileContext* context)
+{
+    return definition_->getDebugScope(context);
+}
 
-        matched_arg->buildContentValue(context);
-        args.push_back(matched_arg->getContentValue());
-    }
+ance::Variable* ance::Function::getVariable(std::string identifier)
+{
+    return definition_->getVariable(identifier);
+}
 
-    auto* content_value = context->ir()->CreateCall(native_type, native_function, args);
-    if (!native_type->getReturnType()->isVoidTy()) content_value->setName(native_function->getName() + ".ret");
-    return content_value;
+bool ance::Function::isTypeRegistered(const std::string& type_name)
+{
+    return definition_->isTypeRegistered(type_name);
+}
+
+ance::Type* ance::Function::getType(const std::string& type_name)
+{
+    return definition_->getType(type_name);
+}
+
+void ance::Function::registerType(ance::Type* type)
+{
+    definition_->registerType(type);
+}
+
+ance::LocalScope* ance::Function::getInsideScope()
+{
+    return definition_->getInsideScope();
 }

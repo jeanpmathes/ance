@@ -16,9 +16,6 @@
 
 #include "ance/scope/LocalScope.h"
 
-#include "ance/construct/DefinedFunction.h"
-#include "ance/construct/ExternFunction.h"
-
 #include "ance/statement/AssignmentStatement.h"
 #include "ance/statement/DeleteStatement.h"
 #include "ance/statement/ExpressionStatement.h"
@@ -96,14 +93,13 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
     shared_parameters.reserve(parameters.size());
     for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
-    std::unique_ptr<ance::DefinedFunction> function =
-        std::make_unique<ance::DefinedFunction>(access,
-                                                ctx->IDENTIFIER()->getText(),
-                                                return_type,
-                                                std::move(shared_parameters),
-                                                &application_.globalScope(),
-                                                declaration_location,
-                                                definition_location);
+    std::unique_ptr<ance::Function> function = std::make_unique<ance::Function>(ctx->IDENTIFIER()->getText());
+    function->defineAsCustom(access,
+                             return_type,
+                             shared_parameters,
+                             &application_.globalScope(),
+                             declaration_location,
+                             definition_location);
 
     for (auto statement_context : ctx->statement())
     {
@@ -125,10 +121,8 @@ antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFu
     shared_parameters.reserve(parameters.size());
     for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
-    std::unique_ptr<ance::Function> function = std::make_unique<ance::ExternFunction>(ctx->IDENTIFIER()->getText(),
-                                                                                      return_type,
-                                                                                      std::move(shared_parameters),
-                                                                                      location(ctx));
+    std::unique_ptr<ance::Function> function = std::make_unique<ance::Function>(ctx->IDENTIFIER()->getText());
+    function->defineAsExtern(&application_.globalScope(), return_type, shared_parameters, location(ctx));
 
     application_.globalScope().addFunction(std::move(function));
 

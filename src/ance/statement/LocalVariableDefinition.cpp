@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "ance/construct/DefinedFunction.h"
+#include "ance/construct/Function.h"
 #include "ance/construct/Variable.h"
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
@@ -24,13 +24,13 @@ LocalVariableDefinition::LocalVariableDefinition(std::string                 ide
     assert(assigner != Assigner::REFERENCE_BINDING);
 }
 
-void LocalVariableDefinition::setFunction(ance::DefinedFunction* function)
+void LocalVariableDefinition::setFunction(ance::Function* function)
 {
-    variable_ = function->getFunctionScope()->defineAutoVariable(identifier_,
-                                                                 type_,
-                                                                 assigner_,
-                                                                 assigned_->getValue(),
-                                                                 location());
+    variable_ = function->getInsideScope()->defineAutoVariable(identifier_,
+                                                               type_,
+                                                               assigner_,
+                                                               assigned_->getValue(),
+                                                               location());
     assigned_->setContainingScope(function);
 }
 

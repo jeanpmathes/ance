@@ -4,6 +4,7 @@
 
 #include <llvm/ADT/SmallVector.h>// critical, missing include will cause linking error
 
+#include "ance/construct/Function.h"
 #include "ance/construct/Variable.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
@@ -14,18 +15,18 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::DefinedFunction::DefinedFunction(AccessModifier                                access,
-                                       const std::string&                            function_name,
+ance::DefinedFunction::DefinedFunction(ance::Function*                               function,
+                                       AccessModifier                                access,
                                        ance::Type*                                   return_type,
                                        std::vector<std::shared_ptr<ance::Parameter>> parameters,
-                                       ance::Scope*                                  scope,
-                                       ance::Location                                declaration_location,
-                                       ance::Location                                definition_location)
-    : ance::Function(function_name, return_type, std::move(parameters), declaration_location)
+                                       ance::Scope*                                  containing_scope,
+
+                                       ance::Location declaration_location,
+                                       ance::Location definition_location)
+    : ance::FunctionDefinition(function, containing_scope, return_type, std::move(parameters), declaration_location)
     , access_(access)
     , definition_location_(definition_location)
-    , containing_scope_(scope)
-    , function_scope_(std::make_unique<ance::LocalScope>(this))
+    , inside_scope_(std::make_unique<ance::LocalScope>(this->function()))
 {
     unsigned no = 1;
     for (const auto& parameter : this->parameters())
@@ -33,25 +34,20 @@ ance::DefinedFunction::DefinedFunction(AccessModifier                           
         Assigner assigner = ance::ReferenceType::isReferenceType(parameter->type()) ? Assigner::REFERENCE_BINDING
                                                                                     : Assigner::COPY_ASSIGNMENT;
 
-        ance::Variable* arg = function_scope_->defineParameterVariable(parameter->name(),
-                                                                       parameter->type(),
-                                                                       assigner,
-                                                                       parameter,
-                                                                       no++,
-                                                                       parameter->location());
+        ance::Variable* arg = inside_scope_->defineParameterVariable(parameter->name(),
+                                                                     parameter->type(),
+                                                                     assigner,
+                                                                     parameter,
+                                                                     no++,
+                                                                     parameter->location());
         arguments_.push_back(arg);
     }
-}
-
-ance::Scope* ance::DefinedFunction::scope() const
-{
-    return containing_scope_;
 }
 
 void ance::DefinedFunction::pushStatement(Statement* statement)
 {
     statements_.push_back(statement);
-    statement->setContainingFunction(this);
+    statement->setContainingFunction(function());
 }
 
 void ance::DefinedFunction::createNativeBacking(CompileContext* context)
@@ -73,7 +69,7 @@ void ance::DefinedFunction::createNativeBacking(CompileContext* context)
     llvm::DISubroutineType* debug_type =
         context->di()->createSubroutineType(context->di()->getOrCreateTypeArray(di_types));
     llvm::DISubprogram* subprogram =
-        context->di()->createFunction(containing_scope_->getDebugScope(context),
+        context->di()->createFunction(scope()->getDebugScope(context),
                                       name(),
                                       llvm::StringRef(),
                                       context->sourceFile(),
@@ -93,7 +89,7 @@ void ance::DefinedFunction::build(CompileContext* context)
 
     context->ir()->SetInsertPoint(entry);
 
-    function_scope_->buildDeclarations(context);// Arguments are also local variables in the function scope.
+    inside_scope_->buildDeclarations(context);// Arguments are also local variables in the function scope.
 
     context->ir()->CreateBr(code);
     context->ir()->SetInsertPoint(code);
@@ -167,19 +163,9 @@ llvm::DISubprogram* ance::DefinedFunction::debugSubprogram()
     return native_function_->getSubprogram();
 }
 
-ance::GlobalScope* ance::DefinedFunction::getGlobalScope()
+ance::LocalScope* ance::DefinedFunction::getInsideScope()
 {
-    return containing_scope_->getGlobalScope();
-}
-
-ance::LocalScope* ance::DefinedFunction::getFunctionScope()
-{
-    return function_scope_.get();
-}
-
-llvm::DIScope* ance::DefinedFunction::getDebugScope(CompileContext*)
-{
-    return debugSubprogram();
+    return inside_scope_.get();
 }
 
 void ance::DefinedFunction::validate(ValidationLogger& validation_logger)
@@ -202,27 +188,32 @@ void ance::DefinedFunction::validate(ValidationLogger& validation_logger)
         }
     }
 
-    function_scope_->validate(validation_logger);
+    inside_scope_->validate(validation_logger);
 
     for (auto statement : statements_) { statement->validate(validation_logger); }
 }
 
+llvm::DIScope* ance::DefinedFunction::getDebugScope(CompileContext*)
+{
+    return debugSubprogram();
+}
+
 ance::Variable* ance::DefinedFunction::getVariable(std::string identifier)
 {
-    return function_scope_->getVariable(identifier);
+    return inside_scope_->getVariable(identifier);
 }
 
 bool ance::DefinedFunction::isTypeRegistered(const std::string& type_name)
 {
-    return function_scope_->isTypeRegistered(type_name);
+    return inside_scope_->isTypeRegistered(type_name);
 }
 
 ance::Type* ance::DefinedFunction::getType(const std::string& type_name)
 {
-    return function_scope_->getType(type_name);
+    return inside_scope_->getType(type_name);
 }
 
 void ance::DefinedFunction::registerType(ance::Type* type)
 {
-    function_scope_->registerType(type);
+    inside_scope_->registerType(type);
 }

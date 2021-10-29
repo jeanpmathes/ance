@@ -18,7 +18,7 @@ class ExpressionStatement : public Statement
      */
     ExpressionStatement(std::unique_ptr<BuildableExpression> expression, ance::Location location);
 
-    void setFunction(ance::DefinedFunction* function) override;
+    void setFunction(ance::Function* function) override;
 
     void validate(ValidationLogger& validation_logger) override;
 

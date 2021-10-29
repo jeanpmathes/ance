@@ -8,7 +8,7 @@
 
 namespace ance
 {
-    class DefinedFunction;
+    class Function;
     class Scope;
 }
 
@@ -31,7 +31,7 @@ class Statement
      * Set the function that contains this statement.
      * @param function The containing function.
      */
-    void setContainingFunction(ance::DefinedFunction* function);
+    void setContainingFunction(ance::Function* function);
 
     /**
      * Get the containing scope.
@@ -43,14 +43,14 @@ class Statement
      * Override this to receive the containing function.
      * @param function The containing function.
      */
-    virtual void setFunction(ance::DefinedFunction* function);
+    virtual void setFunction(ance::Function* function);
 
   public:
     /**
      * Get the function containing this statement.
      * @return The containing function.
      */
-    [[nodiscard]] ance::DefinedFunction* getContainingFunction() const;
+    [[nodiscard]] ance::Function* getContainingFunction() const;
 
     /**
      * Get the source location of this statement.
@@ -82,7 +82,7 @@ class Statement
   private:
     ance::Location location_;
 
-    ance::DefinedFunction* function_ {nullptr};
+    ance::Function* function_ {nullptr};
 };
 
 #endif

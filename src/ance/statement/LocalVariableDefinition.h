@@ -33,7 +33,7 @@ class LocalVariableDefinition : public Statement
                             std::unique_ptr<Expression> assigned,
                             ance::Location              location);
 
-    void setFunction(ance::DefinedFunction* function) override;
+    void setFunction(ance::Function* function) override;
 
     void validate(ValidationLogger& validation_logger) override;
 

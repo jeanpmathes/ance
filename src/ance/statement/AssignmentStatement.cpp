@@ -1,6 +1,6 @@
 #include "AssignmentStatement.h"
 
-#include "ance/construct/DefinedFunction.h"
+#include "ance/construct/Function.h"
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
@@ -17,7 +17,7 @@ AssignmentStatement::AssignmentStatement(std::unique_ptr<Expression> assignable,
     assert(assigner != Assigner::REFERENCE_BINDING);
 }
 
-void AssignmentStatement::setFunction(ance::DefinedFunction* function)
+void AssignmentStatement::setFunction(ance::Function* function)
 {
     assignable_->setContainingScope(function);
     assigned_->setContainingScope(function);

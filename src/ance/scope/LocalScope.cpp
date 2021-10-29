@@ -2,12 +2,15 @@
 
 #include <utility>
 
-#include "ance/construct/LocalVariable.h"
-#include "ance/construct/constant/Constant.h"
 #include "ance/scope/GlobalScope.h"
 #include "ance/type/ReferenceType.h"
 
 ance::LocalScope::LocalScope(ance::Scope* parent) : parent_(parent) {}
+
+ance::Scope* ance::LocalScope::scope()
+{
+    return parent_;
+}
 
 ance::GlobalScope* ance::LocalScope::getGlobalScope()
 {

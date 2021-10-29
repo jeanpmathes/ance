@@ -18,7 +18,7 @@ class ReturnStatement : public Statement
      */
     ReturnStatement(std::unique_ptr<Expression> return_value, ance::Location location);
 
-    void setFunction(ance::DefinedFunction* function) override;
+    void setFunction(ance::Function* function) override;
 
     void validate(ValidationLogger& validation_logger) override;
 

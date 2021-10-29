@@ -8,6 +8,11 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
+ance::Scope* ance::GlobalScope::scope()
+{
+    return this;
+}
+
 ance::GlobalScope* ance::GlobalScope::getGlobalScope()
 {
     return this;

@@ -1,6 +1,6 @@
 #include "DeleteStatement.h"
 
-#include "ance/construct/DefinedFunction.h"
+#include "ance/construct/Function.h"
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/PointerType.h"
@@ -14,7 +14,7 @@ DeleteStatement::DeleteStatement(std::unique_ptr<Expression> to_delete, bool del
     , delete_buffer_(delete_buffer)
 {}
 
-void DeleteStatement::setFunction(ance::DefinedFunction* function)
+void DeleteStatement::setFunction(ance::Function* function)
 {
     to_delete_->setContainingScope(function);
 }

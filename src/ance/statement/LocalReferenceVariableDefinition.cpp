@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "ance/construct/DefinedFunction.h"
+#include "ance/construct/Function.h"
 #include "ance/construct/Variable.h"
 #include "ance/expression/Addressof.h"
 #include "ance/expression/BindRef.h"
@@ -40,14 +40,13 @@ LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string  
     , reference_(std::move(reference))
 {}
 
-void LocalReferenceVariableDefinition::setFunction(ance::DefinedFunction* function)
+void LocalReferenceVariableDefinition::setFunction(ance::Function* function)
 {
-    variable_ =
-        function->getFunctionScope()->defineAutoVariable(identifier_,
-                                                                 type_,
-                                                                 Assigner::REFERENCE_BINDING,
-                                                                 reference_->getValue(),
-                                                                 location());
+    variable_ = function->getInsideScope()->defineAutoVariable(identifier_,
+                                                               type_,
+                                                               Assigner::REFERENCE_BINDING,
+                                                               reference_->getValue(),
+                                                               location());
 
     reference_->setContainingScope(function);
 }

@@ -3,21 +3,24 @@
 #include <set>
 #include <utility>
 
-#include "ance/construct/LocalVariable.h"
 #include "ance/construct/value/WrappedNativeValue.h"
-#include "ance/scope/LocalScope.h"
+#include "ance/scope/Scope.h"
 #include "ance/type/ReferenceType.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::ExternFunction::ExternFunction(std::string                                   function_name,
+ance::ExternFunction::ExternFunction(ance::Function*                               function,
+                                     ance::Scope*                                  containing_scope,
                                      ance::Type*                                   return_type,
                                      std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                      ance::Location                                location)
-    : ance::Function(std::move(function_name), return_type, std::move(parameters), location)
+    : ance::FunctionDefinition(function, containing_scope, return_type, std::move(parameters), location)
 {}
+
+void ance::ExternFunction::pushStatement(Statement*) {}
+void ance::ExternFunction::addReturn(const std::shared_ptr<ance::Value>&) {}
 
 void ance::ExternFunction::validate(ValidationLogger& validation_logger)
 {
@@ -64,4 +67,34 @@ std::shared_ptr<ance::Value> ance::ExternFunction::buildCall(const std::vector<s
 
     llvm::Value* native_value = ance::Values::contentToNative(returnType(), content_value, context);
     return std::make_shared<ance::WrappedNativeValue>(returnType(), native_value);
+}
+
+llvm::DIScope* ance::ExternFunction::getDebugScope(CompileContext*)
+{
+    return native_function_->getSubprogram();
+}
+
+ance::Variable* ance::ExternFunction::getVariable(std::string identifier)
+{
+    return scope()->getVariable(identifier);
+}
+
+bool ance::ExternFunction::isTypeRegistered(const std::string& type_name)
+{
+    return scope()->isTypeRegistered(type_name);
+}
+
+ance::Type* ance::ExternFunction::getType(const std::string& type_name)
+{
+    return scope()->getType(type_name);
+}
+
+void ance::ExternFunction::registerType(ance::Type* type)
+{
+    scope()->registerType(type);
+}
+
+ance::LocalScope* ance::ExternFunction::getInsideScope()
+{
+    return nullptr;
 }

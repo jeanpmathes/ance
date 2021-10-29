@@ -33,6 +33,12 @@ namespace ance
     {
       public:
         /**
+         * Get the containing scope or the global scope if there is no containing scope.
+         * @return The containing scope.
+         */
+        virtual ance::Scope* scope() = 0;
+
+        /**
          * Get the global scope.
          * @return The global scope.
          */

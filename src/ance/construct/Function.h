@@ -1,11 +1,14 @@
 #ifndef ANCE_SRC_ANCE_CONSTRUCT_FUNCTION_H_
 #define ANCE_SRC_ANCE_CONSTRUCT_FUNCTION_H_
 
+#include "ance/scope/Scope.h"
+
 #include <string>
 
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
+#include "ance/construct/FunctionDefinition.h"
 #include "ance/construct/Parameter.h"
 
 namespace ance
@@ -21,28 +24,55 @@ class ValidationLogger;
 namespace ance
 {
     /**
-     * The abstract base class of all functions.
+     * A function.
      */
-    class Function
+    class Function : public ance::Scope
     {
       public:
         /**
          * Create a new function.
          * @param function_name The function name.
-         * @param return_type The return type of the function.
-         * @param parameters The function parameters.
-         * @param location The location of the function in the source code.
          */
-        Function(std::string                                   function_name,
-                 ance::Type*                                   return_type,
-                 std::vector<std::shared_ptr<ance::Parameter>> parameters,
-                 ance::Location                                location);
+        explicit Function(std::string function_name);
 
         /**
          * Get the name of this function.
          * @return The name.
          */
-        [[nodiscard]] std::string name() const;
+        [[nodiscard]] const std::string& name() const;
+
+        /**
+         * Get whether this function is defined.
+         */
+        [[nodiscard]] bool isDefined() const;
+
+        /**
+         * Define this function as extern.
+         * @param containing_scope The function containing scope.
+         * @param return_type The return type.
+         * @param parameters The parameters.
+         * @param location The location of the function declaration.
+         */
+        void defineAsExtern(ance::Scope*                                         containing_scope,
+                            ance::Type*                                          return_type,
+                            const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
+                            ance::Location                                       location);
+
+        /**
+         * Define this function as a custom function.
+         * @param access The access level.
+         * @param return_type The return type of the function.
+         * @param parameters The parameters for this function.
+         * @param containing_scope The scope containing the function.
+         * @param declaration_location The location of the function declaration.
+         * @param definition_location The location of the function definition, meaning its code.
+         */
+        void defineAsCustom(AccessModifier                                       access,
+                            ance::Type*                                          return_type,
+                            const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
+                            ance::Scope*                                         containing_scope,
+                            ance::Location                                       declaration_location,
+                            ance::Location                                       definition_location);
 
         /**
          * Get the return type of this function.
@@ -70,22 +100,30 @@ namespace ance
         [[nodiscard]] ance::Location location() const;
 
         /**
-         * Validate this function.
-         * @param validation_logger A logger to log validation messages.
+         * Push a statement to the end of the statement list.
+         * @param statement The statement to add.
          */
-        virtual void validate(ValidationLogger& validation_logger) = 0;
+        void pushStatement(Statement* statement);
+
+        /**
+         * Add a return. Call this method in the build method of a statement.
+         * @param value The value to return or nullptr if nothing is returned.
+         */
+        void addReturn(const std::shared_ptr<ance::Value>& value = nullptr);
+
+        void validate(ValidationLogger& validation_logger) override;
 
         /**
          * Create the native content of this function, allowing building function code and calling this function.
          * @param context The current compile context.
          */
-        virtual void createNativeBacking(CompileContext* context) = 0;
+        void createNativeBacking(CompileContext* context);
 
         /**
          * Build the function definition. This will be called after building the name.
          * @param context The current compile context.
          */
-        virtual void build(CompileContext* context) = 0;
+        void build(CompileContext* context);
 
         /**
          * Validate a call to this function.
@@ -94,9 +132,9 @@ namespace ance
          * @param validation_logger A logger to log validation messages.
          * @return True if the call is valid.
          */
-        virtual bool validateCall(const std::vector<std::pair<std::shared_ptr<ance::Value>, ance::Location>>& arguments,
-                                  ance::Location                                                              location,
-                                  ValidationLogger& validation_logger);
+        bool validateCall(const std::vector<std::pair<std::shared_ptr<ance::Value>, ance::Location>>& arguments,
+                          ance::Location                                                              location,
+                          ValidationLogger& validation_logger);
 
         /**
          * Build a call to this function.
@@ -104,47 +142,27 @@ namespace ance
          * @param context The current compile context.
          * @return The return value. Will be null for return type void.
          */
-        virtual std::shared_ptr<ance::Value> buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
-                                                       CompileContext* context) const = 0;
+        std::shared_ptr<ance::Value> buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
+                                               CompileContext*                                  context) const;
 
-        virtual ~Function() = default;
-
-      protected:
-        /**
-         * Get the function parameters.
-         * @return A vector containing the parameters.
-         */
-        std::vector<std::shared_ptr<ance::Parameter>>& parameters();
-
-        /**
-         * A helper to create a native function.
-         * @param linkage The linkage type.
-         * @param c The llvm context.
-         * @param m The llvm module.
-         * @return The native function type and the native function.
-         */
-        std::pair<llvm::FunctionType*, llvm::Function*> createNativeFunction(llvm::GlobalValue::LinkageTypes linkage,
-                                                                             llvm::LLVMContext&                   c,
-            llvm::Module*                        m);
+        ance::Scope*       scope() override;
+        ance::GlobalScope* getGlobalScope() override;
+        llvm::DIScope*     getDebugScope(CompileContext* context) override;
+        ance::Variable*    getVariable(std::string identifier) override;
+        bool               isTypeRegistered(const std::string& type_name) override;
+        ance::Type*        getType(const std::string& type_name) override;
+        void               registerType(ance::Type* type) override;
 
         /**
-         * A helper to build a call to a native function.
-         * @param arguments The arguments to pass to the called function.
-         * @param native_type The type of the native function to call.
-         * @param native_function The native function to call.
-         * @param context The current compile context.
-         * @return The return value.
+         * Get the scope inside of this function, if there is any.
+         * @return A scope or null.
          */
-        llvm::CallInst* buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
-                                  llvm::FunctionType*                              native_type,
-                                  llvm::Function*                                  native_function,
-                                  CompileContext*                                  context) const;
+        ance::LocalScope* getInsideScope();
 
       private:
-        std::string                                   name_;
-        ance::Type*                                   return_type_;
-        std::vector<std::shared_ptr<ance::Parameter>> parameters_;
-        ance::Location                                location_;
+        std::string name_;
+
+        std::unique_ptr<ance::FunctionDefinition> definition_ {};
     };
 }
 

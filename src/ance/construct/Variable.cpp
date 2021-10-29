@@ -83,6 +83,7 @@ void ance::Variable::buildDeclaration(CompileContext* context)
 {
     definition_->buildDeclaration(context);
 }
+
 void ance::Variable::buildDefinition(CompileContext* context)
 {
     definition_->buildDefinition(context);

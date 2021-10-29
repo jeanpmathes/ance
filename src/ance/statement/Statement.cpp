@@ -1,11 +1,11 @@
 #include "Statement.h"
 
-#include "ance/construct/DefinedFunction.h"
+#include "ance/construct/Function.h"
 #include "compiler/CompileContext.h"
 
 Statement::Statement(ance::Location location) : location_(location) {}
 
-void Statement::setContainingFunction(ance::DefinedFunction* function)
+void Statement::setContainingFunction(ance::Function* function)
 {
     assert(!function_);
     function_ = function;
@@ -13,14 +13,14 @@ void Statement::setContainingFunction(ance::DefinedFunction* function)
     setFunction(function);
 }
 
-void Statement::setFunction(ance::DefinedFunction*) {}
+void Statement::setFunction(ance::Function*) {}
 
 ance::Scope* Statement::scope() const
 {
     return function_;
 }
 
-ance::DefinedFunction* Statement::getContainingFunction() const
+ance::Function* Statement::getContainingFunction() const
 {
     return function_;
 }

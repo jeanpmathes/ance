@@ -4,7 +4,7 @@
 #include "Scope.h"
 
 #include "ance/Assigner.h"
-#include "ance/construct/LocalVariable.h"
+#include "ance/construct/Variable.h"
 #include "ance/utility/Location.h"
 
 class Expression;
@@ -22,6 +22,8 @@ namespace ance
          * @param parent The parent scope containing this scope.
          */
         explicit LocalScope(ance::Scope* parent);
+
+        ance::Scope* scope() override;
 
         ance::GlobalScope* getGlobalScope() override;
         llvm::DIScope*     getDebugScope(CompileContext* context) override;

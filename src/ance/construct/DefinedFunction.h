@@ -1,8 +1,7 @@
 #ifndef ANCE_SRC_ANCE_CONSTRUCT_DEFINEDFUNCTION_H_
 #define ANCE_SRC_ANCE_CONSTRUCT_DEFINEDFUNCTION_H_
 
-#include "Function.h"
-#include "ance/scope/Scope.h"
+#include "FunctionDefinition.h"
 
 #include <list>
 #include <string>
@@ -14,7 +13,9 @@
 
 namespace ance
 {
-    class LocalVariable;
+    class LocalScope;
+    class Function;
+    class Variable;
 }
 
 class Statement;
@@ -25,49 +26,24 @@ namespace ance
     /**
      * A function that is defined in code.
      */
-    class DefinedFunction
-        : public virtual ance::Function
-        , public virtual ance::Scope
+    class DefinedFunction : public ance::FunctionDefinition
     {
       public:
-        /**
-         * Create a new defined function.
-         * @param access The access level.
-         * @param function_name The name of the function.
-         * @param return_type The return type of the function.
-         * @param parameters The parameters for this function.
-         * @param scope The scope containing the function.
-         * @param declaration_location The location of the function declaration.
-         * @param definition_location The location of the function definition, meaning its code.
-         */
-        DefinedFunction(AccessModifier                                access,
-                        const std::string&                            function_name,
+        DefinedFunction(ance::Function*                               function,
+                        AccessModifier                                access,
                         ance::Type*                                   return_type,
                         std::vector<std::shared_ptr<ance::Parameter>> parameters,
-                        ance::Scope*                                  scope,
+                        ance::Scope*                                  containing_scope,
                         ance::Location                                declaration_location,
                         ance::Location                                definition_location);
 
-        /**
-         * Get the scope containing this function.
-         */
-        [[nodiscard]] ance::Scope* scope() const;
+        void pushStatement(Statement* statement) override;
+        void addReturn(const std::shared_ptr<ance::Value>& value) override;
 
-        /**
-         * Push a statement to the end of the statement list.
-         * @param statement The statement to add.
-         */
-        void pushStatement(Statement* statement);
+        void validate(ValidationLogger& validation_logger) override;
 
-        void createNativeBacking(CompileContext* context) override;
-        void build(CompileContext* context) override;
-
-        /**
-         * Add a return. Call this method in the build method of a statement.
-         * @param value The value to return or nullptr if nothing is returned.
-         */
-        void addReturn(const std::shared_ptr<ance::Value>& value = nullptr);
-
+        void                         createNativeBacking(CompileContext* context) override;
+        void                         build(CompileContext* context) override;
         std::shared_ptr<ance::Value> buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
                                                CompileContext*                                  context) const override;
 
@@ -77,31 +53,22 @@ namespace ance
          */
         llvm::DISubprogram* debugSubprogram();
 
-        ance::GlobalScope* getGlobalScope() override;
-        /**
-         * Get the function scope of this function, in which the statements live.
-         * @return The scope of this function. It is the child scope of the function.
-         */
-        ance::LocalScope* getFunctionScope();
-        llvm::DIScope*    getDebugScope(CompileContext* context) override;
-
-        void validate(ValidationLogger& validation_logger) override;
-
+        llvm::DIScope*  getDebugScope(CompileContext* context) override;
         ance::Variable* getVariable(std::string identifier) override;
+        bool            isTypeRegistered(const std::string& type_name) override;
+        ance::Type*     getType(const std::string& type_name) override;
+        void            registerType(ance::Type* type) override;
 
-        bool        isTypeRegistered(const std::string& type_name) override;
-        ance::Type* getType(const std::string& type_name) override;
-        void        registerType(ance::Type* type) override;
+        ance::LocalScope* getInsideScope() override;
 
       protected:
-        using Function::buildCall;
+        using FunctionDefinition::buildCall;
 
       private:
         AccessModifier access_;
         ance::Location definition_location_;
 
-        ance::Scope*                      containing_scope_;
-        std::unique_ptr<ance::LocalScope> function_scope_;
+        std::unique_ptr<ance::LocalScope> inside_scope_;
 
         std::vector<ance::Variable*> arguments_;
         std::list<Statement*>        statements_;

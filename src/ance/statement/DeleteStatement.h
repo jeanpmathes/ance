@@ -19,7 +19,7 @@ class DeleteStatement : public Statement
      */
     DeleteStatement(std::unique_ptr<Expression> to_delete, bool delete_buffer, ance::Location location);
 
-    void setFunction(ance::DefinedFunction* function) override;
+    void setFunction(ance::Function* function) override;
 
     void validate(ValidationLogger& validation_logger) override;
 
