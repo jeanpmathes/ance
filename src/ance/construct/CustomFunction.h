@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_ANCE_CONSTRUCT_DEFINEDFUNCTION_H_
-#define ANCE_SRC_ANCE_CONSTRUCT_DEFINEDFUNCTION_H_
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_CUSTOMFUNCTION_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_CUSTOMFUNCTION_H_
 
 #include "FunctionDefinition.h"
 
@@ -26,16 +26,16 @@ namespace ance
     /**
      * A function that is defined in code.
      */
-    class DefinedFunction : public ance::FunctionDefinition
+    class CustomFunction : public ance::FunctionDefinition
     {
       public:
-        DefinedFunction(ance::Function*                               function,
-                        AccessModifier                                access,
-                        ance::Type*                                   return_type,
-                        std::vector<std::shared_ptr<ance::Parameter>> parameters,
-                        ance::Scope*                                  containing_scope,
-                        ance::Location                                declaration_location,
-                        ance::Location                                definition_location);
+        CustomFunction(ance::Function*                               function,
+                       AccessModifier                                access,
+                       ance::Type*                                   return_type,
+                       std::vector<std::shared_ptr<ance::Parameter>> parameters,
+                       ance::Scope*                                  containing_scope,
+                       ance::Location                                declaration_location,
+                       ance::Location                                definition_location);
 
         void pushStatement(Statement* statement) override;
         void addReturn(const std::shared_ptr<ance::Value>& value) override;

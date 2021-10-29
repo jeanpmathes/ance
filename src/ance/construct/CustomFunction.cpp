@@ -1,4 +1,4 @@
-#include "DefinedFunction.h"
+#include "CustomFunction.h"
 
 #include <utility>
 
@@ -15,14 +15,14 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::DefinedFunction::DefinedFunction(ance::Function*                               function,
-                                       AccessModifier                                access,
-                                       ance::Type*                                   return_type,
-                                       std::vector<std::shared_ptr<ance::Parameter>> parameters,
-                                       ance::Scope*                                  containing_scope,
+ance::CustomFunction::CustomFunction(ance::Function*                               function,
+                                     AccessModifier                                access,
+                                     ance::Type*                                   return_type,
+                                     std::vector<std::shared_ptr<ance::Parameter>> parameters,
+                                     ance::Scope*                                  containing_scope,
 
-                                       ance::Location declaration_location,
-                                       ance::Location definition_location)
+                                     ance::Location declaration_location,
+                                     ance::Location definition_location)
     : ance::FunctionDefinition(function, containing_scope, return_type, std::move(parameters), declaration_location)
     , access_(access)
     , definition_location_(definition_location)
@@ -44,13 +44,13 @@ ance::DefinedFunction::DefinedFunction(ance::Function*                          
     }
 }
 
-void ance::DefinedFunction::pushStatement(Statement* statement)
+void ance::CustomFunction::pushStatement(Statement* statement)
 {
     statements_.push_back(statement);
     statement->setContainingFunction(function());
 }
 
-void ance::DefinedFunction::createNativeBacking(CompileContext* context)
+void ance::CustomFunction::createNativeBacking(CompileContext* context)
 {
     std::tie(native_type_, native_function_) =
         createNativeFunction(access_.linkage(), *context->llvmContext(), context->module());
@@ -82,7 +82,7 @@ void ance::DefinedFunction::createNativeBacking(CompileContext* context)
     native_function_->setSubprogram(subprogram);
 }
 
-void ance::DefinedFunction::build(CompileContext* context)
+void ance::CustomFunction::build(CompileContext* context)
 {
     llvm::BasicBlock* entry = llvm::BasicBlock::Create(*context->llvmContext(), "entry", native_function_);
     llvm::BasicBlock* code  = llvm::BasicBlock::Create(*context->llvmContext(), "code", native_function_);
@@ -130,7 +130,7 @@ void ance::DefinedFunction::build(CompileContext* context)
     context->di()->finalizeSubprogram(native_function_->getSubprogram());
 }
 
-void ance::DefinedFunction::addReturn(const std::shared_ptr<ance::Value>& value)
+void ance::CustomFunction::addReturn(const std::shared_ptr<ance::Value>& value)
 {
     if (value)
     {
@@ -146,9 +146,8 @@ void ance::DefinedFunction::addReturn(const std::shared_ptr<ance::Value>& value)
     }
 }
 
-std::shared_ptr<ance::Value> ance::DefinedFunction::buildCall(
-    const std::vector<std::shared_ptr<ance::Value>>& arguments,
-    CompileContext*                                  context) const
+std::shared_ptr<ance::Value> ance::CustomFunction::buildCall(const std::vector<std::shared_ptr<ance::Value>>& arguments,
+                                                             CompileContext* context) const
 {
     llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
 
@@ -158,17 +157,17 @@ std::shared_ptr<ance::Value> ance::DefinedFunction::buildCall(
     return std::make_shared<ance::WrappedNativeValue>(returnType(), native_value);
 }
 
-llvm::DISubprogram* ance::DefinedFunction::debugSubprogram()
+llvm::DISubprogram* ance::CustomFunction::debugSubprogram()
 {
     return native_function_->getSubprogram();
 }
 
-ance::LocalScope* ance::DefinedFunction::getInsideScope()
+ance::LocalScope* ance::CustomFunction::getInsideScope()
 {
     return inside_scope_.get();
 }
 
-void ance::DefinedFunction::validate(ValidationLogger& validation_logger)
+void ance::CustomFunction::validate(ValidationLogger& validation_logger)
 {
     returnType()->validate(validation_logger, location());
 
@@ -193,27 +192,27 @@ void ance::DefinedFunction::validate(ValidationLogger& validation_logger)
     for (auto statement : statements_) { statement->validate(validation_logger); }
 }
 
-llvm::DIScope* ance::DefinedFunction::getDebugScope(CompileContext*)
+llvm::DIScope* ance::CustomFunction::getDebugScope(CompileContext*)
 {
     return debugSubprogram();
 }
 
-ance::Variable* ance::DefinedFunction::getVariable(std::string identifier)
+ance::Variable* ance::CustomFunction::getVariable(std::string identifier)
 {
     return inside_scope_->getVariable(identifier);
 }
 
-bool ance::DefinedFunction::isTypeRegistered(const std::string& type_name)
+bool ance::CustomFunction::isTypeRegistered(const std::string& type_name)
 {
     return inside_scope_->isTypeRegistered(type_name);
 }
 
-ance::Type* ance::DefinedFunction::getType(const std::string& type_name)
+ance::Type* ance::CustomFunction::getType(const std::string& type_name)
 {
     return inside_scope_->getType(type_name);
 }
 
-void ance::DefinedFunction::registerType(ance::Type* type)
+void ance::CustomFunction::registerType(ance::Type* type)
 {
     inside_scope_->registerType(type);
 }

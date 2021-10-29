@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "ance/construct/DefinedFunction.h"
+#include "ance/construct/CustomFunction.h"
 #include "ance/construct/ExternFunction.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/scope/LocalScope.h"
@@ -37,13 +37,13 @@ void ance::Function::defineAsCustom(AccessModifier                              
                                     ance::Location                                       declaration_location,
                                     ance::Location                                       definition_location)
 {
-    definition_ = std::make_unique<ance::DefinedFunction>(this,
-                                                          access,
-                                                          return_type,
-                                                          parameters,
-                                                          containing_scope,
-                                                          declaration_location,
-                                                          definition_location);
+    definition_ = std::make_unique<ance::CustomFunction>(this,
+                                                         access,
+                                                         return_type,
+                                                         parameters,
+                                                         containing_scope,
+                                                         declaration_location,
+                                                         definition_location);
 }
 
 ance::Type* ance::Function::returnType() const
