@@ -5,6 +5,11 @@
 
 namespace ance
 {
+    /**
+     * A handle that helps resolving entities that can be used before defining them.
+     * For that purpose the handle supports some rerouting operations.
+     * @tparam T The type of the handled entity.
+     */
     template<typename T>
     class ResolvingHandle
     {
@@ -15,6 +20,8 @@ namespace ance
         ResolvingHandle(ResolvingHandle&& other) noexcept      = default;
 
         T* get() const;
+
+        std::unique_ptr<T> take();
 
       private:
         class HandleNavigator
@@ -28,7 +35,9 @@ namespace ance
             explicit HandleNavigator(std::unique_ptr<T> element);
 
             HandleNavigator* root();
-            T*               get();
+
+            T*                 get();
+            std::unique_ptr<T> take();
 
             friend class ance::ResolvingHandle<T>;
 

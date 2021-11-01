@@ -13,6 +13,12 @@ T* ance::ResolvingHandle<T>::get() const
 }
 
 template<typename T>
+std::unique_ptr<T> ance::ResolvingHandle<T>::take()
+{
+    return navigator_->take();
+}
+
+template<typename T>
 T* ance::ResolvingHandle<T>::operator->() const noexcept
 {
     return get();
@@ -44,6 +50,18 @@ T* ance::ResolvingHandle<T>::HandleNavigator::get()
 {
     auto root = this->root();
     return root->element_ ? element_ : owned_element_.get();
+}
+
+template<typename T>
+std::unique_ptr<T> ance::ResolvingHandle<T>::HandleNavigator::take()
+{
+    auto root = this->root();
+    assert(root->owned_element_);
+
+    std::unique_ptr<T> taken = std::move(root->owned_element_);
+    root->element_           = taken.get();
+
+    return taken;
 }
 
 template<typename T, class... ARGS>

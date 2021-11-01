@@ -29,7 +29,7 @@ int main(int argc, char** argv)
     v->push_back(1);
     v->push_back(2);
 
-    auto& vec = *v;
+    auto vec = v.take();
 
     if (argc != 3)
     {
