@@ -21,7 +21,16 @@ namespace ance
 
         T* get() const;
 
+        /**
+         * Take ownership over the handled object.
+         */
         std::unique_ptr<T> take();
+
+        /**
+         * Reroute this handle to forget the currently handled object and target a new object.
+         * @param target A handle to the new target.
+         */
+        void reroute(ance::ResolvingHandle<T> target);
 
       private:
         class HandleNavigator
@@ -34,10 +43,13 @@ namespace ance
             explicit HandleNavigator(std::shared_ptr<HandleNavigator> next);
             explicit HandleNavigator(std::unique_ptr<T> element);
 
-            HandleNavigator* root();
+            std::shared_ptr<HandleNavigator> sRoot();
+            HandleNavigator*                 root();
 
             T*                 get();
             std::unique_ptr<T> take();
+
+            void target(std::shared_ptr<HandleNavigator> next);
 
             friend class ance::ResolvingHandle<T>;
 
@@ -51,6 +63,8 @@ namespace ance
         T& operator*() const noexcept;
 
       private:
+        std::shared_ptr<HandleNavigator> getRootNavigator();
+
         std::shared_ptr<HandleNavigator> navigator_;
     };
 

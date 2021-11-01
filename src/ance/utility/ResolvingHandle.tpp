@@ -19,6 +19,13 @@ std::unique_ptr<T> ance::ResolvingHandle<T>::take()
 }
 
 template<typename T>
+void ance::ResolvingHandle<T>::reroute(ance::ResolvingHandle<T> target)
+{
+    assert(getRootNavigator() != target.getRootNavigator());
+    navigator_->root()->target(target.getRootNavigator());
+}
+
+template<typename T>
 T* ance::ResolvingHandle<T>::operator->() const noexcept
 {
     return get();
@@ -31,6 +38,15 @@ T& ance::ResolvingHandle<T>::operator*() const noexcept
 }
 
 template<typename T>
+std::shared_ptr<typename ance::ResolvingHandle<T>::HandleNavigator> ance::ResolvingHandle<T>::getRootNavigator()
+{
+    std::shared_ptr<HandleNavigator> nav_root = navigator_->sRoot();
+    if (!nav_root) nav_root = navigator_;
+
+    return nav_root;
+}
+
+template<typename T>
 ance::ResolvingHandle<T>::HandleNavigator::HandleNavigator(std::shared_ptr<HandleNavigator> next) : next_(next)
 {}
 
@@ -38,6 +54,20 @@ template<typename T>
 ance::ResolvingHandle<T>::HandleNavigator::HandleNavigator(std::unique_ptr<T> element)
     : owned_element_(std::move(element))
 {}
+
+template<typename T>
+std::shared_ptr<typename ance::ResolvingHandle<T>::HandleNavigator> ance::ResolvingHandle<T>::HandleNavigator::sRoot()
+{
+    if (next_)
+    {
+        std::shared_ptr<HandleNavigator> potential_root = next_->sRoot();
+        return potential_root ? potential_root : next_;
+    }
+    else
+    {
+        return {};
+    }
+}
 
 template<typename T>
 typename ance::ResolvingHandle<T>::HandleNavigator* ance::ResolvingHandle<T>::HandleNavigator::root()
@@ -48,8 +78,8 @@ typename ance::ResolvingHandle<T>::HandleNavigator* ance::ResolvingHandle<T>::Ha
 template<typename T>
 T* ance::ResolvingHandle<T>::HandleNavigator::get()
 {
-    auto root = this->root();
-    return root->element_ ? element_ : owned_element_.get();
+    HandleNavigator* root = this->root();
+    return root->element_ ? root->element_ : root->owned_element_.get();
 }
 
 template<typename T>
@@ -62,6 +92,15 @@ std::unique_ptr<T> ance::ResolvingHandle<T>::HandleNavigator::take()
     root->element_           = taken.get();
 
     return taken;
+}
+
+template<typename T>
+void ance::ResolvingHandle<T>::HandleNavigator::target(std::shared_ptr<ance::ResolvingHandle<T>::HandleNavigator> next)
+{
+    owned_element_.reset();
+    element_ = nullptr;
+
+    next_ = next;
 }
 
 template<typename T, class... ARGS>

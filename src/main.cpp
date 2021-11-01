@@ -21,16 +21,6 @@
 
 int main(int argc, char** argv)
 {
-    ance::ResolvingHandle<int> h_1 = ance::makeHandled<int>(1);
-    ance::ResolvingHandle<int> h_2 = ance::makeHandled<int>(2);
-    ance::ResolvingHandle<int> h_3 = ance::makeHandled<int>(3);
-
-    ance::ResolvingHandle<std::vector<int>> v = ance::makeHandled<std::vector<int>>();
-    v->push_back(1);
-    v->push_back(2);
-
-    auto vec = v.take();
-
     if (argc != 3)
     {
         std::cout << "ance-c: command: Requires exactly two parameters." << std::endl;
