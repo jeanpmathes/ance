@@ -32,9 +32,7 @@ void ance::GlobalScope::validate(ValidationLogger& validation_logger)
         if (fn) { fn->validate(validation_logger); }
     }
 
-    for (auto const& [key, val] : global_constants_) { val->validate(validation_logger); }
-
-    for (auto const& [key, val] : global_variables_) { val->validate(validation_logger); }
+    for (auto const& [name, variable] : global_defined_) { variable->validate(validation_logger); }
 }
 
 bool ance::GlobalScope::isTypeRegistered(const std::string& type_name)
@@ -62,8 +60,7 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
 {
     assert(assigner != Assigner::REFERENCE_BINDING);
 
-    if (global_variables_.find(identifier) != global_variables_.end()
-        || global_constants_.find(identifier) != global_constants_.end())
+    if (global_defined_.find(identifier) != global_defined_.end())
     {
         errors_.emplace_back("Name '" + identifier + "' already defined in the current context", location);
         return;
@@ -98,19 +95,12 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
     undefined->defineAsGlobal(type, this, access, initializer, is_final, is_constant, location);
     std::unique_ptr<ance::Variable> defined = std::move(undefined);
 
-    if (is_constant) { global_constants_[identifier] = std::move(defined); }
-    else
-    {
-        global_variables_[identifier] = std::move(defined);
-    }
+    global_defined_[identifier] = std::move(defined);
 }
 
 ance::Variable* ance::GlobalScope::getVariable(std::string identifier)
 {
-    if (global_variables_.find(identifier) != global_variables_.end()) { return global_variables_[identifier].get(); }
-
-    if (global_constants_.find(identifier) != global_constants_.end()) { return global_constants_[identifier].get(); }
-
+    if (global_defined_.find(identifier) != global_defined_.end()) { return global_defined_[identifier].get(); }
     if (global_undefined_.find(identifier) != global_undefined_.end()) { return global_undefined_[identifier].get(); }
 
     // Create an undefined global variable.
@@ -178,15 +168,7 @@ void ance::GlobalScope::createNativeBacking(CompileContext* context)
 {
     for (auto const& [key, val] : functions_) { val->createNativeBacking(context); }
 
-    for (auto const& [identifier, constant] : global_constants_)
-    {
-        if (!constant) continue;
-
-        constant->buildDeclaration(context);
-        constant->buildDefinition(context);
-    }
-
-    for (auto const& [identifier, variable] : global_variables_)
+    for (auto const& [identifier, variable] : global_defined_)
     {
         if (!variable) continue;
 

@@ -119,9 +119,8 @@ namespace ance
 
         std::map<std::string, ance::Type*> types_;
 
-        std::map<std::string, std::unique_ptr<ance::Variable>> global_constants_;
-        std::map<std::string, std::unique_ptr<ance::Variable>> global_variables_;
         std::map<std::string, std::unique_ptr<ance::Variable>> global_undefined_;
+        std::map<std::string, std::unique_ptr<ance::Variable>> global_defined_;
 
         std::map<std::string, std::unique_ptr<ance::Function>> functions_;
     };
