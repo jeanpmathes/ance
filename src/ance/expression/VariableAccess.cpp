@@ -2,18 +2,17 @@
 
 #include <utility>
 
-#include "ance/construct/Variable.h"
 #include "ance/scope/Scope.h"
 #include "validation/ValidationLogger.h"
 
-VariableAccess::VariableAccess(std::string identifier, ance::Location location)
+VariableAccess::VariableAccess(ance::ResolvingHandle<ance::Variable> variable, ance::Location location)
     : Expression(location)
-    , identifier_(std::move(identifier))
+    , variable_(std::move(variable))
 {}
 
 void VariableAccess::setScope(ance::Scope* scope)
 {
-    variable_ = scope->getVariable(identifier_);
+    scope->registerUsage(variable_);
 }
 
 ance::Type* VariableAccess::type()

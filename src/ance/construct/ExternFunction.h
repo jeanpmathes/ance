@@ -33,7 +33,6 @@ namespace ance
                                                CompileContext*                                  context) const override;
 
         llvm::DIScope*  getDebugScope(CompileContext* context) override;
-        ance::Variable* getVariable(std::string identifier) override;
         bool            isTypeRegistered(const std::string& type_name) override;
         ance::Type*     getType(const std::string& type_name) override;
         void            registerType(ance::Type* type) override;

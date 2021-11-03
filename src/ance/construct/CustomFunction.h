@@ -4,12 +4,14 @@
 #include "FunctionDefinition.h"
 
 #include <list>
+#include <optional>
 #include <string>
 
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
 #include "ance/AccessModifier.h"
+#include "ance/utility/ResolvingHandle.h"
 
 namespace ance
 {
@@ -54,7 +56,6 @@ namespace ance
         llvm::DISubprogram* debugSubprogram();
 
         llvm::DIScope*  getDebugScope(CompileContext* context) override;
-        ance::Variable* getVariable(std::string identifier) override;
         bool            isTypeRegistered(const std::string& type_name) override;
         ance::Type*     getType(const std::string& type_name) override;
         void            registerType(ance::Type* type) override;
@@ -70,8 +71,8 @@ namespace ance
 
         std::unique_ptr<ance::LocalScope> inside_scope_;
 
-        std::vector<ance::Variable*> arguments_;
-        std::list<Statement*>        statements_;
+        std::vector<std::optional<ance::ResolvingHandle<ance::Variable>>> arguments_;
+        std::list<Statement*>                                             statements_;
 
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};

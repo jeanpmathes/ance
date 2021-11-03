@@ -9,6 +9,7 @@
 
 #include "ance/AccessModifier.h"
 #include "ance/utility/Location.h"
+#include "ance/utility/ResolvingHandle.h"
 
 namespace ance
 {
@@ -51,17 +52,42 @@ namespace ance
         virtual llvm::DIScope* getDebugScope(CompileContext* context) = 0;
 
         /**
+         * Register the usage of a variable in this scope. Only variables that are registered will be resolved.
+         * @param variable The variable to register and resolve. A variable can be registered multiple times, but must be undefined.
+         */
+        virtual void registerUsage(ance::ResolvingHandle<ance::Variable> variable) = 0;
+
+        /**
+         * Register the usage of a function in this scope. Only functions that are registered will be resolved.
+         * @param function The function to register and resolve. A function can be registered multiple times, but must be undefined.
+         */
+        virtual void registerUsage(ance::ResolvingHandle<ance::Function> function) = 0;
+
+        /**
+         * Resolve all undefined usages to find their definitions.
+         */
+        virtual void resolve() = 0;
+
+        /**
+         * Resolve the definition of a function.
+         * @param function The function to find a definition for.
+         * @return True if a definition was found.
+         */
+        virtual bool resolveDefinition(ance::ResolvingHandle<ance::Function> function) = 0;
+
+        /**
+         * Resolve the definition of a variable.
+         * @param variable The variable to find a definition for.
+         * @return True if a definition was found.
+         */
+        virtual bool resolveDefinition(ance::ResolvingHandle<ance::Variable> variable) = 0;
+
+      public:
+        /**
          * Validate this scope.
          * @param validation_logger A logger to log validation messages to.
          */
         virtual void validate(ValidationLogger& validation_logger) = 0;
-
-        /**
-         * Get a variable by name.
-         * @param identifier The identifier of the variable.
-         * @return The variable with the name.
-         */
-        virtual ance::Variable* getVariable(std::string identifier) = 0;
 
         /**
          * Check if a type is registered in this scope.

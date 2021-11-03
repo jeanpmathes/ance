@@ -74,11 +74,6 @@ llvm::DIScope* ance::ExternFunction::getDebugScope(CompileContext*)
     return native_function_->getSubprogram();
 }
 
-ance::Variable* ance::ExternFunction::getVariable(std::string identifier)
-{
-    return scope()->getVariable(identifier);
-}
-
 bool ance::ExternFunction::isTypeRegistered(const std::string& type_name)
 {
     return scope()->isTypeRegistered(type_name);

@@ -81,6 +81,7 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
 antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)
 {
     AccessModifier access      = visit(ctx->accessModifier());
+    std::string    identifier  = ctx->IDENTIFIER()->getText();
     ance::Type*    return_type = ctx->type() ? (ance::Type*) visit(ctx->type()) : ance::VoidType::get();
 
     ance::Location declaration_location = location(ctx);
@@ -93,13 +94,12 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
     shared_parameters.reserve(parameters.size());
     for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
-    std::unique_ptr<ance::Function> function = std::make_unique<ance::Function>(ctx->IDENTIFIER()->getText());
-    function->defineAsCustom(access,
-                             return_type,
-                             shared_parameters,
-                             &application_.globalScope(),
-                             declaration_location,
-                             definition_location);
+    auto function = application_.globalScope().defineCustomFunction(identifier,
+                                                                    access,
+                                                                    return_type,
+                                                                    shared_parameters,
+                                                                    declaration_location,
+                                                                    definition_location);
 
     for (auto statement_context : ctx->statement())
     {
@@ -107,13 +107,12 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
         function->pushStatement(statement);
     }
 
-    application_.globalScope().addFunction(std::move(function));
-
     return this->visitChildren(ctx);
 }
 
 antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx)
 {
+    std::string                   identifier  = ctx->IDENTIFIER()->getText();
     ance::Type*                   return_type = ctx->type() ? (ance::Type*) visit(ctx->type()) : ance::VoidType::get();
     std::vector<ance::Parameter*> parameters  = visit(ctx->parameters());
 
@@ -121,10 +120,7 @@ antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFu
     shared_parameters.reserve(parameters.size());
     for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
-    std::unique_ptr<ance::Function> function = std::make_unique<ance::Function>(ctx->IDENTIFIER()->getText());
-    function->defineAsExtern(&application_.globalScope(), return_type, shared_parameters, location(ctx));
-
-    application_.globalScope().addFunction(std::move(function));
+    application_.globalScope().defineExternFunction(identifier, return_type, shared_parameters, location(ctx));
 
     return this->visitChildren(ctx);
 }
@@ -239,17 +235,16 @@ antlrcpp::Any SourceVisitor::visitReturnStatement(anceParser::ReturnStatementCon
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
 {
-    std::string              identifier = ctx->IDENTIFIER()->getText();
-    std::vector<Expression*> arguments  = visit(ctx->arguments());
-
-    // Call to highest scope intentional, as actual scope of called function is not known.
-    application_.globalScope().addFunctionName(identifier);
+    std::string              function_name = ctx->IDENTIFIER()->getText();
+    std::vector<Expression*> arguments     = visit(ctx->arguments());
 
     std::vector<std::unique_ptr<Expression>> unique_expressions;
     unique_expressions.reserve(arguments.size());
     for (Expression* argument_ptr : arguments) { unique_expressions.emplace_back(argument_ptr); }
 
-    return static_cast<Expression*>(new FunctionCall(identifier, std::move(unique_expressions), location(ctx)));
+    auto function = ance::makeHandled<ance::Function>(function_name);
+
+    return static_cast<Expression*>(new FunctionCall(function, std::move(unique_expressions), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitArguments(anceParser::ArgumentsContext* ctx)
@@ -264,8 +259,9 @@ antlrcpp::Any SourceVisitor::visitArguments(anceParser::ArgumentsContext* ctx)
 antlrcpp::Any SourceVisitor::visitVariableAccess(anceParser::VariableAccessContext* ctx)
 {
     std::string identifier = ctx->IDENTIFIER()->getText();
-    Expression* expression = new VariableAccess(identifier, location(ctx));
-    return expression;
+    auto        variable   = ance::makeHandled<ance::Variable>(identifier);
+
+    return static_cast<Expression*>(new VariableAccess(variable, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitAllocation(anceParser::AllocationContext* ctx)

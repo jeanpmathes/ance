@@ -123,11 +123,6 @@ llvm::DIScope* ance::Function::getDebugScope(CompileContext* context)
     return definition_->getDebugScope(context);
 }
 
-ance::Variable* ance::Function::getVariable(std::string identifier)
-{
-    return definition_->getVariable(identifier);
-}
-
 bool ance::Function::isTypeRegistered(const std::string& type_name)
 {
     return definition_->isTypeRegistered(type_name);
@@ -146,4 +141,30 @@ void ance::Function::registerType(ance::Type* type)
 ance::LocalScope* ance::Function::getInsideScope()
 {
     return definition_->getInsideScope();
+}
+
+void ance::Function::registerUsage(ance::ResolvingHandle<ance::Variable> variable)
+{
+    getInsideScope()->registerUsage(variable);
+}
+
+void ance::Function::registerUsage(ance::ResolvingHandle<ance::Function> function)
+{
+    getInsideScope()->registerUsage(function);
+}
+
+void ance::Function::resolve()
+{
+    ance::Scope* inside_scope = getInsideScope();
+    if (inside_scope) inside_scope->resolve();
+}
+
+bool ance::Function::resolveDefinition(ance::ResolvingHandle<ance::Variable> variable)
+{
+    return scope()->resolveDefinition(variable);
+}
+
+bool ance::Function::resolveDefinition(ance::ResolvingHandle<ance::Function> function)
+{
+    return scope()->resolveDefinition(function);
 }

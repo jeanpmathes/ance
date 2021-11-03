@@ -16,9 +16,6 @@ namespace ance
       public:
         explicit ResolvingHandle(std::unique_ptr<T> handled);
 
-        ResolvingHandle(const ResolvingHandle& other) noexcept = default;
-        ResolvingHandle(ResolvingHandle&& other) noexcept      = default;
-
         T* get() const;
 
         /**

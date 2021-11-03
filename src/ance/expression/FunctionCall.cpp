@@ -2,35 +2,29 @@
 
 #include <utility>
 
-#include "ance/construct/Function.h"
 #include "ance/scope/GlobalScope.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-namespace ance
-{
-    class Function;
-}
-
-FunctionCall::FunctionCall(std::string                              identifier,
+FunctionCall::FunctionCall(ance::ResolvingHandle<ance::Function>    function,
                            std::vector<std::unique_ptr<Expression>> arguments,
                            ance::Location                           location)
     : Expression(location)
-    , identifier_(std::move(identifier))
+    , function_(std::move(function))
     , arguments_(std::move(arguments))
 {}
 
 void FunctionCall::setScope(ance::Scope* scope)
 {
-    scope_ = scope;
+    scope->registerUsage(function_);
 
     for (auto& arg : arguments_) { arg->setContainingScope(scope); }
 }
 
 ance::Type* FunctionCall::type()
 {
-    return scope_->getGlobalScope()->getFunction(identifier_)->returnType();
+    return function_->returnType();
 }
 
 bool FunctionCall::validate(ValidationLogger& validation_logger)
@@ -47,26 +41,22 @@ bool FunctionCall::validate(ValidationLogger& validation_logger)
 
     if (!valid) return false;
 
-    ance::Function* fn = scope_->getGlobalScope()->getFunction(identifier_);
-
-    if (!fn)
+    if (!function_->isDefined())
     {
-        validation_logger.logError("Name '" + identifier_ + "' not defined in the current context", location());
+        validation_logger.logError("Name '" + function_->name() + "' not defined in the current context", location());
         return false;
     }
 
-    return fn->validateCall(arguments, location(), validation_logger);
+    return function_->validateCall(arguments, location(), validation_logger);
 }
 
 void FunctionCall::doBuild(CompileContext* context)
 {
-    ance::Function* fn = context->application()->globalScope().getFunction(identifier_);
-
     std::vector<std::shared_ptr<ance::Value>> arg_values;
 
     for (auto& arg : arguments_) { arg_values.push_back(arg->getValue()); }
 
-    std::shared_ptr<ance::Value> return_value = fn->buildCall(arg_values, context);
+    std::shared_ptr<ance::Value> return_value = function_->buildCall(arg_values, context);
 
     if (return_value != nullptr)// Not every function returns a value.
     {

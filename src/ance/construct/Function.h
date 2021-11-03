@@ -148,16 +148,25 @@ namespace ance
         ance::Scope*       scope() override;
         ance::GlobalScope* getGlobalScope() override;
         llvm::DIScope*     getDebugScope(CompileContext* context) override;
-        ance::Variable*    getVariable(std::string identifier) override;
-        bool               isTypeRegistered(const std::string& type_name) override;
-        ance::Type*        getType(const std::string& type_name) override;
-        void               registerType(ance::Type* type) override;
+
+        bool        isTypeRegistered(const std::string& type_name) override;
+        ance::Type* getType(const std::string& type_name) override;
+        void        registerType(ance::Type* type) override;
 
         /**
          * Get the scope inside of this function, if there is any.
          * @return A scope or null.
          */
         ance::LocalScope* getInsideScope();
+
+        void registerUsage(ance::ResolvingHandle<ance::Variable> variable) override;
+        void registerUsage(ance::ResolvingHandle<ance::Function> function) override;
+
+        void resolve() override;
+
+      protected:
+        bool resolveDefinition(ance::ResolvingHandle<ance::Variable> variable) override;
+        bool resolveDefinition(ance::ResolvingHandle<ance::Function> function) override;
 
       private:
         std::string name_;

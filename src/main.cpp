@@ -61,6 +61,8 @@ int main(int argc, char** argv)
     {
         source_visitor->visit(tree);
 
+        application.globalScope().resolve();
+
         ValidationLogger validation_logger;
         application.validate(validation_logger);
         validation_logger.emitMessages(source_file);

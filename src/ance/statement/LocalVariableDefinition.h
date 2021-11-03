@@ -3,11 +3,14 @@
 
 #include "Statement.h"
 
+#include <optional>
+
 #include "ance/Assigner.h"
+#include "ance/construct/Variable.h"
+#include "ance/utility/ResolvingHandle.h"
 
 namespace ance
 {
-    class Variable;
     class Type;
 }
 
@@ -46,7 +49,7 @@ class LocalVariableDefinition : public Statement
     Assigner                    assigner_;
     std::unique_ptr<Expression> assigned_;
 
-    ance::Variable* variable_ {nullptr};
+    std::optional<ance::ResolvingHandle<ance::Variable>> variable_ {};
 };
 
 #endif

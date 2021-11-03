@@ -38,10 +38,12 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
 {
     if (variable_)
     {
+        auto variable = *variable_;
+
         bool assigned_is_valid = assigned_->validate(validation_logger);
         if (!assigned_is_valid) return;
 
-        if (!variable_->type()->validate(validation_logger, location())) return;
+        if (!variable->type()->validate(validation_logger, location())) return;
 
         if (type_ == ance::VoidType::get())
         {
@@ -56,7 +58,7 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
             return;
         }
 
-        ance::Type::checkMismatch(variable_->type(), assigned_->type(), assigned_->location(), validation_logger);
+        ance::Type::checkMismatch(variable->type(), assigned_->type(), assigned_->location(), validation_logger);
     }
     else
     {
@@ -66,6 +68,6 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
 
 void LocalVariableDefinition::doBuild(CompileContext* context)
 {
-    variable_->buildDefinition(context);
+    (*variable_)->buildDefinition(context);
 }
 

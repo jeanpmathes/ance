@@ -3,6 +3,9 @@
 
 #include "DelayableExpression.h"
 
+#include "ance/construct/Function.h"
+#include "ance/utility/ResolvingHandle.h"
+
 namespace ance
 {
     class Scope;
@@ -16,11 +19,13 @@ class FunctionCall : public DelayableExpression
   public:
     /**
      * Create a new function call.
-     * @param identifier The identifier of the function to call.
+     * @param function The function to call.
      * @param arguments The arguments to pass to the called function.
      * @param location The source location.
      */
-    FunctionCall(std::string identifier, std::vector<std::unique_ptr<Expression>> arguments, ance::Location location);
+    FunctionCall(ance::ResolvingHandle<ance::Function>    function,
+                 std::vector<std::unique_ptr<Expression>> arguments,
+                 ance::Location                           location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -39,9 +44,8 @@ class FunctionCall : public DelayableExpression
     ~FunctionCall() override;
 
   private:
-    std::string                              identifier_;
+    ance::ResolvingHandle<ance::Function>    function_;
     std::vector<std::unique_ptr<Expression>> arguments_;
-    ance::Scope*                             scope_ {nullptr};
 };
 
 #endif

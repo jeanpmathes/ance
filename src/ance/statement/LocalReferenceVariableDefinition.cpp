@@ -3,7 +3,6 @@
 #include <utility>
 
 #include "ance/construct/Function.h"
-#include "ance/construct/Variable.h"
 #include "ance/expression/Addressof.h"
 #include "ance/expression/BindRef.h"
 #include "ance/scope/LocalScope.h"
@@ -89,5 +88,5 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
 
 void LocalReferenceVariableDefinition::doBuild(CompileContext* context)
 {
-    variable_->buildDefinition(context);
+    (*variable_)->buildDefinition(context);
 }

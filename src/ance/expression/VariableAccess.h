@@ -3,9 +3,11 @@
 
 #include "DelayableExpression.h"
 
+#include "ance/construct/Variable.h"
+#include "ance/utility/ResolvingHandle.h"
+
 namespace ance
 {
-    class Variable;
     class Scope;
 }
 
@@ -17,10 +19,10 @@ class VariableAccess : public DelayableExpression
   public:
     /**
      * Create a new variable access.
-     * @param identifier The identifier of the variable to access.
+     * @param variable The variable to access.
      * @param location The source location.
      */
-    explicit VariableAccess(std::string identifier, ance::Location location);
+    explicit VariableAccess(ance::ResolvingHandle<ance::Variable> variable, ance::Location location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -43,8 +45,7 @@ class VariableAccess : public DelayableExpression
     ~VariableAccess() override;
 
   private:
-    std::string     identifier_;
-    ance::Variable* variable_ {nullptr};
+    ance::ResolvingHandle<ance::Variable> variable_;
 };
 
 #endif

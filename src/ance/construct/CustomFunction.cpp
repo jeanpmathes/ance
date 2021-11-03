@@ -34,12 +34,12 @@ ance::CustomFunction::CustomFunction(ance::Function*                            
         Assigner assigner = ance::ReferenceType::isReferenceType(parameter->type()) ? Assigner::REFERENCE_BINDING
                                                                                     : Assigner::COPY_ASSIGNMENT;
 
-        ance::Variable* arg = inside_scope_->defineParameterVariable(parameter->name(),
-                                                                     parameter->type(),
-                                                                     assigner,
-                                                                     parameter,
-                                                                     no++,
-                                                                     parameter->location());
+        auto arg = inside_scope_->defineParameterVariable(parameter->name(),
+                                                          parameter->type(),
+                                                          assigner,
+                                                          parameter,
+                                                          no++,
+                                                          parameter->location());
         arguments_.push_back(arg);
     }
 }
@@ -94,7 +94,7 @@ void ance::CustomFunction::build(CompileContext* context)
     context->ir()->CreateBr(code);
     context->ir()->SetInsertPoint(code);
 
-    for (auto* arg : arguments_) { arg->buildDefinition(context); }
+    for (auto& arg : arguments_) { (*arg)->buildDefinition(context); }
 
     for (auto* statement : statements_)
     {
@@ -195,11 +195,6 @@ void ance::CustomFunction::validate(ValidationLogger& validation_logger)
 llvm::DIScope* ance::CustomFunction::getDebugScope(CompileContext*)
 {
     return debugSubprogram();
-}
-
-ance::Variable* ance::CustomFunction::getVariable(std::string identifier)
-{
-    return inside_scope_->getVariable(identifier);
 }
 
 bool ance::CustomFunction::isTypeRegistered(const std::string& type_name)
