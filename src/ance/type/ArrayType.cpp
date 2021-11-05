@@ -52,8 +52,7 @@ ance::Type* ance::ArrayType::getSubscriptReturnType()
     return element_reference_;
 }
 
-bool ance::ArrayType::validateSubscript(Type* indexed_type,
-                                        ance::Location,
+bool ance::ArrayType::validateSubscript(ance::Location,
                                         Type*             index_type,
                                         ance::Location    index_location,
                                         ValidationLogger& validation_logger)

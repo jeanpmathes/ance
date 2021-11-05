@@ -118,15 +118,13 @@ namespace ance
 
         /**
          * Validate a subscript access.
-         * @param indexed_type The type of the indexed value.
          * @param indexed_location The source location of the indexed value.
          * @param index_type The type of the used index.
          * @param index_location The source location of the index.
          * @param validation_logger A logger to log validation messages.
          * @return True if the get indexer is valid.
          */
-        bool validateSubscript(Type*             indexed_type,
-                               ance::Location    indexed_location,
+        bool validateSubscript(ance::Location    indexed_location,
                                Type*             index_type,
                                ance::Location    index_location,
                                ValidationLogger& validation_logger);

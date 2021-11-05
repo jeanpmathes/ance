@@ -50,8 +50,7 @@ namespace ance
 
         virtual bool validate(ValidationLogger& validation_logger, ance::Location location);
 
-        virtual bool validateSubscript(Type*             indexed_type,
-                                       ance::Location    indexed_location,
+        virtual bool validateSubscript(ance::Location    indexed_location,
                                        Type*             index_type,
                                        ance::Location    index_location,
                                        ValidationLogger& validation_logger);

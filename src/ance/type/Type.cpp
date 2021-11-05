@@ -78,18 +78,13 @@ bool ance::Type::validate(ValidationLogger& validation_logger, ance::Location lo
     return definition_->validate(validation_logger, location);
 }
 
-bool ance::Type::validateSubscript(ance::Type*       indexed_type,
-                                   ance::Location    indexed_location,
-                                   ance::Type*       index_type,
+bool ance::Type::validateSubscript(ance::Location    indexed_location,
+                                   Type*             index_type,
                                    ance::Location    index_location,
                                    ValidationLogger& validation_logger)
 {
     assert(isDefined());
-    return definition_->validateSubscript(indexed_type,
-                                          indexed_location,
-                                          index_type,
-                                          index_location,
-                                          validation_logger);
+    return definition_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
 }
 
 std::shared_ptr<ance::Value> ance::Type::buildSubscript(std::shared_ptr<Value> indexed,

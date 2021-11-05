@@ -52,17 +52,12 @@ ance::Type* ance::ReferenceType::getSubscriptReturnType()
     return element_type_->getSubscriptReturnType();
 }
 
-bool ance::ReferenceType::validateSubscript(Type*,
-                                            ance::Location    indexed_location,
+bool ance::ReferenceType::validateSubscript(ance::Location    indexed_location,
                                             Type*             index_type,
                                             ance::Location    index_location,
                                             ValidationLogger& validation_logger)
 {
-    return element_type_->validateSubscript(element_type_,
-                                            indexed_location,
-                                            index_type,
-                                            index_location,
-                                            validation_logger);
+    return element_type_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
 }
 
 std::shared_ptr<ance::Value> ance::ReferenceType::buildSubscript(std::shared_ptr<Value> indexed,

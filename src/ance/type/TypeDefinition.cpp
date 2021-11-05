@@ -44,7 +44,7 @@ bool ance::TypeDefinition::validate(ValidationLogger&, ance::Location)
     return true;
 }
 
-bool ance::TypeDefinition::validateSubscript(Type*, ance::Location, Type*, ance::Location, ValidationLogger&)
+bool ance::TypeDefinition::validateSubscript(ance::Location, Type*, ance::Location, ValidationLogger&)
 {
     return false;
 }

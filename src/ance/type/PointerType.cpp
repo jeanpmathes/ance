@@ -57,8 +57,7 @@ ance::Type* ance::PointerType::getSubscriptReturnType()
     return element_reference_;
 }
 
-bool ance::PointerType::validateSubscript(Type* indexed_type,
-                                          ance::Location,
+bool ance::PointerType::validateSubscript(ance::Location,
                                           Type*             index_type,
                                           ance::Location    index_location,
                                           ValidationLogger& validation_logger)

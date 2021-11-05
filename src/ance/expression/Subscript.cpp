@@ -29,8 +29,7 @@ bool Subscript::validate(ValidationLogger& validation_logger)
 
     if (indexed_type->isSubscriptDefined())
     {
-        return indexed_type->validateSubscript(indexed_->type(),
-                                               indexed_->location(),
+        return indexed_type->validateSubscript(indexed_->location(),
                                                index_->type(),
                                                index_->location(),
                                                validation_logger);

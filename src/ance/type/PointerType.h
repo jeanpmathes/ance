@@ -26,8 +26,7 @@ namespace ance
 
         ance::Type* getSubscriptReturnType() override;
 
-        bool                         validateSubscript(Type*             indexed_type,
-                                                       ance::Location    indexed_location,
+        bool                         validateSubscript(ance::Location    indexed_location,
                                                        Type*             index_type,
                                                        ance::Location    index_location,
                                                        ValidationLogger& validation_logger) override;
