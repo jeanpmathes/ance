@@ -1,11 +1,8 @@
 #include "FloatConstant.h"
 
-#include "ance/type/FloatingPointType.h"
+#include "ance/type/Type.h"
 
-ance::FloatConstant::FloatConstant(llvm::APFloat number, ance::FloatingPointType* type)
-    : type_(type)
-    , float_(std::move(number))
-{}
+ance::FloatConstant::FloatConstant(llvm::APFloat number, ance::Type* type) : type_(type), float_(std::move(number)) {}
 
 ance::Type* ance::FloatConstant::type()
 {

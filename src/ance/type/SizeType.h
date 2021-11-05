@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_ANCE_TYPE_SIZETYPE_H_
 #define ANCE_SRC_ANCE_TYPE_SIZETYPE_H_
 
-#include "Type.h"
+#include "TypeDefinition.h"
 
 class Application;
 
@@ -10,10 +10,12 @@ namespace ance
     /**
      * Represents an unsigned integer capable of holding the size of the largest possible array as well as a type of holding all possible differences of such sizes.
      */
-    class SizeType : public ance::Type
+    class SizeType : public ance::TypeDefinition
     {
       private:
-        explicit SizeType(std::string name);
+        SizeType(std::string name, llvm::Type*& backing);
+
+        llvm::Type*& backing_;
 
       public:
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
@@ -29,12 +31,12 @@ namespace ance
 
       private:
         inline static unsigned int size_width_        = 0;
-        inline static SizeType*    size_instance_     = nullptr;
-        inline static llvm::Type* size_backing_type_ = nullptr;
+        inline static Type*        size_instance_     = nullptr;
+        inline static llvm::Type*  size_backing_type_ = nullptr;
 
         inline static unsigned int diff_width_        = 0;
-        inline static SizeType*    diff_instance_     = nullptr;
-        inline static llvm::Type* diff_backing_type_ = nullptr;
+        inline static Type*        diff_instance_     = nullptr;
+        inline static llvm::Type*  diff_backing_type_ = nullptr;
 
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;
@@ -51,7 +53,7 @@ namespace ance
          * Get the size type instance.
          * @return The instance.
          */
-        static ance::SizeType* getSize();
+        static ance::Type* getSize();
 
         /**
          * Get the width of the size type.
@@ -62,7 +64,7 @@ namespace ance
          * Get the diff type instance.
          * @return The instance.
          */
-        static ance::SizeType* getDiff();
+        static ance::Type* getDiff();
 
         /**
          * Get the width of the diff type.

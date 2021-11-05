@@ -5,6 +5,7 @@
 #include "ance/scope/GlobalScope.h"
 #include "ance/type/ReferenceType.h"
 #include "ance/type/SizeType.h"
+#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/Application.h"
@@ -12,7 +13,7 @@
 #include "validation/ValidationLogger.h"
 
 ance::PointerType::PointerType(ance::Type* element_type)
-    : Type("*" + element_type->getName())
+    : TypeDefinition("*" + element_type->getName())
     , element_type_(element_type)
     , element_reference_(ance::ReferenceType::get(element_type))
 {}
@@ -62,9 +63,7 @@ bool ance::PointerType::validateSubscript(Type* indexed_type,
                                           ance::Location    index_location,
                                           ValidationLogger& validation_logger)
 {
-    assert(indexed_type == this && "Method call on wrong type.");
-
-    return checkMismatch(ance::SizeType::getSize(), index_type, index_location, validation_logger);
+    return ance::Type::checkMismatch(ance::SizeType::getSize(), index_type, index_location, validation_logger);
 }
 
 std::shared_ptr<ance::Value> ance::PointerType::buildSubscript(std::shared_ptr<Value> indexed,
@@ -120,38 +119,39 @@ llvm::DIType* ance::PointerType::createDebugType(CompileContext* context)
     return di_type;
 }
 
-std::map<ance::Type*, ance::PointerType*>& ance::PointerType::getPointerTypes()
+std::map<ance::Type*, ance::Type*>& ance::PointerType::getPointerTypes()
 {
-    static std::map<ance::Type*, ance::PointerType*> pointer_types;
+    static std::map<ance::Type*, ance::Type*> pointer_types;
     return pointer_types;
 }
 
 ance::Type* ance::PointerType::get(ance::Type* element_type)
 {
-    auto               it           = getPointerTypes().find(element_type);
-    ance::PointerType* pointer_type = nullptr;
+    auto        it   = getPointerTypes().find(element_type);
+    ance::Type* type = nullptr;
 
     if (it == getPointerTypes().end())
     {
-        pointer_type = new ance::PointerType(element_type);
-        getPointerTypes().insert(std::make_pair(element_type, pointer_type));
+        auto* pointer_type = new ance::PointerType(element_type);
+        type               = new ance::Type(std::unique_ptr<ance::PointerType>(pointer_type));
+        getPointerTypes().insert(std::make_pair(element_type, type));
     }
     else
     {
-        pointer_type = it->second;
+        type = it->second;
     }
 
-    return pointer_type;
+    return type;
 }
 
 bool ance::PointerType::isPointerType(ance::Type* type)
 {
-    ance::Type* ptr_type = dynamic_cast<ance::PointerType*>(type);
+    auto* ptr_type = dynamic_cast<ance::PointerType*>(type->getDefinition());
     return ptr_type != nullptr;
 }
 
 ance::Type* ance::PointerType::getPointeeType(ance::Type* type)
 {
-    auto ptr_type = dynamic_cast<ance::PointerType*>(type);
+    auto* ptr_type = dynamic_cast<ance::PointerType*>(type->getDefinition());
     return ptr_type ? ptr_type->element_type_ : nullptr;
 }

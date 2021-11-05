@@ -1,8 +1,9 @@
 #include "QuadType.h"
 
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/Type.h"
 
-ance::QuadType::QuadType() : Type("quad") {}
+ance::QuadType::QuadType() : TypeDefinition("quad") {}
 
 llvm::Constant* ance::QuadType::getDefaultContent(llvm::LLVMContext& c)
 {
@@ -14,9 +15,9 @@ llvm::Type* ance::QuadType::getContentType(llvm::LLVMContext& c)
     return llvm::Type::getFP128Ty(c);
 }
 
-ance::FloatingPointType* ance::QuadType::get()
+ance::Type* ance::QuadType::get()
 {
-    if (!instance_) { instance_ = new QuadType(); }
+    if (!instance_) { instance_ = new ance::Type(std::unique_ptr<ance::TypeDefinition>(new QuadType())); }
 
     return instance_;
 }

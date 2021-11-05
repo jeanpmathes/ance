@@ -349,8 +349,8 @@ antlrcpp::Any SourceVisitor::visitByteLiteral(anceParser::ByteLiteralContext* ct
 
 antlrcpp::Any SourceVisitor::visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext* ctx)
 {
-    llvm::APFloat            number = llvm::APFloat::getZero(llvm::APFloat::Bogus());
-    ance::FloatingPointType* type   = nullptr;
+    llvm::APFloat number = llvm::APFloat::getZero(llvm::APFloat::Bogus());
+    ance::Type*   type   = nullptr;
 
     if (ctx->HALF())
     {

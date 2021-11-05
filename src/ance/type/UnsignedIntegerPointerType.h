@@ -1,10 +1,10 @@
 #ifndef ANCE_SRC_ANCE_TYPE_UNSIGNEDINTEGERPOINTERTYPE_H_
 #define ANCE_SRC_ANCE_TYPE_UNSIGNEDINTEGERPOINTERTYPE_H_
 
+#include "TypeDefinition.h"
+
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
-
-#include "Type.h"
 
 class Application;
 class CompileContext;
@@ -14,7 +14,7 @@ namespace ance
     /**
      * Represents the unsigned integer pointer type. It is capable of holding any pointer as an integer.
      */
-    class UnsignedIntegerPointerType : public Type
+    class UnsignedIntegerPointerType : public ance::TypeDefinition
     {
       private:
         UnsignedIntegerPointerType();
@@ -32,8 +32,8 @@ namespace ance
                                        llvm::DIBuilder*   di);
 
       private:
-        inline static UnsignedIntegerPointerType* instance_    = nullptr;
-        inline static llvm::Type*                 native_type_ = nullptr;
+        inline static Type*       instance_    = nullptr;
+        inline static llvm::Type* native_type_ = nullptr;
 
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;
@@ -50,7 +50,7 @@ namespace ance
          * Get the uiptr type instance.
          * @return The instance.
          */
-        static ance::UnsignedIntegerPointerType* get();
+        static ance::Type* get();
     };
 }
 

@@ -3,13 +3,14 @@
 #include "ance/construct/value/Value.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
 ance::ReferenceType::ReferenceType(ance::Type* element_type)
-    : Type("&" + element_type->getName())
+    : TypeDefinition("&" + element_type->getName())
     , element_type_(element_type)
 {}
 
@@ -85,9 +86,9 @@ llvm::DIType* ance::ReferenceType::createDebugType(CompileContext* context)
     return di_type;
 }
 
-std::map<ance::Type*, ance::ReferenceType*>& ance::ReferenceType::getReferenceTypes()
+std::map<ance::Type*, ance::Type*>& ance::ReferenceType::getReferenceTypes()
 {
-    static std::map<ance::Type*, ance::ReferenceType*> reference_types;
+    static std::map<ance::Type*, ance::Type*> reference_types;
     return reference_types;
 }
 
@@ -99,8 +100,6 @@ llvm::Value* ance::ReferenceType::getReferenced(llvm::Value* value, CompileConte
 std::shared_ptr<ance::Value> ance::ReferenceType::getReferenced(const std::shared_ptr<ance::Value>& value,
                                                                 CompileContext*                     context)
 {
-    assert(value->type() == this);
-
     value->buildNativeValue(context);
 
     llvm::Value* native_reference = value->getNativeValue();
@@ -111,30 +110,31 @@ std::shared_ptr<ance::Value> ance::ReferenceType::getReferenced(const std::share
 
 ance::Type* ance::ReferenceType::get(ance::Type* element_type)
 {
-    auto                 it             = getReferenceTypes().find(element_type);
-    ance::ReferenceType* reference_type = nullptr;
+    auto        it   = getReferenceTypes().find(element_type);
+    ance::Type* type = nullptr;
 
     if (it == getReferenceTypes().end())
     {
-        reference_type = new ance::ReferenceType(element_type);
-        getReferenceTypes().insert(std::make_pair(element_type, reference_type));
+        auto* reference_type = new ance::ReferenceType(element_type);
+        type                 = new ance::Type(std::unique_ptr<ance::ReferenceType>(reference_type));
+        getReferenceTypes().insert(std::make_pair(element_type, type));
     }
     else
     {
-        reference_type = it->second;
+        type = it->second;
     }
 
-    return reference_type;
+    return type;
 }
 
 bool ance::ReferenceType::isReferenceType(ance::Type* type)
 {
-    ance::Type* ref_type = dynamic_cast<ance::ReferenceType*>(type);
+    auto* ref_type = dynamic_cast<ance::ReferenceType*>(type->getDefinition());
     return ref_type != nullptr;
 }
 
 ance::Type* ance::ReferenceType::getReferencedType(ance::Type* type)
 {
-    auto ref_type = dynamic_cast<ance::ReferenceType*>(type);
+    auto ref_type = dynamic_cast<ance::ReferenceType*>(type->getDefinition());
     return ref_type ? ref_type->element_type_ : nullptr;
 }

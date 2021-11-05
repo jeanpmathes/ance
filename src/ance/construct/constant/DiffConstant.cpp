@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "ance/type/SizeType.h"
+#include "ance/type/Type.h"
 #include "compiler/Application.h"
 
 ance::DiffConstant::DiffConstant(std::string value) : type_(ance::SizeType::getDiff()), value_(std::move(value)) {}

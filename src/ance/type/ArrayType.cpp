@@ -5,13 +5,14 @@
 #include "ance/scope/GlobalScope.h"
 #include "ance/type/ReferenceType.h"
 #include "ance/type/SizeType.h"
+#include "ance/type/Type.h"
 #include "ance/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
 ance::ArrayType::ArrayType(Type* element_type, const uint64_t size)
-    : Type("[" + element_type->getName() + "; " + std::to_string(size) + "]")
+    : TypeDefinition("[" + element_type->getName() + "; " + std::to_string(size) + "]")
     , size_(size)
     , element_type_(element_type)
     , element_reference_(ance::ReferenceType::get(element_type))
@@ -57,9 +58,7 @@ bool ance::ArrayType::validateSubscript(Type* indexed_type,
                                         ance::Location    index_location,
                                         ValidationLogger& validation_logger)
 {
-    assert(indexed_type == this && "Method call on wrong type.");
-
-    return checkMismatch(ance::SizeType::getSize(), index_type, index_location, validation_logger);
+    return ance::Type::checkMismatch(ance::SizeType::getSize(), index_type, index_location, validation_logger);
 }
 
 std::shared_ptr<ance::Value> ance::ArrayType::buildSubscript(std::shared_ptr<Value> indexed,
@@ -119,26 +118,27 @@ llvm::DIType* ance::ArrayType::createDebugType(CompileContext* context)
                                           context->di()->getOrCreateArray(subscripts));
 }
 
-std::map<std::pair<ance::Type*, uint64_t>, ance::ArrayType*>& ance::ArrayType::getArrayTypes()
+std::map<std::pair<ance::Type*, uint64_t>, ance::Type*>& ance::ArrayType::getArrayTypes()
 {
-    static std::map<std::pair<ance::Type*, uint64_t>, ance::ArrayType*> array_types;
+    static std::map<std::pair<ance::Type*, uint64_t>, ance::Type*> array_types;
     return array_types;
 }
 
 ance::Type* ance::ArrayType::get(ance::Type* element_type, uint64_t size)
 {
-    auto             it         = getArrayTypes().find(std::make_pair(element_type, size));
-    ance::ArrayType* array_type = nullptr;
+    auto        it   = getArrayTypes().find(std::make_pair(element_type, size));
+    ance::Type* type = nullptr;
 
     if (it == getArrayTypes().end())
     {
-        array_type = new ance::ArrayType(element_type, size);
-        getArrayTypes().insert(std::make_pair(std::make_pair(element_type, size), array_type));
+        auto* array_type = new ance::ArrayType(element_type, size);
+        type             = new ance::Type(std::unique_ptr<ance::ArrayType>(array_type));
+        getArrayTypes().insert(std::make_pair(std::make_pair(element_type, size), type));
     }
     else
     {
-        array_type = it->second;
+        type = it->second;
     }
 
-    return array_type;
+    return type;
 }

@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_ANCE_TYPE_POINTERTYPE_H_
 #define ANCE_SRC_ANCE_TYPE_POINTERTYPE_H_
 
-#include "Type.h"
+#include "TypeDefinition.h"
 
 class Application;
 
@@ -10,7 +10,7 @@ namespace ance
     /**
      * Represents a pointer type. A pointer type has an element type, which is the type of the value pointed too.
      */
-    class PointerType : public Type
+    class PointerType : public ance::TypeDefinition
     {
       private:
         explicit PointerType(Type* element_type);
@@ -51,7 +51,7 @@ namespace ance
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:
-        static std::map<ance::Type*, ance::PointerType*>& getPointerTypes();
+        static std::map<ance::Type*, ance::Type*>& getPointerTypes();
 
       public:
         /**

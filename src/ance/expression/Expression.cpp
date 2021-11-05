@@ -4,6 +4,7 @@
 
 #include "ance/construct/value/Value.h"
 #include "ance/type/ReferenceType.h"
+#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 

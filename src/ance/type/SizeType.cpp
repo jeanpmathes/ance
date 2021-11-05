@@ -1,10 +1,11 @@
 #include "SizeType.h"
 
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/Type.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
-ance::SizeType::SizeType(std::string name) : Type(std::move(name)) {}
+ance::SizeType::SizeType(std::string name, llvm::Type*& backing) : TypeDefinition(std::move(name)), backing_(backing) {}
 
 llvm::Constant* ance::SizeType::getDefaultContent(llvm::LLVMContext& c)
 {
@@ -13,10 +14,7 @@ llvm::Constant* ance::SizeType::getDefaultContent(llvm::LLVMContext& c)
 
 llvm::Type* ance::SizeType::getContentType(llvm::LLVMContext&)
 {
-    if (this == size_instance_) return size_backing_type_;
-    if (this == diff_instance_) return diff_backing_type_;
-
-    return nullptr;
+    return backing_;
 }
 
 llvm::Value* ance::SizeType::buildValue(llvm::TypeSize size)
@@ -32,8 +30,8 @@ llvm::DIType* ance::SizeType::createDebugType(CompileContext* context)
     uint64_t              size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
     llvm::dwarf::TypeKind encoding;
 
-    if (this == size_instance_) encoding = llvm::dwarf::DW_ATE_unsigned;
-    if (this == diff_instance_) encoding = llvm::dwarf::DW_ATE_signed;
+    if (backing_ == size_backing_type_) encoding = llvm::dwarf::DW_ATE_unsigned;
+    if (backing_ == diff_backing_type_) encoding = llvm::dwarf::DW_ATE_signed;
 
     return context->di()->createBasicType(name, size_in_bits, encoding);
 }
@@ -50,9 +48,13 @@ void ance::SizeType::init(llvm::LLVMContext& c, Application& app)
     diff_backing_type_ = llvm::Type::getIntNTy(c, diff_width_);
 }
 
-ance::SizeType* ance::SizeType::getSize()
+ance::Type* ance::SizeType::getSize()
 {
-    if (!size_instance_) { size_instance_ = new SizeType("size"); }
+    if (!size_instance_)
+    {
+        size_instance_ =
+            new ance::Type(std::unique_ptr<ance::TypeDefinition>(new SizeType("size", size_backing_type_)));
+    }
 
     return size_instance_;
 }
@@ -62,9 +64,13 @@ unsigned int ance::SizeType::getSizeWidth()
     return size_width_;
 }
 
-ance::SizeType* ance::SizeType::getDiff()
+ance::Type* ance::SizeType::getDiff()
 {
-    if (!diff_instance_) { diff_instance_ = new SizeType("diff"); }
+    if (!diff_instance_)
+    {
+        diff_instance_ =
+            new ance::Type(std::unique_ptr<ance::TypeDefinition>(new SizeType("diff", diff_backing_type_)));
+    }
 
     return diff_instance_;
 }

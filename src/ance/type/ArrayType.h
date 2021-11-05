@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_ANCE_TYPE_ARRAYTYPE_H_
 #define ANCE_SRC_ANCE_TYPE_ARRAYTYPE_H_
 
-#include "Type.h"
+#include "TypeDefinition.h"
 
 #include <llvm/IR/DerivedTypes.h>
 
@@ -17,7 +17,7 @@ namespace ance
     /**
      * Represents array types. Array types have an element type and a length.
      */
-    class ArrayType : public Type
+    class ArrayType : public ance::TypeDefinition
     {
       private:
         ArrayType(Type* element_type, uint64_t size);
@@ -58,7 +58,7 @@ namespace ance
         llvm::ArrayType* type_ {nullptr};
 
       private:
-        static std::map<std::pair<ance::Type*, uint64_t>, ance::ArrayType*>& getArrayTypes();
+        static std::map<std::pair<ance::Type*, uint64_t>, ance::Type*>& getArrayTypes();
 
       public:
         /**

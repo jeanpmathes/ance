@@ -4,6 +4,7 @@
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/PointerType.h"
+#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
 #include "validation/ValidationLogger.h"

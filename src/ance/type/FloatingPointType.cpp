@@ -1,5 +1,6 @@
 #include "FloatingPointType.h"
 
+#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
 llvm::DIType* ance::FloatingPointType::createDebugType(CompileContext* context)

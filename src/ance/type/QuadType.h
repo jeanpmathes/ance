@@ -19,14 +19,14 @@ namespace ance
         llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
       private:
-        inline static FloatingPointType* instance_ = nullptr;
+        inline static Type* instance_ = nullptr;
 
       public:
         /**
          * Get the quad type instance.
          * @return The instance.
          */
-        static ance::FloatingPointType* get();
+        static ance::Type* get();
     };
 }
 #endif

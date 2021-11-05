@@ -4,6 +4,7 @@
 
 #include "ance/expression/ConstantExpression.h"
 #include "ance/type/IntegerType.h"
+#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"

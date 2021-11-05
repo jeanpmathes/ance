@@ -1,6 +1,7 @@
 #include "SizeofExpression.h"
 
 #include "ance/type/SizeType.h"
+#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
 SizeofExpression::SizeofExpression(std::unique_ptr<Expression> expression, ance::Location location)

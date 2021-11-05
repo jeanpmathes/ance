@@ -8,6 +8,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 
+#include "ance/type/TypeDefinition.h"
 #include "ance/utility/Location.h"
 
 namespace ance
@@ -26,12 +27,18 @@ namespace ance
      */
     class Type
     {
-      protected:
+      public:
         /**
-         * Create a new type with a given name.
+         * Create a new undefined type.
          * @param name The name of the type.
          */
         explicit Type(std::string name);
+
+        /**
+         * Create a defined type.
+         * @param definition The type definition.
+         */
+        explicit Type(std::unique_ptr<ance::TypeDefinition> definition);
         virtual ~Type() = default;
 
       public:
@@ -42,14 +49,19 @@ namespace ance
          * Get the name of this type.
          * @return The name.
          */
-        [[nodiscard]] virtual const std::string& getName() const;
+        [[nodiscard]] const std::string& getName() const;
+
+        /**
+         * Get whether this type is defined.
+         */
+        bool isDefined() const;
 
         /**
          * Get the default content of a value of this type.
          * @param c The llvm context.
          * @return The default content.
          */
-        virtual llvm::Constant* getDefaultContent(llvm::LLVMContext& c) = 0;
+        llvm::Constant* getDefaultContent(llvm::LLVMContext& c);
 
         /**
          * Get the native type. Values of this type are passed around using this type.
@@ -62,7 +74,7 @@ namespace ance
          * @param c The llvm context.
          * @return The content type.
          */
-        virtual llvm::Type* getContentType(llvm::LLVMContext& c) = 0;
+        llvm::Type* getContentType(llvm::LLVMContext& c);
 
         /**
          * Get the debug type, containing information for debuggers.
@@ -88,13 +100,13 @@ namespace ance
          * See if the subscript operation is defined for this type.
          * @return True if the subscript is defined.
          */
-        virtual bool isSubscriptDefined();
+        bool isSubscriptDefined();
 
         /**
          * Get the return type of the get indexer.
          * @return The return type.
          */
-        virtual ance::Type* getSubscriptReturnType();
+        ance::Type* getSubscriptReturnType();
 
         /**
          * Validate if this type is well-formed.
@@ -102,7 +114,7 @@ namespace ance
          * @param location The source location of the type declaration.
          * @return True if the type is valid.
          */
-        virtual bool validate(ValidationLogger& validation_logger, ance::Location location);
+        bool validate(ValidationLogger& validation_logger, ance::Location location);
 
         /**
          * Validate a subscript access.
@@ -113,11 +125,11 @@ namespace ance
          * @param validation_logger A logger to log validation messages.
          * @return True if the get indexer is valid.
          */
-        virtual bool validateSubscript(Type*             indexed_type,
-                                       ance::Location    indexed_location,
-                                       Type*             index_type,
-                                       ance::Location    index_location,
-                                       ValidationLogger& validation_logger);
+        bool validateSubscript(Type*             indexed_type,
+                               ance::Location    indexed_location,
+                               Type*             index_type,
+                               ance::Location    index_location,
+                               ValidationLogger& validation_logger);
 
         /**
          * Build a subscript access.
@@ -126,12 +138,11 @@ namespace ance
          * @param context The current compile context.
          * @return The return value.
          */
-        virtual std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
-                                                            std::shared_ptr<Value> index,
-                                                            CompileContext*        context);
+        std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
+                                                    std::shared_ptr<Value> index,
+                                                    CompileContext*        context);
 
-      protected:
-        virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
+        ance::TypeDefinition* getDefinition();
 
       public:
         /**
@@ -159,8 +170,8 @@ namespace ance
                                                          CompileContext*              context);
 
       private:
-        std::string   name_;
-        llvm::DIType* debug_type_ {nullptr};
+        std::string                           name_;
+        std::unique_ptr<ance::TypeDefinition> definition_ {};
     };
 }
 #endif

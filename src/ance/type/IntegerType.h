@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_ANCE_TYPE_INTEGERTYPE_H_
 #define ANCE_SRC_ANCE_TYPE_INTEGERTYPE_H_
 
-#include "Type.h"
+#include "TypeDefinition.h"
 
 class Application;
 
@@ -10,7 +10,7 @@ namespace ance
     /**
      * Represents an integer type. Integers can have any precision and can be both signed or unsigned.
      */
-    class IntegerType : public Type
+    class IntegerType : public ance::TypeDefinition
     {
       private:
         IntegerType(uint64_t bit_size, bool is_signed);
@@ -29,7 +29,7 @@ namespace ance
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:
-        static std::map<std::pair<uint64_t, bool>, ance::IntegerType*>& getIntegerTypes();
+        static std::map<std::pair<uint64_t, bool>, ance::Type*>& getIntegerTypes();
 
       public:
         /**

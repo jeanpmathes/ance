@@ -1,11 +1,12 @@
 #include "IntegerType.h"
 
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/Type.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
 ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed)
-    : Type((is_signed ? "i" : "ui") + std::to_string(bit_size))
+    : TypeDefinition((is_signed ? "i" : "ui") + std::to_string(bit_size))
     , bit_size_(bit_size)
     , is_signed_(is_signed)
 {}
@@ -33,33 +34,34 @@ llvm::DIType* ance::IntegerType::createDebugType(CompileContext* context)
     return context->di()->createBasicType(name, size_in_bits, encoding);
 }
 
-std::map<std::pair<uint64_t, bool>, ance::IntegerType*>& ance::IntegerType::getIntegerTypes()
+std::map<std::pair<uint64_t, bool>, ance::Type*>& ance::IntegerType::getIntegerTypes()
 {
-    static std::map<std::pair<uint64_t, bool>, ance::IntegerType*> integer_types;
+    static std::map<std::pair<uint64_t, bool>, ance::Type*> integer_types;
     return integer_types;
 }
 
 ance::Type* ance::IntegerType::get(uint64_t bit_size, bool is_signed)
 {
-    auto               it           = getIntegerTypes().find(std::make_pair(bit_size, is_signed));
-    ance::IntegerType* integer_type = nullptr;
+    auto        it   = getIntegerTypes().find(std::make_pair(bit_size, is_signed));
+    ance::Type* type = nullptr;
 
     if (it == getIntegerTypes().end())
     {
-        integer_type = new ance::IntegerType(bit_size, is_signed);
-        getIntegerTypes().insert(std::make_pair(std::make_pair(bit_size, is_signed), integer_type));
+        auto* integer_type = new ance::IntegerType(bit_size, is_signed);
+        type               = new ance::Type(std::unique_ptr<ance::IntegerType>(integer_type));
+        getIntegerTypes().insert(std::make_pair(std::make_pair(bit_size, is_signed), type));
     }
     else
     {
-        integer_type = it->second;
+        type = it->second;
     }
 
-    return integer_type;
+    return type;
 }
 
 bool ance::IntegerType::isIntegerType(ance::Type* type, uint64_t bit_size, bool is_signed)
 {
-    auto* integer_type = dynamic_cast<ance::IntegerType*>(type);
+    auto* integer_type = dynamic_cast<ance::IntegerType*>(type->getDefinition());
     if (!integer_type) return false;
 
     return integer_type->bit_size_ == bit_size && integer_type->is_signed_ == is_signed;

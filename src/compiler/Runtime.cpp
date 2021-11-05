@@ -6,6 +6,7 @@
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/SizeType.h"
+#include "ance/type/Type.h"
 #include "ance/utility/Values.h"
 #include "compiler/CompileContext.h"
 

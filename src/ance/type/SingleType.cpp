@@ -1,8 +1,9 @@
 #include "SingleType.h"
 
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/Type.h"
 
-ance::SingleType::SingleType() : Type("single") {}
+ance::SingleType::SingleType() : TypeDefinition("single") {}
 
 llvm::Constant* ance::SingleType::getDefaultContent(llvm::LLVMContext& c)
 {
@@ -14,9 +15,9 @@ llvm::Type* ance::SingleType::getContentType(llvm::LLVMContext& c)
     return llvm::Type::getFloatTy(c);
 }
 
-ance::FloatingPointType* ance::SingleType::get()
+ance::Type* ance::SingleType::get()
 {
-    if (!instance_) { instance_ = new SingleType(); }
+    if (!instance_) { instance_ = new ance::Type(std::unique_ptr<ance::TypeDefinition>(new SingleType())); }
 
     return instance_;
 }

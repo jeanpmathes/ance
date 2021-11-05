@@ -1,8 +1,9 @@
 #include "DoubleType.h"
 
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/Type.h"
 
-ance::DoubleType::DoubleType() : Type("double") {}
+ance::DoubleType::DoubleType() : TypeDefinition("double") {}
 
 llvm::Constant* ance::DoubleType::getDefaultContent(llvm::LLVMContext& c)
 {
@@ -14,9 +15,9 @@ llvm::Type* ance::DoubleType::getContentType(llvm::LLVMContext& c)
     return llvm::Type::getDoubleTy(c);
 }
 
-ance::FloatingPointType* ance::DoubleType::get()
+ance::Type* ance::DoubleType::get()
 {
-    if (!instance_) { instance_ = new DoubleType(); }
+    if (!instance_) { instance_ = new ance::Type(std::unique_ptr<ance::TypeDefinition>(new DoubleType())); }
 
     return instance_;
 }

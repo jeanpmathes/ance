@@ -5,57 +5,104 @@
 #include "validation/ValidationLogger.h"
 
 ance::Type::Type(std::string name) : name_(std::move(name)) {}
+ance::Type::Type(std::unique_ptr<ance::TypeDefinition> definition)
+    : name_(definition->getName())
+    , definition_(std::move(definition))
+{}
 
 const std::string& ance::Type::getName() const
 {
-    return name_;
+    if (isDefined()) { return definition_->getName(); }
+    else
+    {
+        return name_;
+    }
+}
+
+bool ance::Type::isDefined() const
+{
+    return (definition_ != nullptr);
+}
+
+llvm::Constant* ance::Type::getDefaultContent(llvm::LLVMContext& c)
+{
+    assert(isDefined());
+    return definition_->getDefaultContent(c);
 }
 
 llvm::Type* ance::Type::getNativeType(llvm::LLVMContext& c)
 {
-    return llvm::PointerType::get(getContentType(c), 0);
+    assert(isDefined());
+    return definition_->getNativeType(c);
+}
+
+llvm::Type* ance::Type::getContentType(llvm::LLVMContext& c)
+{
+    assert(isDefined());
+    return definition_->getContentType(c);
 }
 
 llvm::DIType* ance::Type::getDebugType(CompileContext* context)
 {
-    if (!debug_type_) { debug_type_ = createDebugType(context); }
-
-    return debug_type_;
+    assert(isDefined());
+    return definition_->getDebugType(context);
 }
 
 llvm::TypeSize ance::Type::getNativeSize(llvm::Module* m)
 {
-    return m->getDataLayout().getTypeAllocSize(getNativeType(m->getContext()));
+    assert(isDefined());
+    return definition_->getNativeSize(m);
 }
 
 llvm::TypeSize ance::Type::getContentSize(llvm::Module* m)
 {
-    return m->getDataLayout().getTypeAllocSize(getContentType(m->getContext()));
+    assert(isDefined());
+    return definition_->getContentSize(m);
 }
 
 bool ance::Type::isSubscriptDefined()
 {
-    return false;
+    assert(isDefined());
+    return definition_->isSubscriptDefined();
 }
 
 ance::Type* ance::Type::getSubscriptReturnType()
 {
-    return nullptr;
+    assert(isDefined());
+    return definition_->getSubscriptReturnType();
 }
 
-bool ance::Type::validate(ValidationLogger&, ance::Location)
+bool ance::Type::validate(ValidationLogger& validation_logger, ance::Location location)
 {
-    return true;
+    assert(isDefined());
+    return definition_->validate(validation_logger, location);
 }
 
-bool ance::Type::validateSubscript(Type*, ance::Location, Type*, ance::Location, ValidationLogger&)
+bool ance::Type::validateSubscript(ance::Type*       indexed_type,
+                                   ance::Location    indexed_location,
+                                   ance::Type*       index_type,
+                                   ance::Location    index_location,
+                                   ValidationLogger& validation_logger)
 {
-    return false;
+    assert(isDefined());
+    return definition_->validateSubscript(indexed_type,
+                                          indexed_location,
+                                          index_type,
+                                          index_location,
+                                          validation_logger);
 }
 
-std::shared_ptr<ance::Value> ance::Type::buildSubscript(std::shared_ptr<Value>, std::shared_ptr<Value>, CompileContext*)
+std::shared_ptr<ance::Value> ance::Type::buildSubscript(std::shared_ptr<Value> indexed,
+                                                        std::shared_ptr<Value> index,
+                                                        CompileContext*        context)
 {
-    return nullptr;
+    assert(isDefined());
+    return definition_->buildSubscript(indexed, index, context);
+}
+
+ance::TypeDefinition* ance::Type::getDefinition()
+{
+    return definition_.get();
 }
 
 bool ance::Type::checkMismatch(ance::Type*       expected,
@@ -85,7 +132,7 @@ std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::Type*               
 
     if (ance::ReferenceType::getReferencedType(value->type()) == expected)
     {
-        auto reference_type = dynamic_cast<ance::ReferenceType*>(value->type());
+        auto reference_type = dynamic_cast<ance::ReferenceType*>(value->type()->definition_.get());
         return reference_type->getReferenced(value, context);
     }
 

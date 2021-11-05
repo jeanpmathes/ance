@@ -1,7 +1,5 @@
 #include "GlobalVariable.h"
 
-#include <utility>
-
 #include "ance/construct/Parameter.h"
 #include "ance/construct/constant/Constant.h"
 #include "ance/construct/value/WrappedNativeValue.h"
@@ -9,6 +7,7 @@
 #include "ance/scope/GlobalScope.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/ReferenceType.h"
+#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"

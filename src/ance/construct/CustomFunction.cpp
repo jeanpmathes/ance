@@ -10,6 +10,7 @@
 #include "ance/scope/LocalScope.h"
 #include "ance/statement/Statement.h"
 #include "ance/type/ReferenceType.h"
+#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/CompileContext.h"

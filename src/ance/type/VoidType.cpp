@@ -1,8 +1,9 @@
 #include "VoidType.h"
 
+#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
-ance::VoidType::VoidType() : Type("void") {}
+ance::VoidType::VoidType() : TypeDefinition("void") {}
 
 llvm::Constant* ance::VoidType::getDefaultContent(llvm::LLVMContext&)
 {
@@ -19,9 +20,9 @@ llvm::DIType* ance::VoidType::createDebugType(CompileContext* context)
     return context->di()->createUnspecifiedType(getName());
 }
 
-ance::VoidType* ance::VoidType::get()
+ance::Type* ance::VoidType::get()
 {
-    if (!instance_) { instance_ = new ance::VoidType(); }
+    if (!instance_) { instance_ = new ance::Type(std::unique_ptr<ance::TypeDefinition>(new VoidType())); }
 
     return instance_;
 }

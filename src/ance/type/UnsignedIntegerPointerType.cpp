@@ -1,10 +1,11 @@
 #include "UnsignedIntegerPointerType.h"
 
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/Type.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
-ance::UnsignedIntegerPointerType::UnsignedIntegerPointerType() : Type("uiptr") {}
+ance::UnsignedIntegerPointerType::UnsignedIntegerPointerType() : TypeDefinition("uiptr") {}
 
 llvm::Constant* ance::UnsignedIntegerPointerType::getDefaultContent(llvm::LLVMContext& c)
 {
@@ -43,9 +44,12 @@ void ance::UnsignedIntegerPointerType::init(llvm::LLVMContext& llvm_context, llv
     native_type_ = llvm::Type::getIntNTy(llvm_context, data_layout.getMaxPointerSizeInBits());
 }
 
-ance::UnsignedIntegerPointerType* ance::UnsignedIntegerPointerType::get()
+ance::Type* ance::UnsignedIntegerPointerType::get()
 {
-    if (!instance_) { instance_ = new UnsignedIntegerPointerType(); }
+    if (!instance_)
+    {
+        instance_ = new ance::Type(std::unique_ptr<ance::TypeDefinition>(new UnsignedIntegerPointerType()));
+    }
 
     return instance_;
 }

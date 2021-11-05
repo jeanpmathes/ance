@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_ANCE_TYPE_REFERENCETYPE_H_
 #define ANCE_SRC_ANCE_TYPE_REFERENCETYPE_H_
 
-#include "Type.h"
+#include "TypeDefinition.h"
 
 class Application;
 
@@ -10,7 +10,7 @@ namespace ance
     /**
      * A reference refers to another stored value.
      */
-    class ReferenceType : public Type
+    class ReferenceType : public ance::TypeDefinition
     {
       private:
         explicit ReferenceType(ance::Type* element_type);
@@ -44,7 +44,7 @@ namespace ance
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:
-        static std::map<ance::Type*, ance::ReferenceType*>& getReferenceTypes();
+        static std::map<ance::Type*, ance::Type*>& getReferenceTypes();
 
       public:
         /**

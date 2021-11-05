@@ -1,6 +1,7 @@
 #include "SizeofType.h"
 
 #include "ance/type/SizeType.h"
+#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
 SizeofType::SizeofType(ance::Type* type, ance::Location location) : Expression(location), type_(type) {}

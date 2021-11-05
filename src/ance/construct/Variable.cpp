@@ -7,6 +7,7 @@
 #include "ance/construct/Parameter.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/ReferenceType.h"
+#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 

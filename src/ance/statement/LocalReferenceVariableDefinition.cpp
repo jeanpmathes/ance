@@ -8,6 +8,7 @@
 #include "ance/scope/LocalScope.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/ReferenceType.h"
+#include "ance/type/Type.h"
 #include "validation/ValidationLogger.h"
 
 LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferring(std::string identifier,

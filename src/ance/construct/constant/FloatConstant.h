@@ -21,7 +21,7 @@ namespace ance
          * @param number The number to use as value.
          * @param type The type of float to use.
          */
-        FloatConstant(llvm::APFloat number, ance::FloatingPointType* type);
+        FloatConstant(llvm::APFloat number, ance::Type* type);
 
         ance::Type*     type() override;
         llvm::Constant* buildContent(llvm::Module* m) override;

@@ -6,6 +6,7 @@
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/Scope.h"
 #include "ance/type/ReferenceType.h"
+#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/CompileContext.h"

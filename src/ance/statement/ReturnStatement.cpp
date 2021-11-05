@@ -3,6 +3,7 @@
 #include "ance/construct/Function.h"
 #include "ance/expression/Expression.h"
 #include "ance/scope/LocalScope.h"
+#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 

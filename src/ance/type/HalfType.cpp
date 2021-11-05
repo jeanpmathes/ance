@@ -2,7 +2,9 @@
 
 #include "ance/scope/GlobalScope.h"
 
-ance::HalfType::HalfType() : Type("half") {}
+#include "ance/type/Type.h"
+
+ance::HalfType::HalfType() : TypeDefinition("half") {}
 
 llvm::Constant* ance::HalfType::getDefaultContent(llvm::LLVMContext& c)
 {
@@ -14,9 +16,9 @@ llvm::Type* ance::HalfType::getContentType(llvm::LLVMContext& c)
     return llvm::Type::getHalfTy(c);
 }
 
-ance::FloatingPointType* ance::HalfType::get()
+ance::Type* ance::HalfType::get()
 {
-    if (!instance_) { instance_ = new HalfType(); }
+    if (!instance_) { instance_ = new ance::Type(std::unique_ptr<ance::TypeDefinition>(new HalfType())); }
 
     return instance_;
 }
