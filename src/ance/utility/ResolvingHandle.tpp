@@ -76,7 +76,16 @@ std::shared_ptr<typename ance::ResolvingHandle<T>::HandleNavigator> ance::Resolv
     if (next_)
     {
         std::shared_ptr<HandleNavigator> potential_root = next_->sRoot();
-        return potential_root ? potential_root : next_;
+
+        if (potential_root)
+        {
+            next_ = potential_root;
+            return potential_root;
+        }
+        else
+        {
+            return next_;
+        }
     }
     else
     {
