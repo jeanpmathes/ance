@@ -17,8 +17,6 @@
 #include "validation/SourceFile.h"
 #include "validation/ValidationLogger.h"
 
-#include "ance/utility/ResolvingHandle.h"
-
 int main(int argc, char** argv)
 {
     if (argc != 3)

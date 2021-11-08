@@ -47,6 +47,21 @@ std::shared_ptr<typename ance::ResolvingHandle<T>::HandleNavigator> ance::Resolv
 }
 
 template<typename T>
+bool ance::ResolvingHandle<T>::operator==(const ResolvingHandle<T>& other) const
+{
+    T* target       = get();
+    T* other_target = other.get();
+
+    return target == other_target;
+}
+
+template<typename T>
+bool ance::ResolvingHandle<T>::operator!=(const ance::ResolvingHandle<T>& other) const
+{
+    return !(*this == other);
+}
+
+template<typename T>
 ance::ResolvingHandle<T>::HandleNavigator::HandleNavigator(std::shared_ptr<HandleNavigator> next) : next_(next)
 {}
 

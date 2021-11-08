@@ -59,6 +59,9 @@ namespace ance
         T* operator->() const noexcept;
         T& operator*() const noexcept;
 
+        bool operator==(const ResolvingHandle<T>& other) const;
+        bool operator!=(const ResolvingHandle<T>& other) const;
+
       private:
         std::shared_ptr<HandleNavigator> getRootNavigator();
 
