@@ -1,8 +1,8 @@
 #include "Allocation.h"
 
+#include "ance/scope/Scope.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/SizeType.h"
-#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
 Allocation::Allocation(Runtime::Allocator                allocation,
@@ -18,6 +18,8 @@ Allocation::Allocation(Runtime::Allocator                allocation,
 
 void Allocation::setScope(ance::Scope* scope)
 {
+    scope->addType(allocated_type_);
+
     if (count_) count_->setContainingScope(scope);
 }
 

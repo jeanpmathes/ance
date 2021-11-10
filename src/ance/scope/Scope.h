@@ -77,7 +77,7 @@ namespace ance
         virtual void registerDefinition(ance::ResolvingHandle<ance::Type> type) = 0;
 
         /**
-         * Add a type to this scope. Undefined types will be resolved and defined types will be consumed.
+         * Add a type to this scope. Undefined types will be resolved.
          * @param type The type to add.
          */
         void addType(ance::ResolvingHandle<ance::Type> type);

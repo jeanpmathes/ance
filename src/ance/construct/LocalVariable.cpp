@@ -5,7 +5,6 @@
 #include "ance/construct/Parameter.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/LocalScope.h"
-#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
@@ -19,7 +18,9 @@ ance::LocalVariable::LocalVariable(const std::string&                identifier,
     : VariableDefinition(identifier, type, containing_scope, is_final, location)
     , initial_value_(std::move(value))
     , parameter_no_(parameter_no)
-{}
+{
+    containing_scope->addType(type);
+}
 
 void ance::LocalVariable::validate(ValidationLogger&)
 {

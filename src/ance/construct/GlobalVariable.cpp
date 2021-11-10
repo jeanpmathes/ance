@@ -7,7 +7,6 @@
 #include "ance/scope/GlobalScope.h"
 #include "ance/scope/LocalScope.h"
 #include "ance/type/ReferenceType.h"
-#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
@@ -30,6 +29,8 @@ ance::GlobalVariable::GlobalVariable(const std::string&                identifie
     , is_constant_(is_constant)
     , constant_init_(constant_init)
 {
+    containing_scope->addType(type);
+
     constant_init_->setContainingScope(containing_scope);
     initial_value_ = constant_init_->getConstantValue();
 }

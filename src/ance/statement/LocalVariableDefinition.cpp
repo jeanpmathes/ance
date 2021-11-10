@@ -26,6 +26,8 @@ LocalVariableDefinition::LocalVariableDefinition(std::string                    
 
 void LocalVariableDefinition::setFunction(ance::Function* function)
 {
+    function->addType(type_);
+
     variable_ = function->getInsideScope()->defineAutoVariable(identifier_,
                                                                type_,
                                                                assigner_,

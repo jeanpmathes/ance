@@ -4,9 +4,5 @@
 
 void ance::Scope::addType(ance::ResolvingHandle<ance::Type> type)
 {
-    if (type->isDefined()) { registerDefinition(type); }
-    else
-    {
-        registerUsage(type);
-    }
+    if (!type->isDefined()) { registerUsage(type); }
 }

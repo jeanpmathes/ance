@@ -29,9 +29,13 @@ ance::CustomFunction::CustomFunction(ance::Function*                            
     , definition_location_(definition_location)
     , inside_scope_(std::make_unique<ance::LocalScope>(this->function()))
 {
+    containing_scope->addType(return_type);
+
     unsigned no = 1;
     for (const auto& parameter : this->parameters())
     {
+        containing_scope->addType(parameter->type());
+
         Assigner assigner = ance::ReferenceType::isReferenceType(parameter->type()) ? Assigner::REFERENCE_BINDING
                                                                                     : Assigner::COPY_ASSIGNMENT;
 

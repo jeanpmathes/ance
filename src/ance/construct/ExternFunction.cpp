@@ -6,7 +6,6 @@
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/Scope.h"
 #include "ance/type/ReferenceType.h"
-#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/CompileContext.h"
@@ -18,7 +17,11 @@ ance::ExternFunction::ExternFunction(ance::Function*                            
                                      std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                      ance::Location                                location)
     : ance::FunctionDefinition(function, containing_scope, return_type, std::move(parameters), location)
-{}
+{
+    containing_scope->addType(return_type);
+
+    for (const auto& parameter : this->parameters()) { containing_scope->addType(parameter->type()); }
+}
 
 void ance::ExternFunction::pushStatement(Statement*) {}
 void ance::ExternFunction::addReturn(const std::shared_ptr<ance::Value>&) {}

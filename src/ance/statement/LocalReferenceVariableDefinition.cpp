@@ -43,6 +43,8 @@ LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string  
 
 void LocalReferenceVariableDefinition::setFunction(ance::Function* function)
 {
+    function->addType(type_);
+
     variable_ = function->getInsideScope()->defineAutoVariable(identifier_,
                                                                type_,
                                                                Assigner::REFERENCE_BINDING,
