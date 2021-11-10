@@ -31,7 +31,7 @@ class FunctionCall : public DelayableExpression
     void setScope(ance::Scope* scope) override;
 
   public:
-    ance::Type* type() override;
+    ance::ResolvingHandle<ance::Type> type() override;
 
     bool validate(ValidationLogger& validation_logger) override;
 

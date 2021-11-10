@@ -3,6 +3,9 @@
 
 #include "Value.h"
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 namespace ance
 {
     /**
@@ -16,7 +19,7 @@ namespace ance
          * @param type The type of the value.
          * @param value The native value to wrap, can be set later.
          */
-        explicit WrappedNativeValue(ance::Type* type, llvm::Value* value = nullptr);
+        explicit WrappedNativeValue(ance::ResolvingHandle<ance::Type> type, llvm::Value* value = nullptr);
 
         /**
          * Set the wraped value if it is not already set.
@@ -24,14 +27,14 @@ namespace ance
          */
         void setValue(llvm::Value* value);
 
-        ance::Type* type() override;
+        ance::ResolvingHandle<ance::Type> type() override;
 
         void         buildNativeValue(CompileContext* context) override;
         llvm::Value* getNativeValue() override;
 
       private:
-        ance::Type*  type_;
-        llvm::Value* value_;
+        ance::ResolvingHandle<ance::Type> type_;
+        llvm::Value*                      value_;
     };
 }
 #endif

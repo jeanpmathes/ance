@@ -19,7 +19,7 @@ namespace ance
          */
         explicit DelayedValue(DelayableExpression* expression);
 
-        ance::Type* type() override;
+        ance::ResolvingHandle<ance::Type> type() override;
 
         /**
          * Set the value to use. This method should be called once or never by the delayable expression.

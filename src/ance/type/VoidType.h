@@ -26,10 +26,7 @@ namespace ance
          * Get the void type instance.
          * @return The instance.
          */
-        static Type* get();
-
-      private:
-        inline static Type* instance_ = nullptr;
+        static ance::ResolvingHandle<ance::Type> get();
     };
 }
 #endif

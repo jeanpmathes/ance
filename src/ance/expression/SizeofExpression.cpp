@@ -14,7 +14,7 @@ void SizeofExpression::setScope(ance::Scope* scope)
     expression_->setContainingScope(scope);
 }
 
-ance::Type* SizeofExpression::type()
+ance::ResolvingHandle<ance::Type> SizeofExpression::type()
 {
     return ance::SizeType::getSize();
 }

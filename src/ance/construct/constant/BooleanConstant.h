@@ -3,6 +3,9 @@
 
 #include "Constant.h"
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 class Application;
 
 namespace ance
@@ -16,7 +19,7 @@ namespace ance
         explicit BooleanConstant(bool boolean);
 
       public:
-        ance::Type* type() override;
+        ance::ResolvingHandle<ance::Type> type() override;
 
         llvm::Constant* buildContent(llvm::Module* m) override;
 
@@ -32,8 +35,8 @@ namespace ance
         static std::shared_ptr<ance::BooleanConstant> createTrue();
 
       private:
-        ance::Type* type_;
-        bool        boolean_;
+        ance::ResolvingHandle<ance::Type> type_;
+        bool                              boolean_;
     };
 }
 

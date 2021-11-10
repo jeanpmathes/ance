@@ -34,32 +34,29 @@ llvm::DIType* ance::IntegerType::createDebugType(CompileContext* context)
     return context->di()->createBasicType(name, size_in_bits, encoding);
 }
 
-std::map<std::pair<uint64_t, bool>, ance::Type*>& ance::IntegerType::getIntegerTypes()
+std::vector<std::pair<std::pair<uint64_t, bool>, ance::ResolvingHandle<ance::Type>>>& ance::IntegerType::
+    getIntegerTypes()
 {
-    static std::map<std::pair<uint64_t, bool>, ance::Type*> integer_types;
+    static std::vector<std::pair<std::pair<uint64_t, bool>, ance::ResolvingHandle<ance::Type>>> integer_types;
     return integer_types;
 }
 
-ance::Type* ance::IntegerType::get(uint64_t bit_size, bool is_signed)
+ance::ResolvingHandle<ance::Type> ance::IntegerType::get(uint64_t bit_size, bool is_signed)
 {
-    auto        it   = getIntegerTypes().find(std::make_pair(bit_size, is_signed));
-    ance::Type* type = nullptr;
+    for (auto& [current_key, current_type] : getIntegerTypes())
+    {
+        if (current_key == std::make_pair(bit_size, is_signed)) { return current_type; }
+    }
 
-    if (it == getIntegerTypes().end())
-    {
-        auto* integer_type = new ance::IntegerType(bit_size, is_signed);
-        type               = new ance::Type(std::unique_ptr<ance::IntegerType>(integer_type));
-        getIntegerTypes().insert(std::make_pair(std::make_pair(bit_size, is_signed), type));
-    }
-    else
-    {
-        type = it->second;
-    }
+    auto*                             integer_type = new ance::IntegerType(bit_size, is_signed);
+    ance::ResolvingHandle<ance::Type> type =
+        ance::makeHandled<ance::Type>(std::unique_ptr<ance::IntegerType>(integer_type));
+    getIntegerTypes().emplace_back(std::make_pair(bit_size, is_signed), type);
 
     return type;
 }
 
-bool ance::IntegerType::isIntegerType(ance::Type* type, uint64_t bit_size, bool is_signed)
+bool ance::IntegerType::isIntegerType(ance::ResolvingHandle<ance::Type> type, uint64_t bit_size, bool is_signed)
 {
     auto* integer_type = dynamic_cast<ance::IntegerType*>(type->getDefinition());
     if (!integer_type) return false;

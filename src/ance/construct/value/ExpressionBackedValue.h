@@ -19,7 +19,7 @@ namespace ance
          */
         explicit ExpressionBackedValue(BackingExpression* expression);
 
-        ance::Type* type() override;
+        ance::ResolvingHandle<ance::Type> type() override;
 
         void         buildNativeValue(CompileContext* context) override;
         llvm::Value* getNativeValue() override;

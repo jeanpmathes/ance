@@ -5,10 +5,10 @@
 #include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
-Allocation::Allocation(Runtime::Allocator          allocation,
-                       ance::Type*                 type,
-                       std::unique_ptr<Expression> count,
-                       ance::Location              location)
+Allocation::Allocation(Runtime::Allocator                allocation,
+                       ance::ResolvingHandle<ance::Type> type,
+                       std::unique_ptr<Expression>       count,
+                       ance::Location                    location)
     : Expression(location)
     , allocation_(allocation)
     , allocated_type_(type)
@@ -21,7 +21,7 @@ void Allocation::setScope(ance::Scope* scope)
     if (count_) count_->setContainingScope(scope);
 }
 
-ance::Type* Allocation::type()
+ance::ResolvingHandle<ance::Type> Allocation::type()
 {
     return return_type_;
 }

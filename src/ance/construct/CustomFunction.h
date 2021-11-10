@@ -33,7 +33,7 @@ namespace ance
       public:
         CustomFunction(ance::Function*                               function,
                        AccessModifier                                access,
-                       ance::Type*                                   return_type,
+                       ance::ResolvingHandle<ance::Type>             return_type,
                        std::vector<std::shared_ptr<ance::Parameter>> parameters,
                        ance::Scope*                                  containing_scope,
                        ance::Location                                declaration_location,
@@ -56,10 +56,6 @@ namespace ance
         llvm::DISubprogram* debugSubprogram();
 
         llvm::DIScope*  getDebugScope(CompileContext* context) override;
-        bool            isTypeRegistered(const std::string& type_name) override;
-        ance::Type*     getType(const std::string& type_name) override;
-        void            registerType(ance::Type* type) override;
-
         ance::LocalScope* getInsideScope() override;
 
       protected:

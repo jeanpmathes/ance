@@ -10,7 +10,7 @@
 
 ance::FunctionDefinition::FunctionDefinition(ance::Function*                               function,
                                              ance::Scope*                                  containing_scope,
-                                             ance::Type*                                   type,
+                                             ance::ResolvingHandle<ance::Type>             type,
                                              std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                              ance::Location                                location)
     : function_(function)
@@ -35,12 +35,12 @@ ance::Function* ance::FunctionDefinition::function() const
     return function_;
 }
 
-ance::Type* ance::FunctionDefinition::returnType() const
+ance::ResolvingHandle<ance::Type> ance::FunctionDefinition::returnType() const
 {
     return return_type_;
 }
 
-ance::Type* ance::FunctionDefinition::parameterType(size_t index) const
+ance::ResolvingHandle<ance::Type> ance::FunctionDefinition::parameterType(size_t index) const
 {
     return parameters_[index]->type();
 }

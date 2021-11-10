@@ -3,10 +3,8 @@
 
 #include "Constant.h"
 
-namespace ance
-{
-    class FloatingPointType;
-}
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
 
 namespace ance
 {
@@ -21,14 +19,14 @@ namespace ance
          * @param number The number to use as value.
          * @param type The type of float to use.
          */
-        FloatConstant(llvm::APFloat number, ance::Type* type);
+        FloatConstant(llvm::APFloat number, ance::ResolvingHandle<ance::Type> type);
 
-        ance::Type*     type() override;
-        llvm::Constant* buildContent(llvm::Module* m) override;
+        ance::ResolvingHandle<ance::Type> type() override;
+        llvm::Constant*                   buildContent(llvm::Module* m) override;
 
       private:
-        ance::Type*   type_;
-        llvm::APFloat float_;
+        ance::ResolvingHandle<ance::Type> type_;
+        llvm::APFloat                     float_;
     };
 }
 

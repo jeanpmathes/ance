@@ -3,6 +3,9 @@
 
 #include "TypeDefinition.h"
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 class Application;
 
 namespace ance
@@ -13,7 +16,7 @@ namespace ance
     class ReferenceType : public ance::TypeDefinition
     {
       private:
-        explicit ReferenceType(ance::Type* element_type);
+        explicit ReferenceType(ance::ResolvingHandle<ance::Type> element_type);
 
       public:
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
@@ -22,14 +25,14 @@ namespace ance
 
         bool isSubscriptDefined() override;
 
-        ance::Type* getSubscriptReturnType() override;
+        ance::ResolvingHandle<ance::Type> getSubscriptReturnType() override;
 
         bool validate(ValidationLogger& validation_logger, ance::Location location) override;
 
-        bool                         validateSubscript(ance::Location    indexed_location,
-                                                       Type*             index_type,
-                                                       ance::Location    index_location,
-                                                       ValidationLogger& validation_logger) override;
+        bool                         validateSubscript(ance::Location                    indexed_location,
+                                                       ance::ResolvingHandle<ance::Type> index_type,
+                                                       ance::Location                    index_location,
+                                                       ValidationLogger&                 validation_logger) override;
         std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
                                                     CompileContext*        context) override;
@@ -37,13 +40,14 @@ namespace ance
         ~ReferenceType() override = default;
 
       private:
-        ance::Type* element_type_;
+        ance::ResolvingHandle<ance::Type> element_type_;
 
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:
-        static std::map<ance::Type*, ance::Type*>& getReferenceTypes();
+        static std::vector<std::pair<ance::ResolvingHandle<ance::Type>, ance::ResolvingHandle<ance::Type>>>&
+        getReferenceTypes();
 
       public:
         /**
@@ -67,20 +71,20 @@ namespace ance
          * @param element_type The element type.
          * @return The instance.
          */
-        static ance::Type* get(ance::Type* element_type);
+        static ance::ResolvingHandle<ance::Type> get(ance::ResolvingHandle<ance::Type> element_type);
 
         /**
          * Check if a given type is a reference type.
          * @param type The type.
          * @return True if it is a reference type.
          */
-        static bool isReferenceType(ance::Type* type);
+        static bool isReferenceType(ance::ResolvingHandle<ance::Type> type);
 
         /**
          * Get the referenced type of a reference type.
          * @return The element type, or null if the given type is not a reference type.
          */
-        static ance::Type* getReferencedType(ance::Type* type);
+        static ance::ResolvingHandle<ance::Type> getReferencedType(ance::ResolvingHandle<ance::Type> type);
     };
 }
 

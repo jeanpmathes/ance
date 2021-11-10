@@ -15,7 +15,7 @@ void VariableAccess::setScope(ance::Scope* scope)
     scope->registerUsage(variable_);
 }
 
-ance::Type* VariableAccess::type()
+ance::ResolvingHandle<ance::Type> VariableAccess::type()
 {
     return variable_->type();
 }

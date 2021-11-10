@@ -1,7 +1,6 @@
 #include "LocalScope.h"
 
 #include "ance/scope/GlobalScope.h"
-#include "ance/type/ReferenceType.h"
 
 ance::LocalScope::LocalScope(ance::Scope* parent) : parent_(parent) {}
 
@@ -27,7 +26,7 @@ ance::Scope* ance::LocalScope::scope() const
 
 std::optional<ance::ResolvingHandle<ance::Variable>> ance::LocalScope::defineAutoVariable(
     const std::string&                  identifier,
-    ance::Type*                         type,
+    ance::ResolvingHandle<ance::Type>   type,
     Assigner                            assigner,
     const std::shared_ptr<ance::Value>& value,
     ance::Location                      location)
@@ -37,7 +36,7 @@ std::optional<ance::ResolvingHandle<ance::Variable>> ance::LocalScope::defineAut
 
 std::optional<ance::ResolvingHandle<ance::Variable>> ance::LocalScope::defineParameterVariable(
     const std::string&                  identifier,
-    ance::Type*                         type,
+    ance::ResolvingHandle<ance::Type>   type,
     Assigner                            assigner,
     const std::shared_ptr<ance::Value>& value,
     unsigned                            parameter_no,
@@ -76,6 +75,26 @@ void ance::LocalScope::registerUsage(ance::ResolvingHandle<ance::Function> funct
     }
 
     undefined_functions_[function->name()] = ance::OwningHandle<ance::Function>::takeOwnership(function);
+}
+
+void ance::LocalScope::registerUsage(ance::ResolvingHandle<ance::Type> type)
+{
+    assert(!type->isDefined());
+
+    if (undefined_types_.find(type->getName()) != undefined_types_.end())
+    {
+        type.reroute(undefined_types_[type->getName()].handle());
+        return;
+    }
+
+    undefined_types_[type->getName()] = ance::OwningHandle<ance::Type>::takeOwnership(type);
+}
+
+void ance::LocalScope::registerDefinition(ance::ResolvingHandle<ance::Type> type)
+{
+    assert(type->isDefined());
+
+    // Types local to function not yet allowed.
 }
 
 void ance::LocalScope::resolve()
@@ -117,6 +136,11 @@ bool ance::LocalScope::resolveDefinition(ance::ResolvingHandle<ance::Function>)
     return false;
 }
 
+bool ance::LocalScope::resolveDefinition(ance::ResolvingHandle<ance::Type>)
+{
+    return false;
+}
+
 void ance::LocalScope::validate(ValidationLogger& validation_logger)
 {
     for (auto const& [key, val] : defined_local_variables_) { val->validate(validation_logger); }
@@ -127,24 +151,9 @@ void ance::LocalScope::buildDeclarations(CompileContext* context)
     for (auto& [identifier, variable] : defined_local_variables_) { variable->buildDeclaration(context); }
 }
 
-bool ance::LocalScope::isTypeRegistered(const std::string& type_name)
-{
-    return getGlobalScope()->isTypeRegistered(type_name);
-}
-
-ance::Type* ance::LocalScope::getType(const std::string& type_name)
-{
-    return getGlobalScope()->getType(type_name);
-}
-
-void ance::LocalScope::registerType(ance::Type* type)
-{
-    getGlobalScope()->registerType(type);
-}
-
 std::optional<ance::ResolvingHandle<ance::Variable>> ance::LocalScope::defineLocalVariable(
     const std::string&                  identifier,
-    ance::Type*                         type,
+    ance::ResolvingHandle<ance::Type>   type,
     Assigner                            assigner,
     const std::shared_ptr<ance::Value>& value,
     unsigned                            parameter_no,

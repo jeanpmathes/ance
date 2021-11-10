@@ -1,11 +1,10 @@
 #include "BooleanConstant.h"
 
 #include "ance/type/IntegerType.h"
-#include "ance/type/Type.h"
 
 ance::BooleanConstant::BooleanConstant(bool boolean) : type_(ance::IntegerType::get(1, true)), boolean_(boolean) {}
 
-ance::Type* ance::BooleanConstant::type()
+ance::ResolvingHandle<ance::Type> ance::BooleanConstant::type()
 {
     return type_;
 }

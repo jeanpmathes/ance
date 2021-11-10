@@ -6,7 +6,7 @@ ance::ExpressionBackedConstant::ExpressionBackedConstant(BackingConstantExpressi
     : expression_(expression)
 {}
 
-ance::Type* ance::ExpressionBackedConstant::type()
+ance::ResolvingHandle<ance::Type> ance::ExpressionBackedConstant::type()
 {
     return expression_->type();
 }

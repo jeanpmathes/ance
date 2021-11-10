@@ -18,7 +18,7 @@ class ConstantLiteral : public ConstantExpression
      */
     ConstantLiteral(std::shared_ptr<ance::Constant> constant, ance::Location location);
 
-    ance::Type* type() override;
+    ance::ResolvingHandle<ance::Type> type() override;
 
     bool validate(ValidationLogger& validation_logger) override;
 

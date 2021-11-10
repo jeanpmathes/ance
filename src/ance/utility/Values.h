@@ -5,13 +5,13 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 class CompileContext;
 
 namespace ance
 {
-
-    class Type;
-
     /**
      * A utility class to convert between native and content values.
      */
@@ -25,7 +25,9 @@ namespace ance
          * @param context The current compile context.
          * @return The content value.
          */
-        static llvm::Value* nativeToContent(ance::Type* type, llvm::Value* native, CompileContext* context);
+        static llvm::Value* nativeToContent(ance::ResolvingHandle<ance::Type> type,
+                                            llvm::Value*                      native,
+                                            CompileContext*                   context);
         /**
          * Convert a content value to a native value.
          * @param type The type of the value.
@@ -33,7 +35,9 @@ namespace ance
          * @param context The current compile context.
          * @return The native value.
          */
-        static llvm::Value* contentToNative(ance::Type* type, llvm::Value* content, CompileContext* context);
+        static llvm::Value* contentToNative(ance::ResolvingHandle<ance::Type> type,
+                                            llvm::Value*                      content,
+                                            CompileContext*                   context);
     };
 }
 

@@ -11,29 +11,30 @@
 #include "ance/type/Type.h"
 #include "validation/ValidationLogger.h"
 
-LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferring(std::string identifier,
-                                                                                    ance::Type* type,
-                                                                                    std::unique_ptr<Expression> value,
-                                                                                    ance::Location location)
+LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferring(
+    std::string                       identifier,
+    ance::ResolvingHandle<ance::Type> type,
+    std::unique_ptr<Expression>       value,
+    ance::Location                    location)
 {
     std::unique_ptr<Expression> reference = BindRef::refer(std::move(value), location);
     return new LocalReferenceVariableDefinition(std::move(identifier), type, std::move(reference), location);
 }
 
 LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferringTo(
-    std::string                 identifier,
-    ance::Type*                 type,
-    std::unique_ptr<Expression> address,
-    ance::Location              location)
+    std::string                       identifier,
+    ance::ResolvingHandle<ance::Type> type,
+    std::unique_ptr<Expression>       address,
+    ance::Location                    location)
 {
     std::unique_ptr<Expression> reference = BindRef::referTo(std::move(address), location);
     return new LocalReferenceVariableDefinition(std::move(identifier), type, std::move(reference), location);
 }
 
-LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string                 identifier,
-                                                                   ance::Type*                 type,
-                                                                   std::unique_ptr<Expression> reference,
-                                                                   ance::Location              location)
+LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string                       identifier,
+                                                                   ance::ResolvingHandle<ance::Type> type,
+                                                                   std::unique_ptr<Expression>       reference,
+                                                                   ance::Location                    location)
     : Statement(location)
     , identifier_(std::move(identifier))
     , type_(type)
@@ -67,10 +68,11 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
         bool reference_is_valid = reference_->validate(validation_logger);
         if (!reference_is_valid) return;
 
-        ance::Type* reference_type = reference_->type();
+        ance::ResolvingHandle<ance::Type> reference_type = reference_->type();
 
-        ance::Type* declared_referenced_type = ance::ReferenceType::getReferencedType(type_);
-        ance::Type* provided_referenced_type = ance::ReferenceType::getReferencedType(reference_type);
+        ance::ResolvingHandle<ance::Type> declared_referenced_type = ance::ReferenceType::getReferencedType(type_);
+        ance::ResolvingHandle<ance::Type> provided_referenced_type =
+            ance::ReferenceType::getReferencedType(reference_type);
 
         if (declared_referenced_type != provided_referenced_type)
         {

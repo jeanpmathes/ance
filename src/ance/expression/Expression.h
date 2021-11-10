@@ -4,12 +4,13 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
+#include "ance/type/Type.h"
 #include "ance/utility/Location.h"
+#include "ance/utility/ResolvingHandle.h"
 
 namespace ance
 {
     class Value;
-    class Type;
     class Scope;
 }
 
@@ -72,7 +73,7 @@ class Expression
      * Get the return type of this expression.
      * @return The type of the value of this expression.
      */
-    virtual ance::Type* type() = 0;
+    virtual ance::ResolvingHandle<ance::Type> type() = 0;
     /**
      * Get the value returned by this expression.
      * @return The value. One expression always returns the value.

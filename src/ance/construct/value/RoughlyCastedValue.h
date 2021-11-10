@@ -3,6 +3,9 @@
 
 #include "Value.h"
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 namespace ance
 {
     /**
@@ -16,16 +19,16 @@ namespace ance
          * @param target_type The target type.
          * @param original The original value.
          */
-        RoughlyCastedValue(ance::Type* target_type, std::shared_ptr<ance::Value> original);
+        RoughlyCastedValue(ance::ResolvingHandle<ance::Type> target_type, std::shared_ptr<ance::Value> original);
 
-        ance::Type* type() override;
+        ance::ResolvingHandle<ance::Type> type() override;
 
         void         buildNativeValue(CompileContext* context) override;
         llvm::Value* getNativeValue() override;
 
       private:
-        ance::Type*                  target_type_;
-        std::shared_ptr<ance::Value> original_;
+        ance::ResolvingHandle<ance::Type> target_type_;
+        std::shared_ptr<ance::Value>      original_;
     };
 }
 

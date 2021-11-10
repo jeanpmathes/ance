@@ -4,7 +4,7 @@
 
 ance::ExpressionBackedValue::ExpressionBackedValue(BackingExpression* expression) : expression_(expression) {}
 
-ance::Type* ance::ExpressionBackedValue::type()
+ance::ResolvingHandle<ance::Type> ance::ExpressionBackedValue::type()
 {
     return expression_->type();
 }

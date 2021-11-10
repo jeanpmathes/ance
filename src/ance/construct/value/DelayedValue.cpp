@@ -4,7 +4,7 @@
 
 ance::DelayedValue::DelayedValue(DelayableExpression* expression) : expression_(expression) {}
 
-ance::Type* ance::DelayedValue::type()
+ance::ResolvingHandle<ance::Type> ance::DelayedValue::type()
 {
     return expression_->type();
 }

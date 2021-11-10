@@ -10,7 +10,7 @@ ance::IntegerConstant::IntegerConstant(llvm::APInt integer, bool is_signed)
     , integer_(std::move(integer))
 {}
 
-ance::Type* ance::IntegerConstant::type()
+ance::ResolvingHandle<ance::Type> ance::IntegerConstant::type()
 {
     return type_;
 }

@@ -4,7 +4,6 @@
 
 #include "ance/expression/ConstantExpression.h"
 #include "ance/type/IntegerType.h"
-#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
@@ -32,13 +31,13 @@ void ance::GlobalScope::validate(ValidationLogger& validation_logger)
     for (auto const& [name, variable] : global_defined_variables_) { variable->validate(validation_logger); }
 }
 
-void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
-                                             bool                is_constant,
-                                             const std::string&  identifier,
-                                             ance::Type*         type,
-                                             Assigner            assigner,
-                                             ConstantExpression* initializer,
-                                             ance::Location      location)
+void ance::GlobalScope::defineGlobalVariable(AccessModifier                    access,
+                                             bool                              is_constant,
+                                             const std::string&                identifier,
+                                             ance::ResolvingHandle<ance::Type> type,
+                                             Assigner                          assigner,
+                                             ConstantExpression*               initializer,
+                                             ance::Location                    location)
 {
     assert(assigner != Assigner::REFERENCE_BINDING);
 
@@ -82,7 +81,7 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier      access,
 
 ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineExternFunction(
     const std::string&                                   identifier,
-    ance::Type*                                          return_type,
+    ance::ResolvingHandle<ance::Type>                    return_type,
     const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
     ance::Location                                       location)
 {
@@ -99,7 +98,7 @@ ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineExternFunction(
 ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineCustomFunction(
     const std::string&                                   identifier,
     AccessModifier                                       access,
-    ance::Type*                                          return_type,
+    ance::ResolvingHandle<ance::Type>                    return_type,
     const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
     ance::Location                                       declaration_location,
     ance::Location                                       definition_location)
@@ -112,6 +111,21 @@ ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineCustomFunction(
     auto handle                    = defined.handle();
     defined_functions_[identifier] = std::move(defined);
     return handle;
+}
+
+std::optional<ance::ResolvingHandle<ance::Type>> ance::GlobalScope::getType(const std::string& string)
+{
+    auto it = defined_types_.find(string);
+
+    if (it != defined_types_.end())
+    {
+        auto& [name, type] = *it;
+        return type.handle();
+    }
+    else
+    {
+        return {};
+    }
 }
 
 void ance::GlobalScope::registerUsage(ance::ResolvingHandle<ance::Variable> variable)
@@ -152,6 +166,32 @@ void ance::GlobalScope::registerUsage(ance::ResolvingHandle<ance::Function> func
     undefined_functions_[function->name()] = ance::OwningHandle<ance::Function>::takeOwnership(function);
 }
 
+void ance::GlobalScope::registerUsage(ance::ResolvingHandle<ance::Type> type)
+{
+    assert(!type->isDefined());
+
+    if (undefined_types_.find(type->getName()) != undefined_types_.end())
+    {
+        type.reroute(undefined_types_[type->getName()].handle());
+        return;
+    }
+
+    if (defined_types_.find(type->getName()) != defined_types_.end())
+    {
+        type.reroute(defined_types_[type->getName()].handle());
+        return;
+    }
+
+    undefined_types_[type->getName()] = ance::OwningHandle<ance::Type>::takeOwnership(type);
+}
+
+void ance::GlobalScope::registerDefinition(ance::ResolvingHandle<ance::Type> type)
+{
+    assert(type->isDefined());
+
+    defined_types_[type->getName()] = ance::OwningHandle<ance::Type>::takeOwnership(type);
+}
+
 void ance::GlobalScope::resolve()
 {
     for (auto const& [key, fn] : defined_functions_) { fn->resolve(); }
@@ -179,19 +219,15 @@ bool ance::GlobalScope::resolveDefinition(ance::ResolvingHandle<ance::Function> 
     return false;
 }
 
-bool ance::GlobalScope::isTypeRegistered(const std::string& type_name)
+bool ance::GlobalScope::resolveDefinition(ance::ResolvingHandle<ance::Type> type)
 {
-    return types_.find(type_name) != types_.end();
-}
+    if (defined_types_.find(type->getName()) != defined_types_.end())
+    {
+        type.reroute(defined_types_[type->getName()].handle());
+        return true;
+    }
 
-ance::Type* ance::GlobalScope::getType(const std::string& type_name)
-{
-    return types_.at(type_name);
-}
-
-void ance::GlobalScope::registerType(ance::Type* type)
-{
-    types_[type->getName()] = type;
+    return false;
 }
 
 bool ance::GlobalScope::hasEntry()

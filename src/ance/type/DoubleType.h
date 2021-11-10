@@ -3,6 +3,9 @@
 
 #include "FloatingPointType.h"
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 namespace ance
 {
     /**
@@ -26,7 +29,7 @@ namespace ance
          * Get the double type instance.
          * @return The double type instance.
          */
-        static ance::Type* get();
+        static ance::ResolvingHandle<ance::Type> get();
     };
 }
 #endif

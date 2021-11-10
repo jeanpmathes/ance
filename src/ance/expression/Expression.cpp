@@ -39,7 +39,7 @@ bool Expression::validateAssignment(const std::shared_ptr<ance::Value>& value,
 {
     if (ance::ReferenceType::isReferenceType(type()))
     {
-        ance::Type* target_type = ance::ReferenceType::getReferencedType(type());
+        ance::ResolvingHandle<ance::Type> target_type = ance::ReferenceType::getReferencedType(type());
         return ance::Type::checkMismatch(target_type, value->type(), value_location, validation_logger);
     }
     else
@@ -60,7 +60,7 @@ void Expression::doAssign(std::shared_ptr<ance::Value> value, CompileContext* co
 {
     assert(ance::ReferenceType::isReferenceType(type()));
 
-    ance::Type* target_type = ance::ReferenceType::getReferencedType(type());
+    ance::ResolvingHandle<ance::Type> target_type = ance::ReferenceType::getReferencedType(type());
     value                   = ance::Type::makeMatching(target_type, value, context);
 
     std::shared_ptr<ance::Value> expression_return = getValue();

@@ -9,6 +9,7 @@
 #include <llvm/IR/Module.h>
 
 #include "ance/utility/Location.h"
+#include "ance/utility/ResolvingHandle.h"
 
 namespace ance
 {
@@ -46,14 +47,14 @@ namespace ance
 
         virtual bool isSubscriptDefined();
 
-        virtual ance::Type* getSubscriptReturnType();
+        virtual ance::ResolvingHandle<ance::Type> getSubscriptReturnType();
 
         virtual bool validate(ValidationLogger& validation_logger, ance::Location location);
 
-        virtual bool validateSubscript(ance::Location    indexed_location,
-                                       Type*             index_type,
-                                       ance::Location    index_location,
-                                       ValidationLogger& validation_logger);
+        virtual bool validateSubscript(ance::Location                    indexed_location,
+                                       ance::ResolvingHandle<ance::Type> index_type,
+                                       ance::Location                    index_location,
+                                       ValidationLogger&                 validation_logger);
 
         virtual std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                             std::shared_ptr<Value> index,

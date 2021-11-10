@@ -3,6 +3,9 @@
 
 #include "TypeDefinition.h"
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 class Application;
 
 namespace ance
@@ -13,7 +16,7 @@ namespace ance
     class PointerType : public ance::TypeDefinition
     {
       private:
-        explicit PointerType(Type* element_type);
+        explicit PointerType(ance::ResolvingHandle<ance::Type> element_type);
 
       public:
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
@@ -24,12 +27,12 @@ namespace ance
 
         bool isSubscriptDefined() override;
 
-        ance::Type* getSubscriptReturnType() override;
+        ance::ResolvingHandle<ance::Type> getSubscriptReturnType() override;
 
-        bool                         validateSubscript(ance::Location    indexed_location,
-                                                       Type*             index_type,
-                                                       ance::Location    index_location,
-                                                       ValidationLogger& validation_logger) override;
+        bool                         validateSubscript(ance::Location                    indexed_location,
+                                                       ance::ResolvingHandle<ance::Type> index_type,
+                                                       ance::Location                    index_location,
+                                                       ValidationLogger&                 validation_logger) override;
         std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
                                                     CompileContext*        context) override;
@@ -43,14 +46,15 @@ namespace ance
         ~PointerType() override = default;
 
       private:
-        ance::Type* element_type_;
-        ance::Type* element_reference_;
+        ance::ResolvingHandle<ance::Type> element_type_;
+        ance::ResolvingHandle<ance::Type> element_reference_;
 
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:
-        static std::map<ance::Type*, ance::Type*>& getPointerTypes();
+        static std::vector<std::pair<ance::ResolvingHandle<ance::Type>, ance::ResolvingHandle<ance::Type>>>&
+        getPointerTypes();
 
       public:
         /**
@@ -58,21 +62,21 @@ namespace ance
          * @param element_type The element type.
          * @return The instance.
          */
-        static ance::Type* get(ance::Type* element_type);
+        static ance::ResolvingHandle<ance::Type> get(ance::ResolvingHandle<ance::Type> element_type);
 
         /**
          * Check if a given type is a pointer type.
          * @param type The type.
          * @return True if it is a pointer type.
          */
-        static bool isPointerType(ance::Type* type);
+        static bool isPointerType(ance::ResolvingHandle<ance::Type> type);
 
         /**
          * Get the pointee type of a given pointer type.
          * @param type The pointer type.
          * @return The pointee type or nullptr if the given type is not a pointer type.
          */
-        static ance::Type* getPointeeType(ance::Type* type);
+        static ance::ResolvingHandle<ance::Type> getPointeeType(ance::ResolvingHandle<ance::Type> type);
     };
 }
 

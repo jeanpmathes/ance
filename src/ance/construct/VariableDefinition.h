@@ -21,11 +21,11 @@ namespace ance
     class VariableDefinition
     {
       public:
-        VariableDefinition(const std::string& identifier,
-                           ance::Type*        type,
-                           ance::Scope*       containing_scope,
-                           bool               is_final,
-                           ance::Location     location);
+        VariableDefinition(const std::string&                identifier,
+                           ance::ResolvingHandle<ance::Type> type,
+                           ance::Scope*                      containing_scope,
+                           bool                              is_final,
+                           ance::Location                    location);
 
         [[nodiscard]] const std::string& identifier() const;
 
@@ -37,7 +37,7 @@ namespace ance
         /**
          * Get the type of this variable.
          */
-        [[nodiscard]] ance::Type* type() const;
+        [[nodiscard]] ance::ResolvingHandle<ance::Type> type() const;
 
         /**
          * Get the source location of the variable definition.
@@ -69,10 +69,10 @@ namespace ance
       private:
         const std::string& identifier_;
 
-        ance::Type*    type_;
-        ance::Scope*   scope_;
-        bool           is_final_;
-        ance::Location location_;
+        ance::ResolvingHandle<ance::Type> type_;
+        ance::Scope*                      scope_;
+        bool                              is_final_;
+        ance::Location                    location_;
     };
 }
 

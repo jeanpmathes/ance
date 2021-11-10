@@ -3,7 +3,9 @@
 #include "ance/construct/value/RoughlyCastedValue.h"
 #include "ance/type/Type.h"
 
-RoughCast::RoughCast(ance::Type* target_type, std::unique_ptr<Expression> expression, ance::Location location)
+RoughCast::RoughCast(ance::ResolvingHandle<ance::Type> target_type,
+                     std::unique_ptr<Expression>       expression,
+                     ance::Location                    location)
     : Expression(location)
     , target_type_(target_type)
     , expression_(std::move(expression))
@@ -15,7 +17,7 @@ void RoughCast::setScope(ance::Scope* scope)
     expression_->setContainingScope(scope);
 }
 
-ance::Type* RoughCast::type()
+ance::ResolvingHandle<ance::Type> RoughCast::type()
 {
     return target_type_;
 }

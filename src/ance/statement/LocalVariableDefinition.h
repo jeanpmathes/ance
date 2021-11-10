@@ -30,11 +30,11 @@ class LocalVariableDefinition : public Statement
      * @param assigned The initially assigned value.
      * @param location The source location.
      */
-    LocalVariableDefinition(std::string                 identifier,
-                            ance::Type*                 type,
-                            Assigner                    assigner,
-                            std::unique_ptr<Expression> assigned,
-                            ance::Location              location);
+    LocalVariableDefinition(std::string                       identifier,
+                            ance::ResolvingHandle<ance::Type> type,
+                            Assigner                          assigner,
+                            std::unique_ptr<Expression>       assigned,
+                            ance::Location                    location);
 
     void setFunction(ance::Function* function) override;
 
@@ -44,10 +44,10 @@ class LocalVariableDefinition : public Statement
     void doBuild(CompileContext* context) override;
 
   private:
-    std::string identifier_;
-    ance::Type* type_;
-    Assigner                    assigner_;
-    std::unique_ptr<Expression> assigned_;
+    std::string                       identifier_;
+    ance::ResolvingHandle<ance::Type> type_;
+    Assigner                          assigner_;
+    std::unique_ptr<Expression>       assigned_;
 
     std::optional<ance::ResolvingHandle<ance::Variable>> variable_ {};
 };

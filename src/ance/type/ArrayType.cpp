@@ -11,7 +11,7 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::ArrayType::ArrayType(Type* element_type, const uint64_t size)
+ance::ArrayType::ArrayType(ance::ResolvingHandle<ance::Type> element_type, const uint64_t size)
     : TypeDefinition("[" + element_type->getName() + "; " + std::to_string(size) + "]")
     , size_(size)
     , element_type_(element_type)
@@ -47,15 +47,15 @@ bool ance::ArrayType::isSubscriptDefined()
     return true;
 }
 
-ance::Type* ance::ArrayType::getSubscriptReturnType()
+ance::ResolvingHandle<ance::Type> ance::ArrayType::getSubscriptReturnType()
 {
     return element_reference_;
 }
 
 bool ance::ArrayType::validateSubscript(ance::Location,
-                                        Type*             index_type,
-                                        ance::Location    index_location,
-                                        ValidationLogger& validation_logger)
+                                        ance::ResolvingHandle<ance::Type> index_type,
+                                        ance::Location                    index_location,
+                                        ValidationLogger&                 validation_logger)
 {
     return ance::Type::checkMismatch(ance::SizeType::getSize(), index_type, index_location, validation_logger);
 }
@@ -117,27 +117,28 @@ llvm::DIType* ance::ArrayType::createDebugType(CompileContext* context)
                                           context->di()->getOrCreateArray(subscripts));
 }
 
-std::map<std::pair<ance::Type*, uint64_t>, ance::Type*>& ance::ArrayType::getArrayTypes()
+std::vector<std::pair<std::pair<ance::ResolvingHandle<ance::Type>, uint64_t>, ance::ResolvingHandle<ance::Type>>>&
+ance::ArrayType::getArrayTypes()
 {
-    static std::map<std::pair<ance::Type*, uint64_t>, ance::Type*> array_types;
+    static std::vector<
+        std::pair<std::pair<ance::ResolvingHandle<ance::Type>, uint64_t>, ance::ResolvingHandle<ance::Type>>>
+        array_types;
     return array_types;
 }
 
-ance::Type* ance::ArrayType::get(ance::Type* element_type, uint64_t size)
+ance::ResolvingHandle<ance::Type> ance::ArrayType::get(ance::ResolvingHandle<ance::Type> element_type, uint64_t size)
 {
-    auto        it   = getArrayTypes().find(std::make_pair(element_type, size));
-    ance::Type* type = nullptr;
+    for (auto& [current_key, current_type] : getArrayTypes())
+    {
+        auto& [current_element_type, current_size] = current_key;
 
-    if (it == getArrayTypes().end())
-    {
-        auto* array_type = new ance::ArrayType(element_type, size);
-        type             = new ance::Type(std::unique_ptr<ance::ArrayType>(array_type));
-        getArrayTypes().insert(std::make_pair(std::make_pair(element_type, size), type));
+        if (current_element_type == element_type && current_size == size) { return current_type; }
     }
-    else
-    {
-        type = it->second;
-    }
+
+    auto*                             array_type = new ance::ArrayType(element_type, size);
+    ance::ResolvingHandle<ance::Type> type =
+        ance::makeHandled<ance::Type>(std::unique_ptr<ance::ArrayType>(array_type));
+    getArrayTypes().emplace_back(std::make_pair(element_type, size), type);
 
     return type;
 }

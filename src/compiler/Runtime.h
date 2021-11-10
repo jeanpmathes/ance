@@ -7,11 +7,13 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 class CompileContext;
 
 namespace ance
 {
-    class Type;
     class Value;
 }
 
@@ -59,7 +61,7 @@ class Runtime
      * @return A pointer to the allocated memory.
      */
     std::shared_ptr<ance::Value> allocate(Allocator                           allocation,
-                                          ance::Type*                         type,
+                                          ance::ResolvingHandle<ance::Type>   type,
                                           const std::shared_ptr<ance::Value>& count,
                                           CompileContext*                     context);
 
@@ -72,11 +74,13 @@ class Runtime
     void deleteDynamic(const std::shared_ptr<ance::Value>& value, bool delete_buffer, CompileContext* context);
 
   private:
-    llvm::Value* allocateAutomatic(ance::Type*                         type,
+    llvm::Value* allocateAutomatic(ance::ResolvingHandle<ance::Type>   type,
                                    const std::shared_ptr<ance::Value>& count,
                                    CompileContext*                     context);
 
-    llvm::Value* allocateDynamic(ance::Type* type, const std::shared_ptr<ance::Value>& count, CompileContext* context);
+    llvm::Value* allocateDynamic(ance::ResolvingHandle<ance::Type>   type,
+                                 const std::shared_ptr<ance::Value>& count,
+                                 CompileContext*                     context);
 };
 
 #endif

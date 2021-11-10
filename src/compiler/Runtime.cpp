@@ -36,7 +36,7 @@ void Runtime::init(CompileContext* context)
 }
 
 std::shared_ptr<ance::Value> Runtime::allocate(Allocator                           allocation,
-                                               ance::Type*                         type,
+                                               ance::ResolvingHandle<ance::Type>   type,
                                                const std::shared_ptr<ance::Value>& count,
                                                CompileContext*                     context)
 {
@@ -58,8 +58,8 @@ std::shared_ptr<ance::Value> Runtime::allocate(Allocator                        
             throw std::invalid_argument("Unsupported allocation type.");
     }
 
-    ance::Type*  ptr_type   = ance::PointerType::get(type);
-    llvm::Value* native_ptr = ance::Values::contentToNative(ptr_type, ptr_to_allocated, context);
+    ance::ResolvingHandle<ance::Type> ptr_type   = ance::PointerType::get(type);
+    llvm::Value*                      native_ptr = ance::Values::contentToNative(ptr_type, ptr_to_allocated, context);
 
     return std::make_shared<ance::WrappedNativeValue>(ptr_type, native_ptr);
 }
@@ -80,7 +80,7 @@ void Runtime::deleteDynamic(const std::shared_ptr<ance::Value>& value, bool, Com
     success->setName("..free");
 }
 
-llvm::Value* Runtime::allocateAutomatic(ance::Type*                         type,
+llvm::Value* Runtime::allocateAutomatic(ance::ResolvingHandle<ance::Type>   type,
                                         const std::shared_ptr<ance::Value>& count,
                                         CompileContext*                     context)
 {
@@ -95,7 +95,7 @@ llvm::Value* Runtime::allocateAutomatic(ance::Type*                         type
     return context->ir()->CreateAlloca(type->getContentType(*context->llvmContext()), count_value);
 }
 
-llvm::Value* Runtime::allocateDynamic(ance::Type*                         type,
+llvm::Value* Runtime::allocateDynamic(ance::ResolvingHandle<ance::Type>   type,
                                       const std::shared_ptr<ance::Value>& count,
                                       CompileContext*                     context)
 {

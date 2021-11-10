@@ -28,15 +28,15 @@ void BindRef::setScope(ance::Scope* scope)
     address_->setContainingScope(scope);
 }
 
-ance::Type* BindRef::type()
+ance::ResolvingHandle<ance::Type> BindRef::type()
 {
     if (!type_)
     {
-        ance::Type* element_type = ance::PointerType::getPointeeType(address_->type());
-        type_                    = ance::ReferenceType::get(element_type);
+        ance::ResolvingHandle<ance::Type> element_type = ance::PointerType::getPointeeType(address_->type());
+        type_                                          = ance::ReferenceType::get(element_type);
     }
 
-    return type_;
+    return *type_;
 }
 
 bool BindRef::validate(ValidationLogger& validation_logger)
@@ -44,7 +44,7 @@ bool BindRef::validate(ValidationLogger& validation_logger)
     bool address_is_valid = address_->validate(validation_logger);
     if (!address_is_valid) return false;
 
-    ance::Type* address_type = address_->type();
+    ance::ResolvingHandle<ance::Type> address_type = address_->type();
 
     if (!ance::PointerType::isPointerType(address_type))
     {

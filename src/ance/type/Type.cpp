@@ -66,7 +66,7 @@ bool ance::Type::isSubscriptDefined()
     return definition_->isSubscriptDefined();
 }
 
-ance::Type* ance::Type::getSubscriptReturnType()
+ance::ResolvingHandle<ance::Type> ance::Type::getSubscriptReturnType()
 {
     assert(isDefined());
     return definition_->getSubscriptReturnType();
@@ -78,10 +78,10 @@ bool ance::Type::validate(ValidationLogger& validation_logger, ance::Location lo
     return definition_->validate(validation_logger, location);
 }
 
-bool ance::Type::validateSubscript(ance::Location    indexed_location,
-                                   Type*             index_type,
-                                   ance::Location    index_location,
-                                   ValidationLogger& validation_logger)
+bool ance::Type::validateSubscript(ance::Location                    indexed_location,
+                                   ance::ResolvingHandle<ance::Type> index_type,
+                                   ance::Location                    index_location,
+                                   ValidationLogger&                 validation_logger)
 {
     assert(isDefined());
     return definition_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
@@ -100,10 +100,10 @@ ance::TypeDefinition* ance::Type::getDefinition()
     return definition_.get();
 }
 
-bool ance::Type::checkMismatch(ance::Type*       expected,
-                               ance::Type*       actual,
-                               ance::Location    location,
-                               ValidationLogger& validation_logger)
+bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
+                               ance::ResolvingHandle<ance::Type> actual,
+                               ance::Location                    location,
+                               ValidationLogger&                 validation_logger)
 {
     if (expected != actual)
     {
@@ -119,9 +119,9 @@ bool ance::Type::checkMismatch(ance::Type*       expected,
     return true;
 }
 
-std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::Type*                  expected,
-                                                      std::shared_ptr<ance::Value> value,
-                                                      CompileContext*              context)
+std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::ResolvingHandle<ance::Type> expected,
+                                                      std::shared_ptr<ance::Value>      value,
+                                                      CompileContext*                   context)
 {
     if (value->type() == expected) return value;
 

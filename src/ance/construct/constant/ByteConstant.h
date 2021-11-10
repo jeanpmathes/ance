@@ -4,6 +4,8 @@
 #include <string>
 
 #include "ance/construct/constant/Constant.h"
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
 
 class Application;
 
@@ -23,8 +25,8 @@ namespace ance
          */
         explicit ByteConstant(uint8_t byte);
 
-        ance::Type*     type() override;
-        llvm::Constant* buildContent(llvm::Module* m) override;
+        ance::ResolvingHandle<ance::Type> type() override;
+        llvm::Constant*                   buildContent(llvm::Module* m) override;
 
         /**
          * Get the char value for an escaped char.
@@ -40,8 +42,8 @@ namespace ance
         static uint8_t parse(const std::string& unparsed);
 
       private:
-        ance::Type* type_;
-        uint8_t     byte_;
+        ance::ResolvingHandle<ance::Type> type_;
+        uint8_t                           byte_;
     };
 }
 

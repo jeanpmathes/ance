@@ -9,7 +9,7 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::ReferenceType::ReferenceType(ance::Type* element_type)
+ance::ReferenceType::ReferenceType(ance::ResolvingHandle<ance::Type> element_type)
     : TypeDefinition("&" + element_type->getName())
     , element_type_(element_type)
 {}
@@ -47,15 +47,15 @@ bool ance::ReferenceType::isSubscriptDefined()
     return element_type_->isSubscriptDefined();
 }
 
-ance::Type* ance::ReferenceType::getSubscriptReturnType()
+ance::ResolvingHandle<ance::Type> ance::ReferenceType::getSubscriptReturnType()
 {
     return element_type_->getSubscriptReturnType();
 }
 
-bool ance::ReferenceType::validateSubscript(ance::Location    indexed_location,
-                                            Type*             index_type,
-                                            ance::Location    index_location,
-                                            ValidationLogger& validation_logger)
+bool ance::ReferenceType::validateSubscript(ance::Location                    indexed_location,
+                                            ance::ResolvingHandle<ance::Type> index_type,
+                                            ance::Location                    index_location,
+                                            ValidationLogger&                 validation_logger)
 {
     return element_type_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
 }
@@ -81,9 +81,10 @@ llvm::DIType* ance::ReferenceType::createDebugType(CompileContext* context)
     return di_type;
 }
 
-std::map<ance::Type*, ance::Type*>& ance::ReferenceType::getReferenceTypes()
+std::vector<std::pair<ance::ResolvingHandle<ance::Type>, ance::ResolvingHandle<ance::Type>>>& ance::ReferenceType::
+    getReferenceTypes()
 {
-    static std::map<ance::Type*, ance::Type*> reference_types;
+    static std::vector<std::pair<ance::ResolvingHandle<ance::Type>, ance::ResolvingHandle<ance::Type>>> reference_types;
     return reference_types;
 }
 
@@ -103,33 +104,31 @@ std::shared_ptr<ance::Value> ance::ReferenceType::getReferenced(const std::share
     return std::make_shared<ance::WrappedNativeValue>(element_type_, native_referred);
 }
 
-ance::Type* ance::ReferenceType::get(ance::Type* element_type)
+ance::ResolvingHandle<ance::Type> ance::ReferenceType::get(ance::ResolvingHandle<ance::Type> element_type)
 {
-    auto        it   = getReferenceTypes().find(element_type);
-    ance::Type* type = nullptr;
+    for (auto& [current_key, current_type] : getReferenceTypes())
+    {
+        auto& current_element_type = current_key;
 
-    if (it == getReferenceTypes().end())
-    {
-        auto* reference_type = new ance::ReferenceType(element_type);
-        type                 = new ance::Type(std::unique_ptr<ance::ReferenceType>(reference_type));
-        getReferenceTypes().insert(std::make_pair(element_type, type));
+        if (current_element_type == element_type) { return current_type; }
     }
-    else
-    {
-        type = it->second;
-    }
+
+    auto*                             reference_type = new ance::ReferenceType(element_type);
+    ance::ResolvingHandle<ance::Type> type =
+        ance::makeHandled<ance::Type>(std::unique_ptr<ance::ReferenceType>(reference_type));
+    getReferenceTypes().emplace_back(element_type, type);
 
     return type;
 }
 
-bool ance::ReferenceType::isReferenceType(ance::Type* type)
+bool ance::ReferenceType::isReferenceType(ance::ResolvingHandle<ance::Type> type)
 {
     auto* ref_type = dynamic_cast<ance::ReferenceType*>(type->getDefinition());
     return ref_type != nullptr;
 }
 
-ance::Type* ance::ReferenceType::getReferencedType(ance::Type* type)
+ance::ResolvingHandle<ance::Type> ance::ReferenceType::getReferencedType(ance::ResolvingHandle<ance::Type> type)
 {
     auto ref_type = dynamic_cast<ance::ReferenceType*>(type->getDefinition());
-    return ref_type ? ref_type->element_type_ : nullptr;
+    return ref_type ? ref_type->element_type_ : ance::VoidType::get();
 }

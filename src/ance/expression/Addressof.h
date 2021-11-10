@@ -3,6 +3,8 @@
 
 #include "DelayableExpression.h"
 
+#include <optional>
+
 #include "compiler/Runtime.h"
 
 class Application;
@@ -24,7 +26,7 @@ class Addressof : public DelayableExpression
     void setScope(ance::Scope* scope) override;
 
   public:
-    ance::Type* type() override;
+    ance::ResolvingHandle<ance::Type> type() override;
 
     bool validate(ValidationLogger& validation_logger) override;
 
@@ -35,7 +37,7 @@ class Addressof : public DelayableExpression
     ~Addressof() override;
 
   private:
-    std::unique_ptr<Expression> arg_;
-    ance::Type*                 return_type_ {nullptr};
+    std::unique_ptr<Expression>                      arg_;
+    std::optional<ance::ResolvingHandle<ance::Type>> return_type_ {};
 };
 #endif

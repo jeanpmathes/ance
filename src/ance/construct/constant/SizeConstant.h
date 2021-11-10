@@ -3,6 +3,9 @@
 
 #include "Constant.h"
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 class Application;
 
 namespace ance
@@ -19,12 +22,12 @@ namespace ance
          */
         explicit SizeConstant(std::string value);
 
-        ance::Type*     type() override;
-        llvm::Constant* buildContent(llvm::Module* m) override;
+        ance::ResolvingHandle<ance::Type> type() override;
+        llvm::Constant*                   buildContent(llvm::Module* m) override;
 
       private:
-        ance::Type* type_;
-        std::string value_;
+        ance::ResolvingHandle<ance::Type> type_;
+        std::string                       value_;
     };
 }
 

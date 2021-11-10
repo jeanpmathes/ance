@@ -18,7 +18,7 @@ namespace ance
       public:
         ExternFunction(ance::Function*                               function,
                        ance::Scope*                                  containing_scope,
-                       ance::Type*                                   return_type,
+                       ance::ResolvingHandle<ance::Type>             return_type,
                        std::vector<std::shared_ptr<ance::Parameter>> parameters,
                        ance::Location                                location);
 
@@ -33,10 +33,6 @@ namespace ance
                                                CompileContext*                                  context) const override;
 
         llvm::DIScope*  getDebugScope(CompileContext* context) override;
-        bool            isTypeRegistered(const std::string& type_name) override;
-        ance::Type*     getType(const std::string& type_name) override;
-        void            registerType(ance::Type* type) override;
-
         ance::LocalScope* getInsideScope() override;
 
       protected:

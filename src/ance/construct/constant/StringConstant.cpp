@@ -13,7 +13,7 @@ ance::StringConstant::StringConstant(std::string prefix, std::string string)
     , string_(string)
 {}
 
-ance::Type* ance::StringConstant::type()
+ance::ResolvingHandle<ance::Type> ance::StringConstant::type()
 {
     return type_;
 }
@@ -67,7 +67,7 @@ std::string ance::StringConstant::parse(const std::string& unparsed)
     return builder.str();
 }
 
-ance::Type* ance::StringConstant::resolveType(std::string& prefix, std::string& string)
+ance::ResolvingHandle<ance::Type> ance::StringConstant::resolveType(std::string& prefix, std::string& string)
 {
     if (prefix == "c") { return ance::PointerType::get(ance::IntegerType::get(8, false)); }
 

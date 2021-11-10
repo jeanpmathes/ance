@@ -48,15 +48,11 @@ void ance::SizeType::init(llvm::LLVMContext& c, Application& app)
     diff_backing_type_ = llvm::Type::getIntNTy(c, diff_width_);
 }
 
-ance::Type* ance::SizeType::getSize()
+ance::ResolvingHandle<ance::Type> ance::SizeType::getSize()
 {
-    if (!size_instance_)
-    {
-        size_instance_ =
-            new ance::Type(std::unique_ptr<ance::TypeDefinition>(new SizeType("size", size_backing_type_)));
-    }
-
-    return size_instance_;
+    static ance::ResolvingHandle<ance::Type> instance =
+        ance::makeHandled<ance::Type>(std::unique_ptr<ance::TypeDefinition>(new SizeType("size", size_backing_type_)));
+    return instance;
 }
 
 unsigned int ance::SizeType::getSizeWidth()
@@ -64,15 +60,11 @@ unsigned int ance::SizeType::getSizeWidth()
     return size_width_;
 }
 
-ance::Type* ance::SizeType::getDiff()
+ance::ResolvingHandle<ance::Type> ance::SizeType::getDiff()
 {
-    if (!diff_instance_)
-    {
-        diff_instance_ =
-            new ance::Type(std::unique_ptr<ance::TypeDefinition>(new SizeType("diff", diff_backing_type_)));
-    }
-
-    return diff_instance_;
+    static ance::ResolvingHandle<ance::Type> instance =
+        ance::makeHandled<ance::Type>(std::unique_ptr<ance::TypeDefinition>(new SizeType("diff", diff_backing_type_)));
+    return instance;
 }
 
 unsigned int ance::SizeType::getDiffWidth()

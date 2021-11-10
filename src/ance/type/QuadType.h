@@ -3,6 +3,9 @@
 
 #include "FloatingPointType.h"
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 namespace ance
 {
     /**
@@ -18,15 +21,11 @@ namespace ance
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
-      private:
-        inline static Type* instance_ = nullptr;
-
-      public:
         /**
          * Get the quad type instance.
          * @return The instance.
          */
-        static ance::Type* get();
+        static ance::ResolvingHandle<ance::Type> get();
     };
 }
 #endif

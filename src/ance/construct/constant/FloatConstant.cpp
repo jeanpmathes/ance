@@ -2,9 +2,12 @@
 
 #include "ance/type/Type.h"
 
-ance::FloatConstant::FloatConstant(llvm::APFloat number, ance::Type* type) : type_(type), float_(std::move(number)) {}
+ance::FloatConstant::FloatConstant(llvm::APFloat number, ance::ResolvingHandle<ance::Type> type)
+    : type_(type)
+    , float_(std::move(number))
+{}
 
-ance::Type* ance::FloatConstant::type()
+ance::ResolvingHandle<ance::Type> ance::FloatConstant::type()
 {
     return type_;
 }

@@ -54,7 +54,7 @@ namespace ance
          * @param location The location of the function declaration.
          */
         void defineAsExtern(ance::Scope*                                         containing_scope,
-                            ance::Type*                                          return_type,
+                            ance::ResolvingHandle<ance::Type>                                          return_type,
                             const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
                             ance::Location                                       location);
 
@@ -68,7 +68,7 @@ namespace ance
          * @param definition_location The location of the function definition, meaning its code.
          */
         void defineAsCustom(AccessModifier                                       access,
-                            ance::Type*                                          return_type,
+                            ance::ResolvingHandle<ance::Type>                                          return_type,
                             const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
                             ance::Scope*                                         containing_scope,
                             ance::Location                                       declaration_location,
@@ -78,14 +78,14 @@ namespace ance
          * Get the return type of this function.
          * @return The return type.
          */
-        [[nodiscard]] ance::Type* returnType() const;
+        [[nodiscard]] ance::ResolvingHandle<ance::Type> returnType() const;
 
         /**
          * Get the type of a parameter.
          * @param index The index of the parameter. Must be smaller than the parameter count.
          * @return The type of the selected parameter.
          */
-        [[nodiscard]] ance::Type* parameterType(size_t index) const;
+        [[nodiscard]] ance::ResolvingHandle<ance::Type> parameterType(size_t index) const;
 
         /**
          * Get the parameter count.
@@ -149,10 +149,6 @@ namespace ance
         ance::GlobalScope* getGlobalScope() override;
         llvm::DIScope*     getDebugScope(CompileContext* context) override;
 
-        bool        isTypeRegistered(const std::string& type_name) override;
-        ance::Type* getType(const std::string& type_name) override;
-        void        registerType(ance::Type* type) override;
-
         /**
          * Get the scope inside of this function, if there is any.
          * @return A scope or null.
@@ -161,12 +157,16 @@ namespace ance
 
         void registerUsage(ance::ResolvingHandle<ance::Variable> variable) override;
         void registerUsage(ance::ResolvingHandle<ance::Function> function) override;
+        void registerUsage(ance::ResolvingHandle<ance::Type> type) override;
+
+        void registerDefinition(ance::ResolvingHandle<ance::Type> type) override;
 
         void resolve() override;
 
       protected:
         bool resolveDefinition(ance::ResolvingHandle<ance::Variable> variable) override;
         bool resolveDefinition(ance::ResolvingHandle<ance::Function> function) override;
+        bool resolveDefinition(ance::ResolvingHandle<ance::Type> type) override;
 
       private:
         std::string name_;

@@ -55,13 +55,13 @@ namespace ance
          * @param is_constant Whether the variable is constant.
          * @param location The source location.
          */
-        void defineAsGlobal(ance::Type*         type,
-                            ance::GlobalScope*  containing_scope,
-                            AccessModifier      access,
-                            ConstantExpression* constant_init,
-                            bool                is_final,
-                            bool                is_constant,
-                            ance::Location      location);
+        void defineAsGlobal(ance::ResolvingHandle<ance::Type> type,
+                            ance::GlobalScope*                containing_scope,
+                            AccessModifier                    access,
+                            ConstantExpression*               constant_init,
+                            bool                              is_final,
+                            bool                              is_constant,
+                            ance::Location                    location);
 
         /**
          * Define this variable as a local variable.
@@ -72,7 +72,7 @@ namespace ance
          * @param parameter_no The parameter number. Use zero if this is not a parameter.
          * @param location The source location.
          */
-        void defineAsLocal(ance::Type*                         type,
+        void defineAsLocal(ance::ResolvingHandle<ance::Type>   type,
                            ance::LocalScope*                   containing_scope,
                            bool                                is_final,
                            const std::shared_ptr<ance::Value>& value,
@@ -93,7 +93,7 @@ namespace ance
          * Get the value type.
          * @return The type.
          */
-        [[nodiscard]] ance::Type* type() const;
+        [[nodiscard]] ance::ResolvingHandle<ance::Type> type() const;
         /**
          * Get whether this variable is final.
          * @return Whether it is final.

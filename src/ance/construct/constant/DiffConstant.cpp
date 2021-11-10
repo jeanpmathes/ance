@@ -8,7 +8,7 @@
 
 ance::DiffConstant::DiffConstant(std::string value) : type_(ance::SizeType::getDiff()), value_(std::move(value)) {}
 
-ance::Type* ance::DiffConstant::type()
+ance::ResolvingHandle<ance::Type> ance::DiffConstant::type()
 {
     return type_;
 }

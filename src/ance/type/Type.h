@@ -10,6 +10,7 @@
 
 #include "ance/type/TypeDefinition.h"
 #include "ance/utility/Location.h"
+#include "ance/utility/ResolvingHandle.h"
 
 namespace ance
 {
@@ -54,7 +55,7 @@ namespace ance
         /**
          * Get whether this type is defined.
          */
-        bool isDefined() const;
+        [[nodiscard]] bool isDefined() const;
 
         /**
          * Get the default content of a value of this type.
@@ -106,7 +107,7 @@ namespace ance
          * Get the return type of the get indexer.
          * @return The return type.
          */
-        ance::Type* getSubscriptReturnType();
+        ance::ResolvingHandle<ance::Type> getSubscriptReturnType();
 
         /**
          * Validate if this type is well-formed.
@@ -124,10 +125,10 @@ namespace ance
          * @param validation_logger A logger to log validation messages.
          * @return True if the get indexer is valid.
          */
-        bool validateSubscript(ance::Location    indexed_location,
-                               Type*             index_type,
-                               ance::Location    index_location,
-                               ValidationLogger& validation_logger);
+        bool validateSubscript(ance::Location                    indexed_location,
+                               ance::ResolvingHandle<ance::Type> index_type,
+                               ance::Location                    index_location,
+                               ValidationLogger&                 validation_logger);
 
         /**
          * Build a subscript access.
@@ -151,10 +152,10 @@ namespace ance
          * @param validation_logger The validation logger.
          * @return True if the types match.
          */
-        static bool checkMismatch(ance::Type*       expected,
-                                  ance::Type*       actual,
-                                  ance::Location    location,
-                                  ValidationLogger& validation_logger);
+        static bool checkMismatch(ance::ResolvingHandle<ance::Type> expected,
+                                  ance::ResolvingHandle<ance::Type> actual,
+                                  ance::Location                    location,
+                                  ValidationLogger&                 validation_logger);
 
         /**
          * Transform a value so it matches an expected type.
@@ -163,9 +164,9 @@ namespace ance
          * @param context The current compile context.
          * @return A value with the expected type. It can be the same value as passed in.
          */
-        static std::shared_ptr<ance::Value> makeMatching(ance::Type*                  expected,
-                                                         std::shared_ptr<ance::Value> value,
-                                                         CompileContext*              context);
+        static std::shared_ptr<ance::Value> makeMatching(ance::ResolvingHandle<ance::Type> expected,
+                                                         std::shared_ptr<ance::Value>      value,
+                                                         CompileContext*                   context);
 
       private:
         std::string                           name_;

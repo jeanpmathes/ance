@@ -1,7 +1,6 @@
 #include "UnsignedIntegerPointerType.h"
 
 #include "ance/scope/GlobalScope.h"
-#include "ance/type/Type.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
@@ -17,14 +16,9 @@ llvm::Type* ance::UnsignedIntegerPointerType::getContentType(llvm::LLVMContext&)
     return native_type_;
 }
 
-llvm::Value* ance::UnsignedIntegerPointerType::buildValue(llvm::Value* pointer,
-                                                          llvm::LLVMContext&,
-                                                          llvm::Module*,
-                                                          CompileContext*,
-                                                          llvm::IRBuilder<>& ir,
-                                                          llvm::DIBuilder*)
+llvm::Value* ance::UnsignedIntegerPointerType::buildValue(llvm::Value* pointer, CompileContext* context)
 {
-    return ir.CreatePtrToInt(pointer, native_type_);
+    return context->ir()->CreatePtrToInt(pointer, native_type_);
 }
 
 llvm::DIType* ance::UnsignedIntegerPointerType::createDebugType(CompileContext* context)
@@ -44,12 +38,9 @@ void ance::UnsignedIntegerPointerType::init(llvm::LLVMContext& llvm_context, llv
     native_type_ = llvm::Type::getIntNTy(llvm_context, data_layout.getMaxPointerSizeInBits());
 }
 
-ance::Type* ance::UnsignedIntegerPointerType::get()
+ance::ResolvingHandle<ance::Type> ance::UnsignedIntegerPointerType::get()
 {
-    if (!instance_)
-    {
-        instance_ = new ance::Type(std::unique_ptr<ance::TypeDefinition>(new UnsignedIntegerPointerType()));
-    }
-
-    return instance_;
+    static ance::ResolvingHandle<ance::Type> instance =
+        ance::makeHandled<ance::Type>(std::unique_ptr<ance::TypeDefinition>(new UnsignedIntegerPointerType()));
+    return instance;
 }

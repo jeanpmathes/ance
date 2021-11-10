@@ -1,7 +1,6 @@
 #include "DoubleType.h"
 
 #include "ance/scope/GlobalScope.h"
-#include "ance/type/Type.h"
 
 ance::DoubleType::DoubleType() : TypeDefinition("double") {}
 
@@ -15,9 +14,9 @@ llvm::Type* ance::DoubleType::getContentType(llvm::LLVMContext& c)
     return llvm::Type::getDoubleTy(c);
 }
 
-ance::Type* ance::DoubleType::get()
+ance::ResolvingHandle<ance::Type> ance::DoubleType::get()
 {
-    if (!instance_) { instance_ = new ance::Type(std::unique_ptr<ance::TypeDefinition>(new DoubleType())); }
-
-    return instance_;
+    static ance::ResolvingHandle<ance::Type> instance =
+        ance::makeHandled<ance::Type>(std::unique_ptr<ance::TypeDefinition>(new DoubleType()));
+    return instance;
 }

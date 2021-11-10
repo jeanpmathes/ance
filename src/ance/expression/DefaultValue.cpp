@@ -2,9 +2,12 @@
 
 #include "ance/type/Type.h"
 
-DefaultValue::DefaultValue(ance::Type* type, ance::Location location) : Expression(location), type_(type) {}
+DefaultValue::DefaultValue(ance::ResolvingHandle<ance::Type> type, ance::Location location)
+    : Expression(location)
+    , type_(type)
+{}
 
-ance::Type* DefaultValue::type()
+ance::ResolvingHandle<ance::Type> DefaultValue::type()
 {
     return type_;
 }

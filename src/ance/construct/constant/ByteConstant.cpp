@@ -1,12 +1,11 @@
 #include "ByteConstant.h"
 
 #include "ance/type/IntegerType.h"
-#include "ance/type/Type.h"
 #include "compiler/Application.h"
 
 ance::ByteConstant::ByteConstant(uint8_t byte) : type_(ance::IntegerType::get(8, false)), byte_(byte) {}
 
-ance::Type* ance::ByteConstant::type()
+ance::ResolvingHandle<ance::Type> ance::ByteConstant::type()
 {
     return type_;
 }

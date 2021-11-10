@@ -25,7 +25,7 @@ namespace ance
       public:
         explicit FunctionDefinition(ance::Function*                               function,
                                     ance::Scope*                                  containing_scope,
-                                    ance::Type*                                   type,
+                                    ance::ResolvingHandle<ance::Type>             type,
                                     std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                     ance::Location                                location);
 
@@ -49,14 +49,14 @@ namespace ance
          * Get the return type of this function.
          * @return The return type.
          */
-        [[nodiscard]] ance::Type* returnType() const;
+        [[nodiscard]] ance::ResolvingHandle<ance::Type> returnType() const;
 
         /**
          * Get the type of a parameter.
          * @param index The index of the parameter. Must be smaller than the parameter count.
          * @return The type of the selected parameter.
          */
-        [[nodiscard]] ance::Type* parameterType(size_t index) const;
+        [[nodiscard]] ance::ResolvingHandle<ance::Type> parameterType(size_t index) const;
 
         /**
          * Get the parameter count.
@@ -153,12 +153,7 @@ namespace ance
 
       public:
         ance::GlobalScope* getGlobalScope();
-
         virtual llvm::DIScope*  getDebugScope(CompileContext* context)         = 0;
-        virtual bool            isTypeRegistered(const std::string& type_name) = 0;
-        virtual ance::Type*     getType(const std::string& type_name)          = 0;
-        virtual void            registerType(ance::Type* type)                 = 0;
-
         virtual ance::LocalScope* getInsideScope() = 0;
 
         virtual ~FunctionDefinition() = default;
@@ -167,7 +162,7 @@ namespace ance
         ance::Function* function_;
         ance::Scope*    containing_scope_;
 
-        ance::Type*                                   return_type_;
+        ance::ResolvingHandle<ance::Type>             return_type_;
         std::vector<std::shared_ptr<ance::Parameter>> parameters_;
         ance::Location                                location_;
     };

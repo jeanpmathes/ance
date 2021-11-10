@@ -15,7 +15,7 @@ void Subscript::setScope(ance::Scope* scope)
     index_->setContainingScope(scope);
 }
 
-ance::Type* Subscript::type()
+ance::ResolvingHandle<ance::Type> Subscript::type()
 {
     return indexed_->type()->getSubscriptReturnType();
 }
@@ -25,7 +25,7 @@ bool Subscript::validate(ValidationLogger& validation_logger)
     indexed_->validate(validation_logger);
     index_->validate(validation_logger);
 
-    ance::Type* indexed_type = indexed_->type();
+    ance::ResolvingHandle<ance::Type> indexed_type = indexed_->type();
 
     if (indexed_type->isSubscriptDefined())
     {

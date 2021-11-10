@@ -25,9 +25,9 @@ namespace ance
          * @param name The name of the parameter.
          * @param location The source location.
          */
-        Parameter(ance::Type* type, std::string name, ance::Location location);
+        Parameter(ance::ResolvingHandle<ance::Type> type, std::string name, ance::Location location);
 
-        ance::Type* type() override;
+        ance::ResolvingHandle<ance::Type> type() override;
         /**
          * Get the parameter name.
          * @return The name.
@@ -53,8 +53,8 @@ namespace ance
         llvm::Value* getContentValue() override;
 
       private:
-        ance::Type* type_;
-        std::string name_;
+        ance::ResolvingHandle<ance::Type> type_;
+        std::string                       name_;
 
         ance::Location location_;
 

@@ -8,7 +8,7 @@
 
 ance::SizeConstant::SizeConstant(std::string value) : type_(ance::SizeType::getSize()), value_(std::move(value)) {}
 
-ance::Type* ance::SizeConstant::type()
+ance::ResolvingHandle<ance::Type> ance::SizeConstant::type()
 {
     return type_;
 }

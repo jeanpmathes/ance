@@ -20,15 +20,15 @@ class RoughCast : public Expression
      * @param expression The expression providing the value to cast.
      * @param location The source location.
      */
-    RoughCast(ance::Type* target_type, std::unique_ptr<Expression> expression, ance::Location location);
+    RoughCast(ance::ResolvingHandle<ance::Type> target_type,
+              std::unique_ptr<Expression>       expression,
+              ance::Location                    location);
 
-    ance::Type* type() override;
+    ance::ResolvingHandle<ance::Type> type() override;
 
     bool validate(ValidationLogger& validation_logger) override;
 
     [[nodiscard]] std::shared_ptr<ance::Value> getValue() const override;
-
-
 
     ~RoughCast() override;
 
@@ -36,9 +36,9 @@ class RoughCast : public Expression
     void setScope(ance::Scope* scope) override;
 
   private:
-    ance::Type*                 target_type_;
-    std::unique_ptr<Expression>  expression_;
-    std::shared_ptr<ance::Value> return_value_;
+    ance::ResolvingHandle<ance::Type> target_type_;
+    std::unique_ptr<Expression>       expression_;
+    std::shared_ptr<ance::Value>      return_value_;
 };
 
 #endif

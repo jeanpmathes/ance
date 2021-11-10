@@ -18,7 +18,7 @@
 
 ance::CustomFunction::CustomFunction(ance::Function*                               function,
                                      AccessModifier                                access,
-                                     ance::Type*                                   return_type,
+                                     ance::ResolvingHandle<ance::Type>             return_type,
                                      std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                      ance::Scope*                                  containing_scope,
 
@@ -196,19 +196,4 @@ void ance::CustomFunction::validate(ValidationLogger& validation_logger)
 llvm::DIScope* ance::CustomFunction::getDebugScope(CompileContext*)
 {
     return debugSubprogram();
-}
-
-bool ance::CustomFunction::isTypeRegistered(const std::string& type_name)
-{
-    return inside_scope_->isTypeRegistered(type_name);
-}
-
-ance::Type* ance::CustomFunction::getType(const std::string& type_name)
-{
-    return inside_scope_->getType(type_name);
-}
-
-void ance::CustomFunction::registerType(ance::Type* type)
-{
-    inside_scope_->registerType(type);
 }

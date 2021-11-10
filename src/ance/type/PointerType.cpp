@@ -12,7 +12,7 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-ance::PointerType::PointerType(ance::Type* element_type)
+ance::PointerType::PointerType(ance::ResolvingHandle<ance::Type> element_type)
     : TypeDefinition("*" + element_type->getName())
     , element_type_(element_type)
     , element_reference_(ance::ReferenceType::get(element_type))
@@ -52,15 +52,15 @@ bool ance::PointerType::isSubscriptDefined()
     return true;
 }
 
-ance::Type* ance::PointerType::getSubscriptReturnType()
+ance::ResolvingHandle<ance::Type> ance::PointerType::getSubscriptReturnType()
 {
     return element_reference_;
 }
 
 bool ance::PointerType::validateSubscript(ance::Location,
-                                          Type*             index_type,
-                                          ance::Location    index_location,
-                                          ValidationLogger& validation_logger)
+                                          ance::ResolvingHandle<ance::Type> index_type,
+                                          ance::Location                    index_location,
+                                          ValidationLogger&                 validation_logger)
 {
     return ance::Type::checkMismatch(ance::SizeType::getSize(), index_type, index_location, validation_logger);
 }
@@ -118,39 +118,38 @@ llvm::DIType* ance::PointerType::createDebugType(CompileContext* context)
     return di_type;
 }
 
-std::map<ance::Type*, ance::Type*>& ance::PointerType::getPointerTypes()
+std::vector<std::pair<ance::ResolvingHandle<ance::Type>, ance::ResolvingHandle<ance::Type>>>& ance::PointerType::
+    getPointerTypes()
 {
-    static std::map<ance::Type*, ance::Type*> pointer_types;
+    static std::vector<std::pair<ance::ResolvingHandle<ance::Type>, ance::ResolvingHandle<ance::Type>>> pointer_types;
     return pointer_types;
 }
 
-ance::Type* ance::PointerType::get(ance::Type* element_type)
+ance::ResolvingHandle<ance::Type> ance::PointerType::get(ance::ResolvingHandle<ance::Type> element_type)
 {
-    auto        it   = getPointerTypes().find(element_type);
-    ance::Type* type = nullptr;
+    for (auto& [current_key, current_type] : getPointerTypes())
+    {
+        auto& current_element_type = current_key;
 
-    if (it == getPointerTypes().end())
-    {
-        auto* pointer_type = new ance::PointerType(element_type);
-        type               = new ance::Type(std::unique_ptr<ance::PointerType>(pointer_type));
-        getPointerTypes().insert(std::make_pair(element_type, type));
+        if (current_element_type == element_type) { return current_type; }
     }
-    else
-    {
-        type = it->second;
-    }
+
+    auto*                             pointer_type = new ance::PointerType(element_type);
+    ance::ResolvingHandle<ance::Type> type =
+        ance::makeHandled<ance::Type>(std::unique_ptr<ance::PointerType>(pointer_type));
+    getPointerTypes().emplace_back(element_type, type);
 
     return type;
 }
 
-bool ance::PointerType::isPointerType(ance::Type* type)
+bool ance::PointerType::isPointerType(ance::ResolvingHandle<ance::Type> type)
 {
     auto* ptr_type = dynamic_cast<ance::PointerType*>(type->getDefinition());
     return ptr_type != nullptr;
 }
 
-ance::Type* ance::PointerType::getPointeeType(ance::Type* type)
+ance::ResolvingHandle<ance::Type> ance::PointerType::getPointeeType(ance::ResolvingHandle<ance::Type> type)
 {
     auto* ptr_type = dynamic_cast<ance::PointerType*>(type->getDefinition());
-    return ptr_type ? ptr_type->element_type_ : nullptr;
+    return ptr_type ? ptr_type->element_type_ : ance::VoidType::get();
 }

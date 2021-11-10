@@ -7,6 +7,7 @@
 
 #include "ance/Assigner.h"
 #include "ance/construct/Variable.h"
+#include "ance/type/Type.h"
 #include "ance/utility/Location.h"
 #include "ance/utility/OwningHandle.h"
 
@@ -44,7 +45,7 @@ namespace ance
          */
         std::optional<ance::ResolvingHandle<ance::Variable>> defineAutoVariable(
             const std::string&                  identifier,
-            ance::Type*                         type,
+            ance::ResolvingHandle<ance::Type>   type,
             Assigner                            assigner,
             const std::shared_ptr<ance::Value>& value,
             ance::Location                      location);
@@ -61,7 +62,7 @@ namespace ance
          */
         std::optional<ance::ResolvingHandle<ance::Variable>> defineParameterVariable(
             const std::string&                  identifier,
-            ance::Type*                         type,
+            ance::ResolvingHandle<ance::Type>   type,
             Assigner                            assigner,
             const std::shared_ptr<ance::Value>& value,
             unsigned                            parameter_no,
@@ -69,12 +70,16 @@ namespace ance
 
         void registerUsage(ance::ResolvingHandle<ance::Variable> variable) override;
         void registerUsage(ance::ResolvingHandle<ance::Function> function) override;
+        void registerUsage(ance::ResolvingHandle<ance::Type> type) override;
+
+        void registerDefinition(ance::ResolvingHandle<ance::Type> type) override;
 
         void resolve() override;
 
       protected:
         bool resolveDefinition(ance::ResolvingHandle<ance::Variable> variable) override;
         bool resolveDefinition(ance::ResolvingHandle<ance::Function> function) override;
+        bool resolveDefinition(ance::ResolvingHandle<ance::Type> type) override;
 
       public:
         void validate(ValidationLogger& validation_logger) override;
@@ -85,14 +90,10 @@ namespace ance
          */
         void buildDeclarations(CompileContext* context);
 
-        bool        isTypeRegistered(const std::string& type_name) override;
-        ance::Type* getType(const std::string& type_name) override;
-        void        registerType(ance::Type* type) override;
-
       private:
         std::optional<ance::ResolvingHandle<ance::Variable>> defineLocalVariable(
             const std::string&                  identifier,
-            ance::Type*                         type,
+            ance::ResolvingHandle<ance::Type>   type,
             Assigner                            assigner,
             const std::shared_ptr<ance::Value>& value,
             unsigned                            parameter_no,
@@ -105,6 +106,8 @@ namespace ance
         std::map<std::string, ance::OwningHandle<ance::Variable>> defined_local_variables_;
 
         std::map<std::string, ance::OwningHandle<ance::Function>> undefined_functions_;
+
+        std::map<std::string, ance::OwningHandle<ance::Type>> undefined_types_;
     };
 }
 #endif

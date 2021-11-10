@@ -23,7 +23,7 @@ bool ance::Function::isDefined() const
 }
 
 void ance::Function::defineAsExtern(ance::Scope*                                         containing_scope,
-                                    ance::Type*                                          return_type,
+                                    ance::ResolvingHandle<ance::Type>                    return_type,
                                     const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
                                     ance::Location                                       location)
 {
@@ -31,7 +31,7 @@ void ance::Function::defineAsExtern(ance::Scope*                                
 }
 
 void ance::Function::defineAsCustom(AccessModifier                                       access,
-                                    ance::Type*                                          return_type,
+                                    ance::ResolvingHandle<ance::Type>                    return_type,
                                     const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
                                     ance::Scope*                                         containing_scope,
                                     ance::Location                                       declaration_location,
@@ -46,13 +46,13 @@ void ance::Function::defineAsCustom(AccessModifier                              
                                                          definition_location);
 }
 
-ance::Type* ance::Function::returnType() const
+ance::ResolvingHandle<ance::Type> ance::Function::returnType() const
 {
     assert(isDefined());
     return definition_->returnType();
 }
 
-ance::Type* ance::Function::parameterType(size_t index) const
+ance::ResolvingHandle<ance::Type> ance::Function::parameterType(size_t index) const
 {
     assert(isDefined());
     return definition_->parameterType(index);
@@ -123,21 +123,6 @@ llvm::DIScope* ance::Function::getDebugScope(CompileContext* context)
     return definition_->getDebugScope(context);
 }
 
-bool ance::Function::isTypeRegistered(const std::string& type_name)
-{
-    return definition_->isTypeRegistered(type_name);
-}
-
-ance::Type* ance::Function::getType(const std::string& type_name)
-{
-    return definition_->getType(type_name);
-}
-
-void ance::Function::registerType(ance::Type* type)
-{
-    definition_->registerType(type);
-}
-
 ance::LocalScope* ance::Function::getInsideScope()
 {
     return definition_->getInsideScope();
@@ -151,6 +136,16 @@ void ance::Function::registerUsage(ance::ResolvingHandle<ance::Variable> variabl
 void ance::Function::registerUsage(ance::ResolvingHandle<ance::Function> function)
 {
     getInsideScope()->registerUsage(function);
+}
+
+void ance::Function::registerUsage(ance::ResolvingHandle<ance::Type> type)
+{
+    getInsideScope()->registerUsage(type);
+}
+
+void ance::Function::registerDefinition(ance::ResolvingHandle<ance::Type> type)
+{
+    getInsideScope()->registerDefinition(type);
 }
 
 void ance::Function::resolve()
@@ -167,4 +162,9 @@ bool ance::Function::resolveDefinition(ance::ResolvingHandle<ance::Variable> var
 bool ance::Function::resolveDefinition(ance::ResolvingHandle<ance::Function> function)
 {
     return scope()->resolveDefinition(function);
+}
+
+bool ance::Function::resolveDefinition(ance::ResolvingHandle<ance::Type> type)
+{
+    return scope()->resolveDefinition(type);
 }

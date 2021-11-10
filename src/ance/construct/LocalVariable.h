@@ -23,13 +23,13 @@ namespace ance
         /**
          * Create a new local variable definition.
          */
-        LocalVariable(const std::string&           identifier,
-                      ance::Type*                  type,
-                      ance::LocalScope*            containing_scope,
-                      bool                         is_final,
-                      std::shared_ptr<ance::Value> value,
-                      unsigned                     parameter_no,
-                      ance::Location               location);
+        LocalVariable(const std::string&                identifier,
+                      ance::ResolvingHandle<ance::Type> type,
+                      ance::LocalScope*                 containing_scope,
+                      bool                              is_final,
+                      std::shared_ptr<ance::Value>      value,
+                      unsigned                          parameter_no,
+                      ance::Location                    location);
 
         void validate(ValidationLogger& validation_logger) override;
 

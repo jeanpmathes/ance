@@ -18,15 +18,11 @@ namespace ance
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
-      private:
-        inline static Type* instance_ = nullptr;
-
-      public:
         /**
          * Get the half type instance.
          * @return The instance.
          */
-        static ance::Type* get();
+        static ance::ResolvingHandle<ance::Type> get();
     };
 }
 #endif

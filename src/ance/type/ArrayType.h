@@ -5,6 +5,9 @@
 
 #include <llvm/IR/DerivedTypes.h>
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 namespace ance
 {
     class Scope;
@@ -20,21 +23,21 @@ namespace ance
     class ArrayType : public ance::TypeDefinition
     {
       private:
-        ArrayType(Type* element_type, uint64_t size);
+        ArrayType(ance::ResolvingHandle<ance::Type> element_type, uint64_t size);
 
       public:
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
-        bool        isSubscriptDefined() override;
-        ance::Type* getSubscriptReturnType() override;
+        bool                              isSubscriptDefined() override;
+        ance::ResolvingHandle<ance::Type> getSubscriptReturnType() override;
 
         bool validate(ValidationLogger& validation_logger, ance::Location location) override;
 
-        bool                         validateSubscript(ance::Location    indexed_location,
-                                                       Type*             index_type,
-                                                       ance::Location    index_location,
-                                                       ValidationLogger& validation_logger) override;
+        bool                         validateSubscript(ance::Location                    indexed_location,
+                                                       ance::ResolvingHandle<ance::Type> index_type,
+                                                       ance::Location                    index_location,
+                                                       ValidationLogger&                 validation_logger) override;
         std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
                                                     CompileContext*        context) override;
@@ -51,13 +54,15 @@ namespace ance
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:
-        uint64_t         size_;
-        ance::Type*      element_type_;
-        ance::Type*      element_reference_;
-        llvm::ArrayType* type_ {nullptr};
+        uint64_t                          size_;
+        ance::ResolvingHandle<ance::Type> element_type_;
+        ance::ResolvingHandle<ance::Type> element_reference_;
+        llvm::ArrayType*                  type_ {nullptr};
 
       private:
-        static std::map<std::pair<ance::Type*, uint64_t>, ance::Type*>& getArrayTypes();
+        static std::vector<
+            std::pair<std::pair<ance::ResolvingHandle<ance::Type>, uint64_t>, ance::ResolvingHandle<ance::Type>>>&
+        getArrayTypes();
 
       public:
         /**
@@ -66,7 +71,7 @@ namespace ance
          * @param size The size of the array. Must be greater than zero.
          * @return The array type instance.
          */
-        static ance::Type* get(ance::Type* element_type, uint64_t size);
+        static ance::ResolvingHandle<ance::Type> get(ance::ResolvingHandle<ance::Type> element_type, uint64_t size);
     };
 }
 

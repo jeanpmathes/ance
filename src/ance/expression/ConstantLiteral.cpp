@@ -9,7 +9,7 @@ ConstantLiteral::ConstantLiteral(std::shared_ptr<ance::Constant> constant, ance:
     , constant_(std::move(constant))
 {}
 
-ance::Type* ConstantLiteral::type()
+ance::ResolvingHandle<ance::Type> ConstantLiteral::type()
 {
     return constant_->type();
 }

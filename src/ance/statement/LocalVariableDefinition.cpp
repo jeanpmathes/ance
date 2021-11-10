@@ -10,11 +10,11 @@
 #include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
-LocalVariableDefinition::LocalVariableDefinition(std::string                 identifier,
-                                                 ance::Type*                 type,
-                                                 Assigner                    assigner,
-                                                 std::unique_ptr<Expression> assigned,
-                                                 ance::Location              location)
+LocalVariableDefinition::LocalVariableDefinition(std::string                       identifier,
+                                                 ance::ResolvingHandle<ance::Type> type,
+                                                 Assigner                          assigner,
+                                                 std::unique_ptr<Expression>       assigned,
+                                                 ance::Location                    location)
     : Statement(location)
     , identifier_(std::move(identifier))
     , type_(type)

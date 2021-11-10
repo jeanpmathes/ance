@@ -44,6 +44,7 @@ namespace ance
          * @return The global scope.
          */
         virtual ance::GlobalScope* getGlobalScope() = 0;
+
         /**
          * Get the debug scope for this scope.
          * @param context The current compile context.
@@ -64,6 +65,24 @@ namespace ance
         virtual void registerUsage(ance::ResolvingHandle<ance::Function> function) = 0;
 
         /**
+         * Register the usage of a type in this scope. Only types that are registered will be resolved.
+         * @param type The type to register and resolve. A type can be registered multiple times, but must be undefined.
+         */
+        virtual void registerUsage(ance::ResolvingHandle<ance::Type> type) = 0;
+
+        /**
+         * Add the definition for a type. A scope can ignore definitions.
+         * @param type The type to define.
+         */
+        virtual void registerDefinition(ance::ResolvingHandle<ance::Type> type) = 0;
+
+        /**
+         * Add a type to this scope. Undefined types will be resolved and defined types will be consumed.
+         * @param type The type to add.
+         */
+        void addType(ance::ResolvingHandle<ance::Type> type);
+
+        /**
          * Resolve all undefined usages to find their definitions.
          */
         virtual void resolve() = 0;
@@ -82,30 +101,18 @@ namespace ance
          */
         virtual bool resolveDefinition(ance::ResolvingHandle<ance::Variable> variable) = 0;
 
-      public:
+        /**
+         * Resolve the definition of a type.
+         * @param type The type to find a definition for.
+         * @return True if a definition was found.
+         */
+        virtual bool resolveDefinition(ance::ResolvingHandle<ance::Type> type) = 0;
+
         /**
          * Validate this scope.
          * @param validation_logger A logger to log validation messages to.
          */
         virtual void validate(ValidationLogger& validation_logger) = 0;
-
-        /**
-         * Check if a type is registered in this scope.
-         * @param type_name The name of the type.
-         * @return True if it is registered.
-         */
-        virtual bool isTypeRegistered(const std::string& type_name) = 0;
-        /**
-         * Get a type by name.
-         * @param type_name The name of the type.
-         * @return The type with the given name.
-         */
-        virtual ance::Type* getType(const std::string& type_name) = 0;
-        /**
-         * Register a type in this scope.
-         * @param type The type to register.
-         */
-        virtual void registerType(ance::Type* type) = 0;
 
         virtual ~Scope() = default;
     };

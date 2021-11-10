@@ -18,9 +18,9 @@ class SizeofType : public BackingExpression
      * @param type The type to provide the size of.
      * @param location The source location.
      */
-    explicit SizeofType(ance::Type* type, ance::Location location);
+    explicit SizeofType(ance::ResolvingHandle<ance::Type> type, ance::Location location);
 
-    ance::Type* type() override;
+    ance::ResolvingHandle<ance::Type> type() override;
 
     bool validate(ValidationLogger& validation_logger) override;
 
@@ -30,8 +30,8 @@ class SizeofType : public BackingExpression
     llvm::Value* buildNativeValue(CompileContext* context) override;
 
   private:
-    std::shared_ptr<ance::Value> return_value_ {std::make_shared<ance::ExpressionBackedValue>(this)};
-    ance::Type*                  type_;
+    std::shared_ptr<ance::Value>      return_value_ {std::make_shared<ance::ExpressionBackedValue>(this)};
+    ance::ResolvingHandle<ance::Type> type_;
 };
 
 #endif

@@ -3,6 +3,8 @@
 
 #include "DelayableExpression.h"
 
+#include <optional>
+
 class Application;
 
 class BindRef : public DelayableExpression
@@ -24,7 +26,7 @@ class BindRef : public DelayableExpression
     void setScope(ance::Scope* scope) override;
 
   public:
-    ance::Type* type() override;
+    ance::ResolvingHandle<ance::Type> type() override;
 
     bool validate(ValidationLogger& validation_logger) override;
 
@@ -37,7 +39,7 @@ class BindRef : public DelayableExpression
   private:
     std::unique_ptr<Expression> address_;
 
-    ance::Type* type_ {nullptr};
+    std::optional<ance::ResolvingHandle<ance::Type>> type_ {};
 };
 
 #endif

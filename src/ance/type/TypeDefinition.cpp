@@ -1,5 +1,7 @@
 #include "TypeDefinition.h"
 
+#include "ance/type/VoidType.h"
+
 ance::TypeDefinition::TypeDefinition(std::string name) : name_(std::move(name)) {}
 
 const std::string& ance::TypeDefinition::getName() const
@@ -34,9 +36,9 @@ bool ance::TypeDefinition::isSubscriptDefined()
     return false;
 }
 
-ance::Type* ance::TypeDefinition::getSubscriptReturnType()
+ance::ResolvingHandle<ance::Type> ance::TypeDefinition::getSubscriptReturnType()
 {
-    return nullptr;
+    return ance::VoidType::get();
 }
 
 bool ance::TypeDefinition::validate(ValidationLogger&, ance::Location)
@@ -44,7 +46,10 @@ bool ance::TypeDefinition::validate(ValidationLogger&, ance::Location)
     return true;
 }
 
-bool ance::TypeDefinition::validateSubscript(ance::Location, Type*, ance::Location, ValidationLogger&)
+bool ance::TypeDefinition::validateSubscript(ance::Location,
+                                             ance::ResolvingHandle<ance::Type>,
+                                             ance::Location,
+                                             ValidationLogger&)
 {
     return false;
 }

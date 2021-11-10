@@ -17,14 +17,14 @@ namespace llvm
     class Constant;
 }
 
-ance::GlobalVariable::GlobalVariable(const std::string&  identifier,
-                                     ance::Type*         type,
-                                     ance::GlobalScope*  containing_scope,
-                                     AccessModifier      access,
-                                     ConstantExpression* constant_init,
-                                     bool                is_final,
-                                     bool                is_constant,
-                                     ance::Location      location)
+ance::GlobalVariable::GlobalVariable(const std::string&                identifier,
+                                     ance::ResolvingHandle<ance::Type> type,
+                                     ance::GlobalScope*                containing_scope,
+                                     AccessModifier                    access,
+                                     ConstantExpression*               constant_init,
+                                     bool                              is_final,
+                                     bool                              is_constant,
+                                     ance::Location                    location)
     : VariableDefinition(identifier, type, containing_scope, is_final, location)
     , access_(access)
     , is_constant_(is_constant)

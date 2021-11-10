@@ -16,9 +16,9 @@ class DefaultValue : public BackingConstantExpression
      * @param type The type to use the default value of.
      * @param location The source location.
      */
-    explicit DefaultValue(ance::Type* type, ance::Location location);
+    explicit DefaultValue(ance::ResolvingHandle<ance::Type> type, ance::Location location);
 
-    ance::Type* type() override;
+    ance::ResolvingHandle<ance::Type> type() override;
 
     bool validate(ValidationLogger& validation_logger) override;
 
@@ -26,13 +26,11 @@ class DefaultValue : public BackingConstantExpression
     [[nodiscard]] std::shared_ptr<ance::Constant> getConstantValue() const override;
     llvm::Constant*                               buildContentConstant(llvm::LLVMContext& c) override;
 
-
-
     ~DefaultValue() override;
 
   private:
-    ance::Type*                     type_;
-    std::shared_ptr<ance::Constant> constant_ {std::make_shared<ance::ExpressionBackedConstant>(this)};
+    ance::ResolvingHandle<ance::Type> type_;
+    std::shared_ptr<ance::Constant>   constant_ {std::make_shared<ance::ExpressionBackedConstant>(this)};
 };
 
 #endif

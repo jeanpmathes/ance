@@ -14,7 +14,7 @@
 
 ance::ExternFunction::ExternFunction(ance::Function*                               function,
                                      ance::Scope*                                  containing_scope,
-                                     ance::Type*                                   return_type,
+                                     ance::ResolvingHandle<ance::Type>             return_type,
                                      std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                      ance::Location                                location)
     : ance::FunctionDefinition(function, containing_scope, return_type, std::move(parameters), location)
@@ -73,21 +73,6 @@ std::shared_ptr<ance::Value> ance::ExternFunction::buildCall(const std::vector<s
 llvm::DIScope* ance::ExternFunction::getDebugScope(CompileContext*)
 {
     return native_function_->getSubprogram();
-}
-
-bool ance::ExternFunction::isTypeRegistered(const std::string& type_name)
-{
-    return scope()->isTypeRegistered(type_name);
-}
-
-ance::Type* ance::ExternFunction::getType(const std::string& type_name)
-{
-    return scope()->getType(type_name);
-}
-
-void ance::ExternFunction::registerType(ance::Type* type)
-{
-    scope()->registerType(type);
 }
 
 ance::LocalScope* ance::ExternFunction::getInsideScope()

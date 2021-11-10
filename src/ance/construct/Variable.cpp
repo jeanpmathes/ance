@@ -18,13 +18,13 @@ bool ance::Variable::isDefined() const
     return (definition_ != nullptr);
 }
 
-void ance::Variable::defineAsGlobal(ance::Type*         type,
-                                    ance::GlobalScope*  containing_scope,
-                                    AccessModifier      access,
-                                    ConstantExpression* constant_init,
-                                    bool                is_final,
-                                    bool                is_constant,
-                                    ance::Location      location)
+void ance::Variable::defineAsGlobal(ance::ResolvingHandle<ance::Type> type,
+                                    ance::GlobalScope*                containing_scope,
+                                    AccessModifier                    access,
+                                    ConstantExpression*               constant_init,
+                                    bool                              is_final,
+                                    bool                              is_constant,
+                                    ance::Location                    location)
 {
     definition_ = std::make_unique<ance::GlobalVariable>(identifier(),
                                                          type,
@@ -36,7 +36,7 @@ void ance::Variable::defineAsGlobal(ance::Type*         type,
                                                          location);
 }
 
-void ance::Variable::defineAsLocal(ance::Type*                         type,
+void ance::Variable::defineAsLocal(ance::ResolvingHandle<ance::Type>   type,
                                    ance::LocalScope*                   containing_scope,
                                    bool                                is_final,
                                    const std::shared_ptr<ance::Value>& value,
@@ -63,7 +63,7 @@ ance::Scope* ance::Variable::scope() const
     return definition_->scope();
 }
 
-ance::Type* ance::Variable::type() const
+ance::ResolvingHandle<ance::Type> ance::Variable::type() const
 {
     assert(definition_);
     return definition_->type();
@@ -119,7 +119,7 @@ void ance::Variable::validateSetValue(const std::shared_ptr<ance::Value>& value,
         return;// Type mismatch is not relevant if assignment is not allowed no matter what.
     }
 
-    ance::Type* target_type = type();
+    ance::ResolvingHandle<ance::Type> target_type = type();
 
     if (ance::ReferenceType::isReferenceType(type())) { target_type = ance::ReferenceType::getReferencedType(type()); }
 

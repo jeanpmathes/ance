@@ -4,14 +4,14 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-class Expression;
+#include "ance/utility/ResolvingHandle.h"
+#include "ance/type/Type.h"
 
+class Expression;
 class CompileContext;
 
 namespace ance
 {
-    class Type;
-
     /**
      * Represents any value that can be passed around in the final program.
      */
@@ -22,7 +22,7 @@ namespace ance
          * Get the type of the value.
          * @return The type.
          */
-        virtual ance::Type* type() = 0;
+        virtual ance::ResolvingHandle<ance::Type> type() = 0;
 
         /**
          * Build the native value. The native value is the value actually used in the IR.

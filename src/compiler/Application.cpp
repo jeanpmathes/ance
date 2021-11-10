@@ -4,8 +4,6 @@
 
 #include "management/elements/Element.h"
 
-#include "ance/scope/GlobalScope.h"
-
 #include "ance/type/DoubleType.h"
 #include "ance/type/HalfType.h"
 #include "ance/type/QuadType.h"
@@ -21,15 +19,15 @@ Application::Application(data::File& project) : project_(project), global_scope_
 {
     // Register keyword types
 
-    global_scope_->registerType(ance::HalfType::get());
-    global_scope_->registerType(ance::SingleType::get());
-    global_scope_->registerType(ance::DoubleType::get());
-    global_scope_->registerType(ance::QuadType::get());
+    global_scope_->registerDefinition(ance::HalfType::get());
+    global_scope_->registerDefinition(ance::SingleType::get());
+    global_scope_->registerDefinition(ance::DoubleType::get());
+    global_scope_->registerDefinition(ance::QuadType::get());
 
-    global_scope_->registerType(ance::VoidType::get());
-    global_scope_->registerType(ance::SizeType::getSize());
-    global_scope_->registerType(ance::SizeType::getDiff());
-    global_scope_->registerType(ance::UnsignedIntegerPointerType::get());
+    global_scope_->registerDefinition(ance::VoidType::get());
+    global_scope_->registerDefinition(ance::SizeType::getSize());
+    global_scope_->registerDefinition(ance::SizeType::getDiff());
+    global_scope_->registerDefinition(ance::UnsignedIntegerPointerType::get());
 }
 
 void Application::setPointerSize(unsigned size)
@@ -60,7 +58,7 @@ std::filesystem::path Application::getSourceFile() const
 {
     auto src = project_.root()["src"];
 
-    if (!src) return std::filesystem::path();
+    if (!src) return {};
 
     for (auto src_file : src->get())
     {
@@ -74,7 +72,7 @@ std::filesystem::path Application::getSourceFile() const
         return path_to_project.replace_filename(path_to_src);
     }
 
-    return std::filesystem::path();
+    return {};
 }
 
 unsigned Application::getBitness() const

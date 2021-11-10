@@ -3,6 +3,9 @@
 
 #include "Constant.h"
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 class Application;
 
 namespace ance
@@ -20,8 +23,8 @@ namespace ance
          */
         StringConstant(std::string prefix, std::string string);
 
-        ance::Type*     type() override;
-        llvm::Constant* buildContent(llvm::Module* m) override;
+        ance::ResolvingHandle<ance::Type> type() override;
+        llvm::Constant*                   buildContent(llvm::Module* m) override;
 
         /**
          * Parse a given string to remove quotes and resolve escape sequences.
@@ -31,12 +34,12 @@ namespace ance
         static std::string parse(const std::string& unparsed);
 
       private:
-        static ance::Type* resolveType(std::string& prefix, std::string& string);
+        static ance::ResolvingHandle<ance::Type> resolveType(std::string& prefix, std::string& string);
 
       private:
-        ance::Type* type_;
-        std::string prefix_;
-        std::string string_;
+        ance::ResolvingHandle<ance::Type> type_;
+        std::string                       prefix_;
+        std::string                       string_;
     };
 }
 

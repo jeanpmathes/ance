@@ -16,11 +16,11 @@ void Addressof::setScope(ance::Scope* scope)
     arg_->setContainingScope(scope);
 }
 
-ance::Type* Addressof::type()
+ance::ResolvingHandle<ance::Type> Addressof::type()
 {
     if (!return_type_)
     {
-        ance::Type* value_type = arg_->type();
+        ance::ResolvingHandle<ance::Type> value_type = arg_->type();
 
         if (ance::ReferenceType::isReferenceType(value_type))
         {
@@ -30,7 +30,7 @@ ance::Type* Addressof::type()
         return_type_ = ance::PointerType::get(value_type);
     }
 
-    return return_type_;
+    return *return_type_;
 }
 
 bool Addressof::validate(ValidationLogger& validation_logger)

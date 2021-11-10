@@ -3,11 +3,13 @@
 
 #include "Scope.h"
 
+#include <optional>
 #include <vector>
 
 #include "ance/Assigner.h"
 #include "ance/construct/Function.h"
 #include "ance/construct/Variable.h"
+#include "ance/type/Type.h"
 #include "ance/utility/OwningHandle.h"
 
 class ConstantExpression;
@@ -27,10 +29,6 @@ namespace ance
 
         void validate(ValidationLogger& validation_logger) override;
 
-        bool        isTypeRegistered(const std::string& type_name) override;
-        ance::Type* getType(const std::string& type_name) override;
-        void        registerType(ance::Type* type) override;
-
         /**
          * Define a global variable.
          * @param access The access level.
@@ -41,13 +39,13 @@ namespace ance
          * @param initializer The constant initializer.
          * @param location The source location.
          */
-        void defineGlobalVariable(AccessModifier      access,
-                                  bool                is_constant,
-                                  const std::string&  identifier,
-                                  ance::Type*         type,
-                                  Assigner            assigner,
-                                  ConstantExpression* initializer,
-                                  ance::Location      location);
+        void defineGlobalVariable(AccessModifier                    access,
+                                  bool                              is_constant,
+                                  const std::string&                identifier,
+                                  ance::ResolvingHandle<ance::Type> type,
+                                  Assigner                          assigner,
+                                  ConstantExpression*               initializer,
+                                  ance::Location                    location);
 
         /**
          * Define an extern function in this scope.
@@ -59,7 +57,7 @@ namespace ance
          */
         ance::ResolvingHandle<ance::Function> defineExternFunction(
             const std::string&                                   identifier,
-            ance::Type*                                          return_type,
+            ance::ResolvingHandle<ance::Type>                    return_type,
             const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
             ance::Location                                       location);
 
@@ -76,19 +74,30 @@ namespace ance
         ance::ResolvingHandle<ance::Function> defineCustomFunction(
             const std::string&                                   identifier,
             AccessModifier                                       access,
-            ance::Type*                                          return_type,
+            ance::ResolvingHandle<ance::Type>                    return_type,
             const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
             ance::Location                                       declaration_location,
             ance::Location                                       definition_location);
 
+        /**
+         * Get a type defined in this scope by it's name.
+         * @param string The name of the type.
+         * @return The type, or nothing if no such type is defined.
+         */
+        std::optional<ance::ResolvingHandle<ance::Type>> getType(const std::string& string);
+
         void registerUsage(ance::ResolvingHandle<ance::Variable> variable) override;
         void registerUsage(ance::ResolvingHandle<ance::Function> function) override;
+        void registerUsage(ance::ResolvingHandle<ance::Type> type) override;
+
+        void registerDefinition(ance::ResolvingHandle<ance::Type> type) override;
 
         void resolve() override;
 
       protected:
         bool resolveDefinition(ance::ResolvingHandle<ance::Variable> variable) override;
         bool resolveDefinition(ance::ResolvingHandle<ance::Function> function) override;
+        bool resolveDefinition(ance::ResolvingHandle<ance::Type> type) override;
 
       public:
         /**
@@ -122,13 +131,14 @@ namespace ance
 
         std::vector<std::pair<std::string, ance::Location>> errors_;
 
-        std::map<std::string, ance::Type*> types_;
-
         std::map<std::string, ance::OwningHandle<ance::Variable>> global_undefined_variables_;
         std::map<std::string, ance::OwningHandle<ance::Variable>> global_defined_variables_;
 
         std::map<std::string, ance::OwningHandle<ance::Function>> undefined_functions_;
         std::map<std::string, ance::OwningHandle<ance::Function>> defined_functions_;
+
+        std::map<std::string, ance::OwningHandle<ance::Type>> undefined_types_;
+        std::map<std::string, ance::OwningHandle<ance::Type>> defined_types_;
     };
 }
 #endif

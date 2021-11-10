@@ -3,6 +3,9 @@
 
 #include "TypeDefinition.h"
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 class Application;
 
 namespace ance
@@ -53,7 +56,7 @@ namespace ance
          * Get the size type instance.
          * @return The instance.
          */
-        static ance::Type* getSize();
+        static ance::ResolvingHandle<ance::Type> getSize();
 
         /**
          * Get the width of the size type.
@@ -64,7 +67,7 @@ namespace ance
          * Get the diff type instance.
          * @return The instance.
          */
-        static ance::Type* getDiff();
+        static ance::ResolvingHandle<ance::Type> getDiff();
 
         /**
          * Get the width of the diff type.

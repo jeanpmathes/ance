@@ -18,7 +18,7 @@ class BackingConstantExpression
      */
     void buildConstant(llvm::LLVMContext& c);
 
-    ance::Type* type() override = 0;
+    ance::ResolvingHandle<ance::Type> type() override = 0;
 
     [[nodiscard]] std::shared_ptr<ance::Constant> getConstantValue() const override = 0;
 

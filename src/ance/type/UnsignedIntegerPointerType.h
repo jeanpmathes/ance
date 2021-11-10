@@ -6,6 +6,9 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 class Application;
 class CompileContext;
 
@@ -24,12 +27,7 @@ namespace ance
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
-        static llvm::Value* buildValue(llvm::Value*       pointer,
-                                       llvm::LLVMContext& c,
-                                       llvm::Module*      m,
-                                       CompileContext*    state,
-                                       llvm::IRBuilder<>& ir,
-                                       llvm::DIBuilder*   di);
+        [[maybe_unused]] static llvm::Value* buildValue(llvm::Value* pointer, CompileContext* state);
 
       private:
         inline static Type*       instance_    = nullptr;
@@ -50,7 +48,7 @@ namespace ance
          * Get the uiptr type instance.
          * @return The instance.
          */
-        static ance::Type* get();
+        static ance::ResolvingHandle<ance::Type> get();
     };
 }
 

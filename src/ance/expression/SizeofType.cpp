@@ -4,9 +4,12 @@
 #include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
-SizeofType::SizeofType(ance::Type* type, ance::Location location) : Expression(location), type_(type) {}
+SizeofType::SizeofType(ance::ResolvingHandle<ance::Type> type, ance::Location location)
+    : Expression(location)
+    , type_(type)
+{}
 
-ance::Type* SizeofType::type()
+ance::ResolvingHandle<ance::Type> SizeofType::type()
 {
     return ance::SizeType::getSize();
 }

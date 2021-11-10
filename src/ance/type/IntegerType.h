@@ -3,6 +3,9 @@
 
 #include "TypeDefinition.h"
 
+#include "ance/type/Type.h"
+#include "ance/utility/ResolvingHandle.h"
+
 class Application;
 
 namespace ance
@@ -29,7 +32,7 @@ namespace ance
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:
-        static std::map<std::pair<uint64_t, bool>, ance::Type*>& getIntegerTypes();
+        static std::vector<std::pair<std::pair<uint64_t, bool>, ance::ResolvingHandle<ance::Type>>>& getIntegerTypes();
 
       public:
         /**
@@ -38,7 +41,7 @@ namespace ance
          * @param is_signed Whether the integer should be signed.
          * @return The instance.
          */
-        static ance::Type* get(uint64_t bit_size, bool is_signed);
+        static ance::ResolvingHandle<ance::Type> get(uint64_t bit_size, bool is_signed);
 
         /**
          * Check if a given type is an integer type with the given attributes.
@@ -47,7 +50,7 @@ namespace ance
          * @param is_signed The sign attribute.
          * @return True if the given type is as specified.
          */
-        static bool isIntegerType(ance::Type* type, uint64_t bit_size, bool is_signed);
+        static bool isIntegerType(ance::ResolvingHandle<ance::Type> type, uint64_t bit_size, bool is_signed);
     };
 }
 

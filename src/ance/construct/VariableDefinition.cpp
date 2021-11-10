@@ -3,11 +3,11 @@
 #include "ance/type/ReferenceType.h"
 #include "compiler/CompileContext.h"
 
-ance::VariableDefinition::VariableDefinition(const std::string& identifier,
-                                             ance::Type*        type,
-                                             ance::Scope*       containing_scope,
-                                             bool               is_final,
-                                             ance::Location     location)
+ance::VariableDefinition::VariableDefinition(const std::string&                identifier,
+                                             ance::ResolvingHandle<ance::Type> type,
+                                             ance::Scope*                      containing_scope,
+                                             bool                              is_final,
+                                             ance::Location                    location)
     : identifier_(identifier)
     , type_(type)
     , scope_(containing_scope)
@@ -24,7 +24,7 @@ ance::Scope* ance::VariableDefinition::scope() const
 {
     return scope_;
 }
-ance::Type* ance::VariableDefinition::type() const
+ance::ResolvingHandle<ance::Type> ance::VariableDefinition::type() const
 {
     return type_;
 }

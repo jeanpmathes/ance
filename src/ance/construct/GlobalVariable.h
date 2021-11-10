@@ -29,14 +29,14 @@ namespace ance
         /**
          * Create a new global variable definition.
          */
-        GlobalVariable(const std::string&  identifier,
-                       ance::Type*         type,
-                       ance::GlobalScope*  containing_scope,
-                       AccessModifier      access,
-                       ConstantExpression* constant_init,
-                       bool                is_final,
-                       bool                is_constant,
-                       ance::Location      location);
+        GlobalVariable(const std::string&                identifier,
+                       ance::ResolvingHandle<ance::Type> type,
+                       ance::GlobalScope*                containing_scope,
+                       AccessModifier                    access,
+                       ConstantExpression*               constant_init,
+                       bool                              is_final,
+                       bool                              is_constant,
+                       ance::Location                    location);
 
         void validate(ValidationLogger& validation_logger) override;
 

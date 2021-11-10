@@ -20,9 +20,9 @@ llvm::DIType* ance::VoidType::createDebugType(CompileContext* context)
     return context->di()->createUnspecifiedType(getName());
 }
 
-ance::Type* ance::VoidType::get()
+ance::ResolvingHandle<ance::Type> ance::VoidType::get()
 {
-    if (!instance_) { instance_ = new ance::Type(std::unique_ptr<ance::TypeDefinition>(new VoidType())); }
-
-    return instance_;
+    static ance::ResolvingHandle<ance::Type> instance =
+        ance::makeHandled<ance::Type>(std::unique_ptr<ance::TypeDefinition>(new VoidType()));
+    return instance;
 }
