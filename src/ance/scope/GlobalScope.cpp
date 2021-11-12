@@ -113,6 +113,16 @@ ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineCustomFunction(
     return handle;
 }
 
+void ance::GlobalScope::defineTypeAsOther(std::string identifier, ance::ResolvingHandle<ance::Type> original)
+{
+    assert(false && "TODO: Not implemented.");
+}
+
+void ance::GlobalScope::defineTypeAliasOther(std::string identifier, ance::ResolvingHandle<ance::Type> original)
+{
+    assert(false && "TODO: Not implemented.");
+}
+
 std::optional<ance::ResolvingHandle<ance::Type>> ance::GlobalScope::getType(const std::string& string)
 {
     auto it = defined_types_.find(string);

@@ -80,6 +80,20 @@ namespace ance
             ance::Location                                       definition_location);
 
         /**
+         * Define a type that behaves like another type.
+         * @param identifier The name of the new type.
+         * @param original The original type.
+         */
+        void defineTypeAsOther(std::string identifier, ance::ResolvingHandle<ance::Type> original);
+
+        /**
+         * Define a type that is an alias for another type.
+         * @param identifier The name of the alias.
+         * @param original The other type.
+         */
+        void defineTypeAliasOther(std::string identifier, ance::ResolvingHandle<ance::Type> original);
+
+        /**
          * Get a type defined in this scope by it's name.
          * @param string The name of the type.
          * @return The type, or nothing if no such type is defined.

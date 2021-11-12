@@ -1,7 +1,7 @@
 grammar ance;
 
 file
-	: ( variableDeclaration | function )* EOF
+	: ( variableDeclaration | function | typeDefinition )* EOF
 	;
 
 variableDeclaration
@@ -20,6 +20,19 @@ parameters
 parameter
 	: IDENTIFIER ':' type
 	;
+
+typeDefinition
+    : defineAs
+    | defineAlias
+    ;
+
+defineAs
+    : 'define' IDENTIFIER 'as' type
+    ;
+
+defineAlias
+    : 'define' IDENTIFIER 'alias' type
+    ;
 
 accessModifier
 	: 'public' # Public

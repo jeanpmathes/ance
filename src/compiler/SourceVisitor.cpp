@@ -14,6 +14,7 @@
 #include "ance/type/SingleType.h"
 #include "ance/type/VoidType.h"
 
+#include "ance/scope/GlobalScope.h"
 #include "ance/scope/LocalScope.h"
 
 #include "ance/statement/AssignmentStatement.h"
@@ -142,6 +143,22 @@ antlrcpp::Any SourceVisitor::visitParameter(anceParser::ParameterContext* ctx)
     const std::string                 k_identifier = ctx->IDENTIFIER()->getText();
 
     return new ance::Parameter(type, k_identifier, location(ctx));
+}
+
+antlrcpp::Any SourceVisitor::visitDefineAs(anceParser::DefineAsContext* ctx)
+{
+    ance::ResolvingHandle<ance::Type> other = visit(ctx->type());
+    application_.globalScope().defineTypeAsOther(ctx->IDENTIFIER()->getText(), other);
+
+    return this->visitChildren(ctx);
+}
+
+antlrcpp::Any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ctx)
+{
+    ance::ResolvingHandle<ance::Type> other = visit(ctx->type());
+    application_.globalScope().defineTypeAliasOther(ctx->IDENTIFIER()->getText(), other);
+
+    return this->visitChildren(ctx);
 }
 
 antlrcpp::Any SourceVisitor::visitExpressionStatement(anceParser::ExpressionStatementContext* ctx)
