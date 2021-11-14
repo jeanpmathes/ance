@@ -84,14 +84,20 @@ namespace ance
          * @param identifier The name of the new type.
          * @param original The original type.
          */
-        void defineTypeAsOther(const std::string& identifier, ance::ResolvingHandle<ance::Type> original);
+        void defineTypeAsOther(const std::string&                identifier,
+                               ance::ResolvingHandle<ance::Type> original,
+                               ance::Location                    definition_location,
+                               ance::Location                    original_type_location);
 
         /**
          * Define a type that is an alias for another type.
          * @param identifier The name of the alias.
          * @param actual The other type.
          */
-        void defineTypeAliasOther(const std::string& identifier, ance::ResolvingHandle<ance::Type> actual);
+        void defineTypeAliasOther(const std::string&                identifier,
+                                  ance::ResolvingHandle<ance::Type> actual,
+                                  ance::Location                    definition_location,
+                                  ance::Location                    actual_type_location);
 
         /**
          * Get a type defined in this scope by it's name.

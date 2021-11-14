@@ -27,9 +27,12 @@ llvm::DIScope* ance::GlobalScope::getDebugScope(CompileContext* context)
 
 void ance::GlobalScope::validate(ValidationLogger& validation_logger)
 {
+    // Validate types before everything else as they are used and checked by everything.
+    for (auto const& [name, type] : defined_types_) { type->validateDefinition(validation_logger); }
+
     for (auto [message, location] : errors_) { validation_logger.logError(message, location); }
 
-    for (auto const& [key, fn] : defined_functions_) { fn->validate(validation_logger); }
+    for (auto const& [key, function] : defined_functions_) { function->validate(validation_logger); }
     for (auto const& [name, variable] : global_defined_variables_) { variable->validate(validation_logger); }
 }
 
@@ -115,10 +118,14 @@ ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineCustomFunction(
     return handle;
 }
 
-void ance::GlobalScope::defineTypeAsOther(const std::string& identifier, ance::ResolvingHandle<ance::Type> original)
+void ance::GlobalScope::defineTypeAsOther(const std::string&                identifier,
+                                          ance::ResolvingHandle<ance::Type> original,
+                                          ance::Location                    definition_location,
+                                          ance::Location                    original_type_location)
 {
-    ance::OwningHandle<ance::Type>        undefined         = retrieveUndefinedType(identifier);
-    std::unique_ptr<ance::TypeDefinition> cloned_definition = std::make_unique<ance::TypeClone>(identifier, original);
+    ance::OwningHandle<ance::Type>        undefined = retrieveUndefinedType(identifier);
+    std::unique_ptr<ance::TypeDefinition> cloned_definition =
+        std::make_unique<ance::TypeClone>(identifier, original, definition_location, original_type_location);
 
     undefined->define(std::move(cloned_definition));
     ance::OwningHandle<ance::Type> defined = std::move(undefined);
@@ -126,10 +133,14 @@ void ance::GlobalScope::defineTypeAsOther(const std::string& identifier, ance::R
     defined_types_[identifier] = std::move(defined);
 }
 
-void ance::GlobalScope::defineTypeAliasOther(const std::string& identifier, ance::ResolvingHandle<ance::Type> actual)
+void ance::GlobalScope::defineTypeAliasOther(const std::string&                identifier,
+                                             ance::ResolvingHandle<ance::Type> actual,
+                                             ance::Location                    definition_location,
+                                             ance::Location                    actual_type_location)
 {
-    ance::OwningHandle<ance::Type>        undefined        = retrieveUndefinedType(identifier);
-    std::unique_ptr<ance::TypeDefinition> alias_definition = std::make_unique<ance::TypeAlias>(identifier, actual);
+    ance::OwningHandle<ance::Type>        undefined = retrieveUndefinedType(identifier);
+    std::unique_ptr<ance::TypeDefinition> alias_definition =
+        std::make_unique<ance::TypeAlias>(identifier, actual, definition_location, actual_type_location);
 
     undefined->define(std::move(alias_definition));
     ance::OwningHandle<ance::Type> defined = std::move(undefined);

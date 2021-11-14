@@ -3,12 +3,20 @@
 
 #include "TypeDefinition.h"
 
+#include <optional>
+
 namespace ance
 {
+    /**
+     * Defines a type that behaves just like the cloned original type.
+     */
     class TypeClone : public ance::TypeDefinition
     {
       public:
-        TypeClone(const std::string& identifier, ance::ResolvingHandle<ance::Type> original);
+        TypeClone(const std::string&                identifier,
+                  ance::ResolvingHandle<ance::Type> original,
+                  ance::Location                    definition_location,
+                  ance::Location                    original_type_location);
 
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
 
@@ -18,6 +26,7 @@ namespace ance
 
         ance::ResolvingHandle<ance::Type> getSubscriptReturnType() override;
 
+        void validateDefinition(ValidationLogger& validation_logger) override;
         bool validate(ValidationLogger& validation_logger, ance::Location location) override;
 
         bool validateSubscript(ance::Location                    indexed_location,
@@ -34,6 +43,9 @@ namespace ance
 
       private:
         ance::ResolvingHandle<ance::Type> original_;
+        ance::Location                    original_type_location_;
+
+        std::optional<bool> is_valid_ {};
     };
 }
 

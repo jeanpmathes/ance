@@ -1,10 +1,16 @@
 #include "TypeClone.h"
 
 #include "ance/type/Type.h"
+#include "ance/type/VoidType.h"
+#include "validation/ValidationLogger.h"
 
-ance::TypeClone::TypeClone(const std::string& identifier, ance::ResolvingHandle<ance::Type> original)
-    : ance::TypeDefinition(identifier)
+ance::TypeClone::TypeClone(const std::string&                identifier,
+                           ance::ResolvingHandle<ance::Type> original,
+                           ance::Location                    definition_location,
+                           ance::Location                    original_type_location)
+    : ance::TypeDefinition(identifier, definition_location)
     , original_(original)
+    , original_type_location_(original_type_location)
 {}
 
 llvm::Constant* ance::TypeClone::getDefaultContent(llvm::LLVMContext& c)
@@ -27,9 +33,25 @@ ance::ResolvingHandle<ance::Type> ance::TypeClone::getSubscriptReturnType()
     return original_->getSubscriptReturnType();
 }
 
-bool ance::TypeClone::validate(ValidationLogger& validation_logger, ance::Location location)
+void ance::TypeClone::validateDefinition(ValidationLogger& validation_logger)
 {
-    return original_->validate(validation_logger, location);
+    assert(!is_valid_);
+
+    bool valid = true;
+
+    if (original_ == ance::VoidType::get())
+    {
+        validation_logger.logError("Cannot create clone of 'void' type", getDefinitionLocation());
+        valid = false;
+    }
+
+    is_valid_ = valid && original_->validate(validation_logger, original_type_location_);
+}
+
+bool ance::TypeClone::validate(ValidationLogger&, ance::Location)
+{
+    assert(is_valid_ && "Validate the type definition before using the type.");
+    return is_valid_.value();
 }
 
 bool ance::TypeClone::validateSubscript(ance::Location                    indexed_location,

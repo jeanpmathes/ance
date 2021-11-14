@@ -147,7 +147,10 @@ antlrcpp::Any SourceVisitor::visitParameter(anceParser::ParameterContext* ctx)
 antlrcpp::Any SourceVisitor::visitDefineAs(anceParser::DefineAsContext* ctx)
 {
     ance::ResolvingHandle<ance::Type> other = visit(ctx->type());
-    application_.globalScope().defineTypeAsOther(ctx->IDENTIFIER()->getText(), other);
+    application_.globalScope().defineTypeAsOther(ctx->IDENTIFIER()->getText(),
+                                                 other,
+                                                 location(ctx),
+                                                 location(ctx->type()));
 
     return this->visitChildren(ctx);
 }
@@ -155,7 +158,10 @@ antlrcpp::Any SourceVisitor::visitDefineAs(anceParser::DefineAsContext* ctx)
 antlrcpp::Any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ctx)
 {
     ance::ResolvingHandle<ance::Type> other = visit(ctx->type());
-    application_.globalScope().defineTypeAliasOther(ctx->IDENTIFIER()->getText(), other);
+    application_.globalScope().defineTypeAliasOther(ctx->IDENTIFIER()->getText(),
+                                                    other,
+                                                    location(ctx),
+                                                    location(ctx->type()));
 
     return this->visitChildren(ctx);
 }

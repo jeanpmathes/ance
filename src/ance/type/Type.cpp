@@ -79,6 +79,12 @@ ance::ResolvingHandle<ance::Type> ance::Type::getSubscriptReturnType()
     return definition_->getSubscriptReturnType();
 }
 
+void ance::Type::validateDefinition(ValidationLogger& validation_logger)
+{
+    assert(isDefined());
+    if (definition_->isCustom()) definition_->validateDefinition(validation_logger);
+}
+
 bool ance::Type::validate(ValidationLogger& validation_logger, ance::Location location)
 {
     assert(isDefined());

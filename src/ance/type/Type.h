@@ -115,6 +115,12 @@ namespace ance
         ance::ResolvingHandle<ance::Type> getSubscriptReturnType();
 
         /**
+         * Validate the definition of this type, if there is any.
+         * @param validation_logger The validation logger to use.
+         */
+        void validateDefinition(ValidationLogger& validation_logger);
+
+        /**
          * Validate if this type is well-formed.
          * @param validation_logger The validation logger to use.
          * @param location The source location of the type declaration.

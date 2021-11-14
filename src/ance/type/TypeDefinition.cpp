@@ -2,11 +2,24 @@
 
 #include "ance/type/VoidType.h"
 
-ance::TypeDefinition::TypeDefinition(std::string name) : name_(std::move(name)) {}
+ance::TypeDefinition::TypeDefinition(std::string name, ance::Location location)
+    : name_(std::move(name))
+    , location_(location)
+{}
 
 const std::string& ance::TypeDefinition::getName() const
 {
     return name_;
+}
+
+ance::Location ance::TypeDefinition::getDefinitionLocation() const
+{
+    return location_;
+}
+
+bool ance::TypeDefinition::isCustom() const
+{
+    return !location_.isGlobal();
 }
 
 llvm::Type* ance::TypeDefinition::getNativeType(llvm::LLVMContext& c)
@@ -40,6 +53,8 @@ ance::ResolvingHandle<ance::Type> ance::TypeDefinition::getSubscriptReturnType()
 {
     return ance::VoidType::get();
 }
+
+void ance::TypeDefinition::validateDefinition(ValidationLogger&) {}
 
 bool ance::TypeDefinition::validate(ValidationLogger&, ance::Location)
 {

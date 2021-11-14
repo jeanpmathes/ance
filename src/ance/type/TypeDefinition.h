@@ -29,12 +29,19 @@ namespace ance
     class TypeDefinition
     {
       protected:
-        explicit TypeDefinition(std::string name);
+        /**
+         * Create a type definition.
+         * @param name The name of the defined type.
+         * @param location The location of the defined type. Use a non-global location for custom types.
+         */
+        explicit TypeDefinition(std::string name, ance::Location location = ance::Location(0, 0, 0, 0));
 
       public:
         virtual ~TypeDefinition() = default;
 
         [[nodiscard]] const std::string& getName() const;
+        [[nodiscard]] ance::Location     getDefinitionLocation() const;
+        [[nodiscard]] bool               isCustom() const;
 
         virtual llvm::Constant* getDefaultContent(llvm::LLVMContext& c) = 0;
 
@@ -49,6 +56,7 @@ namespace ance
 
         virtual ance::ResolvingHandle<ance::Type> getSubscriptReturnType();
 
+        virtual void validateDefinition(ValidationLogger& validation_logger);
         virtual bool validate(ValidationLogger& validation_logger, ance::Location location);
 
         virtual bool validateSubscript(ance::Location                    indexed_location,
@@ -64,8 +72,9 @@ namespace ance
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
 
       private:
-        std::string   name_;
-        llvm::DIType* debug_type_ {nullptr};
+        std::string    name_;
+        ance::Location location_;
+        llvm::DIType*  debug_type_ {nullptr};
     };
 }
 
