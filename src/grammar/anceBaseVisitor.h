@@ -215,6 +215,8 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitReference(anceParser::ReferenceContext* ctx) override { return visitChildren(ctx); }
 
+    virtual antlrcpp::Any visitCustom(anceParser::CustomContext* ctx) override { return visitChildren(ctx); }
+
     virtual antlrcpp::Any visitIntegerType(anceParser::IntegerTypeContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitArrayType(anceParser::ArrayTypeContext* ctx) override { return visitChildren(ctx); }
@@ -232,5 +234,7 @@ class anceBaseVisitor : public anceVisitor
     }
 
     virtual antlrcpp::Any visitVoidType(anceParser::VoidTypeContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitCustomType(anceParser::CustomTypeContext* ctx) override { return visitChildren(ctx); }
 };
 

@@ -518,6 +518,11 @@ antlrcpp::Any SourceVisitor::visitReference(anceParser::ReferenceContext* ctx)
     return type;
 }
 
+antlrcpp::Any SourceVisitor::visitCustom(anceParser::CustomContext* ctx)
+{
+    return ance::makeHandled<ance::Type>(ctx->getText());
+}
+
 antlrcpp::Any SourceVisitor::visitPublic(anceParser::PublicContext*)
 {
     AccessModifier access_modifier = AccessModifier::PUBLIC_ACCESS;

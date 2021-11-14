@@ -140,6 +140,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitReference(anceParser::ReferenceContext* context) = 0;
 
+    virtual antlrcpp::Any visitCustom(anceParser::CustomContext* context) = 0;
+
     virtual antlrcpp::Any visitIntegerType(anceParser::IntegerTypeContext* context) = 0;
 
     virtual antlrcpp::Any visitArrayType(anceParser::ArrayTypeContext* context) = 0;
@@ -151,5 +153,7 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
     virtual antlrcpp::Any visitTargetDependentType(anceParser::TargetDependentTypeContext* context) = 0;
 
     virtual antlrcpp::Any visitVoidType(anceParser::VoidTypeContext* context) = 0;
+
+    virtual antlrcpp::Any visitCustomType(anceParser::CustomTypeContext* context) = 0;
 };
 

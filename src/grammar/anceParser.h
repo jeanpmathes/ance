@@ -119,7 +119,8 @@ class anceParser : public antlr4::Parser
         RuleKeywordType              = 43,
         RuleFloatingPointType        = 44,
         RuleTargetDependentType      = 45,
-        RuleVoidType                 = 46
+        RuleVoidType                 = 46,
+        RuleCustomType               = 47
     };
 
     anceParser(antlr4::TokenStream* input);
@@ -181,6 +182,7 @@ class anceParser : public antlr4::Parser
     class FloatingPointTypeContext;
     class TargetDependentTypeContext;
     class VoidTypeContext;
+    class CustomTypeContext;
 
     class FileContext : public antlr4::ParserRuleContext
     {
@@ -1051,6 +1053,16 @@ class anceParser : public antlr4::Parser
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class CustomContext : public TypeContext
+    {
+      public:
+        CustomContext(TypeContext* ctx);
+
+        CustomTypeContext* customType();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     TypeContext* type();
 
     class IntegerTypeContext : public antlr4::ParserRuleContext
@@ -1125,6 +1137,18 @@ class anceParser : public antlr4::Parser
     };
 
     VoidTypeContext* voidType();
+
+    class CustomTypeContext : public antlr4::ParserRuleContext
+    {
+      public:
+        CustomTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t              getRuleIndex() const override;
+        antlr4::tree::TerminalNode* IDENTIFIER();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    CustomTypeContext* customType();
 
     virtual bool sempred(antlr4::RuleContext* _localctx, size_t ruleIndex, size_t predicateIndex) override;
     bool         expressionSempred(ExpressionContext* _localctx, size_t predicateIndex);

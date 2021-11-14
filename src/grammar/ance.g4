@@ -203,6 +203,7 @@ type
 	| keywordType # Keyword
 	| '*' type # Pointer
 	| '&' type # Reference
+	| customType # Custom
 	;
 
 integerType
@@ -235,6 +236,10 @@ targetDependentType
 voidType
 	: 'void'
 	;
+
+customType
+    : IDENTIFIER
+    ;
 
 NATIVE_INTEGER_TYPE : 'u'? 'i' INTEGER ;
 

@@ -75,6 +75,7 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitKeywordType(anceParser::KeywordTypeContext* ctx) override;
     antlrcpp::Any visitPointer(anceParser::PointerContext* ctx) override;
     antlrcpp::Any visitReference(anceParser::ReferenceContext* ctx) override;
+    antlrcpp::Any visitCustom(anceParser::CustomContext* ctx) override;
 
     // Other
 
