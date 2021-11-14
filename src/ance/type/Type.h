@@ -40,7 +40,6 @@ namespace ance
          * @param definition The type definition.
          */
         explicit Type(std::unique_ptr<ance::TypeDefinition> definition);
-        virtual ~Type() = default;
 
       public:
         Type(const Type&) = delete;
@@ -56,6 +55,12 @@ namespace ance
          * Get whether this type is defined.
          */
         [[nodiscard]] bool isDefined() const;
+
+        /**
+         * Define this type. Can only be used on undefined types.
+         * @param definition The definition for this type.
+         */
+        void define(std::unique_ptr<ance::TypeDefinition> definition);
 
         /**
          * Get the default content of a value of this type.

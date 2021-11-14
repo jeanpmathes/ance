@@ -12,4 +12,5 @@ target_sources(ance PRIVATE
                PointerType.cpp
                ReferenceType.cpp
                FloatingPointType.cpp
-               TypeDefinition.cpp)
+               TypeDefinition.cpp
+               TypeClone.cpp)

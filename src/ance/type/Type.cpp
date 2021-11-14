@@ -5,6 +5,7 @@
 #include "validation/ValidationLogger.h"
 
 ance::Type::Type(std::string name) : name_(std::move(name)) {}
+
 ance::Type::Type(std::unique_ptr<ance::TypeDefinition> definition)
     : name_(definition->getName())
     , definition_(std::move(definition))
@@ -22,6 +23,12 @@ const std::string& ance::Type::getName() const
 bool ance::Type::isDefined() const
 {
     return (definition_ != nullptr);
+}
+
+void ance::Type::define(std::unique_ptr<ance::TypeDefinition> definition)
+{
+    assert(!isDefined());
+    definition_ = std::move(definition);
 }
 
 llvm::Constant* ance::Type::getDefaultContent(llvm::LLVMContext& c)

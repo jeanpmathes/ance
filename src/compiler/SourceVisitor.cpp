@@ -14,7 +14,6 @@
 #include "ance/type/SingleType.h"
 #include "ance/type/VoidType.h"
 
-#include "ance/scope/GlobalScope.h"
 #include "ance/scope/LocalScope.h"
 
 #include "ance/statement/AssignmentStatement.h"

@@ -4,6 +4,7 @@
 
 #include "ance/expression/ConstantExpression.h"
 #include "ance/type/IntegerType.h"
+#include "ance/type/TypeClone.h"
 #include "ance/type/VoidType.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
@@ -113,12 +114,18 @@ ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineCustomFunction(
     return handle;
 }
 
-void ance::GlobalScope::defineTypeAsOther(std::string identifier, ance::ResolvingHandle<ance::Type> original)
+void ance::GlobalScope::defineTypeAsOther(const std::string& identifier, ance::ResolvingHandle<ance::Type> original)
 {
-    assert(false && "TODO: Not implemented.");
+    ance::OwningHandle<ance::Type>        undefined         = retrieveUndefinedType(identifier);
+    std::unique_ptr<ance::TypeDefinition> cloned_definition = std::make_unique<ance::TypeClone>(identifier, original);
+
+    undefined->define(std::move(cloned_definition));
+    ance::OwningHandle<ance::Type> defined = std::move(undefined);
+
+    defined_types_[identifier] = std::move(defined);
 }
 
-void ance::GlobalScope::defineTypeAliasOther(std::string identifier, ance::ResolvingHandle<ance::Type> original)
+void ance::GlobalScope::defineTypeAliasOther(const std::string& identifier, ance::ResolvingHandle<ance::Type> original)
 {
     assert(false && "TODO: Not implemented.");
 }
@@ -198,8 +205,17 @@ void ance::GlobalScope::registerUsage(ance::ResolvingHandle<ance::Type> type)
 void ance::GlobalScope::registerDefinition(ance::ResolvingHandle<ance::Type> type)
 {
     assert(type->isDefined());
+    assert(defined_types_.find(type->getName()) == defined_types_.end());
 
     defined_types_[type->getName()] = ance::OwningHandle<ance::Type>::takeOwnership(type);
+
+    if (undefined_types_.find(type->getName()) != undefined_types_.end())
+    {
+        ance::OwningHandle<ance::Type> undefined = std::move(undefined_types_[type->getName()]);
+        undefined_types_.erase(type->getName());
+
+        undefined.handle().reroute(type);
+    }
 }
 
 void ance::GlobalScope::resolve()
@@ -277,7 +293,7 @@ void ance::GlobalScope::buildFunctions(CompileContext* context)
     for (auto const& [key, val] : defined_functions_) { val->build(context); }
 }
 
-ance::OwningHandle<ance::Function> ance::GlobalScope::retrieveUndefinedFunction(std::string identifier)
+ance::OwningHandle<ance::Function> ance::GlobalScope::retrieveUndefinedFunction(const std::string& identifier)
 {
     ance::OwningHandle<ance::Function> undefined;
 
@@ -289,6 +305,22 @@ ance::OwningHandle<ance::Function> ance::GlobalScope::retrieveUndefinedFunction(
     else
     {
         undefined = ance::OwningHandle<ance::Function>::takeOwnership(ance::makeHandled<ance::Function>(identifier));
+    }
+
+    return undefined;
+}
+ance::OwningHandle<ance::Type> ance::GlobalScope::retrieveUndefinedType(const std::string& identifier)
+{
+    ance::OwningHandle<ance::Type> undefined;
+
+    if (undefined_types_.find(identifier) != undefined_types_.end())
+    {
+        undefined = std::move(undefined_types_[identifier]);
+        undefined_types_.erase(identifier);
+    }
+    else
+    {
+        undefined = ance::OwningHandle<ance::Type>::takeOwnership(ance::makeHandled<ance::Type>(identifier));
     }
 
     return undefined;

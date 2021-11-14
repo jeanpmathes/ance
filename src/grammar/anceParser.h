@@ -308,6 +308,7 @@ class anceParser : public antlr4::Parser
         virtual size_t              getRuleIndex() const override;
         antlr4::tree::TerminalNode* IDENTIFIER();
         TypeContext*                type();
+        antlr4::tree::TerminalNode* SEMICOLON();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -321,6 +322,7 @@ class anceParser : public antlr4::Parser
         virtual size_t              getRuleIndex() const override;
         antlr4::tree::TerminalNode* IDENTIFIER();
         TypeContext*                type();
+        antlr4::tree::TerminalNode* SEMICOLON();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };

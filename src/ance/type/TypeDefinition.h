@@ -34,7 +34,7 @@ namespace ance
       public:
         virtual ~TypeDefinition() = default;
 
-        [[nodiscard]] virtual const std::string& getName() const;
+        [[nodiscard]] const std::string& getName() const;
 
         virtual llvm::Constant* getDefaultContent(llvm::LLVMContext& c) = 0;
 

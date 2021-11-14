@@ -84,14 +84,14 @@ namespace ance
          * @param identifier The name of the new type.
          * @param original The original type.
          */
-        void defineTypeAsOther(std::string identifier, ance::ResolvingHandle<ance::Type> original);
+        void defineTypeAsOther(const std::string& identifier, ance::ResolvingHandle<ance::Type> original);
 
         /**
          * Define a type that is an alias for another type.
          * @param identifier The name of the alias.
          * @param original The other type.
          */
-        void defineTypeAliasOther(std::string identifier, ance::ResolvingHandle<ance::Type> original);
+        void defineTypeAliasOther(const std::string& identifier, ance::ResolvingHandle<ance::Type> original);
 
         /**
          * Get a type defined in this scope by it's name.
@@ -141,7 +141,8 @@ namespace ance
         void buildFunctions(CompileContext* context);
 
       private:
-        ance::OwningHandle<ance::Function> retrieveUndefinedFunction(std::string identifier);
+        ance::OwningHandle<ance::Function> retrieveUndefinedFunction(const std::string& identifier);
+        ance::OwningHandle<ance::Type>     retrieveUndefinedType(const std::string& identifier);
 
         std::vector<std::pair<std::string, ance::Location>> errors_;
 
