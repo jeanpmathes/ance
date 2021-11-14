@@ -124,6 +124,19 @@ void ance::LocalScope::resolve()
             ++var_it;
         }
     }
+
+    auto tp_it = undefined_types_.begin();
+
+    while (tp_it != undefined_types_.end())
+    {
+        auto& [name, type] = *tp_it;
+
+        if (scope()->resolveDefinition(type.handle())) { tp_it = undefined_types_.erase(tp_it); }
+        else
+        {
+            ++tp_it;
+        }
+    }
 }
 
 bool ance::LocalScope::resolveDefinition(ance::ResolvingHandle<ance::Variable>)

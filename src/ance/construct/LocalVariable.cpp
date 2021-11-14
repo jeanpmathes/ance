@@ -19,7 +19,7 @@ ance::LocalVariable::LocalVariable(const std::string&                identifier,
     , initial_value_(std::move(value))
     , parameter_no_(parameter_no)
 {
-    containing_scope->addType(type);
+    // Type is already added in declaring statement.
 }
 
 void ance::LocalVariable::validate(ValidationLogger&)

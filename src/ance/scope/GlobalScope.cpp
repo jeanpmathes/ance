@@ -4,6 +4,7 @@
 
 #include "ance/expression/ConstantExpression.h"
 #include "ance/type/IntegerType.h"
+#include "ance/type/TypeAlias.h"
 #include "ance/type/TypeClone.h"
 #include "ance/type/VoidType.h"
 #include "compiler/CompileContext.h"
@@ -125,9 +126,15 @@ void ance::GlobalScope::defineTypeAsOther(const std::string& identifier, ance::R
     defined_types_[identifier] = std::move(defined);
 }
 
-void ance::GlobalScope::defineTypeAliasOther(const std::string& identifier, ance::ResolvingHandle<ance::Type> original)
+void ance::GlobalScope::defineTypeAliasOther(const std::string& identifier, ance::ResolvingHandle<ance::Type> actual)
 {
-    assert(false && "TODO: Not implemented.");
+    ance::OwningHandle<ance::Type>        undefined        = retrieveUndefinedType(identifier);
+    std::unique_ptr<ance::TypeDefinition> alias_definition = std::make_unique<ance::TypeAlias>(identifier, actual);
+
+    undefined->define(std::move(alias_definition));
+    ance::OwningHandle<ance::Type> defined = std::move(undefined);
+
+    defined_types_[identifier] = std::move(defined);
 }
 
 std::optional<ance::ResolvingHandle<ance::Type>> ance::GlobalScope::getType(const std::string& string)
