@@ -1,5 +1,7 @@
 #include "Type.h"
 
+#include <utility>
+
 #include "ance/construct/value/Value.h"
 #include "ance/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
@@ -106,7 +108,7 @@ bool ance::Type::validateSubscript(ance::Location                    indexed_loc
                                    ValidationLogger&                 validation_logger)
 {
     assert(isDefined());
-    return definition_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
+    return definition_->validateSubscript(indexed_location, std::move(index_type), index_location, validation_logger);
 }
 
 std::shared_ptr<ance::Value> ance::Type::buildSubscript(std::shared_ptr<Value> indexed,
@@ -114,7 +116,7 @@ std::shared_ptr<ance::Value> ance::Type::buildSubscript(std::shared_ptr<Value> i
                                                         CompileContext*        context)
 {
     assert(isDefined());
-    return definition_->buildSubscript(indexed, index, context);
+    return definition_->buildSubscript(std::move(indexed), std::move(index), context);
 }
 
 ance::TypeDefinition* ance::Type::getDefinition()
