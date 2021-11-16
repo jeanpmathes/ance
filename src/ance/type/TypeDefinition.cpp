@@ -22,6 +22,22 @@ bool ance::TypeDefinition::isCustom() const
     return !location_.isGlobal();
 }
 
+void ance::TypeDefinition::setContainingScope(ance::Scope* scope)
+{
+    assert(!containing_scope_);
+    containing_scope_ = scope;
+
+    onScope();
+}
+
+void ance::TypeDefinition::onScope() {}
+
+ance::Scope* ance::TypeDefinition::scope()
+{
+    assert(containing_scope_);
+    return containing_scope_;
+}
+
 llvm::Type* ance::TypeDefinition::getNativeType(llvm::LLVMContext& c)
 {
     return llvm::PointerType::get(getContentType(c), 0);

@@ -1,5 +1,6 @@
 #include "TypeAlias.h"
 
+#include "ance/scope/Scope.h"
 #include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
@@ -12,6 +13,11 @@ ance::TypeAlias::TypeAlias(const std::string&                identifier,
     , actual_(actual)
     , actual_type_location_(actual_type_location)
 {}
+
+void ance::TypeAlias::onScope()
+{
+    scope()->addType(actual_);
+}
 
 llvm::Constant* ance::TypeAlias::getDefaultContent(llvm::LLVMContext& c)
 {

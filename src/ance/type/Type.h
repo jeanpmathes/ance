@@ -63,6 +63,12 @@ namespace ance
         void define(std::unique_ptr<ance::TypeDefinition> definition);
 
         /**
+         * Set the scope that contains this type. The type must be already defined.
+         * @param scope The scope that contains the type.
+         */
+        void setContainingScope(ance::Scope* scope);
+
+        /**
          * Get the default content of a value of this type.
          * @param c The llvm context.
          * @return The default content.

@@ -43,6 +43,10 @@ namespace ance
         [[nodiscard]] ance::Location     getDefinitionLocation() const;
         [[nodiscard]] bool               isCustom() const;
 
+        void         setContainingScope(Scope* scope);
+        virtual void onScope();
+        Scope*       scope();
+
         virtual llvm::Constant* getDefaultContent(llvm::LLVMContext& c) = 0;
 
         llvm::Type*         getNativeType(llvm::LLVMContext& c);
@@ -74,6 +78,7 @@ namespace ance
       private:
         std::string    name_;
         ance::Location location_;
+        ance::Scope*   containing_scope_ {nullptr};
         llvm::DIType*  debug_type_ {nullptr};
     };
 }

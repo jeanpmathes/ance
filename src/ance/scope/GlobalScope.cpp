@@ -129,6 +129,7 @@ void ance::GlobalScope::defineTypeAsOther(const std::string&                iden
 
     undefined->define(std::move(cloned_definition));
     ance::OwningHandle<ance::Type> defined = std::move(undefined);
+    defined->setContainingScope(this);
 
     defined_types_[identifier] = std::move(defined);
 }
@@ -144,6 +145,7 @@ void ance::GlobalScope::defineTypeAliasOther(const std::string&                i
 
     undefined->define(std::move(alias_definition));
     ance::OwningHandle<ance::Type> defined = std::move(undefined);
+    defined->setContainingScope(this);
 
     defined_types_[identifier] = std::move(defined);
 }
@@ -226,6 +228,7 @@ void ance::GlobalScope::registerDefinition(ance::ResolvingHandle<ance::Type> typ
     assert(defined_types_.find(type->getName()) == defined_types_.end());
 
     defined_types_[type->getName()] = ance::OwningHandle<ance::Type>::takeOwnership(type);
+    type->setContainingScope(this);
 
     if (undefined_types_.find(type->getName()) != undefined_types_.end())
     {

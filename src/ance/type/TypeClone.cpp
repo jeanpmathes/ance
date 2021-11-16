@@ -1,5 +1,6 @@
 #include "TypeClone.h"
 
+#include "ance/scope/Scope.h"
 #include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
@@ -12,6 +13,11 @@ ance::TypeClone::TypeClone(const std::string&                identifier,
     , original_(original)
     , original_type_location_(original_type_location)
 {}
+
+void ance::TypeClone::onScope()
+{
+    scope()->addType(original_);
+}
 
 llvm::Constant* ance::TypeClone::getDefaultContent(llvm::LLVMContext& c)
 {
