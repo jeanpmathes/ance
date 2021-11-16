@@ -39,11 +39,18 @@ ance::ResolvingHandle<ance::Type> ance::TypeClone::getSubscriptReturnType()
     return original_->getSubscriptReturnType();
 }
 
-void ance::TypeClone::validateDefinition(ValidationLogger& validation_logger)
+bool ance::TypeClone::validateDefinition(ValidationLogger& validation_logger)
 {
     assert(!is_valid_);
 
     bool valid = true;
+
+    if (!original_->isDefined())
+    {
+        validation_logger.logError("Cannot clone undefined type '" + original_->getName() + "'",
+                                   original_type_location_);
+        valid = false;
+    }
 
     if (original_ == ance::VoidType::get())
     {
@@ -52,6 +59,7 @@ void ance::TypeClone::validateDefinition(ValidationLogger& validation_logger)
     }
 
     is_valid_ = valid && original_->validate(validation_logger, original_type_location_);
+    return is_valid_.value();
 }
 
 bool ance::TypeClone::validate(ValidationLogger&, ance::Location)

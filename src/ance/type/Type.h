@@ -123,8 +123,9 @@ namespace ance
         /**
          * Validate the definition of this type, if there is any.
          * @param validation_logger The validation logger to use.
+         * @return True if the type has a valid definition.
          */
-        void validateDefinition(ValidationLogger& validation_logger);
+        bool validateDefinition(ValidationLogger& validation_logger);
 
         /**
          * Validate if this type is well-formed.

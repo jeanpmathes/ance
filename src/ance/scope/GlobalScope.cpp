@@ -28,9 +28,12 @@ llvm::DIScope* ance::GlobalScope::getDebugScope(CompileContext* context)
 void ance::GlobalScope::validate(ValidationLogger& validation_logger)
 {
     // Validate types before everything else as they are used and checked by everything.
-    for (auto const& [name, type] : defined_types_) { type->validateDefinition(validation_logger); }
+    bool valid = true;
+
+    for (auto const& [name, type] : defined_types_) { valid &= type->validateDefinition(validation_logger); }
 
     for (auto [message, location] : errors_) { validation_logger.logError(message, location); }
+    if (!valid) return;
 
     for (auto const& [key, function] : defined_functions_) { function->validate(validation_logger); }
     for (auto const& [name, variable] : global_defined_variables_) { variable->validate(validation_logger); }

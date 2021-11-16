@@ -28,7 +28,7 @@ namespace ance
 
         ance::ResolvingHandle<ance::Type> getSubscriptReturnType() override;
 
-        void validateDefinition(ValidationLogger& validation_logger) override;
+        bool validateDefinition(ValidationLogger& validation_logger) override;
         bool validate(ValidationLogger& validation_logger, ance::Location location) override;
 
         bool validateSubscript(ance::Location                    indexed_location,

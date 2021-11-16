@@ -39,11 +39,17 @@ ance::ResolvingHandle<ance::Type> ance::TypeAlias::getSubscriptReturnType()
     return actual_->getSubscriptReturnType();
 }
 
-void ance::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
+bool ance::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
 {
     assert(!is_valid_);
 
     bool valid = true;
+
+    if (!actual_->isDefined())
+    {
+        validation_logger.logError("Cannot alias undefined type '" + actual_->getName() + "'", actual_type_location_);
+        valid = false;
+    }
 
     if (actual_ == ance::VoidType::get())
     {
@@ -52,6 +58,7 @@ void ance::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
     }
 
     is_valid_ = valid && actual_->validate(validation_logger, actual_type_location_);
+    return is_valid_.value();
 }
 
 bool ance::TypeAlias::validate(ValidationLogger&, ance::Location)

@@ -70,7 +70,10 @@ ance::ResolvingHandle<ance::Type> ance::TypeDefinition::getSubscriptReturnType()
     return ance::VoidType::get();
 }
 
-void ance::TypeDefinition::validateDefinition(ValidationLogger&) {}
+bool ance::TypeDefinition::validateDefinition(ValidationLogger&)
+{
+    return true;
+}
 
 bool ance::TypeDefinition::validate(ValidationLogger&, ance::Location)
 {

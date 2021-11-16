@@ -60,7 +60,7 @@ namespace ance
 
         virtual ance::ResolvingHandle<ance::Type> getSubscriptReturnType();
 
-        virtual void validateDefinition(ValidationLogger& validation_logger);
+        virtual bool validateDefinition(ValidationLogger& validation_logger);
         virtual bool validate(ValidationLogger& validation_logger, ance::Location location);
 
         virtual bool validateSubscript(ance::Location                    indexed_location,
