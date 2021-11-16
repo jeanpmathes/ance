@@ -57,6 +57,8 @@ bool ance::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
         valid = false;
     }
 
+    valid &= checkDependencies(validation_logger);
+
     is_valid_ = valid && actual_->validate(validation_logger, actual_type_location_);
     return is_valid_.value();
 }
@@ -85,4 +87,12 @@ std::shared_ptr<ance::Value> ance::TypeAlias::buildSubscript(std::shared_ptr<Val
 llvm::DIType* ance::TypeAlias::createDebugType(CompileContext* context)
 {
     return actual_->getDebugType(context);
+}
+
+std::vector<ance::TypeDefinition*> ance::TypeAlias::getDependencies()
+{
+    std::vector<ance::TypeDefinition*> dependencies;
+    if (actual_->isDefined()) dependencies.push_back(actual_->getDefinition());
+
+    return dependencies;
 }

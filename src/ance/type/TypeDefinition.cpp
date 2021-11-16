@@ -1,6 +1,10 @@
 #include "TypeDefinition.h"
 
+#include <set>
+#include <stack>
+
 #include "ance/type/VoidType.h"
+#include "validation/ValidationLogger.h"
 
 ance::TypeDefinition::TypeDefinition(std::string name, ance::Location location)
     : name_(std::move(name))
@@ -93,4 +97,36 @@ std::shared_ptr<ance::Value> ance::TypeDefinition::buildSubscript(std::shared_pt
                                                                   CompileContext*)
 {
     return nullptr;
+}
+
+bool ance::TypeDefinition::checkDependencies(ValidationLogger& validation_logger)
+{
+    std::stack<ance::TypeDefinition*> to_check;
+    std::set<ance::TypeDefinition*>   checked;
+
+    to_check.push(this);
+
+    while (!to_check.empty())
+    {
+        ance::TypeDefinition* current = to_check.top();
+        to_check.pop();
+
+        if (checked.find(current) != checked.end())
+        {
+            validation_logger.logError("Type '" + getName() + "' has circular dependency",
+                                       current->getDefinitionLocation());
+            return false;
+        }
+
+        checked.insert(current);
+
+        for (auto& dependency : current->getDependencies()) { to_check.push(dependency); }
+    }
+
+    return true;
+}
+
+std::vector<ance::TypeDefinition*> ance::TypeDefinition::getDependencies()
+{
+    return {};
 }

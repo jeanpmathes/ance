@@ -75,6 +75,14 @@ namespace ance
       protected:
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
 
+        /**
+         * Check the dependencies of the type definition for cyclic dependencies.
+         * @param validation_logger The validation logger to use.
+         * @return True if the dependencies are valid.
+         */
+        bool                                       checkDependencies(ValidationLogger& validation_logger);
+        virtual std::vector<ance::TypeDefinition*> getDependencies();
+
       private:
         std::string    name_;
         ance::Location location_;

@@ -43,6 +43,8 @@ namespace ance
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;
 
+        std::vector<ance::TypeDefinition*> getDependencies() override;
+
       private:
         ance::ResolvingHandle<ance::Type> actual_;
         ance::Location                    actual_type_location_;

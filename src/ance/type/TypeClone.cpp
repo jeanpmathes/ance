@@ -58,6 +58,8 @@ bool ance::TypeClone::validateDefinition(ValidationLogger& validation_logger)
         valid = false;
     }
 
+    valid &= checkDependencies(validation_logger);
+
     is_valid_ = valid && original_->validate(validation_logger, original_type_location_);
     return is_valid_.value();
 }
@@ -86,4 +88,12 @@ std::shared_ptr<ance::Value> ance::TypeClone::buildSubscript(std::shared_ptr<Val
 llvm::DIType* ance::TypeClone::createDebugType(CompileContext* context)
 {
     return original_->getDebugType(context);
+}
+
+std::vector<ance::TypeDefinition*> ance::TypeClone::getDependencies()
+{
+    std::vector<ance::TypeDefinition*> dependencies;
+    if (original_->isDefined()) dependencies.push_back(original_->getDefinition());
+
+    return dependencies;
 }

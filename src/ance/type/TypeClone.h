@@ -41,7 +41,8 @@ namespace ance
                                                     CompileContext*        context) override;
 
       protected:
-        llvm::DIType* createDebugType(CompileContext* context) override;
+        llvm::DIType*                      createDebugType(CompileContext* context) override;
+        std::vector<ance::TypeDefinition*> getDependencies() override;
 
       private:
         ance::ResolvingHandle<ance::Type> original_;
