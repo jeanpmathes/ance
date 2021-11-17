@@ -41,7 +41,7 @@ ance::ResolvingHandle<ance::Type> ance::TypeAlias::getSubscriptReturnType()
 
 bool ance::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
 {
-    assert(!is_valid_);
+    if (is_valid_) return is_valid_.value();
 
     bool valid = true;
 
@@ -63,10 +63,9 @@ bool ance::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
     return is_valid_.value();
 }
 
-bool ance::TypeAlias::validate(ValidationLogger&, ance::Location)
+bool ance::TypeAlias::validate(ValidationLogger& validation_logger, ance::Location)
 {
-    assert(is_valid_ && "Validate the type definition before using the type.");
-    return is_valid_.value();
+    return validateDefinition(validation_logger);
 }
 
 bool ance::TypeAlias::validateSubscript(ance::Location                    indexed_location,
