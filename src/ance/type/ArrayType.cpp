@@ -5,7 +5,6 @@
 #include "ance/scope/GlobalScope.h"
 #include "ance/type/ReferenceType.h"
 #include "ance/type/SizeType.h"
-#include "ance/type/Type.h"
 #include "ance/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
@@ -117,28 +116,27 @@ llvm::DIType* ance::ArrayType::createDebugType(CompileContext* context)
                                           context->di()->getOrCreateArray(subscripts));
 }
 
-std::vector<std::pair<std::pair<ance::ResolvingHandle<ance::Type>, uint64_t>, ance::ResolvingHandle<ance::Type>>>&
-ance::ArrayType::getArrayTypes()
+ance::TypeRegistry<uint64_t>& ance::ArrayType::getArrayTypes()
 {
-    static std::vector<
-        std::pair<std::pair<ance::ResolvingHandle<ance::Type>, uint64_t>, ance::ResolvingHandle<ance::Type>>>
-        array_types;
+    static ance::TypeRegistry<uint64_t> array_types;
     return array_types;
 }
 
 ance::ResolvingHandle<ance::Type> ance::ArrayType::get(ance::ResolvingHandle<ance::Type> element_type, uint64_t size)
 {
-    for (auto& [current_key, current_type] : getArrayTypes())
+    std::vector<ance::ResolvingHandle<ance::Type>> used_types;
+    used_types.push_back(element_type);
+
+    std::optional<ance::ResolvingHandle<ance::Type>> defined_type = getArrayTypes().get(used_types, size);
+
+    if (defined_type.has_value()) { return defined_type.value(); }
+    else
     {
-        auto& [current_element_type, current_size] = current_key;
+        auto*                             array_type = new ance::ArrayType(element_type, size);
+        ance::ResolvingHandle<ance::Type> type =
+            ance::makeHandled<ance::Type>(std::unique_ptr<ance::ArrayType>(array_type));
+        getArrayTypes().add(std::move(used_types), size, type);
 
-        if (current_element_type == element_type && current_size == size) { return current_type; }
+        return type;
     }
-
-    auto*                             array_type = new ance::ArrayType(element_type, size);
-    ance::ResolvingHandle<ance::Type> type =
-        ance::makeHandled<ance::Type>(std::unique_ptr<ance::ArrayType>(array_type));
-    getArrayTypes().emplace_back(std::make_pair(element_type, size), type);
-
-    return type;
 }

@@ -34,26 +34,29 @@ llvm::DIType* ance::IntegerType::createDebugType(CompileContext* context)
     return context->di()->createBasicType(name, size_in_bits, encoding);
 }
 
-std::vector<std::pair<std::pair<uint64_t, bool>, ance::ResolvingHandle<ance::Type>>>& ance::IntegerType::
-    getIntegerTypes()
+ance::TypeRegistry<std::pair<uint64_t, bool>>& ance::IntegerType::getIntegerTypes()
 {
-    static std::vector<std::pair<std::pair<uint64_t, bool>, ance::ResolvingHandle<ance::Type>>> integer_types;
+    static TypeRegistry<std::pair<uint64_t, bool>> integer_types;
     return integer_types;
 }
 
 ance::ResolvingHandle<ance::Type> ance::IntegerType::get(uint64_t bit_size, bool is_signed)
 {
-    for (auto& [current_key, current_type] : getIntegerTypes())
+    std::vector<ance::ResolvingHandle<ance::Type>> used_types;
+
+    std::optional<ance::ResolvingHandle<ance::Type>> defined_type =
+        getIntegerTypes().get(used_types, std::make_pair(bit_size, is_signed));
+
+    if (defined_type.has_value()) { return defined_type.value(); }
+    else
     {
-        if (current_key == std::make_pair(bit_size, is_signed)) { return current_type; }
+        auto*                             integer_type = new ance::IntegerType(bit_size, is_signed);
+        ance::ResolvingHandle<ance::Type> type =
+            ance::makeHandled<ance::Type>(std::unique_ptr<ance::IntegerType>(integer_type));
+        getIntegerTypes().add(std::move(used_types), std::make_pair(bit_size, is_signed), type);
+
+        return type;
     }
-
-    auto*                             integer_type = new ance::IntegerType(bit_size, is_signed);
-    ance::ResolvingHandle<ance::Type> type =
-        ance::makeHandled<ance::Type>(std::unique_ptr<ance::IntegerType>(integer_type));
-    getIntegerTypes().emplace_back(std::make_pair(bit_size, is_signed), type);
-
-    return type;
 }
 
 bool ance::IntegerType::isIntegerType(ance::ResolvingHandle<ance::Type> type, uint64_t bit_size, bool is_signed)

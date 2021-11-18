@@ -118,28 +118,29 @@ llvm::DIType* ance::PointerType::createDebugType(CompileContext* context)
     return di_type;
 }
 
-std::vector<std::pair<ance::ResolvingHandle<ance::Type>, ance::ResolvingHandle<ance::Type>>>& ance::PointerType::
-    getPointerTypes()
+ance::TypeRegistry<>& ance::PointerType::getPointerTypes()
 {
-    static std::vector<std::pair<ance::ResolvingHandle<ance::Type>, ance::ResolvingHandle<ance::Type>>> pointer_types;
+    static TypeRegistry<> pointer_types;
     return pointer_types;
 }
 
 ance::ResolvingHandle<ance::Type> ance::PointerType::get(ance::ResolvingHandle<ance::Type> element_type)
 {
-    for (auto& [current_key, current_type] : getPointerTypes())
+    std::vector<ance::ResolvingHandle<ance::Type>> used_types;
+    used_types.push_back(element_type);
+
+    std::optional<ance::ResolvingHandle<ance::Type>> defined_type = getPointerTypes().get(used_types, ance::Empty());
+
+    if (defined_type.has_value()) { return defined_type.value(); }
+    else
     {
-        auto& current_element_type = current_key;
+        auto*                             pointer_type = new ance::PointerType(element_type);
+        ance::ResolvingHandle<ance::Type> type =
+            ance::makeHandled<ance::Type>(std::unique_ptr<ance::PointerType>(pointer_type));
+        getPointerTypes().add(std::move(used_types), ance::Empty(), type);
 
-        if (current_element_type == element_type) { return current_type; }
+        return type;
     }
-
-    auto*                             pointer_type = new ance::PointerType(element_type);
-    ance::ResolvingHandle<ance::Type> type =
-        ance::makeHandled<ance::Type>(std::unique_ptr<ance::PointerType>(pointer_type));
-    getPointerTypes().emplace_back(element_type, type);
-
-    return type;
 }
 
 bool ance::PointerType::isPointerType(ance::ResolvingHandle<ance::Type> type)

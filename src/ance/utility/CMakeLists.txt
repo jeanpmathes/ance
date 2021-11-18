@@ -1,2 +1,3 @@
 target_sources(ance PRIVATE Values.cpp
-               Location.cpp)
+               Location.cpp
+               Empty.cpp)

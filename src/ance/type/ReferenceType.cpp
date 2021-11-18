@@ -81,10 +81,9 @@ llvm::DIType* ance::ReferenceType::createDebugType(CompileContext* context)
     return di_type;
 }
 
-std::vector<std::pair<ance::ResolvingHandle<ance::Type>, ance::ResolvingHandle<ance::Type>>>& ance::ReferenceType::
-    getReferenceTypes()
+ance::TypeRegistry<>& ance::ReferenceType::getReferenceTypes()
 {
-    static std::vector<std::pair<ance::ResolvingHandle<ance::Type>, ance::ResolvingHandle<ance::Type>>> reference_types;
+    static ance::TypeRegistry<> reference_types;
     return reference_types;
 }
 
@@ -106,19 +105,21 @@ std::shared_ptr<ance::Value> ance::ReferenceType::getReferenced(const std::share
 
 ance::ResolvingHandle<ance::Type> ance::ReferenceType::get(ance::ResolvingHandle<ance::Type> element_type)
 {
-    for (auto& [current_key, current_type] : getReferenceTypes())
+    std::vector<ance::ResolvingHandle<ance::Type>> used_types;
+    used_types.push_back(element_type);
+
+    std::optional<ance::ResolvingHandle<ance::Type>> defined_type = getReferenceTypes().get(used_types, ance::Empty());
+
+    if (defined_type.has_value()) { return defined_type.value(); }
+    else
     {
-        auto& current_element_type = current_key;
+        auto*                             reference_type = new ance::ReferenceType(element_type);
+        ance::ResolvingHandle<ance::Type> type =
+            ance::makeHandled<ance::Type>(std::unique_ptr<ance::ReferenceType>(reference_type));
+        getReferenceTypes().add(std::move(used_types), ance::Empty(), type);
 
-        if (current_element_type == element_type) { return current_type; }
+        return type;
     }
-
-    auto*                             reference_type = new ance::ReferenceType(element_type);
-    ance::ResolvingHandle<ance::Type> type =
-        ance::makeHandled<ance::Type>(std::unique_ptr<ance::ReferenceType>(reference_type));
-    getReferenceTypes().emplace_back(element_type, type);
-
-    return type;
 }
 
 bool ance::ReferenceType::isReferenceType(ance::ResolvingHandle<ance::Type> type)

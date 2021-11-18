@@ -7,6 +7,7 @@
 
 #include "ance/type/Type.h"
 #include "ance/utility/ResolvingHandle.h"
+#include "ance/utility/TypeRegistry.h"
 
 namespace ance
 {
@@ -60,9 +61,7 @@ namespace ance
         llvm::ArrayType*                  type_ {nullptr};
 
       private:
-        static std::vector<
-            std::pair<std::pair<ance::ResolvingHandle<ance::Type>, uint64_t>, ance::ResolvingHandle<ance::Type>>>&
-        getArrayTypes();
+        static ance::TypeRegistry<uint64_t>& getArrayTypes();
 
       public:
         /**

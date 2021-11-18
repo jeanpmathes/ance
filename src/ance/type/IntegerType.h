@@ -5,6 +5,7 @@
 
 #include "ance/type/Type.h"
 #include "ance/utility/ResolvingHandle.h"
+#include "ance/utility/TypeRegistry.h"
 
 class Application;
 
@@ -32,7 +33,7 @@ namespace ance
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:
-        static std::vector<std::pair<std::pair<uint64_t, bool>, ance::ResolvingHandle<ance::Type>>>& getIntegerTypes();
+        static ance::TypeRegistry<std::pair<uint64_t, bool>>& getIntegerTypes();
 
       public:
         /**
