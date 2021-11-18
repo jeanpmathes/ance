@@ -50,6 +50,8 @@ namespace ance
         static ance::TypeRegistry<>& getReferenceTypes();
 
       public:
+        static ance::TypeDefinitionRegistry* getRegistry();
+
         /**
          * Get the referenced backing value.
          * @param value A native value for a reference-type variable.

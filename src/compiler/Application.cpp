@@ -9,6 +9,11 @@
 #include "ance/type/QuadType.h"
 #include "ance/type/SingleType.h"
 
+#include "ance/type/ArrayType.h"
+#include "ance/type/IntegerType.h"
+#include "ance/type/PointerType.h"
+#include "ance/type/ReferenceType.h"
+
 #include "ance/type/SizeType.h"
 #include "ance/type/UnsignedIntegerPointerType.h"
 #include "ance/type/VoidType.h"
@@ -28,6 +33,13 @@ Application::Application(data::File& project) : project_(project), global_scope_
     global_scope_->registerDefinition(ance::SizeType::getSize());
     global_scope_->registerDefinition(ance::SizeType::getDiff());
     global_scope_->registerDefinition(ance::UnsignedIntegerPointerType::get());
+
+    // Add type registries
+
+    global_scope_->addTypeRegistry(ance::IntegerType::getRegistry());
+    global_scope_->addTypeRegistry(ance::ArrayType::getRegistry());
+    global_scope_->addTypeRegistry(ance::PointerType::getRegistry());
+    global_scope_->addTypeRegistry(ance::ReferenceType::getRegistry());
 }
 
 void Application::setPointerSize(unsigned size)

@@ -122,6 +122,11 @@ ance::TypeRegistry<uint64_t>& ance::ArrayType::getArrayTypes()
     return array_types;
 }
 
+ance::TypeDefinitionRegistry* ance::ArrayType::getRegistry()
+{
+    return &getArrayTypes();
+}
+
 ance::ResolvingHandle<ance::Type> ance::ArrayType::get(ance::ResolvingHandle<ance::Type> element_type, uint64_t size)
 {
     std::vector<ance::ResolvingHandle<ance::Type>> used_types;

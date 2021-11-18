@@ -63,10 +63,22 @@ namespace ance
         void define(std::unique_ptr<ance::TypeDefinition> definition);
 
         /**
+         * Get whether this type is a custom type.
+         * @return True if this type is a custom type.
+         */
+        [[nodiscard]] bool isCustom() const;
+
+        /**
          * Set the scope that contains this type. The type must be already defined.
          * @param scope The scope that contains the type.
          */
         void setContainingScope(ance::Scope* scope);
+
+        /**
+         * Get the scope that contains this type.
+         * @return The scope that contains the type.
+         */
+        [[nodiscard]] ance::Scope* getContainingScope() const;
 
         /**
          * Get the default content of a value of this type.

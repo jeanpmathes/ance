@@ -124,6 +124,11 @@ ance::TypeRegistry<>& ance::PointerType::getPointerTypes()
     return pointer_types;
 }
 
+ance::TypeDefinitionRegistry* ance::PointerType::getRegistry()
+{
+    return &getPointerTypes();
+}
+
 ance::ResolvingHandle<ance::Type> ance::PointerType::get(ance::ResolvingHandle<ance::Type> element_type)
 {
     std::vector<ance::ResolvingHandle<ance::Type>> used_types;

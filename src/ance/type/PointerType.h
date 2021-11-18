@@ -57,6 +57,8 @@ namespace ance
         static ance::TypeRegistry<>& getPointerTypes();
 
       public:
+        static ance::TypeDefinitionRegistry* getRegistry();
+
         /**
          * Get a pointer type instance.
          * @param element_type The element type.

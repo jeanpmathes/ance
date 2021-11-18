@@ -33,10 +33,22 @@ void ance::Type::define(std::unique_ptr<ance::TypeDefinition> definition)
     definition_ = std::move(definition);
 }
 
+bool ance::Type::isCustom() const
+{
+    assert(isDefined());
+    return definition_->isCustom();
+}
+
 void ance::Type::setContainingScope(ance::Scope* scope)
 {
     assert(isDefined());
     definition_->setContainingScope(scope);
+}
+
+ance::Scope* ance::Type::getContainingScope() const
+{
+    assert(isDefined());
+    return definition_->scope();
 }
 
 llvm::Constant* ance::Type::getDefaultContent(llvm::LLVMContext& c)

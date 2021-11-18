@@ -40,6 +40,11 @@ ance::TypeRegistry<std::pair<uint64_t, bool>>& ance::IntegerType::getIntegerType
     return integer_types;
 }
 
+ance::TypeDefinitionRegistry* ance::IntegerType::getRegistry()
+{
+    return &getIntegerTypes();
+}
+
 ance::ResolvingHandle<ance::Type> ance::IntegerType::get(uint64_t bit_size, bool is_signed)
 {
     std::vector<ance::ResolvingHandle<ance::Type>> used_types;

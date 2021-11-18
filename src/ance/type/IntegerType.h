@@ -36,6 +36,8 @@ namespace ance
         static ance::TypeRegistry<std::pair<uint64_t, bool>>& getIntegerTypes();
 
       public:
+        static ance::TypeDefinitionRegistry* getRegistry();
+
         /**
          * Get an integer type instance.
          * @param bit_size The size of the integer.

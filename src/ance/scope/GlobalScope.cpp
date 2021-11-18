@@ -168,6 +168,11 @@ std::optional<ance::ResolvingHandle<ance::Type>> ance::GlobalScope::getType(cons
     }
 }
 
+void ance::GlobalScope::addTypeRegistry(ance::TypeDefinitionRegistry* registry)
+{
+    type_registries_.push_back(registry);
+}
+
 void ance::GlobalScope::registerUsage(ance::ResolvingHandle<ance::Variable> variable)
 {
     assert(!variable->isDefined());
@@ -244,6 +249,12 @@ void ance::GlobalScope::registerDefinition(ance::ResolvingHandle<ance::Type> typ
 
 void ance::GlobalScope::resolve()
 {
+    for (auto& registry : type_registries_)
+    {
+        registry->setDefaultContainingScope(this);
+        registry->resolve();
+    }
+
     for (auto const& [key, fn] : defined_functions_) { fn->resolve(); }
 }
 

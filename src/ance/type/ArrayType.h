@@ -64,6 +64,8 @@ namespace ance
         static ance::TypeRegistry<uint64_t>& getArrayTypes();
 
       public:
+        static ance::TypeDefinitionRegistry* getRegistry();
+
         /**
          * Get an array type instance.
          * @param element_type The element type of the array.

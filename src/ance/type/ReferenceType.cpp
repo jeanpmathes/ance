@@ -87,6 +87,11 @@ ance::TypeRegistry<>& ance::ReferenceType::getReferenceTypes()
     return reference_types;
 }
 
+ance::TypeDefinitionRegistry* ance::ReferenceType::getRegistry()
+{
+    return &getReferenceTypes();
+}
+
 llvm::Value* ance::ReferenceType::getReferenced(llvm::Value* value, CompileContext* context)
 {
     return context->ir()->CreateLoad(value);

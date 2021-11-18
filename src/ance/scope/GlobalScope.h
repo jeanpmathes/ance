@@ -11,6 +11,7 @@
 #include "ance/construct/Variable.h"
 #include "ance/type/Type.h"
 #include "ance/utility/OwningHandle.h"
+#include "ance/utility/TypeRegistry.h"
 
 class ConstantExpression;
 
@@ -106,6 +107,12 @@ namespace ance
          */
         std::optional<ance::ResolvingHandle<ance::Type>> getType(const std::string& string);
 
+        /**
+         * Add a type registry so it will get the chance to resolve types.
+         * @param registry The registry to add. Only add a registry once.
+         */
+        void addTypeRegistry(ance::TypeDefinitionRegistry* registry);
+
         void registerUsage(ance::ResolvingHandle<ance::Variable> variable) override;
         void registerUsage(ance::ResolvingHandle<ance::Function> function) override;
         void registerUsage(ance::ResolvingHandle<ance::Type> type) override;
@@ -151,6 +158,8 @@ namespace ance
         ance::OwningHandle<ance::Type>     retrieveUndefinedType(const std::string& identifier);
 
         std::vector<std::pair<std::string, ance::Location>> errors_;
+
+        std::vector<ance::TypeDefinitionRegistry*> type_registries_;
 
         std::map<std::string, ance::OwningHandle<ance::Variable>> global_undefined_variables_;
         std::map<std::string, ance::OwningHandle<ance::Variable>> global_defined_variables_;

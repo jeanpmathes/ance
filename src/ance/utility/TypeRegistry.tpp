@@ -23,6 +23,16 @@ void ance::TypeRegistry<OTHER_KEY>::add(UsedTypes&& type_keys, OTHER_KEY other_k
 }
 
 template<typename OTHER_KEY>
+void ance::TypeRegistry<OTHER_KEY>::setDefaultContainingScope(ance::Scope* scope)
+{
+    for (auto& [key, type] : types_)
+    {
+        if (type->isCustom()) continue;
+        type->setContainingScope(scope);
+    }
+}
+
+template<typename OTHER_KEY>
 void ance::TypeRegistry<OTHER_KEY>::resolve()
 {
     for (auto& [key, type] : types_)
@@ -31,7 +41,8 @@ void ance::TypeRegistry<OTHER_KEY>::resolve()
 
         for (auto& used_type : type_keys)
         {
-            type->scope().resolve(used_type);
+            if (used_type->isDefined()) continue;
+            type->getContainingScope()->resolveDefinition(used_type);
         }
     }
 }
