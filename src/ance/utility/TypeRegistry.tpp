@@ -45,4 +45,33 @@ void ance::TypeRegistry<OTHER_KEY>::resolve()
             type->getContainingScope()->resolveDefinition(used_type);
         }
     }
+
+    std::vector<Entry> merged;
+
+    for (auto& [current_key, current_type] : types_)
+    {
+        auto& [current_type_keys, current_other_key] = current_key;
+
+        bool was_merged = false;
+
+        for (auto& [merged_key, merged_type] : merged)
+        {
+            auto& [merged_type_keys, merged_other_key] = merged_key;
+
+            if (merged_type_keys == current_type_keys && merged_other_key == current_other_key)
+            {
+                was_merged = true;
+                current_type.reroute(merged_type);
+                break;
+            }
+        }
+
+        if (!was_merged)
+        {
+            merged.emplace_back(std::make_pair(std::move(current_type_keys), std::move(current_other_key)),
+                                std::move(current_type));
+        }
+    }
+
+    types_ = std::move(merged);
 }
