@@ -12,12 +12,14 @@
 
 LocalVariableDefinition::LocalVariableDefinition(std::string                       identifier,
                                                  ance::ResolvingHandle<ance::Type> type,
+                                                 ance::Location                    type_location,
                                                  Assigner                          assigner,
                                                  std::unique_ptr<Expression>       assigned,
                                                  ance::Location                    location)
     : Statement(location)
     , identifier_(std::move(identifier))
     , type_(type)
+    , type_location_(type_location)
     , assigner_(assigner)
     , assigned_(std::move(assigned))
 {
@@ -30,6 +32,7 @@ void LocalVariableDefinition::setFunction(ance::Function* function)
 
     variable_ = function->getInsideScope()->defineAutoVariable(identifier_,
                                                                type_,
+                                                               type_location_,
                                                                assigner_,
                                                                assigned_->getValue(),
                                                                location());
@@ -45,7 +48,7 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
         bool assigned_is_valid = assigned_->validate(validation_logger);
         if (!assigned_is_valid) return;
 
-        if (!variable->type()->validate(validation_logger, location())) return;
+        if (!variable->type()->validate(validation_logger, type_location_)) return;
 
         if (type_ == ance::VoidType::get())
         {

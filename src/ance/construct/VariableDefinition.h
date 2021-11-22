@@ -23,6 +23,7 @@ namespace ance
       public:
         VariableDefinition(const std::string&                identifier,
                            ance::ResolvingHandle<ance::Type> type,
+                           ance::Location                    type_location,
                            ance::Scope*                      containing_scope,
                            bool                              is_final,
                            ance::Location                    location);
@@ -43,6 +44,11 @@ namespace ance
          * Get the source location of the variable definition.
          */
         [[nodiscard]] ance::Location location() const;
+
+        /**
+         * Get the source location of the type of this variable.
+         */
+        [[nodiscard]] ance::Location typeLocation() const;
 
         /**
          * Get whether this variable is defined as final.
@@ -70,6 +76,7 @@ namespace ance
         const std::string& identifier_;
 
         ance::ResolvingHandle<ance::Type> type_;
+        ance::Location                    type_location_;
         ance::Scope*                      scope_;
         bool                              is_final_;
         ance::Location                    location_;

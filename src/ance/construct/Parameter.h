@@ -22,10 +22,14 @@ namespace ance
         /**
          * Create a new parameter.
          * @param type The type of the parameter.
+         * @param type_location The location of the type.
          * @param name The name of the parameter.
          * @param location The source location.
          */
-        Parameter(ance::ResolvingHandle<ance::Type> type, std::string name, ance::Location location);
+        Parameter(ance::ResolvingHandle<ance::Type> type,
+                  ance::Location                    type_location,
+                  std::string                       name,
+                  ance::Location                    location);
 
         ance::ResolvingHandle<ance::Type> type() override;
         /**
@@ -41,6 +45,12 @@ namespace ance
         [[nodiscard]] ance::Location location() const;
 
         /**
+         * Get the type location.
+         * @return The type location.
+         */
+        [[nodiscard]] ance::Location typeLocation() const;
+
+        /**
          * Wrap an llvm argument as content value.
          * @param argument The native argument of this parameter.
          */
@@ -54,6 +64,7 @@ namespace ance
 
       private:
         ance::ResolvingHandle<ance::Type> type_;
+        ance::Location                    type_location_;
         std::string                       name_;
 
         ance::Location location_;

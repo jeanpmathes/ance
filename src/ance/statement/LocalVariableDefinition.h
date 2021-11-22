@@ -26,12 +26,14 @@ class LocalVariableDefinition : public Statement
      * Create a new local variable definition.
      * @param identifier The identifier of the variable.
      * @param type The type of the variable.
+     * @param type_location The location of the type.
      * @param assigner The assigner to use for initial assignment.
      * @param assigned The initially assigned value.
      * @param location The source location.
      */
     LocalVariableDefinition(std::string                       identifier,
                             ance::ResolvingHandle<ance::Type> type,
+                            ance::Location                    type_location,
                             Assigner                          assigner,
                             std::unique_ptr<Expression>       assigned,
                             ance::Location                    location);
@@ -46,6 +48,7 @@ class LocalVariableDefinition : public Statement
   private:
     std::string                       identifier_;
     ance::ResolvingHandle<ance::Type> type_;
+    ance::Location                    type_location_;
     Assigner                          assigner_;
     std::unique_ptr<Expression>       assigned_;
 

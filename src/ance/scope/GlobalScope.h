@@ -44,6 +44,7 @@ namespace ance
                                   bool                              is_constant,
                                   const std::string&                identifier,
                                   ance::ResolvingHandle<ance::Type> type,
+                                  ance::Location                    type_location,
                                   Assigner                          assigner,
                                   ConstantExpression*               initializer,
                                   ance::Location                    location);
@@ -59,6 +60,7 @@ namespace ance
         ance::ResolvingHandle<ance::Function> defineExternFunction(
             const std::string&                                   identifier,
             ance::ResolvingHandle<ance::Type>                    return_type,
+            ance::Location                                       return_type_location,
             const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
             ance::Location                                       location);
 
@@ -76,6 +78,7 @@ namespace ance
             const std::string&                                   identifier,
             AccessModifier                                       access,
             ance::ResolvingHandle<ance::Type>                    return_type,
+            ance::Location                                       return_type_location,
             const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
             ance::Location                                       declaration_location,
             ance::Location                                       definition_location);

@@ -26,6 +26,7 @@ namespace ance
         explicit FunctionDefinition(ance::Function*                               function,
                                     ance::Scope*                                  containing_scope,
                                     ance::ResolvingHandle<ance::Type>             type,
+                                    ance::Location                                return_type_location,
                                     std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                     ance::Location                                location);
 
@@ -50,6 +51,12 @@ namespace ance
          * @return The return type.
          */
         [[nodiscard]] ance::ResolvingHandle<ance::Type> returnType() const;
+
+        /**
+         * Get the location of the return type.
+         * @return The location.
+         */
+        [[nodiscard]] ance::Location returnTypeLocation() const;
 
         /**
          * Get the type of a parameter.
@@ -163,6 +170,7 @@ namespace ance
         ance::Scope*    containing_scope_;
 
         ance::ResolvingHandle<ance::Type>             return_type_;
+        ance::Location                                return_type_location_;
         std::vector<std::shared_ptr<ance::Parameter>> parameters_;
         ance::Location                                location_;
     };

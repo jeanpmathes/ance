@@ -30,6 +30,7 @@ class LocalReferenceVariableDefinition : public Statement
      */
     static LocalReferenceVariableDefinition* defineReferring(std::string                       identifier,
                                                              ance::ResolvingHandle<ance::Type> type,
+                                                             ance::Location                    type_location,
                                                              std::unique_ptr<Expression>       value,
                                                              ance::Location                    location);
     /**
@@ -39,12 +40,14 @@ class LocalReferenceVariableDefinition : public Statement
      */
     static LocalReferenceVariableDefinition* defineReferringTo(std::string                       identifier,
                                                                ance::ResolvingHandle<ance::Type> type,
+                                                               ance::Location                    type_location,
                                                                std::unique_ptr<Expression>       address,
                                                                ance::Location                    location);
 
   private:
     LocalReferenceVariableDefinition(std::string                       identifier,
                                      ance::ResolvingHandle<ance::Type> type,
+                                     ance::Location                    type_location,
                                      std::unique_ptr<Expression>       reference,
                                      ance::Location                    location);
 
@@ -59,6 +62,7 @@ class LocalReferenceVariableDefinition : public Statement
   private:
     std::string                       identifier_;
     ance::ResolvingHandle<ance::Type> type_;
+    ance::Location                    type_location_;
     std::unique_ptr<Expression>       reference_;
 
     std::optional<ance::ResolvingHandle<ance::Variable>> variable_ {};

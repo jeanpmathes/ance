@@ -38,6 +38,13 @@ llvm::PointerType* ance::PointerType::getContentType(llvm::LLVMContext& c)
 
 bool ance::PointerType::validate(ValidationLogger& validation_logger, ance::Location location)
 {
+    if (!element_type_->isDefined())
+    {
+        validation_logger.logError("Cannot declare pointer to undefined type '" + element_type_->getName() + "'",
+                                   location);
+        return false;
+    }
+
     if (ance::ReferenceType::isReferenceType(element_type_))
     {
         validation_logger.logError("Cannot declare pointers to reference types", location);

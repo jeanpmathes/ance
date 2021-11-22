@@ -27,6 +27,13 @@ llvm::PointerType* ance::ReferenceType::getContentType(llvm::LLVMContext& c)
 
 bool ance::ReferenceType::validate(ValidationLogger& validation_logger, ance::Location location)
 {
+    if (!element_type_->isDefined())
+    {
+        validation_logger.logError("Cannot declare reference to undefined type '" + element_type_->getName() + "'",
+                                   location);
+        return false;
+    }
+
     if (element_type_ == ance::VoidType::get())
     {
         validation_logger.logError("Cannot declare reference to '" + ance::VoidType::get()->getName() + "'", location);

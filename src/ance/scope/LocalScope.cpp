@@ -27,22 +27,24 @@ ance::Scope* ance::LocalScope::scope() const
 std::optional<ance::ResolvingHandle<ance::Variable>> ance::LocalScope::defineAutoVariable(
     const std::string&                  identifier,
     ance::ResolvingHandle<ance::Type>   type,
+    ance::Location                      type_location,
     Assigner                            assigner,
     const std::shared_ptr<ance::Value>& value,
     ance::Location                      location)
 {
-    return defineLocalVariable(identifier, type, assigner, value, 0, location);
+    return defineLocalVariable(identifier, type, type_location, assigner, value, 0, location);
 }
 
 std::optional<ance::ResolvingHandle<ance::Variable>> ance::LocalScope::defineParameterVariable(
     const std::string&                  identifier,
     ance::ResolvingHandle<ance::Type>   type,
+    ance::Location                      type_location,
     Assigner                            assigner,
     const std::shared_ptr<ance::Value>& value,
     unsigned                            parameter_no,
     ance::Location                      location)
 {
-    return defineLocalVariable(identifier, type, assigner, value, parameter_no, location);
+    return defineLocalVariable(identifier, type, type_location, assigner, value, parameter_no, location);
 }
 
 void ance::LocalScope::registerUsage(ance::ResolvingHandle<ance::Variable> variable)
@@ -167,6 +169,7 @@ void ance::LocalScope::buildDeclarations(CompileContext* context)
 std::optional<ance::ResolvingHandle<ance::Variable>> ance::LocalScope::defineLocalVariable(
     const std::string&                  identifier,
     ance::ResolvingHandle<ance::Type>   type,
+    ance::Location                      type_location,
     Assigner                            assigner,
     const std::shared_ptr<ance::Value>& value,
     unsigned                            parameter_no,
@@ -177,7 +180,7 @@ std::optional<ance::ResolvingHandle<ance::Variable>> ance::LocalScope::defineLoc
         bool is_final = assigner.isFinal();
 
         ance::ResolvingHandle<ance::Variable> variable = ance::makeHandled<ance::Variable>(identifier);
-        variable->defineAsLocal(type, this, is_final, value, parameter_no, location);
+        variable->defineAsLocal(type, type_location, this, is_final, value, parameter_no, location);
 
         defined_local_variables_[identifier] = ance::OwningHandle<ance::Variable>::takeOwnership(variable);
         return std::make_optional(variable);

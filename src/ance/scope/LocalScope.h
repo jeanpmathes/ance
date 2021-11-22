@@ -38,6 +38,7 @@ namespace ance
          * Define a local variable that is not a parameter.
          * @param identifier The identifier.
          * @param type The type.
+         * @param type_location The location of the type.
          * @param assigner The assigner to use for initial assignment.
          * @param value The initial value.
          * @param location The source location.
@@ -46,6 +47,7 @@ namespace ance
         std::optional<ance::ResolvingHandle<ance::Variable>> defineAutoVariable(
             const std::string&                  identifier,
             ance::ResolvingHandle<ance::Type>   type,
+            ance::Location                      type_location,
             Assigner                            assigner,
             const std::shared_ptr<ance::Value>& value,
             ance::Location                      location);
@@ -54,6 +56,7 @@ namespace ance
          * Define a local variable that is a parameter.
          * @param identifier The identifier.
          * @param type The type.
+         * @param type_location The source location of the type.
          * @param assigner The assigner to use for initial assignment.
          * @param value The initial value.
          * @param parameter_no The number of the parameter. Counting starts with one.
@@ -63,6 +66,7 @@ namespace ance
         std::optional<ance::ResolvingHandle<ance::Variable>> defineParameterVariable(
             const std::string&                  identifier,
             ance::ResolvingHandle<ance::Type>   type,
+            ance::Location                      type_location,
             Assigner                            assigner,
             const std::shared_ptr<ance::Value>& value,
             unsigned                            parameter_no,
@@ -94,6 +98,7 @@ namespace ance
         std::optional<ance::ResolvingHandle<ance::Variable>> defineLocalVariable(
             const std::string&                  identifier,
             ance::ResolvingHandle<ance::Type>   type,
+            ance::Location                      type_location,
             Assigner                            assigner,
             const std::shared_ptr<ance::Value>& value,
             unsigned                            parameter_no,

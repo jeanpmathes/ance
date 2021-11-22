@@ -19,12 +19,17 @@
 ance::CustomFunction::CustomFunction(ance::Function*                               function,
                                      AccessModifier                                access,
                                      ance::ResolvingHandle<ance::Type>             return_type,
+                                     ance::Location                                return_type_location,
                                      std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                      ance::Scope*                                  containing_scope,
-
-                                     ance::Location declaration_location,
-                                     ance::Location definition_location)
-    : ance::FunctionDefinition(function, containing_scope, return_type, std::move(parameters), declaration_location)
+                                     ance::Location                                declaration_location,
+                                     ance::Location                                definition_location)
+    : ance::FunctionDefinition(function,
+                               containing_scope,
+                               return_type,
+                               return_type_location,
+                               std::move(parameters),
+                               declaration_location)
     , access_(access)
     , definition_location_(definition_location)
     , inside_scope_(std::make_unique<ance::LocalScope>(this->function()))
@@ -41,6 +46,7 @@ ance::CustomFunction::CustomFunction(ance::Function*                            
 
         auto arg = inside_scope_->defineParameterVariable(parameter->name(),
                                                           parameter->type(),
+                                                          parameter->typeLocation(),
                                                           assigner,
                                                           parameter,
                                                           no++,
@@ -174,7 +180,7 @@ ance::LocalScope* ance::CustomFunction::getInsideScope()
 
 void ance::CustomFunction::validate(ValidationLogger& validation_logger)
 {
-    returnType()->validate(validation_logger, location());
+    returnType()->validate(validation_logger, returnTypeLocation());
 
     for (const auto& [parameter, argument] : llvm::zip(parameters(), arguments_))
     {
@@ -184,7 +190,7 @@ void ance::CustomFunction::validate(ValidationLogger& validation_logger)
                                        parameter->location());
         }
 
-        parameter->type()->validate(validation_logger, parameter->location());
+        parameter->type()->validate(validation_logger, parameter->typeLocation());
 
         if (parameter->type() == ance::VoidType::get())
         {

@@ -18,13 +18,14 @@ namespace llvm
 
 ance::GlobalVariable::GlobalVariable(const std::string&                identifier,
                                      ance::ResolvingHandle<ance::Type> type,
+                                     ance::Location                    type_location,
                                      ance::GlobalScope*                containing_scope,
                                      AccessModifier                    access,
                                      ConstantExpression*               constant_init,
                                      bool                              is_final,
                                      bool                              is_constant,
                                      ance::Location                    location)
-    : VariableDefinition(identifier, type, containing_scope, is_final, location)
+    : VariableDefinition(identifier, type, type_location, containing_scope, is_final, location)
     , access_(access)
     , is_constant_(is_constant)
     , constant_init_(constant_init)
@@ -37,7 +38,7 @@ ance::GlobalVariable::GlobalVariable(const std::string&                identifie
 
 void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
 {
-    if (!type()->validate(validation_logger, location())) return;
+    if (!type()->validate(validation_logger, typeLocation())) return;
 
     if (type() == ance::VoidType::get())
     {

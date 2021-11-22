@@ -50,11 +50,13 @@ namespace ance
          * Define this function as extern.
          * @param containing_scope The function containing scope.
          * @param return_type The return type.
+         * @param return_type_location The location of the return type.
          * @param parameters The parameters.
          * @param location The location of the function declaration.
          */
         void defineAsExtern(ance::Scope*                                         containing_scope,
-                            ance::ResolvingHandle<ance::Type>                                          return_type,
+                            ance::ResolvingHandle<ance::Type>                    return_type,
+                            ance::Location                                       return_type_location,
                             const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
                             ance::Location                                       location);
 
@@ -62,13 +64,15 @@ namespace ance
          * Define this function as a custom function.
          * @param access The access level.
          * @param return_type The return type of the function.
+         * @param return_type_location The location of the return type.
          * @param parameters The parameters for this function.
          * @param containing_scope The scope containing the function.
          * @param declaration_location The location of the function declaration.
          * @param definition_location The location of the function definition, meaning its code.
          */
         void defineAsCustom(AccessModifier                                       access,
-                            ance::ResolvingHandle<ance::Type>                                          return_type,
+                            ance::ResolvingHandle<ance::Type>                    return_type,
+                            ance::Location                                       return_type_location,
                             const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
                             ance::Scope*                                         containing_scope,
                             ance::Location                                       declaration_location,

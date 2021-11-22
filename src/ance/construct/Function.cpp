@@ -24,14 +24,21 @@ bool ance::Function::isDefined() const
 
 void ance::Function::defineAsExtern(ance::Scope*                                         containing_scope,
                                     ance::ResolvingHandle<ance::Type>                    return_type,
+                                    ance::Location                                       return_type_location,
                                     const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
                                     ance::Location                                       location)
 {
-    definition_ = std::make_unique<ance::ExternFunction>(this, containing_scope, return_type, parameters, location);
+    definition_ = std::make_unique<ance::ExternFunction>(this,
+                                                         containing_scope,
+                                                         return_type,
+                                                         return_type_location,
+                                                         parameters,
+                                                         location);
 }
 
 void ance::Function::defineAsCustom(AccessModifier                                       access,
                                     ance::ResolvingHandle<ance::Type>                    return_type,
+                                    ance::Location                                       return_type_location,
                                     const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
                                     ance::Scope*                                         containing_scope,
                                     ance::Location                                       declaration_location,
@@ -40,6 +47,7 @@ void ance::Function::defineAsCustom(AccessModifier                              
     definition_ = std::make_unique<ance::CustomFunction>(this,
                                                          access,
                                                          return_type,
+                                                         return_type_location,
                                                          parameters,
                                                          containing_scope,
                                                          declaration_location,

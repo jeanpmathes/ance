@@ -3,19 +3,19 @@
 #include <utility>
 
 #include "ance/construct/Function.h"
-#include "ance/scope/Scope.h"
-#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
 ance::FunctionDefinition::FunctionDefinition(ance::Function*                               function,
                                              ance::Scope*                                  containing_scope,
                                              ance::ResolvingHandle<ance::Type>             type,
+                                             ance::Location                                return_type_location,
                                              std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                              ance::Location                                location)
     : function_(function)
     , containing_scope_(containing_scope)
     , return_type_(type)
+    , return_type_location_(return_type_location)
     , parameters_(std::move(parameters))
     , location_(location)
 {}
@@ -38,6 +38,11 @@ ance::Function* ance::FunctionDefinition::function() const
 ance::ResolvingHandle<ance::Type> ance::FunctionDefinition::returnType() const
 {
     return return_type_;
+}
+
+ance::Location ance::FunctionDefinition::returnTypeLocation() const
+{
+    return return_type_location_;
 }
 
 ance::ResolvingHandle<ance::Type> ance::FunctionDefinition::parameterType(size_t index) const

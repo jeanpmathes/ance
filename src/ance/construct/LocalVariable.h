@@ -25,6 +25,7 @@ namespace ance
          */
         LocalVariable(const std::string&                identifier,
                       ance::ResolvingHandle<ance::Type> type,
+                      ance::Location                    type_location,
                       ance::LocalScope*                 containing_scope,
                       bool                              is_final,
                       std::shared_ptr<ance::Value>      value,

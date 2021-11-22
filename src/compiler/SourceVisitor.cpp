@@ -72,8 +72,14 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
         const_expr = new DefaultValue(type, location(ctx));
     }
 
-    application_.globalScope()
-        .defineGlobalVariable(access, is_constant, identifier, type, assigner, const_expr, location(ctx));
+    application_.globalScope().defineGlobalVariable(access,
+                                                    is_constant,
+                                                    identifier,
+                                                    type,
+                                                    location(ctx->type()),
+                                                    assigner,
+                                                    const_expr,
+                                                    location(ctx));
 
     return this->visitChildren(ctx);
 }
@@ -95,9 +101,12 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
     shared_parameters.reserve(parameters.size());
     for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
+    ance::Location return_type_location = ctx->type() ? location(ctx->type()) : ance::Location(0, 0, 0, 0);
+
     auto function = application_.globalScope().defineCustomFunction(identifier,
                                                                     access,
                                                                     return_type,
+                                                                    return_type_location,
                                                                     shared_parameters,
                                                                     declaration_location,
                                                                     definition_location);
@@ -122,7 +131,13 @@ antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFu
     shared_parameters.reserve(parameters.size());
     for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
-    application_.globalScope().defineExternFunction(identifier, return_type, shared_parameters, location(ctx));
+    ance::Location return_type_location = ctx->type() ? location(ctx->type()) : ance::Location(0, 0, 0, 0);
+
+    application_.globalScope().defineExternFunction(identifier,
+                                                    return_type,
+                                                    return_type_location,
+                                                    shared_parameters,
+                                                    location(ctx));
 
     return this->visitChildren(ctx);
 }
@@ -141,7 +156,7 @@ antlrcpp::Any SourceVisitor::visitParameter(anceParser::ParameterContext* ctx)
     ance::ResolvingHandle<ance::Type> type         = visit(ctx->type());
     const std::string                 k_identifier = ctx->IDENTIFIER()->getText();
 
-    return new ance::Parameter(type, k_identifier, location(ctx));
+    return new ance::Parameter(type, location(ctx->type()), k_identifier, location(ctx));
 }
 
 antlrcpp::Any SourceVisitor::visitDefineAs(anceParser::DefineAsContext* ctx)
@@ -194,8 +209,12 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
         assigned = new DefaultValue(type, location(ctx));
     }
 
-    return static_cast<Statement*>(
-        new LocalVariableDefinition(identifier, type, assigner, std::unique_ptr<Expression>(assigned), location(ctx)));
+    return static_cast<Statement*>(new LocalVariableDefinition(identifier,
+                                                               type,
+                                                               location(ctx->type()),
+                                                               assigner,
+                                                               std::unique_ptr<Expression>(assigned),
+                                                               location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
@@ -208,6 +227,7 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
 
     return static_cast<Statement*>(LocalReferenceVariableDefinition::defineReferring(identifier,
                                                                                      type,
+                                                                                     location(ctx->type()),
                                                                                      std::unique_ptr<Expression>(value),
                                                                                      location(ctx)));
 }
@@ -223,6 +243,7 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
     return static_cast<Statement*>(
         LocalReferenceVariableDefinition::defineReferringTo(identifier,
                                                             type,
+                                                            location(ctx->type()),
                                                             std::unique_ptr<Expression>(address),
                                                             location(ctx)));
 }
@@ -332,7 +353,7 @@ antlrcpp::Any SourceVisitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)
 {
     ance::ResolvingHandle<ance::Type> type = visit(ctx->type());
 
-    return static_cast<Expression*>(new SizeofType(type, location(ctx)));
+    return static_cast<Expression*>(new SizeofType(type, location(ctx->type()), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSizeofExpression(anceParser::SizeofExpressionContext* ctx)

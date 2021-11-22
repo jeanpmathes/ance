@@ -19,6 +19,7 @@ bool ance::Variable::isDefined() const
 }
 
 void ance::Variable::defineAsGlobal(ance::ResolvingHandle<ance::Type> type,
+                                    ance::Location                    type_location,
                                     ance::GlobalScope*                containing_scope,
                                     AccessModifier                    access,
                                     ConstantExpression*               constant_init,
@@ -28,6 +29,7 @@ void ance::Variable::defineAsGlobal(ance::ResolvingHandle<ance::Type> type,
 {
     definition_ = std::make_unique<ance::GlobalVariable>(identifier(),
                                                          type,
+                                                         type_location,
                                                          containing_scope,
                                                          access,
                                                          constant_init,
@@ -37,6 +39,7 @@ void ance::Variable::defineAsGlobal(ance::ResolvingHandle<ance::Type> type,
 }
 
 void ance::Variable::defineAsLocal(ance::ResolvingHandle<ance::Type>   type,
+                                   ance::Location                      type_location,
                                    ance::LocalScope*                   containing_scope,
                                    bool                                is_final,
                                    const std::shared_ptr<ance::Value>& value,
@@ -45,6 +48,7 @@ void ance::Variable::defineAsLocal(ance::ResolvingHandle<ance::Type>   type,
 {
     definition_ = std::make_unique<ance::LocalVariable>(identifier(),
                                                         type,
+                                                        type_location,
                                                         containing_scope,
                                                         is_final,
                                                         value,

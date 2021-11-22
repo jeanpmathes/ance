@@ -48,6 +48,7 @@ namespace ance
         /**
          * Define this variable as a global variable.
          * @param type The type.
+         * @param type_location The location of the type.
          * @param containing_scope The containing scope.
          * @param access The access modifier.
          * @param constant_init The constant used for initialization.
@@ -56,6 +57,7 @@ namespace ance
          * @param location The source location.
          */
         void defineAsGlobal(ance::ResolvingHandle<ance::Type> type,
+                            ance::Location                    type_location,
                             ance::GlobalScope*                containing_scope,
                             AccessModifier                    access,
                             ConstantExpression*               constant_init,
@@ -66,6 +68,7 @@ namespace ance
         /**
          * Define this variable as a local variable.
          * @param type The type.
+         * @param type_location The location of the type.
          * @param containing_scope The containing scope.
          * @param is_final Whether the variable is final.
          * @param value The initial value.
@@ -73,6 +76,7 @@ namespace ance
          * @param location The source location.
          */
         void defineAsLocal(ance::ResolvingHandle<ance::Type>   type,
+                           ance::Location                      type_location,
                            ance::LocalScope*                   containing_scope,
                            bool                                is_final,
                            const std::shared_ptr<ance::Value>& value,

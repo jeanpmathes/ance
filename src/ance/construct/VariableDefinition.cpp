@@ -5,11 +5,13 @@
 
 ance::VariableDefinition::VariableDefinition(const std::string&                identifier,
                                              ance::ResolvingHandle<ance::Type> type,
+                                             ance::Location                    type_location,
                                              ance::Scope*                      containing_scope,
                                              bool                              is_final,
                                              ance::Location                    location)
     : identifier_(identifier)
     , type_(type)
+    , type_location_(type_location)
     , scope_(containing_scope)
     , is_final_(is_final)
     , location_(location)
@@ -32,6 +34,11 @@ ance::ResolvingHandle<ance::Type> ance::VariableDefinition::type() const
 ance::Location ance::VariableDefinition::location() const
 {
     return location_;
+}
+
+ance::Location ance::VariableDefinition::typeLocation() const
+{
+    return type_location_;
 }
 
 bool ance::VariableDefinition::isFinal() const

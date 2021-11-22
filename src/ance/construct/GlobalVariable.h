@@ -31,6 +31,7 @@ namespace ance
          */
         GlobalVariable(const std::string&                identifier,
                        ance::ResolvingHandle<ance::Type> type,
+                       ance::Location                    type_location,
                        ance::GlobalScope*                containing_scope,
                        AccessModifier                    access,
                        ConstantExpression*               constant_init,

@@ -5,8 +5,12 @@
 #include "ance/type/Type.h"
 #include "ance/utility/Values.h"
 
-ance::Parameter::Parameter(ance::ResolvingHandle<ance::Type> type, std::string name, ance::Location location)
+ance::Parameter::Parameter(ance::ResolvingHandle<ance::Type> type,
+                           ance::Location                    type_location,
+                           std::string                       name,
+                           ance::Location                    location)
     : type_(type)
+    , type_location_(type_location)
     , name_(std::move(name))
     , location_(location)
 {}
@@ -24,6 +28,11 @@ std::string ance::Parameter::name()
 ance::Location ance::Parameter::location() const
 {
     return location_;
+}
+
+ance::Location ance::Parameter::typeLocation() const
+{
+    return type_location_;
 }
 
 void ance::Parameter::wrap(llvm::Argument* argument)

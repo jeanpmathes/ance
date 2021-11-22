@@ -14,9 +14,15 @@
 ance::ExternFunction::ExternFunction(ance::Function*                               function,
                                      ance::Scope*                                  containing_scope,
                                      ance::ResolvingHandle<ance::Type>             return_type,
+                                     ance::Location                                return_type_location,
                                      std::vector<std::shared_ptr<ance::Parameter>> parameters,
                                      ance::Location                                location)
-    : ance::FunctionDefinition(function, containing_scope, return_type, std::move(parameters), location)
+    : ance::FunctionDefinition(function,
+                               containing_scope,
+                               return_type,
+                               return_type_location,
+                               std::move(parameters),
+                               location)
 {
     containing_scope->addType(return_type);
 
@@ -28,7 +34,7 @@ void ance::ExternFunction::addReturn(const std::shared_ptr<ance::Value>&) {}
 
 void ance::ExternFunction::validate(ValidationLogger& validation_logger)
 {
-    returnType()->validate(validation_logger, location());
+    returnType()->validate(validation_logger, returnTypeLocation());
 
     std::set<std::string> names;
 
@@ -42,7 +48,7 @@ void ance::ExternFunction::validate(ValidationLogger& validation_logger)
                                        parameter->location());
         }
 
-        parameter->type()->validate(validation_logger, parameter->location());
+        parameter->type()->validate(validation_logger, parameter->typeLocation());
 
         if (parameter->type() == ance::VoidType::get())
         {

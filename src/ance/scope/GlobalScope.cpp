@@ -43,6 +43,7 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier                    a
                                              bool                              is_constant,
                                              const std::string&                identifier,
                                              ance::ResolvingHandle<ance::Type> type,
+                                             ance::Location                    type_location,
                                              Assigner                          assigner,
                                              ConstantExpression*               initializer,
                                              ance::Location                    location)
@@ -81,7 +82,7 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier                    a
         undefined = ance::OwningHandle<ance::Variable>::takeOwnership(ance::makeHandled<ance::Variable>(identifier));
     }
 
-    undefined->defineAsGlobal(type, this, access, initializer, is_final, is_constant, location);
+    undefined->defineAsGlobal(type, type_location, this, access, initializer, is_final, is_constant, location);
     ance::OwningHandle<ance::Variable> defined = std::move(undefined);
 
     global_defined_variables_[identifier] = std::move(defined);
@@ -90,12 +91,13 @@ void ance::GlobalScope::defineGlobalVariable(AccessModifier                    a
 ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineExternFunction(
     const std::string&                                   identifier,
     ance::ResolvingHandle<ance::Type>                    return_type,
+    ance::Location                                       return_type_location,
     const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
     ance::Location                                       location)
 {
     ance::OwningHandle<ance::Function> undefined = retrieveUndefinedFunction(identifier);
 
-    undefined->defineAsExtern(this, return_type, parameters, location);
+    undefined->defineAsExtern(this, return_type, return_type_location, parameters, location);
     ance::OwningHandle<ance::Function> defined = std::move(undefined);
 
     auto handle                    = defined.handle();
@@ -107,13 +109,20 @@ ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineCustomFunction(
     const std::string&                                   identifier,
     AccessModifier                                       access,
     ance::ResolvingHandle<ance::Type>                    return_type,
+    ance::Location                                       return_type_location,
     const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
     ance::Location                                       declaration_location,
     ance::Location                                       definition_location)
 {
     ance::OwningHandle<ance::Function> undefined = retrieveUndefinedFunction(identifier);
 
-    undefined->defineAsCustom(access, return_type, parameters, this, declaration_location, definition_location);
+    undefined->defineAsCustom(access,
+                              return_type,
+                              return_type_location,
+                              parameters,
+                              this,
+                              declaration_location,
+                              definition_location);
     ance::OwningHandle<ance::Function> defined = std::move(undefined);
 
     auto handle                    = defined.handle();

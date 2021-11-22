@@ -4,9 +4,10 @@
 #include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
-SizeofType::SizeofType(ance::ResolvingHandle<ance::Type> type, ance::Location location)
+SizeofType::SizeofType(ance::ResolvingHandle<ance::Type> type, ance::Location type_location, ance::Location location)
     : Expression(location)
     , type_(type)
+    , type_location_(type_location)
 {}
 
 ance::ResolvingHandle<ance::Type> SizeofType::type()
@@ -16,7 +17,7 @@ ance::ResolvingHandle<ance::Type> SizeofType::type()
 
 bool SizeofType::validate(ValidationLogger& validation_logger)
 {
-    return type_->validate(validation_logger, location());
+    return type_->validate(validation_logger, type_location_);
 }
 
 std::shared_ptr<ance::Value> SizeofType::getValue() const

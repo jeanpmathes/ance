@@ -19,6 +19,7 @@ namespace ance
         ExternFunction(ance::Function*                               function,
                        ance::Scope*                                  containing_scope,
                        ance::ResolvingHandle<ance::Type>             return_type,
+                       ance::Location                                return_type_location,
                        std::vector<std::shared_ptr<ance::Parameter>> parameters,
                        ance::Location                                location);
 

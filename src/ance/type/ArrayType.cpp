@@ -32,6 +32,13 @@ llvm::Type* ance::ArrayType::getContentType(llvm::LLVMContext& c)
 
 bool ance::ArrayType::validate(ValidationLogger& validation_logger, ance::Location location)
 {
+    if (!element_type_->isDefined())
+    {
+        validation_logger.logError("Cannot declare array of undefined type '" + element_type_->getName() + "'",
+                                   location);
+        return false;
+    }
+
     if (ance::ReferenceType::isReferenceType(element_type_))
     {
         validation_logger.logError("Cannot declare arrays of reference types", location);
