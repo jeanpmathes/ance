@@ -40,6 +40,16 @@ namespace ance
                                                     std::shared_ptr<Value> index,
                                                     CompileContext*        context) override;
 
+        bool                         isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> target) override;
+        std::shared_ptr<ance::Value> convertImplicitlyTo(ance::ResolvingHandle<ance::Type> target,
+                                                         std::shared_ptr<Value>            value,
+                                                         CompileContext*                   context) override;
+
+        bool                         isImplicitlyConvertibleFrom(ance::ResolvingHandle<ance::Type> source) override;
+        std::shared_ptr<ance::Value> convertImplicitlyFrom(std::shared_ptr<Value>            value,
+                                                           ance::ResolvingHandle<ance::Type> self,
+                                                           CompileContext*                   context) override;
+
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;
 

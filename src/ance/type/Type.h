@@ -171,9 +171,44 @@ namespace ance
                                                     std::shared_ptr<Value> index,
                                                     CompileContext*        context);
 
+        /**
+         * Check if this type can be implicitly converted to another type.
+         * @param target The target conversion type.
+         * @return True if the conversion is possible.
+         */
+        bool isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> target);
+
+        /**
+         * Convert a value of this type to another type, using implicit conversion.
+         * @param target The target conversion type.
+         * @param value The value to convert.
+         * @param context The current compile context.
+         * @return The converted value.
+         */
+        std::shared_ptr<ance::Value> convertImplicitlyTo(ance::ResolvingHandle<ance::Type> target,
+                                                         std::shared_ptr<Value>            value,
+                                                         CompileContext*                   context);
+
+        /**
+         * Check if this type can be implicitly converted from another type.
+         * @param source The source conversion type.
+         * @return True if the conversion is possible.
+         */
+        bool isImplicitlyConvertibleFrom(ance::ResolvingHandle<ance::Type> source);
+
+        /**
+         * Convert a value of this type from another type, using implicit conversion.
+         * @param value The value to convert.
+         * @param self The type to convert to and also the type on which the method is called.
+         * @param context The current compile context.
+         * @return The converted value.
+         */
+        std::shared_ptr<ance::Value> convertImplicitlyFrom(std::shared_ptr<Value>            value,
+                                                           ance::ResolvingHandle<ance::Type> self,
+                                                           CompileContext*                   context);
+
         ance::TypeDefinition* getDefinition();
 
-      public:
         /**
          * Validate that a type matches the expected type.
          * @param expected The expected type.

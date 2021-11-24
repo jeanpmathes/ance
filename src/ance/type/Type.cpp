@@ -4,6 +4,7 @@
 
 #include "ance/construct/value/Value.h"
 #include "ance/type/ReferenceType.h"
+#include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
 ance::Type::Type(std::string name) : name_(std::move(name)) {}
@@ -131,6 +132,34 @@ std::shared_ptr<ance::Value> ance::Type::buildSubscript(std::shared_ptr<Value> i
     return definition_->buildSubscript(std::move(indexed), std::move(index), context);
 }
 
+bool ance::Type::isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> target)
+{
+    assert(isDefined());
+    return definition_->isImplicitlyConvertibleTo(target);
+}
+
+std::shared_ptr<ance::Value> ance::Type::convertImplicitlyTo(ance::ResolvingHandle<ance::Type> target,
+                                                             std::shared_ptr<Value>            value,
+                                                             CompileContext*                   context)
+{
+    assert(isDefined());
+    return definition_->convertImplicitlyTo(target, value, context);
+}
+
+bool ance::Type::isImplicitlyConvertibleFrom(ance::ResolvingHandle<ance::Type> source)
+{
+    assert(isDefined());
+    return definition_->isImplicitlyConvertibleFrom(source);
+}
+
+std::shared_ptr<ance::Value> ance::Type::convertImplicitlyFrom(std::shared_ptr<Value>            value,
+                                                               ance::ResolvingHandle<ance::Type> self,
+                                                               CompileContext*                   context)
+{
+    assert(isDefined());
+    return definition_->convertImplicitlyFrom(value, self, context);
+}
+
 ance::TypeDefinition* ance::Type::getDefinition()
 {
     return definition_.get();
@@ -143,7 +172,24 @@ bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
 {
     if (expected != actual)
     {
-        if (ance::ReferenceType::getReferencedType(actual) == expected) return true;
+        ance::ResolvingHandle<ance::Type> referenced_type = ance::ReferenceType::getReferencedType(actual);
+
+        bool convertible = false;
+
+        if (referenced_type == ance::VoidType::get())
+        {
+            convertible |= actual->isImplicitlyConvertibleTo(expected);
+            convertible |= expected->isImplicitlyConvertibleFrom(actual);
+        }
+        else
+        {
+            convertible = referenced_type == expected;
+
+            convertible |= referenced_type->isImplicitlyConvertibleTo(expected);
+            convertible |= expected->isImplicitlyConvertibleFrom(referenced_type);
+        }
+
+        if (convertible) return true;
 
         validation_logger.logError("Cannot implicitly convert '" + actual->getName() + "' to '" + expected->getName()
                                        + "'",
@@ -161,12 +207,38 @@ std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::ResolvingHandle<ance
 {
     if (value->type() == expected) return value;
 
-    if (ance::ReferenceType::getReferencedType(value->type()) == expected)
+    ance::ResolvingHandle<ance::Type> referenced_type = ance::ReferenceType::getReferencedType(value->type());
+
+    if (referenced_type == ance::VoidType::get())
     {
-        auto reference_type = dynamic_cast<ance::ReferenceType*>(value->type()->definition_.get());
-        return reference_type->getReferenced(value, context);
+        if (value->type()->isImplicitlyConvertibleTo(expected))
+        {
+            return value->type()->convertImplicitlyTo(expected, value, context);
+        }
+
+        if (expected->isImplicitlyConvertibleFrom(value->type()))
+        {
+            return expected->convertImplicitlyFrom(value, expected, context);
+        }
+    }
+    else
+    {
+        auto reference_type                     = dynamic_cast<ance::ReferenceType*>(value->type()->definition_.get());
+        std::shared_ptr<ance::Value> referenced = reference_type->getReferenced(value, context);
+
+        if (referenced->type() == expected) return referenced;
+
+        if (referenced->type()->isImplicitlyConvertibleTo(expected))
+        {
+            return referenced->type()->convertImplicitlyTo(expected, referenced, context);
+        }
+
+        if (expected->isImplicitlyConvertibleFrom(referenced->type()))
+        {
+            return expected->convertImplicitlyFrom(referenced, expected, context);
+        }
     }
 
-    assert(false && "Cannot make the value matching, was isMismatch checked before?");
+    assert(false && "Cannot make the value matching, was mismatch checked before?");
     return nullptr;
 }

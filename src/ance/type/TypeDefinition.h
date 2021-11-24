@@ -72,6 +72,16 @@ namespace ance
                                                             std::shared_ptr<Value> index,
                                                             CompileContext*        context);
 
+        virtual bool                         isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> target);
+        virtual std::shared_ptr<ance::Value> convertImplicitlyTo(ance::ResolvingHandle<ance::Type> target,
+                                                                 std::shared_ptr<Value>            value,
+                                                                 CompileContext*                   context);
+
+        virtual bool                         isImplicitlyConvertibleFrom(ance::ResolvingHandle<ance::Type> source);
+        virtual std::shared_ptr<ance::Value> convertImplicitlyFrom(std::shared_ptr<Value>            value,
+                                                                   ance::ResolvingHandle<ance::Type> self,
+                                                                   CompileContext*                   context);
+
       protected:
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
 
