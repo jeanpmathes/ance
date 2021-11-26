@@ -12,7 +12,9 @@ ance::Type::Type(std::string name) : name_(std::move(name)) {}
 ance::Type::Type(std::unique_ptr<ance::TypeDefinition> definition)
     : name_(definition->getName())
     , definition_(std::move(definition))
-{}
+{
+    definition_->setType(this);
+}
 
 const std::string& ance::Type::getName() const
 {
@@ -32,6 +34,7 @@ void ance::Type::define(std::unique_ptr<ance::TypeDefinition> definition)
 {
     assert(!isDefined());
     definition_ = std::move(definition);
+    definition_->setType(this);
 }
 
 bool ance::Type::isCustom() const

@@ -3,6 +3,7 @@
 #include <set>
 #include <stack>
 
+#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
@@ -24,6 +25,12 @@ ance::Location ance::TypeDefinition::getDefinitionLocation() const
 bool ance::TypeDefinition::isCustom() const
 {
     return !location_.isGlobal();
+}
+
+void ance::TypeDefinition::setType(ance::Type* type)
+{
+    assert(!type_);
+    type_ = type;
 }
 
 void ance::TypeDefinition::setContainingScope(ance::Scope* scope)
@@ -153,4 +160,10 @@ bool ance::TypeDefinition::checkDependencies(ValidationLogger& validation_logger
 std::vector<ance::TypeDefinition*> ance::TypeDefinition::getDependencies()
 {
     return {};
+}
+
+ance::ResolvingHandle<ance::Type> ance::TypeDefinition::self()
+{
+    assert(type_);
+    return type_->self();
 }

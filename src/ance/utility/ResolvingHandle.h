@@ -81,8 +81,6 @@ namespace ance
     {
       public:
         void setSelf(ance::ResolvingHandle<SELF> handle);
-
-      protected:
         ance::ResolvingHandle<SELF> self();
 
       private:

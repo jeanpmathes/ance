@@ -43,6 +43,8 @@ namespace ance
         [[nodiscard]] ance::Location     getDefinitionLocation() const;
         [[nodiscard]] bool               isCustom() const;
 
+        void setType(ance::Type* type);
+
         void         setContainingScope(Scope* scope);
         virtual void onScope();
         Scope*       scope();
@@ -93,9 +95,12 @@ namespace ance
         bool                                       checkDependencies(ValidationLogger& validation_logger);
         virtual std::vector<ance::TypeDefinition*> getDependencies();
 
+        ance::ResolvingHandle<ance::Type> self();
+
       private:
         std::string    name_;
         ance::Location location_;
+        ance::Type*    type_ {nullptr};
         ance::Scope*   containing_scope_ {nullptr};
         llvm::DIType*  debug_type_ {nullptr};
     };
