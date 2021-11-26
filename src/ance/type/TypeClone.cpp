@@ -52,13 +52,19 @@ bool ance::TypeClone::validateDefinition(ValidationLogger& validation_logger)
         valid = false;
     }
 
+    if (original_->getDefinition() == this)
+    {
+        validation_logger.logError("Cannot clone self", original_type_location_);
+        valid = false;
+    }
+
     if (original_ == ance::VoidType::get())
     {
         validation_logger.logError("Cannot create clone of 'void' type", getDefinitionLocation());
         valid = false;
     }
 
-    valid &= checkDependencies(validation_logger);
+    valid = valid && checkDependencies(validation_logger);
 
     is_valid_ = valid && original_->validate(validation_logger, original_type_location_);
     return is_valid_.value();

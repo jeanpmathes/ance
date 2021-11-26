@@ -2,7 +2,6 @@
 
 #include "ance/construct/value/RoughlyCastedValue.h"
 #include "ance/scope/Scope.h"
-#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
@@ -46,6 +45,12 @@ bool ance::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
 
     bool valid = true;
 
+    if (actual_->getDefinition() == this)
+    {
+        validation_logger.logError("Cannot alias self", actual_type_location_);
+        valid = false;
+    }
+
     if (!actual_->isDefined())
     {
         validation_logger.logError("Cannot alias undefined type '" + actual_->getName() + "'", actual_type_location_);
@@ -58,7 +63,7 @@ bool ance::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
         valid = false;
     }
 
-    valid &= checkDependencies(validation_logger);
+    valid = valid && checkDependencies(validation_logger);
 
     is_valid_ = valid && actual_->validate(validation_logger, actual_type_location_);
     return is_valid_.value();
