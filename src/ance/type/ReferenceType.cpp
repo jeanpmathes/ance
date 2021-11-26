@@ -137,7 +137,15 @@ ance::ResolvingHandle<ance::Type> ance::ReferenceType::get(ance::ResolvingHandle
 bool ance::ReferenceType::isReferenceType(ance::ResolvingHandle<ance::Type> type)
 {
     auto* ref_type = dynamic_cast<ance::ReferenceType*>(type->getDefinition());
-    return ref_type != nullptr;
+    if (ref_type != nullptr) return true;
+
+    bool is_reference_type = false;
+
+    if (type->getActualType() != type) { is_reference_type |= isReferenceType(type->getActualType()); }
+
+    if (type->getOriginalType() != type) { is_reference_type |= isReferenceType(type->getOriginalType()); }
+
+    return is_reference_type;
 }
 
 ance::ResolvingHandle<ance::Type> ance::ReferenceType::getReferencedType(ance::ResolvingHandle<ance::Type> type)
