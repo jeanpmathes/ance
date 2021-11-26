@@ -33,6 +33,16 @@ void ance::TypeDefinition::setType(ance::Type* type)
     type_ = type;
 }
 
+ance::ResolvingHandle<ance::Type> ance::TypeDefinition::getActualType()
+{
+    return self();
+}
+
+ance::ResolvingHandle<ance::Type> ance::TypeDefinition::getOriginalType()
+{
+    return self();
+}
+
 void ance::TypeDefinition::setContainingScope(ance::Scope* scope)
 {
     assert(!containing_scope_);

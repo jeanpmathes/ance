@@ -14,6 +14,11 @@ ance::TypeAlias::TypeAlias(const std::string&                identifier,
     , actual_type_location_(actual_type_location)
 {}
 
+ance::ResolvingHandle<ance::Type> ance::TypeAlias::getActualType()
+{
+    return actual_;
+}
+
 void ance::TypeAlias::onScope()
 {
     scope()->addType(actual_);

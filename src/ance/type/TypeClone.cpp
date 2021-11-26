@@ -14,6 +14,11 @@ ance::TypeClone::TypeClone(const std::string&                identifier,
     , original_type_location_(original_type_location)
 {}
 
+ance::ResolvingHandle<ance::Type> ance::TypeClone::getOriginalType()
+{
+    return original_;
+}
+
 void ance::TypeClone::onScope()
 {
     scope()->addType(original_);

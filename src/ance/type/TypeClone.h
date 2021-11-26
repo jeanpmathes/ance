@@ -18,6 +18,8 @@ namespace ance
                   ance::Location                    definition_location,
                   ance::Location                    original_type_location);
 
+        ance::ResolvingHandle<ance::Type> getOriginalType() override;
+
         void onScope() override;
 
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;

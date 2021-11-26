@@ -43,6 +43,17 @@ bool ance::Type::isCustom() const
     return definition_->isCustom();
 }
 
+ance::ResolvingHandle<ance::Type> ance::Type::getActualType()
+{
+    assert(isDefined());
+    return definition_->getActualType();
+}
+ance::ResolvingHandle<ance::Type> ance::Type::getOriginalType()
+{
+    assert(isDefined());
+    return definition_->getOriginalType();
+}
+
 void ance::Type::setContainingScope(ance::Scope* scope)
 {
     assert(isDefined());

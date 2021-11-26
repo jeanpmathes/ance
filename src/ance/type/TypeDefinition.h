@@ -45,6 +45,9 @@ namespace ance
 
         void setType(ance::Type* type);
 
+        virtual ance::ResolvingHandle<ance::Type> getActualType();
+        virtual ance::ResolvingHandle<ance::Type> getOriginalType();
+
         void         setContainingScope(Scope* scope);
         virtual void onScope();
         Scope*       scope();

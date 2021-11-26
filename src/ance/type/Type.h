@@ -69,6 +69,18 @@ namespace ance
         [[nodiscard]] bool isCustom() const;
 
         /**
+         * Get the actual type.
+         * @return The actual type, or the type itself if it already is an actual type.
+         */
+        ance::ResolvingHandle<ance::Type> getActualType();
+
+        /**
+         * Get the original type.
+         * @return The original type, or the type itself if it already is an original type.
+         */
+        ance::ResolvingHandle<ance::Type> getOriginalType();
+
+        /**
          * Set the scope that contains this type. The type must be already defined.
          * @param scope The scope that contains the type.
          */
