@@ -2,13 +2,14 @@
 #define ANCE_SRC_ANCE_UTILITY_RESOLVINGHANDLE_H_
 
 #include <memory>
+#include <optional>
 
 namespace ance
 {
     /**
      * A handle that helps resolving entities that can be used before defining them.
      * For that purpose the handle supports some rerouting operations.
-     * @tparam T The type of the handled entity.
+     * @tparam T The type of the handled entity. Must conform to the handle target interface.
      */
     template<typename T>
     class ResolvingHandle
@@ -70,6 +71,23 @@ namespace ance
 
     template<typename T, class... ARGS>
     ance::ResolvingHandle<T> makeHandled(ARGS&&... args);
+
+    /**
+     * The interface expected from handled entities.
+     * @tparam SELF The type of the handled entity.
+     */
+    template<typename SELF>
+    class HandleTarget
+    {
+      public:
+        void setSelf(ance::ResolvingHandle<SELF> handle);
+
+      protected:
+        ance::ResolvingHandle<SELF> self();
+
+      private:
+        std::optional<ance::ResolvingHandle<SELF>> self_ {};
+    };
 }
 
 #include "ResolvingHandle.tpp"

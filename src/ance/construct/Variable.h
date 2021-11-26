@@ -30,7 +30,7 @@ namespace ance
     /**
      * The base class of all variables.
      */
-    class Variable
+    class Variable : public HandleTarget<ance::Variable>
     {
       public:
         /**

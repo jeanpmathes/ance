@@ -26,7 +26,7 @@ namespace ance
     /**
      * Represents types in the ance language.
      */
-    class Type
+    class Type : public HandleTarget<ance::Type>
     {
       public:
         /**

@@ -4,7 +4,11 @@ template<typename T>
 ance::ResolvingHandle<T>::ResolvingHandle(std::unique_ptr<T> handled)
     : navigator_(std::shared_ptr<ance::ResolvingHandle<T>::HandleNavigator>(
         new ance::ResolvingHandle<T>::HandleNavigator(std::move(handled))))
-{}
+{
+    if (navigator_->get() == nullptr) return;
+
+    (*this)->setSelf(*this);
+}
 
 template<typename T>
 T* ance::ResolvingHandle<T>::get() const
@@ -125,4 +129,17 @@ template<typename T, class... ARGS>
 ance::ResolvingHandle<T> ance::makeHandled(ARGS&&... args)
 {
     return ResolvingHandle<T>(std::make_unique<T>(std::forward<ARGS>(args)...));
+}
+
+template<typename SELF>
+void ance::HandleTarget<SELF>::setSelf(ance::ResolvingHandle<SELF> handle)
+{
+    self_ = std::make_optional<ance::ResolvingHandle<SELF>>(handle);
+}
+
+template<typename SELF>
+ance::ResolvingHandle<SELF> ance::HandleTarget<SELF>::self()
+{
+    assert(self_);
+    return self_.value();
 }

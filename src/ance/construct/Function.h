@@ -26,7 +26,9 @@ namespace ance
     /**
      * A function.
      */
-    class Function : public ance::Scope
+    class Function
+        : public ance::Scope
+        , public HandleTarget<ance::Function>
     {
       public:
         /**
