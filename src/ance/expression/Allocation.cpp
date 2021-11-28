@@ -33,7 +33,13 @@ ance::ResolvingHandle<ance::Type> Allocation::type()
 
 bool Allocation::validate(ValidationLogger& validation_logger)
 {
-    bool is_valid = true;
+    if (!allocated_type_->isDefined())
+    {
+        validation_logger.logError("Cannot allocate undefined type", allocated_type_location_);
+        return false;
+    }
+
+    bool is_valid = return_type_->validate(validation_logger, location());
 
     if (count_)
     {
@@ -41,12 +47,6 @@ bool Allocation::validate(ValidationLogger& validation_logger)
 
         is_valid &=
             ance::Type::checkMismatch(ance::SizeType::getSize(), count_->type(), count_->location(), validation_logger);
-    }
-
-    if (!allocated_type_->isDefined())
-    {
-        validation_logger.logError("Cannot allocate undefined type", allocated_type_location_);
-        is_valid = false;
     }
 
     return is_valid;
