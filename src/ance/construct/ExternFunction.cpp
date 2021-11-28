@@ -34,6 +34,12 @@ void ance::ExternFunction::addReturn(const std::shared_ptr<ance::Value>&) {}
 
 void ance::ExternFunction::validate(ValidationLogger& validation_logger)
 {
+    if (!returnType()->isDefined())
+    {
+        validation_logger.logError("Return type '" + returnType()->getName() + "' not defined.", returnTypeLocation());
+        return;
+    }
+
     returnType()->validate(validation_logger, returnTypeLocation());
 
     std::set<std::string> names;
@@ -46,6 +52,14 @@ void ance::ExternFunction::validate(ValidationLogger& validation_logger)
         {
             validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
                                        parameter->location());
+        }
+
+        if (!parameter->type()->isDefined())
+        {
+            validation_logger.logError("Parameter type '" + parameter->type()->getName() + "' not defined.",
+                                       parameter->typeLocation());
+
+            return;
         }
 
         parameter->type()->validate(validation_logger, parameter->typeLocation());

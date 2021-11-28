@@ -317,7 +317,8 @@ antlrcpp::Any SourceVisitor::visitAllocation(anceParser::AllocationContext* ctx)
 
     if (ctx->expression()) { count = visit(ctx->expression()); }
 
-    return static_cast<Expression*>(new Allocation(allocator, type, std::unique_ptr<Expression>(count), location(ctx)));
+    return static_cast<Expression*>(
+        new Allocation(allocator, type, std::unique_ptr<Expression>(count), location(ctx), location(ctx->type())));
 }
 
 antlrcpp::Any SourceVisitor::visitRoughCast(anceParser::RoughCastContext* ctx)

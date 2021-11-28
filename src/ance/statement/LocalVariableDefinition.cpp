@@ -23,7 +23,7 @@ LocalVariableDefinition::LocalVariableDefinition(std::string                    
     , assigner_(assigner)
     , assigned_(std::move(assigned))
 {
-    assert(assigner != Assigner::REFERENCE_BINDING);
+    assert(assigner.hasSymbol());
 }
 
 void LocalVariableDefinition::setFunction(ance::Function* function)
@@ -48,11 +48,18 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
         bool assigned_is_valid = assigned_->validate(validation_logger);
         if (!assigned_is_valid) return;
 
+        if (!variable->type()->isDefined())
+        {
+            validation_logger.logError("Type '" + variable->type()->getName() + "' not defined", type_location_);
+
+            return;
+        }
+
         if (!variable->type()->validate(validation_logger, type_location_)) return;
 
         if (type_ == ance::VoidType::get())
         {
-            validation_logger.logError("Local variable cannot have 'void' type", location());
+            validation_logger.logError("Local variable cannot have 'void' type", type_location_);
             return;
         }
 

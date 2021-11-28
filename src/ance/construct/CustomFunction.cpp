@@ -41,13 +41,9 @@ ance::CustomFunction::CustomFunction(ance::Function*                            
     {
         containing_scope->addType(parameter->type());
 
-        Assigner assigner = ance::ReferenceType::isReferenceType(parameter->type()) ? Assigner::REFERENCE_BINDING
-                                                                                    : Assigner::COPY_ASSIGNMENT;
-
         auto arg = inside_scope_->defineParameterVariable(parameter->name(),
                                                           parameter->type(),
                                                           parameter->typeLocation(),
-                                                          assigner,
                                                           parameter,
                                                           no++,
                                                           parameter->location());
@@ -180,6 +176,12 @@ ance::LocalScope* ance::CustomFunction::getInsideScope()
 
 void ance::CustomFunction::validate(ValidationLogger& validation_logger)
 {
+    if (!returnType()->isDefined())
+    {
+        validation_logger.logError("Return type '" + returnType()->getName() + "' not defined.", returnTypeLocation());
+        return;
+    }
+
     returnType()->validate(validation_logger, returnTypeLocation());
 
     for (const auto& [parameter, argument] : llvm::zip(parameters(), arguments_))
@@ -188,6 +190,14 @@ void ance::CustomFunction::validate(ValidationLogger& validation_logger)
         {
             validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
                                        parameter->location());
+        }
+
+        if (!parameter->type()->isDefined())
+        {
+            validation_logger.logError("Parameter type '" + parameter->type()->getName() + "' not defined.",
+                                       parameter->typeLocation());
+
+            return;
         }
 
         parameter->type()->validate(validation_logger, parameter->typeLocation());

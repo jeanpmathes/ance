@@ -4,14 +4,17 @@
 #include "ance/type/PointerType.h"
 #include "ance/type/SizeType.h"
 #include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 Allocation::Allocation(Runtime::Allocator                allocation,
                        ance::ResolvingHandle<ance::Type> type,
                        std::unique_ptr<Expression>       count,
-                       ance::Location                    location)
+                       ance::Location                    location,
+                       ance::Location                    allocated_type_location)
     : Expression(location)
     , allocation_(allocation)
     , allocated_type_(type)
+    , allocated_type_location_(allocated_type_location)
     , count_(std::move(count))
     , return_type_(ance::PointerType::get(type))
 {}
@@ -30,17 +33,23 @@ ance::ResolvingHandle<ance::Type> Allocation::type()
 
 bool Allocation::validate(ValidationLogger& validation_logger)
 {
+    bool is_valid = true;
+
     if (count_)
     {
         count_->validate(validation_logger);
 
-        return ance::Type::checkMismatch(ance::SizeType::getSize(),
-                                         count_->type(),
-                                         count_->location(),
-                                         validation_logger);
+        is_valid &=
+            ance::Type::checkMismatch(ance::SizeType::getSize(), count_->type(), count_->location(), validation_logger);
     }
 
-    return true;
+    if (!allocated_type_->isDefined())
+    {
+        validation_logger.logError("Cannot allocate undefined type", allocated_type_location_);
+        is_valid = false;
+    }
+
+    return is_valid;
 }
 
 void Allocation::doBuild(CompileContext* context)

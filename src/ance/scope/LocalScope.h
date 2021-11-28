@@ -57,7 +57,6 @@ namespace ance
          * @param identifier The identifier.
          * @param type The type.
          * @param type_location The source location of the type.
-         * @param assigner The assigner to use for initial assignment.
          * @param value The initial value.
          * @param parameter_no The number of the parameter. Counting starts with one.
          * @param location The source location.
@@ -67,7 +66,6 @@ namespace ance
             const std::string&                  identifier,
             ance::ResolvingHandle<ance::Type>   type,
             ance::Location                      type_location,
-            Assigner                            assigner,
             const std::shared_ptr<ance::Value>& value,
             unsigned                            parameter_no,
             ance::Location                      location);

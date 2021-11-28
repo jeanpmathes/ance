@@ -19,11 +19,13 @@ class Allocation : public DelayableExpression
      * @param type The type of the value to allocate.
      * @param count An expression providing the number of elements to allocate.
      * @param location The source location.
+     * @param allocated_type_location The source location of the type that is allocated.
      */
     Allocation(Runtime::Allocator                allocation,
                ance::ResolvingHandle<ance::Type> type,
                std::unique_ptr<Expression>       count,
-               ance::Location                    location);
+               ance::Location                    location,
+               ance::Location                    allocated_type_location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -42,6 +44,7 @@ class Allocation : public DelayableExpression
   private:
     Runtime::Allocator                allocation_;
     ance::ResolvingHandle<ance::Type> allocated_type_;
+    ance::Location                    allocated_type_location_;
     std::unique_ptr<Expression>       count_;
     ance::ResolvingHandle<ance::Type> return_type_;
 };

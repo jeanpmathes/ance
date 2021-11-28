@@ -24,7 +24,11 @@ class Assigner
         /**
          * A reference binding assignment.
          */
-        REFERENCE_BINDING
+        REFERENCE_BINDING,
+        /**
+         * An unspecified assignment. The actual assignment can be inferred from the used types.
+         */
+        UNSPECIFIED
     };
 
     Assigner() = default;
@@ -38,6 +42,12 @@ class Assigner
      * @return True if this assignment is final.
      */
     bool isFinal();
+
+    /**
+     * Get whether this assignment is represented by a symbol.
+     * @return True if a symbol exists for this assignment.
+     */
+    bool hasSymbol();
 
   private:
     Value value_;

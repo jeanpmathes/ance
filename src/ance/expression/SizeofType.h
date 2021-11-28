@@ -20,6 +20,10 @@ class SizeofType : public BackingExpression
      */
     explicit SizeofType(ance::ResolvingHandle<ance::Type> type, ance::Location type_location, ance::Location location);
 
+  protected:
+    void setScope(ance::Scope* scope) override;
+
+  public:
     ance::ResolvingHandle<ance::Type> type() override;
 
     bool validate(ValidationLogger& validation_logger) override;

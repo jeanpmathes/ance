@@ -38,17 +38,23 @@ ance::GlobalVariable::GlobalVariable(const std::string&                identifie
 
 void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
 {
+    if (!type()->isDefined())
+    {
+        validation_logger.logError("Variable type '" + type()->getName() + "' not defined", typeLocation());
+        return;
+    }
+
     if (!type()->validate(validation_logger, typeLocation())) return;
 
     if (type() == ance::VoidType::get())
     {
-        validation_logger.logError("Global variable cannot have 'void' type", location());
+        validation_logger.logError("Global variable cannot have 'void' type", typeLocation());
         return;
     }
 
     if (ance::ReferenceType::isReferenceType(type()))
     {
-        validation_logger.logError("Global variable cannot have reference type", location());
+        validation_logger.logError("Global variable cannot have reference type", typeLocation());
         return;
     }
 

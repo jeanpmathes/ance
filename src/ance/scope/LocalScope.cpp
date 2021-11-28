@@ -39,12 +39,11 @@ std::optional<ance::ResolvingHandle<ance::Variable>> ance::LocalScope::definePar
     const std::string&                  identifier,
     ance::ResolvingHandle<ance::Type>   type,
     ance::Location                      type_location,
-    Assigner                            assigner,
     const std::shared_ptr<ance::Value>& value,
     unsigned                            parameter_no,
     ance::Location                      location)
 {
-    return defineLocalVariable(identifier, type, type_location, assigner, value, parameter_no, location);
+    return defineLocalVariable(identifier, type, type_location, Assigner::UNSPECIFIED, value, parameter_no, location);
 }
 
 void ance::LocalScope::registerUsage(ance::ResolvingHandle<ance::Variable> variable)
