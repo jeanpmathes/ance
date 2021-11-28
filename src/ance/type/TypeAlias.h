@@ -61,7 +61,8 @@ namespace ance
         ance::ResolvingHandle<ance::Type> actual_;
         ance::Location                    actual_type_location_;
 
-        std::optional<bool> is_valid_ {};
+        std::optional<ance::ResolvingHandle<ance::Type>> actually_actual_ {};
+        std::optional<bool>                              is_valid_ {};
     };
 }
 

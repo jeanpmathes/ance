@@ -16,7 +16,16 @@ ance::TypeAlias::TypeAlias(const std::string&                identifier,
 
 ance::ResolvingHandle<ance::Type> ance::TypeAlias::getActualType()
 {
-    return actual_;
+    if (!actually_actual_.has_value())
+    {
+        ance::ResolvingHandle<ance::Type> current = actual_;
+
+        while (current != current->getActualType()) { current = current->getActualType(); }
+
+        actually_actual_.emplace(current);
+    }
+
+    return actually_actual_.value();
 }
 
 void ance::TypeAlias::onScope()
