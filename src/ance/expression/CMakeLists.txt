@@ -8,7 +8,6 @@ target_sources(ance PRIVATE DefaultValue.cpp
                SizeofExpression.cpp
                SizeofType.cpp
                VariableAccess.cpp
-               RoughCast.cpp
                Allocation.cpp
                DelayableExpression.cpp
                Subscript.cpp

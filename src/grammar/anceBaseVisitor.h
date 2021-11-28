@@ -98,8 +98,6 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
-    virtual antlrcpp::Any visitCast(anceParser::CastContext* ctx) override { return visitChildren(ctx); }
-
     virtual antlrcpp::Any visitRef(anceParser::RefContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* ctx) override { return visitChildren(ctx); }
@@ -138,8 +136,6 @@ class anceBaseVisitor : public anceVisitor
     virtual antlrcpp::Any visitDynamic(anceParser::DynamicContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitAutomatic(anceParser::AutomaticContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitRoughCast(anceParser::RoughCastContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitAddressof(anceParser::AddressofContext* ctx) override { return visitChildren(ctx); }
 

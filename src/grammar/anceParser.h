@@ -97,30 +97,29 @@ class anceParser : public antlr4::Parser
         RuleVariableAccess           = 21,
         RuleAllocation               = 22,
         RuleAllocator                = 23,
-        RuleRoughCast                = 24,
-        RuleAddressof                = 25,
-        RuleBindRef                  = 26,
-        RuleSizeofType               = 27,
-        RuleSizeofExpression         = 28,
-        RuleLiteralExpression        = 29,
-        RuleStringLiteral            = 30,
-        RuleByteLiteral              = 31,
-        RuleIntegerLiteral           = 32,
-        RuleUnsignedInteger          = 33,
-        RuleSignedInteger            = 34,
-        RuleSpecialInteger           = 35,
-        RuleFloatingPointLiteral     = 36,
-        RuleBooleanLiteral           = 37,
-        RuleSizeLiteral              = 38,
-        RuleDiffLiteral              = 39,
-        RuleType                     = 40,
-        RuleIntegerType              = 41,
-        RuleArrayType                = 42,
-        RuleKeywordType              = 43,
-        RuleFloatingPointType        = 44,
-        RuleTargetDependentType      = 45,
-        RuleVoidType                 = 46,
-        RuleCustomType               = 47
+        RuleAddressof                = 24,
+        RuleBindRef                  = 25,
+        RuleSizeofType               = 26,
+        RuleSizeofExpression         = 27,
+        RuleLiteralExpression        = 28,
+        RuleStringLiteral            = 29,
+        RuleByteLiteral              = 30,
+        RuleIntegerLiteral           = 31,
+        RuleUnsignedInteger          = 32,
+        RuleSignedInteger            = 33,
+        RuleSpecialInteger           = 34,
+        RuleFloatingPointLiteral     = 35,
+        RuleBooleanLiteral           = 36,
+        RuleSizeLiteral              = 37,
+        RuleDiffLiteral              = 38,
+        RuleType                     = 39,
+        RuleIntegerType              = 40,
+        RuleArrayType                = 41,
+        RuleKeywordType              = 42,
+        RuleFloatingPointType        = 43,
+        RuleTargetDependentType      = 44,
+        RuleVoidType                 = 45,
+        RuleCustomType               = 46
     };
 
     anceParser(antlr4::TokenStream* input);
@@ -159,7 +158,6 @@ class anceParser : public antlr4::Parser
     class VariableAccessContext;
     class AllocationContext;
     class AllocatorContext;
-    class RoughCastContext;
     class AddressofContext;
     class BindRefContext;
     class SizeofTypeContext;
@@ -541,16 +539,6 @@ class anceParser : public antlr4::Parser
         virtual size_t getRuleIndex() const override;
     };
 
-    class CastContext : public ExpressionContext
-    {
-      public:
-        CastContext(ExpressionContext* ctx);
-
-        RoughCastContext* roughCast();
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
     class RefContext : public ExpressionContext
     {
       public:
@@ -730,19 +718,6 @@ class anceParser : public antlr4::Parser
     };
 
     AllocatorContext* allocator();
-
-    class RoughCastContext : public antlr4::ParserRuleContext
-    {
-      public:
-        RoughCastContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t     getRuleIndex() const override;
-        TypeContext*       type();
-        ExpressionContext* expression();
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    RoughCastContext* roughCast();
 
     class AddressofContext : public antlr4::ParserRuleContext
     {

@@ -82,7 +82,6 @@ returnStatement
 expression
 	: variableAccess # Variable
 	| allocation # Alloc
-	| roughCast # Cast
 	| addressof # AdressOf
 	| bindRef # Ref
 	| sizeofType # SizeOf
@@ -115,10 +114,6 @@ allocation
 allocator
     : 'dynamic' # Dynamic
     | 'automatic' # Automatic
-    ;
-
-roughCast
-    : '{' type '}' expression
     ;
 
 addressof

@@ -30,7 +30,6 @@
 #include "ance/expression/ConstantLiteral.h"
 #include "ance/expression/DefaultValue.h"
 #include "ance/expression/FunctionCall.h"
-#include "ance/expression/RoughCast.h"
 #include "ance/expression/SizeofExpression.h"
 #include "ance/expression/SizeofType.h"
 #include "ance/expression/Subscript.h"
@@ -319,14 +318,6 @@ antlrcpp::Any SourceVisitor::visitAllocation(anceParser::AllocationContext* ctx)
 
     return static_cast<Expression*>(
         new Allocation(allocator, type, std::unique_ptr<Expression>(count), location(ctx), location(ctx->type())));
-}
-
-antlrcpp::Any SourceVisitor::visitRoughCast(anceParser::RoughCastContext* ctx)
-{
-    ance::ResolvingHandle<ance::Type> type = visit(ctx->type());
-    Expression*                       expr = visit(ctx->expression());
-
-    return static_cast<Expression*>(new RoughCast(type, std::unique_ptr<Expression>(expr), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitAddressof(anceParser::AddressofContext* ctx)
