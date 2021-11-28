@@ -205,8 +205,11 @@ bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
 
         if (convertible) return true;
 
-        validation_logger.logError("Cannot implicitly convert '" + actual->getName() + "' to '" + expected->getName()
-                                       + "'",
+        std::string actual_name   = actual->getName();
+        std::string expected_name = expected->getName();
+
+        validation_logger.logError("Cannot implicitly convert " + getAnnotatedName(actual) + " to "
+                                       + getAnnotatedName(expected),
                                    location);
 
         return false;
@@ -255,4 +258,13 @@ std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::ResolvingHandle<ance
 
     assert(false && "Cannot make the value matching, was mismatch checked before?");
     return nullptr;
+}
+
+std::string ance::Type::getAnnotatedName(ance::ResolvingHandle<ance::Type> type)
+{
+    std::string name = "'" + type->getName() + "'";
+
+    if (type->getActualType() != type) { name += " (aka '" + type->getActualType()->getName() + "')"; }
+
+    return name;
 }

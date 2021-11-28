@@ -246,6 +246,9 @@ namespace ance
                                                          CompileContext*                   context);
 
       private:
+        static std::string getAnnotatedName(ance::ResolvingHandle<ance::Type> type);
+
+      private:
         std::string                           name_;
         std::unique_ptr<ance::TypeDefinition> definition_ {};
     };
