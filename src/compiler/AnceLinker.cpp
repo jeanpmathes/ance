@@ -47,7 +47,7 @@ void AnceLinker::link(const std::filesystem::path& obj, const std::filesystem::p
     args.push_back("/debug:FULL");
 
     args.push_back("/machine:x64");
-    args.push_back("/subsystem:windows");
+    args.push_back("/subsystem:console");
 
     args.push_back("/entry:_start");
 
