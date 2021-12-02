@@ -11,7 +11,7 @@ public main () : ui32
 {
     std_out <: GetStdHandle(4294967285:32);
 
-    write(c"Hello, World!", 14:32);
+    write(c"Hello, World!", 13:32);
 
     return 0:32;
 }
