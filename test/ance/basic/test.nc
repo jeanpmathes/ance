@@ -27,6 +27,6 @@ private write (str : *ui8, len : ui32)
     WriteFile(std_out, str, len, written, null_ptr);
 }
 
-extern WriteFile(hFile : Handle, lpBuffer : *ui8, nNumberOfBytesToWrite : ui32, lpNumberOfBytesWritten : *ui32, lpOverlapped : uiptr);
+extern WriteFile (hFile : Handle, lpBuffer : *ui8, nNumberOfBytesToWrite : ui32, lpNumberOfBytesWritten : *ui32, lpOverlapped : uiptr);
 extern GetStdHandle (nStdHandle : ui32) : Handle;
 extern ExitProcess (uExitCode : ui32);
