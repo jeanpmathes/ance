@@ -53,7 +53,7 @@ def create_test(project: Project) -> Optional[Test]:
         return None
 
     is_valid: bool
-    expected_result: str
+    expected_result: Optional[str] = None
 
     with open(code_path, "r") as code_file:
         idx: int = 0

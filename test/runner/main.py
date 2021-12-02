@@ -13,7 +13,7 @@ class TestRun:
 
     def is_passing(self) -> bool:
         if self.is_valid == self.test.is_valid:
-            return self.result == self.test.expected_result
+            return self.test.expected_result is None or self.result == self.test.expected_result
         return False
 
     def create_fail_message(self) -> str:
