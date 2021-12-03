@@ -36,8 +36,10 @@ def run_test(test: discovery.Test) -> TestRun:
         compile_result: int = ance.compile_project(test.project_path, output_path)
 
         is_valid: bool = (compile_result == 0)
-        run_result, run_output = ance.run_project(output_path, "test")
+        if not is_valid:
+            return TestRun(test, is_valid, None)
 
+        run_result, run_output = ance.run_project(output_path, "test")
         return TestRun(test, is_valid, run_output)
 
 
