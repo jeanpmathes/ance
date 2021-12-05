@@ -6,9 +6,10 @@ import discovery
 
 
 class TestRun:
-    def __init__(self, test: discovery.Test, is_valid: bool, result: Optional[str]):
+    def __init__(self, test: discovery.Test, is_valid: bool, compile_output: str, result: Optional[str]):
         self.test = test
         self.is_valid = is_valid
+        self.compile_output = compile_output
         self.result = result
 
     def is_passing(self) -> bool:
@@ -28,19 +29,27 @@ class TestRun:
         else:
             return f"expected: {self.test.expected_result}, actual: {self.result}"
 
+    def print_info(self):
+        if self.is_passing():
+            return
+
+        if self.is_valid != self.test.is_valid and self.test.is_valid:
+            print("\n\nCompile error:\n")
+            print(self.compile_output)
+
 
 def run_test(test: discovery.Test) -> TestRun:
     with tempfile.TemporaryDirectory() as temp:
         output_path: str = temp
 
-        compile_result: int = ance.compile_project(test.project_path, output_path)
+        compile_result, compile_output = ance.compile_project(test.project_path, output_path)
 
         is_valid: bool = (compile_result == 0)
         if not is_valid:
-            return TestRun(test, is_valid, None)
+            return TestRun(test, is_valid, compile_output, None)
 
         run_result, run_output = ance.run_project(output_path, "test")
-        return TestRun(test, is_valid, run_output)
+        return TestRun(test, is_valid, compile_output, run_output)
 
 
 projects: list = discovery.discover_projects("../ance")
@@ -62,3 +71,4 @@ print(f"{passing_count}/{len(tests)} passing")
 for run in test_runs:
     if not run.is_passing():
         print(f"{run.test.test_name} failed - {run.create_fail_message()}")
+        run.print_info()
