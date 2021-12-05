@@ -1,5 +1,5 @@
 // valid
-// Different integer types and a literal.
+// Different integer types and their literals.
 
 private x1 : i1 <: +0:1;
 private x2 : i2 <: +0:2;
