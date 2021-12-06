@@ -1,0 +1,10 @@
+*.nc linguist-language=ance
+
+ance/src/grammar/anceBaseVisitor.cpp linguist-generated
+ance/src/grammar/anceBaseVisitor.h linguist-generated
+ance/src/grammar/anceLexer.cpp linguist-generated
+ance/src/grammar/anceLexer.h linguist-generated
+ance/src/grammar/anceParser.cpp linguist-generated
+ance/src/grammar/anceParser.h linguist-generated
+ance/src/grammar/anceVisitor.cpp linguist-generated
+ance/src/grammar/anceVisitor.h linguist-generated
