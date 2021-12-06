@@ -1,4 +1,5 @@
 // valid
+
 // All floating point types and their literals.
 
 private h1 : half <: 0.0h;

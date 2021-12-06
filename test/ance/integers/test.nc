@@ -1,4 +1,5 @@
 // valid
+
 // Different integer types and their literals.
 
 private x1 : i1 <: +0:1;

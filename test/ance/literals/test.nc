@@ -1,4 +1,5 @@
 // valid
+
 // Special number literals. The hexadecimal, octal, and binary literals are only valid with type suffixes.
 
 private hex1 : ui8 <: 0xFF:8;

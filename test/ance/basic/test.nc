@@ -1,6 +1,8 @@
 // valid
 // o: "Hello, World!"
 
+// A simple hello world program using the Windows API.
+
 private std_out : Handle;
 private null_ptr : uiptr;
 

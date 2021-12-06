@@ -1,4 +1,5 @@
 // valid
+
 // The platform dependent size and diff type and their literals.
 
 private s1 : size <: 0:size;
