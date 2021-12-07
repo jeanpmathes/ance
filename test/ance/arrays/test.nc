@@ -21,6 +21,8 @@ public main () : ui32
     let e : i32 <: arr1[0];
     arr1[0] <: e;
 
+    // The return types of indexers are references to the element type.
+
     return 0:32;
 }
 
