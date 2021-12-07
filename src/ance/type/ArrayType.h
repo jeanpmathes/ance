@@ -27,8 +27,8 @@ namespace ance
         ArrayType(ance::ResolvingHandle<ance::Type> element_type, uint64_t size);
 
       public:
-        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
+        llvm::Constant*  getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::ArrayType* getContentType(llvm::LLVMContext& c) override;
 
         bool                              isSubscriptDefined() override;
         ance::ResolvingHandle<ance::Type> getSubscriptReturnType() override;

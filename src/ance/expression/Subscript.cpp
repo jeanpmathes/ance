@@ -22,8 +22,12 @@ ance::ResolvingHandle<ance::Type> Subscript::type()
 
 bool Subscript::validate(ValidationLogger& validation_logger)
 {
-    indexed_->validate(validation_logger);
-    index_->validate(validation_logger);
+    bool valid = true;
+
+    valid &= indexed_->validate(validation_logger);
+    valid &= index_->validate(validation_logger);
+
+    if (!valid) return false;
 
     ance::ResolvingHandle<ance::Type> indexed_type = indexed_->type();
 

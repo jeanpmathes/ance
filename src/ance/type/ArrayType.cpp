@@ -20,10 +20,10 @@ ance::ArrayType::ArrayType(ance::ResolvingHandle<ance::Type> element_type, const
 llvm::Constant* ance::ArrayType::getDefaultContent(llvm::LLVMContext& c)
 {
     std::vector<llvm::Constant*> content(size_, element_type_->getDefaultContent(c));
-    return llvm::ConstantArray::get(type_, content);
+    return llvm::ConstantArray::get(getContentType(c), content);
 }
 
-llvm::Type* ance::ArrayType::getContentType(llvm::LLVMContext& c)
+llvm::ArrayType* ance::ArrayType::getContentType(llvm::LLVMContext& c)
 {
     if (!type_) { type_ = llvm::ArrayType::get(element_type_->getContentType(c), size_); }
 
