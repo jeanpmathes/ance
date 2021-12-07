@@ -47,6 +47,13 @@ def create_tests(projects: list) -> list:
     return tests
 
 
+def unescape_str(s: str) -> str:
+    return s \
+        .replace("\\n", "\n") \
+        .replace("\\t", "\t") \
+        .replace("\\0", "\0")
+
+
 def create_test(project: Project) -> Optional[Test]:
     code_path: str = os.path.join(project.directory_path, "test.nc")
     if not os.path.exists(code_path):
@@ -68,7 +75,7 @@ def create_test(project: Project) -> Optional[Test]:
             elif idx == 1:
                 match: re.Match = re.match("^// *o: *\"(?P<result>.*)\" *$", line)
                 if match is not None:
-                    expected_result = match.group("result").rstrip('\n')
+                    expected_result = unescape_str(match.group("result").rstrip('\n'))
             else:
                 break
 
