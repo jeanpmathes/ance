@@ -13,3 +13,8 @@ llvm::DIType* ance::FloatingPointType::createDebugType(CompileContext* context)
 
     return context->di()->createBasicType(name, size_in_bits, encoding);
 }
+
+bool ance::FloatingPointType::isFloatingPointType() const
+{
+    return true;
+}

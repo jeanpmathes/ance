@@ -20,6 +20,11 @@ llvm::DIType* ance::VoidType::createDebugType(CompileContext* context)
     return context->di()->createUnspecifiedType(getName());
 }
 
+bool ance::VoidType::isVoidType() const
+{
+    return true;
+}
+
 ance::ResolvingHandle<ance::Type> ance::VoidType::get()
 {
     static ance::ResolvingHandle<ance::Type> instance =

@@ -55,6 +55,42 @@ bool ance::Type::isIntegerType(uint64_t bit_size, bool is_signed) const
     return definition_->isIntegerType(bit_size, is_signed);
 }
 
+bool ance::Type::isBooleanType() const
+{
+    assert(isDefined());
+    return definition_->isBooleanType();
+}
+
+bool ance::Type::isFloatingPointType() const
+{
+    assert(isDefined());
+    return definition_->isFloatingPointType();
+}
+
+bool ance::Type::isFloatingPointType(size_t precision) const
+{
+    assert(isDefined());
+    return definition_->isFloatingPointType(precision);
+}
+
+bool ance::Type::isSizeType() const
+{
+    assert(isDefined());
+    return definition_->isSizeType();
+}
+
+bool ance::Type::isDiffType() const
+{
+    assert(isDefined());
+    return definition_->isDiffType();
+}
+
+bool ance::Type::isVoidType() const
+{
+    assert(isDefined());
+    return definition_->isVoidType();
+}
+
 bool ance::Type::isPointerType() const
 {
     assert(isDefined());

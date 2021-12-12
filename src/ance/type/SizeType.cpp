@@ -1,7 +1,6 @@
 #include "SizeType.h"
 
 #include "ance/scope/GlobalScope.h"
-#include "ance/type/Type.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
@@ -15,6 +14,16 @@ llvm::Constant* ance::SizeType::getDefaultContent(llvm::LLVMContext& c)
 llvm::Type* ance::SizeType::getContentType(llvm::LLVMContext&)
 {
     return backing_;
+}
+
+bool ance::SizeType::isSizeType() const
+{
+    return (backing_ == size_backing_type_);
+}
+
+bool ance::SizeType::isDiffType() const
+{
+    return (backing_ == diff_backing_type_);
 }
 
 llvm::Value* ance::SizeType::buildValue(llvm::TypeSize size)

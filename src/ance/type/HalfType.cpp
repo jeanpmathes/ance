@@ -16,6 +16,11 @@ llvm::Type* ance::HalfType::getContentType(llvm::LLVMContext& c)
     return llvm::Type::getHalfTy(c);
 }
 
+bool ance::HalfType::isFloatingPointType(size_t precision) const
+{
+    return precision == 16;
+}
+
 ance::ResolvingHandle<ance::Type> ance::HalfType::get()
 {
     static ance::ResolvingHandle<ance::Type> instance =

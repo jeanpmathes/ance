@@ -22,8 +22,10 @@ namespace ance
 
       public:
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
-        llvm::Type* getContentType(llvm::LLVMContext& c) override;
+        bool isSizeType() const override;
+        bool isDiffType() const override;
 
         /**
          * Build a value of the size type from a given type size.

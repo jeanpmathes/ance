@@ -18,8 +18,9 @@ namespace ance
 
       public:
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
-        llvm::Type* getContentType(llvm::LLVMContext& c) override;
+        [[nodiscard]] bool isFloatingPointType(size_t precision) const override;
 
       private:
         inline static Type* instance_ = nullptr;

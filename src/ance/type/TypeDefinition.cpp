@@ -37,6 +37,36 @@ bool ance::TypeDefinition::isIntegerType(uint64_t, bool) const
     return false;
 }
 
+bool ance::TypeDefinition::isBooleanType() const
+{
+    return false;
+}
+
+bool ance::TypeDefinition::isFloatingPointType() const
+{
+    return false;
+}
+
+bool ance::TypeDefinition::isFloatingPointType(size_t) const
+{
+    return false;
+}
+
+bool ance::TypeDefinition::isSizeType() const
+{
+    return false;
+}
+
+bool ance::TypeDefinition::isDiffType() const
+{
+    return false;
+}
+
+bool ance::TypeDefinition::isVoidType() const
+{
+    return false;
+}
+
 bool ance::TypeDefinition::isPointerType() const
 {
     return false;

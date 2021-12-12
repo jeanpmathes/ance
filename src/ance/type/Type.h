@@ -83,6 +83,43 @@ namespace ance
         [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const;
 
         /**
+         * Get whether this type is a boolean type.
+         * @return True if this type is a boolean type.
+         */
+        [[nodiscard]] bool isBooleanType() const;
+
+        /**
+         * Get whether this type is a floating point type.
+         * @return True if this type is a floating point type.
+         */
+        [[nodiscard]] bool isFloatingPointType() const;
+
+        /**
+         * Get whether this type is a floating point type with a given precision.
+         * @param precision The precision, in bits.
+         * @return True if this type is a floating point type with the given precision.
+         */
+        [[nodiscard]] bool isFloatingPointType(size_t precision) const;
+
+        /**
+         * Get whether this type is a size type.
+         * @return True if this type is a size type.
+         */
+        [[nodiscard]] bool isSizeType() const;
+
+        /**
+         * Get whether this type is a diff type.
+         * @return True if this type is a diff type.
+         */
+        [[nodiscard]] bool isDiffType() const;
+
+        /**
+         * Get whether this type is the void type.
+         * @return True if this type is the void type.
+         */
+        [[nodiscard]] bool isVoidType() const;
+
+        /**
          * Get whether this type is a pointer type.
          * @return True if this type is a pointer type.
          */

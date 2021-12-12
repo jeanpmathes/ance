@@ -14,6 +14,11 @@ llvm::Type* ance::SingleType::getContentType(llvm::LLVMContext& c)
     return llvm::Type::getFloatTy(c);
 }
 
+bool ance::SingleType::isFloatingPointType(size_t precision) const
+{
+    return precision == 32;
+}
+
 ance::ResolvingHandle<ance::Type> ance::SingleType::get()
 {
     static ance::ResolvingHandle<ance::Type> instance =

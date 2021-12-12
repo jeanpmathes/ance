@@ -49,6 +49,11 @@ ance::TypeRegistry<std::pair<uint64_t, bool>>& ance::IntegerType::getIntegerType
     return integer_types;
 }
 
+bool ance::IntegerType::isBooleanType() const
+{
+    return bit_size_ == 1;
+}
+
 ance::TypeDefinitionRegistry* ance::IntegerType::getRegistry()
 {
     return &getIntegerTypes();

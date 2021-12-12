@@ -15,8 +15,9 @@ namespace ance
 
       public:
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
-        llvm::Type* getContentType(llvm::LLVMContext& c) override;
+        bool isVoidType() const override;
 
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;

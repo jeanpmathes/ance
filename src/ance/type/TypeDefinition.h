@@ -45,6 +45,12 @@ namespace ance
 
         [[nodiscard]] virtual bool isIntegerType() const;
         [[nodiscard]] virtual bool isIntegerType(uint64_t bit_size, bool is_signed) const;
+        [[nodiscard]] virtual bool isBooleanType() const;
+        [[nodiscard]] virtual bool isFloatingPointType() const;
+        [[nodiscard]] virtual bool isFloatingPointType(size_t precision) const;
+        [[nodiscard]] virtual bool isSizeType() const;
+        [[nodiscard]] virtual bool isDiffType() const;
+        [[nodiscard]] virtual bool isVoidType() const;
         [[nodiscard]] virtual bool isPointerType() const;
         [[nodiscard]] virtual bool isReferenceType() const;
 

@@ -6,7 +6,6 @@
 #include "ance/construct/ExternFunction.h"
 #include "ance/construct/LocalVariable.h"
 #include "ance/scope/LocalScope.h"
-#include "ance/type/VoidType.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 

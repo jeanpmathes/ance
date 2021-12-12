@@ -23,6 +23,8 @@ namespace ance
         bool isIntegerType() const override;
         bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
 
+        bool isBooleanType() const override;
+
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 

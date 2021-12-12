@@ -12,6 +12,12 @@ namespace ance
     {
       protected:
         llvm::DIType* createDebugType(CompileContext* context) override;
+
+      public:
+        ~FloatingPointType() override = default;
+
+        [[nodiscard]] bool isFloatingPointType() const override;
+        [[nodiscard]] bool isFloatingPointType(size_t precision) const override = 0;
     };
 }
 #endif
