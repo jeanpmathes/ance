@@ -69,6 +69,20 @@ namespace ance
         [[nodiscard]] bool isCustom() const;
 
         /**
+         * Get whether this type is an integer type. Integer types have a fixed size.
+         * @return True if this type is an integer type.
+         */
+        [[nodiscard]] bool isIntegerType() const;
+
+        /**
+         * Get whether this type is an integer type with a given size and signedness.
+         * @param bit_size The size.
+         * @param is_signed The signedness.
+         * @return True if this type is an integer type with the given size and signedness.
+         */
+        [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const;
+
+        /**
          * Get the actual type.
          * @return The actual type, or the type itself if it already is an actual type.
          */

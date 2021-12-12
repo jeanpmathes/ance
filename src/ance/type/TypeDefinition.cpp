@@ -27,6 +27,16 @@ bool ance::TypeDefinition::isCustom() const
     return !location_.isGlobal();
 }
 
+bool ance::TypeDefinition::isIntegerType() const
+{
+    return false;
+}
+
+bool ance::TypeDefinition::isIntegerType(uint64_t, bool) const
+{
+    return false;
+}
+
 void ance::TypeDefinition::setType(ance::Type* type)
 {
     assert(!type_);

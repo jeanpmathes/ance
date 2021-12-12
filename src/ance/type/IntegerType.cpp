@@ -1,7 +1,6 @@
 #include "IntegerType.h"
 
 #include "ance/scope/GlobalScope.h"
-#include "ance/type/Type.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
@@ -10,6 +9,16 @@ ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed)
     , bit_size_(bit_size)
     , is_signed_(is_signed)
 {}
+
+bool ance::IntegerType::isIntegerType() const
+{
+    return true;
+}
+
+bool ance::IntegerType::isIntegerType(uint64_t bit_size, bool is_signed) const
+{
+    return (bit_size_ == bit_size) && (is_signed_ == is_signed);
+}
 
 llvm::Constant* ance::IntegerType::getDefaultContent(llvm::LLVMContext& c)
 {
@@ -62,12 +71,4 @@ ance::ResolvingHandle<ance::Type> ance::IntegerType::get(uint64_t bit_size, bool
 
         return type;
     }
-}
-
-bool ance::IntegerType::isIntegerType(ance::ResolvingHandle<ance::Type> type, uint64_t bit_size, bool is_signed)
-{
-    auto* integer_type = dynamic_cast<ance::IntegerType*>(type->getDefinition());
-    if (!integer_type) return false;
-
-    return integer_type->bit_size_ == bit_size && integer_type->is_signed_ == is_signed;
 }

@@ -43,6 +43,9 @@ namespace ance
         [[nodiscard]] ance::Location     getDefinitionLocation() const;
         [[nodiscard]] bool               isCustom() const;
 
+        [[nodiscard]] virtual bool isIntegerType() const;
+        [[nodiscard]] virtual bool isIntegerType(uint64_t bit_size, bool is_signed) const;
+
         void setType(ance::Type* type);
 
         virtual ance::ResolvingHandle<ance::Type> getActualType();

@@ -43,6 +43,18 @@ bool ance::Type::isCustom() const
     return definition_->isCustom();
 }
 
+bool ance::Type::isIntegerType() const
+{
+    assert(isDefined());
+    return definition_->isIntegerType();
+}
+
+bool ance::Type::isIntegerType(uint64_t bit_size, bool is_signed) const
+{
+    assert(isDefined());
+    return definition_->isIntegerType(bit_size, is_signed);
+}
+
 ance::ResolvingHandle<ance::Type> ance::Type::getActualType()
 {
     assert(isDefined());

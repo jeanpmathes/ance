@@ -307,7 +307,7 @@ bool ance::GlobalScope::hasEntry()
 
     ance::Function& function = *(c->second);
 
-    return function.parameterCount() == 0 && ance::IntegerType::isIntegerType(function.returnType(), 32, false);
+    return function.parameterCount() == 0 && function.returnType()->isIntegerType(32, false);
 }
 
 bool ance::GlobalScope::hasExit()
@@ -317,7 +317,7 @@ bool ance::GlobalScope::hasExit()
 
     ance::Function& function = *(c->second);
 
-    return function.parameterCount() == 1 && ance::IntegerType::isIntegerType(function.parameterType(0), 32, false)
+    return function.parameterCount() == 1 && function.parameterType(0)->isIntegerType(32, false)
         && function.returnType() == ance::VoidType::get();
 }
 
