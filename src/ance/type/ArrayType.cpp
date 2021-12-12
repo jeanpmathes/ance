@@ -39,7 +39,7 @@ bool ance::ArrayType::validate(ValidationLogger& validation_logger, ance::Locati
         return false;
     }
 
-    if (ance::ReferenceType::isReferenceType(element_type_))
+    if (element_type_->isReferenceType())
     {
         validation_logger.logError("Cannot declare arrays of reference types", location);
         return false;

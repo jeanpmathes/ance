@@ -48,7 +48,7 @@ bool ance::VariableDefinition::isFinal() const
 
 void ance::VariableDefinition::setValue(const std::shared_ptr<ance::Value>& value, CompileContext* context)
 {
-    if (ance::ReferenceType::isReferenceType(type()))
+    if (type()->isReferenceType())
     {
         std::shared_ptr<ance::Value> reference = getValue(context);
 

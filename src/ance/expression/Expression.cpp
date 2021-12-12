@@ -30,14 +30,14 @@ void Expression::setScope(ance::Scope*) {}
 
 bool Expression::isNamed()
 {
-    return ance::ReferenceType::isReferenceType(type());
+    return type()->isReferenceType();
 }
 
 bool Expression::validateAssignment(const std::shared_ptr<ance::Value>& value,
                                     ance::Location                      value_location,
                                     ValidationLogger&                   validation_logger)
 {
-    if (ance::ReferenceType::isReferenceType(type()))
+    if (type()->isReferenceType())
     {
         ance::ResolvingHandle<ance::Type> target_type = ance::ReferenceType::getReferencedType(type());
         return ance::Type::checkMismatch(target_type, value->type(), value_location, validation_logger);
@@ -58,10 +58,10 @@ void Expression::assign(std::shared_ptr<ance::Value> value, CompileContext* cont
 
 void Expression::doAssign(std::shared_ptr<ance::Value> value, CompileContext* context)
 {
-    assert(ance::ReferenceType::isReferenceType(type()));
+    assert(type()->isReferenceType());
 
     ance::ResolvingHandle<ance::Type> target_type = ance::ReferenceType::getReferencedType(type());
-    value                   = ance::Type::makeMatching(target_type, value, context);
+    value                                         = ance::Type::makeMatching(target_type, value, context);
 
     std::shared_ptr<ance::Value> expression_return = getValue();
 

@@ -89,6 +89,12 @@ namespace ance
         [[nodiscard]] bool isPointerType() const;
 
         /**
+         * Get whether this type is a reference type.
+         * @return True if this type is a reference type.
+         */
+        [[nodiscard]] bool isReferenceType() const;
+
+        /**
          * Get the actual type.
          * @return The actual type, or the type itself if it already is an actual type.
          */

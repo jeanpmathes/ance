@@ -52,7 +52,7 @@ void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
         return;
     }
 
-    if (ance::ReferenceType::isReferenceType(type()))
+    if (type()->isReferenceType())
     {
         validation_logger.logError("Global variable cannot have reference type", typeLocation());
         return;

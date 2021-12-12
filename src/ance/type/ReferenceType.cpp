@@ -14,6 +14,11 @@ ance::ReferenceType::ReferenceType(ance::ResolvingHandle<ance::Type> element_typ
     , element_type_(element_type)
 {}
 
+bool ance::ReferenceType::isReferenceType() const
+{
+    return true;
+}
+
 llvm::Constant* ance::ReferenceType::getDefaultContent(llvm::LLVMContext&)
 {
     assert(false && "References cannot be default-initialized.");
@@ -40,7 +45,7 @@ bool ance::ReferenceType::validate(ValidationLogger& validation_logger, ance::Lo
         return false;
     }
 
-    if (ance::ReferenceType::isReferenceType(element_type_))
+    if (element_type_->isReferenceType())
     {
         validation_logger.logError("Cannot declare reference to reference", location);
         return false;
@@ -132,20 +137,6 @@ ance::ResolvingHandle<ance::Type> ance::ReferenceType::get(ance::ResolvingHandle
 
         return type;
     }
-}
-
-bool ance::ReferenceType::isReferenceType(ance::ResolvingHandle<ance::Type> type)
-{
-    auto* ref_type = dynamic_cast<ance::ReferenceType*>(type->getDefinition());
-    if (ref_type != nullptr) return true;
-
-    bool is_reference_type = false;
-
-    if (type->getActualType() != type) { is_reference_type |= isReferenceType(type->getActualType()); }
-
-    if (type->getOriginalType() != type) { is_reference_type |= isReferenceType(type->getOriginalType()); }
-
-    return is_reference_type;
 }
 
 ance::ResolvingHandle<ance::Type> ance::ReferenceType::getReferencedType(ance::ResolvingHandle<ance::Type> type)

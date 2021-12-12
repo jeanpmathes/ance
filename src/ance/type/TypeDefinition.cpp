@@ -42,6 +42,11 @@ bool ance::TypeDefinition::isPointerType() const
     return false;
 }
 
+bool ance::TypeDefinition::isReferenceType() const
+{
+    return false;
+}
+
 void ance::TypeDefinition::setType(ance::Type* type)
 {
     assert(!type_);

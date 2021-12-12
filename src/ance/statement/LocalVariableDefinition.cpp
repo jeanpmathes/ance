@@ -63,7 +63,7 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
             return;
         }
 
-        if (ance::ReferenceType::isReferenceType(type_))
+        if (type_->isReferenceType())
         {
             validation_logger.logError("Cannot declare variable of reference type without binding to a value",
                                        location());

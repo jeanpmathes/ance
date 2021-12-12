@@ -22,10 +22,7 @@ ance::ResolvingHandle<ance::Type> Addressof::type()
     {
         ance::ResolvingHandle<ance::Type> value_type = arg_->type();
 
-        if (ance::ReferenceType::isReferenceType(value_type))
-        {
-            value_type = ance::ReferenceType::getReferencedType(value_type);
-        }
+        if (value_type->isReferenceType()) { value_type = ance::ReferenceType::getReferencedType(value_type); }
 
         return_type_ = ance::PointerType::get(value_type);
     }
@@ -53,8 +50,7 @@ void Addressof::doBuild(CompileContext* context)
     value->buildNativeValue(context);
 
     llvm::Value* address        = value->getNativeValue();
-    if (!ance::ReferenceType::isReferenceType(arg_->type()))
-        address = ance::Values::contentToNative(type(), address, context);
+    if (!arg_->type()->isReferenceType()) address = ance::Values::contentToNative(type(), address, context);
 
     setValue(std::make_shared<ance::WrappedNativeValue>(type(), address));
 }

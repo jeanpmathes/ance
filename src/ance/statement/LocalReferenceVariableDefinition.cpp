@@ -76,7 +76,7 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
             return;
         }
 
-        if (!ance::ReferenceType::isReferenceType(type_))
+        if (!type_->isReferenceType())
         {
             validation_logger.logError("Cannot bind reference to variable of non-reference type '" + type_->getName()
                                            + "'",

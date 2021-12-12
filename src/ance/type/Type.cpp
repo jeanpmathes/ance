@@ -61,6 +61,12 @@ bool ance::Type::isPointerType() const
     return definition_->isPointerType();
 }
 
+bool ance::Type::isReferenceType() const
+{
+    assert(isDefined());
+    return definition_->isReferenceType();
+}
+
 ance::ResolvingHandle<ance::Type> ance::Type::getActualType()
 {
     assert(isDefined());

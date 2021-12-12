@@ -49,7 +49,7 @@ bool ance::PointerType::validate(ValidationLogger& validation_logger, ance::Loca
         return false;
     }
 
-    if (ance::ReferenceType::isReferenceType(element_type_))
+    if (element_type_->isReferenceType())
     {
         validation_logger.logError("Cannot declare pointers to reference types", location);
         return false;

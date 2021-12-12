@@ -20,8 +20,9 @@ namespace ance
         explicit ReferenceType(ance::ResolvingHandle<ance::Type> element_type);
 
       public:
-        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        bool isReferenceType() const override;
 
+        llvm::Constant*    getDefaultContent(llvm::LLVMContext& c) override;
         llvm::PointerType* getContentType(llvm::LLVMContext& c) override;
 
         bool isSubscriptDefined() override;
@@ -74,13 +75,6 @@ namespace ance
          * @return The instance.
          */
         static ance::ResolvingHandle<ance::Type> get(ance::ResolvingHandle<ance::Type> element_type);
-
-        /**
-         * Check if a given type is a reference type.
-         * @param type The type.
-         * @return True if it is a reference type.
-         */
-        static bool isReferenceType(ance::ResolvingHandle<ance::Type> type);
 
         /**
          * Get the referenced type of a reference type.
