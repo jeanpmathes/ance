@@ -5,7 +5,6 @@
 #include "ance/scope/GlobalScope.h"
 #include "ance/type/ReferenceType.h"
 #include "ance/type/SizeType.h"
-#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/Application.h"
@@ -17,6 +16,11 @@ ance::PointerType::PointerType(ance::ResolvingHandle<ance::Type> element_type)
     , element_type_(element_type)
     , element_reference_(ance::ReferenceType::get(element_type))
 {}
+
+bool ance::PointerType::isPointerType() const
+{
+    return true;
+}
 
 llvm::Constant* ance::PointerType::getDefaultContent(llvm::LLVMContext& c)
 {
@@ -153,12 +157,6 @@ ance::ResolvingHandle<ance::Type> ance::PointerType::get(ance::ResolvingHandle<a
 
         return type;
     }
-}
-
-bool ance::PointerType::isPointerType(ance::ResolvingHandle<ance::Type> type)
-{
-    auto* ptr_type = dynamic_cast<ance::PointerType*>(type->getDefinition());
-    return ptr_type != nullptr;
 }
 
 ance::ResolvingHandle<ance::Type> ance::PointerType::getPointeeType(ance::ResolvingHandle<ance::Type> type)

@@ -37,6 +37,11 @@ bool ance::TypeDefinition::isIntegerType(uint64_t, bool) const
     return false;
 }
 
+bool ance::TypeDefinition::isPointerType() const
+{
+    return false;
+}
+
 void ance::TypeDefinition::setType(ance::Type* type)
 {
     assert(!type_);

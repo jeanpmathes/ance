@@ -24,7 +24,7 @@ void DeleteStatement::validate(ValidationLogger& validation_logger)
 {
     if (to_delete_->validate(validation_logger))
     {
-        if (!ance::PointerType::isPointerType(to_delete_->type()))
+        if (!to_delete_->type()->isPointerType())
         {
             validation_logger.logError("Value of type '" + to_delete_->type()->getName()
                                            + "' given to 'delete' cannot be used as pointer type",

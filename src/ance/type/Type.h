@@ -83,6 +83,12 @@ namespace ance
         [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const;
 
         /**
+         * Get whether this type is a pointer type.
+         * @return True if this type is a pointer type.
+         */
+        [[nodiscard]] bool isPointerType() const;
+
+        /**
          * Get the actual type.
          * @return The actual type, or the type itself if it already is an actual type.
          */

@@ -46,7 +46,7 @@ bool BindRef::validate(ValidationLogger& validation_logger)
 
     ance::ResolvingHandle<ance::Type> address_type = address_->type();
 
-    if (!ance::PointerType::isPointerType(address_type))
+    if (!address_type->isPointerType())
     {
         validation_logger.logError("Value of type '" + address_type->getName()
                                        + "' cannot be used as pointer type for reference binding",

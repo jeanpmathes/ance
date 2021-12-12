@@ -66,7 +66,7 @@ std::shared_ptr<ance::Value> Runtime::allocate(Allocator                        
 
 void Runtime::deleteDynamic(const std::shared_ptr<ance::Value>& value, bool, CompileContext* context)
 {
-    assert(ance::PointerType::isPointerType(value->type()));
+    assert(value->type()->isPointerType());
 
     value->buildContentValue(context);
 

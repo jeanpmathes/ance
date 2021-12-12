@@ -55,6 +55,12 @@ bool ance::Type::isIntegerType(uint64_t bit_size, bool is_signed) const
     return definition_->isIntegerType(bit_size, is_signed);
 }
 
+bool ance::Type::isPointerType() const
+{
+    assert(isDefined());
+    return definition_->isPointerType();
+}
+
 ance::ResolvingHandle<ance::Type> ance::Type::getActualType()
 {
     assert(isDefined());

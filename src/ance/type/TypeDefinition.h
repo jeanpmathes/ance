@@ -45,6 +45,7 @@ namespace ance
 
         [[nodiscard]] virtual bool isIntegerType() const;
         [[nodiscard]] virtual bool isIntegerType(uint64_t bit_size, bool is_signed) const;
+        [[nodiscard]] virtual bool isPointerType() const;
 
         void setType(ance::Type* type);
 
