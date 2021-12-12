@@ -20,7 +20,8 @@ namespace ance
         explicit PointerType(ance::ResolvingHandle<ance::Type> element_type);
 
       public:
-        bool isPointerType() const override;
+        bool                              isPointerType() const override;
+        ance::ResolvingHandle<ance::Type> getElementType() const override;
 
         llvm::Constant*    getDefaultContent(llvm::LLVMContext& c) override;
         llvm::PointerType* getContentType(llvm::LLVMContext& c) override;
@@ -66,13 +67,6 @@ namespace ance
          * @return The instance.
          */
         static ance::ResolvingHandle<ance::Type> get(ance::ResolvingHandle<ance::Type> element_type);
-
-        /**
-         * Get the pointee type of a given pointer type.
-         * @param type The pointer type.
-         * @return The pointee type or nullptr if the given type is not a pointer type.
-         */
-        static ance::ResolvingHandle<ance::Type> getPointeeType(ance::ResolvingHandle<ance::Type> type);
     };
 }
 

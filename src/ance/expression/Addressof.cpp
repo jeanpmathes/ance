@@ -22,7 +22,7 @@ ance::ResolvingHandle<ance::Type> Addressof::type()
     {
         ance::ResolvingHandle<ance::Type> value_type = arg_->type();
 
-        if (value_type->isReferenceType()) { value_type = ance::ReferenceType::getReferencedType(value_type); }
+        if (value_type->isReferenceType()) { value_type = value_type->getElementType(); }
 
         return_type_ = ance::PointerType::get(value_type);
     }

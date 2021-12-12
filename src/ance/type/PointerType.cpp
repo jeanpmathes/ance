@@ -22,6 +22,11 @@ bool ance::PointerType::isPointerType() const
     return true;
 }
 
+ance::ResolvingHandle<ance::Type> ance::PointerType::getElementType() const
+{
+    return element_type_;
+}
+
 llvm::Constant* ance::PointerType::getDefaultContent(llvm::LLVMContext& c)
 {
     return llvm::ConstantPointerNull::get(getContentType(c));
@@ -157,10 +162,4 @@ ance::ResolvingHandle<ance::Type> ance::PointerType::get(ance::ResolvingHandle<a
 
         return type;
     }
-}
-
-ance::ResolvingHandle<ance::Type> ance::PointerType::getPointeeType(ance::ResolvingHandle<ance::Type> type)
-{
-    auto* ptr_type = dynamic_cast<ance::PointerType*>(type->getDefinition());
-    return ptr_type ? ptr_type->element_type_ : ance::VoidType::get();
 }

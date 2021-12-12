@@ -67,6 +67,12 @@ bool ance::Type::isReferenceType() const
     return definition_->isReferenceType();
 }
 
+ance::ResolvingHandle<ance::Type> ance::Type::getElementType() const
+{
+    assert(isDefined());
+    return definition_->getElementType();
+}
+
 ance::ResolvingHandle<ance::Type> ance::Type::getActualType()
 {
     assert(isDefined());
@@ -210,17 +216,17 @@ bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
 {
     if (expected != actual)
     {
-        ance::ResolvingHandle<ance::Type> referenced_type = ance::ReferenceType::getReferencedType(actual);
-
         bool convertible = false;
 
-        if (referenced_type == ance::VoidType::get())
+        if (!actual->isReferenceType())
         {
             convertible |= actual->isImplicitlyConvertibleTo(expected);
             convertible |= expected->isImplicitlyConvertibleFrom(actual);
         }
         else
         {
+            ance::ResolvingHandle<ance::Type> referenced_type = actual->getElementType();
+
             convertible = referenced_type == expected;
 
             convertible |= referenced_type->isImplicitlyConvertibleTo(expected);
@@ -248,9 +254,7 @@ std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::ResolvingHandle<ance
 {
     if (value->type() == expected) return value;
 
-    ance::ResolvingHandle<ance::Type> referenced_type = ance::ReferenceType::getReferencedType(value->type());
-
-    if (referenced_type == ance::VoidType::get())
+    if (!value->type()->isReferenceType())
     {
         if (value->type()->isImplicitlyConvertibleTo(expected))
         {

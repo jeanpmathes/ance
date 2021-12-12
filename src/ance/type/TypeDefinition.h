@@ -48,6 +48,8 @@ namespace ance
         [[nodiscard]] virtual bool isPointerType() const;
         [[nodiscard]] virtual bool isReferenceType() const;
 
+        [[nodiscard]] virtual ance::ResolvingHandle<ance::Type> getElementType() const;
+
         void setType(ance::Type* type);
 
         virtual ance::ResolvingHandle<ance::Type> getActualType();

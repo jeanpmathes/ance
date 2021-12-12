@@ -47,6 +47,11 @@ bool ance::TypeDefinition::isReferenceType() const
     return false;
 }
 
+ance::ResolvingHandle<ance::Type> ance::TypeDefinition::getElementType() const
+{
+    return ance::VoidType::get();
+}
+
 void ance::TypeDefinition::setType(ance::Type* type)
 {
     assert(!type_);

@@ -125,7 +125,7 @@ void ance::Variable::validateSetValue(const std::shared_ptr<ance::Value>& value,
 
     ance::ResolvingHandle<ance::Type> target_type = type();
 
-    if (type()->isReferenceType()) { target_type = ance::ReferenceType::getReferencedType(type()); }
+    if (type()->isReferenceType()) { target_type = type()->getElementType(); }
 
     ance::Type::checkMismatch(target_type, value->type(), assigned_location, validation_logger);
 }

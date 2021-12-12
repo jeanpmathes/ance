@@ -95,6 +95,12 @@ namespace ance
         [[nodiscard]] bool isReferenceType() const;
 
         /**
+         * Get the element type of this type. A type can have only exactly one element type. Currently, only arrays, pointers and references have element types.
+         * @return The element type, or void if this type has no element type.
+         */
+        [[nodiscard]] ance::ResolvingHandle<ance::Type> getElementType() const;
+
+        /**
          * Get the actual type.
          * @return The actual type, or the type itself if it already is an actual type.
          */

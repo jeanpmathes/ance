@@ -27,6 +27,8 @@ namespace ance
         ArrayType(ance::ResolvingHandle<ance::Type> element_type, uint64_t size);
 
       public:
+        ance::ResolvingHandle<ance::Type> getElementType() const override;
+
         llvm::Constant*  getDefaultContent(llvm::LLVMContext& c) override;
         llvm::ArrayType* getContentType(llvm::LLVMContext& c) override;
 

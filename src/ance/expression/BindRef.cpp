@@ -32,7 +32,7 @@ ance::ResolvingHandle<ance::Type> BindRef::type()
 {
     if (!type_)
     {
-        ance::ResolvingHandle<ance::Type> element_type = ance::PointerType::getPointeeType(address_->type());
+        ance::ResolvingHandle<ance::Type> element_type = address_->type()->getElementType();
         type_                                          = ance::ReferenceType::get(element_type);
     }
 

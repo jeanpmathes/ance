@@ -6,8 +6,6 @@
 #include "ance/expression/Addressof.h"
 #include "ance/expression/BindRef.h"
 #include "ance/scope/LocalScope.h"
-#include "ance/type/PointerType.h"
-#include "ance/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
 LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferring(
@@ -91,9 +89,8 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
 
         ance::ResolvingHandle<ance::Type> reference_type = reference_->type();
 
-        ance::ResolvingHandle<ance::Type> declared_referenced_type = ance::ReferenceType::getReferencedType(type_);
-        ance::ResolvingHandle<ance::Type> provided_referenced_type =
-            ance::ReferenceType::getReferencedType(reference_type);
+        ance::ResolvingHandle<ance::Type> declared_referenced_type = type_->getElementType();
+        ance::ResolvingHandle<ance::Type> provided_referenced_type = reference_type->getElementType();
 
         if (declared_referenced_type != provided_referenced_type)
         {

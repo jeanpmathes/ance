@@ -3,7 +3,6 @@
 #include "ance/construct/value/Value.h"
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
-#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
@@ -17,6 +16,11 @@ ance::ReferenceType::ReferenceType(ance::ResolvingHandle<ance::Type> element_typ
 bool ance::ReferenceType::isReferenceType() const
 {
     return true;
+}
+
+ance::ResolvingHandle<ance::Type> ance::ReferenceType::getElementType() const
+{
+    return element_type_;
 }
 
 llvm::Constant* ance::ReferenceType::getDefaultContent(llvm::LLVMContext&)
@@ -137,10 +141,4 @@ ance::ResolvingHandle<ance::Type> ance::ReferenceType::get(ance::ResolvingHandle
 
         return type;
     }
-}
-
-ance::ResolvingHandle<ance::Type> ance::ReferenceType::getReferencedType(ance::ResolvingHandle<ance::Type> type)
-{
-    auto ref_type = dynamic_cast<ance::ReferenceType*>(type->getDefinition());
-    return ref_type ? ref_type->element_type_ : ance::VoidType::get();
 }
