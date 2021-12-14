@@ -4,15 +4,22 @@ from typing import Optional
 import ance
 import discovery
 
+COMPILE_VALID = 0
+COMPILE_INVALID = 1
+COMPILE_ERROR = 100
+
 
 class TestRun:
-    def __init__(self, test: discovery.Test, is_valid: bool, compile_output: str, result: Optional[str]):
+    def __init__(self, test: discovery.Test, compile_result: int, compile_output: str, result: Optional[str]):
         self.test = test
-        self.is_valid = is_valid
+        self.is_compiling = compile_result != COMPILE_ERROR
+        self.is_valid = compile_result == COMPILE_VALID
         self.compile_output = compile_output
         self.result = result
 
     def is_passing(self) -> bool:
+        if not self.is_compiling:
+            return False
         if self.is_valid == self.test.is_valid:
             return self.test.expected_result is None or self.result == self.test.expected_result
         return False
@@ -20,6 +27,9 @@ class TestRun:
     def create_fail_message(self) -> str:
         if self.is_passing():
             return ""
+
+        if not self.is_compiling:
+            return "unexpected compiler behavior"
 
         if self.is_valid != self.test.is_valid:
             if self.test.is_valid:
@@ -30,7 +40,7 @@ class TestRun:
             return f"expected: {self.test.expected_result}, actual: {self.result}"
 
     def print_info(self):
-        if self.is_passing():
+        if self.is_passing() or not self.is_compiling:
             return
 
         if self.is_valid != self.test.is_valid and self.test.is_valid:
@@ -44,12 +54,14 @@ def run_test(test: discovery.Test) -> TestRun:
 
         compile_result, compile_output = ance.compile_project(test.project_path, output_path)
 
-        is_valid: bool = (compile_result == 0)
-        if not is_valid:
-            return TestRun(test, is_valid, compile_output, None)
+        if compile_result != COMPILE_VALID and compile_result != COMPILE_INVALID:
+            compile_result = COMPILE_ERROR
+
+        if compile_result != COMPILE_VALID:
+            return TestRun(test, compile_result, compile_output, None)
 
         run_result, run_output = ance.run_project(output_path, "test")
-        return TestRun(test, is_valid, compile_output, run_output)
+        return TestRun(test, compile_result, compile_output, run_output)
 
 
 projects: list = discovery.discover_projects("../ance")
