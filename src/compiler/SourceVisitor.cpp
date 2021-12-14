@@ -286,9 +286,9 @@ antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* 
     unique_expressions.reserve(arguments.size());
     for (Expression* argument_ptr : arguments) { unique_expressions.emplace_back(argument_ptr); }
 
-    auto function = ance::makeHandled<ance::Function>(function_name);
+    auto function_group = ance::makeHandled<ance::FunctionGroup>(function_name);
 
-    return static_cast<Expression*>(new FunctionCall(function, std::move(unique_expressions), location(ctx)));
+    return static_cast<Expression*>(new FunctionCall(function_group, std::move(unique_expressions), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitArguments(anceParser::ArgumentsContext* ctx)

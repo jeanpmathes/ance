@@ -8,6 +8,7 @@
 
 #include "ance/Assigner.h"
 #include "ance/construct/Function.h"
+#include "ance/construct/FunctionGroup.h"
 #include "ance/construct/Variable.h"
 #include "ance/type/Type.h"
 #include "ance/utility/OwningHandle.h"
@@ -117,7 +118,7 @@ namespace ance
         void addTypeRegistry(ance::TypeDefinitionRegistry* registry);
 
         void registerUsage(ance::ResolvingHandle<ance::Variable> variable) override;
-        void registerUsage(ance::ResolvingHandle<ance::Function> function) override;
+        void registerUsage(ance::ResolvingHandle<ance::FunctionGroup> function_group) override;
         void registerUsage(ance::ResolvingHandle<ance::Type> type) override;
 
         void registerDefinition(ance::ResolvingHandle<ance::Type> type) override;
@@ -126,7 +127,7 @@ namespace ance
 
       protected:
         bool resolveDefinition(ance::ResolvingHandle<ance::Variable> variable) override;
-        bool resolveDefinition(ance::ResolvingHandle<ance::Function> function) override;
+        bool resolveDefinition(ance::ResolvingHandle<ance::FunctionGroup> function_group) override;
         bool resolveDefinition(ance::ResolvingHandle<ance::Type> type) override;
 
       public:
@@ -157,8 +158,8 @@ namespace ance
         void buildFunctions(CompileContext* context);
 
       private:
-        ance::OwningHandle<ance::Function> retrieveUndefinedFunction(const std::string& identifier);
-        ance::OwningHandle<ance::Type>     retrieveUndefinedType(const std::string& identifier);
+        ance::ResolvingHandle<ance::FunctionGroup> prepareDefinedFunctionGroup(const std::string& name);
+        ance::OwningHandle<ance::Type>             retrieveUndefinedType(const std::string& identifier);
 
         std::vector<std::pair<std::string, ance::Location>> errors_;
 
@@ -167,8 +168,8 @@ namespace ance
         std::map<std::string, ance::OwningHandle<ance::Variable>> global_undefined_variables_;
         std::map<std::string, ance::OwningHandle<ance::Variable>> global_defined_variables_;
 
-        std::map<std::string, ance::OwningHandle<ance::Function>> undefined_functions_;
-        std::map<std::string, ance::OwningHandle<ance::Function>> defined_functions_;
+        std::map<std::string, ance::OwningHandle<ance::FunctionGroup>> undefined_function_groups_;
+        std::map<std::string, ance::OwningHandle<ance::FunctionGroup>> defined_function_groups_;
 
         std::map<std::string, ance::OwningHandle<ance::Type>> undefined_types_;
         std::map<std::string, ance::OwningHandle<ance::Type>> defined_types_;

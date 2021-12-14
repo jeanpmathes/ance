@@ -65,17 +65,18 @@ void ance::LocalScope::registerUsage(ance::ResolvingHandle<ance::Variable> varia
     undefined_variables_[variable->identifier()] = ance::OwningHandle<ance::Variable>::takeOwnership(variable);
 }
 
-void ance::LocalScope::registerUsage(ance::ResolvingHandle<ance::Function> function)
+void ance::LocalScope::registerUsage(ance::ResolvingHandle<ance::FunctionGroup> function_group)
 {
-    assert(!function->isDefined());
+    assert(!function_group->isDefined());
 
-    if (undefined_functions_.find(function->name()) != undefined_functions_.end())
+    if (undefined_function_groups_.find(function_group->name()) != undefined_function_groups_.end())
     {
-        function.reroute(undefined_functions_[function->name()].handle());
+        function_group.reroute(undefined_function_groups_[function_group->name()].handle());
         return;
     }
 
-    undefined_functions_[function->name()] = ance::OwningHandle<ance::Function>::takeOwnership(function);
+    undefined_function_groups_[function_group->name()] =
+        ance::OwningHandle<ance::FunctionGroup>::takeOwnership(function_group);
 }
 
 void ance::LocalScope::registerUsage(ance::ResolvingHandle<ance::Type> type)
@@ -100,13 +101,13 @@ void ance::LocalScope::registerDefinition(ance::ResolvingHandle<ance::Type> type
 
 void ance::LocalScope::resolve()
 {
-    auto fn_it = undefined_functions_.begin();
+    auto fn_it = undefined_function_groups_.begin();
 
-    while (fn_it != undefined_functions_.end())
+    while (fn_it != undefined_function_groups_.end())
     {
-        auto& [name, function] = *fn_it;
+        auto& [name, function_group] = *fn_it;
 
-        if (scope()->resolveDefinition(function.handle())) { fn_it = undefined_functions_.erase(fn_it); }
+        if (scope()->resolveDefinition(function_group.handle())) { fn_it = undefined_function_groups_.erase(fn_it); }
         else
         {
             ++fn_it;
@@ -145,7 +146,7 @@ bool ance::LocalScope::resolveDefinition(ance::ResolvingHandle<ance::Variable>)
     return false;
 }
 
-bool ance::LocalScope::resolveDefinition(ance::ResolvingHandle<ance::Function>)
+bool ance::LocalScope::resolveDefinition(ance::ResolvingHandle<ance::FunctionGroup>)
 {
     return false;
 }

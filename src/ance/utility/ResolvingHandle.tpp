@@ -1,5 +1,7 @@
 #include "ResolvingHandle.h"
 
+#include <assert.h>
+
 template<typename T>
 ance::ResolvingHandle<T>::ResolvingHandle(std::unique_ptr<T> handled)
     : navigator_(std::shared_ptr<ance::ResolvingHandle<T>::HandleNavigator>(

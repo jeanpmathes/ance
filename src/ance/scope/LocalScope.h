@@ -6,6 +6,7 @@
 #include <optional>
 
 #include "ance/Assigner.h"
+#include "ance/construct/FunctionGroup.h"
 #include "ance/construct/Variable.h"
 #include "ance/type/Type.h"
 #include "ance/utility/Location.h"
@@ -71,7 +72,7 @@ namespace ance
             ance::Location                      location);
 
         void registerUsage(ance::ResolvingHandle<ance::Variable> variable) override;
-        void registerUsage(ance::ResolvingHandle<ance::Function> function) override;
+        void registerUsage(ance::ResolvingHandle<ance::FunctionGroup> function_group) override;
         void registerUsage(ance::ResolvingHandle<ance::Type> type) override;
 
         void registerDefinition(ance::ResolvingHandle<ance::Type> type) override;
@@ -80,7 +81,7 @@ namespace ance
 
       protected:
         bool resolveDefinition(ance::ResolvingHandle<ance::Variable> variable) override;
-        bool resolveDefinition(ance::ResolvingHandle<ance::Function> function) override;
+        bool resolveDefinition(ance::ResolvingHandle<ance::FunctionGroup> function_group) override;
         bool resolveDefinition(ance::ResolvingHandle<ance::Type> type) override;
 
       public:
@@ -108,7 +109,7 @@ namespace ance
         std::map<std::string, ance::OwningHandle<ance::Variable>> undefined_variables_;
         std::map<std::string, ance::OwningHandle<ance::Variable>> defined_local_variables_;
 
-        std::map<std::string, ance::OwningHandle<ance::Function>> undefined_functions_;
+        std::map<std::string, ance::OwningHandle<ance::FunctionGroup>> undefined_function_groups_;
 
         std::map<std::string, ance::OwningHandle<ance::Type>> undefined_types_;
     };

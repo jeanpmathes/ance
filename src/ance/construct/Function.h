@@ -162,7 +162,7 @@ namespace ance
         ance::LocalScope* getInsideScope();
 
         void registerUsage(ance::ResolvingHandle<ance::Variable> variable) override;
-        void registerUsage(ance::ResolvingHandle<ance::Function> function) override;
+        void registerUsage(ance::ResolvingHandle<ance::FunctionGroup> function_group) override;
         void registerUsage(ance::ResolvingHandle<ance::Type> type) override;
 
         void registerDefinition(ance::ResolvingHandle<ance::Type> type) override;
@@ -171,7 +171,7 @@ namespace ance
 
       protected:
         bool resolveDefinition(ance::ResolvingHandle<ance::Variable> variable) override;
-        bool resolveDefinition(ance::ResolvingHandle<ance::Function> function) override;
+        bool resolveDefinition(ance::ResolvingHandle<ance::FunctionGroup> function_group) override;
         bool resolveDefinition(ance::ResolvingHandle<ance::Type> type) override;
 
       private:

@@ -7,24 +7,25 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-FunctionCall::FunctionCall(ance::ResolvingHandle<ance::Function>    function,
-                           std::vector<std::unique_ptr<Expression>> arguments,
-                           ance::Location                           location)
+FunctionCall::FunctionCall(ance::ResolvingHandle<ance::FunctionGroup> function_group,
+                           std::vector<std::unique_ptr<Expression>>   arguments,
+                           ance::Location                             location)
     : Expression(location)
-    , function_(std::move(function))
+    , function_group_(std::move(function_group))
     , arguments_(std::move(arguments))
 {}
 
 void FunctionCall::setScope(ance::Scope* scope)
 {
-    scope->registerUsage(function_);
+    scope->registerUsage(function_group_);
 
     for (auto& arg : arguments_) { arg->setContainingScope(scope); }
 }
 
 ance::ResolvingHandle<ance::Type> FunctionCall::type()
 {
-    return function_->returnType();
+    assert(function().has_value());
+    return function().value()->returnType();
 }
 
 bool FunctionCall::validate(ValidationLogger& validation_logger)
@@ -41,13 +42,28 @@ bool FunctionCall::validate(ValidationLogger& validation_logger)
 
     if (!valid) return false;
 
-    if (!function_->isDefined())
+    if (!function_group_->isDefined())
     {
-        validation_logger.logError("Name '" + function_->name() + "' not defined in the current context", location());
+        validation_logger.logError("Name '" + function_group_->name() + "' not defined in the current context",
+                                   location());
         return false;
     }
 
-    return function_->validateCall(arguments, location(), validation_logger);
+    std::optional<ance::ResolvingHandle<ance::Function>> potential_function = function();
+    if (!potential_function.has_value())
+    {
+        validation_logger.logError("Cannot resolve '" + function_group_->name() + "' function overload", location());
+        return false;
+    }
+
+    ance::ResolvingHandle<ance::Function> actual_function = potential_function.value();
+    if (!actual_function->isDefined())
+    {
+        validation_logger.logError("Function '" + actual_function->name() + "' is not defined", location());
+        return false;
+    }
+
+    return actual_function->validateCall(arguments, location(), validation_logger);
 }
 
 void FunctionCall::doBuild(CompileContext* context)
@@ -56,12 +72,23 @@ void FunctionCall::doBuild(CompileContext* context)
 
     for (auto& arg : arguments_) { arg_values.push_back(arg->getValue()); }
 
-    std::shared_ptr<ance::Value> return_value = function_->buildCall(arg_values, context);
+    std::shared_ptr<ance::Value> return_value = function().value()->buildCall(arg_values, context);
 
     if (return_value != nullptr)// Not every function returns a value.
     {
         setValue(return_value);
     }
+}
+
+std::optional<ance::ResolvingHandle<ance::Function>> FunctionCall::function()
+{
+    if (!overload_resolved_)
+    {
+        function_          = function_group_->resolveOverload();
+        overload_resolved_ = true;
+    }
+
+    return function_;
 }
 
 FunctionCall::~FunctionCall() = default;

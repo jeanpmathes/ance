@@ -19,13 +19,13 @@ class FunctionCall : public DelayableExpression
   public:
     /**
      * Create a new function call.
-     * @param function The function to call.
+     * @param function_group The function group to call.
      * @param arguments The arguments to pass to the called function.
      * @param location The source location.
      */
-    FunctionCall(ance::ResolvingHandle<ance::Function>    function,
-                 std::vector<std::unique_ptr<Expression>> arguments,
-                 ance::Location                           location);
+    FunctionCall(ance::ResolvingHandle<ance::FunctionGroup> function_group,
+                 std::vector<std::unique_ptr<Expression>>   arguments,
+                 ance::Location                             location);
 
   protected:
     void setScope(ance::Scope* scope) override;
@@ -35,8 +35,6 @@ class FunctionCall : public DelayableExpression
 
     bool validate(ValidationLogger& validation_logger) override;
 
-
-
   protected:
     void doBuild(CompileContext* context) override;
 
@@ -44,8 +42,12 @@ class FunctionCall : public DelayableExpression
     ~FunctionCall() override;
 
   private:
-    ance::ResolvingHandle<ance::Function>    function_;
-    std::vector<std::unique_ptr<Expression>> arguments_;
+    std::optional<ance::ResolvingHandle<ance::Function>> function();
+
+    ance::ResolvingHandle<ance::FunctionGroup>           function_group_;
+    std::vector<std::unique_ptr<Expression>>             arguments_;
+    bool                                                 overload_resolved_ {false};
+    std::optional<ance::ResolvingHandle<ance::Function>> function_ {};
 };
 
 #endif

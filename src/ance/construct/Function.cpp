@@ -140,9 +140,9 @@ void ance::Function::registerUsage(ance::ResolvingHandle<ance::Variable> variabl
     getInsideScope()->registerUsage(variable);
 }
 
-void ance::Function::registerUsage(ance::ResolvingHandle<ance::Function> function)
+void ance::Function::registerUsage(ance::ResolvingHandle<ance::FunctionGroup> function_group)
 {
-    getInsideScope()->registerUsage(function);
+    getInsideScope()->registerUsage(function_group);
 }
 
 void ance::Function::registerUsage(ance::ResolvingHandle<ance::Type> type)
@@ -166,9 +166,9 @@ bool ance::Function::resolveDefinition(ance::ResolvingHandle<ance::Variable> var
     return scope()->resolveDefinition(variable);
 }
 
-bool ance::Function::resolveDefinition(ance::ResolvingHandle<ance::Function> function)
+bool ance::Function::resolveDefinition(ance::ResolvingHandle<ance::FunctionGroup> function_group)
 {
-    return scope()->resolveDefinition(function);
+    return scope()->resolveDefinition(function_group);
 }
 
 bool ance::Function::resolveDefinition(ance::ResolvingHandle<ance::Type> type)

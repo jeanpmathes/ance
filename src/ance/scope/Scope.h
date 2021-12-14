@@ -15,6 +15,7 @@ namespace ance
 {
     class Constant;
     class Function;
+    class FunctionGroup;
     class Value;
     class GlobalScope;
     class Variable;
@@ -59,10 +60,10 @@ namespace ance
         virtual void registerUsage(ance::ResolvingHandle<ance::Variable> variable) = 0;
 
         /**
-         * Register the usage of a function in this scope. Only functions that are registered will be resolved.
-         * @param function The function to register and resolve. A function can be registered multiple times, but must be undefined.
+         * Register the usage of a function group in this scope. Only function groups that are registered will be resolved.
+         * @param function The function group to register and resolve. A function group can be registered multiple times, but must be undefined.
          */
-        virtual void registerUsage(ance::ResolvingHandle<ance::Function> function) = 0;
+        virtual void registerUsage(ance::ResolvingHandle<ance::FunctionGroup> function) = 0;
 
         /**
          * Register the usage of a type in this scope. Only types that are registered will be resolved.
@@ -88,11 +89,11 @@ namespace ance
         virtual void resolve() = 0;
 
         /**
-         * Resolve the definition of a function.
-         * @param function The function to find a definition for.
+         * Resolve the definition of a function group.
+         * @param function The function group to find a definition for.
          * @return True if a definition was found.
          */
-        virtual bool resolveDefinition(ance::ResolvingHandle<ance::Function> function) = 0;
+        virtual bool resolveDefinition(ance::ResolvingHandle<ance::FunctionGroup> function) = 0;
 
         /**
          * Resolve the definition of a variable.

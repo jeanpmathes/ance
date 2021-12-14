@@ -35,7 +35,7 @@ void ance::GlobalScope::validate(ValidationLogger& validation_logger)
     for (auto [message, location] : errors_) { validation_logger.logError(message, location); }
     if (!valid) return;
 
-    for (auto const& [key, function] : defined_functions_) { function->validate(validation_logger); }
+    for (auto const& [key, function] : defined_function_groups_) { function->validate(validation_logger); }
     for (auto const& [name, variable] : global_defined_variables_) { variable->validate(validation_logger); }
 }
 
@@ -95,13 +95,15 @@ ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineExternFunction(
     const std::vector<std::shared_ptr<ance::Parameter>>& parameters,
     ance::Location                                       location)
 {
-    ance::OwningHandle<ance::Function> undefined = retrieveUndefinedFunction(identifier);
+    ance::ResolvingHandle<ance::FunctionGroup> group = prepareDefinedFunctionGroup(identifier);
 
+    ance::OwningHandle<ance::Function> undefined =
+        ance::OwningHandle<ance::Function>::takeOwnership(ance::makeHandled<ance::Function>(identifier));
     undefined->defineAsExtern(this, return_type, return_type_location, parameters, location);
     ance::OwningHandle<ance::Function> defined = std::move(undefined);
 
     auto handle                    = defined.handle();
-    defined_functions_[identifier] = std::move(defined);
+    group->addFunction(std::move(defined));
     return handle;
 }
 
@@ -114,8 +116,10 @@ ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineCustomFunction(
     ance::Location                                       declaration_location,
     ance::Location                                       definition_location)
 {
-    ance::OwningHandle<ance::Function> undefined = retrieveUndefinedFunction(identifier);
+    ance::ResolvingHandle<ance::FunctionGroup> group = prepareDefinedFunctionGroup(identifier);
 
+    ance::OwningHandle<ance::Function> undefined =
+        ance::OwningHandle<ance::Function>::takeOwnership(ance::makeHandled<ance::Function>(identifier));
     undefined->defineAsCustom(access,
                               return_type,
                               return_type_location,
@@ -126,7 +130,7 @@ ance::ResolvingHandle<ance::Function> ance::GlobalScope::defineCustomFunction(
     ance::OwningHandle<ance::Function> defined = std::move(undefined);
 
     auto handle                    = defined.handle();
-    defined_functions_[identifier] = std::move(defined);
+    group->addFunction(std::move(defined));
     return handle;
 }
 
@@ -201,23 +205,24 @@ void ance::GlobalScope::registerUsage(ance::ResolvingHandle<ance::Variable> vari
     global_undefined_variables_[variable->identifier()] = ance::OwningHandle<ance::Variable>::takeOwnership(variable);
 }
 
-void ance::GlobalScope::registerUsage(ance::ResolvingHandle<ance::Function> function)
+void ance::GlobalScope::registerUsage(ance::ResolvingHandle<ance::FunctionGroup> function_group)
 {
-    assert(!function->isDefined());
+    assert(!function_group->isDefined());
 
-    if (undefined_functions_.find(function->name()) != undefined_functions_.end())
+    if (undefined_function_groups_.find(function_group->name()) != undefined_function_groups_.end())
     {
-        function.reroute(undefined_functions_[function->name()].handle());
+        function_group.reroute(undefined_function_groups_[function_group->name()].handle());
         return;
     }
 
-    if (defined_functions_.find(function->name()) != defined_functions_.end())
+    if (defined_function_groups_.find(function_group->name()) != defined_function_groups_.end())
     {
-        function.reroute(defined_functions_[function->name()].handle());
+        function_group.reroute(defined_function_groups_[function_group->name()].handle());
         return;
     }
 
-    undefined_functions_[function->name()] = ance::OwningHandle<ance::Function>::takeOwnership(function);
+    undefined_function_groups_[function_group->name()] =
+        ance::OwningHandle<ance::FunctionGroup>::takeOwnership(function_group);
 }
 
 void ance::GlobalScope::registerUsage(ance::ResolvingHandle<ance::Type> type)
@@ -264,7 +269,7 @@ void ance::GlobalScope::resolve()
         registry->resolve();
     }
 
-    for (auto const& [key, fn] : defined_functions_) { fn->resolve(); }
+    for (auto const& [key, group] : defined_function_groups_) { group->resolve(); }
 }
 
 bool ance::GlobalScope::resolveDefinition(ance::ResolvingHandle<ance::Variable> variable)
@@ -278,11 +283,11 @@ bool ance::GlobalScope::resolveDefinition(ance::ResolvingHandle<ance::Variable> 
     return false;
 }
 
-bool ance::GlobalScope::resolveDefinition(ance::ResolvingHandle<ance::Function> function)
+bool ance::GlobalScope::resolveDefinition(ance::ResolvingHandle<ance::FunctionGroup> function_group)
 {
-    if (defined_functions_.find(function->name()) != defined_functions_.end())
+    if (defined_function_groups_.find(function_group->name()) != defined_function_groups_.end())
     {
-        function.reroute(defined_functions_[function->name()].handle());
+        function_group.reroute(defined_function_groups_[function_group->name()].handle());
         return true;
     }
 
@@ -302,20 +307,30 @@ bool ance::GlobalScope::resolveDefinition(ance::ResolvingHandle<ance::Type> type
 
 bool ance::GlobalScope::hasEntry()
 {
-    auto c = defined_functions_.find("main");
-    if (c == defined_functions_.end()) return false;
+    auto c = defined_function_groups_.find("main");
+    if (c == defined_function_groups_.end()) return false;
 
-    ance::Function& function = *(c->second);
+    auto& [name, group] = *c;
+
+    auto potential_function = group->resolveOverload();
+    if (!potential_function) return false;
+
+    ance::Function& function = *(potential_function.value());
 
     return function.parameterCount() == 0 && function.returnType()->isIntegerType(32, false);
 }
 
 bool ance::GlobalScope::hasExit()
 {
-    auto c = defined_functions_.find("exit");
-    if (c == defined_functions_.end()) return false;
+    auto c = defined_function_groups_.find("exit");
+    if (c == defined_function_groups_.end()) return false;
 
-    ance::Function& function = *(c->second);
+    auto& [name, group] = *c;
+
+    auto potential_function = group->resolveOverload();
+    if (!potential_function) return false;
+
+    ance::Function& function = *(potential_function.value());
 
     return function.parameterCount() == 1 && function.parameterType(0)->isIntegerType(32, false)
         && function.returnType() == ance::VoidType::get();
@@ -323,7 +338,7 @@ bool ance::GlobalScope::hasExit()
 
 void ance::GlobalScope::createNativeBacking(CompileContext* context)
 {
-    for (auto const& [key, val] : defined_functions_) { val->createNativeBacking(context); }
+    for (auto const& [key, val] : defined_function_groups_) { val->createNativeBacking(context); }
 
     for (auto const& [identifier, variable] : global_defined_variables_)
     {
@@ -334,25 +349,34 @@ void ance::GlobalScope::createNativeBacking(CompileContext* context)
 
 void ance::GlobalScope::buildFunctions(CompileContext* context)
 {
-    for (auto const& [key, val] : defined_functions_) { val->build(context); }
+    for (auto const& [key, group] : defined_function_groups_) { group->build(context); }
 }
 
-ance::OwningHandle<ance::Function> ance::GlobalScope::retrieveUndefinedFunction(const std::string& identifier)
+ance::ResolvingHandle<ance::FunctionGroup> ance::GlobalScope::prepareDefinedFunctionGroup(const std::string& name)
 {
-    ance::OwningHandle<ance::Function> undefined;
-
-    if (undefined_functions_.find(identifier) != undefined_functions_.end())
+    if (defined_function_groups_.find(name) != defined_function_groups_.end())
     {
-        undefined = std::move(undefined_functions_[identifier]);
-        undefined_functions_.erase(identifier);
+        return defined_function_groups_[name].handle();
+    }
+
+    ance::OwningHandle<ance::FunctionGroup> undefined;
+
+    if (undefined_function_groups_.find(name) != undefined_function_groups_.end())
+    {
+        undefined = std::move(undefined_function_groups_[name]);
+        undefined_function_groups_.erase(name);
     }
     else
     {
-        undefined = ance::OwningHandle<ance::Function>::takeOwnership(ance::makeHandled<ance::Function>(identifier));
+        undefined =
+            ance::OwningHandle<ance::FunctionGroup>::takeOwnership(ance::makeHandled<ance::FunctionGroup>(name));
     }
 
-    return undefined;
+    ance::ResolvingHandle<ance::FunctionGroup> defined = undefined.handle();
+    defined_function_groups_[name]                     = std::move(undefined);
+    return defined;
 }
+
 ance::OwningHandle<ance::Type> ance::GlobalScope::retrieveUndefinedType(const std::string& identifier)
 {
     ance::OwningHandle<ance::Type> undefined;
