@@ -11,4 +11,5 @@ target_sources(ance PRIVATE
                Variable.cpp
                VariableDefinition.cpp
                FunctionDefinition.cpp
-               FunctionGroup.cpp)
+               FunctionGroup.cpp
+               Signature.cpp)
