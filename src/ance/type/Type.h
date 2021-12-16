@@ -52,6 +52,12 @@ namespace ance
         [[nodiscard]] const std::string& getName() const;
 
         /**
+         * Get the mangled name of this type. The mangled name can only be used after all type dependencies have been resolved.
+         * @return The mangled name. Cannot contain any special characters, must be unique.
+         */
+        const std::string& getMangledName();
+
+        /**
          * Get whether this type is defined.
          */
         [[nodiscard]] bool isDefined() const;

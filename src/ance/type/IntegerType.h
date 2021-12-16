@@ -20,10 +20,10 @@ namespace ance
         IntegerType(uint64_t bit_size, bool is_signed);
 
       public:
-        bool isIntegerType() const override;
-        bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
+        [[nodiscard]] bool isIntegerType() const override;
+        [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
 
-        bool isBooleanType() const override;
+        [[nodiscard]] bool isBooleanType() const override;
 
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
@@ -34,6 +34,7 @@ namespace ance
         llvm::Type* type_ {nullptr};
 
       protected:
+        std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:

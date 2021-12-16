@@ -142,6 +142,11 @@ std::shared_ptr<ance::Value> ance::TypeAlias::convertImplicitlyFrom(std::shared_
     return std::make_shared<ance::RoughlyCastedValue>(self, as_actual);
 }
 
+std::string ance::TypeAlias::createMangledName()
+{
+    return getActualType()->getMangledName();
+}
+
 llvm::DIType* ance::TypeAlias::createDebugType(CompileContext* context)
 {
     return actual_->getDebugType(context);

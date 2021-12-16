@@ -40,6 +40,7 @@ namespace ance
         virtual ~TypeDefinition() = default;
 
         [[nodiscard]] const std::string& getName() const;
+        const std::string&               getMangledName();
         [[nodiscard]] ance::Location     getDefinitionLocation() const;
         [[nodiscard]] bool               isCustom() const;
 
@@ -101,6 +102,8 @@ namespace ance
                                                                    CompileContext*                   context);
 
       protected:
+        virtual std::string createMangledName() = 0;
+
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
 
         /**
@@ -116,6 +119,7 @@ namespace ance
       private:
         std::string    name_;
         ance::Location location_;
+        std::string    mangled_name_ {};
         ance::Type*    type_ {nullptr};
         ance::Scope*   containing_scope_ {nullptr};
         llvm::DIType*  debug_type_ {nullptr};

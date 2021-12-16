@@ -107,3 +107,7 @@ std::vector<ance::TypeDefinition*> ance::TypeClone::getDependencies()
 
     return dependencies;
 }
+std::string ance::TypeClone::createMangledName()
+{
+    return getName();
+}

@@ -4,7 +4,6 @@
 
 #include "ance/construct/value/Value.h"
 #include "ance/type/ReferenceType.h"
-#include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
 ance::Type::Type(std::string name) : name_(std::move(name)) {}
@@ -23,6 +22,12 @@ const std::string& ance::Type::getName() const
     {
         return name_;
     }
+}
+
+const std::string& ance::Type::getMangledName()
+{
+    assert(isDefined());
+    return definition_->getMangledName();
 }
 
 bool ance::Type::isDefined() const

@@ -20,6 +20,7 @@ namespace ance
         bool isVoidType() const override;
 
       protected:
+        std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:

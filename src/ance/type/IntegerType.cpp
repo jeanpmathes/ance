@@ -32,6 +32,11 @@ llvm::Type* ance::IntegerType::getContentType(llvm::LLVMContext& c)
     return type_;
 }
 
+std::string ance::IntegerType::createMangledName()
+{
+    return getName();
+}
+
 llvm::DIType* ance::IntegerType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
@@ -77,3 +82,4 @@ ance::ResolvingHandle<ance::Type> ance::IntegerType::get(uint64_t bit_size, bool
         return type;
     }
 }
+

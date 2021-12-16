@@ -44,6 +44,7 @@ namespace ance
         inline static llvm::Type*  diff_backing_type_ = nullptr;
 
       protected:
+        std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:

@@ -46,6 +46,7 @@ namespace ance
         ance::ResolvingHandle<ance::Type> element_type_;
 
       protected:
+        std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:

@@ -11,6 +11,7 @@ namespace ance
     class FloatingPointType : virtual public ance::TypeDefinition
     {
       protected:
+        std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:

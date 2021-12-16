@@ -3,6 +3,11 @@
 #include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 
+std::string ance::FloatingPointType::createMangledName()
+{
+    return getName();
+}
+
 llvm::DIType* ance::FloatingPointType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();

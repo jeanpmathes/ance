@@ -43,6 +43,7 @@ namespace ance
                                                     CompileContext*        context) override;
 
       protected:
+        std::string                        createMangledName() override;
         llvm::DIType*                      createDebugType(CompileContext* context) override;
         std::vector<ance::TypeDefinition*> getDependencies() override;
 

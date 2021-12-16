@@ -83,6 +83,11 @@ std::shared_ptr<ance::Value> ance::ReferenceType::buildSubscript(std::shared_ptr
     return element_type_->buildSubscript(getReferenced(indexed, context), index, context);
 }
 
+std::string ance::ReferenceType::createMangledName()
+{
+    return std::string("ref") + "(" + element_type_->getMangledName() + ")";
+}
+
 llvm::DIType* ance::ReferenceType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();

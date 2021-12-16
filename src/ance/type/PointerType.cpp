@@ -109,6 +109,11 @@ llvm::Value* ance::PointerType::buildGetElementPointer(const std::shared_ptr<anc
     return element_ptr;
 }
 
+std::string ance::PointerType::createMangledName()
+{
+    return std::string("ptr") + "(" + element_type_->getMangledName() + ")";
+}
+
 llvm::DIType* ance::PointerType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();

@@ -15,6 +15,11 @@ llvm::Type* ance::VoidType::getContentType(llvm::LLVMContext& c)
     return llvm::Type::getVoidTy(c);
 }
 
+std::string ance::VoidType::createMangledName()
+{
+    return getName();
+}
+
 llvm::DIType* ance::VoidType::createDebugType(CompileContext* context)
 {
     return context->di()->createUnspecifiedType(getName());

@@ -54,6 +54,7 @@ namespace ance
         ~ArrayType() override = default;
 
       protected:
+        std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:

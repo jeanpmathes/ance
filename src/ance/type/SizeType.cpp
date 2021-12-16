@@ -31,6 +31,11 @@ llvm::Value* ance::SizeType::buildValue(llvm::TypeSize size)
     return llvm::ConstantInt::get(size_backing_type_, size.getFixedSize(), false);
 }
 
+std::string ance::SizeType::createMangledName()
+{
+    return getName();
+}
+
 llvm::DIType* ance::SizeType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();

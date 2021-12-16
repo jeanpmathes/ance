@@ -17,6 +17,13 @@ const std::string& ance::TypeDefinition::getName() const
     return name_;
 }
 
+const std::string& ance::TypeDefinition::getMangledName()
+{
+    if (mangled_name_.empty()) { mangled_name_ = createMangledName(); }
+
+    return mangled_name_;
+}
+
 ance::Location ance::TypeDefinition::getDefinitionLocation() const
 {
     return location_;

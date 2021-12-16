@@ -21,6 +21,11 @@ llvm::Value* ance::UnsignedIntegerPointerType::buildValue(llvm::Value* pointer, 
     return context->ir()->CreatePtrToInt(pointer, native_type_);
 }
 
+std::string ance::UnsignedIntegerPointerType::createMangledName()
+{
+    return getName();
+}
+
 llvm::DIType* ance::UnsignedIntegerPointerType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
@@ -44,3 +49,4 @@ ance::ResolvingHandle<ance::Type> ance::UnsignedIntegerPointerType::get()
         ance::makeHandled<ance::Type>(std::unique_ptr<ance::TypeDefinition>(new UnsignedIntegerPointerType()));
     return instance;
 }
+

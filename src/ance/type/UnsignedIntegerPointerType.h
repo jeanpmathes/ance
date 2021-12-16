@@ -34,6 +34,7 @@ namespace ance
         inline static llvm::Type* native_type_ = nullptr;
 
       protected:
+        std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:
