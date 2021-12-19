@@ -38,7 +38,6 @@ class AnceCompiler
 
   private:
     void buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
-
     void buildStart(ance::ResolvingHandle<ance::Function> main, llvm::FunctionType* exit_type, llvm::Function* exit);
 
   private:

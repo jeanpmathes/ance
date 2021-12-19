@@ -12,9 +12,12 @@
 #include <llvm/Support/Host.h>
 #include <llvm/Support/TargetRegistry.h>
 
+#include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/IntegerType.h"
 #include "ance/type/SizeType.h"
 #include "ance/type/UnsignedIntegerPointerType.h"
+#include "ance/utility/Values.h"
 #include "compiler/Application.h"
 
 AnceCompiler::AnceCompiler(Application& app)
@@ -148,7 +151,9 @@ void AnceCompiler::emitObject(const std::filesystem::path& out)
 
 void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit)
 {
-    llvm::Type* exit_params[] = {llvm::Type::getInt32Ty(llvm_context_)};
+    ance::ResolvingHandle<ance::Type> exitcode_type = ance::IntegerType::get(32, false);
+
+    llvm::Type* exit_params[] = {exitcode_type->getContentType(llvm_context_)};
     exit_type                 = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), exit_params, false);
     exit = llvm::Function::Create(exit_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_exit", module_);
 
@@ -158,8 +163,14 @@ void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& ex
     llvm::BasicBlock* exit_block = llvm::BasicBlock::Create(llvm_context_, "entry", exit);
     ir_.SetInsertPoint(exit_block);
 
-    llvm::Function* user_exit = module_.getFunction("exit");
-    ir_.CreateCall(exit_type, user_exit, {exitcode});
+    ance::ResolvingHandle<ance::Function> user_exit = application_.globalScope().getExit();
+
+    std::vector<std::shared_ptr<ance::Value>> args;
+    args.push_back(std::make_shared<ance::WrappedNativeValue>(
+        exitcode_type,
+        ance::Values::contentToNative(exitcode_type, exitcode, context_.get())));
+
+    user_exit->buildCall(args, context_.get());
 
     ir_.CreateRetVoid();
 }
