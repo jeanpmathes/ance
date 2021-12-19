@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ance/construct/Parameter.h"
+#include "ance/construct/Signature.h"
 #include "ance/utility/Location.h"
 
 namespace ance
@@ -51,6 +52,12 @@ namespace ance
          * @return The return type.
          */
         [[nodiscard]] ance::ResolvingHandle<ance::Type> returnType() const;
+
+        /**
+         * Get the function signature.
+         * @return The function signature.
+         */
+        [[nodiscard]] const ance::Signature& signature() const;
 
         /**
          * Get the location of the return type.
@@ -137,11 +144,13 @@ namespace ance
         /**
          * A helper to create a native function.
          * @param linkage The linkage type.
+         * @param mangle Whether to mangle the function name.
          * @param c The llvm context.
          * @param m The llvm module.
          * @return The native function type and the native function.
          */
         std::pair<llvm::FunctionType*, llvm::Function*> createNativeFunction(llvm::GlobalValue::LinkageTypes linkage,
+                                                                             bool                            mangle,
                                                                              llvm::LLVMContext&              c,
                                                                              llvm::Module*                   m);
 
@@ -173,6 +182,9 @@ namespace ance
         ance::Location                                return_type_location_;
         std::vector<std::shared_ptr<ance::Parameter>> parameters_;
         ance::Location                                location_;
+
+      protected:
+        ance::Signature signature_;
     };
 }
 

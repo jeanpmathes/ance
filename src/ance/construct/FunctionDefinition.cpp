@@ -18,6 +18,7 @@ ance::FunctionDefinition::FunctionDefinition(ance::Function*                    
     , return_type_location_(return_type_location)
     , parameters_(std::move(parameters))
     , location_(location)
+    , signature_(ance::Signature::fromParameters(name(), parameters_))
 {}
 
 const std::string& ance::FunctionDefinition::name() const
@@ -38,6 +39,11 @@ ance::Function* ance::FunctionDefinition::function() const
 ance::ResolvingHandle<ance::Type> ance::FunctionDefinition::returnType() const
 {
     return return_type_;
+}
+
+const ance::Signature& ance::FunctionDefinition::signature() const
+{
+    return signature_;
 }
 
 ance::Location ance::FunctionDefinition::returnTypeLocation() const
@@ -91,16 +97,19 @@ std::vector<std::shared_ptr<ance::Parameter>>& ance::FunctionDefinition::paramet
 
 std::pair<llvm::FunctionType*, llvm::Function*> ance::FunctionDefinition::createNativeFunction(
     llvm::GlobalValue::LinkageTypes linkage,
+    bool                            mangle,
     llvm::LLVMContext&              c,
     llvm::Module*                   m)
 {
+    const std::string& native_name = mangle ? signature_.getMangledName() : function_->name();
+
     std::vector<llvm::Type*> param_types;
     param_types.reserve(parameters_.size());
 
     for (auto& param : parameters_) { param_types.push_back(param->type()->getContentType(c)); }
 
     llvm::FunctionType* native_type     = llvm::FunctionType::get(returnType()->getContentType(c), param_types, false);
-    llvm::Function*     native_function = llvm::Function::Create(native_type, linkage, name(), m);
+    llvm::Function*     native_function = llvm::Function::Create(native_type, linkage, native_name, m);
 
     return {native_type, native_function};
 }
@@ -122,7 +131,7 @@ llvm::CallInst* ance::FunctionDefinition::buildCall(const std::vector<std::share
     }
 
     auto* content_value = context->ir()->CreateCall(native_type, native_function, args);
-    if (!native_type->getReturnType()->isVoidTy()) content_value->setName(native_function->getName() + ".ret");
+    if (!native_type->getReturnType()->isVoidTy()) content_value->setName(name() + ".ret");
     return content_value;
 }
 

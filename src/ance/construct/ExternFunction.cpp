@@ -74,6 +74,7 @@ void ance::ExternFunction::validate(ValidationLogger& validation_logger)
 void ance::ExternFunction::createNativeBacking(CompileContext* context)
 {
     std::tie(native_type_, native_function_) = createNativeFunction(llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+                                                                    false,
                                                                     *context->llvmContext(),
                                                                     context->module());
 

@@ -60,7 +60,7 @@ void ance::CustomFunction::pushStatement(Statement* statement)
 void ance::CustomFunction::createNativeBacking(CompileContext* context)
 {
     std::tie(native_type_, native_function_) =
-        createNativeFunction(access_.linkage(), *context->llvmContext(), context->module());
+        createNativeFunction(access_.linkage(), true, *context->llvmContext(), context->module());
 
     std::vector<llvm::Metadata*> di_types;
     di_types.push_back(returnType()->getDebugType(context));
@@ -78,7 +78,7 @@ void ance::CustomFunction::createNativeBacking(CompileContext* context)
     llvm::DISubprogram* subprogram =
         context->di()->createFunction(scope()->getDebugScope(context),
                                       name(),
-                                      llvm::StringRef(),
+                                      signature_.getMangledName(),
                                       context->sourceFile(),
                                       location().line(),
                                       debug_type,

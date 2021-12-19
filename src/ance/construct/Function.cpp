@@ -59,6 +59,12 @@ ance::ResolvingHandle<ance::Type> ance::Function::returnType() const
     return definition_->returnType();
 }
 
+const ance::Signature& ance::Function::signature() const
+{
+    assert(isDefined());
+    return definition_->signature();
+}
+
 ance::ResolvingHandle<ance::Type> ance::Function::parameterType(size_t index) const
 {
     assert(isDefined());

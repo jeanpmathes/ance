@@ -10,6 +10,7 @@
 
 #include "ance/construct/FunctionDefinition.h"
 #include "ance/construct/Parameter.h"
+#include "ance/construct/Signature.h"
 
 namespace ance
 {
@@ -85,6 +86,12 @@ namespace ance
          * @return The return type.
          */
         [[nodiscard]] ance::ResolvingHandle<ance::Type> returnType() const;
+
+        /**
+         * Get the signature of this function.
+         * @return The function signature.
+         */
+        [[nodiscard]] const ance::Signature& signature() const;
 
         /**
          * Get the type of a parameter.
