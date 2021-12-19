@@ -146,6 +146,12 @@ namespace ance
         bool hasExit();
 
         /**
+         * Get the entry point. Fails if there is no entry point.
+         * @return The entry point.
+         */
+        ance::ResolvingHandle<ance::Function> getEntry();
+
+        /**
          * Create the native content backing methods and functions. It is required for the actual build.
          * @param context The current compile context.
          */

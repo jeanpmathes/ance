@@ -77,14 +77,13 @@ void AnceCompiler::compile(const std::filesystem::path& out)
 
     assert(context_->allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
 
-    llvm::FunctionType* main_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(llvm_context_), false);
-    llvm::Function*     main      = module_.getFunction("main");
+    ance::ResolvingHandle<ance::Function> main = application_.globalScope().getEntry();
 
     llvm::FunctionType* exit_type;
     llvm::Function*     exit;
 
     buildExit(exit_type, exit);
-    buildStart(main_type, main, exit_type, exit);
+    buildStart(main, exit_type, exit);
 
     // Passes.
 
@@ -165,10 +164,9 @@ void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& ex
     ir_.CreateRetVoid();
 }
 
-void AnceCompiler::buildStart(llvm::FunctionType* main_type,
-                              llvm::Function*     main,
-                              llvm::FunctionType* exit_type,
-                              llvm::Function*     exit)
+void AnceCompiler::buildStart(ance::ResolvingHandle<ance::Function> main,
+                              llvm::FunctionType*                   exit_type,
+                              llvm::Function*                       exit)
 {
     llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
     llvm::Function*     start =
@@ -178,9 +176,13 @@ void AnceCompiler::buildStart(llvm::FunctionType* main_type,
 
     ir_.SetInsertPoint(start_block);
 
-    llvm::CallInst* main_exitcode = ir_.CreateCall(main_type, main, llvm::None, "exitcode");
+    std::vector<std::shared_ptr<ance::Value>> args;
+    std::shared_ptr<ance::Value>              exitcode = main->buildCall(args, context_.get());
 
-    llvm::Value* exit_args = {main_exitcode};
+    exitcode->buildContentValue(context_.get());
+    llvm::Value* native_exitcode = exitcode->getContentValue();
+
+    llvm::Value* exit_args = {native_exitcode};
     ir_.CreateCall(exit_type, exit, exit_args);
 
     ir_.CreateRetVoid();

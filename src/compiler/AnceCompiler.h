@@ -7,6 +7,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Target/TargetMachine.h>
 
+#include "ance/construct/Function.h"
 #include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
 
@@ -38,10 +39,7 @@ class AnceCompiler
   private:
     void buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
 
-    void buildStart(llvm::FunctionType* main_type,
-                    llvm::Function*     main,
-                    llvm::FunctionType* exit_type,
-                    llvm::Function*     exit);
+    void buildStart(ance::ResolvingHandle<ance::Function> main, llvm::FunctionType* exit_type, llvm::Function* exit);
 
   private:
     Application&      application_;

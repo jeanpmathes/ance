@@ -336,6 +336,20 @@ bool ance::GlobalScope::hasExit()
         && function.returnType() == ance::VoidType::get();
 }
 
+ance::ResolvingHandle<ance::Function> ance::GlobalScope::getEntry()
+{
+    auto c = defined_function_groups_.find("main");
+    if (c == defined_function_groups_.end()) assert(false);
+
+    auto& [name, group] = *c;
+
+    auto potential_function = group->resolveOverload();
+    if (!potential_function) assert(false);
+
+    ance::ResolvingHandle<ance::Function> function = potential_function.value();
+    return function;
+}
+
 void ance::GlobalScope::createNativeBacking(CompileContext* context)
 {
     for (auto const& [key, val] : defined_function_groups_) { val->createNativeBacking(context); }
