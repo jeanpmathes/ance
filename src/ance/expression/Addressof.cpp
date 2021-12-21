@@ -2,7 +2,6 @@
 
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/type/PointerType.h"
-#include "ance/type/ReferenceType.h"
 #include "ance/utility/Values.h"
 #include "validation/ValidationLogger.h"
 

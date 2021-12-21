@@ -18,6 +18,19 @@ namespace ance
                   ance::Location                    definition_location,
                   ance::Location                    actual_type_location);
 
+        [[nodiscard]] bool isIntegerType() const override;
+        [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
+        [[nodiscard]] bool isBooleanType() const override;
+        [[nodiscard]] bool isFloatingPointType() const override;
+        [[nodiscard]] bool isFloatingPointType(size_t precision) const override;
+        [[nodiscard]] bool isSizeType() const override;
+        [[nodiscard]] bool isDiffType() const override;
+        [[nodiscard]] bool isVoidType() const override;
+        [[nodiscard]] bool isPointerType() const override;
+        [[nodiscard]] bool isReferenceType() const override;
+
+        [[nodiscard]] ance::ResolvingHandle<ance::Type> getElementType() const override;
+
         ance::ResolvingHandle<ance::Type> getActualType() override;
 
         void onScope() override;
@@ -26,8 +39,7 @@ namespace ance
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
-        bool isSubscriptDefined() override;
-
+        bool                              isSubscriptDefined() override;
         ance::ResolvingHandle<ance::Type> getSubscriptReturnType() override;
 
         bool validateDefinition(ValidationLogger& validation_logger) override;
@@ -41,16 +53,6 @@ namespace ance
         std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
                                                     CompileContext*        context) override;
-
-        bool                         isBasicConvertibleTo(ance::ResolvingHandle<ance::Type> target) override;
-        std::shared_ptr<ance::Value> convertBasicTo(ance::ResolvingHandle<ance::Type> target,
-                                                    std::shared_ptr<Value>            value,
-                                                    CompileContext*                   context) override;
-
-        bool                         isBasicConvertibleFrom(ance::ResolvingHandle<ance::Type> source) override;
-        std::shared_ptr<ance::Value> convertBasicFrom(std::shared_ptr<Value>            value,
-                                                      ance::ResolvingHandle<ance::Type> self,
-                                                      CompileContext*                   context) override;
 
       protected:
         std::string   createMangledName() override;

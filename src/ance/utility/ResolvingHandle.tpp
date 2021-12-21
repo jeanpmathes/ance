@@ -58,13 +58,16 @@ bool ance::ResolvingHandle<T>::operator==(const ResolvingHandle<T>& other) const
     T* target       = get();
     T* other_target = other.get();
 
-    return target == other_target;
+    return target->equalsTarget(other_target);
 }
 
 template<typename T>
 bool ance::ResolvingHandle<T>::operator!=(const ance::ResolvingHandle<T>& other) const
 {
-    return !(*this == other);
+    T* target       = get();
+    T* other_target = other.get();
+
+    return not target->equalsTarget(other_target);
 }
 
 template<typename T>
@@ -144,4 +147,10 @@ ance::ResolvingHandle<SELF> ance::HandleTarget<SELF>::self()
 {
     assert(self_);
     return self_.value();
+}
+
+template<typename SELF>
+bool ance::HandleTarget<SELF>::equalsTarget(SELF* other)
+{
+    return this == other;
 }

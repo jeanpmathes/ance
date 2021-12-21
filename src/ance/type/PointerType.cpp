@@ -27,6 +27,16 @@ ance::ResolvingHandle<ance::Type> ance::PointerType::getElementType() const
     return element_type_;
 }
 
+ance::ResolvingHandle<ance::Type> ance::PointerType::getActualType()
+{
+    ance::ResolvingHandle<ance::Type> actual_element_type = element_type_->getActualType();
+    if (actual_element_type == element_type_) { return self(); }
+    else
+    {
+        return ance::PointerType::get(actual_element_type);
+    }
+}
+
 llvm::Constant* ance::PointerType::getDefaultContent(llvm::LLVMContext& c)
 {
     return llvm::ConstantPointerNull::get(getContentType(c));

@@ -80,8 +80,12 @@ namespace ance
     class HandleTarget
     {
       public:
-        void setSelf(ance::ResolvingHandle<SELF> handle);
+        void                        setSelf(ance::ResolvingHandle<SELF> handle);
         ance::ResolvingHandle<SELF> self();
+
+        virtual bool equalsTarget(SELF* other);
+
+        virtual ~HandleTarget() = default;
 
       private:
         std::optional<ance::ResolvingHandle<SELF>> self_ {};

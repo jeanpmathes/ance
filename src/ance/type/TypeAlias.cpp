@@ -1,7 +1,7 @@
 #include "TypeAlias.h"
 
-#include "ance/construct/value/RoughlyCastedValue.h"
 #include "ance/scope/Scope.h"
+#include "ance/type/Type.h"
 #include "ance/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
@@ -13,6 +13,61 @@ ance::TypeAlias::TypeAlias(const std::string&                identifier,
     , actual_(actual)
     , actual_type_location_(actual_type_location)
 {}
+
+bool ance::TypeAlias::isIntegerType() const
+{
+    return actual_->isIntegerType();
+}
+
+bool ance::TypeAlias::isIntegerType(uint64_t bit_size, bool is_signed) const
+{
+    return actual_->isIntegerType(bit_size, is_signed);
+}
+
+bool ance::TypeAlias::isBooleanType() const
+{
+    return actual_->isBooleanType();
+}
+
+bool ance::TypeAlias::isFloatingPointType() const
+{
+    return actual_->isFloatingPointType();
+}
+
+bool ance::TypeAlias::isFloatingPointType(size_t precision) const
+{
+    return actual_->isFloatingPointType(precision);
+}
+
+bool ance::TypeAlias::isSizeType() const
+{
+    return actual_->isSizeType();
+}
+
+bool ance::TypeAlias::isDiffType() const
+{
+    return actual_->isDiffType();
+}
+
+bool ance::TypeAlias::isVoidType() const
+{
+    return actual_->isVoidType();
+}
+
+bool ance::TypeAlias::isPointerType() const
+{
+    return actual_->isPointerType();
+}
+
+bool ance::TypeAlias::isReferenceType() const
+{
+    return actual_->isReferenceType();
+}
+
+ance::ResolvingHandle<ance::Type> ance::TypeAlias::getElementType() const
+{
+    return actual_->getElementType();
+}
 
 ance::ResolvingHandle<ance::Type> ance::TypeAlias::getActualType()
 {
@@ -101,45 +156,6 @@ std::shared_ptr<ance::Value> ance::TypeAlias::buildSubscript(std::shared_ptr<Val
                                                              CompileContext*        context)
 {
     return actual_->buildSubscript(indexed, index, context);
-}
-
-bool ance::TypeAlias::isBasicConvertibleTo(ance::ResolvingHandle<ance::Type> target)
-{
-    if (target == actual_) return true;
-
-    return actual_->isBasicConvertibleTo(target);
-}
-
-std::shared_ptr<ance::Value> ance::TypeAlias::convertBasicTo(ance::ResolvingHandle<ance::Type> target,
-                                                             std::shared_ptr<Value>            value,
-                                                             CompileContext*                   context)
-{
-    std::shared_ptr<ance::Value> as_actual = std::make_shared<ance::RoughlyCastedValue>(actual_, value);
-    if (target == actual_) return as_actual;
-
-    return actual_->convertBasicTo(target, as_actual, context);
-}
-
-bool ance::TypeAlias::isBasicConvertibleFrom(ance::ResolvingHandle<ance::Type> source)
-{
-    if (source == actual_) return true;
-
-    return actual_->isBasicConvertibleFrom(source);
-}
-
-std::shared_ptr<ance::Value> ance::TypeAlias::convertBasicFrom(std::shared_ptr<Value>            value,
-                                                               ance::ResolvingHandle<ance::Type> self,
-                                                               CompileContext*                   context)
-{
-    std::shared_ptr<ance::Value> as_actual;
-
-    if (value->type() == actual_) { as_actual = value; }
-    else
-    {
-        as_actual = actual_->convertBasicFrom(value, actual_, context);
-    }
-
-    return std::make_shared<ance::RoughlyCastedValue>(self, as_actual);
 }
 
 std::string ance::TypeAlias::createMangledName()

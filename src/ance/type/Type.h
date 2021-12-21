@@ -258,42 +258,6 @@ namespace ance
                                                     std::shared_ptr<Value> index,
                                                     CompileContext*        context);
 
-        /**
-         * Check if this type can be converted to another type using basic conversion.
-         * @param target The target conversion type.
-         * @return True if the conversion is possible.
-         */
-        bool isBasicConvertibleTo(ance::ResolvingHandle<ance::Type> target);
-
-        /**
-         * Convert a value of this type to another type, using basic conversion.
-         * @param target The target conversion type.
-         * @param value The value to convert.
-         * @param context The current compile context.
-         * @return The converted value.
-         */
-        std::shared_ptr<ance::Value> convertBasicTo(ance::ResolvingHandle<ance::Type> target,
-                                                    std::shared_ptr<Value>            value,
-                                                    CompileContext*                   context);
-
-        /**
-         * Check if this type can be converted from another type, using basic conversion.
-         * @param source The source conversion type.
-         * @return True if the conversion is possible.
-         */
-        bool isBasicConvertibleFrom(ance::ResolvingHandle<ance::Type> source);
-
-        /**
-         * Convert a value of this type from another type, using basic conversion.
-         * @param value The value to convert.
-         * @param self The type to convert to and also the type on which the method is called.
-         * @param context The current compile context.
-         * @return The converted value.
-         */
-        std::shared_ptr<ance::Value> convertBasicFrom(std::shared_ptr<Value>            value,
-                                                      ance::ResolvingHandle<ance::Type> self,
-                                                      CompileContext*                   context);
-
         ance::TypeDefinition* getDefinition();
 
         /**
@@ -319,6 +283,21 @@ namespace ance
         static std::shared_ptr<ance::Value> makeMatching(ance::ResolvingHandle<ance::Type> expected,
                                                          std::shared_ptr<ance::Value>      value,
                                                          CompileContext*                   context);
+
+        /**
+         * Check if the actual types of two types are the same.
+         * @param lhs The left hand side type.
+         * @param rhs The right hand side type.
+         * @return True if the types are actually the same.
+         */
+        static bool areSame(ance::ResolvingHandle<ance::Type> lhs, ance::ResolvingHandle<ance::Type> rhs);
+
+        /**
+         * Get the value as its actual type.
+         * @param value The value to change the type of.
+         * @return The value with the actual type.
+         */
+        static std::shared_ptr<ance::Value> makeActual(std::shared_ptr<ance::Value> value);
 
       private:
         static std::string getAnnotatedName(ance::ResolvingHandle<ance::Type> type);

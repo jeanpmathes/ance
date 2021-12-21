@@ -4,7 +4,6 @@
 #include "ance/expression/Addressof.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/ReferenceType.h"
-#include "ance/type/Type.h"
 #include "validation/ValidationLogger.h"
 
 std::unique_ptr<BindRef> BindRef::refer(std::unique_ptr<Expression> value, ance::Location location)

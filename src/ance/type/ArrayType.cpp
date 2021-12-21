@@ -22,6 +22,16 @@ ance::ResolvingHandle<ance::Type> ance::ArrayType::getElementType() const
     return element_type_;
 }
 
+ance::ResolvingHandle<ance::Type> ance::ArrayType::getActualType()
+{
+    ance::ResolvingHandle<ance::Type> actual_element_type = element_type_->getActualType();
+    if (actual_element_type == element_type_) { return self(); }
+    else
+    {
+        return ance::ArrayType::get(actual_element_type, size_);
+    }
+}
+
 llvm::Constant* ance::ArrayType::getDefaultContent(llvm::LLVMContext& c)
 {
     std::vector<llvm::Constant*> content(size_, element_type_->getDefaultContent(c));

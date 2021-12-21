@@ -23,6 +23,16 @@ ance::ResolvingHandle<ance::Type> ance::ReferenceType::getElementType() const
     return element_type_;
 }
 
+ance::ResolvingHandle<ance::Type> ance::ReferenceType::getActualType()
+{
+    ance::ResolvingHandle<ance::Type> actual_element_type = element_type_->getActualType();
+    if (actual_element_type == element_type_) { return self(); }
+    else
+    {
+        return ance::ReferenceType::get(actual_element_type);
+    }
+}
+
 llvm::Constant* ance::ReferenceType::getDefaultContent(llvm::LLVMContext&)
 {
     assert(false && "References cannot be default-initialized.");

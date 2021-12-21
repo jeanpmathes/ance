@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "ance/construct/value/RoughlyCastedValue.h"
 #include "ance/construct/value/Value.h"
 #include "ance/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
@@ -217,34 +218,6 @@ std::shared_ptr<ance::Value> ance::Type::buildSubscript(std::shared_ptr<Value> i
     return definition_->buildSubscript(std::move(indexed), std::move(index), context);
 }
 
-bool ance::Type::isBasicConvertibleTo(ance::ResolvingHandle<ance::Type> target)
-{
-    assert(isDefined());
-    return definition_->isBasicConvertibleTo(target);
-}
-
-std::shared_ptr<ance::Value> ance::Type::convertBasicTo(ance::ResolvingHandle<ance::Type> target,
-                                                        std::shared_ptr<Value>            value,
-                                                        CompileContext*                   context)
-{
-    assert(isDefined());
-    return definition_->convertBasicTo(target, value, context);
-}
-
-bool ance::Type::isBasicConvertibleFrom(ance::ResolvingHandle<ance::Type> source)
-{
-    assert(isDefined());
-    return definition_->isBasicConvertibleFrom(source);
-}
-
-std::shared_ptr<ance::Value> ance::Type::convertBasicFrom(std::shared_ptr<Value>            value,
-                                                          ance::ResolvingHandle<ance::Type> self,
-                                                          CompileContext*                   context)
-{
-    assert(isDefined());
-    return definition_->convertBasicFrom(value, self, context);
-}
-
 ance::TypeDefinition* ance::Type::getDefinition()
 {
     return definition_.get();
@@ -255,78 +228,42 @@ bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
                                ance::Location                    location,
                                ValidationLogger&                 validation_logger)
 {
-    if (expected != actual)
+    if (areSame(expected, actual)) return true;
+
+    if (actual->isReferenceType())
     {
-        bool convertible = false;
-
-        if (!actual->isReferenceType())
-        {
-            convertible |= actual->isBasicConvertibleTo(expected);
-            convertible |= expected->isBasicConvertibleFrom(actual);
-        }
-        else
-        {
-            ance::ResolvingHandle<ance::Type> referenced_type = actual->getElementType();
-
-            convertible = referenced_type == expected;
-
-            convertible |= referenced_type->isBasicConvertibleTo(expected);
-            convertible |= expected->isBasicConvertibleFrom(referenced_type);
-        }
-
-        if (convertible) return true;
-
-        std::string actual_name   = actual->getName();
-        std::string expected_name = expected->getName();
-
-        validation_logger.logError("Cannot implicitly convert " + getAnnotatedName(actual) + " to "
-                                       + getAnnotatedName(expected),
-                                   location);
-
-        return false;
+        ance::ResolvingHandle<ance::Type> referenced_type = actual->getElementType();
+        if (areSame(referenced_type, expected)) return true;
     }
 
-    return true;
+    validation_logger.logError("Cannot implicitly convert " + getAnnotatedName(actual) + " to "
+                                   + getAnnotatedName(expected),
+                               location);
+
+    return false;
 }
 
 std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::ResolvingHandle<ance::Type> expected,
                                                       std::shared_ptr<ance::Value>      value,
                                                       CompileContext*                   context)
 {
-    if (value->type() == expected) return value;
+    if (areSame(expected, value->type())) return makeActual(value);
 
-    if (!value->type()->isReferenceType())
-    {
-        if (value->type()->isBasicConvertibleTo(expected))
-        {
-            return value->type()->convertBasicTo(expected, value, context);
-        }
-
-        if (expected->isBasicConvertibleFrom(value->type()))
-        {
-            return expected->convertBasicFrom(value, expected, context);
-        }
-    }
-    else
+    if (value->type()->isReferenceType())
     {
         auto reference_type                     = dynamic_cast<ance::ReferenceType*>(value->type()->definition_.get());
         std::shared_ptr<ance::Value> referenced = reference_type->getReferenced(value, context);
 
-        if (referenced->type() == expected) return referenced;
-
-        if (referenced->type()->isBasicConvertibleTo(expected))
-        {
-            return referenced->type()->convertBasicTo(expected, referenced, context);
-        }
-
-        if (expected->isBasicConvertibleFrom(referenced->type()))
-        {
-            return expected->convertBasicFrom(referenced, expected, context);
-        }
+        return makeActual(referenced);
     }
 
     assert(false && "Cannot make the value matching, was mismatch checked before?");
     return nullptr;
+}
+
+bool ance::Type::areSame(ance::ResolvingHandle<ance::Type> lhs, ance::ResolvingHandle<ance::Type> rhs)
+{
+    return lhs->getActualType() == rhs->getActualType();
 }
 
 std::string ance::Type::getAnnotatedName(ance::ResolvingHandle<ance::Type> type)
@@ -336,4 +273,12 @@ std::string ance::Type::getAnnotatedName(ance::ResolvingHandle<ance::Type> type)
     if (type->getActualType() != type) { name += " (aka '" + type->getActualType()->getName() + "')"; }
 
     return name;
+}
+
+std::shared_ptr<ance::Value> ance::Type::makeActual(std::shared_ptr<ance::Value> value)
+{
+    ance::ResolvingHandle<ance::Type> actual_type = value->type()->getActualType();
+    if (actual_type == value->type()) return value;
+
+    return std::make_shared<ance::RoughlyCastedValue>(actual_type, value);
 }

@@ -39,6 +39,8 @@ namespace ance
       public:
         virtual ~TypeDefinition() = default;
 
+        void setType(ance::Type* type);
+
         [[nodiscard]] const std::string& getName() const;
         const std::string&               getMangledName();
         [[nodiscard]] ance::Location     getDefinitionLocation() const;
@@ -56,8 +58,6 @@ namespace ance
         [[nodiscard]] virtual bool isReferenceType() const;
 
         [[nodiscard]] virtual ance::ResolvingHandle<ance::Type> getElementType() const;
-
-        void setType(ance::Type* type);
 
         virtual ance::ResolvingHandle<ance::Type> getActualType();
         virtual ance::ResolvingHandle<ance::Type> getOriginalType();
@@ -90,16 +90,6 @@ namespace ance
         virtual std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                             std::shared_ptr<Value> index,
                                                             CompileContext*        context);
-
-        virtual bool                         isBasicConvertibleTo(ance::ResolvingHandle<ance::Type> target);
-        virtual std::shared_ptr<ance::Value> convertBasicTo(ance::ResolvingHandle<ance::Type> target,
-                                                            std::shared_ptr<Value>            value,
-                                                            CompileContext*                   context);
-
-        virtual bool                         isBasicConvertibleFrom(ance::ResolvingHandle<ance::Type> source);
-        virtual std::shared_ptr<ance::Value> convertBasicFrom(std::shared_ptr<Value>            value,
-                                                              ance::ResolvingHandle<ance::Type> self,
-                                                              CompileContext*                   context);
 
       protected:
         virtual std::string createMangledName() = 0;

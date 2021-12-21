@@ -14,6 +14,61 @@ ance::TypeClone::TypeClone(const std::string&                identifier,
     , original_type_location_(original_type_location)
 {}
 
+bool ance::TypeClone::isIntegerType() const
+{
+    return original_->isIntegerType();
+}
+
+bool ance::TypeClone::isIntegerType(uint64_t bit_size, bool is_signed) const
+{
+    return original_->isIntegerType(bit_size, is_signed);
+}
+
+bool ance::TypeClone::isBooleanType() const
+{
+    return original_->isBooleanType();
+}
+
+bool ance::TypeClone::isFloatingPointType() const
+{
+    return original_->isFloatingPointType();
+}
+
+bool ance::TypeClone::isFloatingPointType(size_t precision) const
+{
+    return original_->isFloatingPointType(precision);
+}
+
+bool ance::TypeClone::isSizeType() const
+{
+    return original_->isSizeType();
+}
+
+bool ance::TypeClone::isDiffType() const
+{
+    return original_->isDiffType();
+}
+
+bool ance::TypeClone::isVoidType() const
+{
+    return original_->isVoidType();
+}
+
+bool ance::TypeClone::isPointerType() const
+{
+    return original_->isPointerType();
+}
+
+bool ance::TypeClone::isReferenceType() const
+{
+    return original_->isReferenceType();
+}
+
+ance::ResolvingHandle<ance::Type> ance::TypeClone::getElementType() const
+{
+    return original_->getElementType();
+}
+
 ance::ResolvingHandle<ance::Type> ance::TypeClone::getOriginalType()
 {
     return original_;

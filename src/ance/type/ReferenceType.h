@@ -22,6 +22,7 @@ namespace ance
       public:
         bool                              isReferenceType() const override;
         ance::ResolvingHandle<ance::Type> getElementType() const override;
+        ance::ResolvingHandle<ance::Type> getActualType() override;
 
         llvm::Constant*    getDefaultContent(llvm::LLVMContext& c) override;
         llvm::PointerType* getContentType(llvm::LLVMContext& c) override;

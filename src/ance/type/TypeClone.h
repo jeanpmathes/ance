@@ -18,16 +18,27 @@ namespace ance
                   ance::Location                    definition_location,
                   ance::Location                    original_type_location);
 
+        [[nodiscard]] bool isIntegerType() const override;
+        [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
+        [[nodiscard]] bool isBooleanType() const override;
+        [[nodiscard]] bool isFloatingPointType() const override;
+        [[nodiscard]] bool isFloatingPointType(size_t precision) const override;
+        [[nodiscard]] bool isSizeType() const override;
+        [[nodiscard]] bool isDiffType() const override;
+        [[nodiscard]] bool isVoidType() const override;
+        [[nodiscard]] bool isPointerType() const override;
+        [[nodiscard]] bool isReferenceType() const override;
+
+        [[nodiscard]] ance::ResolvingHandle<ance::Type> getElementType() const override;
+
         ance::ResolvingHandle<ance::Type> getOriginalType() override;
 
         void onScope() override;
 
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
-        llvm::Type* getContentType(llvm::LLVMContext& c) override;
-
-        bool isSubscriptDefined() override;
-
+        bool                              isSubscriptDefined() override;
         ance::ResolvingHandle<ance::Type> getSubscriptReturnType() override;
 
         bool validateDefinition(ValidationLogger& validation_logger) override;

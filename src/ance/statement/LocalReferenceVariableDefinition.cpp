@@ -92,7 +92,7 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
         ance::ResolvingHandle<ance::Type> declared_referenced_type = type_->getElementType();
         ance::ResolvingHandle<ance::Type> provided_referenced_type = reference_type->getElementType();
 
-        if (declared_referenced_type != provided_referenced_type)
+        if (!ance::Type::areSame(declared_referenced_type, provided_referenced_type))
         {
             validation_logger.logError("Cannot bind '" + declared_referenced_type->getName()
                                            + "' reference to value of type '" + provided_referenced_type->getName()
