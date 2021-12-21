@@ -103,40 +103,40 @@ std::shared_ptr<ance::Value> ance::TypeAlias::buildSubscript(std::shared_ptr<Val
     return actual_->buildSubscript(indexed, index, context);
 }
 
-bool ance::TypeAlias::isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> target)
+bool ance::TypeAlias::isBasicConvertibleTo(ance::ResolvingHandle<ance::Type> target)
 {
     if (target == actual_) return true;
 
-    return actual_->isImplicitlyConvertibleTo(target);
+    return actual_->isBasicConvertibleTo(target);
 }
 
-std::shared_ptr<ance::Value> ance::TypeAlias::convertImplicitlyTo(ance::ResolvingHandle<ance::Type> target,
-                                                                  std::shared_ptr<Value>            value,
-                                                                  CompileContext*                   context)
+std::shared_ptr<ance::Value> ance::TypeAlias::convertBasicTo(ance::ResolvingHandle<ance::Type> target,
+                                                             std::shared_ptr<Value>            value,
+                                                             CompileContext*                   context)
 {
     std::shared_ptr<ance::Value> as_actual = std::make_shared<ance::RoughlyCastedValue>(actual_, value);
     if (target == actual_) return as_actual;
 
-    return actual_->convertImplicitlyTo(target, as_actual, context);
+    return actual_->convertBasicTo(target, as_actual, context);
 }
 
-bool ance::TypeAlias::isImplicitlyConvertibleFrom(ance::ResolvingHandle<ance::Type> source)
+bool ance::TypeAlias::isBasicConvertibleFrom(ance::ResolvingHandle<ance::Type> source)
 {
     if (source == actual_) return true;
 
-    return actual_->isImplicitlyConvertibleFrom(source);
+    return actual_->isBasicConvertibleFrom(source);
 }
 
-std::shared_ptr<ance::Value> ance::TypeAlias::convertImplicitlyFrom(std::shared_ptr<Value>            value,
-                                                                    ance::ResolvingHandle<ance::Type> self,
-                                                                    CompileContext*                   context)
+std::shared_ptr<ance::Value> ance::TypeAlias::convertBasicFrom(std::shared_ptr<Value>            value,
+                                                               ance::ResolvingHandle<ance::Type> self,
+                                                               CompileContext*                   context)
 {
     std::shared_ptr<ance::Value> as_actual;
 
     if (value->type() == actual_) { as_actual = value; }
     else
     {
-        as_actual = actual_->convertImplicitlyFrom(value, actual_, context);
+        as_actual = actual_->convertBasicFrom(value, actual_, context);
     }
 
     return std::make_shared<ance::RoughlyCastedValue>(self, as_actual);

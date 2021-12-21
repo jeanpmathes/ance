@@ -91,15 +91,15 @@ namespace ance
                                                             std::shared_ptr<Value> index,
                                                             CompileContext*        context);
 
-        virtual bool                         isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> target);
-        virtual std::shared_ptr<ance::Value> convertImplicitlyTo(ance::ResolvingHandle<ance::Type> target,
-                                                                 std::shared_ptr<Value>            value,
-                                                                 CompileContext*                   context);
+        virtual bool                         isBasicConvertibleTo(ance::ResolvingHandle<ance::Type> target);
+        virtual std::shared_ptr<ance::Value> convertBasicTo(ance::ResolvingHandle<ance::Type> target,
+                                                            std::shared_ptr<Value>            value,
+                                                            CompileContext*                   context);
 
-        virtual bool                         isImplicitlyConvertibleFrom(ance::ResolvingHandle<ance::Type> source);
-        virtual std::shared_ptr<ance::Value> convertImplicitlyFrom(std::shared_ptr<Value>            value,
-                                                                   ance::ResolvingHandle<ance::Type> self,
-                                                                   CompileContext*                   context);
+        virtual bool                         isBasicConvertibleFrom(ance::ResolvingHandle<ance::Type> source);
+        virtual std::shared_ptr<ance::Value> convertBasicFrom(std::shared_ptr<Value>            value,
+                                                              ance::ResolvingHandle<ance::Type> self,
+                                                              CompileContext*                   context);
 
       protected:
         virtual std::string createMangledName() = 0;

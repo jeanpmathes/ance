@@ -178,26 +178,26 @@ std::shared_ptr<ance::Value> ance::TypeDefinition::buildSubscript(std::shared_pt
     return nullptr;
 }
 
-bool ance::TypeDefinition::isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type>)
+bool ance::TypeDefinition::isBasicConvertibleTo(ance::ResolvingHandle<ance::Type>)
 {
     return false;
 }
 
-std::shared_ptr<ance::Value> ance::TypeDefinition::convertImplicitlyTo(ance::ResolvingHandle<ance::Type>,
-                                                                       std::shared_ptr<Value>,
-                                                                       CompileContext*)
+std::shared_ptr<ance::Value> ance::TypeDefinition::convertBasicTo(ance::ResolvingHandle<ance::Type>,
+                                                                  std::shared_ptr<Value>,
+                                                                  CompileContext*)
 {
     return {};
 }
 
-bool ance::TypeDefinition::isImplicitlyConvertibleFrom(ance::ResolvingHandle<ance::Type>)
+bool ance::TypeDefinition::isBasicConvertibleFrom(ance::ResolvingHandle<ance::Type>)
 {
     return false;
 }
 
-std::shared_ptr<ance::Value> ance::TypeDefinition::convertImplicitlyFrom(std::shared_ptr<Value>,
-                                                                         ance::ResolvingHandle<ance::Type>,
-                                                                         CompileContext*)
+std::shared_ptr<ance::Value> ance::TypeDefinition::convertBasicFrom(std::shared_ptr<Value>,
+                                                                    ance::ResolvingHandle<ance::Type>,
+                                                                    CompileContext*)
 {
     return {};
 }

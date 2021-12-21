@@ -217,32 +217,32 @@ std::shared_ptr<ance::Value> ance::Type::buildSubscript(std::shared_ptr<Value> i
     return definition_->buildSubscript(std::move(indexed), std::move(index), context);
 }
 
-bool ance::Type::isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> target)
+bool ance::Type::isBasicConvertibleTo(ance::ResolvingHandle<ance::Type> target)
 {
     assert(isDefined());
-    return definition_->isImplicitlyConvertibleTo(target);
+    return definition_->isBasicConvertibleTo(target);
 }
 
-std::shared_ptr<ance::Value> ance::Type::convertImplicitlyTo(ance::ResolvingHandle<ance::Type> target,
-                                                             std::shared_ptr<Value>            value,
-                                                             CompileContext*                   context)
+std::shared_ptr<ance::Value> ance::Type::convertBasicTo(ance::ResolvingHandle<ance::Type> target,
+                                                        std::shared_ptr<Value>            value,
+                                                        CompileContext*                   context)
 {
     assert(isDefined());
-    return definition_->convertImplicitlyTo(target, value, context);
+    return definition_->convertBasicTo(target, value, context);
 }
 
-bool ance::Type::isImplicitlyConvertibleFrom(ance::ResolvingHandle<ance::Type> source)
+bool ance::Type::isBasicConvertibleFrom(ance::ResolvingHandle<ance::Type> source)
 {
     assert(isDefined());
-    return definition_->isImplicitlyConvertibleFrom(source);
+    return definition_->isBasicConvertibleFrom(source);
 }
 
-std::shared_ptr<ance::Value> ance::Type::convertImplicitlyFrom(std::shared_ptr<Value>            value,
-                                                               ance::ResolvingHandle<ance::Type> self,
-                                                               CompileContext*                   context)
+std::shared_ptr<ance::Value> ance::Type::convertBasicFrom(std::shared_ptr<Value>            value,
+                                                          ance::ResolvingHandle<ance::Type> self,
+                                                          CompileContext*                   context)
 {
     assert(isDefined());
-    return definition_->convertImplicitlyFrom(value, self, context);
+    return definition_->convertBasicFrom(value, self, context);
 }
 
 ance::TypeDefinition* ance::Type::getDefinition()
@@ -261,8 +261,8 @@ bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
 
         if (!actual->isReferenceType())
         {
-            convertible |= actual->isImplicitlyConvertibleTo(expected);
-            convertible |= expected->isImplicitlyConvertibleFrom(actual);
+            convertible |= actual->isBasicConvertibleTo(expected);
+            convertible |= expected->isBasicConvertibleFrom(actual);
         }
         else
         {
@@ -270,8 +270,8 @@ bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
 
             convertible = referenced_type == expected;
 
-            convertible |= referenced_type->isImplicitlyConvertibleTo(expected);
-            convertible |= expected->isImplicitlyConvertibleFrom(referenced_type);
+            convertible |= referenced_type->isBasicConvertibleTo(expected);
+            convertible |= expected->isBasicConvertibleFrom(referenced_type);
         }
 
         if (convertible) return true;
@@ -297,14 +297,14 @@ std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::ResolvingHandle<ance
 
     if (!value->type()->isReferenceType())
     {
-        if (value->type()->isImplicitlyConvertibleTo(expected))
+        if (value->type()->isBasicConvertibleTo(expected))
         {
-            return value->type()->convertImplicitlyTo(expected, value, context);
+            return value->type()->convertBasicTo(expected, value, context);
         }
 
-        if (expected->isImplicitlyConvertibleFrom(value->type()))
+        if (expected->isBasicConvertibleFrom(value->type()))
         {
-            return expected->convertImplicitlyFrom(value, expected, context);
+            return expected->convertBasicFrom(value, expected, context);
         }
     }
     else
@@ -314,14 +314,14 @@ std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::ResolvingHandle<ance
 
         if (referenced->type() == expected) return referenced;
 
-        if (referenced->type()->isImplicitlyConvertibleTo(expected))
+        if (referenced->type()->isBasicConvertibleTo(expected))
         {
-            return referenced->type()->convertImplicitlyTo(expected, referenced, context);
+            return referenced->type()->convertBasicTo(expected, referenced, context);
         }
 
-        if (expected->isImplicitlyConvertibleFrom(referenced->type()))
+        if (expected->isBasicConvertibleFrom(referenced->type()))
         {
-            return expected->convertImplicitlyFrom(referenced, expected, context);
+            return expected->convertBasicFrom(referenced, expected, context);
         }
     }
 

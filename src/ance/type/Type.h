@@ -259,40 +259,40 @@ namespace ance
                                                     CompileContext*        context);
 
         /**
-         * Check if this type can be implicitly converted to another type.
+         * Check if this type can be converted to another type using basic conversion.
          * @param target The target conversion type.
          * @return True if the conversion is possible.
          */
-        bool isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> target);
+        bool isBasicConvertibleTo(ance::ResolvingHandle<ance::Type> target);
 
         /**
-         * Convert a value of this type to another type, using implicit conversion.
+         * Convert a value of this type to another type, using basic conversion.
          * @param target The target conversion type.
          * @param value The value to convert.
          * @param context The current compile context.
          * @return The converted value.
          */
-        std::shared_ptr<ance::Value> convertImplicitlyTo(ance::ResolvingHandle<ance::Type> target,
-                                                         std::shared_ptr<Value>            value,
-                                                         CompileContext*                   context);
+        std::shared_ptr<ance::Value> convertBasicTo(ance::ResolvingHandle<ance::Type> target,
+                                                    std::shared_ptr<Value>            value,
+                                                    CompileContext*                   context);
 
         /**
-         * Check if this type can be implicitly converted from another type.
+         * Check if this type can be converted from another type, using basic conversion.
          * @param source The source conversion type.
          * @return True if the conversion is possible.
          */
-        bool isImplicitlyConvertibleFrom(ance::ResolvingHandle<ance::Type> source);
+        bool isBasicConvertibleFrom(ance::ResolvingHandle<ance::Type> source);
 
         /**
-         * Convert a value of this type from another type, using implicit conversion.
+         * Convert a value of this type from another type, using basic conversion.
          * @param value The value to convert.
          * @param self The type to convert to and also the type on which the method is called.
          * @param context The current compile context.
          * @return The converted value.
          */
-        std::shared_ptr<ance::Value> convertImplicitlyFrom(std::shared_ptr<Value>            value,
-                                                           ance::ResolvingHandle<ance::Type> self,
-                                                           CompileContext*                   context);
+        std::shared_ptr<ance::Value> convertBasicFrom(std::shared_ptr<Value>            value,
+                                                      ance::ResolvingHandle<ance::Type> self,
+                                                      CompileContext*                   context);
 
         ance::TypeDefinition* getDefinition();
 
