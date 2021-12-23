@@ -26,7 +26,7 @@ void DeleteStatement::validate(ValidationLogger& validation_logger)
     {
         if (!to_delete_->type()->isPointerType())
         {
-            validation_logger.logError("Value of type '" + to_delete_->type()->getName()
+            validation_logger.logError("Value of type '" + to_delete_->type()->getAnnotatedName()
                                            + "' given to 'delete' cannot be used as pointer type",
                                        to_delete_->location());
         }

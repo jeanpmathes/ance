@@ -3,7 +3,6 @@
 #include <utility>
 
 #include "ance/construct/value/RoughlyCastedValue.h"
-#include "ance/construct/value/Value.h"
 #include "ance/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
@@ -23,6 +22,15 @@ const std::string& ance::Type::getName() const
     {
         return name_;
     }
+}
+
+std::string ance::Type::getAnnotatedName()
+{
+    std::string name = "'" + getName() + "'";
+
+    if (getActualType() != self()) { name += " (aka '" + getActualType()->getName() + "')"; }
+
+    return name;
 }
 
 const std::string& ance::Type::getMangledName()
@@ -236,8 +244,8 @@ bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
         if (areSame(referenced_type, expected)) return true;
     }
 
-    validation_logger.logError("Cannot implicitly convert " + getAnnotatedName(actual) + " to "
-                                   + getAnnotatedName(expected),
+    validation_logger.logError("Cannot implicitly convert " + actual->getAnnotatedName() + " to "
+                                   + expected->getAnnotatedName(),
                                location);
 
     return false;
@@ -264,15 +272,6 @@ std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::ResolvingHandle<ance
 bool ance::Type::areSame(ance::ResolvingHandle<ance::Type> lhs, ance::ResolvingHandle<ance::Type> rhs)
 {
     return lhs->getActualType() == rhs->getActualType();
-}
-
-std::string ance::Type::getAnnotatedName(ance::ResolvingHandle<ance::Type> type)
-{
-    std::string name = "'" + type->getName() + "'";
-
-    if (type->getActualType() != type) { name += " (aka '" + type->getActualType()->getName() + "')"; }
-
-    return name;
 }
 
 std::shared_ptr<ance::Value> ance::Type::makeActual(std::shared_ptr<ance::Value> value)

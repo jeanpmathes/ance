@@ -51,6 +51,8 @@ namespace ance
          */
         [[nodiscard]] const std::string& getName() const;
 
+        std::string getAnnotatedName();
+
         /**
          * Get the mangled name of this type. The mangled name can only be used after all type dependencies have been resolved.
          * @return The mangled name. Cannot contain any special characters, must be unique.
@@ -298,9 +300,6 @@ namespace ance
          * @return The value with the actual type.
          */
         static std::shared_ptr<ance::Value> makeActual(std::shared_ptr<ance::Value> value);
-
-      private:
-        static std::string getAnnotatedName(ance::ResolvingHandle<ance::Type> type);
 
       private:
         std::string                           name_;

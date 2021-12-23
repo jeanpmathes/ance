@@ -59,7 +59,8 @@ bool ance::PointerType::validate(ValidationLogger& validation_logger, ance::Loca
 {
     if (!element_type_->isDefined())
     {
-        validation_logger.logError("Cannot declare pointer to undefined type '" + element_type_->getName() + "'",
+        validation_logger.logError("Cannot declare pointer to undefined type '" + element_type_->getAnnotatedName()
+                                       + "'",
                                    location);
         return false;
     }

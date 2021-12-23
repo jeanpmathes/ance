@@ -122,7 +122,8 @@ bool ance::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
 
     if (!actual_->isDefined())
     {
-        validation_logger.logError("Cannot alias undefined type '" + actual_->getName() + "'", actual_type_location_);
+        validation_logger.logError("Cannot alias undefined type '" + actual_->getAnnotatedName() + "'",
+                                   actual_type_location_);
         valid = false;
     }
 

@@ -47,7 +47,7 @@ bool BindRef::validate(ValidationLogger& validation_logger)
 
     if (!address_type->isPointerType())
     {
-        validation_logger.logError("Value of type '" + address_type->getName()
+        validation_logger.logError("Value of type '" + address_type->getAnnotatedName()
                                        + "' cannot be used as pointer type for reference binding",
                                    address_->location());
         return false;
