@@ -263,6 +263,14 @@ namespace ance
         ance::TypeDefinition* getDefinition();
 
         /**
+         * Check if two types are matching, meaning the available type can be converted to the expected type.
+         * @param expected The expected type.
+         * @param actual The available type.
+         * @return True if the types are matching.
+         */
+        static bool isMatching(ance::ResolvingHandle<ance::Type> expected, ance::ResolvingHandle<ance::Type> actual);
+
+        /**
          * Validate that a type matches the expected type.
          * @param expected The expected type.
          * @param actual The actual type.

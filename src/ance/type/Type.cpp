@@ -231,10 +231,7 @@ ance::TypeDefinition* ance::Type::getDefinition()
     return definition_.get();
 }
 
-bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
-                               ance::ResolvingHandle<ance::Type> actual,
-                               ance::Location                    location,
-                               ValidationLogger&                 validation_logger)
+bool ance::Type::isMatching(ance::ResolvingHandle<ance::Type> expected, ance::ResolvingHandle<ance::Type> actual)
 {
     if (areSame(expected, actual)) return true;
 
@@ -244,11 +241,24 @@ bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
         if (areSame(referenced_type, expected)) return true;
     }
 
-    validation_logger.logError("Cannot implicitly convert " + actual->getAnnotatedName() + " to "
-                                   + expected->getAnnotatedName(),
-                               location);
-
     return false;
+}
+
+bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
+                               ance::ResolvingHandle<ance::Type> actual,
+                               ance::Location                    location,
+                               ValidationLogger&                 validation_logger)
+{
+    bool matching = isMatching(expected, actual);
+
+    if (!matching)
+    {
+        validation_logger.logError("Cannot implicitly convert " + actual->getAnnotatedName() + " to "
+                                       + expected->getAnnotatedName(),
+                                   location);
+    }
+
+    return matching;
 }
 
 std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::ResolvingHandle<ance::Type> expected,

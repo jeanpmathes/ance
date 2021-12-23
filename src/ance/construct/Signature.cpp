@@ -16,6 +16,16 @@ ance::Signature ance::Signature::fromParameters(const std::string&              
     return Signature(name, types);
 }
 
+bool ance::Signature::isMatching(const std::vector<ance::ResolvingHandle<ance::Type>>& arguments) const
+{
+    if (types_.size() != arguments.size()) return false;
+
+    auto types = llvm::zip(types_, arguments);
+    return std::all_of(types.begin(), types.end(), [](const auto& pair) {
+        return ance::Type::isMatching(std::get<0>(pair), std::get<1>(pair));
+    });
+}
+
 const std::string& ance::Signature::getMangledName()
 {
     if (!mangled_name_.empty()) return mangled_name_;

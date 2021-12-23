@@ -26,6 +26,13 @@ namespace ance
                                         const std::vector<std::shared_ptr<ance::Parameter>>& parameters);
 
         /**
+         * Get whether the signature matches the given argument types.
+         * @param arguments The argument types.
+         * @return Whether the signature matches the given argument types.
+         */
+        [[nodiscard]] bool isMatching(const std::vector<ance::ResolvingHandle<ance::Type>>& arguments) const;
+
+        /**
          * Get the mangled name. Will create the mangled name if it has not been created yet.
          * @return The mangled name.
          */

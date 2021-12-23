@@ -40,9 +40,13 @@ void ance::FunctionGroup::addFunction(ance::OwningHandle<ance::Function> functio
     functions_.push_back(std::move(function));
 }
 
-std::optional<ance::ResolvingHandle<ance::Function>> ance::FunctionGroup::resolveOverload()
+std::optional<ance::ResolvingHandle<ance::Function>> ance::FunctionGroup::resolveOverload(
+    const std::vector<ance::ResolvingHandle<ance::Type>>& arguments)
 {
-    if (functions_.empty()) return {};
+    for (auto& function : functions_)
+    {
+        if (function->signature().isMatching(arguments)) { return function.handle(); }
+    }
 
-    return functions_.front().handle();
+    return {};
 }

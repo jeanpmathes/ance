@@ -35,9 +35,11 @@ namespace ance
 
         /**
          * Resolve a function overload.
+         * @param arguments The argument types to use for overload resolution.
          * @return A function, when defined.
          */
-        std::optional<ance::ResolvingHandle<ance::Function>> resolveOverload();
+        std::optional<ance::ResolvingHandle<ance::Function>> resolveOverload(
+            const std::vector<ance::ResolvingHandle<ance::Type>>& arguments);
 
       private:
         std::string                                     name_;

@@ -305,63 +305,69 @@ bool ance::GlobalScope::resolveDefinition(ance::ResolvingHandle<ance::Type> type
     return false;
 }
 
-bool ance::GlobalScope::hasEntry()
+std::optional<ance::ResolvingHandle<ance::Function>> ance::GlobalScope::findEntry()
 {
     auto c = defined_function_groups_.find("main");
-    if (c == defined_function_groups_.end()) return false;
+    if (c == defined_function_groups_.end()) return {};
 
     auto& [name, group] = *c;
 
-    auto potential_function = group->resolveOverload();
-    if (!potential_function) return false;
+    std::vector<ance::ResolvingHandle<ance::Type>> arg_types;
+
+    auto potential_function = group->resolveOverload(arg_types);
+    if (!potential_function) return {};
 
     ance::Function& function = *(potential_function.value());
 
-    return function.parameterCount() == 0 && function.returnType()->isIntegerType(32, false);
+    if (function.returnType()->isIntegerType(32, false))
+        return potential_function;
+    else
+        return {};
+}
+
+std::optional<ance::ResolvingHandle<ance::Function>> ance::GlobalScope::findExit()
+{
+    auto c = defined_function_groups_.find("exit");
+    if (c == defined_function_groups_.end()) return {};
+
+    auto& [name, group] = *c;
+
+    std::vector<ance::ResolvingHandle<ance::Type>> arg_types;
+    arg_types.push_back(ance::IntegerType::get(32, false));
+
+    auto potential_function = group->resolveOverload(arg_types);
+    if (!potential_function) return {};
+
+    ance::Function& function = *(potential_function.value());
+
+    if (function.returnType() == ance::VoidType::get())
+        return potential_function;
+    else
+        return {};
+}
+
+bool ance::GlobalScope::hasEntry()
+{
+    return findEntry().has_value();
 }
 
 bool ance::GlobalScope::hasExit()
 {
-    auto c = defined_function_groups_.find("exit");
-    if (c == defined_function_groups_.end()) return false;
-
-    auto& [name, group] = *c;
-
-    auto potential_function = group->resolveOverload();
-    if (!potential_function) return false;
-
-    ance::Function& function = *(potential_function.value());
-
-    return function.parameterCount() == 1 && function.parameterType(0)->isIntegerType(32, false)
-        && function.returnType() == ance::VoidType::get();
+    return findExit().has_value();
 }
 
 ance::ResolvingHandle<ance::Function> ance::GlobalScope::getEntry()
 {
-    auto c = defined_function_groups_.find("main");
-    if (c == defined_function_groups_.end()) assert(false);
-
-    auto& [name, group] = *c;
-
-    auto potential_function = group->resolveOverload();
-    if (!potential_function) assert(false);
-
-    ance::ResolvingHandle<ance::Function> function = potential_function.value();
-    return function;
+    std::optional<ance::ResolvingHandle<ance::Function>> potential_function = findEntry();
+    assert(potential_function.has_value());
+    return potential_function.value();
 }
 
 ance::ResolvingHandle<ance::Function> ance::GlobalScope::getExit()
 {
-    auto c = defined_function_groups_.find("exit");
-    if (c == defined_function_groups_.end()) assert(false);
-
-    auto& [name, group] = *c;
-
-    auto potential_function = group->resolveOverload();
-    if (!potential_function) assert(false);
-
-    ance::ResolvingHandle<ance::Function> function = potential_function.value();
-    return function;
+    std::optional<ance::ResolvingHandle<ance::Function>> potential_function = findExit();
+    assert(potential_function.has_value());
+    return potential_function.value();
 }
 
 void ance::GlobalScope::createNativeBacking(CompileContext* context)

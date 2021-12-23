@@ -84,7 +84,11 @@ std::optional<ance::ResolvingHandle<ance::Function>> FunctionCall::function()
 {
     if (!overload_resolved_)
     {
-        function_          = function_group_->resolveOverload();
+        std::vector<ance::ResolvingHandle<ance::Type>> arg_types;
+        arg_types.reserve(arguments_.size());
+        for (auto& arg : arguments_) { arg_types.push_back(arg->type()); }
+
+        function_          = function_group_->resolveOverload(arg_types);
         overload_resolved_ = true;
     }
 

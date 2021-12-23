@@ -130,6 +130,10 @@ namespace ance
         bool resolveDefinition(ance::ResolvingHandle<ance::FunctionGroup> function_group) override;
         bool resolveDefinition(ance::ResolvingHandle<ance::Type> type) override;
 
+      private:
+        std::optional<ance::ResolvingHandle<ance::Function>> findEntry();
+        std::optional<ance::ResolvingHandle<ance::Function>> findExit();
+
       public:
         /**
          * Check if this global scope has an entry point.
