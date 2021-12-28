@@ -97,11 +97,10 @@ std::vector<std::shared_ptr<ance::Parameter>>& ance::FunctionDefinition::paramet
 
 std::pair<llvm::FunctionType*, llvm::Function*> ance::FunctionDefinition::createNativeFunction(
     llvm::GlobalValue::LinkageTypes linkage,
-    bool                            mangle,
     llvm::LLVMContext&              c,
     llvm::Module*                   m)
 {
-    const std::string& native_name = mangle ? signature_.getMangledName() : function_->name();
+    const std::string& native_name = isMangled() ? signature_.getMangledName() : function_->name();
 
     std::vector<llvm::Type*> param_types;
     param_types.reserve(parameters_.size());

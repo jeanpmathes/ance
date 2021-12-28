@@ -40,6 +40,8 @@ namespace ance
                        ance::Location                                declaration_location,
                        ance::Location                                definition_location);
 
+        [[nodiscard]] bool isMangled() const override;
+
         void pushStatement(Statement* statement) override;
         void addReturn(const std::shared_ptr<ance::Value>& value) override;
 

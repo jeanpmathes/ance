@@ -23,20 +23,42 @@ void ance::FunctionGroup::resolve()
 
 void ance::FunctionGroup::validate(ValidationLogger& validation_logger)
 {
-    for (size_t i = 0; i < functions_.size(); ++i)
-    {
-        for (size_t j = i + 1; j < functions_.size(); ++j)
+    {// Validate that every signature is unique
+        for (size_t i = 0; i < functions_.size(); ++i)
         {
-            if (functions_[i]->signature() == functions_[j]->signature())
+            for (size_t j = i + 1; j < functions_.size(); ++j)
             {
-                validation_logger.logError("Duplicated function definition with signature '"
-                                               + functions_[i]->signature().toString() + "'",
-                                           functions_[j]->location());
+                if (functions_[i]->signature() == functions_[j]->signature())
+                {
+                    validation_logger.logError("Duplicated function definition with signature '"
+                                                   + functions_[i]->signature().toString() + "'",
+                                               functions_[j]->location());
+                }
             }
         }
     }
 
-    for (const auto& function : functions_) { function->validate(validation_logger); }
+    {// Validate that at most one function is not mangled
+        size_t non_mangled_count = 0;
+
+        for (auto& function : functions_)
+        {
+            if (!function->isMangled())
+            {
+                if (non_mangled_count > 0)
+                {
+                    validation_logger.logError("Multiple non-mangled functions in function group '" + name_ + "'",
+                                               function->location());
+                }
+
+                non_mangled_count++;
+            }
+        }
+    }
+
+    {// Validate every function
+        for (const auto& function : functions_) { function->validate(validation_logger); }
+    }
 }
 
 void ance::FunctionGroup::createNativeBacking(CompileContext* compile_context)

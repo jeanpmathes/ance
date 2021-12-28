@@ -85,6 +85,12 @@ namespace ance
         [[nodiscard]] ance::Location location() const;
 
         /**
+         * Get whether the name of this function is mangled.
+         * @return True if the name is mangled.
+         */
+        [[nodiscard]] virtual bool isMangled() const = 0;
+
+        /**
          * Validate this function.
          * @param validation_logger A logger to log validation messages.
          */
@@ -144,13 +150,11 @@ namespace ance
         /**
          * A helper to create a native function.
          * @param linkage The linkage type.
-         * @param mangle Whether to mangle the function name.
          * @param c The llvm context.
          * @param m The llvm module.
          * @return The native function type and the native function.
          */
         std::pair<llvm::FunctionType*, llvm::Function*> createNativeFunction(llvm::GlobalValue::LinkageTypes linkage,
-                                                                             bool                            mangle,
                                                                              llvm::LLVMContext&              c,
                                                                              llvm::Module*                   m);
 

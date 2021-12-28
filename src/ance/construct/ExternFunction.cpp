@@ -29,6 +29,11 @@ ance::ExternFunction::ExternFunction(ance::Function*                            
     for (const auto& parameter : this->parameters()) { containing_scope->addType(parameter->type()); }
 }
 
+bool ance::ExternFunction::isMangled() const
+{
+    return false;
+}
+
 void ance::ExternFunction::pushStatement(Statement*) {}
 void ance::ExternFunction::addReturn(const std::shared_ptr<ance::Value>&) {}
 
@@ -75,7 +80,6 @@ void ance::ExternFunction::validate(ValidationLogger& validation_logger)
 void ance::ExternFunction::createNativeBacking(CompileContext* context)
 {
     std::tie(native_type_, native_function_) = createNativeFunction(llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-                                                                    false,
                                                                     *context->llvmContext(),
                                                                     context->module());
 

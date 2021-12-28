@@ -83,6 +83,12 @@ ance::Location ance::Function::location() const
     return definition_->location();
 }
 
+bool ance::Function::isMangled() const
+{
+    assert(isDefined());
+    return definition_->isMangled();
+}
+
 void ance::Function::pushStatement(Statement* statement)
 {
     definition_->pushStatement(statement);

@@ -113,6 +113,12 @@ namespace ance
         [[nodiscard]] ance::Location location() const;
 
         /**
+         * Get whether this function is mangled.
+         * @return True if this function is mangled, false otherwise.
+         */
+        [[nodiscard]] bool isMangled() const;
+
+        /**
          * Push a statement to the end of the statement list.
          * @param statement The statement to add.
          */

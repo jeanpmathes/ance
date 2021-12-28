@@ -23,6 +23,8 @@ namespace ance
                        std::vector<std::shared_ptr<ance::Parameter>> parameters,
                        ance::Location                                location);
 
+        [[nodiscard]] bool isMangled() const override;
+
         void pushStatement(Statement* statement) override;
         void addReturn(const std::shared_ptr<ance::Value>& value) override;
 
