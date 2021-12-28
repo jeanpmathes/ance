@@ -21,6 +21,7 @@ void AnceSyntaxErrorHandler::LexerErrorListener::syntaxError(antlr4::Recognizer*
     if (continuing_previous_error && previous_column != 0) return;
 
     parent_.log("Cannot recognize tokens", line, char_position_in_line);
+    parent_.fatal_error_count_++;
 }
 
 AnceSyntaxErrorHandler::ParserErrorListener::ParserErrorListener(AnceSyntaxErrorHandler& parent) : parent_(parent) {}
