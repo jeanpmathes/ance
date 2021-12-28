@@ -107,7 +107,7 @@ bool ance::TypeClone::validateDefinition(ValidationLogger& validation_logger)
 
     if (!original_->isDefined())
     {
-        validation_logger.logError("Cannot clone undefined type '" + original_->getAnnotatedName() + "'",
+        validation_logger.logError("Cannot clone undefined type " + original_->getAnnotatedName(),
                                    original_type_location_);
         valid = false;
     }

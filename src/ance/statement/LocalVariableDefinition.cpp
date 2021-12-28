@@ -50,8 +50,7 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
 
         if (!variable->type()->isDefined())
         {
-            validation_logger.logError("Type '" + variable->type()->getAnnotatedName() + "' not defined",
-                                       type_location_);
+            validation_logger.logError("Type " + variable->type()->getAnnotatedName() + " not defined", type_location_);
 
             return;
         }

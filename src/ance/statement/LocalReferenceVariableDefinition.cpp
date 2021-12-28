@@ -69,16 +69,16 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
     {
         if (!type_->isDefined())
         {
-            validation_logger.logError("Cannot bind reference to variable of undefined type '"
-                                           + type_->getAnnotatedName() + "'",
+            validation_logger.logError("Cannot bind reference to variable of undefined type "
+                                           + type_->getAnnotatedName(),
                                        type_location_);
             return;
         }
 
         if (!type_->isReferenceType())
         {
-            validation_logger.logError("Cannot bind reference to variable of non-reference type '"
-                                           + type_->getAnnotatedName() + "'",
+            validation_logger.logError("Cannot bind reference to variable of non-reference type "
+                                           + type_->getAnnotatedName(),
                                        type_location_);
             return;
         }
@@ -95,9 +95,9 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
 
         if (!ance::Type::areSame(declared_referenced_type, provided_referenced_type))
         {
-            validation_logger.logError("Cannot bind '" + declared_referenced_type->getAnnotatedName()
-                                           + "' reference to value of type '"
-                                           + provided_referenced_type->getAnnotatedName() + "'",
+            validation_logger.logError("Cannot bind " + declared_referenced_type->getAnnotatedName()
+                                           + " reference to value of type "
+                                           + provided_referenced_type->getAnnotatedName(),
                                        reference_->location());
             return;
         }

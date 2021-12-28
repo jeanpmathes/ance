@@ -192,7 +192,7 @@ bool ance::TypeDefinition::checkDependencies(ValidationLogger& validation_logger
 
         if (checked.find(current) != checked.end())
         {
-            validation_logger.logError("Type '" + self()->getAnnotatedName() + "' has circular dependency",
+            validation_logger.logError("Type " + self()->getAnnotatedName() + " has circular dependency",
                                        current->getDefinitionLocation());
             return false;
         }

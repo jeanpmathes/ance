@@ -36,7 +36,7 @@ void ance::ExternFunction::validate(ValidationLogger& validation_logger)
 {
     if (!returnType()->isDefined())
     {
-        validation_logger.logError("Return type '" + returnType()->getAnnotatedName() + "' not defined.",
+        validation_logger.logError("Return type " + returnType()->getAnnotatedName() + " not defined.",
                                    returnTypeLocation());
         return;
     }
@@ -57,7 +57,7 @@ void ance::ExternFunction::validate(ValidationLogger& validation_logger)
 
         if (!parameter->type()->isDefined())
         {
-            validation_logger.logError("Parameter type '" + parameter->type()->getAnnotatedName() + "' not defined.",
+            validation_logger.logError("Parameter type " + parameter->type()->getAnnotatedName() + " not defined.",
                                        parameter->typeLocation());
 
             return;

@@ -49,7 +49,7 @@ bool ance::ArrayType::validate(ValidationLogger& validation_logger, ance::Locati
 {
     if (!element_type_->isDefined())
     {
-        validation_logger.logError("Cannot declare array of undefined type '" + element_type_->getAnnotatedName() + "'",
+        validation_logger.logError("Cannot declare array of undefined type " + element_type_->getAnnotatedName(),
                                    location);
         return false;
     }

@@ -48,15 +48,14 @@ bool ance::ReferenceType::validate(ValidationLogger& validation_logger, ance::Lo
 {
     if (!element_type_->isDefined())
     {
-        validation_logger.logError("Cannot declare reference to undefined type '" + element_type_->getAnnotatedName()
-                                       + "'",
+        validation_logger.logError("Cannot declare reference to undefined type " + element_type_->getAnnotatedName(),
                                    location);
         return false;
     }
 
     if (element_type_ == ance::VoidType::get())
     {
-        validation_logger.logError("Cannot declare reference to '" + ance::VoidType::get()->getAnnotatedName() + "'",
+        validation_logger.logError("Cannot declare reference to " + ance::VoidType::get()->getAnnotatedName(),
                                    location);
         return false;
     }

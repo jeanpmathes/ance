@@ -26,7 +26,7 @@ bool SizeofType::validate(ValidationLogger& validation_logger)
 {
     if (!type_->isDefined())
     {
-        validation_logger.logError("Type '" + type_->getAnnotatedName() + "' not defined", type_location_);
+        validation_logger.logError("Type " + type_->getAnnotatedName() + " not defined", type_location_);
         return false;
     }
 

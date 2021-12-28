@@ -40,7 +40,7 @@ void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
 {
     if (!type()->isDefined())
     {
-        validation_logger.logError("Variable type '" + type()->getAnnotatedName() + "' not defined", typeLocation());
+        validation_logger.logError("Variable type " + type()->getAnnotatedName() + " not defined", typeLocation());
         return;
     }
 

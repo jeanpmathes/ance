@@ -40,7 +40,7 @@ bool Subscript::validate(ValidationLogger& validation_logger)
     }
     else
     {
-        validation_logger.logError("Type '" + indexed_type->getAnnotatedName() + "' does not provide get indexer",
+        validation_logger.logError("Type " + indexed_type->getAnnotatedName() + " does not provide get indexer",
                                    location());
 
         return false;
