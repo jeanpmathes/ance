@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "validation/ValidationLogger.h"
+
 ance::FunctionGroup::FunctionGroup(std::string name) : name_(std::move(name)) {}
 
 bool ance::FunctionGroup::isDefined() const
@@ -21,6 +23,19 @@ void ance::FunctionGroup::resolve()
 
 void ance::FunctionGroup::validate(ValidationLogger& validation_logger)
 {
+    for (size_t i = 0; i < functions_.size(); ++i)
+    {
+        for (size_t j = i + 1; j < functions_.size(); ++j)
+        {
+            if (functions_[i]->signature() == functions_[j]->signature())
+            {
+                validation_logger.logError("Duplicated function definition with signature '"
+                                               + functions_[i]->signature().toString() + "'",
+                                           functions_[j]->location());
+            }
+        }
+    }
+
     for (const auto& function : functions_) { function->validate(validation_logger); }
 }
 

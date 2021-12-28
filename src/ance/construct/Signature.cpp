@@ -45,3 +45,41 @@ const std::string& ance::Signature::getMangledName()
 
     return mangled_name_;
 }
+
+std::string ance::Signature::toString() const
+{
+    std::string string = function_name_ + " (";
+
+    bool is_first = true;
+    for (auto& type : types_)
+    {
+        if (!is_first) { string += ", "; }
+
+        is_first = false;
+        string += type->getActualType()->getName();
+    }
+
+    string += ")";
+    return string;
+}
+
+bool ance::Signature::operator==(const ance::Signature& other) const
+{
+    return areSame(*this, other);
+}
+
+bool ance::Signature::operator!=(const ance::Signature& other) const
+{
+    return !areSame(*this, other);
+}
+
+bool ance::Signature::areSame(const ance::Signature& a, const ance::Signature& b)
+{
+    if (a.function_name_ != b.function_name_) return false;
+    if (a.types_.size() != b.types_.size()) return false;
+
+    auto types = llvm::zip(a.types_, b.types_);
+    return std::all_of(types.begin(), types.end(), [](const auto& pair) {
+        return ance::Type::areSame(std::get<0>(pair), std::get<1>(pair));
+    });
+}

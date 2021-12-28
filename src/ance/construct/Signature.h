@@ -38,6 +38,23 @@ namespace ance
          */
         [[nodiscard]] const std::string& getMangledName();
 
+        /**
+         * Get a string representation of the signature.
+         * @return The string representation.
+         */
+        std::string toString() const;
+
+        bool operator==(const Signature& other) const;
+        bool operator!=(const Signature& other) const;
+
+        /**
+         * Check if two given signatures are the same.
+         * @param a The first signature.
+         * @param b The second signature.
+         * @return True if the signatures are the same, false otherwise.
+         */
+        static bool areSame(const Signature& a, const Signature& b);
+
       private:
         std::string                                    function_name_;
         std::vector<ance::ResolvingHandle<ance::Type>> types_;
