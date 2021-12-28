@@ -73,8 +73,7 @@ bool ance::FunctionDefinition::validateCall(
 {
     if (arguments.size() != parameters_.size())
     {
-        validation_logger.logError("No overload of '" + name() + "' takes " + std::to_string(arguments.size())
-                                       + " arguments",
+        validation_logger.logError("Passed arguments do not match function signature '" + signature_.toString() + "'",
                                    location);
         return false;
     }

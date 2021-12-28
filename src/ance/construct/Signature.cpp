@@ -5,6 +5,11 @@ ance::Signature::Signature(const std::string& name, std::vector<ance::ResolvingH
     , types_(types)
 {}
 
+size_t ance::Signature::getParameterCount() const
+{
+    return types_.size();
+}
+
 ance::Signature ance::Signature::fromParameters(const std::string&                                   name,
                                                 const std::vector<std::shared_ptr<ance::Parameter>>& parameters)
 {

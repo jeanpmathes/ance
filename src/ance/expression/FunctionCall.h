@@ -43,6 +43,7 @@ class FunctionCall : public DelayableExpression
 
   private:
     std::optional<ance::ResolvingHandle<ance::Function>> function();
+    std::vector<ance::ResolvingHandle<ance::Type>>       argumentTypes();
 
     ance::ResolvingHandle<ance::FunctionGroup>           function_group_;
     std::vector<std::unique_ptr<Expression>>             arguments_;

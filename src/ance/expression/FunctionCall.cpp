@@ -49,6 +49,9 @@ bool FunctionCall::validate(ValidationLogger& validation_logger)
         return false;
     }
 
+    bool is_resolving_valid = function_group_->validateResolution(argumentTypes(), location(), validation_logger);
+    if (!is_resolving_valid) return false;
+
     std::optional<ance::ResolvingHandle<ance::Function>> potential_function = function();
     if (!potential_function.has_value())
     {
@@ -84,15 +87,20 @@ std::optional<ance::ResolvingHandle<ance::Function>> FunctionCall::function()
 {
     if (!overload_resolved_)
     {
-        std::vector<ance::ResolvingHandle<ance::Type>> arg_types;
-        arg_types.reserve(arguments_.size());
-        for (auto& arg : arguments_) { arg_types.push_back(arg->type()); }
-
-        function_          = function_group_->resolveOverload(arg_types);
+        function_          = function_group_->resolveOverload(argumentTypes());
         overload_resolved_ = true;
     }
 
     return function_;
+}
+
+std::vector<ance::ResolvingHandle<ance::Type>> FunctionCall::argumentTypes()
+{
+    std::vector<ance::ResolvingHandle<ance::Type>> arg_types;
+    arg_types.reserve(arguments_.size());
+    for (auto& arg : arguments_) { arg_types.push_back(arg->type()); }
+
+    return arg_types;
 }
 
 FunctionCall::~FunctionCall() = default;

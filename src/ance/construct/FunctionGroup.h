@@ -34,6 +34,17 @@ namespace ance
         void addFunction(ance::OwningHandle<ance::Function> function);
 
         /**
+         * Validate the resolution for given types.
+         * @param types The types of the arguments.
+         * @param location The source location at which the resolution was requested.
+         * @param validation_logger The validation logger.
+         * @return True if the resolution is valid.
+         */
+        bool validateResolution(std::vector<ance::ResolvingHandle<ance::Type>> types,
+                                ance::Location                                 location,
+                                ValidationLogger&                              validation_logger);
+
+        /**
          * Resolve a function overload.
          * @param arguments The argument types to use for overload resolution.
          * @return A function, when defined.

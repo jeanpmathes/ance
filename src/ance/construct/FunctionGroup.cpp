@@ -77,6 +77,23 @@ void ance::FunctionGroup::addFunction(ance::OwningHandle<ance::Function> functio
     functions_.push_back(std::move(function));
 }
 
+bool ance::FunctionGroup::validateResolution(std::vector<ance::ResolvingHandle<ance::Type>> types,
+                                             ance::Location                                 location,
+                                             ValidationLogger&                              validation_logger)
+{
+    size_t argument_count = types.size();
+
+    for (auto& function : functions_)
+    {
+        if (function->signature().getParameterCount() == argument_count) return true;
+    }
+
+    validation_logger.logError("No overload of '" + name() + "' takes " + std::to_string(argument_count) + " arguments",
+                               location);
+
+    return false;
+}
+
 std::optional<ance::ResolvingHandle<ance::Function>> ance::FunctionGroup::resolveOverload(
     const std::vector<ance::ResolvingHandle<ance::Type>>& arguments)
 {

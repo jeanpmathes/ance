@@ -16,6 +16,8 @@ namespace ance
         explicit Signature(const std::string& name, std::vector<ance::ResolvingHandle<ance::Type>>& types);
 
       public:
+        [[nodiscard]] size_t getParameterCount() const;
+
         /**
          * Creates a new signature from given parameters.
          * @param name The name of the function.
