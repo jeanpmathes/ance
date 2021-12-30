@@ -600,27 +600,32 @@ antlrcpp::Any SourceVisitor::visitFinalCopyAssignment(anceParser::FinalCopyAssig
 
 antlrcpp::Any SourceVisitor::visitAddition(anceParser::AdditionContext*)
 {
-    return BinaryOperator::ADDITION;
+    BinaryOperator op = BinaryOperator::ADDITION;
+    return op;
 }
 
 antlrcpp::Any SourceVisitor::visitSubtraction(anceParser::SubtractionContext*)
 {
-    return BinaryOperator::SUBTRACTION;
+    BinaryOperator op = BinaryOperator::SUBTRACTION;
+    return op;
 }
 
 antlrcpp::Any SourceVisitor::visitMultiplication(anceParser::MultiplicationContext*)
 {
-    return BinaryOperator::MULTIPLICATION;
+    BinaryOperator op = BinaryOperator::MULTIPLICATION;
+    return op;
 }
 
 antlrcpp::Any SourceVisitor::visitDivision(anceParser::DivisionContext*)
 {
-    return BinaryOperator::DIVISION;
+    BinaryOperator op = BinaryOperator::DIVISION;
+    return op;
 }
 
 antlrcpp::Any SourceVisitor::visitModulo(anceParser::ModuloContext*)
 {
-    return BinaryOperator::MODULO;
+    BinaryOperator op = BinaryOperator::MODULO;
+    return op;
 }
 
 ance::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)

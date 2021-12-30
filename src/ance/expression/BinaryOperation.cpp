@@ -30,9 +30,19 @@ bool BinaryOperation::validate(ValidationLogger& validation_logger)
 
     if (!left_->type()->isOperatorDefined(op_, right_->type()))
     {
-        validation_logger.logError("Type " + left_->type()->getAnnotatedName() + " does not provide operator "
-                                       + op_.toString() + " with type " + right_->type()->getAnnotatedName(),
-                                   location());
+        if (ance::Type::areSame(left_->type(), right_->type()))
+        {
+            validation_logger.logError("Type " + left_->type()->getAnnotatedName() + " does not provide operator '"
+                                           + op_.toString() + "'",
+                                       location());
+        }
+        else
+        {
+            validation_logger.logError("Type " + left_->type()->getAnnotatedName() + " does not provide operator '"
+                                           + op_.toString() + "' with type " + right_->type()->getAnnotatedName(),
+                                       location());
+        }
+
         return false;
     }
 
