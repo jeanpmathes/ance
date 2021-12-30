@@ -62,21 +62,31 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitReturnStatement(anceParser::ReturnStatementContext* context) = 0;
 
+    virtual antlrcpp::Any visitAddition(anceParser::AdditionContext* context) = 0;
+
+    virtual antlrcpp::Any visitMultiplication(anceParser::MultiplicationContext* context) = 0;
+
+    virtual antlrcpp::Any visitVariable(anceParser::VariableContext* context) = 0;
+
+    virtual antlrcpp::Any visitAdressOf(anceParser::AdressOfContext* context) = 0;
+
+    virtual antlrcpp::Any visitModulo(anceParser::ModuloContext* context) = 0;
+
+    virtual antlrcpp::Any visitSubscript(anceParser::SubscriptContext* context) = 0;
+
     virtual antlrcpp::Any visitRef(anceParser::RefContext* context) = 0;
 
     virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* context) = 0;
 
-    virtual antlrcpp::Any visitVariable(anceParser::VariableContext* context) = 0;
-
     virtual antlrcpp::Any visitAlloc(anceParser::AllocContext* context) = 0;
 
-    virtual antlrcpp::Any visitAdressOf(anceParser::AdressOfContext* context) = 0;
+    virtual antlrcpp::Any visitSubtraction(anceParser::SubtractionContext* context) = 0;
 
     virtual antlrcpp::Any visitLiteral(anceParser::LiteralContext* context) = 0;
 
     virtual antlrcpp::Any visitSizeOf(anceParser::SizeOfContext* context) = 0;
 
-    virtual antlrcpp::Any visitSubscript(anceParser::SubscriptContext* context) = 0;
+    virtual antlrcpp::Any visitDivision(anceParser::DivisionContext* context) = 0;
 
     virtual antlrcpp::Any visitIndependentExpression(anceParser::IndependentExpressionContext* context) = 0;
 
