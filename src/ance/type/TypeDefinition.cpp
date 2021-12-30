@@ -153,6 +153,17 @@ ance::ResolvingHandle<ance::Type> ance::TypeDefinition::getSubscriptReturnType()
     return ance::VoidType::get();
 }
 
+bool ance::TypeDefinition::isOperatorDefined(BinaryOperator, ance::ResolvingHandle<ance::Type>)
+{
+    return false;
+}
+
+ance::ResolvingHandle<ance::Type> ance::TypeDefinition::getOperatorResultType(BinaryOperator,
+                                                                              ance::ResolvingHandle<ance::Type>)
+{
+    return ance::VoidType::get();
+}
+
 bool ance::TypeDefinition::validateDefinition(ValidationLogger&)
 {
     return true;
@@ -171,9 +182,26 @@ bool ance::TypeDefinition::validateSubscript(ance::Location,
     return false;
 }
 
+bool ance::TypeDefinition::validateOperator(BinaryOperator,
+                                            ance::ResolvingHandle<ance::Type>,
+                                            ance::Location,
+                                            ance::Location,
+                                            ValidationLogger&)
+{
+    return false;
+}
+
 std::shared_ptr<ance::Value> ance::TypeDefinition::buildSubscript(std::shared_ptr<Value>,
                                                                   std::shared_ptr<Value>,
                                                                   CompileContext*)
+{
+    return nullptr;
+}
+
+std::shared_ptr<ance::Value> ance::TypeDefinition::buildOperator(BinaryOperator,
+                                                                 std::shared_ptr<Value>,
+                                                                 std::shared_ptr<Value>,
+                                                                 CompileContext*)
 {
     return nullptr;
 }

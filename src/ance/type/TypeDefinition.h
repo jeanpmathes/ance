@@ -8,6 +8,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 
+#include "ance/BinaryOperator.h"
 #include "ance/utility/Location.h"
 #include "ance/utility/ResolvingHandle.h"
 
@@ -75,21 +76,32 @@ namespace ance
         llvm::TypeSize getNativeSize(llvm::Module* m);
         llvm::TypeSize getContentSize(llvm::Module* m);
 
-        virtual bool isSubscriptDefined();
-
+        virtual bool                              isSubscriptDefined();
         virtual ance::ResolvingHandle<ance::Type> getSubscriptReturnType();
+
+        virtual bool isOperatorDefined(BinaryOperator op, ance::ResolvingHandle<ance::Type> other);
+        virtual ance::ResolvingHandle<ance::Type> getOperatorResultType(BinaryOperator                    op,
+                                                                        ance::ResolvingHandle<ance::Type> other);
 
         virtual bool validateDefinition(ValidationLogger& validation_logger);
         virtual bool validate(ValidationLogger& validation_logger, ance::Location location);
-
         virtual bool validateSubscript(ance::Location                    indexed_location,
                                        ance::ResolvingHandle<ance::Type> index_type,
                                        ance::Location                    index_location,
                                        ValidationLogger&                 validation_logger);
+        bool         validateOperator(BinaryOperator                    op,
+                                      ance::ResolvingHandle<ance::Type> other,
+                                      ance::Location                    left_location,
+                                      ance::Location                    right_location,
+                                      ValidationLogger&                 validation_logger);
 
         virtual std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                             std::shared_ptr<Value> index,
                                                             CompileContext*        context);
+        std::shared_ptr<ance::Value>         buildOperator(BinaryOperator         op,
+                                                           std::shared_ptr<Value> left,
+                                                           std::shared_ptr<Value> right,
+                                                           CompileContext*        context);
 
       protected:
         virtual std::string createMangledName() = 0;

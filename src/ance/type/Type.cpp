@@ -194,6 +194,18 @@ ance::ResolvingHandle<ance::Type> ance::Type::getSubscriptReturnType()
     return definition_->getSubscriptReturnType();
 }
 
+bool ance::Type::isOperatorDefined(BinaryOperator op, ance::ResolvingHandle<ance::Type> other)
+{
+    assert(isDefined());
+    return definition_->isOperatorDefined(op, other);
+}
+ance::ResolvingHandle<ance::Type> ance::Type::getOperatorResultType(BinaryOperator                    op,
+                                                                    ance::ResolvingHandle<ance::Type> other)
+{
+    assert(isDefined());
+    return definition_->getOperatorResultType(op, other);
+}
+
 bool ance::Type::validateDefinition(ValidationLogger& validation_logger)
 {
     assert(isDefined());
@@ -218,12 +230,31 @@ bool ance::Type::validateSubscript(ance::Location                    indexed_loc
     return definition_->validateSubscript(indexed_location, std::move(index_type), index_location, validation_logger);
 }
 
+bool ance::Type::validateOperator(BinaryOperator                    op,
+                                  ance::ResolvingHandle<ance::Type> other,
+                                  ance::Location                    left_location,
+                                  ance::Location                    right_location,
+                                  ValidationLogger&                 validation_logger)
+{
+    assert(isDefined());
+    return definition_->validateOperator(op, std::move(other), left_location, right_location, validation_logger);
+}
+
 std::shared_ptr<ance::Value> ance::Type::buildSubscript(std::shared_ptr<Value> indexed,
                                                         std::shared_ptr<Value> index,
                                                         CompileContext*        context)
 {
     assert(isDefined());
     return definition_->buildSubscript(std::move(indexed), std::move(index), context);
+}
+
+std::shared_ptr<ance::Value> ance::Type::buildOperator(BinaryOperator         op,
+                                                       std::shared_ptr<Value> left,
+                                                       std::shared_ptr<Value> right,
+                                                       CompileContext*        context)
+{
+    assert(isDefined());
+    return definition_->buildOperator(op, std::move(left), std::move(right), context);
 }
 
 ance::TypeDefinition* ance::Type::getDefinition()

@@ -8,6 +8,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 
+#include "ance/BinaryOperator.h"
 #include "ance/type/TypeDefinition.h"
 #include "ance/utility/Location.h"
 #include "ance/utility/ResolvingHandle.h"
@@ -51,6 +52,10 @@ namespace ance
          */
         [[nodiscard]] const std::string& getName() const;
 
+        /**
+         * Get the name of this type with helpful annotations. Useful for validation messages.
+         * @return The annotated name.
+         */
         std::string getAnnotatedName();
 
         /**
@@ -222,6 +227,23 @@ namespace ance
         ance::ResolvingHandle<ance::Type> getSubscriptReturnType();
 
         /**
+         * Get whether a binary operation is defined for this type.
+         * @param op The operation.
+         * @param other The other type.
+         * @return True if the operation is defined.
+         */
+        bool isOperatorDefined(BinaryOperator op, ance::ResolvingHandle<ance::Type> other);
+
+        /**
+         * Get a binary operation result type.
+         * @param op The operation.
+         * @param other The other type.
+         * @return The result type.
+         */
+        ance::ResolvingHandle<ance::Type> getOperatorResultType(BinaryOperator                    op,
+                                                                ance::ResolvingHandle<ance::Type> other);
+
+        /**
          * Validate the definition of this type, if there is any.
          * @param validation_logger The validation logger to use.
          * @return True if the type has a valid definition.
@@ -250,6 +272,21 @@ namespace ance
                                ValidationLogger&                 validation_logger);
 
         /**
+         * Validate a binary operation.
+         * @param op The operation.
+         * @param other The other type.
+         * @param left_location The source location of the left value.
+         * @param right_location The source location of the right value.
+         * @param validation_logger The validation logger to use.
+         * @return True if the operation is valid.
+         */
+        bool validateOperator(BinaryOperator                    op,
+                              ance::ResolvingHandle<ance::Type> other,
+                              ance::Location                    left_location,
+                              ance::Location                    right_location,
+                              ValidationLogger&                 validation_logger);
+
+        /**
          * Build a subscript access.
          * @param indexed The indexed value.
          * @param index The index to use.
@@ -259,6 +296,19 @@ namespace ance
         std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
                                                     CompileContext*        context);
+
+        /**
+         * Build a binary operation.
+         * @param op The operation.
+         * @param left The left value, must be of this type.
+         * @param right The right value.
+         * @param context The current compile context.
+         * @return The result value.
+         */
+        std::shared_ptr<ance::Value> buildOperator(BinaryOperator         op,
+                                                   std::shared_ptr<Value> left,
+                                                   std::shared_ptr<Value> right,
+                                                   CompileContext*        context);
 
         ance::TypeDefinition* getDefinition();
 
