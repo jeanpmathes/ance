@@ -56,6 +56,7 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext* ctx) override;
     antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext* ctx) override;
     antlrcpp::Any visitSubscript(anceParser::SubscriptContext* ctx) override;
+    antlrcpp::Any visitBinaryOperation(anceParser::BinaryOperationContext* ctx) override;
 
     // Literals and Types
 
@@ -80,11 +81,19 @@ class SourceVisitor : public anceBaseVisitor
 
     antlrcpp::Any visitPublic(anceParser::PublicContext* ctx) override;
     antlrcpp::Any visitPrivate(anceParser::PrivateContext* ctx) override;
+
     antlrcpp::Any visitAutomatic(anceParser::AutomaticContext* ctx) override;
     antlrcpp::Any visitDynamic(anceParser::DynamicContext* ctx) override;
+
     antlrcpp::Any visitCopyAssignment(anceParser::CopyAssignmentContext* ctx) override;
     antlrcpp::Any visitMoveAssignment(anceParser::MoveAssignmentContext* ctx) override;
     antlrcpp::Any visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext* ctx) override;
+
+    antlrcpp::Any visitAddition(anceParser::AdditionContext* ctx) override;
+    antlrcpp::Any visitSubtraction(anceParser::SubtractionContext* ctx) override;
+    antlrcpp::Any visitMultiplication(anceParser::MultiplicationContext* ctx) override;
+    antlrcpp::Any visitDivision(anceParser::DivisionContext* ctx) override;
+    antlrcpp::Any visitModulo(anceParser::ModuloContext* ctx) override;
 
   protected:
     static ance::Location location(antlr4::ParserRuleContext* ctx);

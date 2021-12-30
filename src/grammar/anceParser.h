@@ -95,35 +95,36 @@ class anceParser : public antlr4::Parser
         RuleDeleteStatement          = 15,
         RuleReturnStatement          = 16,
         RuleExpression               = 17,
-        RuleIndependentExpression    = 18,
-        RuleFunctionCall             = 19,
-        RuleArguments                = 20,
-        RuleVariableAccess           = 21,
-        RuleAllocation               = 22,
-        RuleAllocator                = 23,
-        RuleAddressof                = 24,
-        RuleBindRef                  = 25,
-        RuleSizeofType               = 26,
-        RuleSizeofExpression         = 27,
-        RuleLiteralExpression        = 28,
-        RuleStringLiteral            = 29,
-        RuleByteLiteral              = 30,
-        RuleIntegerLiteral           = 31,
-        RuleUnsignedInteger          = 32,
-        RuleSignedInteger            = 33,
-        RuleSpecialInteger           = 34,
-        RuleFloatingPointLiteral     = 35,
-        RuleBooleanLiteral           = 36,
-        RuleSizeLiteral              = 37,
-        RuleDiffLiteral              = 38,
-        RuleType                     = 39,
-        RuleIntegerType              = 40,
-        RuleArrayType                = 41,
-        RuleKeywordType              = 42,
-        RuleFloatingPointType        = 43,
-        RuleTargetDependentType      = 44,
-        RuleVoidType                 = 45,
-        RuleCustomType               = 46
+        RuleBinaryOperator           = 18,
+        RuleIndependentExpression    = 19,
+        RuleFunctionCall             = 20,
+        RuleArguments                = 21,
+        RuleVariableAccess           = 22,
+        RuleAllocation               = 23,
+        RuleAllocator                = 24,
+        RuleAddressof                = 25,
+        RuleBindRef                  = 26,
+        RuleSizeofType               = 27,
+        RuleSizeofExpression         = 28,
+        RuleLiteralExpression        = 29,
+        RuleStringLiteral            = 30,
+        RuleByteLiteral              = 31,
+        RuleIntegerLiteral           = 32,
+        RuleUnsignedInteger          = 33,
+        RuleSignedInteger            = 34,
+        RuleSpecialInteger           = 35,
+        RuleFloatingPointLiteral     = 36,
+        RuleBooleanLiteral           = 37,
+        RuleSizeLiteral              = 38,
+        RuleDiffLiteral              = 39,
+        RuleType                     = 40,
+        RuleIntegerType              = 41,
+        RuleArrayType                = 42,
+        RuleKeywordType              = 43,
+        RuleFloatingPointType        = 44,
+        RuleTargetDependentType      = 45,
+        RuleVoidType                 = 46,
+        RuleCustomType               = 47
     };
 
     anceParser(antlr4::TokenStream* input);
@@ -156,6 +157,7 @@ class anceParser : public antlr4::Parser
     class DeleteStatementContext;
     class ReturnStatementContext;
     class ExpressionContext;
+    class BinaryOperatorContext;
     class IndependentExpressionContext;
     class FunctionCallContext;
     class ArgumentsContext;
@@ -543,78 +545,6 @@ class anceParser : public antlr4::Parser
         virtual size_t getRuleIndex() const override;
     };
 
-    class AdditionContext : public ExpressionContext
-    {
-      public:
-        AdditionContext(ExpressionContext* ctx);
-
-        anceParser::ExpressionContext*  left  = nullptr;
-        anceParser::ExpressionContext*  right = nullptr;
-        std::vector<ExpressionContext*> expression();
-        ExpressionContext*              expression(size_t i);
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    class MultiplicationContext : public ExpressionContext
-    {
-      public:
-        MultiplicationContext(ExpressionContext* ctx);
-
-        anceParser::ExpressionContext*  left  = nullptr;
-        anceParser::ExpressionContext*  right = nullptr;
-        std::vector<ExpressionContext*> expression();
-        ExpressionContext*              expression(size_t i);
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    class VariableContext : public ExpressionContext
-    {
-      public:
-        VariableContext(ExpressionContext* ctx);
-
-        VariableAccessContext* variableAccess();
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    class AdressOfContext : public ExpressionContext
-    {
-      public:
-        AdressOfContext(ExpressionContext* ctx);
-
-        AddressofContext* addressof();
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    class ModuloContext : public ExpressionContext
-    {
-      public:
-        ModuloContext(ExpressionContext* ctx);
-
-        anceParser::ExpressionContext*  left  = nullptr;
-        anceParser::ExpressionContext*  right = nullptr;
-        std::vector<ExpressionContext*> expression();
-        ExpressionContext*              expression(size_t i);
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    class SubscriptContext : public ExpressionContext
-    {
-      public:
-        SubscriptContext(ExpressionContext* ctx);
-
-        anceParser::ExpressionContext*  indexed = nullptr;
-        anceParser::ExpressionContext*  index   = nullptr;
-        std::vector<ExpressionContext*> expression();
-        ExpressionContext*              expression(size_t i);
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
     class RefContext : public ExpressionContext
     {
       public:
@@ -635,6 +565,16 @@ class anceParser : public antlr4::Parser
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class VariableContext : public ExpressionContext
+    {
+      public:
+        VariableContext(ExpressionContext* ctx);
+
+        VariableAccessContext* variableAccess();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     class AllocContext : public ExpressionContext
     {
       public:
@@ -645,13 +585,24 @@ class anceParser : public antlr4::Parser
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    class SubtractionContext : public ExpressionContext
+    class AdressOfContext : public ExpressionContext
     {
       public:
-        SubtractionContext(ExpressionContext* ctx);
+        AdressOfContext(ExpressionContext* ctx);
+
+        AddressofContext* addressof();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class BinaryOperationContext : public ExpressionContext
+    {
+      public:
+        BinaryOperationContext(ExpressionContext* ctx);
 
         anceParser::ExpressionContext*  left  = nullptr;
         anceParser::ExpressionContext*  right = nullptr;
+        BinaryOperatorContext*          binaryOperator();
         std::vector<ExpressionContext*> expression();
         ExpressionContext*              expression(size_t i);
 
@@ -679,13 +630,13 @@ class anceParser : public antlr4::Parser
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    class DivisionContext : public ExpressionContext
+    class SubscriptContext : public ExpressionContext
     {
       public:
-        DivisionContext(ExpressionContext* ctx);
+        SubscriptContext(ExpressionContext* ctx);
 
-        anceParser::ExpressionContext*  left  = nullptr;
-        anceParser::ExpressionContext*  right = nullptr;
+        anceParser::ExpressionContext*  indexed = nullptr;
+        anceParser::ExpressionContext*  index   = nullptr;
         std::vector<ExpressionContext*> expression();
         ExpressionContext*              expression(size_t i);
 
@@ -694,6 +645,60 @@ class anceParser : public antlr4::Parser
 
     ExpressionContext* expression();
     ExpressionContext* expression(int precedence);
+    class BinaryOperatorContext : public antlr4::ParserRuleContext
+    {
+      public:
+        BinaryOperatorContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+        BinaryOperatorContext() = default;
+        void copyFrom(BinaryOperatorContext* context);
+        using antlr4::ParserRuleContext::copyFrom;
+
+        virtual size_t getRuleIndex() const override;
+    };
+
+    class AdditionContext : public BinaryOperatorContext
+    {
+      public:
+        AdditionContext(BinaryOperatorContext* ctx);
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class MultiplicationContext : public BinaryOperatorContext
+    {
+      public:
+        MultiplicationContext(BinaryOperatorContext* ctx);
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class SubtractionContext : public BinaryOperatorContext
+    {
+      public:
+        SubtractionContext(BinaryOperatorContext* ctx);
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class ModuloContext : public BinaryOperatorContext
+    {
+      public:
+        ModuloContext(BinaryOperatorContext* ctx);
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class DivisionContext : public BinaryOperatorContext
+    {
+      public:
+        DivisionContext(BinaryOperatorContext* ctx);
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    BinaryOperatorContext* binaryOperator();
+
     class IndependentExpressionContext : public antlr4::ParserRuleContext
     {
       public:

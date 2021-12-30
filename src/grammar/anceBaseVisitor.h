@@ -98,34 +98,39 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
+    virtual antlrcpp::Any visitRef(anceParser::RefContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitVariable(anceParser::VariableContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitAlloc(anceParser::AllocContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitAdressOf(anceParser::AdressOfContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitBinaryOperation(anceParser::BinaryOperationContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
+    virtual antlrcpp::Any visitLiteral(anceParser::LiteralContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitSizeOf(anceParser::SizeOfContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitSubscript(anceParser::SubscriptContext* ctx) override { return visitChildren(ctx); }
+
     virtual antlrcpp::Any visitAddition(anceParser::AdditionContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitSubtraction(anceParser::SubtractionContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitMultiplication(anceParser::MultiplicationContext* ctx) override
     {
         return visitChildren(ctx);
     }
 
-    virtual antlrcpp::Any visitVariable(anceParser::VariableContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitAdressOf(anceParser::AdressOfContext* ctx) override { return visitChildren(ctx); }
+    virtual antlrcpp::Any visitDivision(anceParser::DivisionContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitModulo(anceParser::ModuloContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitSubscript(anceParser::SubscriptContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitRef(anceParser::RefContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitAlloc(anceParser::AllocContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitSubtraction(anceParser::SubtractionContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitLiteral(anceParser::LiteralContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitSizeOf(anceParser::SizeOfContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitDivision(anceParser::DivisionContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitIndependentExpression(anceParser::IndependentExpressionContext* ctx) override
     {

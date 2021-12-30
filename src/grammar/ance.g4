@@ -89,12 +89,16 @@ expression
 	| literalExpression # Literal
 	| indexed=expression '[' index=expression ']' # Subscript
 	| independentExpression # Independent
-	| left=expression '+' right=expression # Addition
-    | left=expression '-' right=expression # Subtraction
-    | left=expression '*' right=expression # Multiplication
-    | left=expression '/' right=expression # Division
-    | left=expression '%' right=expression # Modulo
+	| left=expression binaryOperator right=expression # BinaryOperation
 	;
+
+binaryOperator
+    : '+' # Addition
+    | '-' # Subtraction
+    | '*' # Multiplication
+    | '/' # Division
+    | '%' # Modulo
+    ;
 
 independentExpression
 	: functionCall

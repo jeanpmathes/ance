@@ -26,6 +26,7 @@
 #include "ance/expression/Addressof.h"
 #include "ance/expression/Allocation.h"
 #include "ance/expression/BackingExpression.h"
+#include "ance/expression/BinaryOperation.h"
 #include "ance/expression/BindRef.h"
 #include "ance/expression/ConstantLiteral.h"
 #include "ance/expression/DefaultValue.h"
@@ -364,6 +365,17 @@ antlrcpp::Any SourceVisitor::visitSubscript(anceParser::SubscriptContext* ctx)
         new Subscript(std::unique_ptr<Expression>(indexed), std::unique_ptr<Expression>(index), location(ctx)));
 }
 
+antlrcpp::Any SourceVisitor::visitBinaryOperation(anceParser::BinaryOperationContext* ctx)
+{
+    Expression* left  = visit(ctx->left);
+    Expression* right = visit(ctx->right);
+
+    BinaryOperator op = visit(ctx->binaryOperator());
+
+    return static_cast<Expression*>(
+        new BinaryOperation(std::unique_ptr<Expression>(left), op, std::unique_ptr<Expression>(right), location(ctx)));
+}
+
 antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)
 {
     std::string prefix;
@@ -584,6 +596,31 @@ antlrcpp::Any SourceVisitor::visitFinalCopyAssignment(anceParser::FinalCopyAssig
 {
     Assigner assigner = Assigner::FINAL_COPY_ASSIGNMENT;
     return assigner;
+}
+
+antlrcpp::Any SourceVisitor::visitAddition(anceParser::AdditionContext*)
+{
+    return BinaryOperator::ADDITION;
+}
+
+antlrcpp::Any SourceVisitor::visitSubtraction(anceParser::SubtractionContext*)
+{
+    return BinaryOperator::SUBTRACTION;
+}
+
+antlrcpp::Any SourceVisitor::visitMultiplication(anceParser::MultiplicationContext*)
+{
+    return BinaryOperator::MULTIPLICATION;
+}
+
+antlrcpp::Any SourceVisitor::visitDivision(anceParser::DivisionContext*)
+{
+    return BinaryOperator::DIVISION;
+}
+
+antlrcpp::Any SourceVisitor::visitModulo(anceParser::ModuloContext*)
+{
+    return BinaryOperator::MODULO;
 }
 
 ance::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)

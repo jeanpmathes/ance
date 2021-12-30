@@ -2,7 +2,6 @@
 
 #include "ance/scope/Scope.h"
 #include "ance/type/SizeType.h"
-#include "ance/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
