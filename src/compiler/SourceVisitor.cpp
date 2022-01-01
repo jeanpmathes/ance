@@ -622,9 +622,9 @@ antlrcpp::Any SourceVisitor::visitDivision(anceParser::DivisionContext*)
     return op;
 }
 
-antlrcpp::Any SourceVisitor::visitModulo(anceParser::ModuloContext*)
+antlrcpp::Any SourceVisitor::visitRemainder(anceParser::RemainderContext*)
 {
-    BinaryOperator op = BinaryOperator::MODULO;
+    BinaryOperator op = BinaryOperator::REMAINDER;
     return op;
 }
 

@@ -69,7 +69,7 @@ std::shared_ptr<ance::Value> ance::SizeType::buildOperator(BinaryOperator       
             if (isSizeType()) result = context->ir()->CreateUDiv(left_value, right_value);
             if (isDiffType()) result = context->ir()->CreateSDiv(left_value, right_value);
             break;
-        case BinaryOperator::MODULO:
+        case BinaryOperator::REMAINDER:
             if (isSizeType()) result = context->ir()->CreateURem(left_value, right_value);
             if (isDiffType()) result = context->ir()->CreateSRem(left_value, right_value);
             break;

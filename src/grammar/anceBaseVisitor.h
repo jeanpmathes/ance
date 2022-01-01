@@ -130,7 +130,7 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitDivision(anceParser::DivisionContext* ctx) override { return visitChildren(ctx); }
 
-    virtual antlrcpp::Any visitModulo(anceParser::ModuloContext* ctx) override { return visitChildren(ctx); }
+    virtual antlrcpp::Any visitRemainder(anceParser::RemainderContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitIndependentExpression(anceParser::IndependentExpressionContext* ctx) override
     {

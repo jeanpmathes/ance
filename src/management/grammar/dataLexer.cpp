@@ -99,8 +99,7 @@ dataLexer::Initializer::Initializer()
         if (name.empty()) { name = _vocabulary.getSymbolicName(i); }
 
         if (name.empty()) { _tokenNames.push_back("<INVALID>"); }
-        else
-        {
+        else {
             _tokenNames.push_back(name);
         }
     }

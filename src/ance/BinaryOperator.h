@@ -28,9 +28,9 @@ class BinaryOperator
          */
         DIVISION,
         /**
-         * The mathematical modulo operator.
+         * The mathematical remainder operator.
          */
-        MODULO
+        REMAINDER
     };
 
     BinaryOperator() = default;

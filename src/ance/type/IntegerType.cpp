@@ -88,7 +88,7 @@ std::shared_ptr<ance::Value> ance::IntegerType::buildOperator(BinaryOperator    
             if (is_signed_) result = context->ir()->CreateSDiv(left_value, right_value);
             else result = context->ir()->CreateUDiv(left_value, right_value);
             break;
-        case BinaryOperator::MODULO:
+        case BinaryOperator::REMAINDER:
             if (is_signed_) result = context->ir()->CreateSRem(left_value, right_value);
             else result = context->ir()->CreateURem(left_value, right_value);
             break;

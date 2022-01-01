@@ -81,10 +81,8 @@ size_t anceParser::FileContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::FileContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitFile(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitFile(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::FileContext* anceParser::file()
@@ -196,10 +194,8 @@ size_t anceParser::VariableDeclarationContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::VariableDeclarationContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitVariableDeclaration(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitVariableDeclaration(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::VariableDeclarationContext* anceParser::variableDeclaration()
@@ -303,8 +299,7 @@ antlrcpp::Any anceParser::ExternFunctionDeclarationContext::accept(tree::ParseTr
 {
     if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
         return parserVisitor->visitExternFunctionDeclaration(this);
-    else
-        return visitor->visitChildren(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- FunctionDefinitionContext ------------------------------------------------------------------
 
@@ -345,10 +340,8 @@ anceParser::FunctionDefinitionContext::FunctionDefinitionContext(FunctionContext
 
 antlrcpp::Any anceParser::FunctionDefinitionContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitFunctionDefinition(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitFunctionDefinition(this);
+    else return visitor->visitChildren(this);
 }
 anceParser::FunctionContext* anceParser::function()
 {
@@ -487,10 +480,8 @@ size_t anceParser::ParametersContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::ParametersContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitParameters(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitParameters(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::ParametersContext* anceParser::parameters()
@@ -559,10 +550,8 @@ size_t anceParser::ParameterContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::ParameterContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitParameter(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitParameter(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::ParameterContext* anceParser::parameter()
@@ -614,10 +603,8 @@ size_t anceParser::TypeDefinitionContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::TypeDefinitionContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitTypeDefinition(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitTypeDefinition(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::TypeDefinitionContext* anceParser::typeDefinition()
@@ -687,10 +674,8 @@ size_t anceParser::DefineAsContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::DefineAsContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitDefineAs(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitDefineAs(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::DefineAsContext* anceParser::defineAs()
@@ -751,10 +736,8 @@ size_t anceParser::DefineAliasContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::DefineAliasContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitDefineAlias(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitDefineAlias(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::DefineAliasContext* anceParser::defineAlias()
@@ -812,10 +795,8 @@ anceParser::PrivateContext::PrivateContext(AccessModifierContext* ctx)
 
 antlrcpp::Any anceParser::PrivateContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitPrivate(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitPrivate(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- PublicContext ------------------------------------------------------------------
 
@@ -826,10 +807,8 @@ anceParser::PublicContext::PublicContext(AccessModifierContext* ctx)
 
 antlrcpp::Any anceParser::PublicContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitPublic(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitPublic(this);
+    else return visitor->visitChildren(this);
 }
 anceParser::AccessModifierContext* anceParser::accessModifier()
 {
@@ -920,10 +899,8 @@ size_t anceParser::StatementContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::StatementContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitStatement(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitStatement(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::StatementContext* anceParser::statement()
@@ -1020,10 +997,8 @@ size_t anceParser::ExpressionStatementContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::ExpressionStatementContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitExpressionStatement(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitExpressionStatement(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::ExpressionStatementContext* anceParser::expressionStatement()
@@ -1091,8 +1066,7 @@ antlrcpp::Any anceParser::LocalVariableDefinitionContext::accept(tree::ParseTree
 {
     if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
         return parserVisitor->visitLocalVariableDefinition(this);
-    else
-        return visitor->visitChildren(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::LocalVariableDefinitionContext* anceParser::localVariableDefinition()
@@ -1190,8 +1164,7 @@ antlrcpp::Any anceParser::LocalReferenceToValueDefinitionContext::accept(tree::P
 {
     if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
         return parserVisitor->visitLocalReferenceToValueDefinition(this);
-    else
-        return visitor->visitChildren(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- LocalReferenceToPointerDefinitionContext ------------------------------------------------------------------
 
@@ -1225,8 +1198,7 @@ antlrcpp::Any anceParser::LocalReferenceToPointerDefinitionContext::accept(tree:
 {
     if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
         return parserVisitor->visitLocalReferenceToPointerDefinition(this);
-    else
-        return visitor->visitChildren(this);
+    else return visitor->visitChildren(this);
 }
 anceParser::LocalReferenceDefinitionContext* anceParser::localReferenceDefinition()
 {
@@ -1331,10 +1303,8 @@ size_t anceParser::AssignmentContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::AssignmentContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitAssignment(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitAssignment(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::AssignmentContext* anceParser::assignment()
@@ -1390,10 +1360,8 @@ anceParser::MoveAssignmentContext::MoveAssignmentContext(AssignerContext* ctx)
 
 antlrcpp::Any anceParser::MoveAssignmentContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitMoveAssignment(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitMoveAssignment(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- FinalCopyAssignmentContext ------------------------------------------------------------------
 
@@ -1404,10 +1372,8 @@ anceParser::FinalCopyAssignmentContext::FinalCopyAssignmentContext(AssignerConte
 
 antlrcpp::Any anceParser::FinalCopyAssignmentContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitFinalCopyAssignment(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitFinalCopyAssignment(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- CopyAssignmentContext ------------------------------------------------------------------
 
@@ -1418,10 +1384,8 @@ anceParser::CopyAssignmentContext::CopyAssignmentContext(AssignerContext* ctx)
 
 antlrcpp::Any anceParser::CopyAssignmentContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitCopyAssignment(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitCopyAssignment(this);
+    else return visitor->visitChildren(this);
 }
 anceParser::AssignerContext* anceParser::assigner()
 {
@@ -1507,10 +1471,8 @@ size_t anceParser::DeleteStatementContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::DeleteStatementContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitDeleteStatement(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitDeleteStatement(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::DeleteStatementContext* anceParser::deleteStatement()
@@ -1572,10 +1534,8 @@ size_t anceParser::ReturnStatementContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::ReturnStatementContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitReturnStatement(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitReturnStatement(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::ReturnStatementContext* anceParser::returnStatement()
@@ -1651,10 +1611,8 @@ anceParser::RefContext::RefContext(ExpressionContext* ctx)
 
 antlrcpp::Any anceParser::RefContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitRef(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitRef(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- IndependentContext ------------------------------------------------------------------
 
@@ -1670,10 +1628,8 @@ anceParser::IndependentContext::IndependentContext(ExpressionContext* ctx)
 
 antlrcpp::Any anceParser::IndependentContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitIndependent(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitIndependent(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- VariableContext ------------------------------------------------------------------
 
@@ -1689,10 +1645,8 @@ anceParser::VariableContext::VariableContext(ExpressionContext* ctx)
 
 antlrcpp::Any anceParser::VariableContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitVariable(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitVariable(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- AllocContext ------------------------------------------------------------------
 
@@ -1708,10 +1662,8 @@ anceParser::AllocContext::AllocContext(ExpressionContext* ctx)
 
 antlrcpp::Any anceParser::AllocContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitAlloc(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitAlloc(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- AdressOfContext ------------------------------------------------------------------
 
@@ -1727,10 +1679,8 @@ anceParser::AdressOfContext::AdressOfContext(ExpressionContext* ctx)
 
 antlrcpp::Any anceParser::AdressOfContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitAdressOf(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitAdressOf(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- BinaryOperationContext ------------------------------------------------------------------
 
@@ -1756,10 +1706,8 @@ anceParser::BinaryOperationContext::BinaryOperationContext(ExpressionContext* ct
 
 antlrcpp::Any anceParser::BinaryOperationContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitBinaryOperation(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitBinaryOperation(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- LiteralContext ------------------------------------------------------------------
 
@@ -1775,10 +1723,8 @@ anceParser::LiteralContext::LiteralContext(ExpressionContext* ctx)
 
 antlrcpp::Any anceParser::LiteralContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitLiteral(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitLiteral(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- SizeOfContext ------------------------------------------------------------------
 
@@ -1799,10 +1745,8 @@ anceParser::SizeOfContext::SizeOfContext(ExpressionContext* ctx)
 
 antlrcpp::Any anceParser::SizeOfContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitSizeOf(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitSizeOf(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- SubscriptContext ------------------------------------------------------------------
 
@@ -1823,10 +1767,8 @@ anceParser::SubscriptContext::SubscriptContext(ExpressionContext* ctx)
 
 antlrcpp::Any anceParser::SubscriptContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitSubscript(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitSubscript(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::ExpressionContext* anceParser::expression()
@@ -2024,10 +1966,8 @@ anceParser::AdditionContext::AdditionContext(BinaryOperatorContext* ctx)
 
 antlrcpp::Any anceParser::AdditionContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitAddition(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitAddition(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- MultiplicationContext ------------------------------------------------------------------
 
@@ -2038,10 +1978,8 @@ anceParser::MultiplicationContext::MultiplicationContext(BinaryOperatorContext* 
 
 antlrcpp::Any anceParser::MultiplicationContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitMultiplication(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitMultiplication(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- SubtractionContext ------------------------------------------------------------------
 
@@ -2052,24 +1990,8 @@ anceParser::SubtractionContext::SubtractionContext(BinaryOperatorContext* ctx)
 
 antlrcpp::Any anceParser::SubtractionContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitSubtraction(this);
-    else
-        return visitor->visitChildren(this);
-}
-//----------------- ModuloContext ------------------------------------------------------------------
-
-anceParser::ModuloContext::ModuloContext(BinaryOperatorContext* ctx)
-{
-    copyFrom(ctx);
-}
-
-antlrcpp::Any anceParser::ModuloContext::accept(tree::ParseTreeVisitor* visitor)
-{
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitModulo(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitSubtraction(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- DivisionContext ------------------------------------------------------------------
 
@@ -2080,10 +2002,20 @@ anceParser::DivisionContext::DivisionContext(BinaryOperatorContext* ctx)
 
 antlrcpp::Any anceParser::DivisionContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitDivision(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitDivision(this);
+    else return visitor->visitChildren(this);
+}
+//----------------- RemainderContext ------------------------------------------------------------------
+
+anceParser::RemainderContext::RemainderContext(BinaryOperatorContext* ctx)
+{
+    copyFrom(ctx);
+}
+
+antlrcpp::Any anceParser::RemainderContext::accept(tree::ParseTreeVisitor* visitor)
+{
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitRemainder(this);
+    else return visitor->visitChildren(this);
 }
 anceParser::BinaryOperatorContext* anceParser::binaryOperator()
 {
@@ -2139,8 +2071,8 @@ anceParser::BinaryOperatorContext* anceParser::binaryOperator()
 
             case anceParser::T__26:
             {
-                _localctx =
-                    dynamic_cast<BinaryOperatorContext*>(_tracker.createInstance<anceParser::ModuloContext>(_localctx));
+                _localctx = dynamic_cast<BinaryOperatorContext*>(
+                    _tracker.createInstance<anceParser::RemainderContext>(_localctx));
                 enterOuterAlt(_localctx, 5);
                 setState(278);
                 match(anceParser::T__26);
@@ -2181,8 +2113,7 @@ antlrcpp::Any anceParser::IndependentExpressionContext::accept(tree::ParseTreeVi
 {
     if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
         return parserVisitor->visitIndependentExpression(this);
-    else
-        return visitor->visitChildren(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::IndependentExpressionContext* anceParser::independentExpression()
@@ -2230,10 +2161,8 @@ size_t anceParser::FunctionCallContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::FunctionCallContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitFunctionCall(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitFunctionCall(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::FunctionCallContext* anceParser::functionCall()
@@ -2287,10 +2216,8 @@ size_t anceParser::ArgumentsContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::ArgumentsContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitArguments(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitArguments(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::ArgumentsContext* anceParser::arguments()
@@ -2363,10 +2290,8 @@ size_t anceParser::VariableAccessContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::VariableAccessContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitVariableAccess(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitVariableAccess(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::VariableAccessContext* anceParser::variableAccess()
@@ -2419,10 +2344,8 @@ size_t anceParser::AllocationContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::AllocationContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitAllocation(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitAllocation(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::AllocationContext* anceParser::allocation()
@@ -2490,10 +2413,8 @@ anceParser::DynamicContext::DynamicContext(AllocatorContext* ctx)
 
 antlrcpp::Any anceParser::DynamicContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitDynamic(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitDynamic(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- AutomaticContext ------------------------------------------------------------------
 
@@ -2504,10 +2425,8 @@ anceParser::AutomaticContext::AutomaticContext(AllocatorContext* ctx)
 
 antlrcpp::Any anceParser::AutomaticContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitAutomatic(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitAutomatic(this);
+    else return visitor->visitChildren(this);
 }
 anceParser::AllocatorContext* anceParser::allocator()
 {
@@ -2573,10 +2492,8 @@ size_t anceParser::AddressofContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::AddressofContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitAddressof(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitAddressof(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::AddressofContext* anceParser::addressof()
@@ -2635,8 +2552,7 @@ antlrcpp::Any anceParser::BindReferenceToAddressContext::accept(tree::ParseTreeV
 {
     if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
         return parserVisitor->visitBindReferenceToAddress(this);
-    else
-        return visitor->visitChildren(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- BindReferenceContext ------------------------------------------------------------------
 
@@ -2652,10 +2568,8 @@ anceParser::BindReferenceContext::BindReferenceContext(BindRefContext* ctx)
 
 antlrcpp::Any anceParser::BindReferenceContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitBindReference(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitBindReference(this);
+    else return visitor->visitChildren(this);
 }
 anceParser::BindRefContext* anceParser::bindRef()
 {
@@ -2724,10 +2638,8 @@ size_t anceParser::SizeofTypeContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::SizeofTypeContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitSizeofType(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitSizeofType(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::SizeofTypeContext* anceParser::sizeofType()
@@ -2772,10 +2684,8 @@ size_t anceParser::SizeofExpressionContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::SizeofExpressionContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitSizeofExpression(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitSizeofExpression(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::SizeofExpressionContext* anceParser::sizeofExpression()
@@ -2854,10 +2764,8 @@ size_t anceParser::LiteralExpressionContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::LiteralExpressionContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitLiteralExpression(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitLiteralExpression(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::LiteralExpressionContext* anceParser::literalExpression()
@@ -2962,10 +2870,8 @@ size_t anceParser::StringLiteralContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::StringLiteralContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitStringLiteral(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitStringLiteral(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::StringLiteralContext* anceParser::stringLiteral()
@@ -3018,10 +2924,8 @@ size_t anceParser::ByteLiteralContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::ByteLiteralContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitByteLiteral(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitByteLiteral(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::ByteLiteralContext* anceParser::byteLiteral()
@@ -3074,10 +2978,8 @@ size_t anceParser::IntegerLiteralContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::IntegerLiteralContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitIntegerLiteral(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitIntegerLiteral(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::IntegerLiteralContext* anceParser::integerLiteral()
@@ -3155,10 +3057,8 @@ size_t anceParser::UnsignedIntegerContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::UnsignedIntegerContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitUnsignedInteger(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitUnsignedInteger(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::UnsignedIntegerContext* anceParser::unsignedInteger()
@@ -3210,10 +3110,8 @@ size_t anceParser::SignedIntegerContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::SignedIntegerContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitSignedInteger(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitSignedInteger(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::SignedIntegerContext* anceParser::signedInteger()
@@ -3275,10 +3173,8 @@ size_t anceParser::SpecialIntegerContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::SpecialIntegerContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitSpecialInteger(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitSpecialInteger(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::SpecialIntegerContext* anceParser::specialInteger()
@@ -3376,10 +3272,8 @@ size_t anceParser::FloatingPointLiteralContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::FloatingPointLiteralContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitFloatingPointLiteral(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitFloatingPointLiteral(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::FloatingPointLiteralContext* anceParser::floatingPointLiteral()
@@ -3402,8 +3296,7 @@ anceParser::FloatingPointLiteralContext* anceParser::floatingPointLiteral()
         {
             _errHandler->recoverInline(this);
         }
-        else
-        {
+        else {
             _errHandler->reportMatch(this);
             consume();
         }
@@ -3443,10 +3336,8 @@ anceParser::TrueContext::TrueContext(BooleanLiteralContext* ctx)
 
 antlrcpp::Any anceParser::TrueContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitTrue(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitTrue(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- FalseContext ------------------------------------------------------------------
 
@@ -3457,10 +3348,8 @@ anceParser::FalseContext::FalseContext(BooleanLiteralContext* ctx)
 
 antlrcpp::Any anceParser::FalseContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitFalse(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitFalse(this);
+    else return visitor->visitChildren(this);
 }
 anceParser::BooleanLiteralContext* anceParser::booleanLiteral()
 {
@@ -3526,10 +3415,8 @@ size_t anceParser::SizeLiteralContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::SizeLiteralContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitSizeLiteral(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitSizeLiteral(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::SizeLiteralContext* anceParser::sizeLiteral()
@@ -3586,10 +3473,8 @@ size_t anceParser::DiffLiteralContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::DiffLiteralContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitDiffLiteral(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitDiffLiteral(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::DiffLiteralContext* anceParser::diffLiteral()
@@ -3658,10 +3543,8 @@ anceParser::IntegerContext::IntegerContext(TypeContext* ctx)
 
 antlrcpp::Any anceParser::IntegerContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitInteger(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitInteger(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- ArrayContext ------------------------------------------------------------------
 
@@ -3677,10 +3560,8 @@ anceParser::ArrayContext::ArrayContext(TypeContext* ctx)
 
 antlrcpp::Any anceParser::ArrayContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitArray(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitArray(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- KeywordContext ------------------------------------------------------------------
 
@@ -3696,10 +3577,8 @@ anceParser::KeywordContext::KeywordContext(TypeContext* ctx)
 
 antlrcpp::Any anceParser::KeywordContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitKeyword(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitKeyword(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- ReferenceContext ------------------------------------------------------------------
 
@@ -3715,10 +3594,8 @@ anceParser::ReferenceContext::ReferenceContext(TypeContext* ctx)
 
 antlrcpp::Any anceParser::ReferenceContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitReference(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitReference(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- PointerContext ------------------------------------------------------------------
 
@@ -3734,10 +3611,8 @@ anceParser::PointerContext::PointerContext(TypeContext* ctx)
 
 antlrcpp::Any anceParser::PointerContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitPointer(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitPointer(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- CustomContext ------------------------------------------------------------------
 
@@ -3753,10 +3628,8 @@ anceParser::CustomContext::CustomContext(TypeContext* ctx)
 
 antlrcpp::Any anceParser::CustomContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitCustom(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitCustom(this);
+    else return visitor->visitChildren(this);
 }
 anceParser::TypeContext* anceParser::type()
 {
@@ -3868,10 +3741,8 @@ size_t anceParser::IntegerTypeContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::IntegerTypeContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitIntegerType(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitIntegerType(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::IntegerTypeContext* anceParser::integerType()
@@ -3924,10 +3795,8 @@ size_t anceParser::ArrayTypeContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::ArrayTypeContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitArrayType(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitArrayType(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::ArrayTypeContext* anceParser::arrayType()
@@ -3988,10 +3857,8 @@ size_t anceParser::KeywordTypeContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::KeywordTypeContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitKeywordType(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitKeywordType(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::KeywordTypeContext* anceParser::keywordType()
@@ -4062,10 +3929,8 @@ size_t anceParser::FloatingPointTypeContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::FloatingPointTypeContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitFloatingPointType(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitFloatingPointType(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::FloatingPointTypeContext* anceParser::floatingPointType()
@@ -4088,8 +3953,7 @@ anceParser::FloatingPointTypeContext* anceParser::floatingPointType()
         {
             _errHandler->recoverInline(this);
         }
-        else
-        {
+        else {
             _errHandler->reportMatch(this);
             consume();
         }
@@ -4117,10 +3981,8 @@ size_t anceParser::TargetDependentTypeContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::TargetDependentTypeContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitTargetDependentType(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitTargetDependentType(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::TargetDependentTypeContext* anceParser::targetDependentType()
@@ -4142,8 +4004,7 @@ anceParser::TargetDependentTypeContext* anceParser::targetDependentType()
         {
             _errHandler->recoverInline(this);
         }
-        else
-        {
+        else {
             _errHandler->reportMatch(this);
             consume();
         }
@@ -4171,10 +4032,8 @@ size_t anceParser::VoidTypeContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::VoidTypeContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitVoidType(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitVoidType(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::VoidTypeContext* anceParser::voidType()
@@ -4217,10 +4076,8 @@ size_t anceParser::CustomTypeContext::getRuleIndex() const
 
 antlrcpp::Any anceParser::CustomTypeContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-        return parserVisitor->visitCustomType(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitCustomType(this);
+    else return visitor->visitChildren(this);
 }
 
 anceParser::CustomTypeContext* anceParser::customType()
@@ -4469,8 +4326,7 @@ anceParser::Initializer::Initializer()
         if (name.empty()) { name = _vocabulary.getSymbolicName(i); }
 
         if (name.empty()) { _tokenNames.push_back("<INVALID>"); }
-        else
-        {
+        else {
             _tokenNames.push_back(name);
         }
     }

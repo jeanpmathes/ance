@@ -79,7 +79,7 @@ std::shared_ptr<ance::Value> ance::FloatingPointType::buildOperator(BinaryOperat
         case BinaryOperator::DIVISION:
             result = context->ir()->CreateFDiv(left_value, right_value);
             break;
-        case BinaryOperator::MODULO:
+        case BinaryOperator::REMAINDER:
             result = context->ir()->CreateFRem(left_value, right_value);
             break;
     }

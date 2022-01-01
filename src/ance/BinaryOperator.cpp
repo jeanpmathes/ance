@@ -19,7 +19,7 @@ std::string BinaryOperator::toString() const
             return "*";
         case DIVISION:
             return "/";
-        case MODULO:
+        case REMAINDER:
             return "%";
 
         default:

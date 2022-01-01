@@ -681,18 +681,18 @@ class anceParser : public antlr4::Parser
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    class ModuloContext : public BinaryOperatorContext
-    {
-      public:
-        ModuloContext(BinaryOperatorContext* ctx);
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
     class DivisionContext : public BinaryOperatorContext
     {
       public:
         DivisionContext(BinaryOperatorContext* ctx);
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class RemainderContext : public BinaryOperatorContext
+    {
+      public:
+        RemainderContext(BinaryOperatorContext* ctx);
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };

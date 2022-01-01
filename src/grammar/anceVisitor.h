@@ -88,7 +88,7 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitDivision(anceParser::DivisionContext* context) = 0;
 
-    virtual antlrcpp::Any visitModulo(anceParser::ModuloContext* context) = 0;
+    virtual antlrcpp::Any visitRemainder(anceParser::RemainderContext* context) = 0;
 
     virtual antlrcpp::Any visitIndependentExpression(anceParser::IndependentExpressionContext* context) = 0;
 

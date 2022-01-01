@@ -97,7 +97,7 @@ binaryOperator
     | '-' # Subtraction
     | '*' # Multiplication
     | '/' # Division
-    | '%' # Modulo
+    | '%' # Remainder
     ;
 
 independentExpression

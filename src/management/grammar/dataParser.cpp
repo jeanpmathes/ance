@@ -66,10 +66,8 @@ size_t dataParser::ElementContext::getRuleIndex() const
 
 antlrcpp::Any dataParser::ElementContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor))
-        return parserVisitor->visitElement(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitElement(this);
+    else return visitor->visitChildren(this);
 }
 
 dataParser::ElementContext* dataParser::element()
@@ -154,10 +152,8 @@ size_t dataParser::DictionaryContext::getRuleIndex() const
 
 antlrcpp::Any dataParser::DictionaryContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor))
-        return parserVisitor->visitDictionary(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitDictionary(this);
+    else return visitor->visitChildren(this);
 }
 
 dataParser::DictionaryContext* dataParser::dictionary()
@@ -230,10 +226,8 @@ size_t dataParser::EntryContext::getRuleIndex() const
 
 antlrcpp::Any dataParser::EntryContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor))
-        return parserVisitor->visitEntry(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitEntry(this);
+    else return visitor->visitChildren(this);
 }
 
 dataParser::EntryContext* dataParser::entry()
@@ -285,10 +279,8 @@ size_t dataParser::ListContext::getRuleIndex() const
 
 antlrcpp::Any dataParser::ListContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor))
-        return parserVisitor->visitList(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitList(this);
+    else return visitor->visitChildren(this);
 }
 
 dataParser::ListContext* dataParser::list()
@@ -360,10 +352,8 @@ size_t dataParser::StringContext::getRuleIndex() const
 
 antlrcpp::Any dataParser::StringContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor))
-        return parserVisitor->visitString(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitString(this);
+    else return visitor->visitChildren(this);
 }
 
 dataParser::StringContext* dataParser::string()
@@ -413,10 +403,8 @@ dataParser::TrueContext::TrueContext(BooleanContext* ctx)
 
 antlrcpp::Any dataParser::TrueContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor))
-        return parserVisitor->visitTrue(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitTrue(this);
+    else return visitor->visitChildren(this);
 }
 //----------------- FalseContext ------------------------------------------------------------------
 
@@ -427,10 +415,8 @@ dataParser::FalseContext::FalseContext(BooleanContext* ctx)
 
 antlrcpp::Any dataParser::FalseContext::accept(tree::ParseTreeVisitor* visitor)
 {
-    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor))
-        return parserVisitor->visitFalse(this);
-    else
-        return visitor->visitChildren(this);
+    if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitFalse(this);
+    else return visitor->visitChildren(this);
 }
 dataParser::BooleanContext* dataParser::boolean()
 {
@@ -504,8 +490,7 @@ dataParser::Initializer::Initializer()
         if (name.empty()) { name = _vocabulary.getSymbolicName(i); }
 
         if (name.empty()) { _tokenNames.push_back("<INVALID>"); }
-        else
-        {
+        else {
             _tokenNames.push_back(name);
         }
     }
