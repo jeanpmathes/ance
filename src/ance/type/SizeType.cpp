@@ -1,6 +1,8 @@
 #include "SizeType.h"
 
+#include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
+#include "ance/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
@@ -14,6 +16,67 @@ llvm::Constant* ance::SizeType::getDefaultContent(llvm::LLVMContext& c)
 llvm::Type* ance::SizeType::getContentType(llvm::LLVMContext&)
 {
     return backing_;
+}
+
+bool ance::SizeType::isOperatorDefined(BinaryOperator, ance::ResolvingHandle<ance::Type> other)
+{
+    if (isSizeType()) return other->isSizeType();
+    if (isDiffType()) return other->isDiffType();
+
+    return false;
+}
+
+ance::ResolvingHandle<ance::Type> ance::SizeType::getOperatorResultType(BinaryOperator,
+                                                                        ance::ResolvingHandle<ance::Type>)
+{
+    return self();
+}
+
+bool ance::SizeType::validateOperator(BinaryOperator,
+                                      ance::ResolvingHandle<ance::Type>,
+                                      ance::Location,
+                                      ance::Location,
+                                      ValidationLogger&)
+{
+    return true;
+}
+
+std::shared_ptr<ance::Value> ance::SizeType::buildOperator(BinaryOperator         op,
+                                                           std::shared_ptr<Value> left,
+                                                           std::shared_ptr<Value> right,
+                                                           CompileContext*        context)
+{
+    left->buildContentValue(context);
+    right->buildContentValue(context);
+
+    llvm::Value* left_value  = left->getContentValue();
+    llvm::Value* right_value = right->getContentValue();
+
+    llvm::Value* result;
+
+    switch (op)
+    {
+        case BinaryOperator::ADDITION:
+            result = context->ir()->CreateAdd(left_value, right_value);
+            break;
+        case BinaryOperator::SUBTRACTION:
+            result = context->ir()->CreateSub(left_value, right_value);
+            break;
+        case BinaryOperator::MULTIPLICATION:
+            result = context->ir()->CreateMul(left_value, right_value);
+            break;
+        case BinaryOperator::DIVISION:
+            if (isSizeType()) result = context->ir()->CreateUDiv(left_value, right_value);
+            if (isDiffType()) result = context->ir()->CreateSDiv(left_value, right_value);
+            break;
+        case BinaryOperator::MODULO:
+            if (isSizeType()) result = context->ir()->CreateURem(left_value, right_value);
+            if (isDiffType()) result = context->ir()->CreateSRem(left_value, right_value);
+            break;
+    }
+
+    llvm::Value* native_result = ance::Values::contentToNative(self(), result, context);
+    return std::make_shared<ance::WrappedNativeValue>(self(), native_result);
 }
 
 bool ance::SizeType::isSizeType() const

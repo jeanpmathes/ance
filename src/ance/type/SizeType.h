@@ -24,8 +24,21 @@ namespace ance
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
-        bool isSizeType() const override;
-        bool isDiffType() const override;
+        bool isOperatorDefined(BinaryOperator op, ance::ResolvingHandle<ance::Type> other) override;
+        ance::ResolvingHandle<ance::Type> getOperatorResultType(BinaryOperator                    op,
+                                                                ance::ResolvingHandle<ance::Type> other) override;
+        bool                              validateOperator(BinaryOperator                    op,
+                                                           ance::ResolvingHandle<ance::Type> other,
+                                                           ance::Location                    left_location,
+                                                           ance::Location                    right_location,
+                                                           ValidationLogger&                 validation_logger) override;
+        std::shared_ptr<ance::Value>      buildOperator(BinaryOperator         op,
+                                                        std::shared_ptr<Value> left,
+                                                        std::shared_ptr<Value> right,
+                                                        CompileContext*        context) override;
+
+        [[nodiscard]] bool isSizeType() const override;
+        [[nodiscard]] bool isDiffType() const override;
 
         /**
          * Build a value of the size type from a given type size.
@@ -36,11 +49,9 @@ namespace ance
 
       private:
         inline static unsigned int size_width_        = 0;
-        inline static Type*        size_instance_     = nullptr;
         inline static llvm::Type*  size_backing_type_ = nullptr;
 
         inline static unsigned int diff_width_        = 0;
-        inline static Type*        diff_instance_     = nullptr;
         inline static llvm::Type*  diff_backing_type_ = nullptr;
 
       protected:
