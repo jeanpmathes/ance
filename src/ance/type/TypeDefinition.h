@@ -89,7 +89,7 @@ namespace ance
                                        ance::ResolvingHandle<ance::Type> index_type,
                                        ance::Location                    index_location,
                                        ValidationLogger&                 validation_logger);
-        bool         validateOperator(BinaryOperator                    op,
+        virtual bool validateOperator(BinaryOperator                    op,
                                       ance::ResolvingHandle<ance::Type> other,
                                       ance::Location                    left_location,
                                       ance::Location                    right_location,
@@ -98,7 +98,7 @@ namespace ance
         virtual std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                             std::shared_ptr<Value> index,
                                                             CompileContext*        context);
-        std::shared_ptr<ance::Value>         buildOperator(BinaryOperator         op,
+        virtual std::shared_ptr<ance::Value> buildOperator(BinaryOperator         op,
                                                            std::shared_ptr<Value> left,
                                                            std::shared_ptr<Value> right,
                                                            CompileContext*        context);

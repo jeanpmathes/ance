@@ -12,7 +12,7 @@ class Application;
 namespace ance
 {
     /**
-     * Represents an integer type. Integers can have any precision and can be both signed or unsigned.
+     * Represents an integer type. Integers can have any precision and can be signed or unsigned.
      */
     class IntegerType : public ance::TypeDefinition
     {
@@ -27,6 +27,19 @@ namespace ance
 
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
+
+        bool isOperatorDefined(BinaryOperator op, ance::ResolvingHandle<ance::Type> other) override;
+        ance::ResolvingHandle<ance::Type> getOperatorResultType(BinaryOperator                    op,
+                                                                ance::ResolvingHandle<ance::Type> other) override;
+        bool                              validateOperator(BinaryOperator                    op,
+                                                           ance::ResolvingHandle<ance::Type> other,
+                                                           ance::Location                    left_location,
+                                                           ance::Location                    right_location,
+                                                           ValidationLogger&                 validation_logger) override;
+        std::shared_ptr<ance::Value>      buildOperator(BinaryOperator         op,
+                                                        std::shared_ptr<Value> left,
+                                                        std::shared_ptr<Value> right,
+                                                        CompileContext*        context) override;
 
       private:
         uint64_t    bit_size_;

@@ -272,7 +272,7 @@ namespace ance
                                ValidationLogger&                 validation_logger);
 
         /**
-         * Validate a binary operation.
+         * Validate a binary operation. May only be called if the operation is defined.
          * @param op The operation.
          * @param other The other type.
          * @param left_location The source location of the left value.
