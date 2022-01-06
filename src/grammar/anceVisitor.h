@@ -82,15 +82,15 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitSubscript(anceParser::SubscriptContext* context) = 0;
 
-    virtual antlrcpp::Any visitAddition(anceParser::AdditionContext* context) = 0;
-
-    virtual antlrcpp::Any visitSubtraction(anceParser::SubtractionContext* context) = 0;
-
     virtual antlrcpp::Any visitMultiplication(anceParser::MultiplicationContext* context) = 0;
 
     virtual antlrcpp::Any visitDivision(anceParser::DivisionContext* context) = 0;
 
     virtual antlrcpp::Any visitRemainder(anceParser::RemainderContext* context) = 0;
+
+    virtual antlrcpp::Any visitAddition(anceParser::AdditionContext* context) = 0;
+
+    virtual antlrcpp::Any visitSubtraction(anceParser::SubtractionContext* context) = 0;
 
     virtual antlrcpp::Any visitIndependentExpression(anceParser::IndependentExpressionContext* context) = 0;
 

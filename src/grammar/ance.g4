@@ -90,15 +90,19 @@ expression
 	| indexed=expression '[' index=expression ']' # Subscript
 	| independentExpression # Independent
 	| '(' expression ')' # Parenthesis
-	| left=expression binaryOperator right=expression # BinaryOperation
+	| left=expression binaryOperatorMultiplicative right=expression # BinaryOperation
+	| left=expression binaryOperatorAdditive right=expression # BinaryOperation
 	;
 
-binaryOperator
-    : '+' # Addition
-    | '-' # Subtraction
-    | '*' # Multiplication
+binaryOperatorMultiplicative
+    : '*' # Multiplication
     | '/' # Division
     | '%' # Remainder
+    ;
+
+binaryOperatorAdditive
+    : '+' # Addition
+    | '-' # Subtraction
     ;
 
 independentExpression

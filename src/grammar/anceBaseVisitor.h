@@ -121,10 +121,6 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitSubscript(anceParser::SubscriptContext* ctx) override { return visitChildren(ctx); }
 
-    virtual antlrcpp::Any visitAddition(anceParser::AdditionContext* ctx) override { return visitChildren(ctx); }
-
-    virtual antlrcpp::Any visitSubtraction(anceParser::SubtractionContext* ctx) override { return visitChildren(ctx); }
-
     virtual antlrcpp::Any visitMultiplication(anceParser::MultiplicationContext* ctx) override
     {
         return visitChildren(ctx);
@@ -133,6 +129,10 @@ class anceBaseVisitor : public anceVisitor
     virtual antlrcpp::Any visitDivision(anceParser::DivisionContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitRemainder(anceParser::RemainderContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitAddition(anceParser::AdditionContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitSubtraction(anceParser::SubtractionContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitIndependentExpression(anceParser::IndependentExpressionContext* ctx) override
     {

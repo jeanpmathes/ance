@@ -370,10 +370,15 @@ antlrcpp::Any SourceVisitor::visitBinaryOperation(anceParser::BinaryOperationCon
     Expression* left  = visit(ctx->left);
     Expression* right = visit(ctx->right);
 
-    BinaryOperator op = visit(ctx->binaryOperator());
+    std::optional<BinaryOperator> op;
+    if (ctx->binaryOperatorMultiplicative()) op = visit(ctx->binaryOperatorMultiplicative());
+    if (ctx->binaryOperatorAdditive()) op = visit(ctx->binaryOperatorAdditive());
+    assert(op.has_value());
 
-    return static_cast<Expression*>(
-        new BinaryOperation(std::unique_ptr<Expression>(left), op, std::unique_ptr<Expression>(right), location(ctx)));
+    return static_cast<Expression*>(new BinaryOperation(std::unique_ptr<Expression>(left),
+                                                        op.value(),
+                                                        std::unique_ptr<Expression>(right),
+                                                        location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitParenthesis(anceParser::ParenthesisContext* ctx)

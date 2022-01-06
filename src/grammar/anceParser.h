@@ -77,54 +77,55 @@ class anceParser : public antlr4::Parser
 
     enum
     {
-        RuleFile                     = 0,
-        RuleVariableDeclaration      = 1,
-        RuleFunction                 = 2,
-        RuleParameters               = 3,
-        RuleParameter                = 4,
-        RuleTypeDefinition           = 5,
-        RuleDefineAs                 = 6,
-        RuleDefineAlias              = 7,
-        RuleAccessModifier           = 8,
-        RuleStatement                = 9,
-        RuleExpressionStatement      = 10,
-        RuleLocalVariableDefinition  = 11,
-        RuleLocalReferenceDefinition = 12,
-        RuleAssignment               = 13,
-        RuleAssigner                 = 14,
-        RuleDeleteStatement          = 15,
-        RuleReturnStatement          = 16,
-        RuleExpression               = 17,
-        RuleBinaryOperator           = 18,
-        RuleIndependentExpression    = 19,
-        RuleFunctionCall             = 20,
-        RuleArguments                = 21,
-        RuleVariableAccess           = 22,
-        RuleAllocation               = 23,
-        RuleAllocator                = 24,
-        RuleAddressof                = 25,
-        RuleBindRef                  = 26,
-        RuleSizeofType               = 27,
-        RuleSizeofExpression         = 28,
-        RuleLiteralExpression        = 29,
-        RuleStringLiteral            = 30,
-        RuleByteLiteral              = 31,
-        RuleIntegerLiteral           = 32,
-        RuleUnsignedInteger          = 33,
-        RuleSignedInteger            = 34,
-        RuleSpecialInteger           = 35,
-        RuleFloatingPointLiteral     = 36,
-        RuleBooleanLiteral           = 37,
-        RuleSizeLiteral              = 38,
-        RuleDiffLiteral              = 39,
-        RuleType                     = 40,
-        RuleIntegerType              = 41,
-        RuleArrayType                = 42,
-        RuleKeywordType              = 43,
-        RuleFloatingPointType        = 44,
-        RuleTargetDependentType      = 45,
-        RuleVoidType                 = 46,
-        RuleCustomType               = 47
+        RuleFile                         = 0,
+        RuleVariableDeclaration          = 1,
+        RuleFunction                     = 2,
+        RuleParameters                   = 3,
+        RuleParameter                    = 4,
+        RuleTypeDefinition               = 5,
+        RuleDefineAs                     = 6,
+        RuleDefineAlias                  = 7,
+        RuleAccessModifier               = 8,
+        RuleStatement                    = 9,
+        RuleExpressionStatement          = 10,
+        RuleLocalVariableDefinition      = 11,
+        RuleLocalReferenceDefinition     = 12,
+        RuleAssignment                   = 13,
+        RuleAssigner                     = 14,
+        RuleDeleteStatement              = 15,
+        RuleReturnStatement              = 16,
+        RuleExpression                   = 17,
+        RuleBinaryOperatorMultiplicative = 18,
+        RuleBinaryOperatorAdditive       = 19,
+        RuleIndependentExpression        = 20,
+        RuleFunctionCall                 = 21,
+        RuleArguments                    = 22,
+        RuleVariableAccess               = 23,
+        RuleAllocation                   = 24,
+        RuleAllocator                    = 25,
+        RuleAddressof                    = 26,
+        RuleBindRef                      = 27,
+        RuleSizeofType                   = 28,
+        RuleSizeofExpression             = 29,
+        RuleLiteralExpression            = 30,
+        RuleStringLiteral                = 31,
+        RuleByteLiteral                  = 32,
+        RuleIntegerLiteral               = 33,
+        RuleUnsignedInteger              = 34,
+        RuleSignedInteger                = 35,
+        RuleSpecialInteger               = 36,
+        RuleFloatingPointLiteral         = 37,
+        RuleBooleanLiteral               = 38,
+        RuleSizeLiteral                  = 39,
+        RuleDiffLiteral                  = 40,
+        RuleType                         = 41,
+        RuleIntegerType                  = 42,
+        RuleArrayType                    = 43,
+        RuleKeywordType                  = 44,
+        RuleFloatingPointType            = 45,
+        RuleTargetDependentType          = 46,
+        RuleVoidType                     = 47,
+        RuleCustomType                   = 48
     };
 
     anceParser(antlr4::TokenStream* input);
@@ -157,7 +158,8 @@ class anceParser : public antlr4::Parser
     class DeleteStatementContext;
     class ReturnStatementContext;
     class ExpressionContext;
-    class BinaryOperatorContext;
+    class BinaryOperatorMultiplicativeContext;
+    class BinaryOperatorAdditiveContext;
     class IndependentExpressionContext;
     class FunctionCallContext;
     class ArgumentsContext;
@@ -610,11 +612,12 @@ class anceParser : public antlr4::Parser
       public:
         BinaryOperationContext(ExpressionContext* ctx);
 
-        anceParser::ExpressionContext*  left  = nullptr;
-        anceParser::ExpressionContext*  right = nullptr;
-        BinaryOperatorContext*          binaryOperator();
-        std::vector<ExpressionContext*> expression();
-        ExpressionContext*              expression(size_t i);
+        anceParser::ExpressionContext*       left  = nullptr;
+        anceParser::ExpressionContext*       right = nullptr;
+        BinaryOperatorMultiplicativeContext* binaryOperatorMultiplicative();
+        std::vector<ExpressionContext*>      expression();
+        ExpressionContext*                   expression(size_t i);
+        BinaryOperatorAdditiveContext*       binaryOperatorAdditive();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -655,59 +658,73 @@ class anceParser : public antlr4::Parser
 
     ExpressionContext* expression();
     ExpressionContext* expression(int precedence);
-    class BinaryOperatorContext : public antlr4::ParserRuleContext
+    class BinaryOperatorMultiplicativeContext : public antlr4::ParserRuleContext
     {
       public:
-        BinaryOperatorContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        BinaryOperatorMultiplicativeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
-        BinaryOperatorContext() = default;
-        void copyFrom(BinaryOperatorContext* context);
+        BinaryOperatorMultiplicativeContext() = default;
+        void copyFrom(BinaryOperatorMultiplicativeContext* context);
         using antlr4::ParserRuleContext::copyFrom;
 
         virtual size_t getRuleIndex() const override;
     };
 
-    class AdditionContext : public BinaryOperatorContext
+    class MultiplicationContext : public BinaryOperatorMultiplicativeContext
     {
       public:
-        AdditionContext(BinaryOperatorContext* ctx);
+        MultiplicationContext(BinaryOperatorMultiplicativeContext* ctx);
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    class MultiplicationContext : public BinaryOperatorContext
+    class DivisionContext : public BinaryOperatorMultiplicativeContext
     {
       public:
-        MultiplicationContext(BinaryOperatorContext* ctx);
+        DivisionContext(BinaryOperatorMultiplicativeContext* ctx);
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    class SubtractionContext : public BinaryOperatorContext
+    class RemainderContext : public BinaryOperatorMultiplicativeContext
     {
       public:
-        SubtractionContext(BinaryOperatorContext* ctx);
+        RemainderContext(BinaryOperatorMultiplicativeContext* ctx);
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    class DivisionContext : public BinaryOperatorContext
+    BinaryOperatorMultiplicativeContext* binaryOperatorMultiplicative();
+
+    class BinaryOperatorAdditiveContext : public antlr4::ParserRuleContext
     {
       public:
-        DivisionContext(BinaryOperatorContext* ctx);
+        BinaryOperatorAdditiveContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+        BinaryOperatorAdditiveContext() = default;
+        void copyFrom(BinaryOperatorAdditiveContext* context);
+        using antlr4::ParserRuleContext::copyFrom;
+
+        virtual size_t getRuleIndex() const override;
+    };
+
+    class AdditionContext : public BinaryOperatorAdditiveContext
+    {
+      public:
+        AdditionContext(BinaryOperatorAdditiveContext* ctx);
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    class RemainderContext : public BinaryOperatorContext
+    class SubtractionContext : public BinaryOperatorAdditiveContext
     {
       public:
-        RemainderContext(BinaryOperatorContext* ctx);
+        SubtractionContext(BinaryOperatorAdditiveContext* ctx);
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    BinaryOperatorContext* binaryOperator();
+    BinaryOperatorAdditiveContext* binaryOperatorAdditive();
 
     class IndependentExpressionContext : public antlr4::ParserRuleContext
     {
