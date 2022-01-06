@@ -57,6 +57,7 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext* ctx) override;
     antlrcpp::Any visitSubscript(anceParser::SubscriptContext* ctx) override;
     antlrcpp::Any visitBinaryOperation(anceParser::BinaryOperationContext* ctx) override;
+    antlrcpp::Any visitParenthesis(anceParser::ParenthesisContext* ctx) override;
 
     // Literals and Types
 

@@ -102,6 +102,8 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* ctx) override { return visitChildren(ctx); }
 
+    virtual antlrcpp::Any visitParenthesis(anceParser::ParenthesisContext* ctx) override { return visitChildren(ctx); }
+
     virtual antlrcpp::Any visitVariable(anceParser::VariableContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitAlloc(anceParser::AllocContext* ctx) override { return visitChildren(ctx); }

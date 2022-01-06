@@ -89,6 +89,7 @@ expression
 	| literalExpression # Literal
 	| indexed=expression '[' index=expression ']' # Subscript
 	| independentExpression # Independent
+	| '(' expression ')' # Parenthesis
 	| left=expression binaryOperator right=expression # BinaryOperation
 	;
 

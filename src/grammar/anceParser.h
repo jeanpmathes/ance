@@ -565,6 +565,16 @@ class anceParser : public antlr4::Parser
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class ParenthesisContext : public ExpressionContext
+    {
+      public:
+        ParenthesisContext(ExpressionContext* ctx);
+
+        ExpressionContext* expression();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     class VariableContext : public ExpressionContext
     {
       public:

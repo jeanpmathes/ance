@@ -376,6 +376,12 @@ antlrcpp::Any SourceVisitor::visitBinaryOperation(anceParser::BinaryOperationCon
         new BinaryOperation(std::unique_ptr<Expression>(left), op, std::unique_ptr<Expression>(right), location(ctx)));
 }
 
+antlrcpp::Any SourceVisitor::visitParenthesis(anceParser::ParenthesisContext* ctx)
+{
+    Expression* contained = visit(ctx->expression());
+    return contained;
+}
+
 antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)
 {
     std::string prefix;
