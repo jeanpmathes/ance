@@ -92,6 +92,8 @@ expression
 	| '(' expression ')' # Parenthesis
 	| left=expression binaryOperatorMultiplicative right=expression # BinaryOperation
 	| left=expression binaryOperatorAdditive right=expression # BinaryOperation
+	| left=expression binaryOperatorRelational right=expression # BinaryOperation
+	| left=expression binaryOperatorEquality right=expression # BinaryOperation
 	;
 
 binaryOperatorMultiplicative
@@ -103,6 +105,18 @@ binaryOperatorMultiplicative
 binaryOperatorAdditive
     : '+' # Addition
     | '-' # Subtraction
+    ;
+
+binaryOperatorRelational
+    : '<' # LessThan
+    | '<=' # LessThanOrEqual
+    | '>' # GreaterThan
+    | '>=' # GreaterThanOrEqual
+    ;
+
+binaryOperatorEquality
+    : '==' # Equal
+    | '!=' # NotEqual
     ;
 
 independentExpression

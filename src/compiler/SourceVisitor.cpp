@@ -639,6 +639,42 @@ antlrcpp::Any SourceVisitor::visitRemainder(anceParser::RemainderContext*)
     return op;
 }
 
+antlrcpp::Any SourceVisitor::visitLessThan(anceParser::LessThanContext*)
+{
+    BinaryOperator op = BinaryOperator::LESS_THAN;
+    return op;
+}
+
+antlrcpp::Any SourceVisitor::visitLessThanOrEqual(anceParser::LessThanOrEqualContext*)
+{
+    BinaryOperator op = BinaryOperator::LESS_THAN_OR_EQUAL;
+    return op;
+}
+
+antlrcpp::Any SourceVisitor::visitGreaterThan(anceParser::GreaterThanContext*)
+{
+    BinaryOperator op = BinaryOperator::GREATER_THAN;
+    return op;
+}
+
+antlrcpp::Any SourceVisitor::visitGreaterThanOrEqual(anceParser::GreaterThanOrEqualContext*)
+{
+    BinaryOperator op = BinaryOperator::GREATER_THAN_OR_EQUAL;
+    return op;
+}
+
+antlrcpp::Any SourceVisitor::visitEqual(anceParser::EqualContext*)
+{
+    BinaryOperator op = BinaryOperator::EQUAL;
+    return op;
+}
+
+antlrcpp::Any SourceVisitor::visitNotEqual(anceParser::NotEqualContext*)
+{
+    BinaryOperator op = BinaryOperator::NOT_EQUAL;
+    return op;
+}
+
 ance::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)
 {
     unsigned start_line   = ctx->getStart()->getLine();

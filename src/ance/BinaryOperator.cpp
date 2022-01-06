@@ -21,6 +21,18 @@ std::string BinaryOperator::toString() const
             return "/";
         case REMAINDER:
             return "%";
+        case LESS_THAN:
+            return "<";
+        case LESS_THAN_OR_EQUAL:
+            return "<=";
+        case GREATER_THAN:
+            return ">";
+        case GREATER_THAN_OR_EQUAL:
+            return ">=";
+        case EQUAL:
+            return "==";
+        case NOT_EQUAL:
+            return "!=";
 
         default:
             assert(false);

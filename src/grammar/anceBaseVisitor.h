@@ -134,6 +134,24 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitSubtraction(anceParser::SubtractionContext* ctx) override { return visitChildren(ctx); }
 
+    virtual antlrcpp::Any visitLessThan(anceParser::LessThanContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitLessThanOrEqual(anceParser::LessThanOrEqualContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
+    virtual antlrcpp::Any visitGreaterThan(anceParser::GreaterThanContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitGreaterThanOrEqual(anceParser::GreaterThanOrEqualContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
+    virtual antlrcpp::Any visitEqual(anceParser::EqualContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitNotEqual(anceParser::NotEqualContext* ctx) override { return visitChildren(ctx); }
+
     virtual antlrcpp::Any visitIndependentExpression(anceParser::IndependentExpressionContext* ctx) override
     {
         return visitChildren(ctx);

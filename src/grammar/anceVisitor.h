@@ -92,6 +92,18 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitSubtraction(anceParser::SubtractionContext* context) = 0;
 
+    virtual antlrcpp::Any visitLessThan(anceParser::LessThanContext* context) = 0;
+
+    virtual antlrcpp::Any visitLessThanOrEqual(anceParser::LessThanOrEqualContext* context) = 0;
+
+    virtual antlrcpp::Any visitGreaterThan(anceParser::GreaterThanContext* context) = 0;
+
+    virtual antlrcpp::Any visitGreaterThanOrEqual(anceParser::GreaterThanOrEqualContext* context) = 0;
+
+    virtual antlrcpp::Any visitEqual(anceParser::EqualContext* context) = 0;
+
+    virtual antlrcpp::Any visitNotEqual(anceParser::NotEqualContext* context) = 0;
+
     virtual antlrcpp::Any visitIndependentExpression(anceParser::IndependentExpressionContext* context) = 0;
 
     virtual antlrcpp::Any visitFunctionCall(anceParser::FunctionCallContext* context) = 0;

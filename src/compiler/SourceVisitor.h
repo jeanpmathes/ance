@@ -95,6 +95,12 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitMultiplication(anceParser::MultiplicationContext* ctx) override;
     antlrcpp::Any visitDivision(anceParser::DivisionContext* ctx) override;
     antlrcpp::Any visitRemainder(anceParser::RemainderContext* ctx) override;
+    antlrcpp::Any visitLessThan(anceParser::LessThanContext* ctx) override;
+    antlrcpp::Any visitLessThanOrEqual(anceParser::LessThanOrEqualContext* ctx) override;
+    antlrcpp::Any visitGreaterThan(anceParser::GreaterThanContext* ctx) override;
+    antlrcpp::Any visitGreaterThanOrEqual(anceParser::GreaterThanOrEqualContext* ctx) override;
+    antlrcpp::Any visitEqual(anceParser::EqualContext* ctx) override;
+    antlrcpp::Any visitNotEqual(anceParser::NotEqualContext* ctx) override;
 
   protected:
     static ance::Location location(antlr4::ParserRuleContext* ctx);

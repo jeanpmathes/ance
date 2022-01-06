@@ -30,7 +30,31 @@ class BinaryOperator
         /**
          * The mathematical remainder operator.
          */
-        REMAINDER
+        REMAINDER,
+        /**
+         * The mathematical less-than relational operator.
+         */
+        LESS_THAN,
+        /**
+         * The mathematical less-than-or-equal relational operator.
+         */
+        LESS_THAN_OR_EQUAL,
+        /**
+         * The mathematical greater-than relational operator.
+         */
+        GREATER_THAN,
+        /**
+         * The mathematical greater-than-or-equal relational operator.
+         */
+        GREATER_THAN_OR_EQUAL,
+        /**
+         * The equality relational operator.
+         */
+        EQUAL,
+        /**
+         * The inequality relational operator.
+         */
+        NOT_EQUAL
     };
 
     BinaryOperator() = default;
