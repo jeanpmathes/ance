@@ -1,7 +1,9 @@
 #include "FloatingPointType.h"
 
 #include "ance/construct/value/WrappedNativeValue.h"
+#include "ance/type/IntegerType.h"
 #include "ance/type/Type.h"
+#include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/CompileContext.h"
 
@@ -37,10 +39,13 @@ bool ance::FloatingPointType::isOperatorDefined(BinaryOperator, ance::ResolvingH
     return false;
 }
 
-ance::ResolvingHandle<ance::Type> ance::FloatingPointType::getOperatorResultType(BinaryOperator,
+ance::ResolvingHandle<ance::Type> ance::FloatingPointType::getOperatorResultType(BinaryOperator op,
                                                                                  ance::ResolvingHandle<ance::Type>)
 {
-    return self();
+    if (op.isArithmetic()) return self();
+    if (op.isRelational()) return ance::IntegerType::getBooleanType();
+
+    return ance::VoidType::get();
 }
 
 bool ance::FloatingPointType::validateOperator(BinaryOperator,
@@ -82,8 +87,27 @@ std::shared_ptr<ance::Value> ance::FloatingPointType::buildOperator(BinaryOperat
         case BinaryOperator::REMAINDER:
             result = context->ir()->CreateFRem(left_value, right_value);
             break;
+        case BinaryOperator::LESS_THAN:
+            result = context->ir()->CreateFCmpOLT(left_value, right_value);
+            break;
+        case BinaryOperator::LESS_THAN_OR_EQUAL:
+            result = context->ir()->CreateFCmpOLE(left_value, right_value);
+            break;
+        case BinaryOperator::GREATER_THAN:
+            result = context->ir()->CreateFCmpOGT(left_value, right_value);
+            break;
+        case BinaryOperator::GREATER_THAN_OR_EQUAL:
+            result = context->ir()->CreateFCmpOGE(left_value, right_value);
+            break;
+        case BinaryOperator::EQUAL:
+            result = context->ir()->CreateFCmpOEQ(left_value, right_value);
+            break;
+        case BinaryOperator::NOT_EQUAL:
+            result = context->ir()->CreateFCmpONE(left_value, right_value);
+            break;
     }
 
-    llvm::Value* native_result = ance::Values::contentToNative(self(), result, context);
-    return std::make_shared<ance::WrappedNativeValue>(self(), native_result);
+    ance::ResolvingHandle<ance::Type> result_type   = getOperatorResultType(op, right->type());
+    llvm::Value*                      native_result = ance::Values::contentToNative(result_type, result, context);
+    return std::make_shared<ance::WrappedNativeValue>(result_type, native_result);
 }
