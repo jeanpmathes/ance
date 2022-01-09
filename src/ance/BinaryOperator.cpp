@@ -39,3 +39,53 @@ std::string BinaryOperator::toString() const
             return "";
     }
 }
+
+bool BinaryOperator::isRelational() const
+{
+    switch (value_)
+    {
+        case ADDITION:
+        case SUBTRACTION:
+        case MULTIPLICATION:
+        case DIVISION:
+        case REMAINDER:
+            return false;
+
+        case LESS_THAN:
+        case LESS_THAN_OR_EQUAL:
+        case GREATER_THAN:
+        case GREATER_THAN_OR_EQUAL:
+        case EQUAL:
+        case NOT_EQUAL:
+            return true;
+
+        default:
+            assert(false);
+            return false;
+    }
+}
+
+bool BinaryOperator::isArithmetic() const
+{
+    switch (value_)
+    {
+        case ADDITION:
+        case SUBTRACTION:
+        case MULTIPLICATION:
+        case DIVISION:
+        case REMAINDER:
+            return true;
+
+        case LESS_THAN:
+        case LESS_THAN_OR_EQUAL:
+        case GREATER_THAN:
+        case GREATER_THAN_OR_EQUAL:
+        case EQUAL:
+        case NOT_EQUAL:
+            return false;
+
+        default:
+            assert(false);
+            return false;
+    }
+}
