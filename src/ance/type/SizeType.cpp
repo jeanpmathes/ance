@@ -2,6 +2,8 @@
 
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/IntegerType.h"
+#include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
@@ -26,10 +28,13 @@ bool ance::SizeType::isOperatorDefined(BinaryOperator, ance::ResolvingHandle<anc
     return false;
 }
 
-ance::ResolvingHandle<ance::Type> ance::SizeType::getOperatorResultType(BinaryOperator,
+ance::ResolvingHandle<ance::Type> ance::SizeType::getOperatorResultType(BinaryOperator op,
                                                                         ance::ResolvingHandle<ance::Type>)
 {
-    return self();
+    if (op.isArithmetic()) return self();
+    if (op.isRelational()) return ance::IntegerType::getBooleanType();
+
+    return ance::VoidType::get();
 }
 
 bool ance::SizeType::validateOperator(BinaryOperator,
@@ -73,10 +78,33 @@ std::shared_ptr<ance::Value> ance::SizeType::buildOperator(BinaryOperator       
             if (isSizeType()) result = context->ir()->CreateURem(left_value, right_value);
             if (isDiffType()) result = context->ir()->CreateSRem(left_value, right_value);
             break;
+        case BinaryOperator::LESS_THAN:
+            if (isSizeType()) result = context->ir()->CreateICmpULT(left_value, right_value);
+            if (isDiffType()) result = context->ir()->CreateICmpSLT(left_value, right_value);
+            break;
+        case BinaryOperator::LESS_THAN_OR_EQUAL:
+            if (isSizeType()) result = context->ir()->CreateICmpULE(left_value, right_value);
+            if (isDiffType()) result = context->ir()->CreateICmpSLE(left_value, right_value);
+            break;
+        case BinaryOperator::GREATER_THAN:
+            if (isSizeType()) result = context->ir()->CreateICmpUGT(left_value, right_value);
+            if (isDiffType()) result = context->ir()->CreateICmpSGT(left_value, right_value);
+            break;
+        case BinaryOperator::GREATER_THAN_OR_EQUAL:
+            if (isSizeType()) result = context->ir()->CreateICmpUGE(left_value, right_value);
+            if (isDiffType()) result = context->ir()->CreateICmpSGE(left_value, right_value);
+            break;
+        case BinaryOperator::EQUAL:
+            result = context->ir()->CreateICmpEQ(left_value, right_value);
+            break;
+        case BinaryOperator::NOT_EQUAL:
+            result = context->ir()->CreateICmpNE(left_value, right_value);
+            break;
     }
 
-    llvm::Value* native_result = ance::Values::contentToNative(self(), result, context);
-    return std::make_shared<ance::WrappedNativeValue>(self(), native_result);
+    ance::ResolvingHandle<ance::Type> result_type   = getOperatorResultType(op, right->type());
+    llvm::Value*                      native_result = ance::Values::contentToNative(result_type, result, context);
+    return std::make_shared<ance::WrappedNativeValue>(result_type, native_result);
 }
 
 bool ance::SizeType::isSizeType() const
