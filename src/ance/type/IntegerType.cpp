@@ -50,7 +50,7 @@ ance::ResolvingHandle<ance::Type> ance::IntegerType::getOperatorResultType(Binar
                                                                            ance::ResolvingHandle<ance::Type>)
 {
     if (op.isArithmetic()) return self();
-    if (op.isRelational()) return ance::IntegerType::getBooleanType();
+    if (op.isRelational() || op.isEquality()) return ance::IntegerType::getBooleanType();
 
     return ance::VoidType::get();
 }

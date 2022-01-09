@@ -40,7 +40,7 @@ std::string BinaryOperator::toString() const
     }
 }
 
-bool BinaryOperator::isRelational() const
+BinaryOperator::Category BinaryOperator::getCategory() const
 {
     switch (value_)
     {
@@ -49,43 +49,34 @@ bool BinaryOperator::isRelational() const
         case MULTIPLICATION:
         case DIVISION:
         case REMAINDER:
-            return false;
+            return Category::ARITHMETIC;
 
         case LESS_THAN:
         case LESS_THAN_OR_EQUAL:
         case GREATER_THAN:
         case GREATER_THAN_OR_EQUAL:
+            return Category::RELATIONAL;
+
         case EQUAL:
         case NOT_EQUAL:
-            return true;
+            return Category::EQUALITY;
 
         default:
             assert(false);
-            return false;
     }
+}
+
+bool BinaryOperator::isRelational() const
+{
+    return getCategory() == Category::RELATIONAL;
+}
+
+bool BinaryOperator::isEquality() const
+{
+    return getCategory() == Category::EQUALITY;
 }
 
 bool BinaryOperator::isArithmetic() const
 {
-    switch (value_)
-    {
-        case ADDITION:
-        case SUBTRACTION:
-        case MULTIPLICATION:
-        case DIVISION:
-        case REMAINDER:
-            return true;
-
-        case LESS_THAN:
-        case LESS_THAN_OR_EQUAL:
-        case GREATER_THAN:
-        case GREATER_THAN_OR_EQUAL:
-        case EQUAL:
-        case NOT_EQUAL:
-            return false;
-
-        default:
-            assert(false);
-            return false;
-    }
+    return getCategory() == Category::ARITHMETIC;
 }

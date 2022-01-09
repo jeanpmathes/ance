@@ -8,6 +8,17 @@
  */
 class BinaryOperator
 {
+  private:
+    enum class Category
+    {
+        ARITHMETIC,
+        RELATIONAL,
+        EQUALITY
+    };
+
+  private:
+    [[nodiscard]] Category getCategory() const;
+
   public:
     enum Value
     {
@@ -70,10 +81,15 @@ class BinaryOperator
     [[nodiscard]] std::string toString() const;
 
     /**
-     * Whether the operator is a relational operator. A relational operator commonly returns a boolean value.
+     * Whether the operator is a relational operator, excluding equality. A relational operator commonly returns a boolean value.
      * @return True if the operator is a relational operator, false otherwise.
      */
     [[nodiscard]] bool isRelational() const;
+    /**
+     * Whether the operator is an equality relational operator. An equality relational operator returns a boolean value.
+     * @return True if the operator is an equality relational operator, false otherwise.
+     */
+    [[nodiscard]] bool isEquality() const;
     /**
      * Whether the operator is an arithmetic operator. An arithmetic operator commonly returns a value of similar type as its operands.
      * @return True if the operator is an arithmetic operator, false otherwise.
