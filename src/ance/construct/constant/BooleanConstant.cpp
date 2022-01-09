@@ -2,7 +2,7 @@
 
 #include "ance/type/IntegerType.h"
 
-ance::BooleanConstant::BooleanConstant(bool boolean) : type_(ance::IntegerType::get(1, true)), boolean_(boolean) {}
+ance::BooleanConstant::BooleanConstant(bool boolean) : type_(ance::IntegerType::getBooleanType()), boolean_(boolean) {}
 
 ance::ResolvingHandle<ance::Type> ance::BooleanConstant::type()
 {

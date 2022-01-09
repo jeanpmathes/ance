@@ -63,6 +63,12 @@ namespace ance
          * @return The instance.
          */
         static ance::ResolvingHandle<ance::Type> get(uint64_t bit_size, bool is_signed);
+
+        /**
+         * Get the boolean type. This is an integer type with size 1.
+         * @return The boolean type.
+         */
+        static ance::ResolvingHandle<ance::Type> getBooleanType();
     };
 }
 

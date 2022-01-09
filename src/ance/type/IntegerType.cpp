@@ -2,6 +2,7 @@
 
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/scope/GlobalScope.h"
+#include "ance/type/VoidType.h"
 #include "ance/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
@@ -45,10 +46,13 @@ bool ance::IntegerType::isOperatorDefined(BinaryOperator, ance::ResolvingHandle<
     return false;
 }
 
-ance::ResolvingHandle<ance::Type> ance::IntegerType::getOperatorResultType(BinaryOperator,
+ance::ResolvingHandle<ance::Type> ance::IntegerType::getOperatorResultType(BinaryOperator op,
                                                                            ance::ResolvingHandle<ance::Type>)
 {
-    return self();
+    if (op.isArithmetic()) return self();
+    else if (op.isRelational()) return ance::IntegerType::getBooleanType();
+
+    return ance::VoidType::get();
 }
 
 bool ance::IntegerType::validateOperator(BinaryOperator,
@@ -92,10 +96,33 @@ std::shared_ptr<ance::Value> ance::IntegerType::buildOperator(BinaryOperator    
             if (is_signed_) result = context->ir()->CreateSRem(left_value, right_value);
             else result = context->ir()->CreateURem(left_value, right_value);
             break;
+        case BinaryOperator::LESS_THAN:
+            if (is_signed_) result = context->ir()->CreateICmpSLT(left_value, right_value);
+            else result = context->ir()->CreateICmpULT(left_value, right_value);
+            break;
+        case BinaryOperator::LESS_THAN_OR_EQUAL:
+            if (is_signed_) result = context->ir()->CreateICmpSLE(left_value, right_value);
+            else result = context->ir()->CreateICmpULE(left_value, right_value);
+            break;
+        case BinaryOperator::GREATER_THAN:
+            if (is_signed_) result = context->ir()->CreateICmpSGT(left_value, right_value);
+            else result = context->ir()->CreateICmpUGT(left_value, right_value);
+            break;
+        case BinaryOperator::GREATER_THAN_OR_EQUAL:
+            if (is_signed_) result = context->ir()->CreateICmpSGE(left_value, right_value);
+            else result = context->ir()->CreateICmpUGE(left_value, right_value);
+            break;
+        case BinaryOperator::EQUAL:
+            result = context->ir()->CreateICmpEQ(left_value, right_value);
+            break;
+        case BinaryOperator::NOT_EQUAL:
+            result = context->ir()->CreateICmpNE(left_value, right_value);
+            break;
     }
 
-    llvm::Value* native_result = ance::Values::contentToNative(self(), result, context);
-    return std::make_shared<ance::WrappedNativeValue>(self(), native_result);
+    ance::ResolvingHandle<ance::Type> result_type   = getOperatorResultType(op, right->type());
+    llvm::Value*                      native_result = ance::Values::contentToNative(result_type, result, context);
+    return std::make_shared<ance::WrappedNativeValue>(result_type, native_result);
 }
 
 std::string ance::IntegerType::createMangledName()
@@ -146,4 +173,9 @@ ance::ResolvingHandle<ance::Type> ance::IntegerType::get(uint64_t bit_size, bool
 
         return type;
     }
+}
+
+ance::ResolvingHandle<ance::Type> ance::IntegerType::getBooleanType()
+{
+    return get(1, true);// Use true so that i1 instead of ui1 can be used. (it is shorter)
 }

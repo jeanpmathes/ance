@@ -373,6 +373,8 @@ antlrcpp::Any SourceVisitor::visitBinaryOperation(anceParser::BinaryOperationCon
     std::optional<BinaryOperator> op;
     if (ctx->binaryOperatorMultiplicative()) op = visit(ctx->binaryOperatorMultiplicative());
     if (ctx->binaryOperatorAdditive()) op = visit(ctx->binaryOperatorAdditive());
+    if (ctx->binaryOperatorRelational()) op = visit(ctx->binaryOperatorRelational());
+    if (ctx->binaryOperatorEquality()) op = visit(ctx->binaryOperatorEquality());
     assert(op.has_value());
 
     return static_cast<Expression*>(new BinaryOperation(std::unique_ptr<Expression>(left),
