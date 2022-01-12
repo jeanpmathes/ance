@@ -35,6 +35,11 @@ void Runtime::init(CompileContext* context)
                                              module);
 }
 
+void Runtime::setExit(ance::ResolvingHandle<ance::Function> exit)
+{
+    exit_ = exit;
+}
+
 std::shared_ptr<ance::Value> Runtime::allocate(Allocator                           allocation,
                                                ance::ResolvingHandle<ance::Type>   type,
                                                const std::shared_ptr<ance::Value>& count,

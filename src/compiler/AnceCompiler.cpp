@@ -78,6 +78,8 @@ void AnceCompiler::compile(const std::filesystem::path& out)
     application_.globalScope().createNativeBacking(context_.get());
     application_.globalScope().buildFunctions(context_.get());
 
+    context_->runtime()->setExit(application_.globalScope().getExit());
+
     assert(context_->allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
 
     ance::ResolvingHandle<ance::Function> main = application_.globalScope().getEntry();

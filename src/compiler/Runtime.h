@@ -9,6 +9,7 @@
 
 #include "ance/type/Type.h"
 #include "ance/utility/ResolvingHandle.h"
+#include "ance/construct/Function.h"
 
 class CompileContext;
 
@@ -29,7 +30,15 @@ class Runtime
      */
     void init(CompileContext* context);
 
+    /**
+     * Set the exit point.
+     * @param exit The exit function, defined for the current application.
+     */
+    void setExit(ance::ResolvingHandle<ance::Function> exit);
+
   private:
+    std::optional<ance::ResolvingHandle<ance::Function>> exit_;
+
     llvm::FunctionType* allocate_dynamic_type_ {nullptr};
     llvm::Function*     allocate_dynamic_ {nullptr};
 
