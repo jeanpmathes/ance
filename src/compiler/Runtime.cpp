@@ -6,12 +6,15 @@
 #include "ance/construct/value/WrappedNativeValue.h"
 #include "ance/type/PointerType.h"
 #include "ance/type/SizeType.h"
+#include "ance/type/IntegerType.h"
 #include "ance/type/Type.h"
 #include "ance/utility/Values.h"
 #include "compiler/CompileContext.h"
 
 void Runtime::init(CompileContext* context)
 {
+    context_ = context;
+
     llvm::LLVMContext& llvm_context = *context->llvmContext();
     llvm::Module&      module       = *context->module();
 
@@ -37,7 +40,43 @@ void Runtime::init(CompileContext* context)
 
 void Runtime::setExit(ance::ResolvingHandle<ance::Function> exit)
 {
-    exit_ = exit;
+    llvm::LLVMContext& llvm_context = *context_->llvmContext();
+    llvm::Module&      module       = *context_->module();
+
+    llvm::Type* assertion_params[] = {llvm::Type::getInt1Ty(llvm_context)};
+
+    assertion_type_ = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context), assertion_params, false);
+    assertion_ =
+        llvm::Function::Create(assertion_type_, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "rt$assert", module);
+
+    llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(llvm_context, "entry", assertion_);
+    llvm::BasicBlock* abort_block = llvm::BasicBlock::Create(llvm_context, "abort", assertion_);
+    llvm::BasicBlock* exit_block  = llvm::BasicBlock::Create(llvm_context, "exit", assertion_);
+
+    context_->ir()->SetInsertPoint(entry_block);
+    {
+        llvm::Value* truth_value = assertion_->getArg(0);
+        context_->ir()->CreateCondBr(truth_value, exit_block, abort_block);
+    }
+
+    context_->ir()->SetInsertPoint(abort_block);
+    {
+        ance::ResolvingHandle<ance::Type> exit_value_type = ance::IntegerType::get(32, false);
+        llvm::Value* exit_value_content = llvm::ConstantInt::get(exit_value_type->getContentType(llvm_context), 3);
+        llvm::Value* exit_value_native  = ance::Values::contentToNative(exit_value_type, exit_value_content, context_);
+        std::shared_ptr<ance::Value> exit_value =
+            std::make_shared<ance::WrappedNativeValue>(exit_value_type, exit_value_native);
+
+        std::vector<std::shared_ptr<ance::Value>> args;
+        args.push_back(exit_value);
+        exit->buildCall(args, context_);
+        context_->ir()->CreateBr(exit_block);
+    }
+
+    context_->ir()->SetInsertPoint(exit_block);
+    {
+        context_->ir()->CreateRetVoid();
+    }
 }
 
 std::shared_ptr<ance::Value> Runtime::allocate(Allocator                           allocation,
@@ -83,6 +122,16 @@ void Runtime::deleteDynamic(const std::shared_ptr<ance::Value>& value, bool, Com
 
     llvm::Value* success = context->ir()->CreateCall(delete_dynamic_type_, delete_dynamic_, args);
     success->setName("..free");
+}
+
+void Runtime::buildAssert(const std::shared_ptr<ance::Value>& value, CompileContext* context)
+{
+    assert(value->type()->isBooleanType());
+
+    value->buildContentValue(context);
+    llvm::Value* truth_value = value->getContentValue();
+
+    context_->ir()->CreateCall(assertion_, truth_value);
 }
 
 llvm::Value* Runtime::allocateAutomatic(ance::ResolvingHandle<ance::Type>   type,

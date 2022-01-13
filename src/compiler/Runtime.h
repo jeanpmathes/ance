@@ -37,13 +37,16 @@ class Runtime
     void setExit(ance::ResolvingHandle<ance::Function> exit);
 
   private:
-    std::optional<ance::ResolvingHandle<ance::Function>> exit_;
+    CompileContext* context_ {nullptr};
 
     llvm::FunctionType* allocate_dynamic_type_ {nullptr};
     llvm::Function*     allocate_dynamic_ {nullptr};
 
     llvm::FunctionType* delete_dynamic_type_ {nullptr};
     llvm::Function*     delete_dynamic_ {nullptr};
+
+    llvm::FunctionType* assertion_type_ {nullptr};
+    llvm::Function*     assertion_ {nullptr};
 
   public:
     /**
@@ -81,6 +84,13 @@ class Runtime
      * @param context The current compile context.
      */
     void deleteDynamic(const std::shared_ptr<ance::Value>& value, bool delete_buffer, CompileContext* context);
+
+    /**
+     * Build an assertion.
+     * @param value The boolean value to assert.
+     * @param context The current compile context.
+     */
+    void buildAssert(const std::shared_ptr<ance::Value>& value, CompileContext* context);
 
   private:
     llvm::Value* allocateAutomatic(ance::ResolvingHandle<ance::Type>   type,
