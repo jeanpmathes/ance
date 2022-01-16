@@ -10,17 +10,23 @@ COMPILE_ERROR = 100
 
 
 class TestRun:
-    def __init__(self, test: discovery.Test, compile_result: int, compile_output: str, result: Optional[str]):
+    def __init__(self, test: discovery.Test,
+                 compile_result: int, compile_output: str,
+                 exit_success: bool, result: Optional[str]):
         self.test = test
         self.is_compiling = compile_result != COMPILE_ERROR
         self.is_valid = compile_result == COMPILE_VALID
         self.compile_output = compile_output
+        self.exit_success = exit_success
         self.result = result
 
     def is_passing(self) -> bool:
         if not self.is_compiling:
             return False
+
         if self.is_valid == self.test.is_valid:
+            if self.is_valid and not self.exit_success:
+                return False
             return self.test.expected_result is None or self.result == self.test.expected_result
         return False
 
@@ -37,6 +43,9 @@ class TestRun:
             else:
                 return "expected: invalid, actual: valid"
         else:
+            if not self.exit_success:
+                return "exit code indicates failure"
+
             return f"expected: {self.test.expected_result}, actual: {self.result}"
 
     def print_info(self):
@@ -58,10 +67,10 @@ def run_test(test: discovery.Test) -> TestRun:
             compile_result = COMPILE_ERROR
 
         if compile_result != COMPILE_VALID:
-            return TestRun(test, compile_result, compile_output, None)
+            return TestRun(test, compile_result, compile_output, False, None)
 
         run_result, run_output = ance.run_project(output_path, "test")
-        return TestRun(test, compile_result, compile_output, run_output)
+        return TestRun(test, compile_result, compile_output, run_result == 0, run_output)
 
 
 projects: list = discovery.discover_projects("../ance")
