@@ -278,6 +278,11 @@ antlrcpp::Any SourceVisitor::visitReturnStatement(anceParser::ReturnStatementCon
     return static_cast<Statement*>(new ReturnStatement(std::unique_ptr<Expression>(return_value), location(ctx)));
 }
 
+antlrcpp::Any SourceVisitor::visitAssertStatement(anceParser::AssertStatementContext* ctx)
+{
+    return anceBaseVisitor::visitAssertStatement(ctx);
+}
+
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
 {
     std::string              function_name = ctx->IDENTIFIER()->getText();

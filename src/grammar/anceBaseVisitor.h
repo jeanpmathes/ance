@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "anceVisitor.h"
 #include "antlr4-runtime.h"
+#include "anceVisitor.h"
 
 /**
  * This class provides an empty implementation of anceVisitor, which can be
@@ -94,6 +94,11 @@ class anceBaseVisitor : public anceVisitor
     }
 
     virtual antlrcpp::Any visitReturnStatement(anceParser::ReturnStatementContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
+    virtual antlrcpp::Any visitAssertStatement(anceParser::AssertStatementContext* ctx) override
     {
         return visitChildren(ctx);
     }

@@ -46,6 +46,7 @@ statement
 	| assignment
 	| deleteStatement
 	| returnStatement
+	| assertStatement
 	;
 
 expressionStatement
@@ -78,6 +79,10 @@ deleteStatement
 returnStatement
 	: 'return' ( expression )? ';'
 	;
+
+assertStatement
+    : 'assert' expression ';'
+    ;
 
 expression
 	: variableAccess # Variable
