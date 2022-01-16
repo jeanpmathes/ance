@@ -1,13 +1,11 @@
-// invalid
+// valid
 
-// As defines can be used in any order, cyclic dependencies must be detected.
-
-define a as b;
-define b as c;
-define c as a;
+// An assertion that has a correct condition.
 
 public main () : ui32
 {
+    assert true;
+
     return 0:32;
 }
 

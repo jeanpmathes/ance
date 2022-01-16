@@ -39,5 +39,7 @@ public main () : ui32
 
 public exit (exitcode : ui32)
 {
-
+     ExitProcess(exitcode);
 }
+
+extern ExitProcess (uExitCode : ui32);

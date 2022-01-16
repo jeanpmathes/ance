@@ -9,8 +9,10 @@ public main () : ui32
 
 public exit (exitcode : ui32)
 {
-
+     ExitProcess(exitcode);
 }
+
+extern ExitProcess (uExitCode : ui32);
 
 extern overloaded (x : ui32);
 extern overloaded (y : ui32);
