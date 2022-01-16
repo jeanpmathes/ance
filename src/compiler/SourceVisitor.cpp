@@ -22,6 +22,7 @@
 #include "ance/statement/LocalReferenceVariableDefinition.h"
 #include "ance/statement/LocalVariableDefinition.h"
 #include "ance/statement/ReturnStatement.h"
+#include "ance/statement/Assertion.h"
 
 #include "ance/expression/Addressof.h"
 #include "ance/expression/Allocation.h"
@@ -280,7 +281,8 @@ antlrcpp::Any SourceVisitor::visitReturnStatement(anceParser::ReturnStatementCon
 
 antlrcpp::Any SourceVisitor::visitAssertStatement(anceParser::AssertStatementContext* ctx)
 {
-    return anceBaseVisitor::visitAssertStatement(ctx);
+    Expression* condition = visit(ctx->expression());
+    return static_cast<Statement*>(new Assertion(std::unique_ptr<Expression>(condition), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
