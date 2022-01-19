@@ -46,7 +46,7 @@ void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
 
     if (!type()->validate(validation_logger, typeLocation())) return;
 
-    if (type() == ance::VoidType::get())
+    if (type()->isVoidType())
     {
         validation_logger.logError("Global variable cannot have 'void' type", typeLocation());
         return;

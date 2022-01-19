@@ -57,7 +57,7 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
 
         if (!variable->type()->validate(validation_logger, type_location_)) return;
 
-        if (type_ == ance::VoidType::get())
+        if (type_->isVoidType())
         {
             validation_logger.logError("Local variable cannot have 'void' type", type_location_);
             return;

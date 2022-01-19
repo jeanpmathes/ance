@@ -12,7 +12,7 @@ ance::ResolvingHandle<ance::Type> ance::DelayedValue::type()
 void ance::DelayedValue::setValue(const std::shared_ptr<ance::Value>& value)
 {
     assert(!value_);
-    assert(value->type() == type() && "Type has to match.");
+    assert(ance::Type::areSame(value->type(), type()) && "Type has to match.");
 
     value_ = value;
 }

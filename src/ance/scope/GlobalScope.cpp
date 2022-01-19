@@ -340,10 +340,8 @@ std::optional<ance::ResolvingHandle<ance::Function>> ance::GlobalScope::findExit
 
     ance::Function& function = *(potential_function.value());
 
-    if (function.returnType() == ance::VoidType::get())
-        return potential_function;
-    else
-        return {};
+    if (function.returnType()->isVoidType()) return potential_function;
+    else return {};
 }
 
 bool ance::GlobalScope::hasEntry()

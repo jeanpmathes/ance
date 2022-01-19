@@ -53,7 +53,7 @@ bool ance::ReferenceType::validate(ValidationLogger& validation_logger, ance::Lo
         return false;
     }
 
-    if (element_type_ == ance::VoidType::get())
+    if (element_type_->isVoidType())
     {
         validation_logger.logError("Cannot declare reference to " + ance::VoidType::get()->getAnnotatedName(),
                                    location);

@@ -70,7 +70,7 @@ void ance::ExternFunction::validate(ValidationLogger& validation_logger)
 
         parameter->type()->validate(validation_logger, parameter->typeLocation());
 
-        if (parameter->type() == ance::VoidType::get())
+        if (parameter->type()->isVoidType())
         {
             validation_logger.logError("Parameter cannot have 'void' type", parameter->location());
         }
@@ -93,7 +93,7 @@ std::shared_ptr<ance::Value> ance::ExternFunction::buildCall(const std::vector<s
 {
     llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
 
-    if (returnType() == ance::VoidType::get()) { return nullptr; }
+    if (returnType()->isVoidType()) { return nullptr; }
 
     llvm::Value* native_value = ance::Values::contentToNative(returnType(), content_value, context);
     return std::make_shared<ance::WrappedNativeValue>(returnType(), native_value);

@@ -130,9 +130,8 @@ void ance::CustomFunction::build(CompileContext* context)
 
     if (!has_return_)
     {
-        if (returnType() == ance::VoidType::get()) { context->ir()->CreateRetVoid(); }
-        else
-        {
+        if (returnType()->isVoidType()) { context->ir()->CreateRetVoid(); }
+        else {
             // todo should actually be part of validation step
             assert(false && "Functions with return type that is not void require a return statement.");
         }
@@ -146,13 +145,12 @@ void ance::CustomFunction::addReturn(const std::shared_ptr<ance::Value>& value)
 {
     if (value)
     {
-        assert(value->type() == returnType());
-        return_value_ = value;
+        assert(ance::Type::areSame(value->type(), returnType()));
+        return_value_ = ance::Type::makeActual(value);
         has_return_   = true;
     }
-    else
-    {
-        assert(returnType() == ance::VoidType::get());
+    else {
+        assert(returnType()->isVoidType());
         return_value_ = nullptr;
         has_return_   = true;
     }
@@ -163,7 +161,7 @@ std::shared_ptr<ance::Value> ance::CustomFunction::buildCall(const std::vector<s
 {
     llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
 
-    if (returnType() == ance::VoidType::get()) { return nullptr; }
+    if (returnType()->isVoidType()) { return nullptr; }
 
     llvm::Value* native_value = ance::Values::contentToNative(returnType(), content_value, context);
     return std::make_shared<ance::WrappedNativeValue>(returnType(), native_value);

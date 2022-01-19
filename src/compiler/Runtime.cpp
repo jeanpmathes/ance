@@ -84,7 +84,7 @@ std::shared_ptr<ance::Value> Runtime::allocate(Allocator                        
                                                const std::shared_ptr<ance::Value>& count,
                                                CompileContext*                     context)
 {
-    if (count) { assert(count->type() == ance::SizeType::getSize()); }
+    if (count) { assert(ance::Type::areSame(count->type(), ance::SizeType::getSize())); }
 
     llvm::Value* ptr_to_allocated;
 

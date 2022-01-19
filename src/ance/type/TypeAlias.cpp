@@ -126,7 +126,7 @@ bool ance::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
         valid = false;
     }
 
-    if (actual_ == ance::VoidType::get())
+    if (actual_ == ance::VoidType::get())// Prevent infinite recursion.
     {
         validation_logger.logError("Cannot create alias for 'void' type", getDefinitionLocation());
         valid = false;

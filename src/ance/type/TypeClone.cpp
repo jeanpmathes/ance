@@ -118,7 +118,7 @@ bool ance::TypeClone::validateDefinition(ValidationLogger& validation_logger)
         valid = false;
     }
 
-    if (original_ == ance::VoidType::get())
+    if (original_ == ance::VoidType::get())// Prevent infinite recursion.
     {
         validation_logger.logError("Cannot create clone of 'void' type", getDefinitionLocation());
         valid = false;

@@ -46,9 +46,8 @@ llvm::PointerType* ance::PointerType::getContentType(llvm::LLVMContext& c)
 {
     llvm::Type* native_type;
 
-    if (element_type_ == ance::VoidType::get()) { native_type = llvm::Type::getInt8PtrTy(c); }
-    else
-    {
+    if (element_type_->isVoidType()) { native_type = llvm::Type::getInt8PtrTy(c); }
+    else {
         native_type = element_type_->getContentType(c);
     }
 
@@ -132,15 +131,14 @@ llvm::DIType* ance::PointerType::createDebugType(CompileContext* context)
 
     llvm::DIType* di_type;
 
-    if (element_type_ == ance::VoidType::get())
+    if (element_type_->isVoidType())
     {
         std::string name     = getName();
         auto        encoding = llvm::dwarf::DW_ATE_address;
 
         di_type = context->di()->createBasicType(name, size_in_bits, encoding);
     }
-    else
-    {
+    else {
         llvm::DIType* element_di_type = element_type_->getDebugType(context);
 
         di_type = context->di()->createPointerType(element_di_type, size_in_bits);
