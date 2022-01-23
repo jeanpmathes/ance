@@ -20,6 +20,8 @@ namespace ance
         IntegerType(uint64_t bit_size, bool is_signed);
 
       public:
+        static const int64_t MAX_INTEGER_SIZE = 1ll << 16;
+
         [[nodiscard]] bool isIntegerType() const override;
         [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
 
@@ -27,6 +29,8 @@ namespace ance
 
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
+
+        bool validate(ValidationLogger& validation_logger, ance::Location location) override;
 
         bool isOperatorDefined(BinaryOperator op, ance::ResolvingHandle<ance::Type> other) override;
         ance::ResolvingHandle<ance::Type> getOperatorResultType(BinaryOperator                    op,

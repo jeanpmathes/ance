@@ -27,6 +27,8 @@ namespace ance
         ArrayType(ance::ResolvingHandle<ance::Type> element_type, uint64_t size);
 
       public:
+        static const uint64_t MAX_ARRAY_TYPE_SIZE = 1ll << 32;
+
         ance::ResolvingHandle<ance::Type> getElementType() const override;
         ance::ResolvingHandle<ance::Type> getActualType() override;
 

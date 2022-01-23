@@ -47,6 +47,13 @@ llvm::ArrayType* ance::ArrayType::getContentType(llvm::LLVMContext& c)
 
 bool ance::ArrayType::validate(ValidationLogger& validation_logger, ance::Location location)
 {
+    if (size_ > MAX_ARRAY_TYPE_SIZE)
+    {
+        validation_logger.logError("Integer type size cannot be larger than " + std::to_string(MAX_ARRAY_TYPE_SIZE),
+                                   location);
+        return false;
+    }
+
     if (!element_type_->isDefined())
     {
         validation_logger.logError("Cannot declare array of undefined type " + element_type_->getAnnotatedName(),

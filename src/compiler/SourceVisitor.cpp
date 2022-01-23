@@ -532,7 +532,7 @@ antlrcpp::Any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ct
     std::string integer_type_str = ctx->NATIVE_INTEGER_TYPE()->getText();
 
     bool     is_unsigned = integer_type_str[0] == 'u';
-    uint64_t size        = std::stoi(integer_type_str.substr(1 + integer_type_str.find('i')));
+    uint64_t size        = parseIntegerTypeSize(integer_type_str.substr(1 + integer_type_str.find('i')));
 
     ance::ResolvingHandle<ance::Type> type = ance::IntegerType::get(size, !is_unsigned);
     return type;
@@ -541,7 +541,7 @@ antlrcpp::Any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ct
 antlrcpp::Any SourceVisitor::visitArrayType(anceParser::ArrayTypeContext* ctx)
 {
     ance::ResolvingHandle<ance::Type> element_type = visit(ctx->type());
-    uint64_t                          size         = std::stoi(ctx->INTEGER()->getText());
+    uint64_t                          size         = parseArrayTypeSize(ctx->INTEGER()->getText());
     ance::ResolvingHandle<ance::Type> type         = ance::ArrayType::get(element_type, size);
 
     return type;
@@ -693,4 +693,32 @@ ance::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)
     unsigned end_column = ctx->getStop()->getCharPositionInLine() + ctx->getStop()->getText().size();
 
     return {start_line, start_column, end_line, end_column};
+}
+
+uint64_t SourceVisitor::parseIntegerTypeSize(const std::string& str)
+{
+    return parseInRange(str, ance::IntegerType::MAX_INTEGER_SIZE);
+}
+
+uint64_t SourceVisitor::parseArrayTypeSize(const std::string& str)
+{
+    return parseInRange(str, ance::ArrayType::MAX_ARRAY_TYPE_SIZE);
+}
+
+uint64_t SourceVisitor::parseInRange(const std::string& str, uint64_t max)
+{
+    uint64_t value;
+
+    try
+    {
+        value = std::stoull(str);
+    }
+    catch (const std::exception& e)
+    {
+        value = max + 1;
+    }
+
+    if (value > max) { value = max + 1; }
+
+    return value;
 }

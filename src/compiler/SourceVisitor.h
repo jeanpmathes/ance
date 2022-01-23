@@ -106,6 +106,11 @@ class SourceVisitor : public anceBaseVisitor
   protected:
     static ance::Location location(antlr4::ParserRuleContext* ctx);
 
+    static uint64_t parseIntegerTypeSize(const std::string& str);
+    static uint64_t parseArrayTypeSize(const std::string& str);
+
+    static uint64_t parseInRange(const std::string& str, uint64_t max);
+
   private:
     Application& application_;
 };

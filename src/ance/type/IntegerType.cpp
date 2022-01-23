@@ -6,6 +6,7 @@
 #include "ance/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "validation/ValidationLogger.h"
 
 ance::IntegerType::IntegerType(uint64_t bit_size, bool is_signed)
     : TypeDefinition((is_signed ? "i" : "ui") + std::to_string(bit_size))
@@ -33,6 +34,24 @@ llvm::Type* ance::IntegerType::getContentType(llvm::LLVMContext& c)
     if (!type_) { type_ = llvm::Type::getIntNTy(c, bit_size_); }
 
     return type_;
+}
+
+bool ance::IntegerType::validate(ValidationLogger& validation_logger, ance::Location location)
+{
+    if (bit_size_ == 0)
+    {
+        validation_logger.logError("Integer type size must be positive", location);
+        return false;
+    }
+
+    if (bit_size_ > MAX_INTEGER_SIZE)
+    {
+        validation_logger.logError("Integer type size cannot be larger than " + std::to_string(MAX_INTEGER_SIZE),
+                                   location);
+        return false;
+    }
+
+    return true;
 }
 
 bool ance::IntegerType::isOperatorDefined(BinaryOperator, ance::ResolvingHandle<ance::Type> other)
