@@ -418,34 +418,36 @@ antlrcpp::Any SourceVisitor::visitByteLiteral(anceParser::ByteLiteralContext* ct
 
 antlrcpp::Any SourceVisitor::visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext* ctx)
 {
-    llvm::APFloat                                    number = llvm::APFloat::getZero(llvm::APFloat::Bogus());
-    std::optional<ance::ResolvingHandle<ance::Type>> type   = {};
+    std::shared_ptr<ance::Constant> flt;
 
     if (ctx->HALF())
     {
-        number = llvm::APFloat(llvm::APFloat::IEEEhalf(), ctx->getText().erase(ctx->getText().size() - 1));
-        type   = ance::HalfType::get();
+        flt = std::make_shared<ance::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
+                                                    llvm::APFloat::IEEEhalf(),
+                                                    ance::HalfType::get());
     }
 
     if (ctx->SINGLE())
     {
-        number = llvm::APFloat(llvm::APFloat::IEEEsingle(), ctx->getText().erase(ctx->getText().size() - 1));
-        type   = ance::SingleType::get();
+        flt = std::make_shared<ance::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
+                                                    llvm::APFloat::IEEEsingle(),
+                                                    ance::SingleType::get());
     }
 
     if (ctx->DOUBLE())
     {
-        number = llvm::APFloat(llvm::APFloat::IEEEdouble(), ctx->getText().erase(ctx->getText().size() - 1));
-        type   = ance::DoubleType::get();
+        flt = std::make_shared<ance::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
+                                                    llvm::APFloat::IEEEdouble(),
+                                                    ance::DoubleType::get());
     }
 
     if (ctx->QUAD())
     {
-        number = llvm::APFloat(llvm::APFloat::IEEEquad(), ctx->getText().erase(ctx->getText().size() - 1));
-        type   = ance::QuadType::get();
+        flt = std::make_shared<ance::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
+                                                    llvm::APFloat::IEEEquad(),
+                                                    ance::QuadType::get());
     }
 
-    std::shared_ptr<ance::Constant> flt = std::make_shared<ance::FloatConstant>(number, *type);
     return static_cast<Expression*>(new ConstantLiteral(flt, location(ctx)));
 }
 

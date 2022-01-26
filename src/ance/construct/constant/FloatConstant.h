@@ -17,9 +17,10 @@ namespace ance
         /**
          * Create a new floating point constant.
          * @param number The number to use as value.
+         * @param semantics The semantics of the constant.
          * @param type The type of float to use.
          */
-        FloatConstant(llvm::APFloat number, ance::ResolvingHandle<ance::Type> type);
+        FloatConstant(std::string number, const llvm::fltSemantics& semantics, ance::ResolvingHandle<ance::Type> type);
 
         ance::ResolvingHandle<ance::Type> type() override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
