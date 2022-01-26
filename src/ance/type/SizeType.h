@@ -21,6 +21,11 @@ namespace ance
         llvm::Type*& backing_;
 
       public:
+        /**
+         * The minimum size of a size/diff value.
+         */
+        static const size_t MINIMUM_BIT_SIZE = 16;
+
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 

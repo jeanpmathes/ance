@@ -22,6 +22,8 @@ namespace ance
          */
         explicit SizeConstant(std::string value);
 
+        bool validate(ValidationLogger& validation_logger, ance::Location location) override;
+
         ance::ResolvingHandle<ance::Type> type() override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
 
