@@ -5,6 +5,11 @@
 
 #include "compiler/CompileContext.h"
 
+bool ance::Constant::validate(ValidationLogger&, ance::Location)
+{
+    return true;
+}
+
 void ance::Constant::buildContentConstant(llvm::Module* m)
 {
     assert(!content_constant_ && "A constant may only be built once.");

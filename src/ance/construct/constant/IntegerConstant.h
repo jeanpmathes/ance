@@ -18,17 +18,23 @@ namespace ance
       public:
         /**
          * Create a new integer constant.
-         * @param integer The integer value to use. The bit width determines the used type.
+         * @param integer The integer value to use, encoded as a string.
+         * @param size The size of the integer, in bits.
          * @param is_signed Whether the integer should be signed or unsigned.
+         * @param radix The radix to use when parsing the integer.
          */
-        IntegerConstant(llvm::APInt integer, bool is_signed);
+        IntegerConstant(std::string integer, int64_t size, bool is_signed, int radix = 10);
+
+        bool validate(ValidationLogger& validation_logger, ance::Location location) override;
 
         ance::ResolvingHandle<ance::Type> type() override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
 
       private:
+        std::string                       text_;
+        std::int64_t                      size_;
+        int                               radix_;
         ance::ResolvingHandle<ance::Type> type_;
-        llvm::APInt                       integer_;
     };
 }
 

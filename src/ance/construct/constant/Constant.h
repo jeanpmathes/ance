@@ -12,6 +12,14 @@ namespace ance
     {
       public:
         /**
+         * Validate the constant value.
+         * @param location The location of the constant.
+         * @param validation_logger The logger to log the validation result.
+         * @return True if the constant value is valid.
+         */
+        virtual bool validate(ValidationLogger& validation_logger, ance::Location location);
+
+        /**
          * Build the content constant of this constant.
          * @param m The module.
          */

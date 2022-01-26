@@ -58,6 +58,9 @@ void ance::GlobalVariable::validate(ValidationLogger& validation_logger)
         return;
     }
 
+    bool valid = constant_init_->validate(validation_logger);
+    if (!valid) return;
+
     ance::Type::checkMismatch(type(), initial_value_->type(), constant_init_->location(), validation_logger);
 }
 

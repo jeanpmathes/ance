@@ -479,25 +479,25 @@ antlrcpp::Any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ct
 
 antlrcpp::Any SourceVisitor::visitUnsignedInteger(anceParser::UnsignedIntegerContext* ctx)
 {
-    uint64_t size = std::stoi(ctx->width->getText());
+    uint64_t size = parseIntegerTypeSize(ctx->width->getText());
 
-    const llvm::APInt               integer(size, ctx->value->getText(), 10);
-    std::shared_ptr<ance::Constant> integer_constant = std::make_shared<ance::IntegerConstant>(integer, false);
+    std::shared_ptr<ance::Constant> integer_constant =
+        std::make_shared<ance::IntegerConstant>(ctx->value->getText(), size, false);
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSignedInteger(anceParser::SignedIntegerContext* ctx)
 {
-    uint64_t size = std::stoi(ctx->width->getText());
+    uint64_t size = parseIntegerTypeSize(ctx->width->getText());
 
-    const llvm::APInt               integer(size, ctx->value->getText(), 10);
-    std::shared_ptr<ance::Constant> integer_constant = std::make_shared<ance::IntegerConstant>(integer, true);
+    std::shared_ptr<ance::Constant> integer_constant =
+        std::make_shared<ance::IntegerConstant>(ctx->value->getText(), size, true);
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerContext* ctx)
 {
-    uint64_t size = std::stoi(ctx->width->getText());
+    uint64_t size = parseIntegerTypeSize(ctx->width->getText());
 
     std::string integer_str;
     int         radix;
@@ -522,8 +522,8 @@ antlrcpp::Any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerConte
 
     integer_str.erase(0, 2);
 
-    const llvm::APInt               integer(size, integer_str, radix);
-    std::shared_ptr<ance::Constant> integer_constant = std::make_shared<ance::IntegerConstant>(integer, false);
+    std::shared_ptr<ance::Constant> integer_constant =
+        std::make_shared<ance::IntegerConstant>(integer_str, size, false, radix);
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 

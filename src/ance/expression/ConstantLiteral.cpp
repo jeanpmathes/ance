@@ -14,9 +14,9 @@ ance::ResolvingHandle<ance::Type> ConstantLiteral::type()
     return constant_->type();
 }
 
-bool ConstantLiteral::validate(ValidationLogger&)
+bool ConstantLiteral::validate(ValidationLogger& validation_logger)
 {
-    return true;
+    return constant_->validate(validation_logger, location());
 }
 
 std::shared_ptr<ance::Constant> ConstantLiteral::getConstantValue() const
