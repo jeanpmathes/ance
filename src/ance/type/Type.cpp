@@ -269,10 +269,12 @@ std::shared_ptr<ance::Value> ance::Type::buildOperator(BinaryOperator         op
     return definition_->buildOperator(op, std::move(left), std::move(right), context);
 }
 
-std::shared_ptr<ance::Value> ance::Type::buildImplicitConversion(std::shared_ptr<Value> value, CompileContext* context)
+std::shared_ptr<ance::Value> ance::Type::buildImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                                                 std::shared_ptr<Value>            value,
+                                                                 CompileContext*                   context)
 {
     assert(isDefined());
-    return definition_->buildImplicitConversion(std::move(value), context);
+    return definition_->buildImplicitConversion(other, std::move(value), context);
 }
 
 ance::TypeDefinition* ance::Type::getDefinition()
@@ -284,10 +286,12 @@ bool ance::Type::isMatching(ance::ResolvingHandle<ance::Type> expected, ance::Re
 {
     if (areSame(expected, actual)) return true;
 
+    if (actual->isImplicitlyConvertibleTo(expected)) return true;
+
     if (actual->isReferenceType())
     {
         ance::ResolvingHandle<ance::Type> referenced_type = actual->getElementType();
-        if (areSame(referenced_type, expected)) return true;
+        if (isMatching(expected, referenced_type)) return true;
     }
 
     return false;
@@ -307,6 +311,14 @@ bool ance::Type::checkMismatch(ance::ResolvingHandle<ance::Type> expected,
                                    location);
     }
 
+    ance::ResolvingHandle<ance::Type> start_type = actual;
+    if (actual->isReferenceType()) start_type = actual->getElementType();
+
+    if (start_type->isImplicitlyConvertibleTo(expected))
+    {
+        matching &= start_type->validateImplicitConversion(expected, location, validation_logger);
+    }
+
     return matching;
 }
 
@@ -316,12 +328,15 @@ std::shared_ptr<ance::Value> ance::Type::makeMatching(ance::ResolvingHandle<ance
 {
     if (areSame(expected, value->type())) return makeActual(value);
 
+    if (value->type()->isImplicitlyConvertibleTo(expected))
+        return value->type()->buildImplicitConversion(expected, value, context);
+
     if (value->type()->isReferenceType())
     {
         auto reference_type                     = dynamic_cast<ance::ReferenceType*>(value->type()->definition_.get());
         std::shared_ptr<ance::Value> referenced = reference_type->getReferenced(value, context);
 
-        return makeActual(referenced);
+        return makeMatching(expected, referenced, context);
     }
 
     assert(false && "Cannot make the value matching, was mismatch checked before?");

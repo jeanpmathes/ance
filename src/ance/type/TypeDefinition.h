@@ -108,7 +108,9 @@ namespace ance
                                                            std::shared_ptr<Value> right,
                                                            CompileContext*        context);
 
-        std::shared_ptr<ance::Value> buildImplicitConversion(std::shared_ptr<Value> value, CompileContext* context);
+        std::shared_ptr<ance::Value> buildImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                                             std::shared_ptr<Value>            value,
+                                                             CompileContext*                   context);
 
       protected:
         virtual std::string createMangledName() = 0;

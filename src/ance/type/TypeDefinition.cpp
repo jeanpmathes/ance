@@ -218,7 +218,9 @@ std::shared_ptr<ance::Value> ance::TypeDefinition::buildOperator(BinaryOperator,
     return nullptr;
 }
 
-std::shared_ptr<ance::Value> ance::TypeDefinition::buildImplicitConversion(std::shared_ptr<Value>, CompileContext*)
+std::shared_ptr<ance::Value> ance::TypeDefinition::buildImplicitConversion(ance::ResolvingHandle<ance::Type>,
+                                                                           std::shared_ptr<Value>,
+                                                                           CompileContext*)
 {
     return nullptr;
 }

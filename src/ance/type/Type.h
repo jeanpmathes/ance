@@ -330,11 +330,14 @@ namespace ance
 
         /**
          * Build an implicit conversion.
+         * @param other The type to convert to.
          * @param value The value to convert.
          * @param context The current compile context.
          * @return The converted value.
          */
-        std::shared_ptr<ance::Value> buildImplicitConversion(std::shared_ptr<Value> value, CompileContext* context);
+        std::shared_ptr<ance::Value> buildImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                                             std::shared_ptr<Value>            value,
+                                                             CompileContext*                   context);
 
         ance::TypeDefinition* getDefinition();
 
