@@ -83,6 +83,8 @@ namespace ance
         virtual ance::ResolvingHandle<ance::Type> getOperatorResultType(BinaryOperator                    op,
                                                                         ance::ResolvingHandle<ance::Type> other);
 
+        bool isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> other);
+
         virtual bool validateDefinition(ValidationLogger& validation_logger);
         virtual bool validate(ValidationLogger& validation_logger, ance::Location location);
         virtual bool validateSubscript(ance::Location                    indexed_location,
@@ -94,6 +96,9 @@ namespace ance
                                       ance::Location                    left_location,
                                       ance::Location                    right_location,
                                       ValidationLogger&                 validation_logger);
+        bool         validateImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                                ance::Location                    location,
+                                                ValidationLogger&                 validation_logger);
 
         virtual std::shared_ptr<ance::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                             std::shared_ptr<Value> index,
@@ -102,6 +107,8 @@ namespace ance
                                                            std::shared_ptr<Value> left,
                                                            std::shared_ptr<Value> right,
                                                            CompileContext*        context);
+
+        std::shared_ptr<ance::Value> buildImplicitConversion(std::shared_ptr<Value> value, CompileContext* context);
 
       protected:
         virtual std::string createMangledName() = 0;

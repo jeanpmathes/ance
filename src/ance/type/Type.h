@@ -244,6 +244,13 @@ namespace ance
                                                                 ance::ResolvingHandle<ance::Type> other);
 
         /**
+         * Check whether implicit conversion to a specified type is possible.
+         * @param other The other type.
+         * @return True if implicit conversion is possible.
+         */
+        bool isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> other);
+
+        /**
          * Validate the definition of this type, if there is any.
          * @param validation_logger The validation logger to use.
          * @return True if the type has a valid definition.
@@ -287,6 +294,17 @@ namespace ance
                               ValidationLogger&                 validation_logger);
 
         /**
+         * Validate an implicit conversion.
+         * @param other The other type.
+         * @param location The source location of implicit conversion.
+         * @param validation_logger The validation logger to use.
+         * @return True if the implicit conversion is valid.
+         */
+        bool validateImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                        ance::Location                    location,
+                                        ValidationLogger&                 validation_logger);
+
+        /**
          * Build a subscript access.
          * @param indexed The indexed value.
          * @param index The index to use.
@@ -309,6 +327,14 @@ namespace ance
                                                    std::shared_ptr<Value> left,
                                                    std::shared_ptr<Value> right,
                                                    CompileContext*        context);
+
+        /**
+         * Build an implicit conversion.
+         * @param value The value to convert.
+         * @param context The current compile context.
+         * @return The converted value.
+         */
+        std::shared_ptr<ance::Value> buildImplicitConversion(std::shared_ptr<Value> value, CompileContext* context);
 
         ance::TypeDefinition* getDefinition();
 

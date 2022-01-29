@@ -206,13 +206,17 @@ ance::ResolvingHandle<ance::Type> ance::Type::getOperatorResultType(BinaryOperat
     return definition_->getOperatorResultType(op, other);
 }
 
+bool ance::Type::isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> other)
+{
+    assert(isDefined());
+    return definition_->isImplicitlyConvertibleTo(other);
+}
+
 bool ance::Type::validateDefinition(ValidationLogger& validation_logger)
 {
     assert(isDefined());
-    if (definition_->isCustom())
-        return definition_->validateDefinition(validation_logger);
-    else
-        return true;
+    if (definition_->isCustom()) return definition_->validateDefinition(validation_logger);
+    else return true;
 }
 
 bool ance::Type::validate(ValidationLogger& validation_logger, ance::Location location)
@@ -240,6 +244,14 @@ bool ance::Type::validateOperator(BinaryOperator                    op,
     return definition_->validateOperator(op, std::move(other), left_location, right_location, validation_logger);
 }
 
+bool ance::Type::validateImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                            ance::Location                    location,
+                                            ValidationLogger&                 validation_logger)
+{
+    assert(isDefined());
+    return definition_->validateImplicitConversion(std::move(other), location, validation_logger);
+}
+
 std::shared_ptr<ance::Value> ance::Type::buildSubscript(std::shared_ptr<Value> indexed,
                                                         std::shared_ptr<Value> index,
                                                         CompileContext*        context)
@@ -255,6 +267,12 @@ std::shared_ptr<ance::Value> ance::Type::buildOperator(BinaryOperator         op
 {
     assert(isDefined());
     return definition_->buildOperator(op, std::move(left), std::move(right), context);
+}
+
+std::shared_ptr<ance::Value> ance::Type::buildImplicitConversion(std::shared_ptr<Value> value, CompileContext* context)
+{
+    assert(isDefined());
+    return definition_->buildImplicitConversion(std::move(value), context);
 }
 
 ance::TypeDefinition* ance::Type::getDefinition()
