@@ -11,7 +11,9 @@ ance::IntegerConstant::IntegerConstant(std::string integer, int64_t size, bool i
     , size_(size)
     , radix_(radix)
     , type_(ance::IntegerType::get(size, is_signed))
-{}
+{
+    text_.erase(0, std::min(text_.find_first_not_of('0'), text_.size() - 1));
+}
 
 bool ance::IntegerConstant::validate(ValidationLogger& validation_logger, ance::Location location)
 {
@@ -19,6 +21,24 @@ bool ance::IntegerConstant::validate(ValidationLogger& validation_logger, ance::
     if (!valid) return false;
 
     unsigned int needed_bits = llvm::APInt::getBitsNeeded(text_, radix_);
+
+    if (radix_ == 2 || radix_ == 8 || radix_ == 16)
+    {
+        // Code from llvm::APInt::getBitsNeeded
+        // Required as the required size can be larger than needed
+
+        unsigned    is_negative = text_[0] == '-';
+        llvm::APInt tmp(needed_bits, text_, radix_);
+
+        unsigned log = tmp.logBase2();
+        if (log == (unsigned) -1) { return is_negative + 1; }
+        else if (is_negative && tmp.isPowerOf2()) {
+            return is_negative + log;
+        }
+        else {
+            return is_negative + log + 1;
+        }
+    }
 
     if (needed_bits > size_)
     {
