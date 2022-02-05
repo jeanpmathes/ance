@@ -54,6 +54,37 @@ bool ance::IntegerType::validate(ValidationLogger& validation_logger, ance::Loca
     return true;
 }
 
+bool ance::IntegerType::isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> other)
+{
+    if (!other->isIntegerType()) return false;
+
+    auto* other_type = dynamic_cast<IntegerType*>(other->getDefinition());
+
+    bool can_enlarge     = (bit_size_ < other_type->bit_size_) && (is_signed_ == other_type->is_signed_);
+    bool can_change_sign = (bit_size_ < other_type->bit_size_) && !is_signed_ && other_type->is_signed_;
+
+    return can_enlarge || can_change_sign;
+}
+
+bool ance::IntegerType::validateImplicitConversion(ance::ResolvingHandle<ance::Type>, ance::Location, ValidationLogger&)
+{
+    return true;
+}
+
+std::shared_ptr<ance::Value> ance::IntegerType::buildImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                                                        std::shared_ptr<Value>            value,
+                                                                        CompileContext*                   context)
+{
+    value->buildContentValue(context);
+    llvm::Value* content_value = value->getContentValue();
+
+    llvm::Value* converted_value =
+        context->ir()->CreateIntCast(content_value, other->getContentType(*context->llvmContext()), is_signed_);
+    llvm::Value* native_converted_value = ance::Values::contentToNative(other, converted_value, context);
+
+    return std::make_shared<WrappedNativeValue>(other, native_converted_value);
+}
+
 bool ance::IntegerType::isOperatorDefined(BinaryOperator, ance::ResolvingHandle<ance::Type> other)
 {
     if (other->isIntegerType())
