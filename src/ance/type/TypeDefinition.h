@@ -83,7 +83,7 @@ namespace ance
         virtual ance::ResolvingHandle<ance::Type> getOperatorResultType(BinaryOperator                    op,
                                                                         ance::ResolvingHandle<ance::Type> other);
 
-        bool isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> other);
+        virtual bool isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> other);
 
         virtual bool validateDefinition(ValidationLogger& validation_logger);
         virtual bool validate(ValidationLogger& validation_logger, ance::Location location);
@@ -96,7 +96,7 @@ namespace ance
                                       ance::Location                    left_location,
                                       ance::Location                    right_location,
                                       ValidationLogger&                 validation_logger);
-        bool         validateImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+        virtual bool validateImplicitConversion(ance::ResolvingHandle<ance::Type> other,
                                                 ance::Location                    location,
                                                 ValidationLogger&                 validation_logger);
 
@@ -108,9 +108,9 @@ namespace ance
                                                            std::shared_ptr<Value> right,
                                                            CompileContext*        context);
 
-        std::shared_ptr<ance::Value> buildImplicitConversion(ance::ResolvingHandle<ance::Type> other,
-                                                             std::shared_ptr<Value>            value,
-                                                             CompileContext*                   context);
+        virtual std::shared_ptr<ance::Value> buildImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                                                     std::shared_ptr<Value>            value,
+                                                                     CompileContext*                   context);
 
       protected:
         virtual std::string createMangledName() = 0;
