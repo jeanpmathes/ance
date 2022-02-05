@@ -14,9 +14,9 @@ llvm::Type* ance::DoubleType::getContentType(llvm::LLVMContext& c)
     return llvm::Type::getDoubleTy(c);
 }
 
-bool ance::DoubleType::isFloatingPointType(size_t precision) const
+size_t ance::DoubleType::getPrecision() const
 {
-    return precision == 64;
+    return 64;
 }
 
 ance::ResolvingHandle<ance::Type> ance::DoubleType::get()

@@ -28,6 +28,41 @@ bool ance::FloatingPointType::isFloatingPointType() const
     return true;
 }
 
+bool ance::FloatingPointType::isFloatingPointType(size_t precision) const
+{
+    return precision == getPrecision();
+}
+
+bool ance::FloatingPointType::isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> other)
+{
+    if (!other->isFloatingPointType()) return false;
+
+    auto* other_float = dynamic_cast<FloatingPointType*>(other->getDefinition());
+
+    return getPrecision() < other_float->getPrecision();
+}
+
+bool ance::FloatingPointType::validateImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                                         ance::Location                    location,
+                                                         ValidationLogger&                 validation_logger)
+{
+    return true;
+}
+
+std::shared_ptr<ance::Value> ance::FloatingPointType::buildImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                                                              std::shared_ptr<Value>            value,
+                                                                              CompileContext*                   context)
+{
+    value->buildContentValue(context);
+    llvm::Value* content_value = value->getContentValue();
+
+    llvm::Value* converted_value =
+        context->ir()->CreateFPCast(content_value, other->getContentType(*context->llvmContext()));
+    llvm::Value* native_content_value = ance::Values::contentToNative(other, converted_value, context);
+
+    return std::make_shared<WrappedNativeValue>(other, native_content_value);
+}
+
 bool ance::FloatingPointType::isOperatorDefined(BinaryOperator, ance::ResolvingHandle<ance::Type> other)
 {
     if (other->isFloatingPointType())

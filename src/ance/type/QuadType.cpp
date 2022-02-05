@@ -14,9 +14,9 @@ llvm::Type* ance::QuadType::getContentType(llvm::LLVMContext& c)
     return llvm::Type::getFP128Ty(c);
 }
 
-bool ance::QuadType::isFloatingPointType(size_t precision) const
+size_t ance::QuadType::getPrecision() const
 {
-    return precision == 128;
+    return 128;
 }
 
 ance::ResolvingHandle<ance::Type> ance::QuadType::get()

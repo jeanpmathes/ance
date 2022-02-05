@@ -20,13 +20,14 @@ namespace ance
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
-        [[nodiscard]] bool isFloatingPointType(size_t precision) const override;
-
         /**
          * Get the quad type instance.
          * @return The instance.
          */
         static ance::ResolvingHandle<ance::Type> get();
+
+      private:
+        [[nodiscard]] size_t getPrecision() const override;
     };
 }
 #endif
