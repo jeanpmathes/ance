@@ -17,10 +17,14 @@ public main () : ui32
     let x5 : i32 <: 1:31;
     let x6 : i64 <: 1:63;
 
+    assert x6 == +1:64;
+
     let x7 : half <: 1.0h;
     let x8 : single <: x7;
     let x9 : double <: x8;
     let x10 : quad <: x9;
+
+    assert x10 == 1.0q;
 
     return 0:32;
 }
