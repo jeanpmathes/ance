@@ -20,6 +20,30 @@ llvm::Type* ance::SizeType::getContentType(llvm::LLVMContext&)
     return backing_;
 }
 
+bool ance::SizeType::isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> other)
+{
+    return self()->isSizeType() && other->isDiffType();
+}
+
+bool ance::SizeType::validateImplicitConversion(ance::ResolvingHandle<ance::Type>, ance::Location, ValidationLogger&)
+{
+    return true;
+}
+
+std::shared_ptr<ance::Value> ance::SizeType::buildImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                                                     std::shared_ptr<Value>            value,
+                                                                     CompileContext*                   context)
+{
+    value->buildContentValue(context);
+    llvm::Value* content_value = value->getContentValue();
+
+    llvm::Value* converted_value =
+        context->ir()->CreateIntCast(content_value, other->getContentType(*context->llvmContext()), false);
+    llvm::Value* native_content_value = ance::Values::contentToNative(other, converted_value, context);
+
+    return std::make_shared<WrappedNativeValue>(other, native_content_value);
+}
+
 bool ance::SizeType::isOperatorDefined(BinaryOperator, ance::ResolvingHandle<ance::Type> other)
 {
     if (isSizeType()) return other->isSizeType();

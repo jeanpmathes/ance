@@ -29,6 +29,14 @@ namespace ance
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
+        bool                         isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Type> other) override;
+        bool                         validateImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                                                ance::Location                    location,
+                                                                ValidationLogger&                 validation_logger) override;
+        std::shared_ptr<ance::Value> buildImplicitConversion(ance::ResolvingHandle<ance::Type> other,
+                                                             std::shared_ptr<Value>            value,
+                                                             CompileContext*                   context) override;
+
         bool isOperatorDefined(BinaryOperator op, ance::ResolvingHandle<ance::Type> other) override;
         ance::ResolvingHandle<ance::Type> getOperatorResultType(BinaryOperator                    op,
                                                                 ance::ResolvingHandle<ance::Type> other) override;
