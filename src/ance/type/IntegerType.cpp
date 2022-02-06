@@ -58,7 +58,7 @@ bool ance::IntegerType::isImplicitlyConvertibleTo(ance::ResolvingHandle<ance::Ty
 {
     if (!other->isIntegerType()) return false;
 
-    auto* other_type = dynamic_cast<IntegerType*>(other->getDefinition());
+    auto* other_type = dynamic_cast<IntegerType*>(other->getActualType()->getDefinition());
 
     bool can_enlarge     = (bit_size_ < other_type->bit_size_) && (is_signed_ == other_type->is_signed_);
     bool can_change_sign = (bit_size_ < other_type->bit_size_) && !is_signed_ && other_type->is_signed_;
