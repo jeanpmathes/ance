@@ -26,6 +26,9 @@ public main () : ui32
 
     assert x10 == 1.0q;
 
+    let x11 : size <: 15;
+    let x12 : diff <: x11;
+
     return 0:32;
 }
 
