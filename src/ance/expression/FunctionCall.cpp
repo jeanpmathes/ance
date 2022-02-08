@@ -24,8 +24,8 @@ void FunctionCall::setScope(ance::Scope* scope)
 
 ance::ResolvingHandle<ance::Type> FunctionCall::type()
 {
-    assert(function().has_value());
-    return function().value()->returnType();
+    assert(!function().empty());
+    return function().front()->returnType();
 }
 
 bool FunctionCall::validate(ValidationLogger& validation_logger)
@@ -52,14 +52,20 @@ bool FunctionCall::validate(ValidationLogger& validation_logger)
     bool is_resolving_valid = function_group_->validateResolution(argumentTypes(), location(), validation_logger);
     if (!is_resolving_valid) return false;
 
-    std::optional<ance::ResolvingHandle<ance::Function>> potential_function = function();
-    if (!potential_function.has_value())
+    std::vector<ance::ResolvingHandle<ance::Function>> potential_functions = function();
+    if (potential_functions.empty())
     {
         validation_logger.logError("Cannot resolve '" + function_group_->name() + "' function overload", location());
         return false;
     }
 
-    ance::ResolvingHandle<ance::Function> actual_function = potential_function.value();
+    if (potential_functions.size() > 1)
+    {
+        validation_logger.logError("Ambiguous function call to '" + function_group_->name() + "'", location());
+        return false;
+    }
+
+    ance::ResolvingHandle<ance::Function> actual_function = potential_functions.front();
     if (!actual_function->isDefined())
     {
         validation_logger.logError("Function '" + actual_function->name() + "' is not defined", location());
@@ -75,7 +81,7 @@ void FunctionCall::doBuild(CompileContext* context)
 
     for (auto& arg : arguments_) { arg_values.push_back(arg->getValue()); }
 
-    std::shared_ptr<ance::Value> return_value = function().value()->buildCall(arg_values, context);
+    std::shared_ptr<ance::Value> return_value = function().front()->buildCall(arg_values, context);
 
     if (return_value != nullptr)// Not every function returns a value.
     {
@@ -83,7 +89,7 @@ void FunctionCall::doBuild(CompileContext* context)
     }
 }
 
-std::optional<ance::ResolvingHandle<ance::Function>> FunctionCall::function()
+std::vector<ance::ResolvingHandle<ance::Function>> FunctionCall::function()
 {
     if (!overload_resolved_)
     {

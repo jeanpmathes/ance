@@ -315,12 +315,11 @@ std::optional<ance::ResolvingHandle<ance::Function>> ance::GlobalScope::findEntr
     std::vector<ance::ResolvingHandle<ance::Type>> arg_types;
 
     auto potential_function = group->resolveOverload(arg_types);
-    if (!potential_function) return {};
+    if (potential_function.size() != 1) return {};
 
-    ance::Function& function = *(potential_function.value());
+    ance::Function& function = *(potential_function.front());
 
-    if (function.returnType()->isIntegerType(32, false))
-        return potential_function;
+    if (function.returnType()->isIntegerType(32, false)) return potential_function.front();
     else
         return {};
 }
@@ -336,11 +335,11 @@ std::optional<ance::ResolvingHandle<ance::Function>> ance::GlobalScope::findExit
     arg_types.push_back(ance::IntegerType::get(32, false));
 
     auto potential_function = group->resolveOverload(arg_types);
-    if (!potential_function) return {};
+    if (potential_function.size() != 1) return {};
 
-    ance::Function& function = *(potential_function.value());
+    ance::Function& function = *potential_function.front();
 
-    if (function.returnType()->isVoidType()) return potential_function;
+    if (function.returnType()->isVoidType()) return potential_function.front();
     else return {};
 }
 

@@ -28,6 +28,13 @@ namespace ance
                                         const std::vector<std::shared_ptr<ance::Parameter>>& parameters);
 
         /**
+         * Get whether the signature can be considered same as the given types.
+         * @param arguments The argument types.
+         * @return Whether the signature can be considered same as the given types.
+         */
+        [[nodiscard]] bool isSame(const std::vector<ance::ResolvingHandle<ance::Type>>& arguments) const;
+
+        /**
          * Get whether the signature matches the given argument types.
          * @param arguments The argument types.
          * @return Whether the signature matches the given argument types.

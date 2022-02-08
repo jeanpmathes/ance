@@ -77,9 +77,9 @@ void ance::FunctionGroup::addFunction(ance::OwningHandle<ance::Function> functio
     functions_.push_back(std::move(function));
 }
 
-bool ance::FunctionGroup::validateResolution(std::vector<ance::ResolvingHandle<ance::Type>> types,
-                                             ance::Location                                 location,
-                                             ValidationLogger&                              validation_logger)
+bool ance::FunctionGroup::validateResolution(const std::vector<ance::ResolvingHandle<ance::Type>>& types,
+                                             ance::Location                                        location,
+                                             ValidationLogger&                                     validation_logger)
 {
     size_t argument_count = types.size();
 
@@ -94,13 +94,18 @@ bool ance::FunctionGroup::validateResolution(std::vector<ance::ResolvingHandle<a
     return false;
 }
 
-std::optional<ance::ResolvingHandle<ance::Function>> ance::FunctionGroup::resolveOverload(
+std::vector<ance::ResolvingHandle<ance::Function>> ance::FunctionGroup::resolveOverload(
     const std::vector<ance::ResolvingHandle<ance::Type>>& arguments)
 {
+    std::vector<ance::ResolvingHandle<ance::Function>> same_signatures;
+    std::vector<ance::ResolvingHandle<ance::Function>> matching_signatures;
+
     for (auto& function : functions_)
     {
-        if (function->signature().isMatching(arguments)) { return function.handle(); }
+        if (function->signature().isSame(arguments)) same_signatures.push_back(function.handle());
+        else if (function->signature().isMatching(arguments)) matching_signatures.push_back(function.handle());
     }
 
-    return {};
+    if (same_signatures.empty()) return matching_signatures;
+    else return same_signatures;
 }

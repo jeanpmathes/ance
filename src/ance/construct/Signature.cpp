@@ -21,6 +21,16 @@ ance::Signature ance::Signature::fromParameters(const std::string&              
     return Signature(name, types);
 }
 
+bool ance::Signature::isSame(const std::vector<ance::ResolvingHandle<ance::Type>>& arguments) const
+{
+    if (types_.size() != arguments.size()) return false;
+
+    auto types = llvm::zip(types_, arguments);
+    return std::all_of(types.begin(), types.end(), [](const auto& pair) {
+        return ance::Type::areSame(std::get<0>(pair), std::get<1>(pair));
+    });
+}
+
 bool ance::Signature::isMatching(const std::vector<ance::ResolvingHandle<ance::Type>>& arguments) const
 {
     if (types_.size() != arguments.size()) return false;
@@ -81,10 +91,5 @@ bool ance::Signature::operator!=(const ance::Signature& other) const
 bool ance::Signature::areSame(const ance::Signature& a, const ance::Signature& b)
 {
     if (a.function_name_ != b.function_name_) return false;
-    if (a.types_.size() != b.types_.size()) return false;
-
-    auto types = llvm::zip(a.types_, b.types_);
-    return std::all_of(types.begin(), types.end(), [](const auto& pair) {
-        return ance::Type::areSame(std::get<0>(pair), std::get<1>(pair));
-    });
+    return a.isSame(b.types_);
 }

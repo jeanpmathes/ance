@@ -35,21 +35,22 @@ namespace ance
 
         /**
          * Validate the resolution for given types.
+         * This is only a rough check, and does not guarantee that an unambiguous resolution is possible.
          * @param types The types of the arguments.
          * @param location The source location at which the resolution was requested.
          * @param validation_logger The validation logger.
          * @return True if the resolution is valid.
          */
-        bool validateResolution(std::vector<ance::ResolvingHandle<ance::Type>> types,
-                                ance::Location                                 location,
-                                ValidationLogger&                              validation_logger);
+        bool validateResolution(const std::vector<ance::ResolvingHandle<ance::Type>>& types,
+                                ance::Location                                        location,
+                                ValidationLogger&                                     validation_logger);
 
         /**
          * Resolve a function overload.
          * @param arguments The argument types to use for overload resolution.
-         * @return A function, when defined.
+         * @return All functions that fit the given arguments.
          */
-        std::optional<ance::ResolvingHandle<ance::Function>> resolveOverload(
+        std::vector<ance::ResolvingHandle<ance::Function>> resolveOverload(
             const std::vector<ance::ResolvingHandle<ance::Type>>& arguments);
 
       private:
