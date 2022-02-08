@@ -1,5 +1,5 @@
 // valid
-// o: "ABCD"
+// o: "ABCDE"
 
 // The language supports function overloading.
 
@@ -17,6 +17,9 @@ public main () : ui32
     overloaded(0:32);
     overloaded(0:64);
     overloaded(0:32, 0:32);
+
+    // Overload resolution considers implicit conversions.
+    overloaded(0.2h);
 
     return 0:32;
 }
@@ -52,6 +55,11 @@ private overloaded (x : ui64)
 private overloaded (x : ui32, y : ui32)
 {
     write(c"D", 1:32);
+}
+
+private overloaded (x : single)
+{
+    write(c"E", 1:32);
 }
 
 extern WriteFile (hFile : Handle, lpBuffer : *ui8, nNumberOfBytesToWrite : ui32, lpNumberOfBytesWritten : *ui32, lpOverlapped : uiptr);
