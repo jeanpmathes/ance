@@ -17,19 +17,19 @@ size_t ValidationLogger::errorCount() const
     return error_count_;
 }
 
-void ValidationLogger::logWarning(const std::string& message, ance::Location location)
+void ValidationLogger::logWarning(const std::string& message, lang::Location location)
 {
     warning_count_++;
     log(LogLevel::WARNING, message, location);
 }
 
-void ValidationLogger::logError(const std::string& message, ance::Location location)
+void ValidationLogger::logError(const std::string& message, lang::Location location)
 {
     error_count_++;
     log(LogLevel::ERROR, message, location);
 }
 
-void ValidationLogger::log(ValidationLogger::LogLevel level, const std::string& message, ance::Location location)
+void ValidationLogger::log(ValidationLogger::LogLevel level, const std::string& message, lang::Location location)
 {
     entries_.emplace_back(level, message, location);
 }

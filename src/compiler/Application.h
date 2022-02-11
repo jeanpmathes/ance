@@ -3,9 +3,9 @@
 
 #include <filesystem>
 
-#include "ance/scope/GlobalScope.h"
+#include "lang/scope/GlobalScope.h"
 
-namespace ance
+namespace lang
 {
     class Function;
 }
@@ -74,12 +74,12 @@ class Application
      * Get the top level scope of this application.
      * @return The global scope.
      */
-    ance::GlobalScope& globalScope();
+    lang::GlobalScope& globalScope();
 
   private:
     data::File& project_;
 
-    std::unique_ptr<ance::GlobalScope> global_scope_;
+    std::unique_ptr<lang::GlobalScope> global_scope_;
 
     unsigned pointer_size_ {0};
 };

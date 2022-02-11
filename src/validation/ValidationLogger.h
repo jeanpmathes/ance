@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "ance/utility/Location.h"
+#include "lang/utility/Location.h"
 
 class SourceFile;
 
@@ -29,9 +29,9 @@ class ValidationLogger
     struct LogEntry {
         LogLevel       level;
         std::string    message;
-        ance::Location location;
+        lang::Location location;
 
-        LogEntry(LogLevel level, std::string message, ance::Location location)
+        LogEntry(LogLevel level, std::string message, lang::Location location)
             : level(level)
             , message(std::move(message))
             , location(location)
@@ -44,17 +44,17 @@ class ValidationLogger
      * @param message A message describing the warning.
      * @param location The source location of the code triggering this warning.
      */
-    void logWarning(const std::string& message, ance::Location location);
+    void logWarning(const std::string& message, lang::Location location);
 
     /**
      * Log an error.
      * @param message A message describing the error.
      * @param location The source location of the code triggering this error.
      */
-    void logError(const std::string& message, ance::Location location);
+    void logError(const std::string& message, lang::Location location);
 
   private:
-    void log(LogLevel level, const std::string& message, ance::Location location);
+    void log(LogLevel level, const std::string& message, lang::Location location);
 
   public:
     /**

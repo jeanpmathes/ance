@@ -7,13 +7,13 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 
-#include "ance/type/Type.h"
-#include "ance/utility/ResolvingHandle.h"
-#include "ance/construct/Function.h"
+#include "lang/type/Type.h"
+#include "lang/utility/ResolvingHandle.h"
+#include "lang/construct/Function.h"
 
 class CompileContext;
 
-namespace ance
+namespace lang
 {
     class Value;
 }
@@ -34,7 +34,7 @@ class Runtime
      * Set the exit point.
      * @param exit The exit function, defined for the current application.
      */
-    void setExit(ance::ResolvingHandle<ance::Function> exit);
+    void setExit(lang::ResolvingHandle<lang::Function> exit);
 
   private:
     CompileContext* context_ {nullptr};
@@ -72,9 +72,9 @@ class Runtime
      * @param context The current compile context.
      * @return A pointer to the allocated memory.
      */
-    std::shared_ptr<ance::Value> allocate(Allocator                           allocation,
-                                          ance::ResolvingHandle<ance::Type>   type,
-                                          const std::shared_ptr<ance::Value>& count,
+    std::shared_ptr<lang::Value> allocate(Allocator                           allocation,
+                                          lang::ResolvingHandle<lang::Type>   type,
+                                          const std::shared_ptr<lang::Value>& count,
                                           CompileContext*                     context);
 
     /**
@@ -83,22 +83,22 @@ class Runtime
      * @param delete_buffer Whether the memory is a single element or a buffer of multiple elements.
      * @param context The current compile context.
      */
-    void deleteDynamic(const std::shared_ptr<ance::Value>& value, bool delete_buffer, CompileContext* context);
+    void deleteDynamic(const std::shared_ptr<lang::Value>& value, bool delete_buffer, CompileContext* context);
 
     /**
      * Build an assertion.
      * @param value The boolean value to assert.
      * @param context The current compile context.
      */
-    void buildAssert(const std::shared_ptr<ance::Value>& value, CompileContext* context);
+    void buildAssert(const std::shared_ptr<lang::Value>& value, CompileContext* context);
 
   private:
-    llvm::Value* allocateAutomatic(ance::ResolvingHandle<ance::Type>   type,
-                                   const std::shared_ptr<ance::Value>& count,
+    llvm::Value* allocateAutomatic(lang::ResolvingHandle<lang::Type>   type,
+                                   const std::shared_ptr<lang::Value>& count,
                                    CompileContext*                     context);
 
-    llvm::Value* allocateDynamic(ance::ResolvingHandle<ance::Type>   type,
-                                 const std::shared_ptr<ance::Value>& count,
+    llvm::Value* allocateDynamic(lang::ResolvingHandle<lang::Type>   type,
+                                 const std::shared_ptr<lang::Value>& count,
                                  CompileContext*                     context);
 };
 

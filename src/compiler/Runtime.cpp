@@ -2,13 +2,13 @@
 
 #include <stdexcept>
 
-#include "ance/construct/value/Value.h"
-#include "ance/construct/value/WrappedNativeValue.h"
-#include "ance/type/PointerType.h"
-#include "ance/type/SizeType.h"
-#include "ance/type/IntegerType.h"
-#include "ance/type/Type.h"
-#include "ance/utility/Values.h"
+#include "lang/construct/value/Value.h"
+#include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/type/PointerType.h"
+#include "lang/type/SizeType.h"
+#include "lang/type/IntegerType.h"
+#include "lang/type/Type.h"
+#include "lang/utility/Values.h"
 #include "compiler/CompileContext.h"
 
 void Runtime::init(CompileContext* context)
@@ -20,7 +20,7 @@ void Runtime::init(CompileContext* context)
 
     // Setup dynamic memory allocation call.
     llvm::Type* allocate_dynamic_params[] = {llvm::Type::getInt32Ty(llvm_context),
-                                             ance::SizeType::getSize()->getContentType(llvm_context)};
+                                             lang::SizeType::getSize()->getContentType(llvm_context)};
     allocate_dynamic_type_ =
         llvm::FunctionType::get(llvm::Type::getInt8PtrTy(llvm_context), allocate_dynamic_params, false);
     allocate_dynamic_ = llvm::Function::Create(allocate_dynamic_type_,
@@ -38,7 +38,7 @@ void Runtime::init(CompileContext* context)
                                              module);
 }
 
-void Runtime::setExit(ance::ResolvingHandle<ance::Function> exit)
+void Runtime::setExit(lang::ResolvingHandle<lang::Function> exit)
 {
     llvm::LLVMContext& llvm_context = *context_->llvmContext();
     llvm::Module&      module       = *context_->module();
@@ -61,13 +61,13 @@ void Runtime::setExit(ance::ResolvingHandle<ance::Function> exit)
 
     context_->ir()->SetInsertPoint(abort_block);
     {
-        ance::ResolvingHandle<ance::Type> exit_value_type = ance::IntegerType::get(32, false);
+        lang::ResolvingHandle<lang::Type> exit_value_type = lang::IntegerType::get(32, false);
         llvm::Value* exit_value_content = llvm::ConstantInt::get(exit_value_type->getContentType(llvm_context), 3);
-        llvm::Value* exit_value_native  = ance::Values::contentToNative(exit_value_type, exit_value_content, context_);
-        std::shared_ptr<ance::Value> exit_value =
-            std::make_shared<ance::WrappedNativeValue>(exit_value_type, exit_value_native);
+        llvm::Value* exit_value_native  = lang::Values::contentToNative(exit_value_type, exit_value_content, context_);
+        std::shared_ptr<lang::Value> exit_value =
+            std::make_shared<lang::WrappedNativeValue>(exit_value_type, exit_value_native);
 
-        std::vector<std::shared_ptr<ance::Value>> args;
+        std::vector<std::shared_ptr<lang::Value>> args;
         args.push_back(exit_value);
         exit->buildCall(args, context_);
         context_->ir()->CreateBr(exit_block);
@@ -79,12 +79,12 @@ void Runtime::setExit(ance::ResolvingHandle<ance::Function> exit)
     }
 }
 
-std::shared_ptr<ance::Value> Runtime::allocate(Allocator                           allocation,
-                                               ance::ResolvingHandle<ance::Type>   type,
-                                               const std::shared_ptr<ance::Value>& count,
+std::shared_ptr<lang::Value> Runtime::allocate(Allocator                           allocation,
+                                               lang::ResolvingHandle<lang::Type>   type,
+                                               const std::shared_ptr<lang::Value>& count,
                                                CompileContext*                     context)
 {
-    if (count) { assert(ance::Type::areSame(count->type(), ance::SizeType::getSize())); }
+    if (count) { assert(lang::Type::areSame(count->type(), lang::SizeType::getSize())); }
 
     llvm::Value* ptr_to_allocated;
 
@@ -102,13 +102,13 @@ std::shared_ptr<ance::Value> Runtime::allocate(Allocator                        
             throw std::invalid_argument("Unsupported allocation type.");
     }
 
-    ance::ResolvingHandle<ance::Type> ptr_type   = ance::PointerType::get(type);
-    llvm::Value*                      native_ptr = ance::Values::contentToNative(ptr_type, ptr_to_allocated, context);
+    lang::ResolvingHandle<lang::Type> ptr_type   = lang::PointerType::get(type);
+    llvm::Value*                      native_ptr = lang::Values::contentToNative(ptr_type, ptr_to_allocated, context);
 
-    return std::make_shared<ance::WrappedNativeValue>(ptr_type, native_ptr);
+    return std::make_shared<lang::WrappedNativeValue>(ptr_type, native_ptr);
 }
 
-void Runtime::deleteDynamic(const std::shared_ptr<ance::Value>& value, bool, CompileContext* context)
+void Runtime::deleteDynamic(const std::shared_ptr<lang::Value>& value, bool, CompileContext* context)
 {
     assert(value->type()->isPointerType());
 
@@ -124,7 +124,7 @@ void Runtime::deleteDynamic(const std::shared_ptr<ance::Value>& value, bool, Com
     success->setName("..free");
 }
 
-void Runtime::buildAssert(const std::shared_ptr<ance::Value>& value, CompileContext* context)
+void Runtime::buildAssert(const std::shared_ptr<lang::Value>& value, CompileContext* context)
 {
     assert(value->type()->isBooleanType());
 
@@ -134,8 +134,8 @@ void Runtime::buildAssert(const std::shared_ptr<ance::Value>& value, CompileCont
     context_->ir()->CreateCall(assertion_, truth_value);
 }
 
-llvm::Value* Runtime::allocateAutomatic(ance::ResolvingHandle<ance::Type>   type,
-                                        const std::shared_ptr<ance::Value>& count,
+llvm::Value* Runtime::allocateAutomatic(lang::ResolvingHandle<lang::Type>   type,
+                                        const std::shared_ptr<lang::Value>& count,
                                         CompileContext*                     context)
 {
     llvm::Value* count_value = nullptr;
@@ -149,8 +149,8 @@ llvm::Value* Runtime::allocateAutomatic(ance::ResolvingHandle<ance::Type>   type
     return context->ir()->CreateAlloca(type->getContentType(*context->llvmContext()), count_value);
 }
 
-llvm::Value* Runtime::allocateDynamic(ance::ResolvingHandle<ance::Type>   type,
-                                      const std::shared_ptr<ance::Value>& count,
+llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type>   type,
+                                      const std::shared_ptr<lang::Value>& count,
                                       CompileContext*                     context)
 {
     // Set the zero init flag.
@@ -162,7 +162,7 @@ llvm::Value* Runtime::allocateDynamic(ance::ResolvingHandle<ance::Type>   type,
     if (count)
     {
         llvm::Value* element_size =
-            llvm::ConstantInt::get(ance::SizeType::getSize()->getContentType(*context->llvmContext()),
+            llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context->llvmContext()),
                                    type->getContentSize(context->module()).getFixedSize(),
                                    false);
 
@@ -173,7 +173,7 @@ llvm::Value* Runtime::allocateDynamic(ance::ResolvingHandle<ance::Type>   type,
     }
     else
     {
-        size = llvm::ConstantInt::get(ance::SizeType::getSize()->getContentType(*context->llvmContext()),
+        size = llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context->llvmContext()),
                                       type->getContentSize(context->module()).getFixedSize(),
                                       false);
     }
@@ -182,5 +182,5 @@ llvm::Value* Runtime::allocateDynamic(ance::ResolvingHandle<ance::Type>   type,
 
     llvm::Value* opaque_ptr = context->ir()->CreateCall(allocate_dynamic_type_, allocate_dynamic_, args);
     return context->ir()->CreateBitCast(opaque_ptr,
-                                        ance::PointerType::get(type)->getContentType(*context->llvmContext()));
+                                        lang::PointerType::get(type)->getContentType(*context->llvmContext()));
 }

@@ -6,9 +6,9 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "ance/utility/Location.h"
+#include "lang/utility/Location.h"
 
-namespace ance
+namespace lang
 {
     class Scope;
 }
@@ -95,7 +95,7 @@ class CompileContext
      * @param location The source location.
      * @param scope The current scope.
      */
-    void setDebugLocation(ance::Location location, ance::Scope* scope);
+    void setDebugLocation(lang::Location location, lang::Scope* scope);
 
     /**
      * Reset the previous debug location.

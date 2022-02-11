@@ -12,12 +12,12 @@
 #include <llvm/Support/Host.h>
 #include <llvm/Support/TargetRegistry.h>
 
-#include "ance/construct/value/WrappedNativeValue.h"
-#include "ance/scope/GlobalScope.h"
-#include "ance/type/IntegerType.h"
-#include "ance/type/SizeType.h"
-#include "ance/type/UnsignedIntegerPointerType.h"
-#include "ance/utility/Values.h"
+#include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/scope/GlobalScope.h"
+#include "lang/type/IntegerType.h"
+#include "lang/type/SizeType.h"
+#include "lang/type/UnsignedIntegerPointerType.h"
+#include "lang/utility/Values.h"
 #include "compiler/Application.h"
 
 AnceCompiler::AnceCompiler(Application& app)
@@ -46,8 +46,8 @@ AnceCompiler::AnceCompiler(Application& app)
     llvm::DataLayout dl = target_machine_->createDataLayout();
     application_.setPointerSize(dl.getPointerSize());
 
-    ance::SizeType::init(llvm_context_, app);
-    ance::UnsignedIntegerPointerType::init(llvm_context_, dl);
+    lang::SizeType::init(llvm_context_, app);
+    lang::UnsignedIntegerPointerType::init(llvm_context_, dl);
 
     module_.setDataLayout(dl);
     module_.setTargetTriple(triple.str());
@@ -82,7 +82,7 @@ void AnceCompiler::compile(const std::filesystem::path& out)
 
     assert(context_->allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
 
-    ance::ResolvingHandle<ance::Function> main = application_.globalScope().getEntry();
+    lang::ResolvingHandle<lang::Function> main = application_.globalScope().getEntry();
 
     llvm::FunctionType* exit_type;
     llvm::Function*     exit;
@@ -153,7 +153,7 @@ void AnceCompiler::emitObject(const std::filesystem::path& out)
 
 void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit)
 {
-    ance::ResolvingHandle<ance::Type> exitcode_type = ance::IntegerType::get(32, false);
+    lang::ResolvingHandle<lang::Type> exitcode_type = lang::IntegerType::get(32, false);
 
     llvm::Type* exit_params[] = {exitcode_type->getContentType(llvm_context_)};
     exit_type                 = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), exit_params, false);
@@ -165,19 +165,19 @@ void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& ex
     llvm::BasicBlock* exit_block = llvm::BasicBlock::Create(llvm_context_, "entry", exit);
     ir_.SetInsertPoint(exit_block);
 
-    ance::ResolvingHandle<ance::Function> user_exit = application_.globalScope().getExit();
+    lang::ResolvingHandle<lang::Function> user_exit = application_.globalScope().getExit();
 
-    std::vector<std::shared_ptr<ance::Value>> args;
-    args.push_back(std::make_shared<ance::WrappedNativeValue>(
+    std::vector<std::shared_ptr<lang::Value>> args;
+    args.push_back(std::make_shared<lang::WrappedNativeValue>(
         exitcode_type,
-        ance::Values::contentToNative(exitcode_type, exitcode, context_.get())));
+        lang::Values::contentToNative(exitcode_type, exitcode, context_.get())));
 
     user_exit->buildCall(args, context_.get());
 
     ir_.CreateRetVoid();
 }
 
-void AnceCompiler::buildStart(ance::ResolvingHandle<ance::Function> main,
+void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main,
                               llvm::FunctionType*                   exit_type,
                               llvm::Function*                       exit)
 {
@@ -189,8 +189,8 @@ void AnceCompiler::buildStart(ance::ResolvingHandle<ance::Function> main,
 
     ir_.SetInsertPoint(start_block);
 
-    std::vector<std::shared_ptr<ance::Value>> args;
-    std::shared_ptr<ance::Value>              exitcode = main->buildCall(args, context_.get());
+    std::vector<std::shared_ptr<lang::Value>> args;
+    std::shared_ptr<lang::Value>              exitcode = main->buildCall(args, context_.get());
 
     exitcode->buildContentValue(context_.get());
     llvm::Value* native_exitcode = exitcode->getContentValue();

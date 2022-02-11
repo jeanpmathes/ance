@@ -1,0 +1,86 @@
+#ifndef ANCE_SRC_ANCE_CONSTRUCT_VARIABLEDEFINITION_H_
+#define ANCE_SRC_ANCE_CONSTRUCT_VARIABLEDEFINITION_H_
+
+#include "lang/construct/value/Value.h"
+#include "lang/utility/Location.h"
+
+namespace lang
+{
+    class Scope;
+    class Type;
+}
+
+class ValidationLogger;
+class CompileContext;
+
+namespace lang
+{
+    /**
+     * Defines the behaviour of a variable.
+     */
+    class VariableDefinition
+    {
+      public:
+        VariableDefinition(const std::string&                identifier,
+                           lang::ResolvingHandle<lang::Type> type,
+                           lang::Location                    type_location,
+                           lang::Scope*                      containing_scope,
+                           bool                              is_final,
+                           lang::Location                    location);
+
+        [[nodiscard]] const std::string& identifier() const;
+
+        /**
+         * Get the scope in which this variable is defined.
+         */
+        [[nodiscard]] lang::Scope* scope() const;
+
+        /**
+         * Get the type of this variable.
+         */
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
+
+        /**
+         * Get the source location of the variable definition.
+         */
+        [[nodiscard]] lang::Location location() const;
+
+        /**
+         * Get the source location of the type of this variable.
+         */
+        [[nodiscard]] lang::Location typeLocation() const;
+
+        /**
+         * Get whether this variable is defined as final.
+         */
+        [[nodiscard]] bool isFinal() const;
+
+        /**
+         * Validate this variable declaration.
+         * @param validation_logger The logger to use for validation.
+         */
+        virtual void validate(ValidationLogger& validation_logger) = 0;
+
+        virtual void buildDeclaration(CompileContext* context) = 0;
+        virtual void buildDefinition(CompileContext* context)  = 0;
+
+        virtual std::shared_ptr<lang::Value> getValue(CompileContext* context) = 0;
+        virtual void setValue(const std::shared_ptr<lang::Value>& value, CompileContext* context);
+
+        virtual ~VariableDefinition() = default;
+
+      protected:
+        virtual void storeValue(std::shared_ptr<lang::Value> value, CompileContext* context) = 0;
+
+      private:
+        const std::string& identifier_;
+
+        lang::ResolvingHandle<lang::Type> type_;
+        lang::Location                    type_location_;
+        lang::Scope*                      scope_;
+        bool                              is_final_;
+        lang::Location                    location_;
+    };
+}
+
+#endif

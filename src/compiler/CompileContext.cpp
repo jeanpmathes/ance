@@ -1,6 +1,6 @@
 #include "CompileContext.h"
 
-#include "ance/scope/Scope.h"
+#include "lang/scope/Scope.h"
 
 CompileContext::CompileContext(Application*         app,
                                Runtime*             runtime,
@@ -60,7 +60,7 @@ llvm::DIFile* CompileContext::sourceFile()
     return src_file_;
 }
 
-void CompileContext::setDebugLocation(ance::Location location, ance::Scope* scope)
+void CompileContext::setDebugLocation(lang::Location location, lang::Scope* scope)
 {
     llvm::DebugLoc previous_location = ir()->getCurrentDebugLocation();
     ir()->SetCurrentDebugLocation(location.getDebugLoc(llvmContext(), scope->getDebugScope(this)));

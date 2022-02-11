@@ -4,58 +4,60 @@
 
 #include "compiler/Application.h"
 
-#include "ance/type/ArrayType.h"
-#include "ance/type/DoubleType.h"
-#include "ance/type/HalfType.h"
-#include "ance/type/IntegerType.h"
-#include "ance/type/PointerType.h"
-#include "ance/type/QuadType.h"
-#include "ance/type/ReferenceType.h"
-#include "ance/type/SingleType.h"
-#include "ance/type/VoidType.h"
+#include "lang/type/ArrayType.h"
+#include "lang/type/DoubleType.h"
+#include "lang/type/HalfType.h"
+#include "lang/type/IntegerType.h"
+#include "lang/type/PointerType.h"
+#include "lang/type/QuadType.h"
+#include "lang/type/ReferenceType.h"
+#include "lang/type/SingleType.h"
+#include "lang/type/VoidType.h"
 
-#include "ance/scope/LocalScope.h"
+#include "lang/scope/LocalScope.h"
 
-#include "ance/statement/AssignmentStatement.h"
-#include "ance/statement/DeleteStatement.h"
-#include "ance/statement/ExpressionStatement.h"
-#include "ance/statement/LocalReferenceVariableDefinition.h"
-#include "ance/statement/LocalVariableDefinition.h"
-#include "ance/statement/ReturnStatement.h"
-#include "ance/statement/Assertion.h"
+#include "lang/statement/AssignmentStatement.h"
+#include "lang/statement/DeleteStatement.h"
+#include "lang/statement/ExpressionStatement.h"
+#include "lang/statement/LocalReferenceVariableDefinition.h"
+#include "lang/statement/LocalVariableDefinition.h"
+#include "lang/statement/ReturnStatement.h"
+#include "lang/statement/Assertion.h"
 
-#include "ance/expression/Addressof.h"
-#include "ance/expression/Allocation.h"
-#include "ance/expression/BackingExpression.h"
-#include "ance/expression/BinaryOperation.h"
-#include "ance/expression/BindRef.h"
-#include "ance/expression/ConstantLiteral.h"
-#include "ance/expression/DefaultValue.h"
-#include "ance/expression/FunctionCall.h"
-#include "ance/expression/SizeofExpression.h"
-#include "ance/expression/SizeofType.h"
-#include "ance/expression/Subscript.h"
-#include "ance/expression/VariableAccess.h"
+#include "lang/expression/Addressof.h"
+#include "lang/expression/Allocation.h"
+#include "lang/expression/BackingExpression.h"
+#include "lang/expression/BinaryOperation.h"
+#include "lang/expression/BindRef.h"
+#include "lang/expression/ConstantLiteral.h"
+#include "lang/expression/DefaultValue.h"
+#include "lang/expression/FunctionCall.h"
+#include "lang/expression/SizeofExpression.h"
+#include "lang/expression/SizeofType.h"
+#include "lang/expression/Subscript.h"
+#include "lang/expression/VariableAccess.h"
 
-#include "ance/construct/constant/BooleanConstant.h"
-#include "ance/construct/constant/ByteConstant.h"
-#include "ance/construct/constant/DiffConstant.h"
-#include "ance/construct/constant/FloatConstant.h"
-#include "ance/construct/constant/IntegerConstant.h"
-#include "ance/construct/constant/SizeConstant.h"
-#include "ance/construct/constant/StringConstant.h"
+#include "lang/construct/constant/BooleanConstant.h"
+#include "lang/construct/constant/ByteConstant.h"
+#include "lang/construct/constant/DiffConstant.h"
+#include "lang/construct/constant/FloatConstant.h"
+#include "lang/construct/constant/IntegerConstant.h"
+#include "lang/construct/constant/SizeConstant.h"
+#include "lang/construct/constant/StringConstant.h"
+#include "lang/AccessModifier.h"
+#include "lang/Assigner.h"
 
 SourceVisitor::SourceVisitor(Application& application) : application_(application) {}
 
 antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx)
 {
-    AccessModifier access      = visit(ctx->accessModifier());
+    lang::AccessModifier              access      = visit(ctx->accessModifier());
     bool                              is_constant = ctx->CONST();
-    ance::ResolvingHandle<ance::Type> type        = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type        = visit(ctx->type());
     std::string                       identifier  = ctx->IDENTIFIER()->getText();
 
     ConstantExpression* const_expr;
-    Assigner            assigner = Assigner::COPY_ASSIGNMENT;
+    lang::Assigner      assigner = lang::Assigner::COPY_ASSIGNMENT;
 
     if (ctx->literalExpression())
     {
@@ -87,22 +89,22 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
 
 antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)
 {
-    AccessModifier access      = visit(ctx->accessModifier());
-    std::string                       identifier  = ctx->IDENTIFIER()->getText();
-    ance::ResolvingHandle<ance::Type> return_type =
-        ctx->type() ? (ance::ResolvingHandle<ance::Type>) visit(ctx->type()) : ance::VoidType::get();
+    lang::AccessModifier              access     = visit(ctx->accessModifier());
+    std::string                       identifier = ctx->IDENTIFIER()->getText();
+    lang::ResolvingHandle<lang::Type> return_type =
+        ctx->type() ? (lang::ResolvingHandle<lang::Type>) visit(ctx->type()) : lang::VoidType::get();
 
-    ance::Location declaration_location = location(ctx);
-    ance::Location definition_location =
+    lang::Location declaration_location = location(ctx);
+    lang::Location definition_location =
         ctx->statement().empty() ? declaration_location : location(ctx->statement()[0]);
 
-    std::vector<ance::Parameter*> parameters = visit(ctx->parameters());
+    std::vector<lang::Parameter*> parameters = visit(ctx->parameters());
 
-    std::vector<std::shared_ptr<ance::Parameter>> shared_parameters;
+    std::vector<std::shared_ptr<lang::Parameter>> shared_parameters;
     shared_parameters.reserve(parameters.size());
-    for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
+    for (lang::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
-    ance::Location return_type_location = ctx->type() ? location(ctx->type()) : ance::Location(0, 0, 0, 0);
+    lang::Location return_type_location = ctx->type() ? location(ctx->type()) : lang::Location(0, 0, 0, 0);
 
     auto function = application_.globalScope().defineCustomFunction(identifier,
                                                                     access,
@@ -124,15 +126,15 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
 antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx)
 {
     std::string                       identifier = ctx->IDENTIFIER()->getText();
-    ance::ResolvingHandle<ance::Type> return_type =
-        ctx->type() ? (ance::ResolvingHandle<ance::Type>) visit(ctx->type()) : ance::VoidType::get();
-    std::vector<ance::Parameter*> parameters = visit(ctx->parameters());
+    lang::ResolvingHandle<lang::Type> return_type =
+        ctx->type() ? (lang::ResolvingHandle<lang::Type>) visit(ctx->type()) : lang::VoidType::get();
+    std::vector<lang::Parameter*> parameters = visit(ctx->parameters());
 
-    std::vector<std::shared_ptr<ance::Parameter>> shared_parameters;
+    std::vector<std::shared_ptr<lang::Parameter>> shared_parameters;
     shared_parameters.reserve(parameters.size());
-    for (ance::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
+    for (lang::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
-    ance::Location return_type_location = ctx->type() ? location(ctx->type()) : ance::Location(0, 0, 0, 0);
+    lang::Location return_type_location = ctx->type() ? location(ctx->type()) : lang::Location(0, 0, 0, 0);
 
     application_.globalScope().defineExternFunction(identifier,
                                                     return_type,
@@ -145,7 +147,7 @@ antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFu
 
 antlrcpp::Any SourceVisitor::visitParameters(anceParser::ParametersContext* ctx)
 {
-    std::vector<ance::Parameter*> params;
+    std::vector<lang::Parameter*> params;
 
     for (auto* param : ctx->parameter()) { params.push_back(visit(param)); }
 
@@ -154,15 +156,15 @@ antlrcpp::Any SourceVisitor::visitParameters(anceParser::ParametersContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitParameter(anceParser::ParameterContext* ctx)
 {
-    ance::ResolvingHandle<ance::Type> type         = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type         = visit(ctx->type());
     const std::string                 k_identifier = ctx->IDENTIFIER()->getText();
 
-    return new ance::Parameter(type, location(ctx->type()), k_identifier, location(ctx));
+    return new lang::Parameter(type, location(ctx->type()), k_identifier, location(ctx));
 }
 
 antlrcpp::Any SourceVisitor::visitDefineAs(anceParser::DefineAsContext* ctx)
 {
-    ance::ResolvingHandle<ance::Type> other = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> other = visit(ctx->type());
     application_.globalScope().defineTypeAsOther(ctx->IDENTIFIER()->getText(),
                                                  other,
                                                  location(ctx),
@@ -173,7 +175,7 @@ antlrcpp::Any SourceVisitor::visitDefineAs(anceParser::DefineAsContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ctx)
 {
-    ance::ResolvingHandle<ance::Type> other = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> other = visit(ctx->type());
     application_.globalScope().defineTypeAliasOther(ctx->IDENTIFIER()->getText(),
                                                     other,
                                                     location(ctx),
@@ -193,11 +195,11 @@ antlrcpp::Any SourceVisitor::visitExpressionStatement(anceParser::ExpressionStat
 
 antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx)
 {
-    ance::ResolvingHandle<ance::Type> type       = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type());
     std::string                       identifier = ctx->IDENTIFIER()->getText();
 
-    Assigner    assigner {};
-    Expression* assigned;
+    lang::Assigner assigner {};
+    Expression*    assigned;
 
     if (ctx->expression())
     {
@@ -206,7 +208,7 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
     }
     else
     {
-        assigner = Assigner::COPY_ASSIGNMENT;
+        assigner = lang::Assigner::COPY_ASSIGNMENT;
         assigned = new DefaultValue(type, location(ctx));
     }
 
@@ -221,7 +223,7 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
 antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
     anceParser::LocalReferenceToValueDefinitionContext* ctx)
 {
-    ance::ResolvingHandle<ance::Type> type       = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type());
     std::string                       identifier = ctx->IDENTIFIER()->getText();
 
     Expression* value = visit(ctx->expression());
@@ -236,7 +238,7 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
 antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
     anceParser::LocalReferenceToPointerDefinitionContext* ctx)
 {
-    ance::ResolvingHandle<ance::Type> type       = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type());
     std::string                       identifier = ctx->IDENTIFIER()->getText();
 
     Expression* address = visit(ctx->expression());
@@ -251,9 +253,9 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
 
 antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
 {
-    Expression* assignable = visit(ctx->assignable);
-    Assigner    assigner   = visit(ctx->assigner());
-    Expression* assigned   = visit(ctx->assigned);
+    Expression*    assignable = visit(ctx->assignable);
+    lang::Assigner assigner   = visit(ctx->assigner());
+    Expression*    assigned   = visit(ctx->assigned);
 
     return static_cast<Statement*>(new AssignmentStatement(std::unique_ptr<Expression>(assignable),
                                                            assigner,
@@ -294,7 +296,7 @@ antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* 
     unique_expressions.reserve(arguments.size());
     for (Expression* argument_ptr : arguments) { unique_expressions.emplace_back(argument_ptr); }
 
-    auto function_group = ance::makeHandled<ance::FunctionGroup>(function_name);
+    auto function_group = lang::makeHandled<lang::FunctionGroup>(function_name);
 
     return static_cast<Expression*>(new FunctionCall(function_group, std::move(unique_expressions), location(ctx)));
 }
@@ -311,7 +313,7 @@ antlrcpp::Any SourceVisitor::visitArguments(anceParser::ArgumentsContext* ctx)
 antlrcpp::Any SourceVisitor::visitVariableAccess(anceParser::VariableAccessContext* ctx)
 {
     std::string identifier = ctx->IDENTIFIER()->getText();
-    auto        variable   = ance::makeHandled<ance::Variable>(identifier);
+    auto        variable   = lang::makeHandled<lang::Variable>(identifier);
 
     return static_cast<Expression*>(new VariableAccess(variable, location(ctx)));
 }
@@ -319,7 +321,7 @@ antlrcpp::Any SourceVisitor::visitVariableAccess(anceParser::VariableAccessConte
 antlrcpp::Any SourceVisitor::visitAllocation(anceParser::AllocationContext* ctx)
 {
     Runtime::Allocator                allocator = visit(ctx->allocator());
-    ance::ResolvingHandle<ance::Type> type      = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type      = visit(ctx->type());
     Expression*                       count     = nullptr;
 
     if (ctx->expression()) { count = visit(ctx->expression()); }
@@ -351,7 +353,7 @@ antlrcpp::Any SourceVisitor::visitBindReferenceToAddress(anceParser::BindReferen
 
 antlrcpp::Any SourceVisitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)
 {
-    ance::ResolvingHandle<ance::Type> type = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type = visit(ctx->type());
 
     return static_cast<Expression*>(new SizeofType(type, location(ctx->type()), location(ctx)));
 }
@@ -377,7 +379,7 @@ antlrcpp::Any SourceVisitor::visitBinaryOperation(anceParser::BinaryOperationCon
     Expression* left  = visit(ctx->left);
     Expression* right = visit(ctx->right);
 
-    std::optional<BinaryOperator> op;
+    std::optional<lang::BinaryOperator> op;
     if (ctx->binaryOperatorMultiplicative()) op = visit(ctx->binaryOperatorMultiplicative());
     if (ctx->binaryOperatorAdditive()) op = visit(ctx->binaryOperatorAdditive());
     if (ctx->binaryOperatorRelational()) op = visit(ctx->binaryOperatorRelational());
@@ -402,50 +404,50 @@ antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext
 
     if (ctx->prefix) { prefix = ctx->prefix->getText(); }
 
-    std::string str = ance::StringConstant::parse(ctx->STRING()->getText());
+    std::string str = lang::StringConstant::parse(ctx->STRING()->getText());
 
-    std::shared_ptr<ance::Constant> string = std::make_shared<ance::StringConstant>(prefix, str);
+    std::shared_ptr<lang::Constant> string = std::make_shared<lang::StringConstant>(prefix, str);
     return static_cast<Expression*>(new ConstantLiteral(string, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitByteLiteral(anceParser::ByteLiteralContext* ctx)
 {
-    uint8_t b = ance::ByteConstant::parse(ctx->BYTE()->getText());
+    uint8_t b = lang::ByteConstant::parse(ctx->BYTE()->getText());
 
-    std::shared_ptr<ance::Constant> byte = std::make_shared<ance::ByteConstant>(b);
+    std::shared_ptr<lang::Constant> byte = std::make_shared<lang::ByteConstant>(b);
     return static_cast<Expression*>(new ConstantLiteral(byte, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext* ctx)
 {
-    std::shared_ptr<ance::Constant> flt;
+    std::shared_ptr<lang::Constant> flt;
 
     if (ctx->HALF())
     {
-        flt = std::make_shared<ance::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
+        flt = std::make_shared<lang::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
                                                     llvm::APFloat::IEEEhalf(),
-                                                    ance::HalfType::get());
+                                                    lang::HalfType::get());
     }
 
     if (ctx->SINGLE())
     {
-        flt = std::make_shared<ance::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
+        flt = std::make_shared<lang::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
                                                     llvm::APFloat::IEEEsingle(),
-                                                    ance::SingleType::get());
+                                                    lang::SingleType::get());
     }
 
     if (ctx->DOUBLE())
     {
-        flt = std::make_shared<ance::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
+        flt = std::make_shared<lang::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
                                                     llvm::APFloat::IEEEdouble(),
-                                                    ance::DoubleType::get());
+                                                    lang::DoubleType::get());
     }
 
     if (ctx->QUAD())
     {
-        flt = std::make_shared<ance::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
+        flt = std::make_shared<lang::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
                                                     llvm::APFloat::IEEEquad(),
-                                                    ance::QuadType::get());
+                                                    lang::QuadType::get());
     }
 
     return static_cast<Expression*>(new ConstantLiteral(flt, location(ctx)));
@@ -453,20 +455,20 @@ antlrcpp::Any SourceVisitor::visitFloatingPointLiteral(anceParser::FloatingPoint
 
 antlrcpp::Any SourceVisitor::visitTrue(anceParser::TrueContext* ctx)
 {
-    std::shared_ptr<ance::Constant> constant = ance::BooleanConstant::createTrue();
+    std::shared_ptr<lang::Constant> constant = lang::BooleanConstant::createTrue();
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFalse(anceParser::FalseContext* ctx)
 {
-    std::shared_ptr<ance::Constant> constant = ance::BooleanConstant::createFalse();
+    std::shared_ptr<lang::Constant> constant = lang::BooleanConstant::createFalse();
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSizeLiteral(anceParser::SizeLiteralContext* ctx)
 {
     std::string                     value    = ctx->INTEGER()->getText();
-    std::shared_ptr<ance::Constant> constant = std::make_shared<ance::SizeConstant>(value);
+    std::shared_ptr<lang::Constant> constant = std::make_shared<lang::SizeConstant>(value);
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
@@ -474,7 +476,7 @@ antlrcpp::Any SourceVisitor::visitSizeLiteral(anceParser::SizeLiteralContext* ct
 antlrcpp::Any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ctx)
 {
     std::string                     value    = ctx->SIGNED_INTEGER()->getText();
-    std::shared_ptr<ance::Constant> constant = std::make_shared<ance::DiffConstant>(value);
+    std::shared_ptr<lang::Constant> constant = std::make_shared<lang::DiffConstant>(value);
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
@@ -483,8 +485,8 @@ antlrcpp::Any SourceVisitor::visitUnsignedInteger(anceParser::UnsignedIntegerCon
 {
     uint64_t size = parseIntegerTypeSize(ctx->width->getText());
 
-    std::shared_ptr<ance::Constant> integer_constant =
-        std::make_shared<ance::IntegerConstant>(ctx->value->getText(), size, false);
+    std::shared_ptr<lang::Constant> integer_constant =
+        std::make_shared<lang::IntegerConstant>(ctx->value->getText(), size, false);
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 
@@ -492,8 +494,8 @@ antlrcpp::Any SourceVisitor::visitSignedInteger(anceParser::SignedIntegerContext
 {
     uint64_t size = parseIntegerTypeSize(ctx->width->getText());
 
-    std::shared_ptr<ance::Constant> integer_constant =
-        std::make_shared<ance::IntegerConstant>(ctx->value->getText(), size, true);
+    std::shared_ptr<lang::Constant> integer_constant =
+        std::make_shared<lang::IntegerConstant>(ctx->value->getText(), size, true);
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 
@@ -524,8 +526,8 @@ antlrcpp::Any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerConte
 
     integer_str.erase(0, 2);
 
-    std::shared_ptr<ance::Constant> integer_constant =
-        std::make_shared<ance::IntegerConstant>(integer_str, size, false, radix);
+    std::shared_ptr<lang::Constant> integer_constant =
+        std::make_shared<lang::IntegerConstant>(integer_str, size, false, radix);
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 
@@ -536,15 +538,15 @@ antlrcpp::Any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ct
     bool     is_unsigned = integer_type_str[0] == 'u';
     uint64_t size        = parseIntegerTypeSize(integer_type_str.substr(1 + integer_type_str.find('i')));
 
-    ance::ResolvingHandle<ance::Type> type = ance::IntegerType::get(size, !is_unsigned);
+    lang::ResolvingHandle<lang::Type> type = lang::IntegerType::get(size, !is_unsigned);
     return type;
 }
 
 antlrcpp::Any SourceVisitor::visitArrayType(anceParser::ArrayTypeContext* ctx)
 {
-    ance::ResolvingHandle<ance::Type> element_type = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> element_type = visit(ctx->type());
     uint64_t                          size         = parseArrayTypeSize(ctx->INTEGER()->getText());
-    ance::ResolvingHandle<ance::Type> type         = ance::ArrayType::get(element_type, size);
+    lang::ResolvingHandle<lang::Type> type         = lang::ArrayType::get(element_type, size);
 
     return type;
 }
@@ -556,34 +558,34 @@ antlrcpp::Any SourceVisitor::visitKeywordType(anceParser::KeywordTypeContext* ct
 
 antlrcpp::Any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)
 {
-    ance::ResolvingHandle<ance::Type> element_type = visit(ctx->type());
-    ance::ResolvingHandle<ance::Type> type         = ance::PointerType::get(element_type);
+    lang::ResolvingHandle<lang::Type> element_type = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type         = lang::PointerType::get(element_type);
 
     return type;
 }
 
 antlrcpp::Any SourceVisitor::visitReference(anceParser::ReferenceContext* ctx)
 {
-    ance::ResolvingHandle<ance::Type> element_type = visit(ctx->type());
-    ance::ResolvingHandle<ance::Type> type         = ance::ReferenceType::get(element_type);
+    lang::ResolvingHandle<lang::Type> element_type = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type         = lang::ReferenceType::get(element_type);
 
     return type;
 }
 
 antlrcpp::Any SourceVisitor::visitCustom(anceParser::CustomContext* ctx)
 {
-    return ance::makeHandled<ance::Type>(ctx->getText());
+    return lang::makeHandled<lang::Type>(ctx->getText());
 }
 
 antlrcpp::Any SourceVisitor::visitPublic(anceParser::PublicContext*)
 {
-    AccessModifier access_modifier = AccessModifier::PUBLIC_ACCESS;
+    lang::AccessModifier access_modifier = lang::AccessModifier::PUBLIC_ACCESS;
     return access_modifier;
 }
 
 antlrcpp::Any SourceVisitor::visitPrivate(anceParser::PrivateContext*)
 {
-    AccessModifier access_modifier = AccessModifier::PRIVATE_ACCESS;
+    lang::AccessModifier access_modifier = lang::AccessModifier::PRIVATE_ACCESS;
     return access_modifier;
 }
 
@@ -601,7 +603,7 @@ antlrcpp::Any SourceVisitor::visitDynamic(anceParser::DynamicContext*)
 
 antlrcpp::Any SourceVisitor::visitCopyAssignment(anceParser::CopyAssignmentContext*)
 {
-    Assigner assigner = Assigner::COPY_ASSIGNMENT;
+    lang::Assigner assigner = lang::Assigner::COPY_ASSIGNMENT;
     return assigner;
 }
 
@@ -610,83 +612,83 @@ antlrcpp::Any SourceVisitor::visitMoveAssignment(anceParser::MoveAssignmentConte
     assert(false && "Move assignment currently not supported.");
     // todo: move assignment
 
-    Assigner assigner = Assigner::MOVE_ASSIGNMENT;
+    lang::Assigner assigner = lang::Assigner::MOVE_ASSIGNMENT;
     return assigner;
 }
 
 antlrcpp::Any SourceVisitor::visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext*)
 {
-    Assigner assigner = Assigner::FINAL_COPY_ASSIGNMENT;
+    lang::Assigner assigner = lang::Assigner::FINAL_COPY_ASSIGNMENT;
     return assigner;
 }
 
 antlrcpp::Any SourceVisitor::visitAddition(anceParser::AdditionContext*)
 {
-    BinaryOperator op = BinaryOperator::ADDITION;
+    lang::BinaryOperator op = lang::BinaryOperator::ADDITION;
     return op;
 }
 
 antlrcpp::Any SourceVisitor::visitSubtraction(anceParser::SubtractionContext*)
 {
-    BinaryOperator op = BinaryOperator::SUBTRACTION;
+    lang::BinaryOperator op = lang::BinaryOperator::SUBTRACTION;
     return op;
 }
 
 antlrcpp::Any SourceVisitor::visitMultiplication(anceParser::MultiplicationContext*)
 {
-    BinaryOperator op = BinaryOperator::MULTIPLICATION;
+    lang::BinaryOperator op = lang::BinaryOperator::MULTIPLICATION;
     return op;
 }
 
 antlrcpp::Any SourceVisitor::visitDivision(anceParser::DivisionContext*)
 {
-    BinaryOperator op = BinaryOperator::DIVISION;
+    lang::BinaryOperator op = lang::BinaryOperator::DIVISION;
     return op;
 }
 
 antlrcpp::Any SourceVisitor::visitRemainder(anceParser::RemainderContext*)
 {
-    BinaryOperator op = BinaryOperator::REMAINDER;
+    lang::BinaryOperator op = lang::BinaryOperator::REMAINDER;
     return op;
 }
 
 antlrcpp::Any SourceVisitor::visitLessThan(anceParser::LessThanContext*)
 {
-    BinaryOperator op = BinaryOperator::LESS_THAN;
+    lang::BinaryOperator op = lang::BinaryOperator::LESS_THAN;
     return op;
 }
 
 antlrcpp::Any SourceVisitor::visitLessThanOrEqual(anceParser::LessThanOrEqualContext*)
 {
-    BinaryOperator op = BinaryOperator::LESS_THAN_OR_EQUAL;
+    lang::BinaryOperator op = lang::BinaryOperator::LESS_THAN_OR_EQUAL;
     return op;
 }
 
 antlrcpp::Any SourceVisitor::visitGreaterThan(anceParser::GreaterThanContext*)
 {
-    BinaryOperator op = BinaryOperator::GREATER_THAN;
+    lang::BinaryOperator op = lang::BinaryOperator::GREATER_THAN;
     return op;
 }
 
 antlrcpp::Any SourceVisitor::visitGreaterThanOrEqual(anceParser::GreaterThanOrEqualContext*)
 {
-    BinaryOperator op = BinaryOperator::GREATER_THAN_OR_EQUAL;
+    lang::BinaryOperator op = lang::BinaryOperator::GREATER_THAN_OR_EQUAL;
     return op;
 }
 
 antlrcpp::Any SourceVisitor::visitEqual(anceParser::EqualContext*)
 {
-    BinaryOperator op = BinaryOperator::EQUAL;
+    lang::BinaryOperator op = lang::BinaryOperator::EQUAL;
     return op;
 }
 
 antlrcpp::Any SourceVisitor::visitNotEqual(anceParser::NotEqualContext*)
 {
-    BinaryOperator op = BinaryOperator::NOT_EQUAL;
+    lang::BinaryOperator op = lang::BinaryOperator::NOT_EQUAL;
     return op;
 }
 
-ance::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)
+lang::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)
 {
     unsigned start_line   = ctx->getStart()->getLine();
     unsigned start_column = ctx->getStart()->getCharPositionInLine() + 1;
@@ -699,12 +701,12 @@ ance::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)
 
 uint64_t SourceVisitor::parseIntegerTypeSize(const std::string& str)
 {
-    return parseInRange(str, ance::IntegerType::MAX_INTEGER_SIZE);
+    return parseInRange(str, lang::IntegerType::MAX_INTEGER_SIZE);
 }
 
 uint64_t SourceVisitor::parseArrayTypeSize(const std::string& str)
 {
-    return parseInRange(str, ance::ArrayType::MAX_ARRAY_TYPE_SIZE);
+    return parseInRange(str, lang::ArrayType::MAX_ARRAY_TYPE_SIZE);
 }
 
 uint64_t SourceVisitor::parseInRange(const std::string& str, uint64_t max)

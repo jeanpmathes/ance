@@ -1,6 +1,6 @@
 add_executable(ance main.cpp)
 
-add_subdirectory(ance)
+add_subdirectory(lang)
 add_subdirectory(compiler)
 add_subdirectory(grammar)
 add_subdirectory(management)

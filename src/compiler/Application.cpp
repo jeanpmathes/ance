@@ -4,42 +4,42 @@
 
 #include "management/elements/Element.h"
 
-#include "ance/type/DoubleType.h"
-#include "ance/type/HalfType.h"
-#include "ance/type/QuadType.h"
-#include "ance/type/SingleType.h"
+#include "lang/type/DoubleType.h"
+#include "lang/type/HalfType.h"
+#include "lang/type/QuadType.h"
+#include "lang/type/SingleType.h"
 
-#include "ance/type/ArrayType.h"
-#include "ance/type/IntegerType.h"
-#include "ance/type/PointerType.h"
-#include "ance/type/ReferenceType.h"
+#include "lang/type/ArrayType.h"
+#include "lang/type/IntegerType.h"
+#include "lang/type/PointerType.h"
+#include "lang/type/ReferenceType.h"
 
-#include "ance/type/SizeType.h"
-#include "ance/type/UnsignedIntegerPointerType.h"
-#include "ance/type/VoidType.h"
+#include "lang/type/SizeType.h"
+#include "lang/type/UnsignedIntegerPointerType.h"
+#include "lang/type/VoidType.h"
 #include "management/File.h"
 #include "validation/ValidationLogger.h"
 
-Application::Application(data::File& project) : project_(project), global_scope_(std::make_unique<ance::GlobalScope>())
+Application::Application(data::File& project) : project_(project), global_scope_(std::make_unique<lang::GlobalScope>())
 {
     // Register keyword types
 
-    global_scope_->registerDefinition(ance::HalfType::get());
-    global_scope_->registerDefinition(ance::SingleType::get());
-    global_scope_->registerDefinition(ance::DoubleType::get());
-    global_scope_->registerDefinition(ance::QuadType::get());
+    global_scope_->registerDefinition(lang::HalfType::get());
+    global_scope_->registerDefinition(lang::SingleType::get());
+    global_scope_->registerDefinition(lang::DoubleType::get());
+    global_scope_->registerDefinition(lang::QuadType::get());
 
-    global_scope_->registerDefinition(ance::VoidType::get());
-    global_scope_->registerDefinition(ance::SizeType::getSize());
-    global_scope_->registerDefinition(ance::SizeType::getDiff());
-    global_scope_->registerDefinition(ance::UnsignedIntegerPointerType::get());
+    global_scope_->registerDefinition(lang::VoidType::get());
+    global_scope_->registerDefinition(lang::SizeType::getSize());
+    global_scope_->registerDefinition(lang::SizeType::getDiff());
+    global_scope_->registerDefinition(lang::UnsignedIntegerPointerType::get());
 
     // Add type registries
 
-    global_scope_->addTypeRegistry(ance::IntegerType::getRegistry());
-    global_scope_->addTypeRegistry(ance::ArrayType::getRegistry());
-    global_scope_->addTypeRegistry(ance::PointerType::getRegistry());
-    global_scope_->addTypeRegistry(ance::ReferenceType::getRegistry());
+    global_scope_->addTypeRegistry(lang::IntegerType::getRegistry());
+    global_scope_->addTypeRegistry(lang::ArrayType::getRegistry());
+    global_scope_->addTypeRegistry(lang::PointerType::getRegistry());
+    global_scope_->addTypeRegistry(lang::ReferenceType::getRegistry());
 }
 
 void Application::setPointerSize(unsigned size)
@@ -98,16 +98,16 @@ void Application::validate(ValidationLogger& validation_logger)
 
     if (!global_scope_->hasEntry())
     {
-        validation_logger.logError("Entry point 'ui32 main()' could not be found", ance::Location(0, 0, 0, 0));
+        validation_logger.logError("Entry point 'ui32 main()' could not be found", lang::Location(0, 0, 0, 0));
     }
 
     if (!global_scope_->hasExit())
     {
-        validation_logger.logError("Exit point 'void exit(ui32)' could not be found", ance::Location(0, 0, 0, 0));
+        validation_logger.logError("Exit point 'void exit(ui32)' could not be found", lang::Location(0, 0, 0, 0));
     }
 }
 
-ance::GlobalScope& Application::globalScope()
+lang::GlobalScope& Application::globalScope()
 {
     return *global_scope_;
 }

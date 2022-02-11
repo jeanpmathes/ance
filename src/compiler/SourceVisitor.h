@@ -3,7 +3,7 @@
 
 #include "grammar/anceBaseVisitor.h"
 
-#include "ance/utility/Location.h"
+#include "lang/utility/Location.h"
 
 class Application;
 
@@ -104,7 +104,7 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitNotEqual(anceParser::NotEqualContext* ctx) override;
 
   protected:
-    static ance::Location location(antlr4::ParserRuleContext* ctx);
+    static lang::Location location(antlr4::ParserRuleContext* ctx);
 
     static uint64_t parseIntegerTypeSize(const std::string& str);
     static uint64_t parseArrayTypeSize(const std::string& str);
