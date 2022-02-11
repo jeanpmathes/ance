@@ -10,12 +10,12 @@ public main () : ui32
     return 0:32;
 }
 
-public exit (exitcode : ui32)
+public exit (exitcode: ui32)
 {
      ExitProcess(exitcode);
 }
 
-private ambiguous (x : i64) {}
-private ambiguous (x : i128) {}
+private ambiguous (x: i64) {}
+private ambiguous (x: i128) {}
 
-extern ExitProcess (uExitCode : ui32);
+extern ExitProcess (uExitCode: ui32);

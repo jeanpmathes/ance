@@ -20,16 +20,16 @@ define Ref alias &size;
 public main () : ui32
 {
     // Type aliases can be used as if they were the actual type.
-    let a : size <: 42;
-    let b : Alias1 <: 42;
-    let c : Alias2 <: 42;
+    let a: size <: 42;
+    let b: Alias1 <: 42;
+    let c: Alias2 <: 42;
 
     a <: b;
     b <: c;
     c <: a;
 
-    let ra : &size ref a;
-    let rb : Ref ref b;
+    let ra: &size ref a;
+    let rb: Ref ref b;
 
     ra <: a;
     rb <: b;
@@ -37,9 +37,9 @@ public main () : ui32
     return 0:32;
 }
 
-public exit (exitcode : ui32)
+public exit (exitcode: ui32)
 {
      ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode : ui32);
+extern ExitProcess (uExitCode: ui32);

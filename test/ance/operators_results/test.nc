@@ -4,17 +4,17 @@
 
 public main () : ui32
 {
-    testIntegerMath();
-    testFloatMath();
-    testSizeMath();
+    test_integer_math();
+    test_float_math();
+    test_size_math();
 
     return 0:32;
 }
 
-private testIntegerMath ()
+private test_integer_math ()
 {
-    let x1 : i32 <: -1:32;
-    let x2 : i32 <: +1:32;
+    let x1: i32 <: -1:32;
+    let x2: i32 <: +1:32;
 
     assert x1 == -1:32;
     assert x2 == +1:32;
@@ -28,8 +28,8 @@ private testIntegerMath ()
     assert x1 / x2 == -1:32;
     assert x1 % x2 == +0:32;
 
-    let x3 : ui32 <: 1:32;
-    let x4 : ui32 <: 2:32;
+    let x3: ui32 <: 1:32;
+    let x4: ui32 <: 2:32;
 
     assert x3 + x4 == 3:32;
     assert x4 - x3 == 1:32;
@@ -38,12 +38,12 @@ private testIntegerMath ()
     assert x3 <= x4;
 }
 
-private testFloatMath ()
+private test_float_math ()
 {
-    let x1 : half <: -1.0h + 1.0h;
-    let x2 : single <: +1.0s - 1.0s;
-    let x3 : double <: +1.0d - 1.0d;
-    let x4 : quad <: +1.0q - 1.0q;
+    let x1: half <: -1.0h + 1.0h;
+    let x2: single <: +1.0s - 1.0s;
+    let x3: double <: +1.0d - 1.0d;
+    let x4: quad <: +1.0q - 1.0q;
 
     assert x1 == 0.0h;
     assert x2 == 0.0s;
@@ -54,10 +54,10 @@ private testFloatMath ()
     assert 1.0d <= 1.0d;
 }
 
-private testSizeMath ()
+private test_size_math ()
 {
-    let x1 : size <: 1;
-    let x2 : size <: 2;
+    let x1: size <: 1;
+    let x2: size <: 2;
 
     assert x1 - x2 > 0;
 
@@ -66,9 +66,9 @@ private testSizeMath ()
     assert 2 * (3 + 2) != 8;
 }
 
-public exit (exitcode : ui32)
+public exit (exitcode: ui32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode : ui32);
+extern ExitProcess (uExitCode: ui32);
