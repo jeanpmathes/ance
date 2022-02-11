@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_ANCE_SCOPE_SCOPE_H_
-#define ANCE_SRC_ANCE_SCOPE_SCOPE_H_
+#ifndef ANCE_SRC_LANG_SCOPE_SCOPE_H_
+#define ANCE_SRC_LANG_SCOPE_SCOPE_H_
 
 #include <map>
 #include <string>

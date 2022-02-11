@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_ANCE_CONSTRUCT_SIGNATURE_H_
-#define ANCE_SRC_ANCE_CONSTRUCT_SIGNATURE_H_
+#ifndef ANCE_SRC_LANG_CONSTRUCT_SIGNATURE_H_
+#define ANCE_SRC_LANG_CONSTRUCT_SIGNATURE_H_
 
 #include "lang/construct/Parameter.h"
 #include "lang/type/Type.h"

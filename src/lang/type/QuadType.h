@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_ANCE_TYPE_QUADTYPE_H_
-#define ANCE_SRC_ANCE_TYPE_QUADTYPE_H_
+#ifndef ANCE_SRC_LANG_TYPE_QUADTYPE_H_
+#define ANCE_SRC_LANG_TYPE_QUADTYPE_H_
 
 #include "FloatingPointType.h"
 
