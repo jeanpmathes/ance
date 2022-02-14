@@ -113,7 +113,8 @@ llvm::Value* lang::PointerType::buildGetElementPointer(const std::shared_ptr<lan
 
     llvm::Value* ptr = indexed->getContentValue();//Pointer to content is instead of pointer to pointer is required.
 
-    llvm::Value* element_ptr = context->ir()->CreateGEP(ptr, indices);
+    llvm::Value* element_ptr =
+        context->ir()->CreateGEP(element_type_->getContentType(*context->llvmContext()), ptr, indices);
     return element_ptr;
 }
 

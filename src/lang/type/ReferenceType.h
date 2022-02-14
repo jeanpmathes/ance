@@ -62,7 +62,7 @@ namespace lang
          * @param context The current compile context.
          * @return A native value for the referenced value.
          */
-        static llvm::Value* getReferenced(llvm::Value* value, CompileContext* context);
+        llvm::Value* getReferenced(llvm::Value* value, CompileContext* context);
 
         /**
          * Get the referenced value.

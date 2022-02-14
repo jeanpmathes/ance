@@ -125,7 +125,7 @@ lang::TypeDefinitionRegistry* lang::ReferenceType::getRegistry()
 
 llvm::Value* lang::ReferenceType::getReferenced(llvm::Value* value, CompileContext* context)
 {
-    return context->ir()->CreateLoad(value);
+    return context->ir()->CreateLoad(getContentType(*context->llvmContext()), value);
 }
 
 std::shared_ptr<lang::Value> lang::ReferenceType::getReferenced(const std::shared_ptr<lang::Value>& value,

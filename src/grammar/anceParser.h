@@ -1,5 +1,5 @@
 
-// Generated from ./src/grammar/ance.g4 by ANTLR 4.8
+// Generated from ./src/grammar/ance.g4 by ANTLR 4.9.3
 
 #pragma once
 
@@ -138,7 +138,7 @@ class anceParser : public antlr4::Parser
         RuleCustomType                   = 51
     };
 
-    anceParser(antlr4::TokenStream* input);
+    explicit anceParser(antlr4::TokenStream* input);
     ~anceParser();
 
     virtual std::string                     getGrammarFileName() const override;
@@ -469,9 +469,7 @@ class anceParser : public antlr4::Parser
     {
       public:
         anceParser::ExpressionContext* assignable = nullptr;
-        ;
-        anceParser::ExpressionContext* assigned = nullptr;
-        ;
+        anceParser::ExpressionContext* assigned   = nullptr;
         AssignmentContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t                  getRuleIndex() const override;
         AssignerContext*                assigner();
@@ -1017,7 +1015,6 @@ class anceParser : public antlr4::Parser
     {
       public:
         antlr4::Token* prefix = nullptr;
-        ;
         StringLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
         antlr4::tree::TerminalNode* STRING();
@@ -1058,9 +1055,7 @@ class anceParser : public antlr4::Parser
     {
       public:
         antlr4::Token* value = nullptr;
-        ;
         antlr4::Token* width = nullptr;
-        ;
         UnsignedIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t                           getRuleIndex() const override;
         std::vector<antlr4::tree::TerminalNode*> INTEGER();
@@ -1075,9 +1070,7 @@ class anceParser : public antlr4::Parser
     {
       public:
         antlr4::Token* value = nullptr;
-        ;
         antlr4::Token* width = nullptr;
-        ;
         SignedIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
         antlr4::tree::TerminalNode* SIGNED_INTEGER();
@@ -1092,7 +1085,6 @@ class anceParser : public antlr4::Parser
     {
       public:
         antlr4::Token* width = nullptr;
-        ;
         SpecialIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
         antlr4::tree::TerminalNode* HEX_INTEGER();

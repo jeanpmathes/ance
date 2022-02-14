@@ -1,5 +1,5 @@
 
-// Generated from ./src/grammar/ance.g4 by ANTLR 4.8
+// Generated from ./src/grammar/ance.g4 by ANTLR 4.9.3
 
 #pragma once
 
@@ -82,7 +82,7 @@ class anceLexer : public antlr4::Lexer
         LINE_COMMENT        = 70
     };
 
-    anceLexer(antlr4::CharStream* input);
+    explicit anceLexer(antlr4::CharStream* input);
     ~anceLexer();
 
     virtual std::string                     getGrammarFileName() const override;

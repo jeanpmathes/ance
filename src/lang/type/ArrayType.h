@@ -51,7 +51,7 @@ namespace lang
       private:
         llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
                                             const std::shared_ptr<lang::Value>& index,
-                                            CompileContext*                     context) const;
+                                            CompileContext*                     context);
 
       public:
         ~ArrayType() override = default;

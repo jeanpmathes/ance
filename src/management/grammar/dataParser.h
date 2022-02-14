@@ -1,5 +1,5 @@
 
-// Generated from ./src/management/grammar/data.g4 by ANTLR 4.8
+// Generated from ./src/management/grammar/data.g4 by ANTLR 4.9.3
 
 #pragma once
 
@@ -21,7 +21,7 @@ public:
     RuleBoolean = 5
   };
 
-  dataParser(antlr4::TokenStream *input);
+  explicit dataParser(antlr4::TokenStream* input);
   ~dataParser();
 
   virtual std::string getGrammarFileName() const override;
@@ -70,7 +70,7 @@ public:
 
   class  EntryContext : public antlr4::ParserRuleContext {
   public:
-    dataParser::ElementContext *value = nullptr;;
+    dataParser::ElementContext* value = nullptr;
     EntryContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *KEY();

@@ -1,5 +1,5 @@
 
-// Generated from ./src/management/grammar/data.g4 by ANTLR 4.8
+// Generated from ./src/management/grammar/data.g4 by ANTLR 4.9.3
 
 #include "dataLexer.h"
 
@@ -63,28 +63,17 @@ atn::PredictionContextCache dataLexer::_sharedContextCache;
 atn::ATN              dataLexer::_atn;
 std::vector<uint16_t> dataLexer::_serializedATN;
 
-std::vector<std::string> dataLexer::_ruleNames = {u8"T__0",
-                                                  u8"T__1",
-                                                  u8"T__2",
-                                                  u8"T__3",
-                                                  u8"T__4",
-                                                  u8"T__5",
-                                                  u8"T__6",
-                                                  u8"T__7",
-                                                  u8"KEY",
-                                                  u8"STRING",
-                                                  u8"WHITESPACE",
-                                                  u8"LINE_COMMENT"};
+std::vector<std::string> dataLexer::_ruleNames =
+    {"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "KEY", "STRING", "WHITESPACE", "LINE_COMMENT"};
 
 std::vector<std::string> dataLexer::_channelNames = {"DEFAULT_TOKEN_CHANNEL", "HIDDEN"};
 
-std::vector<std::string> dataLexer::_modeNames = {u8"DEFAULT_MODE"};
+std::vector<std::string> dataLexer::_modeNames = {"DEFAULT_MODE"};
 
-std::vector<std::string> dataLexer::_literalNames =
-    {"", u8"'{'", u8"','", u8"'}'", u8"':'", u8"'['", u8"']'", u8"'true'", u8"'false'"};
+std::vector<std::string> dataLexer::_literalNames = {"", "'{'", "','", "'}'", "':'", "'['", "']'", "'true'", "'false'"};
 
 std::vector<std::string> dataLexer::_symbolicNames =
-    {"", "", "", "", "", "", "", "", "", u8"KEY", u8"STRING", u8"WHITESPACE", u8"LINE_COMMENT"};
+    {"", "", "", "", "", "", "", "", "", "KEY", "STRING", "WHITESPACE", "LINE_COMMENT"};
 
 dfa::Vocabulary dataLexer::_vocabulary(_literalNames, _symbolicNames);
 
@@ -104,7 +93,7 @@ dataLexer::Initializer::Initializer()
         }
     }
 
-    _serializedATN = {
+    static const uint16_t serializedATNSegment0[] = {
         0x3,  0x608b, 0xa72a, 0x8133, 0xb9ed, 0x417c, 0x3be7, 0x7786, 0x5964, 0x2,  0xe,  0x54, 0x8,  0x1,  0x4,  0x2,
         0x9,  0x2,    0x4,    0x3,    0x9,    0x3,    0x4,    0x4,    0x9,    0x4,  0x4,  0x5,  0x9,  0x5,  0x4,  0x6,
         0x9,  0x6,    0x4,    0x7,    0x9,    0x7,    0x4,    0x8,    0x9,    0x8,  0x4,  0x9,  0x9,  0x9,  0x4,  0xa,
@@ -155,6 +144,10 @@ dataLexer::Initializer::Initializer()
         0x2,  0x52,   0x53,   0x8,    0xd,    0x2,    0x2,    0x53,   0x1a,   0x3,  0x2,  0x2,  0x2,  0x8,  0x2,  0x36,
         0x3d, 0x3f,   0x47,   0x4f,   0x3,    0x8,    0x2,    0x2,
     };
+
+    _serializedATN.insert(_serializedATN.end(),
+                          serializedATNSegment0,
+                          serializedATNSegment0 + sizeof(serializedATNSegment0) / sizeof(serializedATNSegment0[0]));
 
     atn::ATNDeserializer deserializer;
     _atn = deserializer.deserialize(_serializedATN);

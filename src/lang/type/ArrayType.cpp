@@ -101,7 +101,7 @@ std::shared_ptr<lang::Value> lang::ArrayType::buildSubscript(std::shared_ptr<Val
 
 llvm::Value* lang::ArrayType::buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
                                                      const std::shared_ptr<lang::Value>& index,
-                                                     CompileContext*                     context) const
+                                                     CompileContext*                     context)
 {
     indexed->buildNativeValue(context);
     index->buildContentValue(context);
@@ -122,7 +122,7 @@ llvm::Value* lang::ArrayType::buildGetElementPointer(const std::shared_ptr<lang:
 
     // todo: use in_bounds bool to throw exception
 
-    llvm::Value* element_ptr = context->ir()->CreateGEP(array_ptr, indices);
+    llvm::Value* element_ptr = context->ir()->CreateGEP(getContentType(*context->llvmContext()), array_ptr, indices);
     return element_ptr;
 }
 

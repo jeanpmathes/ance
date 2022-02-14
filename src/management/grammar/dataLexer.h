@@ -1,5 +1,5 @@
 
-// Generated from ./src/management/grammar/data.g4 by ANTLR 4.8
+// Generated from ./src/management/grammar/data.g4 by ANTLR 4.9.3
 
 #pragma once
 
@@ -16,7 +16,7 @@ public:
     T__7 = 8, KEY = 9, STRING = 10, WHITESPACE = 11, LINE_COMMENT = 12
   };
 
-  dataLexer(antlr4::CharStream *input);
+  explicit dataLexer(antlr4::CharStream* input);
   ~dataLexer();
 
   virtual std::string getGrammarFileName() const override;

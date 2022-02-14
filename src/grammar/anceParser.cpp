@@ -1,5 +1,5 @@
 
-// Generated from ./src/grammar/ance.g4 by ANTLR 4.8
+// Generated from ./src/grammar/ance.g4 by ANTLR 4.9.3
 
 #include "anceVisitor.h"
 
@@ -91,7 +91,13 @@ anceParser::FileContext* anceParser::file()
     enterRule(_localctx, 0, anceParser::RuleFile);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -128,6 +134,9 @@ anceParser::FileContext* anceParser::file()
                     typeDefinition();
                     break;
                 }
+
+                default:
+                    break;
             }
             setState(111);
             _errHandler->sync(this);
@@ -204,7 +213,13 @@ anceParser::VariableDeclarationContext* anceParser::variableDeclaration()
     enterRule(_localctx, 2, anceParser::RuleVariableDeclaration);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -349,7 +364,13 @@ anceParser::FunctionContext* anceParser::function()
     enterRule(_localctx, 4, anceParser::RuleFunction);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(157);
@@ -359,8 +380,7 @@ anceParser::FunctionContext* anceParser::function()
             case anceParser::T__10:
             case anceParser::T__11:
             {
-                _localctx = dynamic_cast<FunctionContext*>(
-                    _tracker.createInstance<anceParser::FunctionDefinitionContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::FunctionDefinitionContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(128);
                 accessModifier();
@@ -416,8 +436,7 @@ anceParser::FunctionContext* anceParser::function()
 
             case anceParser::T__5:
             {
-                _localctx = dynamic_cast<FunctionContext*>(
-                    _tracker.createInstance<anceParser::ExternFunctionDeclarationContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::ExternFunctionDeclarationContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(146);
                 match(anceParser::T__5);
@@ -492,7 +511,13 @@ anceParser::ParametersContext* anceParser::parameters()
     enterRule(_localctx, 6, anceParser::RuleParameters);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -561,7 +586,13 @@ anceParser::ParameterContext* anceParser::parameter()
     ParameterContext* _localctx = _tracker.createInstance<ParameterContext>(_ctx, getState());
     enterRule(_localctx, 8, anceParser::RuleParameter);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -614,7 +645,13 @@ anceParser::TypeDefinitionContext* anceParser::typeDefinition()
     TypeDefinitionContext* _localctx = _tracker.createInstance<TypeDefinitionContext>(_ctx, getState());
     enterRule(_localctx, 10, anceParser::RuleTypeDefinition);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(175);
@@ -636,6 +673,9 @@ anceParser::TypeDefinitionContext* anceParser::typeDefinition()
                 defineAlias();
                 break;
             }
+
+            default:
+                break;
         }
     }
     catch (RecognitionException& e)
@@ -685,7 +725,13 @@ anceParser::DefineAsContext* anceParser::defineAs()
     DefineAsContext* _localctx = _tracker.createInstance<DefineAsContext>(_ctx, getState());
     enterRule(_localctx, 12, anceParser::RuleDefineAs);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -747,7 +793,13 @@ anceParser::DefineAliasContext* anceParser::defineAlias()
     DefineAliasContext* _localctx = _tracker.createInstance<DefineAliasContext>(_ctx, getState());
     enterRule(_localctx, 14, anceParser::RuleDefineAlias);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -817,7 +869,13 @@ anceParser::AccessModifierContext* anceParser::accessModifier()
     AccessModifierContext* _localctx = _tracker.createInstance<AccessModifierContext>(_ctx, getState());
     enterRule(_localctx, 16, anceParser::RuleAccessModifier);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(191);
@@ -826,8 +884,7 @@ anceParser::AccessModifierContext* anceParser::accessModifier()
         {
             case anceParser::T__10:
             {
-                _localctx =
-                    dynamic_cast<AccessModifierContext*>(_tracker.createInstance<anceParser::PublicContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::PublicContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(189);
                 match(anceParser::T__10);
@@ -836,8 +893,7 @@ anceParser::AccessModifierContext* anceParser::accessModifier()
 
             case anceParser::T__11:
             {
-                _localctx = dynamic_cast<AccessModifierContext*>(
-                    _tracker.createInstance<anceParser::PrivateContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::PrivateContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(190);
                 match(anceParser::T__11);
@@ -915,7 +971,13 @@ anceParser::StatementContext* anceParser::statement()
     StatementContext* _localctx = _tracker.createInstance<StatementContext>(_ctx, getState());
     enterRule(_localctx, 18, anceParser::RuleStatement);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(200);
@@ -977,6 +1039,9 @@ anceParser::StatementContext* anceParser::statement()
                 assertStatement();
                 break;
             }
+
+            default:
+                break;
         }
     }
     catch (RecognitionException& e)
@@ -1021,7 +1086,13 @@ anceParser::ExpressionStatementContext* anceParser::expressionStatement()
     ExpressionStatementContext* _localctx = _tracker.createInstance<ExpressionStatementContext>(_ctx, getState());
     enterRule(_localctx, 20, anceParser::RuleExpressionStatement);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -1091,7 +1162,13 @@ anceParser::LocalVariableDefinitionContext* anceParser::localVariableDefinition(
     enterRule(_localctx, 22, anceParser::RuleLocalVariableDefinition);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -1221,7 +1298,13 @@ anceParser::LocalReferenceDefinitionContext* anceParser::localReferenceDefinitio
         _tracker.createInstance<LocalReferenceDefinitionContext>(_ctx, getState());
     enterRule(_localctx, 24, anceParser::RuleLocalReferenceDefinition);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(233);
@@ -1230,8 +1313,7 @@ anceParser::LocalReferenceDefinitionContext* anceParser::localReferenceDefinitio
         {
             case 1:
             {
-                _localctx = dynamic_cast<LocalReferenceDefinitionContext*>(
-                    _tracker.createInstance<anceParser::LocalReferenceToValueDefinitionContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::LocalReferenceToValueDefinitionContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(216);
                 match(anceParser::T__12);
@@ -1252,8 +1334,7 @@ anceParser::LocalReferenceDefinitionContext* anceParser::localReferenceDefinitio
 
             case 2:
             {
-                _localctx = dynamic_cast<LocalReferenceDefinitionContext*>(
-                    _tracker.createInstance<anceParser::LocalReferenceToPointerDefinitionContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::LocalReferenceToPointerDefinitionContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(224);
                 match(anceParser::T__12);
@@ -1273,6 +1354,9 @@ anceParser::LocalReferenceDefinitionContext* anceParser::localReferenceDefinitio
                 match(anceParser::SEMICOLON);
                 break;
             }
+
+            default:
+                break;
         }
     }
     catch (RecognitionException& e)
@@ -1327,16 +1411,22 @@ anceParser::AssignmentContext* anceParser::assignment()
     AssignmentContext* _localctx = _tracker.createInstance<AssignmentContext>(_ctx, getState());
     enterRule(_localctx, 26, anceParser::RuleAssignment);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
         setState(235);
-        dynamic_cast<AssignmentContext*>(_localctx)->assignable = expression(0);
+        antlrcpp::downCast<AssignmentContext*>(_localctx)->assignable = expression(0);
         setState(236);
         assigner();
         setState(237);
-        dynamic_cast<AssignmentContext*>(_localctx)->assigned = expression(0);
+        antlrcpp::downCast<AssignmentContext*>(_localctx)->assigned = expression(0);
         setState(238);
         match(anceParser::SEMICOLON);
     }
@@ -1407,7 +1497,13 @@ anceParser::AssignerContext* anceParser::assigner()
     AssignerContext* _localctx = _tracker.createInstance<AssignerContext>(_ctx, getState());
     enterRule(_localctx, 28, anceParser::RuleAssigner);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(243);
@@ -1416,8 +1512,7 @@ anceParser::AssignerContext* anceParser::assigner()
         {
             case anceParser::T__15:
             {
-                _localctx = dynamic_cast<AssignerContext*>(
-                    _tracker.createInstance<anceParser::CopyAssignmentContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::CopyAssignmentContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(240);
                 match(anceParser::T__15);
@@ -1426,8 +1521,7 @@ anceParser::AssignerContext* anceParser::assigner()
 
             case anceParser::T__16:
             {
-                _localctx = dynamic_cast<AssignerContext*>(
-                    _tracker.createInstance<anceParser::MoveAssignmentContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::MoveAssignmentContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(241);
                 match(anceParser::T__16);
@@ -1436,8 +1530,7 @@ anceParser::AssignerContext* anceParser::assigner()
 
             case anceParser::T__17:
             {
-                _localctx = dynamic_cast<AssignerContext*>(
-                    _tracker.createInstance<anceParser::FinalCopyAssignmentContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::FinalCopyAssignmentContext>(_localctx);
                 enterOuterAlt(_localctx, 3);
                 setState(242);
                 match(anceParser::T__17);
@@ -1496,7 +1589,13 @@ anceParser::DeleteStatementContext* anceParser::deleteStatement()
     enterRule(_localctx, 30, anceParser::RuleDeleteStatement);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -1559,7 +1658,13 @@ anceParser::ReturnStatementContext* anceParser::returnStatement()
     enterRule(_localctx, 32, anceParser::RuleReturnStatement);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -1629,7 +1734,13 @@ anceParser::AssertStatementContext* anceParser::assertStatement()
     AssertStatementContext* _localctx = _tracker.createInstance<AssertStatementContext>(_ctx, getState());
     enterRule(_localctx, 34, anceParser::RuleAssertStatement);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -1887,7 +1998,13 @@ anceParser::ExpressionContext* anceParser::expression(int precedence)
     size_t startState = 36;
     enterRecursionRule(_localctx, 36, anceParser::RuleExpression, precedence);
 
-    auto onExit = finally([=] { unrollRecursionContexts(parentContext); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        unrollRecursionContexts(parentContext);
+    });
     try
     {
         size_t alt;
@@ -1990,6 +2107,9 @@ anceParser::ExpressionContext* anceParser::expression(int precedence)
                 match(anceParser::T__2);
                 break;
             }
+
+            default:
+                break;
         }
         _ctx->stop = _input->LT(-1);
         setState(300);
@@ -2018,7 +2138,7 @@ anceParser::ExpressionContext* anceParser::expression(int precedence)
                         setState(278);
                         binaryOperatorMultiplicative();
                         setState(279);
-                        dynamic_cast<BinaryOperationContext*>(_localctx)->right = expression(5);
+                        antlrcpp::downCast<BinaryOperationContext*>(_localctx)->right = expression(5);
                         break;
                     }
 
@@ -2035,7 +2155,7 @@ anceParser::ExpressionContext* anceParser::expression(int precedence)
                         setState(282);
                         binaryOperatorAdditive();
                         setState(283);
-                        dynamic_cast<BinaryOperationContext*>(_localctx)->right = expression(4);
+                        antlrcpp::downCast<BinaryOperationContext*>(_localctx)->right = expression(4);
                         break;
                     }
 
@@ -2052,7 +2172,7 @@ anceParser::ExpressionContext* anceParser::expression(int precedence)
                         setState(286);
                         binaryOperatorRelational();
                         setState(287);
-                        dynamic_cast<BinaryOperationContext*>(_localctx)->right = expression(3);
+                        antlrcpp::downCast<BinaryOperationContext*>(_localctx)->right = expression(3);
                         break;
                     }
 
@@ -2069,7 +2189,7 @@ anceParser::ExpressionContext* anceParser::expression(int precedence)
                         setState(290);
                         binaryOperatorEquality();
                         setState(291);
-                        dynamic_cast<BinaryOperationContext*>(_localctx)->right = expression(2);
+                        antlrcpp::downCast<BinaryOperationContext*>(_localctx)->right = expression(2);
                         break;
                     }
 
@@ -2086,11 +2206,14 @@ anceParser::ExpressionContext* anceParser::expression(int precedence)
                         setState(294);
                         match(anceParser::T__21);
                         setState(295);
-                        dynamic_cast<SubscriptContext*>(_localctx)->index = expression(0);
+                        antlrcpp::downCast<SubscriptContext*>(_localctx)->index = expression(0);
                         setState(296);
                         match(anceParser::T__22);
                         break;
                     }
+
+                    default:
+                        break;
                 }
             }
             setState(302);
@@ -2166,7 +2289,13 @@ anceParser::BinaryOperatorMultiplicativeContext* anceParser::binaryOperatorMulti
         _tracker.createInstance<BinaryOperatorMultiplicativeContext>(_ctx, getState());
     enterRule(_localctx, 38, anceParser::RuleBinaryOperatorMultiplicative);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(306);
@@ -2175,8 +2304,7 @@ anceParser::BinaryOperatorMultiplicativeContext* anceParser::binaryOperatorMulti
         {
             case anceParser::T__23:
             {
-                _localctx = dynamic_cast<BinaryOperatorMultiplicativeContext*>(
-                    _tracker.createInstance<anceParser::MultiplicationContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::MultiplicationContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(303);
                 match(anceParser::T__23);
@@ -2185,8 +2313,7 @@ anceParser::BinaryOperatorMultiplicativeContext* anceParser::binaryOperatorMulti
 
             case anceParser::T__24:
             {
-                _localctx = dynamic_cast<BinaryOperatorMultiplicativeContext*>(
-                    _tracker.createInstance<anceParser::DivisionContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::DivisionContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(304);
                 match(anceParser::T__24);
@@ -2195,8 +2322,7 @@ anceParser::BinaryOperatorMultiplicativeContext* anceParser::binaryOperatorMulti
 
             case anceParser::T__25:
             {
-                _localctx = dynamic_cast<BinaryOperatorMultiplicativeContext*>(
-                    _tracker.createInstance<anceParser::RemainderContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::RemainderContext>(_localctx);
                 enterOuterAlt(_localctx, 3);
                 setState(305);
                 match(anceParser::T__25);
@@ -2263,7 +2389,13 @@ anceParser::BinaryOperatorAdditiveContext* anceParser::binaryOperatorAdditive()
     BinaryOperatorAdditiveContext* _localctx = _tracker.createInstance<BinaryOperatorAdditiveContext>(_ctx, getState());
     enterRule(_localctx, 40, anceParser::RuleBinaryOperatorAdditive);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(310);
@@ -2272,8 +2404,7 @@ anceParser::BinaryOperatorAdditiveContext* anceParser::binaryOperatorAdditive()
         {
             case anceParser::T__26:
             {
-                _localctx = dynamic_cast<BinaryOperatorAdditiveContext*>(
-                    _tracker.createInstance<anceParser::AdditionContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::AdditionContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(308);
                 match(anceParser::T__26);
@@ -2282,8 +2413,7 @@ anceParser::BinaryOperatorAdditiveContext* anceParser::binaryOperatorAdditive()
 
             case anceParser::T__27:
             {
-                _localctx = dynamic_cast<BinaryOperatorAdditiveContext*>(
-                    _tracker.createInstance<anceParser::SubtractionContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::SubtractionContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(309);
                 match(anceParser::T__27);
@@ -2375,7 +2505,13 @@ anceParser::BinaryOperatorRelationalContext* anceParser::binaryOperatorRelationa
         _tracker.createInstance<BinaryOperatorRelationalContext>(_ctx, getState());
     enterRule(_localctx, 42, anceParser::RuleBinaryOperatorRelational);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(316);
@@ -2384,8 +2520,7 @@ anceParser::BinaryOperatorRelationalContext* anceParser::binaryOperatorRelationa
         {
             case anceParser::T__28:
             {
-                _localctx = dynamic_cast<BinaryOperatorRelationalContext*>(
-                    _tracker.createInstance<anceParser::LessThanContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::LessThanContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(312);
                 match(anceParser::T__28);
@@ -2394,8 +2529,7 @@ anceParser::BinaryOperatorRelationalContext* anceParser::binaryOperatorRelationa
 
             case anceParser::T__29:
             {
-                _localctx = dynamic_cast<BinaryOperatorRelationalContext*>(
-                    _tracker.createInstance<anceParser::LessThanOrEqualContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::LessThanOrEqualContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(313);
                 match(anceParser::T__29);
@@ -2404,8 +2538,7 @@ anceParser::BinaryOperatorRelationalContext* anceParser::binaryOperatorRelationa
 
             case anceParser::T__30:
             {
-                _localctx = dynamic_cast<BinaryOperatorRelationalContext*>(
-                    _tracker.createInstance<anceParser::GreaterThanContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::GreaterThanContext>(_localctx);
                 enterOuterAlt(_localctx, 3);
                 setState(314);
                 match(anceParser::T__30);
@@ -2414,8 +2547,7 @@ anceParser::BinaryOperatorRelationalContext* anceParser::binaryOperatorRelationa
 
             case anceParser::T__31:
             {
-                _localctx = dynamic_cast<BinaryOperatorRelationalContext*>(
-                    _tracker.createInstance<anceParser::GreaterThanOrEqualContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::GreaterThanOrEqualContext>(_localctx);
                 enterOuterAlt(_localctx, 4);
                 setState(315);
                 match(anceParser::T__31);
@@ -2482,7 +2614,13 @@ anceParser::BinaryOperatorEqualityContext* anceParser::binaryOperatorEquality()
     BinaryOperatorEqualityContext* _localctx = _tracker.createInstance<BinaryOperatorEqualityContext>(_ctx, getState());
     enterRule(_localctx, 44, anceParser::RuleBinaryOperatorEquality);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(320);
@@ -2491,8 +2629,7 @@ anceParser::BinaryOperatorEqualityContext* anceParser::binaryOperatorEquality()
         {
             case anceParser::T__32:
             {
-                _localctx = dynamic_cast<BinaryOperatorEqualityContext*>(
-                    _tracker.createInstance<anceParser::EqualContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::EqualContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(318);
                 match(anceParser::T__32);
@@ -2501,8 +2638,7 @@ anceParser::BinaryOperatorEqualityContext* anceParser::binaryOperatorEquality()
 
             case anceParser::T__33:
             {
-                _localctx = dynamic_cast<BinaryOperatorEqualityContext*>(
-                    _tracker.createInstance<anceParser::NotEqualContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::NotEqualContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(319);
                 match(anceParser::T__33);
@@ -2551,7 +2687,13 @@ anceParser::IndependentExpressionContext* anceParser::independentExpression()
     IndependentExpressionContext* _localctx = _tracker.createInstance<IndependentExpressionContext>(_ctx, getState());
     enterRule(_localctx, 46, anceParser::RuleIndependentExpression);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -2600,7 +2742,13 @@ anceParser::FunctionCallContext* anceParser::functionCall()
     FunctionCallContext* _localctx = _tracker.createInstance<FunctionCallContext>(_ctx, getState());
     enterRule(_localctx, 48, anceParser::RuleFunctionCall);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -2656,7 +2804,13 @@ anceParser::ArgumentsContext* anceParser::arguments()
     enterRule(_localctx, 50, anceParser::RuleArguments);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -2730,7 +2884,13 @@ anceParser::VariableAccessContext* anceParser::variableAccess()
     VariableAccessContext* _localctx = _tracker.createInstance<VariableAccessContext>(_ctx, getState());
     enterRule(_localctx, 52, anceParser::RuleVariableAccess);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -2785,7 +2945,13 @@ anceParser::AllocationContext* anceParser::allocation()
     enterRule(_localctx, 54, anceParser::RuleAllocation);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -2864,7 +3030,13 @@ anceParser::AllocatorContext* anceParser::allocator()
     AllocatorContext* _localctx = _tracker.createInstance<AllocatorContext>(_ctx, getState());
     enterRule(_localctx, 56, anceParser::RuleAllocator);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(353);
@@ -2873,8 +3045,7 @@ anceParser::AllocatorContext* anceParser::allocator()
         {
             case anceParser::T__35:
             {
-                _localctx =
-                    dynamic_cast<AllocatorContext*>(_tracker.createInstance<anceParser::DynamicContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::DynamicContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(351);
                 match(anceParser::T__35);
@@ -2883,8 +3054,7 @@ anceParser::AllocatorContext* anceParser::allocator()
 
             case anceParser::T__36:
             {
-                _localctx =
-                    dynamic_cast<AllocatorContext*>(_tracker.createInstance<anceParser::AutomaticContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::AutomaticContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(352);
                 match(anceParser::T__36);
@@ -2932,7 +3102,13 @@ anceParser::AddressofContext* anceParser::addressof()
     AddressofContext* _localctx = _tracker.createInstance<AddressofContext>(_ctx, getState());
     enterRule(_localctx, 58, anceParser::RuleAddressof);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -3007,7 +3183,13 @@ anceParser::BindRefContext* anceParser::bindRef()
     BindRefContext* _localctx = _tracker.createInstance<BindRefContext>(_ctx, getState());
     enterRule(_localctx, 60, anceParser::RuleBindRef);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(363);
@@ -3016,8 +3198,7 @@ anceParser::BindRefContext* anceParser::bindRef()
         {
             case 1:
             {
-                _localctx =
-                    dynamic_cast<BindRefContext*>(_tracker.createInstance<anceParser::BindReferenceContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::BindReferenceContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(358);
                 match(anceParser::T__13);
@@ -3028,8 +3209,7 @@ anceParser::BindRefContext* anceParser::bindRef()
 
             case 2:
             {
-                _localctx = dynamic_cast<BindRefContext*>(
-                    _tracker.createInstance<anceParser::BindReferenceToAddressContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::BindReferenceToAddressContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(360);
                 match(anceParser::T__13);
@@ -3039,6 +3219,9 @@ anceParser::BindRefContext* anceParser::bindRef()
                 expression(0);
                 break;
             }
+
+            default:
+                break;
         }
     }
     catch (RecognitionException& e)
@@ -3078,7 +3261,13 @@ anceParser::SizeofTypeContext* anceParser::sizeofType()
     SizeofTypeContext* _localctx = _tracker.createInstance<SizeofTypeContext>(_ctx, getState());
     enterRule(_localctx, 62, anceParser::RuleSizeofType);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -3124,7 +3313,13 @@ anceParser::SizeofExpressionContext* anceParser::sizeofExpression()
     SizeofExpressionContext* _localctx = _tracker.createInstance<SizeofExpressionContext>(_ctx, getState());
     enterRule(_localctx, 64, anceParser::RuleSizeofExpression);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -3204,7 +3399,13 @@ anceParser::LiteralExpressionContext* anceParser::literalExpression()
     LiteralExpressionContext* _localctx = _tracker.createInstance<LiteralExpressionContext>(_ctx, getState());
     enterRule(_localctx, 66, anceParser::RuleLiteralExpression);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(380);
@@ -3266,6 +3467,9 @@ anceParser::LiteralExpressionContext* anceParser::literalExpression()
                 diffLiteral();
                 break;
             }
+
+            default:
+                break;
         }
     }
     catch (RecognitionException& e)
@@ -3311,7 +3515,13 @@ anceParser::StringLiteralContext* anceParser::stringLiteral()
     enterRule(_localctx, 68, anceParser::RuleStringLiteral);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -3322,7 +3532,7 @@ anceParser::StringLiteralContext* anceParser::stringLiteral()
         if (_la == anceParser::IDENTIFIER)
         {
             setState(382);
-            dynamic_cast<StringLiteralContext*>(_localctx)->prefix = match(anceParser::IDENTIFIER);
+            antlrcpp::downCast<StringLiteralContext*>(_localctx)->prefix = match(anceParser::IDENTIFIER);
         }
         setState(385);
         match(anceParser::STRING);
@@ -3364,7 +3574,13 @@ anceParser::ByteLiteralContext* anceParser::byteLiteral()
     ByteLiteralContext* _localctx = _tracker.createInstance<ByteLiteralContext>(_ctx, getState());
     enterRule(_localctx, 70, anceParser::RuleByteLiteral);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -3418,7 +3634,13 @@ anceParser::IntegerLiteralContext* anceParser::integerLiteral()
     IntegerLiteralContext* _localctx = _tracker.createInstance<IntegerLiteralContext>(_ctx, getState());
     enterRule(_localctx, 72, anceParser::RuleIntegerLiteral);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(392);
@@ -3497,16 +3719,22 @@ anceParser::UnsignedIntegerContext* anceParser::unsignedInteger()
     UnsignedIntegerContext* _localctx = _tracker.createInstance<UnsignedIntegerContext>(_ctx, getState());
     enterRule(_localctx, 74, anceParser::RuleUnsignedInteger);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
         setState(394);
-        dynamic_cast<UnsignedIntegerContext*>(_localctx)->value = match(anceParser::INTEGER);
+        antlrcpp::downCast<UnsignedIntegerContext*>(_localctx)->value = match(anceParser::INTEGER);
         setState(395);
         match(anceParser::T__0);
         setState(396);
-        dynamic_cast<UnsignedIntegerContext*>(_localctx)->width = match(anceParser::INTEGER);
+        antlrcpp::downCast<UnsignedIntegerContext*>(_localctx)->width = match(anceParser::INTEGER);
     }
     catch (RecognitionException& e)
     {
@@ -3550,16 +3778,22 @@ anceParser::SignedIntegerContext* anceParser::signedInteger()
     SignedIntegerContext* _localctx = _tracker.createInstance<SignedIntegerContext>(_ctx, getState());
     enterRule(_localctx, 76, anceParser::RuleSignedInteger);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
         setState(398);
-        dynamic_cast<SignedIntegerContext*>(_localctx)->value = match(anceParser::SIGNED_INTEGER);
+        antlrcpp::downCast<SignedIntegerContext*>(_localctx)->value = match(anceParser::SIGNED_INTEGER);
         setState(399);
         match(anceParser::T__0);
         setState(400);
-        dynamic_cast<SignedIntegerContext*>(_localctx)->width = match(anceParser::INTEGER);
+        antlrcpp::downCast<SignedIntegerContext*>(_localctx)->width = match(anceParser::INTEGER);
     }
     catch (RecognitionException& e)
     {
@@ -3613,7 +3847,13 @@ anceParser::SpecialIntegerContext* anceParser::specialInteger()
     SpecialIntegerContext* _localctx = _tracker.createInstance<SpecialIntegerContext>(_ctx, getState());
     enterRule(_localctx, 78, anceParser::RuleSpecialInteger);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(411);
@@ -3628,7 +3868,7 @@ anceParser::SpecialIntegerContext* anceParser::specialInteger()
                 setState(403);
                 match(anceParser::T__0);
                 setState(404);
-                dynamic_cast<SpecialIntegerContext*>(_localctx)->width = match(anceParser::INTEGER);
+                antlrcpp::downCast<SpecialIntegerContext*>(_localctx)->width = match(anceParser::INTEGER);
                 break;
             }
 
@@ -3640,7 +3880,7 @@ anceParser::SpecialIntegerContext* anceParser::specialInteger()
                 setState(406);
                 match(anceParser::T__0);
                 setState(407);
-                dynamic_cast<SpecialIntegerContext*>(_localctx)->width = match(anceParser::INTEGER);
+                antlrcpp::downCast<SpecialIntegerContext*>(_localctx)->width = match(anceParser::INTEGER);
                 break;
             }
 
@@ -3652,7 +3892,7 @@ anceParser::SpecialIntegerContext* anceParser::specialInteger()
                 setState(409);
                 match(anceParser::T__0);
                 setState(410);
-                dynamic_cast<SpecialIntegerContext*>(_localctx)->width = match(anceParser::INTEGER);
+                antlrcpp::downCast<SpecialIntegerContext*>(_localctx)->width = match(anceParser::INTEGER);
                 break;
             }
 
@@ -3713,7 +3953,13 @@ anceParser::FloatingPointLiteralContext* anceParser::floatingPointLiteral()
     enterRule(_localctx, 80, anceParser::RuleFloatingPointLiteral);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -3787,7 +4033,13 @@ anceParser::BooleanLiteralContext* anceParser::booleanLiteral()
     BooleanLiteralContext* _localctx = _tracker.createInstance<BooleanLiteralContext>(_ctx, getState());
     enterRule(_localctx, 82, anceParser::RuleBooleanLiteral);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(417);
@@ -3796,8 +4048,7 @@ anceParser::BooleanLiteralContext* anceParser::booleanLiteral()
         {
             case anceParser::T__39:
             {
-                _localctx =
-                    dynamic_cast<BooleanLiteralContext*>(_tracker.createInstance<anceParser::TrueContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::TrueContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(415);
                 match(anceParser::T__39);
@@ -3806,8 +4057,7 @@ anceParser::BooleanLiteralContext* anceParser::booleanLiteral()
 
             case anceParser::T__40:
             {
-                _localctx =
-                    dynamic_cast<BooleanLiteralContext*>(_tracker.createInstance<anceParser::FalseContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::FalseContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(416);
                 match(anceParser::T__40);
@@ -3855,7 +4105,13 @@ anceParser::SizeLiteralContext* anceParser::sizeLiteral()
     SizeLiteralContext* _localctx = _tracker.createInstance<SizeLiteralContext>(_ctx, getState());
     enterRule(_localctx, 84, anceParser::RuleSizeLiteral);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -3874,6 +4130,9 @@ anceParser::SizeLiteralContext* anceParser::sizeLiteral()
                 match(anceParser::T__41);
                 break;
             }
+
+            default:
+                break;
         }
     }
     catch (RecognitionException& e)
@@ -3913,7 +4172,13 @@ anceParser::DiffLiteralContext* anceParser::diffLiteral()
     DiffLiteralContext* _localctx = _tracker.createInstance<DiffLiteralContext>(_ctx, getState());
     enterRule(_localctx, 86, anceParser::RuleDiffLiteral);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -3932,6 +4197,9 @@ anceParser::DiffLiteralContext* anceParser::diffLiteral()
                 match(anceParser::T__42);
                 break;
             }
+
+            default:
+                break;
         }
     }
     catch (RecognitionException& e)
@@ -4067,7 +4335,13 @@ anceParser::TypeContext* anceParser::type()
     TypeContext* _localctx = _tracker.createInstance<TypeContext>(_ctx, getState());
     enterRule(_localctx, 88, anceParser::RuleType);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(437);
@@ -4076,7 +4350,7 @@ anceParser::TypeContext* anceParser::type()
         {
             case anceParser::NATIVE_INTEGER_TYPE:
             {
-                _localctx = dynamic_cast<TypeContext*>(_tracker.createInstance<anceParser::IntegerContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::IntegerContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(429);
                 integerType();
@@ -4085,7 +4359,7 @@ anceParser::TypeContext* anceParser::type()
 
             case anceParser::T__21:
             {
-                _localctx = dynamic_cast<TypeContext*>(_tracker.createInstance<anceParser::ArrayContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::ArrayContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(430);
                 arrayType();
@@ -4101,7 +4375,7 @@ anceParser::TypeContext* anceParser::type()
             case anceParser::T__48:
             case anceParser::T__49:
             {
-                _localctx = dynamic_cast<TypeContext*>(_tracker.createInstance<anceParser::KeywordContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::KeywordContext>(_localctx);
                 enterOuterAlt(_localctx, 3);
                 setState(431);
                 keywordType();
@@ -4110,7 +4384,7 @@ anceParser::TypeContext* anceParser::type()
 
             case anceParser::T__23:
             {
-                _localctx = dynamic_cast<TypeContext*>(_tracker.createInstance<anceParser::PointerContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::PointerContext>(_localctx);
                 enterOuterAlt(_localctx, 4);
                 setState(432);
                 match(anceParser::T__23);
@@ -4121,8 +4395,7 @@ anceParser::TypeContext* anceParser::type()
 
             case anceParser::T__43:
             {
-                _localctx =
-                    dynamic_cast<TypeContext*>(_tracker.createInstance<anceParser::ReferenceContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::ReferenceContext>(_localctx);
                 enterOuterAlt(_localctx, 5);
                 setState(434);
                 match(anceParser::T__43);
@@ -4133,7 +4406,7 @@ anceParser::TypeContext* anceParser::type()
 
             case anceParser::IDENTIFIER:
             {
-                _localctx = dynamic_cast<TypeContext*>(_tracker.createInstance<anceParser::CustomContext>(_localctx));
+                _localctx = _tracker.createInstance<anceParser::CustomContext>(_localctx);
                 enterOuterAlt(_localctx, 6);
                 setState(436);
                 customType();
@@ -4181,7 +4454,13 @@ anceParser::IntegerTypeContext* anceParser::integerType()
     IntegerTypeContext* _localctx = _tracker.createInstance<IntegerTypeContext>(_ctx, getState());
     enterRule(_localctx, 90, anceParser::RuleIntegerType);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -4235,7 +4514,13 @@ anceParser::ArrayTypeContext* anceParser::arrayType()
     ArrayTypeContext* _localctx = _tracker.createInstance<ArrayTypeContext>(_ctx, getState());
     enterRule(_localctx, 92, anceParser::RuleArrayType);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -4297,7 +4582,13 @@ anceParser::KeywordTypeContext* anceParser::keywordType()
     KeywordTypeContext* _localctx = _tracker.createInstance<KeywordTypeContext>(_ctx, getState());
     enterRule(_localctx, 94, anceParser::RuleKeywordType);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(450);
@@ -4370,7 +4661,13 @@ anceParser::FloatingPointTypeContext* anceParser::floatingPointType()
     enterRule(_localctx, 96, anceParser::RuleFloatingPointType);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -4422,7 +4719,13 @@ anceParser::TargetDependentTypeContext* anceParser::targetDependentType()
     enterRule(_localctx, 98, anceParser::RuleTargetDependentType);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -4472,7 +4775,13 @@ anceParser::VoidTypeContext* anceParser::voidType()
     VoidTypeContext* _localctx = _tracker.createInstance<VoidTypeContext>(_ctx, getState());
     enterRule(_localctx, 100, anceParser::RuleVoidType);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -4516,7 +4825,13 @@ anceParser::CustomTypeContext* anceParser::customType()
     CustomTypeContext* _localctx = _tracker.createInstance<CustomTypeContext>(_ctx, getState());
     enterRule(_localctx, 102, anceParser::RuleCustomType);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -4538,7 +4853,7 @@ bool anceParser::sempred(RuleContext* context, size_t ruleIndex, size_t predicat
     switch (ruleIndex)
     {
         case 18:
-            return expressionSempred(dynamic_cast<ExpressionContext*>(context), predicateIndex);
+            return expressionSempred(antlrcpp::downCast<ExpressionContext*>(context), predicateIndex);
 
         default:
             break;
@@ -4786,7 +5101,7 @@ anceParser::Initializer::Initializer()
         }
     }
 
-    _serializedATN = {
+    static const uint16_t serializedATNSegment0[] = {
         0x3,   0x608b, 0xa72a, 0x8133, 0xb9ed, 0x417c, 0x3be7, 0x7786, 0x5964, 0x3,   0x48,  0x1cf, 0x4,   0x2,   0x9,
         0x2,   0x4,    0x3,    0x9,    0x3,    0x4,    0x4,    0x9,    0x4,    0x4,   0x5,   0x9,   0x5,   0x4,   0x6,
         0x9,   0x6,    0x4,    0x7,    0x9,    0x7,    0x4,    0x8,    0x9,    0x8,   0x4,   0x9,   0x9,   0x9,   0x4,
@@ -5053,6 +5368,10 @@ anceParser::Initializer::Initializer()
         0x12e, 0x134,  0x138,  0x13e,  0x142,  0x150,  0x153,  0x15c,  0x163,  0x16d, 0x17e, 0x181, 0x18a, 0x19d, 0x1a3,
         0x1a8, 0x1ad,  0x1b7,  0x1c4,
     };
+
+    _serializedATN.insert(_serializedATN.end(),
+                          serializedATNSegment0,
+                          serializedATNSegment0 + sizeof(serializedATNSegment0) / sizeof(serializedATNSegment0[0]));
 
     atn::ATNDeserializer deserializer;
     _atn = deserializer.deserialize(_serializedATN);

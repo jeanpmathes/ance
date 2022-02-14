@@ -1,5 +1,5 @@
 
-// Generated from ./src/management/grammar/data.g4 by ANTLR 4.8
+// Generated from ./src/management/grammar/data.g4 by ANTLR 4.9.3
 
 #include "dataVisitor.h"
 
@@ -75,7 +75,13 @@ dataParser::ElementContext* dataParser::element()
     ElementContext* _localctx = _tracker.createInstance<ElementContext>(_ctx, getState());
     enterRule(_localctx, 0, dataParser::RuleElement);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(16);
@@ -162,7 +168,13 @@ dataParser::DictionaryContext* dataParser::dictionary()
     enterRule(_localctx, 2, dataParser::RuleDictionary);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -235,7 +247,13 @@ dataParser::EntryContext* dataParser::entry()
     EntryContext* _localctx = _tracker.createInstance<EntryContext>(_ctx, getState());
     enterRule(_localctx, 4, dataParser::RuleEntry);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -244,7 +262,7 @@ dataParser::EntryContext* dataParser::entry()
         setState(32);
         match(dataParser::T__3);
         setState(33);
-        dynamic_cast<EntryContext*>(_localctx)->value = element();
+        antlrcpp::downCast<EntryContext*>(_localctx)->value = element();
     }
     catch (RecognitionException& e)
     {
@@ -289,7 +307,13 @@ dataParser::ListContext* dataParser::list()
     enterRule(_localctx, 6, dataParser::RuleList);
     size_t _la = 0;
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -361,7 +385,13 @@ dataParser::StringContext* dataParser::string()
     StringContext* _localctx = _tracker.createInstance<StringContext>(_ctx, getState());
     enterRule(_localctx, 8, dataParser::RuleString);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         enterOuterAlt(_localctx, 1);
@@ -423,7 +453,13 @@ dataParser::BooleanContext* dataParser::boolean()
     BooleanContext* _localctx = _tracker.createInstance<BooleanContext>(_ctx, getState());
     enterRule(_localctx, 10, dataParser::RuleBoolean);
 
-    auto onExit = finally([=] { exitRule(); });
+#if __cplusplus > 201703L
+    auto onExit = finally([=, this] {
+#else
+    auto onExit = finally([=] {
+#endif
+        exitRule();
+    });
     try
     {
         setState(52);
@@ -432,7 +468,7 @@ dataParser::BooleanContext* dataParser::boolean()
         {
             case dataParser::T__6:
             {
-                _localctx = dynamic_cast<BooleanContext*>(_tracker.createInstance<dataParser::TrueContext>(_localctx));
+                _localctx = _tracker.createInstance<dataParser::TrueContext>(_localctx);
                 enterOuterAlt(_localctx, 1);
                 setState(50);
                 match(dataParser::T__6);
@@ -441,7 +477,7 @@ dataParser::BooleanContext* dataParser::boolean()
 
             case dataParser::T__7:
             {
-                _localctx = dynamic_cast<BooleanContext*>(_tracker.createInstance<dataParser::FalseContext>(_localctx));
+                _localctx = _tracker.createInstance<dataParser::FalseContext>(_localctx);
                 enterOuterAlt(_localctx, 2);
                 setState(51);
                 match(dataParser::T__7);
@@ -495,7 +531,7 @@ dataParser::Initializer::Initializer()
         }
     }
 
-    _serializedATN = {
+    static const uint16_t serializedATNSegment0[] = {
         0x3,  0x608b, 0xa72a, 0x8133, 0xb9ed, 0x417c, 0x3be7, 0x7786, 0x5964, 0x3,  0xe,  0x39, 0x4,  0x2,  0x9,  0x2,
         0x4,  0x3,    0x9,    0x3,    0x4,    0x4,    0x9,    0x4,    0x4,    0x5,  0x9,  0x5,  0x4,  0x6,  0x9,  0x6,
         0x4,  0x7,    0x9,    0x7,    0x3,    0x2,    0x3,    0x2,    0x3,    0x2,  0x3,  0x2,  0x5,  0x2,  0x13, 0xa,
@@ -528,6 +564,10 @@ dataParser::Initializer::Initializer()
         0x2,  0x2,    0x2,    0x36,   0x35,   0x3,    0x2,    0x2,    0x2,    0x37, 0xd,  0x3,  0x2,  0x2,  0x2,  0x8,
         0x12, 0x1a,   0x1d,   0x2b,   0x2e,   0x36,
     };
+
+    _serializedATN.insert(_serializedATN.end(),
+                          serializedATNSegment0,
+                          serializedATNSegment0 + sizeof(serializedATNSegment0) / sizeof(serializedATNSegment0[0]));
 
     atn::ATNDeserializer deserializer;
     _atn = deserializer.deserialize(_serializedATN);

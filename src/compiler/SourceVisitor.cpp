@@ -51,9 +51,9 @@ SourceVisitor::SourceVisitor(Application& application) : application_(applicatio
 
 antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx)
 {
-    lang::AccessModifier              access      = visit(ctx->accessModifier());
+    lang::AccessModifier              access      = visit(ctx->accessModifier()).as<lang::AccessModifier>();
     bool                              is_constant = ctx->CONST();
-    lang::ResolvingHandle<lang::Type> type        = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type        = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     std::string                       identifier  = ctx->IDENTIFIER()->getText();
 
     ConstantExpression* const_expr;
@@ -61,9 +61,9 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
 
     if (ctx->literalExpression())
     {
-        assigner = visit(ctx->assigner());
+        assigner = visit(ctx->assigner()).as<lang::Assigner>();
 
-        Expression* expr = visit(ctx->literalExpression());
+        Expression* expr = visit(ctx->literalExpression()).as<Expression*>();
         const_expr       = dynamic_cast<ConstantExpression*>(expr);
     }
     else if (is_constant)
@@ -89,16 +89,16 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
 
 antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)
 {
-    lang::AccessModifier              access     = visit(ctx->accessModifier());
+    lang::AccessModifier              access     = visit(ctx->accessModifier()).as<lang::AccessModifier>();
     std::string                       identifier = ctx->IDENTIFIER()->getText();
     lang::ResolvingHandle<lang::Type> return_type =
-        ctx->type() ? (lang::ResolvingHandle<lang::Type>) visit(ctx->type()) : lang::VoidType::get();
+        ctx->type() ? visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>() : lang::VoidType::get();
 
     lang::Location declaration_location = location(ctx);
     lang::Location definition_location =
         ctx->statement().empty() ? declaration_location : location(ctx->statement()[0]);
 
-    std::vector<lang::Parameter*> parameters = visit(ctx->parameters());
+    std::vector<lang::Parameter*> parameters = visit(ctx->parameters()).as<std::vector<lang::Parameter*>>();
 
     std::vector<std::shared_ptr<lang::Parameter>> shared_parameters;
     shared_parameters.reserve(parameters.size());
@@ -116,7 +116,7 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
 
     for (auto statement_context : ctx->statement())
     {
-        Statement* statement = visit(statement_context);
+        Statement* statement = visit(statement_context).as<Statement*>();
         function->pushStatement(statement);
     }
 
@@ -127,8 +127,8 @@ antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFu
 {
     std::string                       identifier = ctx->IDENTIFIER()->getText();
     lang::ResolvingHandle<lang::Type> return_type =
-        ctx->type() ? (lang::ResolvingHandle<lang::Type>) visit(ctx->type()) : lang::VoidType::get();
-    std::vector<lang::Parameter*> parameters = visit(ctx->parameters());
+        ctx->type() ? visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>() : lang::VoidType::get();
+    std::vector<lang::Parameter*> parameters = visit(ctx->parameters()).as<std::vector<lang::Parameter*>>();
 
     std::vector<std::shared_ptr<lang::Parameter>> shared_parameters;
     shared_parameters.reserve(parameters.size());
@@ -149,14 +149,14 @@ antlrcpp::Any SourceVisitor::visitParameters(anceParser::ParametersContext* ctx)
 {
     std::vector<lang::Parameter*> params;
 
-    for (auto* param : ctx->parameter()) { params.push_back(visit(param)); }
+    for (auto* param : ctx->parameter()) { params.push_back(visit(param).as<lang::Parameter*>()); }
 
     return params;
 }
 
 antlrcpp::Any SourceVisitor::visitParameter(anceParser::ParameterContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> type         = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type         = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     const std::string                 k_identifier = ctx->IDENTIFIER()->getText();
 
     return new lang::Parameter(type, location(ctx->type()), k_identifier, location(ctx));
@@ -164,7 +164,7 @@ antlrcpp::Any SourceVisitor::visitParameter(anceParser::ParameterContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitDefineAs(anceParser::DefineAsContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> other = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> other = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     application_.globalScope().defineTypeAsOther(ctx->IDENTIFIER()->getText(),
                                                  other,
                                                  location(ctx),
@@ -175,7 +175,7 @@ antlrcpp::Any SourceVisitor::visitDefineAs(anceParser::DefineAsContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> other = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> other = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     application_.globalScope().defineTypeAliasOther(ctx->IDENTIFIER()->getText(),
                                                     other,
                                                     location(ctx),
@@ -186,7 +186,7 @@ antlrcpp::Any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ct
 
 antlrcpp::Any SourceVisitor::visitExpressionStatement(anceParser::ExpressionStatementContext* ctx)
 {
-    Expression*                          expression = visit(ctx->independentExpression());
+    Expression*                          expression = visit(ctx->independentExpression()).as<Expression*>();
     std::unique_ptr<BuildableExpression> buildable_expression(dynamic_cast<BuildableExpression*>(expression));
 
     auto* statement = new ExpressionStatement(std::move(buildable_expression), location(ctx));
@@ -195,7 +195,7 @@ antlrcpp::Any SourceVisitor::visitExpressionStatement(anceParser::ExpressionStat
 
 antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     std::string                       identifier = ctx->IDENTIFIER()->getText();
 
     lang::Assigner assigner {};
@@ -203,8 +203,8 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
 
     if (ctx->expression())
     {
-        assigner = visit(ctx->assigner());
-        assigned = visit(ctx->expression());
+        assigner = visit(ctx->assigner()).as<lang::Assigner>();
+        assigned = visit(ctx->expression()).as<Expression*>();
     }
     else
     {
@@ -223,10 +223,10 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
 antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
     anceParser::LocalReferenceToValueDefinitionContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     std::string                       identifier = ctx->IDENTIFIER()->getText();
 
-    Expression* value = visit(ctx->expression());
+    Expression* value = visit(ctx->expression()).as<Expression*>();
 
     return static_cast<Statement*>(LocalReferenceVariableDefinition::defineReferring(identifier,
                                                                                      type,
@@ -238,10 +238,10 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
 antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
     anceParser::LocalReferenceToPointerDefinitionContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     std::string                       identifier = ctx->IDENTIFIER()->getText();
 
-    Expression* address = visit(ctx->expression());
+    Expression* address = visit(ctx->expression()).as<Expression*>();
 
     return static_cast<Statement*>(
         LocalReferenceVariableDefinition::defineReferringTo(identifier,
@@ -253,9 +253,9 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
 
 antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
 {
-    Expression*    assignable = visit(ctx->assignable);
-    lang::Assigner assigner   = visit(ctx->assigner());
-    Expression*    assigned   = visit(ctx->assigned);
+    Expression*    assignable = visit(ctx->assignable).as<Expression*>();
+    lang::Assigner assigner   = visit(ctx->assigner()).as<lang::Assigner>();
+    Expression*    assigned   = visit(ctx->assigned).as<Expression*>();
 
     return static_cast<Statement*>(new AssignmentStatement(std::unique_ptr<Expression>(assignable),
                                                            assigner,
@@ -265,7 +265,7 @@ antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitDeleteStatement(anceParser::DeleteStatementContext* ctx)
 {
-    Expression* expression    = visit(ctx->expression());
+    Expression* expression    = visit(ctx->expression()).as<Expression*>();
     bool        delete_buffer = ctx->BUFFER();
 
     return static_cast<Statement*>(
@@ -276,21 +276,21 @@ antlrcpp::Any SourceVisitor::visitReturnStatement(anceParser::ReturnStatementCon
 {
     Expression* return_value = nullptr;
 
-    if (ctx->expression() != nullptr) { return_value = visit(ctx->expression()); }
+    if (ctx->expression() != nullptr) { return_value = visit(ctx->expression()).as<Expression*>(); }
 
     return static_cast<Statement*>(new ReturnStatement(std::unique_ptr<Expression>(return_value), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitAssertStatement(anceParser::AssertStatementContext* ctx)
 {
-    Expression* condition = visit(ctx->expression());
+    Expression* condition = visit(ctx->expression()).as<Expression*>();
     return static_cast<Statement*>(new Assertion(std::unique_ptr<Expression>(condition), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
 {
     std::string              function_name = ctx->IDENTIFIER()->getText();
-    std::vector<Expression*> arguments     = visit(ctx->arguments());
+    std::vector<Expression*> arguments     = visit(ctx->arguments()).as<std::vector<Expression*>>();
 
     std::vector<std::unique_ptr<Expression>> unique_expressions;
     unique_expressions.reserve(arguments.size());
@@ -305,7 +305,7 @@ antlrcpp::Any SourceVisitor::visitArguments(anceParser::ArgumentsContext* ctx)
 {
     std::vector<Expression*> arguments;
 
-    for (auto* argument : ctx->expression()) { arguments.push_back(visit(argument)); }
+    for (auto* argument : ctx->expression()) { arguments.push_back(visit(argument).as<Expression*>()); }
 
     return arguments;
 }
@@ -320,11 +320,11 @@ antlrcpp::Any SourceVisitor::visitVariableAccess(anceParser::VariableAccessConte
 
 antlrcpp::Any SourceVisitor::visitAllocation(anceParser::AllocationContext* ctx)
 {
-    Runtime::Allocator                allocator = visit(ctx->allocator());
-    lang::ResolvingHandle<lang::Type> type      = visit(ctx->type());
+    Runtime::Allocator                allocator = visit(ctx->allocator()).as<Runtime::Allocator>();
+    lang::ResolvingHandle<lang::Type> type      = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     Expression*                       count     = nullptr;
 
-    if (ctx->expression()) { count = visit(ctx->expression()); }
+    if (ctx->expression()) { count = visit(ctx->expression()).as<Expression*>(); }
 
     return static_cast<Expression*>(
         new Allocation(allocator, type, std::unique_ptr<Expression>(count), location(ctx), location(ctx->type())));
@@ -332,43 +332,43 @@ antlrcpp::Any SourceVisitor::visitAllocation(anceParser::AllocationContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitAddressof(anceParser::AddressofContext* ctx)
 {
-    Expression* arg = visit(ctx->expression());
+    Expression* arg = visit(ctx->expression()).as<Expression*>();
 
     return static_cast<Expression*>(new Addressof(std::unique_ptr<Expression>(arg), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitBindReference(anceParser::BindReferenceContext* ctx)
 {
-    Expression* value = visit(ctx->expression());
+    Expression* value = visit(ctx->expression()).as<Expression*>();
 
     return static_cast<Expression*>(BindRef::refer(std::unique_ptr<Expression>(value), location(ctx)).release());
 }
 
 antlrcpp::Any SourceVisitor::visitBindReferenceToAddress(anceParser::BindReferenceToAddressContext* ctx)
 {
-    Expression* address = visit(ctx->expression());
+    Expression* address = visit(ctx->expression()).as<Expression*>();
 
     return static_cast<Expression*>(BindRef::referTo(std::unique_ptr<Expression>(address), location(ctx)).release());
 }
 
 antlrcpp::Any SourceVisitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> type = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> type = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
 
     return static_cast<Expression*>(new SizeofType(type, location(ctx->type()), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSizeofExpression(anceParser::SizeofExpressionContext* ctx)
 {
-    Expression* expr = visit(ctx->expression());
+    Expression* expr = visit(ctx->expression()).as<Expression*>();
 
     return static_cast<Expression*>(new SizeofExpression(std::unique_ptr<Expression>(expr), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSubscript(anceParser::SubscriptContext* ctx)
 {
-    Expression* indexed = visit(ctx->indexed);
-    Expression* index   = visit(ctx->index);
+    Expression* indexed = visit(ctx->indexed).as<Expression*>();
+    Expression* index   = visit(ctx->index).as<Expression*>();
 
     return static_cast<Expression*>(
         new Subscript(std::unique_ptr<Expression>(indexed), std::unique_ptr<Expression>(index), location(ctx)));
@@ -376,14 +376,14 @@ antlrcpp::Any SourceVisitor::visitSubscript(anceParser::SubscriptContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitBinaryOperation(anceParser::BinaryOperationContext* ctx)
 {
-    Expression* left  = visit(ctx->left);
-    Expression* right = visit(ctx->right);
+    Expression* left  = visit(ctx->left).as<Expression*>();
+    Expression* right = visit(ctx->right).as<Expression*>();
 
     std::optional<lang::BinaryOperator> op;
-    if (ctx->binaryOperatorMultiplicative()) op = visit(ctx->binaryOperatorMultiplicative());
-    if (ctx->binaryOperatorAdditive()) op = visit(ctx->binaryOperatorAdditive());
-    if (ctx->binaryOperatorRelational()) op = visit(ctx->binaryOperatorRelational());
-    if (ctx->binaryOperatorEquality()) op = visit(ctx->binaryOperatorEquality());
+    if (ctx->binaryOperatorMultiplicative()) op = visit(ctx->binaryOperatorMultiplicative()).as<lang::BinaryOperator>();
+    if (ctx->binaryOperatorAdditive()) op = visit(ctx->binaryOperatorAdditive()).as<lang::BinaryOperator>();
+    if (ctx->binaryOperatorRelational()) op = visit(ctx->binaryOperatorRelational()).as<lang::BinaryOperator>();
+    if (ctx->binaryOperatorEquality()) op = visit(ctx->binaryOperatorEquality()).as<lang::BinaryOperator>();
     assert(op.has_value());
 
     return static_cast<Expression*>(new BinaryOperation(std::unique_ptr<Expression>(left),
@@ -394,7 +394,7 @@ antlrcpp::Any SourceVisitor::visitBinaryOperation(anceParser::BinaryOperationCon
 
 antlrcpp::Any SourceVisitor::visitParenthesis(anceParser::ParenthesisContext* ctx)
 {
-    Expression* contained = visit(ctx->expression());
+    Expression* contained = visit(ctx->expression()).as<Expression*>();
     return contained;
 }
 
@@ -544,7 +544,7 @@ antlrcpp::Any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ct
 
 antlrcpp::Any SourceVisitor::visitArrayType(anceParser::ArrayTypeContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> element_type = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> element_type = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     uint64_t                          size         = parseArrayTypeSize(ctx->INTEGER()->getText());
     lang::ResolvingHandle<lang::Type> type         = lang::ArrayType::get(element_type, size);
 
@@ -558,7 +558,7 @@ antlrcpp::Any SourceVisitor::visitKeywordType(anceParser::KeywordTypeContext* ct
 
 antlrcpp::Any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> element_type = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> element_type = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     lang::ResolvingHandle<lang::Type> type         = lang::PointerType::get(element_type);
 
     return type;
@@ -566,7 +566,7 @@ antlrcpp::Any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitReference(anceParser::ReferenceContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> element_type = visit(ctx->type());
+    lang::ResolvingHandle<lang::Type> element_type = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     lang::ResolvingHandle<lang::Type> type         = lang::ReferenceType::get(element_type);
 
     return type;

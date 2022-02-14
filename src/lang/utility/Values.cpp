@@ -3,11 +3,11 @@
 #include "lang/construct/value/Value.h"
 #include "compiler/CompileContext.h"
 
-llvm::Value* lang::Values::nativeToContent(lang::ResolvingHandle<lang::Type>,
-                                           llvm::Value*    native,
-                                           CompileContext* context)
+llvm::Value* lang::Values::nativeToContent(lang::ResolvingHandle<lang::Type> type,
+                                           llvm::Value*                      native,
+                                           CompileContext*                   context)
 {
-    llvm::Value* content = context->ir()->CreateLoad(native);
+    llvm::Value* content = context->ir()->CreateLoad(type->getContentType(*context->llvmContext()), native);
     return content;
 }
 

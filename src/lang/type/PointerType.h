@@ -42,9 +42,9 @@ namespace lang
                                                     CompileContext*        context) override;
 
       private:
-        static llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
-                                                   const std::shared_ptr<lang::Value>& index,
-                                                   CompileContext*                     context);
+        llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
+                                            const std::shared_ptr<lang::Value>& index,
+                                            CompileContext*                     context);
 
       public:
         ~PointerType() override = default;
