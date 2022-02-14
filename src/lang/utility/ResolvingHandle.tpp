@@ -1,6 +1,6 @@
 #include "ResolvingHandle.h"
 
-#include <assert.h>
+#include <cassert>
 
 template<typename T>
 lang::ResolvingHandle<T>::ResolvingHandle(std::unique_ptr<T> handled)
