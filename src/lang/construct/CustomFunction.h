@@ -43,7 +43,7 @@ namespace lang
 
         [[nodiscard]] bool isMangled() const override;
 
-        void pushStatement(Statement* statement) override;
+        void pushStatement(std::unique_ptr<Statement> statement) override;
         void addReturn(const std::shared_ptr<lang::Value>& value) override;
 
         void validate(ValidationLogger& validation_logger) override;
@@ -71,8 +71,8 @@ namespace lang
 
         std::unique_ptr<lang::LocalScope> inside_scope_;
 
-        std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>> arguments_;
-        std::list<Statement*>                                             statements_;
+        std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>> arguments_ {};
+        std::list<std::unique_ptr<Statement>>                             statements_ {};
 
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};

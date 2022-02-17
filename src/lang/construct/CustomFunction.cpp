@@ -57,10 +57,11 @@ bool lang::CustomFunction::isMangled() const
     return true;
 }
 
-void lang::CustomFunction::pushStatement(Statement* statement)
+void lang::CustomFunction::pushStatement(std::unique_ptr<Statement> statement)
 {
-    statements_.push_back(statement);
-    statement->setContainingFunction(function());
+    Statement* stmt = statement.get();
+    statements_.push_back(std::move(statement));
+    stmt->setContainingFunction(function());
 }
 
 void lang::CustomFunction::createNativeBacking(CompileContext* context)
@@ -109,7 +110,7 @@ void lang::CustomFunction::build(CompileContext* context)
 
     for (auto& arg : arguments_) { (*arg)->buildDefinition(context); }
 
-    for (auto* statement : statements_)
+    for (auto& statement : statements_)
     {
         statement->build(context);
 
@@ -215,7 +216,7 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger)
 
     inside_scope_->validate(validation_logger);
 
-    for (auto statement : statements_) { statement->validate(validation_logger); }
+    for (auto& statement : statements_) { statement->validate(validation_logger); }
 }
 
 llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext*)

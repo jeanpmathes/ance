@@ -10,6 +10,7 @@
 #include "lang/utility/Values.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
+#include "lang/statement/Statement.h"
 
 lang::ExternFunction::ExternFunction(lang::Function*                               function,
                                      lang::Scope*                                  containing_scope,
@@ -34,7 +35,7 @@ bool lang::ExternFunction::isMangled() const
     return false;
 }
 
-void lang::ExternFunction::pushStatement(Statement*) {}
+void lang::ExternFunction::pushStatement(std::unique_ptr<Statement>) {}
 void lang::ExternFunction::addReturn(const std::shared_ptr<lang::Value>&) {}
 
 void lang::ExternFunction::validate(ValidationLogger& validation_logger)

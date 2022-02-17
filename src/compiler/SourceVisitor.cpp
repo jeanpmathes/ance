@@ -117,7 +117,7 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
     for (auto statement_context : ctx->statement())
     {
         Statement* statement = visit(statement_context).as<Statement*>();
-        function->pushStatement(statement);
+        function->pushStatement(std::unique_ptr<Statement>(statement));
     }
 
     return this->visitChildren(ctx);

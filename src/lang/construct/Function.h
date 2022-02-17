@@ -123,7 +123,7 @@ namespace lang
          * Push a statement to the end of the statement list.
          * @param statement The statement to add.
          */
-        void pushStatement(Statement* statement);
+        void pushStatement(std::unique_ptr<Statement> statement);
 
         /**
          * Add a return. Call this method in the build method of a statement.

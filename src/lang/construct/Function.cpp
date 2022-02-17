@@ -9,6 +9,7 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 #include "lang/AccessModifier.h"
+#include "lang/statement/Statement.h"
 
 lang::Function::Function(std::string function_name) : name_(std::move(function_name)) {}
 
@@ -90,9 +91,9 @@ bool lang::Function::isMangled() const
     return definition_->isMangled();
 }
 
-void lang::Function::pushStatement(Statement* statement)
+void lang::Function::pushStatement(std::unique_ptr<Statement> statement)
 {
-    definition_->pushStatement(statement);
+    definition_->pushStatement(std::move(statement));
 }
 
 void lang::Function::addReturn(const std::shared_ptr<lang::Value>& value)
