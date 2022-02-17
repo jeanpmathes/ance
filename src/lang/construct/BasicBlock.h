@@ -34,6 +34,11 @@ namespace lang
         void link(BasicBlock& next);
 
         /**
+         * Simplify this basic block and all that follow it.
+         */
+        void simplify();
+
+        /**
          * Set the containing function of this basic block.
          * @param function The function that contains this basic block.
          */
@@ -65,6 +70,11 @@ namespace lang
         void doBuild(CompileContext* context);
 
       private:
+        void                 registerIncomingLink(BasicBlock& next);
+        void                 updateLink(BasicBlock* former, BasicBlock* updated);
+        [[nodiscard]] size_t getIncomingLinkCount() const;
+        void                 transferStatements(std::list<std::unique_ptr<Statement>>& statements);
+
         BasicBlock() = default;
 
       private:
@@ -77,9 +87,20 @@ namespace lang
                 virtual ~Base() = default;
 
               public:
-                void setIndex(size_t index);
+                void        setSelf(BasicBlock* self);
+                BasicBlock* self();
 
-                virtual void link(BasicBlock& next) = 0;
+                void         setIndex(size_t& index);
+                virtual void finalize(size_t& index) = 0;
+
+                virtual void setLink(BasicBlock& next)                                             = 0;
+                virtual void updateLink(BasicBlock* former, BasicBlock* updated)                   = 0;
+                virtual void transferStatements(std::list<std::unique_ptr<Statement>>& statements) = 0;
+                virtual void simplify()                                                            = 0;
+
+                void                 registerIncomingLink(BasicBlock& block);
+                [[nodiscard]] size_t getIncomingLinkCount() const;
+                void                 updateIncomingLinks(BasicBlock* updated);
 
                 virtual void setContainingFunction(lang::Function* function) = 0;
 
@@ -88,9 +109,15 @@ namespace lang
                 virtual void prepareBuild(CompileContext* context, llvm::Function* native_function) = 0;
                 virtual void doBuild(CompileContext* context)                                       = 0;
 
-              public:
+                llvm::BasicBlock* getNativeBlock();
+
+              protected:
                 size_t            index_ {};
                 llvm::BasicBlock* native_block_ {};
+
+              private:
+                BasicBlock*              self_ {};
+                std::vector<BasicBlock*> incoming_links_ {};
             };
 
             class Empty : public Base
@@ -99,7 +126,13 @@ namespace lang
                 ~Empty() override = default;
 
               public:
-                void link(BasicBlock& next) override;
+                void finalize(size_t& index) override;
+
+                void setLink(BasicBlock& next) override;
+                void updateLink(BasicBlock* former, BasicBlock* updated) override;
+                void simplify() override;
+
+                void transferStatements(std::list<std::unique_ptr<Statement>>& statements) override;
 
                 void setContainingFunction(lang::Function* function) override;
 
@@ -119,7 +152,13 @@ namespace lang
                 ~Simple() override = default;
 
               public:
-                void link(BasicBlock& next) override;
+                void finalize(size_t& index) override;
+
+                void setLink(BasicBlock& next) override;
+                void updateLink(BasicBlock* former, BasicBlock* updated) override;
+                void simplify() override;
+
+                void transferStatements(std::list<std::unique_ptr<Statement>>& statements) override;
 
                 void setContainingFunction(lang::Function* function) override;
 
@@ -129,13 +168,14 @@ namespace lang
                 void doBuild(CompileContext* context) override;
 
               private:
-                std::vector<std::unique_ptr<Statement>> statements_ {};
-                lang::BasicBlock*                       next_ {nullptr};
+                std::list<std::unique_ptr<Statement>> statements_ {};
+                lang::BasicBlock*                     next_ {nullptr};
             };
         };
 
       private:
         std::unique_ptr<Definition::Base> definition_;
+        bool                              simplified_ {false};
         bool                              finalized_ {false};
     };
 }

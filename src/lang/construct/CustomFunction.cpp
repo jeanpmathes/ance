@@ -3,6 +3,7 @@
 #include <utility>
 
 #include <llvm/ADT/SmallVector.h>// critical, missing include will cause linking error
+#include <iostream>
 
 #include "lang/construct/Function.h"
 #include "lang/construct/Variable.h"
@@ -74,8 +75,14 @@ void lang::CustomFunction::addBlock(std::unique_ptr<lang::BasicBlock> block)
 
 void lang::CustomFunction::finalizeDefinition()
 {
+    initial_block_->simplify();
+
+    for (auto& block : blocks_) { block->simplify(); }
+
     size_t running_index = 0;
     initial_block_->finalize(running_index);
+
+    std::cout << "Finalizing blocks: " << std::to_string(running_index) << " in " << name() << std::endl;
 
     for (auto& block : blocks_) { block->finalize(running_index); }
 }
