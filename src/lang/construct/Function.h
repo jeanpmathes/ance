@@ -12,6 +12,7 @@
 #include "lang/construct/Parameter.h"
 #include "lang/construct/Signature.h"
 #include "lang/AccessModifier.h"
+#include "lang/construct/BasicBlock.h"
 
 namespace lang
 {
@@ -120,10 +121,15 @@ namespace lang
         [[nodiscard]] bool isMangled() const;
 
         /**
-         * Push a statement to the end of the statement list.
-         * @param statement The statement to add.
+         * Add a basic block to this function.
+         * @param block The block to add. If this is the first block added, it will be the entry block.
          */
-        void pushStatement(std::unique_ptr<Statement> statement);
+        void addBlock(std::unique_ptr<lang::BasicBlock> block);
+
+        /**
+         * Finalize the function definition. No blocks may be added after this.
+         */
+        void finalizeDefinition();
 
         /**
          * Add a return. Call this method in the build method of a statement.

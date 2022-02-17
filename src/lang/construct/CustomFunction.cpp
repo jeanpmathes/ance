@@ -34,6 +34,7 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
     , access_(access)
     , definition_location_(definition_location)
     , inside_scope_(std::make_unique<lang::LocalScope>(this->function()))
+    , initial_block_(lang::BasicBlock::createEmpty())
 {
     containing_scope->addType(return_type);
 
@@ -57,11 +58,66 @@ bool lang::CustomFunction::isMangled() const
     return true;
 }
 
-void lang::CustomFunction::pushStatement(std::unique_ptr<Statement> statement)
+void lang::CustomFunction::addBlock(std::unique_ptr<lang::BasicBlock> block)
 {
-    Statement* stmt = statement.get();
-    statements_.push_back(std::move(statement));
-    stmt->setContainingFunction(function());
+    lang::BasicBlock* block_ptr = block.get();
+    blocks_.push_back(std::move(block));
+
+    block_ptr->setContainingFunction(function());
+
+    if (entry_block_ == nullptr)
+    {
+        entry_block_ = block_ptr;
+        initial_block_->link(*entry_block_);
+    }
+}
+
+void lang::CustomFunction::finalizeDefinition()
+{
+    size_t running_index = 0;
+    initial_block_->finalize(running_index);
+
+    for (auto& block : blocks_) { block->finalize(running_index); }
+}
+
+void lang::CustomFunction::validate(ValidationLogger& validation_logger)
+{
+    if (!returnType()->isDefined())
+    {
+        validation_logger.logError("Return type " + returnType()->getAnnotatedName() + " not defined.",
+                                   returnTypeLocation());
+        return;
+    }
+
+    returnType()->validate(validation_logger, returnTypeLocation());
+
+    for (const auto& [parameter, argument] : llvm::zip(parameters(), arguments_))
+    {
+        if (!argument)
+        {
+            validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
+                                       parameter->location());
+        }
+
+        if (!parameter->type()->isDefined())
+        {
+            validation_logger.logError("Parameter type " + parameter->type()->getAnnotatedName() + " not defined.",
+                                       parameter->typeLocation());
+
+            return;
+        }
+
+        parameter->type()->validate(validation_logger, parameter->typeLocation());
+
+        if (parameter->type() == lang::VoidType::get())
+        {
+            validation_logger.logError("Parameter cannot have 'void' type", parameter->location());
+        }
+    }
+
+    inside_scope_->validate(validation_logger);
+
+    for (auto& block : blocks_) { block->validate(validation_logger); }
 }
 
 void lang::CustomFunction::createNativeBacking(CompileContext* context)
@@ -98,35 +154,29 @@ void lang::CustomFunction::createNativeBacking(CompileContext* context)
 
 void lang::CustomFunction::build(CompileContext* context)
 {
-    llvm::BasicBlock* entry = llvm::BasicBlock::Create(*context->llvmContext(), "entry", native_function_);
-    llvm::BasicBlock* code  = llvm::BasicBlock::Create(*context->llvmContext(), "code", native_function_);
+    llvm::BasicBlock* decl = llvm::BasicBlock::Create(*context->llvmContext(), "decl", native_function_);
 
-    context->ir()->SetInsertPoint(entry);
-
+    context->ir()->SetInsertPoint(decl);
     inside_scope_->buildDeclarations(context);// Arguments are also local variables in the function scope.
 
-    context->ir()->CreateBr(code);
-    context->ir()->SetInsertPoint(code);
+    llvm::BasicBlock* defs = llvm::BasicBlock::Create(*context->llvmContext(), "defs", native_function_);
 
+    context->ir()->CreateBr(defs);
+    context->ir()->SetInsertPoint(defs);
     for (auto& arg : arguments_) { (*arg)->buildDefinition(context); }
 
-    for (auto& statement : statements_)
+    initial_block_->prepareBuild(context, native_function_);
+    initial_block_->doBuild(context);
+
+    if (has_return_)
     {
-        statement->build(context);
-
-        if (has_return_)
+        if (return_value_)
         {
-            if (return_value_)
-            {
-                return_value_->buildContentValue(context);
-                context->ir()->CreateRet(return_value_->getContentValue());
-            }
-            else
-            {
-                context->ir()->CreateRetVoid();
-            }
-
-            break;
+            return_value_->buildContentValue(context);
+            context->ir()->CreateRet(return_value_->getContentValue());
+        }
+        else {
+            context->ir()->CreateRetVoid();
         }
     }
 
@@ -177,46 +227,6 @@ llvm::DISubprogram* lang::CustomFunction::debugSubprogram()
 lang::LocalScope* lang::CustomFunction::getInsideScope()
 {
     return inside_scope_.get();
-}
-
-void lang::CustomFunction::validate(ValidationLogger& validation_logger)
-{
-    if (!returnType()->isDefined())
-    {
-        validation_logger.logError("Return type " + returnType()->getAnnotatedName() + " not defined.",
-                                   returnTypeLocation());
-        return;
-    }
-
-    returnType()->validate(validation_logger, returnTypeLocation());
-
-    for (const auto& [parameter, argument] : llvm::zip(parameters(), arguments_))
-    {
-        if (!argument)
-        {
-            validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
-                                       parameter->location());
-        }
-
-        if (!parameter->type()->isDefined())
-        {
-            validation_logger.logError("Parameter type " + parameter->type()->getAnnotatedName() + " not defined.",
-                                       parameter->typeLocation());
-
-            return;
-        }
-
-        parameter->type()->validate(validation_logger, parameter->typeLocation());
-
-        if (parameter->type() == lang::VoidType::get())
-        {
-            validation_logger.logError("Parameter cannot have 'void' type", parameter->location());
-        }
-    }
-
-    inside_scope_->validate(validation_logger);
-
-    for (auto& statement : statements_) { statement->validate(validation_logger); }
 }
 
 llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext*)

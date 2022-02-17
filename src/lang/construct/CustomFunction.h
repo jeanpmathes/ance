@@ -43,7 +43,8 @@ namespace lang
 
         [[nodiscard]] bool isMangled() const override;
 
-        void pushStatement(std::unique_ptr<Statement> statement) override;
+        void addBlock(std::unique_ptr<lang::BasicBlock> block) override;
+        void finalizeDefinition() override;
         void addReturn(const std::shared_ptr<lang::Value>& value) override;
 
         void validate(ValidationLogger& validation_logger) override;
@@ -72,7 +73,10 @@ namespace lang
         std::unique_ptr<lang::LocalScope> inside_scope_;
 
         std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>> arguments_ {};
-        std::list<std::unique_ptr<Statement>>                             statements_ {};
+
+        std::unique_ptr<lang::BasicBlock>              initial_block_;
+        lang::BasicBlock*                              entry_block_ {nullptr};
+        std::vector<std::unique_ptr<lang::BasicBlock>> blocks_ {};
 
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};

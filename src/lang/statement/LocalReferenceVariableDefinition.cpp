@@ -9,7 +9,7 @@
 #include "validation/ValidationLogger.h"
 #include "lang/Assigner.h"
 
-LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferring(
+std::unique_ptr<LocalReferenceVariableDefinition> LocalReferenceVariableDefinition::defineReferring(
     std::string                       identifier,
     lang::ResolvingHandle<lang::Type> type,
     lang::Location                    type_location,
@@ -17,14 +17,15 @@ LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferr
     lang::Location                    location)
 {
     std::unique_ptr<Expression> reference = BindRef::refer(std::move(value), location);
-    return new LocalReferenceVariableDefinition(std::move(identifier),
-                                                type,
-                                                type_location,
-                                                std::move(reference),
-                                                location);
+    auto*                       def       = new LocalReferenceVariableDefinition(std::move(identifier),
+                                                     type,
+                                                     type_location,
+                                                     std::move(reference),
+                                                     location);
+    return std::unique_ptr<LocalReferenceVariableDefinition>(def);
 }
 
-LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferringTo(
+std::unique_ptr<LocalReferenceVariableDefinition> LocalReferenceVariableDefinition::defineReferringTo(
     std::string                       identifier,
     lang::ResolvingHandle<lang::Type> type,
     lang::Location                    type_location,
@@ -32,11 +33,12 @@ LocalReferenceVariableDefinition* LocalReferenceVariableDefinition::defineReferr
     lang::Location                    location)
 {
     std::unique_ptr<Expression> reference = BindRef::referTo(std::move(address), location);
-    return new LocalReferenceVariableDefinition(std::move(identifier),
-                                                type,
-                                                type_location,
-                                                std::move(reference),
-                                                location);
+    auto*                       def       = new LocalReferenceVariableDefinition(std::move(identifier),
+                                                     type,
+                                                     type_location,
+                                                     std::move(reference),
+                                                     location);
+    return std::unique_ptr<LocalReferenceVariableDefinition>(def);
 }
 
 LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string                       identifier,

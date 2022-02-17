@@ -91,9 +91,14 @@ bool lang::Function::isMangled() const
     return definition_->isMangled();
 }
 
-void lang::Function::pushStatement(std::unique_ptr<Statement> statement)
+void lang::Function::addBlock(std::unique_ptr<lang::BasicBlock> block)
 {
-    definition_->pushStatement(std::move(statement));
+    definition_->addBlock(std::move(block));
+}
+
+void lang::Function::finalizeDefinition()
+{
+    definition_->finalizeDefinition();
 }
 
 void lang::Function::addReturn(const std::shared_ptr<lang::Value>& value)

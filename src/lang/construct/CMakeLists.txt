@@ -2,6 +2,7 @@ add_subdirectory(constant)
 add_subdirectory(value)
 
 target_sources(ance PRIVATE
+               BasicBlock.cpp
                Function.cpp
                CustomFunction.cpp
                ExternFunction.cpp

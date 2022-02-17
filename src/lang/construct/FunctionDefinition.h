@@ -6,6 +6,7 @@
 #include "lang/construct/Parameter.h"
 #include "lang/construct/Signature.h"
 #include "lang/utility/Location.h"
+#include "lang/construct/BasicBlock.h"
 
 namespace lang
 {
@@ -97,10 +98,15 @@ namespace lang
         virtual void validate(ValidationLogger& validation_logger) = 0;
 
         /**
-         * Push a statement to the end of the statement list.
-         * @param statement The statement to add.
+         * Add a basic block to this function.
+         * @param block The basic block to add.
          */
-        virtual void pushStatement(std::unique_ptr<Statement> statement) = 0;
+        virtual void addBlock(std::unique_ptr<lang::BasicBlock> block) = 0;
+
+        /**
+         * Finalize the function definition.
+         */
+        virtual void finalizeDefinition();
 
         /**
          * Add a return. Call this method in the build method of a statement.

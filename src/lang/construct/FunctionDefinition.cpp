@@ -66,6 +66,8 @@ lang::Location lang::FunctionDefinition::location() const
     return location_;
 }
 
+void lang::FunctionDefinition::finalizeDefinition() {}
+
 bool lang::FunctionDefinition::validateCall(
     const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
     lang::Location                                                              location,
