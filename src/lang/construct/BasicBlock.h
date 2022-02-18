@@ -17,14 +17,14 @@ namespace lang
          * The empty block is meant as the initial block of a function.
          * @return The created basic block.
          */
-        static BasicBlock* createEmpty();
+        static std::unique_ptr<BasicBlock> createEmpty();
 
         /**
          * Create a simple basic block that contains a single statement, and no links.
          * @param statement The statement to add to the basic block.
          * @return The created basic block.
          */
-        static BasicBlock* createSimple(std::unique_ptr<Statement> statement);
+        static std::unique_ptr<BasicBlock> createSimple(Statement* statement);
 
         /**
          * Link this block to unconditionally jump to the given block.
@@ -73,7 +73,7 @@ namespace lang
         void                 registerIncomingLink(BasicBlock& next);
         void                 updateLink(BasicBlock* former, BasicBlock* updated);
         [[nodiscard]] size_t getIncomingLinkCount() const;
-        void                 transferStatements(std::list<std::unique_ptr<Statement>>& statements);
+        void                 transferStatements(std::list<Statement*>& statements);
 
         BasicBlock() = default;
 
@@ -95,7 +95,7 @@ namespace lang
 
                 virtual void setLink(BasicBlock& next)                                             = 0;
                 virtual void updateLink(BasicBlock* former, BasicBlock* updated)                   = 0;
-                virtual void transferStatements(std::list<std::unique_ptr<Statement>>& statements) = 0;
+                virtual void transferStatements(std::list<Statement*>& statements)                 = 0;
                 virtual void simplify()                                                            = 0;
 
                 void                 registerIncomingLink(BasicBlock& block);
@@ -132,7 +132,7 @@ namespace lang
                 void updateLink(BasicBlock* former, BasicBlock* updated) override;
                 void simplify() override;
 
-                void transferStatements(std::list<std::unique_ptr<Statement>>& statements) override;
+                void transferStatements(std::list<Statement*>& statements) override;
 
                 void setContainingFunction(lang::Function* function) override;
 
@@ -148,7 +148,7 @@ namespace lang
             class Simple : public Base
             {
               public:
-                explicit Simple(std::unique_ptr<Statement> statement);
+                explicit Simple(Statement* statement);
                 ~Simple() override = default;
 
               public:
@@ -158,7 +158,7 @@ namespace lang
                 void updateLink(BasicBlock* former, BasicBlock* updated) override;
                 void simplify() override;
 
-                void transferStatements(std::list<std::unique_ptr<Statement>>& statements) override;
+                void transferStatements(std::list<Statement*>& statements) override;
 
                 void setContainingFunction(lang::Function* function) override;
 
@@ -168,8 +168,8 @@ namespace lang
                 void doBuild(CompileContext* context) override;
 
               private:
-                std::list<std::unique_ptr<Statement>> statements_ {};
-                lang::BasicBlock*                     next_ {nullptr};
+                std::list<Statement*> statements_ {};
+                lang::BasicBlock*     next_ {nullptr};
             };
         };
 

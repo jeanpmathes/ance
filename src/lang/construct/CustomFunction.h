@@ -43,7 +43,7 @@ namespace lang
 
         [[nodiscard]] bool isMangled() const override;
 
-        void addBlock(std::unique_ptr<lang::BasicBlock> block) override;
+        void pushStatement(std::unique_ptr<Statement> statement) override;
         void finalizeDefinition() override;
         void addReturn(const std::shared_ptr<lang::Value>& value) override;
 
@@ -67,12 +67,16 @@ namespace lang
         using FunctionDefinition::buildCall;
 
       private:
+        void addBlock(std::unique_ptr<lang::BasicBlock> block);
+
+      private:
         lang::AccessModifier access_;
         lang::Location       definition_location_;
 
         std::unique_ptr<lang::LocalScope> inside_scope_;
 
         std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>> arguments_ {};
+        std::vector<std::unique_ptr<Statement>>                           statements_ {};
 
         std::unique_ptr<lang::BasicBlock>              initial_block_;
         lang::BasicBlock*                              entry_block_ {nullptr};

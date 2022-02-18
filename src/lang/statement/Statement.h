@@ -10,6 +10,7 @@ namespace lang
 {
     class Function;
     class Scope;
+    class BasicBlock;
 }
 
 class CompileContext;
@@ -26,6 +27,12 @@ class Statement
      * @param location The source location.
      */
     explicit Statement(lang::Location location);
+
+    /**
+     * Create a basic block containing this statement.
+     * @return The basic block.
+     */
+    virtual std::unique_ptr<lang::BasicBlock> createBlock();
 
     /**
      * Set the function that contains this statement.

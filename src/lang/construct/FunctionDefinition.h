@@ -98,10 +98,10 @@ namespace lang
         virtual void validate(ValidationLogger& validation_logger) = 0;
 
         /**
-         * Add a basic block to this function.
-         * @param block The basic block to add.
+         * Add a statement to this function.
+         * @param statement The statement to add.
          */
-        virtual void addBlock(std::unique_ptr<lang::BasicBlock> block) = 0;
+        virtual void pushStatement(std::unique_ptr<Statement> statement) = 0;
 
         /**
          * Finalize the function definition.

@@ -2,24 +2,24 @@
 
 #include "compiler/CompileContext.h"
 
-lang::BasicBlock* lang::BasicBlock::createEmpty()
+std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createEmpty()
 {
-    auto block         = new BasicBlock();
+    auto block = new BasicBlock();
 
     block->definition_ = std::make_unique<Definition::Empty>();
     block->definition_->setSelf(block);
 
-    return block;
+    return std::unique_ptr<BasicBlock>(block);
 }
 
-lang::BasicBlock* lang::BasicBlock::createSimple(std::unique_ptr<Statement> statement)
+std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createSimple(Statement* statement)
 {
-    auto block         = new BasicBlock();
+    auto block = new BasicBlock();
 
-    block->definition_ = std::make_unique<Definition::Simple>(std::move(statement));
+    block->definition_ = std::make_unique<Definition::Simple>(statement);
     block->definition_->setSelf(block);
 
-    return block;
+    return std::unique_ptr<BasicBlock>(block);
 }
 
 void lang::BasicBlock::link(lang::BasicBlock& next)
@@ -86,7 +86,7 @@ size_t lang::BasicBlock::getIncomingLinkCount() const
     return definition_->getIncomingLinkCount();
 }
 
-void lang::BasicBlock::transferStatements(std::list<std::unique_ptr<Statement>>& statements)
+void lang::BasicBlock::transferStatements(std::list<Statement*>& statements)
 {
     definition_->transferStatements(statements);
 }
@@ -154,7 +154,7 @@ void lang::BasicBlock::Definition::Empty::updateLink(lang::BasicBlock* former, l
     next_->registerIncomingLink(*self());
 }
 
-void lang::BasicBlock::Definition::Empty::transferStatements(std::list<std::unique_ptr<Statement>>&)
+void lang::BasicBlock::Definition::Empty::transferStatements(std::list<Statement*>&)
 {
     assert(false);
 }
@@ -188,9 +188,9 @@ void lang::BasicBlock::Definition::Empty::doBuild(CompileContext* context)
     }
 }
 
-lang::BasicBlock::Definition::Simple::Simple(std::unique_ptr<Statement> statement)
+lang::BasicBlock::Definition::Simple::Simple(Statement* statement)
 {
-    statements_.push_back(std::move(statement));
+    statements_.push_back(statement);
 }
 
 void lang::BasicBlock::Definition::Simple::finalize(size_t& index)
@@ -218,7 +218,7 @@ void lang::BasicBlock::Definition::Simple::updateLink(lang::BasicBlock* former, 
     next_->registerIncomingLink(*self());
 }
 
-void lang::BasicBlock::Definition::Simple::transferStatements(std::list<std::unique_ptr<Statement>>& statements)
+void lang::BasicBlock::Definition::Simple::transferStatements(std::list<Statement*>& statements)
 {
     statements_.splice(statements_.begin(), statements);
 }

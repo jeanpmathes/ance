@@ -35,7 +35,7 @@ bool lang::ExternFunction::isMangled() const
     return false;
 }
 
-void lang::ExternFunction::addBlock(std::unique_ptr<lang::BasicBlock>) {}
+void lang::ExternFunction::pushStatement(std::unique_ptr<Statement> statement) {}
 void lang::ExternFunction::addReturn(const std::shared_ptr<lang::Value>&) {}
 
 void lang::ExternFunction::validate(ValidationLogger& validation_logger)

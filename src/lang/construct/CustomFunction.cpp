@@ -3,10 +3,8 @@
 #include <utility>
 
 #include <llvm/ADT/SmallVector.h>// critical, missing include will cause linking error
-#include <iostream>
 
 #include "lang/construct/Function.h"
-#include "lang/construct/Variable.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/statement/Statement.h"
@@ -59,6 +57,34 @@ bool lang::CustomFunction::isMangled() const
     return true;
 }
 
+void lang::CustomFunction::pushStatement(std::unique_ptr<Statement> statement)
+{
+    statements_.push_back(std::move(statement));
+}
+
+void lang::CustomFunction::finalizeDefinition()
+{
+    lang::BasicBlock* previous_block = nullptr;
+
+    for (auto& statement : statements_)
+    {
+        auto block = statement->createBlock();
+        if (previous_block) previous_block->link(*block);
+
+        previous_block = block.get();
+        addBlock(std::move(block));
+    }
+
+    initial_block_->simplify();
+
+    for (auto& block : blocks_) { block->simplify(); }
+
+    size_t running_index = 0;
+    initial_block_->finalize(running_index);
+
+    for (auto& block : blocks_) { block->finalize(running_index); }
+}
+
 void lang::CustomFunction::addBlock(std::unique_ptr<lang::BasicBlock> block)
 {
     lang::BasicBlock* block_ptr = block.get();
@@ -71,20 +97,6 @@ void lang::CustomFunction::addBlock(std::unique_ptr<lang::BasicBlock> block)
         entry_block_ = block_ptr;
         initial_block_->link(*entry_block_);
     }
-}
-
-void lang::CustomFunction::finalizeDefinition()
-{
-    initial_block_->simplify();
-
-    for (auto& block : blocks_) { block->simplify(); }
-
-    size_t running_index = 0;
-    initial_block_->finalize(running_index);
-
-    std::cout << "Finalizing blocks: " << std::to_string(running_index) << " in " << name() << std::endl;
-
-    for (auto& block : blocks_) { block->finalize(running_index); }
 }
 
 void lang::CustomFunction::validate(ValidationLogger& validation_logger)

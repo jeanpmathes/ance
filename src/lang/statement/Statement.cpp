@@ -2,6 +2,7 @@
 
 #include "lang/construct/Function.h"
 #include "compiler/CompileContext.h"
+#include "lang/construct/BasicBlock.h"
 
 Statement::Statement(lang::Location location) : location_(location) {}
 
@@ -11,6 +12,11 @@ void Statement::setContainingFunction(lang::Function* function)
     function_ = function;
 
     setFunction(function);
+}
+
+std::unique_ptr<lang::BasicBlock> Statement::createBlock()
+{
+    return lang::BasicBlock::createSimple(this);
 }
 
 void Statement::setFunction(lang::Function*) {}

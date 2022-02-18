@@ -91,9 +91,9 @@ bool lang::Function::isMangled() const
     return definition_->isMangled();
 }
 
-void lang::Function::addBlock(std::unique_ptr<lang::BasicBlock> block)
+void lang::Function::pushStatement(std::unique_ptr<Statement> statement)
 {
-    definition_->addBlock(std::move(block));
+    definition_->pushStatement(std::move(statement));
 }
 
 void lang::Function::finalizeDefinition()

@@ -121,10 +121,10 @@ namespace lang
         [[nodiscard]] bool isMangled() const;
 
         /**
-         * Add a basic block to this function.
-         * @param block The block to add. If this is the first block added, it will be the entry block.
+         * Add a statement to this function. This is only valid before finalization.
+         * @param statement The function to add.
          */
-        void addBlock(std::unique_ptr<lang::BasicBlock> block);
+        void pushStatement(std::unique_ptr<Statement> statement);
 
         /**
          * Finalize the function definition. No blocks may be added after this.
