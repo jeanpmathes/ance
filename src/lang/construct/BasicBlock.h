@@ -175,8 +175,10 @@ namespace lang
 
       private:
         std::unique_ptr<Definition::Base> definition_;
+
         bool                              simplified_ {false};
         bool                              finalized_ {false};
+        bool                              validated_ {false};
     };
 }
 

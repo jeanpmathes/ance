@@ -34,7 +34,10 @@ void lang::BasicBlock::Definition::Empty::simplify()
 
 void lang::BasicBlock::Definition::Empty::setContainingFunction(lang::Function*) {}
 
-void lang::BasicBlock::Definition::Empty::validate(ValidationLogger&) {}
+void lang::BasicBlock::Definition::Empty::validate(ValidationLogger& validation_logger)
+{
+    if (next_) next_->validate(validation_logger);
+}
 
 void lang::BasicBlock::Definition::Empty::prepareBuild(CompileContext* context, llvm::Function* native_function)
 {

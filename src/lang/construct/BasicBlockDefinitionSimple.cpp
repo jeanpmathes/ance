@@ -60,6 +60,8 @@ void lang::BasicBlock::Definition::Simple::setContainingFunction(lang::Function*
 void lang::BasicBlock::Definition::Simple::validate(ValidationLogger& validation_logger)
 {
     for (auto& statement : statements_) { statement->validate(validation_logger); }
+
+    if (next_) { next_->validate(validation_logger); }
 }
 
 void lang::BasicBlock::Definition::Simple::prepareBuild(CompileContext* context, llvm::Function* native_function)

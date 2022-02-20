@@ -136,6 +136,8 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger)
 
     inside_scope_->validate(validation_logger);
 
+    initial_block_->validate(validation_logger);
+
     for (auto& block : blocks_) { block->validate(validation_logger); }
 }
 

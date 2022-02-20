@@ -56,6 +56,10 @@ void lang::BasicBlock::finalize(size_t& index)
 void lang::BasicBlock::validate(ValidationLogger& validation_logger)
 {
     assert(finalized_);
+
+    if (validated_) return;
+    validated_ = true;
+
     definition_->validate(validation_logger);
 }
 
