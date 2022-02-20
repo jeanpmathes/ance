@@ -211,6 +211,7 @@ namespace lang
 
       private:
         std::unique_ptr<Definition::Base> definition_;
+        lang::Function*                   containing_function_ {nullptr};
 
         bool                              simplified_ {false};
         bool                              finalized_ {false};

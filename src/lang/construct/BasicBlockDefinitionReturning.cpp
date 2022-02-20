@@ -76,6 +76,7 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext* context)
     if (return_value_)
     {
         std::shared_ptr<lang::Value> return_value = return_value_->getValue();
+        return_value = lang::Type::makeMatching(self()->containing_function_->returnType(), return_value, context);
 
         return_value->buildContentValue(context);
         context->ir()->CreateRet(return_value->getContentValue());

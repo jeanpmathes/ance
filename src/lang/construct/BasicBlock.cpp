@@ -51,6 +51,8 @@ void lang::BasicBlock::simplify()
 void lang::BasicBlock::setContainingFunction(lang::Function* function)
 {
     assert(!finalized_);
+
+    containing_function_ = function;
     definition_->setContainingFunction(function);
 }
 

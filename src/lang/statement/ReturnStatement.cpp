@@ -17,11 +17,7 @@ std::unique_ptr<lang::BasicBlock> ReturnStatement::createBlock()
 
 void ReturnStatement::setFunction(lang::Function*)
 {
-    /*
-
-    return_value_->setContainingScope(function);
-
-     */
+    // Handled by basic block.
 }
 
 void ReturnStatement::validate(ValidationLogger&)
@@ -48,17 +44,5 @@ void ReturnStatement::validate(ValidationLogger&)
 
 void ReturnStatement::doBuild(CompileContext*)
 {
-    /*
-
-    std::shared_ptr<lang::Value> return_value = nullptr;
-
-    if (return_value_)
-    {
-        return_value = return_value_->getValue();
-        return_value = lang::Type::makeMatching(getContainingFunction()->returnType(), return_value, context);
-    }
-
-    getContainingFunction()->addReturn(return_value);
-
-     */
+    // Handled by basic block.
 }

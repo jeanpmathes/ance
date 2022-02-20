@@ -32,6 +32,12 @@ public main () : ui32
     return 0:32;
 }
 
+private get_quad() : quad
+{
+    // The return statement also allows implicit conversion of its value.
+    return 1.0h;
+}
+
 public exit (exitcode: ui32)
 {
      ExitProcess(exitcode);
