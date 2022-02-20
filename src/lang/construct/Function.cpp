@@ -101,11 +101,6 @@ void lang::Function::finalizeDefinition()
     definition_->finalizeDefinition();
 }
 
-void lang::Function::addReturn(const std::shared_ptr<lang::Value>& value)
-{
-    definition_->addReturn(value);
-}
-
 void lang::Function::validate(ValidationLogger& validation_logger)
 {
     definition_->validate(validation_logger);

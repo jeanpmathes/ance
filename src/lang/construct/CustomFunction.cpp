@@ -189,44 +189,8 @@ void lang::CustomFunction::build(CompileContext* context)
     initial_block_->prepareBuild(context, native_function_);
     initial_block_->doBuild(context);
 
-    if (has_return_)
-    {
-        if (return_value_)
-        {
-            return_value_->buildContentValue(context);
-            context->ir()->CreateRet(return_value_->getContentValue());
-        }
-        else {
-            context->ir()->CreateRetVoid();
-        }
-    }
-
-    if (!has_return_)
-    {
-        if (returnType()->isVoidType()) { context->ir()->CreateRetVoid(); }
-        else {
-            // todo should actually be part of validation step
-            assert(false && "Functions with return type that is not void require a return statement.");
-        }
-    }
-
     context->ir()->SetCurrentDebugLocation(llvm::DebugLoc());
     context->di()->finalizeSubprogram(native_function_->getSubprogram());
-}
-
-void lang::CustomFunction::addReturn(const std::shared_ptr<lang::Value>& value)
-{
-    if (value)
-    {
-        assert(lang::Type::areSame(value->type(), returnType()));
-        return_value_ = lang::Type::makeActual(value);
-        has_return_   = true;
-    }
-    else {
-        assert(returnType()->isVoidType());
-        return_value_ = nullptr;
-        has_return_   = true;
-    }
 }
 
 std::shared_ptr<lang::Value> lang::CustomFunction::buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,

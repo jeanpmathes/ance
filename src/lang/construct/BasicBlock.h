@@ -2,6 +2,7 @@
 #define ANCE_SRC_LANG_CONSTRUCT_BASICBLOCK_H_
 
 #include "lang/statement/Statement.h"
+#include "lang/construct/value/Value.h"
 
 namespace lang
 {
@@ -25,6 +26,13 @@ namespace lang
          * @return The created basic block.
          */
         static std::unique_ptr<BasicBlock> createSimple(Statement* statement);
+
+        /**
+         * Create a basic block that returns from the function.
+         * @param expression The expression providing the return value, or nullptr if no value is returned.
+         * @return The created basic block.
+         */
+        static std::unique_ptr<BasicBlock> createReturning(Expression* expression);
 
         /**
          * Link this block to unconditionally jump to the given block.
@@ -170,6 +178,34 @@ namespace lang
               private:
                 std::list<Statement*> statements_ {};
                 lang::BasicBlock*     next_ {nullptr};
+            };
+
+            class Returning : public Base
+            {
+              public:
+                explicit Returning(Expression* return_value);
+                ~Returning() override = default;
+
+              public:
+                void finalize(size_t& index) override;
+
+                void setLink(BasicBlock& next) override;
+                void updateLink(BasicBlock* former, BasicBlock* updated) override;
+                void simplify() override;
+
+                void transferStatements(std::list<Statement*>& statements) override;
+
+                void setContainingFunction(lang::Function* function) override;
+
+                void validate(ValidationLogger& validation_logger) override;
+
+                void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
+                void doBuild(CompileContext* context) override;
+
+              private:
+                std::list<Statement*> statements_ {};
+                lang::BasicBlock*     unreachable_next_ {nullptr};
+                Expression*           return_value_;
             };
         };
 

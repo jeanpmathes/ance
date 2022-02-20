@@ -131,12 +131,6 @@ namespace lang
          */
         void finalizeDefinition();
 
-        /**
-         * Add a return. Call this method in the build method of a statement.
-         * @param value The value to return or nullptr if nothing is returned.
-         */
-        void addReturn(const std::shared_ptr<lang::Value>& value = nullptr);
-
         void validate(ValidationLogger& validation_logger) override;
 
         /**

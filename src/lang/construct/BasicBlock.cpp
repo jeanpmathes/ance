@@ -22,6 +22,16 @@ std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createSimple(Statement* stat
     return std::unique_ptr<BasicBlock>(block);
 }
 
+std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createReturning(Expression* expression)
+{
+    auto block = new BasicBlock();
+
+    block->definition_ = std::make_unique<Definition::Returning>(expression);
+    block->definition_->setSelf(block);
+
+    return std::unique_ptr<BasicBlock>(block);
+}
+
 void lang::BasicBlock::link(lang::BasicBlock& next)
 {
     assert(!finalized_);

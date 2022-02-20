@@ -5,6 +5,7 @@ target_sources(ance PRIVATE
                BasicBlock.cpp
                BasicBlockDefinitionSimple.cpp
                BasicBlockDefinitionEmpty.cpp
+               BasicBlockDefinitionReturning.cpp
                Function.cpp
                CustomFunction.cpp
                ExternFunction.cpp

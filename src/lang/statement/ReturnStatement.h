@@ -18,6 +18,8 @@ class ReturnStatement : public Statement
      */
     ReturnStatement(std::unique_ptr<Expression> return_value, lang::Location location);
 
+    std::unique_ptr<lang::BasicBlock> createBlock() override;
+
     void setFunction(lang::Function* function) override;
 
     void validate(ValidationLogger& validation_logger) override;

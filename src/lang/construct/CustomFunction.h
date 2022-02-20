@@ -45,7 +45,6 @@ namespace lang
 
         void pushStatement(std::unique_ptr<Statement> statement) override;
         void finalizeDefinition() override;
-        void addReturn(const std::shared_ptr<lang::Value>& value) override;
 
         void validate(ValidationLogger& validation_logger) override;
 
@@ -84,9 +83,6 @@ namespace lang
 
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};
-
-        std::shared_ptr<lang::Value> return_value_ {};
-        bool                         has_return_ {false};
     };
 }
 

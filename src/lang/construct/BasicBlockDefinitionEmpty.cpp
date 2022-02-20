@@ -57,4 +57,7 @@ void lang::BasicBlock::Definition::Empty::doBuild(CompileContext* context)
         context->ir()->CreateBr(next_->definition_->getNativeBlock());
         next_->doBuild(context);
     }
+    else {
+        context->ir()->CreateRetVoid();
+    }
 }

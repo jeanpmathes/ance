@@ -36,7 +36,6 @@ bool lang::ExternFunction::isMangled() const
 }
 
 void lang::ExternFunction::pushStatement(std::unique_ptr<Statement>) {}
-void lang::ExternFunction::addReturn(const std::shared_ptr<lang::Value>&) {}
 
 void lang::ExternFunction::validate(ValidationLogger& validation_logger)
 {

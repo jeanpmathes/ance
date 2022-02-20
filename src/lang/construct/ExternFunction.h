@@ -26,7 +26,6 @@ namespace lang
         [[nodiscard]] bool isMangled() const override;
 
         void pushStatement(std::unique_ptr<Statement> statement) override;
-        void addReturn(const std::shared_ptr<lang::Value>& value) override;
 
         void validate(ValidationLogger& validation_logger) override;
 

@@ -109,12 +109,6 @@ namespace lang
         virtual void finalizeDefinition();
 
         /**
-         * Add a return. Call this method in the build method of a statement.
-         * @param value The value to return or nullptr if nothing is returned.
-         */
-        virtual void addReturn(const std::shared_ptr<lang::Value>& value) = 0;
-
-        /**
          * Create the native content of this function, allowing building function code and calling this function.
          * @param context The current compile context.
          */

@@ -32,11 +32,6 @@ void lang::BasicBlock::Definition::Simple::updateLink(lang::BasicBlock* former, 
     next_->registerIncomingLink(*self());
 }
 
-void lang::BasicBlock::Definition::Simple::transferStatements(std::list<Statement*>& statements)
-{
-    statements_.splice(statements_.begin(), statements);
-}
-
 void lang::BasicBlock::Definition::Simple::simplify()
 {
     if (!next_) { return; }
@@ -50,6 +45,11 @@ void lang::BasicBlock::Definition::Simple::simplify()
     }
 
     next_->simplify();
+}
+
+void lang::BasicBlock::Definition::Simple::transferStatements(std::list<Statement*>& statements)
+{
+    statements_.splice(statements_.begin(), statements);
 }
 
 void lang::BasicBlock::Definition::Simple::setContainingFunction(lang::Function* function)
@@ -82,5 +82,8 @@ void lang::BasicBlock::Definition::Simple::doBuild(CompileContext* context)
     {
         context->ir()->CreateBr(next_->definition_->getNativeBlock());
         next_->doBuild(context);
+    }
+    else {
+        context->ir()->CreateRetVoid();
     }
 }
