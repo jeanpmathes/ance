@@ -2,6 +2,11 @@
 
 #include "compiler/CompileContext.h"
 
+void lang::BasicBlock::Definition::Empty::finalize(size_t& index)
+{
+    if (next_) next_->finalize(index);
+}
+
 void lang::BasicBlock::Definition::Empty::setLink(lang::BasicBlock& next)
 {
     lang::BasicBlock* next_ptr = &next;
@@ -37,6 +42,18 @@ void lang::BasicBlock::Definition::Empty::setContainingFunction(lang::Function*)
 void lang::BasicBlock::Definition::Empty::validate(ValidationLogger& validation_logger)
 {
     if (next_) next_->validate(validation_logger);
+}
+
+std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Empty::getLeaves()
+{
+    std::list<lang::BasicBlock*> leaves;
+
+    if (next_) { leaves.splice(leaves.end(), next_->getLeaves()); }
+    else {
+        leaves.push_back(self());
+    }
+
+    return leaves;
 }
 
 void lang::BasicBlock::Definition::Empty::prepareBuild(CompileContext* context, llvm::Function* native_function)

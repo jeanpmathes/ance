@@ -59,6 +59,22 @@ void lang::BasicBlock::Definition::Returning::validate(ValidationLogger& validat
     if (unreachable_next_) { unreachable_next_->validate(validation_logger); }
 }
 
+std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Returning::getLeaves()
+{
+    std::list<lang::BasicBlock*> leaves;
+
+    leaves.push_back(self());
+
+    return leaves;
+}
+
+std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> lang::BasicBlock::Definition::Returning::
+    getReturnValue()
+{
+    return return_value_ ? std::make_optional(std::make_pair(return_value_->getValue(), return_value_->location()))
+                         : std::nullopt;
+}
+
 void lang::BasicBlock::Definition::Returning::prepareBuild(CompileContext* context, llvm::Function* native_function)
 {
     std::string name = "b" + std::to_string(index_);

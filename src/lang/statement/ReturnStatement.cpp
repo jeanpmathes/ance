@@ -22,24 +22,7 @@ void ReturnStatement::setFunction(lang::Function*)
 
 void ReturnStatement::validate(ValidationLogger&)
 {
-    /*
-
-    if (return_value_)
-    {
-        if (getContainingFunction()->returnType()->isVoidType())
-        {
-            validation_logger.logError("Cannot return value in void function '" + getContainingFunction()->name() + "'",
-                                       location());
-        }
-        else if (return_value_->validate(validation_logger)) {
-            lang::Type::checkMismatch(getContainingFunction()->returnType(),
-                                      return_value_->type(),
-                                      return_value_->location(),
-                                      validation_logger);
-        }
-    }
-
-     */
+    // Handled by basic block.
 }
 
 void ReturnStatement::doBuild(CompileContext*)

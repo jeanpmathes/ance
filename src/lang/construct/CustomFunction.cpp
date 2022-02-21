@@ -139,6 +139,26 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger)
     initial_block_->validate(validation_logger);
 
     for (auto& block : blocks_) { block->validate(validation_logger); }
+
+    std::list<lang::BasicBlock*> final_blocks = initial_block_->getLeaves();
+
+    for (auto* block : final_blocks)
+    {
+        std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> return_value = block->getReturnValue();
+
+        if (return_value)
+        {
+            auto& [value, location] = *return_value;
+
+            if (returnType()->isVoidType())
+            {
+                validation_logger.logError("Cannot return value in void function '" + name() + "'", this->location());
+            }
+            else {
+                lang::Type::checkMismatch(returnType(), value->type(), location, validation_logger);
+            }
+        }
+    }
 }
 
 void lang::CustomFunction::createNativeBacking(CompileContext* context)

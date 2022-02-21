@@ -65,6 +65,19 @@ namespace lang
         void validate(ValidationLogger& validation_logger);
 
         /**
+         * Get all leaves of this basic block. A leave is a basic block that is not followed by any other block.
+         * @return The leaves of this basic block.
+         */
+        std::list<lang::BasicBlock*> getLeaves();
+
+        /**
+         * Get the return value of this basic block. If this is not a return block, an empty optional is returned.
+         * If this is a return block, but no value is returned, the optional contains a nullptr.
+         * @return The return value of this basic block.
+         */
+        std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue();
+
+        /**
          * Prepare building this basic block, and all following blocks.
          * @param context The current compilation context.
          * @param native_function The native function to build into.
@@ -112,7 +125,9 @@ namespace lang
 
                 virtual void setContainingFunction(lang::Function* function) = 0;
 
-                virtual void validate(ValidationLogger& validation_logger) = 0;
+                virtual void                         validate(ValidationLogger& validation_logger) = 0;
+                virtual std::list<lang::BasicBlock*> getLeaves()                                   = 0;
+                virtual std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue();
 
                 virtual void prepareBuild(CompileContext* context, llvm::Function* native_function) = 0;
                 virtual void doBuild(CompileContext* context)                                       = 0;
@@ -144,7 +159,8 @@ namespace lang
 
                 void setContainingFunction(lang::Function* function) override;
 
-                void validate(ValidationLogger& validation_logger) override;
+                void                         validate(ValidationLogger& validation_logger) override;
+                std::list<lang::BasicBlock*> getLeaves() override;
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
@@ -170,7 +186,8 @@ namespace lang
 
                 void setContainingFunction(lang::Function* function) override;
 
-                void validate(ValidationLogger& validation_logger) override;
+                void                         validate(ValidationLogger& validation_logger) override;
+                std::list<lang::BasicBlock*> getLeaves() override;
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
@@ -197,7 +214,9 @@ namespace lang
 
                 void setContainingFunction(lang::Function* function) override;
 
-                void validate(ValidationLogger& validation_logger) override;
+                void                         validate(ValidationLogger& validation_logger) override;
+                std::list<lang::BasicBlock*> getLeaves() override;
+                std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue() override;
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
@@ -211,7 +230,8 @@ namespace lang
 
       private:
         std::unique_ptr<Definition::Base> definition_;
-        lang::Function*                   containing_function_ {nullptr};
+        lang::Function*                             containing_function_ {nullptr};
+        std::optional<std::list<lang::BasicBlock*>> leaves_ {};
 
         bool                              simplified_ {false};
         bool                              finalized_ {false};

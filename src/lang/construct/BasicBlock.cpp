@@ -75,6 +75,22 @@ void lang::BasicBlock::validate(ValidationLogger& validation_logger)
     definition_->validate(validation_logger);
 }
 
+std::list<lang::BasicBlock*> lang::BasicBlock::getLeaves()
+{
+    assert(finalized_);
+    assert(simplified_);
+
+    if (!leaves_.has_value()) { leaves_ = definition_->getLeaves(); }
+
+    return leaves_.value();
+}
+
+std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> lang::BasicBlock::getReturnValue()
+{
+    assert(finalized_);
+    return definition_->getReturnValue();
+}
+
 void lang::BasicBlock::prepareBuild(CompileContext* context, llvm::Function* native_function)
 {
     assert(finalized_);
@@ -140,12 +156,13 @@ void lang::BasicBlock::Definition::Base::updateIncomingLinks(lang::BasicBlock* u
     incoming_links_.clear();
 }
 
+std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> lang::BasicBlock::Definition::Base::
+    getReturnValue()
+{
+    return std::nullopt;
+}
+
 llvm::BasicBlock* lang::BasicBlock::Definition::Base::getNativeBlock()
 {
     return native_block_;
-}
-
-void lang::BasicBlock::Definition::Empty::finalize(size_t& index)
-{
-    if (next_) next_->finalize(index);
 }
