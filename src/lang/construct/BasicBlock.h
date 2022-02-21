@@ -30,9 +30,10 @@ namespace lang
         /**
          * Create a basic block that returns from the function.
          * @param expression The expression providing the return value, or nullptr if no value is returned.
+         * @param return_location The location of the return statement.
          * @return The created basic block.
          */
-        static std::unique_ptr<BasicBlock> createReturning(Expression* expression);
+        static std::unique_ptr<BasicBlock> createReturning(Expression* expression, lang::Location return_location);
 
         /**
          * Link this block to unconditionally jump to the given block.
@@ -76,6 +77,12 @@ namespace lang
          * @return The return value of this basic block.
          */
         std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue();
+
+        /**
+         * Get the location of the last statement in this basic block.
+         * @return The location, or a global location if no statements are present.
+         */
+        lang::Location getEndLocation();
 
         /**
          * Prepare building this basic block, and all following blocks.
@@ -128,6 +135,7 @@ namespace lang
                 virtual void                         validate(ValidationLogger& validation_logger) = 0;
                 virtual std::list<lang::BasicBlock*> getLeaves()                                   = 0;
                 virtual std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue();
+                virtual lang::Location                                                         getEndLocation() = 0;
 
                 virtual void prepareBuild(CompileContext* context, llvm::Function* native_function) = 0;
                 virtual void doBuild(CompileContext* context)                                       = 0;
@@ -161,6 +169,7 @@ namespace lang
 
                 void                         validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*> getLeaves() override;
+                lang::Location               getEndLocation() override;
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
@@ -188,6 +197,7 @@ namespace lang
 
                 void                         validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*> getLeaves() override;
+                lang::Location               getEndLocation() override;
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
@@ -200,7 +210,7 @@ namespace lang
             class Returning : public Base
             {
               public:
-                explicit Returning(Expression* return_value);
+                explicit Returning(Expression* return_value, lang::Location return_location);
                 ~Returning() override = default;
 
               public:
@@ -217,6 +227,7 @@ namespace lang
                 void                         validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*> getLeaves() override;
                 std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue() override;
+                lang::Location                                                         getEndLocation() override;
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
@@ -225,6 +236,7 @@ namespace lang
                 std::list<Statement*> statements_ {};
                 lang::BasicBlock*     unreachable_next_ {nullptr};
                 Expression*           return_value_;
+                lang::Location        return_location_;
             };
         };
 

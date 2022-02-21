@@ -6,7 +6,10 @@
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
 
-lang::BasicBlock::Definition::Returning::Returning(Expression* return_value) : return_value_(return_value) {}
+lang::BasicBlock::Definition::Returning::Returning(Expression* return_value, lang::Location return_location)
+    : return_value_(return_value)
+    , return_location_(return_location)
+{}
 
 void lang::BasicBlock::Definition::Returning::finalize(size_t& index)
 {
@@ -71,8 +74,17 @@ std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Returning::getLeaves(
 std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> lang::BasicBlock::Definition::Returning::
     getReturnValue()
 {
-    return return_value_ ? std::make_optional(std::make_pair(return_value_->getValue(), return_value_->location()))
-                         : std::nullopt;
+    lang::Location               location = return_value_ ? return_value_->location() : return_location_;
+    std::shared_ptr<lang::Value> value    = return_value_ ? return_value_->getValue() : nullptr;
+
+    return std::make_pair(value, location);
+}
+
+lang::Location lang::BasicBlock::Definition::Returning::getEndLocation()
+{
+    if (statements_.empty()) { return {0, 0, 0, 0}; }
+
+    return statements_.back()->location();
 }
 
 void lang::BasicBlock::Definition::Returning::prepareBuild(CompileContext* context, llvm::Function* native_function)
@@ -101,3 +113,4 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext* context)
         context->ir()->CreateRetVoid();
     }
 }
+

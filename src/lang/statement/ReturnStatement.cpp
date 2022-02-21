@@ -12,7 +12,7 @@ ReturnStatement::ReturnStatement(std::unique_ptr<Expression> return_value, lang:
 
 std::unique_ptr<lang::BasicBlock> ReturnStatement::createBlock()
 {
-    return lang::BasicBlock::createReturning(return_value_.get());
+    return lang::BasicBlock::createReturning(return_value_.get(), location());
 }
 
 void ReturnStatement::setFunction(lang::Function*)

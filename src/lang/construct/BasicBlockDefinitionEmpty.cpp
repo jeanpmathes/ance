@@ -56,6 +56,11 @@ std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Empty::getLeaves()
     return leaves;
 }
 
+lang::Location lang::BasicBlock::Definition::Empty::getEndLocation()
+{
+    return {0, 0, 0, 0};
+}
+
 void lang::BasicBlock::Definition::Empty::prepareBuild(CompileContext* context, llvm::Function* native_function)
 {
     std::string name = "e" + std::to_string(index_);

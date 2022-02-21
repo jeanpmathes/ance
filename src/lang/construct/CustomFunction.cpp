@@ -154,8 +154,20 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger)
             {
                 validation_logger.logError("Cannot return value in void function '" + name() + "'", this->location());
             }
+            else if (!value) {
+                validation_logger.logError("Missing return value in function '" + name() + "'", location);
+            }
             else {
                 lang::Type::checkMismatch(returnType(), value->type(), location, validation_logger);
+            }
+        }
+        else {
+            if (!returnType()->isVoidType())
+            {
+                lang::Location end = block->getEndLocation();
+                if (end.isGlobal()) end = this->location();
+
+                validation_logger.logError("Not all code paths of '" + name() + "' return a value", end);
             }
         }
     }

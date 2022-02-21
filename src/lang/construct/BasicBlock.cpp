@@ -22,11 +22,12 @@ std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createSimple(Statement* stat
     return std::unique_ptr<BasicBlock>(block);
 }
 
-std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createReturning(Expression* expression)
+std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createReturning(Expression*    expression,
+                                                                    lang::Location return_location)
 {
     auto block = new BasicBlock();
 
-    block->definition_ = std::make_unique<Definition::Returning>(expression);
+    block->definition_ = std::make_unique<Definition::Returning>(expression, return_location);
     block->definition_->setSelf(block);
 
     return std::unique_ptr<BasicBlock>(block);
@@ -89,6 +90,12 @@ std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> lang::Bas
 {
     assert(finalized_);
     return definition_->getReturnValue();
+}
+
+lang::Location lang::BasicBlock::getEndLocation()
+{
+    assert(finalized_);
+    return definition_->getEndLocation();
 }
 
 void lang::BasicBlock::prepareBuild(CompileContext* context, llvm::Function* native_function)
