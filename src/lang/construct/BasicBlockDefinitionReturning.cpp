@@ -4,7 +4,9 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/construct/Function.h"
+#include "lang/type/Type.h"
 #include "lang/expression/Expression.h"
+#include "validation/ValidationLogger.h"
 
 lang::BasicBlock::Definition::Returning::Returning(Expression* return_value, lang::Location return_location)
     : return_value_(return_value)
@@ -60,6 +62,12 @@ void lang::BasicBlock::Definition::Returning::validate(ValidationLogger& validat
     if (return_value_) { return_value_->validate(validation_logger); }
 
     if (unreachable_next_) { unreachable_next_->validate(validation_logger); }
+    else {
+        if (!return_value_ && self()->containing_function_->returnType()->isVoidType())
+        {
+            validation_logger.logWarning("Unnecessary return statement", return_location_);
+        }
+    }
 }
 
 std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Returning::getLeaves()

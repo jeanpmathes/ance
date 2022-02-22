@@ -156,15 +156,22 @@ void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger)
         {
             auto& [value, location] = *return_value;
 
-            if (returnType()->isVoidType())
+            if (value)
             {
-                validation_logger.logError("Cannot return value in void function '" + name() + "'", this->location());
+                if (returnType()->isVoidType())
+                {
+                    validation_logger.logError("Cannot return value in void function '" + name() + "'",
+                                               this->location());
+                }
+                else {
+                    lang::Type::checkMismatch(returnType(), value->type(), location, validation_logger);
+                }
             }
-            else if (!value) {
+            else if (!returnType()->isVoidType()) {
                 validation_logger.logError("Missing return value in function '" + name() + "'", location);
             }
             else {
-                lang::Type::checkMismatch(returnType(), value->type(), location, validation_logger);
+                // No value, but void return type -> OK
             }
         }
         else {
