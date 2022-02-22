@@ -135,12 +135,18 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger)
     }
 
     inside_scope_->validate(validation_logger);
-
     initial_block_->validate(validation_logger);
-
     for (auto& block : blocks_) { block->validate(validation_logger); }
 
+    validateReturn(validation_logger);
+    validateUnreachable(validation_logger);
+}
+
+void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger)
+{
     std::list<lang::BasicBlock*> final_blocks = initial_block_->getLeaves();
+
+    std::optional<lang::Location> missing_return_location;
 
     for (auto* block : final_blocks)
     {
@@ -166,10 +172,31 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger)
             {
                 lang::Location end = block->getEndLocation();
                 if (end.isGlobal()) end = this->location();
-
-                validation_logger.logError("Not all code paths of '" + name() + "' return a value", end);
+                missing_return_location = end;
             }
         }
+    }
+
+    if (missing_return_location)
+    {
+        validation_logger.logError("Not all code paths of '" + name() + "' return a value", *missing_return_location);
+    }
+}
+
+void lang::CustomFunction::validateUnreachable(ValidationLogger& validation_logger)
+{
+    initial_block_->reach();
+
+    std::optional<lang::Location> unreachable_code_location;
+
+    for (auto& block : blocks_)
+    {
+        if (block->isUnreached()) { unreachable_code_location = block->getStartLocation(); }
+    }
+
+    if (unreachable_code_location)
+    {
+        validation_logger.logWarning("Unreachable code in function '" + name() + "'", *unreachable_code_location);
     }
 }
 

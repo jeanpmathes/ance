@@ -92,6 +92,12 @@ std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> lang::Bas
     return definition_->getReturnValue();
 }
 
+lang::Location lang::BasicBlock::getStartLocation()
+{
+    assert(finalized_);
+    return definition_->getStartLocation();
+}
+
 lang::Location lang::BasicBlock::getEndLocation()
 {
     assert(finalized_);
@@ -128,6 +134,17 @@ size_t lang::BasicBlock::getIncomingLinkCount() const
 void lang::BasicBlock::transferStatements(std::list<Statement*>& statements)
 {
     definition_->transferStatements(statements);
+}
+
+void lang::BasicBlock::reach()
+{
+    reached_ = true;
+    definition_->reach();
+}
+
+bool lang::BasicBlock::isUnreached() const
+{
+    return !reached_ && !unused_;
 }
 
 void lang::BasicBlock::Definition::Base::setSelf(lang::BasicBlock* self)

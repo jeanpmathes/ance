@@ -80,6 +80,13 @@ std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> lang::Bas
     return std::make_pair(value, location);
 }
 
+lang::Location lang::BasicBlock::Definition::Returning::getStartLocation()
+{
+    if (statements_.empty()) { return {0, 0, 0, 0}; }
+
+    return statements_.back()->location();
+}
+
 lang::Location lang::BasicBlock::Definition::Returning::getEndLocation()
 {
     if (statements_.empty()) { return {0, 0, 0, 0}; }
@@ -87,12 +94,12 @@ lang::Location lang::BasicBlock::Definition::Returning::getEndLocation()
     return statements_.back()->location();
 }
 
+void lang::BasicBlock::Definition::Returning::reach() {}
+
 void lang::BasicBlock::Definition::Returning::prepareBuild(CompileContext* context, llvm::Function* native_function)
 {
     std::string name = "b" + std::to_string(index_);
     native_block_    = llvm::BasicBlock::Create(*context->llvmContext(), name, native_function);
-
-    if (unreachable_next_) unreachable_next_->prepareBuild(context, native_function);
 }
 
 void lang::BasicBlock::Definition::Returning::doBuild(CompileContext* context)
@@ -113,4 +120,3 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext* context)
         context->ir()->CreateRetVoid();
     }
 }
-

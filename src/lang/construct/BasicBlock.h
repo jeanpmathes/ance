@@ -79,10 +79,27 @@ namespace lang
         std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue();
 
         /**
+         * Get the location of the first statement in this basic block.
+         * @return The location, or a global location if no statements are present.
+         */
+        lang::Location getStartLocation();
+
+        /**
          * Get the location of the last statement in this basic block.
          * @return The location, or a global location if no statements are present.
          */
         lang::Location getEndLocation();
+
+        /**
+         * Reach this block and all that follow it.
+         */
+        void reach();
+
+        /**
+         * Get whether this block is unreached.
+         * @return True if this block is unreached, false otherwise.
+         */
+        [[nodiscard]] bool isUnreached() const;
 
         /**
          * Prepare building this basic block, and all following blocks.
@@ -135,7 +152,10 @@ namespace lang
                 virtual void                         validate(ValidationLogger& validation_logger) = 0;
                 virtual std::list<lang::BasicBlock*> getLeaves()                                   = 0;
                 virtual std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue();
-                virtual lang::Location                                                         getEndLocation() = 0;
+                virtual lang::Location                                                         getStartLocation() = 0;
+                virtual lang::Location                                                         getEndLocation()   = 0;
+
+                virtual void reach() = 0;
 
                 virtual void prepareBuild(CompileContext* context, llvm::Function* native_function) = 0;
                 virtual void doBuild(CompileContext* context)                                       = 0;
@@ -169,7 +189,10 @@ namespace lang
 
                 void                         validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*> getLeaves() override;
+                lang::Location               getStartLocation() override;
                 lang::Location               getEndLocation() override;
+
+                void reach() override;
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
@@ -197,7 +220,10 @@ namespace lang
 
                 void                         validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*> getLeaves() override;
+                lang::Location               getStartLocation() override;
                 lang::Location               getEndLocation() override;
+
+                void reach() override;
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
@@ -227,7 +253,10 @@ namespace lang
                 void                         validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*> getLeaves() override;
                 std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue() override;
+                lang::Location                                                         getStartLocation() override;
                 lang::Location                                                         getEndLocation() override;
+
+                void reach() override;
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
@@ -245,9 +274,11 @@ namespace lang
         lang::Function*                             containing_function_ {nullptr};
         std::optional<std::list<lang::BasicBlock*>> leaves_ {};
 
-        bool                              simplified_ {false};
-        bool                              finalized_ {false};
-        bool                              validated_ {false};
+        bool simplified_ {false};
+        bool unused_ {false};
+        bool finalized_ {false};
+        bool validated_ {false};
+        bool reached_ {false};
     };
 }
 

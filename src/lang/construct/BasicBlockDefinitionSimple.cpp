@@ -42,6 +42,8 @@ void lang::BasicBlock::Definition::Simple::simplify()
     {
         next_->transferStatements(statements_);
         this->updateIncomingLinks(next_);
+
+        self()->unused_ = true;
     }
 
     next_->simplify();
@@ -76,11 +78,23 @@ std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Simple::getLeaves()
     return leaves;
 }
 
+lang::Location lang::BasicBlock::Definition::Simple::getStartLocation()
+{
+    if (statements_.empty()) { return {0, 0, 0, 0}; }
+
+    return statements_.front()->location();
+}
+
 lang::Location lang::BasicBlock::Definition::Simple::getEndLocation()
 {
     if (statements_.empty()) { return {0, 0, 0, 0}; }
 
     return statements_.back()->location();
+}
+
+void lang::BasicBlock::Definition::Simple::reach()
+{
+    if (next_) { next_->reach(); }
 }
 
 void lang::BasicBlock::Definition::Simple::prepareBuild(CompileContext* context, llvm::Function* native_function)

@@ -66,6 +66,10 @@ namespace lang
         using FunctionDefinition::buildCall;
 
       private:
+        void validateReturn(ValidationLogger& validation_logger);
+        void validateUnreachable(ValidationLogger& validation_logger);
+
+      private:
         void addBlock(std::unique_ptr<lang::BasicBlock> block);
 
       private:
