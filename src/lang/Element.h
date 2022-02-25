@@ -29,9 +29,6 @@ namespace lang
          */
         virtual std::any accept(Visitor<TList...>& visitor) { return visitor.visit(static_cast<Derived&>(*this)); }
     };
-
-    template<typename Derived>
-    using ApplicationVisitor = VisitorBase<Derived, ANCE_CONSTRUCTS>;
 }
 
 #endif

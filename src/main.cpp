@@ -17,12 +17,6 @@
 #include "validation/SourceFile.h"
 #include "validation/ValidationLogger.h"
 
-class PrintingVisitor : public lang::ApplicationVisitor<PrintingVisitor>
-{
-  public:
-    std::any visit(lang::GlobalScope& scope) { return "GlobalScope"; }
-};
-
 int main(int argc, char** argv)
 {
     if (argc != 3)
@@ -38,11 +32,6 @@ int main(int argc, char** argv)
 
     Application application(project);
     SourceFile  source_file(application.getSourceFile());
-
-    lang::GenericVisitor<PrintingVisitor, ANCE_CONSTRUCTS> visitor;
-    std::string                                            ret = std::any_cast<std::string>(visitor.visit(application));
-
-    std::cout << ret << std::endl;
 
     std::cout << "========== Build [ " << application.getName() << " ] ==========" << std::endl;
 

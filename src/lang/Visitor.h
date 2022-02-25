@@ -14,14 +14,23 @@
 
 namespace lang
 {
+    class VisitableBase
+    {
+      public:
+        virtual ~VisitableBase() = default;
+    };
+
     template<typename... Types>
     class Visitor;
 
     template<typename T>
     class Visitor<T>
     {
+      protected:
+        virtual std::any defaultVisit(VisitableBase* ptr) = 0;
+
       public:
-        virtual std::any visit(T& visitable) = 0;
+        virtual std::any visit(T& visitable) { return this->defaultVisit(&visitable); }
     };
 
     template<typename T, typename... TList>
@@ -30,73 +39,17 @@ namespace lang
       public:
         using Visitor<TList...>::visit;
 
-        virtual std::any visit(T& visitable) = 0;
+        virtual std::any visit(T& visitable) { return this->defaultVisit(&visitable); }
     };
 
     template<typename... TList>
-    class VisitorImplementation;
-
-    template<typename U, typename T>
-    class VisitorImplementation<U, T>;
-
-    template<typename U, typename T>
-    concept CanVisit = requires(U visitor, T& visitable)
-    {
-        {
-            visitor.visit(visitable)
-            } -> std::same_as<std::any>;
-    };
-
-    template<typename U, typename T>
-    class VisitorImplementation<U, T>
-    {
-      protected:
-        std::unique_ptr<U> u_;
-
-      public:
-        template<typename... ParamList>
-        explicit VisitorImplementation(ParamList&&... plist)
-            : u_(std::make_unique<U>(std::forward<ParamList>(plist)...))
-        {}
-
-        virtual std::any visit(T& t)
-        {
-            if constexpr (CanVisit<U, T>) { return u_->visit(t); }
-            else {
-                return {};
-            }
-        }
-    };
-
-    template<typename U, typename T, typename... TList>
-    class VisitorImplementation<U, T, TList...> : public virtual VisitorImplementation<U, TList...>
+    class Visitable : public virtual VisitableBase
     {
       public:
-        template<typename... ParamList>
-        explicit VisitorImplementation(ParamList&&... plist)
-            : VisitorImplementation<U, TList...>(std::forward<ParamList>(plist)...)
-        {}
-
-        using VisitorImplementation<U, TList...>::visit;
-        using VisitorImplementation<U, TList...>::u_;
-
-        virtual std::any visit(T& t)
-        {
-            if constexpr (CanVisit<U, T>) { return u_->visit(t); }
-            else {
-                return {};
-            }
-        }
-    };
-
-    template<typename... TList>
-    class Visitable
-    {
         virtual std::any accept(Visitor<TList...>& visitor) = 0;
 
       private:
-        typedef lang::Visitable<TList...> Self;
-
+        typedef lang::Visitable<TList...>         Self;
         std::vector<std::reference_wrapper<Self>> children_ {};
 
       public:
@@ -120,47 +73,31 @@ namespace lang
         Visitable& getChild(size_t index) { return children_[index]; }
     };
 
-    template<typename U, typename... TList>
-    class GenericVisitor : public virtual VisitorImplementation<U, TList...>
-    {
-      public:
-        using VisitorImplementation<U, TList...>::u_;
-
-        template<typename... ParamList>
-        explicit GenericVisitor(ParamList&&... plist)
-            : VisitorImplementation<U, TList...>(std::forward<ParamList>(plist)...)
-        {
-            u_->setVisitor(this);
-        }
-    };
-
     /**
-     * Offers the basic methods required by the generic visitor.
-     * @tparam Derived The derived class.
+     * Offers the basic methods for visitor and tree functionality.
      * @tparam TList The list of visitable types.
      */
-    template<typename Derived, typename... TList>
-    class VisitorBase
+    template<typename... TList>
+    class VisitorBase : public Visitor<TList...>
     {
-      private:
-        using V = GenericVisitor<Derived, TList...>;
-        V* visitor_;
-
-      protected:
-        V& visitor() { return *visitor_; }
-
       public:
-        void setVisitor(V* visitor) { visitor_ = visitor; }
+        using Visitor<TList...>::visit;
 
         virtual void preVisit(Visitable<TList...>&) {}
         virtual void postVisit(Visitable<TList...>&) {}
 
-        std::any visitSome(Visitable<TList...>& visitable)
+        /**
+         * Correctly visit a visitable element. Use this instead of normal visit.
+         * @param visitable The visitable to visit.
+         * @return The result of the visit.
+         */
+        std::any visitTree(Visitable<TList...>& visitable)
         {
             std::any result;
 
             preVisit(visitable);
-            result = visitable.accept(visitor());
+            Visitor<TList...>& visitor = *this;
+            result                     = visitable.accept(visitor);
             postVisit(visitable);
 
             return result;
@@ -169,13 +106,18 @@ namespace lang
         virtual std::any initialize() { return {}; }
         virtual std::any accumulate(std::any&, std::any& next) { return next; }
 
+        /**
+         * Visit all children of a visitable element.
+         * @param visitable The visitable to visit all children of.
+         * @return The result of the visit.
+         */
         std::any visitChildren(Visitable<TList...>& visitable)
         {
             std::any result = initialize();
 
             for (size_t i = 0; i < visitable.childCount(); ++i)
             {
-                std::any next = visit(visitable.getChild(i));
+                std::any next = visitTree(visitable.getChild(i));
                 result        = accumulate(result, next);
             }
 
@@ -183,6 +125,14 @@ namespace lang
         }
 
         virtual ~VisitorBase() = default;
+
+      protected:
+        virtual std::any defaultVisit(VisitableBase* ptr)
+        {
+            auto* visitable = dynamic_cast<Visitable<TList...>*>(ptr);
+            assert(visitable != nullptr && "Visitable is not of the correct type.");
+            return visitChildren(*visitable);
+        }
     };
 }
 
