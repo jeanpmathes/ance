@@ -15,6 +15,7 @@
 #include "lang/utility/TypeRegistry.h"
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
+#include "lang/Element.h"
 
 class ConstantExpression;
 
@@ -23,7 +24,9 @@ namespace lang
     /**
      * The top level scope.
      */
-    class GlobalScope : public Scope
+    class GlobalScope
+        : public Scope
+        , public lang::Element<GlobalScope, ANCE_CONSTRUCTS>
     {
       public:
         lang::Scope* scope() override;

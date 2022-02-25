@@ -4,13 +4,16 @@
 #include "BackingExpression.h"
 
 #include "lang/construct/value/ExpressionBackedValue.h"
+#include "lang/Element.h"
 
 class Application;
 
 /**
  * Gives the size of a value returned by an expression.
  */
-class SizeofExpression : public BackingExpression
+class SizeofExpression
+    : public BackingExpression
+    , public lang::Element<SizeofExpression, ANCE_CONSTRUCTS>
 {
   public:
     /**

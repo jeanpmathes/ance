@@ -7,6 +7,7 @@
 #include "lang/construct/Signature.h"
 #include "lang/utility/Location.h"
 #include "lang/construct/BasicBlock.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -22,7 +23,7 @@ class ValidationLogger;
 
 namespace lang
 {
-    class FunctionDefinition
+    class FunctionDefinition : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     {
       public:
         explicit FunctionDefinition(lang::Function*                               function,

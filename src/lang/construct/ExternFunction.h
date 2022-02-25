@@ -3,6 +3,8 @@
 
 #include "FunctionDefinition.h"
 
+#include "lang/Element.h"
+
 namespace lang
 {
     class Function;
@@ -13,7 +15,9 @@ namespace lang
     /**
      * A function that is just declared, the actual definition is provided externally when linking.
      */
-    class ExternFunction : public lang::FunctionDefinition
+    class ExternFunction
+        : public lang::FunctionDefinition
+        , public lang::Element<ExternFunction, ANCE_CONSTRUCTS>
     {
       public:
         ExternFunction(lang::Function*                               function,

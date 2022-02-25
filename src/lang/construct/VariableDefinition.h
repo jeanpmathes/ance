@@ -3,6 +3,7 @@
 
 #include "lang/construct/value/Value.h"
 #include "lang/utility/Location.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -18,7 +19,7 @@ namespace lang
     /**
      * Defines the behaviour of a variable.
      */
-    class VariableDefinition
+    class VariableDefinition : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     {
       public:
         VariableDefinition(const std::string&                identifier,

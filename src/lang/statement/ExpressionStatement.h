@@ -3,12 +3,16 @@
 
 #include "Statement.h"
 
+#include "lang/Element.h"
+
 class BuildableExpression;
 
 /**
  * A statement that consists of an expression.
  */
-class ExpressionStatement : public Statement
+class ExpressionStatement
+    : public Statement
+    , public lang::Element<ExpressionStatement, ANCE_CONSTRUCTS>
 {
   public:
     /**

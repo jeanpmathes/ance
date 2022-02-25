@@ -5,6 +5,7 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "lang/utility/Location.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -19,7 +20,7 @@ class ValidationLogger;
 /**
  * Base class of all statements. Statements are building blocks of code and are ordered parts of functions.
  */
-class Statement
+class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
 {
   public:
     /**

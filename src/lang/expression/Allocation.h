@@ -4,13 +4,16 @@
 #include "DelayableExpression.h"
 
 #include "compiler/Runtime.h"
+#include "lang/Element.h"
 
 class Application;
 
 /**
  * An allocation expression.
  */
-class Allocation : public DelayableExpression
+class Allocation
+    : public DelayableExpression
+    , public lang::Element<Allocation, ANCE_CONSTRUCTS>
 {
   public:
     /**

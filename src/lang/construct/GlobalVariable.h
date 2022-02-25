@@ -8,7 +8,7 @@
 #include <llvm/IR/LLVMContext.h>
 
 #include "lang/AccessModifier.h"
-#include "lang/AccessModifier.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -24,7 +24,9 @@ namespace lang
     /**
      * A global variable.
      */
-    class GlobalVariable : public VariableDefinition
+    class GlobalVariable
+        : public VariableDefinition
+        , public lang::Element<GlobalVariable, ANCE_CONSTRUCTS>
     {
       public:
         /**

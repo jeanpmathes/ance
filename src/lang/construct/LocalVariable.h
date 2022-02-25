@@ -6,6 +6,8 @@
 #include <memory>
 #include <string>
 
+#include "lang/Element.h"
+
 namespace lang
 {
     class Value;
@@ -17,7 +19,9 @@ namespace lang
     /**
      * A local variable or function parameter definition.
      */
-    class LocalVariable : public lang::VariableDefinition
+    class LocalVariable
+        : public lang::VariableDefinition
+        , public lang::Element<LocalVariable, ANCE_CONSTRUCTS>
     {
       public:
         /**

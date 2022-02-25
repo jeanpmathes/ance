@@ -5,6 +5,7 @@
 
 #include "lang/construct/Variable.h"
 #include "lang/utility/ResolvingHandle.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -14,7 +15,9 @@ namespace lang
 /**
  * Access a variable and get or set its current value.
  */
-class VariableAccess : public DelayableExpression
+class VariableAccess
+    : public DelayableExpression
+    , public lang::Element<VariableAccess, ANCE_CONSTRUCTS>
 {
   public:
     /**

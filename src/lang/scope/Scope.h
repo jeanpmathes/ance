@@ -10,6 +10,7 @@
 #include "lang/AccessModifier.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -31,7 +32,7 @@ namespace lang
     /**
      * The base class for scopes, which contain variables and functions.
      */
-    class Scope
+    class Scope : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     {
       public:
         /**

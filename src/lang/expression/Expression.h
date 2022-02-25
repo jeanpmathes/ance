@@ -7,6 +7,7 @@
 #include "lang/type/Type.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -20,7 +21,7 @@ class ValidationLogger;
 /**
  * The base class of all expressions.
  */
-class Expression
+class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
 {
   protected:
     /**

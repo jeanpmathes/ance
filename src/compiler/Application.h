@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "lang/scope/GlobalScope.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -22,7 +23,7 @@ class ValidationLogger;
 /**
  * The application that is described by the source and will be compiled.
  */
-class Application
+class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
 {
   public:
     /**

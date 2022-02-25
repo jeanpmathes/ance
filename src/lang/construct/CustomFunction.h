@@ -13,6 +13,7 @@
 #include "lang/AccessModifier.h"
 #include "lang/utility/ResolvingHandle.h"
 #include "lang/AccessModifier.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -29,7 +30,9 @@ namespace lang
     /**
      * A function that is defined in code.
      */
-    class CustomFunction : public lang::FunctionDefinition
+    class CustomFunction
+        : public lang::FunctionDefinition
+        , public lang::Element<CustomFunction, ANCE_CONSTRUCTS>
     {
       public:
         CustomFunction(lang::Function*                               function,

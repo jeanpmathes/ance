@@ -10,7 +10,7 @@
 #include "lang/AccessModifier.h"
 #include "lang/construct/VariableDefinition.h"
 #include "lang/utility/Location.h"
-#include "lang/AccessModifier.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -31,7 +31,9 @@ namespace lang
     /**
      * The base class of all variables.
      */
-    class Variable : public HandleTarget<lang::Variable>
+    class Variable
+        : public HandleTarget<lang::Variable>
+        , public lang::Element<Variable, ANCE_CONSTRUCTS>
     {
       public:
         /**

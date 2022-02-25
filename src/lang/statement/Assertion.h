@@ -3,12 +3,16 @@
 
 #include "Statement.h"
 
+#include "lang/Element.h"
+
 class Expression;
 
 /**
  * A statement that asserts a condition.
  */
-class Assertion : public Statement
+class Assertion
+    : public Statement
+    , public lang::Element<Assertion, ANCE_CONSTRUCTS>
 {
   public:
     /**

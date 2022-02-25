@@ -6,12 +6,16 @@
 #include "lang/Assigner.h"
 #include "lang/Assigner.h"
 
+#include "lang/Element.h"
+
 class Expression;
 
 /**
  * A statement with an assignment operation.
  */
-class AssignmentStatement : public Statement
+class AssignmentStatement
+    : public Statement
+    , public lang::Element<AssignmentStatement, ANCE_CONSTRUCTS>
 {
   public:
     /**

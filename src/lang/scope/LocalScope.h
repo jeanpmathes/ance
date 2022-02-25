@@ -12,6 +12,7 @@
 #include "lang/utility/Location.h"
 #include "lang/utility/OwningHandle.h"
 #include "lang/Assigner.h"
+#include "lang/Element.h"
 
 class Expression;
 
@@ -20,7 +21,9 @@ namespace lang
     /**
      * A local scope with local variables. Can be used by functions and similar constructs.
      */
-    class LocalScope : public Scope
+    class LocalScope
+        : public Scope
+        , public lang::Element<LocalScope, ANCE_CONSTRUCTS>
     {
       public:
         /**

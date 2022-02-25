@@ -5,9 +5,13 @@
 
 #include <optional>
 
+#include "lang/Element.h"
+
 class Application;
 
-class BindRef : public DelayableExpression
+class BindRef
+    : public DelayableExpression
+    , public lang::Element<BindRef, ANCE_CONSTRUCTS>
 {
   public:
     /**

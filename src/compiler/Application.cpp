@@ -40,6 +40,10 @@ Application::Application(data::File& project) : project_(project), global_scope_
     global_scope_->addTypeRegistry(lang::ArrayType::getRegistry());
     global_scope_->addTypeRegistry(lang::PointerType::getRegistry());
     global_scope_->addTypeRegistry(lang::ReferenceType::getRegistry());
+
+    // Add children
+
+    addChild(globalScope());
 }
 
 void Application::setPointerSize(unsigned size)

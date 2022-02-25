@@ -12,7 +12,9 @@ class Application;
 /**
  * An addressof expression.
  */
-class Addressof : public DelayableExpression
+class Addressof
+    : public DelayableExpression
+    , public lang::Element<Addressof, ANCE_CONSTRUCTS>
 {
   public:
     /**

@@ -4,11 +4,14 @@
 #include "BackingConstantExpression.h"
 
 #include "lang/construct/constant/ExpressionBackedConstant.h"
+#include "lang/Element.h"
 
 /**
  * Provides the default value for a type.
  */
-class DefaultValue : public BackingConstantExpression
+class DefaultValue
+    : public BackingConstantExpression
+    , public lang::Element<DefaultValue, ANCE_CONSTRUCTS>
 {
   public:
     /**

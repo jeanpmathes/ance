@@ -3,10 +3,14 @@
 
 #include "DelayableExpression.h"
 
+#include "lang/Element.h"
+
 /**
  * A binary operation, taking two operands and returning a result.
  */
-class BinaryOperation : public DelayableExpression
+class BinaryOperation
+    : public DelayableExpression
+    , public lang::Element<BinaryOperation, ANCE_CONSTRUCTS>
 {
   public:
     /**

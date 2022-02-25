@@ -3,12 +3,16 @@
 
 #include "Statement.h"
 
+#include "lang/Element.h"
+
 class Expression;
 
 /**
  * Adds a return value to the containing function.
  */
-class ReturnStatement : public Statement
+class ReturnStatement
+    : public Statement
+    , public lang::Element<ReturnStatement, ANCE_CONSTRUCTS>
 {
   public:
     /**

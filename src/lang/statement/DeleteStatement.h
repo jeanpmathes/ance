@@ -3,12 +3,16 @@
 
 #include "Statement.h"
 
+#include "lang/Element.h"
+
 class Expression;
 
 /**
  * A statement performing a delete operation.
  */
-class DeleteStatement : public Statement
+class DeleteStatement
+    : public Statement
+    , public lang::Element<DeleteStatement, ANCE_CONSTRUCTS>
 {
   public:
     /**

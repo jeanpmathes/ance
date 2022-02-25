@@ -7,6 +7,7 @@
 
 #include "lang/construct/Function.h"
 #include "lang/utility/ResolvingHandle.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -16,7 +17,9 @@ namespace lang
 /**
  * A call to a function.
  */
-class FunctionCall : public DelayableExpression
+class FunctionCall
+    : public DelayableExpression
+    , public lang::Element<FunctionCall, ANCE_CONSTRUCTS>
 {
   public:
     /**

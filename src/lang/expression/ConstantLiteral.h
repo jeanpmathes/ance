@@ -4,11 +4,14 @@
 #include "ConstantExpression.h"
 
 #include "lang/construct/constant/Constant.h"
+#include "lang/Element.h"
 
 /**
  * Wraps a constant.
  */
-class ConstantLiteral : public ConstantExpression
+class ConstantLiteral
+    : public ConstantExpression
+    , public lang::Element<ConstantLiteral, ANCE_CONSTRUCTS>
 {
   public:
     /**

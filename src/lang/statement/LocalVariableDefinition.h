@@ -9,6 +9,7 @@
 #include "lang/construct/Variable.h"
 #include "lang/utility/ResolvingHandle.h"
 #include "lang/Assigner.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -20,7 +21,9 @@ class Expression;
 /**
  * Defines a local variable in the containing function.
  */
-class LocalVariableDefinition : public Statement
+class LocalVariableDefinition
+    : public Statement
+    , public lang::Element<LocalVariableDefinition, ANCE_CONSTRUCTS>
 {
   public:
     /**

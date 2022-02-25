@@ -8,6 +8,7 @@
 #include "lang/Assigner.h"
 #include "lang/construct/Variable.h"
 #include "lang/utility/ResolvingHandle.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -20,7 +21,9 @@ class Application;
 /**
  * Defines a local variable of reference type in the containing function.
  */
-class LocalReferenceVariableDefinition : public Statement
+class LocalReferenceVariableDefinition
+    : public Statement
+    , public lang::Element<LocalReferenceVariableDefinition, ANCE_CONSTRUCTS>
 {
   public:
     /**

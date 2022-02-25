@@ -3,10 +3,14 @@
 
 #include "DelayableExpression.h"
 
+#include "lang/Element.h"
+
 /**
  * A subscript operation.
  */
-class Subscript : public DelayableExpression
+class Subscript
+    : public DelayableExpression
+    , public lang::Element<Subscript, ANCE_CONSTRUCTS>
 {
   public:
     /**

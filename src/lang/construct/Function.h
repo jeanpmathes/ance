@@ -12,6 +12,7 @@
 #include "lang/construct/Parameter.h"
 #include "lang/construct/Signature.h"
 #include "lang/AccessModifier.h"
+#include "lang/Element.h"
 #include "lang/construct/BasicBlock.h"
 
 namespace lang
@@ -32,6 +33,7 @@ namespace lang
     class Function
         : public lang::Scope
         , public HandleTarget<lang::Function>
+        , public lang::Element<Function, ANCE_CONSTRUCTS>
     {
       public:
         /**
