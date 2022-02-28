@@ -5,6 +5,8 @@ class Application;
 
 namespace lang
 {
+    class FunctionGroup;
+
     class Function;
     class CustomFunction;
     class ExternFunction;
@@ -41,10 +43,10 @@ class LocalVariableDefinition;
 class ReturnStatement;
 
 #define ANCE_CONSTRUCTS                                                                                                \
-    Application, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::Variable, lang::GlobalVariable,     \
-        lang::LocalVariable, Addressof, Allocation, BinaryOperation, BindRef, ConstantLiteral, DefaultValue,           \
-        FunctionCall, SizeofExpression, SizeofType, Subscript, VariableAccess, lang::GlobalScope, lang::LocalScope,    \
-        Assertion, AssignmentStatement, DeleteStatement, ExpressionStatement, LocalReferenceVariableDefinition,        \
-        LocalVariableDefinition, ReturnStatement
+    Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::Variable,      \
+        lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation, BinaryOperation, BindRef, ConstantLiteral,   \
+        DefaultValue, FunctionCall, SizeofExpression, SizeofType, Subscript, VariableAccess, lang::GlobalScope,        \
+        lang::LocalScope, Assertion, AssignmentStatement, DeleteStatement, ExpressionStatement,                        \
+        LocalReferenceVariableDefinition, LocalVariableDefinition, ReturnStatement
 
 #endif

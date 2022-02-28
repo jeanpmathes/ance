@@ -398,14 +398,15 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunc
         undefined = std::move(undefined_function_groups_[name]);
         undefined_function_groups_.erase(name);
     }
-    else
-    {
+    else {
         undefined =
             lang::OwningHandle<lang::FunctionGroup>::takeOwnership(lang::makeHandled<lang::FunctionGroup>(name));
     }
 
     lang::ResolvingHandle<lang::FunctionGroup> defined = undefined.handle();
     defined_function_groups_[name]                     = std::move(undefined);
+    addChild(*defined);
+
     return defined;
 }
 

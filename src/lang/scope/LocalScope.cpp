@@ -72,7 +72,6 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Variable> varia
         return;
     }
 
-    addChild(*variable);
     undefined_variables_[variable->identifier()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 
@@ -192,7 +191,9 @@ std::optional<lang::ResolvingHandle<lang::Variable>> lang::LocalScope::defineLoc
         lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(identifier);
         variable->defineAsLocal(type, type_location, this, is_final, value, parameter_no, location);
 
+        addChild(*variable);
         defined_local_variables_[identifier] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+
         return std::make_optional(variable);
     }
     else

@@ -14,7 +14,9 @@ class CompileContext;
 
 namespace lang
 {
-    class FunctionGroup : public HandleTarget<FunctionGroup>
+    class FunctionGroup
+        : public HandleTarget<FunctionGroup>
+        , public Element<FunctionGroup, ANCE_CONSTRUCTS>
     {
       public:
         explicit FunctionGroup(std::string name);

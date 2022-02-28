@@ -74,6 +74,8 @@ void lang::FunctionGroup::build(CompileContext* compile_context)
 void lang::FunctionGroup::addFunction(lang::OwningHandle<lang::Function> function)
 {
     assert(function->name() == name_);
+
+    addChild(*function);
     functions_.push_back(std::move(function));
 }
 
