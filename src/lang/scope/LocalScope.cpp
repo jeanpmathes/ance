@@ -3,7 +3,10 @@
 #include "lang/scope/GlobalScope.h"
 #include "lang/Assigner.h"
 
-lang::LocalScope::LocalScope(lang::Scope* parent) : parent_(parent) {}
+lang::LocalScope::LocalScope(lang::Scope* parent) : parent_(parent)
+{
+    parent_->addChild(*this);
+}
 
 lang::Scope* lang::LocalScope::scope()
 {
@@ -69,6 +72,7 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Variable> varia
         return;
     }
 
+    addChild(*variable);
     undefined_variables_[variable->identifier()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 

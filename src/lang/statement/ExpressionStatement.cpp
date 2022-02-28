@@ -7,7 +7,9 @@
 ExpressionStatement::ExpressionStatement(std::unique_ptr<BuildableExpression> expression, lang::Location location)
     : Statement(location)
     , expression_(std::move(expression))
-{}
+{
+    addChild(*expression_);
+}
 
 void ExpressionStatement::setFunction(lang::Function* function)
 {

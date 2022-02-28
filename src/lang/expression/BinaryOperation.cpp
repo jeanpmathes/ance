@@ -10,7 +10,10 @@ BinaryOperation::BinaryOperation(std::unique_ptr<Expression> left,
     , left_(std::move(left))
     , op_(op)
     , right_(std::move(right))
-{}
+{
+    addChild(*left_);
+    addChild(*right_);
+}
 
 void BinaryOperation::setScope(lang::Scope* scope)
 {

@@ -6,7 +6,6 @@
 #include "lang/type/IntegerType.h"
 #include "lang/type/TypeAlias.h"
 #include "lang/type/TypeClone.h"
-#include "lang/type/VoidType.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 #include "lang/AccessModifier.h"
@@ -87,6 +86,7 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier              a
     undefined->defineAsGlobal(type, type_location, this, access, initializer, is_final, is_constant, location);
     lang::OwningHandle<lang::Variable> defined = std::move(undefined);
 
+    addChild(*defined);
     global_defined_variables_[identifier] = std::move(defined);
 }
 

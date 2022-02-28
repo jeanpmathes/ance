@@ -8,7 +8,9 @@
 Addressof::Addressof(std::unique_ptr<Expression> arg, lang::Location location)
     : Expression(location)
     , arg_(std::move(arg))
-{}
+{
+    addChild(*arg_);
+}
 
 void Addressof::setScope(lang::Scope* scope)
 {

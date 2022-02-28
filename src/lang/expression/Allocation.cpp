@@ -17,7 +17,9 @@ Allocation::Allocation(Runtime::Allocator                allocation,
     , allocated_type_location_(allocated_type_location)
     , count_(std::move(count))
     , return_type_(lang::PointerType::get(type))
-{}
+{
+    if (count_) addChild(*count_);
+}
 
 void Allocation::setScope(lang::Scope* scope)
 {

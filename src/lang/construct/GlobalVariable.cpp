@@ -35,6 +35,8 @@ lang::GlobalVariable::GlobalVariable(const std::string&                identifie
 
     constant_init_->setContainingScope(containing_scope);
     initial_value_ = constant_init_->getConstantValue();
+
+    addChild(*constant_init_);
 }
 
 void lang::GlobalVariable::validate(ValidationLogger& validation_logger)

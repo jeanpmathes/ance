@@ -7,7 +7,9 @@
 SizeofExpression::SizeofExpression(std::unique_ptr<Expression> expression, lang::Location location)
     : Expression(location)
     , expression_(std::move(expression))
-{}
+{
+    addChild(*expression_);
+}
 
 void SizeofExpression::setScope(lang::Scope* scope)
 {

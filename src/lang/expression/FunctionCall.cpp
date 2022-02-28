@@ -13,7 +13,9 @@ FunctionCall::FunctionCall(lang::ResolvingHandle<lang::FunctionGroup> function_g
     : Expression(location)
     , function_group_(std::move(function_group))
     , arguments_(std::move(arguments))
-{}
+{
+    for (auto& argument : arguments_) { addChild(*argument); }
+}
 
 void FunctionCall::setScope(lang::Scope* scope)
 {

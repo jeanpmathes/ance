@@ -20,7 +20,9 @@ std::unique_ptr<BindRef> BindRef::referTo(std::unique_ptr<Expression> address, l
 BindRef::BindRef(std::unique_ptr<Expression> address, lang::Location location)
     : Expression(location)
     , address_(std::move(address))
-{}
+{
+    addChild(*address_);
+}
 
 void BindRef::setScope(lang::Scope* scope)
 {

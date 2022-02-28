@@ -8,7 +8,6 @@
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/statement/Statement.h"
-#include "lang/type/ReferenceType.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
 #include "lang/utility/Values.h"
@@ -59,6 +58,7 @@ bool lang::CustomFunction::isMangled() const
 
 void lang::CustomFunction::pushStatement(std::unique_ptr<Statement> statement)
 {
+    addChild(*statement);
     statements_.push_back(std::move(statement));
 }
 

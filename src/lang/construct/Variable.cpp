@@ -37,6 +37,8 @@ void lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
                                                          is_final,
                                                          is_constant,
                                                          location);
+
+    addChild(*definition_);
 }
 
 void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
@@ -55,6 +57,8 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
                                                         value,
                                                         parameter_no,
                                                         location);
+
+    addChild(*definition_);
 }
 
 const std::string& lang::Variable::identifier() const

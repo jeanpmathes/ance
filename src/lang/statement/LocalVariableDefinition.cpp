@@ -5,9 +5,7 @@
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
 #include "lang/scope/LocalScope.h"
-#include "lang/type/ReferenceType.h"
 #include "lang/type/Type.h"
-#include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 #include "lang/Assigner.h"
 
@@ -25,6 +23,8 @@ LocalVariableDefinition::LocalVariableDefinition(std::string                    
     , assigned_(std::move(assigned))
 {
     assert(assigner.hasSymbol());
+
+    addChild(*assigned_);
 }
 
 void LocalVariableDefinition::setFunction(lang::Function* function)

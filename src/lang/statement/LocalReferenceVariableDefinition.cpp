@@ -51,7 +51,9 @@ LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string  
     , type_(type)
     , type_location_(type_location)
     , reference_(std::move(reference))
-{}
+{
+    addChild(*reference_);
+}
 
 void LocalReferenceVariableDefinition::setFunction(lang::Function* function)
 {

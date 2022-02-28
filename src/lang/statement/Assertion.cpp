@@ -11,7 +11,9 @@
 Assertion::Assertion(std::unique_ptr<Expression> condition, lang::Location location)
     : Statement(location)
     , condition_(std::move(condition))
-{}
+{
+    addChild(*condition_);
+}
 
 void Assertion::setFunction(lang::Function* function)
 {

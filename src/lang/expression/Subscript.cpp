@@ -7,7 +7,10 @@ Subscript::Subscript(std::unique_ptr<Expression> indexed, std::unique_ptr<Expres
     : Expression(location)
     , indexed_(std::move(indexed))
     , index_(std::move(index))
-{}
+{
+    addChild(*indexed_);
+    addChild(*index_);
+}
 
 void Subscript::setScope(lang::Scope* scope)
 {

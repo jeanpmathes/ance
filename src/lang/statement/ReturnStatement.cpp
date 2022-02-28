@@ -8,7 +8,9 @@
 ReturnStatement::ReturnStatement(std::unique_ptr<Expression> return_value, lang::Location location)
     : Statement(location)
     , return_value_(std::move(return_value))
-{}
+{
+    if (return_value_) addChild(*return_value_);
+}
 
 std::unique_ptr<lang::BasicBlock> ReturnStatement::createBlock()
 {

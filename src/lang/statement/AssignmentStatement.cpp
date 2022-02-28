@@ -16,6 +16,9 @@ AssignmentStatement::AssignmentStatement(std::unique_ptr<Expression> assignable,
     , assigned_(std::move(assigned))
 {
     assert(assigner != lang::Assigner::REFERENCE_BINDING);
+
+    addChild(*assignable_);
+    addChild(*assigned_);
 }
 
 void AssignmentStatement::setFunction(lang::Function* function)

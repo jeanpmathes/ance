@@ -35,6 +35,8 @@ void lang::Function::defineAsExtern(lang::Scope*                                
                                                          return_type_location,
                                                          parameters,
                                                          location);
+
+    addChild(*definition_);
 }
 
 void lang::Function::defineAsCustom(lang::AccessModifier                                 access,
@@ -53,6 +55,8 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
                                                          containing_scope,
                                                          declaration_location,
                                                          definition_location);
+
+    addChild(*definition_);
 }
 
 lang::ResolvingHandle<lang::Type> lang::Function::returnType() const
