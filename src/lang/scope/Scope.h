@@ -19,6 +19,7 @@ namespace lang
     class FunctionGroup;
     class Value;
     class GlobalScope;
+    class LocalScope;
     class Variable;
     class Type;
 }
@@ -53,6 +54,12 @@ namespace lang
          * @return The debug scope.
          */
         virtual llvm::DIScope* getDebugScope(CompileContext* context) = 0;
+
+        /**
+         * Create a local scope in this scope.
+         * @return The created local scope.
+         */
+        std::unique_ptr<lang::LocalScope> makeLocalScope();
 
         /**
          * Register the usage of a variable in this scope. Only variables that are registered will be resolved.

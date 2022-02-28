@@ -3,10 +3,7 @@
 #include "lang/scope/GlobalScope.h"
 #include "lang/Assigner.h"
 
-lang::LocalScope::LocalScope(lang::Scope* parent) : parent_(parent)
-{
-    parent_->addChild(*this);
-}
+lang::LocalScope::LocalScope(lang::Scope* parent) : parent_(parent) {}
 
 lang::Scope* lang::LocalScope::scope()
 {

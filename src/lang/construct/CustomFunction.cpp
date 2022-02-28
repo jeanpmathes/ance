@@ -31,7 +31,7 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
                                declaration_location)
     , access_(access)
     , definition_location_(definition_location)
-    , inside_scope_(std::make_unique<lang::LocalScope>(this->function()))
+    , inside_scope_(this->function()->makeLocalScope())
     , initial_block_(lang::BasicBlock::createEmpty())
 {
     containing_scope->addType(return_type);
