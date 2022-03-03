@@ -9,6 +9,8 @@ lang::BasicBlock::Definition::Simple::Simple(Statement* statement)
 
 void lang::BasicBlock::Definition::Simple::finalize(size_t& index)
 {
+    for (auto& statement : statements_) { self()->addChild(*statement); }
+
     if (next_) next_->finalize(index);
 }
 

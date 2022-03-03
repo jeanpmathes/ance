@@ -15,6 +15,8 @@ lang::BasicBlock::Definition::Returning::Returning(Expression* return_value, lan
 
 void lang::BasicBlock::Definition::Returning::finalize(size_t& index)
 {
+    for (auto& statement : statements_) { self()->addChild(*statement); }
+
     if (unreachable_next_) unreachable_next_->finalize(index);
 }
 
