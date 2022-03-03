@@ -58,7 +58,6 @@ bool lang::CustomFunction::isMangled() const
 
 void lang::CustomFunction::pushStatement(std::unique_ptr<Statement> statement)
 {
-    addChild(*statement);
     statements_.push_back(std::move(statement));
 }
 
@@ -82,7 +81,11 @@ void lang::CustomFunction::finalizeDefinition()
     size_t running_index = 0;
     initial_block_->finalize(running_index);
 
-    for (auto& block : blocks_) { block->finalize(running_index); }
+    for (auto& block : blocks_)
+    {
+        block->finalize(running_index);
+        if (block->isUsable()) { addChild(*block); }
+    }
 }
 
 void lang::CustomFunction::addBlock(std::unique_ptr<lang::BasicBlock> block)

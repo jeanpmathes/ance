@@ -66,6 +66,11 @@ void lang::BasicBlock::finalize(size_t& index)
     definition_->finalize(index);
 }
 
+bool lang::BasicBlock::isUsable() const
+{
+    return !unused_;
+}
+
 void lang::BasicBlock::validate(ValidationLogger& validation_logger)
 {
     assert(finalized_);

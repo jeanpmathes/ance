@@ -3,6 +3,7 @@
 
 #include "lang/statement/Statement.h"
 #include "lang/construct/value/Value.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -10,7 +11,7 @@ namespace lang
      * A basic block is a sequence of instructions that are executed sequentially.
      * No branching is possible in a basic block, only on exit.
      */
-    class BasicBlock
+    class BasicBlock : public lang::Element<lang::BasicBlock, ANCE_CONSTRUCTS>
     {
       public:
         /**
@@ -58,6 +59,13 @@ namespace lang
          * @param index A reference to an index, initialized to 0, that is incremented for each block finalization.
          */
         void finalize(size_t& index);
+
+        /**
+         * Whether this basic block is actually usable, i.e. it contains statements and was not simplified away.
+         * This does not mean that the block is reachable.
+         * @return True if this basic block is usable.
+         */
+        [[nodiscard]] bool isUsable() const;
 
         /**
          * Validate this basic block.
