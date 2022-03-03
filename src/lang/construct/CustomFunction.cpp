@@ -80,6 +80,7 @@ void lang::CustomFunction::finalizeDefinition()
 
     size_t running_index = 0;
     initial_block_->finalize(running_index);
+    addChild(*initial_block_);
 
     for (auto& block : blocks_)
     {

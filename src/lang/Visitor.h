@@ -4,6 +4,7 @@
 #include <any>
 #include <memory>
 #include <utility>
+#include <assert.h>
 
 #include "Constructs.h"
 

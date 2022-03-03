@@ -68,6 +68,12 @@ namespace lang
         [[nodiscard]] bool isUsable() const;
 
         /**
+         * Get the ID of this basic block.
+         * @return The ID of this basic block.
+         */
+        [[nodiscard]] size_t getId() const;
+
+        /**
          * Validate this basic block.
          * @param validation_logger The validation logger to use.
          */
@@ -78,6 +84,12 @@ namespace lang
          * @return The leaves of this basic block.
          */
         std::list<lang::BasicBlock*> getLeaves();
+
+        /**
+         * Get the blocks that directly follow this block.
+         * @return The blocks that directly follow this block.
+         */
+        std::vector<lang::BasicBlock*> getSuccessors();
 
         /**
          * Get the return value of this basic block. If this is not a return block, an empty optional is returned.
@@ -143,8 +155,9 @@ namespace lang
                 void        setSelf(BasicBlock* self);
                 BasicBlock* self();
 
-                void         setIndex(size_t& index);
-                virtual void finalize(size_t& index) = 0;
+                void                 setIndex(size_t& index);
+                [[nodiscard]] size_t getIndex() const;
+                virtual void         finalize(size_t& index) = 0;
 
                 virtual void setLink(BasicBlock& next)                                             = 0;
                 virtual void updateLink(BasicBlock* former, BasicBlock* updated)                   = 0;
@@ -158,7 +171,8 @@ namespace lang
                 virtual void setContainingFunction(lang::Function* function) = 0;
 
                 virtual void                         validate(ValidationLogger& validation_logger) = 0;
-                virtual std::list<lang::BasicBlock*> getLeaves()                                   = 0;
+                virtual std::list<lang::BasicBlock*>   getLeaves()                                   = 0;
+                virtual std::vector<lang::BasicBlock*> getSuccessors()                               = 0;
                 virtual std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue();
                 virtual lang::Location                                                         getStartLocation() = 0;
                 virtual lang::Location                                                         getEndLocation()   = 0;
@@ -196,8 +210,9 @@ namespace lang
                 void setContainingFunction(lang::Function* function) override;
 
                 void                         validate(ValidationLogger& validation_logger) override;
-                std::list<lang::BasicBlock*> getLeaves() override;
-                lang::Location               getStartLocation() override;
+                std::list<lang::BasicBlock*>   getLeaves() override;
+                std::vector<lang::BasicBlock*> getSuccessors() override;
+                lang::Location                 getStartLocation() override;
                 lang::Location               getEndLocation() override;
 
                 void reach() override;
@@ -227,8 +242,9 @@ namespace lang
                 void setContainingFunction(lang::Function* function) override;
 
                 void                         validate(ValidationLogger& validation_logger) override;
-                std::list<lang::BasicBlock*> getLeaves() override;
-                lang::Location               getStartLocation() override;
+                std::list<lang::BasicBlock*>   getLeaves() override;
+                std::vector<lang::BasicBlock*> getSuccessors() override;
+                lang::Location                 getStartLocation() override;
                 lang::Location               getEndLocation() override;
 
                 void reach() override;
@@ -259,7 +275,8 @@ namespace lang
                 void setContainingFunction(lang::Function* function) override;
 
                 void                         validate(ValidationLogger& validation_logger) override;
-                std::list<lang::BasicBlock*> getLeaves() override;
+                std::list<lang::BasicBlock*>   getLeaves() override;
+                std::vector<lang::BasicBlock*> getSuccessors() override;
                 std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue() override;
                 lang::Location                                                         getStartLocation() override;
                 lang::Location                                                         getEndLocation() override;

@@ -56,6 +56,15 @@ std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Empty::getLeaves()
     return leaves;
 }
 
+std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Empty::getSuccessors()
+{
+    std::vector<lang::BasicBlock*> successors;
+
+    if (next_) { successors.push_back(next_); }
+
+    return successors;
+}
+
 lang::Location lang::BasicBlock::Definition::Empty::getStartLocation()
 {
     return {0, 0, 0, 0};
@@ -73,7 +82,7 @@ void lang::BasicBlock::Definition::Empty::reach()
 
 void lang::BasicBlock::Definition::Empty::prepareBuild(CompileContext* context, llvm::Function* native_function)
 {
-    std::string name = "e" + std::to_string(index_);
+    std::string name = "b" + std::to_string(index_);
     native_block_    = llvm::BasicBlock::Create(*context->llvmContext(), name, native_function);
 
     if (next_) next_->prepareBuild(context, native_function);

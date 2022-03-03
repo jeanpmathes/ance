@@ -71,6 +71,11 @@ bool lang::BasicBlock::isUsable() const
     return !unused_;
 }
 
+size_t lang::BasicBlock::getId() const
+{
+    return definition_->getIndex();
+}
+
 void lang::BasicBlock::validate(ValidationLogger& validation_logger)
 {
     assert(finalized_);
@@ -89,6 +94,14 @@ std::list<lang::BasicBlock*> lang::BasicBlock::getLeaves()
     if (!leaves_.has_value()) { leaves_ = definition_->getLeaves(); }
 
     return leaves_.value();
+}
+
+std::vector<lang::BasicBlock*> lang::BasicBlock::getSuccessors()
+{
+    assert(finalized_);
+    assert(simplified_);
+
+    return definition_->getSuccessors();
 }
 
 std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> lang::BasicBlock::getReturnValue()
@@ -166,6 +179,11 @@ void lang::BasicBlock::Definition::Base::setIndex(size_t& index)
 {
     index_ = index;
     index++;
+}
+
+size_t lang::BasicBlock::Definition::Base::getIndex() const
+{
+    return index_;
 }
 
 void lang::BasicBlock::Definition::Base::registerIncomingLink(lang::BasicBlock& block)

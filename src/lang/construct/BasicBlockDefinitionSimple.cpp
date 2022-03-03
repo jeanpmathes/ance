@@ -80,6 +80,15 @@ std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Simple::getLeaves()
     return leaves;
 }
 
+std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Simple::getSuccessors()
+{
+    std::vector<lang::BasicBlock*> successors;
+
+    if (next_) { successors.push_back(next_); }
+
+    return successors;
+}
+
 lang::Location lang::BasicBlock::Definition::Simple::getStartLocation()
 {
     if (statements_.empty()) { return {0, 0, 0, 0}; }
@@ -122,3 +131,4 @@ void lang::BasicBlock::Definition::Simple::doBuild(CompileContext* context)
         context->ir()->CreateRetVoid();
     }
 }
+

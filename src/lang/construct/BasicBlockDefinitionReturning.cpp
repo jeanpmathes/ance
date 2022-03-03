@@ -81,6 +81,11 @@ std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Returning::getLeaves(
     return leaves;
 }
 
+std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Returning::getSuccessors()
+{
+    return {};
+}
+
 std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> lang::BasicBlock::Definition::Returning::
     getReturnValue()
 {

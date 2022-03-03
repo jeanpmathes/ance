@@ -19,6 +19,7 @@
 #include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/utility/Values.h"
 #include "compiler/Application.h"
+#include "compiler/ControlFlowGraphPrinter.h"
 
 AnceCompiler::AnceCompiler(Application& app)
     : application_(app)
@@ -81,6 +82,15 @@ void AnceCompiler::compile(const std::filesystem::path& out)
     application_.globalScope().buildFunctions(context_.get());
 
     assert(context_->allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
+
+    // Print control flow graph.
+
+    std::filesystem::path   cfg_path = out.parent_path() / "cfg.gml";
+    std::ofstream           cfg_out(cfg_path);
+    ControlFlowGraphPrinter cfg_printer(cfg_out);
+    cfg_printer.visit(application_);
+
+    // Prepare entry and exit functions.
 
     lang::ResolvingHandle<lang::Function> main = application_.globalScope().getEntry();
 
