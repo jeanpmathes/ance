@@ -10,22 +10,33 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitor
 
     explicit ControlFlowGraphPrinter(std::ostream& out);
 
+    std::any visit(Application& app) override;
     std::any visit(lang::CustomFunction& function) override;
     std::any visit(lang::BasicBlock& block) override;
 
   private:
-    void printNode(const std::string& label, size_t id);
-    void printEdge(size_t from, size_t to);
+    void printBlock(const std::string& label, int32_t id);
+    void printLink(int32_t from, int32_t to);
+    void printGroup(const std::string& label);
 
-    static size_t offset(size_t x);
+    uint32_t map(int32_t i);
+
+  private:
+    enum SpecialNodes
+    {
+        NODE_EXIT  = -1,
+        NODE_GROUP = -2,
+    };
 
   private:
     std::ostream& out_;
 
-    size_t graph_counter_ {0};
-    size_t node_counter_ {0};
+    std::stringstream nodes_ {};
+    std::stringstream edges_ {};
 
-    lang::CustomFunction* current_function_ {nullptr};
+    std::map<std::pair<lang::CustomFunction*, int32_t>, uint32_t> id_map_ {};
+    uint32_t                                                      node_counter_ {0};
+    lang::CustomFunction*                                         current_function_ {nullptr};
 };
 
 #endif
