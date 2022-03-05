@@ -3,6 +3,8 @@
 
 #include "lang/ApplicationVisitor.h"
 
+#include "compiler/CodePrinter.h"
+
 class ControlFlowGraphPrinter : public lang::ApplicationVisitor
 {
   public:
@@ -20,6 +22,8 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitor
     void printGroup(const std::string& label);
 
     uint32_t map(int32_t i);
+
+    static std::string escape(const std::string& s);
 
   private:
     enum SpecialNodes

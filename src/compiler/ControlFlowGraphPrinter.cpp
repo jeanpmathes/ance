@@ -35,10 +35,26 @@ std::any ControlFlowGraphPrinter::visit(lang::CustomFunction& function)
 
 std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
 {
-    auto        id   = static_cast<int32_t>(block.getId());
-    std::string name = (id > 0) ? std::to_string(id) + "b" : current_function_->name();
+    auto id       = static_cast<int32_t>(block.getId());
+    bool has_code = id > 0;
 
-    printBlock(name, id);
+    std::string label;
+
+    if (has_code)
+    {
+        std::stringstream code_stream;
+        CodePrinter       code_printer(code_stream);
+
+        code_printer.visit(block);
+
+        label = escape(code_stream.str());
+        if (label.empty()) label = "-";
+    }
+    else {
+        label = current_function_->name();
+    }
+
+    printBlock(label, id);
 
     std::vector<lang::BasicBlock*> successors = block.getSuccessors();
 
@@ -86,4 +102,26 @@ uint32_t ControlFlowGraphPrinter::map(int32_t i)
     uint32_t id  = node_counter_++;
     id_map_[key] = id;
     return id;
+}
+
+std::string ControlFlowGraphPrinter::escape(const std::string& s)
+{
+    std::string result;
+
+    for (char c : s)
+    {
+        switch (c)
+        {
+            case '"':
+                result += "&quot;";
+                break;
+            case '&':
+                result += "&amp;";
+                break;
+            default:
+                result += c;
+        }
+    }
+
+    return result;
 }
