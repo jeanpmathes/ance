@@ -21,7 +21,7 @@ std::any ControlFlowGraphPrinter::visit(lang::CustomFunction& function)
     visitChildren(function);
 
     printBlock("exit", NODE_EXIT);
-    printGroup(function.name());
+    printGroup(function.signature().toString());
 
     out_ << nodes_.rdbuf();
     out_ << edges_.rdbuf();
