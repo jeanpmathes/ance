@@ -1,11 +1,13 @@
 #include "CodePrinter.h"
 
-std::ostream& util::operator<<(std::ostream& os, const std::any& any)
+std::ostream& util::operator<<(std::ostream&, const std::any&)
 {
     return os;
 }
 
 using namespace util;
+
+#define END_STATEMENT ";" << std::endl
 
 CodePrinter::CodePrinter(std::ostream& out) : out_(out) {}
 
@@ -121,7 +123,7 @@ std::any CodePrinter::visit(VariableAccess& variable_access)
 
 std::any CodePrinter::visit(Assertion& assertion)
 {
-    out_ << "assert " << visitChildren(assertion.condition()) << ";";
+    out_ << "assert " << visitChildren(assertion.condition()) << END_STATEMENT;
 
     return {};
 }
@@ -130,7 +132,7 @@ std::any CodePrinter::visit(AssignmentStatement& assignment_statement)
 {
     out_ << visitChildren(assignment_statement.assignable()) << " ";
     out_ << assignment_statement.assigner().getSymbol() << " ";
-    out_ << visitChildren(assignment_statement.assigned()) << ";";
+    out_ << visitChildren(assignment_statement.assigned()) << END_STATEMENT;
 
     return {};
 }
@@ -140,14 +142,14 @@ std::any CodePrinter::visit(DeleteStatement& delete_statement)
     out_ << "delete";
     if (delete_statement.isBufferDelete()) out_ << "[]";
 
-    out_ << " " << visitChildren(delete_statement.toDelete()) << ";";
+    out_ << " " << visitChildren(delete_statement.toDelete()) << END_STATEMENT;
 
     return {};
 }
 
 std::any CodePrinter::visit(ExpressionStatement& expression_statement)
 {
-    out_ << visitChildren(expression_statement.expression()) << ";";
+    out_ << visitChildren(expression_statement.expression()) << END_STATEMENT;
 
     return {};
 }
@@ -156,7 +158,7 @@ std::any CodePrinter::visit(LocalReferenceVariableDefinition& local_reference_va
 {
     out_ << "let " << local_reference_variable_definition.identifier();
     out_ << " : " << local_reference_variable_definition.type()->getName() << " ";
-    out_ << visitChildren(local_reference_variable_definition.reference()) << ";";
+    out_ << visitChildren(local_reference_variable_definition.reference()) << END_STATEMENT;
 
     return {};
 }
@@ -172,7 +174,7 @@ std::any CodePrinter::visit(LocalVariableDefinition& local_variable_definition)
         out_ << visitChildren(*local_variable_definition.assigned());
     }
 
-    out_ << ";";
+    out_ << END_STATEMENT;
 
     return {};
 }
@@ -183,7 +185,7 @@ std::any CodePrinter::visit(ReturnStatement& return_statement)
 
     if (return_statement.expression()) { out_ << " " << visitChildren(*return_statement.expression()); }
 
-    out_ << ";";
+    out_ << END_STATEMENT;
 
     return {};
 }
