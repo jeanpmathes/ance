@@ -19,6 +19,8 @@ namespace lang
         explicit BooleanConstant(bool boolean);
 
       public:
+        [[nodiscard]] std::string toString() const override;
+
         lang::ResolvingHandle<lang::Type> type() override;
 
         llvm::Constant* buildContent(llvm::Module* m) override;
@@ -37,6 +39,7 @@ namespace lang
       private:
         lang::ResolvingHandle<lang::Type> type_;
         bool                              boolean_;
+        std::string                       string_;
     };
 }
 

@@ -8,6 +8,11 @@
 
 lang::DiffConstant::DiffConstant(std::string value) : type_(lang::SizeType::getDiff()), value_(std::move(value)) {}
 
+std::string lang::DiffConstant::toString() const
+{
+    return value_ + ":diff";
+}
+
 bool lang::DiffConstant::validate(ValidationLogger& validation_logger, lang::Location location)
 {
     if (llvm::APInt::getBitsNeeded(value_, 10) > lang::SizeType::MINIMUM_BIT_SIZE)

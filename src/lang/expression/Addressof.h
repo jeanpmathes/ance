@@ -24,6 +24,8 @@ class Addressof
      */
     Addressof(std::unique_ptr<Expression> arg, lang::Location location);
 
+    [[nodiscard]] Expression& argument() const;
+
   protected:
     void setScope(lang::Scope* scope) override;
 

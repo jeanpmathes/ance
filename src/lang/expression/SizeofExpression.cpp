@@ -11,6 +11,11 @@ SizeofExpression::SizeofExpression(std::unique_ptr<Expression> expression, lang:
     addChild(*expression_);
 }
 
+Expression& SizeofExpression::expression() const
+{
+    return *expression_;
+}
+
 void SizeofExpression::setScope(lang::Scope* scope)
 {
     expression_->setContainingScope(scope);

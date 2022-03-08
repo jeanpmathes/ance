@@ -11,6 +11,11 @@ SizeofType::SizeofType(lang::ResolvingHandle<lang::Type> type, lang::Location ty
     , type_location_(type_location)
 {}
 
+lang::ResolvingHandle<lang::Type> SizeofType::targetType() const
+{
+    return type_;
+}
+
 void SizeofType::setScope(lang::Scope* scope)
 {
     scope->addType(type_);

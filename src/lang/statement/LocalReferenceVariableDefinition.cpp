@@ -55,6 +55,21 @@ LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string  
     addChild(*reference_);
 }
 
+const std::string& LocalReferenceVariableDefinition::identifier() const
+{
+    return identifier_;
+}
+
+lang::ResolvingHandle<lang::Type> LocalReferenceVariableDefinition::type() const
+{
+    return type_;
+}
+
+Expression& LocalReferenceVariableDefinition::reference() const
+{
+    return *reference_;
+}
+
 void LocalReferenceVariableDefinition::setFunction(lang::Function* function)
 {
     function->addType(type_);

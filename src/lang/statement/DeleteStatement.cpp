@@ -15,6 +15,16 @@ DeleteStatement::DeleteStatement(std::unique_ptr<Expression> to_delete, bool del
     addChild(*to_delete_);
 }
 
+Expression& DeleteStatement::toDelete() const
+{
+    return *to_delete_;
+}
+
+bool DeleteStatement::isBufferDelete() const
+{
+    return delete_buffer_;
+}
+
 void DeleteStatement::setFunction(lang::Function* function)
 {
     to_delete_->setContainingScope(function);

@@ -15,6 +15,21 @@ BinaryOperation::BinaryOperation(std::unique_ptr<Expression> left,
     addChild(*right_);
 }
 
+Expression& BinaryOperation::left() const
+{
+    return *left_;
+}
+
+Expression& BinaryOperation::right() const
+{
+    return *right_;
+}
+
+lang::BinaryOperator BinaryOperation::op() const
+{
+    return op_;
+}
+
 void BinaryOperation::setScope(lang::Scope* scope)
 {
     left_->setContainingScope(scope);

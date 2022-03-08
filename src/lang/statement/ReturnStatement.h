@@ -22,6 +22,8 @@ class ReturnStatement
      */
     ReturnStatement(std::unique_ptr<Expression> return_value, lang::Location location);
 
+    [[nodiscard]] Expression* expression();
+
     std::unique_ptr<lang::BasicBlock> createBlock() override;
 
     void setFunction(lang::Function* function) override;

@@ -24,6 +24,11 @@ BindRef::BindRef(std::unique_ptr<Expression> address, lang::Location location)
     addChild(*address_);
 }
 
+Expression& BindRef::address() const
+{
+    return *address_;
+}
+
 void BindRef::setScope(lang::Scope* scope)
 {
     address_->setContainingScope(scope);

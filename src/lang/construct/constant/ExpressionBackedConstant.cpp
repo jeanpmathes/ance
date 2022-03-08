@@ -6,6 +6,16 @@ lang::ExpressionBackedConstant::ExpressionBackedConstant(BackingConstantExpressi
     : expression_(expression)
 {}
 
+std::string lang::ExpressionBackedConstant::toString() const
+{
+    return "";
+}
+
+Expression* lang::ExpressionBackedConstant::getBackingExpression() const
+{
+    return expression_;
+}
+
 lang::ResolvingHandle<lang::Type> lang::ExpressionBackedConstant::type()
 {
     return expression_->type();

@@ -12,6 +12,11 @@ Addressof::Addressof(std::unique_ptr<Expression> arg, lang::Location location)
     addChild(*arg_);
 }
 
+Expression& Addressof::argument() const
+{
+    return *arg_;
+}
+
 void Addressof::setScope(lang::Scope* scope)
 {
     arg_->setContainingScope(scope);

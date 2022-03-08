@@ -25,6 +25,10 @@ class BinaryOperation
                     std::unique_ptr<Expression> right,
                     lang::Location              location);
 
+    [[nodiscard]] Expression&          left() const;
+    [[nodiscard]] Expression&          right() const;
+    [[nodiscard]] lang::BinaryOperator op() const;
+
   protected:
     void setScope(lang::Scope* scope) override;
 

@@ -42,6 +42,11 @@ class LocalVariableDefinition
                             std::unique_ptr<Expression>       assigned,
                             lang::Location                    location);
 
+    [[nodiscard]] const std::string&                identifier() const;
+    [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
+    [[nodiscard]] lang::Assigner                    assigner() const;
+    [[nodiscard]] Expression*                       assigned() const;
+
     void setFunction(lang::Function* function) override;
 
     void validate(ValidationLogger& validation_logger) override;

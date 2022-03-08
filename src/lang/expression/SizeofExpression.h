@@ -23,6 +23,8 @@ class SizeofExpression
      */
     SizeofExpression(std::unique_ptr<Expression> expression, lang::Location location);
 
+    [[nodiscard]] Expression& expression() const;
+
   protected:
     void setScope(lang::Scope* scope) override;
 

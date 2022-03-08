@@ -25,6 +25,8 @@ namespace lang
          */
         explicit ByteConstant(uint8_t byte);
 
+        [[nodiscard]] std::string toString() const override;
+
         lang::ResolvingHandle<lang::Type> type() override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
 

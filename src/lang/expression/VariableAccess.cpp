@@ -10,6 +10,11 @@ VariableAccess::VariableAccess(lang::ResolvingHandle<lang::Variable> variable, l
     , variable_(std::move(variable))
 {}
 
+lang::ResolvingHandle<lang::Variable> VariableAccess::variable() const
+{
+    return variable_;
+}
+
 void VariableAccess::setScope(lang::Scope* scope)
 {
     scope->registerUsage(variable_);

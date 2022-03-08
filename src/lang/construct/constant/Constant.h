@@ -12,6 +12,19 @@ namespace lang
     {
       public:
         /**
+         * Get a string representation of the constant.
+         * The string representation is only guaranteed to exist if no backing expression is used.
+         * @return The string representation.
+         */
+        [[nodiscard]] virtual std::string toString() const = 0;
+
+        /**
+         * Get the backing expression of the constant, if any.
+         * @return The backing expression, or nullptr if none.
+         */
+        [[nodiscard]] virtual Expression* getBackingExpression() const;
+
+        /**
          * Validate the constant value.
          * @param location The location of the constant.
          * @param validation_logger The logger to log the validation result.

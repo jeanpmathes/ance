@@ -27,6 +27,26 @@ LocalVariableDefinition::LocalVariableDefinition(std::string                    
     addChild(*assigned_);
 }
 
+const std::string& LocalVariableDefinition::identifier() const
+{
+    return identifier_;
+}
+
+lang::ResolvingHandle<lang::Type> LocalVariableDefinition::type() const
+{
+    return type_;
+}
+
+lang::Assigner LocalVariableDefinition::assigner() const
+{
+    return assigner_;
+}
+
+Expression* LocalVariableDefinition::assigned() const
+{
+    return assigned_.get();
+}
+
 void LocalVariableDefinition::setFunction(lang::Function* function)
 {
     function->addType(type_);
@@ -83,4 +103,3 @@ void LocalVariableDefinition::doBuild(CompileContext* context)
 {
     (*variable_)->buildDefinition(context);
 }
-

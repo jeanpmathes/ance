@@ -32,6 +32,9 @@ class FunctionCall
                  std::vector<std::unique_ptr<Expression>>   arguments,
                  lang::Location                             location);
 
+    [[nodiscard]] lang::ResolvingHandle<lang::FunctionGroup>      group() const;
+    [[nodiscard]] std::vector<std::reference_wrapper<Expression>> arguments() const;
+
   protected:
     void setScope(lang::Scope* scope) override;
 

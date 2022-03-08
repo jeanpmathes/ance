@@ -22,6 +22,8 @@ namespace lang
          */
         explicit SizeConstant(std::string value);
 
+        [[nodiscard]] std::string toString() const override;
+
         bool validate(ValidationLogger& validation_logger, lang::Location location) override;
 
         lang::ResolvingHandle<lang::Type> type() override;

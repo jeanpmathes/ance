@@ -9,6 +9,11 @@ ConstantLiteral::ConstantLiteral(std::shared_ptr<lang::Constant> constant, lang:
     , constant_(std::move(constant))
 {}
 
+lang::Constant& ConstantLiteral::constant() const
+{
+    return *constant_;
+}
+
 lang::ResolvingHandle<lang::Type> ConstantLiteral::type()
 {
     return constant_->type();

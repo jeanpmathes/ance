@@ -22,6 +22,8 @@ class ExpressionStatement
      */
     ExpressionStatement(std::unique_ptr<BuildableExpression> expression, lang::Location location);
 
+    [[nodiscard]] BuildableExpression& expression() const;
+
     void setFunction(lang::Function* function) override;
 
     void validate(ValidationLogger& validation_logger) override;

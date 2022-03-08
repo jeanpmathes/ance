@@ -17,6 +17,21 @@ FunctionCall::FunctionCall(lang::ResolvingHandle<lang::FunctionGroup> function_g
     for (auto& argument : arguments_) { addChild(*argument); }
 }
 
+lang::ResolvingHandle<lang::FunctionGroup> FunctionCall::group() const
+{
+    return function_group_;
+}
+
+std::vector<std::reference_wrapper<Expression>> FunctionCall::arguments() const
+{
+    std::vector<std::reference_wrapper<Expression>> arguments;
+
+    arguments.reserve(arguments_.size());
+    for (auto& argument : arguments_) { arguments.emplace_back(*argument); }
+
+    return arguments;
+}
+
 void FunctionCall::setScope(lang::Scope* scope)
 {
     scope->registerUsage(function_group_);

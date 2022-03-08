@@ -21,6 +21,21 @@ Allocation::Allocation(Runtime::Allocator                allocation,
     if (count_) addChild(*count_);
 }
 
+Runtime::Allocator Allocation::allocator() const
+{
+    return allocation_;
+}
+
+lang::ResolvingHandle<lang::Type> Allocation::allocatedType() const
+{
+    return allocated_type_;
+}
+
+Expression* Allocation::count() const
+{
+    return count_.get();
+}
+
 void Allocation::setScope(lang::Scope* scope)
 {
     scope->addType(allocated_type_);

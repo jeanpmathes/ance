@@ -27,6 +27,8 @@ class VariableAccess
      */
     explicit VariableAccess(lang::ResolvingHandle<lang::Variable> variable, lang::Location location);
 
+    [[nodiscard]] lang::ResolvingHandle<lang::Variable> variable() const;
+
   protected:
     void setScope(lang::Scope* scope) override;
 

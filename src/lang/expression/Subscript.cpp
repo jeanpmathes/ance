@@ -12,6 +12,16 @@ Subscript::Subscript(std::unique_ptr<Expression> indexed, std::unique_ptr<Expres
     addChild(*index_);
 }
 
+Expression& Subscript::indexed() const
+{
+    return *indexed_;
+}
+
+Expression& Subscript::index() const
+{
+    return *index_;
+}
+
 void Subscript::setScope(lang::Scope* scope)
 {
     indexed_->setContainingScope(scope);

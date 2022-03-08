@@ -5,6 +5,11 @@
 
 #include "compiler/CompileContext.h"
 
+Expression* lang::Constant::getBackingExpression() const
+{
+    return nullptr;
+}
+
 bool lang::Constant::validate(ValidationLogger&, lang::Location)
 {
     return true;

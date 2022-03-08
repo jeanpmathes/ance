@@ -22,6 +22,8 @@ class Assertion
      */
     Assertion(std::unique_ptr<Expression> condition, lang::Location location);
 
+    [[nodiscard]] Expression& condition() const;
+
     void setFunction(lang::Function* function) override;
 
     void validate(ValidationLogger& validation_logger) override;

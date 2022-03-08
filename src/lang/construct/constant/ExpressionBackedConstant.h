@@ -22,6 +22,9 @@ namespace lang
          */
         explicit ExpressionBackedConstant(BackingConstantExpression* expression);
 
+        [[nodiscard]] std::string toString() const override;
+        [[nodiscard]] Expression* getBackingExpression() const override;
+
         lang::ResolvingHandle<lang::Type> type() override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
 

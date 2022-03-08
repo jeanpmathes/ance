@@ -4,6 +4,11 @@
 
 lang::BooleanConstant::BooleanConstant(bool boolean) : type_(lang::IntegerType::getBooleanType()), boolean_(boolean) {}
 
+std::string lang::BooleanConstant::toString() const
+{
+    return boolean_ ? "true" : "false";
+}
+
 lang::ResolvingHandle<lang::Type> lang::BooleanConstant::type()
 {
     return type_;

@@ -12,6 +12,11 @@ ReturnStatement::ReturnStatement(std::unique_ptr<Expression> return_value, lang:
     if (return_value_) addChild(*return_value_);
 }
 
+Expression* ReturnStatement::expression()
+{
+    return return_value_.get();
+}
+
 std::unique_ptr<lang::BasicBlock> ReturnStatement::createBlock()
 {
     return lang::BasicBlock::createReturning(return_value_.get(), location());

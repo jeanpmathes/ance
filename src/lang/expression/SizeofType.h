@@ -23,6 +23,8 @@ class SizeofType
      */
     explicit SizeofType(lang::ResolvingHandle<lang::Type> type, lang::Location type_location, lang::Location location);
 
+    [[nodiscard]] lang::ResolvingHandle<lang::Type> targetType() const;
+
   protected:
     void setScope(lang::Scope* scope) override;
 

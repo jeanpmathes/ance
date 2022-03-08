@@ -11,6 +11,11 @@ ExpressionStatement::ExpressionStatement(std::unique_ptr<BuildableExpression> ex
     addChild(*expression_);
 }
 
+BuildableExpression& ExpressionStatement::expression() const
+{
+    return *expression_;
+}
+
 void ExpressionStatement::setFunction(lang::Function* function)
 {
     expression_->setContainingScope(function);
@@ -25,4 +30,3 @@ void ExpressionStatement::doBuild(CompileContext* context)
 {
     expression_->build(context);
 }
-

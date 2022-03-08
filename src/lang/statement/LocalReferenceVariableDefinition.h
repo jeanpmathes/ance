@@ -55,6 +55,11 @@ class LocalReferenceVariableDefinition
                                      lang::Location                    location);
 
   public:
+    [[nodiscard]] const std::string&                identifier() const;
+    [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
+    [[nodiscard]] Expression&                       reference() const;
+
+  public:
     void setFunction(lang::Function* function) override;
 
     void validate(ValidationLogger& validation_logger) override;

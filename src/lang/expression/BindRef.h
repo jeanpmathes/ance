@@ -26,6 +26,9 @@ class BindRef
   private:
     BindRef(std::unique_ptr<Expression> address, lang::Location location);
 
+  public:
+    [[nodiscard]] Expression& address() const;
+
   protected:
     void setScope(lang::Scope* scope) override;
 

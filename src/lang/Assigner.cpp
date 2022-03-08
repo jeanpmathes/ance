@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "lang/Assigner.h"
 
 lang::Assigner::operator Value() const
@@ -13,4 +15,22 @@ bool lang::Assigner::isFinal()
 bool lang::Assigner::hasSymbol()
 {
     return value_ != REFERENCE_BINDING && value_ != UNSPECIFIED;
+}
+
+std::string lang::Assigner::getSymbol()
+{
+    assert(hasSymbol());
+
+    switch (value_)
+    {
+        case COPY_ASSIGNMENT:
+            return "<:";
+        case MOVE_ASSIGNMENT:
+            return "<-";
+        case FINAL_COPY_ASSIGNMENT:
+            return ":=";
+
+        default:
+            return "";
+    }
 }

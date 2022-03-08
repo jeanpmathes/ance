@@ -21,6 +21,21 @@ AssignmentStatement::AssignmentStatement(std::unique_ptr<Expression> assignable,
     addChild(*assigned_);
 }
 
+Expression& AssignmentStatement::assignable() const
+{
+    return *assignable_;
+}
+
+lang::Assigner AssignmentStatement::assigner() const
+{
+    return assigner_;
+}
+
+Expression& AssignmentStatement::assigned() const
+{
+    return *assigned_;
+}
+
 void AssignmentStatement::setFunction(lang::Function* function)
 {
     assignable_->setContainingScope(function);

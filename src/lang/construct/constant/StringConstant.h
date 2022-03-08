@@ -23,6 +23,8 @@ namespace lang
          */
         StringConstant(std::string prefix, std::string string);
 
+        [[nodiscard]] std::string toString() const override;
+
         lang::ResolvingHandle<lang::Type> type() override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
 

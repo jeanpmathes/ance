@@ -15,6 +15,11 @@ Assertion::Assertion(std::unique_ptr<Expression> condition, lang::Location locat
     addChild(*condition_);
 }
 
+Expression& Assertion::condition() const
+{
+    return *condition_;
+}
+
 void Assertion::setFunction(lang::Function* function)
 {
     condition_->setContainingScope(function);
@@ -35,4 +40,3 @@ void Assertion::doBuild(CompileContext* context)
 {
     context->runtime()->buildAssert(condition_->getValue(), context);
 }
-

@@ -22,10 +22,13 @@ namespace lang
          */
         FloatConstant(std::string number, const llvm::fltSemantics& semantics, lang::ResolvingHandle<lang::Type> type);
 
+        [[nodiscard]] std::string toString() const override;
+
         lang::ResolvingHandle<lang::Type> type() override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
 
       private:
+        std::string                       text_;
         lang::ResolvingHandle<lang::Type> type_;
         llvm::APFloat                     float_;
     };

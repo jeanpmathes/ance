@@ -9,6 +9,11 @@
 
 lang::SizeConstant::SizeConstant(std::string value) : type_(lang::SizeType::getSize()), value_(std::move(value)) {}
 
+std::string lang::SizeConstant::toString() const
+{
+    return value_ + ":size";
+}
+
 bool lang::SizeConstant::validate(ValidationLogger& validation_logger, lang::Location location)
 {
     if (llvm::APInt::getBitsNeeded(value_, 10) > lang::SizeType::MINIMUM_BIT_SIZE)

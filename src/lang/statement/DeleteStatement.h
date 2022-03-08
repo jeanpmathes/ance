@@ -23,6 +23,9 @@ class DeleteStatement
      */
     DeleteStatement(std::unique_ptr<Expression> to_delete, bool delete_buffer, lang::Location location);
 
+    [[nodiscard]] Expression& toDelete() const;
+    [[nodiscard]] bool        isBufferDelete() const;
+
     void setFunction(lang::Function* function) override;
 
     void validate(ValidationLogger& validation_logger) override;

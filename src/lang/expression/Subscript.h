@@ -21,6 +21,9 @@ class Subscript
      */
     Subscript(std::unique_ptr<Expression> indexed, std::unique_ptr<Expression> index, lang::Location location);
 
+    [[nodiscard]] Expression& indexed() const;
+    [[nodiscard]] Expression& index() const;
+
   protected:
     void setScope(lang::Scope* scope) override;
 

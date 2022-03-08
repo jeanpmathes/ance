@@ -5,6 +5,28 @@
 
 lang::ByteConstant::ByteConstant(uint8_t byte) : type_(lang::IntegerType::get(8, false)), byte_(byte) {}
 
+std::string lang::ByteConstant::toString() const
+{
+    std::string content;
+
+    switch (byte_)
+    {
+        case '\n':
+            content = "\\n";
+            break;
+
+        case '\0':
+            content = "\\0";
+            break;
+
+        default:
+            content = std::to_string(byte_);
+            break;
+    }
+
+    return "'" + content + "'";
+}
+
 lang::ResolvingHandle<lang::Type> lang::ByteConstant::type()
 {
     return type_;

@@ -30,6 +30,10 @@ class Allocation
                lang::Location                    location,
                lang::Location                    allocated_type_location);
 
+    [[nodiscard]] Runtime::Allocator                allocator() const;
+    [[nodiscard]] lang::ResolvingHandle<lang::Type> allocatedType() const;
+    [[nodiscard]] Expression*                       count() const;
+
   protected:
     void setScope(lang::Scope* scope) override;
 

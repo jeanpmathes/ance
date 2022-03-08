@@ -15,6 +15,31 @@ lang::IntegerConstant::IntegerConstant(std::string integer, int64_t size, bool i
     text_.erase(0, std::min(text_.find_first_not_of('0'), text_.size() - 1));
 }
 
+std::string lang::IntegerConstant::toString() const
+{
+    std::string prefix;
+
+    switch (radix_)
+    {
+        case 2:
+            prefix = "0b";
+            break;
+        case 8:
+            prefix = "0o";
+            break;
+        case 10:
+            prefix = "";
+            break;
+        case 16:
+            prefix = "0x";
+            break;
+        default:
+            throw std::runtime_error("Invalid radix");
+    }
+
+    return prefix + text_ + ":" + std::to_string(size_);
+}
+
 bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::Location location)
 {
     bool valid = type()->validate(validation_logger, location);

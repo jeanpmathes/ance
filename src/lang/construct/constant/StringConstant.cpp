@@ -13,6 +13,11 @@ lang::StringConstant::StringConstant(std::string prefix, std::string string)
     , string_(string)
 {}
 
+std::string lang::StringConstant::toString() const
+{
+    return prefix_ + "\"" + string_ + "\"";
+}
+
 lang::ResolvingHandle<lang::Type> lang::StringConstant::type()
 {
     return type_;

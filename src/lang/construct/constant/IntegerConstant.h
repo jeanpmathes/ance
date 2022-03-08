@@ -25,6 +25,8 @@ namespace lang
          */
         IntegerConstant(std::string integer, int64_t size, bool is_signed, int radix = 10);
 
+        [[nodiscard]] std::string toString() const override;
+
         bool validate(ValidationLogger& validation_logger, lang::Location location) override;
 
         lang::ResolvingHandle<lang::Type> type() override;
