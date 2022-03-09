@@ -13,7 +13,7 @@ CodePrinter::CodePrinter(std::ostream& out) : out_(out) {}
 
 std::any CodePrinter::visit(Addressof& addressof)
 {
-    out_ << "addressof " << visitChildren(addressof.argument());
+    out_ << "addressof " << visitTree(addressof.argument());
 
     return {};
 }
@@ -21,7 +21,7 @@ std::any CodePrinter::visit(Addressof& addressof)
 std::any CodePrinter::visit(Allocation& allocation)
 {
     out_ << "new";
-    if (allocation.count()) out_ << "[" << visitChildren(*allocation.count()) << "]";
+    if (allocation.count()) out_ << "[" << visitTree(*allocation.count()) << "]";
 
     std::string allocator;
     switch (allocation.allocator())

@@ -20,7 +20,7 @@ std::string lang::ByteConstant::toString() const
             break;
 
         default:
-            content = std::to_string(byte_);
+            content = std::string(1, static_cast<char>(byte_));
             break;
     }
 
