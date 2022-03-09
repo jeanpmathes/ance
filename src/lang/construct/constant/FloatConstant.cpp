@@ -15,7 +15,7 @@ std::string lang::FloatConstant::toString() const
     std::string suffix;
 
     if (type_->isFloatingPointType(16)) suffix += "h";
-    if (type_->isFloatingPointType(32)) suffix += "f";
+    if (type_->isFloatingPointType(32)) suffix += "s";
     if (type_->isFloatingPointType(64)) suffix += "d";
     if (type_->isFloatingPointType(128)) suffix += "q";
 
