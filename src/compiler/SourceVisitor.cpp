@@ -36,6 +36,7 @@
 #include "lang/expression/SizeofType.h"
 #include "lang/expression/Subscript.h"
 #include "lang/expression/VariableAccess.h"
+#include "lang/expression/Parenthesis.h"
 
 #include "lang/construct/constant/BooleanConstant.h"
 #include "lang/construct/constant/ByteConstant.h"
@@ -399,7 +400,7 @@ antlrcpp::Any SourceVisitor::visitBinaryOperation(anceParser::BinaryOperationCon
 antlrcpp::Any SourceVisitor::visitParenthesis(anceParser::ParenthesisContext* ctx)
 {
     Expression* contained = visit(ctx->expression()).as<Expression*>();
-    return contained;
+    return static_cast<Expression*>(new Parenthesis(std::unique_ptr<Expression>(contained), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)

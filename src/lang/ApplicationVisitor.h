@@ -29,6 +29,7 @@ namespace lang
 #include "lang/expression/SizeofType.h"
 #include "lang/expression/Subscript.h"
 #include "lang/expression/VariableAccess.h"
+#include "lang/expression/Parenthesis.h"
 
 #include "lang/scope/GlobalScope.h"
 #include "lang/scope/LocalScope.h"

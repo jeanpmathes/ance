@@ -25,6 +25,7 @@ class BindRef;
 class ConstantLiteral;
 class DefaultValue;
 class FunctionCall;
+class Parenthesis;
 class SizeofExpression;
 class SizeofType;
 class Subscript;
@@ -47,8 +48,8 @@ class ReturnStatement;
 #define ANCE_CONSTRUCTS                                                                                                \
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::BasicBlock,    \
         lang::Variable, lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation, BinaryOperation, BindRef,    \
-        ConstantLiteral, DefaultValue, FunctionCall, SizeofExpression, SizeofType, Subscript, VariableAccess,          \
-        lang::GlobalScope, lang::LocalScope, Assertion, AssignmentStatement, DeleteStatement, ExpressionStatement,     \
-        LocalReferenceVariableDefinition, LocalVariableDefinition, ReturnStatement
+        ConstantLiteral, DefaultValue, FunctionCall, Parenthesis, SizeofExpression, SizeofType, Subscript,             \
+        VariableAccess, lang::GlobalScope, lang::LocalScope, Assertion, AssignmentStatement, DeleteStatement,          \
+        ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, ReturnStatement
 
 #endif

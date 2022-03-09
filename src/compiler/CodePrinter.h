@@ -22,6 +22,7 @@ class CodePrinter : public lang::ApplicationVisitor
     std::any visit(ConstantLiteral& constant_literal) override;
     std::any visit(DefaultValue& default_value) override;
     std::any visit(FunctionCall& function_call) override;
+    std::any visit(Parenthesis& parenthesis) override;
     std::any visit(SizeofExpression& sizeof_expression) override;
     std::any visit(SizeofType& sizeof_type) override;
     std::any visit(Subscript& subscript) override;

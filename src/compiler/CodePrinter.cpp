@@ -93,6 +93,13 @@ std::any CodePrinter::visit(FunctionCall& function_call)
     return {};
 }
 
+std::any CodePrinter::visit(Parenthesis& parenthesis)
+{
+    out_ << "(" << visitTree(parenthesis.contained()) << ")";
+
+    return {};
+}
+
 std::any CodePrinter::visit(SizeofExpression& sizeof_expression)
 {
     out_ << "sizeof(" << visitTree(sizeof_expression.expression()) << ")";

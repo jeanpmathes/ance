@@ -81,7 +81,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      */
     [[nodiscard]] virtual std::shared_ptr<lang::Value> getValue() const = 0;
 
-    virtual ~Expression() = default;
+    ~Expression() override = default;
 
   protected:
     /**
