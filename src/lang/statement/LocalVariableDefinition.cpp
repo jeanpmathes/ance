@@ -8,6 +8,7 @@
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 #include "lang/Assigner.h"
+#include "lang/expression/DefaultValue.h"
 
 LocalVariableDefinition::LocalVariableDefinition(std::string                       identifier,
                                                  lang::ResolvingHandle<lang::Type> type,
@@ -20,7 +21,8 @@ LocalVariableDefinition::LocalVariableDefinition(std::string                    
     , type_(type)
     , type_location_(type_location)
     , assigner_(assigner)
-    , assigned_(std::move(assigned))
+    , assigned_ptr_(assigned.get())
+    , assigned_(assigned ? std::move(assigned) : std::make_unique<DefaultValue>(type, location))
 {
     assert(assigner.hasSymbol());
 
@@ -44,7 +46,7 @@ lang::Assigner LocalVariableDefinition::assigner() const
 
 Expression* LocalVariableDefinition::assigned() const
 {
-    return assigned_.get();
+    return assigned_ptr_;
 }
 
 void LocalVariableDefinition::setFunction(lang::Function* function)

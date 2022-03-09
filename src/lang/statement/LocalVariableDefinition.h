@@ -32,7 +32,7 @@ class LocalVariableDefinition
      * @param type The type of the variable.
      * @param type_location The location of the type.
      * @param assigner The assigner to use for initial assignment.
-     * @param assigned The initially assigned value.
+     * @param assigned The initially assigned value, or nullptr if a default value is used.
      * @param location The source location.
      */
     LocalVariableDefinition(std::string                       identifier,
@@ -59,6 +59,7 @@ class LocalVariableDefinition
     lang::ResolvingHandle<lang::Type> type_;
     lang::Location                    type_location_;
     lang::Assigner                    assigner_;
+    Expression*                       assigned_ptr_;
     std::unique_ptr<Expression>       assigned_;
 
     std::optional<lang::ResolvingHandle<lang::Variable>> variable_ {};

@@ -211,7 +211,7 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
     }
     else {
         assigner = lang::Assigner::COPY_ASSIGNMENT;
-        assigned = new DefaultValue(type, location(ctx));
+        assigned = nullptr;
     }
 
     return static_cast<Statement*>(new LocalVariableDefinition(identifier,
