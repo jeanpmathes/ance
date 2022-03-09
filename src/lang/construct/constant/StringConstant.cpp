@@ -15,7 +15,11 @@ lang::StringConstant::StringConstant(std::string prefix, std::string string)
 
 std::string lang::StringConstant::toString() const
 {
-    return prefix_ + "\"" + string_ + "\"";
+    std::string escaped;
+
+    for (auto& c : string_) { escaped += lang::ByteConstant::escape(c); }
+
+    return prefix_ + "\"" + escaped + "\"";
 }
 
 lang::ResolvingHandle<lang::Type> lang::StringConstant::type()

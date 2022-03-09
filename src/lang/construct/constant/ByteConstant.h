@@ -36,6 +36,14 @@ namespace lang
          * @return The value of the escaped char.
          */
         static char resolveEscaped(char content);
+
+        /**
+         * Escape a char for use in a string.
+         * @param content The char to escape.
+         * @return The escaped char.
+         */
+        static std::string escape(char content);
+
         /**
          * Parse a char containing a byte constant.
          * @param unparsed The unparsed string, with quotes and escape characters.

@@ -7,24 +7,8 @@ lang::ByteConstant::ByteConstant(uint8_t byte) : type_(lang::IntegerType::get(8,
 
 std::string lang::ByteConstant::toString() const
 {
-    std::string content;
-
-    switch (byte_)
-    {
-        case '\n':
-            content = "\\n";
-            break;
-
-        case '\0':
-            content = "\\0";
-            break;
-
-        default:
-            content = std::string(1, static_cast<char>(byte_));
-            break;
-    }
-
-    return "'" + content + "'";
+    std::string escaped = escape(static_cast<char>(byte_));
+    return "'" + escaped + "'";
 }
 
 lang::ResolvingHandle<lang::Type> lang::ByteConstant::type()
@@ -50,6 +34,28 @@ char lang::ByteConstant::resolveEscaped(char content)
         default:
             return content;
     }
+}
+
+std::string lang::ByteConstant::escape(char content)
+{
+    std::string escaped;
+
+    switch (content)
+    {
+        case '\n':
+            escaped = "\\n";
+            break;
+
+        case '\0':
+            escaped = "\\0";
+            break;
+
+        default:
+            escaped = std::string(1, content);
+            break;
+    }
+
+    return escaped;
 }
 
 uint8_t lang::ByteConstant::parse(const std::string& unparsed)
