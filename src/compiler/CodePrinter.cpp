@@ -82,9 +82,10 @@ std::any CodePrinter::visit(FunctionCall& function_call)
 
     for (Expression& argument : function_call.arguments())
     {
-        out_ << visitTree(argument);
         if (!first) out_ << ", ";
         first = false;
+
+        out_ << visitTree(argument);
     }
 
     out_ << ")";
