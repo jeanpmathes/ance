@@ -93,6 +93,10 @@ void ControlFlowGraphPrinter::printBlock(const std::string& label, int32_t id, B
            << "\"" << color << "\"" << std::endl;
     nodes_ << "\t\t]" << std::endl;
 
+    nodes_ << "\t\tLabelGraphics [" << std::endl;
+    nodes_ << "\t\t\tfontName \"Consolas\"" << std::endl;
+    nodes_ << "\t\t]" << std::endl;
+
     nodes_ << "\t]" << std::endl;
 }
 
