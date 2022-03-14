@@ -20,7 +20,7 @@ std::any ControlFlowGraphPrinter::visit(lang::CustomFunction& function)
 
     visitChildren(function);
 
-    printBlock("exit", NODE_EXIT);
+    printBlock("exit", NODE_EXIT, BlockStyle::IMPLICIT);
     printGroup(function.signature().toString());
 
     out_ << nodes_.rdbuf();
@@ -48,13 +48,13 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
         code_printer.visit(block);
 
         label = escape(code_stream.str());
-        if (label.empty()) label = "-";
+        if (label.empty()) label = "  ---  ";
     }
     else {
         label = current_function_->name();
     }
 
-    printBlock(label, id);
+    printBlock(label, id, block.isUnreached() ? BlockStyle::UNREACHABLE_CODE : BlockStyle::NORMAL_CODE);
 
     std::vector<lang::BasicBlock*> successors = block.getSuccessors();
 
@@ -66,12 +66,33 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
     return {};
 }
 
-void ControlFlowGraphPrinter::printBlock(const std::string& label, int32_t id)
+void ControlFlowGraphPrinter::printBlock(const std::string& label, int32_t id, BlockStyle style)
 {
+    std::string color;
+
+    switch (style)
+    {
+        case BlockStyle::NORMAL_CODE:
+            color = "#F8F8F8";
+            break;
+        case BlockStyle::UNREACHABLE_CODE:
+            color = "#A9A9A9";
+            break;
+        case BlockStyle::IMPLICIT:
+            color = "#FCE205";
+            break;
+    }
+
     nodes_ << "\tnode [" << std::endl;
     nodes_ << "\t\tlabel \"" << label << "\"" << std::endl;
     nodes_ << "\t\tid " << map(id) << std::endl;
     nodes_ << "\t\tgid " << map(NODE_GROUP) << std::endl;
+
+    nodes_ << "\t\tgraphics [" << std::endl;
+    nodes_ << "\t\t\tfill "
+           << "\"" << color << "\"" << std::endl;
+    nodes_ << "\t\t]" << std::endl;
+
     nodes_ << "\t]" << std::endl;
 }
 

@@ -7,6 +7,14 @@
 
 class ControlFlowGraphPrinter : public lang::ApplicationVisitor
 {
+  private:
+    enum class BlockStyle
+    {
+        NORMAL_CODE,
+        UNREACHABLE_CODE,
+        IMPLICIT
+    };
+
   public:
     using lang::ApplicationVisitor::visit;
 
@@ -17,7 +25,7 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitor
     std::any visit(lang::BasicBlock& block) override;
 
   private:
-    void printBlock(const std::string& label, int32_t id);
+    void printBlock(const std::string& label, int32_t id, BlockStyle style);
     void printLink(int32_t from, int32_t to);
     void printGroup(const std::string& label);
 
