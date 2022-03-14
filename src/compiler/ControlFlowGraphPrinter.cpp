@@ -69,17 +69,21 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
 void ControlFlowGraphPrinter::printBlock(const std::string& label, int32_t id, BlockStyle style)
 {
     std::string color;
+    bool        is_code;
 
     switch (style)
     {
         case BlockStyle::NORMAL_CODE:
             color = "#F8F8F8";
+            is_code = true;
             break;
         case BlockStyle::UNREACHABLE_CODE:
             color = "#A9A9A9";
+            is_code = true;
             break;
         case BlockStyle::IMPLICIT:
             color = "#FCE205";
+            is_code = false;
             break;
     }
 
@@ -89,12 +93,13 @@ void ControlFlowGraphPrinter::printBlock(const std::string& label, int32_t id, B
     nodes_ << "\t\tgid " << map(NODE_GROUP) << std::endl;
 
     nodes_ << "\t\tgraphics [" << std::endl;
-    nodes_ << "\t\t\tfill "
-           << "\"" << color << "\"" << std::endl;
+    nodes_ << "\t\t\tfill \"" << color << "\"" << std::endl;
     nodes_ << "\t\t]" << std::endl;
 
     nodes_ << "\t\tLabelGraphics [" << std::endl;
     nodes_ << "\t\t\tfontName \"Consolas\"" << std::endl;
+    if (!is_code) nodes_ << "\t\t\tfontStyle \"bold\"" << std::endl;
+    if (is_code) nodes_ << "\t\t\talignment \"left\"" << std::endl;
     nodes_ << "\t\t]" << std::endl;
 
     nodes_ << "\t]" << std::endl;
