@@ -332,7 +332,7 @@ std::shared_ptr<lang::Value> lang::Type::makeMatching(lang::ResolvingHandle<lang
 
     if (value->type()->isReferenceType())
     {
-        auto reference_type                     = dynamic_cast<lang::ReferenceType*>(value->type()->definition_.get());
+        auto* reference_type                    = dynamic_cast<lang::ReferenceType*>(value->type()->definition_.get());
         std::shared_ptr<lang::Value> referenced = reference_type->getReferenced(value, context);
 
         return makeMatching(expected, referenced, context);

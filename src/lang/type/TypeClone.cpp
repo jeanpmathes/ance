@@ -124,6 +124,13 @@ bool lang::TypeClone::validateDefinition(ValidationLogger& validation_logger)
         valid = false;
     }
 
+    if (original_->isReferenceType())// Could currently cause problems, as conversion requires actual reference type.
+    {
+        validation_logger.logError("Cannot clone reference type " + original_->getAnnotatedName(),
+                                   original_type_location_);
+        valid = false;
+    }
+
     valid = valid && checkDependencies(validation_logger);
 
     is_valid_ = valid && original_->validate(validation_logger, original_type_location_);

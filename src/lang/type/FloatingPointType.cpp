@@ -39,6 +39,8 @@ bool lang::FloatingPointType::isImplicitlyConvertibleTo(lang::ResolvingHandle<la
 
     auto* other_float = dynamic_cast<FloatingPointType*>(other->getDefinition());
 
+    if (!other_float) return false;// Cloned floating point types do not allow implicit conversion.
+
     return getPrecision() < other_float->getPrecision();
 }
 
@@ -67,7 +69,7 @@ bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator, lang::Reso
 {
     if (other->isFloatingPointType())
     {
-        auto other_type = dynamic_cast<FloatingPointType*>(other->getActualType()->getDefinition());
+        auto* other_type = dynamic_cast<FloatingPointType*>(other->getActualType()->getDefinition());
         return this == other_type;
     }
 

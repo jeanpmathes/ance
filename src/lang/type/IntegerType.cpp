@@ -60,6 +60,8 @@ bool lang::IntegerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Ty
 
     auto* other_type = dynamic_cast<IntegerType*>(other->getActualType()->getDefinition());
 
+    if (!other_type) return false;// Cloned integer types do not allow implicit conversion.
+
     bool can_enlarge     = (bit_size_ < other_type->bit_size_) && (is_signed_ == other_type->is_signed_);
     bool can_change_sign = (bit_size_ < other_type->bit_size_) && !is_signed_ && other_type->is_signed_;
 
@@ -89,7 +91,7 @@ bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingH
 {
     if (other->isIntegerType())
     {
-        auto other_type = dynamic_cast<IntegerType*>(other->getActualType()->getDefinition());
+        auto* other_type = dynamic_cast<IntegerType*>(other->getActualType()->getDefinition());
         return this == other_type;
     }
 
