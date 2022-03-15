@@ -36,10 +36,10 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     virtual std::unique_ptr<lang::BasicBlock> createBlock();
 
     /**
-     * Set the function that contains this statement.
-     * @param function The containing function.
+     * Set the scope that contains this statement.
+     * @param scope The containing scope.
      */
-    void setContainingFunction(lang::Function* function);
+    void setContainingScope(lang::Scope* scope);
 
     /**
      * Get the containing scope.
@@ -49,17 +49,11 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
   protected:
     /**
      * Override this to receive the containing function.
-     * @param function The containing function.
+     * @param scope The containing function.
      */
-    virtual void setFunction(lang::Function* function);
+    virtual void setScope(lang::Scope* scope);
 
   public:
-    /**
-     * Get the function containing this statement.
-     * @return The containing function.
-     */
-    [[nodiscard]] lang::Function* getContainingFunction() const;
-
     /**
      * Get the source location of this statement.
      */
@@ -85,12 +79,12 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     virtual void doBuild(CompileContext* context) = 0;
 
   public:
-    virtual ~Statement() = default;
+    ~Statement() override = default;
 
   private:
     lang::Location location_;
 
-    lang::Function* function_ {nullptr};
+    lang::Scope* containing_scope_ = nullptr;
 };
 
 #endif

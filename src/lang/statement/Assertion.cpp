@@ -20,9 +20,9 @@ Expression& Assertion::condition() const
     return *condition_;
 }
 
-void Assertion::setFunction(lang::Function* function)
+void Assertion::setScope(lang::Scope* scope)
 {
-    condition_->setContainingScope(function);
+    condition_->setContainingScope(scope);
 }
 
 void Assertion::validate(ValidationLogger& validation_logger)

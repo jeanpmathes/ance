@@ -49,6 +49,12 @@ namespace lang
         virtual lang::GlobalScope* getGlobalScope() = 0;
 
         /**
+         * Get the corresponding local scope, if there is one.
+         * @return The local scope, or nullptr if there is no local scope.
+         */
+        virtual lang::LocalScope* getLocalScope();
+
+        /**
          * Get the debug scope for this scope.
          * @param context The current compile context.
          * @return The debug scope.

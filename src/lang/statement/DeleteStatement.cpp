@@ -25,9 +25,9 @@ bool DeleteStatement::isBufferDelete() const
     return delete_buffer_;
 }
 
-void DeleteStatement::setFunction(lang::Function* function)
+void DeleteStatement::setScope(lang::Scope* scope)
 {
-    to_delete_->setContainingScope(function);
+    to_delete_->setContainingScope(scope);
 }
 
 void DeleteStatement::validate(ValidationLogger& validation_logger)

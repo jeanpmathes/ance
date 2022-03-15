@@ -22,7 +22,7 @@ std::unique_ptr<lang::BasicBlock> ReturnStatement::createBlock()
     return lang::BasicBlock::createReturning(return_value_.get(), location());
 }
 
-void ReturnStatement::setFunction(lang::Function*)
+void ReturnStatement::setScope(lang::Scope*)
 {
     // Handled by basic block.
 }

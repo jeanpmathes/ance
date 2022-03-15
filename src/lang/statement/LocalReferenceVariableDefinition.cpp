@@ -70,18 +70,18 @@ Expression& LocalReferenceVariableDefinition::reference() const
     return *reference_;
 }
 
-void LocalReferenceVariableDefinition::setFunction(lang::Function* function)
+void LocalReferenceVariableDefinition::setScope(lang::Scope* scope)
 {
-    function->addType(type_);
+    scope->addType(type_);
 
-    variable_ = function->getInsideScope()->defineAutoVariable(identifier_,
-                                                               type_,
-                                                               type_location_,
-                                                               lang::Assigner::REFERENCE_BINDING,
-                                                               reference_->getValue(),
-                                                               location());
+    variable_ = scope->getLocalScope()->defineAutoVariable(identifier_,
+                                                           type_,
+                                                           type_location_,
+                                                           lang::Assigner::REFERENCE_BINDING,
+                                                           reference_->getValue(),
+                                                           location());
 
-    reference_->setContainingScope(function);
+    reference_->setContainingScope(scope);
 }
 void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger)
 {

@@ -35,6 +35,7 @@ namespace lang
         lang::Scope* scope() override;
 
         lang::GlobalScope* getGlobalScope() override;
+        lang::LocalScope*  getLocalScope() override;
         llvm::DIScope*     getDebugScope(CompileContext* context) override;
 
         [[nodiscard]] lang::Scope* scope() const;

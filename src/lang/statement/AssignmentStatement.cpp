@@ -36,10 +36,10 @@ Expression& AssignmentStatement::assigned() const
     return *assigned_;
 }
 
-void AssignmentStatement::setFunction(lang::Function* function)
+void AssignmentStatement::setScope(lang::Scope* scope)
 {
-    assignable_->setContainingScope(function);
-    assigned_->setContainingScope(function);
+    assignable_->setContainingScope(scope);
+    assigned_->setContainingScope(scope);
 }
 
 void AssignmentStatement::validate(ValidationLogger& validation_logger)

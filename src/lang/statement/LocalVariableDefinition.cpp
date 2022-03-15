@@ -49,17 +49,17 @@ Expression* LocalVariableDefinition::assigned() const
     return assigned_ptr_;
 }
 
-void LocalVariableDefinition::setFunction(lang::Function* function)
+void LocalVariableDefinition::setScope(lang::Scope* scope)
 {
-    function->addType(type_);
+    scope->addType(type_);
 
-    variable_ = function->getInsideScope()->defineAutoVariable(identifier_,
-                                                               type_,
-                                                               type_location_,
-                                                               assigner_,
-                                                               assigned_->getValue(),
-                                                               location());
-    assigned_->setContainingScope(function);
+    variable_ = scope->getLocalScope()->defineAutoVariable(identifier_,
+                                                           type_,
+                                                           type_location_,
+                                                           assigner_,
+                                                           assigned_->getValue(),
+                                                           location());
+    assigned_->setContainingScope(scope);
 }
 
 void LocalVariableDefinition::validate(ValidationLogger& validation_logger)

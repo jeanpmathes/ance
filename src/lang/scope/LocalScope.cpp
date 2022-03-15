@@ -15,6 +15,11 @@ lang::GlobalScope* lang::LocalScope::getGlobalScope()
     return parent_->getGlobalScope();
 }
 
+lang::LocalScope* lang::LocalScope::getLocalScope()
+{
+    return this;
+}
+
 llvm::DIScope* lang::LocalScope::getDebugScope(CompileContext* context)
 {
     return parent_->getDebugScope(context);

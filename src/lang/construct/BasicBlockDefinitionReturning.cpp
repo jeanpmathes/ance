@@ -52,7 +52,7 @@ void lang::BasicBlock::Definition::Returning::transferStatements(std::list<State
 
 void lang::BasicBlock::Definition::Returning::setContainingFunction(lang::Function* function)
 {
-    for (auto& statement : statements_) { statement->setContainingFunction(function); }
+    for (auto& statement : statements_) { statement->setContainingScope(function); }
 
     if (return_value_) return_value_->setContainingScope(function);
 }

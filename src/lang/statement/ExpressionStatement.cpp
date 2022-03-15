@@ -16,9 +16,9 @@ BuildableExpression& ExpressionStatement::expression() const
     return *expression_;
 }
 
-void ExpressionStatement::setFunction(lang::Function* function)
+void ExpressionStatement::setScope(lang::Scope* scope)
 {
-    expression_->setContainingScope(function);
+    expression_->setContainingScope(scope);
 }
 
 void ExpressionStatement::validate(ValidationLogger& validation_logger)

@@ -1,6 +1,7 @@
 #include "BasicBlock.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/construct/Function.h"
 
 lang::BasicBlock::Definition::Simple::Simple(Statement* statement)
 {
@@ -58,7 +59,7 @@ void lang::BasicBlock::Definition::Simple::transferStatements(std::list<Statemen
 
 void lang::BasicBlock::Definition::Simple::setContainingFunction(lang::Function* function)
 {
-    for (auto& statement : statements_) { statement->setContainingFunction(function); }
+    for (auto& statement : statements_) { statement->setContainingScope(function); }
 }
 
 void lang::BasicBlock::Definition::Simple::validate(ValidationLogger& validation_logger)

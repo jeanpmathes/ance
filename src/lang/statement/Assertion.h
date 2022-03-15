@@ -24,7 +24,7 @@ class Assertion
 
     [[nodiscard]] Expression& condition() const;
 
-    void setFunction(lang::Function* function) override;
+    void setScope(lang::Scope* scope) override;
 
     void validate(ValidationLogger& validation_logger) override;
 

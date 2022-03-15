@@ -26,7 +26,7 @@ class ReturnStatement
 
     std::unique_ptr<lang::BasicBlock> createBlock() override;
 
-    void setFunction(lang::Function* function) override;
+    void setScope(lang::Scope* scope) override;
 
     void validate(ValidationLogger& validation_logger) override;
 

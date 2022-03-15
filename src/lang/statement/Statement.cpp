@@ -6,12 +6,12 @@
 
 Statement::Statement(lang::Location location) : location_(location) {}
 
-void Statement::setContainingFunction(lang::Function* function)
+void Statement::setContainingScope(lang::Scope* scope)
 {
-    assert(!function_);
-    function_ = function;
+    assert(!containing_scope_);
+    containing_scope_ = scope;
 
-    setFunction(function);
+    setScope(scope);
 }
 
 std::unique_ptr<lang::BasicBlock> Statement::createBlock()
@@ -19,16 +19,11 @@ std::unique_ptr<lang::BasicBlock> Statement::createBlock()
     return lang::BasicBlock::createSimple(this);
 }
 
-void Statement::setFunction(lang::Function*) {}
+void Statement::setScope(lang::Scope*) {}
 
 lang::Scope* Statement::scope() const
 {
-    return function_;
-}
-
-lang::Function* Statement::getContainingFunction() const
-{
-    return function_;
+    return containing_scope_;
 }
 
 lang::Location Statement::location() const
@@ -38,7 +33,7 @@ lang::Location Statement::location() const
 
 void Statement::build(CompileContext* context)
 {
-    context->setDebugLocation(location(), getContainingFunction());
+    context->setDebugLocation(location(), scope());
     doBuild(context);
     context->resetDebugLocation();
 }

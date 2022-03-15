@@ -60,7 +60,7 @@ class LocalReferenceVariableDefinition
     [[nodiscard]] Expression&                       reference() const;
 
   public:
-    void setFunction(lang::Function* function) override;
+    void setScope(lang::Scope* scope) override;
 
     void validate(ValidationLogger& validation_logger) override;
 

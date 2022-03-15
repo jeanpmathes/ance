@@ -26,7 +26,7 @@ class DeleteStatement
     [[nodiscard]] Expression& toDelete() const;
     [[nodiscard]] bool        isBufferDelete() const;
 
-    void setFunction(lang::Function* function) override;
+    void setScope(lang::Scope* scope) override;
 
     void validate(ValidationLogger& validation_logger) override;
 
