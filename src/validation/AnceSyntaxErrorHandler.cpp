@@ -4,6 +4,7 @@
 #include "grammar/anceParser.h"
 #include "validation/SourceFile.h"
 #include "validation/Strings.h"
+#include "validation/ANSI.h"
 
 AnceSyntaxErrorHandler::LexerErrorListener::LexerErrorListener(AnceSyntaxErrorHandler& parent) : parent_(parent) {}
 
@@ -89,12 +90,15 @@ void AnceSyntaxErrorHandler::emitMessages(const SourceFile& source_file)
 
         unsigned int start;
 
-        std::cout << "ance-c: syntax: (" << line << ", " << column << ") " << message << std::endl;
+        std::cout << "ance-c: " << ansi::ColorRed << "syntax" << ansi::ColorReset << ": (" << line << ", " << column
+                  << ") " << message << std::endl;
+        std::cout << std::endl;
         std::cout << '\t' << trim(source_file.getLine(line), start) << std::endl;
 
         unsigned int marker_position = column - start - 1;
 
         std::cout << '\t' << std::string(marker_position, ' ') << '^' << std::endl;
+        std::cout << std::endl;
     }
 }
 

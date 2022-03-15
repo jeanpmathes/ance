@@ -4,6 +4,7 @@
 
 #include "validation/SourceFile.h"
 #include "validation/Strings.h"
+#include "validation/ANSI.h"
 
 ValidationLogger::ValidationLogger() = default;
 
@@ -47,16 +48,17 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
         switch (entry.level)
         {
             case LogLevel::ERROR:
-                std::cout << "error: ";
+                std::cout << ansi::ColorRed << "error" << ansi::ColorReset << ": ";
                 break;
             case LogLevel::WARNING:
-                std::cout << "warning: ";
+                std::cout << ansi::ColorYellow << "warning" << ansi::ColorReset << ": ";
                 break;
             default:
                 assert(false && "Add a case for every log level.");
         }
 
         std::cout << entry.location << " " << entry.message << std::endl;
+        std::cout << std::endl;
 
         if (entry.location.isGlobal()) continue;
 
@@ -68,6 +70,7 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
             unsigned int marker_length = entry.location.columnEnd() - entry.location.column() + 1;
 
             std::cout << '\t' << std::string(marker_start - 1, ' ') << std::string(marker_length, '~') << std::endl;
+            std::cout << std::endl;
         }
     }
 }
