@@ -6,8 +6,7 @@
 namespace ansi
 {
     inline const char* ColorRed    = "\x1B[31m";
-    inline const char* ColorYellow = "\x1B[93m";
-    inline const char* ColorGray   = "\x1B[90m";
+    inline const char* ColorYellow = "\x1B[33m";
 
     inline const char* ColorReset = "\x1B[0m";
 }
