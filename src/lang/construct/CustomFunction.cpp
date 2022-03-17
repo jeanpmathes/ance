@@ -7,7 +7,6 @@
 #include "lang/construct/Function.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/LocalScope.h"
-#include "lang/statement/Statement.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
 #include "lang/utility/Values.h"
@@ -20,6 +19,7 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
                                      lang::ResolvingHandle<lang::Type>             return_type,
                                      lang::Location                                return_type_location,
                                      std::vector<std::shared_ptr<lang::Parameter>> parameters,
+                                     std::unique_ptr<lang::CodeBlock>              code,
                                      lang::Scope*                                  containing_scope,
                                      lang::Location                                declaration_location,
                                      lang::Location                                definition_location)
@@ -29,11 +29,14 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
                                return_type_location,
                                std::move(parameters),
                                declaration_location)
+    , code_(std::move(code))
     , access_(access)
     , definition_location_(definition_location)
-    , inside_scope_(this->function()->makeLocalScope())
     , initial_block_(lang::BasicBlock::createEmpty())
 {
+    inside_scope_ = code_->createScopes(this->function());
+    assert(inside_scope_);
+
     containing_scope->addType(return_type);
 
     unsigned no = 1;
@@ -41,14 +44,16 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
     {
         containing_scope->addType(parameter->type());
 
-        auto arg = inside_scope_->defineParameterVariable(parameter->name(),
-                                                          parameter->type(),
-                                                          parameter->typeLocation(),
-                                                          parameter,
-                                                          no++,
-                                                          parameter->location());
+        auto arg = function->defineParameterVariable(parameter->name(),
+                                                     parameter->type(),
+                                                     parameter->typeLocation(),
+                                                     parameter,
+                                                     no++,
+                                                     parameter->location());
         arguments_.push_back(arg);
     }
+
+    finalizeDefinition();
 }
 
 bool lang::CustomFunction::isMangled() const
@@ -56,23 +61,13 @@ bool lang::CustomFunction::isMangled() const
     return true;
 }
 
-void lang::CustomFunction::pushStatement(std::unique_ptr<Statement> statement)
-{
-    statements_.push_back(std::move(statement));
-}
-
 void lang::CustomFunction::finalizeDefinition()
 {
-    lang::BasicBlock* previous_block = nullptr;
+    blocks_ = code_->createBasicBlocks(*initial_block_, function());
 
-    for (auto& statement : statements_)
-    {
-        auto block = statement->createBlock();
-        if (previous_block) previous_block->link(*block);
+    initial_block_->setContainingFunction(function());
 
-        previous_block = block.get();
-        addBlock(std::move(block));
-    }
+    for (auto& block : blocks_) { block->setContainingFunction(function()); }
 
     initial_block_->simplify();
 
@@ -86,20 +81,6 @@ void lang::CustomFunction::finalizeDefinition()
     {
         block->finalize(running_index);
         if (block->isUsable()) { addChild(*block); }
-    }
-}
-
-void lang::CustomFunction::addBlock(std::unique_ptr<lang::BasicBlock> block)
-{
-    lang::BasicBlock* block_ptr = block.get();
-    blocks_.push_back(std::move(block));
-
-    block_ptr->setContainingFunction(function());
-
-    if (entry_block_ == nullptr)
-    {
-        entry_block_ = block_ptr;
-        initial_block_->link(*entry_block_);
     }
 }
 
@@ -139,8 +120,13 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger)
     }
 
     inside_scope_->validate(validation_logger);
-    initial_block_->validate(validation_logger);
-    for (auto& block : blocks_) { block->validate(validation_logger); }
+
+    bool are_blocks_valid = true;
+
+    are_blocks_valid &= initial_block_->validate(validation_logger);
+    for (auto& block : blocks_) { are_blocks_valid &= block->validate(validation_logger); }
+
+    if (!are_blocks_valid) return;
 
     validateReturn(validation_logger);
     validateUnreachable(validation_logger);
@@ -248,7 +234,8 @@ void lang::CustomFunction::build(CompileContext* context)
     llvm::BasicBlock* decl = llvm::BasicBlock::Create(*context->llvmContext(), "decl", native_function_);
 
     context->ir()->SetInsertPoint(decl);
-    inside_scope_->buildDeclarations(context);// Arguments are also local variables in the function scope.
+    function()->buildDeclarations(context);
+    inside_scope_->buildDeclarations(context);
 
     llvm::BasicBlock* defs = llvm::BasicBlock::Create(*context->llvmContext(), "defs", native_function_);
 
@@ -281,7 +268,7 @@ llvm::DISubprogram* lang::CustomFunction::debugSubprogram()
 
 lang::LocalScope* lang::CustomFunction::getInsideScope()
 {
-    return inside_scope_.get();
+    return inside_scope_;
 }
 
 llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext*)

@@ -74,12 +74,12 @@ void LocalReferenceVariableDefinition::setScope(lang::Scope* scope)
 {
     scope->addType(type_);
 
-    variable_ = scope->getLocalScope()->defineAutoVariable(identifier_,
-                                                           type_,
-                                                           type_location_,
-                                                           lang::Assigner::REFERENCE_BINDING,
-                                                           reference_->getValue(),
-                                                           location());
+    variable_ = scope->getLocalScope()->defineLocalVariable(identifier_,
+                                                            type_,
+                                                            type_location_,
+                                                            lang::Assigner::REFERENCE_BINDING,
+                                                            reference_->getValue(),
+                                                            location());
 
     reference_->setContainingScope(scope);
 }

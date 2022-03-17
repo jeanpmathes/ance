@@ -14,12 +14,15 @@
 #include "lang/AccessModifier.h"
 #include "lang/Element.h"
 #include "lang/construct/BasicBlock.h"
+#include "lang/construct/CodeBlock.h"
+#include "lang/utility/OwningHandle.h"
 
 namespace lang
 {
     class Value;
     class LocalScope;
     class Type;
+    class CodeBlock;
 }
 
 class CompileContext;
@@ -73,6 +76,7 @@ namespace lang
          * @param return_type The return type of the function.
          * @param return_type_location The location of the return type.
          * @param parameters The parameters for this function.
+         * @param code The code block for this function.
          * @param containing_scope The scope containing the function.
          * @param declaration_location The location of the function declaration.
          * @param definition_location The location of the function definition, meaning its code.
@@ -81,9 +85,28 @@ namespace lang
                             lang::ResolvingHandle<lang::Type>                    return_type,
                             lang::Location                                       return_type_location,
                             const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                            std::unique_ptr<lang::CodeBlock>                     code,
                             lang::Scope*                                         containing_scope,
                             lang::Location                                       declaration_location,
                             lang::Location                                       definition_location);
+
+        /**
+         * Define a local variable that is a parameter.
+         * @param identifier The identifier.
+         * @param type The type.
+         * @param type_location The source location of the type.
+         * @param value The initial value.
+         * @param parameter_no The number of the parameter. Counting starts with one.
+         * @param location The source location.
+         * @return The defined variable or nothing if defining is not possible.
+         */
+        std::optional<lang::ResolvingHandle<lang::Variable>> defineParameterVariable(
+            const std::string&                  identifier,
+            lang::ResolvingHandle<lang::Type>   type,
+            lang::Location                      type_location,
+            const std::shared_ptr<lang::Value>& value,
+            unsigned                            parameter_no,
+            lang::Location                      location);
 
         /**
          * Get the return type of this function.
@@ -122,17 +145,6 @@ namespace lang
          */
         [[nodiscard]] bool isMangled() const;
 
-        /**
-         * Add a statement to this function. This is only valid before finalization.
-         * @param statement The function to add.
-         */
-        void pushStatement(std::unique_ptr<Statement> statement);
-
-        /**
-         * Finalize the function definition. No blocks may be added after this.
-         */
-        void finalizeDefinition();
-
         void validate(ValidationLogger& validation_logger) override;
 
         /**
@@ -146,6 +158,12 @@ namespace lang
          * @param context The current compile context.
          */
         void build(CompileContext* context);
+
+        /**
+         * Build all parameter declarations.
+         * @param context The current compile context.
+         */
+        void buildDeclarations(CompileContext* context);
 
         /**
          * Validate a call to this function.
@@ -195,6 +213,13 @@ namespace lang
         std::string name_;
 
         std::unique_ptr<lang::FunctionDefinition> definition_ {};
+
+        std::map<std::string, lang::OwningHandle<lang::Variable>> undefined_variables_ {};
+        std::map<std::string, lang::OwningHandle<lang::Variable>> defined_parameters_ {};
+
+        std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_ {};
+
+        std::map<std::string, lang::OwningHandle<lang::Type>> undefined_types_ {};
     };
 }
 

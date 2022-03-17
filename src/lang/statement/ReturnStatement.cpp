@@ -2,7 +2,6 @@
 
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
-#include "lang/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
 
 ReturnStatement::ReturnStatement(std::unique_ptr<Expression> return_value, lang::Location location)
@@ -22,9 +21,9 @@ std::unique_ptr<lang::BasicBlock> ReturnStatement::createBlock()
     return lang::BasicBlock::createReturning(return_value_.get(), location());
 }
 
-void ReturnStatement::setScope(lang::Scope*)
+void ReturnStatement::setScope(lang::Scope* scope)
 {
-    // Handled by basic block.
+    if (return_value_) return_value_->setContainingScope(scope);
 }
 
 void ReturnStatement::validate(ValidationLogger&)

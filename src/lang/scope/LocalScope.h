@@ -41,7 +41,7 @@ namespace lang
         [[nodiscard]] lang::Scope* scope() const;
 
         /**
-         * Define a local variable that is not a parameter.
+         * Define a local variable. Parameters are not local variables and should be define in function scope.
          * @param identifier The identifier.
          * @param type The type.
          * @param type_location The location of the type.
@@ -50,30 +50,12 @@ namespace lang
          * @param location The source location.
          * @return The defined variable or nothing if defining is not possible.
          */
-        std::optional<lang::ResolvingHandle<lang::Variable>> defineAutoVariable(
+        std::optional<lang::ResolvingHandle<lang::Variable>> defineLocalVariable(
             const std::string&                  identifier,
             lang::ResolvingHandle<lang::Type>   type,
             lang::Location                      type_location,
             lang::Assigner                      assigner,
             const std::shared_ptr<lang::Value>& value,
-            lang::Location                      location);
-
-        /**
-         * Define a local variable that is a parameter.
-         * @param identifier The identifier.
-         * @param type The type.
-         * @param type_location The source location of the type.
-         * @param value The initial value.
-         * @param parameter_no The number of the parameter. Counting starts with one.
-         * @param location The source location.
-         * @return The defined variable or nothing if defining is not possible.
-         */
-        std::optional<lang::ResolvingHandle<lang::Variable>> defineParameterVariable(
-            const std::string&                  identifier,
-            lang::ResolvingHandle<lang::Type>   type,
-            lang::Location                      type_location,
-            const std::shared_ptr<lang::Value>& value,
-            unsigned                            parameter_no,
             lang::Location                      location);
 
         void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
@@ -99,24 +81,14 @@ namespace lang
         void buildDeclarations(CompileContext* context);
 
       private:
-        std::optional<lang::ResolvingHandle<lang::Variable>> defineLocalVariable(
-            const std::string&                  identifier,
-            lang::ResolvingHandle<lang::Type>   type,
-            lang::Location                      type_location,
-            lang::Assigner                      assigner,
-            const std::shared_ptr<lang::Value>& value,
-            unsigned                            parameter_no,
-            lang::Location                      location);
-
-      private:
         lang::Scope* parent_;
 
-        std::map<std::string, lang::OwningHandle<lang::Variable>> undefined_variables_;
-        std::map<std::string, lang::OwningHandle<lang::Variable>> defined_local_variables_;
+        std::map<std::string, lang::OwningHandle<lang::Variable>> undefined_variables_ {};
+        std::map<std::string, lang::OwningHandle<lang::Variable>> defined_local_variables_ {};
 
-        std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
+        std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_ {};
 
-        std::map<std::string, lang::OwningHandle<lang::Type>> undefined_types_;
+        std::map<std::string, lang::OwningHandle<lang::Type>> undefined_types_ {};
     };
 }
 #endif

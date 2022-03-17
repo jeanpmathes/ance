@@ -99,17 +99,6 @@ namespace lang
         virtual void validate(ValidationLogger& validation_logger) = 0;
 
         /**
-         * Add a statement to this function.
-         * @param statement The statement to add.
-         */
-        virtual void pushStatement(std::unique_ptr<Statement> statement) = 0;
-
-        /**
-         * Finalize the function definition.
-         */
-        virtual void finalizeDefinition();
-
-        /**
          * Create the native content of this function, allowing building function code and calling this function.
          * @param context The current compile context.
          */

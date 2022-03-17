@@ -43,6 +43,7 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
                                     lang::ResolvingHandle<lang::Type>                    return_type,
                                     lang::Location                                       return_type_location,
                                     const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                    std::unique_ptr<lang::CodeBlock>                     block,
                                     lang::Scope*                                         containing_scope,
                                     lang::Location                                       declaration_location,
                                     lang::Location                                       definition_location)
@@ -52,11 +53,37 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
                                                          return_type,
                                                          return_type_location,
                                                          parameters,
+                                                         std::move(block),
                                                          containing_scope,
                                                          declaration_location,
                                                          definition_location);
 
     addChild(*definition_);
+}
+
+std::optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParameterVariable(
+    const std::string&                  identifier,
+    lang::ResolvingHandle<lang::Type>   type,
+    lang::Location                      type_location,
+    const std::shared_ptr<lang::Value>& value,
+    unsigned int                        parameter_no,
+    lang::Location                      location)
+{
+    if (defined_parameters_.find(identifier) == defined_parameters_.end())
+    {
+        bool is_final = false;// Assigner has value UNSPECIFIED, so it's not final.
+
+        lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(identifier);
+        variable->defineAsLocal(type, type_location, this, is_final, value, parameter_no, location);
+
+        addChild(*variable);
+        defined_parameters_[identifier] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+
+        return std::make_optional(variable);
+    }
+    else {
+        return {};
+    }
 }
 
 lang::ResolvingHandle<lang::Type> lang::Function::returnType() const
@@ -95,16 +122,6 @@ bool lang::Function::isMangled() const
     return definition_->isMangled();
 }
 
-void lang::Function::pushStatement(std::unique_ptr<Statement> statement)
-{
-    definition_->pushStatement(std::move(statement));
-}
-
-void lang::Function::finalizeDefinition()
-{
-    definition_->finalizeDefinition();
-}
-
 void lang::Function::validate(ValidationLogger& validation_logger)
 {
     definition_->validate(validation_logger);
@@ -118,6 +135,11 @@ void lang::Function::createNativeBacking(CompileContext* context)
 void lang::Function::build(CompileContext* context)
 {
     definition_->build(context);
+}
+
+void lang::Function::buildDeclarations(CompileContext* context)
+{
+    for (auto& [identifier, parameter] : defined_parameters_) { parameter->buildDeclaration(context); }
 }
 
 bool lang::Function::validateCall(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
@@ -160,17 +182,48 @@ lang::LocalScope* lang::Function::getInsideScope()
 
 void lang::Function::registerUsage(lang::ResolvingHandle<lang::Variable> variable)
 {
-    getInsideScope()->registerUsage(variable);
+    assert(!variable->isDefined());
+
+    if (undefined_variables_.find(variable->identifier()) != undefined_variables_.end())
+    {
+        variable.reroute(undefined_variables_[variable->identifier()].handle());
+        return;
+    }
+
+    if (defined_parameters_.find(variable->identifier()) != defined_parameters_.end())
+    {
+        variable.reroute(defined_parameters_[variable->identifier()].handle());
+        return;
+    }
+
+    undefined_variables_[variable->identifier()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 
 void lang::Function::registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
 {
-    getInsideScope()->registerUsage(function_group);
+    assert(!function_group->isDefined());
+
+    if (undefined_function_groups_.find(function_group->name()) != undefined_function_groups_.end())
+    {
+        function_group.reroute(undefined_function_groups_[function_group->name()].handle());
+        return;
+    }
+
+    undefined_function_groups_[function_group->name()] =
+        lang::OwningHandle<lang::FunctionGroup>::takeOwnership(function_group);
 }
 
 void lang::Function::registerUsage(lang::ResolvingHandle<lang::Type> type)
 {
-    getInsideScope()->registerUsage(type);
+    assert(!type->isDefined());
+
+    if (undefined_types_.find(type->getName()) != undefined_types_.end())
+    {
+        type.reroute(undefined_types_[type->getName()].handle());
+        return;
+    }
+
+    undefined_types_[type->getName()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
 }
 
 void lang::Function::registerDefinition(lang::ResolvingHandle<lang::Type> type)
@@ -182,10 +235,52 @@ void lang::Function::resolve()
 {
     lang::Scope* inside_scope = getInsideScope();
     if (inside_scope) inside_scope->resolve();
+
+    auto fn_it = undefined_function_groups_.begin();
+
+    while (fn_it != undefined_function_groups_.end())
+    {
+        auto& [name, function_group] = *fn_it;
+
+        if (scope()->resolveDefinition(function_group.handle())) { fn_it = undefined_function_groups_.erase(fn_it); }
+        else {
+            ++fn_it;
+        }
+    }
+
+    auto var_it = undefined_variables_.begin();
+
+    while (var_it != undefined_variables_.end())
+    {
+        auto& [identifier, variable] = *var_it;
+
+        if (scope()->resolveDefinition(variable.handle())) { var_it = undefined_variables_.erase(var_it); }
+        else {
+            ++var_it;
+        }
+    }
+
+    auto tp_it = undefined_types_.begin();
+
+    while (tp_it != undefined_types_.end())
+    {
+        auto& [name, type] = *tp_it;
+
+        if (scope()->resolveDefinition(type.handle())) { tp_it = undefined_types_.erase(tp_it); }
+        else {
+            ++tp_it;
+        }
+    }
 }
 
 bool lang::Function::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
 {
+    if (defined_parameters_.find(variable->identifier()) != defined_parameters_.end())
+    {
+        variable.reroute(defined_parameters_[variable->identifier()].handle());
+        return true;
+    }
+
     return scope()->resolveDefinition(variable);
 }
 

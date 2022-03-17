@@ -16,6 +16,7 @@
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
 #include "lang/Element.h"
+#include "lang/construct/CodeBlock.h"
 
 class ConstantExpression;
 
@@ -76,6 +77,7 @@ namespace lang
          * @param access The access level.
          * @param return_type The return type of the function.
          * @param parameters The parameters for this function.
+         * @param code The code of the function.
          * @param declaration_location The location of the function declaration.
          * @param definition_location The location of the function definition, meaning its code.
          * @return A handle to the defined function.
@@ -86,6 +88,7 @@ namespace lang
             lang::ResolvingHandle<lang::Type>                    return_type,
             lang::Location                                       return_type_location,
             const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+            std::unique_ptr<lang::CodeBlock>                     code,
             lang::Location                                       declaration_location,
             lang::Location                                       definition_location);
 

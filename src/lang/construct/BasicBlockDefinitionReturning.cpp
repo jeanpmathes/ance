@@ -50,26 +50,23 @@ void lang::BasicBlock::Definition::Returning::transferStatements(std::list<State
     statements_.splice(statements_.begin(), statements);
 }
 
-void lang::BasicBlock::Definition::Returning::setContainingFunction(lang::Function* function)
+bool lang::BasicBlock::Definition::Returning::validate(ValidationLogger& validation_logger)
 {
-    for (auto& statement : statements_) { statement->setContainingScope(function); }
+    bool valid = true;
 
-    if (return_value_) return_value_->setContainingScope(function);
-}
-
-void lang::BasicBlock::Definition::Returning::validate(ValidationLogger& validation_logger)
-{
     for (auto& statement : statements_) { statement->validate(validation_logger); }
 
-    if (return_value_) { return_value_->validate(validation_logger); }
+    if (return_value_) { valid &= return_value_->validate(validation_logger); }
 
-    if (unreachable_next_) { unreachable_next_->validate(validation_logger); }
+    if (unreachable_next_) { valid &= unreachable_next_->validate(validation_logger); }
     else {
         if (!return_value_ && self()->containing_function_->returnType()->isVoidType())
         {
             validation_logger.logWarning("Unnecessary return statement", return_location_);
         }
     }
+
+    return valid;
 }
 
 std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Returning::getLeaves()

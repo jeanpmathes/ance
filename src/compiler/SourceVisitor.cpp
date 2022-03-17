@@ -46,6 +46,8 @@
 #include "lang/construct/constant/SizeConstant.h"
 #include "lang/construct/constant/StringConstant.h"
 
+#include "lang/construct/CodeBlock.h"
+
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
 
@@ -108,21 +110,24 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
 
     lang::Location return_type_location = ctx->type() ? location(ctx->type()) : lang::Location(0, 0, 0, 0);
 
+    auto function_block = lang::CodeBlock::makeInitial();
+
+    for (auto statement_context : ctx->statement())
+    {
+        lang::CodeBlock* block     = visit(statement_context).as<lang::CodeBlock*>();
+        auto             block_ptr = std::unique_ptr<lang::CodeBlock>(block);
+
+        function_block->append(std::move(block_ptr));
+    }
+
     auto function = application_.globalScope().defineCustomFunction(identifier,
                                                                     access,
                                                                     return_type,
                                                                     return_type_location,
                                                                     shared_parameters,
+                                                                    std::move(function_block),
                                                                     declaration_location,
                                                                     definition_location);
-
-    for (auto statement_context : ctx->statement())
-    {
-        Statement* statement = visit(statement_context).as<Statement*>();
-        function->pushStatement(std::unique_ptr<Statement>(statement));
-    }
-
-    function->finalizeDefinition();
 
     return this->visitChildren(ctx);
 }
@@ -193,8 +198,8 @@ antlrcpp::Any SourceVisitor::visitExpressionStatement(anceParser::ExpressionStat
     Expression*                          expression = visit(ctx->independentExpression()).as<Expression*>();
     std::unique_ptr<BuildableExpression> buildable_expression(dynamic_cast<BuildableExpression*>(expression));
 
-    auto* statement = new ExpressionStatement(std::move(buildable_expression), location(ctx));
-    return static_cast<Statement*>(statement);
+    auto statement = std::make_unique<ExpressionStatement>(std::move(buildable_expression), location(ctx));
+    return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 
 antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx)
@@ -215,12 +220,13 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
         assigned = nullptr;
     }
 
-    return static_cast<Statement*>(new LocalVariableDefinition(identifier,
+    auto statement = std::make_unique<LocalVariableDefinition>(identifier,
                                                                type,
                                                                location(ctx->type()),
                                                                assigner,
                                                                std::unique_ptr<Expression>(assigned),
-                                                               location(ctx)));
+                                                               location(ctx));
+    return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 
 antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
@@ -231,12 +237,12 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
 
     Expression* value = visit(ctx->expression()).as<Expression*>();
 
-    return static_cast<Statement*>(LocalReferenceVariableDefinition::defineReferring(identifier,
-                                                                                     type,
-                                                                                     location(ctx->type()),
-                                                                                     std::unique_ptr<Expression>(value),
-                                                                                     location(ctx))
-                                       .release());
+    auto statement = LocalReferenceVariableDefinition::defineReferring(identifier,
+                                                                       type,
+                                                                       location(ctx->type()),
+                                                                       std::unique_ptr<Expression>(value),
+                                                                       location(ctx));
+    return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 
 antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
@@ -247,13 +253,13 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
 
     Expression* address = visit(ctx->expression()).as<Expression*>();
 
-    return static_cast<Statement*>(
-        LocalReferenceVariableDefinition::defineReferringTo(identifier,
-                                                            type,
-                                                            location(ctx->type()),
-                                                            std::unique_ptr<Expression>(address),
-                                                            location(ctx))
-            .release());
+    auto statement = LocalReferenceVariableDefinition::defineReferringTo(identifier,
+                                                                         type,
+                                                                         location(ctx->type()),
+                                                                         std::unique_ptr<Expression>(address),
+                                                                         location(ctx));
+
+    return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 
 antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
@@ -262,10 +268,12 @@ antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
     lang::Assigner assigner   = visit(ctx->assigner()).as<lang::Assigner>();
     Expression*    assigned   = visit(ctx->assigned).as<Expression*>();
 
-    return static_cast<Statement*>(new AssignmentStatement(std::unique_ptr<Expression>(assignable),
+    auto statement = std::make_unique<AssignmentStatement>(std::unique_ptr<Expression>(assignable),
                                                            assigner,
                                                            std::unique_ptr<Expression>(assigned),
-                                                           location(ctx)));
+                                                           location(ctx));
+
+    return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 
 antlrcpp::Any SourceVisitor::visitDeleteStatement(anceParser::DeleteStatementContext* ctx)
@@ -273,8 +281,10 @@ antlrcpp::Any SourceVisitor::visitDeleteStatement(anceParser::DeleteStatementCon
     Expression* expression    = visit(ctx->expression()).as<Expression*>();
     bool        delete_buffer = ctx->BUFFER();
 
-    return static_cast<Statement*>(
-        new DeleteStatement(std::unique_ptr<Expression>(expression), delete_buffer, location(ctx)));
+    auto statement =
+        std::make_unique<DeleteStatement>(std::unique_ptr<Expression>(expression), delete_buffer, location(ctx));
+
+    return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 
 antlrcpp::Any SourceVisitor::visitReturnStatement(anceParser::ReturnStatementContext* ctx)
@@ -283,13 +293,17 @@ antlrcpp::Any SourceVisitor::visitReturnStatement(anceParser::ReturnStatementCon
 
     if (ctx->expression() != nullptr) { return_value = visit(ctx->expression()).as<Expression*>(); }
 
-    return static_cast<Statement*>(new ReturnStatement(std::unique_ptr<Expression>(return_value), location(ctx)));
+    auto statement = std::make_unique<ReturnStatement>(std::unique_ptr<Expression>(return_value), location(ctx));
+
+    return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 
 antlrcpp::Any SourceVisitor::visitAssertStatement(anceParser::AssertStatementContext* ctx)
 {
     Expression* condition = visit(ctx->expression()).as<Expression*>();
-    return static_cast<Statement*>(new Assertion(std::unique_ptr<Expression>(condition), location(ctx)));
+
+    auto statement = std::make_unique<Assertion>(std::unique_ptr<Expression>(condition), location(ctx));
+    return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)

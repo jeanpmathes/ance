@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     Application application(project);
     SourceFile  source_file(application.getSourceFile());
 
-    std::cout << "========== Build [ " << application.getName() << " ] ==========" << std::endl;
+    std::cout << "============ Build [ " << application.getName() << " ] ============" << std::endl;
 
     std::fstream code;
     code.open(application.getSourceFile());

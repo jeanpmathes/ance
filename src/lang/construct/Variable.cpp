@@ -1,6 +1,7 @@
 #include "Variable.h"
 
 #include <utility>
+#include <iostream>
 
 #include "lang/construct/GlobalVariable.h"
 #include "lang/construct/LocalVariable.h"
@@ -43,7 +44,7 @@ void lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
 
 void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
                                    lang::Location                      type_location,
-                                   lang::LocalScope*                   containing_scope,
+                                   lang::Scope*                        containing_scope,
                                    bool                                is_final,
                                    const std::shared_ptr<lang::Value>& value,
                                    unsigned int                        parameter_no,

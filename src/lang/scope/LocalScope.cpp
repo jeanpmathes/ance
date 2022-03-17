@@ -30,7 +30,7 @@ lang::Scope* lang::LocalScope::scope() const
     return parent_;
 }
 
-std::optional<lang::ResolvingHandle<lang::Variable>> lang::LocalScope::defineAutoVariable(
+std::optional<lang::ResolvingHandle<lang::Variable>> lang::LocalScope::defineLocalVariable(
     const std::string&                  identifier,
     lang::ResolvingHandle<lang::Type>   type,
     lang::Location                      type_location,
@@ -38,24 +38,21 @@ std::optional<lang::ResolvingHandle<lang::Variable>> lang::LocalScope::defineAut
     const std::shared_ptr<lang::Value>& value,
     lang::Location                      location)
 {
-    return defineLocalVariable(identifier, type, type_location, assigner, value, 0, location);
-}
+    if (defined_local_variables_.find(identifier) == defined_local_variables_.end())
+    {
+        bool is_final = assigner.isFinal();
 
-std::optional<lang::ResolvingHandle<lang::Variable>> lang::LocalScope::defineParameterVariable(
-    const std::string&                  identifier,
-    lang::ResolvingHandle<lang::Type>   type,
-    lang::Location                      type_location,
-    const std::shared_ptr<lang::Value>& value,
-    unsigned                            parameter_no,
-    lang::Location                      location)
-{
-    return defineLocalVariable(identifier,
-                               type,
-                               type_location,
-                               lang::Assigner::UNSPECIFIED,
-                               value,
-                               parameter_no,
-                               location);
+        lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(identifier);
+        variable->defineAsLocal(type, type_location, this, is_final, value, 0, location);
+
+        addChild(*variable);
+        defined_local_variables_[identifier] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+
+        return std::make_optional(variable);
+    }
+    else {
+        return {};
+    }
 }
 
 void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Variable> variable)
@@ -175,31 +172,4 @@ void lang::LocalScope::validate(ValidationLogger& validation_logger)
 void lang::LocalScope::buildDeclarations(CompileContext* context)
 {
     for (auto& [identifier, variable] : defined_local_variables_) { variable->buildDeclaration(context); }
-}
-
-std::optional<lang::ResolvingHandle<lang::Variable>> lang::LocalScope::defineLocalVariable(
-    const std::string&                  identifier,
-    lang::ResolvingHandle<lang::Type>   type,
-    lang::Location                      type_location,
-    lang::Assigner                      assigner,
-    const std::shared_ptr<lang::Value>& value,
-    unsigned                            parameter_no,
-    lang::Location                      location)
-{
-    if (defined_local_variables_.find(identifier) == defined_local_variables_.end())
-    {
-        bool is_final = assigner.isFinal();
-
-        lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(identifier);
-        variable->defineAsLocal(type, type_location, this, is_final, value, parameter_no, location);
-
-        addChild(*variable);
-        defined_local_variables_[identifier] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
-
-        return std::make_optional(variable);
-    }
-    else
-    {
-        return {};
-    }
 }

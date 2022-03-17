@@ -76,8 +76,9 @@ namespace lang
         /**
          * Validate this basic block.
          * @param validation_logger The validation logger to use.
+         * @return Whether the basic block is valid.
          */
-        void validate(ValidationLogger& validation_logger);
+        bool validate(ValidationLogger& validation_logger);
 
         /**
          * Get all leaves of this basic block. A leave is a basic block that is not followed by any other block.
@@ -168,9 +169,7 @@ namespace lang
                 [[nodiscard]] size_t getIncomingLinkCount() const;
                 void                 updateIncomingLinks(BasicBlock* updated);
 
-                virtual void setContainingFunction(lang::Function* function) = 0;
-
-                virtual void                         validate(ValidationLogger& validation_logger) = 0;
+                virtual bool                           validate(ValidationLogger& validation_logger) = 0;
                 virtual std::list<lang::BasicBlock*>   getLeaves()                                   = 0;
                 virtual std::vector<lang::BasicBlock*> getSuccessors()                               = 0;
                 virtual std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue();
@@ -207,9 +206,7 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                void setContainingFunction(lang::Function* function) override;
-
-                void                         validate(ValidationLogger& validation_logger) override;
+                bool                           validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*>   getLeaves() override;
                 std::vector<lang::BasicBlock*> getSuccessors() override;
                 lang::Location                 getStartLocation() override;
@@ -239,9 +236,7 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                void setContainingFunction(lang::Function* function) override;
-
-                void                         validate(ValidationLogger& validation_logger) override;
+                bool                           validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*>   getLeaves() override;
                 std::vector<lang::BasicBlock*> getSuccessors() override;
                 lang::Location                 getStartLocation() override;
@@ -272,9 +267,7 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                void setContainingFunction(lang::Function* function) override;
-
-                void                         validate(ValidationLogger& validation_logger) override;
+                bool                           validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*>   getLeaves() override;
                 std::vector<lang::BasicBlock*> getSuccessors() override;
                 std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue() override;
@@ -295,15 +288,16 @@ namespace lang
         };
 
       private:
-        std::unique_ptr<Definition::Base> definition_;
+        std::unique_ptr<Definition::Base>           definition_;
         lang::Function*                             containing_function_ {nullptr};
         std::optional<std::list<lang::BasicBlock*>> leaves_ {};
 
         bool simplified_ {false};
         bool unused_ {false};
         bool finalized_ {false};
-        bool validated_ {false};
         bool reached_ {false};
+
+        std::optional<bool> validated_ {};
     };
 }
 

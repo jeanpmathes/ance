@@ -54,7 +54,6 @@ void lang::BasicBlock::setContainingFunction(lang::Function* function)
     assert(!finalized_);
 
     containing_function_ = function;
-    definition_->setContainingFunction(function);
 }
 
 void lang::BasicBlock::finalize(size_t& index)
@@ -76,14 +75,13 @@ size_t lang::BasicBlock::getId() const
     return definition_->getIndex();
 }
 
-void lang::BasicBlock::validate(ValidationLogger& validation_logger)
+bool lang::BasicBlock::validate(ValidationLogger& validation_logger)
 {
     assert(finalized_);
 
-    if (validated_) return;
-    validated_ = true;
+    if (!validated_) { validated_ = std::make_optional(definition_->validate(validation_logger)); }
 
-    definition_->validate(validation_logger);
+    return validated_.value();
 }
 
 std::list<lang::BasicBlock*> lang::BasicBlock::getLeaves()

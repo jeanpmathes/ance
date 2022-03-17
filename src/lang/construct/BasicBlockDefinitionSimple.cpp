@@ -57,16 +57,15 @@ void lang::BasicBlock::Definition::Simple::transferStatements(std::list<Statemen
     statements_.splice(statements_.begin(), statements);
 }
 
-void lang::BasicBlock::Definition::Simple::setContainingFunction(lang::Function* function)
+bool lang::BasicBlock::Definition::Simple::validate(ValidationLogger& validation_logger)
 {
-    for (auto& statement : statements_) { statement->setContainingScope(function); }
-}
+    bool valid = true;
 
-void lang::BasicBlock::Definition::Simple::validate(ValidationLogger& validation_logger)
-{
     for (auto& statement : statements_) { statement->validate(validation_logger); }
 
-    if (next_) { next_->validate(validation_logger); }
+    if (next_) { valid &= next_->validate(validation_logger); }
+
+    return valid;
 }
 
 std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Simple::getLeaves()

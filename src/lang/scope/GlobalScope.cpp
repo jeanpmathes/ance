@@ -115,6 +115,7 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineCustomFunction(
     lang::ResolvingHandle<lang::Type>                    return_type,
     lang::Location                                       return_type_location,
     const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+    std::unique_ptr<lang::CodeBlock>                     code,
     lang::Location                                       declaration_location,
     lang::Location                                       definition_location)
 {
@@ -126,6 +127,7 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineCustomFunction(
                               return_type,
                               return_type_location,
                               parameters,
+                              std::move(code),
                               this,
                               declaration_location,
                               definition_location);

@@ -80,7 +80,7 @@ namespace lang
          */
         void defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
                            lang::Location                      type_location,
-                           lang::LocalScope*                   containing_scope,
+                           lang::Scope*                        containing_scope,
                            bool                                is_final,
                            const std::shared_ptr<lang::Value>& value,
                            unsigned                            parameter_no,

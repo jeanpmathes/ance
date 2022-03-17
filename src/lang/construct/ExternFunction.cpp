@@ -35,8 +35,6 @@ bool lang::ExternFunction::isMangled() const
     return false;
 }
 
-void lang::ExternFunction::pushStatement(std::unique_ptr<Statement>) {}
-
 void lang::ExternFunction::validate(ValidationLogger& validation_logger)
 {
     if (!returnType()->isDefined())

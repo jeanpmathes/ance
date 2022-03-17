@@ -14,6 +14,7 @@
 #include "lang/utility/ResolvingHandle.h"
 #include "lang/AccessModifier.h"
 #include "lang/Element.h"
+#include "lang/construct/CodeBlock.h"
 
 namespace lang
 {
@@ -40,14 +41,12 @@ namespace lang
                        lang::ResolvingHandle<lang::Type>             return_type,
                        lang::Location                                return_type_location,
                        std::vector<std::shared_ptr<lang::Parameter>> parameters,
+                       std::unique_ptr<lang::CodeBlock>              code,
                        lang::Scope*                                  containing_scope,
                        lang::Location                                declaration_location,
                        lang::Location                                definition_location);
 
         [[nodiscard]] bool isMangled() const override;
-
-        void pushStatement(std::unique_ptr<Statement> statement) override;
-        void finalizeDefinition() override;
 
         void validate(ValidationLogger& validation_logger) override;
 
@@ -69,23 +68,20 @@ namespace lang
         using FunctionDefinition::buildCall;
 
       private:
+        void finalizeDefinition();
         void validateReturn(ValidationLogger& validation_logger);
         void validateUnreachable(ValidationLogger& validation_logger);
 
       private:
-        void addBlock(std::unique_ptr<lang::BasicBlock> block);
+        std::unique_ptr<lang::CodeBlock> code_;
+        lang::LocalScope*                inside_scope_ {nullptr};
 
-      private:
         lang::AccessModifier access_;
         lang::Location       definition_location_;
 
-        std::unique_ptr<lang::LocalScope> inside_scope_;
-
         std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>> arguments_ {};
-        std::vector<std::unique_ptr<Statement>>                           statements_ {};
 
         std::unique_ptr<lang::BasicBlock>              initial_block_;
-        lang::BasicBlock*                              entry_block_ {nullptr};
         std::vector<std::unique_ptr<lang::BasicBlock>> blocks_ {};
 
         llvm::FunctionType* native_type_ {nullptr};

@@ -11,7 +11,7 @@
 lang::LocalVariable::LocalVariable(const std::string&                identifier,
                                    lang::ResolvingHandle<lang::Type> type,
                                    lang::Location                    type_location,
-                                   lang::LocalScope*                 containing_scope,
+                                   lang::Scope*                      containing_scope,
                                    bool                              is_final,
                                    std::shared_ptr<lang::Value>      value,
                                    unsigned                          parameter_no,
@@ -39,6 +39,7 @@ void lang::LocalVariable::buildDeclaration(CompileContext* context)
 void lang::LocalVariable::buildDefinition(CompileContext* context)
 {
     assert(initial_value_);
+    assert(native_value_);
 
     if (parameter_no_ == 0)
     {
