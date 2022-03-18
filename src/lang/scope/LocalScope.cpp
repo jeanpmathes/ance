@@ -110,6 +110,8 @@ void lang::LocalScope::registerDefinition(lang::ResolvingHandle<lang::Type> type
 
 void lang::LocalScope::resolve()
 {
+    for (auto& sub_scope : sub_scopes_) { sub_scope->resolve(); }
+
     auto fn_it = undefined_function_groups_.begin();
 
     while (fn_it != undefined_function_groups_.end())
@@ -149,19 +151,30 @@ void lang::LocalScope::resolve()
     }
 }
 
-bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable>)
+bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
 {
-    return false;
+    if (defined_local_variables_.find(variable->identifier()) != defined_local_variables_.end())
+    {
+        variable.reroute(defined_local_variables_[variable->identifier()].handle());
+        return true;
+    }
+
+    return scope()->resolveDefinition(variable);
 }
 
-bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup>)
+bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group)
 {
-    return false;
+    return scope()->resolveDefinition(function_group);
 }
 
-bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::Type>)
+bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::Type> type)
 {
-    return false;
+    return scope()->resolveDefinition(type);
+}
+
+void lang::LocalScope::onSubScope(lang::LocalScope* sub_scope)
+{
+    sub_scopes_.push_back(sub_scope);
 }
 
 void lang::LocalScope::validate(ValidationLogger& validation_logger)
@@ -172,4 +185,6 @@ void lang::LocalScope::validate(ValidationLogger& validation_logger)
 void lang::LocalScope::buildDeclarations(CompileContext* context)
 {
     for (auto& [identifier, variable] : defined_local_variables_) { variable->buildDeclaration(context); }
+
+    for (auto& sub_scope : sub_scopes_) { sub_scope->buildDeclarations(context); }
 }

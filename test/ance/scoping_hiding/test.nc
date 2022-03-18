@@ -1,4 +1,4 @@
-// valid
+// invalid
 
 // Variables defined in scopes hide outer variables. They also block access before definition.
 

@@ -47,6 +47,10 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitPrivate(anceParser::PrivateContext* ctx) override { return visitChildren(ctx); }
 
+    virtual antlrcpp::Any visitCode(anceParser::CodeContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitBlock(anceParser::BlockContext* ctx) override { return visitChildren(ctx); }
+
     virtual antlrcpp::Any visitStatement(anceParser::StatementContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitExpressionStatement(anceParser::ExpressionStatementContext* ctx) override

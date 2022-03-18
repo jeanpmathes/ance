@@ -71,6 +71,8 @@ namespace lang
         bool resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
         bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) override;
 
+        void onSubScope(lang::LocalScope* sub_scope) override;
+
       public:
         void validate(ValidationLogger& validation_logger) override;
 
@@ -81,7 +83,8 @@ namespace lang
         void buildDeclarations(CompileContext* context);
 
       private:
-        lang::Scope* parent_;
+        lang::Scope*                   parent_;
+        std::vector<lang::LocalScope*> sub_scopes_;
 
         std::map<std::string, lang::OwningHandle<lang::Variable>> undefined_variables_ {};
         std::map<std::string, lang::OwningHandle<lang::Variable>> defined_local_variables_ {};

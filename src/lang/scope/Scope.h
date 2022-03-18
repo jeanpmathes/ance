@@ -129,7 +129,10 @@ namespace lang
          */
         virtual void validate(ValidationLogger& validation_logger) = 0;
 
-        virtual ~Scope() = default;
+        ~Scope() override = default;
+
+      protected:
+        virtual void onSubScope(LocalScope* local_scope);
     };
 }
 #endif

@@ -9,7 +9,7 @@ variableDeclaration
 	;
 
 function
-	: accessModifier IDENTIFIER '(' parameters ')' (':' type)? '{' ( statement )* '}' # FunctionDefinition
+	: accessModifier IDENTIFIER '(' parameters ')' (':' type)? '{' ( code )* '}' # FunctionDefinition
 	| 'extern' IDENTIFIER '(' parameters ')' (':' type)? ';' # ExternFunctionDeclaration
 	;
 
@@ -38,6 +38,15 @@ accessModifier
 	: 'public' # Public
 	| 'private' # Private
 	;
+
+code
+    : statement
+    | block
+    ;
+
+block
+    : '{' ( code )* '}'
+    ;
 
 statement
 	: expressionStatement

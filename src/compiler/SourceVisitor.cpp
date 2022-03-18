@@ -99,8 +99,7 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
         ctx->type() ? visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>() : lang::VoidType::get();
 
     lang::Location declaration_location = location(ctx);
-    lang::Location definition_location =
-        ctx->statement().empty() ? declaration_location : location(ctx->statement()[0]);
+    lang::Location definition_location  = ctx->code().empty() ? declaration_location : location(ctx->code()[0]);
 
     std::vector<lang::Parameter*> parameters = visit(ctx->parameters()).as<std::vector<lang::Parameter*>>();
 
@@ -112,9 +111,9 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
 
     auto function_block = lang::CodeBlock::makeInitial();
 
-    for (auto statement_context : ctx->statement())
+    for (auto code_context : ctx->code())
     {
-        lang::CodeBlock* block     = visit(statement_context).as<lang::CodeBlock*>();
+        lang::CodeBlock* block     = visit(code_context).as<lang::CodeBlock*>();
         auto             block_ptr = std::unique_ptr<lang::CodeBlock>(block);
 
         function_block->append(std::move(block_ptr));
@@ -191,6 +190,21 @@ antlrcpp::Any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ct
                                                     location(ctx->type()));
 
     return this->visitChildren(ctx);
+}
+
+antlrcpp::Any SourceVisitor::visitBlock(anceParser::BlockContext* ctx)
+{
+    lang::CodeBlock* block = lang::CodeBlock::makeScoped();
+
+    for (auto code_context : ctx->code())
+    {
+        lang::CodeBlock* code     = visit(code_context).as<lang::CodeBlock*>();
+        auto             code_ptr = std::unique_ptr<lang::CodeBlock>(code);
+
+        block->append(std::move(code_ptr));
+    }
+
+    return block;
 }
 
 antlrcpp::Any SourceVisitor::visitExpressionStatement(anceParser::ExpressionStatementContext* ctx)

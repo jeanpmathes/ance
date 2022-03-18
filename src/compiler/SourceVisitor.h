@@ -34,6 +34,8 @@ class SourceVisitor : public anceBaseVisitor
 
     // Statements
 
+    antlrcpp::Any visitBlock(anceParser::BlockContext* ctx) override;
+
     antlrcpp::Any visitExpressionStatement(anceParser::ExpressionStatementContext* ctx) override;
     antlrcpp::Any visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx) override;
     antlrcpp::Any visitLocalReferenceToValueDefinition(
