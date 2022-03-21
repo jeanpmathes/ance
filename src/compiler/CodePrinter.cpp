@@ -109,7 +109,7 @@ std::any CodePrinter::visit(SizeofExpression& sizeof_expression)
 
 std::any CodePrinter::visit(SizeofType& sizeof_type)
 {
-    out_ << "sizeof " << sizeof_type.type()->getName();
+    out_ << "sizeof " << sizeof_type.targetType()->getName();
 
     return {};
 }
