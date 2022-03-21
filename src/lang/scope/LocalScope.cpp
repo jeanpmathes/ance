@@ -15,7 +15,7 @@ lang::GlobalScope* lang::LocalScope::getGlobalScope()
     return parent_->getGlobalScope();
 }
 
-lang::LocalScope* lang::LocalScope::getLocalScope()
+lang::LocalScope* lang::LocalScope::asLocalScope()
 {
     return this;
 }
@@ -65,11 +65,10 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Variable> varia
         return;
     }
 
-    if (defined_local_variables_.find(variable->identifier()) != defined_local_variables_.end())
-    {
-        variable.reroute(defined_local_variables_[variable->identifier()].handle());
-        return;
-    }
+    if (findExistingLocalDeclaration(variable)) return;
+
+    lang::LocalScope* parent = scope()->asLocalScope();
+    if (parent && parent->findExistingLocalDeclaration(variable)) return;
 
     undefined_variables_[variable->identifier()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
@@ -153,12 +152,6 @@ void lang::LocalScope::resolve()
 
 bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
 {
-    if (defined_local_variables_.find(variable->identifier()) != defined_local_variables_.end())
-    {
-        variable.reroute(defined_local_variables_[variable->identifier()].handle());
-        return true;
-    }
-
     return scope()->resolveDefinition(variable);
 }
 
@@ -170,6 +163,17 @@ bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::FunctionGro
 bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::Type> type)
 {
     return scope()->resolveDefinition(type);
+}
+
+bool lang::LocalScope::findExistingLocalDeclaration(lang::ResolvingHandle<lang::Variable> variable)
+{
+    if (defined_local_variables_.find(variable->identifier()) != defined_local_variables_.end())
+    {
+        variable.reroute(defined_local_variables_[variable->identifier()].handle());
+        return true;
+    }
+
+    return false;
 }
 
 void lang::LocalScope::onSubScope(lang::LocalScope* sub_scope)

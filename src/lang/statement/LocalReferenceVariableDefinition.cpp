@@ -79,12 +79,12 @@ void LocalReferenceVariableDefinition::walkDefinitions()
 {
     reference_->walkDefinitions();
 
-    variable_ = scope()->getLocalScope()->defineLocalVariable(identifier_,
-                                                              type_,
-                                                              type_location_,
-                                                              lang::Assigner::REFERENCE_BINDING,
-                                                              reference_->getValue(),
-                                                              location());
+    variable_ = scope()->asLocalScope()->defineLocalVariable(identifier_,
+                                                             type_,
+                                                             type_location_,
+                                                             lang::Assigner::REFERENCE_BINDING,
+                                                             reference_->getValue(),
+                                                             location());
 
     scope()->addType(type_);
 }

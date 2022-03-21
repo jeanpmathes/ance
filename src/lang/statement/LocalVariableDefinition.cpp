@@ -58,12 +58,12 @@ void LocalVariableDefinition::walkDefinitions()
 {
     assigned_->walkDefinitions();
 
-    variable_ = scope()->getLocalScope()->defineLocalVariable(identifier_,
-                                                              type_,
-                                                              type_location_,
-                                                              assigner_,
-                                                              assigned_->getValue(),
-                                                              location());
+    variable_ = scope()->asLocalScope()->defineLocalVariable(identifier_,
+                                                             type_,
+                                                             type_location_,
+                                                             assigner_,
+                                                             assigned_->getValue(),
+                                                             location());
 
     scope()->addType(type_);
 }

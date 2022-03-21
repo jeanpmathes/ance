@@ -3,7 +3,7 @@
 #include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
 
-lang::LocalScope* lang::Scope::getLocalScope()
+lang::LocalScope* lang::Scope::asLocalScope()
 {
     return nullptr;
 }

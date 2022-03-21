@@ -35,7 +35,7 @@ namespace lang
         lang::Scope* scope() override;
 
         lang::GlobalScope* getGlobalScope() override;
-        lang::LocalScope*  getLocalScope() override;
+        lang::LocalScope*  asLocalScope() override;
         llvm::DIScope*     getDebugScope(CompileContext* context) override;
 
         [[nodiscard]] lang::Scope* scope() const;
@@ -70,6 +70,8 @@ namespace lang
         bool resolveDefinition(lang::ResolvingHandle<lang::Variable> variable) override;
         bool resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
         bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) override;
+
+        bool findExistingLocalDeclaration(lang::ResolvingHandle<lang::Variable> variable);
 
         void onSubScope(lang::LocalScope* sub_scope) override;
 

@@ -165,11 +165,6 @@ lang::GlobalScope* lang::Function::getGlobalScope()
     return definition_->getGlobalScope();
 }
 
-lang::LocalScope* lang::Function::getLocalScope()
-{
-    return getInsideScope();
-}
-
 llvm::DIScope* lang::Function::getDebugScope(CompileContext* context)
 {
     return definition_->getDebugScope(context);

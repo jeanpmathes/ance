@@ -49,10 +49,10 @@ namespace lang
         virtual lang::GlobalScope* getGlobalScope() = 0;
 
         /**
-         * Get the corresponding local scope, if there is one.
-         * @return The local scope, or nullptr if there is no local scope.
+         * Get this scope as a local scope, if it is one.
+         * @return The local scope, or nullptr if this scope is not a local scope.
          */
-        virtual lang::LocalScope* getLocalScope();
+        virtual lang::LocalScope* asLocalScope();
 
         /**
          * Get the debug scope for this scope.
