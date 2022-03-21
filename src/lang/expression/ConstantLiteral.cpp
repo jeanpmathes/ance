@@ -19,6 +19,8 @@ lang::ResolvingHandle<lang::Type> ConstantLiteral::type()
     return constant_->type();
 }
 
+void ConstantLiteral::walkDefinitions() {}
+
 bool ConstantLiteral::validate(ValidationLogger& validation_logger)
 {
     return constant_->validate(validation_logger, location());

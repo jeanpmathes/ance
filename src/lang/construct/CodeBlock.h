@@ -53,6 +53,12 @@ namespace lang
         lang::LocalScope* createScopes(lang::Scope* parent);
 
         /**
+         * Walk all definitions and declarations in this block.
+         * This will not do any resolving, but will consider blockers.
+         */
+        void walkDefinitions();
+
+        /**
          * Create basic blocks from the statements in this block.
          * @param entry The entry basic block.
          * @param function The function this block belongs to.

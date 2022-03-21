@@ -51,15 +51,21 @@ Expression* LocalVariableDefinition::assigned() const
 
 void LocalVariableDefinition::setScope(lang::Scope* scope)
 {
-    scope->addType(type_);
-
-    variable_ = scope->getLocalScope()->defineLocalVariable(identifier_,
-                                                            type_,
-                                                            type_location_,
-                                                            assigner_,
-                                                            assigned_->getValue(),
-                                                            location());
     assigned_->setContainingScope(scope);
+}
+
+void LocalVariableDefinition::walkDefinitions()
+{
+    assigned_->walkDefinitions();
+
+    variable_ = scope()->getLocalScope()->defineLocalVariable(identifier_,
+                                                              type_,
+                                                              type_location_,
+                                                              assigner_,
+                                                              assigned_->getValue(),
+                                                              location());
+
+    scope()->addType(type_);
 }
 
 void LocalVariableDefinition::validate(ValidationLogger& validation_logger)

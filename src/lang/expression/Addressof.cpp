@@ -22,6 +22,11 @@ void Addressof::setScope(lang::Scope* scope)
     arg_->setContainingScope(scope);
 }
 
+void Addressof::walkDefinitions()
+{
+    arg_->walkDefinitions();
+}
+
 lang::ResolvingHandle<lang::Type> Addressof::type()
 {
     if (!return_type_)

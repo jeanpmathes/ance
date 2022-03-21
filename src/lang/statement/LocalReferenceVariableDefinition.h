@@ -61,6 +61,7 @@ class LocalReferenceVariableDefinition
 
   public:
     void setScope(lang::Scope* scope) override;
+    void walkDefinitions() override;
 
     void validate(ValidationLogger& validation_logger) override;
 

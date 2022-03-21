@@ -46,9 +46,16 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      */
     [[nodiscard]] lang::Scope* scope() const;
 
+    /**
+     * Walk all definitions and declarations in this statement.
+     * Use this for order-dependent definitions, as well as the usage of resolvable entities.
+     */
+    virtual void walkDefinitions() = 0;
+
   protected:
     /**
      * Override this to receive the containing function.
+     * Order-dependent definitions should not happen here.
      * @param scope The containing function.
      */
     virtual void setScope(lang::Scope* scope);

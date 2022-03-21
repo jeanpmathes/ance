@@ -15,9 +15,11 @@ lang::ResolvingHandle<lang::Variable> VariableAccess::variable() const
     return variable_;
 }
 
-void VariableAccess::setScope(lang::Scope* scope)
+void VariableAccess::setScope(lang::Scope*) {}
+
+void VariableAccess::walkDefinitions()
 {
-    scope->registerUsage(variable_);
+    scope()->registerUsage(variable_);
 }
 
 lang::ResolvingHandle<lang::Type> VariableAccess::type()

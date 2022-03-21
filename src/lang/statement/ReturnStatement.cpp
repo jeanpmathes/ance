@@ -26,6 +26,11 @@ void ReturnStatement::setScope(lang::Scope* scope)
     if (return_value_) return_value_->setContainingScope(scope);
 }
 
+void ReturnStatement::walkDefinitions()
+{
+    if (return_value_) return_value_->walkDefinitions();
+}
+
 void ReturnStatement::validate(ValidationLogger&)
 {
     // Handled by basic block.

@@ -41,6 +41,11 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     void setContainingScope(lang::Scope* scope);
 
     /**
+     * Walk all ordered definitions and declarations, as well as the usage of resolvable entities.
+     */
+    virtual void walkDefinitions() = 0;
+
+    /**
      * Get whether this expression is a named value source.
      */
     [[nodiscard]] virtual bool isNamed();

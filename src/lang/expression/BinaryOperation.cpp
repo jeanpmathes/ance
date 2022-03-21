@@ -36,6 +36,12 @@ void BinaryOperation::setScope(lang::Scope* scope)
     right_->setContainingScope(scope);
 }
 
+void BinaryOperation::walkDefinitions()
+{
+    left_->walkDefinitions();
+    right_->walkDefinitions();
+}
+
 lang::ResolvingHandle<lang::Type> BinaryOperation::type()
 {
     return left_->type()->getOperatorResultType(op_, right_->type());

@@ -38,9 +38,14 @@ Expression* Allocation::count() const
 
 void Allocation::setScope(lang::Scope* scope)
 {
-    scope->addType(allocated_type_);
-
     if (count_) count_->setContainingScope(scope);
+}
+
+void Allocation::walkDefinitions()
+{
+    if (count_) count_->walkDefinitions();
+
+    scope()->addType(allocated_type_);
 }
 
 lang::ResolvingHandle<lang::Type> Allocation::type()

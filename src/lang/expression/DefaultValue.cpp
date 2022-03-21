@@ -12,6 +12,8 @@ lang::ResolvingHandle<lang::Type> DefaultValue::type()
     return type_;
 }
 
+void DefaultValue::walkDefinitions() {}
+
 bool DefaultValue::validate(ValidationLogger&)
 {
     return true;

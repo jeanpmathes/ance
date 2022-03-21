@@ -34,9 +34,14 @@ std::vector<std::reference_wrapper<Expression>> FunctionCall::arguments() const
 
 void FunctionCall::setScope(lang::Scope* scope)
 {
-    scope->registerUsage(function_group_);
-
     for (auto& arg : arguments_) { arg->setContainingScope(scope); }
+}
+
+void FunctionCall::walkDefinitions()
+{
+    for (auto& arg : arguments_) { arg->walkDefinitions(); }
+
+    scope()->registerUsage(function_group_);
 }
 
 lang::ResolvingHandle<lang::Type> FunctionCall::type()

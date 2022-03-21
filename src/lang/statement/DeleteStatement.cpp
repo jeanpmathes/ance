@@ -30,6 +30,11 @@ void DeleteStatement::setScope(lang::Scope* scope)
     to_delete_->setContainingScope(scope);
 }
 
+void DeleteStatement::walkDefinitions()
+{
+    to_delete_->walkDefinitions();
+}
+
 void DeleteStatement::validate(ValidationLogger& validation_logger)
 {
     if (to_delete_->validate(validation_logger))

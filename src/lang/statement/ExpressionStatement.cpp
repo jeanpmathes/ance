@@ -21,6 +21,11 @@ void ExpressionStatement::setScope(lang::Scope* scope)
     expression_->setContainingScope(scope);
 }
 
+void ExpressionStatement::walkDefinitions()
+{
+    expression_->walkDefinitions();
+}
+
 void ExpressionStatement::validate(ValidationLogger& validation_logger)
 {
     expression_->validate(validation_logger);

@@ -34,6 +34,11 @@ void BindRef::setScope(lang::Scope* scope)
     address_->setContainingScope(scope);
 }
 
+void BindRef::walkDefinitions()
+{
+    address_->walkDefinitions();
+}
+
 lang::ResolvingHandle<lang::Type> BindRef::type()
 {
     if (!type_)

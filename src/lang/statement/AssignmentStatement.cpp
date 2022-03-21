@@ -42,6 +42,12 @@ void AssignmentStatement::setScope(lang::Scope* scope)
     assigned_->setContainingScope(scope);
 }
 
+void AssignmentStatement::walkDefinitions()
+{
+    assignable_->walkDefinitions();
+    assigned_->walkDefinitions();
+}
+
 void AssignmentStatement::validate(ValidationLogger& validation_logger)
 {
     if (assigner_.isFinal())

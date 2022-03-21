@@ -37,6 +37,8 @@ bool Expression::validateAssignment(const std::shared_ptr<lang::Value>& value,
                                     lang::Location                      value_location,
                                     ValidationLogger&                   validation_logger)
 {
+    if (!validate(validation_logger)) return false;
+
     if (type()->isReferenceType())
     {
         lang::ResolvingHandle<lang::Type> target_type = type()->getElementType();

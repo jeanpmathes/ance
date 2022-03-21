@@ -25,6 +25,11 @@ void Assertion::setScope(lang::Scope* scope)
     condition_->setContainingScope(scope);
 }
 
+void Assertion::walkDefinitions()
+{
+    condition_->walkDefinitions();
+}
+
 void Assertion::validate(ValidationLogger& validation_logger)
 {
     bool is_valid = condition_->validate(validation_logger);

@@ -23,6 +23,8 @@ class DefaultValue
 
     lang::ResolvingHandle<lang::Type> type() override;
 
+    void walkDefinitions() override;
+
     bool validate(ValidationLogger& validation_logger) override;
 
     [[nodiscard]] std::shared_ptr<lang::Value>    getValue() const override;

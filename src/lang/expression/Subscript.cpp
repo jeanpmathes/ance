@@ -28,6 +28,12 @@ void Subscript::setScope(lang::Scope* scope)
     index_->setContainingScope(scope);
 }
 
+void Subscript::walkDefinitions()
+{
+    indexed_->walkDefinitions();
+    index_->walkDefinitions();
+}
+
 lang::ResolvingHandle<lang::Type> Subscript::type()
 {
     return indexed_->type()->getSubscriptReturnType();

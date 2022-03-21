@@ -16,9 +16,11 @@ lang::ResolvingHandle<lang::Type> SizeofType::targetType() const
     return type_;
 }
 
-void SizeofType::setScope(lang::Scope* scope)
+void SizeofType::setScope(lang::Scope*) {}
+
+void SizeofType::walkDefinitions()
 {
-    scope->addType(type_);
+    scope()->addType(type_);
 }
 
 lang::ResolvingHandle<lang::Type> SizeofType::type()

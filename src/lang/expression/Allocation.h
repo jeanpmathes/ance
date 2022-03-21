@@ -36,6 +36,7 @@ class Allocation
 
   protected:
     void setScope(lang::Scope* scope) override;
+    void walkDefinitions() override;
 
   public:
     lang::ResolvingHandle<lang::Type> type() override;

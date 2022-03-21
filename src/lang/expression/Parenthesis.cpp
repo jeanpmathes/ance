@@ -44,6 +44,11 @@ void Parenthesis::setScope(lang::Scope* scope)
     expression_->setContainingScope(scope);
 }
 
+void Parenthesis::walkDefinitions()
+{
+    expression_->walkDefinitions();
+}
+
 void Parenthesis::doAssign(std::shared_ptr<lang::Value> value, CompileContext* context)
 {
     expression_->assign(value, context);

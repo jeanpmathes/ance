@@ -21,6 +21,11 @@ void SizeofExpression::setScope(lang::Scope* scope)
     expression_->setContainingScope(scope);
 }
 
+void SizeofExpression::walkDefinitions()
+{
+    expression_->walkDefinitions();
+}
+
 lang::ResolvingHandle<lang::Type> SizeofExpression::type()
 {
     return lang::SizeType::getSize();

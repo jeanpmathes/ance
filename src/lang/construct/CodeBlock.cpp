@@ -57,6 +57,19 @@ lang::LocalScope* lang::CodeBlock::createScopes(lang::Scope* parent)
 
     return created;
 }
+
+void lang::CodeBlock::walkDefinitions()
+{
+    for (auto& sub : statements_)
+    {
+        auto* block = std::get_if<std::unique_ptr<CodeBlock>>(&sub);
+        if (block) { block->get()->walkDefinitions(); }
+
+        auto* statement = std::get_if<std::unique_ptr<Statement>>(&sub);
+        if (statement) { statement->get()->walkDefinitions(); }
+    }
+}
+
 std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlocks(lang::BasicBlock& entry,
                                                                                   lang::Function*   function)
 {

@@ -37,6 +37,8 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
     inside_scope_ = code_->createScopes(this->function());
     assert(inside_scope_);
 
+    code_->walkDefinitions();
+
     containing_scope->addType(return_type);
 
     unsigned no = 1;

@@ -72,17 +72,23 @@ Expression& LocalReferenceVariableDefinition::reference() const
 
 void LocalReferenceVariableDefinition::setScope(lang::Scope* scope)
 {
-    scope->addType(type_);
-
-    variable_ = scope->getLocalScope()->defineLocalVariable(identifier_,
-                                                            type_,
-                                                            type_location_,
-                                                            lang::Assigner::REFERENCE_BINDING,
-                                                            reference_->getValue(),
-                                                            location());
-
     reference_->setContainingScope(scope);
 }
+
+void LocalReferenceVariableDefinition::walkDefinitions()
+{
+    reference_->walkDefinitions();
+
+    variable_ = scope()->getLocalScope()->defineLocalVariable(identifier_,
+                                                              type_,
+                                                              type_location_,
+                                                              lang::Assigner::REFERENCE_BINDING,
+                                                              reference_->getValue(),
+                                                              location());
+
+    scope()->addType(type_);
+}
+
 void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger)
 {
     if (variable_)
