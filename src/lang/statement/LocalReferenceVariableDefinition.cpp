@@ -73,6 +73,8 @@ Expression& LocalReferenceVariableDefinition::reference() const
 void LocalReferenceVariableDefinition::setScope(lang::Scope* scope)
 {
     reference_->setContainingScope(scope);
+
+    scope->asLocalScope()->prepareDefinition(identifier_);
 }
 
 void LocalReferenceVariableDefinition::walkDefinitions()

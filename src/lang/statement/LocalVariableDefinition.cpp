@@ -52,6 +52,8 @@ Expression* LocalVariableDefinition::assigned() const
 void LocalVariableDefinition::setScope(lang::Scope* scope)
 {
     assigned_->setContainingScope(scope);
+
+    scope->asLocalScope()->prepareDefinition(identifier_);
 }
 
 void LocalVariableDefinition::walkDefinitions()

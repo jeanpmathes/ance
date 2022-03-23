@@ -30,6 +30,11 @@ lang::Scope* lang::LocalScope::scope() const
     return parent_;
 }
 
+void lang::LocalScope::prepareDefinition(const std::string& identifier)
+{
+    blockers_.emplace(identifier);
+}
+
 std::optional<lang::ResolvingHandle<lang::Variable>> lang::LocalScope::defineLocalVariable(
     const std::string&                  identifier,
     lang::ResolvingHandle<lang::Type>   type,
@@ -38,6 +43,8 @@ std::optional<lang::ResolvingHandle<lang::Variable>> lang::LocalScope::defineLoc
     const std::shared_ptr<lang::Value>& value,
     lang::Location                      location)
 {
+    assert(blockers_.contains(identifier));
+
     if (defined_local_variables_.find(identifier) == defined_local_variables_.end())
     {
         bool is_final = assigner.isFinal();
@@ -67,6 +74,19 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Variable> varia
 
     if (findExistingLocalDeclaration(variable)) return;
 
+    if (blockers_.contains(variable->identifier()))
+    {
+        if (blocked_variables_.contains(variable->identifier()))
+        {
+            variable.reroute(blocked_variables_[variable->identifier()].handle());
+        }
+        else {
+            blocked_variables_[variable->identifier()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+        }
+
+        return;
+    }
+
     lang::LocalScope* parent = scope()->asLocalScope();
     if (parent && parent->findExistingLocalDeclaration(variable)) return;
 
@@ -83,6 +103,20 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::FunctionGroup> 
         return;
     }
 
+    if (blockers_.contains(function_group->name()))
+    {
+        if (blocked_function_groups_.contains(function_group->name()))
+        {
+            function_group.reroute(blocked_function_groups_[function_group->name()].handle());
+        }
+        else {
+            blocked_function_groups_[function_group->name()] =
+                lang::OwningHandle<lang::FunctionGroup>::takeOwnership(function_group);
+        }
+
+        return;
+    }
+
     undefined_function_groups_[function_group->name()] =
         lang::OwningHandle<lang::FunctionGroup>::takeOwnership(function_group);
 }
@@ -94,6 +128,16 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Type> type)
     if (undefined_types_.find(type->getName()) != undefined_types_.end())
     {
         type.reroute(undefined_types_[type->getName()].handle());
+        return;
+    }
+
+    if (blockers_.contains(type->getName()))
+    {
+        if (blocked_types_.contains(type->getName())) { type.reroute(blocked_types_[type->getName()].handle()); }
+        else {
+            blocked_types_[type->getName()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
+        }
+
         return;
     }
 

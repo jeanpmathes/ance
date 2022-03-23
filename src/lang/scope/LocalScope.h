@@ -4,6 +4,7 @@
 #include "Scope.h"
 
 #include <optional>
+#include <set>
 
 #include "lang/Assigner.h"
 #include "lang/construct/FunctionGroup.h"
@@ -39,6 +40,12 @@ namespace lang
         llvm::DIScope*     getDebugScope(CompileContext* context) override;
 
         [[nodiscard]] lang::Scope* scope() const;
+
+        /**
+         * Prepare the definition of a new variable. This will block resolution above this scope.
+         * @param identifier The identifier of the variable.
+         */
+        void prepareDefinition(const std::string& identifier);
 
         /**
          * Define a local variable. Parameters are not local variables and should be define in function scope.
@@ -88,12 +95,17 @@ namespace lang
         lang::Scope*                   parent_;
         std::vector<lang::LocalScope*> sub_scopes_;
 
+        std::set<std::string> blockers_ {};
+
         std::map<std::string, lang::OwningHandle<lang::Variable>> undefined_variables_ {};
+        std::map<std::string, lang::OwningHandle<lang::Variable>> blocked_variables_ {};
         std::map<std::string, lang::OwningHandle<lang::Variable>> defined_local_variables_ {};
 
         std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_ {};
+        std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> blocked_function_groups_ {};
 
         std::map<std::string, lang::OwningHandle<lang::Type>> undefined_types_ {};
+        std::map<std::string, lang::OwningHandle<lang::Type>> blocked_types_ {};
     };
 }
 #endif
