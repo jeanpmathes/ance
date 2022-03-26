@@ -175,6 +175,11 @@ lang::LocalScope* lang::Function::getInsideScope()
     return definition_->getInsideScope();
 }
 
+const std::vector<lang::BasicBlock*>& lang::Function::getBasicBlocks() const
+{
+    return definition_->getBasicBlocks();
+}
+
 void lang::Function::registerUsage(lang::ResolvingHandle<lang::Variable> variable)
 {
     assert(!variable->isDefined());

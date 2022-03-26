@@ -18,7 +18,7 @@ std::any ControlFlowGraphPrinter::visit(lang::CustomFunction& function)
 {
     current_function_ = &function;
 
-    visitChildren(function);
+    for (auto& bb : function.getBasicBlocks()) { visit(*bb); }
 
     printBlock("exit", NODE_EXIT, BlockStyle::IMPLICIT);
     printGroup(function.signature().toString());

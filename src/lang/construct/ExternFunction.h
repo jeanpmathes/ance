@@ -37,7 +37,8 @@ namespace lang
                                                CompileContext*                                  context) const override;
 
         llvm::DIScope*    getDebugScope(CompileContext* context) override;
-        lang::LocalScope* getInsideScope() override;
+        lang::LocalScope*                                   getInsideScope() override;
+        [[nodiscard]] const std::vector<lang::BasicBlock*>& getBasicBlocks() const override;
 
       protected:
         using FunctionDefinition::buildCall;

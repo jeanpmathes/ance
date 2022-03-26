@@ -195,6 +195,12 @@ namespace lang
          */
         lang::LocalScope* getInsideScope();
 
+        /**
+         * Get the basic blocks for this function.
+         * @return A vector containing all basic blocks.
+         */
+        const std::vector<lang::BasicBlock*>& getBasicBlocks() const;
+
         void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
         void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
         void registerUsage(lang::ResolvingHandle<lang::Type> type) override;

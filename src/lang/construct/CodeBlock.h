@@ -7,6 +7,7 @@
 #include "lang/scope/LocalScope.h"
 #include "lang/scope/Scope.h"
 #include "lang/statement/Statement.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -14,7 +15,7 @@ namespace lang
      * A code block is a sequence of statements.
      * In contrast to basic blocks, code blocks can be nested and contain branching statements.
      */
-    class CodeBlock
+    class CodeBlock : public lang::Element<CodeBlock, ANCE_CONSTRUCTS>
     {
       private:
         explicit CodeBlock(bool scoped);
@@ -69,7 +70,7 @@ namespace lang
 
       private:
         bool                                                                              scoped_;
-        std::vector<std::variant<std::unique_ptr<Statement>, std::unique_ptr<CodeBlock>>> statements_ {};
+        std::vector<std::variant<std::unique_ptr<Statement>, std::unique_ptr<CodeBlock>>> subs_ {};
         std::unique_ptr<lang::LocalScope>                                                 scope_ {};
     };
 

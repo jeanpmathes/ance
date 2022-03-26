@@ -64,6 +64,8 @@ namespace lang
         llvm::DIScope*    getDebugScope(CompileContext* context) override;
         lang::LocalScope* getInsideScope() override;
 
+        [[nodiscard]] const std::vector<lang::BasicBlock*>& getBasicBlocks() const override;
+
       protected:
         using FunctionDefinition::buildCall;
 
@@ -83,6 +85,7 @@ namespace lang
 
         std::unique_ptr<lang::BasicBlock>              initial_block_;
         std::vector<std::unique_ptr<lang::BasicBlock>> blocks_ {};
+        std::vector<lang::BasicBlock*>                 used_blocks_ {};
 
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};

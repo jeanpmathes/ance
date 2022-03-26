@@ -14,6 +14,9 @@ namespace lang
 #include "lang/construct/ExternFunction.h"
 #include "lang/construct/Function.h"
 
+#include "lang/construct/BasicBlock.h"
+#include "lang/construct/CodeBlock.h"
+
 #include "lang/construct/GlobalVariable.h"
 #include "lang/construct/LocalVariable.h"
 #include "lang/construct/Variable.h"

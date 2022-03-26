@@ -34,6 +34,8 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
     , definition_location_(definition_location)
     , initial_block_(lang::BasicBlock::createEmpty())
 {
+    addChild(*code_);
+
     inside_scope_ = code_->createScopes(this->function());
     assert(inside_scope_);
 
@@ -77,12 +79,12 @@ void lang::CustomFunction::finalizeDefinition()
 
     size_t running_index = 0;
     initial_block_->finalize(running_index);
-    addChild(*initial_block_);
+    used_blocks_.push_back(initial_block_.get());
 
     for (auto& block : blocks_)
     {
         block->finalize(running_index);
-        if (block->isUsable()) { addChild(*block); }
+        if (block->isUsable()) { used_blocks_.push_back(block.get()); }
     }
 }
 
@@ -271,6 +273,11 @@ llvm::DISubprogram* lang::CustomFunction::debugSubprogram()
 lang::LocalScope* lang::CustomFunction::getInsideScope()
 {
     return inside_scope_;
+}
+
+const std::vector<lang::BasicBlock*>& lang::CustomFunction::getBasicBlocks() const
+{
+    return used_blocks_;
 }
 
 llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext*)

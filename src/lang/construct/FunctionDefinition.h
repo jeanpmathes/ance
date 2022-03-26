@@ -166,6 +166,8 @@ namespace lang
         virtual llvm::DIScope*    getDebugScope(CompileContext* context) = 0;
         virtual lang::LocalScope* getInsideScope()                       = 0;
 
+        [[nodiscard]] virtual const std::vector<lang::BasicBlock*>& getBasicBlocks() const = 0;
+
         virtual ~FunctionDefinition() = default;
 
       private:

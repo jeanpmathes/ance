@@ -12,7 +12,7 @@ std::unique_ptr<lang::CodeBlock> lang::CodeBlock::makeInitial()
 lang::CodeBlock* lang::CodeBlock::wrapStatement(std::unique_ptr<Statement> statement)
 {
     auto* block = new CodeBlock(false);
-    block->statements_.emplace_back(std::move(statement));
+    block->subs_.emplace_back(std::move(statement));
 
     return block;
 }
@@ -24,11 +24,25 @@ lang::CodeBlock* lang::CodeBlock::makeScoped()
 
 void lang::CodeBlock::append(std::unique_ptr<CodeBlock> block)
 {
-    if (block->scoped_) { statements_.emplace_back(std::move(block)); }
+    if (block->scoped_)
+    {
+        lang::CodeBlock* last_ptr = block.get();
+        subs_.emplace_back(std::move(block));
+        addChild(*last_ptr);
+    }
     else {
-        for (auto& statement : block->statements_) { statements_.push_back(std::move(statement)); }
+        for (auto& sub : block->subs_)
+        {
+            auto* added_block = std::get_if<std::unique_ptr<CodeBlock>>(&sub);
+            if (added_block) { addChild(**added_block); }
 
-        block->statements_.clear();
+            auto* added_statement = std::get_if<std::unique_ptr<Statement>>(&sub);
+            if (added_statement) { addChild(**added_statement); }
+
+            subs_.push_back(std::move(sub));
+        }
+
+        block->subs_.clear();
     }
 }
 
@@ -42,7 +56,7 @@ lang::LocalScope* lang::CodeBlock::createScopes(lang::Scope* parent)
         created = scope_.get();
     }
 
-    for (auto& sub : statements_)
+    for (auto& sub : subs_)
     {
         auto* block = std::get_if<std::unique_ptr<CodeBlock>>(&sub);
         if (block)
@@ -60,7 +74,7 @@ lang::LocalScope* lang::CodeBlock::createScopes(lang::Scope* parent)
 
 void lang::CodeBlock::walkDefinitions()
 {
-    for (auto& sub : statements_)
+    for (auto& sub : subs_)
     {
         auto* block = std::get_if<std::unique_ptr<CodeBlock>>(&sub);
         if (block) { block->get()->walkDefinitions(); }
@@ -77,7 +91,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlock
 
     lang::BasicBlock* previous_block = &entry;
 
-    for (auto& sub : statements_)
+    for (auto& sub : subs_)
     {
         auto* block = std::get_if<std::unique_ptr<CodeBlock>>(&sub);
         if (block)

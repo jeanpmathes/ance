@@ -106,3 +106,9 @@ lang::LocalScope* lang::ExternFunction::getInsideScope()
 {
     return nullptr;
 }
+
+const std::vector<lang::BasicBlock*>& lang::ExternFunction::getBasicBlocks() const
+{
+    static std::vector<lang::BasicBlock*> empty;
+    return empty;
+}
