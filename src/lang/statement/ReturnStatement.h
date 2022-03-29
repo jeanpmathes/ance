@@ -8,7 +8,7 @@
 class Expression;
 
 /**
- * Adds a return value to the containing function.
+ * Returns from the containing function.
  */
 class ReturnStatement
     : public Statement
@@ -24,7 +24,8 @@ class ReturnStatement
 
     [[nodiscard]] Expression* expression();
 
-    std::unique_ptr<lang::BasicBlock> createBlock() override;
+    std::vector<std::unique_ptr<lang::BasicBlock>> createBlocks(lang::BasicBlock& entry,
+                                                                lang::Function*   function) override;
 
     void setScope(lang::Scope* scope) override;
     void walkDefinitions() override;
@@ -37,4 +38,5 @@ class ReturnStatement
   private:
     std::unique_ptr<Expression> return_value_;
 };
+
 #endif

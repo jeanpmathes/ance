@@ -22,11 +22,11 @@ namespace lang
         static std::unique_ptr<BasicBlock> createEmpty();
 
         /**
-         * Create a simple basic block that contains a single statement, and no links.
-         * @param statement The statement to add to the basic block.
+         * Create a simple basic block that contains a single or no statement, and no links.
+         * @param statement The statement to add to the basic block, or nullptr if no statement should be added.
          * @return The created basic block.
          */
-        static std::unique_ptr<BasicBlock> createSimple(Statement* statement);
+        static std::unique_ptr<BasicBlock> createSimple(Statement* statement = nullptr);
 
         /**
          * Create a basic block that returns from the function.
@@ -35,6 +35,19 @@ namespace lang
          * @return The created basic block.
          */
         static std::unique_ptr<BasicBlock> createReturning(Expression* expression, lang::Location return_location);
+
+        /**
+         * Create a basic block that branches depending on the value of an expression.
+         * @param condition The expression providing the condition.
+         * @param true_block The block to execute if the condition is true.
+         * @param false_block The block to execute if the condition is false.
+         * @param function The function containing the basic block.
+         * @return The created basic blocks.
+         */
+        static std::vector<std::unique_ptr<BasicBlock>> createBranching(Expression*      condition,
+                                                                        lang::CodeBlock* true_block,
+                                                                        lang::CodeBlock* false_block,
+                                                                        lang::Function*  function);
 
         /**
          * Link this block to unconditionally jump to the given block.
@@ -136,7 +149,7 @@ namespace lang
         void doBuild(CompileContext* context);
 
       private:
-        void                 registerIncomingLink(BasicBlock& next);
+        void                 registerIncomingLink(BasicBlock& predecessor);
         void                 updateLink(BasicBlock* former, BasicBlock* updated);
         [[nodiscard]] size_t getIncomingLinkCount() const;
         void                 transferStatements(std::list<Statement*>& statements);
@@ -224,6 +237,7 @@ namespace lang
             class Simple : public Base
             {
               public:
+                Simple();
                 explicit Simple(Statement* statement);
                 ~Simple() override = default;
 
@@ -285,6 +299,41 @@ namespace lang
                 Expression*           return_value_;
                 lang::Location        return_location_;
             };
+
+            class Branching : public Base
+            {
+              public:
+                explicit Branching(Expression* condition);
+                ~Branching() override = default;
+
+              public:
+                void finalize(size_t& index) override;
+
+                void setLink(BasicBlock& next) override;
+                void updateLink(BasicBlock* former, BasicBlock* updated) override;
+                void simplify() override;
+
+                void transferStatements(std::list<Statement*>& statements) override;
+
+                bool                           validate(ValidationLogger& validation_logger) override;
+                std::list<lang::BasicBlock*>   getLeaves() override;
+                std::vector<lang::BasicBlock*> getSuccessors() override;
+                lang::Location                 getStartLocation() override;
+                lang::Location                 getEndLocation() override;
+
+                void reach() override;
+
+                void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
+                void doBuild(CompileContext* context) override;
+
+              private:
+                std::list<Statement*> statements_ {};
+
+                lang::BasicBlock* true_next_ {nullptr};
+                lang::BasicBlock* false_next_ {nullptr};
+
+                Expression* condition_;
+            };
         };
 
       private:
@@ -296,6 +345,9 @@ namespace lang
         bool unused_ {false};
         bool finalized_ {false};
         bool reached_ {false};
+
+        bool build_prepared_ {false};
+        bool build_done_ {false};
 
         std::optional<bool> validated_ {};
     };

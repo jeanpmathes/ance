@@ -30,10 +30,13 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     explicit Statement(lang::Location location);
 
     /**
-     * Create a basic block containing this statement.
-     * @return The basic block.
+     * Create the basis blocks that make up this statement.
+     * @param entry The entry block.
+     * @param function The function this statement is part of.
+     * @return The basic blocks.
      */
-    virtual std::unique_ptr<lang::BasicBlock> createBlock();
+    virtual std::vector<std::unique_ptr<lang::BasicBlock>> createBlocks(lang::BasicBlock& entry,
+                                                                        lang::Function*   function);
 
     /**
      * Set the scope that contains this statement.

@@ -93,26 +93,24 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlock
 
     for (auto& sub : subs_)
     {
-        auto* block = std::get_if<std::unique_ptr<CodeBlock>>(&sub);
-        if (block)
-        {
-            auto sub_blocks = block->get()->createBasicBlocks(*previous_block, function);
+        std::vector<std::unique_ptr<BasicBlock>> new_blocks;
 
-            blocks.insert(blocks.end(),
-                          std::make_move_iterator(sub_blocks.begin()),
-                          std::make_move_iterator(sub_blocks.end()));
-        }
+        auto* block = std::get_if<std::unique_ptr<CodeBlock>>(&sub);
+        if (block) { new_blocks = block->get()->createBasicBlocks(*previous_block, function); }
 
         auto* statement = std::get_if<std::unique_ptr<Statement>>(&sub);
         if (statement)
         {
-            auto bb = statement->get()->createBlock();
-            previous_block->link(*bb);
-            bb->setContainingFunction(function);
+            new_blocks = statement->get()->createBlocks(*previous_block, function);
 
-            blocks.push_back(std::move(bb));
+            for (auto& bb : new_blocks) { bb->setContainingFunction(function); }
         }
 
+        blocks.insert(blocks.end(),
+                      std::make_move_iterator(new_blocks.begin()),
+                      std::make_move_iterator(new_blocks.end()));
+
+        assert(previous_block != blocks.back().get());
         previous_block = blocks.back().get();
     }
 

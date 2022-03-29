@@ -45,6 +45,7 @@ class ExpressionStatement;
 class LocalReferenceVariableDefinition;
 class LocalVariableDefinition;
 class ReturnStatement;
+class If;
 
 #define ANCE_CONSTRUCTS                                                                                                \
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::BasicBlock,    \
@@ -52,6 +53,6 @@ class ReturnStatement;
         BinaryOperation, BindRef, ConstantLiteral, DefaultValue, FunctionCall, Parenthesis, SizeofExpression,          \
         SizeofType, Subscript, VariableAccess, lang::GlobalScope, lang::LocalScope, Assertion, AssignmentStatement,    \
         DeleteStatement, ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition,               \
-        ReturnStatement
+        ReturnStatement, If
 
 #endif

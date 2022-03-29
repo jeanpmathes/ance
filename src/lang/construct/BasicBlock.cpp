@@ -1,6 +1,7 @@
 #include "BasicBlock.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/construct/CodeBlock.h"
 
 std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createEmpty()
 {
@@ -16,7 +17,8 @@ std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createSimple(Statement* stat
 {
     auto block = new BasicBlock();
 
-    block->definition_ = std::make_unique<Definition::Simple>(statement);
+    block->definition_ =
+        statement ? std::make_unique<Definition::Simple>(statement) : std::make_unique<Definition::Simple>();
     block->definition_->setSelf(block);
 
     return std::unique_ptr<BasicBlock>(block);
@@ -31,6 +33,42 @@ std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createReturning(Expression* 
     block->definition_->setSelf(block);
 
     return std::unique_ptr<BasicBlock>(block);
+}
+
+std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createBranching(Expression*      condition,
+                                                                                 lang::CodeBlock* true_block,
+                                                                                 lang::CodeBlock* false_block,
+                                                                                 lang::Function*  function)
+{
+    std::vector<std::unique_ptr<BasicBlock>> blocks;
+
+    auto block = new BasicBlock();
+    blocks.push_back(std::unique_ptr<BasicBlock>(block));
+
+    block->definition_ = std::make_unique<Definition::Branching>(condition);
+    block->definition_->setSelf(block);
+
+    std::unique_ptr<lang::BasicBlock> end_block = lang::BasicBlock::createSimple();
+
+    auto append_code_block = [&](lang::CodeBlock* code_block) {
+        auto new_basic_blocks = code_block->createBasicBlocks(*block, function);
+        assert(!new_basic_blocks.empty());
+
+        blocks.insert(blocks.end(),
+                      std::make_move_iterator(new_basic_blocks.begin()),
+                      std::make_move_iterator(new_basic_blocks.end()));
+
+        blocks.back()->link(*end_block);
+    };
+
+    append_code_block(true_block);
+
+    if (false_block) append_code_block(false_block);
+    else block->link(*end_block);
+
+    blocks.push_back(std::move(end_block));
+
+    return blocks;
 }
 
 void lang::BasicBlock::link(lang::BasicBlock& next)
@@ -122,19 +160,27 @@ lang::Location lang::BasicBlock::getEndLocation()
 
 void lang::BasicBlock::prepareBuild(CompileContext* context, llvm::Function* native_function)
 {
+    if (build_prepared_) return;
+
     assert(finalized_);
     definition_->prepareBuild(context, native_function);
+
+    build_prepared_ = true;
 }
 
 void lang::BasicBlock::doBuild(CompileContext* context)
 {
+    if (build_done_) return;
+
     assert(finalized_);
     definition_->doBuild(context);
+
+    build_done_ = true;
 }
 
-void lang::BasicBlock::registerIncomingLink(lang::BasicBlock& next)
+void lang::BasicBlock::registerIncomingLink(lang::BasicBlock& predecessor)
 {
-    definition_->registerIncomingLink(next);
+    definition_->registerIncomingLink(predecessor);
 }
 
 void lang::BasicBlock::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)

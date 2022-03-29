@@ -14,9 +14,14 @@ void Statement::setContainingScope(lang::Scope* scope)
     setScope(scope);
 }
 
-std::unique_ptr<lang::BasicBlock> Statement::createBlock()
+std::vector<std::unique_ptr<lang::BasicBlock>> Statement::createBlocks(lang::BasicBlock& entry, lang::Function*)
 {
-    return lang::BasicBlock::createSimple(this);
+    std::vector<std::unique_ptr<lang::BasicBlock>> blocks;
+    blocks.push_back(lang::BasicBlock::createSimple(this));
+
+    entry.link(*blocks.front());
+
+    return blocks;
 }
 
 void Statement::setScope(lang::Scope*) {}

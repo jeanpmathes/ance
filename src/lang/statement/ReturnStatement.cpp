@@ -16,9 +16,14 @@ Expression* ReturnStatement::expression()
     return return_value_.get();
 }
 
-std::unique_ptr<lang::BasicBlock> ReturnStatement::createBlock()
+std::vector<std::unique_ptr<lang::BasicBlock>> ReturnStatement::createBlocks(lang::BasicBlock& entry, lang::Function*)
 {
-    return lang::BasicBlock::createReturning(return_value_.get(), location());
+    std::vector<std::unique_ptr<lang::BasicBlock>> blocks;
+    blocks.push_back(lang::BasicBlock::createReturning(return_value_.get(), location()));
+
+    entry.link(*blocks.front());
+
+    return blocks;
 }
 
 void ReturnStatement::setScope(lang::Scope* scope)

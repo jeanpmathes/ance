@@ -44,5 +44,6 @@ namespace lang
 #include "lang/statement/LocalReferenceVariableDefinition.h"
 #include "lang/statement/LocalVariableDefinition.h"
 #include "lang/statement/ReturnStatement.h"
+#include "lang/statement/If.h"
 
 #endif

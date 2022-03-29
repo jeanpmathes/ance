@@ -14,8 +14,6 @@
 #include "lang/type/SingleType.h"
 #include "lang/type/VoidType.h"
 
-#include "lang/scope/LocalScope.h"
-
 #include "lang/statement/AssignmentStatement.h"
 #include "lang/statement/DeleteStatement.h"
 #include "lang/statement/ExpressionStatement.h"
@@ -23,6 +21,7 @@
 #include "lang/statement/LocalVariableDefinition.h"
 #include "lang/statement/ReturnStatement.h"
 #include "lang/statement/Assertion.h"
+#include "lang/statement/If.h"
 
 #include "lang/expression/Addressof.h"
 #include "lang/expression/Allocation.h"
@@ -318,6 +317,21 @@ antlrcpp::Any SourceVisitor::visitAssertStatement(anceParser::AssertStatementCon
 
     auto statement = std::make_unique<Assertion>(std::unique_ptr<Expression>(condition), location(ctx));
     return lang::CodeBlock::wrapStatement(std::move(statement));
+}
+
+antlrcpp::Any SourceVisitor::visitIfStatement(anceParser::IfStatementContext* ctx)
+{
+    Expression* condition = visit(ctx->expression()).as<Expression*>();
+    bool        has_else  = ctx->elseBlock != nullptr;
+
+    auto if_block = std::unique_ptr<lang::CodeBlock>(visit(ctx->ifBlock).as<lang::CodeBlock*>());
+    auto else_block =
+        has_else ? std::unique_ptr<lang::CodeBlock>(visit(ctx->elseBlock).as<lang::CodeBlock*>()) : nullptr;
+
+    return lang::CodeBlock::wrapStatement(std::make_unique<If>(std::unique_ptr<Expression>(condition),
+                                                               std::move(if_block),
+                                                               std::move(else_block),
+                                                               location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)

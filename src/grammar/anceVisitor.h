@@ -68,6 +68,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitAssertStatement(anceParser::AssertStatementContext* context) = 0;
 
+    virtual antlrcpp::Any visitIfStatement(anceParser::IfStatementContext* context) = 0;
+
     virtual antlrcpp::Any visitRef(anceParser::RefContext* context) = 0;
 
     virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* context) = 0;
