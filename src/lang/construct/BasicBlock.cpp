@@ -209,6 +209,11 @@ bool lang::BasicBlock::isUnreached() const
     return !reached_ && !unused_;
 }
 
+std::string lang::BasicBlock::getExitRepresentation()
+{
+    return definition_->getExitRepresentation();
+}
+
 void lang::BasicBlock::Definition::Base::setSelf(lang::BasicBlock* self)
 {
     self_ = self;

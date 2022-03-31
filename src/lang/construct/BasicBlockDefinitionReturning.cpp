@@ -132,3 +132,8 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext* context)
         context->ir()->CreateRetVoid();
     }
 }
+
+std::string lang::BasicBlock::Definition::Returning::getExitRepresentation()
+{
+    return "// return";
+}

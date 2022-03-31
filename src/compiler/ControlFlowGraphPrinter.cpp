@@ -48,7 +48,7 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
         code_printer.visit(block);
 
         label = escape(code_stream.str());
-        if (label.empty()) label = "  ---  ";
+        label += block.getExitRepresentation();
     }
     else {
         label = current_function_->name();

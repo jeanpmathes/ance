@@ -101,3 +101,8 @@ void lang::BasicBlock::Definition::Empty::doBuild(CompileContext* context)
         context->ir()->CreateRetVoid();
     }
 }
+
+std::string lang::BasicBlock::Definition::Empty::getExitRepresentation()
+{
+    return "// entry ";
+}

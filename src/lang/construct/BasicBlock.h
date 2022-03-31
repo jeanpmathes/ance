@@ -148,6 +148,12 @@ namespace lang
          */
         void doBuild(CompileContext* context);
 
+        /**
+         * Get the exit type of this basic block represented as a string.
+         * @return The exit type of this basic block.
+         */
+        std::string getExitRepresentation();
+
       private:
         void                 registerIncomingLink(BasicBlock& predecessor);
         void                 updateLink(BasicBlock* former, BasicBlock* updated);
@@ -196,6 +202,8 @@ namespace lang
 
                 llvm::BasicBlock* getNativeBlock();
 
+                virtual std::string getExitRepresentation() = 0;
+
               protected:
                 size_t            index_ {};
                 llvm::BasicBlock* native_block_ {};
@@ -223,12 +231,14 @@ namespace lang
                 std::list<lang::BasicBlock*>   getLeaves() override;
                 std::vector<lang::BasicBlock*> getSuccessors() override;
                 lang::Location                 getStartLocation() override;
-                lang::Location               getEndLocation() override;
+                lang::Location                 getEndLocation() override;
 
                 void reach() override;
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
+
+                std::string getExitRepresentation() override;
 
               private:
                 lang::BasicBlock* next_ {nullptr};
@@ -254,12 +264,14 @@ namespace lang
                 std::list<lang::BasicBlock*>   getLeaves() override;
                 std::vector<lang::BasicBlock*> getSuccessors() override;
                 lang::Location                 getStartLocation() override;
-                lang::Location               getEndLocation() override;
+                lang::Location                 getEndLocation() override;
 
                 void reach() override;
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
+
+                std::string getExitRepresentation() override;
 
               private:
                 std::list<Statement*> statements_ {};
@@ -293,6 +305,8 @@ namespace lang
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
 
+                std::string getExitRepresentation() override;
+
               private:
                 std::list<Statement*> statements_ {};
                 lang::BasicBlock*     unreachable_next_ {nullptr};
@@ -325,6 +339,8 @@ namespace lang
 
                 void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
                 void doBuild(CompileContext* context) override;
+
+                std::string getExitRepresentation() override;
 
               private:
                 std::list<Statement*> statements_ {};

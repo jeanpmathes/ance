@@ -133,3 +133,8 @@ void lang::BasicBlock::Definition::Simple::doBuild(CompileContext* context)
         context->ir()->CreateRetVoid();
     }
 }
+
+std::string lang::BasicBlock::Definition::Simple::getExitRepresentation()
+{
+    return "// ---";
+}

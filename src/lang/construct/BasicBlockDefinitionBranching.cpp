@@ -158,3 +158,8 @@ void lang::BasicBlock::Definition::Branching::doBuild(CompileContext* context)
     true_next_->doBuild(context);
     false_next_->doBuild(context);
 }
+
+std::string lang::BasicBlock::Definition::Branching::getExitRepresentation()
+{
+    return "// branch";
+}
