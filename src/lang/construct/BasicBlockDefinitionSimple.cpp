@@ -41,7 +41,8 @@ void lang::BasicBlock::Definition::Simple::simplify()
 {
     if (!next_) { return; }
 
-    bool can_simplify = next_->getIncomingLinkCount() == 1;// This block is the only block entering the next block.
+    // This block is the only block entering the next block, or this block is unnecessary.
+    bool can_simplify = next_->getIncomingLinkCount() == 1 || statements_.empty();
 
     if (can_simplify)
     {

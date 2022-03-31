@@ -195,6 +195,7 @@ size_t lang::BasicBlock::getIncomingLinkCount() const
 
 void lang::BasicBlock::transferStatements(std::list<Statement*>& statements)
 {
+    if (statements.empty()) return;
     definition_->transferStatements(statements);
 }
 

@@ -65,7 +65,7 @@ void lang::BasicBlock::Definition::Branching::updateLink(lang::BasicBlock* forme
 void lang::BasicBlock::Definition::Branching::simplify()
 {
     true_next_->simplify();
-    if (false_next_) false_next_->simplify();
+    false_next_->simplify();
 }
 
 void lang::BasicBlock::Definition::Branching::transferStatements(std::list<Statement*>& statements)
