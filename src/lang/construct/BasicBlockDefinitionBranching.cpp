@@ -5,6 +5,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/construct/value/Value.h"
 #include "lang/expression/Expression.h"
+#include "lang/type/IntegerType.h"
 
 lang::BasicBlock::Definition::Branching::Branching(Expression* condition) : condition_(condition) {}
 
@@ -74,7 +75,18 @@ void lang::BasicBlock::Definition::Branching::transferStatements(std::list<State
 
 bool lang::BasicBlock::Definition::Branching::validate(ValidationLogger& validation_logger)
 {
-    return true;// todo
+    bool valid = true;
+
+    for (auto& statement : statements_) { statement->validate(validation_logger); }
+
+    valid &= condition_->validate(validation_logger);
+    valid &= valid
+          && lang::Type::checkMismatch(lang::IntegerType::getBooleanType(),
+                                       condition_->type(),
+                                       condition_->location(),
+                                       validation_logger);
+
+    return valid;
 }
 
 std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Branching::getLeaves()
@@ -134,7 +146,10 @@ void lang::BasicBlock::Definition::Branching::doBuild(CompileContext* context)
     for (auto& statement : statements_) { statement->build(context); }
 
     std::shared_ptr<lang::Value> truth = condition_->getValue();
-    truth->buildContentValue(context);
+    std::shared_ptr<lang::Value> boolean_truth =
+        lang::Type::makeMatching(lang::IntegerType::getBooleanType(), truth, context);
+
+    boolean_truth->buildContentValue(context);
 
     context->ir()->CreateCondBr(truth->getContentValue(),
                                 true_next_->definition_->getNativeBlock(),
