@@ -91,8 +91,9 @@ bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingH
 {
     if (other->isIntegerType())
     {
-        auto* other_type = dynamic_cast<IntegerType*>(other->getActualType()->getDefinition());
-        return this == other_type;
+        auto* other_type = other->getActualType()->getDefinition();
+        auto* this_type  = self()->getActualType()->getDefinition();
+        return this_type == other_type;
     }
 
     return false;

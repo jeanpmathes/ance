@@ -16,8 +16,15 @@ namespace lang
     class SizeType : public lang::TypeDefinition
     {
       private:
-        SizeType(std::string name, llvm::Type*& backing);
+        enum Kind
+        {
+            SIZE_KIND,
+            DIFF_KIND
+        };
 
+        SizeType(std::string name, Kind kind, llvm::Type*& backing);
+
+        Kind         kind_;
         llvm::Type*& backing_;
 
       public:

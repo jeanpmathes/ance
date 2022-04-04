@@ -8,7 +8,11 @@
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
-lang::SizeType::SizeType(std::string name, llvm::Type*& backing) : TypeDefinition(std::move(name)), backing_(backing) {}
+lang::SizeType::SizeType(std::string name, Kind kind, llvm::Type*& backing)
+    : TypeDefinition(std::move(name))
+    , kind_(kind)
+    , backing_(backing)
+{}
 
 llvm::Constant* lang::SizeType::getDefaultContent(llvm::LLVMContext& c)
 {
@@ -133,12 +137,12 @@ std::shared_ptr<lang::Value> lang::SizeType::buildOperator(lang::BinaryOperator 
 
 bool lang::SizeType::isSizeType() const
 {
-    return (backing_ == size_backing_type_);
+    return (kind_ == SIZE_KIND);
 }
 
 bool lang::SizeType::isDiffType() const
 {
-    return (backing_ == diff_backing_type_);
+    return (kind_ == DIFF_KIND);
 }
 
 llvm::Value* lang::SizeType::buildValue(llvm::TypeSize size)
@@ -179,8 +183,8 @@ void lang::SizeType::init(llvm::LLVMContext& c, Application& app)
 
 lang::ResolvingHandle<lang::Type> lang::SizeType::getSize()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new SizeType("size", size_backing_type_)));
+    static lang::ResolvingHandle<lang::Type> instance = lang::makeHandled<lang::Type>(
+        std::unique_ptr<lang::TypeDefinition>(new SizeType("size", SIZE_KIND, size_backing_type_)));
     return instance;
 }
 
@@ -191,8 +195,8 @@ unsigned int lang::SizeType::getSizeWidth()
 
 lang::ResolvingHandle<lang::Type> lang::SizeType::getDiff()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new SizeType("diff", diff_backing_type_)));
+    static lang::ResolvingHandle<lang::Type> instance = lang::makeHandled<lang::Type>(
+        std::unique_ptr<lang::TypeDefinition>(new SizeType("diff", DIFF_KIND, diff_backing_type_)));
     return instance;
 }
 
