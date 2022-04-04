@@ -342,14 +342,14 @@ std::shared_ptr<lang::Value> lang::Type::makeMatching(lang::ResolvingHandle<lang
     return nullptr;
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::getDereferencedType(lang::ResolvingHandle<lang::Type> type)
+lang::ResolvingHandle<lang::Type> lang::Type::getReferencedType(lang::ResolvingHandle<lang::Type> type)
 {
     if (type->isReferenceType()) type = type->getElementType();
     return type;
 }
 
-std::shared_ptr<lang::Value> lang::Type::getValueOrDereference(std::shared_ptr<lang::Value> value,
-                                                               CompileContext*              context)
+std::shared_ptr<lang::Value> lang::Type::getValueOrReferencedValue(std::shared_ptr<lang::Value> value,
+                                                                   CompileContext*              context)
 {
     if (value->type()->isReferenceType())
     {

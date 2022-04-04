@@ -93,6 +93,34 @@ std::shared_ptr<lang::Value> lang::ReferenceType::buildSubscript(std::shared_ptr
     return element_type_->buildSubscript(getReferenced(indexed, context), index, context);
 }
 
+bool lang::ReferenceType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
+{
+    return element_type_->isOperatorDefined(op, other);
+}
+
+lang::ResolvingHandle<lang::Type> lang::ReferenceType::getOperatorResultType(lang::BinaryOperator              op,
+                                                                             lang::ResolvingHandle<lang::Type> other)
+{
+    return element_type_->getOperatorResultType(op, other);
+}
+
+bool lang::ReferenceType::validateOperator(lang::BinaryOperator              op,
+                                           lang::ResolvingHandle<lang::Type> other,
+                                           lang::Location                    left_location,
+                                           lang::Location                    right_location,
+                                           ValidationLogger&                 validation_logger)
+{
+    return element_type_->validateOperator(op, other, left_location, right_location, validation_logger);
+}
+
+std::shared_ptr<lang::Value> lang::ReferenceType::buildOperator(lang::BinaryOperator   op,
+                                                                std::shared_ptr<Value> left,
+                                                                std::shared_ptr<Value> right,
+                                                                CompileContext*        context)
+{
+    return element_type_->buildOperator(op, getReferenced(left, context), right, context);
+}
+
 std::string lang::ReferenceType::createMangledName()
 {
     return std::string("ref") + "(" + element_type_->getMangledName() + ")";

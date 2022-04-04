@@ -67,7 +67,7 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(la
 
 bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type> other)
 {
-    other = lang::Type::getDereferencedType(other);
+    other = lang::Type::getReferencedType(other);
 
     if (other->isFloatingPointType())
     {
@@ -101,7 +101,7 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::Binary
                                                                     std::shared_ptr<Value> right,
                                                                     CompileContext*        context)
 {
-    right = lang::Type::getValueOrDereference(right, context);
+    right = lang::Type::getValueOrReferencedValue(right, context);
 
     left->buildContentValue(context);
     right->buildContentValue(context);

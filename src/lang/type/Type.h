@@ -374,20 +374,20 @@ namespace lang
                                                          CompileContext*                   context);
 
         /**
-         * Get the dereferenced type, meaning the type itself if it is not a reference type, or the element type.
-         * @param type The type to dereference.
+         * Get the referenced type, meaning the type itself if it is not a reference type, or the element type.
+         * @param type The type to get the referenced type of.
          * @return The dereferenced type.
          */
-        static lang::ResolvingHandle<lang::Type> getDereferencedType(lang::ResolvingHandle<lang::Type> type);
+        static lang::ResolvingHandle<lang::Type> getReferencedType(lang::ResolvingHandle<lang::Type> type);
 
         /**
-         * Get the value directly, or the dereferenced value if it is a reference type.
-         * @param value The value to dereference.
+         * Get the value directly, or the referenced value if it is a reference type.
+         * @param value The value to get the referenced value of.
          * @param context The current compile context.
-         * @return The dereferenced value.
+         * @return The referenced value.
          */
-        static std::shared_ptr<lang::Value> getValueOrDereference(std::shared_ptr<lang::Value> value,
-                                                                  CompileContext*              context);
+        static std::shared_ptr<lang::Value> getValueOrReferencedValue(std::shared_ptr<lang::Value> value,
+                                                                      CompileContext*              context);
 
         /**
          * Check if the actual types of two types are the same.

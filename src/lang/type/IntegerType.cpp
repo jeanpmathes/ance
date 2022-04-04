@@ -89,7 +89,7 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Re
 
 bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type> other)
 {
-    other = lang::Type::getDereferencedType(other);
+    other = lang::Type::getReferencedType(other);
 
     if (other->isIntegerType())
     {
@@ -124,7 +124,7 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
                                                               std::shared_ptr<Value> right,
                                                               CompileContext*        context)
 {
-    right = lang::Type::getValueOrDereference(right, context);
+    right = lang::Type::getValueOrReferencedValue(right, context);
 
     left->buildContentValue(context);
     right->buildContentValue(context);
