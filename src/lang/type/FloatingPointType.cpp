@@ -67,6 +67,8 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(la
 
 bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type> other)
 {
+    other = lang::Type::getDereferencedType(other);
+
     if (other->isFloatingPointType())
     {
         auto* other_type = dynamic_cast<FloatingPointType*>(other->getActualType()->getDefinition());
@@ -79,7 +81,7 @@ bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator, lang::Reso
 lang::ResolvingHandle<lang::Type> lang::FloatingPointType::getOperatorResultType(lang::BinaryOperator op,
                                                                                  lang::ResolvingHandle<lang::Type>)
 {
-    if (op.isArithmetic()) return self();
+    if (op.isArithmetic()) return self()->getActualType();
     if (op.isRelational() || op.isEquality()) return lang::IntegerType::getBooleanType();
 
     return lang::VoidType::get();
@@ -99,6 +101,8 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::Binary
                                                                     std::shared_ptr<Value> right,
                                                                     CompileContext*        context)
 {
+    right = lang::Type::getValueOrDereference(right, context);
+
     left->buildContentValue(context);
     right->buildContentValue(context);
 

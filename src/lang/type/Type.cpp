@@ -342,6 +342,24 @@ std::shared_ptr<lang::Value> lang::Type::makeMatching(lang::ResolvingHandle<lang
     return nullptr;
 }
 
+lang::ResolvingHandle<lang::Type> lang::Type::getDereferencedType(lang::ResolvingHandle<lang::Type> type)
+{
+    if (type->isReferenceType()) type = type->getElementType();
+    return type;
+}
+
+std::shared_ptr<lang::Value> lang::Type::getValueOrDereference(std::shared_ptr<lang::Value> value,
+                                                               CompileContext*              context)
+{
+    if (value->type()->isReferenceType())
+    {
+        auto* reference_type = dynamic_cast<lang::ReferenceType*>(value->type()->definition_.get());
+        return reference_type->getReferenced(value, context);
+    }
+
+    return value;
+}
+
 bool lang::Type::areSame(lang::ResolvingHandle<lang::Type> lhs, lang::ResolvingHandle<lang::Type> rhs)
 {
     return lhs->getActualType() == rhs->getActualType();

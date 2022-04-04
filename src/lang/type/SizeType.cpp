@@ -50,6 +50,8 @@ std::shared_ptr<lang::Value> lang::SizeType::buildImplicitConversion(lang::Resol
 
 bool lang::SizeType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type> other)
 {
+    other = lang::Type::getDereferencedType(other);
+
     if (isSizeType()) return other->isSizeType();
     if (isDiffType()) return other->isDiffType();
 
@@ -59,7 +61,7 @@ bool lang::SizeType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHand
 lang::ResolvingHandle<lang::Type> lang::SizeType::getOperatorResultType(lang::BinaryOperator op,
                                                                         lang::ResolvingHandle<lang::Type>)
 {
-    if (op.isArithmetic()) return self();
+    if (op.isArithmetic()) return self()->getActualType();
     if (op.isRelational() || op.isEquality()) return lang::IntegerType::getBooleanType();
 
     return lang::VoidType::get();
@@ -79,6 +81,8 @@ std::shared_ptr<lang::Value> lang::SizeType::buildOperator(lang::BinaryOperator 
                                                            std::shared_ptr<Value> right,
                                                            CompileContext*        context)
 {
+    right = lang::Type::getValueOrDereference(right, context);
+
     left->buildContentValue(context);
     right->buildContentValue(context);
 
