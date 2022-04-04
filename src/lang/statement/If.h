@@ -46,4 +46,5 @@ class If
     std::unique_ptr<lang::CodeBlock> if_block_;
     std::unique_ptr<lang::CodeBlock> else_block_;
 };
+
 #endif

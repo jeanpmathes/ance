@@ -79,6 +79,9 @@ bool lang::BasicBlock::Definition::Branching::validate(ValidationLogger& validat
 
     for (auto& statement : statements_) { statement->validate(validation_logger); }
 
+    valid &= true_next_->validate(validation_logger);
+    valid &= false_next_->validate(validation_logger);
+
     valid &= condition_->validate(validation_logger);
     valid &= valid
           && lang::Type::checkMismatch(lang::IntegerType::getBooleanType(),

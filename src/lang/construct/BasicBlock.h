@@ -50,6 +50,18 @@ namespace lang
                                                                         lang::Function*  function);
 
         /**
+         * Create a basic block that loops as long as the condition is true.
+         * @param condition The expression providing the condition.
+         * @param code_block The block to execute as long as the condition is true.
+         * @param function The function containing the basic block.
+         * @return The created basic blocks.
+         */
+        static std::vector<std::unique_ptr<BasicBlock>> createLooping(Expression*      condition,
+                                                                      lang::CodeBlock* code_block,
+                                                                      lang::Function*  function);
+
+      public:
+        /**
          * Link this block to unconditionally jump to the given block.
          * This is only possible if this is a simple block, and no link is already present.
          * @param next The next block to jump to.

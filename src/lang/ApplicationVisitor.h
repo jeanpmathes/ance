@@ -45,5 +45,6 @@ namespace lang
 #include "lang/statement/LocalVariableDefinition.h"
 #include "lang/statement/ReturnStatement.h"
 #include "lang/statement/If.h"
+#include "lang/statement/While.h"
 
 #endif

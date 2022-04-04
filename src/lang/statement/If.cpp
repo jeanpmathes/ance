@@ -12,7 +12,9 @@ If::If(std::unique_ptr<Expression>      condition,
     , condition_(std::move(condition))
     , if_block_(std::move(if_block))
     , else_block_(std::move(else_block))
-{}
+{
+    addChild(*condition_);
+}
 
 Expression& If::condition()
 {

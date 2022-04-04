@@ -109,6 +109,11 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitIfStatement(anceParser::IfStatementContext* ctx) override { return visitChildren(ctx); }
 
+    virtual antlrcpp::Any visitWhileStatement(anceParser::WhileStatementContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
     virtual antlrcpp::Any visitRef(anceParser::RefContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* ctx) override { return visitChildren(ctx); }

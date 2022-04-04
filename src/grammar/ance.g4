@@ -57,6 +57,7 @@ statement
 	| returnStatement
 	| assertStatement
 	| ifStatement
+    | whileStatement
 	;
 
 expressionStatement
@@ -96,6 +97,10 @@ assertStatement
 
 ifStatement
     : 'if' expression 'then' ifBlock=code ( 'else' elseBlock=code )?
+    ;
+
+whileStatement
+    : 'while' expression 'do' code
     ;
 
 expression

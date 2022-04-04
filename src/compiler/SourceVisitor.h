@@ -47,6 +47,7 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitReturnStatement(anceParser::ReturnStatementContext* ctx) override;
     antlrcpp::Any visitAssertStatement(anceParser::AssertStatementContext* ctx) override;
     antlrcpp::Any visitIfStatement(anceParser::IfStatementContext* ctx) override;
+    antlrcpp::Any visitWhileStatement(anceParser::WhileStatementContext* ctx) override;
 
     // Expressions
 

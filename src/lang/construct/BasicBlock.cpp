@@ -71,6 +71,39 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createBranching
     return blocks;
 }
 
+std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(Expression*      condition,
+                                                                               lang::CodeBlock* code_block,
+                                                                               lang::Function*  function)
+{
+    std::vector<std::unique_ptr<BasicBlock>> blocks;
+
+    auto block = new BasicBlock();
+    blocks.push_back(std::unique_ptr<BasicBlock>(block));
+
+    block->definition_ = std::make_unique<Definition::Branching>(condition);
+    block->definition_->setSelf(block);
+
+    std::unique_ptr<lang::BasicBlock> end_block = lang::BasicBlock::createSimple();
+
+    auto append_code_block = [&](lang::CodeBlock* code_block, lang::BasicBlock& next) {
+        auto new_basic_blocks = code_block->createBasicBlocks(*block, function);
+        assert(!new_basic_blocks.empty());
+
+        blocks.insert(blocks.end(),
+                      std::make_move_iterator(new_basic_blocks.begin()),
+                      std::make_move_iterator(new_basic_blocks.end()));
+
+        blocks.back()->link(next);
+    };
+
+    append_code_block(code_block, *block);
+    block->link(*end_block);
+
+    blocks.push_back(std::move(end_block));
+
+    return blocks;
+}
+
 void lang::BasicBlock::link(lang::BasicBlock& next)
 {
     assert(!finalized_);
@@ -117,7 +150,11 @@ bool lang::BasicBlock::validate(ValidationLogger& validation_logger)
 {
     assert(finalized_);
 
-    if (!validated_) { validated_ = std::make_optional(definition_->validate(validation_logger)); }
+    if (!validated_)
+    {
+        validated_ = true;// Prevent infinite recursion. Must be true as booleans are and'd together.
+        validated_ = definition_->validate(validation_logger);
+    }
 
     return validated_.value();
 }
@@ -127,7 +164,11 @@ std::list<lang::BasicBlock*> lang::BasicBlock::getLeaves()
     assert(finalized_);
     assert(simplified_);
 
-    if (!leaves_.has_value()) { leaves_ = definition_->getLeaves(); }
+    if (!leaves_.has_value())
+    {
+        leaves_ = std::make_optional(std::list<lang::BasicBlock*>());// Prevent infinite recursion.
+        leaves_ = definition_->getLeaves();
+    }
 
     return leaves_.value();
 }
@@ -161,21 +202,19 @@ lang::Location lang::BasicBlock::getEndLocation()
 void lang::BasicBlock::prepareBuild(CompileContext* context, llvm::Function* native_function)
 {
     if (build_prepared_) return;
+    build_prepared_ = true;
 
     assert(finalized_);
     definition_->prepareBuild(context, native_function);
-
-    build_prepared_ = true;
 }
 
 void lang::BasicBlock::doBuild(CompileContext* context)
 {
     if (build_done_) return;
+    build_done_ = true;
 
     assert(finalized_);
     definition_->doBuild(context);
-
-    build_done_ = true;
 }
 
 void lang::BasicBlock::registerIncomingLink(lang::BasicBlock& predecessor)
@@ -201,7 +240,9 @@ void lang::BasicBlock::transferStatements(std::list<Statement*>& statements)
 
 void lang::BasicBlock::reach()
 {
+    if (reached_) return;
     reached_ = true;
+
     definition_->reach();
 }
 

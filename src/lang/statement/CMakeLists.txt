@@ -6,4 +6,5 @@ target_sources(ance PRIVATE AssignmentStatement.cpp
                ExpressionStatement.cpp
                Assertion.cpp
                If.cpp
+               While.cpp
                Statement.cpp)

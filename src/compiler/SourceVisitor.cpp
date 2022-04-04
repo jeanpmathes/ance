@@ -22,6 +22,7 @@
 #include "lang/statement/ReturnStatement.h"
 #include "lang/statement/Assertion.h"
 #include "lang/statement/If.h"
+#include "lang/statement/While.h"
 
 #include "lang/expression/Addressof.h"
 #include "lang/expression/Allocation.h"
@@ -332,6 +333,16 @@ antlrcpp::Any SourceVisitor::visitIfStatement(anceParser::IfStatementContext* ct
                                                                std::move(if_block),
                                                                std::move(else_block),
                                                                location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitWhileStatement(anceParser::WhileStatementContext* ctx)
+{
+    Expression* condition = visit(ctx->expression()).as<Expression*>();
+
+    auto block = std::unique_ptr<lang::CodeBlock>(visit(ctx->code()).as<lang::CodeBlock*>());
+
+    return lang::CodeBlock::wrapStatement(
+        std::make_unique<While>(std::unique_ptr<Expression>(condition), std::move(block), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
@@ -773,3 +784,4 @@ uint64_t SourceVisitor::parseInRange(const std::string& str, uint64_t max)
 
     return value;
 }
+
