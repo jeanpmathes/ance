@@ -114,6 +114,15 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
+    virtual antlrcpp::Any visitMatchStatement(anceParser::MatchStatementContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
+    virtual antlrcpp::Any visitLiteralCase(anceParser::LiteralCaseContext* ctx) override { return visitChildren(ctx); }
+
+    virtual antlrcpp::Any visitDefaultCase(anceParser::DefaultCaseContext* ctx) override { return visitChildren(ctx); }
+
     virtual antlrcpp::Any visitRef(anceParser::RefContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* ctx) override { return visitChildren(ctx); }

@@ -4,6 +4,7 @@
 #include "lang/statement/Statement.h"
 #include "lang/construct/value/Value.h"
 #include "lang/Element.h"
+#include "lang/expression/ConstantExpression.h"
 
 namespace lang
 {
@@ -60,6 +61,18 @@ namespace lang
                                                                       lang::CodeBlock* code_block,
                                                                       lang::Function*  function);
 
+        /**
+         * Create basis blocks that match a case for a given value.
+         * @param condition The expression providing the condition.
+         * @param cases The cases to match. These are pairs of (value, block), where multiple values can use the same block. For the default case, the condition is null.
+         * @param function The function containing the basic block.
+         * @return The created basic blocks.
+         */
+        static std::vector<std::unique_ptr<BasicBlock>> createMatching(
+            Expression*                                                   condition,
+            std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> cases,
+            lang::Function*                                               function);
+
       public:
         /**
          * Link this block to unconditionally jump to the given block.
@@ -106,7 +119,7 @@ namespace lang
         bool validate(ValidationLogger& validation_logger);
 
         /**
-         * Get all leaves of this basic block. A leave is a basic block that is not followed by any other block.
+         * Get all leaves of this basic block. A leaf is a basic block that is not followed by any other block.
          * @return The leaves of this basic block.
          */
         std::list<lang::BasicBlock*> getLeaves();
@@ -361,6 +374,43 @@ namespace lang
                 lang::BasicBlock* false_next_ {nullptr};
 
                 Expression* condition_;
+            };
+
+            class Matching : public Base
+            {
+              public:
+                explicit Matching(Expression* condition, std::vector<std::vector<ConstantExpression*>> cases);
+                ~Matching() override = default;
+
+              public:
+                void finalize(size_t& index) override;
+
+                void setLink(BasicBlock& next) override;
+                void updateLink(BasicBlock* former, BasicBlock* updated) override;
+                void simplify() override;
+
+                void transferStatements(std::list<Statement*>& statements) override;
+
+                bool                           validate(ValidationLogger& validation_logger) override;
+                std::list<lang::BasicBlock*>   getLeaves() override;
+                std::vector<lang::BasicBlock*> getSuccessors() override;
+                lang::Location                 getStartLocation() override;
+                lang::Location                 getEndLocation() override;
+
+                void reach() override;
+
+                void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
+                void doBuild(CompileContext* context) override;
+
+                std::string getExitRepresentation() override;
+
+              private:
+                std::list<Statement*> statements_ {};
+
+                std::vector<lang::BasicBlock*> branches_ {};
+
+                Expression*                                   condition_;
+                std::vector<std::vector<ConstantExpression*>> cases_;
             };
         };
 

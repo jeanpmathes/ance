@@ -47,6 +47,7 @@ class LocalVariableDefinition;
 class ReturnStatement;
 class If;
 class While;
+class Match;
 
 #define ANCE_CONSTRUCTS                                                                                                \
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::BasicBlock,    \
@@ -54,6 +55,6 @@ class While;
         BinaryOperation, BindRef, ConstantLiteral, DefaultValue, FunctionCall, Parenthesis, SizeofExpression,          \
         SizeofType, Subscript, VariableAccess, lang::GlobalScope, lang::LocalScope, Assertion, AssignmentStatement,    \
         DeleteStatement, ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition,               \
-        ReturnStatement, If, While
+        ReturnStatement, If, While, Match
 
 #endif

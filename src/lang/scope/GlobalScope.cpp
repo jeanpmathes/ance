@@ -40,14 +40,14 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger)
     for (auto const& [name, variable] : global_defined_variables_) { variable->validate(validation_logger); }
 }
 
-void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier              access,
-                                             bool                              is_constant,
-                                             const std::string&                identifier,
-                                             lang::ResolvingHandle<lang::Type> type,
-                                             lang::Location                    type_location,
-                                             lang::Assigner                    assigner,
-                                             ConstantExpression*               initializer,
-                                             lang::Location                    location)
+void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                access,
+                                             bool                                is_constant,
+                                             const std::string&                  identifier,
+                                             lang::ResolvingHandle<lang::Type>   type,
+                                             lang::Location                      type_location,
+                                             lang::Assigner                      assigner,
+                                             std::unique_ptr<ConstantExpression> initializer,
+                                             lang::Location                      location)
 {
     assert(assigner.hasSymbol());
 
@@ -83,7 +83,8 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier              a
         undefined = lang::OwningHandle<lang::Variable>::takeOwnership(lang::makeHandled<lang::Variable>(identifier));
     }
 
-    undefined->defineAsGlobal(type, type_location, this, access, initializer, is_final, is_constant, location);
+    undefined
+        ->defineAsGlobal(type, type_location, this, access, std::move(initializer), is_final, is_constant, location);
     lang::OwningHandle<lang::Variable> defined = std::move(undefined);
 
     addChild(*defined);

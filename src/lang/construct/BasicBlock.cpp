@@ -104,6 +104,53 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(E
     return blocks;
 }
 
+std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createMatching(
+    Expression*                                                   condition,
+    std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> cases,
+    lang::Function*                                               function)
+{
+    std::map<lang::CodeBlock*, std::vector<ConstantExpression*>> code_to_case;
+
+    for (auto& [case_value, code_block] : cases)
+    {
+        if (!code_to_case.contains(code_block)) { code_to_case[code_block] = {}; }
+
+        // Filter out default case, represented by null.
+        if (case_value) code_to_case[code_block].push_back(case_value);
+    }
+
+    std::vector<std::vector<ConstantExpression*>> case_values;
+
+    case_values.reserve(code_to_case.size());
+    for (auto& [code_block, targeting_values] : code_to_case) { case_values.push_back(targeting_values); }
+
+    std::vector<std::unique_ptr<BasicBlock>> blocks;
+
+    auto block = new BasicBlock();
+    blocks.push_back(std::unique_ptr<BasicBlock>(block));
+
+    block->definition_ = std::make_unique<Definition::Matching>(condition, case_values);
+    block->definition_->setSelf(block);
+
+    std::unique_ptr<lang::BasicBlock> end_block = lang::BasicBlock::createSimple();
+
+    for (auto& [code_block, targeting_values] : code_to_case)
+    {
+        auto new_basic_blocks = code_block->createBasicBlocks(*block, function);
+        assert(!new_basic_blocks.empty());
+
+        blocks.insert(blocks.end(),
+                      std::make_move_iterator(new_basic_blocks.begin()),
+                      std::make_move_iterator(new_basic_blocks.end()));
+
+        blocks.back()->link(*end_block);
+    }
+
+    blocks.push_back(std::move(end_block));
+
+    return blocks;
+}
+
 void lang::BasicBlock::link(lang::BasicBlock& next)
 {
     assert(!finalized_);

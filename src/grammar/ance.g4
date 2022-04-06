@@ -58,6 +58,7 @@ statement
 	| assertStatement
 	| ifStatement
     | whileStatement
+    | matchStatement
 	;
 
 expressionStatement
@@ -101,6 +102,15 @@ ifStatement
 
 whileStatement
     : 'while' expression 'do' code
+    ;
+
+matchStatement
+    : 'match' expression '{' ( matchCase )* '}'
+    ;
+
+matchCase
+    : literalExpression ( '|' literalExpression )* '=>' code # LiteralCase
+    | 'default' '=>' code # DefaultCase
     ;
 
 expression

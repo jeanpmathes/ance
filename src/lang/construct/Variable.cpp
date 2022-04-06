@@ -20,21 +20,21 @@ bool lang::Variable::isDefined() const
     return (definition_ != nullptr);
 }
 
-void lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
-                                    lang::Location                    type_location,
-                                    lang::GlobalScope*                containing_scope,
-                                    lang::AccessModifier              access,
-                                    ConstantExpression*               constant_init,
-                                    bool                              is_final,
-                                    bool                              is_constant,
-                                    lang::Location                    location)
+void lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type>   type,
+                                    lang::Location                      type_location,
+                                    lang::GlobalScope*                  containing_scope,
+                                    lang::AccessModifier                access,
+                                    std::unique_ptr<ConstantExpression> constant_init,
+                                    bool                                is_final,
+                                    bool                                is_constant,
+                                    lang::Location                      location)
 {
     definition_ = std::make_unique<lang::GlobalVariable>(identifier(),
                                                          type,
                                                          type_location,
                                                          containing_scope,
                                                          access,
-                                                         constant_init,
+                                                         std::move(constant_init),
                                                          is_final,
                                                          is_constant,
                                                          location);

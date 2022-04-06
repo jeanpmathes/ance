@@ -59,14 +59,14 @@ namespace lang
          * @param is_constant Whether the variable is constant.
          * @param location The source location.
          */
-        void defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
-                            lang::Location                    type_location,
-                            lang::GlobalScope*                containing_scope,
-                            lang::AccessModifier              access,
-                            ConstantExpression*               constant_init,
-                            bool                              is_final,
-                            bool                              is_constant,
-                            lang::Location                    location);
+        void defineAsGlobal(lang::ResolvingHandle<lang::Type>   type,
+                            lang::Location                      type_location,
+                            lang::GlobalScope*                  containing_scope,
+                            lang::AccessModifier                access,
+                            std::unique_ptr<ConstantExpression> constant_init,
+                            bool                                is_final,
+                            bool                                is_constant,
+                            lang::Location                      location);
 
         /**
          * Define this variable as a local variable.

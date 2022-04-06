@@ -46,5 +46,6 @@ namespace lang
 #include "lang/statement/ReturnStatement.h"
 #include "lang/statement/If.h"
 #include "lang/statement/While.h"
+#include "lang/statement/Match.h"
 
 #endif

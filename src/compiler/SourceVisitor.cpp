@@ -23,6 +23,7 @@
 #include "lang/statement/Assertion.h"
 #include "lang/statement/If.h"
 #include "lang/statement/While.h"
+#include "lang/statement/Match.h"
 
 #include "lang/expression/Addressof.h"
 #include "lang/expression/Allocation.h"
@@ -85,7 +86,7 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
                                                     type,
                                                     location(ctx->type()),
                                                     assigner,
-                                                    const_expr,
+                                                    std::unique_ptr<ConstantExpression>(const_expr),
                                                     location(ctx));
 
     return this->visitChildren(ctx);
@@ -343,6 +344,42 @@ antlrcpp::Any SourceVisitor::visitWhileStatement(anceParser::WhileStatementConte
 
     return lang::CodeBlock::wrapStatement(
         std::make_unique<While>(std::unique_ptr<Expression>(condition), std::move(block), location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitMatchStatement(anceParser::MatchStatementContext* ctx)
+{
+    Expression* expression = visit(ctx->expression()).as<Expression*>();
+
+    std::vector<std::unique_ptr<Match::Case>> cases;
+    for (auto& case_ctx : ctx->matchCase())
+    {
+        Match::Case* case_instance = visit(case_ctx).as<Match::Case*>();
+        cases.push_back(std::unique_ptr<Match::Case>(case_instance));
+    }
+
+    return lang::CodeBlock::wrapStatement(
+        std::make_unique<Match>(std::move(cases), std::unique_ptr<Expression>(expression), location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitLiteralCase(anceParser::LiteralCaseContext* ctx)
+{
+    auto block = std::unique_ptr<lang::CodeBlock>(visit(ctx->code()).as<lang::CodeBlock*>());
+
+    std::vector<std::unique_ptr<ConstantExpression>> cases;
+    for (auto& condition_ctx : ctx->literalExpression())
+    {
+        auto condition = dynamic_cast<ConstantExpression*>(visit(condition_ctx).as<Expression*>());
+        cases.push_back(std::unique_ptr<ConstantExpression>(condition));
+    }
+
+    return Match::Case::createCase(std::move(cases), std::move(block));
+}
+
+antlrcpp::Any SourceVisitor::visitDefaultCase(anceParser::DefaultCaseContext* ctx)
+{
+    auto block = std::unique_ptr<lang::CodeBlock>(visit(ctx->code()).as<lang::CodeBlock*>());
+
+    return Match::Case::createDefault(std::move(block));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
@@ -784,4 +821,3 @@ uint64_t SourceVisitor::parseInRange(const std::string& str, uint64_t max)
 
     return value;
 }
-

@@ -5,7 +5,6 @@
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/expression/ConstantExpression.h"
 #include "lang/scope/GlobalScope.h"
-#include "lang/scope/LocalScope.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/VoidType.h"
 #include "compiler/CompileContext.h"
@@ -17,19 +16,19 @@ namespace llvm
     class Constant;
 }
 
-lang::GlobalVariable::GlobalVariable(const std::string&                identifier,
-                                     lang::ResolvingHandle<lang::Type> type,
-                                     lang::Location                    type_location,
-                                     lang::GlobalScope*                containing_scope,
-                                     lang::AccessModifier              access,
-                                     ConstantExpression*               constant_init,
-                                     bool                              is_final,
-                                     bool                              is_constant,
-                                     lang::Location                    location)
+lang::GlobalVariable::GlobalVariable(const std::string&                  identifier,
+                                     lang::ResolvingHandle<lang::Type>   type,
+                                     lang::Location                      type_location,
+                                     lang::GlobalScope*                  containing_scope,
+                                     lang::AccessModifier                access,
+                                     std::unique_ptr<ConstantExpression> constant_init,
+                                     bool                                is_final,
+                                     bool                                is_constant,
+                                     lang::Location                      location)
     : VariableDefinition(identifier, type, type_location, containing_scope, is_final, location)
     , access_(access)
     , is_constant_(is_constant)
-    , constant_init_(constant_init)
+    , constant_init_(std::move(constant_init))
 {
     containing_scope->addType(type);
 

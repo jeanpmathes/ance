@@ -96,9 +96,9 @@ std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Branching::getLeaves(
 {
     std::set<lang::BasicBlock*> leaves;
 
-    for (auto leave : true_next_->getLeaves()) { leaves.insert(leave); }
+    for (auto leaf : true_next_->getLeaves()) { leaves.insert(leaf); }
 
-    for (auto leave : false_next_->getLeaves()) { leaves.insert(leave); }
+    for (auto leaf : false_next_->getLeaves()) { leaves.insert(leaf); }
 
     return {leaves.begin(), leaves.end()};
 }
