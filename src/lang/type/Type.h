@@ -12,6 +12,7 @@
 #include "lang/type/TypeDefinition.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
+#include "lang/type/StateCount.h"
 
 namespace lang
 {
@@ -74,6 +75,12 @@ namespace lang
          * @param definition The definition for this type.
          */
         void define(std::unique_ptr<lang::TypeDefinition> definition);
+
+        /**
+         * Get the number of states for this type.
+         * @return The number of states.
+         */
+        StateCount getStateCount() const;
 
         /**
          * Get whether this type is a custom type.

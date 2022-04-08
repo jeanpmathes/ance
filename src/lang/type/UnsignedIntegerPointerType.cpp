@@ -6,6 +6,11 @@
 
 lang::UnsignedIntegerPointerType::UnsignedIntegerPointerType() : TypeDefinition("uiptr") {}
 
+StateCount lang::UnsignedIntegerPointerType::getStateCount() const
+{
+    return SpecialCount::PLATFORM_DEPENDENT;
+}
+
 llvm::Constant* lang::UnsignedIntegerPointerType::getDefaultContent(llvm::LLVMContext& c)
 {
     return llvm::ConstantInt::get(getContentType(c), 0, false);

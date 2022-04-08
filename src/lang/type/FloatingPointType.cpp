@@ -7,6 +7,11 @@
 #include "lang/utility/Values.h"
 #include "compiler/CompileContext.h"
 
+StateCount lang::FloatingPointType::getStateCount() const
+{
+    return SpecialCount::UNCOUNTABLE;
+}
+
 std::string lang::FloatingPointType::createMangledName()
 {
     return getName();

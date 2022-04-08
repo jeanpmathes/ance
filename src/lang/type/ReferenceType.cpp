@@ -13,6 +13,11 @@ lang::ReferenceType::ReferenceType(lang::ResolvingHandle<lang::Type> element_typ
     , element_type_(element_type)
 {}
 
+StateCount lang::ReferenceType::getStateCount() const
+{
+    return element_type_->getStateCount();
+}
+
 bool lang::ReferenceType::isReferenceType() const
 {
     return true;

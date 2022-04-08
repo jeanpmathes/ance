@@ -17,6 +17,8 @@ namespace lang
       public:
         ~FloatingPointType() override = default;
 
+        StateCount getStateCount() const override;
+
         [[nodiscard]] bool isFloatingPointType() const override;
         [[nodiscard]] bool isFloatingPointType(size_t precision) const override;
 

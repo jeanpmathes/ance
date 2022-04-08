@@ -14,6 +14,11 @@ lang::TypeAlias::TypeAlias(const std::string&                identifier,
     , actual_type_location_(actual_type_location)
 {}
 
+StateCount lang::TypeAlias::getStateCount() const
+{
+    return actual_->getStateCount();
+}
+
 bool lang::TypeAlias::isIntegerType() const
 {
     return actual_->isIntegerType();

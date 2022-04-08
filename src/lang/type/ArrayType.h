@@ -29,6 +29,8 @@ namespace lang
       public:
         static const uint64_t MAX_ARRAY_TYPE_SIZE = 1ll << 32;
 
+        StateCount getStateCount() const override;
+
         lang::ResolvingHandle<lang::Type> getElementType() const override;
         lang::ResolvingHandle<lang::Type> getActualType() override;
 

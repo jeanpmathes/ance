@@ -14,6 +14,11 @@ lang::TypeClone::TypeClone(const std::string&                identifier,
     , original_type_location_(original_type_location)
 {}
 
+StateCount lang::TypeClone::getStateCount() const
+{
+    return original_->getStateCount();
+}
+
 bool lang::TypeClone::isIntegerType() const
 {
     return original_->isIntegerType();

@@ -11,6 +11,7 @@
 #include "lang/BinaryOperator.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
+#include "lang/type/StateCount.h"
 
 namespace lang
 {
@@ -46,6 +47,8 @@ namespace lang
         const std::string&               getMangledName();
         [[nodiscard]] lang::Location     getDefinitionLocation() const;
         [[nodiscard]] bool               isCustom() const;
+
+        [[nodiscard]] virtual StateCount getStateCount() const = 0;
 
         [[nodiscard]] virtual bool isIntegerType() const;
         [[nodiscard]] virtual bool isIntegerType(uint64_t bit_size, bool is_signed) const;

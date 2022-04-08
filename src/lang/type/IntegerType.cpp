@@ -14,6 +14,12 @@ lang::IntegerType::IntegerType(uint64_t bit_size, bool is_signed)
     , is_signed_(is_signed)
 {}
 
+StateCount lang::IntegerType::getStateCount() const
+{
+    size_t state_count = 1 << bit_size_;
+    return state_count;
+}
+
 bool lang::IntegerType::isIntegerType() const
 {
     return true;

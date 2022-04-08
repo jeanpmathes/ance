@@ -18,6 +18,8 @@ namespace lang
                   lang::Location                    definition_location,
                   lang::Location                    original_type_location);
 
+        StateCount getStateCount() const override;
+
         [[nodiscard]] bool isIntegerType() const override;
         [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
         [[nodiscard]] bool isBooleanType() const override;

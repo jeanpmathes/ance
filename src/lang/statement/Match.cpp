@@ -70,10 +70,11 @@ bool Match::Case::validateConflicts(Match::Case* other, ValidationLogger& valida
     return !conflicts;
 }
 
-bool Match::Case::validate(ValidationLogger& validation_logger)
+bool Match::Case::validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger)
 {
-    std::vector<ConstantExpression*> local_conditions;
+    coverage_count_ = static_cast<ssize_t>(conditions_.size());
 
+    std::vector<ConstantExpression*> local_conditions;
     for (auto& condition : conditions_)
     {
         for (auto& local_condition : local_conditions)
@@ -85,13 +86,27 @@ bool Match::Case::validate(ValidationLogger& validation_logger)
             {
                 validation_logger.logWarning("Match case '" + condition_constant->toString() + "' is duplicated",
                                              condition->location());
+
+                coverage_count_--;
             }
         }
 
         local_conditions.push_back(condition.get());
+
+        if (!lang::Type::areSame(condition->type(), target_type))
+        {
+            validation_logger.logError("Cases must be of matched value type " + target_type->getAnnotatedName(),
+                                       condition->location());
+        }
     }
 
     return true;
+}
+
+ssize_t Match::Case::getCoverageCount()
+{
+    if (conditions_.empty()) { return -1; }
+    return coverage_count_;
 }
 
 Match::Match(std::vector<std::unique_ptr<Match::Case>> cases,
@@ -142,10 +157,15 @@ bool Match::validateCases(ValidationLogger& validation_logger)
     bool valid = true;
 
     std::vector<Match::Case*> checked_cases;
+    ssize_t                   covered_cases = 0;
 
     for (auto& case_ptr : cases_)
     {
-        valid &= case_ptr->validate(validation_logger);
+        valid &= case_ptr->validate(expression_->type(), validation_logger);
+
+        ssize_t additional_coverage = case_ptr->getCoverageCount();
+        bool    has_default_case    = additional_coverage == -1 || covered_cases == -1;
+        covered_cases               = has_default_case ? -1 : covered_cases + additional_coverage;
 
         for (auto& checked_case : checked_cases)
         {
@@ -153,6 +173,39 @@ bool Match::validateCases(ValidationLogger& validation_logger)
         }
 
         checked_cases.push_back(case_ptr.get());
+    }
+
+    StateCount state_count = expression_->type()->getStateCount();
+
+    if (covered_cases != -1)
+    {
+        bool uncovered;
+
+        if (auto* count = std::get_if<size_t>(&state_count))
+        {
+            uncovered = static_cast<ssize_t>(*count) != covered_cases;
+        }
+        else {
+            uncovered = true;
+        }
+
+        if (uncovered)
+        {
+            validation_logger.logError("Match does not cover all possible states of type "
+                                           + expression_->type()->getAnnotatedName(),
+                                       location());
+            valid = false;
+        }
+    }
+
+    if (auto* count = std::get_if<SpecialCount>(&state_count))
+    {
+        if (*count == SpecialCount::UNCOUNTABLE)
+        {
+            validation_logger.logError("Cannot match uncountable type " + expression_->type()->getAnnotatedName(),
+                                       location());
+            valid = false;
+        }
     }
 
     return valid;

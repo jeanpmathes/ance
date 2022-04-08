@@ -50,6 +50,12 @@ void lang::Type::define(std::unique_ptr<lang::TypeDefinition> definition)
     definition_->setType(this);
 }
 
+StateCount lang::Type::getStateCount() const
+{
+    assert(isDefined());
+    return definition_->getStateCount();
+}
+
 bool lang::Type::isCustom() const
 {
     assert(isDefined());
@@ -372,3 +378,4 @@ std::shared_ptr<lang::Value> lang::Type::makeActual(std::shared_ptr<lang::Value>
 
     return std::make_shared<lang::RoughlyCastedValue>(actual_type, value);
 }
+

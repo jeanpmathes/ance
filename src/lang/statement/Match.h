@@ -45,11 +45,14 @@ class Match
         std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> getConditions();
 
         bool validateConflicts(Case* other, ValidationLogger& validation_logger);
-        bool validate(ValidationLogger& validation_logger);
+        bool validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger);
+
+        ssize_t getCoverageCount();
 
       private:
         std::vector<std::unique_ptr<ConstantExpression>> conditions_;
         std::unique_ptr<lang::CodeBlock>                 code_;
+        ssize_t                                          coverage_count_ {};
     };
 
   public:

@@ -17,6 +17,15 @@ lang::ArrayType::ArrayType(lang::ResolvingHandle<lang::Type> element_type, const
     , element_reference_(lang::ReferenceType::get(element_type))
 {}
 
+StateCount lang::ArrayType::getStateCount() const
+{
+    StateCount state_count = element_type_->getStateCount();
+
+    if (auto* size = std::get_if<size_t>(&state_count)) { *size *= size_; }
+
+    return state_count;
+}
+
 lang::ResolvingHandle<lang::Type> lang::ArrayType::getElementType() const
 {
     return element_type_;

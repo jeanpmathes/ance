@@ -33,6 +33,8 @@ namespace lang
          */
         static const size_t MINIMUM_BIT_SIZE = 16;
 
+        StateCount getStateCount() const override;
+
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 

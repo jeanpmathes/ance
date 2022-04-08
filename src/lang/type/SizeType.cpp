@@ -14,6 +14,11 @@ lang::SizeType::SizeType(std::string name, Kind kind, llvm::Type*& backing)
     , backing_(backing)
 {}
 
+StateCount lang::SizeType::getStateCount() const
+{
+    return SpecialCount::PLATFORM_DEPENDENT;
+}
+
 llvm::Constant* lang::SizeType::getDefaultContent(llvm::LLVMContext& c)
 {
     return llvm::ConstantInt::get(getContentType(c), 0, false);

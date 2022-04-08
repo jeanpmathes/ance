@@ -22,6 +22,8 @@ namespace lang
       public:
         static const int64_t MAX_INTEGER_SIZE = 1ll << 16;
 
+        StateCount getStateCount() const override;
+
         [[nodiscard]] bool isIntegerType() const override;
         [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
 

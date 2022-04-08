@@ -14,6 +14,8 @@ namespace lang
         VoidType();
 
       public:
+        StateCount getStateCount() const override;
+
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 

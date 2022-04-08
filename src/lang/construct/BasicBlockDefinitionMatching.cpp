@@ -4,6 +4,7 @@
 #include "lang/construct/constant/Constant.h"
 #include "lang/construct/value/Value.h"
 #include "lang/statement/Match.h"
+#include "validation/ValidationLogger.h"
 
 lang::BasicBlock::Definition::Matching::Matching(Match* match, std::vector<std::vector<ConstantExpression*>> cases)
     : match_(match)
@@ -62,6 +63,17 @@ bool lang::BasicBlock::Definition::Matching::validate(ValidationLogger& validati
     for (auto& branch : branches_) { valid &= branch->validate(validation_logger); }
 
     valid &= match_->expression().validate(validation_logger);
+
+    if (!valid) return false;
+
+    lang::ResolvingHandle<lang::Type> type = match_->expression().type();
+
+    if (!type->isIntegerType() && !type->isBooleanType() && !type->isSizeType() && !type->isDiffType())
+    {
+        validation_logger.logError("Cannot match non-numeric or logical type " + type->getAnnotatedName(),
+                                   match_->expression().location());
+        valid = false;
+    }
 
     if (!valid) return false;
 

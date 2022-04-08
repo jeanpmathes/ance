@@ -23,9 +23,10 @@ namespace lang
         UnsignedIntegerPointerType();
 
       public:
-        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        StateCount getStateCount() const override;
 
-        llvm::Type* getContentType(llvm::LLVMContext& c) override;
+        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
         [[maybe_unused]] static llvm::Value* buildValue(llvm::Value* pointer, CompileContext* state);
 

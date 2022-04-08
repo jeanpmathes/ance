@@ -20,6 +20,8 @@ namespace lang
         explicit ReferenceType(lang::ResolvingHandle<lang::Type> element_type);
 
       public:
+        StateCount getStateCount() const override;
+
         bool                              isReferenceType() const override;
         lang::ResolvingHandle<lang::Type> getElementType() const override;
         lang::ResolvingHandle<lang::Type> getActualType() override;

@@ -5,6 +5,12 @@
 
 lang::VoidType::VoidType() : TypeDefinition("void") {}
 
+StateCount lang::VoidType::getStateCount() const
+{
+    size_t count = 0;
+    return count;
+}
+
 llvm::Constant* lang::VoidType::getDefaultContent(llvm::LLVMContext&)
 {
     throw std::logic_error("Void does not have a default value.");

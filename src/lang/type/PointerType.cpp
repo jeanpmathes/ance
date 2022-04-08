@@ -17,6 +17,11 @@ lang::PointerType::PointerType(lang::ResolvingHandle<lang::Type> element_type)
     , element_reference_(lang::ReferenceType::get(element_type))
 {}
 
+StateCount lang::PointerType::getStateCount() const
+{
+    return SpecialCount::ABSTRACT;
+}
+
 bool lang::PointerType::isPointerType() const
 {
     return true;
