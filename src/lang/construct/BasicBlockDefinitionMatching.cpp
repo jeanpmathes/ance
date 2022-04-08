@@ -145,13 +145,15 @@ void lang::BasicBlock::Definition::Matching::doBuild(CompileContext* context)
         }
     }
 
-    assert(default_block);
+    if (!default_block) { default_block = branches_.front()->definition_->getNativeBlock(); }
 
     auto switch_instance = context->ir()->CreateSwitch(value->getContentValue(), default_block, cases_.size());
 
     for (const auto& [case_value, branch_block] : llvm::zip(cases_, branches_))
     {
-        if (case_value.empty()) { continue; }
+        llvm::BasicBlock* branch_native_block = branch_block->definition_->getNativeBlock();
+
+        if (case_value.empty() || branch_native_block == default_block) continue;
 
         for (auto& case_value_expression : case_value)
         {
@@ -160,7 +162,7 @@ void lang::BasicBlock::Definition::Matching::doBuild(CompileContext* context)
             llvm::Constant* native_constant = constant->getContentConstant();
 
             auto native_integer_constant = llvm::cast<llvm::ConstantInt>(native_constant);
-            switch_instance->addCase(native_integer_constant, branch_block->definition_->getNativeBlock());
+            switch_instance->addCase(native_integer_constant, branch_native_block);
         }
     }
 
