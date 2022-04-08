@@ -44,6 +44,9 @@ class Match
 
         std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> getConditions();
 
+        bool validateConflicts(Case* other, ValidationLogger& validation_logger);
+        bool validate(ValidationLogger& validation_logger);
+
       private:
         std::vector<std::unique_ptr<ConstantExpression>> conditions_;
         std::unique_ptr<lang::CodeBlock>                 code_;
@@ -69,6 +72,13 @@ class Match
     void walkDefinitions() override;
 
     void validate(ValidationLogger& validation_logger) override;
+
+    /**
+     * Validate the cases of the match statement.
+     * @param validation_logger The validation logger to use.
+     * @return True if the cases are valid, false otherwise.
+     */
+    bool validateCases(ValidationLogger& validation_logger);
 
   protected:
     void doBuild(CompileContext* context) override;

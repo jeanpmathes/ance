@@ -26,3 +26,8 @@ llvm::Constant* lang::ExpressionBackedConstant::buildContent(llvm::Module* m)
     expression_->buildConstant(m->getContext());
     return expression_->getContentConstant();
 }
+
+bool lang::ExpressionBackedConstant::equals(const lang::Constant*) const
+{
+    return false;
+}

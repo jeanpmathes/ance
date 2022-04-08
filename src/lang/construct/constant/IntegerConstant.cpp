@@ -84,3 +84,14 @@ llvm::Constant* lang::IntegerConstant::buildContent(llvm::Module* m)
     llvm::APInt integer(size_, text_, radix_);
     return llvm::ConstantInt::get(type_->getContentType(m->getContext()), integer);
 }
+
+bool lang::IntegerConstant::equals(const lang::Constant* other) const
+{
+    auto other_int = dynamic_cast<const IntegerConstant*>(other);
+    if (!other_int) return false;
+
+    llvm::APInt this_value(size_, text_, radix_);
+    llvm::APInt other_value(other_int->size_, other_int->text_, other_int->radix_);
+
+    return this_value == other_value;
+}

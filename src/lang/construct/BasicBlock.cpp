@@ -105,7 +105,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(E
 }
 
 std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createMatching(
-    Expression*                                                   condition,
+    Match*                                                        match,
     std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> cases,
     lang::Function*                                               function)
 {
@@ -129,7 +129,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createMatching(
     auto block = new BasicBlock();
     blocks.push_back(std::unique_ptr<BasicBlock>(block));
 
-    block->definition_ = std::make_unique<Definition::Matching>(condition, case_values);
+    block->definition_ = std::make_unique<Definition::Matching>(match, case_values);
     block->definition_->setSelf(block);
 
     std::unique_ptr<lang::BasicBlock> end_block = lang::BasicBlock::createSimple();

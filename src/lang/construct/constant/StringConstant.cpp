@@ -44,10 +44,17 @@ llvm::Constant* lang::StringConstant::buildContent(llvm::Module* m)
 
         return llvm::ConstantExpr::getInBoundsGetElementPtr(str_arr_ptr->getValueType(), str_arr_ptr, indices);
     }
-    else
-    {
+    else {
         return llvm::ConstantDataArray::getString(m->getContext(), string_, false);
     }
+}
+
+bool lang::StringConstant::equals(const lang::Constant* other) const
+{
+    auto other_diff = dynamic_cast<const StringConstant*>(other);
+    if (!other_diff) return false;
+
+    return this->prefix_ == other_diff->prefix_ && this->string_ == other_diff->string_;
 }
 
 std::string lang::StringConstant::parse(const std::string& unparsed)

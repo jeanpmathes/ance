@@ -3,12 +3,10 @@
 #include "compiler/CompileContext.h"
 #include "lang/construct/constant/Constant.h"
 #include "lang/construct/value/Value.h"
-#include "lang/expression/Expression.h"
-#include "lang/type/IntegerType.h"
+#include "lang/statement/Match.h"
 
-lang::BasicBlock::Definition::Matching::Matching(Expression*                                   condition,
-                                                 std::vector<std::vector<ConstantExpression*>> cases)
-    : condition_(condition)
+lang::BasicBlock::Definition::Matching::Matching(Match* match, std::vector<std::vector<ConstantExpression*>> cases)
+    : match_(match)
     , cases_(std::move(cases))
 {}
 
@@ -53,9 +51,21 @@ bool lang::BasicBlock::Definition::Matching::validate(ValidationLogger& validati
     bool valid = true;
 
     for (auto& statement : statements_) { statement->validate(validation_logger); }
+
+    for (auto& case_list : cases_)
+    {
+        std::for_each(case_list.begin(), case_list.end(), [&](ConstantExpression* c) {
+            valid &= c->validate(validation_logger);
+        });
+    }
+
     for (auto& branch : branches_) { valid &= branch->validate(validation_logger); }
 
-    valid &= condition_->validate(validation_logger);
+    valid &= match_->expression().validate(validation_logger);
+
+    if (!valid) return false;
+
+    valid &= match_->validateCases(validation_logger);
 
     return valid;
 }
@@ -109,7 +119,7 @@ void lang::BasicBlock::Definition::Matching::doBuild(CompileContext* context)
 
     for (auto& statement : statements_) { statement->build(context); }
 
-    std::shared_ptr<lang::Value> value = condition_->getValue();
+    std::shared_ptr<lang::Value> value = match_->expression().getValue();
     value->buildContentValue(context);
 
     llvm::BasicBlock* default_block = nullptr;

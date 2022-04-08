@@ -36,3 +36,14 @@ llvm::Constant* lang::DiffConstant::buildContent(llvm::Module* m)
     llvm::APInt size(lang::SizeType::getDiffWidth(), value_, 10);
     return llvm::ConstantInt::get(type_->getContentType(m->getContext()), size);
 }
+
+bool lang::DiffConstant::equals(const lang::Constant* other) const
+{
+    auto other_diff = dynamic_cast<const DiffConstant*>(other);
+    if (!other_diff) return false;
+
+    llvm::APInt this_value(lang::SizeType::MINIMUM_BIT_SIZE, value_, 10);
+    llvm::APInt other_value(lang::SizeType::MINIMUM_BIT_SIZE, other_diff->value_, 10);
+
+    return this_value == other_value;
+}

@@ -53,6 +53,13 @@ namespace lang
          */
         llvm::Constant* getContentConstant();
 
+        /**
+         * Check if this constant equals another constant. Only valid constants can be compared.
+         * @param other The other constant.
+         * @return True if the constants are equal.
+         */
+        virtual bool equals(const lang::Constant* other) const = 0;
+
         void buildNativeValue(CompileContext* context) final;
         void buildContentValue(CompileContext* context) final;
 

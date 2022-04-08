@@ -63,13 +63,13 @@ namespace lang
 
         /**
          * Create basis blocks that match a case for a given value.
-         * @param condition The expression providing the condition.
+         * @param match The match statement.
          * @param cases The cases to match. These are pairs of (value, block), where multiple values can use the same block. For the default case, the condition is null.
          * @param function The function containing the basic block.
          * @return The created basic blocks.
          */
         static std::vector<std::unique_ptr<BasicBlock>> createMatching(
-            Expression*                                                   condition,
+            Match*                                                        match,
             std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> cases,
             lang::Function*                                               function);
 
@@ -379,7 +379,7 @@ namespace lang
             class Matching : public Base
             {
               public:
-                explicit Matching(Expression* condition, std::vector<std::vector<ConstantExpression*>> cases);
+                explicit Matching(Match* match, std::vector<std::vector<ConstantExpression*>> cases);
                 ~Matching() override = default;
 
               public:
@@ -409,7 +409,7 @@ namespace lang
 
                 std::vector<lang::BasicBlock*> branches_ {};
 
-                Expression*                                   condition_;
+                Match*                                        match_;
                 std::vector<std::vector<ConstantExpression*>> cases_;
             };
         };

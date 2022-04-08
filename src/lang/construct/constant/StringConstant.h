@@ -28,6 +28,8 @@ namespace lang
         lang::ResolvingHandle<lang::Type> type() override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
 
+        bool equals(const lang::Constant* other) const override;
+
         /**
          * Parse a given string to remove quotes and resolve escape sequences.
          * @param unparsed The unparsed string.

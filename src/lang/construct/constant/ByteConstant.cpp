@@ -21,6 +21,14 @@ llvm::Constant* lang::ByteConstant::buildContent(llvm::Module* m)
     return llvm::ConstantInt::get(type_->getContentType(m->getContext()), byte_, false);
 }
 
+bool lang::ByteConstant::equals(const lang::Constant* other) const
+{
+    auto other_byte = dynamic_cast<const ByteConstant*>(other);
+    if (!other_byte) return false;
+
+    return this->byte_ == other_byte->byte_;
+}
+
 char lang::ByteConstant::resolveEscaped(char content)
 {
     switch (content)

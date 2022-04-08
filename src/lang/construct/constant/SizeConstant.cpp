@@ -37,3 +37,14 @@ llvm::Constant* lang::SizeConstant::buildContent(llvm::Module* m)
     llvm::APInt size(lang::SizeType::getSizeWidth(), value_, 10);
     return llvm::ConstantInt::get(type_->getContentType(m->getContext()), size);
 }
+
+bool lang::SizeConstant::equals(const lang::Constant* other) const
+{
+    auto other_size = dynamic_cast<const SizeConstant*>(other);
+    if (!other_size) return false;
+
+    llvm::APInt this_value(lang::SizeType::MINIMUM_BIT_SIZE, value_, 10);
+    llvm::APInt other_value(lang::SizeType::MINIMUM_BIT_SIZE, other_size->value_, 10);
+
+    return this_value == other_value;
+}

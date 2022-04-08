@@ -29,6 +29,8 @@ namespace lang
         lang::ResolvingHandle<lang::Type> type() override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
 
+        bool equals(const lang::Constant* other) const override;
+
       private:
         lang::ResolvingHandle<lang::Type> type_;
         std::string                       value_;

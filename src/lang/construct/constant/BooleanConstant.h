@@ -25,6 +25,8 @@ namespace lang
 
         llvm::Constant* buildContent(llvm::Module* m) override;
 
+        bool equals(const lang::Constant* other) const override;
+
         /**
          * Create a boolean constant with the false value.
          * @return The new boolean constant.

@@ -31,3 +31,11 @@ llvm::Constant* lang::FloatConstant::buildContent(llvm::Module* m)
 {
     return llvm::ConstantFP::get(type_->getContentType(m->getContext()), float_);
 }
+
+bool lang::FloatConstant::equals(const lang::Constant* other) const
+{
+    auto other_float = dynamic_cast<const FloatConstant*>(other);
+    if (!other_float) return false;
+
+    return this->float_ == other_float->float_;
+}

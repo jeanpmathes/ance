@@ -20,6 +20,14 @@ llvm::Constant* lang::BooleanConstant::buildContent(llvm::Module* m)
                     : llvm::ConstantInt::getFalse(type_->getContentType(m->getContext()));
 }
 
+bool lang::BooleanConstant::equals(const lang::Constant* other) const
+{
+    auto* other_boolean = dynamic_cast<const BooleanConstant*>(other);
+    if (!other_boolean) return false;
+
+    return this->boolean_ == other_boolean->boolean_;
+}
+
 std::shared_ptr<lang::BooleanConstant> lang::BooleanConstant::createFalse()
 {
     return std::shared_ptr<lang::BooleanConstant>(new BooleanConstant(false));
