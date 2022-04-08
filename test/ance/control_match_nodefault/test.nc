@@ -1,6 +1,7 @@
-// invalid
+// valid
+// o: "true"
 
-// Match-statements must complete cover all possible cases.
+// Match-statements do not need a default case.
 
 private std_out: Handle;
 private null_ptr: uiptr;
@@ -12,11 +13,12 @@ public main () : ui32
 {
     std_out <: GetStdHandle(4294967285:32);
 
-    let value: size <: 3;
+    let value: i1 <: true;
 
     match value with
     {
-        0 => write(c"A", 1:32); // Only once case covered.
+        false => write(c"false", 5:32);
+        true => write(c"true", 4:32);
     }
 
     return 0:32;

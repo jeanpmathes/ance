@@ -1,5 +1,4 @@
 // invalid
-// o: "C"
 
 // Every case of a match-statement must be unique.
 
