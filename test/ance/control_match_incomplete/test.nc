@@ -15,7 +15,7 @@ public main () : ui32
 
     let value: size <: 3;
 
-    match value
+    match value with
     {
         0 => write(c"A", 1:32); // Only once case covered.
     }

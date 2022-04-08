@@ -105,7 +105,7 @@ whileStatement
     ;
 
 matchStatement
-    : 'match' expression '{' ( matchCase )* '}'
+    : 'match' expression 'with' '{' ( matchCase )* '}'
     ;
 
 matchCase
