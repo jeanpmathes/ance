@@ -50,9 +50,14 @@ void lang::BasicBlock::Definition::Matching::transferStatements(std::list<Statem
 
 bool lang::BasicBlock::Definition::Matching::validate(ValidationLogger& validation_logger)
 {
-    // todo
+    bool valid = true;
 
-    return true;
+    for (auto& statement : statements_) { statement->validate(validation_logger); }
+    for (auto& branch : branches_) { valid &= branch->validate(validation_logger); }
+
+    valid &= condition_->validate(validation_logger);
+
+    return valid;
 }
 
 std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Matching::getLeaves()
