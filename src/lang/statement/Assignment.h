@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_LANG_STATEMENT_ASSIGNMENTSTATEMENT_H_
-#define ANCE_SRC_LANG_STATEMENT_ASSIGNMENTSTATEMENT_H_
+#ifndef ANCE_SRC_LANG_STATEMENT_ASSIGNMENT_H_
+#define ANCE_SRC_LANG_STATEMENT_ASSIGNMENT_H_
 
 #include "Statement.h"
 
@@ -13,9 +13,9 @@ class Expression;
 /**
  * A statement with an assignment operation.
  */
-class AssignmentStatement
+class Assignment
     : public Statement
-    , public lang::Element<AssignmentStatement, ANCE_CONSTRUCTS>
+    , public lang::Element<Assignment, ANCE_CONSTRUCTS>
 {
   public:
     /**
@@ -25,10 +25,10 @@ class AssignmentStatement
      * @param assigned An expression producing the value that is assigned.
      * @param location The source location.
      */
-    AssignmentStatement(std::unique_ptr<Expression> assignable,
-                        lang::Assigner              assigner,
-                        std::unique_ptr<Expression> assigned,
-                        lang::Location              location);
+    Assignment(std::unique_ptr<Expression> assignable,
+               lang::Assigner              assigner,
+               std::unique_ptr<Expression> assigned,
+               lang::Location              location);
 
     [[nodiscard]] Expression&    assignable() const;
     [[nodiscard]] lang::Assigner assigner() const;

@@ -1,4 +1,4 @@
-#include "DeleteStatement.h"
+#include "Delete.h"
 
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
@@ -7,7 +7,7 @@
 #include "compiler/Runtime.h"
 #include "validation/ValidationLogger.h"
 
-DeleteStatement::DeleteStatement(std::unique_ptr<Expression> to_delete, bool delete_buffer, lang::Location location)
+Delete::Delete(std::unique_ptr<Expression> to_delete, bool delete_buffer, lang::Location location)
     : Statement(location)
     , to_delete_(std::move(to_delete))
     , delete_buffer_(delete_buffer)
@@ -15,27 +15,27 @@ DeleteStatement::DeleteStatement(std::unique_ptr<Expression> to_delete, bool del
     addChild(*to_delete_);
 }
 
-Expression& DeleteStatement::toDelete() const
+Expression& Delete::toDelete() const
 {
     return *to_delete_;
 }
 
-bool DeleteStatement::isBufferDelete() const
+bool Delete::isBufferDelete() const
 {
     return delete_buffer_;
 }
 
-void DeleteStatement::setScope(lang::Scope* scope)
+void Delete::setScope(lang::Scope* scope)
 {
     to_delete_->setContainingScope(scope);
 }
 
-void DeleteStatement::walkDefinitions()
+void Delete::walkDefinitions()
 {
     to_delete_->walkDefinitions();
 }
 
-void DeleteStatement::validate(ValidationLogger& validation_logger)
+void Delete::validate(ValidationLogger& validation_logger)
 {
     if (to_delete_->validate(validation_logger))
     {
@@ -48,7 +48,7 @@ void DeleteStatement::validate(ValidationLogger& validation_logger)
     }
 }
 
-void DeleteStatement::doBuild(CompileContext* context)
+void Delete::doBuild(CompileContext* context)
 {
     context->runtime()->deleteDynamic(to_delete_->getValue(), delete_buffer_, context);
 }

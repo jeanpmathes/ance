@@ -14,12 +14,12 @@
 #include "lang/type/SingleType.h"
 #include "lang/type/VoidType.h"
 
-#include "lang/statement/AssignmentStatement.h"
-#include "lang/statement/DeleteStatement.h"
+#include "lang/statement/Assignment.h"
+#include "lang/statement/Delete.h"
 #include "lang/statement/ExpressionStatement.h"
 #include "lang/statement/LocalReferenceVariableDefinition.h"
 #include "lang/statement/LocalVariableDefinition.h"
-#include "lang/statement/ReturnStatement.h"
+#include "lang/statement/Return.h"
 #include "lang/statement/Assertion.h"
 #include "lang/statement/If.h"
 #include "lang/statement/While.h"
@@ -283,10 +283,10 @@ antlrcpp::Any SourceVisitor::visitAssignment(anceParser::AssignmentContext* ctx)
     lang::Assigner assigner   = visit(ctx->assigner()).as<lang::Assigner>();
     Expression*    assigned   = visit(ctx->assigned).as<Expression*>();
 
-    auto statement = std::make_unique<AssignmentStatement>(std::unique_ptr<Expression>(assignable),
-                                                           assigner,
-                                                           std::unique_ptr<Expression>(assigned),
-                                                           location(ctx));
+    auto statement = std::make_unique<Assignment>(std::unique_ptr<Expression>(assignable),
+                                                  assigner,
+                                                  std::unique_ptr<Expression>(assigned),
+                                                  location(ctx));
 
     return lang::CodeBlock::wrapStatement(std::move(statement));
 }
@@ -296,8 +296,7 @@ antlrcpp::Any SourceVisitor::visitDeleteStatement(anceParser::DeleteStatementCon
     Expression* expression    = visit(ctx->expression()).as<Expression*>();
     bool        delete_buffer = ctx->BUFFER();
 
-    auto statement =
-        std::make_unique<DeleteStatement>(std::unique_ptr<Expression>(expression), delete_buffer, location(ctx));
+    auto statement = std::make_unique<Delete>(std::unique_ptr<Expression>(expression), delete_buffer, location(ctx));
 
     return lang::CodeBlock::wrapStatement(std::move(statement));
 }
@@ -308,7 +307,7 @@ antlrcpp::Any SourceVisitor::visitReturnStatement(anceParser::ReturnStatementCon
 
     if (ctx->expression() != nullptr) { return_value = visit(ctx->expression()).as<Expression*>(); }
 
-    auto statement = std::make_unique<ReturnStatement>(std::unique_ptr<Expression>(return_value), location(ctx));
+    auto statement = std::make_unique<Return>(std::unique_ptr<Expression>(return_value), location(ctx));
 
     return lang::CodeBlock::wrapStatement(std::move(statement));
 }

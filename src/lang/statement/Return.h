@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_LANG_STATEMENT_RETURNSTATEMENT_H_
-#define ANCE_SRC_LANG_STATEMENT_RETURNSTATEMENT_H_
+#ifndef ANCE_SRC_LANG_STATEMENT_RETURN_H_
+#define ANCE_SRC_LANG_STATEMENT_RETURN_H_
 
 #include "Statement.h"
 
@@ -10,9 +10,9 @@ class Expression;
 /**
  * Returns from the containing function.
  */
-class ReturnStatement
+class Return
     : public Statement
-    , public lang::Element<ReturnStatement, ANCE_CONSTRUCTS>
+    , public lang::Element<Return, ANCE_CONSTRUCTS>
 {
   public:
     /**
@@ -20,7 +20,7 @@ class ReturnStatement
      * @param return_value An expression producing the return value.
      * @param location The source location.
      */
-    ReturnStatement(std::unique_ptr<Expression> return_value, lang::Location location);
+    Return(std::unique_ptr<Expression> return_value, lang::Location location);
 
     [[nodiscard]] Expression* expression();
 

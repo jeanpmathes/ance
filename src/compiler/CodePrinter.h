@@ -29,12 +29,12 @@ class CodePrinter : public lang::ApplicationVisitor
     std::any visit(VariableAccess& variable_access) override;
 
     std::any visit(Assertion& assertion) override;
-    std::any visit(AssignmentStatement& assignment_statement) override;
-    std::any visit(DeleteStatement& delete_statement) override;
+    std::any visit(Assignment& assignment_statement) override;
+    std::any visit(Delete& delete_statement) override;
     std::any visit(ExpressionStatement& expression_statement) override;
     std::any visit(LocalReferenceVariableDefinition& local_reference_variable_definition) override;
     std::any visit(LocalVariableDefinition& local_variable_definition) override;
-    std::any visit(ReturnStatement& return_statement) override;
+    std::any visit(Return& return_statement) override;
 
   private:
     std::ostream& out_;

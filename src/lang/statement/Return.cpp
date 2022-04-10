@@ -1,22 +1,22 @@
-#include "ReturnStatement.h"
+#include "Return.h"
 
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
 #include "validation/ValidationLogger.h"
 
-ReturnStatement::ReturnStatement(std::unique_ptr<Expression> return_value, lang::Location location)
+Return::Return(std::unique_ptr<Expression> return_value, lang::Location location)
     : Statement(location)
     , return_value_(std::move(return_value))
 {
     if (return_value_) addChild(*return_value_);
 }
 
-Expression* ReturnStatement::expression()
+Expression* Return::expression()
 {
     return return_value_.get();
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> ReturnStatement::createBlocks(lang::BasicBlock& entry, lang::Function*)
+std::vector<std::unique_ptr<lang::BasicBlock>> Return::createBlocks(lang::BasicBlock& entry, lang::Function*)
 {
     std::vector<std::unique_ptr<lang::BasicBlock>> blocks;
     blocks.push_back(lang::BasicBlock::createReturning(return_value_.get(), location()));
@@ -26,22 +26,22 @@ std::vector<std::unique_ptr<lang::BasicBlock>> ReturnStatement::createBlocks(lan
     return blocks;
 }
 
-void ReturnStatement::setScope(lang::Scope* scope)
+void Return::setScope(lang::Scope* scope)
 {
     if (return_value_) return_value_->setContainingScope(scope);
 }
 
-void ReturnStatement::walkDefinitions()
+void Return::walkDefinitions()
 {
     if (return_value_) return_value_->walkDefinitions();
 }
 
-void ReturnStatement::validate(ValidationLogger&)
+void Return::validate(ValidationLogger&)
 {
     // Handled by basic block.
 }
 
-void ReturnStatement::doBuild(CompileContext*)
+void Return::doBuild(CompileContext*)
 {
     // Handled by basic block.
 }

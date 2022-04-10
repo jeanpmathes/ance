@@ -39,12 +39,12 @@ namespace lang
 }
 
 class Assertion;
-class AssignmentStatement;
-class DeleteStatement;
+class Assignment;
+class Delete;
 class ExpressionStatement;
 class LocalReferenceVariableDefinition;
 class LocalVariableDefinition;
-class ReturnStatement;
+class Return;
 class If;
 class While;
 class Match;
@@ -53,8 +53,7 @@ class Match;
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::BasicBlock,    \
         lang::CodeBlock, lang::Variable, lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation,             \
         BinaryOperation, BindRef, ConstantLiteral, DefaultValue, FunctionCall, Parenthesis, SizeofExpression,          \
-        SizeofType, Subscript, VariableAccess, lang::GlobalScope, lang::LocalScope, Assertion, AssignmentStatement,    \
-        DeleteStatement, ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition,               \
-        ReturnStatement, If, While, Match
+        SizeofType, Subscript, VariableAccess, lang::GlobalScope, lang::LocalScope, Assertion, Assignment, Delete,     \
+        ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Return, If, While, Match
 
 #endif

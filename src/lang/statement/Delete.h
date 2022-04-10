@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_LANG_STATEMENT_DELETESTATEMENT_H_
-#define ANCE_SRC_LANG_STATEMENT_DELETESTATEMENT_H_
+#ifndef ANCE_SRC_LANG_STATEMENT_DELETE_H_
+#define ANCE_SRC_LANG_STATEMENT_DELETE_H_
 
 #include "Statement.h"
 
@@ -10,9 +10,9 @@ class Expression;
 /**
  * A statement performing a delete operation.
  */
-class DeleteStatement
+class Delete
     : public Statement
-    , public lang::Element<DeleteStatement, ANCE_CONSTRUCTS>
+    , public lang::Element<Delete, ANCE_CONSTRUCTS>
 {
   public:
     /**
@@ -21,7 +21,7 @@ class DeleteStatement
      * @param delete_buffer Whether to delete a single element or a buffer.
      * @param location The source location.
      */
-    DeleteStatement(std::unique_ptr<Expression> to_delete, bool delete_buffer, lang::Location location);
+    Delete(std::unique_ptr<Expression> to_delete, bool delete_buffer, lang::Location location);
 
     [[nodiscard]] Expression& toDelete() const;
     [[nodiscard]] bool        isBufferDelete() const;

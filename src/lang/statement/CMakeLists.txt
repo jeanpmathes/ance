@@ -1,8 +1,8 @@
-target_sources(ance PRIVATE AssignmentStatement.cpp
+target_sources(ance PRIVATE Assignment.cpp
                LocalVariableDefinition.cpp
                LocalReferenceVariableDefinition.cpp
-               DeleteStatement.cpp
-               ReturnStatement.cpp
+               Delete.cpp
+               Return.cpp
                ExpressionStatement.cpp
                Assertion.cpp
                If.cpp

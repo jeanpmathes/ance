@@ -1,4 +1,4 @@
-#include "AssignmentStatement.h"
+#include "Assignment.h"
 
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
@@ -6,10 +6,10 @@
 #include "validation/ValidationLogger.h"
 #include "lang/Assigner.h"
 
-AssignmentStatement::AssignmentStatement(std::unique_ptr<Expression> assignable,
-                                         lang::Assigner              assigner,
-                                         std::unique_ptr<Expression> assigned,
-                                         lang::Location              location)
+Assignment::Assignment(std::unique_ptr<Expression> assignable,
+                       lang::Assigner              assigner,
+                       std::unique_ptr<Expression> assigned,
+                       lang::Location              location)
     : Statement(location)
     , assignable_(std::move(assignable))
     , assigner_(assigner)
@@ -21,34 +21,34 @@ AssignmentStatement::AssignmentStatement(std::unique_ptr<Expression> assignable,
     addChild(*assigned_);
 }
 
-Expression& AssignmentStatement::assignable() const
+Expression& Assignment::assignable() const
 {
     return *assignable_;
 }
 
-lang::Assigner AssignmentStatement::assigner() const
+lang::Assigner Assignment::assigner() const
 {
     return assigner_;
 }
 
-Expression& AssignmentStatement::assigned() const
+Expression& Assignment::assigned() const
 {
     return *assigned_;
 }
 
-void AssignmentStatement::setScope(lang::Scope* scope)
+void Assignment::setScope(lang::Scope* scope)
 {
     assignable_->setContainingScope(scope);
     assigned_->setContainingScope(scope);
 }
 
-void AssignmentStatement::walkDefinitions()
+void Assignment::walkDefinitions()
 {
     assignable_->walkDefinitions();
     assigned_->walkDefinitions();
 }
 
-void AssignmentStatement::validate(ValidationLogger& validation_logger)
+void Assignment::validate(ValidationLogger& validation_logger)
 {
     if (assigner_.isFinal())
     {
@@ -62,7 +62,7 @@ void AssignmentStatement::validate(ValidationLogger& validation_logger)
     }
 }
 
-void AssignmentStatement::doBuild(CompileContext* context)
+void Assignment::doBuild(CompileContext* context)
 {
     assignable_->assign(assigned_->getValue(), context);
 }

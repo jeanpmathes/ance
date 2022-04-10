@@ -136,7 +136,7 @@ std::any CodePrinter::visit(Assertion& assertion)
     return {};
 }
 
-std::any CodePrinter::visit(AssignmentStatement& assignment_statement)
+std::any CodePrinter::visit(Assignment& assignment_statement)
 {
     out_ << visitTree(assignment_statement.assignable()) << " ";
     out_ << assignment_statement.assigner().getSymbol() << " ";
@@ -145,7 +145,7 @@ std::any CodePrinter::visit(AssignmentStatement& assignment_statement)
     return {};
 }
 
-std::any CodePrinter::visit(DeleteStatement& delete_statement)
+std::any CodePrinter::visit(Delete& delete_statement)
 {
     out_ << "delete";
     if (delete_statement.isBufferDelete()) out_ << "[]";
@@ -187,7 +187,7 @@ std::any CodePrinter::visit(LocalVariableDefinition& local_variable_definition)
     return {};
 }
 
-std::any CodePrinter::visit(ReturnStatement& return_statement)
+std::any CodePrinter::visit(Return& return_statement)
 {
     out_ << "return";
 
