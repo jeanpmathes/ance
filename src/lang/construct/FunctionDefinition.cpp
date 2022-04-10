@@ -129,7 +129,7 @@ llvm::CallInst* lang::FunctionDefinition::buildCall(const std::vector<std::share
     }
 
     auto* content_value = context->ir()->CreateCall(native_type, native_function, args);
-    if (!native_type->getReturnType()->isVoidTy()) content_value->setName(name() + ".ret");
+    if (!native_type->getReturnType()->isVoidTy()) content_value->setName(name() + ".call");
     return content_value;
 }
 

@@ -32,8 +32,7 @@ void lang::LocalVariable::buildDeclaration(CompileContext* context)
 {
     assert(initial_value_);
 
-    native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr);
-    native_value_->setName(identifier());
+    native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr, identifier());
 }
 
 void lang::LocalVariable::buildDefinition(CompileContext* context)

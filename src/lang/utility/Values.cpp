@@ -7,7 +7,8 @@ llvm::Value* lang::Values::nativeToContent(lang::ResolvingHandle<lang::Type> typ
                                            llvm::Value*                      native,
                                            CompileContext*                   context)
 {
-    llvm::Value* content = context->ir()->CreateLoad(type->getContentType(*context->llvmContext()), native);
+    llvm::Value* content =
+        context->ir()->CreateLoad(type->getContentType(*context->llvmContext()), native, native->getName() + ".load");
     return content;
 }
 
@@ -15,7 +16,7 @@ llvm::Value* lang::Values::contentToNative(lang::ResolvingHandle<lang::Type> typ
                                            llvm::Value*                      content,
                                            CompileContext*                   context)
 {
-    llvm::Value* native = context->ir()->CreateAlloca(type->getContentType(*context->llvmContext()));
+    llvm::Value* native = context->ir()->CreateAlloca(type->getContentType(*context->llvmContext()), nullptr, "alloca");
     context->ir()->CreateStore(content, native);
     return native;
 }

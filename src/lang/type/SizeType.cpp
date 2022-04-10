@@ -46,8 +46,10 @@ std::shared_ptr<lang::Value> lang::SizeType::buildImplicitConversion(lang::Resol
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
 
-    llvm::Value* converted_value =
-        context->ir()->CreateIntCast(content_value, other->getContentType(*context->llvmContext()), false);
+    llvm::Value* converted_value      = context->ir()->CreateIntCast(content_value,
+                                                                other->getContentType(*context->llvmContext()),
+                                                                false,
+                                                                content_value->getName() + ".icast");
     llvm::Value* native_content_value = lang::Values::contentToNative(other, converted_value, context);
 
     return std::make_shared<WrappedNativeValue>(other, native_content_value);
@@ -99,43 +101,55 @@ std::shared_ptr<lang::Value> lang::SizeType::buildOperator(lang::BinaryOperator 
     switch (op)
     {
         case lang::BinaryOperator::ADDITION:
-            result = context->ir()->CreateAdd(left_value, right_value);
+            result = context->ir()->CreateAdd(left_value, right_value, left_value->getName() + ".add");
             break;
         case lang::BinaryOperator::SUBTRACTION:
-            result = context->ir()->CreateSub(left_value, right_value);
+            result = context->ir()->CreateSub(left_value, right_value, left_value->getName() + ".sub");
             break;
         case lang::BinaryOperator::MULTIPLICATION:
-            result = context->ir()->CreateMul(left_value, right_value);
+            result = context->ir()->CreateMul(left_value, right_value, left_value->getName() + ".mul");
             break;
         case lang::BinaryOperator::DIVISION:
-            if (isSizeType()) result = context->ir()->CreateUDiv(left_value, right_value);
-            if (isDiffType()) result = context->ir()->CreateSDiv(left_value, right_value);
+            if (isSizeType())
+                result = context->ir()->CreateUDiv(left_value, right_value, left_value->getName() + ".udiv");
+            if (isDiffType())
+                result = context->ir()->CreateSDiv(left_value, right_value, left_value->getName() + ".sdiv");
             break;
         case lang::BinaryOperator::REMAINDER:
-            if (isSizeType()) result = context->ir()->CreateURem(left_value, right_value);
-            if (isDiffType()) result = context->ir()->CreateSRem(left_value, right_value);
+            if (isSizeType())
+                result = context->ir()->CreateURem(left_value, right_value, left_value->getName() + ".urem");
+            if (isDiffType())
+                result = context->ir()->CreateSRem(left_value, right_value, left_value->getName() + ".srem");
             break;
         case lang::BinaryOperator::LESS_THAN:
-            if (isSizeType()) result = context->ir()->CreateICmpULT(left_value, right_value);
-            if (isDiffType()) result = context->ir()->CreateICmpSLT(left_value, right_value);
+            if (isSizeType())
+                result = context->ir()->CreateICmpULT(left_value, right_value, left_value->getName() + ".icmp");
+            if (isDiffType())
+                result = context->ir()->CreateICmpSLT(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::LESS_THAN_OR_EQUAL:
-            if (isSizeType()) result = context->ir()->CreateICmpULE(left_value, right_value);
-            if (isDiffType()) result = context->ir()->CreateICmpSLE(left_value, right_value);
+            if (isSizeType())
+                result = context->ir()->CreateICmpULE(left_value, right_value, left_value->getName() + ".icmp");
+            if (isDiffType())
+                result = context->ir()->CreateICmpSLE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::GREATER_THAN:
-            if (isSizeType()) result = context->ir()->CreateICmpUGT(left_value, right_value);
-            if (isDiffType()) result = context->ir()->CreateICmpSGT(left_value, right_value);
+            if (isSizeType())
+                result = context->ir()->CreateICmpUGT(left_value, right_value, left_value->getName() + ".icmp");
+            if (isDiffType())
+                result = context->ir()->CreateICmpSGT(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::GREATER_THAN_OR_EQUAL:
-            if (isSizeType()) result = context->ir()->CreateICmpUGE(left_value, right_value);
-            if (isDiffType()) result = context->ir()->CreateICmpSGE(left_value, right_value);
+            if (isSizeType())
+                result = context->ir()->CreateICmpUGE(left_value, right_value, left_value->getName() + ".icmp");
+            if (isDiffType())
+                result = context->ir()->CreateICmpSGE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::EQUAL:
-            result = context->ir()->CreateICmpEQ(left_value, right_value);
+            result = context->ir()->CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::NOT_EQUAL:
-            result = context->ir()->CreateICmpNE(left_value, right_value);
+            result = context->ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
             break;
     }
 

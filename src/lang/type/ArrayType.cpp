@@ -125,13 +125,16 @@ llvm::Value* lang::ArrayType::buildGetElementPointer(const std::shared_ptr<lang:
     // Check if index is smaller than size.
     llvm::Value* native_size =
         llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context->llvmContext()), size_);
-    llvm::Value* in_bounds = context->ir()->CreateICmpULT(native_index, native_size);
+    llvm::Value* in_bounds = context->ir()->CreateICmpULT(native_index, native_size, native_index->getName() + ".icmp");
 
     in_bounds->setName("..inbounds");
 
     // todo: use in_bounds bool to throw exception
 
-    llvm::Value* element_ptr = context->ir()->CreateGEP(getContentType(*context->llvmContext()), array_ptr, indices);
+    llvm::Value* element_ptr = context->ir()->CreateGEP(getContentType(*context->llvmContext()),
+                                                        array_ptr,
+                                                        indices,
+                                                        array_ptr->getName() + ".gep");
     return element_ptr;
 }
 

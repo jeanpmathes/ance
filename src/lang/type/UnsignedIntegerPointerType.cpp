@@ -23,7 +23,7 @@ llvm::Type* lang::UnsignedIntegerPointerType::getContentType(llvm::LLVMContext&)
 
 llvm::Value* lang::UnsignedIntegerPointerType::buildValue(llvm::Value* pointer, CompileContext* context)
 {
-    return context->ir()->CreatePtrToInt(pointer, native_type_);
+    return context->ir()->CreatePtrToInt(pointer, native_type_, pointer->getName() + ".ptrtoint");
 }
 
 std::string lang::UnsignedIntegerPointerType::createMangledName()

@@ -116,12 +116,14 @@ void Runtime::deleteDynamic(const std::shared_ptr<lang::Value>& value, bool, Com
 
     llvm::Value* ptr =
         value->getContentValue();// While native value is a pointer too, it might not be the pointer we need.
-    llvm::Value* opaque_ptr = context->ir()->CreateBitCast(ptr, llvm::Type::getInt8PtrTy(*context->llvmContext()));
+    llvm::Value* opaque_ptr = context->ir()->CreateBitCast(ptr,
+                                                           llvm::Type::getInt8PtrTy(*context->llvmContext()),
+                                                           ptr->getName() + ".bitcast");
 
     llvm::Value* args[] = {opaque_ptr};
 
     llvm::Value* success = context->ir()->CreateCall(delete_dynamic_type_, delete_dynamic_, args);
-    success->setName("..free");
+    success->setName(delete_dynamic_->getName() + ".call");
 }
 
 void Runtime::buildAssert(const std::shared_ptr<lang::Value>& value, CompileContext* context)
@@ -146,7 +148,7 @@ llvm::Value* Runtime::allocateAutomatic(lang::ResolvingHandle<lang::Type>   type
         count_value = count->getContentValue();
     }
 
-    return context->ir()->CreateAlloca(type->getContentType(*context->llvmContext()), count_value);
+    return context->ir()->CreateAlloca(type->getContentType(*context->llvmContext()), count_value, "alloca");
 }
 
 llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type>   type,
@@ -169,7 +171,7 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type>   type,
         count->buildContentValue(context);
         llvm::Value* element_count = count->getContentValue();
 
-        size = context->ir()->CreateMul(element_size, element_count);
+        size = context->ir()->CreateMul(element_count, element_size, element_count->getName() + ".mul");
     }
     else
     {
@@ -180,7 +182,11 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type>   type,
 
     llvm::Value* args[] = {flags, size};
 
-    llvm::Value* opaque_ptr = context->ir()->CreateCall(allocate_dynamic_type_, allocate_dynamic_, args);
+    llvm::Value* opaque_ptr = context->ir()->CreateCall(allocate_dynamic_type_,
+                                                        allocate_dynamic_,
+                                                        args,
+                                                        allocate_dynamic_->getName() + ".call");
     return context->ir()->CreateBitCast(opaque_ptr,
-                                        lang::PointerType::get(type)->getContentType(*context->llvmContext()));
+                                        lang::PointerType::get(type)->getContentType(*context->llvmContext()),
+                                        opaque_ptr->getName() + ".bitcast");
 }

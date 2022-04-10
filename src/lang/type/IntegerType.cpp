@@ -86,8 +86,10 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Re
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
 
-    llvm::Value* converted_value =
-        context->ir()->CreateIntCast(content_value, other->getContentType(*context->llvmContext()), is_signed_);
+    llvm::Value* converted_value        = context->ir()->CreateIntCast(content_value,
+                                                                other->getContentType(*context->llvmContext()),
+                                                                is_signed_,
+                                                                content_value->getName() + ".icast");
     llvm::Value* native_converted_value = lang::Values::contentToNative(other, converted_value, context);
 
     return std::make_shared<WrappedNativeValue>(other, native_converted_value);
@@ -143,43 +145,49 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
     switch (op)
     {
         case lang::BinaryOperator::ADDITION:
-            result = context->ir()->CreateAdd(left_value, right_value);
+            result = context->ir()->CreateAdd(left_value, right_value, left_value->getName() + ".add");
             break;
         case lang::BinaryOperator::SUBTRACTION:
-            result = context->ir()->CreateSub(left_value, right_value);
+            result = context->ir()->CreateSub(left_value, right_value, left_value->getName() + ".sub");
             break;
         case lang::BinaryOperator::MULTIPLICATION:
-            result = context->ir()->CreateMul(left_value, right_value);
+            result = context->ir()->CreateMul(left_value, right_value, left_value->getName() + ".mul");
             break;
         case lang::BinaryOperator::DIVISION:
-            if (is_signed_) result = context->ir()->CreateSDiv(left_value, right_value);
-            else result = context->ir()->CreateUDiv(left_value, right_value);
+            if (is_signed_)
+                result = context->ir()->CreateSDiv(left_value, right_value, left_value->getName() + ".sdiv");
+            else result = context->ir()->CreateUDiv(left_value, right_value, left_value->getName() + ".udiv");
             break;
         case lang::BinaryOperator::REMAINDER:
-            if (is_signed_) result = context->ir()->CreateSRem(left_value, right_value);
-            else result = context->ir()->CreateURem(left_value, right_value);
+            if (is_signed_)
+                result = context->ir()->CreateSRem(left_value, right_value, left_value->getName() + ".srem");
+            else result = context->ir()->CreateURem(left_value, right_value, left_value->getName() + ".urem");
             break;
         case lang::BinaryOperator::LESS_THAN:
-            if (is_signed_) result = context->ir()->CreateICmpSLT(left_value, right_value);
-            else result = context->ir()->CreateICmpULT(left_value, right_value);
+            if (is_signed_)
+                result = context->ir()->CreateICmpSLT(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context->ir()->CreateICmpULT(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::LESS_THAN_OR_EQUAL:
-            if (is_signed_) result = context->ir()->CreateICmpSLE(left_value, right_value);
-            else result = context->ir()->CreateICmpULE(left_value, right_value);
+            if (is_signed_)
+                result = context->ir()->CreateICmpSLE(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context->ir()->CreateICmpULE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::GREATER_THAN:
-            if (is_signed_) result = context->ir()->CreateICmpSGT(left_value, right_value);
-            else result = context->ir()->CreateICmpUGT(left_value, right_value);
+            if (is_signed_)
+                result = context->ir()->CreateICmpSGT(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context->ir()->CreateICmpUGT(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::GREATER_THAN_OR_EQUAL:
-            if (is_signed_) result = context->ir()->CreateICmpSGE(left_value, right_value);
-            else result = context->ir()->CreateICmpUGE(left_value, right_value);
+            if (is_signed_)
+                result = context->ir()->CreateICmpSGE(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context->ir()->CreateICmpUGE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::EQUAL:
-            result = context->ir()->CreateICmpEQ(left_value, right_value);
+            result = context->ir()->CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::NOT_EQUAL:
-            result = context->ir()->CreateICmpNE(left_value, right_value);
+            result = context->ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
             break;
     }
 
