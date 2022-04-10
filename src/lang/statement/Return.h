@@ -27,9 +27,6 @@ class Return
     std::vector<std::unique_ptr<lang::BasicBlock>> createBlocks(lang::BasicBlock& entry,
                                                                 lang::Function*   function) override;
 
-    void setScope(lang::Scope* scope) override;
-    void walkDefinitions() override;
-
     void validate(ValidationLogger& validation_logger) override;
 
   protected:

@@ -48,12 +48,12 @@ class Return;
 class If;
 class While;
 class Match;
+class Case;
 
 #define ANCE_CONSTRUCTS                                                                                                \
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::BasicBlock,    \
         lang::CodeBlock, lang::Variable, lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation,             \
         BinaryOperation, BindRef, ConstantLiteral, DefaultValue, FunctionCall, Parenthesis, SizeofExpression,          \
         SizeofType, Subscript, VariableAccess, lang::GlobalScope, lang::LocalScope, Assertion, Assignment, Delete,     \
-        ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Return, If, While, Match
-
+        ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Return, If, While, Match, Case
 #endif

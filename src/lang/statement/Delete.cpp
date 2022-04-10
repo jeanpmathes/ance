@@ -12,7 +12,7 @@ Delete::Delete(std::unique_ptr<Expression> to_delete, bool delete_buffer, lang::
     , to_delete_(std::move(to_delete))
     , delete_buffer_(delete_buffer)
 {
-    addChild(*to_delete_);
+    addSubexpression(*to_delete_);
 }
 
 Expression& Delete::toDelete() const
@@ -23,16 +23,6 @@ Expression& Delete::toDelete() const
 bool Delete::isBufferDelete() const
 {
     return delete_buffer_;
-}
-
-void Delete::setScope(lang::Scope* scope)
-{
-    to_delete_->setContainingScope(scope);
-}
-
-void Delete::walkDefinitions()
-{
-    to_delete_->walkDefinitions();
 }
 
 void Delete::validate(ValidationLogger& validation_logger)

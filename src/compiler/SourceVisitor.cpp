@@ -349,11 +349,11 @@ antlrcpp::Any SourceVisitor::visitMatchStatement(anceParser::MatchStatementConte
 {
     Expression* expression = visit(ctx->expression()).as<Expression*>();
 
-    std::vector<std::unique_ptr<Match::Case>> cases;
+    std::vector<std::unique_ptr<Case>> cases;
     for (auto& case_ctx : ctx->matchCase())
     {
-        Match::Case* case_instance = visit(case_ctx).as<Match::Case*>();
-        cases.push_back(std::unique_ptr<Match::Case>(case_instance));
+        Case* case_instance = visit(case_ctx).as<Case*>();
+        cases.push_back(std::unique_ptr<Case>(case_instance));
     }
 
     return lang::CodeBlock::wrapStatement(
@@ -371,14 +371,14 @@ antlrcpp::Any SourceVisitor::visitLiteralCase(anceParser::LiteralCaseContext* ct
         cases.push_back(std::unique_ptr<ConstantExpression>(condition));
     }
 
-    return Match::Case::createCase(std::move(cases), std::move(block));
+    return Case::createCase(std::move(cases), std::move(block));
 }
 
 antlrcpp::Any SourceVisitor::visitDefaultCase(anceParser::DefaultCaseContext* ctx)
 {
     auto block = std::unique_ptr<lang::CodeBlock>(visit(ctx->code()).as<lang::CodeBlock*>());
 
-    return Match::Case::createDefault(std::move(block));
+    return Case::createDefault(std::move(block));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)

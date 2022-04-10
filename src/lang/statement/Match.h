@@ -8,6 +8,45 @@
 
 class Expression;
 
+class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
+{
+  public:
+    /**
+         * Create a default case.
+         * @param code The code to execute.
+         * @return The created case.
+         */
+    static Case* createDefault(std::unique_ptr<lang::CodeBlock> code);
+
+    /**
+         * Create a case.
+         * @param conditions The conditions to match.
+         * @param code The code to execute.
+         * @return The created case.
+         */
+    static Case* createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions,
+                            std::unique_ptr<lang::CodeBlock>                 code);
+
+  private:
+    Case(std::vector<std::unique_ptr<ConstantExpression>> conditions, std::unique_ptr<lang::CodeBlock> code);
+
+  public:
+    void setContainingScope(lang::Scope* scope);
+    void walkDefinitions();
+
+    std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> getConditions();
+
+    bool validateConflicts(Case* other, ValidationLogger& validation_logger);
+    bool validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger);
+
+    ssize_t getCoverageCount();
+
+  private:
+    std::vector<std::unique_ptr<ConstantExpression>> conditions_;
+    std::unique_ptr<lang::CodeBlock>                 code_;
+    ssize_t                                          coverage_count_ {};
+};
+
 /**
  * A match control-flow statement. It matches an expression against a list of cases.
  */
@@ -16,55 +55,13 @@ class Match
     , public lang::Element<Match, ANCE_CONSTRUCTS>
 {
   public:
-    class Case
-    {
-      public:
-        /**
-         * Create a default case.
-         * @param code The code to execute.
-         * @return The created case.
-         */
-        static Case* createDefault(std::unique_ptr<lang::CodeBlock> code);
-
-        /**
-         * Create a case.
-         * @param conditions The conditions to match.
-         * @param code The code to execute.
-         * @return The created case.
-         */
-        static Case* createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions,
-                                std::unique_ptr<lang::CodeBlock>                 code);
-
-      private:
-        Case(std::vector<std::unique_ptr<ConstantExpression>> conditions, std::unique_ptr<lang::CodeBlock> code);
-
-      public:
-        void setContainingScope(lang::Scope* scope);
-        void walkDefinitions();
-
-        std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> getConditions();
-
-        bool validateConflicts(Case* other, ValidationLogger& validation_logger);
-        bool validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger);
-
-        ssize_t getCoverageCount();
-
-      private:
-        std::vector<std::unique_ptr<ConstantExpression>> conditions_;
-        std::unique_ptr<lang::CodeBlock>                 code_;
-        ssize_t                                          coverage_count_ {};
-    };
-
-  public:
     /**
      * Create a new match statement.
      * @param cases The cases to match against.
      * @param expression The expression to match.
      * @param location The source location of the statement.
      */
-    Match(std::vector<std::unique_ptr<Match::Case>> cases,
-          std::unique_ptr<Expression>               expression,
-          lang::Location                            location);
+    Match(std::vector<std::unique_ptr<Case>> cases, std::unique_ptr<Expression> expression, lang::Location location);
 
     [[nodiscard]] Expression& expression();
 

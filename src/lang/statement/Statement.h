@@ -14,6 +14,7 @@ namespace lang
     class BasicBlock;
 }
 
+class Expression;
 class CompileContext;
 class ValidationLogger;
 
@@ -53,7 +54,7 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * Walk all definitions and declarations in this statement.
      * Use this for order-dependent definitions, as well as the usage of resolvable entities.
      */
-    virtual void walkDefinitions() = 0;
+    virtual void walkDefinitions();
 
   protected:
     /**
@@ -88,6 +89,12 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      */
     virtual void doBuild(CompileContext* context) = 0;
 
+    /**
+     * Add a subexpression to the current
+     * @param subexpression The subexpression to add.
+     */
+    void addSubexpression(Expression& subexpression);
+
   public:
     ~Statement() override = default;
 
@@ -95,6 +102,8 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     lang::Location location_;
 
     lang::Scope* containing_scope_ = nullptr;
+
+    std::vector<Expression*> subexpressions_;
 };
 
 #endif

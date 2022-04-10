@@ -8,22 +8,12 @@ ExpressionStatement::ExpressionStatement(std::unique_ptr<BuildableExpression> ex
     : Statement(location)
     , expression_(std::move(expression))
 {
-    addChild(*expression_);
+    addSubexpression(*expression_);
 }
 
 BuildableExpression& ExpressionStatement::expression() const
 {
     return *expression_;
-}
-
-void ExpressionStatement::setScope(lang::Scope* scope)
-{
-    expression_->setContainingScope(scope);
-}
-
-void ExpressionStatement::walkDefinitions()
-{
-    expression_->walkDefinitions();
 }
 
 void ExpressionStatement::validate(ValidationLogger& validation_logger)

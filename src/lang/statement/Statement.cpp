@@ -24,11 +24,19 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Statement::createBlocks(lang::Bas
     return blocks;
 }
 
-void Statement::setScope(lang::Scope*) {}
+void Statement::setScope(lang::Scope* scope)
+{
+    for (auto& subexpression : subexpressions_) { subexpression->setContainingScope(scope); }
+}
 
 lang::Scope* Statement::scope() const
 {
     return containing_scope_;
+}
+
+void Statement::walkDefinitions()
+{
+    for (auto& subexpression : subexpressions_) { subexpression->walkDefinitions(); }
 }
 
 lang::Location Statement::location() const
@@ -41,4 +49,10 @@ void Statement::build(CompileContext* context)
     context->setDebugLocation(location(), scope());
     doBuild(context);
     context->resetDebugLocation();
+}
+
+void Statement::addSubexpression(Expression& subexpression)
+{
+    subexpressions_.push_back(&subexpression);
+    addChild(subexpression);
 }

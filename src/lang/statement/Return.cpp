@@ -8,7 +8,7 @@ Return::Return(std::unique_ptr<Expression> return_value, lang::Location location
     : Statement(location)
     , return_value_(std::move(return_value))
 {
-    if (return_value_) addChild(*return_value_);
+    if (return_value_) addSubexpression(*return_value_);
 }
 
 Expression* Return::expression()
@@ -24,16 +24,6 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Return::createBlocks(lang::BasicB
     entry.link(*blocks.front());
 
     return blocks;
-}
-
-void Return::setScope(lang::Scope* scope)
-{
-    if (return_value_) return_value_->setContainingScope(scope);
-}
-
-void Return::walkDefinitions()
-{
-    if (return_value_) return_value_->walkDefinitions();
 }
 
 void Return::validate(ValidationLogger&)

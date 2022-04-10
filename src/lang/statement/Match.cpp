@@ -3,38 +3,45 @@
 #include "lang/construct/CodeBlock.h"
 #include "lang/construct/constant/Constant.h"
 #include "validation/ValidationLogger.h"
+#include "lang/expression/Expression.h"
 
-Match::Case* Match::Case::createDefault(std::unique_ptr<lang::CodeBlock> code)
+Case* Case::createDefault(std::unique_ptr<lang::CodeBlock> code)
 {
-    return new Match::Case(std::vector<std::unique_ptr<ConstantExpression>>(), std::move(code));
+    return new Case(std::vector<std::unique_ptr<ConstantExpression>>(), std::move(code));
 }
 
-Match::Case* Match::Case::createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions,
-                                     std::unique_ptr<lang::CodeBlock>                 code)
+Case* Case::createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions,
+                       std::unique_ptr<lang::CodeBlock>                 code)
 {
-    return new Match::Case(std::move(conditions), std::move(code));
+    return new Case(std::move(conditions), std::move(code));
 }
 
-Match::Case::Case(std::vector<std::unique_ptr<ConstantExpression>> conditions, std::unique_ptr<lang::CodeBlock> code)
+Case::Case(std::vector<std::unique_ptr<ConstantExpression>> conditions, std::unique_ptr<lang::CodeBlock> code)
     : conditions_(std::move(conditions))
     , code_(std::move(code))
-{}
+{
+    for (auto& condition : conditions_)
+    {
+        Expression* condition_expression = condition.get();
+        addChild(*condition_expression);
+    }
+}
 
-void Match::Case::setContainingScope(lang::Scope* scope)
+void Case::setContainingScope(lang::Scope* scope)
 {
     for (auto& condition : conditions_) { condition->setContainingScope(scope); }
 
     code_->createScopes(scope);
 }
 
-void Match::Case::walkDefinitions()
+void Case::walkDefinitions()
 {
     for (auto& condition : conditions_) { condition->walkDefinitions(); }
 
     code_->walkDefinitions();
 }
 
-std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> Match::Case::getConditions()
+std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> Case::getConditions()
 {
     std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> conditions;
 
@@ -46,7 +53,7 @@ std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> Match::Case::getCo
     return conditions;
 }
 
-bool Match::Case::validateConflicts(Match::Case* other, ValidationLogger& validation_logger)
+bool Case::validateConflicts(Case* other, ValidationLogger& validation_logger)
 {
     bool conflicts = false;
 
@@ -70,7 +77,7 @@ bool Match::Case::validateConflicts(Match::Case* other, ValidationLogger& valida
     return !conflicts;
 }
 
-bool Match::Case::validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger)
+bool Case::validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger)
 {
     coverage_count_ = static_cast<ssize_t>(conditions_.size());
 
@@ -103,19 +110,19 @@ bool Match::Case::validate(lang::ResolvingHandle<lang::Type> target_type, Valida
     return true;
 }
 
-ssize_t Match::Case::getCoverageCount()
+ssize_t Case::getCoverageCount()
 {
     if (conditions_.empty()) { return -1; }
     return coverage_count_;
 }
 
-Match::Match(std::vector<std::unique_ptr<Match::Case>> cases,
-             std::unique_ptr<Expression>               expression,
-             lang::Location                            location)
+Match::Match(std::vector<std::unique_ptr<Case>> cases, std::unique_ptr<Expression> expression, lang::Location location)
     : Statement(location)
     , expression_(std::move(expression))
     , cases_(std::move(cases))
-{}
+{
+    addSubexpression(*expression_);
+}
 
 Expression& Match::expression()
 {
@@ -140,14 +147,14 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Match::createBlocks(lang::BasicBl
 
 void Match::setScope(lang::Scope* scope)
 {
-    expression_->setContainingScope(scope);
+    Statement::setScope(scope);
 
     for (auto& case_ptr : cases_) { case_ptr->setContainingScope(scope); }
 }
 
 void Match::walkDefinitions()
 {
-    expression_->walkDefinitions();
+    Statement::walkDefinitions();
 
     for (auto& case_ptr : cases_) { case_ptr->walkDefinitions(); }
 }
@@ -156,8 +163,8 @@ bool Match::validateCases(ValidationLogger& validation_logger)
 {
     bool valid = true;
 
-    std::vector<Match::Case*> checked_cases;
-    ssize_t                   covered_cases = 0;
+    std::vector<Case*> checked_cases;
+    ssize_t            covered_cases = 0;
 
     for (auto& case_ptr : cases_)
     {

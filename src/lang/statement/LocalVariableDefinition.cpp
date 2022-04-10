@@ -26,7 +26,7 @@ LocalVariableDefinition::LocalVariableDefinition(std::string                    
 {
     assert(assigner.hasSymbol());
 
-    addChild(*assigned_);
+    addSubexpression(*assigned_);
 }
 
 const std::string& LocalVariableDefinition::identifier() const
@@ -51,14 +51,14 @@ Expression* LocalVariableDefinition::assigned() const
 
 void LocalVariableDefinition::setScope(lang::Scope* scope)
 {
-    assigned_->setContainingScope(scope);
+    Statement::setScope(scope);
 
     scope->asLocalScope()->prepareDefinition(identifier_);
 }
 
 void LocalVariableDefinition::walkDefinitions()
 {
-    assigned_->walkDefinitions();
+    Statement::walkDefinitions();
 
     variable_ = scope()->asLocalScope()->defineLocalVariable(identifier_,
                                                              type_,

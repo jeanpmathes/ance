@@ -52,7 +52,7 @@ LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string  
     , type_location_(type_location)
     , reference_(std::move(reference))
 {
-    addChild(*reference_);
+    addSubexpression(*reference_);
 }
 
 const std::string& LocalReferenceVariableDefinition::identifier() const
@@ -72,14 +72,14 @@ Expression& LocalReferenceVariableDefinition::reference() const
 
 void LocalReferenceVariableDefinition::setScope(lang::Scope* scope)
 {
-    reference_->setContainingScope(scope);
+    Statement::setScope(scope);
 
     scope->asLocalScope()->prepareDefinition(identifier_);
 }
 
 void LocalReferenceVariableDefinition::walkDefinitions()
 {
-    reference_->walkDefinitions();
+    Statement::walkDefinitions();
 
     variable_ = scope()->asLocalScope()->defineLocalVariable(identifier_,
                                                              type_,

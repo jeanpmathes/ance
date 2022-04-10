@@ -17,8 +17,8 @@ Assignment::Assignment(std::unique_ptr<Expression> assignable,
 {
     assert(assigner != lang::Assigner::REFERENCE_BINDING);
 
-    addChild(*assignable_);
-    addChild(*assigned_);
+    addSubexpression(*assignable_);
+    addSubexpression(*assigned_);
 }
 
 Expression& Assignment::assignable() const
@@ -34,18 +34,6 @@ lang::Assigner Assignment::assigner() const
 Expression& Assignment::assigned() const
 {
     return *assigned_;
-}
-
-void Assignment::setScope(lang::Scope* scope)
-{
-    assignable_->setContainingScope(scope);
-    assigned_->setContainingScope(scope);
-}
-
-void Assignment::walkDefinitions()
-{
-    assignable_->walkDefinitions();
-    assigned_->walkDefinitions();
 }
 
 void Assignment::validate(ValidationLogger& validation_logger)

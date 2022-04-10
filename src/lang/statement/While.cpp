@@ -9,7 +9,7 @@ While::While(std::unique_ptr<Expression> condition, std::unique_ptr<lang::CodeBl
     , condition_(std::move(condition))
     , block_(std::move(block))
 {
-    addChild(*condition_);
+    addSubexpression(*condition_);
 }
 
 Expression& While::condition()
@@ -28,14 +28,14 @@ std::vector<std::unique_ptr<lang::BasicBlock>> While::createBlocks(lang::BasicBl
 
 void While::setScope(lang::Scope* scope)
 {
-    condition_->setContainingScope(scope);
+    Statement::setScope(scope);
 
     block_->createScopes(scope);
 }
 
 void While::walkDefinitions()
 {
-    condition_->walkDefinitions();
+    Statement::walkDefinitions();
 
     block_->walkDefinitions();
 }

@@ -12,22 +12,12 @@ Assertion::Assertion(std::unique_ptr<Expression> condition, lang::Location locat
     : Statement(location)
     , condition_(std::move(condition))
 {
-    addChild(*condition_);
+    addSubexpression(*condition_);
 }
 
 Expression& Assertion::condition() const
 {
     return *condition_;
-}
-
-void Assertion::setScope(lang::Scope* scope)
-{
-    condition_->setContainingScope(scope);
-}
-
-void Assertion::walkDefinitions()
-{
-    condition_->walkDefinitions();
 }
 
 void Assertion::validate(ValidationLogger& validation_logger)
