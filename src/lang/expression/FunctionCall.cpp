@@ -14,7 +14,7 @@ FunctionCall::FunctionCall(lang::ResolvingHandle<lang::FunctionGroup> function_g
     , function_group_(std::move(function_group))
     , arguments_(std::move(arguments))
 {
-    for (auto& argument : arguments_) { addChild(*argument); }
+    for (auto& argument : arguments_) { addSubexpression(*argument); }
 }
 
 lang::ResolvingHandle<lang::FunctionGroup> FunctionCall::group() const
@@ -32,14 +32,9 @@ std::vector<std::reference_wrapper<Expression>> FunctionCall::arguments() const
     return arguments;
 }
 
-void FunctionCall::setScope(lang::Scope* scope)
-{
-    for (auto& arg : arguments_) { arg->setContainingScope(scope); }
-}
-
 void FunctionCall::walkDefinitions()
 {
-    for (auto& arg : arguments_) { arg->walkDefinitions(); }
+    Expression::walkDefinitions();
 
     scope()->registerUsage(function_group_);
 }

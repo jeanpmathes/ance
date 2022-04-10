@@ -8,22 +8,12 @@ SizeofExpression::SizeofExpression(std::unique_ptr<Expression> expression, lang:
     : Expression(location)
     , expression_(std::move(expression))
 {
-    addChild(*expression_);
+    addSubexpression(*expression_);
 }
 
 Expression& SizeofExpression::expression() const
 {
     return *expression_;
-}
-
-void SizeofExpression::setScope(lang::Scope* scope)
-{
-    expression_->setContainingScope(scope);
-}
-
-void SizeofExpression::walkDefinitions()
-{
-    expression_->walkDefinitions();
 }
 
 lang::ResolvingHandle<lang::Type> SizeofExpression::type()

@@ -32,8 +32,6 @@ class Parenthesis
     [[nodiscard]] std::shared_ptr<lang::Value> getValue() const override;
 
   protected:
-    void setScope(lang::Scope* scope) override;
-    void walkDefinitions() override;
     void doAssign(std::shared_ptr<lang::Value> value, CompileContext* context) override;
 
   private:

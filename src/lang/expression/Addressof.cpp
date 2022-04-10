@@ -9,22 +9,12 @@ Addressof::Addressof(std::unique_ptr<Expression> arg, lang::Location location)
     : Expression(location)
     , arg_(std::move(arg))
 {
-    addChild(*arg_);
+    addSubexpression(*arg_);
 }
 
 Expression& Addressof::argument() const
 {
     return *arg_;
-}
-
-void Addressof::setScope(lang::Scope* scope)
-{
-    arg_->setContainingScope(scope);
-}
-
-void Addressof::walkDefinitions()
-{
-    arg_->walkDefinitions();
 }
 
 lang::ResolvingHandle<lang::Type> Addressof::type()

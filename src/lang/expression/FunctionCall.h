@@ -36,7 +36,6 @@ class FunctionCall
     [[nodiscard]] std::vector<std::reference_wrapper<Expression>> arguments() const;
 
   protected:
-    void setScope(lang::Scope* scope) override;
     void walkDefinitions() override;
 
   public:

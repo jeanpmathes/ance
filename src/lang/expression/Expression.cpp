@@ -26,7 +26,15 @@ void Expression::setContainingScope(lang::Scope* scope)
     setScope(scope);
 }
 
-void Expression::setScope(lang::Scope*) {}
+void Expression::walkDefinitions()
+{
+    for (auto& subexpression : subexpressions_) { subexpression->walkDefinitions(); }
+}
+
+void Expression::setScope(lang::Scope* scope)
+{
+    for (auto& subexpression : subexpressions_) { subexpression->setContainingScope(scope); }
+}
 
 bool Expression::isNamed()
 {
@@ -70,4 +78,10 @@ void Expression::doAssign(std::shared_ptr<lang::Value> value, CompileContext* co
     value->buildContentValue(context);
 
     context->ir()->CreateStore(value->getContentValue(), expression_return->getContentValue());
+}
+
+void Expression::addSubexpression(Expression& subexpression)
+{
+    subexpressions_.push_back(&subexpression);
+    addChild(subexpression);
 }

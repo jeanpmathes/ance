@@ -21,22 +21,12 @@ BindRef::BindRef(std::unique_ptr<Expression> address, lang::Location location)
     : Expression(location)
     , address_(std::move(address))
 {
-    addChild(*address_);
+    addSubexpression(*address_);
 }
 
 Expression& BindRef::address() const
 {
     return *address_;
-}
-
-void BindRef::setScope(lang::Scope* scope)
-{
-    address_->setContainingScope(scope);
-}
-
-void BindRef::walkDefinitions()
-{
-    address_->walkDefinitions();
 }
 
 lang::ResolvingHandle<lang::Type> BindRef::type()

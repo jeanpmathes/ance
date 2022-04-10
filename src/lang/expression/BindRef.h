@@ -29,11 +29,6 @@ class BindRef
   public:
     [[nodiscard]] Expression& address() const;
 
-  protected:
-    void setScope(lang::Scope* scope) override;
-    void walkDefinitions() override;
-
-  public:
     lang::ResolvingHandle<lang::Type> type() override;
 
     bool validate(ValidationLogger& validation_logger) override;

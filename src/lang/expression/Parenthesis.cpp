@@ -4,7 +4,7 @@ Parenthesis::Parenthesis(std::unique_ptr<Expression> expression, lang::Location 
     : Expression(location)
     , expression_(std::move(expression))
 {
-    addChild(*expression_);
+    addSubexpression(*expression_);
 }
 
 Expression& Parenthesis::contained() const
@@ -37,16 +37,6 @@ lang::ResolvingHandle<lang::Type> Parenthesis::type()
 std::shared_ptr<lang::Value> Parenthesis::getValue() const
 {
     return expression_->getValue();
-}
-
-void Parenthesis::setScope(lang::Scope* scope)
-{
-    expression_->setContainingScope(scope);
-}
-
-void Parenthesis::walkDefinitions()
-{
-    expression_->walkDefinitions();
 }
 
 void Parenthesis::doAssign(std::shared_ptr<lang::Value> value, CompileContext* context)

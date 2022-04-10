@@ -8,8 +8,8 @@ Subscript::Subscript(std::unique_ptr<Expression> indexed, std::unique_ptr<Expres
     , indexed_(std::move(indexed))
     , index_(std::move(index))
 {
-    addChild(*indexed_);
-    addChild(*index_);
+    addSubexpression(*indexed_);
+    addSubexpression(*index_);
 }
 
 Expression& Subscript::indexed() const
@@ -20,18 +20,6 @@ Expression& Subscript::indexed() const
 Expression& Subscript::index() const
 {
     return *index_;
-}
-
-void Subscript::setScope(lang::Scope* scope)
-{
-    indexed_->setContainingScope(scope);
-    index_->setContainingScope(scope);
-}
-
-void Subscript::walkDefinitions()
-{
-    indexed_->walkDefinitions();
-    index_->walkDefinitions();
 }
 
 lang::ResolvingHandle<lang::Type> Subscript::type()

@@ -24,8 +24,6 @@ class ConstantLiteral
     [[nodiscard]] lang::Constant&     constant() const;
     lang::ResolvingHandle<lang::Type> type() override;
 
-    void walkDefinitions() override;
-
     bool validate(ValidationLogger& validation_logger) override;
 
     [[nodiscard]] std::shared_ptr<lang::Constant> getConstantValue() const override;

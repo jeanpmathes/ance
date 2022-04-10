@@ -16,8 +16,6 @@ lang::ResolvingHandle<lang::Type> SizeofType::targetType() const
     return type_;
 }
 
-void SizeofType::setScope(lang::Scope*) {}
-
 void SizeofType::walkDefinitions()
 {
     scope()->addType(type_);

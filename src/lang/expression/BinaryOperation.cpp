@@ -11,8 +11,8 @@ BinaryOperation::BinaryOperation(std::unique_ptr<Expression> left,
     , op_(op)
     , right_(std::move(right))
 {
-    addChild(*left_);
-    addChild(*right_);
+    addSubexpression(*left_);
+    addSubexpression(*right_);
 }
 
 Expression& BinaryOperation::left() const
@@ -28,18 +28,6 @@ Expression& BinaryOperation::right() const
 lang::BinaryOperator BinaryOperation::op() const
 {
     return op_;
-}
-
-void BinaryOperation::setScope(lang::Scope* scope)
-{
-    left_->setContainingScope(scope);
-    right_->setContainingScope(scope);
-}
-
-void BinaryOperation::walkDefinitions()
-{
-    left_->walkDefinitions();
-    right_->walkDefinitions();
 }
 
 lang::ResolvingHandle<lang::Type> BinaryOperation::type()

@@ -24,11 +24,6 @@ class Subscript
     [[nodiscard]] Expression& indexed() const;
     [[nodiscard]] Expression& index() const;
 
-  protected:
-    void setScope(lang::Scope* scope) override;
-    void walkDefinitions() override;
-
-  public:
     lang::ResolvingHandle<lang::Type> type() override;
 
     bool validate(ValidationLogger& validation_logger) override;

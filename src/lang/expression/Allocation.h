@@ -35,7 +35,6 @@ class Allocation
     [[nodiscard]] Expression*                       count() const;
 
   protected:
-    void setScope(lang::Scope* scope) override;
     void walkDefinitions() override;
 
   public:

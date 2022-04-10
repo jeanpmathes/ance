@@ -43,7 +43,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     /**
      * Walk all ordered definitions and declarations, as well as the usage of resolvable entities.
      */
-    virtual void walkDefinitions() = 0;
+    virtual void walkDefinitions();
 
     /**
      * Get whether this expression is a named value source.
@@ -97,9 +97,17 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
 
     virtual void doAssign(std::shared_ptr<lang::Value> value, CompileContext* context);
 
+    /**
+     * Add a subexpression to this expression.
+     * @param subexpression The subexpression to add.
+     */
+    void addSubexpression(Expression& subexpression);
+
   private:
     lang::Location location_;
     lang::Scope*   containing_scope_ {nullptr};
+
+    std::vector<Expression*> subexpressions_;
 };
 
 #endif

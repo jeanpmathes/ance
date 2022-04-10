@@ -26,7 +26,6 @@ class SizeofType
     [[nodiscard]] lang::ResolvingHandle<lang::Type> targetType() const;
 
   protected:
-    void setScope(lang::Scope* scope) override;
     void walkDefinitions() override;
 
   public:

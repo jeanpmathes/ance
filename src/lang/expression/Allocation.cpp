@@ -18,7 +18,7 @@ Allocation::Allocation(Runtime::Allocator                allocation,
     , count_(std::move(count))
     , return_type_(lang::PointerType::get(type))
 {
-    if (count_) addChild(*count_);
+    if (count_) addSubexpression(*count_);
 }
 
 Runtime::Allocator Allocation::allocator() const
@@ -36,14 +36,9 @@ Expression* Allocation::count() const
     return count_.get();
 }
 
-void Allocation::setScope(lang::Scope* scope)
-{
-    if (count_) count_->setContainingScope(scope);
-}
-
 void Allocation::walkDefinitions()
 {
-    if (count_) count_->walkDefinitions();
+    Expression::walkDefinitions();
 
     scope()->addType(allocated_type_);
 }
