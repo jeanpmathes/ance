@@ -6,7 +6,6 @@
 private std_out: Handle;
 private null_ptr: uiptr;
 
-define bool as i1;
 define Handle as *void;
 
 public main () : ui32

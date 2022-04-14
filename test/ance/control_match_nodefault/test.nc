@@ -6,14 +6,13 @@
 private std_out: Handle;
 private null_ptr: uiptr;
 
-define bool as i1;
 define Handle as *void;
 
 public main () : ui32
 {
     std_out <: GetStdHandle(4294967285:32);
 
-    let value: i1 <: true;
+    let value: bool <: true;
 
     match value with
     {
