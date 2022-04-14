@@ -1,8 +1,8 @@
 #include "BooleanConstant.h"
 
-#include "lang/type/IntegerType.h"
+#include "lang/type/BooleanType.h"
 
-lang::BooleanConstant::BooleanConstant(bool boolean) : type_(lang::IntegerType::getBooleanType()), boolean_(boolean) {}
+lang::BooleanConstant::BooleanConstant(bool boolean) : type_(lang::BooleanType::get()), boolean_(boolean) {}
 
 std::string lang::BooleanConstant::toString() const
 {

@@ -274,6 +274,7 @@ arrayType
 keywordType
     : floatingPointType
     | targetDependentType
+    | booleanType
     | voidType
     ;
 
@@ -289,6 +290,10 @@ targetDependentType
     | 'diff'
     | 'uiptr'
     ;
+
+booleanType
+	: 'bool'
+	;
 
 voidType
 	: 'void'

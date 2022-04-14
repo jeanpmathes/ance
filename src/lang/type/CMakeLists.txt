@@ -14,4 +14,5 @@ target_sources(ance PRIVATE
                FloatingPointType.cpp
                TypeDefinition.cpp
                TypeClone.cpp
-               TypeAlias.cpp)
+               TypeAlias.cpp
+               BooleanType.cpp)

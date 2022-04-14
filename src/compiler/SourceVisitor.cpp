@@ -12,6 +12,7 @@
 #include "lang/type/QuadType.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SingleType.h"
+#include "lang/type/BooleanType.h"
 #include "lang/type/VoidType.h"
 
 #include "lang/statement/Assignment.h"
@@ -634,6 +635,11 @@ antlrcpp::Any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ct
 
     lang::ResolvingHandle<lang::Type> type = lang::IntegerType::get(size, !is_unsigned);
     return type;
+}
+
+antlrcpp::Any SourceVisitor::visitBooleanType(anceParser::BooleanTypeContext*)
+{
+    return lang::BooleanType::get();
 }
 
 antlrcpp::Any SourceVisitor::visitArrayType(anceParser::ArrayTypeContext* ctx)

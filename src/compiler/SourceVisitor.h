@@ -80,6 +80,7 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitSignedInteger(anceParser::SignedIntegerContext* ctx) override;
     antlrcpp::Any visitSpecialInteger(anceParser::SpecialIntegerContext* ctx) override;
     antlrcpp::Any visitIntegerType(anceParser::IntegerTypeContext* ctx) override;
+    antlrcpp::Any visitBooleanType(anceParser::BooleanTypeContext* ctx) override;
     antlrcpp::Any visitArrayType(anceParser::ArrayTypeContext* ctx) override;
     antlrcpp::Any visitKeywordType(anceParser::KeywordTypeContext* ctx) override;
     antlrcpp::Any visitPointer(anceParser::PointerContext* ctx) override;

@@ -1,7 +1,7 @@
 #include "FloatingPointType.h"
 
 #include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/type/IntegerType.h"
+#include "lang/type/BooleanType.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
 #include "lang/utility/Values.h"
@@ -88,7 +88,7 @@ lang::ResolvingHandle<lang::Type> lang::FloatingPointType::getOperatorResultType
                                                                                  lang::ResolvingHandle<lang::Type>)
 {
     if (op.isArithmetic()) return self()->getActualType();
-    if (op.isRelational() || op.isEquality()) return lang::IntegerType::getBooleanType();
+    if (op.isRelational() || op.isEquality()) return lang::BooleanType::get();
 
     return lang::VoidType::get();
 }

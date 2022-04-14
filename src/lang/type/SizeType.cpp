@@ -1,9 +1,8 @@
 #include "SizeType.h"
 
 #include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/scope/GlobalScope.h"
-#include "lang/type/IntegerType.h"
 #include "lang/type/VoidType.h"
+#include "lang/type/BooleanType.h"
 #include "lang/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
@@ -69,7 +68,7 @@ lang::ResolvingHandle<lang::Type> lang::SizeType::getOperatorResultType(lang::Bi
                                                                         lang::ResolvingHandle<lang::Type>)
 {
     if (op.isArithmetic()) return self()->getActualType();
-    if (op.isRelational() || op.isEquality()) return lang::IntegerType::getBooleanType();
+    if (op.isRelational() || op.isEquality()) return lang::BooleanType::get();
 
     return lang::VoidType::get();
 }

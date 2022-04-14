@@ -27,8 +27,6 @@ namespace lang
         [[nodiscard]] bool isIntegerType() const override;
         [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
 
-        [[nodiscard]] bool isBooleanType() const override;
-
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
@@ -77,12 +75,6 @@ namespace lang
          * @return The instance.
          */
         static lang::ResolvingHandle<lang::Type> get(uint64_t bit_size, bool is_signed);
-
-        /**
-         * Get the boolean type. This is an integer type with size 1.
-         * @return The boolean type.
-         */
-        static lang::ResolvingHandle<lang::Type> getBooleanType();
     };
 }
 

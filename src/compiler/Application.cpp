@@ -17,6 +17,7 @@
 #include "lang/type/SizeType.h"
 #include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/type/VoidType.h"
+#include "lang/type/BooleanType.h"
 #include "management/File.h"
 #include "validation/ValidationLogger.h"
 
@@ -30,6 +31,7 @@ Application::Application(data::File& project) : project_(project), global_scope_
     global_scope_->registerDefinition(lang::QuadType::get());
 
     global_scope_->registerDefinition(lang::VoidType::get());
+    global_scope_->registerDefinition(lang::BooleanType::get());
     global_scope_->registerDefinition(lang::SizeType::getSize());
     global_scope_->registerDefinition(lang::SizeType::getDiff());
     global_scope_->registerDefinition(lang::UnsignedIntegerPointerType::get());

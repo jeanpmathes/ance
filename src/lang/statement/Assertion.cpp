@@ -6,7 +6,7 @@
 #include "compiler/Runtime.h"
 #include "validation/ValidationLogger.h"
 #include "lang/type/Type.h"
-#include "lang/type/IntegerType.h"
+#include "lang/type/BooleanType.h"
 
 Assertion::Assertion(std::unique_ptr<Expression> condition, lang::Location location)
     : Statement(location)
@@ -25,10 +25,7 @@ void Assertion::validate(ValidationLogger& validation_logger)
     bool is_valid = condition_->validate(validation_logger);
     if (!is_valid) return;
 
-    lang::Type::checkMismatch(lang::IntegerType::getBooleanType(),
-                              condition_->type(),
-                              condition_->location(),
-                              validation_logger);
+    lang::Type::checkMismatch(lang::BooleanType::get(), condition_->type(), condition_->location(), validation_logger);
 }
 
 void Assertion::doBuild(CompileContext* context)

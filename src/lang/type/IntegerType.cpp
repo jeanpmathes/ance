@@ -3,6 +3,7 @@
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/VoidType.h"
+#include "lang/type/BooleanType.h"
 #include "lang/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
@@ -113,7 +114,7 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang:
                                                                            lang::ResolvingHandle<lang::Type>)
 {
     if (op.isArithmetic()) return self()->getActualType();
-    if (op.isRelational() || op.isEquality()) return lang::IntegerType::getBooleanType();
+    if (op.isRelational() || op.isEquality()) return lang::BooleanType::get();
 
     return lang::VoidType::get();
 }
@@ -218,11 +219,6 @@ lang::TypeRegistry<std::pair<uint64_t, bool>>& lang::IntegerType::getIntegerType
     return integer_types;
 }
 
-bool lang::IntegerType::isBooleanType() const
-{
-    return bit_size_ == 1;
-}
-
 lang::TypeDefinitionRegistry* lang::IntegerType::getRegistry()
 {
     return &getIntegerTypes();
@@ -244,9 +240,4 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::get(uint64_t bit_size, bool
 
         return type;
     }
-}
-
-lang::ResolvingHandle<lang::Type> lang::IntegerType::getBooleanType()
-{
-    return get(1, true);// Use true so that i1 instead of ui1 can be used. (it is shorter)
 }

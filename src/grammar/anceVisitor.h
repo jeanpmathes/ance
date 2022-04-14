@@ -190,6 +190,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitTargetDependentType(anceParser::TargetDependentTypeContext* context) = 0;
 
+    virtual antlrcpp::Any visitBooleanType(anceParser::BooleanTypeContext* context) = 0;
+
     virtual antlrcpp::Any visitVoidType(anceParser::VoidTypeContext* context) = 0;
 
     virtual antlrcpp::Any visitCustomType(anceParser::CustomTypeContext* context) = 0;

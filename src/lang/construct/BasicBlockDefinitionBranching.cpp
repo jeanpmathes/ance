@@ -5,7 +5,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/construct/value/Value.h"
 #include "lang/expression/Expression.h"
-#include "lang/type/IntegerType.h"
+#include "lang/type/BooleanType.h"
 
 lang::BasicBlock::Definition::Branching::Branching(Expression* condition) : condition_(condition) {}
 
@@ -84,7 +84,7 @@ bool lang::BasicBlock::Definition::Branching::validate(ValidationLogger& validat
 
     valid &= condition_->validate(validation_logger);
     valid &= valid
-          && lang::Type::checkMismatch(lang::IntegerType::getBooleanType(),
+          && lang::Type::checkMismatch(lang::BooleanType::get(),
                                        condition_->type(),
                                        condition_->location(),
                                        validation_logger);
@@ -148,9 +148,8 @@ void lang::BasicBlock::Definition::Branching::doBuild(CompileContext* context)
 
     for (auto& statement : statements_) { statement->build(context); }
 
-    std::shared_ptr<lang::Value> truth = condition_->getValue();
-    std::shared_ptr<lang::Value> boolean_truth =
-        lang::Type::makeMatching(lang::IntegerType::getBooleanType(), truth, context);
+    std::shared_ptr<lang::Value> truth         = condition_->getValue();
+    std::shared_ptr<lang::Value> boolean_truth = lang::Type::makeMatching(lang::BooleanType::get(), truth, context);
 
     boolean_truth->buildContentValue(context);
 

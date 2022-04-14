@@ -292,6 +292,8 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
+    virtual antlrcpp::Any visitBooleanType(anceParser::BooleanTypeContext* ctx) override { return visitChildren(ctx); }
+
     virtual antlrcpp::Any visitVoidType(anceParser::VoidTypeContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitCustomType(anceParser::CustomTypeContext* ctx) override { return visitChildren(ctx); }
