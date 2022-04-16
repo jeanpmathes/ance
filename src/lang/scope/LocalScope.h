@@ -49,21 +49,21 @@ namespace lang
 
         /**
          * Define a local variable. Parameters are not local variables and should be define in function scope.
+         * If the name is already defined, the old variable will be dropped.
          * @param identifier The identifier.
          * @param type The type.
          * @param type_location The location of the type.
          * @param assigner The assigner to use for initial assignment.
          * @param value The initial value.
          * @param location The source location.
-         * @return The defined variable or nothing if defining is not possible.
+         * @return The defined variable.
          */
-        std::optional<lang::ResolvingHandle<lang::Variable>> defineLocalVariable(
-            const std::string&                  identifier,
-            lang::ResolvingHandle<lang::Type>   type,
-            lang::Location                      type_location,
-            lang::Assigner                      assigner,
-            const std::shared_ptr<lang::Value>& value,
-            lang::Location                      location);
+        lang::ResolvingHandle<lang::Variable> defineLocalVariable(const std::string&                  identifier,
+                                                                  lang::ResolvingHandle<lang::Type>   type,
+                                                                  lang::Location                      type_location,
+                                                                  lang::Assigner                      assigner,
+                                                                  const std::shared_ptr<lang::Value>& value,
+                                                                  lang::Location                      location);
 
         void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
         void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
@@ -97,9 +97,11 @@ namespace lang
 
         std::set<std::string> blockers_ {};
 
-        std::map<std::string, lang::OwningHandle<lang::Variable>> undefined_variables_ {};
-        std::map<std::string, lang::OwningHandle<lang::Variable>> blocked_variables_ {};
-        std::map<std::string, lang::OwningHandle<lang::Variable>> defined_local_variables_ {};
+        std::map<std::string, lang::OwningHandle<lang::Variable>>              undefined_variables_ {};
+        std::map<std::string, lang::OwningHandle<lang::Variable>>              blocked_variables_ {};
+        std::map<std::string, std::vector<lang::OwningHandle<lang::Variable>>> defined_local_variables_ {};
+
+        std::map<std::string, lang::ResolvingHandle<lang::Variable>> active_variables_ {};
 
         std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_ {};
         std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> blocked_function_groups_ {};

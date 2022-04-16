@@ -72,41 +72,34 @@ void LocalVariableDefinition::walkDefinitions()
 
 void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
 {
-    if (variable_)
+    assert(variable_);
+    auto variable = *variable_;
+
+    bool assigned_is_valid = assigned_->validate(validation_logger);
+    if (!assigned_is_valid) return;
+
+    if (!variable->type()->isDefined())
     {
-        auto variable = *variable_;
+        validation_logger.logError("Type " + variable->type()->getAnnotatedName() + " not defined", type_location_);
 
-        bool assigned_is_valid = assigned_->validate(validation_logger);
-        if (!assigned_is_valid) return;
-
-        if (!variable->type()->isDefined())
-        {
-            validation_logger.logError("Type " + variable->type()->getAnnotatedName() + " not defined", type_location_);
-
-            return;
-        }
-
-        if (!variable->type()->validate(validation_logger, type_location_)) return;
-
-        if (type_->isVoidType())
-        {
-            validation_logger.logError("Local variable cannot have 'void' type", type_location_);
-            return;
-        }
-
-        if (type_->isReferenceType())
-        {
-            validation_logger.logError("Cannot declare variable of reference type without binding to a value",
-                                       location());
-            return;
-        }
-
-        lang::Type::checkMismatch(variable->type(), assigned_->type(), assigned_->location(), validation_logger);
+        return;
     }
-    else
+
+    if (!variable->type()->validate(validation_logger, type_location_)) return;
+
+    if (type_->isVoidType())
     {
-        validation_logger.logError("Name '" + identifier_ + "' already defined in the current context", location());
+        validation_logger.logError("Local variable cannot have 'void' type", type_location_);
+        return;
     }
+
+    if (type_->isReferenceType())
+    {
+        validation_logger.logError("Cannot declare variable of reference type without binding to a value", location());
+        return;
+    }
+
+    lang::Type::checkMismatch(variable->type(), assigned_->type(), assigned_->location(), validation_logger);
 }
 
 void LocalVariableDefinition::doBuild(CompileContext* context)
