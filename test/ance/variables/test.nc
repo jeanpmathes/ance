@@ -9,7 +9,7 @@ private g1: ui32 <: 100:32;
 private g2: ui32;
 
 // Global variables can be declared as constant, in which case the initial value is not optional.
-private const g3: ui32:= 100:32;
+private const g3: ui32 := 100:32;
 
 public main () : ui32
 {
