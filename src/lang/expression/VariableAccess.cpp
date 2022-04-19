@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "lang/scope/Scope.h"
+#include "lang/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
 
 VariableAccess::VariableAccess(lang::ResolvingHandle<lang::Variable> variable, lang::Location location)
@@ -32,6 +33,12 @@ bool VariableAccess::isNamed()
 
 bool VariableAccess::validate(ValidationLogger& validation_logger)
 {
+    if (!variable_->isDefined() && scope()->asLocalScope()->wasVariableDropped(variable_))
+    {
+        validation_logger.logError("Variable with name '" + variable_->identifier() + "' was dropped", location());
+        return false;
+    }
+
     return variable_->validateGetValue(validation_logger, location());
 }
 
@@ -39,8 +46,13 @@ bool VariableAccess::validateAssignment(const std::shared_ptr<lang::Value>& valu
                                         lang::Location                      value_location,
                                         ValidationLogger&                   validation_logger)
 {
-    variable_->validateSetValue(value, validation_logger, location(), value_location);
-    return true;
+    if (!variable_->isDefined() && scope()->asLocalScope()->wasVariableDropped(variable_))
+    {
+        validation_logger.logError("Variable with name '" + variable_->identifier() + "' was dropped", location());
+        return false;
+    }
+
+    return variable_->validateSetValue(value, validation_logger, location(), value_location);
 }
 
 void VariableAccess::doBuild(CompileContext* context)

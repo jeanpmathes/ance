@@ -72,6 +72,13 @@ namespace lang
          */
         bool drop(lang::ResolvingHandle<lang::Variable> variable);
 
+        /**
+         * Check if a variable with the specified identifier was defined and then dropped.
+         * @param variable The variable to check.
+         * @return True if the variable was dropped, false otherwise.
+         */
+        bool wasVariableDropped(lang::ResolvingHandle<lang::Variable> variable) const;
+
         void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
         void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
         void registerUsage(lang::ResolvingHandle<lang::Type> type) override;

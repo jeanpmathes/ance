@@ -111,7 +111,7 @@ bool lang::Variable::validateGetValue(ValidationLogger& validation_logger, lang:
     return true;
 }
 
-void lang::Variable::validateSetValue(const std::shared_ptr<lang::Value>& value,
+bool lang::Variable::validateSetValue(const std::shared_ptr<lang::Value>& value,
                                       ValidationLogger&                   validation_logger,
                                       lang::Location                      assignable_location,
                                       lang::Location                      assigned_location) const
@@ -120,20 +120,20 @@ void lang::Variable::validateSetValue(const std::shared_ptr<lang::Value>& value,
     {
         validation_logger.logError("Name '" + identifier() + "' not defined in the current context",
                                    assignable_location);
-        return;// The following variable methods require that the variable is defined.
+        return false;// The following variable methods require that the variable is defined.
     }
 
     if (isFinal())
     {
         validation_logger.logError("Cannot assign to final variable '" + identifier() + "'", assignable_location);
-        return;// Type mismatch is not relevant if assignment is not allowed no matter what.
+        return false;// Type mismatch is not relevant if assignment is not allowed no matter what.
     }
 
     lang::ResolvingHandle<lang::Type> target_type = type();
 
     if (type()->isReferenceType()) { target_type = type()->getElementType(); }
 
-    lang::Type::checkMismatch(target_type, value->type(), assigned_location, validation_logger);
+    return lang::Type::checkMismatch(target_type, value->type(), assigned_location, validation_logger);
 }
 
 std::shared_ptr<lang::Value> lang::Variable::getValue(CompileContext* context)

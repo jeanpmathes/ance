@@ -140,7 +140,7 @@ namespace lang
          * @param assignable_location The source location of the assignable.
          * @param assigned_location The source location of the value that is assigned to the assignable.
          */
-        void validateSetValue(const std::shared_ptr<lang::Value>& value,
+        bool validateSetValue(const std::shared_ptr<lang::Value>& value,
                               ValidationLogger&                   validation_logger,
                               lang::Location                      assignable_location,
                               lang::Location                      assigned_location) const;

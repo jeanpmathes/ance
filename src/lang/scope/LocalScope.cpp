@@ -66,6 +66,12 @@ bool lang::LocalScope::drop(lang::ResolvingHandle<lang::Variable> variable)
     return true;
 }
 
+bool lang::LocalScope::wasVariableDropped(lang::ResolvingHandle<lang::Variable> variable) const
+{
+    return !active_variables_.contains(variable->identifier())
+        && defined_local_variables_.contains(variable->identifier());
+}
+
 void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Variable> variable)
 {
     assert(!variable->isDefined());
