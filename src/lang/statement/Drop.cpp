@@ -4,6 +4,7 @@
 
 #include "lang/scope/LocalScope.h"
 #include "lang/scope/Scope.h"
+#include "validation/ValidationLogger.h"
 
 Drop::Drop(lang::ResolvingHandle<lang::Variable> variable, lang::Location location)
     : Statement(location)
@@ -18,12 +19,25 @@ lang::ResolvingHandle<lang::Variable> Drop::variable() const
 void Drop::walkDefinitions()
 {
     scope()->registerUsage(variable_);
-    scope()->asLocalScope()->drop(variable_);
+    dropped_ = scope()->asLocalScope()->drop(variable_);
 }
 
-void Drop::validate(ValidationLogger&)
+void Drop::validate(ValidationLogger& validation_logger)
 {
-    // todo
+    if (!variable_->isDefined())
+    {
+        validation_logger.logError("Name '" + variable_->identifier() + "' not defined in the current context",
+                                   location());
+        return;
+    }
+
+    if (!dropped_)
+    {
+        validation_logger.logError("Cannot drop variable '" + variable_->identifier()
+                                       + "' which is declared in outer scope",
+                                   location());
+        return;
+    }
 }
 
 void Drop::doBuild(CompileContext*)

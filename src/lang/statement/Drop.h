@@ -35,5 +35,6 @@ class Drop
 
   private:
     lang::ResolvingHandle<lang::Variable> variable_;
+    bool                                  dropped_;
 };
 #endif
