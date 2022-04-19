@@ -44,6 +44,7 @@ class Delete;
 class ExpressionStatement;
 class LocalReferenceVariableDefinition;
 class LocalVariableDefinition;
+class Drop;
 class Return;
 class If;
 class While;
@@ -55,5 +56,6 @@ class Case;
         lang::CodeBlock, lang::Variable, lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation,             \
         BinaryOperation, BindRef, ConstantLiteral, DefaultValue, FunctionCall, Parenthesis, SizeofExpression,          \
         SizeofType, Subscript, VariableAccess, lang::GlobalScope, lang::LocalScope, Assertion, Assignment, Delete,     \
-        ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Return, If, While, Match, Case
+        ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Drop, Return, If, While,       \
+        Match, Case
 #endif

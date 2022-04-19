@@ -20,6 +20,7 @@
 #include "lang/statement/ExpressionStatement.h"
 #include "lang/statement/LocalReferenceVariableDefinition.h"
 #include "lang/statement/LocalVariableDefinition.h"
+#include "lang/statement/Drop.h"
 #include "lang/statement/Return.h"
 #include "lang/statement/Assertion.h"
 #include "lang/statement/If.h"
@@ -275,6 +276,15 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
                                                                          std::unique_ptr<Expression>(address),
                                                                          location(ctx));
 
+    return lang::CodeBlock::wrapStatement(std::move(statement));
+}
+
+antlrcpp::Any SourceVisitor::visitDropStatement(anceParser::DropStatementContext* ctx)
+{
+    std::string identifier = ctx->IDENTIFIER()->getText();
+    auto        variable   = lang::makeHandled<lang::Variable>(identifier);
+
+    auto statement = std::make_unique<Drop>(variable, location(ctx));
     return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 

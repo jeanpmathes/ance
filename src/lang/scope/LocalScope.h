@@ -65,6 +65,13 @@ namespace lang
                                                                   const std::shared_ptr<lang::Value>& value,
                                                                   lang::Location                      location);
 
+        /**
+         * Drop a variable. A variable must be defined in this scope to be dropped.
+         * @param variable The variable to drop.
+         * @return True if the variable was dropped, false otherwise.
+         */
+        bool drop(lang::ResolvingHandle<lang::Variable> variable);
+
         void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
         void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
         void registerUsage(lang::ResolvingHandle<lang::Type> type) override;

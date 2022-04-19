@@ -43,6 +43,7 @@ namespace lang
 #include "lang/statement/ExpressionStatement.h"
 #include "lang/statement/LocalReferenceVariableDefinition.h"
 #include "lang/statement/LocalVariableDefinition.h"
+#include "lang/statement/Drop.h"
 #include "lang/statement/Return.h"
 #include "lang/statement/If.h"
 #include "lang/statement/While.h"

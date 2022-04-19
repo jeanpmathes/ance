@@ -52,6 +52,7 @@ statement
 	: expressionStatement
 	| localVariableDefinition
 	| localReferenceDefinition
+	| dropStatement
 	| assignment
 	| deleteStatement
 	| returnStatement
@@ -72,6 +73,10 @@ localVariableDefinition
 localReferenceDefinition
     : 'let' IDENTIFIER ':' type 'ref' expression ';' # LocalReferenceToValueDefinition
     | 'let' IDENTIFIER ':' type 'ref' 'to' expression ';' # LocalReferenceToPointerDefinition
+    ;
+
+dropStatement
+    : 'drop' IDENTIFIER ';'
     ;
 
 assignment

@@ -75,6 +75,11 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
+    virtual antlrcpp::Any visitDropStatement(anceParser::DropStatementContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
     virtual antlrcpp::Any visitAssignment(anceParser::AssignmentContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitCopyAssignment(anceParser::CopyAssignmentContext* ctx) override
