@@ -72,26 +72,27 @@ class anceParser : public antlr4::Parser
         T__59               = 60,
         T__60               = 61,
         T__61               = 62,
-        NATIVE_INTEGER_TYPE = 63,
-        SIGNED_INTEGER      = 64,
-        HEX_INTEGER         = 65,
-        BIN_INTEGER         = 66,
-        OCT_INTEGER         = 67,
-        HALF                = 68,
-        SINGLE              = 69,
-        DOUBLE              = 70,
-        QUAD                = 71,
-        DECIMAL             = 72,
-        STRING              = 73,
-        BYTE                = 74,
-        INTEGER             = 75,
-        BUFFER              = 76,
-        CONST               = 77,
-        IDENTIFIER          = 78,
-        SEMICOLON           = 79,
-        WHITESPACE          = 80,
-        BLOCK_COMMENT       = 81,
-        LINE_COMMENT        = 82
+        T__62               = 63,
+        NATIVE_INTEGER_TYPE = 64,
+        SIGNED_INTEGER      = 65,
+        HEX_INTEGER         = 66,
+        BIN_INTEGER         = 67,
+        OCT_INTEGER         = 68,
+        HALF                = 69,
+        SINGLE              = 70,
+        DOUBLE              = 71,
+        QUAD                = 72,
+        DECIMAL             = 73,
+        STRING              = 74,
+        BYTE                = 75,
+        INTEGER             = 76,
+        BUFFER              = 77,
+        CONST               = 78,
+        IDENTIFIER          = 79,
+        SEMICOLON           = 80,
+        WHITESPACE          = 81,
+        BLOCK_COMMENT       = 82,
+        LINE_COMMENT        = 83
     };
 
     enum
@@ -816,6 +817,16 @@ class anceParser : public antlr4::Parser
 
         SizeofTypeContext*       sizeofType();
         SizeofExpressionContext* sizeofExpression();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class NotOperationContext : public ExpressionContext
+    {
+      public:
+        NotOperationContext(ExpressionContext* ctx);
+
+        ExpressionContext* expression();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };

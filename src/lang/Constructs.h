@@ -22,6 +22,7 @@ namespace lang
 class Addressof;
 class Allocation;
 class BinaryOperation;
+class UnaryOperation;
 class BindRef;
 class ConstantLiteral;
 class DefaultValue;
@@ -54,8 +55,8 @@ class Case;
 #define ANCE_CONSTRUCTS                                                                                                \
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::BasicBlock,    \
         lang::CodeBlock, lang::Variable, lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation,             \
-        BinaryOperation, BindRef, ConstantLiteral, DefaultValue, FunctionCall, Parenthesis, SizeofExpression,          \
-        SizeofType, Subscript, VariableAccess, lang::GlobalScope, lang::LocalScope, Assertion, Assignment, Delete,     \
-        ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Drop, Return, If, While,       \
-        Match, Case
+        BinaryOperation, UnaryOperation, BindRef, ConstantLiteral, DefaultValue, FunctionCall, Parenthesis,            \
+        SizeofExpression, SizeofType, Subscript, VariableAccess, lang::GlobalScope, lang::LocalScope, Assertion,       \
+        Assignment, Delete, ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Drop,      \
+        Return, If, While, Match, Case
 #endif

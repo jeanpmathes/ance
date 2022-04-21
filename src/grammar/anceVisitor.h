@@ -98,6 +98,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitSizeOf(anceParser::SizeOfContext* context) = 0;
 
+    virtual antlrcpp::Any visitNotOperation(anceParser::NotOperationContext* context) = 0;
+
     virtual antlrcpp::Any visitSubscript(anceParser::SubscriptContext* context) = 0;
 
     virtual antlrcpp::Any visitMultiplication(anceParser::MultiplicationContext* context) = 0;

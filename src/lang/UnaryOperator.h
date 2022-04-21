@@ -1,6 +1,8 @@
 #ifndef ANCE_SRC_LANG_UNARYOPERATOR_H_
 #define ANCE_SRC_LANG_UNARYOPERATOR_H_
 
+#include <string>
+
 namespace lang
 {
     /**
@@ -22,6 +24,8 @@ namespace lang
 
                  operator Value() const;// NOLINT(google-explicit-constructor)
         explicit operator bool() = delete;
+
+        [[nodiscard]] std::string toString() const;
 
       private:
         Value value_;

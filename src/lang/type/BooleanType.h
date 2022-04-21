@@ -20,6 +20,15 @@ namespace lang
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
+        bool                              isOperatorDefined(lang::UnaryOperator op) override;
+        lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
+        bool                              validateOperator(lang::UnaryOperator op,
+                                                           lang::Location      location,
+                                                           ValidationLogger&   validation_logger) override;
+        std::shared_ptr<lang::Value>      buildOperator(lang::UnaryOperator    op,
+                                                        std::shared_ptr<Value> value,
+                                                        CompileContext*        context) override;
+
       protected:
         std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;

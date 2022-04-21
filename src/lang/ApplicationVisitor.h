@@ -24,6 +24,7 @@ namespace lang
 #include "lang/expression/Addressof.h"
 #include "lang/expression/Allocation.h"
 #include "lang/expression/BinaryOperation.h"
+#include "lang/expression/UnaryOperation.h"
 #include "lang/expression/BindRef.h"
 #include "lang/expression/ConstantLiteral.h"
 #include "lang/expression/DefaultValue.h"

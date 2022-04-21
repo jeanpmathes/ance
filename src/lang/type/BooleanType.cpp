@@ -2,6 +2,9 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/type/Type.h"
+#include "lang/construct/value/Value.h"
+#include "lang/utility/Values.h"
+#include "lang/construct/value/WrappedNativeValue.h"
 
 lang::BooleanType::BooleanType() : TypeDefinition("bool") {}
 
@@ -48,4 +51,43 @@ lang::ResolvingHandle<lang::Type> lang::BooleanType::get()
     static lang::ResolvingHandle<lang::Type> instance =
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new BooleanType()));
     return instance;
+}
+
+bool lang::BooleanType::isOperatorDefined(lang::UnaryOperator op)
+{
+    return op == lang::UnaryOperator::NOT;
+}
+
+lang::ResolvingHandle<lang::Type> lang::BooleanType::getOperatorResultType(lang::UnaryOperator)
+{
+    return self();
+}
+
+bool lang::BooleanType::validateOperator(lang::UnaryOperator, lang::Location, ValidationLogger&)
+{
+    return true;
+}
+
+std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator    op,
+                                                              std::shared_ptr<Value> value,
+                                                              CompileContext*        context)
+{
+    value->buildContentValue(context);
+    llvm::Value* content_value = value->getContentValue();
+
+    llvm::Value* result;
+
+    switch (op)
+    {
+        case lang::UnaryOperator::NOT:
+            result = context->ir()->CreateNot(content_value, content_value->getName() + ".not");
+            break;
+
+        default:
+            throw std::logic_error("Unsupported unary operator.");
+    }
+
+    lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op);
+    llvm::Value*                      native_result = lang::Values::contentToNative(result_type, result, context);
+    return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
 }

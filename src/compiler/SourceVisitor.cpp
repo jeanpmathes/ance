@@ -31,6 +31,7 @@
 #include "lang/expression/Allocation.h"
 #include "lang/expression/BackingExpression.h"
 #include "lang/expression/BinaryOperation.h"
+#include "lang/expression/UnaryOperation.h"
 #include "lang/expression/BindRef.h"
 #include "lang/expression/ConstantLiteral.h"
 #include "lang/expression/DefaultValue.h"
@@ -501,6 +502,13 @@ antlrcpp::Any SourceVisitor::visitParenthesis(anceParser::ParenthesisContext* ct
 {
     Expression* contained = visit(ctx->expression()).as<Expression*>();
     return static_cast<Expression*>(new Parenthesis(std::unique_ptr<Expression>(contained), location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitNotOperation(anceParser::NotOperationContext* ctx)
+{
+    Expression* value = visit(ctx->expression()).as<Expression*>();
+    return static_cast<Expression*>(
+        new UnaryOperation(lang::UnaryOperator::NOT, std::unique_ptr<Expression>(value), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)
