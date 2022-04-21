@@ -158,8 +158,18 @@ bool lang::TypeDefinition::isOperatorDefined(lang::BinaryOperator, lang::Resolvi
     return false;
 }
 
+bool lang::TypeDefinition::isOperatorDefined(lang::UnaryOperator)
+{
+    return false;
+}
+
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getOperatorResultType(lang::BinaryOperator,
                                                                               lang::ResolvingHandle<lang::Type>)
+{
+    return lang::VoidType::get();
+}
+
+lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getOperatorResultType(lang::UnaryOperator)
 {
     return lang::VoidType::get();
 }
@@ -196,6 +206,11 @@ bool lang::TypeDefinition::validateOperator(lang::BinaryOperator,
     return false;
 }
 
+bool lang::TypeDefinition::validateOperator(lang::UnaryOperator, lang::Location, ValidationLogger&)
+{
+    return false;
+}
+
 bool lang::TypeDefinition::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
                                                       lang::Location,
                                                       ValidationLogger&)
@@ -212,6 +227,13 @@ std::shared_ptr<lang::Value> lang::TypeDefinition::buildSubscript(std::shared_pt
 
 std::shared_ptr<lang::Value> lang::TypeDefinition::buildOperator(lang::BinaryOperator,
                                                                  std::shared_ptr<Value>,
+                                                                 std::shared_ptr<Value>,
+                                                                 CompileContext*)
+{
+    return nullptr;
+}
+
+std::shared_ptr<lang::Value> lang::TypeDefinition::buildOperator(lang::UnaryOperator,
                                                                  std::shared_ptr<Value>,
                                                                  CompileContext*)
 {
@@ -262,3 +284,4 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::self()
     assert(type_);
     return type_->self();
 }
+

@@ -9,6 +9,7 @@
 #include <llvm/IR/Module.h>
 
 #include "lang/BinaryOperator.h"
+#include "lang/UnaryOperator.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
 #include "lang/type/StateCount.h"
@@ -83,8 +84,10 @@ namespace lang
         virtual lang::ResolvingHandle<lang::Type> getSubscriptReturnType();
 
         virtual bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other);
+        virtual bool isOperatorDefined(lang::UnaryOperator op);
         virtual lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
                                                                         lang::ResolvingHandle<lang::Type> other);
+        virtual lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op);
 
         virtual bool isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other);
 
@@ -99,6 +102,9 @@ namespace lang
                                       lang::Location                    left_location,
                                       lang::Location                    right_location,
                                       ValidationLogger&                 validation_logger);
+        virtual bool validateOperator(lang::UnaryOperator op,
+                                      lang::Location      location,
+                                      ValidationLogger&   validation_logger);
         virtual bool validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                 lang::Location                    location,
                                                 ValidationLogger&                 validation_logger);
@@ -109,6 +115,9 @@ namespace lang
         virtual std::shared_ptr<lang::Value> buildOperator(lang::BinaryOperator   op,
                                                            std::shared_ptr<Value> left,
                                                            std::shared_ptr<Value> right,
+                                                           CompileContext*        context);
+        virtual std::shared_ptr<lang::Value> buildOperator(lang::UnaryOperator    op,
+                                                           std::shared_ptr<Value> value,
                                                            CompileContext*        context);
 
         virtual std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,

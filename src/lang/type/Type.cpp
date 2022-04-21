@@ -204,11 +204,24 @@ bool lang::Type::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandl
     assert(isDefined());
     return definition_->isOperatorDefined(op, other);
 }
+
+bool lang::Type::isOperatorDefined(lang::UnaryOperator op)
+{
+    assert(isDefined());
+    return definition_->isOperatorDefined(op);
+}
+
 lang::ResolvingHandle<lang::Type> lang::Type::getOperatorResultType(lang::BinaryOperator              op,
                                                                     lang::ResolvingHandle<lang::Type> other)
 {
     assert(isDefined());
     return definition_->getOperatorResultType(op, other);
+}
+
+lang::ResolvingHandle<lang::Type> lang::Type::getOperatorResultType(lang::UnaryOperator op)
+{
+    assert(isDefined());
+    return definition_->getOperatorResultType(op);
 }
 
 bool lang::Type::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
@@ -249,6 +262,12 @@ bool lang::Type::validateOperator(lang::BinaryOperator              op,
     return definition_->validateOperator(op, std::move(other), left_location, right_location, validation_logger);
 }
 
+bool lang::Type::validateOperator(lang::UnaryOperator op, lang::Location location, ValidationLogger& validation_logger)
+{
+    assert(isDefined());
+    return definition_->validateOperator(op, location, validation_logger);
+}
+
 bool lang::Type::validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                             lang::Location                    location,
                                             ValidationLogger&                 validation_logger)
@@ -272,6 +291,14 @@ std::shared_ptr<lang::Value> lang::Type::buildOperator(lang::BinaryOperator   op
 {
     assert(isDefined());
     return definition_->buildOperator(op, std::move(left), std::move(right), context);
+}
+
+std::shared_ptr<lang::Value> lang::Type::buildOperator(lang::UnaryOperator    op,
+                                                       std::shared_ptr<Value> value,
+                                                       CompileContext*        context)
+{
+    assert(isDefined());
+    return definition_->buildOperator(op, std::move(value), context);
 }
 
 std::shared_ptr<lang::Value> lang::Type::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,

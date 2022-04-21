@@ -7,4 +7,5 @@ add_subdirectory(utility)
 
 target_sources(ance PRIVATE AccessModifier.cpp
                Assigner.cpp
-               BinaryOperator.cpp)
+               BinaryOperator.cpp
+               UnaryOperator.cpp)

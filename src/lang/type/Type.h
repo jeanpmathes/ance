@@ -13,6 +13,7 @@
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
 #include "lang/type/StateCount.h"
+#include "lang/UnaryOperator.h"
 
 namespace lang
 {
@@ -242,6 +243,13 @@ namespace lang
         bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other);
 
         /**
+         * Get whether a unary operation is defined for this type.
+         * @param op The operation.
+         * @return True if the operation is defined.
+         */
+        bool isOperatorDefined(lang::UnaryOperator op);
+
+        /**
          * Get a binary operation result type.
          * @param op The operation.
          * @param other The other type.
@@ -249,6 +257,13 @@ namespace lang
          */
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
                                                                 lang::ResolvingHandle<lang::Type> other);
+
+        /**
+         * Get the unary operation result type.
+         * @param op The operation.
+         * @return The result type.
+         */
+        lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op);
 
         /**
          * Check whether implicit conversion to a specified type is possible.
@@ -301,6 +316,15 @@ namespace lang
                               ValidationLogger&                 validation_logger);
 
         /**
+         * Validate a unary operation. May only be called if the operation is defined.
+         * @param op The operation.
+         * @param location The source location of the value.
+         * @param validation_logger The validation logger to use.
+         * @return True if the operation is valid.
+         */
+        bool validateOperator(lang::UnaryOperator op, lang::Location location, ValidationLogger& validation_logger);
+
+        /**
          * Validate an implicit conversion.
          * @param other The other type.
          * @param location The source location of implicit conversion.
@@ -333,6 +357,17 @@ namespace lang
         std::shared_ptr<lang::Value> buildOperator(lang::BinaryOperator   op,
                                                    std::shared_ptr<Value> left,
                                                    std::shared_ptr<Value> right,
+                                                   CompileContext*        context);
+
+        /**
+         * Build a unary operation.
+         * @param op The operation.
+         * @param value The value to operate on.
+         * @param context The current compile context.
+         * @return The result value.
+         */
+        std::shared_ptr<lang::Value> buildOperator(lang::UnaryOperator    op,
+                                                   std::shared_ptr<Value> value,
                                                    CompileContext*        context);
 
         /**
