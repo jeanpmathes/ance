@@ -44,6 +44,15 @@ llvm::DebugLoc lang::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm
     return llvm::DILocation::get(*llvm_context, line(), column(), scope);
 }
 
+void lang::Location::extend(lang::Location location)
+{
+    start_line_   = std::min(start_line_, location.start_line_);
+    start_column_ = std::min(start_column_, location.start_column_);
+
+    end_line_   = std::max(end_line_, location.end_line_);
+    end_column_ = std::max(end_column_, location.end_column_);
+}
+
 std::ostream& lang::operator<<(std::ostream& os, const lang::Location& location)
 {
     if (!location.isGlobal()) { os << "(" << location.start_line_ << ", " << location.start_column_ << ")"; }

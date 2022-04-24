@@ -113,7 +113,7 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
 
     lang::Location return_type_location = ctx->type() ? location(ctx->type()) : lang::Location(0, 0, 0, 0);
 
-    auto function_block = lang::CodeBlock::makeInitial();
+    auto function_block = lang::CodeBlock::makeInitial(location(ctx));
 
     for (auto code_context : ctx->code())
     {
@@ -198,7 +198,7 @@ antlrcpp::Any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ct
 
 antlrcpp::Any SourceVisitor::visitBlock(anceParser::BlockContext* ctx)
 {
-    lang::CodeBlock* block = lang::CodeBlock::makeScoped();
+    lang::CodeBlock* block = lang::CodeBlock::makeScoped(location(ctx));
 
     for (auto code_context : ctx->code())
     {

@@ -2,24 +2,24 @@
 
 #include "lang/scope/LocalScope.h"
 
-lang::CodeBlock::CodeBlock(bool scoped) : scoped_(scoped) {}
+lang::CodeBlock::CodeBlock(bool scoped, lang::Location location) : Statement(location), scoped_(scoped) {}
 
-std::unique_ptr<lang::CodeBlock> lang::CodeBlock::makeInitial()
+std::unique_ptr<lang::CodeBlock> lang::CodeBlock::makeInitial(lang::Location location)
 {
-    return std::unique_ptr<lang::CodeBlock>(new CodeBlock(true));
+    return std::unique_ptr<lang::CodeBlock>(new CodeBlock(true, location));
 }
 
 lang::CodeBlock* lang::CodeBlock::wrapStatement(std::unique_ptr<Statement> statement)
 {
-    auto* block = new CodeBlock(false);
+    auto* block = new CodeBlock(false, statement->location());
     block->subs_.emplace_back(std::move(statement));
 
     return block;
 }
 
-lang::CodeBlock* lang::CodeBlock::makeScoped()
+lang::CodeBlock* lang::CodeBlock::makeScoped(lang::Location location)
 {
-    return new CodeBlock(true);
+    return new CodeBlock(true, location);
 }
 
 void lang::CodeBlock::append(std::unique_ptr<CodeBlock> block)
@@ -33,12 +33,7 @@ void lang::CodeBlock::append(std::unique_ptr<CodeBlock> block)
     else {
         for (auto& sub : block->subs_)
         {
-            auto* added_block = std::get_if<std::unique_ptr<CodeBlock>>(&sub);
-            if (added_block) { addChild(**added_block); }
-
-            auto* added_statement = std::get_if<std::unique_ptr<Statement>>(&sub);
-            if (added_statement) { addChild(**added_statement); }
-
+            addChild(*sub);
             subs_.push_back(std::move(sub));
         }
 
@@ -46,42 +41,25 @@ void lang::CodeBlock::append(std::unique_ptr<CodeBlock> block)
     }
 }
 
-lang::LocalScope* lang::CodeBlock::createScopes(lang::Scope* parent)
+void lang::CodeBlock::setScope(lang::Scope* scope)
 {
     lang::LocalScope* created = nullptr;
 
     if (scoped_)
     {
-        scope_  = parent->makeLocalScope();
+        scope_  = scope->makeLocalScope();
         created = scope_.get();
     }
 
-    for (auto& sub : subs_)
-    {
-        auto* block = std::get_if<std::unique_ptr<CodeBlock>>(&sub);
-        if (block)
-        {
-            lang::Scope* local_parent = created ? created : parent;
-            block->get()->createScopes(local_parent);
-        }
+    lang::Scope* local_parent = created ? created : scope;
 
-        auto* statement = std::get_if<std::unique_ptr<Statement>>(&sub);
-        if (statement) { statement->get()->setContainingScope(created ? created : parent); }
-    }
-
-    return created;
+    for (auto& sub : subs_) { sub->setContainingScope(local_parent); }
 }
 
 void lang::CodeBlock::walkDefinitions()
 {
     for (auto& sub : subs_)
-    {
-        auto* block = std::get_if<std::unique_ptr<CodeBlock>>(&sub);
-        if (block) { block->get()->walkDefinitions(); }
-
-        auto* statement = std::get_if<std::unique_ptr<Statement>>(&sub);
-        if (statement) { statement->get()->walkDefinitions(); }
-    }
+    { sub->walkDefinitions(); }
 }
 
 std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlocks(lang::BasicBlock& entry,
@@ -93,18 +71,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlock
 
     for (auto& sub : subs_)
     {
-        std::vector<std::unique_ptr<BasicBlock>> new_blocks;
-
-        auto* block = std::get_if<std::unique_ptr<CodeBlock>>(&sub);
-        if (block) { new_blocks = block->get()->createBasicBlocks(*previous_block, function); }
-
-        auto* statement = std::get_if<std::unique_ptr<Statement>>(&sub);
-        if (statement)
-        {
-            new_blocks = statement->get()->createBlocks(*previous_block, function);
-
-            for (auto& bb : new_blocks) { bb->setContainingFunction(function); }
-        }
+        std::vector<std::unique_ptr<BasicBlock>> new_blocks = sub->createBasicBlocks(*previous_block, function);
 
         blocks.insert(blocks.end(),
                       std::make_move_iterator(new_blocks.begin()),
@@ -115,4 +82,19 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlock
     }
 
     return blocks;
+}
+
+lang::LocalScope* lang::CodeBlock::getBlockScope() const
+{
+    return scope_.get();
+}
+
+void lang::CodeBlock::validate(ValidationLogger& validation_logger)
+{
+    for (auto& sub : subs_) { sub->validate(validation_logger); }
+}
+
+void lang::CodeBlock::doBuild(CompileContext*)
+{
+    assert(false && "Build step must use code-block free hierarchy.");// Building uses BBs.
 }

@@ -33,9 +33,12 @@ namespace lang
          * Create a basic block that returns from the function.
          * @param expression The expression providing the return value, or nullptr if no value is returned.
          * @param return_location The location of the return statement.
+         * @param function The function that contains the basic block.
          * @return The created basic block.
          */
-        static std::unique_ptr<BasicBlock> createReturning(Expression* expression, lang::Location return_location);
+        static std::unique_ptr<BasicBlock> createReturning(Expression*     expression,
+                                                           lang::Location  return_location,
+                                                           lang::Function* function);
 
         /**
          * Create a basic block that branches depending on the value of an expression.

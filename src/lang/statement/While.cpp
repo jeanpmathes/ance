@@ -10,6 +10,7 @@ While::While(std::unique_ptr<Expression> condition, std::unique_ptr<lang::CodeBl
     , block_(std::move(block))
 {
     addSubexpression(*condition_);
+    addSubstatement(*block_);
 }
 
 Expression& While::condition()
@@ -17,27 +18,14 @@ Expression& While::condition()
     return *condition_;
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> While::createBlocks(lang::BasicBlock& entry, lang::Function* function)
+std::vector<std::unique_ptr<lang::BasicBlock>> While::createBasicBlocks(lang::BasicBlock& entry,
+                                                                        lang::Function*   function)
 {
     auto blocks = lang::BasicBlock::createLooping(condition_.get(), block_.get(), function);
 
     entry.link(*blocks.front());
 
     return blocks;
-}
-
-void While::setScope(lang::Scope* scope)
-{
-    Statement::setScope(scope);
-
-    block_->createScopes(scope);
-}
-
-void While::walkDefinitions()
-{
-    Statement::walkDefinitions();
-
-    block_->walkDefinitions();
 }
 
 void While::validate(ValidationLogger&)

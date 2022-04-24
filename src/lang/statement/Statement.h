@@ -36,8 +36,8 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @param function The function this statement is part of.
      * @return The basic blocks.
      */
-    virtual std::vector<std::unique_ptr<lang::BasicBlock>> createBlocks(lang::BasicBlock& entry,
-                                                                        lang::Function*   function);
+    virtual std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
+                                                                             lang::Function*   function);
 
     /**
      * Set the scope that contains this statement.
@@ -90,10 +90,16 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     virtual void doBuild(CompileContext* context) = 0;
 
     /**
-     * Add a subexpression to the current
+     * Add a subexpression to the current statement.
      * @param subexpression The subexpression to add.
      */
     void addSubexpression(Expression& subexpression);
+
+    /**
+     * Add a substatement to the current statement.
+     * @param substatement The substatement to add.
+     */
+    void addSubstatement(Statement& substatement);
 
   public:
     ~Statement() override = default;
@@ -104,6 +110,7 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     lang::Scope* containing_scope_ = nullptr;
 
     std::vector<Expression*> subexpressions_;
+    std::vector<Statement*>  substatements_;
 };
 
 #endif

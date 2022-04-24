@@ -16,10 +16,11 @@ Expression* Return::expression()
     return return_value_.get();
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> Return::createBlocks(lang::BasicBlock& entry, lang::Function*)
+std::vector<std::unique_ptr<lang::BasicBlock>> Return::createBasicBlocks(lang::BasicBlock& entry,
+                                                                         lang::Function*   function)
 {
     std::vector<std::unique_ptr<lang::BasicBlock>> blocks;
-    blocks.push_back(lang::BasicBlock::createReturning(return_value_.get(), location()));
+    blocks.push_back(lang::BasicBlock::createReturning(return_value_.get(), location(), function));
 
     entry.link(*blocks.front());
 

@@ -24,13 +24,16 @@ std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createSimple(Statement* stat
     return std::unique_ptr<BasicBlock>(block);
 }
 
-std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createReturning(Expression*    expression,
-                                                                    lang::Location return_location)
+std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createReturning(Expression*     expression,
+                                                                    lang::Location  return_location,
+                                                                    lang::Function* function)
 {
     auto block = new BasicBlock();
 
     block->definition_ = std::make_unique<Definition::Returning>(expression, return_location);
     block->definition_->setSelf(block);
+
+    block->setContainingFunction(function);
 
     return std::unique_ptr<BasicBlock>(block);
 }
@@ -68,6 +71,8 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createBranching
 
     blocks.push_back(std::move(end_block));
 
+    for (auto& new_block : blocks) new_block->setContainingFunction(function);
+
     return blocks;
 }
 
@@ -100,6 +105,8 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(E
     block->link(*end_block);
 
     blocks.push_back(std::move(end_block));
+
+    for (auto& new_block : blocks) new_block->setContainingFunction(function);
 
     return blocks;
 }
@@ -147,6 +154,8 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createMatching(
     }
 
     blocks.push_back(std::move(end_block));
+
+    for (auto& new_block : blocks) new_block->setContainingFunction(function);
 
     return blocks;
 }

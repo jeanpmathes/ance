@@ -14,12 +14,15 @@ void Statement::setContainingScope(lang::Scope* scope)
     setScope(scope);
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> Statement::createBlocks(lang::BasicBlock& entry, lang::Function*)
+std::vector<std::unique_ptr<lang::BasicBlock>> Statement::createBasicBlocks(lang::BasicBlock& entry,
+                                                                            lang::Function*   function)
 {
     std::vector<std::unique_ptr<lang::BasicBlock>> blocks;
     blocks.push_back(lang::BasicBlock::createSimple(this));
 
     entry.link(*blocks.front());
+
+    for (auto& block : blocks) { block->setContainingFunction(function); }
 
     return blocks;
 }
@@ -27,6 +30,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Statement::createBlocks(lang::Bas
 void Statement::setScope(lang::Scope* scope)
 {
     for (auto& subexpression : subexpressions_) { subexpression->setContainingScope(scope); }
+    for (auto& substatement : substatements_) { substatement->setContainingScope(scope); }
 }
 
 lang::Scope* Statement::scope() const
@@ -37,6 +41,7 @@ lang::Scope* Statement::scope() const
 void Statement::walkDefinitions()
 {
     for (auto& subexpression : subexpressions_) { subexpression->walkDefinitions(); }
+    for (auto& substatement : substatements_) { substatement->walkDefinitions(); }
 }
 
 lang::Location Statement::location() const
@@ -55,4 +60,10 @@ void Statement::addSubexpression(Expression& subexpression)
 {
     subexpressions_.push_back(&subexpression);
     addChild(subexpression);
+}
+
+void Statement::addSubstatement(Statement& substatement)
+{
+    substatements_.push_back(&substatement);
+    addChild(substatement);
 }

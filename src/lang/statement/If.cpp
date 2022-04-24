@@ -14,6 +14,10 @@ If::If(std::unique_ptr<Expression>      condition,
     , else_block_(std::move(else_block))
 {
     addSubexpression(*condition_);
+
+    if (if_block_) addSubstatement(*if_block_);
+
+    if (else_block_) addSubstatement(*else_block_);
 }
 
 Expression& If::condition()
@@ -21,29 +25,13 @@ Expression& If::condition()
     return *condition_;
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> If::createBlocks(lang::BasicBlock& entry, lang::Function* function)
+std::vector<std::unique_ptr<lang::BasicBlock>> If::createBasicBlocks(lang::BasicBlock& entry, lang::Function* function)
 {
     auto blocks = lang::BasicBlock::createBranching(condition_.get(), if_block_.get(), else_block_.get(), function);
 
     entry.link(*blocks.front());
 
     return blocks;
-}
-
-void If::setScope(lang::Scope* scope)
-{
-    Statement::setScope(scope);
-
-    if_block_->createScopes(scope);
-    if (else_block_) else_block_->createScopes(scope);
-}
-
-void If::walkDefinitions()
-{
-    Statement::walkDefinitions();
-
-    if_block_->walkDefinitions();
-    if (else_block_) else_block_->walkDefinitions();
 }
 
 void If::validate(ValidationLogger&)

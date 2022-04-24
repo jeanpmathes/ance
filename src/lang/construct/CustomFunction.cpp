@@ -36,7 +36,8 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
 {
     addChild(*code_);
 
-    inside_scope_ = code_->createScopes(this->function());
+    code_->setContainingScope(this->function());
+    inside_scope_ = code_->getBlockScope();
     assert(inside_scope_);
 
     code_->walkDefinitions();

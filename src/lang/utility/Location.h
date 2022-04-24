@@ -58,6 +58,12 @@ namespace lang
          */
         llvm::DebugLoc getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope) const;
 
+        /**
+         * Extend this location to include another location.
+         * @param location The location to extend to.
+         */
+        void extend(lang::Location location);
+
         friend std::ostream& operator<<(std::ostream& os, const lang::Location& location);
 
       private:

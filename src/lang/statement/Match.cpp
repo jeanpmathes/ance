@@ -31,7 +31,7 @@ void Case::setContainingScope(lang::Scope* scope)
 {
     for (auto& condition : conditions_) { condition->setContainingScope(scope); }
 
-    code_->createScopes(scope);
+    code_->setContainingScope(scope);
 }
 
 void Case::walkDefinitions()
@@ -129,7 +129,8 @@ Expression& Match::expression()
     return *expression_;
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> Match::createBlocks(lang::BasicBlock& entry, lang::Function* function)
+std::vector<std::unique_ptr<lang::BasicBlock>> Match::createBasicBlocks(lang::BasicBlock& entry,
+                                                                        lang::Function*   function)
 {
     std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> conditions;
 

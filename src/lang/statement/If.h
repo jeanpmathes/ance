@@ -29,11 +29,8 @@ class If
 
     [[nodiscard]] Expression& condition();
 
-    std::vector<std::unique_ptr<lang::BasicBlock>> createBlocks(lang::BasicBlock& entry,
-                                                                lang::Function*   function) override;
-
-    void setScope(lang::Scope* scope) override;
-    void walkDefinitions() override;
+    std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
+                                                                     lang::Function*   function) override;
 
     void validate(ValidationLogger& validation_logger) override;
 

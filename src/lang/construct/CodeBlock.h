@@ -1,31 +1,32 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_CODEBLOCK_H_
 #define ANCE_SRC_LANG_CONSTRUCT_CODEBLOCK_H_
 
-#include <variant>
+#include "lang/statement/Statement.h"
 
 #include "lang/construct/BasicBlock.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/scope/Scope.h"
-#include "lang/statement/Statement.h"
 #include "lang/Element.h"
 
 namespace lang
 {
     /**
-     * A code block is a sequence of statements.
+     * A code block is a sequence of statements, a compound statement.
      * In contrast to basic blocks, code blocks can be nested and contain branching statements.
      */
-    class CodeBlock : public lang::Element<CodeBlock, ANCE_CONSTRUCTS>
+    class CodeBlock
+        : public Statement
+        , public lang::Element<lang::CodeBlock, ANCE_CONSTRUCTS>
     {
       private:
-        explicit CodeBlock(bool scoped);
+        CodeBlock(bool scoped, lang::Location location);
 
       public:
         /**
          * Make an initial block. This block is scoped.
          * @return The initial block.
          */
-        static std::unique_ptr<CodeBlock> makeInitial();
+        static std::unique_ptr<CodeBlock> makeInitial(lang::Location location);
 
         /**
          * Make a block wrapping a statement. The block is not scoped.
@@ -38,7 +39,7 @@ namespace lang
          * Make a scoped block.
          * @return The block.
          */
-        static CodeBlock* makeScoped();
+        static CodeBlock* makeScoped(lang::Location location);
 
         /**
          * Append a block to this block.
@@ -46,32 +47,26 @@ namespace lang
          */
         void append(std::unique_ptr<CodeBlock> block);
 
-        /**
-         * Create the scopes for this block and all sub-blocks.
-         * @param parent The parent scope.
-         * @return The created scope, or nullptr if the block is not scoped.
-         */
-        lang::LocalScope* createScopes(lang::Scope* parent);
+        void setScope(lang::Scope* scope) override;
 
-        /**
-         * Walk all definitions and declarations in this block.
-         * This will not do any resolving, but will consider blockers.
-         */
-        void walkDefinitions();
+        void walkDefinitions() override;
 
-        /**
-         * Create basic blocks from the statements in this block.
-         * @param entry The entry basic block.
-         * @param function The function this block belongs to.
-         * @return The created basic blocks.
-         */
         std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
-                                                                         lang::Function*   function);
+                                                                         lang::Function*   function) override;
+
+        /**
+         * Get the scope that belongs to this block.
+         * @return The scope, or null if this block is not scoped.
+         */
+        lang::LocalScope* getBlockScope() const;
+
+        void validate(ValidationLogger& validation_logger) override;
+        void doBuild(CompileContext* context) override;
 
       private:
-        bool                                                                              scoped_;
-        std::vector<std::variant<std::unique_ptr<Statement>, std::unique_ptr<CodeBlock>>> subs_ {};
-        std::unique_ptr<lang::LocalScope>                                                 scope_ {};
+        bool                                    scoped_;
+        std::vector<std::unique_ptr<Statement>> subs_ {};
+        std::unique_ptr<lang::LocalScope>       scope_ {};
     };
 
 }
