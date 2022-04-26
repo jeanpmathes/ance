@@ -23,7 +23,7 @@ class While
      * @param block The block to execute if the condition is true.
      * @param location The source location of the statement.
      */
-    While(std::unique_ptr<Expression> condition, std::unique_ptr<lang::CodeBlock> block, lang::Location location);
+    While(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> block, lang::Location location);
 
     [[nodiscard]] Expression& condition();
 
@@ -38,7 +38,7 @@ class While
   private:
     std::unique_ptr<Expression> condition_;
 
-    std::unique_ptr<lang::CodeBlock> block_;
+    std::unique_ptr<Statement> block_;
 };
 
 #endif

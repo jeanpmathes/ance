@@ -38,10 +38,10 @@ std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createReturning(Expression* 
     return std::unique_ptr<BasicBlock>(block);
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createBranching(Expression*      condition,
-                                                                                 lang::CodeBlock* true_block,
-                                                                                 lang::CodeBlock* false_block,
-                                                                                 lang::Function*  function)
+std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createBranching(Expression*     condition,
+                                                                                 Statement*      true_block,
+                                                                                 Statement*      false_block,
+                                                                                 lang::Function* function)
 {
     std::vector<std::unique_ptr<BasicBlock>> blocks;
 
@@ -53,7 +53,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createBranching
 
     std::unique_ptr<lang::BasicBlock> end_block = lang::BasicBlock::createSimple();
 
-    auto append_code_block = [&](lang::CodeBlock* code_block) {
+    auto append_code_block = [&](Statement* code_block) {
         auto new_basic_blocks = code_block->createBasicBlocks(*block, function);
         assert(!new_basic_blocks.empty());
 
@@ -76,9 +76,9 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createBranching
     return blocks;
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(Expression*      condition,
-                                                                               lang::CodeBlock* code_block,
-                                                                               lang::Function*  function)
+std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(Expression*     condition,
+                                                                               Statement*      code_block,
+                                                                               lang::Function* function)
 {
     std::vector<std::unique_ptr<BasicBlock>> blocks;
 
@@ -90,7 +90,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(E
 
     std::unique_ptr<lang::BasicBlock> end_block = lang::BasicBlock::createSimple();
 
-    auto append_code_block = [&](lang::CodeBlock* code_block, lang::BasicBlock& next) {
+    auto append_code_block = [&](Statement* code_block, lang::BasicBlock& next) {
         auto new_basic_blocks = code_block->createBasicBlocks(*block, function);
         assert(!new_basic_blocks.empty());
 
@@ -112,11 +112,11 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(E
 }
 
 std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createMatching(
-    Match*                                                        match,
-    std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> cases,
-    lang::Function*                                               function)
+    Match*                                                  match,
+    std::vector<std::pair<ConstantExpression*, Statement*>> cases,
+    lang::Function*                                         function)
 {
-    std::map<lang::CodeBlock*, std::vector<ConstantExpression*>> code_to_case;
+    std::map<Statement*, std::vector<ConstantExpression*>> code_to_case;
 
     for (auto& [case_value, code_block] : cases)
     {

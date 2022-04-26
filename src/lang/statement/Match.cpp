@@ -5,18 +5,17 @@
 #include "validation/ValidationLogger.h"
 #include "lang/expression/Expression.h"
 
-Case* Case::createDefault(std::unique_ptr<lang::CodeBlock> code)
+Case* Case::createDefault(std::unique_ptr<Statement> code)
 {
     return new Case(std::vector<std::unique_ptr<ConstantExpression>>(), std::move(code));
 }
 
-Case* Case::createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions,
-                       std::unique_ptr<lang::CodeBlock>                 code)
+Case* Case::createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions, std::unique_ptr<Statement> code)
 {
     return new Case(std::move(conditions), std::move(code));
 }
 
-Case::Case(std::vector<std::unique_ptr<ConstantExpression>> conditions, std::unique_ptr<lang::CodeBlock> code)
+Case::Case(std::vector<std::unique_ptr<ConstantExpression>> conditions, std::unique_ptr<Statement> code)
     : conditions_(std::move(conditions))
     , code_(std::move(code))
 {
@@ -41,9 +40,9 @@ void Case::walkDefinitions()
     code_->walkDefinitions();
 }
 
-std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> Case::getConditions()
+std::vector<std::pair<ConstantExpression*, Statement*>> Case::getConditions()
 {
-    std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> conditions;
+    std::vector<std::pair<ConstantExpression*, Statement*>> conditions;
 
     if (conditions_.empty()) { conditions.emplace_back(nullptr, code_.get()); }
     else {
@@ -132,7 +131,7 @@ Expression& Match::expression()
 std::vector<std::unique_ptr<lang::BasicBlock>> Match::createBasicBlocks(lang::BasicBlock& entry,
                                                                         lang::Function*   function)
 {
-    std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> conditions;
+    std::vector<std::pair<ConstantExpression*, Statement*>> conditions;
 
     for (auto& case_ptr : cases_)
     {

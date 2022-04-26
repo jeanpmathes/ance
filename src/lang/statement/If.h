@@ -22,10 +22,10 @@ class If
      * @param else_block The block to execute if the condition is false. May be null.
      * @param location The location of the statement.
      */
-    If(std::unique_ptr<Expression>      condition,
-       std::unique_ptr<lang::CodeBlock> if_block,
-       std::unique_ptr<lang::CodeBlock> else_block,
-       lang::Location                   location);
+    If(std::unique_ptr<Expression> condition,
+       std::unique_ptr<Statement>  if_block,
+       std::unique_ptr<Statement>  else_block,
+       lang::Location              location);
 
     [[nodiscard]] Expression& condition();
 
@@ -40,8 +40,8 @@ class If
   private:
     std::unique_ptr<Expression> condition_;
 
-    std::unique_ptr<lang::CodeBlock> if_block_;
-    std::unique_ptr<lang::CodeBlock> else_block_;
+    std::unique_ptr<Statement> if_block_;
+    std::unique_ptr<Statement> else_block_;
 };
 
 #endif

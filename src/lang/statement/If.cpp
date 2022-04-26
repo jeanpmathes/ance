@@ -4,10 +4,10 @@
 #include "lang/expression/Expression.h"
 #include "validation/ValidationLogger.h"
 
-If::If(std::unique_ptr<Expression>      condition,
-       std::unique_ptr<lang::CodeBlock> if_block,
-       std::unique_ptr<lang::CodeBlock> else_block,
-       lang::Location                   location)
+If::If(std::unique_ptr<Expression> condition,
+       std::unique_ptr<Statement>  if_block,
+       std::unique_ptr<Statement>  else_block,
+       lang::Location              location)
     : Statement(location)
     , condition_(std::move(condition))
     , if_block_(std::move(if_block))

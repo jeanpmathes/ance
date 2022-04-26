@@ -4,7 +4,7 @@
 #include "lang/expression/Expression.h"
 #include "validation/ValidationLogger.h"
 
-While::While(std::unique_ptr<Expression> condition, std::unique_ptr<lang::CodeBlock> block, lang::Location location)
+While::While(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> block, lang::Location location)
     : Statement(location)
     , condition_(std::move(condition))
     , block_(std::move(block))

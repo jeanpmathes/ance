@@ -48,10 +48,10 @@ namespace lang
          * @param function The function containing the basic block.
          * @return The created basic blocks.
          */
-        static std::vector<std::unique_ptr<BasicBlock>> createBranching(Expression*      condition,
-                                                                        lang::CodeBlock* true_block,
-                                                                        lang::CodeBlock* false_block,
-                                                                        lang::Function*  function);
+        static std::vector<std::unique_ptr<BasicBlock>> createBranching(Expression*     condition,
+                                                                        Statement*      true_block,
+                                                                        Statement*      false_block,
+                                                                        lang::Function* function);
 
         /**
          * Create a basic block that loops as long as the condition is true.
@@ -60,9 +60,9 @@ namespace lang
          * @param function The function containing the basic block.
          * @return The created basic blocks.
          */
-        static std::vector<std::unique_ptr<BasicBlock>> createLooping(Expression*      condition,
-                                                                      lang::CodeBlock* code_block,
-                                                                      lang::Function*  function);
+        static std::vector<std::unique_ptr<BasicBlock>> createLooping(Expression*     condition,
+                                                                      Statement*      code_block,
+                                                                      lang::Function* function);
 
         /**
          * Create basis blocks that match a case for a given value.
@@ -72,9 +72,9 @@ namespace lang
          * @return The created basic blocks.
          */
         static std::vector<std::unique_ptr<BasicBlock>> createMatching(
-            Match*                                                        match,
-            std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> cases,
-            lang::Function*                                               function);
+            Match*                                                  match,
+            std::vector<std::pair<ConstantExpression*, Statement*>> cases,
+            lang::Function*                                         function);
 
       public:
         /**

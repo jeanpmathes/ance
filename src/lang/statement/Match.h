@@ -16,7 +16,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
          * @param code The code to execute.
          * @return The created case.
          */
-    static Case* createDefault(std::unique_ptr<lang::CodeBlock> code);
+    static Case* createDefault(std::unique_ptr<Statement> code);
 
     /**
          * Create a case.
@@ -25,16 +25,16 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
          * @return The created case.
          */
     static Case* createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions,
-                            std::unique_ptr<lang::CodeBlock>                 code);
+                            std::unique_ptr<Statement>                       code);
 
   private:
-    Case(std::vector<std::unique_ptr<ConstantExpression>> conditions, std::unique_ptr<lang::CodeBlock> code);
+    Case(std::vector<std::unique_ptr<ConstantExpression>> conditions, std::unique_ptr<Statement> code);
 
   public:
     void setContainingScope(lang::Scope* scope);
     void walkDefinitions();
 
-    std::vector<std::pair<ConstantExpression*, lang::CodeBlock*>> getConditions();
+    std::vector<std::pair<ConstantExpression*, Statement*>> getConditions();
 
     bool validateConflicts(Case* other, ValidationLogger& validation_logger);
     bool validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger);
@@ -43,7 +43,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
 
   private:
     std::vector<std::unique_ptr<ConstantExpression>> conditions_;
-    std::unique_ptr<lang::CodeBlock>                 code_;
+    std::unique_ptr<Statement>                       code_;
     ssize_t                                          coverage_count_ {};
 };
 
