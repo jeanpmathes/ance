@@ -129,6 +129,20 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
     }
 }
 
+Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressions, Statements) const
+{
+    Statements statements;
+
+    statements.push_back(std::unique_ptr<LocalReferenceVariableDefinition>(
+        new LocalReferenceVariableDefinition(identifier_,
+                                             type_->toUndefined(),
+                                             type_location_,
+                                             std::move(subexpressions[0]),
+                                             location())));
+
+    return statements;
+}
+
 void LocalReferenceVariableDefinition::doBuild(CompileContext* context)
 {
     (*variable_)->buildDefinition(context);

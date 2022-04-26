@@ -4,6 +4,7 @@
 #include "lang/type/SizeType.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
+#include "lang/statement/Statement.h"
 
 SizeofType::SizeofType(lang::ResolvingHandle<lang::Type> type, lang::Location type_location, lang::Location location)
     : Expression(location)
@@ -35,6 +36,11 @@ bool SizeofType::validate(ValidationLogger& validation_logger)
     }
 
     return type_->validate(validation_logger, type_location_);
+}
+
+Expression::Expansion SizeofType::expandWith(Expressions) const
+{
+    return {Statements(), std::make_unique<SizeofType>(type_->toUndefined(), type_location_, location()), Statements()};
 }
 
 std::shared_ptr<lang::Value> SizeofType::getValue() const

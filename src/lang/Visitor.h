@@ -72,6 +72,11 @@ namespace lang
          * @return The child at the given index.
          */
         Visitable& getChild(size_t index) { return children_[index]; }
+
+        /**
+         * Clear all children from this visitable.
+         */
+        void clearChildren() { children_.clear(); }
     };
 
     /**

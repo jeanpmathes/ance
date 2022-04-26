@@ -75,6 +75,15 @@ void lang::ExternFunction::validate(ValidationLogger& validation_logger)
     }
 }
 
+void lang::ExternFunction::expand() {}
+
+void lang::ExternFunction::determineFlow() {}
+
+bool lang::ExternFunction::validateFlow(ValidationLogger&)
+{
+    return true;
+}
+
 void lang::ExternFunction::createNativeBacking(CompileContext* context)
 {
     std::tie(native_type_, native_function_) = createNativeFunction(llvm::GlobalValue::LinkageTypes::ExternalLinkage,

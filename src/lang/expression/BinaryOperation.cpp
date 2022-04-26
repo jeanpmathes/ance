@@ -1,6 +1,7 @@
 #include "BinaryOperation.h"
 
 #include "validation/ValidationLogger.h"
+#include "lang/statement/Statement.h"
 
 BinaryOperation::BinaryOperation(std::unique_ptr<Expression> left,
                                  lang::BinaryOperator        op,
@@ -62,6 +63,14 @@ bool BinaryOperation::validate(ValidationLogger& validation_logger)
                                            left_->location(),
                                            right_->location(),
                                            validation_logger);
+}
+
+Expression::Expansion BinaryOperation::expandWith(Expressions subexpressions) const
+{
+    return {
+        Statements(),
+        std::make_unique<BinaryOperation>(std::move(subexpressions[0]), op_, std::move(subexpressions[1]), location()),
+        Statements()};
 }
 
 void BinaryOperation::doBuild(CompileContext* context)

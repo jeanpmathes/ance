@@ -29,6 +29,8 @@ class SizeofExpression
 
     bool validate(ValidationLogger& validation_logger) override;
 
+    [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
+
     [[nodiscard]] std::shared_ptr<lang::Value> getValue() const override;
 
   protected:

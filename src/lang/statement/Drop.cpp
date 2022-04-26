@@ -40,6 +40,15 @@ void Drop::validate(ValidationLogger& validation_logger)
     }
 }
 
+Statements Drop::expandWith(Expressions, Statements) const
+{
+    Statements statements;
+
+    statements.push_back(std::make_unique<Drop>(variable_->toUndefined(), location()));
+
+    return statements;
+}
+
 void Drop::doBuild(CompileContext*)
 {
     // No code to build yet.

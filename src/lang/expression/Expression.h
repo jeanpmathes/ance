@@ -15,6 +15,7 @@ namespace lang
     class Scope;
 }
 
+class Statement;
 class CompileContext;
 class ValidationLogger;
 
@@ -56,6 +57,21 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @return Whether this expression is valid and dependent entities can be validated too.
      */
     virtual bool validate(ValidationLogger& validation_logger) = 0;
+
+    using Expansion = std::tuple<Statements, std::unique_ptr<Expression>, Statements>;
+
+    /**
+     * Expand this expression to remove syntactic sugar.
+     * @return The statements to use before and after the current containing statement, as well as a new expression.
+     */
+    [[nodiscard]] virtual Expansion expand() const;
+
+    /**
+     * Expand this expression with the given subexpressions.
+     * @param subexpressions The subexpressions to use.
+     * @return The statements to use before and after the current containing statement, as well as a new expression.
+     */
+    [[nodiscard]] virtual Expansion expandWith(Expressions subexpressions) const = 0;
 
     /**
      * Validate an assignment to this expression.
@@ -107,7 +123,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     lang::Location location_;
     lang::Scope*   containing_scope_ {nullptr};
 
-    std::vector<Expression*> subexpressions_;
+    std::vector<std::reference_wrapper<Expression>> subexpressions_;
 };
 
 #endif

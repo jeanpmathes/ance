@@ -1,6 +1,7 @@
 #include "DefaultValue.h"
 
 #include "lang/type/Type.h"
+#include "lang/statement/Statement.h"
 
 DefaultValue::DefaultValue(lang::ResolvingHandle<lang::Type> type, lang::Location location)
     : Expression(location)
@@ -15,6 +16,11 @@ lang::ResolvingHandle<lang::Type> DefaultValue::type()
 bool DefaultValue::validate(ValidationLogger&)
 {
     return true;
+}
+
+Expression::Expansion DefaultValue::expandWith(Expressions) const
+{
+    return {Statements(), std::make_unique<DefaultValue>(type_, location()), Statements()};
 }
 
 std::shared_ptr<lang::Value> DefaultValue::getValue() const

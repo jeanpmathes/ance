@@ -49,6 +49,9 @@ namespace lang
         [[nodiscard]] bool isMangled() const override;
 
         void validate(ValidationLogger& validation_logger) override;
+        void expand() override;
+        void determineFlow() override;
+        bool validateFlow(ValidationLogger& validation_logger) override;
 
         void                         createNativeBacking(CompileContext* context) override;
         void                         build(CompileContext* context) override;
@@ -70,7 +73,7 @@ namespace lang
         using FunctionDefinition::buildCall;
 
       private:
-        void finalizeDefinition();
+        void setupCode();
         void validateReturn(ValidationLogger& validation_logger);
         void validateUnreachable(ValidationLogger& validation_logger);
 

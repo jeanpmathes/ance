@@ -21,7 +21,7 @@
 #include "management/File.h"
 #include "validation/ValidationLogger.h"
 
-Application::Application(data::File& project) : project_(project), global_scope_(std::make_unique<lang::GlobalScope>())
+Application::Application(data::File& project) : Application(project, std::make_unique<lang::GlobalScope>())
 {
     // Register keyword types
 
@@ -42,9 +42,12 @@ Application::Application(data::File& project) : project_(project), global_scope_
     global_scope_->addTypeRegistry(lang::ArrayType::getRegistry());
     global_scope_->addTypeRegistry(lang::PointerType::getRegistry());
     global_scope_->addTypeRegistry(lang::ReferenceType::getRegistry());
+}
 
-    // Add children
-
+Application::Application(data::File& project, std::unique_ptr<lang::GlobalScope>&& scope)
+    : project_(project)
+    , global_scope_(std::move(scope))
+{
     addChild(globalScope());
 }
 
@@ -98,6 +101,11 @@ unsigned Application::getBitness() const
     return pointer_size_ * 8;
 }
 
+void Application::preValidate()
+{
+    global_scope_->resolve();
+}
+
 void Application::validate(ValidationLogger& validation_logger)
 {
     global_scope_->validate(validation_logger);
@@ -111,6 +119,13 @@ void Application::validate(ValidationLogger& validation_logger)
     {
         validation_logger.logError("Exit point 'void exit(ui32)' could not be found", lang::Location(0, 0, 0, 0));
     }
+}
+
+void Application::preBuild()
+{
+    global_scope_->expand();
+    global_scope_->resolve();
+    global_scope_->determineFlow();
 }
 
 lang::GlobalScope& Application::globalScope()

@@ -33,6 +33,16 @@ void While::validate(ValidationLogger&)
     // Handled by basic block.
 }
 
+Statements While::expandWith(Expressions subexpressions, Statements substatements) const
+{
+    Statements statements;
+
+    statements.push_back(
+        std::make_unique<While>(std::move(subexpressions[0]), std::move(substatements[0]), location()));
+
+    return statements;
+}
+
 void While::doBuild(CompileContext*)
 {
     // Handled by basic block.

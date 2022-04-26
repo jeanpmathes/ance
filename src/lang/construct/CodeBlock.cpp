@@ -12,6 +12,9 @@ std::unique_ptr<lang::CodeBlock> lang::CodeBlock::makeInitial(lang::Location loc
 lang::CodeBlock* lang::CodeBlock::wrapStatement(std::unique_ptr<Statement> statement)
 {
     auto* block = new CodeBlock(false, statement->location());
+
+    block->addSubstatement(*statement);
+
     block->subs_.emplace_back(std::move(statement));
 
     return block;
@@ -28,12 +31,14 @@ void lang::CodeBlock::append(std::unique_ptr<CodeBlock> block)
     {
         lang::CodeBlock* last_ptr = block.get();
         subs_.emplace_back(std::move(block));
-        addChild(*last_ptr);
+
+        addSubstatement(*last_ptr);
     }
     else {
         for (auto& sub : block->subs_)
         {
-            addChild(*sub);
+            addSubstatement(*sub);
+
             subs_.push_back(std::move(sub));
         }
 
@@ -92,6 +97,23 @@ lang::LocalScope* lang::CodeBlock::getBlockScope() const
 void lang::CodeBlock::validate(ValidationLogger& validation_logger)
 {
     for (auto& sub : subs_) { sub->validate(validation_logger); }
+}
+
+Statements lang::CodeBlock::expandWith(Expressions, Statements substatements) const
+{
+    Statements statements;
+
+    auto* block = new CodeBlock(scoped_, location());
+    statements.push_back(std::unique_ptr<Statement>(block));
+
+    for (auto& sub : substatements)
+    {
+        block->addSubstatement(*sub);
+
+        block->subs_.push_back(std::move(sub));
+    }
+
+    return statements;
 }
 
 void lang::CodeBlock::doBuild(CompileContext*)

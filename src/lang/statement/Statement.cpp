@@ -29,8 +29,8 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Statement::createBasicBlocks(lang
 
 void Statement::setScope(lang::Scope* scope)
 {
-    for (auto& subexpression : subexpressions_) { subexpression->setContainingScope(scope); }
-    for (auto& substatement : substatements_) { substatement->setContainingScope(scope); }
+    for (auto& subexpression : subexpressions_) { subexpression.get().setContainingScope(scope); }
+    for (auto& substatement : substatements_) { substatement.get().setContainingScope(scope); }
 }
 
 lang::Scope* Statement::scope() const
@@ -40,13 +40,59 @@ lang::Scope* Statement::scope() const
 
 void Statement::walkDefinitions()
 {
-    for (auto& subexpression : subexpressions_) { subexpression->walkDefinitions(); }
-    for (auto& substatement : substatements_) { substatement->walkDefinitions(); }
+    for (auto& subexpression : subexpressions_) { subexpression.get().walkDefinitions(); }
+    for (auto& substatement : substatements_) { substatement.get().walkDefinitions(); }
 }
 
 lang::Location Statement::location() const
 {
     return location_;
+}
+
+Statements Statement::expand() const
+{
+    Statements before;
+    Statements after;
+
+    Expressions subexpressions;
+    subexpressions.reserve(subexpressions_.size());
+
+    for (auto& subexpression : subexpressions_)
+    {
+        auto [statements_before, expanded_expression, statements_after] = subexpression.get().expand();
+
+        before.insert(before.end(),
+                      std::make_move_iterator(statements_before.begin()),
+                      std::make_move_iterator(statements_before.end()));
+        after.insert(after.begin(),
+                     std::make_move_iterator(statements_after.begin()),
+                     std::make_move_iterator(statements_after.end()));
+
+        subexpressions.push_back(std::move(expanded_expression));
+    }
+
+    Statements substatements;
+    substatements.reserve(substatements_.size());
+
+    for (auto& substatement : substatements_)
+    {
+        Statements expanded_substatement = substatement.get().expand();
+        substatements.insert(substatements.end(),
+                             std::make_move_iterator(expanded_substatement.begin()),
+                             std::make_move_iterator(expanded_substatement.end()));
+    }
+
+    auto expanded_statements = this->expandWith(std::move(subexpressions), std::move(substatements));
+
+    Statements final;
+
+    final.insert(final.end(), std::make_move_iterator(before.begin()), std::make_move_iterator(before.end()));
+    final.insert(final.end(),
+                 std::make_move_iterator(expanded_statements.begin()),
+                 std::make_move_iterator(expanded_statements.end()));
+    final.insert(final.end(), std::make_move_iterator(after.begin()), std::make_move_iterator(after.end()));
+
+    return final;
 }
 
 void Statement::build(CompileContext* context)
@@ -58,12 +104,12 @@ void Statement::build(CompileContext* context)
 
 void Statement::addSubexpression(Expression& subexpression)
 {
-    subexpressions_.push_back(&subexpression);
+    subexpressions_.emplace_back(subexpression);
     addChild(subexpression);
 }
 
 void Statement::addSubstatement(Statement& substatement)
 {
-    substatements_.push_back(&substatement);
+    substatements_.emplace_back(substatement);
     addChild(substatement);
 }

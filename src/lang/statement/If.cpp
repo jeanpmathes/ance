@@ -39,6 +39,25 @@ void If::validate(ValidationLogger&)
     // Handled by basic block.
 }
 
+Statements If::expandWith(Expressions subexpressions, Statements substatements) const
+{
+    Statements statements;
+
+    if (!else_block_)
+    {
+        statements.push_back(
+            std::make_unique<If>(std::move(subexpressions[0]), std::move(substatements[0]), nullptr, location()));
+    }
+    else {
+        statements.push_back(std::make_unique<If>(std::move(subexpressions[0]),
+                                                  std::move(substatements[0]),
+                                                  std::move(substatements[1]),
+                                                  location()));
+    }
+
+    return statements;
+}
+
 void If::doBuild(CompileContext*)
 {
     // Handled by basic block.

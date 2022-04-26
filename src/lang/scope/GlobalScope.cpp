@@ -40,6 +40,18 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger)
     for (auto const& [name, variable] : global_defined_variables_) { variable->validate(validation_logger); }
 }
 
+void lang::GlobalScope::expand()
+{
+    for (auto const& [key, function] : defined_function_groups_) { function->expand(); }
+
+    expanded_ = true;
+}
+
+void lang::GlobalScope::determineFlow()
+{
+    for (auto const& [key, function] : defined_function_groups_) { function->determineFlow(); }
+}
+
 void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                access,
                                              bool                                is_constant,
                                              const std::string&                  identifier,
@@ -267,10 +279,13 @@ void lang::GlobalScope::registerDefinition(lang::ResolvingHandle<lang::Type> typ
 
 void lang::GlobalScope::resolve()
 {
-    for (auto& registry : type_registries_)
+    if (!expanded_)
     {
-        registry->setDefaultContainingScope(this);
-        registry->resolve();
+        for (auto& registry : type_registries_)
+        {
+            registry->setDefaultContainingScope(this);
+            registry->resolve();
+        }
     }
 
     for (auto const& [key, group] : defined_function_groups_) { group->resolve(); }

@@ -127,6 +127,22 @@ void lang::Function::validate(ValidationLogger& validation_logger)
     definition_->validate(validation_logger);
 }
 
+void lang::Function::expand()
+{
+    {// Quick fix to remove old scope from children, with full expansion this would be unnecessary.
+        clearChildren();
+        addChild(*definition_);
+        for (const auto& [name, parameter] : defined_parameters_) { addChild(*parameter); }
+    }
+
+    definition_->expand();
+}
+
+void lang::Function::determineFlow()
+{
+    definition_->determineFlow();
+}
+
 void lang::Function::createNativeBacking(CompileContext* context)
 {
     definition_->createNativeBacking(context);

@@ -142,7 +142,7 @@ void lang::HandleTarget<SELF>::setSelf(lang::ResolvingHandle<SELF> handle)
 }
 
 template<typename SELF>
-lang::ResolvingHandle<SELF> lang::HandleTarget<SELF>::self()
+lang::ResolvingHandle<SELF> lang::HandleTarget<SELF>::self() const
 {
     assert(self_);
     return self_.value();

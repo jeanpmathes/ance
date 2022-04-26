@@ -55,6 +55,11 @@ bool VariableAccess::validateAssignment(const std::shared_ptr<lang::Value>& valu
     return variable_->validateSetValue(value, validation_logger, location(), value_location);
 }
 
+Expression::Expansion VariableAccess::expandWith(Expressions) const
+{
+    return {Statements(), std::make_unique<VariableAccess>(variable_->toUndefined(), location()), Statements()};
+}
+
 void VariableAccess::doBuild(CompileContext* context)
 {
     std::shared_ptr<lang::Value> value = variable_->getValue(context);

@@ -21,6 +21,18 @@ void ExpressionStatement::validate(ValidationLogger& validation_logger)
     expression_->validate(validation_logger);
 }
 
+Statements ExpressionStatement::expandWith(Expressions subexpressions, Statements) const
+{
+    Statements statements;
+
+    auto* expression = dynamic_cast<BuildableExpression*>(subexpressions[0].release());
+
+    statements.push_back(
+        std::make_unique<ExpressionStatement>(std::unique_ptr<BuildableExpression>(expression), location()));
+
+    return statements;
+}
+
 void ExpressionStatement::doBuild(CompileContext* context)
 {
     expression_->build(context);

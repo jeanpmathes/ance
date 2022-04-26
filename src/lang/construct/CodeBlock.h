@@ -61,6 +61,9 @@ namespace lang
         lang::LocalScope* getBlockScope() const;
 
         void validate(ValidationLogger& validation_logger) override;
+
+        Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+
         void doBuild(CompileContext* context) override;
 
       private:

@@ -38,6 +38,15 @@ void Delete::validate(ValidationLogger& validation_logger)
     }
 }
 
+Statements Delete::expandWith(Expressions subexpressions, Statements) const
+{
+    Statements statements;
+
+    statements.push_back(std::make_unique<Delete>(std::move(subexpressions[0]), delete_buffer_, location()));
+
+    return statements;
+}
+
 void Delete::doBuild(CompileContext* context)
 {
     context->runtime()->deleteDynamic(to_delete_->getValue(), delete_buffer_, context);

@@ -29,6 +29,8 @@ class Return
 
     void validate(ValidationLogger& validation_logger) override;
 
+    Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+
   protected:
     void doBuild(CompileContext* context) override;
 

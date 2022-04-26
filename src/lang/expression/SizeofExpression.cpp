@@ -3,6 +3,7 @@
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
 #include "compiler/CompileContext.h"
+#include "lang/statement/Statement.h"
 
 SizeofExpression::SizeofExpression(std::unique_ptr<Expression> expression, lang::Location location)
     : Expression(location)
@@ -24,6 +25,11 @@ lang::ResolvingHandle<lang::Type> SizeofExpression::type()
 bool SizeofExpression::validate(ValidationLogger& validation_logger)
 {
     return expression_->validate(validation_logger);
+}
+
+Expression::Expansion SizeofExpression::expandWith(Expressions subexpressions) const
+{
+    return {Statements(), std::make_unique<SizeofExpression>(std::move(subexpressions[0]), location()), Statements()};
 }
 
 std::shared_ptr<lang::Value> SizeofExpression::getValue() const

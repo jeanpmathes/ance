@@ -26,6 +26,8 @@ namespace lang
 
         void resolve();
         void validate(ValidationLogger& validation_logger);
+        void expand();
+        void determineFlow();
         void createNativeBacking(CompileContext* compile_context);
         void build(CompileContext* compile_context);
 
@@ -54,6 +56,11 @@ namespace lang
          */
         std::vector<lang::ResolvingHandle<lang::Function>> resolveOverload(
             const std::vector<lang::ResolvingHandle<lang::Type>>& arguments);
+
+        /**
+         * Get an undefined function group with the same name.
+         */
+        [[nodiscard]] lang::ResolvingHandle<lang::FunctionGroup> toUndefined() const;
 
       private:
         std::string                                     name_;

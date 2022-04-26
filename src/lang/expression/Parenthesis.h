@@ -28,6 +28,8 @@ class Parenthesis
                             lang::Location                      value_location,
                             ValidationLogger&                   validation_logger) override;
 
+    [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
+
     lang::ResolvingHandle<lang::Type>          type() override;
     [[nodiscard]] std::shared_ptr<lang::Value> getValue() const override;
 

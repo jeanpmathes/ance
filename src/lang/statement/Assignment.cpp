@@ -50,6 +50,18 @@ void Assignment::validate(ValidationLogger& validation_logger)
     }
 }
 
+Statements Assignment::expandWith(Expressions subexpressions, Statements) const
+{
+    Statements statements;
+
+    statements.push_back(std::make_unique<Assignment>(std::move(subexpressions[0]),
+                                                      assigner_,
+                                                      std::move(subexpressions[1]),
+                                                      location()));
+
+    return statements;
+}
+
 void Assignment::doBuild(CompileContext* context)
 {
     assignable_->assign(assigned_->getValue(), context);

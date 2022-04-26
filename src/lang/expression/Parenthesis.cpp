@@ -1,5 +1,7 @@
 #include "Parenthesis.h"
 
+#include "lang/statement/Statement.h"
+
 Parenthesis::Parenthesis(std::unique_ptr<Expression> expression, lang::Location location)
     : Expression(location)
     , expression_(std::move(expression))
@@ -27,6 +29,11 @@ bool Parenthesis::validateAssignment(const std::shared_ptr<lang::Value>& value,
                                      ValidationLogger&                   validation_logger)
 {
     return expression_->validateAssignment(value, value_location, validation_logger);
+}
+
+Expression::Expansion Parenthesis::expandWith(Expressions subexpressions) const
+{
+    return {Statements(), std::make_unique<Parenthesis>(std::move(subexpressions[0]), location()), Statements()};
 }
 
 lang::ResolvingHandle<lang::Type> Parenthesis::type()

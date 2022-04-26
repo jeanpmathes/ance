@@ -58,6 +58,13 @@ bool BindRef::validate(ValidationLogger& validation_logger)
     return true;
 }
 
+Expression::Expansion BindRef::expandWith(Expressions subexpressions) const
+{
+    return {Statements(),
+            std::unique_ptr<BindRef>(new BindRef(std::move(subexpressions[0]), location())),
+            Statements()};
+}
+
 void BindRef::doBuild(CompileContext*)
 {
     setValue(std::make_shared<lang::RoughlyCastedValue>(type(), address_->getValue()));

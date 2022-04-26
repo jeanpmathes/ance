@@ -145,3 +145,8 @@ void lang::Variable::setValue(const std::shared_ptr<lang::Value>& value, Compile
 {
     definition_->setValue(value, context);
 }
+
+lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const
+{
+    return lang::makeHandled<lang::Variable>(identifier());
+}

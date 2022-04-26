@@ -42,6 +42,8 @@ class VariableAccess
                             lang::Location                      value_location,
                             ValidationLogger&                   validation_logger) override;
 
+    [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
+
   protected:
     void doBuild(CompileContext* context) override;
     void doAssign(std::shared_ptr<lang::Value> value, CompileContext* context) override;

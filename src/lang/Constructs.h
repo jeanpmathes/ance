@@ -60,3 +60,9 @@ class Case;
         Assignment, Delete, ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Drop,      \
         Return, If, While, Match, Case
 #endif
+
+class Statement;
+using Statements = std::vector<std::unique_ptr<Statement>>;
+
+class Expression;
+using Expressions = std::vector<std::unique_ptr<Expression>>;

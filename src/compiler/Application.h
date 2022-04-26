@@ -2,6 +2,7 @@
 #define ANCE_SRC_COMPILER_APPLICATION_H_
 
 #include <filesystem>
+#include <memory>
 
 #include "lang/scope/GlobalScope.h"
 #include "lang/Element.h"
@@ -32,6 +33,10 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
      */
     explicit Application(data::File& project);
 
+  private:
+    Application(data::File& project, std::unique_ptr<lang::GlobalScope>&& scope);
+
+  public:
     Application(const Application&) = delete;
     Application(Application&&)      = delete;
 
@@ -66,10 +71,20 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
     [[nodiscard]] unsigned getBitness() const;
 
     /**
+     * Prepare everything for the first validation step.
+     */
+    void preValidate();
+
+    /**
      * Validate the application before compilation.
      * @param validation_logger A logger to log validation messages.
      */
     void validate(ValidationLogger& validation_logger);
+
+    /**
+     * Prepare everything for compilation.
+     */
+    void preBuild();
 
     /**
      * Get the top level scope of this application.

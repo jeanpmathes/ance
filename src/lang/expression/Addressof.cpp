@@ -45,12 +45,17 @@ bool Addressof::validate(ValidationLogger& validation_logger)
     return true;
 }
 
+Expression::Expansion Addressof::expandWith(Expressions subexpressions) const
+{
+    return {Statements(), std::make_unique<Addressof>(std::move(subexpressions[0]), location()), Statements()};
+}
+
 void Addressof::doBuild(CompileContext* context)
 {
     std::shared_ptr<lang::Value> value = arg_->getValue();
     value->buildNativeValue(context);
 
-    llvm::Value* address        = value->getNativeValue();
+    llvm::Value* address = value->getNativeValue();
     if (!arg_->type()->isReferenceType()) address = lang::Values::contentToNative(type(), address, context);
 
     setValue(std::make_shared<lang::WrappedNativeValue>(type(), address));

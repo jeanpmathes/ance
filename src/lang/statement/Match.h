@@ -39,6 +39,8 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
     bool validateConflicts(Case* other, ValidationLogger& validation_logger);
     bool validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger);
 
+    std::unique_ptr<Case> expand() const;
+
     ssize_t getCoverageCount();
 
   private:
@@ -72,6 +74,8 @@ class Match
     void walkDefinitions() override;
 
     void validate(ValidationLogger& validation_logger) override;
+
+    Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
     /**
      * Validate the cases of the match statement.

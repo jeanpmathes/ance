@@ -406,3 +406,10 @@ std::shared_ptr<lang::Value> lang::Type::makeActual(std::shared_ptr<lang::Value>
     return std::make_shared<lang::RoughlyCastedValue>(actual_type, value);
 }
 
+lang::ResolvingHandle<lang::Type> lang::Type::toUndefined() const
+{
+    if (!isDefined()) return self();
+    if (!isCustom()) return self();
+
+    return lang::makeHandled<lang::Type>(getName());
+}

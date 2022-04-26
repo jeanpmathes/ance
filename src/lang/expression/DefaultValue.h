@@ -25,6 +25,8 @@ class DefaultValue
 
     bool validate(ValidationLogger& validation_logger) override;
 
+    [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
+
     [[nodiscard]] std::shared_ptr<lang::Value>    getValue() const override;
     [[nodiscard]] std::shared_ptr<lang::Constant> getConstantValue() const override;
     llvm::Constant*                               buildContentConstant(llvm::LLVMContext& c) override;

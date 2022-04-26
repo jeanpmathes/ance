@@ -81,7 +81,7 @@ namespace lang
     {
       public:
         void                        setSelf(lang::ResolvingHandle<SELF> handle);
-        lang::ResolvingHandle<SELF> self();
+        lang::ResolvingHandle<SELF> self() const;
 
         virtual bool equalsTarget(SELF* other);
 

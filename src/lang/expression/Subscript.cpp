@@ -2,6 +2,7 @@
 
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
+#include "lang/statement/Statement.h"
 
 Subscript::Subscript(std::unique_ptr<Expression> indexed, std::unique_ptr<Expression> index, lang::Location location)
     : Expression(location)
@@ -45,13 +46,19 @@ bool Subscript::validate(ValidationLogger& validation_logger)
                                                index_->location(),
                                                validation_logger);
     }
-    else
-    {
+    else {
         validation_logger.logError("Type " + indexed_type->getAnnotatedName() + " does not provide subscript",
                                    location());
 
         return false;
     }
+}
+
+Expression::Expansion Subscript::expandWith(Expressions subexpressions) const
+{
+    return {Statements(),
+            std::make_unique<Subscript>(std::move(subexpressions[0]), std::move(subexpressions[1]), location()),
+            Statements()};
 }
 
 void Subscript::doBuild(CompileContext* context)

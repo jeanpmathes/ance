@@ -148,6 +148,17 @@ namespace lang
         void validate(ValidationLogger& validation_logger) override;
 
         /**
+         * Expand this function to remove syntactic sugar.
+         */
+        void expand();
+
+        /**
+         * Determine the control flow in this function and build the CFG.
+         * This step is necessary to build.
+         */
+        void determineFlow();
+
+        /**
          * Create the native content of this function, allowing building function code and calling this function.
          * @param context The current compile context.
          */

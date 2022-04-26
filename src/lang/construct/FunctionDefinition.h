@@ -99,6 +99,23 @@ namespace lang
         virtual void validate(ValidationLogger& validation_logger) = 0;
 
         /**
+         * Expand the function content to remove syntactic sugar.
+         */
+        virtual void expand() = 0;
+
+        /**
+         * Determine and create structures to represent control flow.
+         */
+        virtual void determineFlow() = 0;
+
+        /**
+         * Validate the control flow of this function.
+         * @param validation_logger The logger to log validation messages.
+         * @return True if the control flow is valid.
+         */
+        virtual bool validateFlow(ValidationLogger& validation_logger) = 0;
+
+        /**
          * Create the native content of this function, allowing building function code and calling this function.
          * @param context The current compile context.
          */

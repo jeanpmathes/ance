@@ -33,6 +33,8 @@ class BindRef
 
     bool validate(ValidationLogger& validation_logger) override;
 
+    [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
+
   protected:
     void doBuild(CompileContext* context) override;
 

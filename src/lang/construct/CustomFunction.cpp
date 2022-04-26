@@ -34,13 +34,7 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
     , definition_location_(definition_location)
     , initial_block_(lang::BasicBlock::createEmpty())
 {
-    addChild(*code_);
-
-    code_->setContainingScope(this->function());
-    inside_scope_ = code_->getBlockScope();
-    assert(inside_scope_);
-
-    code_->walkDefinitions();
+    setupCode();
 
     containing_scope->addType(return_type);
 
@@ -57,36 +51,22 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
                                                      parameter->location());
         arguments_.push_back(arg);
     }
+}
 
-    finalizeDefinition();
+void lang::CustomFunction::setupCode()
+{
+    addChild(*code_);
+
+    code_->setContainingScope(this->function());
+    inside_scope_ = code_->getBlockScope();
+    assert(inside_scope_);
+
+    code_->walkDefinitions();
 }
 
 bool lang::CustomFunction::isMangled() const
 {
     return true;
-}
-
-void lang::CustomFunction::finalizeDefinition()
-{
-    blocks_ = code_->createBasicBlocks(*initial_block_, function());
-
-    initial_block_->setContainingFunction(function());
-
-    for (auto& block : blocks_) { block->setContainingFunction(function()); }
-
-    initial_block_->simplify();
-
-    for (auto& block : blocks_) { block->simplify(); }
-
-    size_t running_index = 0;
-    initial_block_->finalize(running_index);
-    used_blocks_.push_back(initial_block_.get());
-
-    for (auto& block : blocks_)
-    {
-        block->finalize(running_index);
-        if (block->isUsable()) { used_blocks_.push_back(block.get()); }
-    }
 }
 
 void lang::CustomFunction::validate(ValidationLogger& validation_logger)
@@ -125,16 +105,56 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger)
     }
 
     inside_scope_->validate(validation_logger);
+}
 
+void lang::CustomFunction::expand()
+{
+    clearChildren();
+
+    Statements expanded_statements = code_->expand();
+    assert(expanded_statements.size() == 1);
+
+    code_ = std::unique_ptr<lang::CodeBlock>(dynamic_cast<lang::CodeBlock*>(expanded_statements.front().release()));
+
+    setupCode();
+}
+
+void lang::CustomFunction::determineFlow()
+{
+    blocks_ = code_->createBasicBlocks(*initial_block_, function());
+
+    initial_block_->setContainingFunction(function());
+
+    for (auto& block : blocks_) { block->setContainingFunction(function()); }
+
+    initial_block_->simplify();
+
+    for (auto& block : blocks_) { block->simplify(); }
+
+    size_t running_index = 0;
+    initial_block_->finalize(running_index);
+    used_blocks_.push_back(initial_block_.get());
+
+    for (auto& block : blocks_)
+    {
+        block->finalize(running_index);
+        if (block->isUsable()) { used_blocks_.push_back(block.get()); }
+    }
+}
+
+bool lang::CustomFunction::validateFlow(ValidationLogger& validation_logger)
+{
     bool are_blocks_valid = true;
 
     are_blocks_valid &= initial_block_->validate(validation_logger);
     for (auto& block : blocks_) { are_blocks_valid &= block->validate(validation_logger); }
 
-    if (!are_blocks_valid) return;
+    if (!are_blocks_valid) return false;
 
     validateReturn(validation_logger);
     validateUnreachable(validation_logger);
+
+    return true;
 }
 
 void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger)

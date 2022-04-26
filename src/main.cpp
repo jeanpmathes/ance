@@ -59,7 +59,7 @@ int main(int argc, char** argv)
     {
         source_visitor->visit(tree);
 
-        application.globalScope().resolve();
+        application.preValidate();
 
         ValidationLogger validation_logger;
         application.validate(validation_logger);
@@ -67,6 +67,8 @@ int main(int argc, char** argv)
 
         if (validation_logger.errorCount() == 0)
         {
+            application.preBuild();
+
             llvm::InitializeAllTargetInfos();
             llvm::InitializeAllTargets();
             llvm::InitializeAllTargetMCs();

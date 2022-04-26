@@ -30,13 +30,16 @@ namespace lang
         [[nodiscard]] bool isMangled() const override;
 
         void validate(ValidationLogger& validation_logger) override;
+        void expand() override;
+        void determineFlow() override;
+        bool validateFlow(ValidationLogger& validation_logger) override;
 
         void                         createNativeBacking(CompileContext* context) override;
         void                         build(CompileContext* context) override;
         std::shared_ptr<lang::Value> buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
                                                CompileContext*                                  context) const override;
 
-        llvm::DIScope*    getDebugScope(CompileContext* context) override;
+        llvm::DIScope*                                      getDebugScope(CompileContext* context) override;
         lang::LocalScope*                                   getInsideScope() override;
         [[nodiscard]] const std::vector<lang::BasicBlock*>& getBasicBlocks() const override;
 

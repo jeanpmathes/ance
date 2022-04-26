@@ -1,6 +1,7 @@
 #include "UnaryOperation.h"
 
 #include "validation/ValidationLogger.h"
+#include "lang/statement/Statement.h"
 
 UnaryOperation::UnaryOperation(lang::UnaryOperator op, std::unique_ptr<Expression> operand, lang::Location location)
     : Expression(location)
@@ -37,6 +38,13 @@ bool UnaryOperation::validate(ValidationLogger& validation_logger)
     }
 
     return operand_->type()->validateOperator(op_, operand_->location(), validation_logger);
+}
+
+Expression::Expansion UnaryOperation::expandWith(Expressions subexpressions) const
+{
+    return {Statements(),
+            std::make_unique<UnaryOperation>(op_, std::move(subexpressions[0]), location()),
+            Statements()};
 }
 
 void UnaryOperation::doBuild(CompileContext* context)

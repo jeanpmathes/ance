@@ -77,6 +77,20 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     virtual void validate(ValidationLogger& validation_logger) = 0;
 
     /**
+     * Expand this statement into new statements that do not use syntactic sugar.
+     * @return The expanded statements.
+     */
+    [[nodiscard]] virtual Statements expand() const;
+
+    /**
+     * Expand this statement into new statements with the given sub-elements.
+     * @param subexpressions The subexpressions to use.
+     * @param substatements The substatements to use.
+     * @return The expanded statements.
+     */
+    [[nodiscard]] virtual Statements expandWith(Expressions subexpressions, Statements substatements) const = 0;
+
+    /**
      * Build this statement.
      * @param context The current compile context.
      */
@@ -109,8 +123,8 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
 
     lang::Scope* containing_scope_ = nullptr;
 
-    std::vector<Expression*> subexpressions_;
-    std::vector<Statement*>  substatements_;
+    std::vector<std::reference_wrapper<Expression>> subexpressions_;
+    std::vector<std::reference_wrapper<Statement>>  substatements_;
 };
 
 #endif

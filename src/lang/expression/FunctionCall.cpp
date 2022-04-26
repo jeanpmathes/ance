@@ -92,6 +92,13 @@ bool FunctionCall::validate(ValidationLogger& validation_logger)
     return actual_function->validateCall(arguments, location(), validation_logger);
 }
 
+Expression::Expansion FunctionCall::expandWith(Expressions subexpressions) const
+{
+    return {Statements(),
+            std::make_unique<FunctionCall>(function_group_->toUndefined(), std::move(subexpressions), location()),
+            Statements()};
+}
+
 void FunctionCall::doBuild(CompileContext* context)
 {
     std::vector<std::shared_ptr<lang::Value>> arg_values;

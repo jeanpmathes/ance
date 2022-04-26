@@ -102,6 +102,20 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
     lang::Type::checkMismatch(variable->type(), assigned_->type(), assigned_->location(), validation_logger);
 }
 
+Statements LocalVariableDefinition::expandWith(Expressions subexpressions, Statements) const
+{
+    Statements statements;
+
+    statements.push_back(std::make_unique<LocalVariableDefinition>(identifier_,
+                                                                   type_->toUndefined(),
+                                                                   type_location_,
+                                                                   assigner_,
+                                                                   std::move(subexpressions[0]),
+                                                                   location()));
+
+    return statements;
+}
+
 void LocalVariableDefinition::doBuild(CompileContext* context)
 {
     (*variable_)->buildDefinition(context);

@@ -158,6 +158,11 @@ namespace lang
          */
         void setValue(const std::shared_ptr<lang::Value>& value, CompileContext* context);
 
+        /**
+         * Get an undefined variable with the same name.
+         */
+        [[nodiscard]] lang::ResolvingHandle<lang::Variable> toUndefined() const;
+
       private:
         std::string                               identifier_;
         std::unique_ptr<lang::VariableDefinition> definition_ {};

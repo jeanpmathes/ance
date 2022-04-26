@@ -28,6 +28,15 @@ void Assertion::validate(ValidationLogger& validation_logger)
     lang::Type::checkMismatch(lang::BooleanType::get(), condition_->type(), condition_->location(), validation_logger);
 }
 
+Statements Assertion::expandWith(Expressions subexpressions, Statements) const
+{
+    Statements statements;
+
+    statements.push_back(std::make_unique<Assertion>(std::move(subexpressions[0]), location()));
+
+    return statements;
+}
+
 void Assertion::doBuild(CompileContext* context)
 {
     context->runtime()->buildAssert(condition_->getValue(), context);

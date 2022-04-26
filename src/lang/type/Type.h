@@ -446,6 +446,12 @@ namespace lang
          */
         static std::shared_ptr<lang::Value> makeActual(std::shared_ptr<lang::Value> value);
 
+        /**
+         * Get an undefined type with the same name. Types given by literals cannot be undefined.
+         * Therefore, for these types the returned type will be the same as the type passed in.
+         */
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> toUndefined() const;
+
       private:
         std::string                           name_;
         std::unique_ptr<lang::TypeDefinition> definition_ {};

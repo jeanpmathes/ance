@@ -69,6 +69,29 @@ bool Allocation::validate(ValidationLogger& validation_logger)
     return is_valid;
 }
 
+Expression::Expansion Allocation::expandWith(Expressions subexpressions) const
+{
+    if (count_)
+    {
+        return {Statements(),
+                std::make_unique<Allocation>(allocation_,
+                                             allocated_type_->toUndefined(),
+                                             std::move(subexpressions[0]),
+                                             location(),
+                                             allocated_type_location_),
+                Statements()};
+    }
+    else {
+        return {Statements(),
+                std::make_unique<Allocation>(allocation_,
+                                             allocated_type_->toUndefined(),
+                                             nullptr,
+                                             location(),
+                                             allocated_type_location_),
+                Statements()};
+    }
+}
+
 void Allocation::doBuild(CompileContext* context)
 {
     std::shared_ptr<lang::Value> count = {};

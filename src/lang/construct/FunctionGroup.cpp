@@ -61,6 +61,16 @@ void lang::FunctionGroup::validate(ValidationLogger& validation_logger)
     }
 }
 
+void lang::FunctionGroup::expand()
+{
+    for (auto& function : functions_) function->expand();
+}
+
+void lang::FunctionGroup::determineFlow()
+{
+    for (auto& function : functions_) function->determineFlow();
+}
+
 void lang::FunctionGroup::createNativeBacking(CompileContext* compile_context)
 {
     for (auto& function : functions_) function->createNativeBacking(compile_context);
@@ -110,4 +120,9 @@ std::vector<lang::ResolvingHandle<lang::Function>> lang::FunctionGroup::resolveO
 
     if (same_signatures.empty()) return matching_signatures;
     else return same_signatures;
+}
+
+lang::ResolvingHandle<lang::FunctionGroup> lang::FunctionGroup::toUndefined() const
+{
+    return lang::makeHandled<lang::FunctionGroup>(name());
 }

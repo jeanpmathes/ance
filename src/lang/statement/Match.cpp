@@ -109,6 +109,27 @@ bool Case::validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLog
     return true;
 }
 
+std::unique_ptr<Case> Case::expand() const
+{
+    Statements expanded_statements = code_->expand();
+    assert(expanded_statements.size() == 1);
+
+    std::vector<std::unique_ptr<ConstantExpression>> expanded_conditions;
+
+    for (auto& condition : conditions_)
+    {
+        auto [before, expanded_condition, after] = condition->expand();
+
+        assert(before.empty());
+        assert(after.empty());
+
+        expanded_conditions.push_back(
+            std::unique_ptr<ConstantExpression>(dynamic_cast<ConstantExpression*>(expanded_condition.release())));
+    }
+
+    return std::unique_ptr<Case>(new Case(std::move(expanded_conditions), std::move(expanded_statements.front())));
+}
+
 ssize_t Case::getCoverageCount()
 {
     if (conditions_.empty()) { return -1; }
@@ -216,6 +237,22 @@ bool Match::validateCases(ValidationLogger& validation_logger)
     }
 
     return valid;
+}
+
+Statements Match::expandWith(Expressions subexpressions, Statements) const
+{
+    std::vector<std::unique_ptr<Case>> expanded_cases;
+    for (auto& case_ptr : cases_)
+    {
+        auto expanded_case = case_ptr->expand();
+        expanded_cases.push_back(std::move(expanded_case));
+    }
+
+    Statements statements;
+
+    statements.push_back(std::make_unique<Match>(std::move(expanded_cases), std::move(subexpressions[0]), location()));
+
+    return statements;
 }
 
 void Match::validate(ValidationLogger&)

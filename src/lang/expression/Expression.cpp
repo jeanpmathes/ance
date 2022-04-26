@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "lang/construct/value/Value.h"
-#include "lang/type/ReferenceType.h"
+#include "lang/statement/Statement.h"
 #include "lang/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
@@ -28,12 +28,12 @@ void Expression::setContainingScope(lang::Scope* scope)
 
 void Expression::walkDefinitions()
 {
-    for (auto& subexpression : subexpressions_) { subexpression->walkDefinitions(); }
+    for (auto& subexpression : subexpressions_) { subexpression.get().walkDefinitions(); }
 }
 
 void Expression::setScope(lang::Scope* scope)
 {
-    for (auto& subexpression : subexpressions_) { subexpression->setContainingScope(scope); }
+    for (auto& subexpression : subexpressions_) { subexpression.get().setContainingScope(scope); }
 }
 
 bool Expression::isNamed()
@@ -82,6 +82,40 @@ void Expression::doAssign(std::shared_ptr<lang::Value> value, CompileContext* co
 
 void Expression::addSubexpression(Expression& subexpression)
 {
-    subexpressions_.push_back(&subexpression);
+    subexpressions_.emplace_back(subexpression);
     addChild(subexpression);
+}
+
+std::tuple<Statements, std::unique_ptr<Expression>, Statements> Expression::expand() const
+{
+    Statements before;
+    Statements after;
+
+    Expressions subexpressions;
+    subexpressions.reserve(subexpressions_.size());
+
+    for (auto& subexpression : subexpressions_)
+    {
+        auto [statements_before, expanded_expression, statements_after] = subexpression.get().expand();
+
+        before.insert(before.end(),
+                      std::make_move_iterator(statements_before.begin()),
+                      std::make_move_iterator(statements_before.end()));
+        after.insert(after.begin(),
+                     std::make_move_iterator(statements_after.begin()),
+                     std::make_move_iterator(statements_after.end()));
+
+        subexpressions.push_back(std::move(expanded_expression));
+    }
+
+    auto [statements_before, expanded_expression, statements_after] = this->expandWith(std::move(subexpressions));
+
+    before.insert(before.end(),
+                  std::make_move_iterator(statements_before.begin()),
+                  std::make_move_iterator(statements_before.end()));
+    after.insert(after.begin(),
+                 std::make_move_iterator(statements_after.begin()),
+                 std::make_move_iterator(statements_after.end()));
+
+    return std::make_tuple(std::move(before), std::move(expanded_expression), std::move(after));
 }

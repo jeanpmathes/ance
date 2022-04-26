@@ -37,6 +37,9 @@ namespace lang
 
         void validate(ValidationLogger& validation_logger) override;
 
+        void expand();
+        void determineFlow();
+
         /**
          * Define a global variable.
          * @param access The access level.
@@ -197,6 +200,8 @@ namespace lang
 
         std::map<std::string, lang::OwningHandle<lang::Type>> undefined_types_;
         std::map<std::string, lang::OwningHandle<lang::Type>> defined_types_;
+
+        bool expanded_ {false};
     };
 }
 #endif
