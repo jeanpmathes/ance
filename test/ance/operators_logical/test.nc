@@ -11,6 +11,8 @@ define Handle as *void;
 
 public main () : ui32
 {
+    std_out <: GetStdHandle(4294967285:32);
+
     assert true and true;
     assert true or false;
     assert false or true;
