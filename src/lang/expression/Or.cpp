@@ -36,9 +36,14 @@ lang::ResolvingHandle<lang::Type> Or::type()
 
 bool Or::validate(ValidationLogger& validation_logger)
 {
-    return left_->validate(validation_logger) && right_->validate(validation_logger);
+    bool valid = left_->validate(validation_logger) && right_->validate(validation_logger);
 
-    // todo
+    if (!valid) return false;
+
+    valid &= lang::Type::checkMismatch(lang::BooleanType::get(), left_->type(), location(), validation_logger);
+    valid &= lang::Type::checkMismatch(lang::BooleanType::get(), right_->type(), location(), validation_logger);
+
+    return valid;
 }
 
 Expression::Expansion Or::expandWith(Expressions subexpressions) const
