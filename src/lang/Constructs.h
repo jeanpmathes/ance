@@ -32,6 +32,8 @@ class SizeofExpression;
 class SizeofType;
 class Subscript;
 class VariableAccess;
+class And;
+class Or;
 
 namespace lang
 {
@@ -56,9 +58,9 @@ class Case;
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::BasicBlock,    \
         lang::CodeBlock, lang::Variable, lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation,             \
         BinaryOperation, UnaryOperation, BindRef, ConstantLiteral, DefaultValue, FunctionCall, Parenthesis,            \
-        SizeofExpression, SizeofType, Subscript, VariableAccess, lang::GlobalScope, lang::LocalScope, Assertion,       \
-        Assignment, Delete, ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Drop,      \
-        Return, If, While, Match, Case
+        SizeofExpression, SizeofType, Subscript, VariableAccess, And, Or, lang::GlobalScope, lang::LocalScope,         \
+        Assertion, Assignment, Delete, ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, \
+        Drop, Return, If, While, Match, Case
 #endif
 
 class Statement;

@@ -134,6 +134,8 @@ expression
 	| left=expression binaryOperatorAdditive right=expression # BinaryOperation
 	| left=expression binaryOperatorRelational right=expression # BinaryOperation
 	| left=expression binaryOperatorEquality right=expression # BinaryOperation
+	| left=expression 'and' right=expression # LogicalAnd
+    | left=expression 'or' right=expression # LogicalOr
 	;
 
 binaryOperatorMultiplicative
@@ -192,7 +194,6 @@ bindRef
     : 'ref' expression # BindReference
     | 'ref' 'to' expression # BindReferenceToAddress
     ;
-
 
 sizeofType
 	: 'sizeof' type

@@ -34,6 +34,8 @@ namespace lang
 #include "lang/expression/Subscript.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/expression/Parenthesis.h"
+#include "lang/expression/And.h"
+#include "lang/expression/Or.h"
 
 #include "lang/scope/GlobalScope.h"
 #include "lang/scope/LocalScope.h"

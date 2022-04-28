@@ -80,27 +80,31 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitDefaultCase(anceParser::DefaultCaseContext* context) = 0;
 
+    virtual antlrcpp::Any visitVariable(anceParser::VariableContext* context) = 0;
+
+    virtual antlrcpp::Any visitAdressOf(anceParser::AdressOfContext* context) = 0;
+
+    virtual antlrcpp::Any visitBinaryOperation(anceParser::BinaryOperationContext* context) = 0;
+
+    virtual antlrcpp::Any visitNotOperation(anceParser::NotOperationContext* context) = 0;
+
+    virtual antlrcpp::Any visitSubscript(anceParser::SubscriptContext* context) = 0;
+
+    virtual antlrcpp::Any visitLogicalOr(anceParser::LogicalOrContext* context) = 0;
+
     virtual antlrcpp::Any visitRef(anceParser::RefContext* context) = 0;
 
     virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* context) = 0;
 
     virtual antlrcpp::Any visitParenthesis(anceParser::ParenthesisContext* context) = 0;
 
-    virtual antlrcpp::Any visitVariable(anceParser::VariableContext* context) = 0;
-
     virtual antlrcpp::Any visitAlloc(anceParser::AllocContext* context) = 0;
-
-    virtual antlrcpp::Any visitAdressOf(anceParser::AdressOfContext* context) = 0;
-
-    virtual antlrcpp::Any visitBinaryOperation(anceParser::BinaryOperationContext* context) = 0;
 
     virtual antlrcpp::Any visitLiteral(anceParser::LiteralContext* context) = 0;
 
+    virtual antlrcpp::Any visitLogicalAnd(anceParser::LogicalAndContext* context) = 0;
+
     virtual antlrcpp::Any visitSizeOf(anceParser::SizeOfContext* context) = 0;
-
-    virtual antlrcpp::Any visitNotOperation(anceParser::NotOperationContext* context) = 0;
-
-    virtual antlrcpp::Any visitSubscript(anceParser::SubscriptContext* context) = 0;
 
     virtual antlrcpp::Any visitMultiplication(anceParser::MultiplicationContext* context) = 0;
 

@@ -7,7 +7,9 @@ UnaryOperation::UnaryOperation(lang::UnaryOperator op, std::unique_ptr<Expressio
     : Expression(location)
     , operand_(std::move(operand))
     , op_(op)
-{}
+{
+    addSubexpression(*operand_);
+}
 
 Expression& UnaryOperation::operand() const
 {

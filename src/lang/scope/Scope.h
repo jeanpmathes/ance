@@ -55,6 +55,12 @@ namespace lang
         virtual lang::LocalScope* asLocalScope();
 
         /**
+         * Get the name for a temporary element like a variable or function.
+         * @return A name that that will not clash with any other element in this scope.
+         */
+        std::string getTemporaryName();
+
+        /**
          * Get the debug scope for this scope.
          * @param context The current compile context.
          * @return The debug scope.
@@ -133,6 +139,9 @@ namespace lang
 
       protected:
         virtual void onSubScope(LocalScope* local_scope);
+
+      private:
+        size_t temp_name_counter_ = 0;
     };
 }
 #endif

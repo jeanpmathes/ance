@@ -41,6 +41,8 @@
 #include "lang/expression/Subscript.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/expression/Parenthesis.h"
+#include "lang/expression/And.h"
+#include "lang/expression/Or.h"
 
 #include "lang/construct/constant/BooleanConstant.h"
 #include "lang/construct/constant/ByteConstant.h"
@@ -509,6 +511,24 @@ antlrcpp::Any SourceVisitor::visitNotOperation(anceParser::NotOperationContext* 
     Expression* value = visit(ctx->expression()).as<Expression*>();
     return static_cast<Expression*>(
         new UnaryOperation(lang::UnaryOperator::NOT, std::unique_ptr<Expression>(value), location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitLogicalAnd(anceParser::LogicalAndContext* ctx)
+{
+    Expression* left  = visit(ctx->left).as<Expression*>();
+    Expression* right = visit(ctx->right).as<Expression*>();
+
+    return static_cast<Expression*>(
+        new And(std::unique_ptr<Expression>(left), std::unique_ptr<Expression>(right), location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitLogicalOr(anceParser::LogicalOrContext* ctx)
+{
+    Expression* left  = visit(ctx->left).as<Expression*>();
+    Expression* right = visit(ctx->right).as<Expression*>();
+
+    return static_cast<Expression*>(
+        new Or(std::unique_ptr<Expression>(left), std::unique_ptr<Expression>(right), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)

@@ -15,5 +15,7 @@ target_sources(ance PRIVATE DefaultValue.cpp
                Addressof.cpp
                BindRef.cpp
                BinaryOperation.cpp
+               And.cpp
+               Or.cpp
                UnaryOperation.cpp
                Parenthesis.cpp)
