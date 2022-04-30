@@ -202,19 +202,6 @@ size_t lang::BasicBlock::getId() const
     return definition_->getIndex();
 }
 
-bool lang::BasicBlock::validate(ValidationLogger& validation_logger)
-{
-    assert(finalized_);
-
-    if (!validated_)
-    {
-        validated_ = true;// Prevent infinite recursion. Must be true as booleans are and'd together.
-        validated_ = definition_->validate(validation_logger);
-    }
-
-    return validated_.value();
-}
-
 std::list<lang::BasicBlock*> lang::BasicBlock::getLeaves()
 {
     assert(finalized_);

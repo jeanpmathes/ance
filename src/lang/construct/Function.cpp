@@ -143,6 +143,11 @@ void lang::Function::determineFlow()
     definition_->determineFlow();
 }
 
+void lang::Function::validateFlow(ValidationLogger& validation_logger)
+{
+    definition_->validateFlow(validation_logger);
+}
+
 void lang::Function::createNativeBacking(CompileContext* context)
 {
     definition_->createNativeBacking(context);
@@ -309,3 +314,4 @@ bool lang::Function::resolveDefinition(lang::ResolvingHandle<lang::Type> type)
 {
     return scope()->resolveDefinition(type);
 }
+

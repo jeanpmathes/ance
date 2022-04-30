@@ -60,17 +60,6 @@ void lang::BasicBlock::Definition::Simple::transferStatements(std::list<Statemen
     statements_.splice(statements_.begin(), statements);
 }
 
-bool lang::BasicBlock::Definition::Simple::validate(ValidationLogger& validation_logger)
-{
-    bool valid = true;
-
-    for (auto& statement : statements_) { statement->validate(validation_logger); }
-
-    if (next_) { valid &= next_->validate(validation_logger); }
-
-    return valid;
-}
-
 std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Simple::getLeaves()
 {
     std::list<lang::BasicBlock*> leaves;

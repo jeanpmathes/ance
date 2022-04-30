@@ -40,6 +40,8 @@ namespace lang
         void expand();
         void determineFlow();
 
+        void validateFlow(ValidationLogger& validation_logger);
+
         /**
          * Define a global variable.
          * @param access The access level.

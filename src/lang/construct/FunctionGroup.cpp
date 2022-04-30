@@ -71,6 +71,11 @@ void lang::FunctionGroup::determineFlow()
     for (auto& function : functions_) function->determineFlow();
 }
 
+void lang::FunctionGroup::validateFlow(ValidationLogger& validation_logger)
+{
+    for (auto& function : functions_) function->validateFlow(validation_logger);
+}
+
 void lang::FunctionGroup::createNativeBacking(CompileContext* compile_context)
 {
     for (auto& function : functions_) function->createNativeBacking(compile_context);

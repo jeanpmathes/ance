@@ -27,9 +27,9 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Return::createBasicBlocks(lang::B
     return blocks;
 }
 
-void Return::validate(ValidationLogger&)
+void Return::validate(ValidationLogger& validation_logger)
 {
-    // Handled by basic block.
+    if (return_value_) return_value_->validate(validation_logger);
 }
 
 Statements Return::expandWith(Expressions subexpressions, Statements) const

@@ -52,6 +52,11 @@ void lang::GlobalScope::determineFlow()
     for (auto const& [key, function] : defined_function_groups_) { function->determineFlow(); }
 }
 
+void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger)
+{
+    for (auto const& [key, function] : defined_function_groups_) { function->validateFlow(validation_logger); }
+}
+
 void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                access,
                                              bool                                is_constant,
                                              const std::string&                  identifier,
@@ -443,3 +448,4 @@ lang::OwningHandle<lang::Type> lang::GlobalScope::retrieveUndefinedType(const st
 
     return undefined;
 }
+

@@ -115,13 +115,6 @@ namespace lang
         [[nodiscard]] size_t getId() const;
 
         /**
-         * Validate this basic block.
-         * @param validation_logger The validation logger to use.
-         * @return Whether the basic block is valid.
-         */
-        bool validate(ValidationLogger& validation_logger);
-
-        /**
          * Get all leaves of this basic block. A leaf is a basic block that is not followed by any other block.
          * @return The leaves of this basic block.
          */
@@ -216,7 +209,6 @@ namespace lang
                 [[nodiscard]] size_t getIncomingLinkCount() const;
                 void                 updateIncomingLinks(BasicBlock* updated);
 
-                virtual bool                           validate(ValidationLogger& validation_logger) = 0;
                 virtual std::list<lang::BasicBlock*>   getLeaves()                                   = 0;
                 virtual std::vector<lang::BasicBlock*> getSuccessors()                               = 0;
                 virtual std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue();
@@ -255,7 +247,6 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                bool                           validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*>   getLeaves() override;
                 std::vector<lang::BasicBlock*> getSuccessors() override;
                 lang::Location                 getStartLocation() override;
@@ -288,7 +279,6 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                bool                           validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*>   getLeaves() override;
                 std::vector<lang::BasicBlock*> getSuccessors() override;
                 lang::Location                 getStartLocation() override;
@@ -321,7 +311,6 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                bool                           validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*>   getLeaves() override;
                 std::vector<lang::BasicBlock*> getSuccessors() override;
                 std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue() override;
@@ -357,7 +346,6 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                bool                           validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*>   getLeaves() override;
                 std::vector<lang::BasicBlock*> getSuccessors() override;
                 lang::Location                 getStartLocation() override;
@@ -394,7 +382,6 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                bool                           validate(ValidationLogger& validation_logger) override;
                 std::list<lang::BasicBlock*>   getLeaves() override;
                 std::vector<lang::BasicBlock*> getSuccessors() override;
                 lang::Location                 getStartLocation() override;
@@ -429,8 +416,6 @@ namespace lang
 
         bool build_prepared_ {false};
         bool build_done_ {false};
-
-        std::optional<bool> validated_ {};
     };
 }
 

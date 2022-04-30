@@ -78,6 +78,12 @@ bool Case::validateConflicts(Case* other, ValidationLogger& validation_logger)
 
 bool Case::validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger)
 {
+    bool valid = true;
+
+    for (auto& condition : conditions_) { valid &= condition->validate(validation_logger); }
+
+    if (!valid) return false;
+
     coverage_count_ = static_cast<ssize_t>(conditions_.size());
 
     std::vector<ConstantExpression*> local_conditions;
@@ -103,10 +109,12 @@ bool Case::validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLog
         {
             validation_logger.logError("Cases must be of matched value type " + target_type->getAnnotatedName(),
                                        condition->location());
+
+            valid = false;
         }
     }
 
-    return true;
+    return valid;
 }
 
 std::unique_ptr<Case> Case::expand() const
@@ -255,9 +263,26 @@ Statements Match::expandWith(Expressions subexpressions, Statements) const
     return statements;
 }
 
-void Match::validate(ValidationLogger&)
+void Match::validate(ValidationLogger& validation_logger)
 {
-    // Handled by basic block.
+    bool valid = true;
+
+    valid &= expression_->validate(validation_logger);
+
+    if (!valid) return;
+
+    lang::ResolvingHandle<lang::Type> type = expression_->type();
+
+    if (!type->isIntegerType() && !type->isBooleanType() && !type->isSizeType() && !type->isDiffType())
+    {
+        validation_logger.logError("Cannot match non-numeric or logical type " + type->getAnnotatedName(),
+                                   expression_->location());
+        valid = false;
+    }
+
+    if (!valid) return;
+
+    validateCases(validation_logger);
 }
 
 void Match::doBuild(CompileContext*)

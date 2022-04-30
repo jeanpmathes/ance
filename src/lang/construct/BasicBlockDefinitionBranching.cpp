@@ -73,25 +73,6 @@ void lang::BasicBlock::Definition::Branching::transferStatements(std::list<State
     statements_.splice(statements_.begin(), statements);
 }
 
-bool lang::BasicBlock::Definition::Branching::validate(ValidationLogger& validation_logger)
-{
-    bool valid = true;
-
-    for (auto& statement : statements_) { statement->validate(validation_logger); }
-
-    valid &= true_next_->validate(validation_logger);
-    valid &= false_next_->validate(validation_logger);
-
-    valid &= condition_->validate(validation_logger);
-    valid &= valid
-          && lang::Type::checkMismatch(lang::BooleanType::get(),
-                                       condition_->type(),
-                                       condition_->location(),
-                                       validation_logger);
-
-    return valid;
-}
-
 std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Branching::getLeaves()
 {
     std::set<lang::BasicBlock*> leaves;

@@ -105,6 +105,7 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger)
     }
 
     inside_scope_->validate(validation_logger);
+    code_->validate(validation_logger);
 }
 
 void lang::CustomFunction::expand()
@@ -144,13 +145,6 @@ void lang::CustomFunction::determineFlow()
 
 bool lang::CustomFunction::validateFlow(ValidationLogger& validation_logger)
 {
-    bool are_blocks_valid = true;
-
-    are_blocks_valid &= initial_block_->validate(validation_logger);
-    for (auto& block : blocks_) { are_blocks_valid &= block->validate(validation_logger); }
-
-    if (!are_blocks_valid) return false;
-
     validateReturn(validation_logger);
     validateUnreachable(validation_logger);
 

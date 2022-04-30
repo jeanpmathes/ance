@@ -62,6 +62,7 @@ int main(int argc, char** argv)
         application.preValidate();
 
         ValidationLogger validation_logger;
+
         application.validate(validation_logger);
         validation_logger.emitMessages(source_file);
 
@@ -69,35 +70,41 @@ int main(int argc, char** argv)
         {
             application.preBuild();
 
-            llvm::InitializeAllTargetInfos();
-            llvm::InitializeAllTargets();
-            llvm::InitializeAllTargetMCs();
-            llvm::InitializeAllAsmParsers();
-            llvm::InitializeAllAsmPrinters();
+            application.validateFlow(validation_logger);
+            validation_logger.emitMessages(source_file);
 
-            AnceCompiler compiler(application);
-            AnceLinker   linker(project.root()["link"]);
+            if (validation_logger.errorCount() == 0)
+            {
+                llvm::InitializeAllTargetInfos();
+                llvm::InitializeAllTargets();
+                llvm::InitializeAllTargetMCs();
+                llvm::InitializeAllAsmParsers();
+                llvm::InitializeAllAsmPrinters();
 
-            std::filesystem::path out_dir(argv[2]);
+                AnceCompiler compiler(application);
+                AnceLinker   linker(project.root()["link"]);
 
-            std::filesystem::path obj_dir = out_dir / "obj";
-            std::filesystem::path bin_dir = out_dir / "bin";
+                std::filesystem::path out_dir(argv[2]);
 
-            std::filesystem::create_directory(obj_dir);
-            std::filesystem::create_directory(bin_dir);
+                std::filesystem::path obj_dir = out_dir / "obj";
+                std::filesystem::path bin_dir = out_dir / "bin";
 
-            std::filesystem::path ilr = obj_dir / (application.getName() + ".ll");
-            std::filesystem::path obj = obj_dir / (application.getName() + ".o");
-            std::filesystem::path exe = bin_dir / (application.getName() + ".exe");
+                std::filesystem::create_directory(obj_dir);
+                std::filesystem::create_directory(bin_dir);
 
-            compiler.compile(ilr);
-            compiler.emitObject(obj);
+                std::filesystem::path ilr = obj_dir / (application.getName() + ".ll");
+                std::filesystem::path obj = obj_dir / (application.getName() + ".o");
+                std::filesystem::path exe = bin_dir / (application.getName() + ".exe");
 
-            linker.link(obj, exe);
+                compiler.compile(ilr);
+                compiler.emitObject(obj);
 
-            llvm::llvm_shutdown();
+                linker.link(obj, exe);
 
-            return EXIT_SUCCESS;
+                llvm::llvm_shutdown();
+
+                return EXIT_SUCCESS;
+            }
         }
     }
 

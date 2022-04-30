@@ -159,6 +159,12 @@ namespace lang
         void determineFlow();
 
         /**
+         * Validate the flow of this function.
+         * @param validation_logger The validation logger.
+         */
+        void validateFlow(ValidationLogger& validation_logger);
+
+        /**
          * Create the native content of this function, allowing building function code and calling this function.
          * @param context The current compile context.
          */

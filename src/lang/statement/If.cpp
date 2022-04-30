@@ -3,6 +3,7 @@
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
 #include "validation/ValidationLogger.h"
+#include "lang/type/BooleanType.h"
 
 If::If(std::unique_ptr<Expression> condition,
        std::unique_ptr<Statement>  if_block,
@@ -34,9 +35,11 @@ std::vector<std::unique_ptr<lang::BasicBlock>> If::createBasicBlocks(lang::Basic
     return blocks;
 }
 
-void If::validate(ValidationLogger&)
+void If::validate(ValidationLogger& validation_logger)
 {
-    // Handled by basic block.
+    if (!condition_->validate(validation_logger)) return;
+
+    lang::Type::checkMismatch(lang::BooleanType::get(), condition_->type(), condition_->location(), validation_logger);
 }
 
 Statements If::expandWith(Expressions subexpressions, Statements substatements) const

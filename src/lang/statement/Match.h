@@ -77,6 +77,7 @@ class Match
 
     Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
+  private:
     /**
      * Validate the cases of the match statement.
      * @param validation_logger The validation logger to use.

@@ -37,12 +37,6 @@ void lang::BasicBlock::Definition::Empty::simplify()
     if (next_) next_->simplify();
 }
 
-bool lang::BasicBlock::Definition::Empty::validate(ValidationLogger& validation_logger)
-{
-    if (next_) return next_->validate(validation_logger);
-    else return true;
-}
-
 std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Empty::getLeaves()
 {
     std::list<lang::BasicBlock*> leaves;

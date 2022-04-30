@@ -87,6 +87,12 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
     void preBuild();
 
     /**
+     * Validate the application before compilation.
+     * @param validation_logger The logger to log validation messages.
+     */
+    void validateFlow(ValidationLogger& validation_logger);
+
+    /**
      * Get the top level scope of this application.
      * @return The global scope.
      */

@@ -40,8 +40,8 @@ bool Or::validate(ValidationLogger& validation_logger)
 
     if (!valid) return false;
 
-    valid &= lang::Type::checkMismatch(lang::BooleanType::get(), left_->type(), location(), validation_logger);
-    valid &= lang::Type::checkMismatch(lang::BooleanType::get(), right_->type(), location(), validation_logger);
+    valid &= lang::Type::checkMismatch(lang::BooleanType::get(), left_->type(), left_->location(), validation_logger);
+    valid &= lang::Type::checkMismatch(lang::BooleanType::get(), right_->type(), right_->location(), validation_logger);
 
     return valid;
 }

@@ -28,6 +28,7 @@ namespace lang
         void validate(ValidationLogger& validation_logger);
         void expand();
         void determineFlow();
+        void validateFlow(ValidationLogger& validation_logger);
         void createNativeBacking(CompileContext* compile_context);
         void build(CompileContext* compile_context);
 

@@ -50,25 +50,6 @@ void lang::BasicBlock::Definition::Returning::transferStatements(std::list<State
     statements_.splice(statements_.begin(), statements);
 }
 
-bool lang::BasicBlock::Definition::Returning::validate(ValidationLogger& validation_logger)
-{
-    bool valid = true;
-
-    for (auto& statement : statements_) { statement->validate(validation_logger); }
-
-    if (return_value_) { valid &= return_value_->validate(validation_logger); }
-
-    if (unreachable_next_) { valid &= unreachable_next_->validate(validation_logger); }
-    else {
-        if (!return_value_ && self()->containing_function_->returnType()->isVoidType())
-        {
-            validation_logger.logWarning("Unnecessary return statement", return_location_);
-        }
-    }
-
-    return valid;
-}
-
 std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Returning::getLeaves()
 {
     std::list<lang::BasicBlock*> leaves;

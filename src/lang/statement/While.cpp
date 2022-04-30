@@ -3,6 +3,7 @@
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
 #include "validation/ValidationLogger.h"
+#include "lang/type/BooleanType.h"
 
 While::While(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> block, lang::Location location)
     : Statement(location)
@@ -28,9 +29,11 @@ std::vector<std::unique_ptr<lang::BasicBlock>> While::createBasicBlocks(lang::Ba
     return blocks;
 }
 
-void While::validate(ValidationLogger&)
+void While::validate(ValidationLogger& validation_logger)
 {
-    // Handled by basic block.
+    if (!condition_->validate(validation_logger)) return;
+
+    lang::Type::checkMismatch(lang::BooleanType::get(), condition_->type(), condition_->location(), validation_logger);
 }
 
 Statements While::expandWith(Expressions subexpressions, Statements substatements) const

@@ -128,6 +128,11 @@ void Application::preBuild()
     global_scope_->determineFlow();
 }
 
+void Application::validateFlow(ValidationLogger& validation_logger)
+{
+    global_scope_->validateFlow(validation_logger);
+}
+
 lang::GlobalScope& Application::globalScope()
 {
     return *global_scope_;

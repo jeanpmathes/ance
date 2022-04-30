@@ -73,4 +73,6 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
             std::cout << std::endl;
         }
     }
+
+    entries_.clear();
 }

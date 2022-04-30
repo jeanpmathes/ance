@@ -47,41 +47,6 @@ void lang::BasicBlock::Definition::Matching::transferStatements(std::list<Statem
     statements_.splice(statements_.begin(), statements);
 }
 
-bool lang::BasicBlock::Definition::Matching::validate(ValidationLogger& validation_logger)
-{
-    bool valid = true;
-
-    for (auto& statement : statements_) { statement->validate(validation_logger); }
-
-    for (auto& case_list : cases_)
-    {
-        std::for_each(case_list.begin(), case_list.end(), [&](ConstantExpression* c) {
-            valid &= c->validate(validation_logger);
-        });
-    }
-
-    for (auto& branch : branches_) { valid &= branch->validate(validation_logger); }
-
-    valid &= match_->expression().validate(validation_logger);
-
-    if (!valid) return false;
-
-    lang::ResolvingHandle<lang::Type> type = match_->expression().type();
-
-    if (!type->isIntegerType() && !type->isBooleanType() && !type->isSizeType() && !type->isDiffType())
-    {
-        validation_logger.logError("Cannot match non-numeric or logical type " + type->getAnnotatedName(),
-                                   match_->expression().location());
-        valid = false;
-    }
-
-    if (!valid) return false;
-
-    valid &= match_->validateCases(validation_logger);
-
-    return valid;
-}
-
 std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Matching::getLeaves()
 {
     std::list<lang::BasicBlock*> leaves;
