@@ -39,6 +39,9 @@ void If::validate(ValidationLogger& validation_logger)
 {
     if (!condition_->validate(validation_logger)) return;
 
+    if (if_block_) if_block_->validate(validation_logger);
+    if (else_block_) else_block_->validate(validation_logger);
+
     lang::Type::checkMismatch(lang::BooleanType::get(), condition_->type(), condition_->location(), validation_logger);
 }
 

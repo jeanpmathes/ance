@@ -64,17 +64,17 @@ int main(int argc, char** argv)
         ValidationLogger validation_logger;
 
         application.validate(validation_logger);
-        validation_logger.emitMessages(source_file);
 
         if (validation_logger.errorCount() == 0)
         {
             application.preBuild();
 
             application.validateFlow(validation_logger);
-            validation_logger.emitMessages(source_file);
 
             if (validation_logger.errorCount() == 0)
             {
+                validation_logger.emitMessages(source_file);
+
                 llvm::InitializeAllTargetInfos();
                 llvm::InitializeAllTargets();
                 llvm::InitializeAllTargetMCs();
@@ -105,6 +105,12 @@ int main(int argc, char** argv)
 
                 return EXIT_SUCCESS;
             }
+            else {
+                validation_logger.emitMessages(source_file);
+            }
+        }
+        else {
+            validation_logger.emitMessages(source_file);
         }
     }
 

@@ -33,6 +33,8 @@ void While::validate(ValidationLogger& validation_logger)
 {
     if (!condition_->validate(validation_logger)) return;
 
+    block_->validate(validation_logger);
+
     lang::Type::checkMismatch(lang::BooleanType::get(), condition_->type(), condition_->location(), validation_logger);
 }
 

@@ -81,6 +81,7 @@ bool Case::validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLog
     bool valid = true;
 
     for (auto& condition : conditions_) { valid &= condition->validate(validation_logger); }
+    code_->validate(validation_logger);
 
     if (!valid) return false;
 
