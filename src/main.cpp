@@ -16,6 +16,7 @@
 #include "validation/AnceSyntaxErrorHandler.h"
 #include "validation/SourceFile.h"
 #include "validation/ValidationLogger.h"
+#include "compiler/Project.h"
 
 int main(int argc, char** argv)
 {
@@ -26,17 +27,19 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    std::filesystem::path project_file(argv[1]);
-    data::File            project(project_file);
-    project.read();
+    std::filesystem::path project_file_path(argv[1]);
+    data::File            project_file(project_file_path);
+    project_file.read();
 
-    Application application(project);
-    SourceFile  source_file(application.getSourceFile());
+    Project project(project_file);
 
-    std::cout << "============ Build [ " << application.getName() << " ] ============" << std::endl;
+    Application& application = project.getApplication();
+    SourceFile   source_file(project.getSourceFile());
+
+    std::cout << "============ Build [ " << project.getName() << " ] ============" << std::endl;
 
     std::fstream code;
-    code.open(application.getSourceFile());
+    code.open(project.getSourceFile());
 
     AnceSyntaxErrorHandler syntax_error_listener;
 
@@ -82,7 +85,7 @@ int main(int argc, char** argv)
                 llvm::InitializeAllAsmPrinters();
 
                 AnceCompiler compiler(application);
-                AnceLinker   linker(project.root()["link"]);
+                AnceLinker   linker(project_file.root()["link"]);
 
                 std::filesystem::path out_dir(argv[2]);
 
@@ -92,9 +95,9 @@ int main(int argc, char** argv)
                 std::filesystem::create_directory(obj_dir);
                 std::filesystem::create_directory(bin_dir);
 
-                std::filesystem::path ilr = obj_dir / (application.getName() + ".ll");
-                std::filesystem::path obj = obj_dir / (application.getName() + ".o");
-                std::filesystem::path exe = bin_dir / (application.getName() + ".exe");
+                std::filesystem::path ilr = obj_dir / (project.getName() + ".ll");
+                std::filesystem::path obj = obj_dir / (project.getName() + ".o");
+                std::filesystem::path exe = bin_dir / (project.getName() + ".exe");
 
                 compiler.compile(ilr);
                 compiler.emitObject(obj);

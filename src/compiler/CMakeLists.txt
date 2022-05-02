@@ -5,4 +5,5 @@ target_sources(ance PRIVATE AnceCompiler.cpp
                Runtime.cpp
                SourceVisitor.cpp
                ControlFlowGraphPrinter.cpp
+               Project.cpp
                CodePrinter.cpp)

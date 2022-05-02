@@ -3,6 +3,9 @@
 #include <iostream>
 
 #include "management/elements/Element.h"
+#include "management/File.h"
+#include "validation/ValidationLogger.h"
+#include "compiler/Project.h"
 
 #include "lang/type/DoubleType.h"
 #include "lang/type/HalfType.h"
@@ -18,10 +21,8 @@
 #include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/type/VoidType.h"
 #include "lang/type/BooleanType.h"
-#include "management/File.h"
-#include "validation/ValidationLogger.h"
 
-Application::Application(data::File& project) : Application(project, std::make_unique<lang::GlobalScope>())
+Application::Application(Project& project) : Application(project, std::make_unique<lang::GlobalScope>())
 {
     // Register keyword types
 
@@ -44,7 +45,7 @@ Application::Application(data::File& project) : Application(project, std::make_u
     global_scope_->addTypeRegistry(lang::ReferenceType::getRegistry());
 }
 
-Application::Application(data::File& project, std::unique_ptr<lang::GlobalScope>&& scope)
+Application::Application(Project& project, std::unique_ptr<lang::GlobalScope>&& scope)
     : project_(project)
     , global_scope_(std::move(scope))
 {
@@ -56,44 +57,9 @@ void Application::setPointerSize(unsigned size)
     pointer_size_ = size;
 }
 
-std::string Application::getName() const
+Project& Application::getProject() const
 {
-    auto name = project_.root()["name"];
-
-    if (name)
-    {
-        auto str = name->get().asString();
-
-        if (str) { return str->get(); }
-    }
-
-    return "unnamed";
-}
-
-std::filesystem::path Application::getProjectFile() const
-{
-    return project_.path();
-}
-
-std::filesystem::path Application::getSourceFile() const
-{
-    auto src = project_.root()["src"];
-
-    if (!src) return {};
-
-    for (auto src_file : src->get())
-    {
-        auto src_file_str = src_file.get().asString();
-
-        if (!src_file_str) continue;
-
-        std::filesystem::path path_to_src(src_file_str->get());
-        std::filesystem::path path_to_project = getProjectFile();
-
-        return path_to_project.replace_filename(path_to_src);
-    }
-
-    return {};
+    return project_;
 }
 
 unsigned Application::getBitness() const

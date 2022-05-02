@@ -20,6 +20,7 @@ namespace data
 class Statement;
 class CompileContext;
 class ValidationLogger;
+class Project;
 
 /**
  * The application that is described by the source and will be compiled.
@@ -28,13 +29,13 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
 {
   public:
     /**
-     * Create a new application from a given project file.
-     * @param project The project file.
+     * Create a new application from a given project.
+     * @param project The project.
      */
-    explicit Application(data::File& project);
+    explicit Application(Project& project);
 
   private:
-    Application(data::File& project, std::unique_ptr<lang::GlobalScope>&& scope);
+    Application(Project& project, std::unique_ptr<lang::GlobalScope>&& scope);
 
   public:
     Application(const Application&) = delete;
@@ -48,21 +49,10 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
     void setPointerSize(unsigned size);
 
     /**
-     * Get the name of the application.
-     * @return The name.
+     * Get the containing project.
+     * @return The project.
      */
-    [[nodiscard]] std::string getName() const;
-
-    /**
-     * Get the path to the project file.
-     * @return The project file.
-     */
-    [[nodiscard]] std::filesystem::path getProjectFile() const;
-    /**
-     * Get the path to the source file.
-     * @return The source file.
-     */
-    [[nodiscard]] std::filesystem::path getSourceFile() const;
+    Project& getProject() const;
 
     /**
      * Get the bitness of the application.
@@ -99,7 +89,7 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
     lang::GlobalScope& globalScope();
 
   private:
-    data::File& project_;
+    Project& project_;
 
     std::unique_ptr<lang::GlobalScope> global_scope_;
 

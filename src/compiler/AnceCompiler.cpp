@@ -20,14 +20,15 @@
 #include "lang/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/ControlFlowGraphPrinter.h"
+#include "compiler/Project.h"
 
 AnceCompiler::AnceCompiler(Application& app)
     : application_(app)
-    , module_(application_.getName(), llvm_context_)
+    , module_(application_.getProject().getName(), llvm_context_)
     , ir_(llvm_context_)
     , di_(module_)
 {
-    module_.setSourceFileName(application_.getSourceFile().filename().string());
+    module_.setSourceFileName(application_.getProject().getSourceFile().filename().string());
 
     llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
 
@@ -56,8 +57,8 @@ AnceCompiler::AnceCompiler(Application& app)
     module_.addModuleFlag(llvm::Module::Warning, "Dwarf Version", llvm::dwarf::DWARF_VERSION);
     module_.addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
 
-    llvm::DIFile* src_file = di_.createFile(application_.getSourceFile().filename().generic_string(),
-                                            application_.getSourceFile().parent_path().generic_string());
+    llvm::DIFile* src_file = di_.createFile(application_.getProject().getSourceFile().filename().generic_string(),
+                                            application_.getProject().getSourceFile().parent_path().generic_string());
 
     llvm::DICompileUnit* unit = di_.createCompileUnit(llvm::dwarf::DW_LANG_C, src_file, "ancec-0", false, "", 0);
 
