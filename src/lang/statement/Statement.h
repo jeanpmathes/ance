@@ -51,6 +51,13 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     [[nodiscard]] lang::Scope* scope() const;
 
     /**
+     * Get the block scope of the statement, if any.
+     * For compound statements the block scope is the scope that contains all the statements.
+     * @return The block scope, or nullptr.
+     */
+    [[nodiscard]] virtual lang::LocalScope* getBlockScope() const;
+
+    /**
      * Walk all definitions and declarations in this statement.
      * Use this for order-dependent definitions, as well as the usage of resolvable entities.
      */

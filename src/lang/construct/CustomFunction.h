@@ -41,7 +41,7 @@ namespace lang
                        lang::ResolvingHandle<lang::Type>             return_type,
                        lang::Location                                return_type_location,
                        std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                       std::unique_ptr<lang::CodeBlock>              code,
+                       std::unique_ptr<Statement>                    code,
                        lang::Scope*                                  containing_scope,
                        lang::Location                                declaration_location,
                        lang::Location                                definition_location);
@@ -78,8 +78,8 @@ namespace lang
         void validateUnreachable(ValidationLogger& validation_logger);
 
       private:
-        std::unique_ptr<lang::CodeBlock> code_;
-        lang::LocalScope*                inside_scope_ {nullptr};
+        std::unique_ptr<Statement> code_;
+        lang::LocalScope*          inside_scope_ {nullptr};
 
         lang::AccessModifier access_;
         lang::Location       definition_location_;

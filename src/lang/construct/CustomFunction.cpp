@@ -19,7 +19,7 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
                                      lang::ResolvingHandle<lang::Type>             return_type,
                                      lang::Location                                return_type_location,
                                      std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                                     std::unique_ptr<lang::CodeBlock>              code,
+                                     std::unique_ptr<Statement>                    code,
                                      lang::Scope*                                  containing_scope,
                                      lang::Location                                declaration_location,
                                      lang::Location                                definition_location)
@@ -115,7 +115,7 @@ void lang::CustomFunction::expand()
     Statements expanded_statements = code_->expand();
     assert(expanded_statements.size() == 1);
 
-    code_ = std::unique_ptr<lang::CodeBlock>(dynamic_cast<lang::CodeBlock*>(expanded_statements.front().release()));
+    code_ = std::move(expanded_statements.front());
 
     setupCode();
 }

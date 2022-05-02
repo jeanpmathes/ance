@@ -38,6 +38,11 @@ lang::Scope* Statement::scope() const
     return containing_scope_;
 }
 
+lang::LocalScope* Statement::getBlockScope() const
+{
+    return nullptr;
+}
+
 void Statement::walkDefinitions()
 {
     for (auto& subexpression : subexpressions_) { subexpression.get().walkDefinitions(); }

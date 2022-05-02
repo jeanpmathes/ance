@@ -16,7 +16,7 @@ namespace lang
      */
     class CodeBlock
         : public Statement
-        , public lang::Element<lang::CodeBlock, ANCE_CONSTRUCTS>
+        , public lang::Element<CodeBlock, ANCE_CONSTRUCTS>
     {
       private:
         CodeBlock(bool scoped, lang::Location location);
@@ -54,11 +54,7 @@ namespace lang
         std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
                                                                          lang::Function*   function) override;
 
-        /**
-         * Get the scope that belongs to this block.
-         * @return The scope, or null if this block is not scoped.
-         */
-        lang::LocalScope* getBlockScope() const;
+        lang::LocalScope* getBlockScope() const override;
 
         void validate(ValidationLogger& validation_logger) override;
 
