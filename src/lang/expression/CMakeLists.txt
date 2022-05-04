@@ -3,6 +3,7 @@ target_sources(ance PRIVATE DefaultValue.cpp
                ConstantExpression.cpp
                BackingExpression.cpp
                BackingConstantExpression.cpp
+               UnexpandedExpression.cpp
                FunctionCall.cpp
                ConstantLiteral.cpp
                SizeofExpression.cpp

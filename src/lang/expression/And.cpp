@@ -10,7 +10,7 @@
 #include "lang/statement/LocalVariableDefinition.h"
 
 And::And(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, lang::Location location)
-    : Expression(location)
+    : UnexpandedExpression(location)
     , left_(std::move(left))
     , right_(std::move(right))
 {
@@ -77,11 +77,6 @@ Expression::Expansion And::expandWith(Expressions subexpressions) const
     after.push_back(std::make_unique<Drop>(make_temp_variable(), location()));
 
     return {std::move(before), std::move(result), std::move(after)};
-}
-
-void And::doBuild(CompileContext*)
-{
-    throw std::runtime_error("Expanded away.");
 }
 
 And::~And() = default;

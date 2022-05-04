@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_AND_H_
 #define ANCE_SRC_LANG_EXPRESSION_AND_H_
 
-#include "DelayableExpression.h"
+#include "UnexpandedExpression.h"
 
 #include "lang/Element.h"
 
@@ -9,7 +9,7 @@
  * Logical 'and' expression, with short-circuit evaluation.
  */
 class And
-    : public DelayableExpression
+    : public UnexpandedExpression
     , public lang::Element<And, ANCE_CONSTRUCTS>
 {
   public:
@@ -30,9 +30,6 @@ class And
     bool validate(ValidationLogger& validation_logger) override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
-
-  protected:
-    void doBuild(CompileContext* context) override;
 
   public:
     ~And() override;
