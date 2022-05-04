@@ -96,6 +96,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @return The type of the value of this expression.
      */
     virtual lang::ResolvingHandle<lang::Type> type() = 0;
+
     /**
      * Get the value returned by this expression.
      * @return The value. One expression always returns the value.

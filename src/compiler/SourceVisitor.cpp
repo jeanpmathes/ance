@@ -43,6 +43,7 @@
 #include "lang/expression/Parenthesis.h"
 #include "lang/expression/And.h"
 #include "lang/expression/Or.h"
+#include "lang/expression/IfSelect.h"
 
 #include "lang/construct/constant/BooleanConstant.h"
 #include "lang/construct/constant/ByteConstant.h"
@@ -531,6 +532,19 @@ antlrcpp::Any SourceVisitor::visitLogicalOr(anceParser::LogicalOrContext* ctx)
         new Or(std::unique_ptr<Expression>(left), std::unique_ptr<Expression>(right), location(ctx)));
 }
 
+antlrcpp::Any SourceVisitor::visitIfExpression(anceParser::IfExpressionContext* ctx)
+{
+    Expression* condition = visit(ctx->condition).as<Expression*>();
+
+    Expression* then_expression = visit(ctx->thenBlock).as<Expression*>();
+    Expression* else_expression = visit(ctx->elseBlock).as<Expression*>();
+
+    return static_cast<Expression*>(new IfSelect(std::unique_ptr<Expression>(condition),
+                                                 std::unique_ptr<Expression>(then_expression),
+                                                 std::unique_ptr<Expression>(else_expression),
+                                                 location(ctx)));
+}
+
 antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)
 {
     std::string prefix;
@@ -864,3 +878,4 @@ uint64_t SourceVisitor::parseInRange(const std::string& str, uint64_t max)
 
     return value;
 }
+

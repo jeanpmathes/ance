@@ -36,6 +36,7 @@ namespace lang
 #include "lang/expression/Parenthesis.h"
 #include "lang/expression/And.h"
 #include "lang/expression/Or.h"
+#include "lang/expression/IfSelect.h"
 
 #include "lang/scope/GlobalScope.h"
 #include "lang/scope/LocalScope.h"

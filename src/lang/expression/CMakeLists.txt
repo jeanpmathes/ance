@@ -19,4 +19,5 @@ target_sources(ance PRIVATE DefaultValue.cpp
                And.cpp
                Or.cpp
                UnaryOperation.cpp
+               IfSelect.cpp
                Parenthesis.cpp)

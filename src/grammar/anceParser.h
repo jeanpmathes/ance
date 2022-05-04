@@ -725,6 +725,20 @@ class anceParser : public antlr4::Parser
         virtual size_t getRuleIndex() const override;
     };
 
+    class IfExpressionContext : public ExpressionContext
+    {
+      public:
+        IfExpressionContext(ExpressionContext* ctx);
+
+        anceParser::ExpressionContext*  condition = nullptr;
+        anceParser::ExpressionContext*  thenBlock = nullptr;
+        anceParser::ExpressionContext*  elseBlock = nullptr;
+        std::vector<ExpressionContext*> expression();
+        ExpressionContext*              expression(size_t i);
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     class VariableContext : public ExpressionContext
     {
       public:

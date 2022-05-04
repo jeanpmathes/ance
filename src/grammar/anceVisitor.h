@@ -80,6 +80,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitDefaultCase(anceParser::DefaultCaseContext* context) = 0;
 
+    virtual antlrcpp::Any visitIfExpression(anceParser::IfExpressionContext* context) = 0;
+
     virtual antlrcpp::Any visitVariable(anceParser::VariableContext* context) = 0;
 
     virtual antlrcpp::Any visitAdressOf(anceParser::AdressOfContext* context) = 0;

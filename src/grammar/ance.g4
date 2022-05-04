@@ -136,6 +136,7 @@ expression
 	| left=expression binaryOperatorEquality right=expression # BinaryOperation
 	| left=expression 'and' right=expression # LogicalAnd
     | left=expression 'or' right=expression # LogicalOr
+    | 'if' condition=expression 'then' thenBlock=expression 'else' elseBlock=expression # IfExpression
 	;
 
 binaryOperatorMultiplicative

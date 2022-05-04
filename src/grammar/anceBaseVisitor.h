@@ -128,6 +128,11 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitDefaultCase(anceParser::DefaultCaseContext* ctx) override { return visitChildren(ctx); }
 
+    virtual antlrcpp::Any visitIfExpression(anceParser::IfExpressionContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
     virtual antlrcpp::Any visitVariable(anceParser::VariableContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitAdressOf(anceParser::AdressOfContext* ctx) override { return visitChildren(ctx); }
