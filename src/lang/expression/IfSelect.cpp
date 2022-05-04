@@ -1,6 +1,8 @@
 #include "IfSelect.h"
 
 #include "lang/scope/Scope.h"
+#include "lang/type/BooleanType.h"
+#include "validation/ValidationLogger.h"
 
 #include "lang/expression/DefaultValue.h"
 #include "lang/expression/VariableAccess.h"
@@ -50,8 +52,26 @@ lang::ResolvingHandle<lang::Type> IfSelect::type() const
 
 bool IfSelect::validate(ValidationLogger& validation_logger)
 {
+    bool valid = true;
 
-    return true;
+    valid &= condition_->validate(validation_logger);
+    valid &= then_expression_->validate(validation_logger);
+    valid &= else_expression_->validate(validation_logger);
+
+    if (!valid) return false;
+
+    valid &= lang::Type::checkMismatch(lang::BooleanType::get(),
+                                       condition_->type(),
+                                       condition_->location(),
+                                       validation_logger);
+
+    if (!lang::Type::areSame(then_expression_->type(), else_expression_->type()))
+    {
+        validation_logger.logError("Both branches must have same type", location());
+        valid = false;
+    }
+
+    return valid;
 }
 
 Expression::Expansion IfSelect::expandWith(Expressions subexpressions) const
