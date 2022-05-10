@@ -21,7 +21,7 @@ public main () : ui32
         2 | 3 => c"C",
         4 => c"D",
         default => c"E"
-    }
+    };
 
     write(string, 1:32);
 
