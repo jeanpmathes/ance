@@ -139,26 +139,28 @@ class anceParser : public antlr4::Parser
         RuleBindRef                      = 37,
         RuleSizeofType                   = 38,
         RuleSizeofExpression             = 39,
-        RuleLiteralExpression            = 40,
-        RuleStringLiteral                = 41,
-        RuleByteLiteral                  = 42,
-        RuleIntegerLiteral               = 43,
-        RuleUnsignedInteger              = 44,
-        RuleSignedInteger                = 45,
-        RuleSpecialInteger               = 46,
-        RuleFloatingPointLiteral         = 47,
-        RuleBooleanLiteral               = 48,
-        RuleSizeLiteral                  = 49,
-        RuleDiffLiteral                  = 50,
-        RuleType                         = 51,
-        RuleIntegerType                  = 52,
-        RuleArrayType                    = 53,
-        RuleKeywordType                  = 54,
-        RuleFloatingPointType            = 55,
-        RuleTargetDependentType          = 56,
-        RuleBooleanType                  = 57,
-        RuleVoidType                     = 58,
-        RuleCustomType                   = 59
+        RuleMatchExpression              = 40,
+        RuleMatchExpressionCase          = 41,
+        RuleLiteralExpression            = 42,
+        RuleStringLiteral                = 43,
+        RuleByteLiteral                  = 44,
+        RuleIntegerLiteral               = 45,
+        RuleUnsignedInteger              = 46,
+        RuleSignedInteger                = 47,
+        RuleSpecialInteger               = 48,
+        RuleFloatingPointLiteral         = 49,
+        RuleBooleanLiteral               = 50,
+        RuleSizeLiteral                  = 51,
+        RuleDiffLiteral                  = 52,
+        RuleType                         = 53,
+        RuleIntegerType                  = 54,
+        RuleArrayType                    = 55,
+        RuleKeywordType                  = 56,
+        RuleFloatingPointType            = 57,
+        RuleTargetDependentType          = 58,
+        RuleBooleanType                  = 59,
+        RuleVoidType                     = 60,
+        RuleCustomType                   = 61
     };
 
     explicit anceParser(antlr4::TokenStream* input);
@@ -213,6 +215,8 @@ class anceParser : public antlr4::Parser
     class BindRefContext;
     class SizeofTypeContext;
     class SizeofExpressionContext;
+    class MatchExpressionContext;
+    class MatchExpressionCaseContext;
     class LiteralExpressionContext;
     class StringLiteralContext;
     class ByteLiteralContext;
@@ -812,6 +816,16 @@ class anceParser : public antlr4::Parser
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class MatchContext : public ExpressionContext
+    {
+      public:
+        MatchContext(ExpressionContext* ctx);
+
+        MatchExpressionContext* matchExpression();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     class RefContext : public ExpressionContext
     {
       public:
@@ -1195,6 +1209,57 @@ class anceParser : public antlr4::Parser
     };
 
     SizeofExpressionContext* sizeofExpression();
+
+    class MatchExpressionContext : public antlr4::ParserRuleContext
+    {
+      public:
+        anceParser::ExpressionContext* condition = nullptr;
+        MatchExpressionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t                           getRuleIndex() const override;
+        ExpressionContext*                       expression();
+        std::vector<MatchExpressionCaseContext*> matchExpressionCase();
+        MatchExpressionCaseContext*              matchExpressionCase(size_t i);
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    MatchExpressionContext* matchExpression();
+
+    class MatchExpressionCaseContext : public antlr4::ParserRuleContext
+    {
+      public:
+        MatchExpressionCaseContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+        MatchExpressionCaseContext() = default;
+        void copyFrom(MatchExpressionCaseContext* context);
+        using antlr4::ParserRuleContext::copyFrom;
+
+        virtual size_t getRuleIndex() const override;
+    };
+
+    class LiteralExpressionCaseContext : public MatchExpressionCaseContext
+    {
+      public:
+        LiteralExpressionCaseContext(MatchExpressionCaseContext* ctx);
+
+        std::vector<LiteralExpressionContext*> literalExpression();
+        LiteralExpressionContext*              literalExpression(size_t i);
+        ExpressionContext*                     expression();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class DefaultExpressionCaseContext : public MatchExpressionCaseContext
+    {
+      public:
+        DefaultExpressionCaseContext(MatchExpressionCaseContext* ctx);
+
+        ExpressionContext* expression();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    MatchExpressionCaseContext* matchExpressionCase();
 
     class LiteralExpressionContext : public antlr4::ParserRuleContext
     {

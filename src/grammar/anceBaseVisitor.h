@@ -151,6 +151,8 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitLogicalOr(anceParser::LogicalOrContext* ctx) override { return visitChildren(ctx); }
 
+    virtual antlrcpp::Any visitMatch(anceParser::MatchContext* ctx) override { return visitChildren(ctx); }
+
     virtual antlrcpp::Any visitRef(anceParser::RefContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* ctx) override { return visitChildren(ctx); }
@@ -234,6 +236,21 @@ class anceBaseVisitor : public anceVisitor
     virtual antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
+    virtual antlrcpp::Any visitMatchExpression(anceParser::MatchExpressionContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
+    virtual antlrcpp::Any visitLiteralExpressionCase(anceParser::LiteralExpressionCaseContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
+    virtual antlrcpp::Any visitDefaultExpressionCase(anceParser::DefaultExpressionCaseContext* ctx) override
     {
         return visitChildren(ctx);
     }

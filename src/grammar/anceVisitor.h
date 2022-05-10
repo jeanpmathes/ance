@@ -94,6 +94,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitLogicalOr(anceParser::LogicalOrContext* context) = 0;
 
+    virtual antlrcpp::Any visitMatch(anceParser::MatchContext* context) = 0;
+
     virtual antlrcpp::Any visitRef(anceParser::RefContext* context) = 0;
 
     virtual antlrcpp::Any visitIndependent(anceParser::IndependentContext* context) = 0;
@@ -153,6 +155,12 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
     virtual antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext* context) = 0;
 
     virtual antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext* context) = 0;
+
+    virtual antlrcpp::Any visitMatchExpression(anceParser::MatchExpressionContext* context) = 0;
+
+    virtual antlrcpp::Any visitLiteralExpressionCase(anceParser::LiteralExpressionCaseContext* context) = 0;
+
+    virtual antlrcpp::Any visitDefaultExpressionCase(anceParser::DefaultExpressionCaseContext* context) = 0;
 
     virtual antlrcpp::Any visitLiteralExpression(anceParser::LiteralExpressionContext* context) = 0;
 

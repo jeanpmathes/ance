@@ -44,6 +44,7 @@
 #include "lang/expression/And.h"
 #include "lang/expression/Or.h"
 #include "lang/expression/IfSelect.h"
+#include "lang/expression/MatchSelect.h"
 
 #include "lang/construct/constant/BooleanConstant.h"
 #include "lang/construct/constant/ByteConstant.h"
@@ -545,6 +546,42 @@ antlrcpp::Any SourceVisitor::visitIfExpression(anceParser::IfExpressionContext* 
                                                  location(ctx)));
 }
 
+antlrcpp::Any SourceVisitor::visitMatchExpression(anceParser::MatchExpressionContext* ctx)
+{
+    Expression* expression = visit(ctx->expression()).as<Expression*>();
+
+    std::vector<std::unique_ptr<Case>> cases;
+    for (auto& case_ctx : ctx->matchExpressionCase())
+    {
+        Case* case_instance = visit(case_ctx).as<Case*>();
+        cases.push_back(std::unique_ptr<Case>(case_instance));
+    }
+
+    return static_cast<Expression*>(
+        new MatchSelect(std::unique_ptr<Expression>(expression), std::move(cases), location(ctx)));
+}
+
+antlrcpp::Any SourceVisitor::visitDefaultExpressionCase(anceParser::DefaultExpressionCaseContext* ctx)
+{
+    auto expression = std::unique_ptr<Expression>(visit(ctx->expression()).as<Expression*>());
+
+    return Case::createDefault(std::move(expression));
+}
+
+antlrcpp::Any SourceVisitor::visitLiteralExpressionCase(anceParser::LiteralExpressionCaseContext* ctx)
+{
+    auto block = std::unique_ptr<Expression>(visit(ctx->expression()).as<Expression*>());
+
+    std::vector<std::unique_ptr<ConstantExpression>> cases;
+    for (auto& condition_ctx : ctx->literalExpression())
+    {
+        auto condition = dynamic_cast<ConstantExpression*>(visit(condition_ctx).as<Expression*>());
+        cases.push_back(std::unique_ptr<ConstantExpression>(condition));
+    }
+
+    return Case::createCase(std::move(cases), std::move(block));
+}
+
 antlrcpp::Any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx)
 {
     std::string prefix;
@@ -878,4 +915,3 @@ uint64_t SourceVisitor::parseInRange(const std::string& str, uint64_t max)
 
     return value;
 }
-

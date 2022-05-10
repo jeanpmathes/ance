@@ -137,6 +137,7 @@ expression
 	| left=expression 'and' right=expression # LogicalAnd
     | left=expression 'or' right=expression # LogicalOr
     | 'if' condition=expression 'then' thenBlock=expression 'else' elseBlock=expression # IfExpression
+    | matchExpression # Match
 	;
 
 binaryOperatorMultiplicative
@@ -203,6 +204,15 @@ sizeofType
 sizeofExpression
 	: 'sizeof' '(' expression ')'
 	;
+
+matchExpression
+    : 'match' condition=expression 'with' '{' ( matchExpressionCase ( ',' matchExpressionCase )* )? '}'
+    ;
+
+matchExpressionCase
+    : literalExpression ( '|' literalExpression )* '=>' expression # LiteralExpressionCase
+    | 'default' '=>' expression # DefaultExpressionCase
+    ;
 
 literalExpression
 	: stringLiteral

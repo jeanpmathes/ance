@@ -36,6 +36,13 @@ namespace lang
         static CodeBlock* wrapStatement(std::unique_ptr<Statement> statement);
 
         /**
+         * Create a code block wrapping multiple statements.
+         * @param statements The statements to wrap.
+         * @return The block.
+         */
+        static std::unique_ptr<CodeBlock> wrapStatements(std::vector<std::unique_ptr<Statement>> statements);
+
+        /**
          * Make a scoped block.
          * @return The block.
          */

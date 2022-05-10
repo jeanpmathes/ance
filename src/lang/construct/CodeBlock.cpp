@@ -20,6 +20,23 @@ lang::CodeBlock* lang::CodeBlock::wrapStatement(std::unique_ptr<Statement> state
     return block;
 }
 
+std::unique_ptr<lang::CodeBlock> lang::CodeBlock::wrapStatements(std::vector<std::unique_ptr<Statement>> statements)
+{
+    lang::Location location(0, 0, 0, 0);
+
+    for (auto& statement : statements) { location.extend(statement->location()); }
+
+    auto* block = new CodeBlock(false, location);
+
+    for (auto& statement : statements)
+    {
+        block->addSubstatement(*statement);
+        block->subs_.emplace_back(std::move(statement));
+    }
+
+    return std::unique_ptr<lang::CodeBlock>(block);
+}
+
 lang::CodeBlock* lang::CodeBlock::makeScoped(lang::Location location)
 {
     return new CodeBlock(true, location);

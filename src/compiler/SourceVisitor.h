@@ -71,6 +71,9 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitLogicalAnd(anceParser::LogicalAndContext* ctx) override;
     antlrcpp::Any visitLogicalOr(anceParser::LogicalOrContext* ctx) override;
     antlrcpp::Any visitIfExpression(anceParser::IfExpressionContext* ctx) override;
+    antlrcpp::Any visitDefaultExpressionCase(anceParser::DefaultExpressionCaseContext* ctx) override;
+    antlrcpp::Any visitLiteralExpressionCase(anceParser::LiteralExpressionCaseContext* ctx) override;
+    antlrcpp::Any visitMatchExpression(anceParser::MatchExpressionContext* ctx) override;
 
     // Literals and Types
 

@@ -46,8 +46,6 @@ class IfSelect
     std::unique_ptr<Expression> condition_;
     std::unique_ptr<Expression> then_expression_;
     std::unique_ptr<Expression> else_expression_;
-
-    std::optional<lang::ResolvingHandle<lang::Type>> type_;
 };
 
 #endif

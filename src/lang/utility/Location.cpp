@@ -46,6 +46,11 @@ llvm::DebugLoc lang::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm
 
 void lang::Location::extend(lang::Location location)
 {
+    if (this->isGlobal()) { *this = location; }
+    else if (location.isGlobal()) {
+        return;
+    }
+
     start_line_   = std::min(start_line_, location.start_line_);
     start_column_ = std::min(start_column_, location.start_column_);
 

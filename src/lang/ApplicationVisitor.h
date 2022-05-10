@@ -37,6 +37,7 @@ namespace lang
 #include "lang/expression/And.h"
 #include "lang/expression/Or.h"
 #include "lang/expression/IfSelect.h"
+#include "lang/expression/MatchSelect.h"
 
 #include "lang/scope/GlobalScope.h"
 #include "lang/scope/LocalScope.h"

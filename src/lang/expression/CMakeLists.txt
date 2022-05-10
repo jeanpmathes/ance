@@ -20,4 +20,5 @@ target_sources(ance PRIVATE DefaultValue.cpp
                Or.cpp
                UnaryOperation.cpp
                IfSelect.cpp
+               MatchSelect.cpp
                Parenthesis.cpp)

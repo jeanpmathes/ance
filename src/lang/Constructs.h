@@ -35,6 +35,7 @@ class VariableAccess;
 class And;
 class Or;
 class IfSelect;
+class MatchSelect;
 
 namespace lang
 {
@@ -59,7 +60,7 @@ class Case;
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::BasicBlock,    \
         lang::CodeBlock, lang::Variable, lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation,             \
         BinaryOperation, UnaryOperation, BindRef, ConstantLiteral, DefaultValue, FunctionCall, Parenthesis,            \
-        SizeofExpression, SizeofType, Subscript, VariableAccess, And, Or, IfSelect, lang::GlobalScope,                 \
+        SizeofExpression, SizeofType, Subscript, VariableAccess, And, Or, IfSelect, MatchSelect, lang::GlobalScope,    \
         lang::LocalScope, Assertion, Assignment, Delete, ExpressionStatement, LocalReferenceVariableDefinition,        \
         LocalVariableDefinition, Drop, Return, If, While, Match, Case
 #endif

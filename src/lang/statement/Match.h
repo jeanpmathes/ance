@@ -27,8 +27,25 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
     static Case* createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions,
                             std::unique_ptr<Statement>                       code);
 
+    /**
+     * Create a default case, using an expression.
+     * @param expression The expression that provides the value.
+     * @return The created case.
+     */
+    static Case* createDefault(std::unique_ptr<Expression> expression);
+
+    /**
+     * Create a case, using an expression.
+     * @param conditions The conditions to match.
+     * @param expression The expression that provides a value.
+     * @return The created case.
+     */
+    static Case* createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions,
+                            std::unique_ptr<Expression>                      expression);
+
   private:
-    Case(std::vector<std::unique_ptr<ConstantExpression>> conditions, std::unique_ptr<Statement> code);
+    Case(std::vector<std::unique_ptr<ConstantExpression>>                      conditions,
+         std::variant<std::unique_ptr<Statement>, std::unique_ptr<Expression>> code);
 
   public:
     void setContainingScope(lang::Scope* scope);
@@ -39,14 +56,32 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
     bool validateConflicts(Case* other, ValidationLogger& validation_logger);
     bool validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger);
 
-    std::unique_ptr<Case> expand() const;
+    /**
+     * Get the common type of the cases. The cases must be expression-based.
+     * @param cases The cases to get the common type from.
+     * @return The common type.
+     */
+    static lang::ResolvingHandle<lang::Type> getCommonType(const std::vector<std::unique_ptr<Case>>& cases);
+
+    /**
+     * Expand the contents of this case. This is only valid for statement-based cases.
+     * @return The expanded case.
+     */
+    [[nodiscard]] std::unique_ptr<Case> expand() const;
+
+    /**
+     * Expand the contents of this case. This is only valid for expression-based cases.
+     * @param target The variable to assign the result of the expression to.
+     * @return The expanded case.
+     */
+    [[nodiscard]] std::unique_ptr<Case> expand(lang::ResolvingHandle<lang::Variable> target) const;
 
     ssize_t getCoverageCount();
 
   private:
-    std::vector<std::unique_ptr<ConstantExpression>> conditions_;
-    std::unique_ptr<Statement>                       code_;
-    ssize_t                                          coverage_count_ {};
+    std::vector<std::unique_ptr<ConstantExpression>>                      conditions_;
+    std::variant<std::unique_ptr<Statement>, std::unique_ptr<Expression>> code_;
+    ssize_t                                                               coverage_count_ {};
 };
 
 /**
