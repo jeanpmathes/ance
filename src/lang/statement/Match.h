@@ -53,7 +53,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
 
     std::vector<std::pair<ConstantExpression*, Statement*>> getConditions();
 
-    bool validateConflicts(Case* other, ValidationLogger& validation_logger);
+    bool validateConflicts(Case& other, ValidationLogger& validation_logger);
     bool validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger);
 
     /**
@@ -110,15 +110,28 @@ class Match
 
     void validate(ValidationLogger& validation_logger) override;
 
-    Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+    /**
+     * Validate the type matched by this match.
+     * @param expression The expression providing the value to match.
+     * @param validation_logger The validation logger to use.
+     * @return True if the type can be matched, false otherwise.
+     */
+    static bool validateType(Expression& expression, ValidationLogger& validation_logger);
 
-  private:
     /**
      * Validate the cases of the match statement.
+     * @param location The location of the match.
+     * @param expression The expression providing the value to match.
+     * @param cases The cases to validate.
      * @param validation_logger The validation logger to use.
      * @return True if the cases are valid, false otherwise.
      */
-    bool validateCases(ValidationLogger& validation_logger);
+    static bool validateCases(lang::Location                            location,
+                              Expression&                               expression,
+                              std::vector<std::reference_wrapper<Case>> cases,
+                              ValidationLogger&                         validation_logger);
+
+    [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
     void doBuild(CompileContext* context) override;

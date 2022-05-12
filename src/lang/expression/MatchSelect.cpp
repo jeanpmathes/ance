@@ -5,6 +5,7 @@
 #include "lang/scope/Scope.h"
 #include "lang/statement/LocalVariableDefinition.h"
 #include "lang/statement/Match.h"
+#include "validation/ValidationLogger.h"
 
 MatchSelect::MatchSelect(std::unique_ptr<Expression>        condition,
                          std::vector<std::unique_ptr<Case>> cases,
@@ -33,7 +34,23 @@ lang::ResolvingHandle<lang::Type> MatchSelect::type() const
 
 bool MatchSelect::validate(ValidationLogger& validation_logger)
 {
-    return true;// TODO
+    bool valid = true;
+
+    valid &= condition_->validate(validation_logger);
+
+    if (!valid) return false;
+
+    valid &= Match::validateType(*condition_, validation_logger);
+
+    if (!valid) return false;
+
+    std::vector<std::reference_wrapper<Case>> cases;
+    cases.reserve(cases_.size());
+    std::for_each(cases_.begin(), cases_.end(), [&cases](auto& case_ptr) { cases.push_back(*case_ptr); });
+
+    valid &= Match::validateCases(location(), *condition_, cases, validation_logger);
+
+    return valid;
 }
 
 Expression::Expansion MatchSelect::expandWith(Expressions subexpressions) const

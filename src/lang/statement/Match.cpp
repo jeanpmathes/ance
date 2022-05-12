@@ -89,13 +89,13 @@ std::vector<std::pair<ConstantExpression*, Statement*>> Case::getConditions()
     return conditions;
 }
 
-bool Case::validateConflicts(Case* other, ValidationLogger& validation_logger)
+bool Case::validateConflicts(Case& other, ValidationLogger& validation_logger)
 {
     bool conflicts = false;
 
     for (auto& condition : conditions_)
     {
-        for (auto& other_condition : other->conditions_)
+        for (auto& other_condition : other.conditions_)
         {
             std::shared_ptr<lang::Constant> condition_constant       = condition->getConstantValue();
             std::shared_ptr<lang::Constant> other_condition_constant = other_condition->getConstantValue();
@@ -283,65 +283,6 @@ void Match::walkDefinitions()
     for (auto& case_ptr : cases_) { case_ptr->walkDefinitions(); }
 }
 
-bool Match::validateCases(ValidationLogger& validation_logger)
-{
-    bool valid = true;
-
-    std::vector<Case*> checked_cases;
-    ssize_t            covered_cases = 0;
-
-    for (auto& case_ptr : cases_)
-    {
-        valid &= case_ptr->validate(expression_->type(), validation_logger);
-
-        ssize_t additional_coverage = case_ptr->getCoverageCount();
-        bool    has_default_case    = additional_coverage == -1 || covered_cases == -1;
-        covered_cases               = has_default_case ? -1 : covered_cases + additional_coverage;
-
-        for (auto& checked_case : checked_cases)
-        {
-            if (!case_ptr->validateConflicts(checked_case, validation_logger)) { valid = false; }
-        }
-
-        checked_cases.push_back(case_ptr.get());
-    }
-
-    StateCount state_count = expression_->type()->getStateCount();
-
-    if (covered_cases != -1)
-    {
-        bool uncovered;
-
-        if (auto* count = std::get_if<size_t>(&state_count))
-        {
-            uncovered = static_cast<ssize_t>(*count) != covered_cases;
-        }
-        else {
-            uncovered = true;
-        }
-
-        if (uncovered)
-        {
-            validation_logger.logError("Match does not cover all possible states of type "
-                                           + expression_->type()->getAnnotatedName(),
-                                       location());
-            valid = false;
-        }
-    }
-
-    if (auto* count = std::get_if<SpecialCount>(&state_count))
-    {
-        if (*count == SpecialCount::UNCOUNTABLE)
-        {
-            validation_logger.logError("Cannot match uncountable type " + expression_->type()->getAnnotatedName(),
-                                       location());
-            valid = false;
-        }
-    }
-
-    return valid;
-}
-
 Statements Match::expandWith(Expressions subexpressions, Statements) const
 {
     std::vector<std::unique_ptr<Case>> expanded_cases;
@@ -366,18 +307,92 @@ void Match::validate(ValidationLogger& validation_logger)
 
     if (!valid) return;
 
-    lang::ResolvingHandle<lang::Type> type = expression_->type();
+    valid &= validateType(*expression_, validation_logger);
+
+    if (!valid) return;
+
+    std::vector<std::reference_wrapper<Case>> cases;
+    cases.reserve(cases_.size());
+    std::for_each(cases_.begin(), cases_.end(), [&cases](auto& case_ptr) { cases.push_back(*case_ptr); });
+
+    validateCases(location(), *expression_, cases, validation_logger);
+}
+
+bool Match::validateType(Expression& expression, ValidationLogger& validation_logger)
+{
+    lang::ResolvingHandle<lang::Type> type = expression.type();
 
     if (!type->isIntegerType() && !type->isBooleanType() && !type->isSizeType() && !type->isDiffType())
     {
         validation_logger.logError("Cannot match non-numeric or logical type " + type->getAnnotatedName(),
-                                   expression_->location());
-        valid = false;
+                                   expression.location());
+
+        return false;
     }
 
-    if (!valid) return;
+    return true;
+}
 
-    validateCases(validation_logger);
+bool Match::validateCases(lang::Location                            location,
+                          Expression&                               expression,
+                          std::vector<std::reference_wrapper<Case>> cases,
+                          ValidationLogger&                         validation_logger)
+{
+    bool valid = true;
+
+    std::vector<std::reference_wrapper<Case>> checked_cases;
+    ssize_t                                   covered_cases = 0;
+
+    for (auto& case_instance : cases)
+    {
+        valid &= case_instance.get().validate(expression.type(), validation_logger);
+
+        ssize_t additional_coverage = case_instance.get().getCoverageCount();
+        bool    has_default_case    = additional_coverage == -1 || covered_cases == -1;
+        covered_cases               = has_default_case ? -1 : covered_cases + additional_coverage;
+
+        for (auto& checked_case : checked_cases)
+        {
+            if (!case_instance.get().validateConflicts(checked_case, validation_logger)) { valid = false; }
+        }
+
+        checked_cases.emplace_back(case_instance.get());
+    }
+
+    StateCount state_count = expression.type()->getStateCount();
+
+    if (covered_cases != -1)
+    {
+        bool uncovered;
+
+        if (auto* count = std::get_if<size_t>(&state_count))
+        {
+            uncovered = static_cast<ssize_t>(*count) != covered_cases;
+        }
+        else {
+            uncovered = true;
+        }
+
+        if (uncovered)
+        {
+            validation_logger.logError("Match does not cover all possible states of type "
+                                           + expression.type()->getAnnotatedName(),
+                                       location);
+            valid = false;
+        }
+    }
+
+    if (auto* count = std::get_if<SpecialCount>(&state_count))
+    {
+        if (*count == SpecialCount::UNCOUNTABLE)
+        {
+            validation_logger.logError("Cannot match uncountable type " + expression.type()->getAnnotatedName(),
+                                       location);
+            valid = false;
+        }
+    }
+
+    return valid;
 }
 
 void Match::doBuild(CompileContext*)
