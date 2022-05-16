@@ -1,7 +1,7 @@
 // valid
 // o: "C"
 
-// TO select a value, match-expressions can be used.
+// To select a value, match-expressions can be used.
 
 private std_out: Handle;
 private null_ptr: uiptr;
