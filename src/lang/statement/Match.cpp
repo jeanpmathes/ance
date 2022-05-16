@@ -332,11 +332,7 @@ void Match::validate(ValidationLogger& validation_logger)
 
     if (!valid) return;
 
-    std::vector<std::reference_wrapper<Case>> cases;
-    cases.reserve(cases_.size());
-    std::for_each(cases_.begin(), cases_.end(), [&cases](auto& case_ptr) { cases.push_back(*case_ptr); });
-
-    validateCases(location(), *expression_, cases, validation_logger);
+    validateCases(location(), *expression_, cases_, validation_logger);
 }
 
 bool Match::validateType(Expression& expression, ValidationLogger& validation_logger)
@@ -356,7 +352,7 @@ bool Match::validateType(Expression& expression, ValidationLogger& validation_lo
 
 bool Match::validateCases(lang::Location                            location,
                           Expression&                               expression,
-                          std::vector<std::reference_wrapper<Case>> cases,
+                          const std::vector<std::unique_ptr<Case>>& cases,
                           ValidationLogger&                         validation_logger)
 {
     bool valid = true;
@@ -366,18 +362,18 @@ bool Match::validateCases(lang::Location                            location,
 
     for (auto& case_instance : cases)
     {
-        valid &= case_instance.get().validate(expression.type(), validation_logger);
+        valid &= case_instance->validate(expression.type(), validation_logger);
 
-        ssize_t additional_coverage = case_instance.get().getCoverageCount();
+        ssize_t additional_coverage = case_instance->getCoverageCount();
         bool    has_default_case    = additional_coverage == -1 || covered_cases == -1;
         covered_cases               = has_default_case ? -1 : covered_cases + additional_coverage;
 
         for (auto& checked_case : checked_cases)
         {
-            if (!case_instance.get().validateConflicts(checked_case, validation_logger)) { valid = false; }
+            if (!case_instance->validateConflicts(checked_case, validation_logger)) { valid = false; }
         }
 
-        checked_cases.emplace_back(case_instance.get());
+        checked_cases.emplace_back(*case_instance);
     }
 
     StateCount state_count = expression.type()->getStateCount();

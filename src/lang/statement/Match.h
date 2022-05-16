@@ -139,7 +139,7 @@ class Match
      */
     static bool validateCases(lang::Location                            location,
                               Expression&                               expression,
-                              std::vector<std::reference_wrapper<Case>> cases,
+                              const std::vector<std::unique_ptr<Case>>& cases,
                               ValidationLogger&                         validation_logger);
 
     [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;

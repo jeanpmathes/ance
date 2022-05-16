@@ -44,11 +44,7 @@ bool MatchSelect::validate(ValidationLogger& validation_logger)
 
     if (!valid) return false;
 
-    std::vector<std::reference_wrapper<Case>> cases;
-    cases.reserve(cases_.size());
-    std::for_each(cases_.begin(), cases_.end(), [&cases](auto& case_ptr) { cases.push_back(*case_ptr); });
-
-    valid &= Match::validateCases(location(), *condition_, cases, validation_logger);
+    valid &= Match::validateCases(location(), *condition_, cases_, validation_logger);
     valid &= Case::validateReturnTypes(location(), cases_, validation_logger);
 
     return valid;
