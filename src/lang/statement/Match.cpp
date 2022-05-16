@@ -172,6 +172,27 @@ lang::ResolvingHandle<lang::Type> Case::getCommonType(const std::vector<std::uni
     return std::get<std::unique_ptr<Expression>>(code)->type();
 }
 
+bool Case::validateReturnTypes(lang::Location                            location,
+                               const std::vector<std::unique_ptr<Case>>& cases,
+                               ValidationLogger&                         validation_logger)
+{
+    lang::ResolvingHandle<lang::Type> common_type = getCommonType(cases);
+
+    for (auto& case_ptr : cases)
+    {
+        lang::ResolvingHandle<lang::Type> case_type = std::get<std::unique_ptr<Expression>>(case_ptr->code_)->type();
+
+        if (!lang::Type::areSame(case_type, common_type))
+        {
+            validation_logger.logError("Cases must all provide same return type", location);
+
+            return false;
+        }
+    }
+
+    return true;
+}
+
 std::unique_ptr<Case> Case::expand() const
 {
     Statements expanded_statements = std::get<std::unique_ptr<Statement>>(code_)->expand();

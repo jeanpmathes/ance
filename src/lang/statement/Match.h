@@ -64,6 +64,17 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
     static lang::ResolvingHandle<lang::Type> getCommonType(const std::vector<std::unique_ptr<Case>>& cases);
 
     /**
+     * Validate the return types of the case-expressions.
+     * @param location The source location of the match entity.
+     * @param cases The cases to validate. Must be expression-based.
+     * @param validation_logger The validation logger to use.
+     * @return True if the return types are valid, false otherwise.
+     */
+    static bool validateReturnTypes(lang::Location                            location,
+                                    const std::vector<std::unique_ptr<Case>>& cases,
+                                    ValidationLogger&                         validation_logger);
+
+    /**
      * Expand the contents of this case. This is only valid for statement-based cases.
      * @return The expanded case.
      */
