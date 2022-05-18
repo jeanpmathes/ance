@@ -33,7 +33,7 @@ lang::BinaryOperator BinaryOperation::op() const
 
 lang::ResolvingHandle<lang::Type> BinaryOperation::type()
 {
-    return left_->type()->getOperatorResultType(op_, right_->type());
+    return left_->type()->getOperatorResultType(op_, getRightType());
 }
 
 bool BinaryOperation::validate(ValidationLogger& validation_logger)
@@ -41,7 +41,10 @@ bool BinaryOperation::validate(ValidationLogger& validation_logger)
     bool valid_operands = left_->validate(validation_logger) && right_->validate(validation_logger);
     if (!valid_operands) return false;
 
-    if (!left_->type()->isOperatorDefined(op_, right_->type()))
+    auto left_type  = left_->type();
+    auto right_type = getRightType();
+
+    if (!left_type->isOperatorDefined(op_, right_type))
     {
         if (lang::Type::areSame(left_->type(), right_->type()))
         {
@@ -57,12 +60,13 @@ bool BinaryOperation::validate(ValidationLogger& validation_logger)
 
         return false;
     }
+    else if (!lang::Type::areSame(right_type, right_->type())) {
+        bool can_convert =
+            right_->type()->validateImplicitConversion(right_type, right_->location(), validation_logger);
+        if (!can_convert) return false;
+    }
 
-    return left_->type()->validateOperator(op_,
-                                           right_->type(),
-                                           left_->location(),
-                                           right_->location(),
-                                           validation_logger);
+    return left_type->validateOperator(op_, right_type, left_->location(), right_->location(), validation_logger);
 }
 
 Expression::Expansion BinaryOperation::expandWith(Expressions subexpressions) const
@@ -78,8 +82,26 @@ void BinaryOperation::doBuild(CompileContext* context)
     std::shared_ptr<lang::Value> left_value  = left_->getValue();
     std::shared_ptr<lang::Value> right_value = right_->getValue();
 
+    if (!lang::Type::areSame(right_->type(), getRightType()))
+    {
+        right_value = right_->type()->buildImplicitConversion(getRightType(), right_value, context);
+    }
+
     std::shared_ptr<lang::Value> result = left_value->type()->buildOperator(op_, left_value, right_value, context);
     setValue(result);
+}
+
+lang::ResolvingHandle<lang::Type> BinaryOperation::getRightType()
+{
+    if (lang::Type::areSame(left_->type(), right_->type())) return right_->type();
+
+    if (!left_->type()->isOperatorDefined(op_, right_->type()) && left_->type()->isOperatorDefined(op_, left_->type())
+        && right_->type()->isImplicitlyConvertibleTo(left_->type()))
+    {
+        return left_->type();
+    }
+
+    return right_->type();
 }
 
 BinaryOperation::~BinaryOperation() = default;

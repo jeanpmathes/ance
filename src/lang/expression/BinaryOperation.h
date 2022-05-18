@@ -39,6 +39,9 @@ class BinaryOperation
   protected:
     void doBuild(CompileContext* context) override;
 
+  private:
+    lang::ResolvingHandle<lang::Type> getRightType();
+
   public:
     ~BinaryOperation() override;
 
