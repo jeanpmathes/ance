@@ -70,6 +70,11 @@ private x62: ui512 <: 0:512;
 private x63: ui1024 <: 0:1024;
 private x64: ui2048 <: 0:2048;
 
+// Integer literals without type suffixes use the smallest possible integer type.
+private x65: i32 <: 5;
+private x66: i32 <: -5;
+private x67: ui32 <: 5;
+
 public main () : ui32
 {
     return 0:32;

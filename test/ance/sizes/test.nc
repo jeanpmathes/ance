@@ -5,11 +5,6 @@
 private s1: size <: 0:size;
 private d1: diff <: +0:diff;
 
-// The number literals without type suffixes are of type size and diff.
-private s2: size <: 0;
-private d2: diff <: +0;
-private d3: diff <: -0;
-
 public main () : ui32
 {
     return 0:32;
