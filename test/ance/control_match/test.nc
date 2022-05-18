@@ -16,10 +16,10 @@ public main () : ui32
 
     match value with
     {
-        0 => write(c"A", 1:32); // No break is required, because no fallthrough is possible.
-        1 => write(c"B", 1:32);
-        2 | 3 => write(c"C", 1:32);
-        4 =>
+        0:size => write(c"A", 1:32); // No break is required, because no fallthrough is possible.
+        1:size => write(c"B", 1:32);
+        2:size | 3:size => write(c"C", 1:32);
+        4:size =>
         {
             write(c"D", 1:32);
         }

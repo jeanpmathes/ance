@@ -16,10 +16,10 @@ public main () : ui32
 
     let string: *ui8 <: match value with
     {
-        0 => c"A",
-        1 => c"B",
-        2 | 3 => c"C",
-        4 => c"D",
+        0:size => c"A",
+        1:size => c"B",
+        2:size | 3:size => c"C",
+        4:size => c"D",
         default => c"E"
     };
 

@@ -15,8 +15,8 @@ public main () : ui32
 
     match value with
     {
-        0 => write(c"A", 1:32);
-        0 => write(c"B", 1:32); // Case 0 is already defined.
+        0:size => write(c"A", 1:32);
+        0:size => write(c"B", 1:32); // Case 0 is already defined.
         default => write(c"C", 1:32);
     }
 
