@@ -15,6 +15,10 @@ lang::IntegerConstant::IntegerConstant(std::string integer, int64_t size, bool i
     text_.erase(0, std::min(text_.find_first_not_of('0'), text_.size() - 1));
 }
 
+lang::IntegerConstant::IntegerConstant(const std::string& integer, bool is_signed)
+    : IntegerConstant(integer, llvm::APInt::getBitsNeeded(integer, 10), is_signed, 10)
+{}
+
 std::string lang::IntegerConstant::toString() const
 {
     std::string prefix;

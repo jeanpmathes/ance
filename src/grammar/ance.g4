@@ -239,11 +239,11 @@ integerLiteral
 	;
 
 unsignedInteger
-	: value=INTEGER ':' width=INTEGER
+	: value=INTEGER ( ':' width=INTEGER )?
 	;
 
 signedInteger
-	: value=SIGNED_INTEGER ':' width=INTEGER
+	: value=SIGNED_INTEGER ( ':' width=INTEGER )?
 	;
 
 specialInteger
@@ -265,11 +265,11 @@ booleanLiteral
     ;
 
 sizeLiteral
-    : INTEGER ( ':' 'size' )?
+    : INTEGER ':' 'size'
     ;
 
 diffLiteral
-    : SIGNED_INTEGER ( ':' 'diff' )?
+    : SIGNED_INTEGER ':' 'diff'
     ;
 
 type

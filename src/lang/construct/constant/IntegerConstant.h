@@ -25,6 +25,13 @@ namespace lang
          */
         IntegerConstant(std::string integer, int64_t size, bool is_signed, int radix = 10);
 
+        /**
+         * Create a new integer constant that selects it's size to be large enough to hold the given value.
+         * @param integer The integer value to use, encoded as a string. Radix is assumed to be 10.
+         * @param is_signed Whether the integer value is signed or unsigned.
+         */
+        IntegerConstant(const std::string& integer, bool is_signed);
+
         [[nodiscard]] std::string toString() const override;
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) override;

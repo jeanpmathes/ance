@@ -667,19 +667,35 @@ antlrcpp::Any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ct
 
 antlrcpp::Any SourceVisitor::visitUnsignedInteger(anceParser::UnsignedIntegerContext* ctx)
 {
-    uint64_t size = parseIntegerTypeSize(ctx->width->getText());
+    const bool                      is_signed = false;
+    std::shared_ptr<lang::Constant> integer_constant;
 
-    std::shared_ptr<lang::Constant> integer_constant =
-        std::make_shared<lang::IntegerConstant>(ctx->value->getText(), size, false);
+    if (ctx->width)
+    {
+        uint64_t size    = parseIntegerTypeSize(ctx->width->getText());
+        integer_constant = std::make_shared<lang::IntegerConstant>(ctx->value->getText(), size, is_signed);
+    }
+    else {
+        integer_constant = std::make_shared<lang::IntegerConstant>(ctx->value->getText(), is_signed);
+    }
+
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSignedInteger(anceParser::SignedIntegerContext* ctx)
 {
-    uint64_t size = parseIntegerTypeSize(ctx->width->getText());
+    const bool                      is_signed = true;
+    std::shared_ptr<lang::Constant> integer_constant;
 
-    std::shared_ptr<lang::Constant> integer_constant =
-        std::make_shared<lang::IntegerConstant>(ctx->value->getText(), size, true);
+    if (ctx->width)
+    {
+        uint64_t size    = parseIntegerTypeSize(ctx->width->getText());
+        integer_constant = std::make_shared<lang::IntegerConstant>(ctx->value->getText(), size, is_signed);
+    }
+    else {
+        integer_constant = std::make_shared<lang::IntegerConstant>(ctx->value->getText(), is_signed);
+    }
+
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 
