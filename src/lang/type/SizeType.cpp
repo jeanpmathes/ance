@@ -196,7 +196,7 @@ void lang::SizeType::init(llvm::LLVMContext& c, Application& app)
     assert(!size_backing_type_);
     assert(!diff_backing_type_);
 
-    size_width_ = app.getBitness();
+    size_width_ = std::max(app.getBitness(), static_cast<unsigned int>(MINIMUM_BIT_SIZE));
     diff_width_ = size_width_ * 2;
 
     size_backing_type_ = llvm::Type::getIntNTy(c, size_width_);

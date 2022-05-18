@@ -29,11 +29,16 @@ namespace lang
 
       public:
         /**
-         * The minimum size of a size/diff value.
+         * The minimum size of a size value.
          */
         static const size_t MINIMUM_BIT_SIZE = 16;
 
-        StateCount getStateCount() const override;
+        /**
+         * The minimum size of a diff value.
+         */
+        static const size_t MINIMUM_DIFF_BIT_SIZE = MINIMUM_BIT_SIZE * 2;
+
+        [[nodiscard]] StateCount getStateCount() const override;
 
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;

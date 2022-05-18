@@ -3,6 +3,7 @@
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/VoidType.h"
+#include "lang/type/SizeType.h"
 #include "lang/type/BooleanType.h"
 #include "lang/utility/Values.h"
 #include "compiler/Application.h"
@@ -63,16 +64,29 @@ bool lang::IntegerType::validate(ValidationLogger& validation_logger, lang::Loca
 
 bool lang::IntegerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
 {
-    if (!other->isIntegerType()) return false;
+    if (other->isIntegerType())
+    {
+        auto* other_type = dynamic_cast<IntegerType*>(other->getActualType()->getDefinition());
 
-    auto* other_type = dynamic_cast<IntegerType*>(other->getActualType()->getDefinition());
+        if (!other_type) return false;// Cloned integer types do not allow implicit conversion.
 
-    if (!other_type) return false;// Cloned integer types do not allow implicit conversion.
+        bool can_enlarge   = (bit_size_ < other_type->bit_size_) && (is_signed_ == other_type->is_signed_);
+        bool can_gain_sign = (bit_size_ < other_type->bit_size_) && !is_signed_ && other_type->is_signed_;
 
-    bool can_enlarge     = (bit_size_ < other_type->bit_size_) && (is_signed_ == other_type->is_signed_);
-    bool can_change_sign = (bit_size_ < other_type->bit_size_) && !is_signed_ && other_type->is_signed_;
+        return can_enlarge || can_gain_sign;
+    }
 
-    return can_enlarge || can_change_sign;
+    if (other->isSizeType()) { return !is_signed_ && (bit_size_ <= lang::SizeType::MINIMUM_BIT_SIZE); }
+
+    if (other->isDiffType())
+    {
+        bool can_enlarge   = is_signed_ && (bit_size_ <= lang::SizeType::MINIMUM_DIFF_BIT_SIZE);
+        bool can_gain_sign = !is_signed_ && (bit_size_ < lang::SizeType::MINIMUM_DIFF_BIT_SIZE);
+
+        return can_enlarge || can_gain_sign;
+    }
+
+    return false;
 }
 
 bool lang::IntegerType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>, lang::Location, ValidationLogger&)
@@ -84,14 +98,28 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Re
                                                                         std::shared_ptr<Value>            value,
                                                                         CompileContext*                   context)
 {
-    value->buildContentValue(context);
-    llvm::Value* content_value = value->getContentValue();
+    llvm::Value* native_converted_value;
 
-    llvm::Value* converted_value        = context->ir()->CreateIntCast(content_value,
-                                                                other->getContentType(*context->llvmContext()),
-                                                                is_signed_,
-                                                                content_value->getName() + ".icast");
-    llvm::Value* native_converted_value = lang::Values::contentToNative(other, converted_value, context);
+    bool can_directly_convert_to_size =
+        other->isSizeType() && !is_signed_ && (bit_size_ == lang::SizeType::MINIMUM_BIT_SIZE);
+    bool can_directly_convert_to_diff =
+        other->isDiffType() && is_signed_ && (bit_size_ == lang::SizeType::MINIMUM_DIFF_BIT_SIZE);
+
+    if (can_directly_convert_to_size || can_directly_convert_to_diff)
+    {
+        value->buildNativeValue(context);
+        native_converted_value = value->getNativeValue();
+    }
+    else {
+        value->buildContentValue(context);
+        llvm::Value* content_value = value->getContentValue();
+
+        llvm::Value* converted_value = context->ir()->CreateIntCast(content_value,
+                                                                    other->getContentType(*context->llvmContext()),
+                                                                    is_signed_,
+                                                                    content_value->getName() + ".icast");
+        native_converted_value       = lang::Values::contentToNative(other, converted_value, context);
+    }
 
     return std::make_shared<WrappedNativeValue>(other, native_converted_value);
 }
