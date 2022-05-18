@@ -97,5 +97,7 @@ bool lang::IntegerConstant::equals(const lang::Constant* other) const
     llvm::APInt this_value(size_, text_, radix_);
     llvm::APInt other_value(other_int->size_, other_int->text_, other_int->radix_);
 
+    if (this_value.getBitWidth() != other_value.getBitWidth()) return false;
+
     return this_value == other_value;
 }
