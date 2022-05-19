@@ -63,7 +63,12 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger)
     bool valid = constant_init_->validate(validation_logger);
     if (!valid) return;
 
-    lang::Type::checkMismatch(type(), initial_value_->type(), constant_init_->location(), validation_logger);
+    if (!lang::Type::areSame(type(), initial_value_->type()))
+    {
+        validation_logger.logError("Constant initializer must be of variable type " + type()->getAnnotatedName(),
+                                   typeLocation());
+        return;
+    }
 }
 
 void lang::GlobalVariable::buildDeclaration(CompileContext*) {}
