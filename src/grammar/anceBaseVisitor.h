@@ -272,12 +272,7 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
-    virtual antlrcpp::Any visitUnsignedInteger(anceParser::UnsignedIntegerContext* ctx) override
-    {
-        return visitChildren(ctx);
-    }
-
-    virtual antlrcpp::Any visitSignedInteger(anceParser::SignedIntegerContext* ctx) override
+    virtual antlrcpp::Any visitNormalInteger(anceParser::NormalIntegerContext* ctx) override
     {
         return visitChildren(ctx);
     }

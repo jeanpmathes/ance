@@ -145,22 +145,21 @@ class anceParser : public antlr4::Parser
         RuleStringLiteral                = 43,
         RuleByteLiteral                  = 44,
         RuleIntegerLiteral               = 45,
-        RuleUnsignedInteger              = 46,
-        RuleSignedInteger                = 47,
-        RuleSpecialInteger               = 48,
-        RuleFloatingPointLiteral         = 49,
-        RuleBooleanLiteral               = 50,
-        RuleSizeLiteral                  = 51,
-        RuleDiffLiteral                  = 52,
-        RuleType                         = 53,
-        RuleIntegerType                  = 54,
-        RuleArrayType                    = 55,
-        RuleKeywordType                  = 56,
-        RuleFloatingPointType            = 57,
-        RuleTargetDependentType          = 58,
-        RuleBooleanType                  = 59,
-        RuleVoidType                     = 60,
-        RuleCustomType                   = 61
+        RuleNormalInteger                = 46,
+        RuleSpecialInteger               = 47,
+        RuleFloatingPointLiteral         = 48,
+        RuleBooleanLiteral               = 49,
+        RuleSizeLiteral                  = 50,
+        RuleDiffLiteral                  = 51,
+        RuleType                         = 52,
+        RuleIntegerType                  = 53,
+        RuleArrayType                    = 54,
+        RuleKeywordType                  = 55,
+        RuleFloatingPointType            = 56,
+        RuleTargetDependentType          = 57,
+        RuleBooleanType                  = 58,
+        RuleVoidType                     = 59,
+        RuleCustomType                   = 60
     };
 
     explicit anceParser(antlr4::TokenStream* input);
@@ -221,8 +220,7 @@ class anceParser : public antlr4::Parser
     class StringLiteralContext;
     class ByteLiteralContext;
     class IntegerLiteralContext;
-    class UnsignedIntegerContext;
-    class SignedIntegerContext;
+    class NormalIntegerContext;
     class SpecialIntegerContext;
     class FloatingPointLiteralContext;
     class BooleanLiteralContext;
@@ -1309,45 +1307,31 @@ class anceParser : public antlr4::Parser
     {
       public:
         IntegerLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t          getRuleIndex() const override;
-        UnsignedIntegerContext* unsignedInteger();
-        SignedIntegerContext*   signedInteger();
-        SpecialIntegerContext*  specialInteger();
+        virtual size_t         getRuleIndex() const override;
+        NormalIntegerContext*  normalInteger();
+        SpecialIntegerContext* specialInteger();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
     IntegerLiteralContext* integerLiteral();
 
-    class UnsignedIntegerContext : public antlr4::ParserRuleContext
+    class NormalIntegerContext : public antlr4::ParserRuleContext
     {
       public:
-        antlr4::Token* value = nullptr;
-        antlr4::Token* width = nullptr;
-        UnsignedIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        antlr4::Token* uvalue = nullptr;
+        antlr4::Token* svalue = nullptr;
+        antlr4::Token* width  = nullptr;
+        NormalIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t                           getRuleIndex() const override;
         std::vector<antlr4::tree::TerminalNode*> INTEGER();
         antlr4::tree::TerminalNode*              INTEGER(size_t i);
+        antlr4::tree::TerminalNode*              SIGNED_INTEGER();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    UnsignedIntegerContext* unsignedInteger();
-
-    class SignedIntegerContext : public antlr4::ParserRuleContext
-    {
-      public:
-        antlr4::Token* value = nullptr;
-        antlr4::Token* width = nullptr;
-        SignedIntegerContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t              getRuleIndex() const override;
-        antlr4::tree::TerminalNode* SIGNED_INTEGER();
-        antlr4::tree::TerminalNode* INTEGER();
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    SignedIntegerContext* signedInteger();
+    NormalIntegerContext* normalInteger();
 
     class SpecialIntegerContext : public antlr4::ParserRuleContext
     {

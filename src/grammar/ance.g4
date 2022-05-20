@@ -233,17 +233,12 @@ byteLiteral
     ;
 
 integerLiteral
-	: unsignedInteger
-	| signedInteger
+	: normalInteger
 	| specialInteger
 	;
 
-unsignedInteger
-	: value=INTEGER ( ':' width=INTEGER )?
-	;
-
-signedInteger
-	: value=SIGNED_INTEGER ( ':' width=INTEGER )?
+normalInteger
+	: ( uvalue=INTEGER | svalue=SIGNED_INTEGER) ( ':' width=INTEGER )?
 	;
 
 specialInteger

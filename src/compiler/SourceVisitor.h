@@ -84,8 +84,7 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitFalse(anceParser::FalseContext* ctx) override;
     antlrcpp::Any visitSizeLiteral(anceParser::SizeLiteralContext* ctx) override;
     antlrcpp::Any visitDiffLiteral(anceParser::DiffLiteralContext* ctx) override;
-    antlrcpp::Any visitUnsignedInteger(anceParser::UnsignedIntegerContext* ctx) override;
-    antlrcpp::Any visitSignedInteger(anceParser::SignedIntegerContext* ctx) override;
+    antlrcpp::Any visitNormalInteger(anceParser::NormalIntegerContext* ctx) override;
     antlrcpp::Any visitSpecialInteger(anceParser::SpecialIntegerContext* ctx) override;
     antlrcpp::Any visitIntegerType(anceParser::IntegerTypeContext* ctx) override;
     antlrcpp::Any visitBooleanType(anceParser::BooleanTypeContext* ctx) override;

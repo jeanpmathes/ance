@@ -170,9 +170,7 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitIntegerLiteral(anceParser::IntegerLiteralContext* context) = 0;
 
-    virtual antlrcpp::Any visitUnsignedInteger(anceParser::UnsignedIntegerContext* context) = 0;
-
-    virtual antlrcpp::Any visitSignedInteger(anceParser::SignedIntegerContext* context) = 0;
+    virtual antlrcpp::Any visitNormalInteger(anceParser::NormalIntegerContext* context) = 0;
 
     virtual antlrcpp::Any visitSpecialInteger(anceParser::SpecialIntegerContext* context) = 0;
 
