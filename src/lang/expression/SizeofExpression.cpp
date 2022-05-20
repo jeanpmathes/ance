@@ -4,6 +4,7 @@
 #include "lang/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "lang/statement/Statement.h"
+#include "lang/utility/Values.h"
 
 SizeofExpression::SizeofExpression(std::unique_ptr<Expression> expression, lang::Location location)
     : Expression(location)
@@ -39,5 +40,7 @@ std::shared_ptr<lang::Value> SizeofExpression::getValue() const
 
 llvm::Value* SizeofExpression::buildNativeValue(CompileContext* context)
 {
-    return lang::SizeType::buildValue(expression_->type()->getContentSize(context->module()));
+    llvm::Value* content_value =
+        lang::SizeType::buildContentValue(expression_->type()->getContentSize(context->module()));
+    return lang::Values::contentToNative(type(), content_value, context);
 }

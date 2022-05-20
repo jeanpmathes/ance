@@ -17,6 +17,9 @@ public main () : ui32
     let s2: size <: sizeof(x);
     assert s2 == 4;
 
+    // The size of void is zero.
+    assert sizeof void == 0;
+
     return 0:32;
 }
 

@@ -5,6 +5,7 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 #include "lang/statement/Statement.h"
+#include "lang/utility/Values.h"
 
 SizeofType::SizeofType(lang::ResolvingHandle<lang::Type> type, lang::Location type_location, lang::Location location)
     : Expression(location)
@@ -50,5 +51,6 @@ std::shared_ptr<lang::Value> SizeofType::getValue() const
 
 llvm::Value* SizeofType::buildNativeValue(CompileContext* context)
 {
-    return lang::SizeType::buildValue(type_->getContentSize(context->module()));
+    llvm::Value* content_value = lang::SizeType::buildContentValue(type_->getContentSize(context->module()));
+    return lang::Values::contentToNative(type(), content_value, context);
 }

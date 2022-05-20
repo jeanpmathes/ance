@@ -72,7 +72,7 @@ namespace lang
          * @param size The type size to use as value.
          * @return The content value containing the given type size.
          */
-        static llvm::Value* buildValue(llvm::TypeSize size);
+        static llvm::Value* buildContentValue(llvm::TypeSize size);
 
       private:
         inline static unsigned int size_width_        = 0;

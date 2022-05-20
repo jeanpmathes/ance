@@ -135,11 +135,15 @@ llvm::DIType* lang::TypeDefinition::getDebugType(CompileContext* context)
 
 llvm::TypeSize lang::TypeDefinition::getNativeSize(llvm::Module* m)
 {
+    if (self() == lang::VoidType::get()) return llvm::TypeSize::getNull();
+
     return m->getDataLayout().getTypeAllocSize(getNativeType(m->getContext()));
 }
 
 llvm::TypeSize lang::TypeDefinition::getContentSize(llvm::Module* m)
 {
+    if (self() == lang::VoidType::get()) return llvm::TypeSize::getNull();
+
     return m->getDataLayout().getTypeAllocSize(getContentType(m->getContext()));
 }
 

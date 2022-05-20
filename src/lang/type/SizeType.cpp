@@ -167,7 +167,7 @@ bool lang::SizeType::isDiffType() const
     return (kind_ == DIFF_KIND);
 }
 
-llvm::Value* lang::SizeType::buildValue(llvm::TypeSize size)
+llvm::Value* lang::SizeType::buildContentValue(llvm::TypeSize size)
 {
     return llvm::ConstantInt::get(size_backing_type_, size.getFixedSize(), false);
 }
