@@ -66,9 +66,9 @@ namespace lang
         virtual void buildDefinition(CompileContext* context)  = 0;
 
         virtual std::shared_ptr<lang::Value> getValue(CompileContext* context) = 0;
-        virtual void setValue(const std::shared_ptr<lang::Value>& value, CompileContext* context);
+        virtual void                         setValue(std::shared_ptr<lang::Value> value, CompileContext* context);
 
-        virtual ~VariableDefinition() = default;
+        ~VariableDefinition() override = default;
 
       protected:
         virtual void storeValue(std::shared_ptr<lang::Value> value, CompileContext* context) = 0;
