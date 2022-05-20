@@ -61,9 +61,9 @@ private test_size_math ()
 
     assert x1 - x2 > 0;
 
-    assert 2 + 3 * 2 == 8;
-    assert 2 * 3 + 2 == 8;
-    assert 2 * (3 + 2) != 8;
+    assert 2:size + 3:size * 2:size == 8:size;
+    assert 2:size * 3:size + 2:size == 8:size;
+    assert 2:size * (3:size + 2:size) != 8:size;
 }
 
 public exit (exitcode: ui32)
