@@ -190,12 +190,11 @@ namespace lang
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(const std::string& name);
         lang::OwningHandle<lang::Type>             retrieveUndefinedType(const std::string& identifier);
 
-        std::vector<std::pair<std::string, lang::Location>> errors_;
-
         std::vector<lang::TypeDefinitionRegistry*> type_registries_;
 
         std::map<std::string, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
         std::map<std::string, lang::OwningHandle<lang::Variable>> global_defined_variables_;
+        std::vector<std::tuple<std::string, lang::Location>>      duplicated_variable_names_;
 
         std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
         std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> defined_function_groups_;

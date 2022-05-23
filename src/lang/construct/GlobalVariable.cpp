@@ -32,10 +32,13 @@ lang::GlobalVariable::GlobalVariable(const std::string&                  identif
 {
     containing_scope->addType(type);
 
-    constant_init_->setContainingScope(containing_scope);
-    initial_value_ = constant_init_->getConstantValue();
+    if (constant_init_)
+    {
+        constant_init_->setContainingScope(containing_scope);
+        initial_value_ = constant_init_->getConstantValue();
 
-    addChild(*constant_init_);
+        addChild(*constant_init_);
+    }
 }
 
 void lang::GlobalVariable::validate(ValidationLogger& validation_logger)
@@ -57,6 +60,24 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger)
     if (type()->isReferenceType())
     {
         validation_logger.logError("Global variable cannot have reference type", typeLocation());
+        return;
+    }
+
+    if (!constant_init_)
+    {
+        if (is_constant_)
+        {
+            validation_logger.logError("Constants require an explicit initializer", location());
+            return;
+        }
+        else {
+            assert(false && "For non-const global vars, an initializer (potentially the default one) must be passed.");
+        }
+    }
+
+    if (is_constant_ && !isFinal())
+    {
+        validation_logger.logError("Assignment to constants must be final", location());
         return;
     }
 

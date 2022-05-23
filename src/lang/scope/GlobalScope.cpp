@@ -2,14 +2,14 @@
 
 #include <ostream>
 
+#include "compiler/CompileContext.h"
+#include "lang/AccessModifier.h"
+#include "lang/Assigner.h"
 #include "lang/expression/ConstantExpression.h"
 #include "lang/type/IntegerType.h"
 #include "lang/type/TypeAlias.h"
 #include "lang/type/TypeClone.h"
-#include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
-#include "lang/AccessModifier.h"
-#include "lang/Assigner.h"
 
 lang::Scope* lang::GlobalScope::scope()
 {
@@ -33,7 +33,11 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger)
 
     for (auto const& [name, type] : defined_types_) { valid &= type->validateDefinition(validation_logger); }
 
-    for (auto [message, location] : errors_) { validation_logger.logError(message, location); }
+    for (auto const& [name, location] : duplicated_variable_names_)
+    {
+        validation_logger.logError("Name '" + name + "' already defined in the current context", location);
+    }
+
     if (!valid) return;
 
     for (auto const& [key, function] : defined_function_groups_) { function->validate(validation_logger); }
@@ -70,23 +74,11 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
 
     if (global_defined_variables_.find(identifier) != global_defined_variables_.end())
     {
-        errors_.emplace_back("Name '" + identifier + "' already defined in the current context", location);
-        return;
-    }
-
-    if (!initializer)
-    {
-        errors_.emplace_back("Constants require an explicit initializer", location);
+        duplicated_variable_names_.emplace_back(identifier, location);
         return;
     }
 
     bool is_final = assigner.isFinal();
-
-    if (is_constant && !is_final)
-    {
-        errors_.emplace_back("Assignment to constants must be final", location);
-        return;
-    }
 
     lang::OwningHandle<lang::Variable> undefined;
 
@@ -95,8 +87,7 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
         undefined = std::move(global_undefined_variables_[identifier]);
         global_undefined_variables_.erase(identifier);
     }
-    else
-    {
+    else {
         undefined = lang::OwningHandle<lang::Variable>::takeOwnership(lang::makeHandled<lang::Variable>(identifier));
     }
 
@@ -344,8 +335,7 @@ std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntr
     lang::Function& function = *(potential_function.front());
 
     if (function.returnType()->isIntegerType(32, false)) return potential_function.front();
-    else
-        return {};
+    else return {};
 }
 
 std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findExit()
@@ -448,4 +438,3 @@ lang::OwningHandle<lang::Type> lang::GlobalScope::retrieveUndefinedType(const st
 
     return undefined;
 }
-
