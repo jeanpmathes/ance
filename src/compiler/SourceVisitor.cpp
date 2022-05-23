@@ -96,7 +96,7 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
                                                     std::unique_ptr<ConstantExpression>(const_expr),
                                                     location(ctx));
 
-    return this->visitChildren(ctx);
+    return {};
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)
@@ -136,7 +136,7 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
                                                                     declaration_location,
                                                                     definition_location);
 
-    return this->visitChildren(ctx);
+    return {};
 }
 
 antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx)
@@ -158,7 +158,7 @@ antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFu
                                                     shared_parameters,
                                                     location(ctx));
 
-    return this->visitChildren(ctx);
+    return {};
 }
 
 antlrcpp::Any SourceVisitor::visitParameters(anceParser::ParametersContext* ctx)
@@ -186,7 +186,7 @@ antlrcpp::Any SourceVisitor::visitDefineAs(anceParser::DefineAsContext* ctx)
                                                  location(ctx),
                                                  location(ctx->type()));
 
-    return this->visitChildren(ctx);
+    return {};
 }
 
 antlrcpp::Any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ctx)
@@ -197,7 +197,7 @@ antlrcpp::Any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ct
                                                     location(ctx),
                                                     location(ctx->type()));
 
-    return this->visitChildren(ctx);
+    return {};
 }
 
 antlrcpp::Any SourceVisitor::visitBlock(anceParser::BlockContext* ctx)
