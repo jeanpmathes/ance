@@ -5,6 +5,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/statement/Statement.h"
 #include "lang/utility/Values.h"
+#include "lang/construct/value/WrappedNativeValue.h"
 
 SizeofExpression::SizeofExpression(std::unique_ptr<Expression> expression, lang::Location location)
     : Expression(location)
@@ -33,14 +34,12 @@ Expression::Expansion SizeofExpression::expandWith(Expressions subexpressions) c
     return {Statements(), std::make_unique<SizeofExpression>(std::move(subexpressions[0]), location()), Statements()};
 }
 
-std::shared_ptr<lang::Value> SizeofExpression::getValue() const
-{
-    return return_value_;
-}
-
-llvm::Value* SizeofExpression::buildNativeValue(CompileContext* context)
+void SizeofExpression::doBuild(CompileContext* context)
 {
     llvm::Value* content_value =
         lang::SizeType::buildContentValue(expression_->type()->getContentSize(context->module()));
-    return lang::Values::contentToNative(type(), content_value, context);
+    llvm::Value* native_value = lang::Values::contentToNative(type(), content_value, context);
+
+    std::shared_ptr<lang::WrappedNativeValue> value = std::make_shared<lang::WrappedNativeValue>(type(), native_value);
+    setValue(value);
 }

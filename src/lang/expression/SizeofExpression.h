@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_SIZEOFEXPRESSION_H_
 #define ANCE_SRC_LANG_EXPRESSION_SIZEOFEXPRESSION_H_
 
-#include "BackingExpression.h"
+#include "DelayableExpression.h"
 
 #include "lang/construct/value/ExpressionBackedValue.h"
 #include "lang/Element.h"
@@ -12,7 +12,7 @@ class Application;
  * Gives the size of a value returned by an expression.
  */
 class SizeofExpression
-    : public BackingExpression
+    : public DelayableExpression
     , public lang::Element<SizeofExpression, ANCE_CONSTRUCTS>
 {
   public:
@@ -31,13 +31,10 @@ class SizeofExpression
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
-    [[nodiscard]] std::shared_ptr<lang::Value> getValue() const override;
-
   protected:
-    llvm::Value* buildNativeValue(CompileContext* context) override;
+    void doBuild(CompileContext* context) override;
 
   private:
-    std::shared_ptr<lang::Value> return_value_ {std::make_shared<lang::ExpressionBackedValue>(this)};
     std::unique_ptr<Expression>  expression_;
 };
 
