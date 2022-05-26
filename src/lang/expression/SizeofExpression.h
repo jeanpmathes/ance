@@ -3,7 +3,6 @@
 
 #include "DelayableExpression.h"
 
-#include "lang/construct/value/ExpressionBackedValue.h"
 #include "lang/Element.h"
 
 class Application;

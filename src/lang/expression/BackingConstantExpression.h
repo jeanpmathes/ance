@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_BACKINGCONSTANTEXPRESSION_H_
 #define ANCE_SRC_LANG_EXPRESSION_BACKINGCONSTANTEXPRESSION_H_
 
-#include "BackingExpression.h"
+#include "BuildableExpression.h"
 #include "ConstantExpression.h"
 
 /**
@@ -9,7 +9,7 @@
  */
 class BackingConstantExpression
     : public ConstantExpression
-    , public BackingExpression
+    , public BuildableExpression
 {
   public:
     /**
@@ -36,7 +36,7 @@ class BackingConstantExpression
      */
     virtual llvm::Constant* buildContentConstant(llvm::LLVMContext& c) = 0;
 
-    llvm::Value* buildNativeValue(CompileContext* context) final;
+    void doBuild(CompileContext* context) override;
 
   private:
     llvm::Constant* content_constant_ {nullptr};

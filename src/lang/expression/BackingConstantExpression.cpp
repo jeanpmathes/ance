@@ -16,8 +16,4 @@ llvm::Constant* BackingConstantExpression::getContentConstant()
     return content_constant_;
 }
 
-llvm::Value* BackingConstantExpression::buildNativeValue(CompileContext* context)
-{
-    buildConstant(*context->llvmContext());
-    return lang::Values::contentToNative(type(), content_constant_, context);
-}
+void BackingConstantExpression::doBuild(CompileContext* context) {}

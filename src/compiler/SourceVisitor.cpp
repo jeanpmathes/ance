@@ -29,7 +29,6 @@
 
 #include "lang/expression/Addressof.h"
 #include "lang/expression/Allocation.h"
-#include "lang/expression/BackingExpression.h"
 #include "lang/expression/BinaryOperation.h"
 #include "lang/expression/UnaryOperation.h"
 #include "lang/expression/BindRef.h"

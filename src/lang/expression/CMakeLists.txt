@@ -1,7 +1,6 @@
 target_sources(ance PRIVATE DefaultValue.cpp
                Expression.cpp
                ConstantExpression.cpp
-               BackingExpression.cpp
                BackingConstantExpression.cpp
                UnexpandedExpression.cpp
                FunctionCall.cpp
