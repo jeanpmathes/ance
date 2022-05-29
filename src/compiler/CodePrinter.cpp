@@ -15,6 +15,8 @@ CodePrinter::CodePrinter(std::ostream& out) : out_(out) {}
 
 std::any CodePrinter::visit(lang::CustomFunction& function)
 {
+    indent();
+
     out_ << function.access().toString() << " ";
     out_ << function.name() << " ";
     out_ << function.parameterSource();
@@ -30,8 +32,10 @@ std::any CodePrinter::visit(lang::CustomFunction& function)
 
 std::any CodePrinter::visit(lang::ExternFunction& function)
 {
+    indent();
+
     out_ << "extern " << function.name() << " ";
-    out_ << function.parameterSource() << END_STATEMENT;
+    out_ << function.parameterSource() << ";" << std::endl;
 
     return {};
 }
@@ -154,8 +158,25 @@ std::any CodePrinter::visit(VariableAccess& variable_access)
     return {};
 }
 
+std::any CodePrinter::visit(lang::CodeBlock& code_block)
+{
+    indent();
+    out_ << "{" << std::endl;
+    indent_++;
+
+    for (auto& statement : code_block.statements()) { visitTree(statement); }
+
+    indent_--;
+    indent();
+    out_ << "}" << std::endl;
+
+    return {};
+}
+
 std::any CodePrinter::visit(Assertion& assertion)
 {
+    indent();
+
     out_ << "assert " << visitTree(assertion.condition()) << END_STATEMENT;
 
     return {};
@@ -163,6 +184,8 @@ std::any CodePrinter::visit(Assertion& assertion)
 
 std::any CodePrinter::visit(Assignment& assignment_statement)
 {
+    indent();
+
     out_ << visitTree(assignment_statement.assignable()) << " ";
     out_ << assignment_statement.assigner().getSymbol() << " ";
     out_ << visitTree(assignment_statement.assigned()) << END_STATEMENT;
@@ -172,6 +195,8 @@ std::any CodePrinter::visit(Assignment& assignment_statement)
 
 std::any CodePrinter::visit(Delete& delete_statement)
 {
+    indent();
+
     out_ << "delete";
     if (delete_statement.isBufferDelete()) out_ << "[]";
 
@@ -182,6 +207,8 @@ std::any CodePrinter::visit(Delete& delete_statement)
 
 std::any CodePrinter::visit(ExpressionStatement& expression_statement)
 {
+    indent();
+
     out_ << visitTree(expression_statement.expression()) << END_STATEMENT;
 
     return {};
@@ -189,6 +216,8 @@ std::any CodePrinter::visit(ExpressionStatement& expression_statement)
 
 std::any CodePrinter::visit(LocalReferenceVariableDefinition& local_reference_variable_definition)
 {
+    indent();
+
     out_ << "let " << local_reference_variable_definition.identifier();
     out_ << ": " << local_reference_variable_definition.type()->getName() << " ";
     out_ << visitTree(local_reference_variable_definition.reference()) << END_STATEMENT;
@@ -198,6 +227,8 @@ std::any CodePrinter::visit(LocalReferenceVariableDefinition& local_reference_va
 
 std::any CodePrinter::visit(LocalVariableDefinition& local_variable_definition)
 {
+    indent();
+
     out_ << "let " << local_variable_definition.identifier();
     out_ << ": " << local_variable_definition.type()->getName();
 
@@ -214,6 +245,8 @@ std::any CodePrinter::visit(LocalVariableDefinition& local_variable_definition)
 
 std::any CodePrinter::visit(Return& return_statement)
 {
+    indent();
+
     out_ << "return";
 
     if (return_statement.expression()) { out_ << " " << visitTree(*return_statement.expression()); }
@@ -221,4 +254,9 @@ std::any CodePrinter::visit(Return& return_statement)
     out_ << END_STATEMENT;
 
     return {};
+}
+
+void CodePrinter::indent()
+{
+    out_ << std::string(indent_ * 4, ' ');
 }

@@ -31,6 +31,7 @@ class CodePrinter : public lang::ApplicationVisitor
     std::any visit(Subscript& subscript) override;
     std::any visit(VariableAccess& variable_access) override;
 
+    std::any visit(lang::CodeBlock& code_block) override;
     std::any visit(Assertion& assertion) override;
     std::any visit(Assignment& assignment_statement) override;
     std::any visit(Delete& delete_statement) override;
@@ -40,7 +41,10 @@ class CodePrinter : public lang::ApplicationVisitor
     std::any visit(Return& return_statement) override;
 
   private:
+    void indent();
+
     std::ostream& out_;
+    size_t        indent_ = 0;
 };
 
 #endif

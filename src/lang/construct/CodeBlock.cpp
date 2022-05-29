@@ -42,6 +42,16 @@ lang::CodeBlock* lang::CodeBlock::makeScoped(lang::Location location)
     return new CodeBlock(true, location);
 }
 
+std::vector<std::reference_wrapper<Statement>> lang::CodeBlock::statements() const
+{
+    std::vector<std::reference_wrapper<Statement>> s;
+    s.reserve(subs_.size());
+
+    for (auto& statement : subs_) { s.emplace_back(*statement); }
+
+    return s;
+}
+
 void lang::CodeBlock::append(std::unique_ptr<CodeBlock> block)
 {
     if (block->scoped_)

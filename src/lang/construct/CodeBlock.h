@@ -48,6 +48,8 @@ namespace lang
          */
         static CodeBlock* makeScoped(lang::Location location);
 
+        [[nodiscard]] std::vector<std::reference_wrapper<Statement>> statements() const;
+
         /**
          * Append a block to this block.
          * @param block The block to append.
