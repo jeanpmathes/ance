@@ -4,9 +4,10 @@
 #include <llvm/IR/GlobalValue.h>
 
 namespace lang
-{ /**
- * Represents different access levels of named values.
- */
+{
+    /**
+     * Represents different access levels of named values.
+     */
     class AccessModifier
     {
       public:
@@ -17,20 +18,26 @@ namespace lang
         };
 
         AccessModifier() = default;
-    constexpr AccessModifier(Value val) : value_(val) {}// NOLINT(google-explicit-constructor)
+        constexpr AccessModifier(Value val) : value_(val) {}// NOLINT(google-explicit-constructor)
 
-             operator Value() const;// NOLINT(google-explicit-constructor)
-    explicit operator bool() = delete;
+                 operator Value() const;// NOLINT(google-explicit-constructor)
+        explicit operator bool() = delete;
 
-    /**
+        /**
+     * Get this access modifier as string.
+     * @return The string.
+     */
+        std::string toString() const;
+
+        /**
      * Get the corresponding native linkage type.
      * @return The linkage type.
      */
-    llvm::GlobalValue::LinkageTypes linkage();
+        llvm::GlobalValue::LinkageTypes linkage();
 
-  private:
-    Value value_;
-};
+      private:
+        Value value_;
+    };
 }
 
 #endif

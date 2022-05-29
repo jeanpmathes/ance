@@ -15,6 +15,9 @@ class CodePrinter : public lang::ApplicationVisitor
 
     explicit CodePrinter(std::ostream& out);
 
+    std::any visit(lang::CustomFunction& function) override;
+    std::any visit(lang::ExternFunction& function) override;
+
     std::any visit(Addressof& addressof) override;
     std::any visit(Allocation& allocation) override;
     std::any visit(BinaryOperation& binary_operation) override;

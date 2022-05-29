@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_LANG_CONSTRUCTS_H_
-#define ANCE_SRC_LANG_CONSTRUCTS_H_
+#ifndef ANCE_SRC_LANG_CONSTRUCTS_H
+#define ANCE_SRC_LANG_CONSTRUCTS_H
 
 class Application;
 

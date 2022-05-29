@@ -48,6 +48,9 @@ namespace lang
 
         [[nodiscard]] bool isMangled() const override;
 
+        [[nodiscard]] lang::AccessModifier access() const;
+        [[nodiscard]] Statement&           code() const;
+
         void validate(ValidationLogger& validation_logger) override;
         void expand() override;
         void determineFlow() override;

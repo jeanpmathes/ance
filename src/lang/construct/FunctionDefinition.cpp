@@ -89,6 +89,22 @@ bool lang::FunctionDefinition::validateCall(
     return valid;
 }
 
+std::string lang::FunctionDefinition::parameterSource() const
+{
+    std::string source   = "(";
+    bool        is_first = true;
+
+    for (auto& parameter : parameters_)
+    {
+        if (!is_first) source += ", ";
+        source += parameter->name() + ": " + parameter->type()->getName();
+
+        is_first = false;
+    }
+
+    return source + ")";
+}
+
 std::vector<std::shared_ptr<lang::Parameter>>& lang::FunctionDefinition::parameters()
 {
     return parameters_;

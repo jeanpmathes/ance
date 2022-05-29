@@ -49,9 +49,10 @@ namespace lang
 
         /**
          * Get a string representation of the signature.
+         * The format is shortened in comparison, e.g. no argument names are used.
          * @return The string representation.
          */
-        std::string toString() const;
+        [[nodiscard]] std::string toString() const;
 
         bool operator==(const Signature& other) const;
         bool operator!=(const Signature& other) const;

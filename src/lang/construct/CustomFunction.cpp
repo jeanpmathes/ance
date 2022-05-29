@@ -69,6 +69,16 @@ bool lang::CustomFunction::isMangled() const
     return true;
 }
 
+lang::AccessModifier lang::CustomFunction::access() const
+{
+    return access_;
+}
+
+Statement& lang::CustomFunction::code() const
+{
+    return *code_;
+}
+
 void lang::CustomFunction::validate(ValidationLogger& validation_logger)
 {
     if (!returnType()->isDefined())

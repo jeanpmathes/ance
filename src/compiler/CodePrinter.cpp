@@ -1,5 +1,7 @@
 #include "CodePrinter.h"
 
+#include "lang/type/VoidType.h"
+
 std::ostream& util::operator<<(std::ostream& os, const std::any&)
 {
     return os;
@@ -10,6 +12,29 @@ using namespace util;
 #define END_STATEMENT ";" << std::endl
 
 CodePrinter::CodePrinter(std::ostream& out) : out_(out) {}
+
+std::any CodePrinter::visit(lang::CustomFunction& function)
+{
+    out_ << function.access().toString() << " ";
+    out_ << function.name() << " ";
+    out_ << function.parameterSource();
+
+    if (function.returnType() != lang::VoidType::get()) { out_ << " : " << function.returnType()->getName(); }
+
+    out_ << std::endl;
+
+    out_ << visitTree(function.code());
+
+    return {};
+}
+
+std::any CodePrinter::visit(lang::ExternFunction& function)
+{
+    out_ << "extern " << function.name() << " ";
+    out_ << function.parameterSource() << END_STATEMENT;
+
+    return {};
+}
 
 std::any CodePrinter::visit(Addressof& addressof)
 {

@@ -147,6 +147,11 @@ namespace lang
         virtual std::shared_ptr<lang::Value> buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
                                                        CompileContext* context) const = 0;
 
+        /**
+         * Get the parameter list as source, with parentheses.
+         */
+        [[nodiscard]] std::string parameterSource() const;
+
       protected:
         /**
          * Get the function parameters.

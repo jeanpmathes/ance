@@ -5,6 +5,18 @@ lang::AccessModifier::operator Value() const
     return value_;
 }
 
+std::string lang::AccessModifier::toString() const
+{
+    switch (value_)
+    {
+        case AccessModifier::PRIVATE_ACCESS:
+            return "private";
+
+        case AccessModifier::PUBLIC_ACCESS:
+            return "public";
+    }
+}
+
 llvm::GlobalValue::LinkageTypes lang::AccessModifier::linkage()
 {
     llvm::GlobalValue::LinkageTypes linkage;
