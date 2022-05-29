@@ -9,6 +9,7 @@
 
 #include "lang/AccessModifier.h"
 #include "lang/Element.h"
+#include "lang/Assigner.h"
 
 namespace lang
 {
@@ -41,6 +42,11 @@ namespace lang
                        bool                                is_final,
                        bool                                is_constant,
                        lang::Location                      location);
+
+        [[nodiscard]] lang::AccessModifier access() const;
+        [[nodiscard]] bool                 isConstant() const;
+        [[nodiscard]] lang::Assigner       assigner() const;
+        [[nodiscard]] lang::Constant&      init() const;
 
         void validate(ValidationLogger& validation_logger) override;
 

@@ -13,6 +13,29 @@ using namespace util;
 
 CodePrinter::CodePrinter(std::ostream& out) : out_(out) {}
 
+std::any CodePrinter::visit(lang::GlobalVariable& variable)
+{
+    indent();
+
+    out_ << variable.access().toString() << " ";
+    if (variable.isConstant())
+        out_ << "const"
+             << " ";
+    out_ << variable.identifier() << ": ";
+    out_ << variable.type()->getName();
+
+    std::string value = variable.init().toString();
+    if (!value.empty())
+    {
+        out_ << " " << variable.assigner().getSymbol() << " ";
+        out_ << variable.init().toString();
+    }
+
+    out_ << END_STATEMENT;
+
+    return {};
+}
+
 std::any CodePrinter::visit(lang::CustomFunction& function)
 {
     indent();
@@ -35,7 +58,7 @@ std::any CodePrinter::visit(lang::ExternFunction& function)
     indent();
 
     out_ << "extern " << function.name() << " ";
-    out_ << function.parameterSource() << ";" << std::endl;
+    out_ << function.parameterSource() << END_STATEMENT;
 
     return {};
 }

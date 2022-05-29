@@ -41,6 +41,29 @@ lang::GlobalVariable::GlobalVariable(const std::string&                  identif
     }
 }
 
+lang::AccessModifier lang::GlobalVariable::access() const
+{
+    return access_;
+}
+
+bool lang::GlobalVariable::isConstant() const
+{
+    return is_constant_;
+}
+
+lang::Assigner lang::GlobalVariable::assigner() const
+{
+    if (isFinal()) { return lang::Assigner::FINAL_COPY_ASSIGNMENT; }
+    else {
+        return lang::Assigner::COPY_ASSIGNMENT;
+    }
+}
+
+lang::Constant& lang::GlobalVariable::init() const
+{
+    return *initial_value_;
+}
+
 void lang::GlobalVariable::validate(ValidationLogger& validation_logger)
 {
     if (!type()->isDefined())

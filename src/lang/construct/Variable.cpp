@@ -7,7 +7,6 @@
 #include "lang/construct/LocalVariable.h"
 #include "lang/construct/Parameter.h"
 #include "lang/scope/LocalScope.h"
-#include "lang/type/ReferenceType.h"
 #include "lang/type/Type.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
