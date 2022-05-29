@@ -77,6 +77,12 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
     void preBuild();
 
     /**
+     * Emit the parsed and processed application as source.
+     * @param out The file to emit to.
+     */
+    void emitAsSource(std::filesystem::path out);
+
+    /**
      * Validate the application before compilation.
      * @param validation_logger The logger to log validation messages.
      */

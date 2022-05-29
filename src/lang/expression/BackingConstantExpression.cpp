@@ -16,4 +16,4 @@ llvm::Constant* BackingConstantExpression::getContentConstant()
     return content_constant_;
 }
 
-void BackingConstantExpression::doBuild(CompileContext* context) {}
+void BackingConstantExpression::doBuild(CompileContext*) {}

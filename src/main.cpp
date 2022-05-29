@@ -70,7 +70,14 @@ int main(int argc, char** argv)
 
         if (validation_logger.errorCount() == 0)
         {
+            std::filesystem::path out_dir(argv[2]);
+
+            std::filesystem::path obj_dir = out_dir / "obj";
+            std::filesystem::path bin_dir = out_dir / "bin";
+
+            application.emitAsSource(obj_dir / "input.nc");
             application.preBuild();
+            application.emitAsSource(obj_dir / "input_prebuilt.nc");
 
             application.validateFlow(validation_logger);
 
@@ -86,11 +93,6 @@ int main(int argc, char** argv)
 
                 AnceCompiler compiler(application);
                 AnceLinker   linker(project_file.root()["link"]);
-
-                std::filesystem::path out_dir(argv[2]);
-
-                std::filesystem::path obj_dir = out_dir / "obj";
-                std::filesystem::path bin_dir = out_dir / "bin";
 
                 std::filesystem::create_directory(obj_dir);
                 std::filesystem::create_directory(bin_dir);
