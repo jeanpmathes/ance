@@ -28,6 +28,8 @@ class If
        lang::Location              location);
 
     [[nodiscard]] Expression& condition();
+    [[nodiscard]] Statement*  ifBlock();
+    [[nodiscard]] Statement*  elseBlock();
 
     std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
                                                                      lang::Function*   function) override;

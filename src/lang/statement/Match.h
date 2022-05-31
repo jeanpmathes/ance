@@ -48,6 +48,9 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
          std::variant<std::unique_ptr<Statement>, std::unique_ptr<Expression>> code);
 
   public:
+    [[nodiscard]] std::vector<std::reference_wrapper<ConstantExpression>>  conditions() const;
+    [[nodiscard]] std::reference_wrapper<lang::Visitable<ANCE_CONSTRUCTS>> code() const;
+
     void setContainingScope(lang::Scope* scope);
     void walkDefinitions();
 
@@ -111,7 +114,8 @@ class Match
      */
     Match(std::vector<std::unique_ptr<Case>> cases, std::unique_ptr<Expression> expression, lang::Location location);
 
-    [[nodiscard]] Expression& expression();
+    [[nodiscard]] Expression&                               expression() const;
+    [[nodiscard]] std::vector<std::reference_wrapper<Case>> cases() const;
 
     std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
                                                                      lang::Function*   function) override;

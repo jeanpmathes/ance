@@ -121,6 +121,13 @@ lang::LocalScope* lang::CodeBlock::getBlockScope() const
     return scope_.get();
 }
 
+bool lang::CodeBlock::isCompound() const
+{
+    // Compound blocks must be scoped, and unscoped blocks should have exactly one statement.
+    assert(scoped_ || subs_.size() == 1);
+    return scoped_;
+}
+
 void lang::CodeBlock::validate(ValidationLogger& validation_logger)
 {
     for (auto& sub : subs_) { sub->validate(validation_logger); }

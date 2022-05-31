@@ -43,6 +43,11 @@ lang::LocalScope* Statement::getBlockScope() const
     return nullptr;
 }
 
+bool Statement::isCompound() const
+{
+    return false;
+}
+
 void Statement::walkDefinitions()
 {
     for (auto& subexpression : subexpressions_) { subexpression.get().walkDefinitions(); }

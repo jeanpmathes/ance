@@ -40,6 +40,30 @@ Case::Case(std::vector<std::unique_ptr<ConstantExpression>>                     
     }
 }
 
+std::vector<std::reference_wrapper<ConstantExpression>> Case::conditions() const
+{
+    std::vector<std::reference_wrapper<ConstantExpression>> result;
+
+    for (auto& condition : conditions_) { result.emplace_back(*condition); }
+
+    return result;
+}
+
+std::reference_wrapper<lang::Visitable<ANCE_CONSTRUCTS>> Case::code() const
+{
+    if (std::holds_alternative<std::unique_ptr<Statement>>(code_))
+    {
+        return *std::get<std::unique_ptr<Statement>>(code_);
+    }
+
+    if (std::holds_alternative<std::unique_ptr<Expression>>(code_))
+    {
+        return *std::get<std::unique_ptr<Expression>>(code_);
+    }
+
+    throw std::runtime_error("Case::code() called on invalid case");
+}
+
 void Case::setContainingScope(lang::Scope* scope)
 {
     for (auto& condition : conditions_) { condition->setContainingScope(scope); }
@@ -268,9 +292,18 @@ Match::Match(std::vector<std::unique_ptr<Case>> cases, std::unique_ptr<Expressio
     for (auto& case_instance : cases_) { addChild(*case_instance); }
 }
 
-Expression& Match::expression()
+Expression& Match::expression() const
 {
     return *expression_;
+}
+
+std::vector<std::reference_wrapper<Case>> Match::cases() const
+{
+    std::vector<std::reference_wrapper<Case>> cases;
+
+    for (auto& case_instance : cases_) { cases.emplace_back(*case_instance); }
+
+    return cases;
 }
 
 std::vector<std::unique_ptr<lang::BasicBlock>> Match::createBasicBlocks(lang::BasicBlock& entry,

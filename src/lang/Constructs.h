@@ -21,21 +21,21 @@ namespace lang
 
 class Addressof;
 class Allocation;
+class And;
 class BinaryOperation;
-class UnaryOperation;
 class BindRef;
 class ConstantLiteral;
 class DefaultValue;
 class FunctionCall;
+class IfSelect;
+class MatchSelect;
+class Or;
 class Parenthesis;
 class SizeofExpression;
 class SizeofType;
 class Subscript;
+class UnaryOperation;
 class VariableAccess;
-class And;
-class Or;
-class IfSelect;
-class MatchSelect;
 
 namespace lang
 {
@@ -45,16 +45,16 @@ namespace lang
 
 class Assertion;
 class Assignment;
+class Case;
 class Delete;
+class Drop;
 class ExpressionStatement;
+class If;
 class LocalReferenceVariableDefinition;
 class LocalVariableDefinition;
-class Drop;
-class Return;
-class If;
-class While;
 class Match;
-class Case;
+class Return;
+class While;
 
 #define ANCE_CONSTRUCTS                                                                                                \
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::BasicBlock,    \

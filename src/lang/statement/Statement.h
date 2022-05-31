@@ -58,6 +58,13 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     [[nodiscard]] virtual lang::LocalScope* getBlockScope() const;
 
     /**
+     * Get whether this statement is a compound statement.
+     * A compound statement has it's own scope and can contain multiple statements.
+     * @return True if this statement is a compound statement.
+     */
+    [[nodiscard]] virtual bool isCompound() const;
+
+    /**
      * Walk all definitions and declarations in this statement.
      * Use this for order-dependent definitions, as well as the usage of resolvable entities.
      */

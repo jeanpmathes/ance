@@ -26,6 +26,7 @@ class While
     While(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> block, lang::Location location);
 
     [[nodiscard]] Expression& condition();
+    [[nodiscard]] Statement&  body();
 
     std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
                                                                      lang::Function*   function) override;

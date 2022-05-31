@@ -25,7 +25,8 @@ class MatchSelect
                 std::vector<std::unique_ptr<Case>> cases,
                 lang::Location                     location);
 
-    [[nodiscard]] Expression& condition() const;
+    [[nodiscard]] Expression&                               condition() const;
+    [[nodiscard]] std::vector<std::reference_wrapper<Case>> cases() const;
 
   public:
     lang::ResolvingHandle<lang::Type>               type() override;

@@ -26,6 +26,16 @@ Expression& If::condition()
     return *condition_;
 }
 
+Statement* If::ifBlock()
+{
+    return if_block_.get();
+}
+
+Statement* If::elseBlock()
+{
+    return else_block_.get();
+}
+
 std::vector<std::unique_ptr<lang::BasicBlock>> If::createBasicBlocks(lang::BasicBlock& entry, lang::Function* function)
 {
     auto blocks = lang::BasicBlock::createBranching(condition_.get(), if_block_.get(), else_block_.get(), function);

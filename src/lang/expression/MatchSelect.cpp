@@ -22,6 +22,15 @@ Expression& MatchSelect::condition() const
     return *condition_;
 }
 
+std::vector<std::reference_wrapper<Case>> MatchSelect::cases() const
+{
+    std::vector<std::reference_wrapper<Case>> cases;
+
+    for (auto& c : cases_) { cases.emplace_back(*c); }
+
+    return cases;
+}
+
 lang::ResolvingHandle<lang::Type> MatchSelect::type()
 {
     return Case::getCommonType(cases_);

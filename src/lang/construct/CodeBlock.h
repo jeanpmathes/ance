@@ -64,6 +64,7 @@ namespace lang
                                                                          lang::Function*   function) override;
 
         lang::LocalScope* getBlockScope() const override;
+        bool              isCompound() const override;
 
         void validate(ValidationLogger& validation_logger) override;
 

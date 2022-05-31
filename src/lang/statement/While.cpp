@@ -19,6 +19,11 @@ Expression& While::condition()
     return *condition_;
 }
 
+Statement& While::body()
+{
+    return *block_;
+}
+
 std::vector<std::unique_ptr<lang::BasicBlock>> While::createBasicBlocks(lang::BasicBlock& entry,
                                                                         lang::Function*   function)
 {
