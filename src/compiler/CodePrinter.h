@@ -25,6 +25,7 @@ class CodePrinter : public lang::ApplicationVisitor
     std::any visit(And& an_and) override;
     std::any visit(BinaryOperation& binary_operation) override;
     std::any visit(BindRef& bind_ref) override;
+    std::any visit(BindRefTo& bind_ref_to) override;
     std::any visit(ConstantLiteral& constant_literal) override;
     std::any visit(DefaultValue& default_value) override;
     std::any visit(FunctionCall& function_call) override;

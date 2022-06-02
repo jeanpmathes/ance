@@ -492,35 +492,10 @@ class anceParser : public antlr4::Parser
     {
       public:
         LocalReferenceDefinitionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-
-        LocalReferenceDefinitionContext() = default;
-        void copyFrom(LocalReferenceDefinitionContext* context);
-        using antlr4::ParserRuleContext::copyFrom;
-
-        virtual size_t getRuleIndex() const override;
-    };
-
-    class LocalReferenceToValueDefinitionContext : public LocalReferenceDefinitionContext
-    {
-      public:
-        LocalReferenceToValueDefinitionContext(LocalReferenceDefinitionContext* ctx);
-
+        virtual size_t              getRuleIndex() const override;
         antlr4::tree::TerminalNode* IDENTIFIER();
         TypeContext*                type();
-        ExpressionContext*          expression();
-        antlr4::tree::TerminalNode* SEMICOLON();
-
-        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    class LocalReferenceToPointerDefinitionContext : public LocalReferenceDefinitionContext
-    {
-      public:
-        LocalReferenceToPointerDefinitionContext(LocalReferenceDefinitionContext* ctx);
-
-        antlr4::tree::TerminalNode* IDENTIFIER();
-        TypeContext*                type();
-        ExpressionContext*          expression();
+        BindRefContext*             bindRef();
         antlr4::tree::TerminalNode* SEMICOLON();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;

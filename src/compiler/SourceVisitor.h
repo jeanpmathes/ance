@@ -38,10 +38,7 @@ class SourceVisitor : public anceBaseVisitor
 
     antlrcpp::Any visitExpressionStatement(anceParser::ExpressionStatementContext* ctx) override;
     antlrcpp::Any visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx) override;
-    antlrcpp::Any visitLocalReferenceToValueDefinition(
-        anceParser::LocalReferenceToValueDefinitionContext* ctx) override;
-    antlrcpp::Any visitLocalReferenceToPointerDefinition(
-        anceParser::LocalReferenceToPointerDefinitionContext* ctx) override;
+    antlrcpp::Any visitLocalReferenceDefinition(anceParser::LocalReferenceDefinitionContext* ctx) override;
     antlrcpp::Any visitDropStatement(anceParser::DropStatementContext* ctx) override;
     antlrcpp::Any visitAssignment(anceParser::AssignmentContext* ctx) override;
     antlrcpp::Any visitDeleteStatement(anceParser::DeleteStatementContext* ctx) override;

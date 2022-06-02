@@ -1,5 +1,6 @@
 #include "LocalReferenceVariableDefinition.h"
 
+#include <memory>
 #include <utility>
 
 #include "lang/construct/Function.h"
@@ -8,38 +9,6 @@
 #include "lang/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
 #include "lang/Assigner.h"
-
-std::unique_ptr<LocalReferenceVariableDefinition> LocalReferenceVariableDefinition::defineReferring(
-    std::string                       identifier,
-    lang::ResolvingHandle<lang::Type> type,
-    lang::Location                    type_location,
-    std::unique_ptr<Expression>       value,
-    lang::Location                    location)
-{
-    std::unique_ptr<Expression> reference = BindRef::refer(std::move(value), location);
-    auto*                       def       = new LocalReferenceVariableDefinition(std::move(identifier),
-                                                     type,
-                                                     type_location,
-                                                     std::move(reference),
-                                                     location);
-    return std::unique_ptr<LocalReferenceVariableDefinition>(def);
-}
-
-std::unique_ptr<LocalReferenceVariableDefinition> LocalReferenceVariableDefinition::defineReferringTo(
-    std::string                       identifier,
-    lang::ResolvingHandle<lang::Type> type,
-    lang::Location                    type_location,
-    std::unique_ptr<Expression>       address,
-    lang::Location                    location)
-{
-    std::unique_ptr<Expression> reference = BindRef::referTo(std::move(address), location);
-    auto*                       def       = new LocalReferenceVariableDefinition(std::move(identifier),
-                                                     type,
-                                                     type_location,
-                                                     std::move(reference),
-                                                     location);
-    return std::unique_ptr<LocalReferenceVariableDefinition>(def);
-}
 
 LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string                       identifier,
                                                                    lang::ResolvingHandle<lang::Type> type,
@@ -133,12 +102,11 @@ Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressio
 {
     Statements statements;
 
-    statements.push_back(std::unique_ptr<LocalReferenceVariableDefinition>(
-        new LocalReferenceVariableDefinition(identifier_,
-                                             type_->toUndefined(),
-                                             type_location_,
-                                             std::move(subexpressions[0]),
-                                             location())));
+    statements.push_back(std::make_unique<LocalReferenceVariableDefinition>(identifier_,
+                                                                            type_->toUndefined(),
+                                                                            type_location_,
+                                                                            std::move(subexpressions[0]),
+                                                                            location()));
 
     return statements;
 }

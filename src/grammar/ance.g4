@@ -71,8 +71,7 @@ localVariableDefinition
 	;
 
 localReferenceDefinition
-    : 'let' IDENTIFIER ':' type 'ref' expression ';' # LocalReferenceToValueDefinition
-    | 'let' IDENTIFIER ':' type 'ref' 'to' expression ';' # LocalReferenceToPointerDefinition
+    : 'let' IDENTIFIER ':' type bindRef ';'
     ;
 
 dropStatement

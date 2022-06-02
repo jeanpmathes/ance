@@ -63,14 +63,7 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
-    virtual antlrcpp::Any visitLocalReferenceToValueDefinition(
-        anceParser::LocalReferenceToValueDefinitionContext* ctx) override
-    {
-        return visitChildren(ctx);
-    }
-
-    virtual antlrcpp::Any visitLocalReferenceToPointerDefinition(
-        anceParser::LocalReferenceToPointerDefinitionContext* ctx) override
+    virtual antlrcpp::Any visitLocalReferenceDefinition(anceParser::LocalReferenceDefinitionContext* ctx) override
     {
         return visitChildren(ctx);
     }

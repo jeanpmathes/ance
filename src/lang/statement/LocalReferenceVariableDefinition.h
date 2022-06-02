@@ -27,27 +27,13 @@ class LocalReferenceVariableDefinition
 {
   public:
     /**
-     * Define a local variable referring to another value.
-     * @param value The value to refer.
-     * @return The created statement.
+     * Constructs a new local reference variable definition.
+     * @param identifier The identifier of the variable.
+     * @param type The type of the variable.
+     * @param type_location The location of the type.
+     * @param reference The reference to bind.
+     * @param location The location of the local reference variable definition.
      */
-    static std::unique_ptr<LocalReferenceVariableDefinition> defineReferring(std::string identifier,
-                                                                             lang::ResolvingHandle<lang::Type> type,
-                                                                             lang::Location              type_location,
-                                                                             std::unique_ptr<Expression> value,
-                                                                             lang::Location              location);
-    /**
-     * Define a local variable referring to a given address.
-     * @param address The address to refer to.
-     * @return The created statement.
-     */
-    static std::unique_ptr<LocalReferenceVariableDefinition> defineReferringTo(std::string identifier,
-                                                                               lang::ResolvingHandle<lang::Type> type,
-                                                                               lang::Location type_location,
-                                                                               std::unique_ptr<Expression> address,
-                                                                               lang::Location              location);
-
-  private:
     LocalReferenceVariableDefinition(std::string                       identifier,
                                      lang::ResolvingHandle<lang::Type> type,
                                      lang::Location                    type_location,

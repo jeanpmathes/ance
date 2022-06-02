@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_BINDREF_H_
 #define ANCE_SRC_LANG_EXPRESSION_BINDREF_H_
 
-#include "DelayableExpression.h"
+#include "UnexpandedExpression.h"
 
 #include <optional>
 
@@ -10,24 +10,19 @@
 class Application;
 
 class BindRef
-    : public DelayableExpression
+    : public UnexpandedExpression
     , public lang::Element<BindRef, ANCE_CONSTRUCTS>
 {
   public:
     /**
-     * Get an expression returning a reference to a given value.
+     * Creates a new bind reference.
+     * @param value The value to bind.
+     * @param location The location of the bind reference.
      */
-    static std::unique_ptr<BindRef> refer(std::unique_ptr<Expression> value, lang::Location location);
-    /**
-     * Get an expression returning a reference to a value at a given address.
-     */
-    static std::unique_ptr<BindRef> referTo(std::unique_ptr<Expression> address, lang::Location location);
-
-  private:
-    BindRef(std::unique_ptr<Expression> address, lang::Location location);
+    BindRef(std::unique_ptr<Expression> value, lang::Location location);
 
   public:
-    [[nodiscard]] Expression& address() const;
+    [[nodiscard]] Expression& value() const;
 
     lang::ResolvingHandle<lang::Type> type() override;
 
@@ -35,14 +30,11 @@ class BindRef
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
-  protected:
-    void doBuild(CompileContext* context) override;
-
   public:
     ~BindRef() override;
 
   private:
-    std::unique_ptr<Expression> address_;
+    std::unique_ptr<Expression> value_;
 
     std::optional<lang::ResolvingHandle<lang::Type>> type_ {};
 };

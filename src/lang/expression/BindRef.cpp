@@ -1,40 +1,32 @@
 #include "BindRef.h"
 
-#include "lang/construct/value/RoughlyCastedValue.h"
 #include "lang/expression/Addressof.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
+#include "lang/expression/BindRefTo.h"
 
-std::unique_ptr<BindRef> BindRef::refer(std::unique_ptr<Expression> value, lang::Location location)
+BindRef::BindRef(std::unique_ptr<Expression> value, lang::Location location)
+    : UnexpandedExpression(location)
+    , value_(std::move(value))
 {
-    auto addressof = std::make_unique<Addressof>(std::move(value), location);
-    return std::unique_ptr<BindRef>(new BindRef(std::move(addressof), location));
+    addSubexpression(*value_);
 }
 
-std::unique_ptr<BindRef> BindRef::referTo(std::unique_ptr<Expression> address, lang::Location location)
+Expression& BindRef::value() const
 {
-    return std::unique_ptr<BindRef>(new BindRef(std::move(address), location));
-}
-
-BindRef::BindRef(std::unique_ptr<Expression> address, lang::Location location)
-    : Expression(location)
-    , address_(std::move(address))
-{
-    addSubexpression(*address_);
-}
-
-Expression& BindRef::address() const
-{
-    return *address_;
+    return *value_;
 }
 
 lang::ResolvingHandle<lang::Type> BindRef::type()
 {
     if (!type_)
     {
-        lang::ResolvingHandle<lang::Type> element_type = address_->type()->getElementType();
-        type_                                          = lang::ReferenceType::get(element_type);
+        lang::ResolvingHandle<lang::Type> element_type = value_->type();
+
+        if (element_type->isReferenceType()) { element_type = element_type->getElementType(); }
+
+        type_ = lang::ReferenceType::get(element_type);
     }
 
     return *type_;
@@ -42,16 +34,12 @@ lang::ResolvingHandle<lang::Type> BindRef::type()
 
 bool BindRef::validate(ValidationLogger& validation_logger)
 {
-    bool address_is_valid = address_->validate(validation_logger);
-    if (!address_is_valid) return false;
+    bool is_arg_valid = value_->validate(validation_logger);
+    if (!is_arg_valid) return false;
 
-    lang::ResolvingHandle<lang::Type> address_type = address_->type();
-
-    if (!address_type->isPointerType())
+    if (!value_->isNamed())
     {
-        validation_logger.logError("Value of type " + address_type->getAnnotatedName()
-                                       + " cannot be used as pointer type for reference binding",
-                                   address_->location());
+        validation_logger.logError("Cannot get address of unnamed value", value_->location());
         return false;
     }
 
@@ -60,14 +48,10 @@ bool BindRef::validate(ValidationLogger& validation_logger)
 
 Expression::Expansion BindRef::expandWith(Expressions subexpressions) const
 {
-    return {Statements(),
-            std::unique_ptr<BindRef>(new BindRef(std::move(subexpressions[0]), location())),
-            Statements()};
-}
-
-void BindRef::doBuild(CompileContext*)
-{
-    setValue(std::make_shared<lang::RoughlyCastedValue>(type(), address_->getValue()));
+    return {
+        Statements(),
+        std::make_unique<BindRefTo>(std::make_unique<Addressof>(std::move(subexpressions[0]), location()), location()),
+        Statements()};
 }
 
 BindRef::~BindRef() = default;

@@ -26,6 +26,7 @@ namespace lang
 #include "lang/expression/BinaryOperation.h"
 #include "lang/expression/UnaryOperation.h"
 #include "lang/expression/BindRef.h"
+#include "lang/expression/BindRefTo.h"
 #include "lang/expression/ConstantLiteral.h"
 #include "lang/expression/DefaultValue.h"
 #include "lang/expression/FunctionCall.h"

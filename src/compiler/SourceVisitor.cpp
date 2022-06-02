@@ -32,6 +32,7 @@
 #include "lang/expression/BinaryOperation.h"
 #include "lang/expression/UnaryOperation.h"
 #include "lang/expression/BindRef.h"
+#include "lang/expression/BindRefTo.h"
 #include "lang/expression/ConstantLiteral.h"
 #include "lang/expression/DefaultValue.h"
 #include "lang/expression/FunctionCall.h"
@@ -250,36 +251,18 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
     return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 
-antlrcpp::Any SourceVisitor::visitLocalReferenceToValueDefinition(
-    anceParser::LocalReferenceToValueDefinitionContext* ctx)
+antlrcpp::Any SourceVisitor::visitLocalReferenceDefinition(anceParser::LocalReferenceDefinitionContext* ctx)
 {
     lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
     std::string                       identifier = ctx->IDENTIFIER()->getText();
 
-    Expression* value = visit(ctx->expression()).as<Expression*>();
+    Expression* ref = visit(ctx->bindRef()).as<Expression*>();
 
-    auto statement = LocalReferenceVariableDefinition::defineReferring(identifier,
-                                                                       type,
-                                                                       location(ctx->type()),
-                                                                       std::unique_ptr<Expression>(value),
-                                                                       location(ctx));
-    return lang::CodeBlock::wrapStatement(std::move(statement));
-}
-
-antlrcpp::Any SourceVisitor::visitLocalReferenceToPointerDefinition(
-    anceParser::LocalReferenceToPointerDefinitionContext* ctx)
-{
-    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
-    std::string                       identifier = ctx->IDENTIFIER()->getText();
-
-    Expression* address = visit(ctx->expression()).as<Expression*>();
-
-    auto statement = LocalReferenceVariableDefinition::defineReferringTo(identifier,
-                                                                         type,
-                                                                         location(ctx->type()),
-                                                                         std::unique_ptr<Expression>(address),
-                                                                         location(ctx));
-
+    auto statement = std::make_unique<LocalReferenceVariableDefinition>(identifier,
+                                                                        type,
+                                                                        location(ctx->type()),
+                                                                        std::unique_ptr<Expression>(ref),
+                                                                        location(ctx));
     return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 
@@ -450,14 +433,14 @@ antlrcpp::Any SourceVisitor::visitBindReference(anceParser::BindReferenceContext
 {
     Expression* value = visit(ctx->expression()).as<Expression*>();
 
-    return static_cast<Expression*>(BindRef::refer(std::unique_ptr<Expression>(value), location(ctx)).release());
+    return static_cast<Expression*>(new BindRef(std::unique_ptr<Expression>(value), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitBindReferenceToAddress(anceParser::BindReferenceToAddressContext* ctx)
 {
     Expression* address = visit(ctx->expression()).as<Expression*>();
 
-    return static_cast<Expression*>(BindRef::referTo(std::unique_ptr<Expression>(address), location(ctx)).release());
+    return static_cast<Expression*>(new BindRefTo(std::unique_ptr<Expression>(address), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)

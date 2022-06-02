@@ -14,6 +14,7 @@ target_sources(ance PRIVATE DefaultValue.cpp
                BuildableExpression.cpp
                Addressof.cpp
                BindRef.cpp
+               BindRefTo.cpp
                BinaryOperation.cpp
                And.cpp
                Or.cpp

@@ -110,7 +110,14 @@ std::any CodePrinter::visit(BinaryOperation& binary_operation)
 
 std::any CodePrinter::visit(BindRef& bind_ref)
 {
-    out_ << "ref to " << visitTree(bind_ref.address());
+    out_ << "ref " << visitTree(bind_ref.value());
+
+    return {};
+}
+
+std::any CodePrinter::visit(BindRefTo& bind_ref_to)
+{
+    out_ << "ref to " << visitTree(bind_ref_to.address());
 
     return {};
 }
@@ -433,3 +440,4 @@ void CodePrinter::indent()
 {
     out_ << std::string(indent_ * 4, ' ');
 }
+
