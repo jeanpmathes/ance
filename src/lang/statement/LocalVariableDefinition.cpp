@@ -107,11 +107,11 @@ Statements LocalVariableDefinition::expandWith(Expressions subexpressions, State
     Statements statements;
 
     statements.push_back(std::make_unique<LocalVariableDefinition>(identifier_,
-                                                                   type_->toUndefined(),
-                                                                   type_location_,
-                                                                   assigner_,
-                                                                   std::move(subexpressions[0]),
-                                                                   location()));
+                                                  type_->toUndefined(),
+                                                  type_location_,
+                                                  assigner_,
+                                                  assigned_ptr_ ? std::move(subexpressions[0]) : nullptr,
+                                                  location()));
 
     return statements;
 }

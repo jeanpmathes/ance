@@ -73,11 +73,11 @@ Expression::Expansion MatchSelect::expandWith(Expressions subexpressions) const
 
     statements.push_back(
         std::make_unique<LocalVariableDefinition>(temp_name,
-                                                  type()->toUndefined(),
-                                                  location(),
-                                                  lang::Assigner::COPY_ASSIGNMENT,
-                                                  std::make_unique<DefaultValue>(type()->toUndefined(), location()),
-                                                  location()));
+                                                                   type()->toUndefined(),
+                                                                   location(),
+                                                                   lang::Assigner::COPY_ASSIGNMENT,
+                                                                   nullptr,
+                                                                   location()));
 
     statements.push_back(std::make_unique<Match>(std::move(cases), std::move(condition), location()));
 

@@ -86,11 +86,11 @@ Expression::Expansion IfSelect::expandWith(Expressions subexpressions) const
 
     before.push_back(
         std::make_unique<LocalVariableDefinition>(temp_name,
-                                                  type()->toUndefined(),
-                                                  location(),
-                                                  lang::Assigner::COPY_ASSIGNMENT,
-                                                  std::make_unique<DefaultValue>(type()->toUndefined(), location()),
-                                                  location()));
+                                                               type()->toUndefined(),
+                                                               location(),
+                                                               lang::Assigner::COPY_ASSIGNMENT,
+                                                               nullptr,
+                                                               location()));
 
     before.push_back(std::make_unique<If>(
         std::move(condition),

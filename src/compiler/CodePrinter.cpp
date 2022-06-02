@@ -130,6 +130,8 @@ std::any CodePrinter::visit(ConstantLiteral& constant_literals)
 
 std::any CodePrinter::visit(DefaultValue&)
 {
+    out_ << "$default";
+
     return {};
 }
 
