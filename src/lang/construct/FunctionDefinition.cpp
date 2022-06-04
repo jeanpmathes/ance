@@ -6,8 +6,8 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-lang::FunctionDefinition::FunctionDefinition(lang::Function*                               function,
-                                             lang::Scope*                                  containing_scope,
+lang::FunctionDefinition::FunctionDefinition(Function&                                     function,
+                                             Scope&                                        containing_scope,
                                              lang::ResolvingHandle<lang::Type>             type,
                                              lang::Location                                return_type_location,
                                              std::vector<std::shared_ptr<lang::Parameter>> parameters,
@@ -23,15 +23,15 @@ lang::FunctionDefinition::FunctionDefinition(lang::Function*                    
 
 const std::string& lang::FunctionDefinition::name() const
 {
-    return function_->name();
+    return function_.name();
 }
 
-lang::Scope* lang::FunctionDefinition::scope() const
+lang::Scope& lang::FunctionDefinition::scope() const
 {
     return containing_scope_;
 }
 
-lang::Function* lang::FunctionDefinition::function() const
+lang::Function& lang::FunctionDefinition::function() const
 {
     return function_;
 }
@@ -115,7 +115,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::FunctionDefinition::create
     llvm::LLVMContext&              c,
     llvm::Module*                   m)
 {
-    const std::string& native_name = isMangled() ? signature_.getMangledName() : function_->name();
+    const std::string& native_name = isMangled() ? signature_.getMangledName() : function_.name();
 
     std::vector<llvm::Type*> param_types;
     param_types.reserve(parameters_.size());
@@ -151,5 +151,5 @@ llvm::CallInst* lang::FunctionDefinition::buildCall(const std::vector<std::share
 
 lang::GlobalScope* lang::FunctionDefinition::getGlobalScope()
 {
-    return containing_scope_->getGlobalScope();
+    return containing_scope_.getGlobalScope();
 }

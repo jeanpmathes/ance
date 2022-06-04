@@ -30,7 +30,7 @@ namespace lang
         LocalVariable(const std::string&                identifier,
                       lang::ResolvingHandle<lang::Type> type,
                       lang::Location                    type_location,
-                      lang::Scope*                      containing_scope,
+                      Scope&                            containing_scope,
                       bool                              is_final,
                       std::shared_ptr<lang::Value>      value,
                       unsigned                          parameter_no,

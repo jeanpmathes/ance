@@ -26,8 +26,8 @@ namespace lang
     class FunctionDefinition : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     {
       public:
-        explicit FunctionDefinition(lang::Function*                               function,
-                                    lang::Scope*                                  containing_scope,
+        explicit FunctionDefinition(lang::Function&                               function,
+                                    lang::Scope&                                  containing_scope,
                                     lang::ResolvingHandle<lang::Type>             type,
                                     lang::Location                                return_type_location,
                                     std::vector<std::shared_ptr<lang::Parameter>> parameters,
@@ -42,12 +42,12 @@ namespace lang
         /**
          * Get the containing scope.
          */
-        [[nodiscard]] lang::Scope* scope() const;
+        [[nodiscard]] lang::Scope& scope() const;
 
         /**
          * Get the function.
          */
-        [[nodiscard]] lang::Function* function() const;
+        [[nodiscard]] lang::Function& function() const;
 
         /**
          * Get the return type of this function.
@@ -193,8 +193,8 @@ namespace lang
         virtual ~FunctionDefinition() = default;
 
       private:
-        lang::Function* function_;
-        lang::Scope*    containing_scope_;
+        lang::Function& function_;
+        lang::Scope&    containing_scope_;
 
         lang::ResolvingHandle<lang::Type>             return_type_;
         lang::Location                                return_type_location_;

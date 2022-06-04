@@ -73,19 +73,19 @@ void lang::CodeBlock::append(std::unique_ptr<CodeBlock> block)
     }
 }
 
-void lang::CodeBlock::setScope(lang::Scope* scope)
+void lang::CodeBlock::setScope(Scope& scope)
 {
     lang::LocalScope* created = nullptr;
 
     if (scoped_)
     {
-        scope_  = scope->makeLocalScope();
+        scope_  = scope.makeLocalScope();
         created = scope_.get();
     }
 
-    lang::Scope* local_parent = created ? created : scope;
+    lang::Scope* local_parent = created ? created : &scope;
 
-    for (auto& sub : subs_) { sub->setContainingScope(local_parent); }
+    for (auto& sub : subs_) { sub->setContainingScope(*local_parent); }
 }
 
 void lang::CodeBlock::walkDefinitions()
@@ -95,7 +95,7 @@ void lang::CodeBlock::walkDefinitions()
 }
 
 std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlocks(lang::BasicBlock& entry,
-                                                                                  lang::Function*   function)
+                                                                                  Function&         function)
 {
     std::vector<std::unique_ptr<lang::BasicBlock>> blocks;
 

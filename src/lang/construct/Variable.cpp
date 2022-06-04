@@ -21,7 +21,7 @@ bool lang::Variable::isDefined() const
 
 void lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type>   type,
                                     lang::Location                      type_location,
-                                    lang::GlobalScope*                  containing_scope,
+                                    GlobalScope&                        containing_scope,
                                     lang::AccessModifier                access,
                                     std::unique_ptr<ConstantExpression> constant_init,
                                     bool                                is_final,
@@ -43,7 +43,7 @@ void lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type>   type,
 
 void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
                                    lang::Location                      type_location,
-                                   lang::Scope*                        containing_scope,
+                                   Scope&                              containing_scope,
                                    bool                                is_final,
                                    const std::shared_ptr<lang::Value>& value,
                                    unsigned int                        parameter_no,

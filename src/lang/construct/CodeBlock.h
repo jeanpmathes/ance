@@ -56,12 +56,12 @@ namespace lang
          */
         void append(std::unique_ptr<CodeBlock> block);
 
-        void setScope(lang::Scope* scope) override;
+        void setScope(Scope& scope) override;
 
         void walkDefinitions() override;
 
         std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
-                                                                         lang::Function*   function) override;
+                                                                         Function&         function) override;
 
         lang::LocalScope* getBlockScope() const override;
         bool              isCompound() const override;

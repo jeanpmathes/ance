@@ -49,11 +49,11 @@ Expression* LocalVariableDefinition::assigned() const
     return assigned_ptr_;
 }
 
-void LocalVariableDefinition::setScope(lang::Scope* scope)
+void LocalVariableDefinition::setScope(lang::Scope& scope)
 {
     Statement::setScope(scope);
 
-    scope->asLocalScope()->prepareDefinition(identifier_);
+    scope.asLocalScope()->prepareDefinition(identifier_);
 }
 
 void LocalVariableDefinition::walkDefinitions()

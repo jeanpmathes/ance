@@ -6,7 +6,7 @@
 lang::VariableDefinition::VariableDefinition(const std::string&                identifier,
                                              lang::ResolvingHandle<lang::Type> type,
                                              lang::Location                    type_location,
-                                             lang::Scope*                      containing_scope,
+                                             Scope&                            containing_scope,
                                              bool                              is_final,
                                              lang::Location                    location)
     : identifier_(identifier)
@@ -24,7 +24,7 @@ const std::string& lang::VariableDefinition::identifier() const
 
 lang::Scope* lang::VariableDefinition::scope() const
 {
-    return scope_;
+    return &scope_;
 }
 lang::ResolvingHandle<lang::Type> lang::VariableDefinition::type() const
 {

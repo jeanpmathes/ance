@@ -36,7 +36,7 @@ namespace lang
         GlobalVariable(const std::string&                  identifier,
                        lang::ResolvingHandle<lang::Type>   type,
                        lang::Location                      type_location,
-                       lang::GlobalScope*                  containing_scope,
+                       GlobalScope&                        containing_scope,
                        lang::AccessModifier                access,
                        std::unique_ptr<ConstantExpression> constant_init,
                        bool                                is_final,

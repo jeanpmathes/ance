@@ -51,7 +51,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
     [[nodiscard]] std::vector<std::reference_wrapper<ConstantExpression>>  conditions() const;
     [[nodiscard]] std::reference_wrapper<lang::Visitable<ANCE_CONSTRUCTS>> code() const;
 
-    void setContainingScope(lang::Scope* scope);
+    void setContainingScope(lang::Scope& scope);
     void walkDefinitions();
 
     std::vector<std::pair<ConstantExpression*, Statement*>> getConditions();
@@ -118,9 +118,9 @@ class Match
     [[nodiscard]] std::vector<std::reference_wrapper<Case>> cases() const;
 
     std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
-                                                                     lang::Function*   function) override;
+                                                                     lang::Function&   function) override;
 
-    void setScope(lang::Scope* scope) override;
+    void setScope(lang::Scope& scope) override;
     void walkDefinitions() override;
 
     void validate(ValidationLogger& validation_logger) override;

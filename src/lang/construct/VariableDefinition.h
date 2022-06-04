@@ -25,7 +25,7 @@ namespace lang
         VariableDefinition(const std::string&                identifier,
                            lang::ResolvingHandle<lang::Type> type,
                            lang::Location                    type_location,
-                           lang::Scope*                      containing_scope,
+                           Scope&                            containing_scope,
                            bool                              is_final,
                            lang::Location                    location);
 
@@ -78,7 +78,7 @@ namespace lang
 
         lang::ResolvingHandle<lang::Type> type_;
         lang::Location                    type_location_;
-        lang::Scope*                      scope_;
+        lang::Scope&                      scope_;
         bool                              is_final_;
         lang::Location                    location_;
     };

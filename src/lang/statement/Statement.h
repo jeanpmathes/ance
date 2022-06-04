@@ -37,13 +37,13 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @return The basic blocks.
      */
     virtual std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
-                                                                             lang::Function*   function);
+                                                                             lang::Function&   function);
 
     /**
      * Set the scope that contains this statement.
      * @param scope The containing scope.
      */
-    void setContainingScope(lang::Scope* scope);
+    void setContainingScope(lang::Scope& scope);
 
     /**
      * Get the containing scope.
@@ -76,7 +76,7 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * Order-dependent definitions should not happen here.
      * @param scope The containing function.
      */
-    virtual void setScope(lang::Scope* scope);
+    virtual void setScope(lang::Scope& scope);
 
   public:
     /**

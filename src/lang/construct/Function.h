@@ -64,7 +64,7 @@ namespace lang
          * @param parameters The parameters.
          * @param location The location of the function declaration.
          */
-        void defineAsExtern(lang::Scope*                                         containing_scope,
+        void defineAsExtern(Scope&                                               containing_scope,
                             lang::ResolvingHandle<lang::Type>                    return_type,
                             lang::Location                                       return_type_location,
                             const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
@@ -76,7 +76,7 @@ namespace lang
          * @param return_type The return type of the function.
          * @param return_type_location The location of the return type.
          * @param parameters The parameters for this function.
-         * @param code The code block for this function.
+         * @param block The code block for this function.
          * @param containing_scope The scope containing the function.
          * @param declaration_location The location of the function declaration.
          * @param definition_location The location of the function definition, meaning its code.
@@ -85,8 +85,8 @@ namespace lang
                             lang::ResolvingHandle<lang::Type>                    return_type,
                             lang::Location                                       return_type_location,
                             const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
-                            std::unique_ptr<lang::CodeBlock>                     code,
-                            lang::Scope*                                         containing_scope,
+                            std::unique_ptr<lang::CodeBlock>                     block,
+                            Scope&                                               containing_scope,
                             lang::Location                                       declaration_location,
                             lang::Location                                       definition_location);
 

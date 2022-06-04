@@ -12,8 +12,8 @@
 #include "validation/ValidationLogger.h"
 #include "lang/statement/Statement.h"
 
-lang::ExternFunction::ExternFunction(lang::Function*                               function,
-                                     lang::Scope*                                  containing_scope,
+lang::ExternFunction::ExternFunction(Function&                                     function,
+                                     Scope&                                        containing_scope,
                                      lang::ResolvingHandle<lang::Type>             return_type,
                                      lang::Location                                return_type_location,
                                      std::vector<std::shared_ptr<lang::Parameter>> parameters,
@@ -25,9 +25,9 @@ lang::ExternFunction::ExternFunction(lang::Function*                            
                                std::move(parameters),
                                location)
 {
-    containing_scope->addType(return_type);
+    containing_scope.addType(return_type);
 
-    for (const auto& parameter : this->parameters()) { containing_scope->addType(parameter->type()); }
+    for (const auto& parameter : this->parameters()) { containing_scope.addType(parameter->type()); }
 }
 
 bool lang::ExternFunction::isMangled() const

@@ -36,7 +36,7 @@ Statement* If::elseBlock()
     return else_block_.get();
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> If::createBasicBlocks(lang::BasicBlock& entry, lang::Function* function)
+std::vector<std::unique_ptr<lang::BasicBlock>> If::createBasicBlocks(lang::BasicBlock& entry, lang::Function& function)
 {
     auto blocks = lang::BasicBlock::createBranching(condition_.get(), if_block_.get(), else_block_.get(), function);
 

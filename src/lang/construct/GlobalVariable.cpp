@@ -19,7 +19,7 @@ namespace llvm
 lang::GlobalVariable::GlobalVariable(const std::string&                  identifier,
                                      lang::ResolvingHandle<lang::Type>   type,
                                      lang::Location                      type_location,
-                                     lang::GlobalScope*                  containing_scope,
+                                     GlobalScope&                        containing_scope,
                                      lang::AccessModifier                access,
                                      std::unique_ptr<ConstantExpression> constant_init,
                                      bool                                is_final,
@@ -30,7 +30,7 @@ lang::GlobalVariable::GlobalVariable(const std::string&                  identif
     , is_constant_(is_constant)
     , constant_init_(std::move(constant_init))
 {
-    containing_scope->addType(type);
+    containing_scope.addType(type);
 
     if (constant_init_)
     {

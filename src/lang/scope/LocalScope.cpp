@@ -47,7 +47,7 @@ lang::ResolvingHandle<lang::Variable> lang::LocalScope::defineLocalVariable(cons
     bool is_final = assigner.isFinal();
 
     lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(identifier);
-    variable->defineAsLocal(type, type_location, this, is_final, value, 0, location);
+    variable->defineAsLocal(type, type_location, *this, is_final, value, 0, location);
 
     addChild(*variable);
     defined_local_variables_[identifier].push_back(lang::OwningHandle<lang::Variable>::takeOwnership(variable));

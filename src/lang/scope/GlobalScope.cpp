@@ -92,7 +92,7 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
     }
 
     undefined
-        ->defineAsGlobal(type, type_location, this, access, std::move(initializer), is_final, is_constant, location);
+        ->defineAsGlobal(type, type_location, *this, access, std::move(initializer), is_final, is_constant, location);
     lang::OwningHandle<lang::Variable> defined = std::move(undefined);
 
     addChild(*defined);
@@ -110,7 +110,7 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineExternFunction(
 
     lang::OwningHandle<lang::Function> undefined =
         lang::OwningHandle<lang::Function>::takeOwnership(lang::makeHandled<lang::Function>(identifier));
-    undefined->defineAsExtern(this, return_type, return_type_location, parameters, location);
+    undefined->defineAsExtern(*this, return_type, return_type_location, parameters, location);
     lang::OwningHandle<lang::Function> defined = std::move(undefined);
 
     auto handle = defined.handle();
@@ -137,7 +137,7 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineCustomFunction(
                               return_type_location,
                               parameters,
                               std::move(code),
-                              this,
+                              *this,
                               declaration_location,
                               definition_location);
     lang::OwningHandle<lang::Function> defined = std::move(undefined);

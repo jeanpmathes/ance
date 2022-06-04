@@ -36,13 +36,13 @@ namespace lang
         , public lang::Element<CustomFunction, ANCE_CONSTRUCTS>
     {
       public:
-        CustomFunction(lang::Function*                               function,
+        CustomFunction(Function&                                     function,
                        lang::AccessModifier                          access,
                        lang::ResolvingHandle<lang::Type>             return_type,
                        lang::Location                                return_type_location,
                        std::vector<std::shared_ptr<lang::Parameter>> parameters,
                        std::unique_ptr<Statement>                    code,
-                       lang::Scope*                                  containing_scope,
+                       Scope&                                        containing_scope,
                        lang::Location                                declaration_location,
                        lang::Location                                definition_location);
 

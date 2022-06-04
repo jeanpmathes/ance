@@ -23,13 +23,13 @@ bool lang::Function::isDefined() const
     return (definition_ != nullptr);
 }
 
-void lang::Function::defineAsExtern(lang::Scope*                                         containing_scope,
+void lang::Function::defineAsExtern(Scope&                                               containing_scope,
                                     lang::ResolvingHandle<lang::Type>                    return_type,
                                     lang::Location                                       return_type_location,
                                     const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
                                     lang::Location                                       location)
 {
-    definition_ = std::make_unique<lang::ExternFunction>(this,
+    definition_ = std::make_unique<lang::ExternFunction>(*this,
                                                          containing_scope,
                                                          return_type,
                                                          return_type_location,
@@ -44,11 +44,11 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
                                     lang::Location                                       return_type_location,
                                     const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
                                     std::unique_ptr<lang::CodeBlock>                     block,
-                                    lang::Scope*                                         containing_scope,
+                                    Scope&                                               containing_scope,
                                     lang::Location                                       declaration_location,
                                     lang::Location                                       definition_location)
 {
-    definition_ = std::make_unique<lang::CustomFunction>(this,
+    definition_ = std::make_unique<lang::CustomFunction>(*this,
                                                          access,
                                                          return_type,
                                                          return_type_location,
@@ -74,7 +74,7 @@ std::optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParam
         bool is_final = false;// Assigner has value UNSPECIFIED, so it's not final.
 
         lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(identifier);
-        variable->defineAsLocal(type, type_location, this, is_final, value, parameter_no, location);
+        variable->defineAsLocal(type, type_location, *this, is_final, value, parameter_no, location);
 
         addChild(*variable);
         defined_parameters_[identifier] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
@@ -178,7 +178,7 @@ std::shared_ptr<lang::Value> lang::Function::buildCall(const std::vector<std::sh
 
 lang::Scope* lang::Function::scope()
 {
-    return definition_->scope();
+    return &definition_->scope();
 }
 
 lang::GlobalScope* lang::Function::getGlobalScope()

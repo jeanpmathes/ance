@@ -64,7 +64,7 @@ std::reference_wrapper<lang::Visitable<ANCE_CONSTRUCTS>> Case::code() const
     throw std::runtime_error("Case::code() called on invalid case");
 }
 
-void Case::setContainingScope(lang::Scope* scope)
+void Case::setContainingScope(lang::Scope& scope)
 {
     for (auto& condition : conditions_) { condition->setContainingScope(scope); }
 
@@ -307,7 +307,7 @@ std::vector<std::reference_wrapper<Case>> Match::cases() const
 }
 
 std::vector<std::unique_ptr<lang::BasicBlock>> Match::createBasicBlocks(lang::BasicBlock& entry,
-                                                                        lang::Function*   function)
+                                                                        lang::Function&   function)
 {
     std::vector<std::pair<ConstantExpression*, Statement*>> conditions;
 
@@ -323,7 +323,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Match::createBasicBlocks(lang::Ba
     return blocks;
 }
 
-void Match::setScope(lang::Scope* scope)
+void Match::setScope(lang::Scope& scope)
 {
     Statement::setScope(scope);
 

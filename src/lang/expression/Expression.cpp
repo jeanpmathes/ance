@@ -20,9 +20,9 @@ lang::Scope* Expression::scope() const
     return containing_scope_;
 }
 
-void Expression::setContainingScope(lang::Scope* scope)
+void Expression::setContainingScope(lang::Scope& scope)
 {
-    containing_scope_ = scope;
+    containing_scope_ = &scope;
     setScope(scope);
 }
 
@@ -31,7 +31,7 @@ void Expression::walkDefinitions()
     for (auto& subexpression : subexpressions_) { subexpression.get().walkDefinitions(); }
 }
 
-void Expression::setScope(lang::Scope* scope)
+void Expression::setScope(lang::Scope& scope)
 {
     for (auto& subexpression : subexpressions_) { subexpression.get().setContainingScope(scope); }
 }

@@ -39,7 +39,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * Set the scope containing this expression.
      * @param scope The containing scope.
      */
-    void setContainingScope(lang::Scope* scope);
+    void setContainingScope(lang::Scope& scope);
 
     /**
      * Walk all ordered definitions and declarations, as well as the usage of resolvable entities.
@@ -110,7 +110,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * Override this method to receive the containing scope.
      * @param scope The containing scope.
      */
-    virtual void setScope(lang::Scope* scope);
+    virtual void setScope(lang::Scope& scope);
 
     virtual void doAssign(std::shared_ptr<lang::Value> value, CompileContext* context);
 

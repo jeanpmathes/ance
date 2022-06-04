@@ -20,8 +20,8 @@ namespace lang
         , public lang::Element<ExternFunction, ANCE_CONSTRUCTS>
     {
       public:
-        ExternFunction(lang::Function*                               function,
-                       lang::Scope*                                  containing_scope,
+        ExternFunction(Function&                                     function,
+                       Scope&                                        containing_scope,
                        lang::ResolvingHandle<lang::Type>             return_type,
                        lang::Location                                return_type_location,
                        std::vector<std::shared_ptr<lang::Parameter>> parameters,

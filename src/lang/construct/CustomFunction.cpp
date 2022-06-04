@@ -14,13 +14,13 @@
 #include "validation/ValidationLogger.h"
 #include "lang/AccessModifier.h"
 
-lang::CustomFunction::CustomFunction(lang::Function*                               function,
+lang::CustomFunction::CustomFunction(Function&                                     function,
                                      lang::AccessModifier                          access,
                                      lang::ResolvingHandle<lang::Type>             return_type,
                                      lang::Location                                return_type_location,
                                      std::vector<std::shared_ptr<lang::Parameter>> parameters,
                                      std::unique_ptr<Statement>                    code,
-                                     lang::Scope*                                  containing_scope,
+                                     Scope&                                        containing_scope,
                                      lang::Location                                declaration_location,
                                      lang::Location                                definition_location)
     : lang::FunctionDefinition(function,
@@ -36,19 +36,19 @@ lang::CustomFunction::CustomFunction(lang::Function*                            
 {
     setupCode();
 
-    containing_scope->addType(return_type);
+    containing_scope.addType(return_type);
 
     unsigned no = 1;
     for (const auto& parameter : this->parameters())
     {
-        containing_scope->addType(parameter->type());
+        containing_scope.addType(parameter->type());
 
-        auto arg = function->defineParameterVariable(parameter->name(),
-                                                     parameter->type(),
-                                                     parameter->typeLocation(),
-                                                     parameter,
-                                                     no++,
-                                                     parameter->location());
+        auto arg = function.defineParameterVariable(parameter->name(),
+                                                    parameter->type(),
+                                                    parameter->typeLocation(),
+                                                    parameter,
+                                                    no++,
+                                                    parameter->location());
         arguments_.push_back(arg);
     }
 }
@@ -245,7 +245,7 @@ void lang::CustomFunction::createNativeBacking(CompileContext* context)
     llvm::DISubroutineType* debug_type =
         context->di()->createSubroutineType(context->di()->getOrCreateTypeArray(di_types));
     llvm::DISubprogram* subprogram =
-        context->di()->createFunction(scope()->getDebugScope(context),
+        context->di()->createFunction(scope().getDebugScope(context),
                                       name(),
                                       signature_.getMangledName(),
                                       context->sourceFile(),
@@ -263,7 +263,7 @@ void lang::CustomFunction::build(CompileContext* context)
     llvm::BasicBlock* decl = llvm::BasicBlock::Create(*context->llvmContext(), "decl", native_function_);
 
     context->ir()->SetInsertPoint(decl);
-    function()->buildDeclarations(context);
+    function().buildDeclarations(context);
     inside_scope_->buildDeclarations(context);
 
     llvm::BasicBlock* defs = llvm::BasicBlock::Create(*context->llvmContext(), "defs", native_function_);

@@ -47,7 +47,7 @@ class LocalVariableDefinition
     [[nodiscard]] lang::Assigner                    assigner() const;
     [[nodiscard]] Expression*                       assigned() const;
 
-    void setScope(lang::Scope* scope) override;
+    void setScope(lang::Scope& scope) override;
     void walkDefinitions() override;
 
     void validate(ValidationLogger& validation_logger) override;

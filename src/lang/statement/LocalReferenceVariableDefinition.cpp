@@ -39,11 +39,11 @@ Expression& LocalReferenceVariableDefinition::reference() const
     return *reference_;
 }
 
-void LocalReferenceVariableDefinition::setScope(lang::Scope* scope)
+void LocalReferenceVariableDefinition::setScope(lang::Scope& scope)
 {
     Statement::setScope(scope);
 
-    scope->asLocalScope()->prepareDefinition(identifier_);
+    scope.asLocalScope()->prepareDefinition(identifier_);
 }
 
 void LocalReferenceVariableDefinition::walkDefinitions()

@@ -25,7 +25,7 @@ Statement& While::body()
 }
 
 std::vector<std::unique_ptr<lang::BasicBlock>> While::createBasicBlocks(lang::BasicBlock& entry,
-                                                                        lang::Function*   function)
+                                                                        lang::Function&   function)
 {
     auto blocks = lang::BasicBlock::createLooping(condition_.get(), block_.get(), function);
 
