@@ -35,7 +35,7 @@ class DefaultValue
 
   private:
     lang::ResolvingHandle<lang::Type> type_;
-    std::shared_ptr<lang::Constant>   constant_ {std::make_shared<lang::ExpressionBackedConstant>(this)};
+    std::shared_ptr<lang::Constant>   constant_ {std::make_shared<lang::ExpressionBackedConstant>(*this)};
 };
 
 #endif

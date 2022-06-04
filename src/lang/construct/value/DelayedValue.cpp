@@ -2,11 +2,11 @@
 
 #include "lang/expression/DelayableExpression.h"
 
-lang::DelayedValue::DelayedValue(DelayableExpression* expression) : expression_(expression) {}
+lang::DelayedValue::DelayedValue(DelayableExpression& expression) : expression_(expression) {}
 
 lang::ResolvingHandle<lang::Type> lang::DelayedValue::type()
 {
-    return expression_->type();
+    return expression_.type();
 }
 
 void lang::DelayedValue::setValue(const std::shared_ptr<lang::Value>& value)
@@ -19,7 +19,7 @@ void lang::DelayedValue::setValue(const std::shared_ptr<lang::Value>& value)
 
 void lang::DelayedValue::buildNativeValue(CompileContext* context)
 {
-    expression_->build(context);
+    expression_.build(context);
     value_->buildNativeValue(context);
 }
 

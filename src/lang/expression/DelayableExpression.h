@@ -24,7 +24,7 @@ class DelayableExpression
     void setValue(const std::shared_ptr<lang::Value>& value);
 
   private:
-    std::shared_ptr<lang::DelayedValue> value_ {std::make_shared<lang::DelayedValue>(this)};
+    std::shared_ptr<lang::DelayedValue> value_ {std::make_shared<lang::DelayedValue>(*this)};
 };
 
 #endif

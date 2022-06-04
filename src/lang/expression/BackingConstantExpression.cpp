@@ -1,7 +1,6 @@
 #include "BackingConstantExpression.h"
 
 #include "lang/construct/constant/Constant.h"
-#include "lang/utility/Values.h"
 #include "compiler/CompileContext.h"
 
 void BackingConstantExpression::buildConstant(llvm::LLVMContext& c)

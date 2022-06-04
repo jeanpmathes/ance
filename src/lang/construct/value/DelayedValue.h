@@ -17,7 +17,7 @@ namespace lang
          * Create a new delayed value.
          * @param expression The backing expression.
          */
-        explicit DelayedValue(DelayableExpression* expression);
+        explicit DelayedValue(DelayableExpression& expression);
 
         lang::ResolvingHandle<lang::Type> type() override;
 
@@ -31,7 +31,7 @@ namespace lang
         llvm::Value* getNativeValue() override;
 
       private:
-        DelayableExpression*         expression_;
+        DelayableExpression&         expression_;
         std::shared_ptr<lang::Value> value_ {};
     };
 }

@@ -20,7 +20,7 @@ namespace lang
          * Create a new expression backed constant.
          * @param expression The backing constant expression.
          */
-        explicit ExpressionBackedConstant(BackingConstantExpression* expression);
+        explicit ExpressionBackedConstant(BackingConstantExpression& expression);
 
         [[nodiscard]] std::string toString() const override;
         [[nodiscard]] Expression* getBackingExpression() const override;
@@ -31,7 +31,7 @@ namespace lang
         bool equals(const lang::Constant* other) const override;
 
       private:
-        BackingConstantExpression* expression_;
+        BackingConstantExpression& expression_;
     };
 }
 #endif
