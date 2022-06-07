@@ -32,13 +32,25 @@ void lang::ResolvingHandle<T>::reroute(lang::ResolvingHandle<T> target)
 }
 
 template<typename T>
-T* lang::ResolvingHandle<T>::operator->() const noexcept
+T* lang::ResolvingHandle<T>::operator->() noexcept
 {
     return get();
 }
 
 template<typename T>
-T& lang::ResolvingHandle<T>::operator*() const noexcept
+T& lang::ResolvingHandle<T>::operator*() noexcept
+{
+    return *get();
+}
+
+template<typename T>
+const T* lang::ResolvingHandle<T>::operator->() const noexcept
+{
+    return get();
+}
+
+template<typename T>
+const T& lang::ResolvingHandle<T>::operator*() const noexcept
 {
     return *get();
 }

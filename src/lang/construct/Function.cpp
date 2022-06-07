@@ -132,7 +132,7 @@ void lang::Function::expand()
     {// Quick fix to remove old scope from children, with full expansion this would be unnecessary.
         clearChildren();
         addChild(*definition_);
-        for (const auto& [name, parameter] : defined_parameters_) { addChild(*parameter); }
+        for (auto& [name, parameter] : defined_parameters_) { addChild(*parameter); }
     }
 
     definition_->expand();

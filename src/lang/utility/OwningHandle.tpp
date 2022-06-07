@@ -18,19 +18,31 @@ lang::OwningHandle<T> lang::OwningHandle<T>::takeOwnership(ResolvingHandle<T> ha
 }
 
 template<typename T>
-lang::ResolvingHandle<T> lang::OwningHandle<T>::handle()
+lang::ResolvingHandle<T> lang::OwningHandle<T>::handle() const
 {
     return handle_;
 }
 
 template<typename T>
-T* lang::OwningHandle<T>::operator->() const noexcept
+T* lang::OwningHandle<T>::operator->() noexcept
 {
     return owner_.get();
 }
 
 template<typename T>
-T& lang::OwningHandle<T>::operator*() const noexcept
+T& lang::OwningHandle<T>::operator*() noexcept
+{
+    return *owner_;
+}
+
+template<typename T>
+const T* lang::OwningHandle<T>::operator->() const noexcept
+{
+    return owner_.get();
+}
+
+template<typename T>
+const T& lang::OwningHandle<T>::operator*() const noexcept
 {
     return *owner_;
 }

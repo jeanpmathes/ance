@@ -56,7 +56,7 @@ namespace lang
          * @return All functions that fit the given arguments.
          */
         std::vector<lang::ResolvingHandle<lang::Function>> resolveOverload(
-            const std::vector<lang::ResolvingHandle<lang::Type>>& arguments);
+            const std::vector<lang::ResolvingHandle<lang::Type>>& arguments) const;
 
         /**
          * Get an undefined function group with the same name.

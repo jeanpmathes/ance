@@ -57,7 +57,7 @@ void lang::FunctionGroup::validate(ValidationLogger& validation_logger)
     }
 
     {// Validate every function
-        for (const auto& function : functions_) { function->validate(validation_logger); }
+        for (auto& function : functions_) { function->validate(validation_logger); }
     }
 }
 
@@ -112,7 +112,7 @@ bool lang::FunctionGroup::validateResolution(const std::vector<lang::ResolvingHa
 }
 
 std::vector<lang::ResolvingHandle<lang::Function>> lang::FunctionGroup::resolveOverload(
-    const std::vector<lang::ResolvingHandle<lang::Type>>& arguments)
+    const std::vector<lang::ResolvingHandle<lang::Type>>& arguments) const
 {
     std::vector<lang::ResolvingHandle<lang::Function>> same_signatures;
     std::vector<lang::ResolvingHandle<lang::Function>> matching_signatures;

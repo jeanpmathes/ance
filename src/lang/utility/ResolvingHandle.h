@@ -17,8 +17,10 @@ namespace lang
       public:
         explicit ResolvingHandle(std::unique_ptr<T> handled);
 
+      private:
         T* get() const;
 
+      public:
         /**
          * Take ownership over the handled object.
          */
@@ -57,8 +59,11 @@ namespace lang
         };
 
       public:
-        T* operator->() const noexcept;
-        T& operator*() const noexcept;
+        T* operator->() noexcept;
+        T& operator*() noexcept;
+
+        const T* operator->() const noexcept;
+        const T& operator*() const noexcept;
 
         bool operator==(const ResolvingHandle<T>& other) const;
         bool operator!=(const ResolvingHandle<T>& other) const;

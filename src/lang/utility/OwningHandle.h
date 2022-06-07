@@ -18,10 +18,13 @@ namespace lang
 
         static lang::OwningHandle<T> takeOwnership(lang::ResolvingHandle<T> handle);
 
-        lang::ResolvingHandle<T> handle();
+        lang::ResolvingHandle<T> handle() const;
 
-        T* operator->() const noexcept;
-        T& operator*() const noexcept;
+        T* operator->() noexcept;
+        T& operator*() noexcept;
+
+        const T* operator->() const noexcept;
+        const T& operator*() const noexcept;
 
       private:
         std::unique_ptr<T>       owner_ {};

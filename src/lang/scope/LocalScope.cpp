@@ -239,9 +239,9 @@ void lang::LocalScope::onSubScope(lang::LocalScope* sub_scope)
 
 void lang::LocalScope::validate(ValidationLogger& validation_logger)
 {
-    for (auto const& [identifier, variables] : defined_local_variables_)
+    for (auto& [identifier, variables] : defined_local_variables_)
     {
-        for (auto const& variable : variables) { variable->validate(validation_logger); }
+        for (auto& variable : variables) { variable->validate(validation_logger); }
     }
 }
 
@@ -249,7 +249,7 @@ void lang::LocalScope::buildDeclarations(CompileContext* context)
 {
     for (auto& [identifier, variables] : defined_local_variables_)
     {
-        for (auto const& variable : variables) { variable->buildDeclaration(context); }
+        for (auto& variable : variables) { variable->buildDeclaration(context); }
     }
 
     for (auto& sub_scope : sub_scopes_) { sub_scope->buildDeclarations(context); }

@@ -31,7 +31,7 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger)
     // Validate types before everything else as they are used and checked by everything.
     bool valid = true;
 
-    for (auto const& [name, type] : defined_types_) { valid &= type->validateDefinition(validation_logger); }
+    for (auto& [name, type] : defined_types_) { valid &= type->validateDefinition(validation_logger); }
 
     for (auto const& [name, location] : duplicated_variable_names_)
     {
@@ -40,25 +40,25 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger)
 
     if (!valid) return;
 
-    for (auto const& [key, function] : defined_function_groups_) { function->validate(validation_logger); }
-    for (auto const& [name, variable] : global_defined_variables_) { variable->validate(validation_logger); }
+    for (auto& [key, function] : defined_function_groups_) { function->validate(validation_logger); }
+    for (auto& [name, variable] : global_defined_variables_) { variable->validate(validation_logger); }
 }
 
 void lang::GlobalScope::expand()
 {
-    for (auto const& [key, function] : defined_function_groups_) { function->expand(); }
+    for (auto& [key, function] : defined_function_groups_) { function->expand(); }
 
     expanded_ = true;
 }
 
 void lang::GlobalScope::determineFlow()
 {
-    for (auto const& [key, function] : defined_function_groups_) { function->determineFlow(); }
+    for (auto& [key, function] : defined_function_groups_) { function->determineFlow(); }
 }
 
 void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger)
 {
-    for (auto const& [key, function] : defined_function_groups_) { function->validateFlow(validation_logger); }
+    for (auto& [key, function] : defined_function_groups_) { function->validateFlow(validation_logger); }
 }
 
 void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                access,
@@ -284,7 +284,7 @@ void lang::GlobalScope::resolve()
         }
     }
 
-    for (auto const& [key, group] : defined_function_groups_) { group->resolve(); }
+    for (auto& [key, group] : defined_function_groups_) { group->resolve(); }
 }
 
 bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
@@ -383,9 +383,9 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::getExit()
 
 void lang::GlobalScope::createNativeBacking(CompileContext* context)
 {
-    for (auto const& [key, val] : defined_function_groups_) { val->createNativeBacking(context); }
+    for (auto& [key, val] : defined_function_groups_) { val->createNativeBacking(context); }
 
-    for (auto const& [identifier, variable] : global_defined_variables_)
+    for (auto& [identifier, variable] : global_defined_variables_)
     {
         variable->buildDeclaration(context);
         variable->buildDefinition(context);
@@ -394,7 +394,7 @@ void lang::GlobalScope::createNativeBacking(CompileContext* context)
 
 void lang::GlobalScope::buildFunctions(CompileContext* context)
 {
-    for (auto const& [key, group] : defined_function_groups_) { group->build(context); }
+    for (auto& [key, group] : defined_function_groups_) { group->build(context); }
 }
 
 lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunctionGroup(const std::string& name)
