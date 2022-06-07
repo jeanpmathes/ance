@@ -8,7 +8,7 @@ DefaultValue::DefaultValue(lang::ResolvingHandle<lang::Type> type, lang::Locatio
     , type_(type)
 {}
 
-lang::ResolvingHandle<lang::Type> DefaultValue::type()
+lang::ResolvingHandle<lang::Type> DefaultValue::type() const
 {
     return type_;
 }

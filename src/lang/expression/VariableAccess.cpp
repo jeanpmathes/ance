@@ -21,7 +21,7 @@ void VariableAccess::walkDefinitions()
     scope()->registerUsage(variable_);
 }
 
-lang::ResolvingHandle<lang::Type> VariableAccess::type()
+lang::ResolvingHandle<lang::Type> VariableAccess::type() const
 {
     return variable_->type();
 }

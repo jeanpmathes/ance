@@ -39,7 +39,7 @@ void FunctionCall::walkDefinitions()
     scope()->registerUsage(function_group_);
 }
 
-lang::ResolvingHandle<lang::Type> FunctionCall::type()
+lang::ResolvingHandle<lang::Type> FunctionCall::type() const
 {
     assert(!function().empty());
     return function().front()->returnType();
@@ -113,7 +113,7 @@ void FunctionCall::doBuild(CompileContext* context)
     }
 }
 
-std::vector<lang::ResolvingHandle<lang::Function>> FunctionCall::function()
+std::vector<lang::ResolvingHandle<lang::Function>> FunctionCall::function() const
 {
     if (!overload_resolved_)
     {
@@ -124,7 +124,7 @@ std::vector<lang::ResolvingHandle<lang::Function>> FunctionCall::function()
     return function_;
 }
 
-std::vector<lang::ResolvingHandle<lang::Type>> FunctionCall::argumentTypes()
+std::vector<lang::ResolvingHandle<lang::Type>> FunctionCall::argumentTypes() const
 {
     std::vector<lang::ResolvingHandle<lang::Type>> arg_types;
     arg_types.reserve(arguments_.size());

@@ -17,7 +17,7 @@ Expression& Addressof::argument() const
     return *arg_;
 }
 
-lang::ResolvingHandle<lang::Type> Addressof::type()
+lang::ResolvingHandle<lang::Type> Addressof::type() const
 {
     if (!return_type_)
     {

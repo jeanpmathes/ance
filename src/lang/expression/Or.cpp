@@ -29,7 +29,7 @@ Expression& Or::right() const
     return *right_;
 }
 
-lang::ResolvingHandle<lang::Type> Or::type()
+lang::ResolvingHandle<lang::Type> Or::type() const
 {
     return lang::ResolvingHandle<lang::Type>(lang::BooleanType::get());
 }

@@ -20,7 +20,7 @@ Expression& BindRefTo::address() const
     return *address_;
 }
 
-lang::ResolvingHandle<lang::Type> BindRefTo::type()
+lang::ResolvingHandle<lang::Type> BindRefTo::type() const
 {
     if (!type_)
     {

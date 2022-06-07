@@ -21,7 +21,7 @@ lang::UnaryOperator UnaryOperation::op() const
     return op_;
 }
 
-lang::ResolvingHandle<lang::Type> UnaryOperation::type()
+lang::ResolvingHandle<lang::Type> UnaryOperation::type() const
 {
     return operand_->type()->getOperatorResultType(op_);
 }

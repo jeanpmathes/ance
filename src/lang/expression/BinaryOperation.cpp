@@ -31,7 +31,7 @@ lang::BinaryOperator BinaryOperation::op() const
     return op_;
 }
 
-lang::ResolvingHandle<lang::Type> BinaryOperation::type()
+lang::ResolvingHandle<lang::Type> BinaryOperation::type() const
 {
     return left_->type()->getOperatorResultType(op_, getRightType());
 }
@@ -91,7 +91,7 @@ void BinaryOperation::doBuild(CompileContext* context)
     setValue(result);
 }
 
-lang::ResolvingHandle<lang::Type> BinaryOperation::getRightType()
+lang::ResolvingHandle<lang::Type> BinaryOperation::getRightType() const
 {
     if (lang::Type::areSame(left_->type(), right_->type())) return right_->type();
 

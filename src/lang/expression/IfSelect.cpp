@@ -40,11 +40,6 @@ Expression& IfSelect::elseExpression() const
     return *else_expression_;
 }
 
-lang::ResolvingHandle<lang::Type> IfSelect::type()
-{
-    return then_expression_->type();
-}
-
 lang::ResolvingHandle<lang::Type> IfSelect::type() const
 {
     return then_expression_->type();

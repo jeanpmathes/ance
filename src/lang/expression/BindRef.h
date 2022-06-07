@@ -24,7 +24,7 @@ class BindRef
   public:
     [[nodiscard]] Expression& value() const;
 
-    lang::ResolvingHandle<lang::Type> type() override;
+    lang::ResolvingHandle<lang::Type> type() const override;
 
     bool validate(ValidationLogger& validation_logger) override;
 
@@ -36,7 +36,7 @@ class BindRef
   private:
     std::unique_ptr<Expression> value_;
 
-    std::optional<lang::ResolvingHandle<lang::Type>> type_ {};
+    mutable std::optional<lang::ResolvingHandle<lang::Type>> type_ {};
 };
 
 #endif

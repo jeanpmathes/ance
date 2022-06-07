@@ -23,7 +23,7 @@ Expression& Subscript::index() const
     return *index_;
 }
 
-lang::ResolvingHandle<lang::Type> Subscript::type()
+lang::ResolvingHandle<lang::Type> Subscript::type() const
 {
     return indexed_->type()->getSubscriptReturnType();
 }

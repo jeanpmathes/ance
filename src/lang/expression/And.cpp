@@ -28,7 +28,7 @@ Expression& And::right() const
     return *right_;
 }
 
-lang::ResolvingHandle<lang::Type> And::type()
+lang::ResolvingHandle<lang::Type> And::type() const
 {
     return lang::ResolvingHandle<lang::Type>(lang::BooleanType::get());
 }

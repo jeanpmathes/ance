@@ -28,7 +28,7 @@ class SizeofType
     void walkDefinitions() override;
 
   public:
-    lang::ResolvingHandle<lang::Type> type() override;
+    lang::ResolvingHandle<lang::Type> type() const override;
 
     bool validate(ValidationLogger& validation_logger) override;
 

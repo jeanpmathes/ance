@@ -19,7 +19,7 @@ Expression& SizeofExpression::expression() const
     return *expression_;
 }
 
-lang::ResolvingHandle<lang::Type> SizeofExpression::type()
+lang::ResolvingHandle<lang::Type> SizeofExpression::type() const
 {
     return lang::SizeType::getSize();
 }

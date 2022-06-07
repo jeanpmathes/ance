@@ -33,7 +33,7 @@ class VariableAccess
     void walkDefinitions() override;
 
   public:
-    lang::ResolvingHandle<lang::Type> type() override;
+    lang::ResolvingHandle<lang::Type> type() const override;
 
     [[nodiscard]] bool isNamed() override;
 

@@ -24,7 +24,7 @@ class Subscript
     [[nodiscard]] Expression& indexed() const;
     [[nodiscard]] Expression& index() const;
 
-    lang::ResolvingHandle<lang::Type> type() override;
+    lang::ResolvingHandle<lang::Type> type() const override;
 
     bool validate(ValidationLogger& validation_logger) override;
 

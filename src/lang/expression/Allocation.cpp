@@ -43,7 +43,7 @@ void Allocation::walkDefinitions()
     scope()->addType(allocated_type_);
 }
 
-lang::ResolvingHandle<lang::Type> Allocation::type()
+lang::ResolvingHandle<lang::Type> Allocation::type() const
 {
     return return_type_;
 }

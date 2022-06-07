@@ -29,8 +29,7 @@ class MatchSelect
     [[nodiscard]] std::vector<std::reference_wrapper<Case>> cases() const;
 
   public:
-    lang::ResolvingHandle<lang::Type>               type() override;
-    [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
+    lang::ResolvingHandle<lang::Type> type() const override;
 
     bool validate(ValidationLogger& validation_logger) override;
 

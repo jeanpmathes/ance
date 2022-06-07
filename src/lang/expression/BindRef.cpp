@@ -18,7 +18,7 @@ Expression& BindRef::value() const
     return *value_;
 }
 
-lang::ResolvingHandle<lang::Type> BindRef::type()
+lang::ResolvingHandle<lang::Type> BindRef::type() const
 {
     if (!type_)
     {

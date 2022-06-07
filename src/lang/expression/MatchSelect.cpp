@@ -31,11 +31,6 @@ std::vector<std::reference_wrapper<Case>> MatchSelect::cases() const
     return cases;
 }
 
-lang::ResolvingHandle<lang::Type> MatchSelect::type()
-{
-    return Case::getCommonType(cases_);
-}
-
 lang::ResolvingHandle<lang::Type> MatchSelect::type() const
 {
     return Case::getCommonType(cases_);

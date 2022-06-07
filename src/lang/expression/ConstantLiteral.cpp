@@ -15,7 +15,7 @@ lang::Constant& ConstantLiteral::constant() const
     return *constant_;
 }
 
-lang::ResolvingHandle<lang::Type> ConstantLiteral::type()
+lang::ResolvingHandle<lang::Type> ConstantLiteral::type() const
 {
     return constant_->type();
 }

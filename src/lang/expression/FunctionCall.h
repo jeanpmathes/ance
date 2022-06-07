@@ -39,7 +39,7 @@ class FunctionCall
     void walkDefinitions() override;
 
   public:
-    lang::ResolvingHandle<lang::Type> type() override;
+    lang::ResolvingHandle<lang::Type> type() const override;
 
     bool validate(ValidationLogger& validation_logger) override;
 
@@ -52,13 +52,14 @@ class FunctionCall
     ~FunctionCall() override;
 
   private:
-    std::vector<lang::ResolvingHandle<lang::Function>> function();
-    std::vector<lang::ResolvingHandle<lang::Type>>     argumentTypes();
+    std::vector<lang::ResolvingHandle<lang::Function>> function() const;
+    std::vector<lang::ResolvingHandle<lang::Type>>     argumentTypes() const;
 
-    lang::ResolvingHandle<lang::FunctionGroup>         function_group_;
-    std::vector<std::unique_ptr<Expression>>           arguments_;
-    bool                                               overload_resolved_ {false};
-    std::vector<lang::ResolvingHandle<lang::Function>> function_ {};
+    lang::ResolvingHandle<lang::FunctionGroup> function_group_;
+    std::vector<std::unique_ptr<Expression>>   arguments_;
+
+    mutable bool                                               overload_resolved_ {false};
+    mutable std::vector<lang::ResolvingHandle<lang::Function>> function_ {};
 };
 
 #endif

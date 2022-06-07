@@ -18,7 +18,7 @@ class BackingConstantExpression
      */
     void buildConstant(llvm::LLVMContext& c);
 
-    lang::ResolvingHandle<lang::Type> type() override = 0;
+    lang::ResolvingHandle<lang::Type> type() const override = 0;
 
     [[nodiscard]] std::shared_ptr<lang::Constant> getConstantValue() const override = 0;
 

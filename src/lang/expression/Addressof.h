@@ -27,7 +27,7 @@ class Addressof
     [[nodiscard]] Expression& argument() const;
 
   public:
-    lang::ResolvingHandle<lang::Type> type() override;
+    lang::ResolvingHandle<lang::Type> type() const override;
 
     bool validate(ValidationLogger& validation_logger) override;
 
@@ -40,7 +40,7 @@ class Addressof
     ~Addressof() override;
 
   private:
-    std::unique_ptr<Expression>                      arg_;
-    std::optional<lang::ResolvingHandle<lang::Type>> return_type_ {};
+    std::unique_ptr<Expression>                              arg_;
+    mutable std::optional<lang::ResolvingHandle<lang::Type>> return_type_ {};
 };
 #endif

@@ -24,7 +24,7 @@ void SizeofType::walkDefinitions()
     scope()->addType(type_);
 }
 
-lang::ResolvingHandle<lang::Type> SizeofType::type()
+lang::ResolvingHandle<lang::Type> SizeofType::type() const
 {
     return lang::SizeType::getSize();
 }

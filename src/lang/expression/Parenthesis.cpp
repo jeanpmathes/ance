@@ -36,7 +36,7 @@ Expression::Expansion Parenthesis::expandWith(Expressions subexpressions) const
     return {Statements(), std::make_unique<Parenthesis>(std::move(subexpressions[0]), location()), Statements()};
 }
 
-lang::ResolvingHandle<lang::Type> Parenthesis::type()
+lang::ResolvingHandle<lang::Type> Parenthesis::type() const
 {
     return expression_->type();
 }
