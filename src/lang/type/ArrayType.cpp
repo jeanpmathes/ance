@@ -31,7 +31,7 @@ lang::ResolvingHandle<lang::Type> lang::ArrayType::getElementType() const
     return element_type_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::ArrayType::getActualType()
+lang::ResolvingHandle<lang::Type> lang::ArrayType::getActualType() const
 {
     lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
     if (actual_element_type == element_type_) { return self(); }

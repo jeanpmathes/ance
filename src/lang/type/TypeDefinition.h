@@ -64,8 +64,8 @@ namespace lang
 
         [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getElementType() const;
 
-        virtual lang::ResolvingHandle<lang::Type> getActualType();
-        virtual lang::ResolvingHandle<lang::Type> getOriginalType();
+        virtual lang::ResolvingHandle<lang::Type> getActualType() const;
+        virtual lang::ResolvingHandle<lang::Type> getOriginalType() const;
 
         void         setContainingScope(Scope* scope);
         virtual void onScope();
@@ -137,7 +137,7 @@ namespace lang
         bool                                       checkDependencies(ValidationLogger& validation_logger);
         virtual std::vector<lang::TypeDefinition*> getDependencies();
 
-        lang::ResolvingHandle<lang::Type> self();
+        lang::ResolvingHandle<lang::Type> self() const;
 
       private:
         std::string    name_;

@@ -74,7 +74,7 @@ lang::ResolvingHandle<lang::Type> lang::TypeAlias::getElementType() const
     return actual_->getElementType();
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeAlias::getActualType()
+lang::ResolvingHandle<lang::Type> lang::TypeAlias::getActualType() const
 {
     if (!actually_actual_.has_value())
     {

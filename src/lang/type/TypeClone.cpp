@@ -74,7 +74,7 @@ lang::ResolvingHandle<lang::Type> lang::TypeClone::getElementType() const
     return original_->getElementType();
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeClone::getOriginalType()
+lang::ResolvingHandle<lang::Type> lang::TypeClone::getOriginalType() const
 {
     return original_;
 }

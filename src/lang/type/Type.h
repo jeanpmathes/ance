@@ -81,7 +81,7 @@ namespace lang
          * Get the number of states for this type.
          * @return The number of states.
          */
-        StateCount getStateCount() const;
+        [[nodiscard]] StateCount getStateCount() const;
 
         /**
          * Get whether this type is a custom type.
@@ -162,13 +162,13 @@ namespace lang
          * Get the actual type.
          * @return The actual type, or the type itself if it already is an actual type.
          */
-        lang::ResolvingHandle<lang::Type> getActualType();
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const;
 
         /**
          * Get the original type.
          * @return The original type, or the type itself if it already is an original type.
          */
-        lang::ResolvingHandle<lang::Type> getOriginalType();
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> getOriginalType() const;
 
         /**
          * Set the scope that contains this type. The type must be already defined.

@@ -33,7 +33,7 @@ namespace lang
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const override;
 
-        lang::ResolvingHandle<lang::Type> getActualType() override;
+        lang::ResolvingHandle<lang::Type> getActualType() const override;
 
         void onScope() override;
 
@@ -66,8 +66,8 @@ namespace lang
         lang::ResolvingHandle<lang::Type> actual_;
         lang::Location                    actual_type_location_;
 
-        std::optional<lang::ResolvingHandle<lang::Type>> actually_actual_ {};
-        std::optional<bool>                              is_valid_ {};
+        mutable std::optional<lang::ResolvingHandle<lang::Type>> actually_actual_ {};
+        std::optional<bool>                                      is_valid_ {};
     };
 }
 

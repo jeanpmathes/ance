@@ -95,12 +95,12 @@ void lang::TypeDefinition::setType(lang::Type* type)
     type_ = type;
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getActualType()
+lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getActualType() const
 {
     return self();
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getOriginalType()
+lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getOriginalType() const
 {
     return self();
 }
@@ -283,9 +283,8 @@ std::vector<lang::TypeDefinition*> lang::TypeDefinition::getDependencies()
     return {};
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeDefinition::self()
+lang::ResolvingHandle<lang::Type> lang::TypeDefinition::self() const
 {
     assert(type_);
     return type_->self();
 }
-

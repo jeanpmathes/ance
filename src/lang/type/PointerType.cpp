@@ -32,7 +32,7 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::getElementType() const
     return element_type_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::PointerType::getActualType()
+lang::ResolvingHandle<lang::Type> lang::PointerType::getActualType() const
 {
     lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
     if (actual_element_type == element_type_) { return self(); }

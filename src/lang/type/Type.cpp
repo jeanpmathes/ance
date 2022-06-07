@@ -128,12 +128,13 @@ lang::ResolvingHandle<lang::Type> lang::Type::getElementType() const
     return definition_->getElementType();
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::getActualType()
+lang::ResolvingHandle<lang::Type> lang::Type::getActualType() const
 {
     assert(isDefined());
     return definition_->getActualType();
 }
-lang::ResolvingHandle<lang::Type> lang::Type::getOriginalType()
+
+lang::ResolvingHandle<lang::Type> lang::Type::getOriginalType() const
 {
     assert(isDefined());
     return definition_->getOriginalType();

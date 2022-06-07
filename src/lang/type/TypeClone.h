@@ -33,7 +33,7 @@ namespace lang
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const override;
 
-        lang::ResolvingHandle<lang::Type> getOriginalType() override;
+        lang::ResolvingHandle<lang::Type> getOriginalType() const override;
 
         void onScope() override;
 

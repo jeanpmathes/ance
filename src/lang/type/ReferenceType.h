@@ -24,7 +24,7 @@ namespace lang
 
         bool                              isReferenceType() const override;
         lang::ResolvingHandle<lang::Type> getElementType() const override;
-        lang::ResolvingHandle<lang::Type> getActualType() override;
+        lang::ResolvingHandle<lang::Type> getActualType() const override;
 
         llvm::Constant*    getDefaultContent(llvm::LLVMContext& c) override;
         llvm::PointerType* getContentType(llvm::LLVMContext& c) override;
