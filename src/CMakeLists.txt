@@ -8,7 +8,7 @@ add_subdirectory(validation)
 
 include_directories(.)
 
-set(LLD_AVAILABLE_LIBS lldCOFF;lldCommon;lldCore;lldDriver;lldELF;lldMachO;lldMachO2;lldMinGW;lldReaderWriter;lldWasm;lldYAML)
+set(LLD_AVAILABLE_LIBS lldCommon;lldCOFF;lldELF;lldMachO;lldMinGW;lldWasm)
 target_link_libraries(ance PRIVATE ${ANTLR4_LIB} ${LLVM_AVAILABLE_LIBS} ${LLD_AVAILABLE_LIBS})
 
 target_compile_options(ance PRIVATE /EHa /W4 -Wdocumentation -MDd)

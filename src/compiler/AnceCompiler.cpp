@@ -10,7 +10,7 @@
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
-#include <llvm/Support/TargetRegistry.h>
+#include <llvm/MC/TargetRegistry.h>
 
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
@@ -119,9 +119,9 @@ void AnceCompiler::compile(const std::filesystem::path& out)
                                       cgscc_analysis_manager,
                                       module_analysis_manager);
 
-    auto opt_level = llvm::PassBuilder::OptimizationLevel::O1;
+    auto opt_level = llvm::OptimizationLevel::O1;
 
-    if (opt_level != llvm::PassBuilder::OptimizationLevel::O0)
+    if (opt_level != llvm::OptimizationLevel::O0)
     {
         llvm::ModulePassManager pass_manager =
             pass_builder.buildModuleSimplificationPipeline(opt_level, llvm::ThinOrFullLTOPhase::None);
