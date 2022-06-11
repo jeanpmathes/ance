@@ -10,13 +10,13 @@
 #include "validation/ValidationLogger.h"
 #include "lang/Assigner.h"
 
-LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string                       identifier,
+LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string                       name,
                                                                    lang::ResolvingHandle<lang::Type> type,
                                                                    lang::Location                    type_location,
                                                                    std::unique_ptr<Expression>       reference,
                                                                    lang::Location                    location)
     : Statement(location)
-    , identifier_(std::move(identifier))
+    , name_(std::move(name))
     , type_(type)
     , type_location_(type_location)
     , reference_(std::move(reference))
@@ -24,9 +24,9 @@ LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string  
     addSubexpression(*reference_);
 }
 
-const std::string& LocalReferenceVariableDefinition::identifier() const
+const std::string& LocalReferenceVariableDefinition::name() const
 {
-    return identifier_;
+    return name_;
 }
 
 lang::ResolvingHandle<lang::Type> LocalReferenceVariableDefinition::type() const
@@ -43,14 +43,14 @@ void LocalReferenceVariableDefinition::setScope(lang::Scope& scope)
 {
     Statement::setScope(scope);
 
-    scope.asLocalScope()->prepareDefinition(identifier_);
+    scope.asLocalScope()->prepareDefinition(name_);
 }
 
 void LocalReferenceVariableDefinition::walkDefinitions()
 {
     Statement::walkDefinitions();
 
-    variable_ = scope()->asLocalScope()->defineLocalVariable(identifier_,
+    variable_ = scope()->asLocalScope()->defineLocalVariable(name_,
                                                              type_,
                                                              type_location_,
                                                              lang::Assigner::REFERENCE_BINDING,
@@ -102,7 +102,7 @@ Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressio
 {
     Statements statements;
 
-    statements.push_back(std::make_unique<LocalReferenceVariableDefinition>(identifier_,
+    statements.push_back(std::make_unique<LocalReferenceVariableDefinition>(name_,
                                                                             type_->toUndefined(),
                                                                             type_location_,
                                                                             std::move(subexpressions[0]),

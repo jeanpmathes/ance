@@ -63,7 +63,7 @@ void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger)
 
 void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                access,
                                              bool                                is_constant,
-                                             const std::string&                  identifier,
+                                             const std::string&                  name,
                                              lang::ResolvingHandle<lang::Type>   type,
                                              lang::Location                      type_location,
                                              lang::Assigner                      assigner,
@@ -72,9 +72,9 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
 {
     assert(assigner.hasSymbol());
 
-    if (global_defined_variables_.find(identifier) != global_defined_variables_.end())
+    if (global_defined_variables_.find(name) != global_defined_variables_.end())
     {
-        duplicated_variable_names_.emplace_back(identifier, location);
+        duplicated_variable_names_.emplace_back(name, location);
         return;
     }
 
@@ -82,13 +82,13 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
 
     lang::OwningHandle<lang::Variable> undefined;
 
-    if (global_undefined_variables_.find(identifier) != global_undefined_variables_.end())
+    if (global_undefined_variables_.find(name) != global_undefined_variables_.end())
     {
-        undefined = std::move(global_undefined_variables_[identifier]);
-        global_undefined_variables_.erase(identifier);
+        undefined = std::move(global_undefined_variables_[name]);
+        global_undefined_variables_.erase(name);
     }
     else {
-        undefined = lang::OwningHandle<lang::Variable>::takeOwnership(lang::makeHandled<lang::Variable>(identifier));
+        undefined = lang::OwningHandle<lang::Variable>::takeOwnership(lang::makeHandled<lang::Variable>(name));
     }
 
     undefined
@@ -96,20 +96,20 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
     lang::OwningHandle<lang::Variable> defined = std::move(undefined);
 
     addChild(*defined);
-    global_defined_variables_[identifier] = std::move(defined);
+    global_defined_variables_[name] = std::move(defined);
 }
 
 lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineExternFunction(
-    const std::string&                                   identifier,
+    const std::string&                                   name,
     lang::ResolvingHandle<lang::Type>                    return_type,
     lang::Location                                       return_type_location,
     const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
     lang::Location                                       location)
 {
-    lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(identifier);
+    lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(name);
 
     lang::OwningHandle<lang::Function> undefined =
-        lang::OwningHandle<lang::Function>::takeOwnership(lang::makeHandled<lang::Function>(identifier));
+        lang::OwningHandle<lang::Function>::takeOwnership(lang::makeHandled<lang::Function>(name));
     undefined->defineAsExtern(*this, return_type, return_type_location, parameters, location);
     lang::OwningHandle<lang::Function> defined = std::move(undefined);
 
@@ -119,7 +119,7 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineExternFunction(
 }
 
 lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineCustomFunction(
-    const std::string&                                   identifier,
+    const std::string&                                   name,
     lang::AccessModifier                                 access,
     lang::ResolvingHandle<lang::Type>                    return_type,
     lang::Location                                       return_type_location,
@@ -128,10 +128,10 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineCustomFunction(
     lang::Location                                       declaration_location,
     lang::Location                                       definition_location)
 {
-    lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(identifier);
+    lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(name);
 
     lang::OwningHandle<lang::Function> undefined =
-        lang::OwningHandle<lang::Function>::takeOwnership(lang::makeHandled<lang::Function>(identifier));
+        lang::OwningHandle<lang::Function>::takeOwnership(lang::makeHandled<lang::Function>(name));
     undefined->defineAsCustom(access,
                               return_type,
                               return_type_location,
@@ -147,36 +147,36 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineCustomFunction(
     return handle;
 }
 
-void lang::GlobalScope::defineTypeAsOther(const std::string&                identifier,
+void lang::GlobalScope::defineTypeAsOther(const std::string&                name,
                                           lang::ResolvingHandle<lang::Type> original,
                                           lang::Location                    definition_location,
                                           lang::Location                    original_type_location)
 {
-    lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(identifier);
+    lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
     std::unique_ptr<lang::TypeDefinition> cloned_definition =
-        std::make_unique<lang::TypeClone>(identifier, original, definition_location, original_type_location);
+        std::make_unique<lang::TypeClone>(name, original, definition_location, original_type_location);
 
     undefined->define(std::move(cloned_definition));
     lang::OwningHandle<lang::Type> defined = std::move(undefined);
 
-    defined_types_[identifier] = std::move(defined);
-    defined_types_[identifier]->setContainingScope(this);
+    defined_types_[name] = std::move(defined);
+    defined_types_[name]->setContainingScope(this);
 }
 
-void lang::GlobalScope::defineTypeAliasOther(const std::string&                identifier,
+void lang::GlobalScope::defineTypeAliasOther(const std::string&                name,
                                              lang::ResolvingHandle<lang::Type> actual,
                                              lang::Location                    definition_location,
                                              lang::Location                    actual_type_location)
 {
-    lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(identifier);
+    lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
     std::unique_ptr<lang::TypeDefinition> alias_definition =
-        std::make_unique<lang::TypeAlias>(identifier, actual, definition_location, actual_type_location);
+        std::make_unique<lang::TypeAlias>(name, actual, definition_location, actual_type_location);
 
     undefined->define(std::move(alias_definition));
     lang::OwningHandle<lang::Type> defined = std::move(undefined);
 
-    defined_types_[identifier] = std::move(defined);
-    defined_types_[identifier]->setContainingScope(this);
+    defined_types_[name] = std::move(defined);
+    defined_types_[name]->setContainingScope(this);
 }
 
 std::optional<lang::ResolvingHandle<lang::Type>> lang::GlobalScope::getType(const std::string& string)
@@ -202,19 +202,19 @@ void lang::GlobalScope::registerUsage(lang::ResolvingHandle<lang::Variable> vari
 {
     assert(!variable->isDefined());
 
-    if (global_undefined_variables_.find(variable->identifier()) != global_undefined_variables_.end())
+    if (global_undefined_variables_.find(variable->name()) != global_undefined_variables_.end())
     {
-        variable.reroute(global_undefined_variables_[variable->identifier()].handle());
+        variable.reroute(global_undefined_variables_[variable->name()].handle());
         return;
     }
 
-    if (global_defined_variables_.find(variable->identifier()) != global_defined_variables_.end())
+    if (global_defined_variables_.find(variable->name()) != global_defined_variables_.end())
     {
-        variable.reroute(global_defined_variables_[variable->identifier()].handle());
+        variable.reroute(global_defined_variables_[variable->name()].handle());
         return;
     }
 
-    global_undefined_variables_[variable->identifier()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+    global_undefined_variables_[variable->name()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 
 void lang::GlobalScope::registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
@@ -289,9 +289,9 @@ void lang::GlobalScope::resolve()
 
 bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
 {
-    if (global_defined_variables_.find(variable->identifier()) != global_defined_variables_.end())
+    if (global_defined_variables_.find(variable->name()) != global_defined_variables_.end())
     {
-        variable.reroute(global_defined_variables_[variable->identifier()].handle());
+        variable.reroute(global_defined_variables_[variable->name()].handle());
         return true;
     }
 
@@ -385,7 +385,7 @@ void lang::GlobalScope::createNativeBacking(CompileContext* context)
 {
     for (auto& [key, val] : defined_function_groups_) { val->createNativeBacking(context); }
 
-    for (auto& [identifier, variable] : global_defined_variables_)
+    for (auto& [name, variable] : global_defined_variables_)
     {
         variable->buildDeclaration(context);
         variable->buildDefinition(context);
@@ -423,17 +423,17 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunc
     return defined;
 }
 
-lang::OwningHandle<lang::Type> lang::GlobalScope::retrieveUndefinedType(const std::string& identifier)
+lang::OwningHandle<lang::Type> lang::GlobalScope::retrieveUndefinedType(const std::string& name)
 {
     lang::OwningHandle<lang::Type> undefined;
 
-    if (undefined_types_.find(identifier) != undefined_types_.end())
+    if (undefined_types_.find(name) != undefined_types_.end())
     {
-        undefined = std::move(undefined_types_[identifier]);
-        undefined_types_.erase(identifier);
+        undefined = std::move(undefined_types_[name]);
+        undefined_types_.erase(name);
     }
     else {
-        undefined = lang::OwningHandle<lang::Type>::takeOwnership(lang::makeHandled<lang::Type>(identifier));
+        undefined = lang::OwningHandle<lang::Type>::takeOwnership(lang::makeHandled<lang::Type>(name));
     }
 
     return undefined;

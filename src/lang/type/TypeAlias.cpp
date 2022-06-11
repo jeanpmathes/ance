@@ -5,11 +5,11 @@
 #include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
-lang::TypeAlias::TypeAlias(const std::string&                identifier,
+lang::TypeAlias::TypeAlias(const std::string&                name,
                            lang::ResolvingHandle<lang::Type> actual,
                            lang::Location                    definition_location,
                            lang::Location                    actual_type_location)
-    : lang::TypeDefinition(identifier, definition_location)
+    : lang::TypeDefinition(name, definition_location)
     , actual_(actual)
     , actual_type_location_(actual_type_location)
 {}

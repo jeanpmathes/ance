@@ -30,68 +30,67 @@ lang::Scope* lang::LocalScope::scope() const
     return parent_;
 }
 
-void lang::LocalScope::prepareDefinition(const std::string& identifier)
+void lang::LocalScope::prepareDefinition(const std::string& name)
 {
-    blockers_.emplace(identifier);
+    blockers_.emplace(name);
 }
 
-lang::ResolvingHandle<lang::Variable> lang::LocalScope::defineLocalVariable(const std::string& identifier,
+lang::ResolvingHandle<lang::Variable> lang::LocalScope::defineLocalVariable(const std::string&                name,
                                                                             lang::ResolvingHandle<lang::Type> type,
                                                                             lang::Location type_location,
                                                                             lang::Assigner assigner,
                                                                             const std::shared_ptr<lang::Value>& value,
                                                                             lang::Location location)
 {
-    assert(blockers_.contains(identifier));
+    assert(blockers_.contains(name));
 
     bool is_final = assigner.isFinal();
 
-    lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(identifier);
+    lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(name);
     variable->defineAsLocal(type, type_location, *this, is_final, value, 0, location);
 
     addChild(*variable);
-    defined_local_variables_[identifier].push_back(lang::OwningHandle<lang::Variable>::takeOwnership(variable));
+    defined_local_variables_[name].push_back(lang::OwningHandle<lang::Variable>::takeOwnership(variable));
 
-    active_variables_.insert_or_assign(identifier, variable);
+    active_variables_.insert_or_assign(name, variable);
 
     return variable;
 }
 
 bool lang::LocalScope::drop(lang::ResolvingHandle<lang::Variable> variable)
 {
-    if (!variable->isDefined() || !active_variables_.contains(variable->identifier())) return false;
+    if (!variable->isDefined() || !active_variables_.contains(variable->name())) return false;
 
-    active_variables_.erase(variable->identifier());
+    active_variables_.erase(variable->name());
 
     return true;
 }
 
 bool lang::LocalScope::wasVariableDropped(lang::ResolvingHandle<lang::Variable> variable) const
 {
-    return !active_variables_.contains(variable->identifier())
-        && defined_local_variables_.contains(variable->identifier());
+    return !active_variables_.contains(variable->name()) && defined_local_variables_.contains(variable->name());
 }
 
 void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Variable> variable)
 {
     assert(!variable->isDefined());
 
-    if (undefined_variables_.find(variable->identifier()) != undefined_variables_.end())
+    if (undefined_variables_.find(variable->name()) != undefined_variables_.end())
     {
-        variable.reroute(undefined_variables_[variable->identifier()].handle());
+        variable.reroute(undefined_variables_[variable->name()].handle());
         return;
     }
 
     if (findExistingLocalDeclaration(variable)) return;
 
-    if (blockers_.contains(variable->identifier()))
+    if (blockers_.contains(variable->name()))
     {
-        if (blocked_variables_.contains(variable->identifier()))
+        if (blocked_variables_.contains(variable->name()))
         {
-            variable.reroute(blocked_variables_[variable->identifier()].handle());
+            variable.reroute(blocked_variables_[variable->name()].handle());
         }
         else {
-            blocked_variables_[variable->identifier()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+            blocked_variables_[variable->name()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
         }
 
         return;
@@ -100,7 +99,7 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Variable> varia
     lang::LocalScope* parent = scope()->asLocalScope();
     if (parent && parent->findExistingLocalDeclaration(variable)) return;
 
-    undefined_variables_[variable->identifier()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+    undefined_variables_[variable->name()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 
 void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
@@ -181,7 +180,7 @@ void lang::LocalScope::resolve()
 
     while (var_it != undefined_variables_.end())
     {
-        auto& [identifier, variable] = *var_it;
+        auto& [name, variable] = *var_it;
 
         if (scope()->resolveDefinition(variable.handle())) { var_it = undefined_variables_.erase(var_it); }
         else
@@ -221,7 +220,7 @@ bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::Type> type)
 
 bool lang::LocalScope::findExistingLocalDeclaration(lang::ResolvingHandle<lang::Variable> variable)
 {
-    auto it = active_variables_.find(variable->identifier());
+    auto it = active_variables_.find(variable->name());
 
     if (it != active_variables_.end())
     {
@@ -239,7 +238,7 @@ void lang::LocalScope::onSubScope(lang::LocalScope* sub_scope)
 
 void lang::LocalScope::validate(ValidationLogger& validation_logger)
 {
-    for (auto& [identifier, variables] : defined_local_variables_)
+    for (auto& [name, variables] : defined_local_variables_)
     {
         for (auto& variable : variables) { variable->validate(validation_logger); }
     }
@@ -247,7 +246,7 @@ void lang::LocalScope::validate(ValidationLogger& validation_logger)
 
 void lang::LocalScope::buildDeclarations(CompileContext* context)
 {
-    for (auto& [identifier, variables] : defined_local_variables_)
+    for (auto& [name, variables] : defined_local_variables_)
     {
         for (auto& variable : variables) { variable->buildDeclaration(context); }
     }

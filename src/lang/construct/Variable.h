@@ -38,9 +38,9 @@ namespace lang
       public:
         /**
          * Create an undefined variable.
-         * @param identifier The identifier.
+         * @param name The name.
          */
-        explicit Variable(std::string identifier);
+        explicit Variable(std::string name);
 
         /**
          * Check if this variable is defined.
@@ -87,10 +87,10 @@ namespace lang
                            lang::Location                      location);
 
         /**
-         * Get the identifier.
-         * @return The identifier.
+         * Get the name.
+         * @return The name.
          */
-        [[nodiscard]] const std::string& identifier() const;
+        [[nodiscard]] const std::string& name() const;
         /**
          * Get the containing scope.
          * @return The scope.
@@ -164,7 +164,7 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Variable> toUndefined() const;
 
       private:
-        std::string                               identifier_;
+        std::string                               name_;
         std::unique_ptr<lang::VariableDefinition> definition_ {};
     };
 }

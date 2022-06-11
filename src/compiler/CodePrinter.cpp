@@ -19,7 +19,7 @@ std::any CodePrinter::visit(lang::GlobalVariable& variable)
     if (variable.isConstant())
         out_ << "const"
              << " ";
-    out_ << variable.identifier() << ": ";
+    out_ << variable.name() << ": ";
     out_ << variable.type()->getName();
 
     std::string value = variable.init().toString();
@@ -246,7 +246,7 @@ std::any CodePrinter::visit(UnaryOperation& unary_operation)
 
 std::any CodePrinter::visit(VariableAccess& variable_access)
 {
-    out_ << variable_access.variable()->identifier();
+    out_ << variable_access.variable()->name();
 
     return {};
 }
@@ -305,7 +305,7 @@ std::any CodePrinter::visit(Delete& delete_statement)
 
 std::any CodePrinter::visit(Drop& drop_statement)
 {
-    out_ << "drop " << drop_statement.variable()->identifier() << ";";
+    out_ << "drop " << drop_statement.variable()->name() << ";";
 
     return {};
 }
@@ -353,7 +353,7 @@ std::any CodePrinter::visit(If& if_statement)
 
 std::any CodePrinter::visit(LocalReferenceVariableDefinition& local_reference_variable_definition)
 {
-    out_ << "let " << local_reference_variable_definition.identifier();
+    out_ << "let " << local_reference_variable_definition.name();
     out_ << ": " << local_reference_variable_definition.type()->getName() << " ";
     out_ << visitTree(local_reference_variable_definition.reference()) << ";";
 
@@ -362,7 +362,7 @@ std::any CodePrinter::visit(LocalReferenceVariableDefinition& local_reference_va
 
 std::any CodePrinter::visit(LocalVariableDefinition& local_variable_definition)
 {
-    out_ << "let " << local_variable_definition.identifier();
+    out_ << "let " << local_variable_definition.name();
     out_ << ": " << local_variable_definition.type()->getName();
 
     if (local_variable_definition.assigned())

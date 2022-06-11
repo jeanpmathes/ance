@@ -8,7 +8,7 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-lang::LocalVariable::LocalVariable(const std::string&                identifier,
+lang::LocalVariable::LocalVariable(const std::string&                name,
                                    lang::ResolvingHandle<lang::Type> type,
                                    lang::Location                    type_location,
                                    Scope&                            containing_scope,
@@ -16,7 +16,7 @@ lang::LocalVariable::LocalVariable(const std::string&                identifier,
                                    std::shared_ptr<lang::Value>      value,
                                    unsigned                          parameter_no,
                                    lang::Location                    location)
-    : VariableDefinition(identifier, type, type_location, containing_scope, is_final, location)
+    : VariableDefinition(name, type, type_location, containing_scope, is_final, location)
     , initial_value_(std::move(value))
     , parameter_no_(parameter_no)
 {
@@ -32,7 +32,7 @@ void lang::LocalVariable::buildDeclaration(CompileContext* context)
 {
     assert(initial_value_);
 
-    native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr, identifier());
+    native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr, name());
 }
 
 void lang::LocalVariable::buildDefinition(CompileContext* context)
@@ -43,7 +43,7 @@ void lang::LocalVariable::buildDefinition(CompileContext* context)
     if (parameter_no_ == 0)
     {
         local_debug_variable_ = context->di()->createAutoVariable(scope()->getDebugScope(context),
-                                                                  identifier(),
+                                                                  name(),
                                                                   context->sourceFile(),
                                                                   location().line(),
                                                                   type()->getDebugType(context),
@@ -52,7 +52,7 @@ void lang::LocalVariable::buildDefinition(CompileContext* context)
     else
     {
         local_debug_variable_ = context->di()->createParameterVariable(scope()->getDebugScope(context),
-                                                                       identifier(),
+                                                                       name(),
                                                                        parameter_no_,
                                                                        context->sourceFile(),
                                                                        location().line(),

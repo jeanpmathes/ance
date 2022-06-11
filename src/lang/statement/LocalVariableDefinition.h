@@ -28,21 +28,21 @@ class LocalVariableDefinition
   public:
     /**
      * Create a new local variable definition.
-     * @param identifier The identifier of the variable.
+     * @param name The name of the variable.
      * @param type The type of the variable.
      * @param type_location The location of the type.
      * @param assigner The assigner to use for initial assignment.
      * @param assigned The initially assigned value, or nullptr if a default value is used.
      * @param location The source location.
      */
-    LocalVariableDefinition(std::string                       identifier,
+    LocalVariableDefinition(std::string                       name,
                             lang::ResolvingHandle<lang::Type> type,
                             lang::Location                    type_location,
                             lang::Assigner                    assigner,
                             std::unique_ptr<Expression>       assigned,
                             lang::Location                    location);
 
-    [[nodiscard]] const std::string&                identifier() const;
+    [[nodiscard]] const std::string&                name() const;
     [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
     [[nodiscard]] lang::Assigner                    assigner() const;
     [[nodiscard]] Expression*                       assigned() const;
@@ -58,7 +58,7 @@ class LocalVariableDefinition
     void doBuild(CompileContext* context) override;
 
   private:
-    std::string                       identifier_;
+    std::string                       name_;
     lang::ResolvingHandle<lang::Type> type_;
     lang::Location                    type_location_;
     lang::Assigner                    assigner_;

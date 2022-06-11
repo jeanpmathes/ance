@@ -12,7 +12,7 @@
 #include "validation/ValidationLogger.h"
 #include "lang/AccessModifier.h"
 
-lang::Variable::Variable(std::string identifier) : identifier_(std::move(identifier)) {}
+lang::Variable::Variable(std::string name) : name_(std::move(name)) {}
 
 bool lang::Variable::isDefined() const
 {
@@ -28,7 +28,7 @@ void lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type>   type,
                                     bool                                is_constant,
                                     lang::Location                      location)
 {
-    definition_ = std::make_unique<lang::GlobalVariable>(identifier(),
+    definition_ = std::make_unique<lang::GlobalVariable>(name(),
                                                          type,
                                                          type_location,
                                                          containing_scope,
@@ -49,7 +49,7 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
                                    unsigned int                        parameter_no,
                                    lang::Location                      location)
 {
-    definition_ = std::make_unique<lang::LocalVariable>(identifier(),
+    definition_ = std::make_unique<lang::LocalVariable>(name(),
                                                         type,
                                                         type_location,
                                                         containing_scope,
@@ -61,9 +61,9 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
     addChild(*definition_);
 }
 
-const std::string& lang::Variable::identifier() const
+const std::string& lang::Variable::name() const
 {
-    return identifier_;
+    return name_;
 }
 
 lang::Scope* lang::Variable::scope() const
@@ -103,7 +103,7 @@ bool lang::Variable::validateGetValue(ValidationLogger& validation_logger, lang:
 {
     if (!isDefined())
     {
-        validation_logger.logError("Name '" + identifier() + "' not defined in the current context", location);
+        validation_logger.logError("Name '" + name() + "' not defined in the current context", location);
         return false;
     }
 
@@ -117,14 +117,13 @@ bool lang::Variable::validateSetValue(const std::shared_ptr<lang::Value>& value,
 {
     if (!isDefined())
     {
-        validation_logger.logError("Name '" + identifier() + "' not defined in the current context",
-                                   assignable_location);
+        validation_logger.logError("Name '" + name() + "' not defined in the current context", assignable_location);
         return false;// The following variable methods require that the variable is defined.
     }
 
     if (isFinal())
     {
-        validation_logger.logError("Cannot assign to final variable '" + identifier() + "'", assignable_location);
+        validation_logger.logError("Cannot assign to final variable '" + name() + "'", assignable_location);
         return false;// Type mismatch is not relevant if assignment is not allowed no matter what.
     }
 
@@ -147,5 +146,5 @@ void lang::Variable::setValue(const std::shared_ptr<lang::Value>& value, Compile
 
 lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const
 {
-    return lang::makeHandled<lang::Variable>(identifier());
+    return lang::makeHandled<lang::Variable>(name());
 }

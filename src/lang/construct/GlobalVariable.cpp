@@ -16,7 +16,7 @@ namespace llvm
     class Constant;
 }
 
-lang::GlobalVariable::GlobalVariable(const std::string&                  identifier,
+lang::GlobalVariable::GlobalVariable(const std::string&                  name,
                                      lang::ResolvingHandle<lang::Type>   type,
                                      lang::Location                      type_location,
                                      GlobalScope&                        containing_scope,
@@ -25,7 +25,7 @@ lang::GlobalVariable::GlobalVariable(const std::string&                  identif
                                      bool                                is_final,
                                      bool                                is_constant,
                                      lang::Location                      location)
-    : VariableDefinition(identifier, type, type_location, containing_scope, is_final, location)
+    : VariableDefinition(name, type, type_location, containing_scope, is_final, location)
     , access_(access)
     , is_constant_(is_constant)
     , constant_init_(std::move(constant_init))
@@ -127,11 +127,11 @@ void lang::GlobalVariable::buildDefinition(CompileContext* context)
                                                 is_constant_,
                                                 linkage,
                                                 native_initializer,
-                                                identifier());
+                                                name());
 
     auto* debug_info = context->di()->createGlobalVariableExpression(context->unit(),
-                                                                     identifier(),
-                                                                     identifier(),
+                                                                     name(),
+                                                                     name(),
                                                                      context->sourceFile(),
                                                                      location().line(),
                                                                      type()->getDebugType(context),

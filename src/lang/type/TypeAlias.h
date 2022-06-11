@@ -13,7 +13,7 @@ namespace lang
     class TypeAlias : public lang::TypeDefinition
     {
       public:
-        TypeAlias(const std::string&                identifier,
+        TypeAlias(const std::string&                name,
                   lang::ResolvingHandle<lang::Type> actual,
                   lang::Location                    definition_location,
                   lang::Location                    actual_type_location);

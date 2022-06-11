@@ -26,15 +26,13 @@ void Drop::validate(ValidationLogger& validation_logger)
 {
     if (!variable_->isDefined())
     {
-        validation_logger.logError("Name '" + variable_->identifier() + "' not defined in the current context",
-                                   location());
+        validation_logger.logError("Name '" + variable_->name() + "' not defined in the current context", location());
         return;
     }
 
     if (!dropped_)
     {
-        validation_logger.logError("Cannot drop variable '" + variable_->identifier()
-                                       + "' which is declared in outer scope",
+        validation_logger.logError("Cannot drop variable '" + variable_->name() + "' which is declared in outer scope",
                                    location());
         return;
     }

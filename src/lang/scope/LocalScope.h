@@ -43,14 +43,14 @@ namespace lang
 
         /**
          * Prepare the definition of a new variable. This will block resolution above this scope.
-         * @param identifier The identifier of the variable.
+         * @param name The name of the variable.
          */
-        void prepareDefinition(const std::string& identifier);
+        void prepareDefinition(const std::string& name);
 
         /**
          * Define a local variable. Parameters are not local variables and should be define in function scope.
          * If the name is already defined, the old variable will be dropped.
-         * @param identifier The identifier.
+         * @param name The name.
          * @param type The type.
          * @param type_location The location of the type.
          * @param assigner The assigner to use for initial assignment.
@@ -58,7 +58,7 @@ namespace lang
          * @param location The source location.
          * @return The defined variable.
          */
-        lang::ResolvingHandle<lang::Variable> defineLocalVariable(const std::string&                  identifier,
+        lang::ResolvingHandle<lang::Variable> defineLocalVariable(const std::string&                  name,
                                                                   lang::ResolvingHandle<lang::Type>   type,
                                                                   lang::Location                      type_location,
                                                                   lang::Assigner                      assigner,
@@ -73,7 +73,7 @@ namespace lang
         bool drop(lang::ResolvingHandle<lang::Variable> variable);
 
         /**
-         * Check if a variable with the specified identifier was defined and then dropped.
+         * Check if a variable with the specified name was defined and then dropped.
          * @param variable The variable to check.
          * @return True if the variable was dropped, false otherwise.
          */

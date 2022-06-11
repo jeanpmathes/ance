@@ -62,22 +62,22 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
 }
 
 std::optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParameterVariable(
-    const std::string&                  identifier,
+    const std::string&                  name,
     lang::ResolvingHandle<lang::Type>   type,
     lang::Location                      type_location,
     const std::shared_ptr<lang::Value>& value,
     unsigned int                        parameter_no,
     lang::Location                      location)
 {
-    if (defined_parameters_.find(identifier) == defined_parameters_.end())
+    if (defined_parameters_.find(name) == defined_parameters_.end())
     {
         bool is_final = false;// Assigner has value UNSPECIFIED, so it's not final.
 
-        lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(identifier);
+        lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(name);
         variable->defineAsLocal(type, type_location, *this, is_final, value, parameter_no, location);
 
         addChild(*variable);
-        defined_parameters_[identifier] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+        defined_parameters_[name] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 
         return std::make_optional(variable);
     }
@@ -160,7 +160,7 @@ void lang::Function::build(CompileContext* context)
 
 void lang::Function::buildDeclarations(CompileContext* context)
 {
-    for (auto& [identifier, parameter] : defined_parameters_) { parameter->buildDeclaration(context); }
+    for (auto& [name, parameter] : defined_parameters_) { parameter->buildDeclaration(context); }
 }
 
 bool lang::Function::validateCall(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
@@ -205,19 +205,19 @@ void lang::Function::registerUsage(lang::ResolvingHandle<lang::Variable> variabl
 {
     assert(!variable->isDefined());
 
-    if (undefined_variables_.find(variable->identifier()) != undefined_variables_.end())
+    if (undefined_variables_.find(variable->name()) != undefined_variables_.end())
     {
-        variable.reroute(undefined_variables_[variable->identifier()].handle());
+        variable.reroute(undefined_variables_[variable->name()].handle());
         return;
     }
 
-    if (defined_parameters_.find(variable->identifier()) != defined_parameters_.end())
+    if (defined_parameters_.find(variable->name()) != defined_parameters_.end())
     {
-        variable.reroute(defined_parameters_[variable->identifier()].handle());
+        variable.reroute(defined_parameters_[variable->name()].handle());
         return;
     }
 
-    undefined_variables_[variable->identifier()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+    undefined_variables_[variable->name()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 
 void lang::Function::registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
@@ -273,7 +273,7 @@ void lang::Function::resolve()
 
     while (var_it != undefined_variables_.end())
     {
-        auto& [identifier, variable] = *var_it;
+        auto& [name, variable] = *var_it;
 
         if (scope()->resolveDefinition(variable.handle())) { var_it = undefined_variables_.erase(var_it); }
         else {
@@ -296,9 +296,9 @@ void lang::Function::resolve()
 
 bool lang::Function::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
 {
-    if (defined_parameters_.find(variable->identifier()) != defined_parameters_.end())
+    if (defined_parameters_.find(variable->name()) != defined_parameters_.end())
     {
-        variable.reroute(defined_parameters_[variable->identifier()].handle());
+        variable.reroute(defined_parameters_[variable->name()].handle());
         return true;
     }
 

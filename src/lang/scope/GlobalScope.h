@@ -46,7 +46,7 @@ namespace lang
          * Define a global variable.
          * @param access The access level.
          * @param is_constant Whether the variable is a constant.
-         * @param identifier The identifier of the variable.
+         * @param name The name of the variable.
          * @param type The type of the variable.
          * @param assigner The assigner to use for the initial assignment.
          * @param initializer The constant initializer.
@@ -54,7 +54,7 @@ namespace lang
          */
         void defineGlobalVariable(lang::AccessModifier                access,
                                   bool                                is_constant,
-                                  const std::string&                  identifier,
+                                  const std::string&                  name,
                                   lang::ResolvingHandle<lang::Type>   type,
                                   lang::Location                      type_location,
                                   lang::Assigner                      assigner,
@@ -63,14 +63,14 @@ namespace lang
 
         /**
          * Define an extern function in this scope.
-         * @param identifier The name of the function.
+         * @param name The name of the function.
          * @param return_type The return type.
          * @param parameters The parameters.
          * @param location The location of the function declaration.
          * @return A handle to the defined function.
          */
         lang::ResolvingHandle<lang::Function> defineExternFunction(
-            const std::string&                                   identifier,
+            const std::string&                                   name,
             lang::ResolvingHandle<lang::Type>                    return_type,
             lang::Location                                       return_type_location,
             const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
@@ -78,7 +78,7 @@ namespace lang
 
         /**
          * Define a custom function in this scope.
-         * @param identifier The name of the function.
+         * @param name The name of the function.
          * @param access The access level.
          * @param return_type The return type of the function.
          * @param parameters The parameters for this function.
@@ -88,7 +88,7 @@ namespace lang
          * @return A handle to the defined function.
          */
         lang::ResolvingHandle<lang::Function> defineCustomFunction(
-            const std::string&                                   identifier,
+            const std::string&                                   name,
             lang::AccessModifier                                 access,
             lang::ResolvingHandle<lang::Type>                    return_type,
             lang::Location                                       return_type_location,
@@ -99,20 +99,20 @@ namespace lang
 
         /**
          * Define a type that behaves like another type.
-         * @param identifier The name of the new type.
+         * @param name The name of the new type.
          * @param original The original type.
          */
-        void defineTypeAsOther(const std::string&                identifier,
+        void defineTypeAsOther(const std::string&                name,
                                lang::ResolvingHandle<lang::Type> original,
                                lang::Location                    definition_location,
                                lang::Location                    original_type_location);
 
         /**
          * Define a type that is an alias for another type.
-         * @param identifier The name of the alias.
+         * @param name The name of the alias.
          * @param actual The other type.
          */
-        void defineTypeAliasOther(const std::string&                identifier,
+        void defineTypeAliasOther(const std::string&                name,
                                   lang::ResolvingHandle<lang::Type> actual,
                                   lang::Location                    definition_location,
                                   lang::Location                    actual_type_location);
@@ -188,7 +188,7 @@ namespace lang
 
       private:
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(const std::string& name);
-        lang::OwningHandle<lang::Type>             retrieveUndefinedType(const std::string& identifier);
+        lang::OwningHandle<lang::Type>             retrieveUndefinedType(const std::string& name);
 
         std::vector<lang::TypeDefinitionRegistry*> type_registries_;
 

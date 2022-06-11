@@ -13,7 +13,7 @@ namespace lang
     class TypeClone : public lang::TypeDefinition
     {
       public:
-        TypeClone(const std::string&                identifier,
+        TypeClone(const std::string&                name,
                   lang::ResolvingHandle<lang::Type> original,
                   lang::Location                    definition_location,
                   lang::Location                    original_type_location);

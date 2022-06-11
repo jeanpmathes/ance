@@ -92,7 +92,7 @@ namespace lang
 
         /**
          * Define a local variable that is a parameter.
-         * @param identifier The identifier.
+         * @param name The name.
          * @param type The type.
          * @param type_location The source location of the type.
          * @param value The initial value.
@@ -101,7 +101,7 @@ namespace lang
          * @return The defined variable or nothing if defining is not possible.
          */
         std::optional<lang::ResolvingHandle<lang::Variable>> defineParameterVariable(
-            const std::string&                  identifier,
+            const std::string&                  name,
             lang::ResolvingHandle<lang::Type>   type,
             lang::Location                      type_location,
             const std::shared_ptr<lang::Value>& value,

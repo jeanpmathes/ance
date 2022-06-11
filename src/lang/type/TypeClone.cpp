@@ -5,11 +5,11 @@
 #include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
-lang::TypeClone::TypeClone(const std::string&                identifier,
+lang::TypeClone::TypeClone(const std::string&                name,
                            lang::ResolvingHandle<lang::Type> original,
                            lang::Location                    definition_location,
                            lang::Location                    original_type_location)
-    : lang::TypeDefinition(identifier, definition_location)
+    : lang::TypeDefinition(name, definition_location)
     , original_(original)
     , original_type_location_(original_type_location)
 {}

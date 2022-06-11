@@ -10,14 +10,14 @@
 #include "lang/Assigner.h"
 #include "lang/expression/DefaultValue.h"
 
-LocalVariableDefinition::LocalVariableDefinition(std::string                       identifier,
+LocalVariableDefinition::LocalVariableDefinition(std::string                       name,
                                                  lang::ResolvingHandle<lang::Type> type,
                                                  lang::Location                    type_location,
                                                  lang::Assigner                    assigner,
                                                  std::unique_ptr<Expression>       assigned,
                                                  lang::Location                    location)
     : Statement(location)
-    , identifier_(std::move(identifier))
+    , name_(std::move(name))
     , type_(type)
     , type_location_(type_location)
     , assigner_(assigner)
@@ -29,9 +29,9 @@ LocalVariableDefinition::LocalVariableDefinition(std::string                    
     addSubexpression(*assigned_);
 }
 
-const std::string& LocalVariableDefinition::identifier() const
+const std::string& LocalVariableDefinition::name() const
 {
-    return identifier_;
+    return name_;
 }
 
 lang::ResolvingHandle<lang::Type> LocalVariableDefinition::type() const
@@ -53,14 +53,14 @@ void LocalVariableDefinition::setScope(lang::Scope& scope)
 {
     Statement::setScope(scope);
 
-    scope.asLocalScope()->prepareDefinition(identifier_);
+    scope.asLocalScope()->prepareDefinition(name_);
 }
 
 void LocalVariableDefinition::walkDefinitions()
 {
     Statement::walkDefinitions();
 
-    variable_ = scope()->asLocalScope()->defineLocalVariable(identifier_,
+    variable_ = scope()->asLocalScope()->defineLocalVariable(name_,
                                                              type_,
                                                              type_location_,
                                                              assigner_,
@@ -106,7 +106,8 @@ Statements LocalVariableDefinition::expandWith(Expressions subexpressions, State
 {
     Statements statements;
 
-    statements.push_back(std::make_unique<LocalVariableDefinition>(identifier_,
+    statements.push_back(
+        std::make_unique<LocalVariableDefinition>(name_,
                                                   type_->toUndefined(),
                                                   type_location_,
                                                   assigner_,

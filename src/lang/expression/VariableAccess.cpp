@@ -35,7 +35,7 @@ bool VariableAccess::validate(ValidationLogger& validation_logger)
 {
     if (!variable_->isDefined() && scope()->asLocalScope()->wasVariableDropped(variable_))
     {
-        validation_logger.logError("Variable with name '" + variable_->identifier() + "' was dropped", location());
+        validation_logger.logError("Variable with name '" + variable_->name() + "' was dropped", location());
         return false;
     }
 
@@ -48,7 +48,7 @@ bool VariableAccess::validateAssignment(const std::shared_ptr<lang::Value>& valu
 {
     if (!variable_->isDefined() && scope()->asLocalScope()->wasVariableDropped(variable_))
     {
-        validation_logger.logError("Variable with name '" + variable_->identifier() + "' was dropped", location());
+        validation_logger.logError("Variable with name '" + variable_->name() + "' was dropped", location());
         return false;
     }
 
