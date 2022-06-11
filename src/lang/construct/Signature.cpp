@@ -71,7 +71,7 @@ std::string lang::Signature::toString() const
         if (!is_first) { string += ", "; }
 
         is_first = false;
-        string += type->getActualType()->getName();
+        string += type->getActualType()->name();
     }
 
     string += ")";

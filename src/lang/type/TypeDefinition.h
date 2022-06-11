@@ -44,7 +44,7 @@ namespace lang
 
         void setType(lang::Type* type);
 
-        [[nodiscard]] const std::string& getName() const;
+        [[nodiscard]] const std::string& name() const;
         const std::string&               getMangledName();
         [[nodiscard]] lang::Location     getDefinitionLocation() const;
         [[nodiscard]] bool               isCustom() const;

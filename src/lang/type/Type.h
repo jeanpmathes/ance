@@ -52,7 +52,7 @@ namespace lang
          * Get the name of this type.
          * @return The name.
          */
-        [[nodiscard]] const std::string& getName() const;
+        [[nodiscard]] const std::string& name() const;
 
         /**
          * Get the name of this type with helpful annotations. Useful for validation messages.

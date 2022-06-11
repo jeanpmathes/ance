@@ -227,14 +227,14 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
 
 std::string lang::IntegerType::createMangledName()
 {
-    return getName();
+    return name();
 }
 
 llvm::DIType* lang::IntegerType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
 
-    std::string name         = getName();
+    std::string name         = this->name();
     uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
     auto        encoding     = is_signed_ ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned;
 

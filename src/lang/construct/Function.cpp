@@ -238,13 +238,13 @@ void lang::Function::registerUsage(lang::ResolvingHandle<lang::Type> type)
 {
     assert(!type->isDefined());
 
-    if (undefined_types_.find(type->getName()) != undefined_types_.end())
+    if (undefined_types_.find(type->name()) != undefined_types_.end())
     {
-        type.reroute(undefined_types_[type->getName()].handle());
+        type.reroute(undefined_types_[type->name()].handle());
         return;
     }
 
-    undefined_types_[type->getName()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
+    undefined_types_[type->name()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
 }
 
 void lang::Function::registerDefinition(lang::ResolvingHandle<lang::Type> type)

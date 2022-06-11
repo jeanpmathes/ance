@@ -9,15 +9,15 @@
 lang::Type::Type(std::string name) : name_(std::move(name)) {}
 
 lang::Type::Type(std::unique_ptr<lang::TypeDefinition> definition)
-    : name_(definition->getName())
+    : name_(definition->name())
     , definition_(std::move(definition))
 {
     definition_->setType(this);
 }
 
-const std::string& lang::Type::getName() const
+const std::string& lang::Type::name() const
 {
-    if (isDefined()) { return definition_->getName(); }
+    if (isDefined()) { return definition_->name(); }
     else {
         return name_;
     }
@@ -25,9 +25,9 @@ const std::string& lang::Type::getName() const
 
 std::string lang::Type::getAnnotatedName()
 {
-    std::string name = "'" + getName() + "'";
+    std::string name = "'" + this->name() + "'";
 
-    if (getActualType() != self()) { name += " (aka '" + getActualType()->getName() + "')"; }
+    if (getActualType() != self()) { name += " (aka '" + getActualType()->name() + "')"; }
 
     return name;
 }
@@ -412,5 +412,5 @@ lang::ResolvingHandle<lang::Type> lang::Type::toUndefined() const
     if (!isDefined()) return self();
     if (!isCustom()) return self();
 
-    return lang::makeHandled<lang::Type>(getName());
+    return lang::makeHandled<lang::Type>(name());
 }

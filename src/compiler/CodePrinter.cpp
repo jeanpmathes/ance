@@ -20,7 +20,7 @@ std::any CodePrinter::visit(lang::GlobalVariable& variable)
         out_ << "const"
              << " ";
     out_ << variable.name() << ": ";
-    out_ << variable.type()->getName();
+    out_ << variable.type()->name();
 
     std::string value = variable.init().toString();
     if (!value.empty())
@@ -42,7 +42,7 @@ std::any CodePrinter::visit(lang::CustomFunction& function)
     out_ << function.name() << " ";
     out_ << function.parameterSource();
 
-    if (function.returnType() != lang::VoidType::get()) { out_ << " : " << function.returnType()->getName(); }
+    if (function.returnType() != lang::VoidType::get()) { out_ << " : " << function.returnType()->name(); }
 
     out_ << std::endl;
 
@@ -85,7 +85,7 @@ std::any CodePrinter::visit(Allocation& allocation)
     }
 
     out_ << " " << allocator << " ";
-    out_ << allocation.allocatedType()->getName();
+    out_ << allocation.allocatedType()->name();
 
     return {};
 }
@@ -223,7 +223,7 @@ std::any CodePrinter::visit(SizeofExpression& sizeof_expression)
 
 std::any CodePrinter::visit(SizeofType& sizeof_type)
 {
-    out_ << "sizeof " << sizeof_type.targetType()->getName();
+    out_ << "sizeof " << sizeof_type.targetType()->name();
 
     return {};
 }
@@ -354,7 +354,7 @@ std::any CodePrinter::visit(If& if_statement)
 std::any CodePrinter::visit(LocalReferenceVariableDefinition& local_reference_variable_definition)
 {
     out_ << "let " << local_reference_variable_definition.name();
-    out_ << ": " << local_reference_variable_definition.type()->getName() << " ";
+    out_ << ": " << local_reference_variable_definition.type()->name() << " ";
     out_ << visitTree(local_reference_variable_definition.reference()) << ";";
 
     return {};
@@ -363,7 +363,7 @@ std::any CodePrinter::visit(LocalReferenceVariableDefinition& local_reference_va
 std::any CodePrinter::visit(LocalVariableDefinition& local_variable_definition)
 {
     out_ << "let " << local_variable_definition.name();
-    out_ << ": " << local_variable_definition.type()->getName();
+    out_ << ": " << local_variable_definition.type()->name();
 
     if (local_variable_definition.assigned())
     {

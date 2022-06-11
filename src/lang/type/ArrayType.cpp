@@ -11,7 +11,7 @@
 #include "validation/ValidationLogger.h"
 
 lang::ArrayType::ArrayType(lang::ResolvingHandle<lang::Type> element_type, const uint64_t size)
-    : TypeDefinition("[" + element_type->getName() + "; " + std::to_string(size) + "]")
+    : TypeDefinition("[" + element_type->name() + "; " + std::to_string(size) + "]")
     , size_(size)
     , element_type_(element_type)
     , element_reference_(lang::ReferenceType::get(element_type))

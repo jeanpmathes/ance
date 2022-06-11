@@ -134,23 +134,23 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Type> type)
 {
     assert(!type->isDefined());
 
-    if (undefined_types_.find(type->getName()) != undefined_types_.end())
+    if (undefined_types_.find(type->name()) != undefined_types_.end())
     {
-        type.reroute(undefined_types_[type->getName()].handle());
+        type.reroute(undefined_types_[type->name()].handle());
         return;
     }
 
-    if (blockers_.contains(type->getName()))
+    if (blockers_.contains(type->name()))
     {
-        if (blocked_types_.contains(type->getName())) { type.reroute(blocked_types_[type->getName()].handle()); }
+        if (blocked_types_.contains(type->name())) { type.reroute(blocked_types_[type->name()].handle()); }
         else {
-            blocked_types_[type->getName()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
+            blocked_types_[type->name()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
         }
 
         return;
     }
 
-    undefined_types_[type->getName()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
+    undefined_types_[type->name()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
 }
 
 void lang::LocalScope::registerDefinition(lang::ResolvingHandle<lang::Type> type)

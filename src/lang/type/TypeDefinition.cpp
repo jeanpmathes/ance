@@ -12,7 +12,7 @@ lang::TypeDefinition::TypeDefinition(std::string name, lang::Location location)
     , location_(location)
 {}
 
-const std::string& lang::TypeDefinition::getName() const
+const std::string& lang::TypeDefinition::name() const
 {
     return name_;
 }

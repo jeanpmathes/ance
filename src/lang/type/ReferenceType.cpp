@@ -9,7 +9,7 @@
 #include "validation/ValidationLogger.h"
 
 lang::ReferenceType::ReferenceType(lang::ResolvingHandle<lang::Type> element_type)
-    : TypeDefinition("&" + element_type->getName())
+    : TypeDefinition("&" + element_type->name())
     , element_type_(element_type)
 {}
 

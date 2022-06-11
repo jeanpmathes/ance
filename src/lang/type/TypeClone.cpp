@@ -182,5 +182,5 @@ std::vector<lang::TypeDefinition*> lang::TypeClone::getDependencies()
 }
 std::string lang::TypeClone::createMangledName()
 {
-    return getName();
+    return name();
 }

@@ -40,7 +40,7 @@ llvm::DIType* lang::BooleanType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
 
-    std::string name         = getName();
+    std::string name         = this->name();
     uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
 
     return context->di()->createBasicType(name, size_in_bits, llvm::dwarf::DW_ATE_boolean);

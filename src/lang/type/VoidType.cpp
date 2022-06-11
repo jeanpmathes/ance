@@ -23,12 +23,12 @@ llvm::Type* lang::VoidType::getContentType(llvm::LLVMContext& c)
 
 std::string lang::VoidType::createMangledName()
 {
-    return getName();
+    return name();
 }
 
 llvm::DIType* lang::VoidType::createDebugType(CompileContext* context)
 {
-    return context->di()->createUnspecifiedType(getName());
+    return context->di()->createUnspecifiedType(name());
 }
 
 bool lang::VoidType::isVoidType() const

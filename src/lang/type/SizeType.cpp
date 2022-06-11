@@ -174,14 +174,14 @@ llvm::Value* lang::SizeType::buildContentValue(llvm::TypeSize size)
 
 std::string lang::SizeType::createMangledName()
 {
-    return getName();
+    return name();
 }
 
 llvm::DIType* lang::SizeType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
 
-    std::string           name         = getName();
+    std::string           name         = this->name();
     uint64_t              size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
     llvm::dwarf::TypeKind encoding;
 

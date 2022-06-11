@@ -241,33 +241,33 @@ void lang::GlobalScope::registerUsage(lang::ResolvingHandle<lang::Type> type)
 {
     assert(!type->isDefined());
 
-    if (undefined_types_.find(type->getName()) != undefined_types_.end())
+    if (undefined_types_.find(type->name()) != undefined_types_.end())
     {
-        type.reroute(undefined_types_[type->getName()].handle());
+        type.reroute(undefined_types_[type->name()].handle());
         return;
     }
 
-    if (defined_types_.find(type->getName()) != defined_types_.end())
+    if (defined_types_.find(type->name()) != defined_types_.end())
     {
-        type.reroute(defined_types_[type->getName()].handle());
+        type.reroute(defined_types_[type->name()].handle());
         return;
     }
 
-    undefined_types_[type->getName()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
+    undefined_types_[type->name()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
 }
 
 void lang::GlobalScope::registerDefinition(lang::ResolvingHandle<lang::Type> type)
 {
     assert(type->isDefined());
-    assert(defined_types_.find(type->getName()) == defined_types_.end());
+    assert(defined_types_.find(type->name()) == defined_types_.end());
 
-    defined_types_[type->getName()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
+    defined_types_[type->name()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
     type->setContainingScope(this);
 
-    if (undefined_types_.find(type->getName()) != undefined_types_.end())
+    if (undefined_types_.find(type->name()) != undefined_types_.end())
     {
-        lang::OwningHandle<lang::Type> undefined = std::move(undefined_types_[type->getName()]);
-        undefined_types_.erase(type->getName());
+        lang::OwningHandle<lang::Type> undefined = std::move(undefined_types_[type->name()]);
+        undefined_types_.erase(type->name());
 
         undefined.handle().reroute(type);
     }
@@ -311,9 +311,9 @@ bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::FunctionGr
 
 bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Type> type)
 {
-    if (defined_types_.find(type->getName()) != defined_types_.end())
+    if (defined_types_.find(type->name()) != defined_types_.end())
     {
-        type.reroute(defined_types_[type->getName()].handle());
+        type.reroute(defined_types_[type->name()].handle());
         return true;
     }
 

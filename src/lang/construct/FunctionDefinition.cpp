@@ -97,7 +97,7 @@ std::string lang::FunctionDefinition::parameterSource() const
     for (auto& parameter : parameters_)
     {
         if (!is_first) source += ", ";
-        source += parameter->name() + ": " + parameter->type()->getName();
+        source += parameter->name() + ": " + parameter->type()->name();
 
         is_first = false;
     }
