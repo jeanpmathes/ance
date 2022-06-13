@@ -56,17 +56,17 @@ bool MatchSelect::validate(ValidationLogger& validation_logger)
 
 Expression::Expansion MatchSelect::expandWith(Expressions subexpressions) const
 {
-    std::string temp_name = scope()->getTemporaryName();
-    auto        condition = std::move(subexpressions[0]);
+    auto temp_name = lang::Identifier::from(scope()->getTemporaryName(), location());
+    auto condition = std::move(subexpressions[0]);
 
-    auto variable = lang::makeHandled<lang::Variable>(lang::Identifier::from(temp_name));
+    auto variable = lang::makeHandled<lang::Variable>(temp_name);
 
     std::vector<std::unique_ptr<Case>> cases;
     for (auto& original_case : cases_) { cases.push_back(original_case->expand(variable)); }
 
     Statements statements;
 
-    statements.push_back(std::make_unique<LocalVariableDefinition>(lang::Identifier::from(temp_name),
+    statements.push_back(std::make_unique<LocalVariableDefinition>(temp_name,
                                                                    type()->toUndefined(),
                                                                    location(),
                                                                    lang::Assigner::COPY_ASSIGNMENT,

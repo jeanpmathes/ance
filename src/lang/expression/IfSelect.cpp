@@ -71,17 +71,15 @@ bool IfSelect::validate(ValidationLogger& validation_logger)
 
 Expression::Expansion IfSelect::expandWith(Expressions subexpressions) const
 {
-    std::string temp_name          = scope()->getTemporaryName();
-    auto        make_temp_variable = [&temp_name]() {
-        return lang::makeHandled<lang::Variable>(lang::Identifier::from(temp_name));
-    };
+    auto        temp_name          = lang::Identifier::from(scope()->getTemporaryName(), location());
+    auto        make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
     auto        condition          = std::move(subexpressions[0]);
     auto        then_expression    = std::move(subexpressions[1]);
     auto        else_expression    = std::move(subexpressions[2]);
 
     Statements before;
 
-    before.push_back(std::make_unique<LocalVariableDefinition>(lang::Identifier::from(temp_name),
+    before.push_back(std::make_unique<LocalVariableDefinition>(temp_name,
                                                                type()->toUndefined(),
                                                                location(),
                                                                lang::Assigner::COPY_ASSIGNMENT,

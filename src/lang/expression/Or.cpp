@@ -48,16 +48,14 @@ bool Or::validate(ValidationLogger& validation_logger)
 
 Expression::Expansion Or::expandWith(Expressions subexpressions) const
 {
-    std::string temp_name          = scope()->getTemporaryName();
-    auto        make_temp_variable = [&temp_name]() {
-        return lang::makeHandled<lang::Variable>(lang::Identifier::from(temp_name));
-    };
+    auto        temp_name          = lang::Identifier::from(scope()->getTemporaryName(), location());
+    auto        make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
     auto lhs = std::move(subexpressions[0]);
     auto        rhs                = std::move(subexpressions[1]);
 
     Statements before;
 
-    before.push_back(std::make_unique<LocalVariableDefinition>(lang::Identifier::from(temp_name),
+    before.push_back(std::make_unique<LocalVariableDefinition>(temp_name,
                                                                lang::BooleanType::get(),
                                                                location(),
                                                                lang::Assigner::COPY_ASSIGNMENT,
