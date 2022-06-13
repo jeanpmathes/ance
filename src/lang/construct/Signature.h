@@ -13,7 +13,7 @@ namespace lang
     class Signature
     {
       private:
-        explicit Signature(const std::string& name, std::vector<lang::ResolvingHandle<lang::Type>>& types);
+        explicit Signature(const Identifier& name, std::vector<lang::ResolvingHandle<lang::Type>>& types);
 
       public:
         [[nodiscard]] size_t getParameterCount() const;
@@ -24,7 +24,7 @@ namespace lang
          * @param parameters The parameters of the function.
          * @return The signature.
          */
-        static Signature fromParameters(const std::string&                                   name,
+        static Signature fromParameters(Identifier                                           name,
                                         const std::vector<std::shared_ptr<lang::Parameter>>& parameters);
 
         /**
@@ -66,7 +66,7 @@ namespace lang
         static bool areSame(const Signature& a, const Signature& b);
 
       private:
-        std::string                                    function_name_;
+        lang::Identifier                               function_name_;
         std::vector<lang::ResolvingHandle<lang::Type>> types_;
         std::string                                    mangled_name_ {};
     };

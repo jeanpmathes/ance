@@ -14,6 +14,7 @@
 #include "lang/utility/ResolvingHandle.h"
 #include "lang/type/StateCount.h"
 #include "lang/UnaryOperator.h"
+#include "lang/utility/Identifier.h"
 
 namespace lang
 {
@@ -36,7 +37,7 @@ namespace lang
          * Create a new undefined type.
          * @param name The name of the type.
          */
-        explicit Type(std::string name);
+        explicit Type(Identifier name);
 
         /**
          * Create a defined type.
@@ -52,7 +53,7 @@ namespace lang
          * Get the name of this type.
          * @return The name.
          */
-        [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] const lang::Identifier& name() const;
 
         /**
          * Get the name of this type with helpful annotations. Useful for validation messages.
@@ -453,7 +454,7 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Type> toUndefined() const;
 
       private:
-        std::string                           name_;
+        lang::Identifier                      name_;
         std::unique_ptr<lang::TypeDefinition> definition_ {};
     };
 }

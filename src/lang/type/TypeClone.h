@@ -2,6 +2,7 @@
 #define ANCE_SRC_LANG_TYPE_TYPECLONE_H_
 
 #include "TypeDefinition.h"
+#include "lang/utility/Identifier.h"
 
 #include <optional>
 
@@ -13,7 +14,7 @@ namespace lang
     class TypeClone : public lang::TypeDefinition
     {
       public:
-        TypeClone(const std::string&                name,
+        TypeClone(lang::Identifier                  name,
                   lang::ResolvingHandle<lang::Type> original,
                   lang::Location                    definition_location,
                   lang::Location                    original_type_location);

@@ -246,14 +246,14 @@ void lang::CustomFunction::createNativeBacking(CompileContext* context)
         context->di()->createSubroutineType(context->di()->getOrCreateTypeArray(di_types));
     llvm::DISubprogram* subprogram =
         context->di()->createFunction(scope().getDebugScope(context),
-                                      name(),
+                                      name().text(),
                                       signature_.getMangledName(),
                                       context->sourceFile(),
                                       location().line(),
                                       debug_type,
                                       definition_location_.line(),
                                       llvm::DINode::DIFlags::FlagPrototyped,
-                                      llvm::DISubprogram::toSPFlags(false, true, false, 0U, name() == "main"));
+                                      llvm::DISubprogram::toSPFlags(false, true, false, 0U, name().text() == "main"));
 
     native_function_->setSubprogram(subprogram);
 }

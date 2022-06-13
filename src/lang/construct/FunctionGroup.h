@@ -19,10 +19,10 @@ namespace lang
         , public Element<FunctionGroup, ANCE_CONSTRUCTS>
     {
       public:
-        explicit FunctionGroup(std::string name);
+        explicit FunctionGroup(Identifier name);
 
-        [[nodiscard]] bool               isDefined() const;
-        [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] bool              isDefined() const;
+        [[nodiscard]] const Identifier& name() const;
 
         void resolve();
         void validate(ValidationLogger& validation_logger);
@@ -64,7 +64,7 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::FunctionGroup> toUndefined() const;
 
       private:
-        std::string                                     name_;
+        lang::Identifier                                name_;
         std::vector<lang::OwningHandle<lang::Function>> functions_;
     };
 }

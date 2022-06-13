@@ -11,9 +11,9 @@
 #include "lang/AccessModifier.h"
 #include "lang/statement/Statement.h"
 
-lang::Function::Function(std::string function_name) : name_(std::move(function_name)) {}
+lang::Function::Function(Identifier function_name) : name_(std::move(function_name)) {}
 
-const std::string& lang::Function::name() const
+const lang::Identifier& lang::Function::name() const
 {
     return name_;
 }
@@ -62,7 +62,7 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
 }
 
 std::optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParameterVariable(
-    const std::string&                  name,
+    const Identifier&                   name,
     lang::ResolvingHandle<lang::Type>   type,
     lang::Location                      type_location,
     const std::shared_ptr<lang::Value>& value,

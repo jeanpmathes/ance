@@ -6,6 +6,7 @@
 #include "lang/construct/Parameter.h"
 #include "lang/construct/Signature.h"
 #include "lang/utility/Location.h"
+#include "lang/utility/Identifier.h"
 #include "lang/construct/BasicBlock.h"
 #include "lang/Element.h"
 
@@ -37,7 +38,7 @@ namespace lang
          * Get the name of this function.
          * @return The name.
          */
-        [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] const Identifier& name() const;
 
         /**
          * Get the containing scope.

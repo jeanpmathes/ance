@@ -12,7 +12,7 @@
 #include "validation/ValidationLogger.h"
 #include "lang/AccessModifier.h"
 
-lang::Variable::Variable(std::string name) : name_(std::move(name)) {}
+lang::Variable::Variable(lang::Identifier name) : name_(std::move(name)) {}
 
 bool lang::Variable::isDefined() const
 {
@@ -61,7 +61,7 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
     addChild(*definition_);
 }
 
-const std::string& lang::Variable::name() const
+const lang::Identifier& lang::Variable::name() const
 {
     return name_;
 }

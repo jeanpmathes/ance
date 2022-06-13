@@ -5,7 +5,7 @@
 #include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
-lang::TypeClone::TypeClone(const std::string&                name,
+lang::TypeClone::TypeClone(lang::Identifier                  name,
                            lang::ResolvingHandle<lang::Type> original,
                            lang::Location                    definition_location,
                            lang::Location                    original_type_location)
@@ -182,5 +182,5 @@ std::vector<lang::TypeDefinition*> lang::TypeClone::getDependencies()
 }
 std::string lang::TypeClone::createMangledName()
 {
-    return name();
+    return std::string(name().text());
 }

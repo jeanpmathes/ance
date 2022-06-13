@@ -4,7 +4,7 @@
 
 #include "lang/type/Type.h"
 
-lang::HalfType::HalfType() : TypeDefinition("half") {}
+lang::HalfType::HalfType() : TypeDefinition(lang::Identifier::from("half")) {}
 
 llvm::Constant* lang::HalfType::getDefaultContent(llvm::LLVMContext& c)
 {

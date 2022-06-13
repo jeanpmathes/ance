@@ -63,7 +63,7 @@ void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger)
 
 void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                access,
                                              bool                                is_constant,
-                                             const std::string&                  name,
+                                             lang::Identifier                    name,
                                              lang::ResolvingHandle<lang::Type>   type,
                                              lang::Location                      type_location,
                                              lang::Assigner                      assigner,
@@ -100,7 +100,7 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
 }
 
 lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineExternFunction(
-    const std::string&                                   name,
+    Identifier                                           name,
     lang::ResolvingHandle<lang::Type>                    return_type,
     lang::Location                                       return_type_location,
     const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
@@ -119,7 +119,7 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineExternFunction(
 }
 
 lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineCustomFunction(
-    const std::string&                                   name,
+    Identifier                                           name,
     lang::AccessModifier                                 access,
     lang::ResolvingHandle<lang::Type>                    return_type,
     lang::Location                                       return_type_location,
@@ -147,7 +147,7 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineCustomFunction(
     return handle;
 }
 
-void lang::GlobalScope::defineTypeAsOther(const std::string&                name,
+void lang::GlobalScope::defineTypeAsOther(Identifier                        name,
                                           lang::ResolvingHandle<lang::Type> original,
                                           lang::Location                    definition_location,
                                           lang::Location                    original_type_location)
@@ -163,7 +163,7 @@ void lang::GlobalScope::defineTypeAsOther(const std::string&                name
     defined_types_[name]->setContainingScope(this);
 }
 
-void lang::GlobalScope::defineTypeAliasOther(const std::string&                name,
+void lang::GlobalScope::defineTypeAliasOther(Identifier                        name,
                                              lang::ResolvingHandle<lang::Type> actual,
                                              lang::Location                    definition_location,
                                              lang::Location                    actual_type_location)
@@ -179,7 +179,7 @@ void lang::GlobalScope::defineTypeAliasOther(const std::string&                n
     defined_types_[name]->setContainingScope(this);
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> lang::GlobalScope::getType(const std::string& string)
+std::optional<lang::ResolvingHandle<lang::Type>> lang::GlobalScope::getType(Identifier string)
 {
     auto it = defined_types_.find(string);
 
@@ -322,7 +322,7 @@ bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Type> type
 
 std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntry()
 {
-    auto c = defined_function_groups_.find("main");
+    auto c = defined_function_groups_.find(lang::Identifier::from("main"));
     if (c == defined_function_groups_.end()) return {};
 
     auto& [name, group] = *c;
@@ -340,7 +340,7 @@ std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntr
 
 std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findExit()
 {
-    auto c = defined_function_groups_.find("exit");
+    auto c = defined_function_groups_.find(lang::Identifier::from("exit"));
     if (c == defined_function_groups_.end()) return {};
 
     auto& [name, group] = *c;
@@ -397,7 +397,7 @@ void lang::GlobalScope::buildFunctions(CompileContext* context)
     for (auto& [key, group] : defined_function_groups_) { group->build(context); }
 }
 
-lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunctionGroup(const std::string& name)
+lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunctionGroup(Identifier name)
 {
     if (defined_function_groups_.find(name) != defined_function_groups_.end())
     {
@@ -423,7 +423,7 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunc
     return defined;
 }
 
-lang::OwningHandle<lang::Type> lang::GlobalScope::retrieveUndefinedType(const std::string& name)
+lang::OwningHandle<lang::Type> lang::GlobalScope::retrieveUndefinedType(Identifier name)
 {
     lang::OwningHandle<lang::Type> undefined;
 

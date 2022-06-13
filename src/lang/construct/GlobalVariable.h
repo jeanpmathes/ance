@@ -33,7 +33,7 @@ namespace lang
         /**
          * Create a new global variable definition.
          */
-        GlobalVariable(const std::string&                  name,
+        GlobalVariable(Identifier                          name,
                        lang::ResolvingHandle<lang::Type>   type,
                        lang::Location                      type_location,
                        GlobalScope&                        containing_scope,

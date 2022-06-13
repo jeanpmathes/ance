@@ -1,6 +1,6 @@
 #include "Signature.h"
 
-lang::Signature::Signature(const std::string& name, std::vector<lang::ResolvingHandle<lang::Type>>& types)
+lang::Signature::Signature(const Identifier& name, std::vector<lang::ResolvingHandle<lang::Type>>& types)
     : function_name_(name)
     , types_(types)
 {}
@@ -10,7 +10,7 @@ size_t lang::Signature::getParameterCount() const
     return types_.size();
 }
 
-lang::Signature lang::Signature::fromParameters(const std::string&                                   name,
+lang::Signature lang::Signature::fromParameters(Identifier                                           name,
                                                 const std::vector<std::shared_ptr<lang::Parameter>>& parameters)
 {
     std::vector<ResolvingHandle<Type>> types;
@@ -71,7 +71,7 @@ std::string lang::Signature::toString() const
         if (!is_first) { string += ", "; }
 
         is_first = false;
-        string += type->getActualType()->name();
+        string += type->getActualType()->name().text();
     }
 
     string += ")";
@@ -90,6 +90,6 @@ bool lang::Signature::operator!=(const lang::Signature& other) const
 
 bool lang::Signature::areSame(const lang::Signature& a, const lang::Signature& b)
 {
-    if (a.function_name_ != b.function_name_) return false;
+    if (a.function_name_.text() != b.function_name_.text()) return false;
     return a.isSame(b.types_);
 }

@@ -45,7 +45,7 @@ namespace lang
          * Prepare the definition of a new variable. This will block resolution above this scope.
          * @param name The name of the variable.
          */
-        void prepareDefinition(const std::string& name);
+        void prepareDefinition(Identifier name);
 
         /**
          * Define a local variable. Parameters are not local variables and should be define in function scope.
@@ -58,7 +58,7 @@ namespace lang
          * @param location The source location.
          * @return The defined variable.
          */
-        lang::ResolvingHandle<lang::Variable> defineLocalVariable(const std::string&                  name,
+        lang::ResolvingHandle<lang::Variable> defineLocalVariable(Identifier                          name,
                                                                   lang::ResolvingHandle<lang::Type>   type,
                                                                   lang::Location                      type_location,
                                                                   lang::Assigner                      assigner,
@@ -109,19 +109,19 @@ namespace lang
         lang::Scope*                   parent_;
         std::vector<lang::LocalScope*> sub_scopes_;
 
-        std::set<std::string> blockers_ {};
+        std::set<lang::Identifier> blockers_ {};
 
-        std::map<std::string, lang::OwningHandle<lang::Variable>>              undefined_variables_ {};
-        std::map<std::string, lang::OwningHandle<lang::Variable>>              blocked_variables_ {};
-        std::map<std::string, std::vector<lang::OwningHandle<lang::Variable>>> defined_local_variables_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>>              undefined_variables_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>>              blocked_variables_ {};
+        std::map<lang::Identifier, std::vector<lang::OwningHandle<lang::Variable>>> defined_local_variables_ {};
 
-        std::map<std::string, lang::ResolvingHandle<lang::Variable>> active_variables_ {};
+        std::map<lang::Identifier, lang::ResolvingHandle<lang::Variable>> active_variables_ {};
 
-        std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_ {};
-        std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> blocked_function_groups_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> blocked_function_groups_ {};
 
-        std::map<std::string, lang::OwningHandle<lang::Type>> undefined_types_ {};
-        std::map<std::string, lang::OwningHandle<lang::Type>> blocked_types_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::Type>> blocked_types_ {};
     };
 }
 #endif

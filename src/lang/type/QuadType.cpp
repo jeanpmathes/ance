@@ -2,7 +2,7 @@
 
 #include "lang/scope/GlobalScope.h"
 
-lang::QuadType::QuadType() : TypeDefinition("quad") {}
+lang::QuadType::QuadType() : TypeDefinition(lang::Identifier::from("quad")) {}
 
 llvm::Constant* lang::QuadType::getDefaultContent(llvm::LLVMContext& c)
 {

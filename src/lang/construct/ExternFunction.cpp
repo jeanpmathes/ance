@@ -5,7 +5,6 @@
 
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/Scope.h"
-#include "lang/type/ReferenceType.h"
 #include "lang/type/VoidType.h"
 #include "lang/utility/Values.h"
 #include "compiler/CompileContext.h"
@@ -46,7 +45,7 @@ void lang::ExternFunction::validate(ValidationLogger& validation_logger)
 
     returnType()->validate(validation_logger, returnTypeLocation());
 
-    std::set<std::string> names;
+    std::set<lang::Identifier> names;
 
     for (const auto& parameter : parameters())
     {

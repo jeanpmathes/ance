@@ -13,6 +13,7 @@
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
 #include "lang/type/StateCount.h"
+#include "lang/utility/Identifier.h"
 
 namespace lang
 {
@@ -37,14 +38,14 @@ namespace lang
          * @param name The name of the defined type.
          * @param location The location of the defined type. Use a non-global location for custom types.
          */
-        explicit TypeDefinition(std::string name, lang::Location location = lang::Location(0, 0, 0, 0));
+        explicit TypeDefinition(lang::Identifier name, lang::Location location = lang::Location(0, 0, 0, 0));
 
       public:
         virtual ~TypeDefinition() = default;
 
         void setType(lang::Type* type);
 
-        [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] const Identifier&  name() const;
         const std::string&               getMangledName();
         [[nodiscard]] lang::Location     getDefinitionLocation() const;
         [[nodiscard]] bool               isCustom() const;
@@ -140,8 +141,8 @@ namespace lang
         lang::ResolvingHandle<lang::Type> self() const;
 
       private:
-        std::string    name_;
-        lang::Location location_;
+        lang::Identifier name_;
+        lang::Location   location_;
         std::string    mangled_name_ {};
         lang::Type*    type_ {nullptr};
         lang::Scope*   containing_scope_ {nullptr};

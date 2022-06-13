@@ -51,7 +51,7 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
         label += block.getExitRepresentation();
     }
     else {
-        label = current_function_->name();
+        label = current_function_->name().text();
     }
 
     printBlock(label, id, block.isUnreached() ? BlockStyle::UNREACHABLE_CODE : BlockStyle::NORMAL_CODE);

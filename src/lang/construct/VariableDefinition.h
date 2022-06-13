@@ -22,14 +22,14 @@ namespace lang
     class VariableDefinition : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     {
       public:
-        VariableDefinition(const std::string&                name,
+        VariableDefinition(Identifier                        name,
                            lang::ResolvingHandle<lang::Type> type,
                            lang::Location                    type_location,
                            Scope&                            containing_scope,
                            bool                              is_final,
                            lang::Location                    location);
 
-        [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] const Identifier& name() const;
 
         /**
          * Get the scope in which this variable is defined.
@@ -74,7 +74,7 @@ namespace lang
         virtual void storeValue(std::shared_ptr<lang::Value> value, CompileContext* context) = 0;
 
       private:
-        const std::string& name_;
+        lang::Identifier name_;
 
         lang::ResolvingHandle<lang::Type> type_;
         lang::Location                    type_location_;

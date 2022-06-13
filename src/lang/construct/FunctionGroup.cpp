@@ -4,14 +4,14 @@
 
 #include "validation/ValidationLogger.h"
 
-lang::FunctionGroup::FunctionGroup(std::string name) : name_(std::move(name)) {}
+lang::FunctionGroup::FunctionGroup(Identifier name) : name_(std::move(name)) {}
 
 bool lang::FunctionGroup::isDefined() const
 {
     return !functions_.empty();
 }
 
-const std::string& lang::FunctionGroup::name() const
+const lang::Identifier& lang::FunctionGroup::name() const
 {
     return name_;
 }
@@ -88,7 +88,7 @@ void lang::FunctionGroup::build(CompileContext* compile_context)
 
 void lang::FunctionGroup::addFunction(lang::OwningHandle<lang::Function> function)
 {
-    assert(function->name() == name_);
+    assert(function->name().text() == name_.text());
 
     addChild(*function);
     functions_.push_back(std::move(function));

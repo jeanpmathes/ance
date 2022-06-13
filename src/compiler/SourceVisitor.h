@@ -4,6 +4,7 @@
 #include "grammar/anceBaseVisitor.h"
 
 #include "lang/utility/Location.h"
+#include "lang/utility/Identifier.h"
 
 class Application;
 
@@ -116,7 +117,9 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitNotEqual(anceParser::NotEqualContext* ctx) override;
 
   protected:
-    static lang::Location location(antlr4::ParserRuleContext* ctx);
+    static lang::Location   location(antlr4::ParserRuleContext* ctx);
+    static lang::Identifier ident(antlr4::tree::TerminalNode* i);
+    static lang::Identifier createIdentifier(const std::string& text, lang::Location location);
 
     static uint64_t parseIntegerTypeSize(const std::string& str);
     static uint64_t parseArrayTypeSize(const std::string& str);

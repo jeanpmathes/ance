@@ -11,6 +11,7 @@
 #include "lang/construct/VariableDefinition.h"
 #include "lang/utility/Location.h"
 #include "lang/Element.h"
+#include "lang/utility/Identifier.h"
 
 namespace lang
 {
@@ -40,7 +41,7 @@ namespace lang
          * Create an undefined variable.
          * @param name The name.
          */
-        explicit Variable(std::string name);
+        explicit Variable(lang::Identifier name);
 
         /**
          * Check if this variable is defined.
@@ -90,7 +91,7 @@ namespace lang
          * Get the name.
          * @return The name.
          */
-        [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] const Identifier& name() const;
         /**
          * Get the containing scope.
          * @return The scope.
@@ -164,7 +165,7 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Variable> toUndefined() const;
 
       private:
-        std::string                               name_;
+        lang::Identifier                          name_;
         std::unique_ptr<lang::VariableDefinition> definition_ {};
     };
 }

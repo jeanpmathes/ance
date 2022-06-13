@@ -2,7 +2,7 @@
 
 #include "lang/scope/GlobalScope.h"
 
-lang::DoubleType::DoubleType() : TypeDefinition("double") {}
+lang::DoubleType::DoubleType() : TypeDefinition(lang::Identifier::from("double")) {}
 
 llvm::Constant* lang::DoubleType::getDefaultContent(llvm::LLVMContext& c)
 {

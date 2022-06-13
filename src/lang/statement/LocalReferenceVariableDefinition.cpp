@@ -10,7 +10,7 @@
 #include "validation/ValidationLogger.h"
 #include "lang/Assigner.h"
 
-LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string                       name,
+LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(lang::Identifier                  name,
                                                                    lang::ResolvingHandle<lang::Type> type,
                                                                    lang::Location                    type_location,
                                                                    std::unique_ptr<Expression>       reference,
@@ -24,7 +24,7 @@ LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(std::string  
     addSubexpression(*reference_);
 }
 
-const std::string& LocalReferenceVariableDefinition::name() const
+const lang::Identifier& LocalReferenceVariableDefinition::name() const
 {
     return name_;
 }

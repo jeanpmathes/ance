@@ -34,14 +34,14 @@ class LocalReferenceVariableDefinition
      * @param reference The reference to bind.
      * @param location The location of the local reference variable definition.
      */
-    LocalReferenceVariableDefinition(std::string                       name,
+    LocalReferenceVariableDefinition(lang::Identifier                  name,
                                      lang::ResolvingHandle<lang::Type> type,
                                      lang::Location                    type_location,
                                      std::unique_ptr<Expression>       reference,
                                      lang::Location                    location);
 
   public:
-    [[nodiscard]] const std::string&                name() const;
+    [[nodiscard]] const lang::Identifier&           name() const;
     [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
     [[nodiscard]] Expression&                       reference() const;
 
@@ -57,7 +57,7 @@ class LocalReferenceVariableDefinition
     void doBuild(CompileContext* context) override;
 
   private:
-    std::string                       name_;
+    lang::Identifier                  name_;
     lang::ResolvingHandle<lang::Type> type_;
     lang::Location                    type_location_;
     std::unique_ptr<Expression>       reference_;

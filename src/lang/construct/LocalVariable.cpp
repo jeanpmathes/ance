@@ -8,7 +8,7 @@
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
-lang::LocalVariable::LocalVariable(const std::string&                name,
+lang::LocalVariable::LocalVariable(Identifier                        name,
                                    lang::ResolvingHandle<lang::Type> type,
                                    lang::Location                    type_location,
                                    Scope&                            containing_scope,
@@ -32,7 +32,8 @@ void lang::LocalVariable::buildDeclaration(CompileContext* context)
 {
     assert(initial_value_);
 
-    native_value_ = context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr, name());
+    native_value_ =
+        context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr, name().text());
 }
 
 void lang::LocalVariable::buildDefinition(CompileContext* context)
@@ -43,7 +44,7 @@ void lang::LocalVariable::buildDefinition(CompileContext* context)
     if (parameter_no_ == 0)
     {
         local_debug_variable_ = context->di()->createAutoVariable(scope()->getDebugScope(context),
-                                                                  name(),
+                                                                  name().text(),
                                                                   context->sourceFile(),
                                                                   location().line(),
                                                                   type()->getDebugType(context),
@@ -52,7 +53,7 @@ void lang::LocalVariable::buildDefinition(CompileContext* context)
     else
     {
         local_debug_variable_ = context->di()->createParameterVariable(scope()->getDebugScope(context),
-                                                                       name(),
+                                                                       name().text(),
                                                                        parameter_no_,
                                                                        context->sourceFile(),
                                                                        location().line(),

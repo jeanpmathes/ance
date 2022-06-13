@@ -10,7 +10,7 @@
 #include "lang/Assigner.h"
 #include "lang/expression/DefaultValue.h"
 
-LocalVariableDefinition::LocalVariableDefinition(std::string                       name,
+LocalVariableDefinition::LocalVariableDefinition(lang::Identifier                  name,
                                                  lang::ResolvingHandle<lang::Type> type,
                                                  lang::Location                    type_location,
                                                  lang::Assigner                    assigner,
@@ -29,7 +29,7 @@ LocalVariableDefinition::LocalVariableDefinition(std::string                    
     addSubexpression(*assigned_);
 }
 
-const std::string& LocalVariableDefinition::name() const
+const lang::Identifier& LocalVariableDefinition::name() const
 {
     return name_;
 }

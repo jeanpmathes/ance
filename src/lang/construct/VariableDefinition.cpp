@@ -3,7 +3,7 @@
 #include "lang/type/ReferenceType.h"
 #include "compiler/CompileContext.h"
 
-lang::VariableDefinition::VariableDefinition(const std::string&                name,
+lang::VariableDefinition::VariableDefinition(Identifier                        name,
                                              lang::ResolvingHandle<lang::Type> type,
                                              lang::Location                    type_location,
                                              Scope&                            containing_scope,
@@ -17,7 +17,7 @@ lang::VariableDefinition::VariableDefinition(const std::string&                n
     , location_(location)
 {}
 
-const std::string& lang::VariableDefinition::name() const
+const lang::Identifier& lang::VariableDefinition::name() const
 {
     return name_;
 }

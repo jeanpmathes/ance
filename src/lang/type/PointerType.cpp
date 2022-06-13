@@ -12,7 +12,7 @@
 #include "validation/ValidationLogger.h"
 
 lang::PointerType::PointerType(lang::ResolvingHandle<lang::Type> element_type)
-    : TypeDefinition("*" + element_type->name())
+    : TypeDefinition(lang::Identifier::from("*" + element_type->name()))
     , element_type_(element_type)
     , element_reference_(lang::ReferenceType::get(element_type))
 {}
@@ -140,7 +140,7 @@ llvm::DIType* lang::PointerType::createDebugType(CompileContext* context)
 
     if (element_type_->isVoidType())
     {
-        std::string name     = this->name();
+        std::string name     = std::string(this->name().text());
         auto        encoding = llvm::dwarf::DW_ATE_address;
 
         di_type = context->di()->createBasicType(name, size_in_bits, encoding);

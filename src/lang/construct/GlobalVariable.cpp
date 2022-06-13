@@ -16,7 +16,7 @@ namespace llvm
     class Constant;
 }
 
-lang::GlobalVariable::GlobalVariable(const std::string&                  name,
+lang::GlobalVariable::GlobalVariable(Identifier                          name,
                                      lang::ResolvingHandle<lang::Type>   type,
                                      lang::Location                      type_location,
                                      GlobalScope&                        containing_scope,
@@ -127,11 +127,11 @@ void lang::GlobalVariable::buildDefinition(CompileContext* context)
                                                 is_constant_,
                                                 linkage,
                                                 native_initializer,
-                                                name());
+                                                name().text());
 
     auto* debug_info = context->di()->createGlobalVariableExpression(context->unit(),
-                                                                     name(),
-                                                                     name(),
+                                                                     name().text(),
+                                                                     name().text(),
                                                                      context->sourceFile(),
                                                                      location().line(),
                                                                      type()->getDebugType(context),

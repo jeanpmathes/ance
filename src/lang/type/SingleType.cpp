@@ -2,7 +2,7 @@
 
 #include "lang/scope/GlobalScope.h"
 
-lang::SingleType::SingleType() : TypeDefinition("single") {}
+lang::SingleType::SingleType() : TypeDefinition(lang::Identifier::from("single")) {}
 
 llvm::Constant* lang::SingleType::getDefaultContent(llvm::LLVMContext& c)
 {

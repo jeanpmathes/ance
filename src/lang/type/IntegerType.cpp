@@ -11,7 +11,7 @@
 #include "validation/ValidationLogger.h"
 
 lang::IntegerType::IntegerType(uint64_t bit_size, bool is_signed)
-    : TypeDefinition((is_signed ? "i" : "ui") + std::to_string(bit_size))
+    : TypeDefinition(lang::Identifier::from((is_signed ? "i" : "ui") + std::to_string(bit_size)))
     , bit_size_(bit_size)
     , is_signed_(is_signed)
 {}
@@ -227,14 +227,14 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
 
 std::string lang::IntegerType::createMangledName()
 {
-    return name();
+    return std::string(name().text());
 }
 
 llvm::DIType* lang::IntegerType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
 
-    std::string name         = this->name();
+    std::string name         = std::string(this->name().text());
     uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
     auto        encoding     = is_signed_ ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned;
 

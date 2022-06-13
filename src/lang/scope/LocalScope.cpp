@@ -30,12 +30,12 @@ lang::Scope* lang::LocalScope::scope() const
     return parent_;
 }
 
-void lang::LocalScope::prepareDefinition(const std::string& name)
+void lang::LocalScope::prepareDefinition(Identifier name)
 {
     blockers_.emplace(name);
 }
 
-lang::ResolvingHandle<lang::Variable> lang::LocalScope::defineLocalVariable(const std::string&                name,
+lang::ResolvingHandle<lang::Variable> lang::LocalScope::defineLocalVariable(Identifier                        name,
                                                                             lang::ResolvingHandle<lang::Type> type,
                                                                             lang::Location type_location,
                                                                             lang::Assigner assigner,

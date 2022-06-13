@@ -66,7 +66,7 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
     lang::AccessModifier              access      = visit(ctx->accessModifier()).as<lang::AccessModifier>();
     bool                              is_constant = ctx->CONST();
     lang::ResolvingHandle<lang::Type> type        = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
-    std::string                       identifier  = ctx->IDENTIFIER()->getText();
+    lang::Identifier                  identifier  = ident(ctx->IDENTIFIER());
 
     ConstantExpression* const_expr;
     lang::Assigner      assigner = lang::Assigner::COPY_ASSIGNMENT;
@@ -102,7 +102,7 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
 antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)
 {
     lang::AccessModifier              access     = visit(ctx->accessModifier()).as<lang::AccessModifier>();
-    std::string                       identifier = ctx->IDENTIFIER()->getText();
+    lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
     lang::ResolvingHandle<lang::Type> return_type =
         ctx->type() ? visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>() : lang::VoidType::get();
 
@@ -141,7 +141,7 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
 
 antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx)
 {
-    std::string                       identifier = ctx->IDENTIFIER()->getText();
+    lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
     lang::ResolvingHandle<lang::Type> return_type =
         ctx->type() ? visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>() : lang::VoidType::get();
     std::vector<lang::Parameter*> parameters = visit(ctx->parameters()).as<std::vector<lang::Parameter*>>();
@@ -172,30 +172,28 @@ antlrcpp::Any SourceVisitor::visitParameters(anceParser::ParametersContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitParameter(anceParser::ParameterContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> type         = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
-    const std::string                 k_identifier = ctx->IDENTIFIER()->getText();
+    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
+    lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
 
-    return new lang::Parameter(type, location(ctx->type()), k_identifier, location(ctx));
+    return new lang::Parameter(type, location(ctx->type()), identifier, location(ctx));
 }
 
 antlrcpp::Any SourceVisitor::visitDefineAs(anceParser::DefineAsContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> other = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
-    application_.globalScope().defineTypeAsOther(ctx->IDENTIFIER()->getText(),
-                                                 other,
-                                                 location(ctx),
-                                                 location(ctx->type()));
+    lang::ResolvingHandle<lang::Type> other      = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
+    lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
+
+    application_.globalScope().defineTypeAsOther(identifier, other, location(ctx), location(ctx->type()));
 
     return {};
 }
 
 antlrcpp::Any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> other = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
-    application_.globalScope().defineTypeAliasOther(ctx->IDENTIFIER()->getText(),
-                                                    other,
-                                                    location(ctx),
-                                                    location(ctx->type()));
+    lang::ResolvingHandle<lang::Type> other      = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
+    lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
+
+    application_.globalScope().defineTypeAliasOther(identifier, other, location(ctx), location(ctx->type()));
 
     return {};
 }
@@ -227,7 +225,7 @@ antlrcpp::Any SourceVisitor::visitExpressionStatement(anceParser::ExpressionStat
 antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx)
 {
     lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
-    std::string                       identifier = ctx->IDENTIFIER()->getText();
+    lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
 
     lang::Assigner assigner {};
     Expression*    assigned;
@@ -254,7 +252,7 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
 antlrcpp::Any SourceVisitor::visitLocalReferenceDefinition(anceParser::LocalReferenceDefinitionContext* ctx)
 {
     lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
-    std::string                       identifier = ctx->IDENTIFIER()->getText();
+    lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
 
     Expression* ref = visit(ctx->bindRef()).as<Expression*>();
 
@@ -268,8 +266,8 @@ antlrcpp::Any SourceVisitor::visitLocalReferenceDefinition(anceParser::LocalRefe
 
 antlrcpp::Any SourceVisitor::visitDropStatement(anceParser::DropStatementContext* ctx)
 {
-    std::string identifier = ctx->IDENTIFIER()->getText();
-    auto        variable   = lang::makeHandled<lang::Variable>(identifier);
+    lang::Identifier identifier = ident(ctx->IDENTIFIER());
+    auto             variable   = lang::makeHandled<lang::Variable>(identifier);
 
     auto statement = std::make_unique<Drop>(variable, location(ctx));
     return lang::CodeBlock::wrapStatement(std::move(statement));
@@ -381,14 +379,14 @@ antlrcpp::Any SourceVisitor::visitDefaultCase(anceParser::DefaultCaseContext* ct
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
 {
-    std::string              function_name = ctx->IDENTIFIER()->getText();
-    std::vector<Expression*> arguments     = visit(ctx->arguments()).as<std::vector<Expression*>>();
+    lang::Identifier         identifier = ident(ctx->IDENTIFIER());
+    std::vector<Expression*> arguments  = visit(ctx->arguments()).as<std::vector<Expression*>>();
 
     std::vector<std::unique_ptr<Expression>> unique_expressions;
     unique_expressions.reserve(arguments.size());
     for (Expression* argument_ptr : arguments) { unique_expressions.emplace_back(argument_ptr); }
 
-    auto function_group = lang::makeHandled<lang::FunctionGroup>(function_name);
+    auto function_group = lang::makeHandled<lang::FunctionGroup>(identifier);
 
     return static_cast<Expression*>(new FunctionCall(function_group, std::move(unique_expressions), location(ctx)));
 }
@@ -404,8 +402,8 @@ antlrcpp::Any SourceVisitor::visitArguments(anceParser::ArgumentsContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitVariableAccess(anceParser::VariableAccessContext* ctx)
 {
-    std::string identifier = ctx->IDENTIFIER()->getText();
-    auto        variable   = lang::makeHandled<lang::Variable>(identifier);
+    lang::Identifier identifier = ident(ctx->IDENTIFIER());
+    auto             variable   = lang::makeHandled<lang::Variable>(identifier);
 
     return static_cast<Expression*>(new VariableAccess(variable, location(ctx)));
 }
@@ -725,7 +723,7 @@ antlrcpp::Any SourceVisitor::visitArrayType(anceParser::ArrayTypeContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitKeywordType(anceParser::KeywordTypeContext* ctx)
 {
-    return application_.globalScope().getType(ctx->getText()).value();
+    return application_.globalScope().getType(createIdentifier(ctx->getText(), location(ctx))).value();
 }
 
 antlrcpp::Any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)
@@ -746,7 +744,7 @@ antlrcpp::Any SourceVisitor::visitReference(anceParser::ReferenceContext* ctx)
 
 antlrcpp::Any SourceVisitor::visitCustom(anceParser::CustomContext* ctx)
 {
-    return lang::makeHandled<lang::Type>(ctx->getText());
+    return lang::makeHandled<lang::Type>(createIdentifier(ctx->getText(), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitPublic(anceParser::PublicContext*)
@@ -869,6 +867,25 @@ lang::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)
     unsigned end_column = ctx->getStop()->getCharPositionInLine() + ctx->getStop()->getText().size();
 
     return {start_line, start_column, end_line, end_column};
+}
+
+lang::Identifier SourceVisitor::ident(antlr4::tree::TerminalNode* i)
+{
+    std::string text = i->getText();
+
+    auto     token        = i->getSymbol();
+    unsigned start_line   = token->getLine();
+    unsigned start_column = token->getCharPositionInLine() + 1;
+
+    unsigned end_line   = start_line;
+    unsigned end_column = start_column + text.size();
+
+    return createIdentifier(text, {start_line, start_column, end_line, end_column});
+}
+
+lang::Identifier SourceVisitor::createIdentifier(const std::string& text, lang::Location location)
+{
+    return {text, location};
 }
 
 uint64_t SourceVisitor::parseIntegerTypeSize(const std::string& str)

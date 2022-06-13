@@ -28,7 +28,7 @@ namespace lang
          */
         Parameter(lang::ResolvingHandle<lang::Type> type,
                   lang::Location                    type_location,
-                  std::string                       name,
+                  Identifier                        name,
                   lang::Location                    location);
 
         lang::ResolvingHandle<lang::Type> type() override;
@@ -36,7 +36,7 @@ namespace lang
          * Get the parameter name.
          * @return The name.
          */
-        std::string name();
+        const Identifier& name();
 
         /**
          * Get the source location.
@@ -65,7 +65,7 @@ namespace lang
       private:
         lang::ResolvingHandle<lang::Type> type_;
         lang::Location                    type_location_;
-        std::string                       name_;
+        lang::Identifier                  name_;
 
         lang::Location location_;
 

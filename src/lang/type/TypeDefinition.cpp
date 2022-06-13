@@ -7,12 +7,12 @@
 #include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
-lang::TypeDefinition::TypeDefinition(std::string name, lang::Location location)
+lang::TypeDefinition::TypeDefinition(lang::Identifier name, lang::Location location)
     : name_(std::move(name))
     , location_(location)
 {}
 
-const std::string& lang::TypeDefinition::name() const
+const lang::Identifier& lang::TypeDefinition::name() const
 {
     return name_;
 }

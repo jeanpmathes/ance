@@ -4,8 +4,9 @@
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
+#include "lang/utility/Identifier.h"
 
-lang::TypeAlias::TypeAlias(const std::string&                name,
+lang::TypeAlias::TypeAlias(lang::Identifier                  name,
                            lang::ResolvingHandle<lang::Type> actual,
                            lang::Location                    definition_location,
                            lang::Location                    actual_type_location)

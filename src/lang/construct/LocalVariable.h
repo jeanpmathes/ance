@@ -27,7 +27,7 @@ namespace lang
         /**
          * Create a new local variable definition.
          */
-        LocalVariable(const std::string&                name,
+        LocalVariable(Identifier                        name,
                       lang::ResolvingHandle<lang::Type> type,
                       lang::Location                    type_location,
                       Scope&                            containing_scope,

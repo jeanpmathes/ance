@@ -6,7 +6,7 @@
 #include "lang/utility/Values.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 
-lang::BooleanType::BooleanType() : TypeDefinition("bool") {}
+lang::BooleanType::BooleanType() : TypeDefinition(lang::Identifier::from("bool")) {}
 
 StateCount lang::BooleanType::getStateCount() const
 {
@@ -40,7 +40,7 @@ llvm::DIType* lang::BooleanType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
 
-    std::string name         = this->name();
+    std::string name         = std::string(this->name().text());
     uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
 
     return context->di()->createBasicType(name, size_in_bits, llvm::dwarf::DW_ATE_boolean);

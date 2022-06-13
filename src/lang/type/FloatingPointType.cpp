@@ -14,14 +14,14 @@ StateCount lang::FloatingPointType::getStateCount() const
 
 std::string lang::FloatingPointType::createMangledName()
 {
-    return name();
+    return std::string(name().text());
 }
 
 llvm::DIType* lang::FloatingPointType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
 
-    std::string name         = this->name();
+    std::string name         = std::string(this->name().text());
     uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
     auto        encoding     = llvm::dwarf::DW_ATE_float;
 

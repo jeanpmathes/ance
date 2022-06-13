@@ -8,7 +8,7 @@
 #include "compiler/CompileContext.h"
 
 lang::SizeType::SizeType(std::string name, Kind kind, llvm::Type*& backing)
-    : TypeDefinition(std::move(name))
+    : TypeDefinition(lang::Identifier::from(name))
     , kind_(kind)
     , backing_(backing)
 {}
@@ -174,14 +174,14 @@ llvm::Value* lang::SizeType::buildContentValue(llvm::TypeSize size)
 
 std::string lang::SizeType::createMangledName()
 {
-    return name();
+    return std::string(name().text());
 }
 
 llvm::DIType* lang::SizeType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
 
-    std::string           name         = this->name();
+    std::string           name         = std::string(this->name().text());
     uint64_t              size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
     llvm::dwarf::TypeKind encoding;
 

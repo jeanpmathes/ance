@@ -3,7 +3,7 @@
 #include "lang/type/Type.h"
 #include "compiler/CompileContext.h"
 
-lang::VoidType::VoidType() : TypeDefinition("void") {}
+lang::VoidType::VoidType() : TypeDefinition(lang::Identifier::from("void")) {}
 
 StateCount lang::VoidType::getStateCount() const
 {
@@ -23,12 +23,12 @@ llvm::Type* lang::VoidType::getContentType(llvm::LLVMContext& c)
 
 std::string lang::VoidType::createMangledName()
 {
-    return name();
+    return std::string(name().text());
 }
 
 llvm::DIType* lang::VoidType::createDebugType(CompileContext* context)
 {
-    return context->di()->createUnspecifiedType(name());
+    return context->di()->createUnspecifiedType(name().text());
 }
 
 bool lang::VoidType::isVoidType() const

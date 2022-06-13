@@ -4,7 +4,7 @@
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 
-lang::UnsignedIntegerPointerType::UnsignedIntegerPointerType() : TypeDefinition("uiptr") {}
+lang::UnsignedIntegerPointerType::UnsignedIntegerPointerType() : TypeDefinition(lang::Identifier::from("uiptr")) {}
 
 StateCount lang::UnsignedIntegerPointerType::getStateCount() const
 {
@@ -28,14 +28,14 @@ llvm::Value* lang::UnsignedIntegerPointerType::buildValue(llvm::Value* pointer, 
 
 std::string lang::UnsignedIntegerPointerType::createMangledName()
 {
-    return name();
+    return std::string(name().text());
 }
 
 llvm::DIType* lang::UnsignedIntegerPointerType::createDebugType(CompileContext* context)
 {
     const llvm::DataLayout& dl = context->module()->getDataLayout();
 
-    std::string name         = this->name();
+    std::string name         = std::string(this->name().text());
     uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
     auto        encoding     = llvm::dwarf::DW_ATE_unsigned;
 

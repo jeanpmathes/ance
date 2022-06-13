@@ -16,6 +16,7 @@
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
 #include "lang/Element.h"
+#include "lang/utility/Identifier.h"
 #include "lang/construct/CodeBlock.h"
 
 class ConstantExpression;
@@ -54,7 +55,7 @@ namespace lang
          */
         void defineGlobalVariable(lang::AccessModifier                access,
                                   bool                                is_constant,
-                                  const std::string&                  name,
+                                  lang::Identifier                    name,
                                   lang::ResolvingHandle<lang::Type>   type,
                                   lang::Location                      type_location,
                                   lang::Assigner                      assigner,
@@ -70,7 +71,7 @@ namespace lang
          * @return A handle to the defined function.
          */
         lang::ResolvingHandle<lang::Function> defineExternFunction(
-            const std::string&                                   name,
+            Identifier                                           name,
             lang::ResolvingHandle<lang::Type>                    return_type,
             lang::Location                                       return_type_location,
             const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
@@ -88,7 +89,7 @@ namespace lang
          * @return A handle to the defined function.
          */
         lang::ResolvingHandle<lang::Function> defineCustomFunction(
-            const std::string&                                   name,
+            Identifier                                           name,
             lang::AccessModifier                                 access,
             lang::ResolvingHandle<lang::Type>                    return_type,
             lang::Location                                       return_type_location,
@@ -102,7 +103,7 @@ namespace lang
          * @param name The name of the new type.
          * @param original The original type.
          */
-        void defineTypeAsOther(const std::string&                name,
+        void defineTypeAsOther(Identifier                        name,
                                lang::ResolvingHandle<lang::Type> original,
                                lang::Location                    definition_location,
                                lang::Location                    original_type_location);
@@ -112,7 +113,7 @@ namespace lang
          * @param name The name of the alias.
          * @param actual The other type.
          */
-        void defineTypeAliasOther(const std::string&                name,
+        void defineTypeAliasOther(Identifier                        name,
                                   lang::ResolvingHandle<lang::Type> actual,
                                   lang::Location                    definition_location,
                                   lang::Location                    actual_type_location);
@@ -122,7 +123,7 @@ namespace lang
          * @param string The name of the type.
          * @return The type, or nothing if no such type is defined.
          */
-        std::optional<lang::ResolvingHandle<lang::Type>> getType(const std::string& string);
+        std::optional<lang::ResolvingHandle<lang::Type>> getType(Identifier string);
 
         /**
          * Add a type registry so it will get the chance to resolve types.
@@ -187,20 +188,20 @@ namespace lang
         void buildFunctions(CompileContext* context);
 
       private:
-        lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(const std::string& name);
-        lang::OwningHandle<lang::Type>             retrieveUndefinedType(const std::string& name);
+        lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);
+        lang::OwningHandle<lang::Type>             retrieveUndefinedType(Identifier name);
 
         std::vector<lang::TypeDefinitionRegistry*> type_registries_;
 
-        std::map<std::string, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
-        std::map<std::string, lang::OwningHandle<lang::Variable>> global_defined_variables_;
-        std::vector<std::tuple<std::string, lang::Location>>      duplicated_variable_names_;
+        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
+        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_defined_variables_;
+        std::vector<std::tuple<lang::Identifier, lang::Location>>      duplicated_variable_names_;
 
-        std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
-        std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> defined_function_groups_;
+        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
+        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> defined_function_groups_;
 
-        std::map<std::string, lang::OwningHandle<lang::Type>> undefined_types_;
-        std::map<std::string, lang::OwningHandle<lang::Type>> defined_types_;
+        std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_;
+        std::map<lang::Identifier, lang::OwningHandle<lang::Type>> defined_types_;
 
         bool expanded_ {false};
     };

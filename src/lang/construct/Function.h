@@ -43,13 +43,13 @@ namespace lang
          * Create a new function.
          * @param function_name The function name.
          */
-        explicit Function(std::string function_name);
+        explicit Function(Identifier function_name);
 
         /**
          * Get the name of this function.
          * @return The name.
          */
-        [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] const Identifier& name() const;
 
         /**
          * Get whether this function is defined.
@@ -101,7 +101,7 @@ namespace lang
          * @return The defined variable or nothing if defining is not possible.
          */
         std::optional<lang::ResolvingHandle<lang::Variable>> defineParameterVariable(
-            const std::string&                  name,
+            const Identifier&                   name,
             lang::ResolvingHandle<lang::Type>   type,
             lang::Location                      type_location,
             const std::shared_ptr<lang::Value>& value,
@@ -232,16 +232,16 @@ namespace lang
         bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) override;
 
       private:
-        std::string name_;
+        lang::Identifier name_;
 
         std::unique_ptr<lang::FunctionDefinition> definition_ {};
 
-        std::map<std::string, lang::OwningHandle<lang::Variable>> undefined_variables_ {};
-        std::map<std::string, lang::OwningHandle<lang::Variable>> defined_parameters_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> undefined_variables_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> defined_parameters_ {};
 
-        std::map<std::string, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_ {};
 
-        std::map<std::string, lang::OwningHandle<lang::Type>> undefined_types_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_ {};
     };
 }
 

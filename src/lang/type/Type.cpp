@@ -5,8 +5,9 @@
 #include "lang/construct/value/RoughlyCastedValue.h"
 #include "lang/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
+#include "lang/utility/Identifier.h"
 
-lang::Type::Type(std::string name) : name_(std::move(name)) {}
+lang::Type::Type(Identifier name) : name_(std::move(name)) {}
 
 lang::Type::Type(std::unique_ptr<lang::TypeDefinition> definition)
     : name_(definition->name())
@@ -15,7 +16,7 @@ lang::Type::Type(std::unique_ptr<lang::TypeDefinition> definition)
     definition_->setType(this);
 }
 
-const std::string& lang::Type::name() const
+const lang::Identifier& lang::Type::name() const
 {
     if (isDefined()) { return definition_->name(); }
     else {

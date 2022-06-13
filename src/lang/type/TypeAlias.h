@@ -2,6 +2,7 @@
 #define ANCE_SRC_LANG_TYPE_TYPEALIAS_H_
 
 #include "TypeDefinition.h"
+#include "lang/utility/Identifier.h"
 
 #include <optional>
 
@@ -13,7 +14,7 @@ namespace lang
     class TypeAlias : public lang::TypeDefinition
     {
       public:
-        TypeAlias(const std::string&                name,
+        TypeAlias(lang::Identifier                  name,
                   lang::ResolvingHandle<lang::Type> actual,
                   lang::Location                    definition_location,
                   lang::Location                    actual_type_location);

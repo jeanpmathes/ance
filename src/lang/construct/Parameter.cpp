@@ -7,7 +7,7 @@
 
 lang::Parameter::Parameter(lang::ResolvingHandle<lang::Type> type,
                            lang::Location                    type_location,
-                           std::string                       name,
+                           Identifier                        name,
                            lang::Location                    location)
     : type_(type)
     , type_location_(type_location)
@@ -20,7 +20,7 @@ lang::ResolvingHandle<lang::Type> lang::Parameter::type()
     return type_;
 }
 
-std::string lang::Parameter::name()
+const lang::Identifier& lang::Parameter::name()
 {
     return name_;
 }

@@ -21,7 +21,7 @@ lang::FunctionDefinition::FunctionDefinition(Function&                          
     , signature_(lang::Signature::fromParameters(name(), parameters_))
 {}
 
-const std::string& lang::FunctionDefinition::name() const
+const lang::Identifier& lang::FunctionDefinition::name() const
 {
     return function_.name();
 }
@@ -115,7 +115,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::FunctionDefinition::create
     llvm::LLVMContext&              c,
     llvm::Module*                   m)
 {
-    const std::string& native_name = isMangled() ? signature_.getMangledName() : function_.name();
+    const std::string& native_name = isMangled() ? signature_.getMangledName() : std::string(function_.name().text());
 
     std::vector<llvm::Type*> param_types;
     param_types.reserve(parameters_.size());
