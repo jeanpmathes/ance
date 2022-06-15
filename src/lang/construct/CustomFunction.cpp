@@ -95,7 +95,7 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger)
         if (!argument)
         {
             validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
-                                       parameter->location());
+                                       parameter->name().location());
         }
 
         if (!parameter->type()->isDefined())

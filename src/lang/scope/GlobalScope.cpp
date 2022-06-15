@@ -35,7 +35,7 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger)
 
     for (auto const& [name, location] : duplicated_variable_names_)
     {
-        validation_logger.logError("Name '" + name + "' already defined in the current context", location);
+        validation_logger.logError("Name '" + name + "' already defined in the current context", name.location());
     }
 
     if (!valid) return;
