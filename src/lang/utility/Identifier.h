@@ -15,8 +15,8 @@ namespace lang
      */
     class Identifier
     {
-      public:
-        Identifier(std::string string, lang::Location location);
+      private:
+        Identifier(std::string_view string, lang::Location location);
 
       public:
         /**
@@ -30,8 +30,8 @@ namespace lang
         [[nodiscard]] lang::Location   location() const;
 
       private:
-        std::string    string_;
-        lang::Location location_;
+        std::string_view string_;
+        lang::Location   location_;
     };
 }
 

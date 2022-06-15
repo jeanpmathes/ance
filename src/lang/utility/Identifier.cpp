@@ -1,15 +1,14 @@
 #include "Identifier.h"
 
-#include <utility>
+#include "lang/utility/StringStorage.h"
 
-lang::Identifier::Identifier(std::string string, lang::Location location)
-    : string_(std::move(string))
-    , location_(location)
-{}
+lang::Identifier::Identifier(std::string_view string, lang::Location location) : string_(string), location_(location) {}
 
 lang::Identifier lang::Identifier::from(const std::string& string, lang::Location location)
 {
-    return {std::string(string), location};
+    std::string_view view = lang::StringStorage::shared().store(string);
+
+    return {view, location};
 }
 
 std::string_view lang::Identifier::text() const

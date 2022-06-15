@@ -885,7 +885,7 @@ lang::Identifier SourceVisitor::ident(antlr4::tree::TerminalNode* i)
 
 lang::Identifier SourceVisitor::createIdentifier(const std::string& text, lang::Location location)
 {
-    return {text, location};
+    return lang::Identifier::from(text, location);
 }
 
 uint64_t SourceVisitor::parseIntegerTypeSize(const std::string& str)
