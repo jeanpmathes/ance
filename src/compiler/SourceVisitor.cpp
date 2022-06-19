@@ -55,6 +55,7 @@
 #include "lang/construct/constant/StringConstant.h"
 
 #include "lang/construct/CodeBlock.h"
+#include "lang/construct/Member.h"
 
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
@@ -97,6 +98,32 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
                                                     location(ctx));
 
     return {};
+}
+
+antlrcpp::Any SourceVisitor::visitStructDefinition(anceParser::StructDefinitionContext* ctx)
+{
+    lang::AccessModifier access     = visit(ctx->accessModifier()).as<lang::AccessModifier>();
+    lang::Identifier     identifier = ident(ctx->IDENTIFIER());
+
+    std::vector<std::unique_ptr<lang::Member>> members;
+
+    for (auto member : ctx->member())
+    {
+        members.push_back(std::unique_ptr<lang::Member>(visit(member).as<lang::Member*>()));
+    }
+
+    application_.globalScope().defineStruct(access, identifier, std::move(members), location(ctx));
+
+    return {};
+}
+
+antlrcpp::Any SourceVisitor::visitMember(anceParser::MemberContext* ctx)
+{
+    lang::AccessModifier              access     = visit(ctx->accessModifier()).as<lang::AccessModifier>();
+    lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
+    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
+
+    return new lang::Member(access, identifier, type, location(ctx));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)

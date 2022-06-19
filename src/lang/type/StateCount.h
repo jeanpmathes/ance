@@ -25,4 +25,4 @@ enum class SpecialCount
 
 using StateCount = std::variant<SpecialCount, size_t>;
 
-#endif//ANCE_SRC_LANG_TYPE_STATECOUNT_H_
+#endif

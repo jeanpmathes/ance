@@ -19,4 +19,5 @@ target_sources(ance PRIVATE
                FunctionDefinition.cpp
                FunctionGroup.cpp
                Signature.cpp
+               Member.cpp
                CodeBlock.cpp)

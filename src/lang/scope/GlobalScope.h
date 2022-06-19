@@ -18,6 +18,7 @@
 #include "lang/Element.h"
 #include "lang/utility/Identifier.h"
 #include "lang/construct/CodeBlock.h"
+#include "lang/construct/Member.h"
 
 class ConstantExpression;
 
@@ -117,6 +118,18 @@ namespace lang
                                   lang::ResolvingHandle<lang::Type> actual,
                                   lang::Location                    definition_location,
                                   lang::Location                    actual_type_location);
+
+        /**
+         * Define a struct.
+         * @param access The access level.
+         * @param name The name of the struct.
+         * @param members The members of the struct.
+         * @param definition_location The location of the struct definition.
+         */
+        void defineStruct(lang::AccessModifier                       access,
+                          Identifier                                 name,
+                          std::vector<std::unique_ptr<lang::Member>> members,
+                          lang::Location                             definition_location);
 
         /**
          * Get a type defined in this scope by it's name.

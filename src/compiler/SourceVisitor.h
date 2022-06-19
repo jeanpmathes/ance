@@ -23,6 +23,8 @@ class SourceVisitor : public anceBaseVisitor
     // Declarations
 
     antlrcpp::Any visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx) override;
+    antlrcpp::Any visitStructDefinition(anceParser::StructDefinitionContext* ctx) override;
+    antlrcpp::Any visitMember(anceParser::MemberContext* ctx) override;
 
     // Functions
 

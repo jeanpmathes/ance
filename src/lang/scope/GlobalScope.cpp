@@ -10,6 +10,7 @@
 #include "lang/type/TypeAlias.h"
 #include "lang/type/TypeClone.h"
 #include "validation/ValidationLogger.h"
+#include "lang/type/StructType.h"
 
 lang::Scope* lang::GlobalScope::scope()
 {
@@ -173,6 +174,22 @@ void lang::GlobalScope::defineTypeAliasOther(Identifier                        n
         std::make_unique<lang::TypeAlias>(name, actual, definition_location, actual_type_location);
 
     undefined->define(std::move(alias_definition));
+    lang::OwningHandle<lang::Type> defined = std::move(undefined);
+
+    defined_types_[name] = std::move(defined);
+    defined_types_[name]->setContainingScope(this);
+}
+
+void lang::GlobalScope::defineStruct(lang::AccessModifier                       access,
+                                     lang::Identifier                           name,
+                                     std::vector<std::unique_ptr<lang::Member>> members,
+                                     lang::Location                             definition_location)
+{
+    lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
+    std::unique_ptr<lang::TypeDefinition> struct_definition =
+        std::make_unique<lang::StructType>(access, name, std::move(members), this, definition_location);
+
+    undefined->define(std::move(struct_definition));
     lang::OwningHandle<lang::Type> defined = std::move(undefined);
 
     defined_types_[name] = std::move(defined);
