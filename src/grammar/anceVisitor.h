@@ -34,6 +34,10 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitDefineAlias(anceParser::DefineAliasContext* context) = 0;
 
+    virtual antlrcpp::Any visitStructDefinition(anceParser::StructDefinitionContext* context) = 0;
+
+    virtual antlrcpp::Any visitMember(anceParser::MemberContext* context) = 0;
+
     virtual antlrcpp::Any visitPublic(anceParser::PublicContext* context) = 0;
 
     virtual antlrcpp::Any visitPrivate(anceParser::PrivateContext* context) = 0;

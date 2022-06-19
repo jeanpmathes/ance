@@ -75,26 +75,27 @@ class anceParser : public antlr4::Parser
         T__62               = 63,
         T__63               = 64,
         T__64               = 65,
-        NATIVE_INTEGER_TYPE = 66,
-        SIGNED_INTEGER      = 67,
-        HEX_INTEGER         = 68,
-        BIN_INTEGER         = 69,
-        OCT_INTEGER         = 70,
-        HALF                = 71,
-        SINGLE              = 72,
-        DOUBLE              = 73,
-        QUAD                = 74,
-        DECIMAL             = 75,
-        STRING              = 76,
-        BYTE                = 77,
-        INTEGER             = 78,
-        BUFFER              = 79,
-        CONST               = 80,
-        IDENTIFIER          = 81,
-        SEMICOLON           = 82,
-        WHITESPACE          = 83,
-        BLOCK_COMMENT       = 84,
-        LINE_COMMENT        = 85
+        T__65               = 66,
+        NATIVE_INTEGER_TYPE = 67,
+        SIGNED_INTEGER      = 68,
+        HEX_INTEGER         = 69,
+        BIN_INTEGER         = 70,
+        OCT_INTEGER         = 71,
+        HALF                = 72,
+        SINGLE              = 73,
+        DOUBLE              = 74,
+        QUAD                = 75,
+        DECIMAL             = 76,
+        STRING              = 77,
+        BYTE                = 78,
+        INTEGER             = 79,
+        BUFFER              = 80,
+        CONST               = 81,
+        IDENTIFIER          = 82,
+        SEMICOLON           = 83,
+        WHITESPACE          = 84,
+        BLOCK_COMMENT       = 85,
+        LINE_COMMENT        = 86
     };
 
     enum
@@ -107,59 +108,61 @@ class anceParser : public antlr4::Parser
         RuleTypeDefinition               = 5,
         RuleDefineAs                     = 6,
         RuleDefineAlias                  = 7,
-        RuleAccessModifier               = 8,
-        RuleCode                         = 9,
-        RuleBlock                        = 10,
-        RuleStatement                    = 11,
-        RuleExpressionStatement          = 12,
-        RuleLocalVariableDefinition      = 13,
-        RuleLocalReferenceDefinition     = 14,
-        RuleDropStatement                = 15,
-        RuleAssignment                   = 16,
-        RuleAssigner                     = 17,
-        RuleDeleteStatement              = 18,
-        RuleReturnStatement              = 19,
-        RuleAssertStatement              = 20,
-        RuleIfStatement                  = 21,
-        RuleWhileStatement               = 22,
-        RuleMatchStatement               = 23,
-        RuleMatchCase                    = 24,
-        RuleExpression                   = 25,
-        RuleBinaryOperatorMultiplicative = 26,
-        RuleBinaryOperatorAdditive       = 27,
-        RuleBinaryOperatorRelational     = 28,
-        RuleBinaryOperatorEquality       = 29,
-        RuleIndependentExpression        = 30,
-        RuleFunctionCall                 = 31,
-        RuleArguments                    = 32,
-        RuleVariableAccess               = 33,
-        RuleAllocation                   = 34,
-        RuleAllocator                    = 35,
-        RuleAddressof                    = 36,
-        RuleBindRef                      = 37,
-        RuleSizeofType                   = 38,
-        RuleSizeofExpression             = 39,
-        RuleMatchExpression              = 40,
-        RuleMatchExpressionCase          = 41,
-        RuleLiteralExpression            = 42,
-        RuleStringLiteral                = 43,
-        RuleByteLiteral                  = 44,
-        RuleIntegerLiteral               = 45,
-        RuleNormalInteger                = 46,
-        RuleSpecialInteger               = 47,
-        RuleFloatingPointLiteral         = 48,
-        RuleBooleanLiteral               = 49,
-        RuleSizeLiteral                  = 50,
-        RuleDiffLiteral                  = 51,
-        RuleType                         = 52,
-        RuleIntegerType                  = 53,
-        RuleArrayType                    = 54,
-        RuleKeywordType                  = 55,
-        RuleFloatingPointType            = 56,
-        RuleTargetDependentType          = 57,
-        RuleBooleanType                  = 58,
-        RuleVoidType                     = 59,
-        RuleCustomType                   = 60
+        RuleStructDefinition             = 8,
+        RuleMember                       = 9,
+        RuleAccessModifier               = 10,
+        RuleCode                         = 11,
+        RuleBlock                        = 12,
+        RuleStatement                    = 13,
+        RuleExpressionStatement          = 14,
+        RuleLocalVariableDefinition      = 15,
+        RuleLocalReferenceDefinition     = 16,
+        RuleDropStatement                = 17,
+        RuleAssignment                   = 18,
+        RuleAssigner                     = 19,
+        RuleDeleteStatement              = 20,
+        RuleReturnStatement              = 21,
+        RuleAssertStatement              = 22,
+        RuleIfStatement                  = 23,
+        RuleWhileStatement               = 24,
+        RuleMatchStatement               = 25,
+        RuleMatchCase                    = 26,
+        RuleExpression                   = 27,
+        RuleBinaryOperatorMultiplicative = 28,
+        RuleBinaryOperatorAdditive       = 29,
+        RuleBinaryOperatorRelational     = 30,
+        RuleBinaryOperatorEquality       = 31,
+        RuleIndependentExpression        = 32,
+        RuleFunctionCall                 = 33,
+        RuleArguments                    = 34,
+        RuleVariableAccess               = 35,
+        RuleAllocation                   = 36,
+        RuleAllocator                    = 37,
+        RuleAddressof                    = 38,
+        RuleBindRef                      = 39,
+        RuleSizeofType                   = 40,
+        RuleSizeofExpression             = 41,
+        RuleMatchExpression              = 42,
+        RuleMatchExpressionCase          = 43,
+        RuleLiteralExpression            = 44,
+        RuleStringLiteral                = 45,
+        RuleByteLiteral                  = 46,
+        RuleIntegerLiteral               = 47,
+        RuleNormalInteger                = 48,
+        RuleSpecialInteger               = 49,
+        RuleFloatingPointLiteral         = 50,
+        RuleBooleanLiteral               = 51,
+        RuleSizeLiteral                  = 52,
+        RuleDiffLiteral                  = 53,
+        RuleType                         = 54,
+        RuleIntegerType                  = 55,
+        RuleArrayType                    = 56,
+        RuleKeywordType                  = 57,
+        RuleFloatingPointType            = 58,
+        RuleTargetDependentType          = 59,
+        RuleBooleanType                  = 60,
+        RuleVoidType                     = 61,
+        RuleCustomType                   = 62
     };
 
     explicit anceParser(antlr4::TokenStream* input);
@@ -182,6 +185,8 @@ class anceParser : public antlr4::Parser
     class TypeDefinitionContext;
     class DefineAsContext;
     class DefineAliasContext;
+    class StructDefinitionContext;
+    class MemberContext;
     class AccessModifierContext;
     class CodeContext;
     class BlockContext;
@@ -344,9 +349,10 @@ class anceParser : public antlr4::Parser
     {
       public:
         TypeDefinitionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t      getRuleIndex() const override;
-        DefineAsContext*    defineAs();
-        DefineAliasContext* defineAlias();
+        virtual size_t           getRuleIndex() const override;
+        DefineAsContext*         defineAs();
+        DefineAliasContext*      defineAlias();
+        StructDefinitionContext* structDefinition();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -380,6 +386,36 @@ class anceParser : public antlr4::Parser
     };
 
     DefineAliasContext* defineAlias();
+
+    class StructDefinitionContext : public antlr4::ParserRuleContext
+    {
+      public:
+        StructDefinitionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t              getRuleIndex() const override;
+        AccessModifierContext*      accessModifier();
+        antlr4::tree::TerminalNode* IDENTIFIER();
+        std::vector<MemberContext*> member();
+        MemberContext*              member(size_t i);
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    StructDefinitionContext* structDefinition();
+
+    class MemberContext : public antlr4::ParserRuleContext
+    {
+      public:
+        MemberContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t              getRuleIndex() const override;
+        AccessModifierContext*      accessModifier();
+        antlr4::tree::TerminalNode* IDENTIFIER();
+        TypeContext*                type();
+        antlr4::tree::TerminalNode* SEMICOLON();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    MemberContext* member();
 
     class AccessModifierContext : public antlr4::ParserRuleContext
     {
