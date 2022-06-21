@@ -26,7 +26,8 @@ void Drop::validate(ValidationLogger& validation_logger)
 {
     if (!variable_->isDefined())
     {
-        validation_logger.logError("Name '" + variable_->name() + "' not defined in the current context", location());
+        validation_logger.logError("Name '" + variable_->name() + "' not defined in the current context",
+                                   variable_->name().location());
         return;
     }
 
