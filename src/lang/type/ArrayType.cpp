@@ -161,6 +161,15 @@ llvm::DIType* lang::ArrayType::createDebugType(CompileContext* context)
                                           context->di()->getOrCreateArray(subscripts));
 }
 
+std::vector<lang::TypeDefinition*> lang::ArrayType::getDependencies()
+{
+    std::vector<lang::TypeDefinition*> dependencies;
+
+    if (element_type_->getDefinition()) dependencies.push_back(element_type_->getDefinition());
+
+    return dependencies;
+}
+
 lang::TypeRegistry<uint64_t>& lang::ArrayType::getArrayTypes()
 {
     static lang::TypeRegistry<uint64_t> array_types;

@@ -29,6 +29,11 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
         [[nodiscard]] lang::Location                    location() const;
 
+        /**
+         * Set the scope that contains the member.
+         */
+        void setScope(lang::Scope* scope);
+
       private:
         lang::AccessModifier              access_;
         lang::Identifier                  name_;

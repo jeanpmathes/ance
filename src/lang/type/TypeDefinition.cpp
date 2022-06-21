@@ -1,6 +1,7 @@
 #include "TypeDefinition.h"
 
 #include <set>
+#include <map>
 #include <stack>
 
 #include "lang/type/Type.h"
@@ -253,26 +254,41 @@ std::shared_ptr<lang::Value> lang::TypeDefinition::buildImplicitConversion(lang:
 
 bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger)
 {
-    std::stack<lang::TypeDefinition*> to_check;
-    std::set<lang::TypeDefinition*>   checked;
+    const int visited  = 1;
+    const int finished = 2;
 
-    to_check.push(this);
+    std::stack<std::pair<lang::TypeDefinition*, bool>> to_check;
+    std::map<lang::TypeDefinition*, int>               state;
+
+    to_check.emplace(this, false);
 
     while (!to_check.empty())
     {
-        lang::TypeDefinition* current = to_check.top();
-        to_check.pop();
+        auto& [current, visited_children] = to_check.top();
 
-        if (checked.find(current) != checked.end())
+        if (visited_children)
         {
-            validation_logger.logError("Type " + self()->getAnnotatedName() + " has circular dependency",
-                                       current->getDefinitionLocation());
-            return false;
+            to_check.pop();
+            state[current] = finished;
         }
+        else {
+            to_check.top() = std::make_pair(current, true);
 
-        checked.insert(current);
+            if (state[current] == visited)
+            {
+                validation_logger.logError("Type " + self()->getAnnotatedName(false) + " has circular dependency",
+                                           this->getDefinitionLocation());
+                return false;
+            }
 
-        for (auto& dependency : current->getDependencies()) { to_check.push(dependency); }
+            state[current] = visited;
+
+            for (auto& dependency : current->getDependencies())
+            {
+                if (state[dependency] == finished) continue;
+                to_check.emplace(dependency, false);
+            }
+        }
     }
 
     return true;

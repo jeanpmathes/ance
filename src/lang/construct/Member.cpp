@@ -1,5 +1,7 @@
 #include "Member.h"
 
+#include "lang/scope/Scope.h"
+
 lang::Member::Member(lang::AccessModifier              access,
                      lang::Identifier                  name,
                      lang::ResolvingHandle<lang::Type> type,
@@ -28,4 +30,9 @@ lang::ResolvingHandle<lang::Type> lang::Member::type() const
 lang::Location lang::Member::location() const
 {
     return location_;
+}
+
+void lang::Member::setScope(lang::Scope* scope)
+{
+    scope->addType(type());
 }

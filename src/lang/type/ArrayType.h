@@ -60,7 +60,8 @@ namespace lang
 
       protected:
         std::string   createMangledName() override;
-        llvm::DIType* createDebugType(CompileContext* context) override;
+        llvm::DIType*                      createDebugType(CompileContext* context) override;
+        std::vector<lang::TypeDefinition*> getDependencies() override;
 
       private:
         uint64_t                          size_;

@@ -47,6 +47,11 @@ llvm::StructType* lang::StructType::getContentType(llvm::LLVMContext& c)
     return native_type_;
 }
 
+void lang::StructType::onScope()
+{
+    for (auto& member : members_) { member->setScope(scope()); }
+}
+
 std::string lang::StructType::createMangledName()
 {
     std::string mangled_name;
@@ -92,8 +97,18 @@ llvm::DIType* lang::StructType::createDebugType(CompileContext* context)
 std::vector<lang::TypeDefinition*> lang::StructType::getDependencies()
 {
     std::vector<lang::TypeDefinition*> dependencies;
+    std::set<lang::TypeDefinition*>    added;
 
-    for (auto& member : members_) { dependencies.push_back(member->type()->getDefinition()); }
+    for (auto& member : members_)
+    {
+        auto* definition = member->type()->getDefinition();
+
+        if (definition && !added.contains(definition))
+        {
+            dependencies.push_back(definition);
+            added.insert(definition);
+        }
+    }
 
     return dependencies;
 }

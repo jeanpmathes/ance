@@ -24,6 +24,8 @@ namespace lang
         llvm::Constant*   getDefaultContent(llvm::LLVMContext& c) override;
         llvm::StructType* getContentType(llvm::LLVMContext& c) override;
 
+        void onScope() override;
+
       protected:
         std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;

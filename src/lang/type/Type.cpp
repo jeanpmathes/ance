@@ -24,11 +24,11 @@ const lang::Identifier& lang::Type::name() const
     }
 }
 
-std::string lang::Type::getAnnotatedName()
+std::string lang::Type::getAnnotatedName(bool is_safe)
 {
     std::string name = "'" + this->name() + "'";
 
-    if (getActualType() != self()) { name += " (aka '" + getActualType()->name() + "')"; }
+    if (is_safe && getActualType() != self()) { name += " (aka '" + getActualType()->name() + "')"; }
 
     return name;
 }

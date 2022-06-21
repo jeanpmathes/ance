@@ -57,9 +57,10 @@ namespace lang
 
         /**
          * Get the name of this type with helpful annotations. Useful for validation messages.
+         * @param is_safe Whether the type is currently safe to use. Set to false when endless loops could occur.
          * @return The annotated name.
          */
-        std::string getAnnotatedName();
+        std::string getAnnotatedName(bool is_safe = true);
 
         /**
          * Get the mangled name of this type. The mangled name can only be used after all type dependencies have been resolved.
