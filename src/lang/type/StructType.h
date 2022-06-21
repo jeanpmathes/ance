@@ -26,6 +26,8 @@ namespace lang
 
         void onScope() override;
 
+        bool validateDefinition(ValidationLogger& validation_logger) override;
+
       protected:
         std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;

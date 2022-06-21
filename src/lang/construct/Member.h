@@ -18,16 +18,19 @@ namespace lang
          * @param name The name of the member.
          * @param type The type of the member.
          * @param location The location of the member.
+         * @param type_location The location of the type of the member.
          */
         Member(lang::AccessModifier              access,
                lang::Identifier                  name,
                lang::ResolvingHandle<lang::Type> type,
-               lang::Location                    location);
+               lang::Location                    location,
+               lang::Location                    type_location);
 
         [[nodiscard]] lang::AccessModifier              access() const;
         [[nodiscard]] const lang::Identifier&           name() const;
         [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
         [[nodiscard]] lang::Location                    location() const;
+        [[nodiscard]] lang::Location                    typeLocation() const;
 
         /**
          * Set the scope that contains the member.
@@ -39,6 +42,7 @@ namespace lang
         lang::Identifier                  name_;
         lang::ResolvingHandle<lang::Type> type_;
         lang::Location                    location_;
+        lang::Location                    type_location_;
     };
 }
 

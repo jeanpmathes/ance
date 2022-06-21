@@ -123,7 +123,7 @@ antlrcpp::Any SourceVisitor::visitMember(anceParser::MemberContext* ctx)
     lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
     lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
 
-    return new lang::Member(access, identifier, type, location(ctx));
+    return new lang::Member(access, identifier, type, location(ctx), location(ctx->type()));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)
@@ -905,7 +905,7 @@ lang::Identifier SourceVisitor::ident(antlr4::tree::TerminalNode* i)
     unsigned start_column = token->getCharPositionInLine() + 1;
 
     unsigned end_line   = start_line;
-    unsigned end_column = start_column + text.size();
+    unsigned end_column = start_column + text.size() - 1;
 
     return createIdentifier(text, {start_line, start_column, end_line, end_column});
 }

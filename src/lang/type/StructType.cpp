@@ -4,6 +4,8 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/scope/Scope.h"
+#include "validation/ValidationLogger.h"
+#include "lang/type/VoidType.h"
 
 lang::StructType::StructType(lang::AccessModifier                       access_modifier,
                              lang::Identifier                           name,
@@ -50,6 +52,66 @@ llvm::StructType* lang::StructType::getContentType(llvm::LLVMContext& c)
 void lang::StructType::onScope()
 {
     for (auto& member : members_) { member->setScope(scope()); }
+}
+
+bool lang::StructType::validateDefinition(ValidationLogger& validation_logger)
+{
+    bool valid = true;
+
+    for (auto& member : members_)
+    {
+        auto type = member->type();
+
+        if (!type->isDefined())
+        {
+            validation_logger.logError("Cannot declare member of undefined type " + type->getAnnotatedName(),
+                                       member->location());
+            valid = false;
+            continue;
+        }
+
+        if (type == self())
+        {
+            validation_logger.logError("Cannot declare recursive member", member->location());
+            valid = false;
+            continue;
+        }
+
+        if (type == lang::VoidType::get())
+        {
+            validation_logger.logError("Cannot declare member of 'void' type", member->location());
+            valid = false;
+            continue;
+        }
+
+        if (type->isReferenceType())
+        {
+            validation_logger.logError("Cannot declare member of reference type", member->location());
+            valid = false;
+            continue;
+        }
+    }
+
+    valid = valid && checkDependencies(validation_logger);
+
+    if (!valid) return false;// These checks depend on the definition being roughly valid.
+
+    std::set<lang::Identifier> member_names;
+
+    for (auto& member : members_)
+    {
+        if (!member->type()->validate(validation_logger, member->location())) { valid = false; }
+
+        if (member_names.contains(member->name()))
+        {
+            validation_logger.logError("Member name '" + member->name() + "' already used", member->name().location());
+            valid = false;
+        }
+
+        member_names.insert(member->name());
+    }
+
+    return valid;
 }
 
 std::string lang::StructType::createMangledName()
