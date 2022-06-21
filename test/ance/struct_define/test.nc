@@ -5,7 +5,7 @@
 define DataAlias alias Data;
 define DataClone as Data;
 
-struct Data
+public struct Data
 {
     private a: DataAlias;
     private c: DataClone;

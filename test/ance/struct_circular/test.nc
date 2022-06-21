@@ -2,12 +2,12 @@
 
 // Structs cannot have circular type dependencies.
 
-struct Data1
+public struct Data1
 {
     private d: Data2;
 }
 
-struct Data2
+public struct Data2
 {
     private d: Data1;
 }

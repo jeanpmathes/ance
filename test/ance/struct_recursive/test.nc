@@ -2,7 +2,7 @@
 
 // Structs cannot hold values of their own type.
 
-struct Data
+public struct Data
 {
     private d: Data;
 }

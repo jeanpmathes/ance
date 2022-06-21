@@ -35,7 +35,7 @@ class TestRun:
             return ""
 
         if not self.is_compiling:
-            return "unexpected compiler behavior"
+            return "unexpected compiler behaviour"
 
         if self.is_valid != self.test.is_valid:
             if self.test.is_valid:
