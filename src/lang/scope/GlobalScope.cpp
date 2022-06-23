@@ -39,6 +39,11 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger)
         validation_logger.logError("Name '" + name + "' already defined in the current context", name.location());
     }
 
+    for (auto const& [name, location] : duplicated_type_names_)
+    {
+        validation_logger.logError("Name '" + name + "' already defined in the current context", name.location());
+    }
+
     if (!valid) return;
 
     for (auto& [key, function] : defined_function_groups_) { function->validate(validation_logger); }
@@ -153,6 +158,12 @@ void lang::GlobalScope::defineTypeAsOther(Identifier                        name
                                           lang::Location                    definition_location,
                                           lang::Location                    original_type_location)
 {
+    if (defined_types_.find(name) != defined_types_.end())
+    {
+        duplicated_type_names_.emplace_back(name, definition_location);
+        return;
+    }
+
     lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
     std::unique_ptr<lang::TypeDefinition> cloned_definition =
         std::make_unique<lang::TypeClone>(name, original, definition_location, original_type_location);
@@ -169,6 +180,12 @@ void lang::GlobalScope::defineTypeAliasOther(Identifier                        n
                                              lang::Location                    definition_location,
                                              lang::Location                    actual_type_location)
 {
+    if (defined_types_.find(name) != defined_types_.end())
+    {
+        duplicated_type_names_.emplace_back(name, definition_location);
+        return;
+    }
+
     lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
     std::unique_ptr<lang::TypeDefinition> alias_definition =
         std::make_unique<lang::TypeAlias>(name, actual, definition_location, actual_type_location);
@@ -185,6 +202,12 @@ void lang::GlobalScope::defineStruct(lang::AccessModifier                       
                                      std::vector<std::unique_ptr<lang::Member>> members,
                                      lang::Location                             definition_location)
 {
+    if (defined_types_.find(name) != defined_types_.end())
+    {
+        duplicated_type_names_.emplace_back(name, definition_location);
+        return;
+    }
+
     lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
     std::unique_ptr<lang::TypeDefinition> struct_definition =
         std::make_unique<lang::StructType>(access, name, std::move(members), this, definition_location);

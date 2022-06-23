@@ -215,6 +215,7 @@ namespace lang
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> defined_types_;
+        std::vector<std::tuple<lang::Identifier, lang::Location>>  duplicated_type_names_;
 
         bool expanded_ {false};
     };
