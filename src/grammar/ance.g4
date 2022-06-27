@@ -129,12 +129,13 @@ matchCase
 expression
 	: variableAccess # Variable
 	| allocation # Alloc
-	| addressof # AdressOf
-	| bindRef # Ref
-	| sizeofType # SizeOf
-	| sizeofExpression # SizeOf
 	| literalExpression # Literal
 	| indexed=expression '[' index=expression ']' # Subscript
+	| accessed=expression IDENTIFIER # MemberAccess
+	| addressof # AdressOf
+    | bindRef # Ref
+    | sizeofType # SizeOf
+    | sizeofExpression # SizeOf
 	| independentExpression # Independent
 	| '(' expression ')' # Parenthesis
     | 'not' expression # NotOperation

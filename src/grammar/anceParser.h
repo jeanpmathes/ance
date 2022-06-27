@@ -875,6 +875,18 @@ class anceParser : public antlr4::Parser
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class MemberAccessContext : public ExpressionContext
+    {
+      public:
+        MemberAccessContext(ExpressionContext* ctx);
+
+        anceParser::ExpressionContext* accessed = nullptr;
+        antlr4::tree::TerminalNode*    IDENTIFIER();
+        ExpressionContext*             expression();
+
+        virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     class LiteralContext : public ExpressionContext
     {
       public:

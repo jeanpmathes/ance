@@ -161,6 +161,11 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitAlloc(anceParser::AllocContext* ctx) override { return visitChildren(ctx); }
 
+    virtual antlrcpp::Any visitMemberAccess(anceParser::MemberAccessContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
     virtual antlrcpp::Any visitLiteral(anceParser::LiteralContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitLogicalAnd(anceParser::LogicalAndContext* ctx) override { return visitChildren(ctx); }

@@ -104,6 +104,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual antlrcpp::Any visitAlloc(anceParser::AllocContext* context) = 0;
 
+    virtual antlrcpp::Any visitMemberAccess(anceParser::MemberAccessContext* context) = 0;
+
     virtual antlrcpp::Any visitLiteral(anceParser::LiteralContext* context) = 0;
 
     virtual antlrcpp::Any visitLogicalAnd(anceParser::LogicalAndContext* context) = 0;
