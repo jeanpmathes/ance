@@ -2,6 +2,9 @@
 #define ANCE_SRC_LANG_TYPE_STRUCTTYPE_H_
 
 #include "TypeDefinition.h"
+
+#include <map>
+
 #include "lang/construct/Member.h"
 #include "lang/utility/Identifier.h"
 
@@ -28,6 +31,13 @@ namespace lang
 
         bool validateDefinition(ValidationLogger& validation_logger) override;
 
+        bool                              hasMember(const lang::Identifier& name) override;
+        lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name) override;
+        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) override;
+        std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
+                                                       const lang::Identifier& name,
+                                                       CompileContext*         context) override;
+
       protected:
         std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
@@ -37,8 +47,10 @@ namespace lang
       private:
         [[maybe_unused]] lang::AccessModifier access_;
 
-        std::vector<std::unique_ptr<lang::Member>> members_;
-        lang::Scope*                               scope_;
+        std::vector<std::unique_ptr<lang::Member>>                       members_;
+        std::map<lang::Identifier, std::reference_wrapper<lang::Member>> member_map_ {};
+        std::map<lang::Identifier, int32_t>                              member_indices_ {};
+        lang::Scope*                                                     scope_;
 
         llvm::StructType* native_type_ {nullptr};
     };

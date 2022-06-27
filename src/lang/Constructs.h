@@ -37,6 +37,7 @@ class SizeofType;
 class Subscript;
 class UnaryOperation;
 class VariableAccess;
+class MemberAccess;
 
 namespace lang
 {
@@ -61,9 +62,9 @@ class While;
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::BasicBlock,    \
         lang::CodeBlock, lang::Variable, lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation,             \
         BinaryOperation, UnaryOperation, BindRef, BindRefTo, ConstantLiteral, DefaultValue, FunctionCall, Parenthesis, \
-        SizeofExpression, SizeofType, Subscript, VariableAccess, And, Or, IfSelect, MatchSelect, lang::GlobalScope,    \
-        lang::LocalScope, Assertion, Assignment, Delete, ExpressionStatement, LocalReferenceVariableDefinition,        \
-        LocalVariableDefinition, Drop, Return, If, While, Match, Case
+        SizeofExpression, SizeofType, Subscript, VariableAccess, MemberAccess, And, Or, IfSelect, MatchSelect,         \
+        lang::GlobalScope, lang::LocalScope, Assertion, Assignment, Delete, ExpressionStatement,                       \
+        LocalReferenceVariableDefinition, LocalVariableDefinition, Drop, Return, If, While, Match, Case
 #endif
 
 class Statement;

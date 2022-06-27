@@ -184,6 +184,16 @@ bool lang::TypeDefinition::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang:
     return false;
 }
 
+bool lang::TypeDefinition::hasMember(const lang::Identifier&)
+{
+    return false;
+}
+
+lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getMemberType(const lang::Identifier&)
+{
+    return lang::VoidType::get();
+}
+
 bool lang::TypeDefinition::validateDefinition(ValidationLogger&)
 {
     return true;
@@ -223,6 +233,11 @@ bool lang::TypeDefinition::validateImplicitConversion(lang::ResolvingHandle<lang
     return false;
 }
 
+bool lang::TypeDefinition::validateMemberAccess(const lang::Identifier&, ValidationLogger&)
+{
+    return false;
+}
+
 std::shared_ptr<lang::Value> lang::TypeDefinition::buildSubscript(std::shared_ptr<Value>,
                                                                   std::shared_ptr<Value>,
                                                                   CompileContext*)
@@ -248,6 +263,13 @@ std::shared_ptr<lang::Value> lang::TypeDefinition::buildOperator(lang::UnaryOper
 std::shared_ptr<lang::Value> lang::TypeDefinition::buildImplicitConversion(lang::ResolvingHandle<lang::Type>,
                                                                            std::shared_ptr<Value>,
                                                                            CompileContext*)
+{
+    return nullptr;
+}
+
+std::shared_ptr<lang::Value> lang::TypeDefinition::buildMemberAccess(std::shared_ptr<Value>,
+                                                                     const lang::Identifier&,
+                                                                     CompileContext*)
 {
     return nullptr;
 }

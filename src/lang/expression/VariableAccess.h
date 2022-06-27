@@ -25,7 +25,7 @@ class VariableAccess
      * @param variable The variable to access.
      * @param location The source location.
      */
-    explicit VariableAccess(lang::ResolvingHandle<lang::Variable> variable, lang::Location location);
+    VariableAccess(lang::ResolvingHandle<lang::Variable> variable, lang::Location location);
 
     [[nodiscard]] lang::ResolvingHandle<lang::Variable> variable() const;
 

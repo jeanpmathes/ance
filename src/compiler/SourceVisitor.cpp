@@ -27,6 +27,7 @@
 #include "lang/statement/While.h"
 #include "lang/statement/Match.h"
 
+#include "lang/expression/MemberAccess.h"
 #include "lang/expression/Addressof.h"
 #include "lang/expression/Allocation.h"
 #include "lang/expression/BinaryOperation.h"
@@ -402,6 +403,14 @@ antlrcpp::Any SourceVisitor::visitDefaultCase(anceParser::DefaultCaseContext* ct
     auto block = std::unique_ptr<lang::CodeBlock>(visit(ctx->code()).as<lang::CodeBlock*>());
 
     return Case::createDefault(std::move(block));
+}
+
+antlrcpp::Any SourceVisitor::visitMemberAccess(anceParser::MemberAccessContext* ctx)
+{
+    Expression*      accessed = visit(ctx->accessed).as<Expression*>();
+    lang::Identifier member   = ident(ctx->IDENTIFIER());
+
+    return static_cast<Expression*>(new MemberAccess(std::unique_ptr<Expression>(accessed), member, location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)

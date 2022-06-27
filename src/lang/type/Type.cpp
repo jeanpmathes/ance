@@ -311,6 +311,32 @@ std::shared_ptr<lang::Value> lang::Type::buildImplicitConversion(lang::Resolving
     return definition_->buildImplicitConversion(other, std::move(value), context);
 }
 
+bool lang::Type::hasMember(const lang::Identifier& name)
+{
+    assert(isDefined());
+    return definition_->hasMember(name);
+}
+
+lang::ResolvingHandle<lang::Type> lang::Type::getMemberType(const lang::Identifier& name)
+{
+    assert(isDefined());
+    return definition_->getMemberType(name);
+}
+
+bool lang::Type::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
+{
+    assert(isDefined());
+    return definition_->validateMemberAccess(name, validation_logger);
+}
+
+std::shared_ptr<lang::Value> lang::Type::buildMemberAccess(std::shared_ptr<Value>  value,
+                                                           const lang::Identifier& name,
+                                                           CompileContext*         context)
+{
+    assert(isDefined());
+    return definition_->buildMemberAccess(std::move(value), name, context);
+}
+
 lang::TypeDefinition* lang::Type::getDefinition()
 {
     return definition_.get();
@@ -415,3 +441,4 @@ lang::ResolvingHandle<lang::Type> lang::Type::toUndefined() const
 
     return lang::makeHandled<lang::Type>(name());
 }
+

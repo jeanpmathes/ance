@@ -65,8 +65,8 @@ namespace lang
 
         [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getElementType() const;
 
-        virtual lang::ResolvingHandle<lang::Type> getActualType() const;
-        virtual lang::ResolvingHandle<lang::Type> getOriginalType() const;
+        [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getActualType() const;
+        [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getOriginalType() const;
 
         void         setContainingScope(Scope* scope);
         virtual void onScope();
@@ -89,8 +89,9 @@ namespace lang
         virtual lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
                                                                         lang::ResolvingHandle<lang::Type> other);
         virtual lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op);
-
-        virtual bool isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other);
+        virtual bool                              isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other);
+        virtual bool                              hasMember(const lang::Identifier& name);
+        virtual lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name);
 
         virtual bool validateDefinition(ValidationLogger& validation_logger);
         virtual bool validate(ValidationLogger& validation_logger, lang::Location location);
@@ -109,6 +110,7 @@ namespace lang
         virtual bool validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                 lang::Location                    location,
                                                 ValidationLogger&                 validation_logger);
+        virtual bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger);
 
         virtual std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                             std::shared_ptr<Value> index,
@@ -120,10 +122,12 @@ namespace lang
         virtual std::shared_ptr<lang::Value> buildOperator(lang::UnaryOperator    op,
                                                            std::shared_ptr<Value> value,
                                                            CompileContext*        context);
-
         virtual std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                                      std::shared_ptr<Value>            value,
                                                                      CompileContext*                   context);
+        virtual std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
+                                                               const lang::Identifier& name,
+                                                               CompileContext*         context);
 
       protected:
         virtual std::string createMangledName() = 0;
@@ -138,7 +142,7 @@ namespace lang
         bool                                       checkDependencies(ValidationLogger& validation_logger);
         virtual std::vector<lang::TypeDefinition*> getDependencies();
 
-        lang::ResolvingHandle<lang::Type> self() const;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> self() const;
 
       private:
         lang::Identifier name_;

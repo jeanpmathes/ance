@@ -39,6 +39,7 @@ namespace lang
 #include "lang/expression/Or.h"
 #include "lang/expression/IfSelect.h"
 #include "lang/expression/MatchSelect.h"
+#include "lang/expression/MemberAccess.h"
 
 #include "lang/scope/GlobalScope.h"
 #include "lang/scope/LocalScope.h"

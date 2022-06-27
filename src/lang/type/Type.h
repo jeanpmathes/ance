@@ -383,6 +383,39 @@ namespace lang
                                                              std::shared_ptr<Value>            value,
                                                              CompileContext*                   context);
 
+        /**
+         * Check if this type has a member with the given name.
+         * @param name The name of the member.
+         * @return True if the member exists.
+         */
+        bool hasMember(const lang::Identifier& name);
+
+        /**
+         * Get the type of a member.
+         * @param name The name of the member.
+         * @return The type of the member.
+         */
+        lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name);
+
+        /**
+         * Validate a member access.
+         * @param name The name of the member.
+         * @param validation_logger The validation logger to use.
+         * @return True if the member access is valid.
+         */
+        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger);
+
+        /**
+         * Build a member access.
+         * @param value The value to access.
+         * @param name The name of the member.
+         * @param context The current compile context.
+         * @return The result value.
+         */
+        std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
+                                                       const lang::Identifier& name,
+                                                       CompileContext*         context);
+
         lang::TypeDefinition* getDefinition();
 
         /**

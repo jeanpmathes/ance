@@ -6,6 +6,10 @@
 #include "lang/scope/Scope.h"
 #include "validation/ValidationLogger.h"
 #include "lang/type/VoidType.h"
+#include "lang/construct/value/Value.h"
+#include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/utility/Values.h"
+#include "lang/type/ReferenceType.h"
 
 lang::StructType::StructType(lang::AccessModifier                       access_modifier,
                              lang::Identifier                           name,
@@ -16,7 +20,15 @@ lang::StructType::StructType(lang::AccessModifier                       access_m
     , access_(access_modifier)
     , members_(std::move(members))
     , scope_(scope)
-{}
+{
+    int32_t index = 0;
+
+    for (auto& member : members_)
+    {
+        member_map_.emplace(member->name(), *member);
+        member_indices_[member->name()] = index++;
+    }
+}
 
 StateCount lang::StructType::getStateCount() const
 {
@@ -173,4 +185,39 @@ std::vector<lang::TypeDefinition*> lang::StructType::getDependencies()
     }
 
     return dependencies;
+}
+
+bool lang::StructType::hasMember(const lang::Identifier& name)
+{
+    return member_map_.contains(name);
+}
+
+lang::ResolvingHandle<lang::Type> lang::StructType::getMemberType(const lang::Identifier& name)
+{
+    return member_map_.at(name).get().type();
+}
+
+bool lang::StructType::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
+{
+    return true;
+}
+
+std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr<Value>  value,
+                                                                 const lang::Identifier& name,
+                                                                 CompileContext*         context)
+{
+    lang::ResolvingHandle<lang::Type> return_type = lang::ReferenceType::get(getMemberType(name));
+
+    auto&                             member       = member_map_.at(name);
+    size_t                            member_index = member_indices_[name];
+    lang::ResolvingHandle<lang::Type> member_type  = member.get().type();
+
+    value->buildNativeValue(context);
+    llvm::Value* struct_ptr = value->getNativeValue();
+
+    llvm::Value* member_ptr =
+        context->ir()->CreateStructGEP(getContentType(*context->llvmContext()), struct_ptr, member_index);
+    llvm::Value* native_value = lang::Values::contentToNative(return_type, member_ptr, context);
+
+    return std::make_shared<lang::WrappedNativeValue>(return_type, native_value);
 }

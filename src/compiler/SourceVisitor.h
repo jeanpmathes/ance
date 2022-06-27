@@ -55,6 +55,7 @@ class SourceVisitor : public anceBaseVisitor
 
     // Expressions
 
+    antlrcpp::Any visitMemberAccess(anceParser::MemberAccessContext* ctx) override;
     antlrcpp::Any visitFunctionCall(anceParser::FunctionCallContext* ctx) override;
     antlrcpp::Any visitArguments(anceParser::ArgumentsContext* ctx) override;
     antlrcpp::Any visitVariableAccess(anceParser::VariableAccessContext* ctx) override;
