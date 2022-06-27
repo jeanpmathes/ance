@@ -33,7 +33,7 @@ bool MemberAccess::validate(ValidationLogger& validation_logger)
 
     if (!value_->type()->hasMember(member_))
     {
-        validation_logger.logError("Member '" + member_ + "' is not a member of type '" + value_->type()->name() + "'",
+        validation_logger.logError("Type " + value_->type()->getAnnotatedName() + " has no member '" + member_ + "'",
                                    member_.location());
         return false;
     }

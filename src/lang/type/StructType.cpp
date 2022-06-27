@@ -199,6 +199,12 @@ lang::ResolvingHandle<lang::Type> lang::StructType::getMemberType(const lang::Id
 
 bool lang::StructType::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
 {
+    if (member_map_.at(name).get().access() == AccessModifier::PRIVATE_ACCESS)
+    {
+        validation_logger.logError("Cannot access private member '" + name + "'", name.location());
+        return false;
+    }
+
     return true;
 }
 
