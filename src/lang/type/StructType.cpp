@@ -218,8 +218,17 @@ std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr
     size_t                            member_index = member_indices_[name];
     lang::ResolvingHandle<lang::Type> member_type  = member.get().type();
 
-    value->buildNativeValue(context);
-    llvm::Value* struct_ptr = value->getNativeValue();
+    llvm::Value* struct_ptr;
+
+    if (value->type()->isReferenceType())
+    {
+        value->buildContentValue(context);
+        struct_ptr = value->getContentValue();
+    }
+    else {
+        value->buildNativeValue(context);
+        struct_ptr = value->getNativeValue();
+    }
 
     llvm::Value* member_ptr =
         context->ir()->CreateStructGEP(getContentType(*context->llvmContext()), struct_ptr, member_index);

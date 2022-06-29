@@ -126,6 +126,28 @@ std::shared_ptr<lang::Value> lang::ReferenceType::buildOperator(lang::BinaryOper
     return element_type_->buildOperator(op, getReferenced(left, context), right, context);
 }
 
+bool lang::ReferenceType::hasMember(const lang::Identifier& name)
+{
+    return element_type_->hasMember(name);
+}
+
+lang::ResolvingHandle<lang::Type> lang::ReferenceType::getMemberType(const lang::Identifier& name)
+{
+    return element_type_->getMemberType(name);
+}
+
+bool lang::ReferenceType::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
+{
+    return element_type_->validateMemberAccess(name, validation_logger);
+}
+
+std::shared_ptr<lang::Value> lang::ReferenceType::buildMemberAccess(std::shared_ptr<Value>  value,
+                                                                    const lang::Identifier& name,
+                                                                    CompileContext*         context)
+{
+    return element_type_->buildMemberAccess(value, name, context);
+}
+
 std::string lang::ReferenceType::createMangledName()
 {
     return std::string("ref") + "(" + element_type_->getMangledName() + ")";
@@ -189,3 +211,4 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::get(lang::ResolvingHandle
         return type;
     }
 }
+

@@ -56,6 +56,13 @@ namespace lang
                                                         std::shared_ptr<Value> right,
                                                         CompileContext*        context) override;
 
+        bool                              hasMember(const lang::Identifier& name) override;
+        lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name) override;
+        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) override;
+        std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
+                                                       const lang::Identifier& name,
+                                                       CompileContext*         context) override;
+
         ~ReferenceType() override = default;
 
       private:
