@@ -31,8 +31,8 @@ public main () : ui32
     // With the indirection operator, the value pointed to can both be read or written.
     value_ptr. <: another_value;
 
-    assert value x == 3:64;
-    assert value y == 4:64;
+    assert value x == +3:64;
+    assert value y == +4:64;
 
     return 0:32;
 }

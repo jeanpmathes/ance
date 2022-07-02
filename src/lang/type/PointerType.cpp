@@ -125,6 +125,30 @@ llvm::Value* lang::PointerType::buildGetElementPointer(const std::shared_ptr<lan
     return element_ptr;
 }
 
+bool lang::PointerType::definesIndirection()
+{
+    return true;
+}
+
+lang::ResolvingHandle<lang::Type> lang::PointerType::getIndirectionType()
+{
+    return element_type_;
+}
+
+bool lang::PointerType::validateIndirection(lang::Location, ValidationLogger&)
+{
+    return true;
+}
+
+std::shared_ptr<lang::Value> lang::PointerType::buildIndirection(std::shared_ptr<Value> value, CompileContext* context)
+{
+    value->buildContentValue(context);
+    llvm::Value* ptr = value->getContentValue();
+
+    llvm::Value* native_value = lang::Values::contentToNative(element_reference_, ptr, context);
+    return std::make_shared<lang::WrappedNativeValue>(element_reference_, native_value);
+}
+
 std::string lang::PointerType::createMangledName()
 {
     return std::string("ptr") + "(" + element_type_->getMangledName() + ")";

@@ -275,6 +275,33 @@ namespace lang
         bool isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other);
 
         /**
+         * Check if this type has a member with the given name.
+         * @param name The name of the member.
+         * @return True if the member exists.
+         */
+        bool hasMember(const lang::Identifier& name);
+
+        /**
+         * Get the type of a member.
+         * @param name The name of the member.
+         * @return The type of the member.
+         */
+        lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name);
+
+        /**
+         * Get whether this type defines the indirection operator.
+         * @return True if the type defines the indirection operator.
+         */
+        bool definesIndirection();
+
+        /**
+         * Get the type this type is an indirection to.
+         * The actual return type of the indirection operator is a reference to that type.
+         * @return The type this type is an indirection to.
+         */
+        lang::ResolvingHandle<lang::Type> getIndirectionType();
+
+        /**
          * Validate the definition of this type, if there is any.
          * @param validation_logger The validation logger to use.
          * @return True if the type has a valid definition.
@@ -338,6 +365,22 @@ namespace lang
                                         ValidationLogger&                 validation_logger);
 
         /**
+         * Validate a member access.
+         * @param name The name of the member.
+         * @param validation_logger The validation logger to use.
+         * @return True if the member access is valid.
+         */
+        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger);
+
+        /**
+         * Validate indirection.
+         * @param location The source location of the indirection.
+         * @param validation_logger The validation logger to use.
+         * @return True if the indirection is valid.
+         */
+        bool validateIndirection(lang::Location location, ValidationLogger& validation_logger);
+
+        /**
          * Build a subscript access.
          * @param indexed The indexed value.
          * @param index The index to use.
@@ -384,28 +427,6 @@ namespace lang
                                                              CompileContext*                   context);
 
         /**
-         * Check if this type has a member with the given name.
-         * @param name The name of the member.
-         * @return True if the member exists.
-         */
-        bool hasMember(const lang::Identifier& name);
-
-        /**
-         * Get the type of a member.
-         * @param name The name of the member.
-         * @return The type of the member.
-         */
-        lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name);
-
-        /**
-         * Validate a member access.
-         * @param name The name of the member.
-         * @param validation_logger The validation logger to use.
-         * @return True if the member access is valid.
-         */
-        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger);
-
-        /**
          * Build a member access.
          * @param value The value to access.
          * @param name The name of the member.
@@ -415,6 +436,14 @@ namespace lang
         std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
                                                        const lang::Identifier& name,
                                                        CompileContext*         context);
+
+        /**
+         * Build indirection.
+         * @param value The value to indirect.
+         * @param context The current compile context.
+         * @return The result value, which is a reference of indirection return type.
+         */
+        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context);
 
         lang::TypeDefinition* getDefinition();
 

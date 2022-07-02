@@ -4,6 +4,7 @@ target_sources(ance PRIVATE DefaultValue.cpp
                BackingConstantExpression.cpp
                UnexpandedExpression.cpp
                MemberAccess.cpp
+               Indirection.cpp
                FunctionCall.cpp
                ConstantLiteral.cpp
                SizeofExpression.cpp

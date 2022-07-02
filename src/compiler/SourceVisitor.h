@@ -75,6 +75,7 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitDefaultExpressionCase(anceParser::DefaultExpressionCaseContext* ctx) override;
     antlrcpp::Any visitLiteralExpressionCase(anceParser::LiteralExpressionCaseContext* ctx) override;
     antlrcpp::Any visitMatchExpression(anceParser::MatchExpressionContext* ctx) override;
+    antlrcpp::Any visitIndirection(anceParser::IndirectionContext* ctx) override;
 
     // Literals and Types
 

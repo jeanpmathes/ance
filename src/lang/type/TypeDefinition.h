@@ -83,7 +83,6 @@ namespace lang
 
         virtual bool                              isSubscriptDefined();
         virtual lang::ResolvingHandle<lang::Type> getSubscriptReturnType();
-
         virtual bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other);
         virtual bool isOperatorDefined(lang::UnaryOperator op);
         virtual lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
@@ -92,6 +91,8 @@ namespace lang
         virtual bool                              isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other);
         virtual bool                              hasMember(const lang::Identifier& name);
         virtual lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name);
+        virtual bool                              definesIndirection();
+        virtual lang::ResolvingHandle<lang::Type> getIndirectionType();
 
         virtual bool validateDefinition(ValidationLogger& validation_logger);
         virtual bool validate(ValidationLogger& validation_logger, lang::Location location);
@@ -111,6 +112,7 @@ namespace lang
                                                 lang::Location                    location,
                                                 ValidationLogger&                 validation_logger);
         virtual bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger);
+        virtual bool validateIndirection(lang::Location location, ValidationLogger& validation_logger);
 
         virtual std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                             std::shared_ptr<Value> index,
@@ -128,6 +130,7 @@ namespace lang
         virtual std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
                                                                const lang::Identifier& name,
                                                                CompileContext*         context);
+        virtual std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context);
 
       protected:
         virtual std::string createMangledName() = 0;

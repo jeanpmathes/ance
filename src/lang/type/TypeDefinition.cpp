@@ -194,6 +194,16 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getMemberType(const lang
     return lang::VoidType::get();
 }
 
+bool lang::TypeDefinition::definesIndirection()
+{
+    return false;
+}
+
+lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getIndirectionType()
+{
+    return lang::VoidType::get();
+}
+
 bool lang::TypeDefinition::validateDefinition(ValidationLogger&)
 {
     return true;
@@ -238,6 +248,11 @@ bool lang::TypeDefinition::validateMemberAccess(const lang::Identifier&, Validat
     return false;
 }
 
+bool lang::TypeDefinition::validateIndirection(lang::Location, ValidationLogger&)
+{
+    return true;
+}
+
 std::shared_ptr<lang::Value> lang::TypeDefinition::buildSubscript(std::shared_ptr<Value>,
                                                                   std::shared_ptr<Value>,
                                                                   CompileContext*)
@@ -270,6 +285,11 @@ std::shared_ptr<lang::Value> lang::TypeDefinition::buildImplicitConversion(lang:
 std::shared_ptr<lang::Value> lang::TypeDefinition::buildMemberAccess(std::shared_ptr<Value>,
                                                                      const lang::Identifier&,
                                                                      CompileContext*)
+{
+    return nullptr;
+}
+
+std::shared_ptr<lang::Value> lang::TypeDefinition::buildIndirection(std::shared_ptr<Value>, CompileContext*)
 {
     return nullptr;
 }

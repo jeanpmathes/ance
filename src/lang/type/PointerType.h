@@ -43,6 +43,11 @@ namespace lang
                                                     std::shared_ptr<Value> index,
                                                     CompileContext*        context) override;
 
+        bool                              definesIndirection() override;
+        lang::ResolvingHandle<lang::Type> getIndirectionType() override;
+        bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) override;
+        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context) override;
+
       private:
         llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
                                             const std::shared_ptr<lang::Value>& index,

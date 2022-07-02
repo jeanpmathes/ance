@@ -148,6 +148,27 @@ std::shared_ptr<lang::Value> lang::ReferenceType::buildMemberAccess(std::shared_
     return element_type_->buildMemberAccess(value, name, context);
 }
 
+bool lang::ReferenceType::definesIndirection()
+{
+    return element_type_->definesIndirection();
+}
+
+lang::ResolvingHandle<lang::Type> lang::ReferenceType::getIndirectionType()
+{
+    return element_type_->getIndirectionType();
+}
+
+bool lang::ReferenceType::validateIndirection(lang::Location location, ValidationLogger& validation_logger)
+{
+    return element_type_->validateIndirection(location, validation_logger);
+}
+
+std::shared_ptr<lang::Value> lang::ReferenceType::buildIndirection(std::shared_ptr<Value> value,
+                                                                   CompileContext*        context)
+{
+    return element_type_->buildIndirection(getReferenced(value, context), context);
+}
+
 std::string lang::ReferenceType::createMangledName()
 {
     return std::string("ref") + "(" + element_type_->getMangledName() + ")";
@@ -211,4 +232,3 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::get(lang::ResolvingHandle
         return type;
     }
 }
-

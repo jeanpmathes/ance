@@ -232,6 +232,30 @@ bool lang::Type::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> oth
     return definition_->isImplicitlyConvertibleTo(other);
 }
 
+bool lang::Type::hasMember(const lang::Identifier& name)
+{
+    assert(isDefined());
+    return definition_->hasMember(name);
+}
+
+lang::ResolvingHandle<lang::Type> lang::Type::getMemberType(const lang::Identifier& name)
+{
+    assert(isDefined());
+    return definition_->getMemberType(name);
+}
+
+bool lang::Type::definesIndirection()
+{
+    assert(isDefined());
+    return definition_->definesIndirection();
+}
+
+lang::ResolvingHandle<lang::Type> lang::Type::getIndirectionType()
+{
+    assert(isDefined());
+    return definition_->getIndirectionType();
+}
+
 bool lang::Type::validateDefinition(ValidationLogger& validation_logger)
 {
     assert(isDefined());
@@ -278,6 +302,18 @@ bool lang::Type::validateImplicitConversion(lang::ResolvingHandle<lang::Type> ot
     return definition_->validateImplicitConversion(std::move(other), location, validation_logger);
 }
 
+bool lang::Type::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
+{
+    assert(isDefined());
+    return definition_->validateMemberAccess(name, validation_logger);
+}
+
+bool lang::Type::validateIndirection(lang::Location location, ValidationLogger& validation_logger)
+{
+    assert(isDefined());
+    return definition_->validateIndirection(location, validation_logger);
+}
+
 std::shared_ptr<lang::Value> lang::Type::buildSubscript(std::shared_ptr<Value> indexed,
                                                         std::shared_ptr<Value> index,
                                                         CompileContext*        context)
@@ -311,30 +347,18 @@ std::shared_ptr<lang::Value> lang::Type::buildImplicitConversion(lang::Resolving
     return definition_->buildImplicitConversion(other, std::move(value), context);
 }
 
-bool lang::Type::hasMember(const lang::Identifier& name)
-{
-    assert(isDefined());
-    return definition_->hasMember(name);
-}
-
-lang::ResolvingHandle<lang::Type> lang::Type::getMemberType(const lang::Identifier& name)
-{
-    assert(isDefined());
-    return definition_->getMemberType(name);
-}
-
-bool lang::Type::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
-{
-    assert(isDefined());
-    return definition_->validateMemberAccess(name, validation_logger);
-}
-
 std::shared_ptr<lang::Value> lang::Type::buildMemberAccess(std::shared_ptr<Value>  value,
                                                            const lang::Identifier& name,
                                                            CompileContext*         context)
 {
     assert(isDefined());
     return definition_->buildMemberAccess(std::move(value), name, context);
+}
+
+std::shared_ptr<lang::Value> lang::Type::buildIndirection(std::shared_ptr<Value> value, CompileContext* context)
+{
+    assert(isDefined());
+    return definition_->buildIndirection(std::move(value), context);
 }
 
 lang::TypeDefinition* lang::Type::getDefinition()
@@ -441,4 +465,3 @@ lang::ResolvingHandle<lang::Type> lang::Type::toUndefined() const
 
     return lang::makeHandled<lang::Type>(name());
 }
-

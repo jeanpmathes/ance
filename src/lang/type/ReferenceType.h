@@ -63,6 +63,11 @@ namespace lang
                                                        const lang::Identifier& name,
                                                        CompileContext*         context) override;
 
+        bool                              definesIndirection() override;
+        lang::ResolvingHandle<lang::Type> getIndirectionType() override;
+        bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) override;
+        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context) override;
+
         ~ReferenceType() override = default;
 
       private:

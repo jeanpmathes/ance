@@ -20,6 +20,7 @@ void lang::DelayedValue::setValue(const std::shared_ptr<lang::Value>& value)
 void lang::DelayedValue::buildNativeValue(CompileContext* context)
 {
     expression_.build(context);
+    assert(value_ && "setValue must be called in expression when their value is used");
     value_->buildNativeValue(context);
 }
 

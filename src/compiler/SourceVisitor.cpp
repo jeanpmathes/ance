@@ -46,6 +46,7 @@
 #include "lang/expression/Or.h"
 #include "lang/expression/IfSelect.h"
 #include "lang/expression/MatchSelect.h"
+#include "lang/expression/Indirection.h"
 
 #include "lang/construct/constant/BooleanConstant.h"
 #include "lang/construct/constant/ByteConstant.h"
@@ -577,6 +578,12 @@ antlrcpp::Any SourceVisitor::visitMatchExpression(anceParser::MatchExpressionCon
         new MatchSelect(std::unique_ptr<Expression>(expression), std::move(cases), location(ctx)));
 }
 
+antlrcpp::Any SourceVisitor::visitIndirection(anceParser::IndirectionContext* ctx)
+{
+    Expression* value = visit(ctx->expression()).as<Expression*>();
+    return static_cast<Expression*>(new Indirection(std::unique_ptr<Expression>(value), location(ctx)));
+}
+
 antlrcpp::Any SourceVisitor::visitDefaultExpressionCase(anceParser::DefaultExpressionCaseContext* ctx)
 {
     auto expression = std::unique_ptr<Expression>(visit(ctx->expression()).as<Expression*>());
@@ -951,3 +958,4 @@ uint64_t SourceVisitor::parseInRange(const std::string& str, uint64_t max)
 
     return value;
 }
+
