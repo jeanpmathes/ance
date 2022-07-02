@@ -130,6 +130,7 @@ expression
 	: variableAccess # Variable
 	| allocation # Alloc
 	| literalExpression # Literal
+	| value=expression '.' # Indirection
 	| indexed=expression '[' index=expression ']' # Subscript
 	| accessed=expression IDENTIFIER # MemberAccess
 	| addressof # AdressOf

@@ -172,6 +172,8 @@ class anceBaseVisitor : public anceVisitor
 
     virtual antlrcpp::Any visitSizeOf(anceParser::SizeOfContext* ctx) override { return visitChildren(ctx); }
 
+    virtual antlrcpp::Any visitIndirection(anceParser::IndirectionContext* ctx) override { return visitChildren(ctx); }
+
     virtual antlrcpp::Any visitMultiplication(anceParser::MultiplicationContext* ctx) override
     {
         return visitChildren(ctx);
