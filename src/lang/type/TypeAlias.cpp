@@ -104,16 +104,6 @@ llvm::Type* lang::TypeAlias::getContentType(llvm::LLVMContext& c)
     return actual_->getContentType(c);
 }
 
-bool lang::TypeAlias::isSubscriptDefined()
-{
-    return actual_->isSubscriptDefined();
-}
-
-lang::ResolvingHandle<lang::Type> lang::TypeAlias::getSubscriptReturnType()
-{
-    return actual_->getSubscriptReturnType();
-}
-
 bool lang::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
 {
     if (is_valid_) return is_valid_.value();
@@ -149,6 +139,16 @@ bool lang::TypeAlias::validate(ValidationLogger& validation_logger, lang::Locati
     return validateDefinition(validation_logger);
 }
 
+bool lang::TypeAlias::isSubscriptDefined()
+{
+    return actual_->isSubscriptDefined();
+}
+
+lang::ResolvingHandle<lang::Type> lang::TypeAlias::getSubscriptReturnType()
+{
+    return actual_->getSubscriptReturnType();
+}
+
 bool lang::TypeAlias::validateSubscript(lang::Location                    indexed_location,
                                         lang::ResolvingHandle<lang::Type> index_type,
                                         lang::Location                    index_location,
@@ -162,6 +162,95 @@ std::shared_ptr<lang::Value> lang::TypeAlias::buildSubscript(std::shared_ptr<Val
                                                              CompileContext*        context)
 {
     return actual_->buildSubscript(indexed, index, context);
+}
+
+bool lang::TypeAlias::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
+{
+    return actual_->isImplicitlyConvertibleTo(other);
+}
+
+bool lang::TypeAlias::validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                 lang::Location                    location,
+                                                 ValidationLogger&                 validation_logger)
+{
+    return actual_->validateImplicitConversion(other, location, validation_logger);
+}
+
+std::shared_ptr<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                                      std::shared_ptr<Value>            value,
+                                                                      CompileContext*                   context)
+{
+    return actual_->buildImplicitConversion(other, value, context);
+}
+
+bool lang::TypeAlias::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
+{
+    return actual_->isOperatorDefined(op, other);
+}
+
+lang::ResolvingHandle<lang::Type> lang::TypeAlias::getOperatorResultType(lang::BinaryOperator              op,
+                                                                         lang::ResolvingHandle<lang::Type> other)
+{
+    return actual_->getOperatorResultType(op, other);
+}
+
+bool lang::TypeAlias::validateOperator(lang::BinaryOperator              op,
+                                       lang::ResolvingHandle<lang::Type> other,
+                                       lang::Location                    left_location,
+                                       lang::Location                    right_location,
+                                       ValidationLogger&                 validation_logger)
+{
+    return actual_->validateOperator(op, other, left_location, right_location, validation_logger);
+}
+
+std::shared_ptr<lang::Value> lang::TypeAlias::buildOperator(lang::BinaryOperator   op,
+                                                            std::shared_ptr<Value> left,
+                                                            std::shared_ptr<Value> right,
+                                                            CompileContext*        context)
+{
+    return actual_->buildOperator(op, left, right, context);
+}
+
+bool lang::TypeAlias::hasMember(const lang::Identifier& name)
+{
+    return actual_->hasMember(name);
+}
+
+lang::ResolvingHandle<lang::Type> lang::TypeAlias::getMemberType(const lang::Identifier& name)
+{
+    return actual_->getMemberType(name);
+}
+
+bool lang::TypeAlias::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
+{
+    return actual_->validateMemberAccess(name, validation_logger);
+}
+
+std::shared_ptr<lang::Value> lang::TypeAlias::buildMemberAccess(std::shared_ptr<Value>  value,
+                                                                const lang::Identifier& name,
+                                                                CompileContext*         context)
+{
+    return actual_->buildMemberAccess(value, name, context);
+}
+
+bool lang::TypeAlias::definesIndirection()
+{
+    return actual_->definesIndirection();
+}
+
+lang::ResolvingHandle<lang::Type> lang::TypeAlias::getIndirectionType()
+{
+    return actual_->getIndirectionType();
+}
+
+bool lang::TypeAlias::validateIndirection(lang::Location location, ValidationLogger& validation_logger)
+{
+    return actual_->validateIndirection(location, validation_logger);
+}
+
+std::shared_ptr<lang::Value> lang::TypeAlias::buildIndirection(std::shared_ptr<Value> value, CompileContext* context)
+{
+    return actual_->buildIndirection(value, context);
 }
 
 std::string lang::TypeAlias::createMangledName()

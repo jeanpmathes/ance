@@ -42,20 +42,51 @@ namespace lang
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
-        bool                              isSubscriptDefined() override;
-        lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
-
         bool validateDefinition(ValidationLogger& validation_logger) override;
         bool validate(ValidationLogger& validation_logger, lang::Location location) override;
 
-        bool validateSubscript(lang::Location                    indexed_location,
-                               lang::ResolvingHandle<lang::Type> index_type,
-                               lang::Location                    index_location,
-                               ValidationLogger&                 validation_logger) override;
+        bool                              isSubscriptDefined() override;
+        lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
+        bool                              validateSubscript(lang::Location                    indexed_location,
+                                                            lang::ResolvingHandle<lang::Type> index_type,
+                                                            lang::Location                    index_location,
+                                                            ValidationLogger&                 validation_logger) override;
+        std::shared_ptr<lang::Value>      buildSubscript(std::shared_ptr<Value> indexed,
+                                                         std::shared_ptr<Value> index,
+                                                         CompileContext*        context) override;
 
-        std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
-                                                    std::shared_ptr<Value> index,
-                                                    CompileContext*        context) override;
+        bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
+        bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                                lang::Location                    location,
+                                                                ValidationLogger&                 validation_logger) override;
+        std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                             std::shared_ptr<Value>            value,
+                                                             CompileContext*                   context) override;
+
+        bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other) override;
+        lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
+                                                                lang::ResolvingHandle<lang::Type> other) override;
+        bool                              validateOperator(lang::BinaryOperator              op,
+                                                           lang::ResolvingHandle<lang::Type> other,
+                                                           lang::Location                    left_location,
+                                                           lang::Location                    right_location,
+                                                           ValidationLogger&                 validation_logger) override;
+        std::shared_ptr<lang::Value>      buildOperator(lang::BinaryOperator   op,
+                                                        std::shared_ptr<Value> left,
+                                                        std::shared_ptr<Value> right,
+                                                        CompileContext*        context) override;
+
+        bool                              hasMember(const lang::Identifier& name) override;
+        lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name) override;
+        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) override;
+        std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
+                                                       const lang::Identifier& name,
+                                                       CompileContext*         context) override;
+
+        bool                              definesIndirection() override;
+        lang::ResolvingHandle<lang::Type> getIndirectionType() override;
+        bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) override;
+        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context) override;
 
       protected:
         std::string   createMangledName() override;

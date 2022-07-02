@@ -2,6 +2,8 @@
 
 // Integer and float types allow implicit conversion of their values to larger types.
 
+define int alias i64;
+
 public main () : ui32
 {
     let x1: i32 <: +1:16;
@@ -28,6 +30,10 @@ public main () : ui32
 
     let x11: size <: 15;
     let x12: diff <: x11;
+
+    // Type aliasing has no effect on implicit conversion.
+    let x13: int <: x4;
+    let x14: i64 <: x13;
 
     return 0:32;
 }

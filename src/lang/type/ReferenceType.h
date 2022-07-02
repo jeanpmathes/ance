@@ -20,11 +20,11 @@ namespace lang
         explicit ReferenceType(lang::ResolvingHandle<lang::Type> element_type);
 
       public:
-        StateCount getStateCount() const override;
+        [[nodiscard]] StateCount getStateCount() const override;
 
-        bool                              isReferenceType() const override;
-        lang::ResolvingHandle<lang::Type> getElementType() const override;
-        lang::ResolvingHandle<lang::Type> getActualType() const override;
+        [[nodiscard]] bool                              isReferenceType() const override;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const override;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
 
         llvm::Constant*    getDefaultContent(llvm::LLVMContext& c) override;
         llvm::PointerType* getContentType(llvm::LLVMContext& c) override;
