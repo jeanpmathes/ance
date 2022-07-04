@@ -10,7 +10,7 @@ void lang::WrappedNativeValue::setValue(llvm::Value* value)
     value_ = value;
 }
 
-lang::ResolvingHandle<lang::Type> lang::WrappedNativeValue::type()
+lang::ResolvingHandle<lang::Type> lang::WrappedNativeValue::type() const
 {
     return type_;
 }

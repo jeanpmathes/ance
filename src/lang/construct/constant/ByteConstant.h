@@ -27,7 +27,7 @@ namespace lang
 
         [[nodiscard]] std::string toString() const override;
 
-        lang::ResolvingHandle<lang::Type> type() override;
+        lang::ResolvingHandle<lang::Type> type() const override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
 
         bool equals(const lang::Constant* other) const override;

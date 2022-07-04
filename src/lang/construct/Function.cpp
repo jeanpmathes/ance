@@ -122,7 +122,7 @@ bool lang::Function::isMangled() const
     return definition_->isMangled();
 }
 
-void lang::Function::validate(ValidationLogger& validation_logger)
+void lang::Function::validate(ValidationLogger& validation_logger) const
 {
     definition_->validate(validation_logger);
 }
@@ -143,7 +143,7 @@ void lang::Function::determineFlow()
     definition_->determineFlow();
 }
 
-void lang::Function::validateFlow(ValidationLogger& validation_logger)
+void lang::Function::validateFlow(ValidationLogger& validation_logger) const
 {
     definition_->validateFlow(validation_logger);
 }

@@ -60,7 +60,7 @@ namespace lang
          * Validate this variable declaration.
          * @param validation_logger The logger to use for validation.
          */
-        virtual void validate(ValidationLogger& validation_logger) = 0;
+        virtual void validate(ValidationLogger& validation_logger) const = 0;
 
         virtual void buildDeclaration(CompileContext* context) = 0;
         virtual void buildDefinition(CompileContext* context)  = 0;

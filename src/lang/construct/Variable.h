@@ -112,7 +112,7 @@ namespace lang
          * Validate this variable.
          * @param validation_logger A logger to log validation messages.
          */
-        void validate(ValidationLogger& validation_logger);
+        void validate(ValidationLogger& validation_logger) const;
 
         /**
          * Build the variable declaration which prepares the storage.

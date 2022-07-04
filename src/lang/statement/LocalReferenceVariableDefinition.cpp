@@ -60,7 +60,7 @@ void LocalReferenceVariableDefinition::walkDefinitions()
     scope()->addType(type_);
 }
 
-void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger)
+void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger) const
 {
     assert(variable_);
 

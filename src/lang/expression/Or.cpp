@@ -34,7 +34,7 @@ lang::ResolvingHandle<lang::Type> Or::type() const
     return lang::ResolvingHandle<lang::Type>(lang::BooleanType::get());
 }
 
-bool Or::validate(ValidationLogger& validation_logger)
+bool Or::validate(ValidationLogger& validation_logger) const
 {
     bool valid = left_->validate(validation_logger) && right_->validate(validation_logger);
 

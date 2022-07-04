@@ -20,7 +20,7 @@ lang::ResolvingHandle<lang::Type> ConstantLiteral::type() const
     return constant_->type();
 }
 
-bool ConstantLiteral::validate(ValidationLogger& validation_logger)
+bool ConstantLiteral::validate(ValidationLogger& validation_logger) const
 {
     return constant_->validate(validation_logger, location());
 }

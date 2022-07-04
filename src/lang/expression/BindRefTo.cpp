@@ -31,7 +31,7 @@ lang::ResolvingHandle<lang::Type> BindRefTo::type() const
     return *type_;
 }
 
-bool BindRefTo::validate(ValidationLogger& validation_logger)
+bool BindRefTo::validate(ValidationLogger& validation_logger) const
 {
     bool address_is_valid = address_->validate(validation_logger);
     if (!address_is_valid) return false;

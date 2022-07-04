@@ -22,7 +22,7 @@ std::string lang::StringConstant::toString() const
     return prefix_ + "\"" + escaped + "\"";
 }
 
-lang::ResolvingHandle<lang::Type> lang::StringConstant::type()
+lang::ResolvingHandle<lang::Type> lang::StringConstant::type() const
 {
     return type_;
 }

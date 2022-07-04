@@ -145,7 +145,7 @@ namespace lang
          */
         [[nodiscard]] bool isMangled() const;
 
-        void validate(ValidationLogger& validation_logger) override;
+        void validate(ValidationLogger& validation_logger) const override;
 
         /**
          * Expand this function to remove syntactic sugar.
@@ -162,7 +162,7 @@ namespace lang
          * Validate the flow of this function.
          * @param validation_logger The validation logger.
          */
-        void validateFlow(ValidationLogger& validation_logger);
+        void validateFlow(ValidationLogger& validation_logger) const;
 
         /**
          * Create the native content of this function, allowing building function code and calling this function.

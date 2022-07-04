@@ -19,7 +19,7 @@ bool Parenthesis::isNamed()
     return expression_->isNamed();
 }
 
-bool Parenthesis::validate(ValidationLogger& validation_logger)
+bool Parenthesis::validate(ValidationLogger& validation_logger) const
 {
     return expression_->validate(validation_logger);
 }

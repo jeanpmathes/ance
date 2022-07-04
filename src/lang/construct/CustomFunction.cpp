@@ -79,7 +79,7 @@ Statement& lang::CustomFunction::code() const
     return *code_;
 }
 
-void lang::CustomFunction::validate(ValidationLogger& validation_logger)
+void lang::CustomFunction::validate(ValidationLogger& validation_logger) const
 {
     if (!returnType()->isDefined())
     {
@@ -153,7 +153,7 @@ void lang::CustomFunction::determineFlow()
     }
 }
 
-bool lang::CustomFunction::validateFlow(ValidationLogger& validation_logger)
+bool lang::CustomFunction::validateFlow(ValidationLogger& validation_logger) const
 {
     validateReturn(validation_logger);
     validateUnreachable(validation_logger);
@@ -161,7 +161,7 @@ bool lang::CustomFunction::validateFlow(ValidationLogger& validation_logger)
     return true;
 }
 
-void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger)
+void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger) const
 {
     std::list<lang::BasicBlock*> final_blocks = initial_block_->getLeaves();
 
@@ -209,7 +209,7 @@ void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger)
     }
 }
 
-void lang::CustomFunction::validateUnreachable(ValidationLogger& validation_logger)
+void lang::CustomFunction::validateUnreachable(ValidationLogger& validation_logger) const
 {
     initial_block_->reach();
 

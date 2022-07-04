@@ -24,7 +24,7 @@ lang::ResolvingHandle<lang::Type> SizeofExpression::type() const
     return lang::SizeType::getSize();
 }
 
-bool SizeofExpression::validate(ValidationLogger& validation_logger)
+bool SizeofExpression::validate(ValidationLogger& validation_logger) const
 {
     return expression_->validate(validation_logger);
 }

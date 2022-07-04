@@ -69,7 +69,7 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
      * Validate the application before compilation.
      * @param validation_logger A logger to log validation messages.
      */
-    void validate(ValidationLogger& validation_logger);
+    void validate(ValidationLogger& validation_logger) const;
 
     /**
      * Prepare everything for compilation.
@@ -86,7 +86,7 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
      * Validate the application before compilation.
      * @param validation_logger The logger to log validation messages.
      */
-    void validateFlow(ValidationLogger& validation_logger);
+    void validateFlow(ValidationLogger& validation_logger) const;
 
     /**
      * Get the top level scope of this application.

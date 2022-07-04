@@ -11,7 +11,7 @@ lang::RoughlyCastedValue::RoughlyCastedValue(lang::ResolvingHandle<lang::Type> t
     , original_(std::move(original))
 {}
 
-lang::ResolvingHandle<lang::Type> lang::RoughlyCastedValue::type()
+lang::ResolvingHandle<lang::Type> lang::RoughlyCastedValue::type() const
 {
     return target_type_;
 }

@@ -32,7 +32,7 @@ lang::ResolvingHandle<lang::Type> BindRef::type() const
     return *type_;
 }
 
-bool BindRef::validate(ValidationLogger& validation_logger)
+bool BindRef::validate(ValidationLogger& validation_logger) const
 {
     bool is_arg_valid = value_->validate(validation_logger);
     if (!is_arg_valid) return false;

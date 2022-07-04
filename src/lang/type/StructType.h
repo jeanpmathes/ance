@@ -29,11 +29,11 @@ namespace lang
 
         void onScope() override;
 
-        bool validateDefinition(ValidationLogger& validation_logger) override;
+        bool validateDefinition(ValidationLogger& validation_logger) const override;
 
         bool                              hasMember(const lang::Identifier& name) override;
         lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name) override;
-        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) override;
+        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const override;
         std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
                                                        const lang::Identifier& name,
                                                        CompileContext*         context) override;
@@ -42,7 +42,7 @@ namespace lang
         std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
-        std::vector<lang::TypeDefinition*> getDependencies() override;
+        std::vector<lang::TypeDefinition*> getDependencies() const override;
 
       private:
         [[maybe_unused]] lang::AccessModifier access_;

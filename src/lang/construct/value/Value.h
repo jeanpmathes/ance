@@ -22,7 +22,7 @@ namespace lang
          * Get the type of the value.
          * @return The type.
          */
-        virtual lang::ResolvingHandle<lang::Type> type() = 0;
+        virtual lang::ResolvingHandle<lang::Type> type() const = 0;
 
         /**
          * Build the native value. The native value is the value actually used in the IR.

@@ -9,7 +9,7 @@ std::string lang::BooleanConstant::toString() const
     return boolean_ ? "true" : "false";
 }
 
-lang::ResolvingHandle<lang::Type> lang::BooleanConstant::type()
+lang::ResolvingHandle<lang::Type> lang::BooleanConstant::type() const
 {
     return type_;
 }

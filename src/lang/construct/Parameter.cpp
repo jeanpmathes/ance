@@ -15,7 +15,7 @@ lang::Parameter::Parameter(lang::ResolvingHandle<lang::Type> type,
     , location_(location)
 {}
 
-lang::ResolvingHandle<lang::Type> lang::Parameter::type()
+lang::ResolvingHandle<lang::Type> lang::Parameter::type() const
 {
     return type_;
 }

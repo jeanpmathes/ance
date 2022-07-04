@@ -11,7 +11,7 @@ std::string lang::ByteConstant::toString() const
     return "'" + escaped + "'";
 }
 
-lang::ResolvingHandle<lang::Type> lang::ByteConstant::type()
+lang::ResolvingHandle<lang::Type> lang::ByteConstant::type() const
 {
     return type_;
 }

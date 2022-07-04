@@ -29,7 +29,7 @@ lang::ResolvingHandle<lang::Type> SizeofType::type() const
     return lang::SizeType::getSize();
 }
 
-bool SizeofType::validate(ValidationLogger& validation_logger)
+bool SizeofType::validate(ValidationLogger& validation_logger) const
 {
     if (!type_->isDefined())
     {

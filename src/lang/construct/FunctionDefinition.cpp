@@ -105,7 +105,7 @@ std::string lang::FunctionDefinition::parameterSource() const
     return source + ")";
 }
 
-std::vector<std::shared_ptr<lang::Parameter>>& lang::FunctionDefinition::parameters()
+const std::vector<std::shared_ptr<lang::Parameter>>& lang::FunctionDefinition::parameters() const
 {
     return parameters_;
 }

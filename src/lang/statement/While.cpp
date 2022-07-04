@@ -34,7 +34,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> While::createBasicBlocks(lang::Ba
     return blocks;
 }
 
-void While::validate(ValidationLogger& validation_logger)
+void While::validate(ValidationLogger& validation_logger) const
 {
     if (!condition_->validate(validation_logger)) return;
 

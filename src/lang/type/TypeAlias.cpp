@@ -104,7 +104,7 @@ llvm::Type* lang::TypeAlias::getContentType(llvm::LLVMContext& c)
     return actual_->getContentType(c);
 }
 
-bool lang::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
+bool lang::TypeAlias::validateDefinition(ValidationLogger& validation_logger) const
 {
     if (is_valid_) return is_valid_.value();
 
@@ -134,7 +134,7 @@ bool lang::TypeAlias::validateDefinition(ValidationLogger& validation_logger)
     return is_valid_.value();
 }
 
-bool lang::TypeAlias::validate(ValidationLogger& validation_logger, lang::Location)
+bool lang::TypeAlias::validate(ValidationLogger& validation_logger, lang::Location) const
 {
     return validateDefinition(validation_logger);
 }
@@ -152,7 +152,7 @@ lang::ResolvingHandle<lang::Type> lang::TypeAlias::getSubscriptReturnType()
 bool lang::TypeAlias::validateSubscript(lang::Location                    indexed_location,
                                         lang::ResolvingHandle<lang::Type> index_type,
                                         lang::Location                    index_location,
-                                        ValidationLogger&                 validation_logger)
+                                        ValidationLogger&                 validation_logger) const
 {
     return actual_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
 }
@@ -171,7 +171,7 @@ bool lang::TypeAlias::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type
 
 bool lang::TypeAlias::validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                  lang::Location                    location,
-                                                 ValidationLogger&                 validation_logger)
+                                                 ValidationLogger&                 validation_logger) const
 {
     return actual_->validateImplicitConversion(other, location, validation_logger);
 }
@@ -198,7 +198,7 @@ bool lang::TypeAlias::validateOperator(lang::BinaryOperator              op,
                                        lang::ResolvingHandle<lang::Type> other,
                                        lang::Location                    left_location,
                                        lang::Location                    right_location,
-                                       ValidationLogger&                 validation_logger)
+                                       ValidationLogger&                 validation_logger) const
 {
     return actual_->validateOperator(op, other, left_location, right_location, validation_logger);
 }
@@ -221,7 +221,7 @@ lang::ResolvingHandle<lang::Type> lang::TypeAlias::getMemberType(const lang::Ide
     return actual_->getMemberType(name);
 }
 
-bool lang::TypeAlias::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
+bool lang::TypeAlias::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const
 {
     return actual_->validateMemberAccess(name, validation_logger);
 }
@@ -243,7 +243,7 @@ lang::ResolvingHandle<lang::Type> lang::TypeAlias::getIndirectionType()
     return actual_->getIndirectionType();
 }
 
-bool lang::TypeAlias::validateIndirection(lang::Location location, ValidationLogger& validation_logger)
+bool lang::TypeAlias::validateIndirection(lang::Location location, ValidationLogger& validation_logger) const
 {
     return actual_->validateIndirection(location, validation_logger);
 }
@@ -263,7 +263,7 @@ llvm::DIType* lang::TypeAlias::createDebugType(CompileContext* context)
     return actual_->getDebugType(context);
 }
 
-std::vector<lang::TypeDefinition*> lang::TypeAlias::getDependencies()
+std::vector<lang::TypeDefinition*> lang::TypeAlias::getDependencies() const
 {
     std::vector<lang::TypeDefinition*> dependencies;
     if (actual_->isDefined()) dependencies.push_back(actual_->getDefinition());

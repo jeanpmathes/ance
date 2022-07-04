@@ -14,7 +14,7 @@ std::string lang::SizeConstant::toString() const
     return value_ + ":size";
 }
 
-bool lang::SizeConstant::validate(ValidationLogger& validation_logger, lang::Location location)
+bool lang::SizeConstant::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (llvm::APInt::getBitsNeeded(value_, 10) > lang::SizeType::MINIMUM_BIT_SIZE)
     {
@@ -27,7 +27,7 @@ bool lang::SizeConstant::validate(ValidationLogger& validation_logger, lang::Loc
     return true;
 }
 
-lang::ResolvingHandle<lang::Type> lang::SizeConstant::type()
+lang::ResolvingHandle<lang::Type> lang::SizeConstant::type() const
 {
     return type_;
 }

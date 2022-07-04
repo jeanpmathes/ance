@@ -36,7 +36,7 @@ lang::ResolvingHandle<lang::Type> MatchSelect::type() const
     return Case::getCommonType(cases_);
 }
 
-bool MatchSelect::validate(ValidationLogger& validation_logger)
+bool MatchSelect::validate(ValidationLogger& validation_logger) const
 {
     bool valid = true;
 

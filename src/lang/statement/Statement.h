@@ -88,7 +88,7 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * Validate this statement.
      * @param validation_logger A logger to log validation messages.
      */
-    virtual void validate(ValidationLogger& validation_logger) = 0;
+    virtual void validate(ValidationLogger& validation_logger) const = 0;
 
     /**
      * Expand this statement into new statements that do not use syntactic sugar.

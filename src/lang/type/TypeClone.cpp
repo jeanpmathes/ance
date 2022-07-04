@@ -94,7 +94,7 @@ llvm::Type* lang::TypeClone::getContentType(llvm::LLVMContext& c)
     return original_->getContentType(c);
 }
 
-bool lang::TypeClone::validateDefinition(ValidationLogger& validation_logger)
+bool lang::TypeClone::validateDefinition(ValidationLogger& validation_logger) const
 {
     if (is_valid_) return is_valid_.value();
 
@@ -138,7 +138,7 @@ bool lang::TypeClone::validateDefinition(ValidationLogger& validation_logger)
     return is_valid_.value();
 }
 
-bool lang::TypeClone::validate(ValidationLogger& validation_logger, lang::Location)
+bool lang::TypeClone::validate(ValidationLogger& validation_logger, lang::Location) const
 {
     return validateDefinition(validation_logger);
 }
@@ -156,7 +156,7 @@ lang::ResolvingHandle<lang::Type> lang::TypeClone::getSubscriptReturnType()
 bool lang::TypeClone::validateSubscript(lang::Location                    indexed_location,
                                         lang::ResolvingHandle<lang::Type> index_type,
                                         lang::Location                    index_location,
-                                        ValidationLogger&                 validation_logger)
+                                        ValidationLogger&                 validation_logger) const
 {
     return original_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
 }
@@ -178,7 +178,7 @@ lang::ResolvingHandle<lang::Type> lang::TypeClone::getMemberType(const lang::Ide
     return original_->getMemberType(name);
 }
 
-bool lang::TypeClone::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
+bool lang::TypeClone::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const
 {
     return original_->validateMemberAccess(name, validation_logger);
 }
@@ -200,7 +200,7 @@ lang::ResolvingHandle<lang::Type> lang::TypeClone::getIndirectionType()
     return original_->getIndirectionType();
 }
 
-bool lang::TypeClone::validateIndirection(lang::Location location, ValidationLogger& validation_logger)
+bool lang::TypeClone::validateIndirection(lang::Location location, ValidationLogger& validation_logger) const
 {
     return original_->validateIndirection(location, validation_logger);
 }
@@ -215,7 +215,7 @@ llvm::DIType* lang::TypeClone::createDebugType(CompileContext* context)
     return original_->getDebugType(context);
 }
 
-std::vector<lang::TypeDefinition*> lang::TypeClone::getDependencies()
+std::vector<lang::TypeDefinition*> lang::TypeClone::getDependencies() const
 {
     std::vector<lang::TypeDefinition*> dependencies;
     if (original_->isDefined()) dependencies.push_back(original_->getDefinition());

@@ -236,7 +236,7 @@ void lang::LocalScope::onSubScope(lang::LocalScope* sub_scope)
     sub_scopes_.push_back(sub_scope);
 }
 
-void lang::LocalScope::validate(ValidationLogger& validation_logger)
+void lang::LocalScope::validate(ValidationLogger& validation_logger) const
 {
     for (auto& [name, variables] : defined_local_variables_)
     {

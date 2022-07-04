@@ -33,7 +33,9 @@ bool lang::SizeType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type>
     return self()->isSizeType() && other->isDiffType();
 }
 
-bool lang::SizeType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>, lang::Location, ValidationLogger&)
+bool lang::SizeType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
+                                                lang::Location,
+                                                ValidationLogger&) const
 {
     return true;
 }
@@ -77,7 +79,7 @@ bool lang::SizeType::validateOperator(lang::BinaryOperator,
                                       lang::ResolvingHandle<lang::Type>,
                                       lang::Location,
                                       lang::Location,
-                                      ValidationLogger&)
+                                      ValidationLogger&) const
 {
     return true;
 }

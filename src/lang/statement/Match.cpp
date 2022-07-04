@@ -353,7 +353,7 @@ Statements Match::expandWith(Expressions subexpressions, Statements) const
     return statements;
 }
 
-void Match::validate(ValidationLogger& validation_logger)
+void Match::validate(ValidationLogger& validation_logger) const
 {
     bool valid = true;
 

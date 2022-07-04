@@ -58,7 +58,7 @@ llvm::PointerType* lang::PointerType::getContentType(llvm::LLVMContext& c)
     return llvm::PointerType::get(native_type, 0);
 }
 
-bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Location location)
+bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (!element_type_->isDefined())
     {
@@ -89,7 +89,7 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::getSubscriptReturnType()
 bool lang::PointerType::validateSubscript(lang::Location,
                                           lang::ResolvingHandle<lang::Type> index_type,
                                           lang::Location                    index_location,
-                                          ValidationLogger&                 validation_logger)
+                                          ValidationLogger&                 validation_logger) const
 {
     return lang::Type::checkMismatch(lang::SizeType::getSize(), index_type, index_location, validation_logger);
 }
@@ -135,7 +135,7 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::getIndirectionType()
     return element_type_;
 }
 
-bool lang::PointerType::validateIndirection(lang::Location, ValidationLogger&)
+bool lang::PointerType::validateIndirection(lang::Location, ValidationLogger&) const
 {
     return true;
 }

@@ -133,7 +133,7 @@ namespace lang
          * Validate this scope.
          * @param validation_logger A logger to log validation messages to.
          */
-        virtual void validate(ValidationLogger& validation_logger) = 0;
+        virtual void validate(ValidationLogger& validation_logger) const = 0;
 
         ~Scope() override = default;
 

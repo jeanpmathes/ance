@@ -20,7 +20,7 @@ Expression& Assertion::condition() const
     return *condition_;
 }
 
-void Assertion::validate(ValidationLogger& validation_logger)
+void Assertion::validate(ValidationLogger& validation_logger) const
 {
     bool is_valid = condition_->validate(validation_logger);
     if (!is_valid) return;

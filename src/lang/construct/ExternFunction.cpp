@@ -34,7 +34,7 @@ bool lang::ExternFunction::isMangled() const
     return false;
 }
 
-void lang::ExternFunction::validate(ValidationLogger& validation_logger)
+void lang::ExternFunction::validate(ValidationLogger& validation_logger) const
 {
     if (!returnType()->isDefined())
     {
@@ -78,7 +78,7 @@ void lang::ExternFunction::expand() {}
 
 void lang::ExternFunction::determineFlow() {}
 
-bool lang::ExternFunction::validateFlow(ValidationLogger&)
+bool lang::ExternFunction::validateFlow(ValidationLogger&) const
 {
     return true;
 }

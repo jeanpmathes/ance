@@ -74,7 +74,7 @@ void Application::preValidate()
     global_scope_->resolve();
 }
 
-void Application::validate(ValidationLogger& validation_logger)
+void Application::validate(ValidationLogger& validation_logger) const
 {
     global_scope_->validate(validation_logger);
 
@@ -107,7 +107,7 @@ void Application::emitAsSource(std::filesystem::path out)
     printer.visit(*this);
 }
 
-void Application::validateFlow(ValidationLogger& validation_logger)
+void Application::validateFlow(ValidationLogger& validation_logger) const
 {
     global_scope_->validateFlow(validation_logger);
 }

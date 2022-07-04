@@ -66,7 +66,7 @@ namespace lang
         lang::LocalScope* getBlockScope() const override;
         bool              isCompound() const override;
 
-        void validate(ValidationLogger& validation_logger) override;
+        void validate(ValidationLogger& validation_logger) const override;
 
         Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 

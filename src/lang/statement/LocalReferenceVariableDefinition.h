@@ -49,7 +49,7 @@ class LocalReferenceVariableDefinition
     void setScope(lang::Scope& scope) override;
     void walkDefinitions() override;
 
-    void validate(ValidationLogger& validation_logger) override;
+    void validate(ValidationLogger& validation_logger) const override;
 
     Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 

@@ -51,7 +51,7 @@ bool lang::FloatingPointType::isImplicitlyConvertibleTo(lang::ResolvingHandle<la
 
 bool lang::FloatingPointType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
                                                          lang::Location,
-                                                         ValidationLogger&)
+                                                         ValidationLogger&) const
 {
     return true;
 }
@@ -97,7 +97,7 @@ bool lang::FloatingPointType::validateOperator(lang::BinaryOperator,
                                                lang::ResolvingHandle<lang::Type>,
                                                lang::Location,
                                                lang::Location,
-                                               ValidationLogger&)
+                                               ValidationLogger&) const
 {
     return true;
 }

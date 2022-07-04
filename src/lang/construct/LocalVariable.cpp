@@ -23,7 +23,7 @@ lang::LocalVariable::LocalVariable(Identifier                        name,
     // Type is already added in declaring statement.
 }
 
-void lang::LocalVariable::validate(ValidationLogger&)
+void lang::LocalVariable::validate(ValidationLogger&) const
 {
     // Validation of initial value in declaring statement.
 }

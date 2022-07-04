@@ -27,7 +27,7 @@ namespace lang
          */
         void setValue(llvm::Value* value);
 
-        lang::ResolvingHandle<lang::Type> type() override;
+        lang::ResolvingHandle<lang::Type> type() const override;
 
         void         buildNativeValue(CompileContext* context) override;
         llvm::Value* getNativeValue() override;

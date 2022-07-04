@@ -36,7 +36,7 @@ lang::ResolvingHandle<lang::Type> BinaryOperation::type() const
     return left_->type()->getOperatorResultType(op_, getRightType());
 }
 
-bool BinaryOperation::validate(ValidationLogger& validation_logger)
+bool BinaryOperation::validate(ValidationLogger& validation_logger) const
 {
     bool valid_operands = left_->validate(validation_logger) && right_->validate(validation_logger);
     if (!valid_operands) return false;

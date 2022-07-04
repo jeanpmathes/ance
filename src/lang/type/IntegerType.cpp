@@ -44,7 +44,7 @@ llvm::Type* lang::IntegerType::getContentType(llvm::LLVMContext& c)
     return type_;
 }
 
-bool lang::IntegerType::validate(ValidationLogger& validation_logger, lang::Location location)
+bool lang::IntegerType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (bit_size_ == 0)
     {
@@ -89,7 +89,9 @@ bool lang::IntegerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Ty
     return false;
 }
 
-bool lang::IntegerType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>, lang::Location, ValidationLogger&)
+bool lang::IntegerType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
+                                                   lang::Location,
+                                                   ValidationLogger&) const
 {
     return true;
 }
@@ -151,7 +153,7 @@ bool lang::IntegerType::validateOperator(lang::BinaryOperator,
                                          lang::ResolvingHandle<lang::Type>,
                                          lang::Location,
                                          lang::Location,
-                                         ValidationLogger&)
+                                         ValidationLogger&) const
 {
     return true;
 }

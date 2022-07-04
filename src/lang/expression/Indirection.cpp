@@ -22,7 +22,7 @@ lang::ResolvingHandle<lang::Type> Indirection::type() const
     return lang::ReferenceType::get(value_->type()->getIndirectionType());
 }
 
-bool Indirection::validate(ValidationLogger& validation_logger)
+bool Indirection::validate(ValidationLogger& validation_logger) const
 {
     if (!value_->validate(validation_logger)) return false;
 

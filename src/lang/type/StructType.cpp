@@ -66,7 +66,7 @@ void lang::StructType::onScope()
     for (auto& member : members_) { member->setScope(scope()); }
 }
 
-bool lang::StructType::validateDefinition(ValidationLogger& validation_logger)
+bool lang::StructType::validateDefinition(ValidationLogger& validation_logger) const
 {
     bool valid = true;
 
@@ -168,7 +168,7 @@ llvm::DIType* lang::StructType::createDebugType(CompileContext* context)
                                            debug_type);
 }
 
-std::vector<lang::TypeDefinition*> lang::StructType::getDependencies()
+std::vector<lang::TypeDefinition*> lang::StructType::getDependencies() const
 {
     std::vector<lang::TypeDefinition*> dependencies;
     std::set<lang::TypeDefinition*>    added;
@@ -197,7 +197,7 @@ lang::ResolvingHandle<lang::Type> lang::StructType::getMemberType(const lang::Id
     return member_map_.at(name).get().type();
 }
 
-bool lang::StructType::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
+bool lang::StructType::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const
 {
     if (member_map_.at(name).get().access() == AccessModifier::PRIVATE_ACCESS)
     {

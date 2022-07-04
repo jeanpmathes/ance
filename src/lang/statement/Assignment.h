@@ -34,7 +34,7 @@ class Assignment
     [[nodiscard]] lang::Assigner assigner() const;
     [[nodiscard]] Expression&    assigned() const;
 
-    void validate(ValidationLogger& validation_logger) override;
+    void validate(ValidationLogger& validation_logger) const override;
 
     Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 

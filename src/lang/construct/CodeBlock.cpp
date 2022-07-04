@@ -128,7 +128,7 @@ bool lang::CodeBlock::isCompound() const
     return scoped_;
 }
 
-void lang::CodeBlock::validate(ValidationLogger& validation_logger)
+void lang::CodeBlock::validate(ValidationLogger& validation_logger) const
 {
     for (auto& sub : subs_) { sub->validate(validation_logger); }
 }

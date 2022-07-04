@@ -21,7 +21,7 @@ class BindRefTo
 
     lang::ResolvingHandle<lang::Type> type() const override;
 
-    bool validate(ValidationLogger& validation_logger) override;
+    bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 

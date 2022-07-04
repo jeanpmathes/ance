@@ -97,7 +97,7 @@ namespace lang
          * Validate this function.
          * @param validation_logger A logger to log validation messages.
          */
-        virtual void validate(ValidationLogger& validation_logger) = 0;
+        virtual void validate(ValidationLogger& validation_logger) const = 0;
 
         /**
          * Expand the function content to remove syntactic sugar.
@@ -114,7 +114,7 @@ namespace lang
          * @param validation_logger The logger to log validation messages.
          * @return True if the control flow is valid.
          */
-        virtual bool validateFlow(ValidationLogger& validation_logger) = 0;
+        virtual bool validateFlow(ValidationLogger& validation_logger) const = 0;
 
         /**
          * Create the native content of this function, allowing building function code and calling this function.
@@ -158,7 +158,7 @@ namespace lang
          * Get the function parameters.
          * @return A vector containing the parameters.
          */
-        std::vector<std::shared_ptr<lang::Parameter>>& parameters();
+        [[nodiscard]] const std::vector<std::shared_ptr<lang::Parameter>>& parameters() const;
 
         /**
          * A helper to create a native function.

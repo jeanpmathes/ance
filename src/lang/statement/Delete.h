@@ -26,7 +26,7 @@ class Delete
     [[nodiscard]] Expression& toDelete() const;
     [[nodiscard]] bool        isBufferDelete() const;
 
-    void validate(ValidationLogger& validation_logger) override;
+    void validate(ValidationLogger& validation_logger) const override;
 
     Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 

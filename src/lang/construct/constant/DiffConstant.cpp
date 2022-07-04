@@ -13,7 +13,7 @@ std::string lang::DiffConstant::toString() const
     return value_ + ":diff";
 }
 
-bool lang::DiffConstant::validate(ValidationLogger& validation_logger, lang::Location location)
+bool lang::DiffConstant::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (llvm::APInt::getBitsNeeded(value_, 10) > lang::SizeType::MINIMUM_BIT_SIZE)
     {
@@ -26,7 +26,7 @@ bool lang::DiffConstant::validate(ValidationLogger& validation_logger, lang::Loc
     return true;
 }
 
-lang::ResolvingHandle<lang::Type> lang::DiffConstant::type()
+lang::ResolvingHandle<lang::Type> lang::DiffConstant::type() const
 {
     return type_;
 }

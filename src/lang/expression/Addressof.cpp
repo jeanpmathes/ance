@@ -31,7 +31,7 @@ lang::ResolvingHandle<lang::Type> Addressof::type() const
     return *return_type_;
 }
 
-bool Addressof::validate(ValidationLogger& validation_logger)
+bool Addressof::validate(ValidationLogger& validation_logger) const
 {
     bool is_arg_valid = arg_->validate(validation_logger);
     if (!is_arg_valid) return false;

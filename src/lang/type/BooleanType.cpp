@@ -63,7 +63,7 @@ lang::ResolvingHandle<lang::Type> lang::BooleanType::getOperatorResultType(lang:
     return self();
 }
 
-bool lang::BooleanType::validateOperator(lang::UnaryOperator, lang::Location, ValidationLogger&)
+bool lang::BooleanType::validateOperator(lang::UnaryOperator, lang::Location, ValidationLogger&) const
 {
     return true;
 }

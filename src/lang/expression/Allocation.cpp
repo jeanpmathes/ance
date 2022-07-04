@@ -48,7 +48,7 @@ lang::ResolvingHandle<lang::Type> Allocation::type() const
     return return_type_;
 }
 
-bool Allocation::validate(ValidationLogger& validation_logger)
+bool Allocation::validate(ValidationLogger& validation_logger) const
 {
     if (!allocated_type_->isDefined())
     {

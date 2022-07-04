@@ -19,7 +19,7 @@ namespace lang
          */
         explicit DelayedValue(DelayableExpression& expression);
 
-        lang::ResolvingHandle<lang::Type> type() override;
+        lang::ResolvingHandle<lang::Type> type() const override;
 
         /**
          * Set the value to use. This method should be called once or never by the delayable expression.

@@ -29,10 +29,10 @@ namespace lang
 
         [[nodiscard]] bool isMangled() const override;
 
-        void validate(ValidationLogger& validation_logger) override;
+        void validate(ValidationLogger& validation_logger) const override;
         void expand() override;
         void determineFlow() override;
-        bool validateFlow(ValidationLogger& validation_logger) override;
+        bool validateFlow(ValidationLogger& validation_logger) const override;
 
         void                         createNativeBacking(CompileContext* context) override;
         void                         build(CompileContext* context) override;

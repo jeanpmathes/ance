@@ -31,7 +31,7 @@ bool VariableAccess::isNamed()
     return true;
 }
 
-bool VariableAccess::validate(ValidationLogger& validation_logger)
+bool VariableAccess::validate(ValidationLogger& validation_logger) const
 {
     if (!variable_->isDefined() && scope()->asLocalScope()->wasVariableDropped(variable_))
     {

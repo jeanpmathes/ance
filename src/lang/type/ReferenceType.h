@@ -33,12 +33,12 @@ namespace lang
 
         lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
 
-        bool validate(ValidationLogger& validation_logger, lang::Location location) override;
+        bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
         bool                         validateSubscript(lang::Location                    indexed_location,
                                                        lang::ResolvingHandle<lang::Type> index_type,
                                                        lang::Location                    index_location,
-                                                       ValidationLogger&                 validation_logger) override;
+                                                       ValidationLogger&                 validation_logger) const override;
         std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
                                                     CompileContext*        context) override;
@@ -50,7 +50,7 @@ namespace lang
                                                            lang::ResolvingHandle<lang::Type> other,
                                                            lang::Location                    left_location,
                                                            lang::Location                    right_location,
-                                                           ValidationLogger&                 validation_logger) override;
+                                                           ValidationLogger&                 validation_logger) const override;
         std::shared_ptr<lang::Value>      buildOperator(lang::BinaryOperator   op,
                                                         std::shared_ptr<Value> left,
                                                         std::shared_ptr<Value> right,
@@ -58,14 +58,14 @@ namespace lang
 
         bool                              hasMember(const lang::Identifier& name) override;
         lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name) override;
-        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) override;
+        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const override;
         std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
                                                        const lang::Identifier& name,
                                                        CompileContext*         context) override;
 
         bool                              definesIndirection() override;
         lang::ResolvingHandle<lang::Type> getIndirectionType() override;
-        bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) override;
+        bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
         std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context) override;
 
         ~ReferenceType() override = default;

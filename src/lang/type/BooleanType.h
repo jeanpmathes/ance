@@ -24,7 +24,7 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
         bool                              validateOperator(lang::UnaryOperator op,
                                                            lang::Location      location,
-                                                           ValidationLogger&   validation_logger) override;
+                                                           ValidationLogger&   validation_logger) const override;
         std::shared_ptr<lang::Value>      buildOperator(lang::UnaryOperator    op,
                                                         std::shared_ptr<Value> value,
                                                         CompileContext*        context) override;

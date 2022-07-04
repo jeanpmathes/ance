@@ -94,25 +94,25 @@ namespace lang
         virtual bool                              definesIndirection();
         virtual lang::ResolvingHandle<lang::Type> getIndirectionType();
 
-        virtual bool validateDefinition(ValidationLogger& validation_logger);
-        virtual bool validate(ValidationLogger& validation_logger, lang::Location location);
+        virtual bool validateDefinition(ValidationLogger& validation_logger) const;
+        virtual bool validate(ValidationLogger& validation_logger, lang::Location location) const;
         virtual bool validateSubscript(lang::Location                    indexed_location,
                                        lang::ResolvingHandle<lang::Type> index_type,
                                        lang::Location                    index_location,
-                                       ValidationLogger&                 validation_logger);
+                                       ValidationLogger&                 validation_logger) const;
         virtual bool validateOperator(lang::BinaryOperator              op,
                                       lang::ResolvingHandle<lang::Type> other,
                                       lang::Location                    left_location,
                                       lang::Location                    right_location,
-                                      ValidationLogger&                 validation_logger);
+                                      ValidationLogger&                 validation_logger) const;
         virtual bool validateOperator(lang::UnaryOperator op,
                                       lang::Location      location,
-                                      ValidationLogger&   validation_logger);
+                                      ValidationLogger&   validation_logger) const;
         virtual bool validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                 lang::Location                    location,
-                                                ValidationLogger&                 validation_logger);
-        virtual bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger);
-        virtual bool validateIndirection(lang::Location location, ValidationLogger& validation_logger);
+                                                ValidationLogger&                 validation_logger) const;
+        virtual bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const;
+        virtual bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const;
 
         virtual std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                             std::shared_ptr<Value> index,
@@ -142,18 +142,18 @@ namespace lang
          * @param validation_logger The validation logger to use.
          * @return True if the dependencies are valid.
          */
-        bool                                       checkDependencies(ValidationLogger& validation_logger);
-        virtual std::vector<lang::TypeDefinition*> getDependencies();
+        bool                                       checkDependencies(ValidationLogger& validation_logger) const;
+        virtual std::vector<lang::TypeDefinition*> getDependencies() const;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self() const;
 
       private:
         lang::Identifier name_;
         lang::Location   location_;
-        std::string    mangled_name_ {};
-        lang::Type*    type_ {nullptr};
-        lang::Scope*   containing_scope_ {nullptr};
-        llvm::DIType*  debug_type_ {nullptr};
+        std::string      mangled_name_ {};
+        lang::Type*      type_ {nullptr};
+        lang::Scope*     containing_scope_ {nullptr};
+        llvm::DIType*    debug_type_ {nullptr};
     };
 }
 

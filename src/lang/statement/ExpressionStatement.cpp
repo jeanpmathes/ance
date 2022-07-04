@@ -16,7 +16,7 @@ BuildableExpression& ExpressionStatement::expression() const
     return *expression_;
 }
 
-void ExpressionStatement::validate(ValidationLogger& validation_logger)
+void ExpressionStatement::validate(ValidationLogger& validation_logger) const
 {
     expression_->validate(validation_logger);
 }

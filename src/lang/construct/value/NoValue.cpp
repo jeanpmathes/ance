@@ -2,7 +2,7 @@
 
 lang::NoValue::NoValue(UnexpandedExpression& unexpanded_expression) : unexpanded_expression_(unexpanded_expression) {}
 
-lang::ResolvingHandle<lang::Type> lang::NoValue::type()
+lang::ResolvingHandle<lang::Type> lang::NoValue::type() const
 {
     return unexpanded_expression_.type();
 }

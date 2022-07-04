@@ -22,7 +22,7 @@ std::string lang::FloatConstant::toString() const
     return text_ + suffix;
 }
 
-lang::ResolvingHandle<lang::Type> lang::FloatConstant::type()
+lang::ResolvingHandle<lang::Type> lang::FloatConstant::type() const
 {
     return type_;
 }

@@ -26,7 +26,7 @@ lang::ResolvingHandle<lang::Type> UnaryOperation::type() const
     return operand_->type()->getOperatorResultType(op_);
 }
 
-bool UnaryOperation::validate(ValidationLogger& validation_logger)
+bool UnaryOperation::validate(ValidationLogger& validation_logger) const
 {
     if (!operand_->validate(validation_logger)) return false;
 

@@ -204,12 +204,12 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getIndirectionType()
     return lang::VoidType::get();
 }
 
-bool lang::TypeDefinition::validateDefinition(ValidationLogger&)
+bool lang::TypeDefinition::validateDefinition(ValidationLogger&) const
 {
     return true;
 }
 
-bool lang::TypeDefinition::validate(ValidationLogger&, lang::Location)
+bool lang::TypeDefinition::validate(ValidationLogger&, lang::Location) const
 {
     return true;
 }
@@ -217,7 +217,7 @@ bool lang::TypeDefinition::validate(ValidationLogger&, lang::Location)
 bool lang::TypeDefinition::validateSubscript(lang::Location,
                                              lang::ResolvingHandle<lang::Type>,
                                              lang::Location,
-                                             ValidationLogger&)
+                                             ValidationLogger&) const
 {
     return false;
 }
@@ -226,29 +226,29 @@ bool lang::TypeDefinition::validateOperator(lang::BinaryOperator,
                                             lang::ResolvingHandle<lang::Type>,
                                             lang::Location,
                                             lang::Location,
-                                            ValidationLogger&)
+                                            ValidationLogger&) const
 {
     return false;
 }
 
-bool lang::TypeDefinition::validateOperator(lang::UnaryOperator, lang::Location, ValidationLogger&)
+bool lang::TypeDefinition::validateOperator(lang::UnaryOperator, lang::Location, ValidationLogger&) const
 {
     return false;
 }
 
 bool lang::TypeDefinition::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
                                                       lang::Location,
-                                                      ValidationLogger&)
+                                                      ValidationLogger&) const
 {
     return false;
 }
 
-bool lang::TypeDefinition::validateMemberAccess(const lang::Identifier&, ValidationLogger&)
+bool lang::TypeDefinition::validateMemberAccess(const lang::Identifier&, ValidationLogger&) const
 {
     return false;
 }
 
-bool lang::TypeDefinition::validateIndirection(lang::Location, ValidationLogger&)
+bool lang::TypeDefinition::validateIndirection(lang::Location, ValidationLogger&) const
 {
     return true;
 }
@@ -294,13 +294,13 @@ std::shared_ptr<lang::Value> lang::TypeDefinition::buildIndirection(std::shared_
     return nullptr;
 }
 
-bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger)
+bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger) const
 {
     const int visited  = 1;
     const int finished = 2;
 
-    std::stack<std::pair<lang::TypeDefinition*, bool>> to_check;
-    std::map<lang::TypeDefinition*, int>               state;
+    std::stack<std::pair<const lang::TypeDefinition*, bool>> to_check;
+    std::map<const lang::TypeDefinition*, int>               state;
 
     to_check.emplace(this, false);
 
@@ -336,7 +336,7 @@ bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger
     return true;
 }
 
-std::vector<lang::TypeDefinition*> lang::TypeDefinition::getDependencies()
+std::vector<lang::TypeDefinition*> lang::TypeDefinition::getDependencies() const
 {
     return {};
 }

@@ -45,7 +45,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> If::createBasicBlocks(lang::Basic
     return blocks;
 }
 
-void If::validate(ValidationLogger& validation_logger)
+void If::validate(ValidationLogger& validation_logger) const
 {
     if (!condition_->validate(validation_logger)) return;
 

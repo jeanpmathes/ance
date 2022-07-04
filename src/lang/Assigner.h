@@ -45,19 +45,19 @@ namespace lang
          * Get whether this assignment is final.
          * @return True if this assignment is final.
          */
-        bool isFinal();
+        bool isFinal() const;
 
         /**
          * Get whether this assignment is represented by a symbol.
          * @return True if a symbol exists for this assignment.
          */
-        bool hasSymbol();
+        bool hasSymbol() const;
 
         /**
          * Get the symbol for this assignment.
          * @return The symbol for this assignment.
          */
-        std::string getSymbol();
+        std::string getSymbol() const;
 
       private:
         Value value_;

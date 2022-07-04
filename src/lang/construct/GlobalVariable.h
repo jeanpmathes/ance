@@ -48,7 +48,7 @@ namespace lang
         [[nodiscard]] lang::Assigner       assigner() const;
         [[nodiscard]] lang::Constant&      init() const;
 
-        void validate(ValidationLogger& validation_logger) override;
+        void validate(ValidationLogger& validation_logger) const override;
 
         void buildDeclaration(CompileContext* context) override;
         void buildDefinition(CompileContext* context) override;

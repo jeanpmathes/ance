@@ -45,7 +45,7 @@ lang::ResolvingHandle<lang::Type> IfSelect::type() const
     return then_expression_->type();
 }
 
-bool IfSelect::validate(ValidationLogger& validation_logger)
+bool IfSelect::validate(ValidationLogger& validation_logger) const
 {
     bool valid = true;
 

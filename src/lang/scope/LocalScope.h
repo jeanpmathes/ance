@@ -97,7 +97,7 @@ namespace lang
         void onSubScope(lang::LocalScope* sub_scope) override;
 
       public:
-        void validate(ValidationLogger& validation_logger) override;
+        void validate(ValidationLogger& validation_logger) const override;
 
         /**
          * Build all variable declarations.

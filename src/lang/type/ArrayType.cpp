@@ -53,7 +53,7 @@ llvm::ArrayType* lang::ArrayType::getContentType(llvm::LLVMContext& c)
     return type_;
 }
 
-bool lang::ArrayType::validate(ValidationLogger& validation_logger, lang::Location location)
+bool lang::ArrayType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (size_ > MAX_ARRAY_TYPE_SIZE)
     {
@@ -91,7 +91,7 @@ lang::ResolvingHandle<lang::Type> lang::ArrayType::getSubscriptReturnType()
 bool lang::ArrayType::validateSubscript(lang::Location,
                                         lang::ResolvingHandle<lang::Type> index_type,
                                         lang::Location                    index_location,
-                                        ValidationLogger&                 validation_logger)
+                                        ValidationLogger&                 validation_logger) const
 {
     return lang::Type::checkMismatch(lang::SizeType::getSize(), index_type, index_location, validation_logger);
 }
@@ -161,7 +161,7 @@ llvm::DIType* lang::ArrayType::createDebugType(CompileContext* context)
                                           context->di()->getOrCreateArray(subscripts));
 }
 
-std::vector<lang::TypeDefinition*> lang::ArrayType::getDependencies()
+std::vector<lang::TypeDefinition*> lang::ArrayType::getDependencies() const
 {
     std::vector<lang::TypeDefinition*> dependencies;
 

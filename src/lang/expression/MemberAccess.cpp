@@ -27,7 +27,7 @@ lang::ResolvingHandle<lang::Type> MemberAccess::type() const
     return lang::ReferenceType::get(value_->type()->getMemberType(member_));
 }
 
-bool MemberAccess::validate(ValidationLogger& validation_logger)
+bool MemberAccess::validate(ValidationLogger& validation_logger) const
 {
     if (!value_->validate(validation_logger)) return false;
 

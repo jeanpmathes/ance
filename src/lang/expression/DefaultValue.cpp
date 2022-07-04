@@ -13,7 +13,7 @@ lang::ResolvingHandle<lang::Type> DefaultValue::type() const
     return type_;
 }
 
-bool DefaultValue::validate(ValidationLogger&)
+bool DefaultValue::validate(ValidationLogger&) const
 {
     return true;
 }

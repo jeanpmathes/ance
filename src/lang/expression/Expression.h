@@ -56,7 +56,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @param validation_logger A logger to log validation messages.
      * @return Whether this expression is valid and dependent entities can be validated too.
      */
-    virtual bool validate(ValidationLogger& validation_logger) = 0;
+    virtual bool validate(ValidationLogger& validation_logger) const = 0;
 
     using Expansion = std::tuple<Statements, std::unique_ptr<Expression>, Statements>;
 

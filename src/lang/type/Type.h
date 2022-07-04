@@ -60,7 +60,7 @@ namespace lang
          * @param is_safe Whether the type is currently safe to use. Set to false when endless loops could occur.
          * @return The annotated name.
          */
-        std::string getAnnotatedName(bool is_safe = true);
+        std::string getAnnotatedName(bool is_safe = true) const;
 
         /**
          * Get the mangled name of this type. The mangled name can only be used after all type dependencies have been resolved.
@@ -306,7 +306,7 @@ namespace lang
          * @param validation_logger The validation logger to use.
          * @return True if the type has a valid definition.
          */
-        bool validateDefinition(ValidationLogger& validation_logger);
+        bool validateDefinition(ValidationLogger& validation_logger) const;
 
         /**
          * Validate if this type is well-formed.
@@ -314,7 +314,7 @@ namespace lang
          * @param location The source location of the type declaration.
          * @return True if the type is valid.
          */
-        bool validate(ValidationLogger& validation_logger, lang::Location location);
+        bool validate(ValidationLogger& validation_logger, lang::Location location) const;
 
         /**
          * Validate a subscript access.
@@ -327,7 +327,7 @@ namespace lang
         bool validateSubscript(lang::Location                    indexed_location,
                                lang::ResolvingHandle<lang::Type> index_type,
                                lang::Location                    index_location,
-                               ValidationLogger&                 validation_logger);
+                               ValidationLogger&                 validation_logger) const;
 
         /**
          * Validate a binary operation. May only be called if the operation is defined.
@@ -342,7 +342,7 @@ namespace lang
                               lang::ResolvingHandle<lang::Type> other,
                               lang::Location                    left_location,
                               lang::Location                    right_location,
-                              ValidationLogger&                 validation_logger);
+                              ValidationLogger&                 validation_logger) const;
 
         /**
          * Validate a unary operation. May only be called if the operation is defined.
@@ -351,7 +351,9 @@ namespace lang
          * @param validation_logger The validation logger to use.
          * @return True if the operation is valid.
          */
-        bool validateOperator(lang::UnaryOperator op, lang::Location location, ValidationLogger& validation_logger);
+        bool validateOperator(lang::UnaryOperator op,
+                              lang::Location      location,
+                              ValidationLogger&   validation_logger) const;
 
         /**
          * Validate an implicit conversion.
@@ -362,7 +364,7 @@ namespace lang
          */
         bool validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                         lang::Location                    location,
-                                        ValidationLogger&                 validation_logger);
+                                        ValidationLogger&                 validation_logger) const;
 
         /**
          * Validate a member access.
@@ -370,7 +372,7 @@ namespace lang
          * @param validation_logger The validation logger to use.
          * @return True if the member access is valid.
          */
-        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger);
+        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const;
 
         /**
          * Validate indirection.
@@ -378,7 +380,7 @@ namespace lang
          * @param validation_logger The validation logger to use.
          * @return True if the indirection is valid.
          */
-        bool validateIndirection(lang::Location location, ValidationLogger& validation_logger);
+        bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const;
 
         /**
          * Build a subscript access.
@@ -445,7 +447,7 @@ namespace lang
          */
         std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context);
 
-        lang::TypeDefinition* getDefinition();
+        lang::TypeDefinition* getDefinition() const;
 
         /**
          * Check if two types are matching, meaning the available type can be converted to the expected type.

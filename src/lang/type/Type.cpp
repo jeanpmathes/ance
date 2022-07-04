@@ -24,7 +24,7 @@ const lang::Identifier& lang::Type::name() const
     }
 }
 
-std::string lang::Type::getAnnotatedName(bool is_safe)
+std::string lang::Type::getAnnotatedName(bool is_safe) const
 {
     std::string name = "'" + this->name() + "'";
 
@@ -256,14 +256,14 @@ lang::ResolvingHandle<lang::Type> lang::Type::getIndirectionType()
     return definition_->getIndirectionType();
 }
 
-bool lang::Type::validateDefinition(ValidationLogger& validation_logger)
+bool lang::Type::validateDefinition(ValidationLogger& validation_logger) const
 {
     assert(isDefined());
     if (definition_->isCustom()) return definition_->validateDefinition(validation_logger);
     else return true;
 }
 
-bool lang::Type::validate(ValidationLogger& validation_logger, lang::Location location)
+bool lang::Type::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     assert(isDefined());
     return definition_->validate(validation_logger, location);
@@ -272,7 +272,7 @@ bool lang::Type::validate(ValidationLogger& validation_logger, lang::Location lo
 bool lang::Type::validateSubscript(lang::Location                    indexed_location,
                                    lang::ResolvingHandle<lang::Type> index_type,
                                    lang::Location                    index_location,
-                                   ValidationLogger&                 validation_logger)
+                                   ValidationLogger&                 validation_logger) const
 {
     assert(isDefined());
     return definition_->validateSubscript(indexed_location, std::move(index_type), index_location, validation_logger);
@@ -282,13 +282,15 @@ bool lang::Type::validateOperator(lang::BinaryOperator              op,
                                   lang::ResolvingHandle<lang::Type> other,
                                   lang::Location                    left_location,
                                   lang::Location                    right_location,
-                                  ValidationLogger&                 validation_logger)
+                                  ValidationLogger&                 validation_logger) const
 {
     assert(isDefined());
     return definition_->validateOperator(op, std::move(other), left_location, right_location, validation_logger);
 }
 
-bool lang::Type::validateOperator(lang::UnaryOperator op, lang::Location location, ValidationLogger& validation_logger)
+bool lang::Type::validateOperator(lang::UnaryOperator op,
+                                  lang::Location      location,
+                                  ValidationLogger&   validation_logger) const
 {
     assert(isDefined());
     return definition_->validateOperator(op, location, validation_logger);
@@ -296,19 +298,19 @@ bool lang::Type::validateOperator(lang::UnaryOperator op, lang::Location locatio
 
 bool lang::Type::validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                             lang::Location                    location,
-                                            ValidationLogger&                 validation_logger)
+                                            ValidationLogger&                 validation_logger) const
 {
     assert(isDefined());
     return definition_->validateImplicitConversion(std::move(other), location, validation_logger);
 }
 
-bool lang::Type::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
+bool lang::Type::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const
 {
     assert(isDefined());
     return definition_->validateMemberAccess(name, validation_logger);
 }
 
-bool lang::Type::validateIndirection(lang::Location location, ValidationLogger& validation_logger)
+bool lang::Type::validateIndirection(lang::Location location, ValidationLogger& validation_logger) const
 {
     assert(isDefined());
     return definition_->validateIndirection(location, validation_logger);
@@ -361,7 +363,7 @@ std::shared_ptr<lang::Value> lang::Type::buildIndirection(std::shared_ptr<Value>
     return definition_->buildIndirection(std::move(value), context);
 }
 
-lang::TypeDefinition* lang::Type::getDefinition()
+lang::TypeDefinition* lang::Type::getDefinition() const
 {
     return definition_.get();
 }

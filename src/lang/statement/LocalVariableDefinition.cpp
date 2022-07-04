@@ -70,7 +70,7 @@ void LocalVariableDefinition::walkDefinitions()
     scope()->addType(type_);
 }
 
-void LocalVariableDefinition::validate(ValidationLogger& validation_logger)
+void LocalVariableDefinition::validate(ValidationLogger& validation_logger) const
 {
     assert(variable_);
     auto variable = *variable_;

@@ -16,7 +16,7 @@ Expression* lang::ExpressionBackedConstant::getBackingExpression() const
     return &expression_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::ExpressionBackedConstant::type()
+lang::ResolvingHandle<lang::Type> lang::ExpressionBackedConstant::type() const
 {
     return expression_.type();
 }

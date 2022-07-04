@@ -22,7 +22,7 @@ void Drop::walkDefinitions()
     dropped_ = scope()->asLocalScope()->drop(variable_);
 }
 
-void Drop::validate(ValidationLogger& validation_logger)
+void Drop::validate(ValidationLogger& validation_logger) const
 {
     if (!variable_->isDefined())
     {

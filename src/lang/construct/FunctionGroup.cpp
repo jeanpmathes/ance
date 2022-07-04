@@ -21,7 +21,7 @@ void lang::FunctionGroup::resolve()
     for (auto& function : functions_) function->resolve();
 }
 
-void lang::FunctionGroup::validate(ValidationLogger& validation_logger)
+void lang::FunctionGroup::validate(ValidationLogger& validation_logger) const
 {
     {// Validate that every signature is unique
         for (size_t i = 0; i < functions_.size(); ++i)
@@ -71,7 +71,7 @@ void lang::FunctionGroup::determineFlow()
     for (auto& function : functions_) function->determineFlow();
 }
 
-void lang::FunctionGroup::validateFlow(ValidationLogger& validation_logger)
+void lang::FunctionGroup::validateFlow(ValidationLogger& validation_logger) const
 {
     for (auto& function : functions_) function->validateFlow(validation_logger);
 }
@@ -96,7 +96,7 @@ void lang::FunctionGroup::addFunction(lang::OwningHandle<lang::Function> functio
 
 bool lang::FunctionGroup::validateResolution(const std::vector<lang::ResolvingHandle<lang::Type>>& types,
                                              lang::Location                                        location,
-                                             ValidationLogger&                                     validation_logger)
+                                             ValidationLogger& validation_logger) const
 {
     size_t argument_count = types.size();
 

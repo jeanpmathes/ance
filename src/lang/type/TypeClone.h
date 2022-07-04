@@ -41,41 +41,41 @@ namespace lang
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
-        bool validateDefinition(ValidationLogger& validation_logger) override;
-        bool validate(ValidationLogger& validation_logger, lang::Location location) override;
+        bool validateDefinition(ValidationLogger& validation_logger) const override;
+        bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
         bool                              isSubscriptDefined() override;
         lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
         bool                              validateSubscript(lang::Location                    indexed_location,
                                                             lang::ResolvingHandle<lang::Type> index_type,
                                                             lang::Location                    index_location,
-                                                            ValidationLogger&                 validation_logger) override;
+                                                            ValidationLogger&                 validation_logger) const override;
         std::shared_ptr<lang::Value>      buildSubscript(std::shared_ptr<Value> indexed,
                                                          std::shared_ptr<Value> index,
                                                          CompileContext*        context) override;
 
         bool                              hasMember(const lang::Identifier& name) override;
         lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name) override;
-        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) override;
+        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const override;
         std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
                                                        const lang::Identifier& name,
                                                        CompileContext*         context) override;
 
         bool                              definesIndirection() override;
         lang::ResolvingHandle<lang::Type> getIndirectionType() override;
-        bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) override;
+        bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
         std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context) override;
 
       protected:
         std::string                        createMangledName() override;
         llvm::DIType*                      createDebugType(CompileContext* context) override;
-        std::vector<lang::TypeDefinition*> getDependencies() override;
+        std::vector<lang::TypeDefinition*> getDependencies() const override;
 
       private:
         lang::ResolvingHandle<lang::Type> original_;
         lang::Location                    original_type_location_;
 
-        std::optional<bool> is_valid_ {};
+        mutable std::optional<bool> is_valid_ {};
     };
 }
 

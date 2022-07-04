@@ -4,7 +4,7 @@
 
 lang::DelayedValue::DelayedValue(DelayableExpression& expression) : expression_(expression) {}
 
-lang::ResolvingHandle<lang::Type> lang::DelayedValue::type()
+lang::ResolvingHandle<lang::Type> lang::DelayedValue::type() const
 {
     return expression_.type();
 }

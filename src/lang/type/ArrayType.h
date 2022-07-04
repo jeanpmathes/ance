@@ -40,12 +40,12 @@ namespace lang
         bool                              isSubscriptDefined() override;
         lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
 
-        bool validate(ValidationLogger& validation_logger, lang::Location location) override;
+        bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
         bool                         validateSubscript(lang::Location                    indexed_location,
                                                        lang::ResolvingHandle<lang::Type> index_type,
                                                        lang::Location                    index_location,
-                                                       ValidationLogger&                 validation_logger) override;
+                                                       ValidationLogger&                 validation_logger) const override;
         std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
                                                     CompileContext*        context) override;
@@ -61,7 +61,7 @@ namespace lang
       protected:
         std::string   createMangledName() override;
         llvm::DIType*                      createDebugType(CompileContext* context) override;
-        std::vector<lang::TypeDefinition*> getDependencies() override;
+        std::vector<lang::TypeDefinition*> getDependencies() const override;
 
       private:
         uint64_t                          size_;

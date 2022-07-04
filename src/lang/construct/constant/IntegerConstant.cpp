@@ -44,7 +44,7 @@ std::string lang::IntegerConstant::toString() const
     return prefix + text_ + ":" + std::to_string(size_);
 }
 
-bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::Location location)
+bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     bool valid = type()->validate(validation_logger, location);
     if (!valid) return false;
@@ -78,7 +78,7 @@ bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::
     return true;
 }
 
-lang::ResolvingHandle<lang::Type> lang::IntegerConstant::type()
+lang::ResolvingHandle<lang::Type> lang::IntegerConstant::type() const
 {
     return type_;
 }

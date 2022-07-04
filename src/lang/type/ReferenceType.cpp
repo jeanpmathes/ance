@@ -48,7 +48,7 @@ llvm::PointerType* lang::ReferenceType::getContentType(llvm::LLVMContext& c)
     return llvm::PointerType::get(element_type_->getContentType(c), 0);
 }
 
-bool lang::ReferenceType::validate(ValidationLogger& validation_logger, lang::Location location)
+bool lang::ReferenceType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (!element_type_->isDefined())
     {
@@ -86,7 +86,7 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::getSubscriptReturnType()
 bool lang::ReferenceType::validateSubscript(lang::Location                    indexed_location,
                                             lang::ResolvingHandle<lang::Type> index_type,
                                             lang::Location                    index_location,
-                                            ValidationLogger&                 validation_logger)
+                                            ValidationLogger&                 validation_logger) const
 {
     return element_type_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
 }
@@ -113,7 +113,7 @@ bool lang::ReferenceType::validateOperator(lang::BinaryOperator              op,
                                            lang::ResolvingHandle<lang::Type> other,
                                            lang::Location                    left_location,
                                            lang::Location                    right_location,
-                                           ValidationLogger&                 validation_logger)
+                                           ValidationLogger&                 validation_logger) const
 {
     return element_type_->validateOperator(op, other, left_location, right_location, validation_logger);
 }
@@ -136,7 +136,7 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::getMemberType(const lang:
     return element_type_->getMemberType(name);
 }
 
-bool lang::ReferenceType::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger)
+bool lang::ReferenceType::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const
 {
     return element_type_->validateMemberAccess(name, validation_logger);
 }
@@ -158,7 +158,7 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::getIndirectionType()
     return element_type_->getIndirectionType();
 }
 
-bool lang::ReferenceType::validateIndirection(lang::Location location, ValidationLogger& validation_logger)
+bool lang::ReferenceType::validateIndirection(lang::Location location, ValidationLogger& validation_logger) const
 {
     return element_type_->validateIndirection(location, validation_logger);
 }

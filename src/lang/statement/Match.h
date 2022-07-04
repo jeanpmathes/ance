@@ -123,7 +123,7 @@ class Match
     void setScope(lang::Scope& scope) override;
     void walkDefinitions() override;
 
-    void validate(ValidationLogger& validation_logger) override;
+    void validate(ValidationLogger& validation_logger) const override;
 
     /**
      * Validate the type matched by this match.

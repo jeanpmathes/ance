@@ -25,10 +25,10 @@ namespace lang
         [[nodiscard]] const Identifier& name() const;
 
         void resolve();
-        void validate(ValidationLogger& validation_logger);
+        void validate(ValidationLogger& validation_logger) const;
         void expand();
         void determineFlow();
-        void validateFlow(ValidationLogger& validation_logger);
+        void validateFlow(ValidationLogger& validation_logger) const;
         void createNativeBacking(CompileContext* compile_context);
         void build(CompileContext* compile_context);
 
@@ -48,7 +48,7 @@ namespace lang
          */
         bool validateResolution(const std::vector<lang::ResolvingHandle<lang::Type>>& types,
                                 lang::Location                                        location,
-                                ValidationLogger&                                     validation_logger);
+                                ValidationLogger&                                     validation_logger) const;
 
         /**
          * Resolve a function overload.

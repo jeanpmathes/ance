@@ -84,7 +84,7 @@ bool lang::Variable::isFinal() const
     return definition_->isFinal();
 }
 
-void lang::Variable::validate(ValidationLogger& validation_logger)
+void lang::Variable::validate(ValidationLogger& validation_logger) const
 {
     definition_->validate(validation_logger);
 }

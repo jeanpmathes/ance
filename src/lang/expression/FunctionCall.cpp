@@ -45,7 +45,7 @@ lang::ResolvingHandle<lang::Type> FunctionCall::type() const
     return function().front()->returnType();
 }
 
-bool FunctionCall::validate(ValidationLogger& validation_logger)
+bool FunctionCall::validate(ValidationLogger& validation_logger) const
 {
     std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> arguments;
 

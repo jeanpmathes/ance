@@ -51,10 +51,10 @@ namespace lang
         [[nodiscard]] lang::AccessModifier access() const;
         [[nodiscard]] Statement&           code() const;
 
-        void validate(ValidationLogger& validation_logger) override;
+        void validate(ValidationLogger& validation_logger) const override;
         void expand() override;
         void determineFlow() override;
-        bool validateFlow(ValidationLogger& validation_logger) override;
+        bool validateFlow(ValidationLogger& validation_logger) const override;
 
         void                         createNativeBacking(CompileContext* context) override;
         void                         build(CompileContext* context) override;
@@ -77,8 +77,8 @@ namespace lang
 
       private:
         void setupCode();
-        void validateReturn(ValidationLogger& validation_logger);
-        void validateUnreachable(ValidationLogger& validation_logger);
+        void validateReturn(ValidationLogger& validation_logger) const;
+        void validateUnreachable(ValidationLogger& validation_logger) const;
 
       private:
         std::unique_ptr<Statement> code_;

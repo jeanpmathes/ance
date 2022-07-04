@@ -37,12 +37,12 @@ namespace lang
         lang::GlobalScope* getGlobalScope() override;
         llvm::DIScope*     getDebugScope(CompileContext* context) override;
 
-        void validate(ValidationLogger& validation_logger) override;
+        void validate(ValidationLogger& validation_logger) const override;
 
         void expand();
         void determineFlow();
 
-        void validateFlow(ValidationLogger& validation_logger);
+        void validateFlow(ValidationLogger& validation_logger) const;
 
         /**
          * Define a global variable.
@@ -158,8 +158,8 @@ namespace lang
         bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) override;
 
       private:
-        std::optional<lang::ResolvingHandle<lang::Function>> findEntry();
-        std::optional<lang::ResolvingHandle<lang::Function>> findExit();
+        std::optional<lang::ResolvingHandle<lang::Function>> findEntry() const;
+        std::optional<lang::ResolvingHandle<lang::Function>> findExit() const;
 
       public:
         /**
@@ -167,14 +167,14 @@ namespace lang
          * The default entry point is a main method returning ui32.
          * @return True if there is an entry point.
          */
-        bool hasEntry();
+        bool hasEntry() const;
 
         /**
          * Check if this global scope has an exit point
          * The default exit point is an exit method taking a ui32.
          * @return True if there is an exit point.
          */
-        bool hasExit();
+        bool hasExit() const;
 
         /**
          * Get the entry point. Fails if there is no entry point.

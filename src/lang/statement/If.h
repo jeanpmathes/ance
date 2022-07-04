@@ -34,7 +34,7 @@ class If
     std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
                                                                      lang::Function&   function) override;
 
-    void validate(ValidationLogger& validation_logger) override;
+    void validate(ValidationLogger& validation_logger) const override;
 
     Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 

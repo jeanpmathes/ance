@@ -21,7 +21,7 @@ namespace lang
          */
         RoughlyCastedValue(lang::ResolvingHandle<lang::Type> target_type, std::shared_ptr<lang::Value> original);
 
-        lang::ResolvingHandle<lang::Type> type() override;
+        lang::ResolvingHandle<lang::Type> type() const override;
 
         void         buildNativeValue(CompileContext* context) override;
         llvm::Value* getNativeValue() override;

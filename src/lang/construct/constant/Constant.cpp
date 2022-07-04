@@ -10,7 +10,7 @@ Expression* lang::Constant::getBackingExpression() const
     return nullptr;
 }
 
-bool lang::Constant::validate(ValidationLogger&, lang::Location)
+bool lang::Constant::validate(ValidationLogger&, lang::Location) const
 {
     return true;
 }

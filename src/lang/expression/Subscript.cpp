@@ -28,7 +28,7 @@ lang::ResolvingHandle<lang::Type> Subscript::type() const
     return indexed_->type()->getSubscriptReturnType();
 }
 
-bool Subscript::validate(ValidationLogger& validation_logger)
+bool Subscript::validate(ValidationLogger& validation_logger) const
 {
     bool valid = true;
 

@@ -27,7 +27,7 @@ llvm::DIScope* lang::GlobalScope::getDebugScope(CompileContext* context)
     return context->unit();
 }
 
-void lang::GlobalScope::validate(ValidationLogger& validation_logger)
+void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 {
     // Validate types before everything else as they are used and checked by everything.
     bool valid = true;
@@ -62,7 +62,7 @@ void lang::GlobalScope::determineFlow()
     for (auto& [key, function] : defined_function_groups_) { function->determineFlow(); }
 }
 
-void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger)
+void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger) const
 {
     for (auto& [key, function] : defined_function_groups_) { function->validateFlow(validation_logger); }
 }
@@ -360,7 +360,7 @@ bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Type> type
     return false;
 }
 
-std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntry()
+std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntry() const
 {
     auto c = defined_function_groups_.find(lang::Identifier::from("main"));
     if (c == defined_function_groups_.end()) return {};
@@ -378,7 +378,7 @@ std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntr
     else return {};
 }
 
-std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findExit()
+std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findExit() const
 {
     auto c = defined_function_groups_.find(lang::Identifier::from("exit"));
     if (c == defined_function_groups_.end()) return {};
@@ -397,12 +397,12 @@ std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findExit
     else return {};
 }
 
-bool lang::GlobalScope::hasEntry()
+bool lang::GlobalScope::hasEntry() const
 {
     return findEntry().has_value();
 }
 
-bool lang::GlobalScope::hasExit()
+bool lang::GlobalScope::hasExit() const
 {
     return findExit().has_value();
 }

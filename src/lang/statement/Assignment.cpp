@@ -36,7 +36,7 @@ Expression& Assignment::assigned() const
     return *assigned_;
 }
 
-void Assignment::validate(ValidationLogger& validation_logger)
+void Assignment::validate(ValidationLogger& validation_logger) const
 {
     if (assigner_.isFinal())
     {

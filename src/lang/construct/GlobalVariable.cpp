@@ -64,7 +64,7 @@ lang::Constant& lang::GlobalVariable::init() const
     return *initial_value_;
 }
 
-void lang::GlobalVariable::validate(ValidationLogger& validation_logger)
+void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
 {
     if (!type()->isDefined())
     {

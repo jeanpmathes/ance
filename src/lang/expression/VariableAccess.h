@@ -37,7 +37,7 @@ class VariableAccess
 
     [[nodiscard]] bool isNamed() override;
 
-    bool validate(ValidationLogger& validation_logger) override;
+    bool validate(ValidationLogger& validation_logger) const override;
     bool validateAssignment(const std::shared_ptr<lang::Value>& value,
                             lang::Location                      value_location,
                             ValidationLogger&                   validation_logger) override;

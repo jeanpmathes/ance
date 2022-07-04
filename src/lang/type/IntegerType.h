@@ -30,12 +30,12 @@ namespace lang
         llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
-        bool validate(ValidationLogger& validation_logger, lang::Location location) override;
+        bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
         bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
         bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                                 lang::Location                    location,
-                                                                ValidationLogger&                 validation_logger) override;
+                                                                ValidationLogger&                 validation_logger) const override;
         std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                              std::shared_ptr<Value>            value,
                                                              CompileContext*                   context) override;
@@ -47,7 +47,7 @@ namespace lang
                                                            lang::ResolvingHandle<lang::Type> other,
                                                            lang::Location                    left_location,
                                                            lang::Location                    right_location,
-                                                           ValidationLogger&                 validation_logger) override;
+                                                           ValidationLogger&                 validation_logger) const override;
         std::shared_ptr<lang::Value>      buildOperator(lang::BinaryOperator   op,
                                                         std::shared_ptr<Value> left,
                                                         std::shared_ptr<Value> right,

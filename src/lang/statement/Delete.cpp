@@ -25,7 +25,7 @@ bool Delete::isBufferDelete() const
     return delete_buffer_;
 }
 
-void Delete::validate(ValidationLogger& validation_logger)
+void Delete::validate(ValidationLogger& validation_logger) const
 {
     if (to_delete_->validate(validation_logger))
     {

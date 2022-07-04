@@ -30,7 +30,7 @@ namespace lang
          * @param validation_logger The logger to log the validation result.
          * @return True if the constant value is valid.
          */
-        virtual bool validate(ValidationLogger& validation_logger, lang::Location location);
+        virtual bool validate(ValidationLogger& validation_logger, lang::Location location) const;
 
         /**
          * Build the content constant of this constant.
