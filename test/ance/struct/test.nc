@@ -2,8 +2,8 @@
 
 // The language allows to define structs, which hold together values.
 
-define DataAlias alias Data;
-define DataClone as Data;
+public define DataAlias alias Data;
+public define DataClone as Data;
 
 public struct Data
 {

@@ -3,19 +3,19 @@
 // New types can be defined using existing types.
 
 // Type clones are a new type that behaves like the original type.
-define Clone1 as i64;
-define Clone2 as Clone1;
+public define Clone1 as i64;
+public define Clone2 as Clone1;
 
 // Type aliases are just a placeholder for an actual type.
-define Alias1 alias size;
-define Alias2 alias Alias1;
+public define Alias1 alias size;
+public define Alias2 alias Alias1;
 
 // The order in the source file is not important.
-define Clone3 as Clone4;
-define Clone4 as Clone1;
+public define Clone3 as Clone4;
+public define Clone4 as Clone1;
 
 // Reference types can be aliased too, but double-refs still aren't allowed.
-define Ref alias &size;
+public define Ref alias &size;
 
 public main () : ui32
 {

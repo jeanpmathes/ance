@@ -2,9 +2,9 @@
 
 // As defines can be used in any order, cyclic dependencies must be detected.
 
-define a as b;
-define b as c;
-define c as a;
+public define a as b;
+public define b as c;
+public define c as a;
 
 public main () : ui32
 {

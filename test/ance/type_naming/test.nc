@@ -6,7 +6,7 @@ public nameA () {}
 public nameA: i32;
 
 public nameB: i32;
-define nameB alias i32;
+public define nameB alias i32;
 
 public struct nameC {}
 public nameC () {}

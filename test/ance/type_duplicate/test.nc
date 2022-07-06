@@ -3,7 +3,7 @@
 // Type names must be unique.
 
 public struct Duplicate {}
-define Duplicate as i32;
+public define Duplicate as i32;
 
 public main () : ui32
 {

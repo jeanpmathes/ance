@@ -2,7 +2,7 @@
 
 // Integer and float types allow implicit conversion of their values to larger types.
 
-define int alias i64;
+public define int alias i64;
 
 public main () : ui32
 {

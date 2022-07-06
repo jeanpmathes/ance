@@ -28,11 +28,11 @@ typeDefinition
     ;
 
 defineAs
-    : 'define' IDENTIFIER 'as' type ';'
+    : accessModifier 'define' IDENTIFIER 'as' type ';'
     ;
 
 defineAlias
-    : 'define' IDENTIFIER 'alias' type ';'
+    : accessModifier 'define' IDENTIFIER 'alias' type ';'
     ;
 
 structDefinition

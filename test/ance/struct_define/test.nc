@@ -2,8 +2,8 @@
 
 // Structs cannot hold values of their own type, even if the type is an alias or clone.
 
-define DataAlias alias Data;
-define DataClone as Data;
+public define DataAlias alias Data;
+public define DataClone as Data;
 
 public struct Data
 {

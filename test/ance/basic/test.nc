@@ -6,7 +6,7 @@
 private std_out: Handle;
 private null_ptr: uiptr;
 
-define Handle as *void;
+public define Handle as *void;
 
 // Defined functions must be public or private.
 

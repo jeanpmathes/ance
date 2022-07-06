@@ -20,7 +20,7 @@ private str8: *ui8 <: c"ABC";
 private std_out: Handle;
 private null_ptr: uiptr;
 
-define Handle as *void;
+public define Handle as *void;
 
 public main () : ui32
 {

@@ -365,6 +365,7 @@ class anceParser : public antlr4::Parser
       public:
         DefineAsContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
+        AccessModifierContext*      accessModifier();
         antlr4::tree::TerminalNode* IDENTIFIER();
         TypeContext*                type();
         antlr4::tree::TerminalNode* SEMICOLON();
@@ -379,6 +380,7 @@ class anceParser : public antlr4::Parser
       public:
         DefineAliasContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
+        AccessModifierContext*      accessModifier();
         antlr4::tree::TerminalNode* IDENTIFIER();
         TypeContext*                type();
         antlr4::tree::TerminalNode* SEMICOLON();
