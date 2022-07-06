@@ -69,14 +69,12 @@ namespace lang
          * @param return_type The return type.
          * @param parameters The parameters.
          * @param location The location of the function declaration.
-         * @return A handle to the defined function.
          */
-        lang::ResolvingHandle<lang::Function> defineExternFunction(
-            Identifier                                           name,
-            lang::ResolvingHandle<lang::Type>                    return_type,
-            lang::Location                                       return_type_location,
-            const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
-            lang::Location                                       location);
+        void defineExternFunction(Identifier                                           name,
+                                  lang::ResolvingHandle<lang::Type>                    return_type,
+                                  lang::Location                                       return_type_location,
+                                  const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                  lang::Location                                       location);
 
         /**
          * Define a custom function in this scope.
@@ -87,17 +85,15 @@ namespace lang
          * @param code The code of the function.
          * @param declaration_location The location of the function declaration.
          * @param definition_location The location of the function definition, meaning its code.
-         * @return A handle to the defined function.
          */
-        lang::ResolvingHandle<lang::Function> defineCustomFunction(
-            Identifier                                           name,
-            lang::AccessModifier                                 access,
-            lang::ResolvingHandle<lang::Type>                    return_type,
-            lang::Location                                       return_type_location,
-            const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
-            std::unique_ptr<lang::CodeBlock>                     code,
-            lang::Location                                       declaration_location,
-            lang::Location                                       definition_location);
+        void defineCustomFunction(Identifier                                           name,
+                                  lang::AccessModifier                                 access,
+                                  lang::ResolvingHandle<lang::Type>                    return_type,
+                                  lang::Location                                       return_type_location,
+                                  const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                  std::unique_ptr<lang::CodeBlock>                     code,
+                                  lang::Location                                       declaration_location,
+                                  lang::Location                                       definition_location);
 
         /**
          * Define a type that behaves like another type.
@@ -208,14 +204,15 @@ namespace lang
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_defined_variables_;
-        std::vector<std::tuple<lang::Identifier, lang::Location>>      duplicated_variable_names_;
 
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> defined_function_groups_;
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> defined_types_;
-        std::vector<std::tuple<lang::Identifier, lang::Location>>  duplicated_type_names_;
+
+        std::set<lang::Identifier>                                defined_names_;
+        std::vector<std::tuple<lang::Identifier, lang::Location>> duplicated_names_;
 
         bool expanded_ {false};
     };

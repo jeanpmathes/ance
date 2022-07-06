@@ -34,12 +34,7 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 
     for (auto& [name, type] : defined_types_) { valid &= type->validateDefinition(validation_logger); }
 
-    for (auto const& [name, location] : duplicated_variable_names_)
-    {
-        validation_logger.logError("Name '" + name + "' already defined in the current context", name.location());
-    }
-
-    for (auto const& [name, location] : duplicated_type_names_)
+    for (auto const& [name, location] : duplicated_names_)
     {
         validation_logger.logError("Name '" + name + "' already defined in the current context", name.location());
     }
@@ -78,11 +73,13 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
 {
     assert(assigner.hasSymbol());
 
-    if (global_defined_variables_.find(name) != global_defined_variables_.end())
+    if (defined_names_.contains(name))
     {
-        duplicated_variable_names_.emplace_back(name, location);
+        duplicated_names_.emplace_back(name, location);
         return;
     }
+
+    defined_names_.emplace(name);
 
     bool is_final = assigner.isFinal();
 
@@ -105,13 +102,20 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
     global_defined_variables_[name] = std::move(defined);
 }
 
-lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineExternFunction(
-    Identifier                                           name,
-    lang::ResolvingHandle<lang::Type>                    return_type,
-    lang::Location                                       return_type_location,
-    const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
-    lang::Location                                       location)
+void lang::GlobalScope::defineExternFunction(Identifier                                           name,
+                                             lang::ResolvingHandle<lang::Type>                    return_type,
+                                             lang::Location                                       return_type_location,
+                                             const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                             lang::Location                                       location)
 {
+    if (defined_names_.contains(name) && !defined_function_groups_.contains(name))
+    {
+        duplicated_names_.emplace_back(name, location);
+        return;
+    }
+
+    defined_names_.emplace(name);
+
     lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(name);
 
     lang::OwningHandle<lang::Function> undefined =
@@ -119,21 +123,26 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineExternFunction(
     undefined->defineAsExtern(*this, return_type, return_type_location, parameters, location);
     lang::OwningHandle<lang::Function> defined = std::move(undefined);
 
-    auto handle = defined.handle();
     group->addFunction(std::move(defined));
-    return handle;
 }
 
-lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineCustomFunction(
-    Identifier                                           name,
-    lang::AccessModifier                                 access,
-    lang::ResolvingHandle<lang::Type>                    return_type,
-    lang::Location                                       return_type_location,
-    const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
-    std::unique_ptr<lang::CodeBlock>                     code,
-    lang::Location                                       declaration_location,
-    lang::Location                                       definition_location)
+void lang::GlobalScope::defineCustomFunction(Identifier                                           name,
+                                             lang::AccessModifier                                 access,
+                                             lang::ResolvingHandle<lang::Type>                    return_type,
+                                             lang::Location                                       return_type_location,
+                                             const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                             std::unique_ptr<lang::CodeBlock>                     code,
+                                             lang::Location                                       declaration_location,
+                                             lang::Location                                       definition_location)
 {
+    if (defined_names_.contains(name) && !defined_function_groups_.contains(name))
+    {
+        duplicated_names_.emplace_back(name, definition_location);
+        return;
+    }
+
+    defined_names_.emplace(name);
+
     lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(name);
 
     lang::OwningHandle<lang::Function> undefined =
@@ -148,9 +157,7 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::defineCustomFunction(
                               definition_location);
     lang::OwningHandle<lang::Function> defined = std::move(undefined);
 
-    auto handle = defined.handle();
     group->addFunction(std::move(defined));
-    return handle;
 }
 
 void lang::GlobalScope::defineTypeAsOther(Identifier                        name,
@@ -158,11 +165,13 @@ void lang::GlobalScope::defineTypeAsOther(Identifier                        name
                                           lang::Location                    definition_location,
                                           lang::Location                    original_type_location)
 {
-    if (defined_types_.find(name) != defined_types_.end())
+    if (defined_names_.contains(name))
     {
-        duplicated_type_names_.emplace_back(name, definition_location);
+        duplicated_names_.emplace_back(name, definition_location);
         return;
     }
+
+    defined_names_.emplace(name);
 
     lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
     std::unique_ptr<lang::TypeDefinition> cloned_definition =
@@ -180,11 +189,13 @@ void lang::GlobalScope::defineTypeAliasOther(Identifier                        n
                                              lang::Location                    definition_location,
                                              lang::Location                    actual_type_location)
 {
-    if (defined_types_.find(name) != defined_types_.end())
+    if (defined_names_.contains(name))
     {
-        duplicated_type_names_.emplace_back(name, definition_location);
+        duplicated_names_.emplace_back(name, definition_location);
         return;
     }
+
+    defined_names_.emplace(name);
 
     lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
     std::unique_ptr<lang::TypeDefinition> alias_definition =
@@ -202,11 +213,13 @@ void lang::GlobalScope::defineStruct(lang::AccessModifier                       
                                      std::vector<std::unique_ptr<lang::Member>> members,
                                      lang::Location                             definition_location)
 {
-    if (defined_types_.find(name) != defined_types_.end())
+    if (defined_names_.contains(name))
     {
-        duplicated_type_names_.emplace_back(name, definition_location);
+        duplicated_names_.emplace_back(name, definition_location);
         return;
     }
+
+    defined_names_.emplace(name);
 
     lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
     std::unique_ptr<lang::TypeDefinition> struct_definition =

@@ -156,14 +156,14 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
         function_block->append(std::move(block_ptr));
     }
 
-    auto function = application_.globalScope().defineCustomFunction(identifier,
-                                                                    access,
-                                                                    return_type,
-                                                                    return_type_location,
-                                                                    shared_parameters,
-                                                                    std::move(function_block),
-                                                                    declaration_location,
-                                                                    definition_location);
+    application_.globalScope().defineCustomFunction(identifier,
+                                                    access,
+                                                    return_type,
+                                                    return_type_location,
+                                                    shared_parameters,
+                                                    std::move(function_block),
+                                                    declaration_location,
+                                                    definition_location);
 
     return {};
 }
