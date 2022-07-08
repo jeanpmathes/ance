@@ -46,7 +46,7 @@ private get_quad() : quad
 
 public exit (exitcode: ui32)
 {
-     ExitProcess(exitcode);
+    ExitProcess(exitcode);
 }
 
 extern ExitProcess (uExitCode: ui32);

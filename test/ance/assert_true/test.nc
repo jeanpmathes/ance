@@ -11,7 +11,7 @@ public main () : ui32
 
 public exit (exitcode: ui32)
 {
-     ExitProcess(exitcode);
+    ExitProcess(exitcode);
 }
 
 extern ExitProcess (uExitCode: ui32);

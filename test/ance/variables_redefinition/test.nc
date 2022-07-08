@@ -31,7 +31,7 @@ private write (str: *ui8, len: ui32) : void
 
 public exit (exitcode: ui32)
 {
-     ExitProcess(exitcode);
+    ExitProcess(exitcode);
 }
 
 extern WriteFile (hFile: Handle, lpBuffer: *ui8, nNumberOfBytesToWrite: ui32, lpNumberOfBytesWritten: *ui32, lpOverlapped: uiptr);
