@@ -40,7 +40,7 @@ structDefinition
     ;
 
 member
-    : accessModifier IDENTIFIER ':' type ';'
+    : accessModifier IDENTIFIER ':' type ( assigner literalExpression )? ';'
     ;
 
 accessModifier

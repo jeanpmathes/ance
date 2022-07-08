@@ -414,6 +414,8 @@ class anceParser : public antlr4::Parser
         antlr4::tree::TerminalNode* IDENTIFIER();
         TypeContext*                type();
         antlr4::tree::TerminalNode* SEMICOLON();
+        AssignerContext*            assigner();
+        LiteralExpressionContext*   literalExpression();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
