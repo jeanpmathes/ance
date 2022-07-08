@@ -126,6 +126,30 @@ std::shared_ptr<lang::Value> lang::ReferenceType::buildOperator(lang::BinaryOper
     return element_type_->buildOperator(op, getReferenced(left, context), right, context);
 }
 
+bool lang::ReferenceType::isOperatorDefined(lang::UnaryOperator op)
+{
+    return element_type_->isOperatorDefined(op);
+}
+
+lang::ResolvingHandle<lang::Type> lang::ReferenceType::getOperatorResultType(lang::UnaryOperator op)
+{
+    return element_type_->getOperatorResultType(op);
+}
+
+bool lang::ReferenceType::validateOperator(lang::UnaryOperator op,
+                                           lang::Location      location,
+                                           ValidationLogger&   validation_logger) const
+{
+    return element_type_->validateOperator(op, location, validation_logger);
+}
+
+std::shared_ptr<lang::Value> lang::ReferenceType::buildOperator(lang::UnaryOperator    op,
+                                                                std::shared_ptr<Value> value,
+                                                                CompileContext*        context)
+{
+    return element_type_->buildOperator(op, getReferenced(value, context), context);
+}
+
 bool lang::ReferenceType::hasMember(const lang::Identifier& name)
 {
     return element_type_->hasMember(name);

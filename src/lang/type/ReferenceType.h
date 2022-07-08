@@ -56,6 +56,15 @@ namespace lang
                                                         std::shared_ptr<Value> right,
                                                         CompileContext*        context) override;
 
+        bool                              isOperatorDefined(lang::UnaryOperator op) override;
+        lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
+        bool                              validateOperator(lang::UnaryOperator op,
+                                                           lang::Location      location,
+                                                           ValidationLogger&   validation_logger) const override;
+        std::shared_ptr<lang::Value>      buildOperator(lang::UnaryOperator    op,
+                                                        std::shared_ptr<Value> value,
+                                                        CompileContext*        context) override;
+
         bool                              hasMember(const lang::Identifier& name) override;
         lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name) override;
         bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const override;
