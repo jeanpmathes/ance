@@ -125,7 +125,24 @@ antlrcpp::Any SourceVisitor::visitMember(anceParser::MemberContext* ctx)
     lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
     lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
 
-    return new lang::Member(access, identifier, type, location(ctx), location(ctx->type()));
+    ConstantExpression* const_expr = nullptr;
+    lang::Assigner      assigner   = lang::Assigner::UNSPECIFIED;
+
+    if (ctx->literalExpression())
+    {
+        assigner = visit(ctx->assigner()).as<lang::Assigner>();
+
+        Expression* expr = visit(ctx->literalExpression()).as<Expression*>();
+        const_expr       = dynamic_cast<ConstantExpression*>(expr);
+    }
+
+    return new lang::Member(access,
+                            identifier,
+                            type,
+                            assigner,
+                            std::unique_ptr<ConstantExpression>(const_expr),
+                            location(ctx),
+                            location(ctx->type()));
 }
 
 antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)

@@ -2,7 +2,11 @@
 #define ANCE_SRC_LANG_CONSTRUCT_MEMBER_H_
 
 #include "lang/AccessModifier.h"
+#include "lang/Assigner.h"
 #include "lang/type/Type.h"
+#include "lang/expression/ConstantExpression.h"
+
+class ConstantExpression;
 
 namespace lang
 {
@@ -17,18 +21,23 @@ namespace lang
          * @param access The access modifier of the member.
          * @param name The name of the member.
          * @param type The type of the member.
+         * @param assigner The assigner of the member.
+         * @param constant_init The constant initializer of the member.
          * @param location The location of the member.
          * @param type_location The location of the type of the member.
          */
-        Member(lang::AccessModifier              access,
-               lang::Identifier                  name,
-               lang::ResolvingHandle<lang::Type> type,
-               lang::Location                    location,
-               lang::Location                    type_location);
+        Member(lang::AccessModifier                access,
+               lang::Identifier                    name,
+               lang::ResolvingHandle<lang::Type>   type,
+               lang::Assigner                      assigner,
+               std::unique_ptr<ConstantExpression> constant_init,
+               lang::Location                      location,
+               lang::Location                      type_location);
 
         [[nodiscard]] lang::AccessModifier              access() const;
         [[nodiscard]] const lang::Identifier&           name() const;
         [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
+        [[nodiscard]] lang::Assigner                    assigner() const;
         [[nodiscard]] lang::Location                    location() const;
         [[nodiscard]] lang::Location                    typeLocation() const;
 
@@ -37,12 +46,21 @@ namespace lang
          */
         void setScope(lang::Scope* scope);
 
+        /**
+         * Validates the member.
+         * @param validation_logger The logger to use for validation.
+         * @return True if the member is valid, false otherwise.
+         */
+        bool validate(ValidationLogger& validation_logger) const;
+
       private:
-        lang::AccessModifier              access_;
-        lang::Identifier                  name_;
-        lang::ResolvingHandle<lang::Type> type_;
-        lang::Location                    location_;
-        lang::Location                    type_location_;
+        lang::AccessModifier                access_;
+        lang::Identifier                    name_;
+        lang::ResolvingHandle<lang::Type>   type_;
+        lang::Assigner                      assigner_;
+        std::unique_ptr<ConstantExpression> constant_init_;
+        lang::Location                      location_;
+        lang::Location                      type_location_;
     };
 }
 

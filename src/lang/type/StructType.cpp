@@ -112,7 +112,7 @@ bool lang::StructType::validateDefinition(ValidationLogger& validation_logger) c
 
     for (auto& member : members_)
     {
-        if (!member->type()->validate(validation_logger, member->location())) { valid = false; }
+        valid &= member->validate(validation_logger);
 
         if (member_names.contains(member->name()))
         {
