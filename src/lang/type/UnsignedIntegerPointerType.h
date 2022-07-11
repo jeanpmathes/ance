@@ -25,7 +25,7 @@ namespace lang
       public:
         StateCount getStateCount() const override;
 
-        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
         [[maybe_unused]] static llvm::Value* buildValue(llvm::Value* pointer, CompileContext* state);

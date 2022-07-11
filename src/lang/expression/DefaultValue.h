@@ -29,7 +29,7 @@ class DefaultValue
 
     [[nodiscard]] std::shared_ptr<lang::Value>    getValue() const override;
     [[nodiscard]] std::shared_ptr<lang::Constant> getConstantValue() const override;
-    llvm::Constant*                               buildContentConstant(llvm::LLVMContext& c) override;
+    llvm::Constant*                               buildContentConstant(llvm::Module& m) override;
 
     ~DefaultValue() override;
 

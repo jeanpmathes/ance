@@ -22,10 +22,12 @@ namespace lang
                    lang::Scope*                               scope,
                    lang::Location                             location);
 
-        StateCount getStateCount() const override;
+        [[nodiscard]] StateCount getStateCount() const override;
 
-        llvm::Constant*   getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant*   getDefaultContent(llvm::Module& m) override;
         llvm::StructType* getContentType(llvm::LLVMContext& c) override;
+
+        [[nodiscard]] lang::AccessModifier getAccessModifier() const override;
 
         void onScope() override;
 
@@ -42,7 +44,10 @@ namespace lang
         std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
-        std::vector<lang::TypeDefinition*> getDependencies() const override;
+        [[nodiscard]] std::vector<lang::TypeDefinition*> getDependencies() const override;
+
+      private:
+        llvm::Value* buildGetElementPointer(llvm::Value* struct_ptr, int32_t member_index, CompileContext* context);
 
       private:
         [[maybe_unused]] lang::AccessModifier access_;

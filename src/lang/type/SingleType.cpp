@@ -4,9 +4,9 @@
 
 lang::SingleType::SingleType() : TypeDefinition(lang::Identifier::from("single")) {}
 
-llvm::Constant* lang::SingleType::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::SingleType::getDefaultContent(llvm::Module& m)
 {
-    return llvm::ConstantFP::get(getContentType(c), 0);
+    return llvm::ConstantFP::get(getContentType(m.getContext()), 0);
 }
 
 llvm::Type* lang::SingleType::getContentType(llvm::LLVMContext& c)

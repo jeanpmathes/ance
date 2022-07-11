@@ -23,7 +23,7 @@ lang::ResolvingHandle<lang::Type> lang::ExpressionBackedConstant::type() const
 
 llvm::Constant* lang::ExpressionBackedConstant::buildContent(llvm::Module* m)
 {
-    expression_.buildConstant(m->getContext());
+    expression_.buildConstant(*m);
     return expression_.getContentConstant();
 }
 

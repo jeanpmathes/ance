@@ -38,27 +38,34 @@ StateCount lang::StructType::getStateCount() const
     return SpecialCount::ABSTRACT;
 }
 
-llvm::Constant* lang::StructType::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::StructType::getDefaultContent(llvm::Module& m)
 {
     std::vector<llvm::Constant*> values;
 
-    for (auto& member : members_) { values.push_back(member->type()->getDefaultContent(c)); }
+    for (auto& member : members_) { values.push_back(member->getConstantInitializer(m)); }
 
-    return llvm::ConstantStruct::get(getContentType(c), values);
+    return llvm::ConstantStruct::get(getContentType(m.getContext()), values);
 }
 
 llvm::StructType* lang::StructType::getContentType(llvm::LLVMContext& c)
 {
     if (!native_type_)
     {
+        native_type_ = llvm::StructType::create(c, getMangledName());
+
         std::vector<llvm::Type*> member_types;
 
         for (auto& member : members_) { member_types.push_back(member->type()->getContentType(c)); }
 
-        native_type_ = llvm::StructType::create(c, member_types, createMangledName());
+        native_type_->setBody(member_types);
     }
 
     return native_type_;
+}
+
+lang::AccessModifier lang::StructType::getAccessModifier() const
+{
+    return access_;
 }
 
 void lang::StructType::onScope()
@@ -128,20 +135,7 @@ bool lang::StructType::validateDefinition(ValidationLogger& validation_logger) c
 
 std::string lang::StructType::createMangledName()
 {
-    std::string mangled_name;
-    mangled_name += "struct";
-    mangled_name += "(" + name() + ")";
-    mangled_name += "(";
-
-    for (auto& member : members_)
-    {
-        mangled_name += "(";
-        mangled_name += member->type()->getMangledName();
-        mangled_name += ")";
-    }
-
-    mangled_name += ")";
-    return mangled_name;
+    return "struct(" + name() + ")";
 }
 
 llvm::DIType* lang::StructType::createDebugType(CompileContext* context)
@@ -215,7 +209,7 @@ std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr
     lang::ResolvingHandle<lang::Type> return_type = lang::ReferenceType::get(getMemberType(name));
 
     auto&                             member       = member_map_.at(name);
-    size_t                            member_index = member_indices_[name];
+    int32_t                           member_index = member_indices_[name];
     lang::ResolvingHandle<lang::Type> member_type  = member.get().type();
 
     llvm::Value* struct_ptr;
@@ -230,9 +224,18 @@ std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr
         struct_ptr = value->getNativeValue();
     }
 
-    llvm::Value* member_ptr =
-        context->ir()->CreateStructGEP(getContentType(*context->llvmContext()), struct_ptr, member_index);
+    llvm::Value* member_ptr   = buildGetElementPointer(struct_ptr, member_index, context);
     llvm::Value* native_value = lang::Values::contentToNative(return_type, member_ptr, context);
 
     return std::make_shared<lang::WrappedNativeValue>(return_type, native_value);
+}
+
+llvm::Value* lang::StructType::buildGetElementPointer(llvm::Value*    struct_ptr,
+                                                      int32_t         member_index,
+                                                      CompileContext* context)
+{
+    return context->ir()->CreateStructGEP(getContentType(*context->llvmContext()),
+                                          struct_ptr,
+                                          member_index,
+                                          struct_ptr->getName() + ".gep");
 }

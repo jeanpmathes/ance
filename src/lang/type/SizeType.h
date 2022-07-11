@@ -40,7 +40,7 @@ namespace lang
 
         [[nodiscard]] StateCount getStateCount() const override;
 
-        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
         bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;

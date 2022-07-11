@@ -33,9 +33,9 @@ std::shared_ptr<lang::Constant> DefaultValue::getConstantValue() const
     return constant_;
 }
 
-llvm::Constant* DefaultValue::buildContentConstant(llvm::LLVMContext& c)
+llvm::Constant* DefaultValue::buildContentConstant(llvm::Module& m)
 {
-    return type_->getDefaultContent(c);
+    return type_->getDefaultContent(m);
 }
 
 DefaultValue::~DefaultValue() = default;

@@ -18,9 +18,9 @@ StateCount lang::SizeType::getStateCount() const
     return SpecialCount::PLATFORM_DEPENDENT;
 }
 
-llvm::Constant* lang::SizeType::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::SizeType::getDefaultContent(llvm::Module& m)
 {
-    return llvm::ConstantInt::get(getContentType(c), 0, false);
+    return llvm::ConstantInt::get(getContentType(m.getContext()), 0, false);
 }
 
 llvm::Type* lang::SizeType::getContentType(llvm::LLVMContext&)

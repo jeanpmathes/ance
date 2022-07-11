@@ -38,7 +38,7 @@ namespace lang
 
         void onScope() override;
 
-        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) override;
 
         llvm::Type* getContentType(llvm::LLVMContext& c) override;
 
@@ -87,6 +87,10 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getIndirectionType() override;
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
         std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context) override;
+
+        void buildDefaultInitializer(llvm::Value* ptr, CompileContext* context) override;
+        void buildNativeDeclaration(CompileContext* context) override;
+        void buildNativeDefinition(CompileContext* context) override;
 
       protected:
         std::string   createMangledName() override;

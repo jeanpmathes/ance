@@ -26,7 +26,7 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const override;
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
 
-        llvm::Constant*    getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant*    getDefaultContent(llvm::Module& m) override;
         llvm::PointerType* getContentType(llvm::LLVMContext& c) override;
 
         bool isSubscriptDefined() override;

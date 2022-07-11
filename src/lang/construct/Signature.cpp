@@ -45,7 +45,7 @@ const std::string& lang::Signature::getMangledName()
 {
     if (!mangled_name_.empty()) return mangled_name_;
 
-    mangled_name_ = function_name_ + "$$overload(";
+    mangled_name_ = function_name_ + "$overload(";
 
     bool is_first = true;
     for (auto& type : types_)

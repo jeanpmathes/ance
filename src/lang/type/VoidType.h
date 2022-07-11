@@ -14,12 +14,16 @@ namespace lang
         VoidType();
 
       public:
-        StateCount getStateCount() const override;
+        [[nodiscard]] StateCount getStateCount() const override;
 
-        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
-        bool isVoidType() const override;
+        [[nodiscard]] bool isVoidType() const override;
+
+        void buildDefaultInitializer(llvm::Value* ptr, CompileContext* context) override;
+        void buildNativeDeclaration(CompileContext* context) override;
+        void buildNativeDefinition(CompileContext* context) override;
 
       protected:
         std::string   createMangledName() override;

@@ -40,10 +40,10 @@ lang::ResolvingHandle<lang::Type> lang::ArrayType::getActualType() const
     }
 }
 
-llvm::Constant* lang::ArrayType::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::ArrayType::getDefaultContent(llvm::Module& m)
 {
-    std::vector<llvm::Constant*> content(size_, element_type_->getDefaultContent(c));
-    return llvm::ConstantArray::get(getContentType(c), content);
+    std::vector<llvm::Constant*> content(size_, element_type_->getDefaultContent(m));
+    return llvm::ConstantArray::get(getContentType(m.getContext()), content);
 }
 
 llvm::ArrayType* lang::ArrayType::getContentType(llvm::LLVMContext& c)

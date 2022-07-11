@@ -37,7 +37,7 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::getActualType() const
     }
 }
 
-llvm::Constant* lang::ReferenceType::getDefaultContent(llvm::LLVMContext&)
+llvm::Constant* lang::ReferenceType::getDefaultContent(llvm::Module&)
 {
     assert(false && "References cannot be default-initialized.");
     return nullptr;

@@ -15,6 +15,7 @@
 #include "lang/type/StateCount.h"
 #include "lang/UnaryOperator.h"
 #include "lang/utility/Identifier.h"
+#include "lang/AccessModifier.h"
 
 namespace lang
 {
@@ -173,6 +174,12 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getOriginalType() const;
 
         /**
+         * Get the access modifier for this type.
+         * @return The access modifier.
+         */
+        [[nodiscard]] lang::AccessModifier getAccessModifier() const;
+
+        /**
          * Set the scope that contains this type. The type must be already defined.
          * @param scope The scope that contains the type.
          */
@@ -186,10 +193,10 @@ namespace lang
 
         /**
          * Get the default content of a value of this type.
-         * @param c The llvm context.
+         * @param m The module.
          * @return The default content.
          */
-        llvm::Constant* getDefaultContent(llvm::LLVMContext& c);
+        llvm::Constant* getDefaultContent(llvm::Module& m);
 
         /**
          * Get the native type. Values of this type are passed around using this type.
@@ -455,10 +462,16 @@ namespace lang
         void buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
 
         /**
-         * Build the native backing required by this type.
+         * Build the native backing required for the declaration.
          * @param context The current compile context.
          */
-        void buildNativeBacking(CompileContext* context);
+        void buildNativeDeclaration(CompileContext* context);
+
+        /**
+         * Build the native backing required for the definition of this type.
+         * @param context The current compile context.
+         */
+        void buildNativeDefinition(CompileContext* context);
 
         [[nodiscard]] lang::TypeDefinition* getDefinition() const;
 

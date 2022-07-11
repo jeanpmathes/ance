@@ -84,9 +84,9 @@ void lang::TypeClone::onScope()
     scope()->addType(original_);
 }
 
-llvm::Constant* lang::TypeClone::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::TypeClone::getDefaultContent(llvm::Module& m)
 {
-    return original_->getDefaultContent(c);
+    return original_->getDefaultContent(m);
 }
 
 llvm::Type* lang::TypeClone::getContentType(llvm::LLVMContext& c)
@@ -210,6 +210,15 @@ std::shared_ptr<lang::Value> lang::TypeClone::buildIndirection(std::shared_ptr<V
     return original_->buildIndirection(value, context);
 }
 
+void lang::TypeClone::buildDefaultInitializer(llvm::Value* ptr, CompileContext* context)
+{
+    original_->buildDefaultInitializer(ptr, context);
+}
+
+void lang::TypeClone::buildNativeDeclaration(CompileContext*) {}
+
+void lang::TypeClone::buildNativeDefinition(CompileContext*) {}
+
 llvm::DIType* lang::TypeClone::createDebugType(CompileContext* context)
 {
     return original_->getDebugType(context);
@@ -224,5 +233,6 @@ std::vector<lang::TypeDefinition*> lang::TypeClone::getDependencies() const
 }
 std::string lang::TypeClone::createMangledName()
 {
-    return std::string(name().text());
+    return "clone(" + std::string(name().text()) + ")";
 }
+

@@ -141,6 +141,12 @@ lang::ResolvingHandle<lang::Type> lang::Type::getOriginalType() const
     return definition_->getOriginalType();
 }
 
+lang::AccessModifier lang::Type::getAccessModifier() const
+{
+    assert(isDefined());
+    return definition_->getAccessModifier();
+}
+
 void lang::Type::setContainingScope(lang::Scope* scope)
 {
     assert(isDefined());
@@ -153,10 +159,10 @@ lang::Scope* lang::Type::getContainingScope() const
     return definition_->scope();
 }
 
-llvm::Constant* lang::Type::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::Type::getDefaultContent(llvm::Module& m)
 {
     assert(isDefined());
-    return definition_->getDefaultContent(c);
+    return definition_->getDefaultContent(m);
 }
 
 llvm::Type* lang::Type::getNativeType(llvm::LLVMContext& c)
@@ -369,10 +375,16 @@ void lang::Type::buildDefaultInitializer(llvm::Value* ptr, CompileContext* conte
     definition_->buildDefaultInitializer(ptr, context);
 }
 
-void lang::Type::buildNativeBacking(CompileContext* context)
+void lang::Type::buildNativeDeclaration(CompileContext* context)
 {
     assert(isDefined());
-    definition_->buildNativeBacking(context);
+    definition_->buildNativeDeclaration(context);
+}
+
+void lang::Type::buildNativeDefinition(CompileContext* context)
+{
+    assert(isDefined());
+    definition_->buildNativeDefinition(context);
 }
 
 lang::TypeDefinition* lang::Type::getDefinition() const
@@ -479,3 +491,4 @@ lang::ResolvingHandle<lang::Type> lang::Type::toUndefined() const
 
     return lang::makeHandled<lang::Type>(name());
 }
+

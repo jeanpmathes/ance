@@ -17,7 +17,7 @@ namespace lang
         SingleType();
 
       public:
-        llvm::Constant* getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) override;
 
         /**

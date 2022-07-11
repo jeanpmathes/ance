@@ -53,6 +53,12 @@ namespace lang
          */
         bool validate(ValidationLogger& validation_logger) const;
 
+        /**
+         * Gets the constant initializer of the member.
+         * @return The constant initializer of the member.
+         */
+        [[nodiscard]] llvm::Constant* getConstantInitializer(llvm::Module& m) const;
+
       private:
         lang::AccessModifier                access_;
         lang::Identifier                    name_;
@@ -61,6 +67,8 @@ namespace lang
         std::unique_ptr<ConstantExpression> constant_init_;
         lang::Location                      location_;
         lang::Location                      type_location_;
+
+        mutable llvm::Constant* initial_value_ {nullptr};
     };
 }
 

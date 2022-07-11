@@ -444,7 +444,8 @@ void lang::GlobalScope::createNativeBacking(CompileContext* context)
         variable->buildDefinition(context);
     }
 
-    for (auto& [name, type] : defined_types_) { type->buildNativeBacking(context); }
+    for (auto& [name, type] : defined_types_) { type->buildNativeDeclaration(context); }
+    for (auto& [name, type] : defined_types_) { type->buildNativeDefinition(context); }
 }
 
 void lang::GlobalScope::buildFunctions(CompileContext* context)

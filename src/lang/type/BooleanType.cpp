@@ -19,9 +19,9 @@ bool lang::BooleanType::isBooleanType() const
     return true;
 }
 
-llvm::Constant* lang::BooleanType::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::BooleanType::getDefaultContent(llvm::Module& m)
 {
-    return llvm::ConstantInt::get(getContentType(c), 0, false);
+    return llvm::ConstantInt::get(getContentType(m.getContext()), 0, false);
 }
 
 llvm::Type* lang::BooleanType::getContentType(llvm::LLVMContext& c)

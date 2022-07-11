@@ -6,9 +6,9 @@
 
 lang::HalfType::HalfType() : TypeDefinition(lang::Identifier::from("half")) {}
 
-llvm::Constant* lang::HalfType::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::HalfType::getDefaultContent(llvm::Module& m)
 {
-    return llvm::ConstantFP::get(getContentType(c), 0);
+    return llvm::ConstantFP::get(getContentType(m.getContext()), 0);
 }
 
 llvm::Type* lang::HalfType::getContentType(llvm::LLVMContext& c)

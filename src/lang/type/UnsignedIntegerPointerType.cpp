@@ -11,9 +11,9 @@ StateCount lang::UnsignedIntegerPointerType::getStateCount() const
     return SpecialCount::PLATFORM_DEPENDENT;
 }
 
-llvm::Constant* lang::UnsignedIntegerPointerType::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::UnsignedIntegerPointerType::getDefaultContent(llvm::Module& m)
 {
-    return llvm::ConstantInt::get(getContentType(c), 0, false);
+    return llvm::ConstantInt::get(getContentType(m.getContext()), 0, false);
 }
 
 llvm::Type* lang::UnsignedIntegerPointerType::getContentType(llvm::LLVMContext&)

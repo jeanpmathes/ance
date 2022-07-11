@@ -94,9 +94,9 @@ void lang::TypeAlias::onScope()
     scope()->addType(actual_);
 }
 
-llvm::Constant* lang::TypeAlias::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::TypeAlias::getDefaultContent(llvm::Module& m)
 {
-    return actual_->getDefaultContent(c);
+    return actual_->getDefaultContent(m);
 }
 
 llvm::Type* lang::TypeAlias::getContentType(llvm::LLVMContext& c)
@@ -252,6 +252,15 @@ std::shared_ptr<lang::Value> lang::TypeAlias::buildIndirection(std::shared_ptr<V
 {
     return actual_->buildIndirection(value, context);
 }
+
+void lang::TypeAlias::buildDefaultInitializer(llvm::Value* ptr, CompileContext* context)
+{
+    actual_->buildDefaultInitializer(ptr, context);
+}
+
+void lang::TypeAlias::buildNativeDeclaration(CompileContext*) {}
+
+void lang::TypeAlias::buildNativeDefinition(CompileContext*) {}
 
 std::string lang::TypeAlias::createMangledName()
 {

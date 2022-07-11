@@ -32,9 +32,9 @@ bool lang::IntegerType::isIntegerType(uint64_t bit_size, bool is_signed) const
     return (bit_size_ == bit_size) && (is_signed_ == is_signed);
 }
 
-llvm::Constant* lang::IntegerType::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::IntegerType::getDefaultContent(llvm::Module& m)
 {
-    return llvm::ConstantInt::get(getContentType(c), 0, is_signed_);
+    return llvm::ConstantInt::get(getContentType(m.getContext()), 0, is_signed_);
 }
 
 llvm::Type* lang::IntegerType::getContentType(llvm::LLVMContext& c)

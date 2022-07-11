@@ -14,9 +14,9 @@ class BackingConstantExpression
   public:
     /**
      * Build the constant.
-     * @param c The llvm context.
+     * @param m The llvm module to build the constant in.
      */
-    void buildConstant(llvm::LLVMContext& c);
+    void buildConstant(llvm::Module& m);
 
     lang::ResolvingHandle<lang::Type> type() const override = 0;
 
@@ -31,10 +31,10 @@ class BackingConstantExpression
   protected:
     /**
      * Build the content constant.
-     * @param c The llvm context.
+     * @param m The llvm context.
      * @return The content constant.
      */
-    virtual llvm::Constant* buildContentConstant(llvm::LLVMContext& c) = 0;
+    virtual llvm::Constant* buildContentConstant(llvm::Module& m) = 0;
 
     void doBuild(CompileContext* context) override;
 

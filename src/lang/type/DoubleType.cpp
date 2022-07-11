@@ -4,9 +4,9 @@
 
 lang::DoubleType::DoubleType() : TypeDefinition(lang::Identifier::from("double")) {}
 
-llvm::Constant* lang::DoubleType::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::DoubleType::getDefaultContent(llvm::Module& m)
 {
-    return llvm::ConstantFP::get(getContentType(c), 0);
+    return llvm::ConstantFP::get(getContentType(m.getContext()), 0);
 }
 
 llvm::Type* lang::DoubleType::getContentType(llvm::LLVMContext& c)

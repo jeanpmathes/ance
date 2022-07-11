@@ -14,6 +14,7 @@
 #include "lang/utility/ResolvingHandle.h"
 #include "lang/type/StateCount.h"
 #include "lang/utility/Identifier.h"
+#include "lang/AccessModifier.h"
 
 namespace lang
 {
@@ -68,11 +69,13 @@ namespace lang
         [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getActualType() const;
         [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getOriginalType() const;
 
+        [[nodiscard]] virtual lang::AccessModifier getAccessModifier() const;
+
         void         setContainingScope(Scope* scope);
         virtual void onScope();
         Scope*       scope();
 
-        virtual llvm::Constant* getDefaultContent(llvm::LLVMContext& c) = 0;
+        virtual llvm::Constant* getDefaultContent(llvm::Module& m) = 0;
 
         llvm::Type*         getNativeType(llvm::LLVMContext& c);
         virtual llvm::Type* getContentType(llvm::LLVMContext& c) = 0;
@@ -131,8 +134,10 @@ namespace lang
                                                                const lang::Identifier& name,
                                                                CompileContext*         context);
         virtual std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context);
-        virtual void                         buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
-        virtual void                         buildNativeBacking(CompileContext* context);
+
+        virtual void buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
+        virtual void buildNativeDeclaration(CompileContext* context);
+        virtual void buildNativeDefinition(CompileContext* context);
 
       protected:
         virtual std::string createMangledName() = 0;
@@ -148,6 +153,9 @@ namespace lang
         virtual std::vector<lang::TypeDefinition*> getDependencies() const;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self() const;
+
+      protected:
+        llvm::Function* default_initializer_ {nullptr};
 
       private:
         lang::Identifier name_;

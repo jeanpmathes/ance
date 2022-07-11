@@ -2,6 +2,9 @@
 
 #include "lang/scope/Scope.h"
 #include "validation/ValidationLogger.h"
+#include "lang/construct/value/Value.h"
+#include "lang/construct/constant/Constant.h"
+#include "compiler/CompileContext.h"
 
 lang::Member::Member(lang::AccessModifier                access,
                      lang::Identifier                    name,
@@ -78,4 +81,22 @@ bool lang::Member::validate(ValidationLogger& validation_logger) const
     }
 
     return true;
+}
+
+llvm::Constant* lang::Member::getConstantInitializer(llvm::Module& m) const
+{
+    if (constant_init_)
+    {
+        if (!initial_value_)
+        {
+            std::shared_ptr<lang::Constant> constant = constant_init_->getConstantValue();
+            constant->buildContentConstant(&m);
+            initial_value_ = constant->getContentConstant();
+        }
+
+        return initial_value_;
+    }
+    else {
+        return type()->getDefaultContent(m);
+    }
 }

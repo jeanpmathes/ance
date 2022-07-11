@@ -41,9 +41,9 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::getActualType() const
     }
 }
 
-llvm::Constant* lang::PointerType::getDefaultContent(llvm::LLVMContext& c)
+llvm::Constant* lang::PointerType::getDefaultContent(llvm::Module& m)
 {
-    return llvm::ConstantPointerNull::get(getContentType(c));
+    return llvm::ConstantPointerNull::get(getContentType(m.getContext()));
 }
 
 llvm::PointerType* lang::PointerType::getContentType(llvm::LLVMContext& c)

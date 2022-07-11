@@ -11,7 +11,7 @@ StateCount lang::VoidType::getStateCount() const
     return count;
 }
 
-llvm::Constant* lang::VoidType::getDefaultContent(llvm::LLVMContext&)
+llvm::Constant* lang::VoidType::getDefaultContent(llvm::Module&)
 {
     throw std::logic_error("Void does not have a default value.");
 }
@@ -35,6 +35,15 @@ bool lang::VoidType::isVoidType() const
 {
     return true;
 }
+
+void lang::VoidType::buildDefaultInitializer(llvm::Value* ptr, CompileContext* context)
+{
+    throw std::logic_error("Void does not have a default value.");
+}
+
+void lang::VoidType::buildNativeDeclaration(CompileContext*) {}
+
+void lang::VoidType::buildNativeDefinition(CompileContext*) {}
 
 lang::ResolvingHandle<lang::Type> lang::VoidType::get()
 {

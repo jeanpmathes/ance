@@ -7,6 +7,7 @@
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
+#include "compiler/CompileContext.h"
 
 lang::TypeDefinition::TypeDefinition(lang::Identifier name, lang::Location location)
     : name_(std::move(name))
@@ -104,6 +105,11 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getActualType() const
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getOriginalType() const
 {
     return self();
+}
+
+lang::AccessModifier lang::TypeDefinition::getAccessModifier() const
+{
+    return lang::AccessModifier::PUBLIC_ACCESS;
 }
 
 void lang::TypeDefinition::setContainingScope(lang::Scope* scope)
@@ -294,9 +300,37 @@ std::shared_ptr<lang::Value> lang::TypeDefinition::buildIndirection(std::shared_
     return nullptr;
 }
 
-void lang::TypeDefinition::buildDefaultInitializer(llvm::Value*, CompileContext*) {}
+void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, CompileContext* context)
+{
+    if (!default_initializer_) return;
 
-void lang::TypeDefinition::buildNativeBacking(CompileContext*) {}
+    context->ir()->CreateCall(default_initializer_, {ptr});
+}
+
+void lang::TypeDefinition::buildNativeDeclaration(CompileContext* context)
+{
+    llvm::FunctionType* default_initializer_type =
+        llvm::FunctionType::get(llvm::Type::getVoidTy(*context->llvmContext()),
+                                {getNativeType(*context->llvmContext())},
+                                false);
+
+    default_initializer_ = llvm::Function::Create(default_initializer_type,
+                                                  getAccessModifier().linkage(),
+                                                  "ctor_default$" + getMangledName(),
+                                                  context->module());
+}
+
+void lang::TypeDefinition::buildNativeDefinition(CompileContext* context)
+{
+    llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", default_initializer_);
+    context->ir()->SetInsertPoint(block);
+
+    llvm::Value* ptr     = default_initializer_->getArg(0);
+    llvm::Value* content = getDefaultContent(*context->module());
+
+    context->ir()->CreateStore(content, ptr);
+    context->ir()->CreateRetVoid();
+}
 
 bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger) const
 {

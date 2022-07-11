@@ -34,7 +34,7 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getElementType() const override;
         lang::ResolvingHandle<lang::Type> getActualType() const override;
 
-        llvm::Constant*  getDefaultContent(llvm::LLVMContext& c) override;
+        llvm::Constant*  getDefaultContent(llvm::Module& m) override;
         llvm::ArrayType* getContentType(llvm::LLVMContext& c) override;
 
         bool                              isSubscriptDefined() override;
