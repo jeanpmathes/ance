@@ -294,6 +294,10 @@ std::shared_ptr<lang::Value> lang::TypeDefinition::buildIndirection(std::shared_
     return nullptr;
 }
 
+void lang::TypeDefinition::buildDefaultInitializer(llvm::Value*, CompileContext*) {}
+
+void lang::TypeDefinition::buildNativeBacking(CompileContext*) {}
+
 bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger) const
 {
     const int visited  = 1;
@@ -346,3 +350,4 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::self() const
     assert(type_);
     return type_->self();
 }
+

@@ -131,6 +131,8 @@ namespace lang
                                                                const lang::Identifier& name,
                                                                CompileContext*         context);
         virtual std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context);
+        virtual void                         buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
+        virtual void                         buildNativeBacking(CompileContext* context);
 
       protected:
         virtual std::string createMangledName() = 0;

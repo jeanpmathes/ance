@@ -363,6 +363,18 @@ std::shared_ptr<lang::Value> lang::Type::buildIndirection(std::shared_ptr<Value>
     return definition_->buildIndirection(std::move(value), context);
 }
 
+void lang::Type::buildDefaultInitializer(llvm::Value* ptr, CompileContext* context)
+{
+    assert(isDefined());
+    definition_->buildDefaultInitializer(ptr, context);
+}
+
+void lang::Type::buildNativeBacking(CompileContext* context)
+{
+    assert(isDefined());
+    definition_->buildNativeBacking(context);
+}
+
 lang::TypeDefinition* lang::Type::getDefinition() const
 {
     return definition_.get();

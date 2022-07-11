@@ -447,7 +447,20 @@ namespace lang
          */
         std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context);
 
-        lang::TypeDefinition* getDefinition() const;
+        /**
+         * Build the default initializer for this type.
+         * @param ptr A pointer to where the value should be initialized.
+         * @param context The current compile context.
+         */
+        void buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
+
+        /**
+         * Build the native backing required by this type.
+         * @param context The current compile context.
+         */
+        void buildNativeBacking(CompileContext* context);
+
+        [[nodiscard]] lang::TypeDefinition* getDefinition() const;
 
         /**
          * Check if two types are matching, meaning the available type can be converted to the expected type.
