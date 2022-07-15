@@ -71,7 +71,7 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
     lang::Identifier                  identifier  = ident(ctx->IDENTIFIER());
 
     ConstantExpression* const_expr;
-    lang::Assigner      assigner = lang::Assigner::COPY_ASSIGNMENT;
+    lang::Assigner      assigner = lang::Assigner::UNSPECIFIED;
 
     if (ctx->literalExpression())
     {
@@ -275,7 +275,7 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
         assigned = visit(ctx->expression()).as<Expression*>();
     }
     else {
-        assigner = lang::Assigner::COPY_ASSIGNMENT;
+        assigner = lang::Assigner::UNSPECIFIED;
         assigned = nullptr;
     }
 

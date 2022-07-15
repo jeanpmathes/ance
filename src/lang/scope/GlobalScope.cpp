@@ -71,8 +71,6 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
                                              std::unique_ptr<ConstantExpression> initializer,
                                              lang::Location                      location)
 {
-    assert(assigner.hasSymbol());
-
     if (defined_names_.contains(name))
     {
         duplicated_names_.emplace_back(name, location);

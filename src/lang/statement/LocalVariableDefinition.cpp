@@ -21,8 +21,6 @@ LocalVariableDefinition::LocalVariableDefinition(lang::Identifier               
     , assigner_(assigner)
     , assigned_(std::move(assigned))
 {
-    assert(assigner.hasSymbol());
-
     if (assigned_) { addSubexpression(*assigned_); }
 }
 
