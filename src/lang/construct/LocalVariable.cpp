@@ -30,15 +30,12 @@ void lang::LocalVariable::validate(ValidationLogger&) const
 
 void lang::LocalVariable::buildDeclaration(CompileContext* context)
 {
-    assert(initial_value_);
-
     native_value_ =
         context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr, name().text());
 }
 
 void lang::LocalVariable::buildDefinition(CompileContext* context)
 {
-    assert(initial_value_);
     assert(native_value_);
 
     if (parameter_no_ == 0)
@@ -67,7 +64,8 @@ void lang::LocalVariable::buildDefinition(CompileContext* context)
                                  location().getDebugLoc(context->llvmContext(), scope()->getDebugScope(context)),
                                  context->ir()->GetInsertBlock());
 
-    store(initial_value_, context);
+    if (initial_value_) { store(initial_value_, context); }
+    else { type()->buildDefaultInitializer(native_value_, context); }
 }
 
 std::shared_ptr<lang::Value> lang::LocalVariable::getValue(CompileContext*)

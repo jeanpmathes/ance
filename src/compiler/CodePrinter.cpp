@@ -22,11 +22,10 @@ std::any CodePrinter::visit(lang::GlobalVariable& variable)
     out_ << variable.name() << ": ";
     out_ << variable.type()->name();
 
-    std::string value = variable.init().toString();
-    if (!value.empty())
+    if (variable.init())
     {
         out_ << " " << variable.assigner().getSymbol() << " ";
-        out_ << variable.init().toString();
+        out_ << variable.init()->toString();
     }
 
     out_ << ";" << std::endl;
@@ -131,13 +130,6 @@ std::any CodePrinter::visit(ConstantLiteral& constant_literals)
     else {
         out_ << constant_literals.constant().toString();
     }
-
-    return {};
-}
-
-std::any CodePrinter::visit(DefaultValue&)
-{
-    out_ << "$default";
 
     return {};
 }

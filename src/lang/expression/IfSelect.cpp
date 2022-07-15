@@ -4,7 +4,6 @@
 #include "lang/type/BooleanType.h"
 #include "validation/ValidationLogger.h"
 
-#include "lang/expression/DefaultValue.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/statement/Assignment.h"
 #include "lang/statement/Drop.h"

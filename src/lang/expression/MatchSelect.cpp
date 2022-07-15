@@ -1,6 +1,5 @@
 #include "MatchSelect.h"
 
-#include "lang/expression/DefaultValue.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/scope/Scope.h"
 #include "lang/statement/LocalVariableDefinition.h"

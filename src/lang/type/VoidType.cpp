@@ -36,7 +36,7 @@ bool lang::VoidType::isVoidType() const
     return true;
 }
 
-void lang::VoidType::buildDefaultInitializer(llvm::Value* ptr, CompileContext* context)
+void lang::VoidType::buildDefaultInitializer(llvm::Value*, CompileContext*)
 {
     throw std::logic_error("Void does not have a default value.");
 }

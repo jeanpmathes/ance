@@ -35,7 +35,6 @@
 #include "lang/expression/BindRef.h"
 #include "lang/expression/BindRefTo.h"
 #include "lang/expression/ConstantLiteral.h"
-#include "lang/expression/DefaultValue.h"
 #include "lang/expression/FunctionCall.h"
 #include "lang/expression/SizeofExpression.h"
 #include "lang/expression/SizeofType.h"
@@ -81,14 +80,8 @@ antlrcpp::Any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclar
         Expression* expr = visit(ctx->literalExpression()).as<Expression*>();
         const_expr       = dynamic_cast<ConstantExpression*>(expr);
     }
-    else if (is_constant)
-    {
-        const_expr = nullptr;
-    }
     else
-    {
-        const_expr = new DefaultValue(type, location(ctx));
-    }
+    { const_expr = nullptr; }
 
     application_.globalScope().defineGlobalVariable(access,
                                                     is_constant,

@@ -46,7 +46,7 @@ namespace lang
         [[nodiscard]] lang::AccessModifier access() const;
         [[nodiscard]] bool                 isConstant() const;
         [[nodiscard]] lang::Assigner       assigner() const;
-        [[nodiscard]] lang::Constant&      init() const;
+        [[nodiscard]] lang::Constant*      init() const;
 
         void validate(ValidationLogger& validation_logger) const override;
 
@@ -64,7 +64,6 @@ namespace lang
         std::unique_ptr<ConstantExpression> constant_init_;
 
         llvm::GlobalVariable*           native_variable_ {nullptr};
-        std::shared_ptr<lang::Constant> initial_value_ {nullptr};
     };
 }
 

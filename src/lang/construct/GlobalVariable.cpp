@@ -35,8 +35,6 @@ lang::GlobalVariable::GlobalVariable(Identifier                          name,
     if (constant_init_)
     {
         constant_init_->setContainingScope(containing_scope);
-        initial_value_ = constant_init_->getConstantValue();
-
         addChild(*constant_init_);
     }
 }
@@ -59,9 +57,9 @@ lang::Assigner lang::GlobalVariable::assigner() const
     }
 }
 
-lang::Constant& lang::GlobalVariable::init() const
+lang::Constant* lang::GlobalVariable::init() const
 {
-    return *initial_value_;
+    return constant_init_ ? constant_init_->getConstantValue().get() : nullptr;
 }
 
 void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
@@ -86,16 +84,10 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
         return;
     }
 
-    if (!constant_init_)
+    if (!constant_init_ && is_constant_)
     {
-        if (is_constant_)
-        {
-            validation_logger.logError("Constants require an explicit initializer", location());
-            return;
-        }
-        else {
-            assert(false && "For non-const global vars, an initializer (potentially the default one) must be passed.");
-        }
+        validation_logger.logError("Constants require an explicit initializer", location());
+        return;
     }
 
     if (is_constant_ && !isFinal())
@@ -104,14 +96,16 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
         return;
     }
 
-    bool valid = constant_init_->validate(validation_logger);
-    if (!valid) return;
-
-    if (!lang::Type::areSame(type(), initial_value_->type()))
+    if (constant_init_)
     {
-        validation_logger.logError("Constant initializer must be of variable type " + type()->getAnnotatedName(),
-                                   typeLocation());
-        return;
+        if (!constant_init_->validate(validation_logger)) return;
+
+        if (!lang::Type::areSame(type(), constant_init_->getConstantValue()->type()))
+        {
+            validation_logger.logError("Constant initializer must be of variable type " + type()->getAnnotatedName(),
+                                       typeLocation());
+            return;
+        }
     }
 }
 
@@ -120,9 +114,17 @@ void lang::GlobalVariable::buildDefinition(CompileContext* context)
 {
     llvm::GlobalValue::LinkageTypes linkage = access_.linkage();
 
-    initial_value_->buildContentConstant(context->module());
-    llvm::Constant* native_initializer = initial_value_->getContentConstant();
-    native_variable_                   = new llvm::GlobalVariable(*context->module(),
+    llvm::Constant* native_initializer;
+
+    if (constant_init_)
+    {
+        std::shared_ptr<lang::Constant> initial_value = constant_init_->getConstantValue();
+        initial_value->buildContentConstant(context->module());
+        native_initializer = initial_value->getContentConstant();
+    }
+    else { native_initializer = type()->getDefaultContent(*context->module()); }
+
+    native_variable_ = new llvm::GlobalVariable(*context->module(),
                                                 type()->getContentType(context->module()->getContext()),
                                                 is_constant_,
                                                 linkage,

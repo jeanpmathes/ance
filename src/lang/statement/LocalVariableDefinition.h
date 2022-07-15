@@ -62,7 +62,6 @@ class LocalVariableDefinition
     lang::ResolvingHandle<lang::Type> type_;
     lang::Location                    type_location_;
     lang::Assigner                    assigner_;
-    Expression*                       assigned_ptr_;
     std::unique_ptr<Expression>       assigned_;
 
     std::optional<lang::ResolvingHandle<lang::Variable>> variable_ {};

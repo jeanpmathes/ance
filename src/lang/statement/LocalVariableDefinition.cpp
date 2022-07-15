@@ -4,11 +4,9 @@
 
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
-#include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 #include "lang/Assigner.h"
-#include "lang/expression/DefaultValue.h"
 
 LocalVariableDefinition::LocalVariableDefinition(lang::Identifier                  name,
                                                  lang::ResolvingHandle<lang::Type> type,
@@ -21,12 +19,11 @@ LocalVariableDefinition::LocalVariableDefinition(lang::Identifier               
     , type_(type)
     , type_location_(type_location)
     , assigner_(assigner)
-    , assigned_ptr_(assigned.get())
-    , assigned_(assigned ? std::move(assigned) : std::make_unique<DefaultValue>(type, location))
+    , assigned_(std::move(assigned))
 {
     assert(assigner.hasSymbol());
 
-    addSubexpression(*assigned_);
+    if (assigned_) { addSubexpression(*assigned_); }
 }
 
 const lang::Identifier& LocalVariableDefinition::name() const
@@ -46,7 +43,7 @@ lang::Assigner LocalVariableDefinition::assigner() const
 
 Expression* LocalVariableDefinition::assigned() const
 {
-    return assigned_ptr_;
+    return assigned_.get();
 }
 
 void LocalVariableDefinition::setScope(lang::Scope& scope)
@@ -64,7 +61,7 @@ void LocalVariableDefinition::walkDefinitions()
                                                              type_,
                                                              type_location_,
                                                              assigner_,
-                                                             assigned_->getValue(),
+                                                             assigned_ ? assigned_->getValue() : nullptr,
                                                              location());
 
     scope()->addType(type_);
@@ -74,9 +71,6 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
 {
     assert(variable_);
     auto variable = *variable_;
-
-    bool assigned_is_valid = assigned_->validate(validation_logger);
-    if (!assigned_is_valid) return;
 
     if (!variable->type()->isDefined())
     {
@@ -99,7 +93,12 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
         return;
     }
 
-    lang::Type::checkMismatch(variable->type(), assigned_->type(), assigned_->location(), validation_logger);
+    if (assigned_)
+    {
+        if (!assigned_->validate(validation_logger)) return;
+
+        lang::Type::checkMismatch(variable->type(), assigned_->type(), assigned_->location(), validation_logger);
+    }
 }
 
 Statements LocalVariableDefinition::expandWith(Expressions subexpressions, Statements) const
@@ -111,7 +110,7 @@ Statements LocalVariableDefinition::expandWith(Expressions subexpressions, State
                                                   type_->toUndefined(),
                                                   type_location_,
                                                   assigner_,
-                                                  assigned_ptr_ ? std::move(subexpressions[0]) : nullptr,
+                                                  subexpressions.size() == 1 ? std::move(subexpressions[0]) : nullptr,
                                                   location()));
 
     return statements;
