@@ -21,8 +21,9 @@ class AnceLinker
      * Link object files.
      * @param obj The object files to link.
      * @param exe The path of the finished executable.
+     * @return True if the linking was successful, false otherwise.
      */
-    void link(const std::filesystem::path& obj, const std::filesystem::path& exe);
+    bool link(const std::filesystem::path& obj, const std::filesystem::path& exe);
 
   private:
     std::vector<std::string> lib_paths_;

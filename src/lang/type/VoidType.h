@@ -21,7 +21,7 @@ namespace lang
 
         [[nodiscard]] bool isVoidType() const override;
 
-        void buildDefaultInitializer(llvm::Value* ptr, CompileContext* context) override;
+        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context) override;
         void buildNativeDeclaration(CompileContext* context) override;
         void buildNativeDefinition(CompileContext* context) override;
 

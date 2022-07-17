@@ -210,9 +210,9 @@ std::shared_ptr<lang::Value> lang::TypeClone::buildIndirection(std::shared_ptr<V
     return original_->buildIndirection(value, context);
 }
 
-void lang::TypeClone::buildDefaultInitializer(llvm::Value* ptr, CompileContext* context)
+void lang::TypeClone::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
 {
-    original_->buildDefaultInitializer(ptr, context);
+    original_->buildDefaultInitializer(ptr, count, context);
 }
 
 void lang::TypeClone::buildNativeDeclaration(CompileContext*) {}

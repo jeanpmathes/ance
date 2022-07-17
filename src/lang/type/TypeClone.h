@@ -66,7 +66,7 @@ namespace lang
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
         std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context) override;
 
-        void buildDefaultInitializer(llvm::Value* ptr, CompileContext* context) override;
+        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context) override;
         void buildNativeDeclaration(CompileContext* context) override;
         void buildNativeDefinition(CompileContext* context) override;
 

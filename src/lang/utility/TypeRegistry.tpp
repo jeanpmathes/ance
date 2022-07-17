@@ -73,3 +73,14 @@ void lang::TypeRegistry<OTHER_KEY>::resolve()
 
     types_ = std::move(merged);
 }
+template<typename OTHER_KEY>
+void lang::TypeRegistry<OTHER_KEY>::buildNativeDeclarations(CompileContext* context)
+{
+    for (auto& [key, type] : types_) { type->buildNativeDeclaration(context); }
+}
+
+template<typename OTHER_KEY>
+void lang::TypeRegistry<OTHER_KEY>::buildNativeDefinitions(CompileContext* context)
+{
+    for (auto& [key, type] : types_) { type->buildNativeDefinition(context); }
+}

@@ -135,7 +135,8 @@ namespace lang
                                                                CompileContext*         context);
         virtual std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context);
 
-        virtual void buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
+        void         buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
+        virtual void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context);
         virtual void buildNativeDeclaration(CompileContext* context);
         virtual void buildNativeDefinition(CompileContext* context);
 

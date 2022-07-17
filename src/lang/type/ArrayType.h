@@ -29,10 +29,10 @@ namespace lang
       public:
         static const uint64_t MAX_ARRAY_TYPE_SIZE = 1ll << 32;
 
-        StateCount getStateCount() const override;
+        [[nodiscard]] StateCount getStateCount() const override;
 
-        lang::ResolvingHandle<lang::Type> getElementType() const override;
-        lang::ResolvingHandle<lang::Type> getActualType() const override;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const override;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
 
         llvm::Constant*  getDefaultContent(llvm::Module& m) override;
         llvm::ArrayType* getContentType(llvm::LLVMContext& c) override;

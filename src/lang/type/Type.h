@@ -462,6 +462,14 @@ namespace lang
         void buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
 
         /**
+         * Build the default initializer for this type, initializing multiple instances.
+         * @param ptr The pointer to the first instance.
+         * @param count The number of instances to initialize.
+         * @param context The current compile context.
+         */
+        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context);
+
+        /**
          * Build the native backing required for the declaration.
          * @param context The current compile context.
          */

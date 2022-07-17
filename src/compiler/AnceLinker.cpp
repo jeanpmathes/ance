@@ -37,7 +37,7 @@ AnceLinker::AnceLinker(std::optional<std::reference_wrapper<const data::Element>
     }
 }
 
-void AnceLinker::link(const std::filesystem::path& obj, const std::filesystem::path& exe)
+bool AnceLinker::link(const std::filesystem::path& obj, const std::filesystem::path& exe)
 {
     std::vector<const char*> args;
     args.push_back("lld");
@@ -61,5 +61,5 @@ void AnceLinker::link(const std::filesystem::path& obj, const std::filesystem::p
     std::string in = obj.string();
     args.push_back(in.c_str());
 
-    lld::mingw::link(args, llvm::outs(), llvm::errs(), false, false);
+    return lld::mingw::link(args, llvm::outs(), llvm::errs(), false, false);
 }

@@ -25,6 +25,18 @@ namespace lang
          * Resolve the used types.
          */
         virtual void resolve() = 0;
+
+        /**
+         * Build all native declarations.
+         * @param context The compile context.
+         */
+        virtual void buildNativeDeclarations(CompileContext* context) = 0;
+
+        /**
+         * Build all native definitions.
+         * @param context The compile context.
+         */
+        virtual void buildNativeDefinitions(CompileContext* context) = 0;
     };
 
     /**
@@ -44,6 +56,9 @@ namespace lang
 
         void setDefaultContainingScope(lang::Scope* scope) override;
         void resolve() override;
+
+        void buildNativeDeclarations(CompileContext* context) override;
+        void buildNativeDefinitions(CompileContext* context) override;
 
       private:
         std::vector<Entry> types_;

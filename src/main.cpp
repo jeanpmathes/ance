@@ -104,11 +104,11 @@ int main(int argc, char** argv)
                 compiler.compile(ilr);
                 compiler.emitObject(obj);
 
-                linker.link(obj, exe);
+                bool ok = linker.link(obj, exe);
 
                 llvm::llvm_shutdown();
 
-                return EXIT_SUCCESS;
+                return ok ? EXIT_SUCCESS : EXIT_FAILURE;
             }
             else {
                 validation_logger.emitMessages(source_file);

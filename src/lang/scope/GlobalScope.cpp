@@ -440,7 +440,10 @@ void lang::GlobalScope::createNativeBacking(CompileContext* context)
     }
 
     for (auto& [name, type] : defined_types_) { type->buildNativeDeclaration(context); }
+    for (auto& registry : type_registries_) { registry->buildNativeDeclarations(context); }
+
     for (auto& [name, type] : defined_types_) { type->buildNativeDefinition(context); }
+    for (auto& registry : type_registries_) { registry->buildNativeDefinitions(context); }
 }
 
 void lang::GlobalScope::buildFunctions(CompileContext* context)

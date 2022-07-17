@@ -93,13 +93,13 @@ class Runtime
     void buildAssert(const std::shared_ptr<lang::Value>& value, CompileContext* context);
 
   private:
-    llvm::Value* allocateAutomatic(lang::ResolvingHandle<lang::Type>   type,
-                                   const std::shared_ptr<lang::Value>& count,
-                                   CompileContext*                     context);
+    llvm::Value* allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
+                                   llvm::Value*                      count_value,
+                                   CompileContext*                   context);
 
-    llvm::Value* allocateDynamic(lang::ResolvingHandle<lang::Type>   type,
-                                 const std::shared_ptr<lang::Value>& count,
-                                 CompileContext*                     context);
+    llvm::Value* allocateDynamic(lang::ResolvingHandle<lang::Type> type,
+                                 llvm::Value*                      count_value,
+                                 CompileContext*                   context);
 };
 
 #endif

@@ -253,9 +253,9 @@ std::shared_ptr<lang::Value> lang::TypeAlias::buildIndirection(std::shared_ptr<V
     return actual_->buildIndirection(value, context);
 }
 
-void lang::TypeAlias::buildDefaultInitializer(llvm::Value* ptr, CompileContext* context)
+void lang::TypeAlias::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
 {
-    actual_->buildDefaultInitializer(ptr, context);
+    actual_->buildDefaultInitializer(ptr, count, context);
 }
 
 void lang::TypeAlias::buildNativeDeclaration(CompileContext*) {}

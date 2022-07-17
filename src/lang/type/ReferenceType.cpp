@@ -193,6 +193,15 @@ std::shared_ptr<lang::Value> lang::ReferenceType::buildIndirection(std::shared_p
     return element_type_->buildIndirection(getReferenced(value, context), context);
 }
 
+void lang::ReferenceType::buildDefaultInitializer(llvm::Value*, llvm::Value*, CompileContext*)
+{
+    throw std::logic_error("Reference does not have a default value.");
+}
+
+void lang::ReferenceType::buildNativeDeclaration(CompileContext*) {}
+
+void lang::ReferenceType::buildNativeDefinition(CompileContext*) {}
+
 std::string lang::ReferenceType::createMangledName()
 {
     return std::string("ref") + "(" + element_type_->getMangledName() + ")";
@@ -259,3 +268,4 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::get(lang::ResolvingHandle
         return type;
     }
 }
+

@@ -84,18 +84,26 @@ std::shared_ptr<lang::Value> Runtime::allocate(Allocator                        
                                                const std::shared_ptr<lang::Value>& count,
                                                CompileContext*                     context)
 {
-    if (count) { assert(lang::Type::areSame(count->type(), lang::SizeType::getSize())); }
+    llvm::Value* count_value = nullptr;
+
+    if (count)
+    {
+        assert(lang::Type::areSame(count->type(), lang::SizeType::getSize()));
+
+        count->buildContentValue(context);
+        count_value = count->getContentValue();
+    }
 
     llvm::Value* ptr_to_allocated;
 
     switch (allocation)
     {
         case AUTOMATIC:
-            ptr_to_allocated = allocateAutomatic(type, count, context);
+            ptr_to_allocated = allocateAutomatic(type, count_value, context);
             break;
 
         case DYNAMIC:
-            ptr_to_allocated = allocateDynamic(type, count, context);
+            ptr_to_allocated = allocateDynamic(type, count_value, context);
             break;
 
         default:
@@ -104,6 +112,9 @@ std::shared_ptr<lang::Value> Runtime::allocate(Allocator                        
 
     lang::ResolvingHandle<lang::Type> ptr_type   = lang::PointerType::get(type);
     llvm::Value*                      native_ptr = lang::Values::contentToNative(ptr_type, ptr_to_allocated, context);
+
+    if (count_value) { type->buildDefaultInitializer(ptr_to_allocated, count_value, context); }
+    else { type->buildDefaultInitializer(ptr_to_allocated, context); }
 
     return std::make_shared<lang::WrappedNativeValue>(ptr_type, native_ptr);
 }
@@ -136,24 +147,16 @@ void Runtime::buildAssert(const std::shared_ptr<lang::Value>& value, CompileCont
     context_->ir()->CreateCall(assertion_, truth_value);
 }
 
-llvm::Value* Runtime::allocateAutomatic(lang::ResolvingHandle<lang::Type>   type,
-                                        const std::shared_ptr<lang::Value>& count,
-                                        CompileContext*                     context)
+llvm::Value* Runtime::allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
+                                        llvm::Value*                      count_value,
+                                        CompileContext*                   context)
 {
-    llvm::Value* count_value = nullptr;
-
-    if (count)
-    {
-        count->buildContentValue(context);
-        count_value = count->getContentValue();
-    }
-
     return context->ir()->CreateAlloca(type->getContentType(*context->llvmContext()), count_value, "alloca");
 }
 
-llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type>   type,
-                                      const std::shared_ptr<lang::Value>& count,
-                                      CompileContext*                     context)
+llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
+                                      llvm::Value*                      count_value,
+                                      CompileContext*                   context)
 {
     // Set the zero init flag.
     llvm::Value* flags = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context->llvmContext()), 0x0040, false);
@@ -161,17 +164,14 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type>   type,
     // Calculate the size to allocate.
     llvm::Value* size;
 
-    if (count)
+    if (count_value)
     {
         llvm::Value* element_size =
             llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context->llvmContext()),
                                    type->getContentSize(context->module()).getFixedSize(),
                                    false);
 
-        count->buildContentValue(context);
-        llvm::Value* element_count = count->getContentValue();
-
-        size = context->ir()->CreateMul(element_count, element_size, element_count->getName() + ".mul");
+        size = context->ir()->CreateMul(count_value, element_size, count_value->getName() + ".mul");
     }
     else
     {

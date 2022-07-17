@@ -4,10 +4,11 @@
 #include <map>
 #include <stack>
 
+#include "compiler/CompileContext.h"
+#include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
-#include "compiler/CompileContext.h"
 
 lang::TypeDefinition::TypeDefinition(lang::Identifier name, lang::Location location)
     : name_(std::move(name))
@@ -302,17 +303,27 @@ std::shared_ptr<lang::Value> lang::TypeDefinition::buildIndirection(std::shared_
 
 void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, CompileContext* context)
 {
+    llvm::APInt count_value = llvm::APInt(lang::SizeType::getSizeWidth(), 1);
+    llvm::Type* count_type  = lang::SizeType::getSize()->getContentType(*context->llvmContext());
+
+    llvm::Value* count = llvm::ConstantInt::get(count_type, count_value);
+
+    buildDefaultInitializer(ptr, count, context);
+}
+
+void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+{
     if (!default_initializer_) return;
 
-    context->ir()->CreateCall(default_initializer_, {ptr});
+    context->ir()->CreateCall(default_initializer_, {ptr, count});
 }
 
 void lang::TypeDefinition::buildNativeDeclaration(CompileContext* context)
 {
-    llvm::FunctionType* default_initializer_type =
-        llvm::FunctionType::get(llvm::Type::getVoidTy(*context->llvmContext()),
-                                {getNativeType(*context->llvmContext())},
-                                false);
+    llvm::FunctionType* default_initializer_type = llvm::FunctionType::get(
+        llvm::Type::getVoidTy(*context->llvmContext()),
+        {getNativeType(*context->llvmContext()), lang::SizeType::getSize()->getContentType(*context->llvmContext())},
+        false);
 
     default_initializer_ = llvm::Function::Create(default_initializer_type,
                                                   getAccessModifier().linkage(),
@@ -322,14 +333,41 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext* context)
 
 void lang::TypeDefinition::buildNativeDefinition(CompileContext* context)
 {
-    llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", default_initializer_);
-    context->ir()->SetInsertPoint(block);
+    llvm::Type* size_type = lang::SizeType::getSize()->getContentType(*context->llvmContext());
 
     llvm::Value* ptr     = default_initializer_->getArg(0);
+    llvm::Value* count   = default_initializer_->getArg(1);
     llvm::Value* content = getDefaultContent(*context->module());
 
-    context->ir()->CreateStore(content, ptr);
-    context->ir()->CreateRetVoid();
+    llvm::BasicBlock* init = llvm::BasicBlock::Create(*context->llvmContext(), "init", default_initializer_);
+    llvm::BasicBlock* body = llvm::BasicBlock::Create(*context->llvmContext(), "body", default_initializer_);
+    llvm::BasicBlock* end  = llvm::BasicBlock::Create(*context->llvmContext(), "end", default_initializer_);
+
+    context->ir()->SetInsertPoint(init);
+    {
+        context->ir()->CreateBr(body);
+    }
+
+    context->ir()->SetInsertPoint(body);
+    {
+        llvm::PHINode* current = context->ir()->CreatePHI(size_type, 2, "i");
+        current->addIncoming(llvm::ConstantInt::get(size_type, 0), init);
+
+        llvm::Value* element_ptr =
+            context->ir()->CreateInBoundsGEP(getContentType(*context->llvmContext()), ptr, current, "element_ptr");
+        context->ir()->CreateStore(content, element_ptr);
+
+        llvm::Value* next = context->ir()->CreateAdd(current, llvm::ConstantInt::get(size_type, 1), "next");
+        current->addIncoming(next, body);
+
+        llvm::Value* condition = context->ir()->CreateICmpULT(next, count, "condition");
+        context->ir()->CreateCondBr(condition, body, end);
+    }
+
+    context->ir()->SetInsertPoint(end);
+    {
+        context->ir()->CreateRetVoid();
+    }
 }
 
 bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger) const
