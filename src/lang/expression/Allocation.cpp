@@ -56,7 +56,8 @@ bool Allocation::validate(ValidationLogger& validation_logger) const
         return false;
     }
 
-    bool is_valid = return_type_->validate(validation_logger, location());
+    bool is_valid = allocated_type_->validate(validation_logger, location())
+                 && return_type_->validate(validation_logger, location());
 
     if (count_)
     {

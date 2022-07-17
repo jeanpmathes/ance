@@ -114,7 +114,7 @@ lang::AccessModifier lang::TypeDefinition::getAccessModifier() const
 
 void lang::TypeDefinition::setContainingScope(lang::Scope* scope)
 {
-    assert(!containing_scope_);
+    if (containing_scope_) return;
     containing_scope_ = scope;
 
     onScope();

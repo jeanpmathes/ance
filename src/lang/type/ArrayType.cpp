@@ -183,13 +183,16 @@ lang::TypeDefinitionRegistry* lang::ArrayType::getRegistry()
 
 lang::ResolvingHandle<lang::Type> lang::ArrayType::get(lang::ResolvingHandle<lang::Type> element_type, uint64_t size)
 {
+    element_type = element_type->toSeparateUndefined();
+
     std::vector<lang::ResolvingHandle<lang::Type>> used_types;
     used_types.push_back(element_type);
 
     std::optional<lang::ResolvingHandle<lang::Type>> defined_type = getArrayTypes().get(used_types, size);
 
     if (defined_type.has_value()) { return defined_type.value(); }
-    else {
+    else
+    {
         auto*                             array_type = new lang::ArrayType(element_type, size);
         lang::ResolvingHandle<lang::Type> type =
             lang::makeHandled<lang::Type>(std::unique_ptr<lang::ArrayType>(array_type));

@@ -213,8 +213,6 @@ namespace lang
 
         std::set<lang::Identifier>                                defined_names_;
         std::vector<std::tuple<lang::Identifier, lang::Location>> duplicated_names_;
-
-        bool expanded_ {false};
     };
 }
 #endif

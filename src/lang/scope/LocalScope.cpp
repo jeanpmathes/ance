@@ -134,7 +134,7 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Type> type)
 {
     assert(!type->isDefined());
 
-    if (undefined_types_.find(type->name()) != undefined_types_.end())
+    if (undefined_types_.contains(type->name()))
     {
         type.reroute(undefined_types_[type->name()].handle());
         return;

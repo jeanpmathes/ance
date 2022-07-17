@@ -296,7 +296,7 @@ void lang::Function::resolve()
 
 bool lang::Function::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
 {
-    if (defined_parameters_.find(variable->name()) != defined_parameters_.end())
+    if (defined_parameters_.contains(variable->name()))
     {
         variable.reroute(defined_parameters_[variable->name()].handle());
         return true;

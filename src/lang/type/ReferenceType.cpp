@@ -241,13 +241,16 @@ std::shared_ptr<lang::Value> lang::ReferenceType::getReferenced(const std::share
 
 lang::ResolvingHandle<lang::Type> lang::ReferenceType::get(lang::ResolvingHandle<lang::Type> element_type)
 {
+    element_type = element_type->toSeparateUndefined();
+
     std::vector<lang::ResolvingHandle<lang::Type>> used_types;
     used_types.push_back(element_type);
 
     std::optional<lang::ResolvingHandle<lang::Type>> defined_type = getReferenceTypes().get(used_types, lang::Empty());
 
     if (defined_type.has_value()) { return defined_type.value(); }
-    else {
+    else
+    {
         auto*                             reference_type = new lang::ReferenceType(element_type);
         lang::ResolvingHandle<lang::Type> type =
             lang::makeHandled<lang::Type>(std::unique_ptr<lang::ReferenceType>(reference_type));

@@ -544,6 +544,12 @@ namespace lang
          */
         [[nodiscard]] lang::ResolvingHandle<lang::Type> toUndefined() const;
 
+        /**
+         * Get a separate type handle if the type is undefined, otherwise return the same type.
+         * @return The type handle.
+         */
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> toSeparateUndefined() const;
+
       private:
         lang::Identifier                      name_;
         std::unique_ptr<lang::TypeDefinition> definition_ {};

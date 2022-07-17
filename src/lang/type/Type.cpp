@@ -28,6 +28,8 @@ std::string lang::Type::getAnnotatedName(bool is_safe) const
 {
     std::string name = "'" + this->name() + "'";
 
+    is_safe &= isDefined();
+
     if (is_safe && getActualType() != self()) { name += " (aka '" + getActualType()->name() + "')"; }
 
     return name;
@@ -492,3 +494,7 @@ lang::ResolvingHandle<lang::Type> lang::Type::toUndefined() const
     return lang::makeHandled<lang::Type>(name());
 }
 
+lang::ResolvingHandle<lang::Type> lang::Type::toSeparateUndefined() const
+{
+    return isDefined() ? self() : lang::makeHandled<lang::Type>(name());
+}

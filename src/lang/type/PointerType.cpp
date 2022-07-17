@@ -62,8 +62,8 @@ bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Loca
 {
     if (!element_type_->isDefined())
     {
-        validation_logger.logError("Cannot declare pointer to undefined type" + element_type_->getAnnotatedName(),
-                                   location);
+        validation_logger.logError("Cannot declare pointer to undefined type " + element_type_->getAnnotatedName(),
+                                   element_type_->name().location());
         return false;
     }
 
@@ -191,13 +191,16 @@ lang::TypeDefinitionRegistry* lang::PointerType::getRegistry()
 
 lang::ResolvingHandle<lang::Type> lang::PointerType::get(lang::ResolvingHandle<lang::Type> element_type)
 {
+    element_type = element_type->toSeparateUndefined();
+
     std::vector<lang::ResolvingHandle<lang::Type>> used_types;
     used_types.push_back(element_type);
 
     std::optional<lang::ResolvingHandle<lang::Type>> defined_type = getPointerTypes().get(used_types, lang::Empty());
 
     if (defined_type.has_value()) { return defined_type.value(); }
-    else {
+    else
+    {
         auto*                             pointer_type = new lang::PointerType(element_type);
         lang::ResolvingHandle<lang::Type> type =
             lang::makeHandled<lang::Type>(std::unique_ptr<lang::PointerType>(pointer_type));

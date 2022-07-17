@@ -48,8 +48,6 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 void lang::GlobalScope::expand()
 {
     for (auto& [key, function] : defined_function_groups_) { function->expand(); }
-
-    expanded_ = true;
 }
 
 void lang::GlobalScope::determineFlow()
@@ -326,16 +324,15 @@ void lang::GlobalScope::registerDefinition(lang::ResolvingHandle<lang::Type> typ
 
 void lang::GlobalScope::resolve()
 {
-    if (!expanded_)
-    {
-        for (auto& registry : type_registries_)
-        {
-            registry->setDefaultContainingScope(this);
-            registry->resolve();
-        }
-    }
-
     for (auto& [key, group] : defined_function_groups_) { group->resolve(); }
+
+    // Type registries are currently incorrect, as they resolve type dependencies in an incorrect scope.
+
+    for (auto& registry : type_registries_)
+    {
+        registry->setDefaultContainingScope(this);
+        registry->resolve();
+    }
 }
 
 bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
@@ -362,7 +359,7 @@ bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::FunctionGr
 
 bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Type> type)
 {
-    if (defined_types_.find(type->name()) != defined_types_.end())
+    if (defined_types_.contains(type->name()))
     {
         type.reroute(defined_types_[type->name()].handle());
         return true;
