@@ -32,6 +32,8 @@ public main () : ui32
     // Array members are also initialized.
     let v_array: [Values; 3];
     assert v_array[0] a == +15:32;
+    assert v_array[1] a == +15:32;
+    assert v_array[2] a == +15:32;
 
     return 0:32;
 }

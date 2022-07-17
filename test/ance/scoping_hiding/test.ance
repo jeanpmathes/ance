@@ -7,8 +7,10 @@
         lib: [
             "kernel32",
             "ucrt",
+            "libucrt",
             "msvcrt",
-            "libcmt"
+            "libcmt",
+            "libvcruntime"
         ],
         libpath: [
             "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.19041.0\\um\\x64",
