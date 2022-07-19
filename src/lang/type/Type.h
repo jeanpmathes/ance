@@ -470,6 +470,14 @@ namespace lang
         void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context);
 
         /**
+         * Build the copy initializer for this type.
+         * @param ptr A pointer to where the value should be initialized.
+         * @param original A pointer to the original value.
+         * @param context The current compile context.
+         */
+        void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context);
+
+        /**
          * Build the native backing required for the declaration.
          * @param context The current compile context.
          */

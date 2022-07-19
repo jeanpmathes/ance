@@ -318,6 +318,13 @@ void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, llvm::Value
     context->ir()->CreateCall(default_initializer_, {ptr, count});
 }
 
+void lang::TypeDefinition::buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context)
+{
+    if (!copy_initializer_) return;
+
+    context->ir()->CreateCall(copy_initializer_, {ptr, original});
+}
+
 void lang::TypeDefinition::buildNativeDeclaration(CompileContext* context)
 {
     llvm::FunctionType* default_initializer_type = llvm::FunctionType::get(
@@ -329,11 +336,27 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext* context)
                                                   getAccessModifier().linkage(),
                                                   "ctor_default$" + getMangledName(),
                                                   context->module());
+
+    llvm::FunctionType* copy_initializer_type =
+        llvm::FunctionType::get(llvm::Type::getVoidTy(*context->llvmContext()),
+                                {getNativeType(*context->llvmContext()), getNativeType(*context->llvmContext())},
+                                false);
+
+    copy_initializer_ = llvm::Function::Create(copy_initializer_type,
+                                               getAccessModifier().linkage(),
+                                               "ctor_copy$" + getMangledName(),
+                                               context->module());
 }
 
 void lang::TypeDefinition::buildNativeDefinition(CompileContext* context)
 {
-    llvm::Type* size_type = lang::SizeType::getSize()->getContentType(*context->llvmContext());
+    defineDefaultInitializer(context);
+    defineCopyInitializer(context);
+}
+
+void lang::TypeDefinition::defineDefaultInitializer(CompileContext* context)
+{
+    llvm::Type* size_type = SizeType::getSize()->getContentType(*context->llvmContext());
 
     llvm::Value* ptr     = default_initializer_->getArg(0);
     llvm::Value* count   = default_initializer_->getArg(1);
@@ -366,6 +389,22 @@ void lang::TypeDefinition::buildNativeDefinition(CompileContext* context)
 
     context->ir()->SetInsertPoint(end);
     {
+        context->ir()->CreateRetVoid();
+    }
+}
+
+void lang::TypeDefinition::defineCopyInitializer(CompileContext* context)
+{
+    llvm::Type* content_type = getContentType(*context->llvmContext());
+
+    llvm::Value* dst_ptr = copy_initializer_->getArg(0);
+    llvm::Value* src_ptr = copy_initializer_->getArg(1);
+
+    llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", copy_initializer_);
+    context->ir()->SetInsertPoint(block);
+    {
+        llvm::Value* src_content = context->ir()->CreateLoad(content_type, src_ptr);
+        context->ir()->CreateStore(src_content, dst_ptr);
         context->ir()->CreateRetVoid();
     }
 }
@@ -422,4 +461,3 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::self() const
     assert(type_);
     return type_->self();
 }
-

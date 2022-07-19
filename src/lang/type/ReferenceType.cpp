@@ -198,6 +198,11 @@ void lang::ReferenceType::buildDefaultInitializer(llvm::Value*, llvm::Value*, Co
     throw std::logic_error("Reference does not have a default value.");
 }
 
+void lang::ReferenceType::buildCopyInitializer(llvm::Value*, llvm::Value*, CompileContext*)
+{
+    throw std::logic_error("Reference does not have a copy value.");
+}
+
 void lang::ReferenceType::buildNativeDeclaration(CompileContext*) {}
 
 void lang::ReferenceType::buildNativeDefinition(CompileContext*) {}

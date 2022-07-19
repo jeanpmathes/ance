@@ -377,6 +377,12 @@ void lang::Type::buildDefaultInitializer(llvm::Value* ptr, CompileContext* conte
     definition_->buildDefaultInitializer(ptr, context);
 }
 
+void lang::Type::buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context)
+{
+    assert(isDefined());
+    definition_->buildCopyInitializer(ptr, original, context);
+}
+
 void lang::Type::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
 {
     assert(isDefined());

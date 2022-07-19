@@ -215,6 +215,11 @@ void lang::TypeClone::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* cou
     original_->buildDefaultInitializer(ptr, count, context);
 }
 
+void lang::TypeClone::buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context)
+{
+    original_->buildCopyInitializer(ptr, original, context);
+}
+
 void lang::TypeClone::buildNativeDeclaration(CompileContext*) {}
 
 void lang::TypeClone::buildNativeDefinition(CompileContext*) {}
@@ -235,4 +240,3 @@ std::string lang::TypeClone::createMangledName()
 {
     return "clone(" + std::string(name().text()) + ")";
 }
-

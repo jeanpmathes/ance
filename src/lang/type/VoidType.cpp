@@ -41,6 +41,11 @@ void lang::VoidType::buildDefaultInitializer(llvm::Value*, llvm::Value*, Compile
     throw std::logic_error("Void does not have a default value.");
 }
 
+void lang::VoidType::buildCopyInitializer(llvm::Value*, llvm::Value*, CompileContext*)
+{
+    throw std::logic_error("Void does not have a copy value.");
+}
+
 void lang::VoidType::buildNativeDeclaration(CompileContext*) {}
 
 void lang::VoidType::buildNativeDefinition(CompileContext*) {}

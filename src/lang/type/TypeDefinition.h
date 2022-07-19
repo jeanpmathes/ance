@@ -137,10 +137,14 @@ namespace lang
 
         void         buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
         virtual void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context);
+        virtual void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context);
         virtual void buildNativeDeclaration(CompileContext* context);
         virtual void buildNativeDefinition(CompileContext* context);
 
       protected:
+        void defineDefaultInitializer(CompileContext* context);
+        void defineCopyInitializer(CompileContext* context);
+
         virtual std::string createMangledName() = 0;
 
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
@@ -157,6 +161,7 @@ namespace lang
 
       protected:
         llvm::Function* default_initializer_ {nullptr};
+        llvm::Function* copy_initializer_ {nullptr};
 
       private:
         lang::Identifier name_;
