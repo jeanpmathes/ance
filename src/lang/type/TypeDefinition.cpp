@@ -360,7 +360,6 @@ void lang::TypeDefinition::defineDefaultInitializer(CompileContext* context)
 
     llvm::Value* ptr     = default_initializer_->getArg(0);
     llvm::Value* count   = default_initializer_->getArg(1);
-    llvm::Value* content = getDefaultContent(*context->module());
 
     llvm::BasicBlock* init = llvm::BasicBlock::Create(*context->llvmContext(), "init", default_initializer_);
     llvm::BasicBlock* body = llvm::BasicBlock::Create(*context->llvmContext(), "body", default_initializer_);
@@ -378,7 +377,7 @@ void lang::TypeDefinition::defineDefaultInitializer(CompileContext* context)
 
         llvm::Value* element_ptr =
             context->ir()->CreateInBoundsGEP(getContentType(*context->llvmContext()), ptr, current, "element_ptr");
-        context->ir()->CreateStore(content, element_ptr);
+        buildSingleDefaultInitializerDefinition(element_ptr, context);
 
         llvm::Value* next = context->ir()->CreateAdd(current, llvm::ConstantInt::get(size_type, 1), "next");
         current->addIncoming(next, body);
@@ -407,6 +406,12 @@ void lang::TypeDefinition::defineCopyInitializer(CompileContext* context)
         context->ir()->CreateStore(src_content, dst_ptr);
         context->ir()->CreateRetVoid();
     }
+}
+
+void lang::TypeDefinition::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context)
+{
+    llvm::Value* content = getDefaultContent(*context->module());
+    context->ir()->CreateStore(content, ptr);
 }
 
 bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger) const

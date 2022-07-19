@@ -145,6 +145,11 @@ namespace lang
         void defineDefaultInitializer(CompileContext* context);
         void defineCopyInitializer(CompileContext* context);
 
+        /**
+         * Build the part of the definition that default-initializes a single element of this type.
+         */
+        virtual void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context);
+
         virtual std::string createMangledName() = 0;
 
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
