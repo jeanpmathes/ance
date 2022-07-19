@@ -52,12 +52,13 @@ void lang::VariableDefinition::setValue(std::shared_ptr<lang::Value> value, Comp
     {
         std::shared_ptr<lang::Value> reference = getValue(context);
 
-        value = lang::Type::makeMatching(type()->getElementType(), value, context);
+        lang::ResolvingHandle<lang::Type> target_type = type()->getElementType();
+        value                                         = lang::Type::makeMatching(target_type, value, context);
 
         reference->buildContentValue(context);
-        value->buildContentValue(context);
+        value->buildNativeValue(context);
 
-        context->ir()->CreateStore(value->getContentValue(), reference->getContentValue());
+        target_type->buildCopyInitializer(reference->getContentValue(), value->getNativeValue(), context);
     }
     else
     {

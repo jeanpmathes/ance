@@ -82,8 +82,18 @@ void lang::LocalVariable::store(std::shared_ptr<lang::Value> value, CompileConte
 {
     value = lang::Type::makeMatching(type(), value, context);
 
-    value->buildContentValue(context);
-    llvm::Value* stored = value->getContentValue();
+    if (type()->isReferenceType())
+    {
+        value->buildContentValue(context);
+        llvm::Value* stored = value->getContentValue();
 
-    context->ir()->CreateStore(stored, native_value_);
+        context->ir()->CreateStore(stored, native_value_);
+    }
+    else
+    {
+        value->buildNativeValue(context);
+        llvm::Value* value_ptr = value->getNativeValue();
+
+        type()->buildCopyInitializer(native_value_, value_ptr, context);
+    }
 }

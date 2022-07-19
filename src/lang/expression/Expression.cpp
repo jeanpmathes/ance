@@ -75,9 +75,9 @@ void Expression::doAssign(std::shared_ptr<lang::Value> value, CompileContext* co
     std::shared_ptr<lang::Value> expression_return = getValue();
 
     expression_return->buildContentValue(context);
-    value->buildContentValue(context);
+    value->buildNativeValue(context);
 
-    context->ir()->CreateStore(value->getContentValue(), expression_return->getContentValue());
+    target_type->buildCopyInitializer(expression_return->getContentValue(), value->getNativeValue(), context);
 }
 
 void Expression::addSubexpression(Expression& subexpression)

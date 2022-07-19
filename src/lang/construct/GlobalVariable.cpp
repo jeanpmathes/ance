@@ -151,8 +151,8 @@ void lang::GlobalVariable::storeValue(std::shared_ptr<lang::Value> value, Compil
 {
     value = lang::Type::makeMatching(type(), value, context);
 
-    value->buildContentValue(context);
+    value->buildNativeValue(context);
 
-    llvm::Value* content = value->getContentValue();
-    context->ir()->CreateStore(content, native_variable_);
+    llvm::Value* value_ptr = value->getNativeValue();
+    type()->buildCopyInitializer(native_variable_, value_ptr, context);
 }
