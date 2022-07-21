@@ -159,8 +159,8 @@ namespace lang
          * @param validation_logger The validation logger to use.
          * @return True if the dependencies are valid.
          */
-        bool                                       checkDependencies(ValidationLogger& validation_logger) const;
-        virtual std::vector<lang::TypeDefinition*> getDependencies() const;
+        bool checkDependencies(ValidationLogger& validation_logger) const;
+        [[nodiscard]] virtual std::vector<lang::TypeDefinition*> getDependencies() const;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self() const;
 

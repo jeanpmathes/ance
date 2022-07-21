@@ -219,7 +219,8 @@ std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr
         value->buildContentValue(context);
         struct_ptr = value->getContentValue();
     }
-    else {
+    else
+    {
         value->buildNativeValue(context);
         struct_ptr = value->getNativeValue();
     }
@@ -228,6 +229,15 @@ std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr
     llvm::Value* native_value = lang::Values::contentToNative(return_type, member_ptr, context);
 
     return std::make_shared<lang::WrappedNativeValue>(return_type, native_value);
+}
+
+void lang::StructType::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context)
+{
+    for (size_t index = 0; index < members_.size(); index++)
+    {
+        llvm::Value* member_ptr = buildGetElementPointer(ptr, index, context);
+        members_[index]->buildInitialization(member_ptr, context);
+    }
 }
 
 llvm::Value* lang::StructType::buildGetElementPointer(llvm::Value*    struct_ptr,

@@ -59,6 +59,16 @@ namespace lang
          */
         [[nodiscard]] llvm::Constant* getConstantInitializer(llvm::Module& m) const;
 
+        /**
+         * Build the initialization of this member.
+         * @param ptr The pointer to the member.
+         * @param context The compile context.
+         */
+        void buildInitialization(llvm::Value* ptr, CompileContext* context);
+
+      private:
+        llvm::Constant* getInitialValue(llvm::Module& m) const;
+
       private:
         lang::AccessModifier                access_;
         lang::Identifier                    name_;

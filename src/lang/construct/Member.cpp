@@ -1,10 +1,11 @@
 #include "Member.h"
 
-#include "lang/scope/Scope.h"
-#include "validation/ValidationLogger.h"
-#include "lang/construct/value/Value.h"
-#include "lang/construct/constant/Constant.h"
 #include "compiler/CompileContext.h"
+#include "lang/construct/constant/Constant.h"
+#include "lang/construct/value/Value.h"
+#include "lang/scope/Scope.h"
+#include "lang/utility/Values.h"
+#include "validation/ValidationLogger.h"
 
 lang::Member::Member(lang::AccessModifier                access,
                      lang::Identifier                    name,
@@ -85,18 +86,30 @@ bool lang::Member::validate(ValidationLogger& validation_logger) const
 
 llvm::Constant* lang::Member::getConstantInitializer(llvm::Module& m) const
 {
+    if (constant_init_) { return getInitialValue(m); }
+    else { return type()->getDefaultContent(m); }
+}
+
+void lang::Member::buildInitialization(llvm::Value* ptr, CompileContext* context)
+{
     if (constant_init_)
     {
-        if (!initial_value_)
-        {
-            std::shared_ptr<lang::Constant> constant = constant_init_->getConstantValue();
-            constant->buildContentConstant(&m);
-            initial_value_ = constant->getContentConstant();
-        }
+        llvm::Value* content   = getInitialValue(*context->module());
+        llvm::Value* value_ptr = lang::Values::contentToNative(type(), content, context);
 
-        return initial_value_;
+        type()->buildCopyInitializer(ptr, value_ptr, context);
     }
-    else {
-        return type()->getDefaultContent(m);
+    else { type()->buildDefaultInitializer(ptr, context); }
+}
+
+llvm::Constant* lang::Member::getInitialValue(llvm::Module& m) const
+{
+    if (!initial_value_)
+    {
+        std::shared_ptr<lang::Constant> constant = constant_init_->getConstantValue();
+        constant->buildContentConstant(&m);
+        initial_value_ = constant->getContentConstant();
     }
+
+    return initial_value_;
 }
