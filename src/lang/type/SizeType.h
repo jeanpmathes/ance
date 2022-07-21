@@ -82,6 +82,9 @@ namespace lang
         inline static llvm::Type*  diff_backing_type_ = nullptr;
 
       protected:
+        [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
+        [[nodiscard]] bool isTriviallyCopyConstructible() const override;
+
         std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 

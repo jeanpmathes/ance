@@ -26,6 +26,16 @@ llvm::Value* lang::UnsignedIntegerPointerType::buildValue(llvm::Value* pointer, 
     return context->ir()->CreatePtrToInt(pointer, native_type_, pointer->getName() + ".ptrtoint");
 }
 
+bool lang::UnsignedIntegerPointerType::isTriviallyDefaultConstructible() const
+{
+    return true;
+}
+
+bool lang::UnsignedIntegerPointerType::isTriviallyCopyConstructible() const
+{
+    return true;
+}
+
 std::string lang::UnsignedIntegerPointerType::createMangledName()
 {
     return std::string(name().text());
@@ -54,3 +64,4 @@ lang::ResolvingHandle<lang::Type> lang::UnsignedIntegerPointerType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new UnsignedIntegerPointerType()));
     return instance;
 }
+

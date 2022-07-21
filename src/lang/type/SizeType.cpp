@@ -174,6 +174,16 @@ llvm::Value* lang::SizeType::buildContentValue(llvm::TypeSize size)
     return llvm::ConstantInt::get(size_backing_type_, size.getFixedSize(), false);
 }
 
+bool lang::SizeType::isTriviallyDefaultConstructible() const
+{
+    return true;
+}
+
+bool lang::SizeType::isTriviallyCopyConstructible() const
+{
+    return true;
+}
+
 std::string lang::SizeType::createMangledName()
 {
     return std::string(name().text());
@@ -228,3 +238,4 @@ unsigned int lang::SizeType::getDiffWidth()
 {
     return diff_width_;
 }
+

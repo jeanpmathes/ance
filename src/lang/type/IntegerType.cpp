@@ -227,6 +227,16 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
     return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
 }
 
+bool lang::IntegerType::isTriviallyDefaultConstructible() const
+{
+    return true;
+}
+
+bool lang::IntegerType::isTriviallyCopyConstructible() const
+{
+    return true;
+}
+
 std::string lang::IntegerType::createMangledName()
 {
     return std::string(name().text());
@@ -271,3 +281,4 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::get(uint64_t bit_size, bool
         return type;
     }
 }
+

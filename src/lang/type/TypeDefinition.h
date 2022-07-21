@@ -142,6 +142,15 @@ namespace lang
         virtual void buildNativeDefinition(CompileContext* context);
 
       protected:
+        /**
+         * Whether this type can be default-constructed by zeroing memory.
+         */
+        [[nodiscard]] virtual bool isTriviallyDefaultConstructible() const;
+        /**
+         * Whether this type can be copy-constructed by copying memory.
+         */
+        [[nodiscard]] virtual bool isTriviallyCopyConstructible() const;
+
         void defineDefaultInitializer(CompileContext* context);
         void defineCopyInitializer(CompileContext* context);
 

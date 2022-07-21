@@ -313,6 +313,23 @@ void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, CompileCont
 
 void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
 {
+    if (isTriviallyDefaultConstructible())
+    {
+        llvm::Value* element_size =
+            llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context->llvmContext()),
+                                   getContentSize(context->module()).getFixedSize(),
+                                   false);
+
+        llvm::Value* size = context->ir()->CreateMul(count, element_size, count->getName() + ".mul");
+
+        context->ir()->CreateMemSet(ptr,
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context->llvmContext()), 0),
+                                    size,
+                                    llvm::Align(1));
+
+        return;
+    }
+
     if (!default_initializer_) return;
 
     context->ir()->CreateCall(default_initializer_, {ptr, count});
@@ -320,6 +337,16 @@ void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, llvm::Value
 
 void lang::TypeDefinition::buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context)
 {
+    if (isTriviallyCopyConstructible())
+    {
+        context->ir()->CreateMemCpy(ptr,
+                                    llvm::Align(1),
+                                    original,
+                                    llvm::Align(1),
+                                    getContentSize(context->module()).getFixedSize());
+        return;
+    }
+
     if (!copy_initializer_) return;
 
     context->ir()->CreateCall(copy_initializer_, {ptr, original});
@@ -327,39 +354,56 @@ void lang::TypeDefinition::buildCopyInitializer(llvm::Value* ptr, llvm::Value* o
 
 void lang::TypeDefinition::buildNativeDeclaration(CompileContext* context)
 {
-    llvm::FunctionType* default_initializer_type = llvm::FunctionType::get(
-        llvm::Type::getVoidTy(*context->llvmContext()),
-        {getNativeType(*context->llvmContext()), lang::SizeType::getSize()->getContentType(*context->llvmContext())},
-        false);
+    if (!isTriviallyDefaultConstructible())
+    {
+        llvm::FunctionType* default_initializer_type =
+            llvm::FunctionType::get(llvm::Type::getVoidTy(*context->llvmContext()),
+                                    {getNativeType(*context->llvmContext()),
+                                     lang::SizeType::getSize()->getContentType(*context->llvmContext())},
+                                    false);
 
-    default_initializer_ = llvm::Function::Create(default_initializer_type,
-                                                  getAccessModifier().linkage(),
-                                                  "ctor_default$" + getMangledName(),
-                                                  context->module());
+        default_initializer_ = llvm::Function::Create(default_initializer_type,
+                                                      getAccessModifier().linkage(),
+                                                      "ctor_default$" + getMangledName(),
+                                                      context->module());
+    }
 
-    llvm::FunctionType* copy_initializer_type =
-        llvm::FunctionType::get(llvm::Type::getVoidTy(*context->llvmContext()),
-                                {getNativeType(*context->llvmContext()), getNativeType(*context->llvmContext())},
-                                false);
+    if (!isTriviallyCopyConstructible())
+    {
+        llvm::FunctionType* copy_initializer_type =
+            llvm::FunctionType::get(llvm::Type::getVoidTy(*context->llvmContext()),
+                                    {getNativeType(*context->llvmContext()), getNativeType(*context->llvmContext())},
+                                    false);
 
-    copy_initializer_ = llvm::Function::Create(copy_initializer_type,
-                                               getAccessModifier().linkage(),
-                                               "ctor_copy$" + getMangledName(),
-                                               context->module());
+        copy_initializer_ = llvm::Function::Create(copy_initializer_type,
+                                                   getAccessModifier().linkage(),
+                                                   "ctor_copy$" + getMangledName(),
+                                                   context->module());
+    }
 }
 
 void lang::TypeDefinition::buildNativeDefinition(CompileContext* context)
 {
-    defineDefaultInitializer(context);
-    defineCopyInitializer(context);
+    if (!isTriviallyDefaultConstructible()) defineDefaultInitializer(context);
+    if (!isTriviallyCopyConstructible()) defineCopyInitializer(context);
+}
+
+bool lang::TypeDefinition::isTriviallyDefaultConstructible() const
+{
+    return false;
+}
+
+bool lang::TypeDefinition::isTriviallyCopyConstructible() const
+{
+    return false;
 }
 
 void lang::TypeDefinition::defineDefaultInitializer(CompileContext* context)
 {
     llvm::Type* size_type = SizeType::getSize()->getContentType(*context->llvmContext());
 
-    llvm::Value* ptr     = default_initializer_->getArg(0);
-    llvm::Value* count   = default_initializer_->getArg(1);
+    llvm::Value* ptr   = default_initializer_->getArg(0);
+    llvm::Value* count = default_initializer_->getArg(1);
 
     llvm::BasicBlock* init = llvm::BasicBlock::Create(*context->llvmContext(), "init", default_initializer_);
     llvm::BasicBlock* body = llvm::BasicBlock::Create(*context->llvmContext(), "body", default_initializer_);

@@ -31,6 +31,16 @@ llvm::Type* lang::BooleanType::getContentType(llvm::LLVMContext& c)
     return native_type_;
 }
 
+bool lang::BooleanType::isTriviallyDefaultConstructible() const
+{
+    return true;
+}
+
+bool lang::BooleanType::isTriviallyCopyConstructible() const
+{
+    return true;
+}
+
 std::string lang::BooleanType::createMangledName()
 {
     return "b";

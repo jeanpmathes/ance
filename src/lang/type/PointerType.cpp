@@ -149,6 +149,16 @@ std::shared_ptr<lang::Value> lang::PointerType::buildIndirection(std::shared_ptr
     return std::make_shared<lang::WrappedNativeValue>(element_reference_, native_value);
 }
 
+bool lang::PointerType::isTriviallyDefaultConstructible() const
+{
+    return true;
+}
+
+bool lang::PointerType::isTriviallyCopyConstructible() const
+{
+    return true;
+}
+
 std::string lang::PointerType::createMangledName()
 {
     return std::string("ptr") + "(" + element_type_->getMangledName() + ")";

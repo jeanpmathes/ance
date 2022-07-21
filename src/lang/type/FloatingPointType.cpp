@@ -158,3 +158,13 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::Binary
     llvm::Value*                      native_result = lang::Values::contentToNative(result_type, result, context);
     return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
 }
+
+bool lang::FloatingPointType::isTriviallyDefaultConstructible() const
+{
+    return true;
+}
+
+bool lang::FloatingPointType::isTriviallyCopyConstructible() const
+{
+    return true;
+}

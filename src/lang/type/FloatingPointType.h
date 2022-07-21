@@ -43,6 +43,10 @@ namespace lang
                                                         std::shared_ptr<Value> right,
                                                         CompileContext*        context) override;
 
+      protected:
+        [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
+        [[nodiscard]] bool isTriviallyCopyConstructible() const override;
+
       private:
         [[nodiscard]] virtual size_t getPrecision() const = 0;
     };
