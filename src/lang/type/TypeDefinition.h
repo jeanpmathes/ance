@@ -149,6 +149,12 @@ namespace lang
          * Build the part of the definition that default-initializes a single element of this type.
          */
         virtual void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context);
+        /**
+         * Build the part of the definition that copies a single element of this type.
+         */
+        virtual void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
+                                                          llvm::Value*    src_ptr,
+                                                          CompileContext* context);
 
         virtual std::string createMangledName() = 0;
 

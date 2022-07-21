@@ -394,16 +394,13 @@ void lang::TypeDefinition::defineDefaultInitializer(CompileContext* context)
 
 void lang::TypeDefinition::defineCopyInitializer(CompileContext* context)
 {
-    llvm::Type* content_type = getContentType(*context->llvmContext());
-
     llvm::Value* dst_ptr = copy_initializer_->getArg(0);
     llvm::Value* src_ptr = copy_initializer_->getArg(1);
 
     llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", copy_initializer_);
     context->ir()->SetInsertPoint(block);
     {
-        llvm::Value* src_content = context->ir()->CreateLoad(content_type, src_ptr);
-        context->ir()->CreateStore(src_content, dst_ptr);
+        buildSingleCopyInitializerDefinition(dst_ptr, src_ptr, context);
         context->ir()->CreateRetVoid();
     }
 }
@@ -412,6 +409,16 @@ void lang::TypeDefinition::buildSingleDefaultInitializerDefinition(llvm::Value* 
 {
     llvm::Value* content = getDefaultContent(*context->module());
     context->ir()->CreateStore(content, ptr);
+}
+
+void lang::TypeDefinition::buildSingleCopyInitializerDefinition(llvm::Value*    dst_ptr,
+                                                                llvm::Value*    src_ptr,
+                                                                CompileContext* context)
+{
+    llvm::Type* content_type = getContentType(*context->llvmContext());
+
+    llvm::Value* src_content = context->ir()->CreateLoad(content_type, src_ptr);
+    context->ir()->CreateStore(src_content, dst_ptr);
 }
 
 bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger) const

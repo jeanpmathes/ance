@@ -42,6 +42,9 @@ namespace lang
 
       protected:
         void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context) override;
+        void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
+                                                  llvm::Value*    src_ptr,
+                                                  CompileContext* context) override;
 
         std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;
