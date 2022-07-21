@@ -59,7 +59,11 @@ namespace lang
         ~ArrayType() override = default;
 
       protected:
-        std::string   createMangledName() override;
+        void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
+                                                  llvm::Value*    src_ptr,
+                                                  CompileContext* context) override;
+
+        std::string                        createMangledName() override;
         llvm::DIType*                      createDebugType(CompileContext* context) override;
         std::vector<lang::TypeDefinition*> getDependencies() const override;
 

@@ -138,6 +138,29 @@ llvm::Value* lang::ArrayType::buildGetElementPointer(const std::shared_ptr<lang:
     return element_ptr;
 }
 
+void lang::ArrayType::buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
+                                                           llvm::Value*    src_ptr,
+                                                           CompileContext* context)
+{
+    llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context->llvmContext()), 0);
+
+    auto build_gep = [&](llvm::Value* ptr, uint64_t index) -> llvm::Value* {
+        llvm::Value* native_index = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context->llvmContext()), index);
+        return context->ir()->CreateGEP(getContentType(*context->llvmContext()),
+                                        ptr,
+                                        {zero, native_index},
+                                        ptr->getName() + "gep");
+    };
+
+    for (uint64_t index = 0; index < size_; index++)
+    {
+        llvm::Value* dst_element_ptr = build_gep(dts_ptr, index);
+        llvm::Value* src_element_ptr = build_gep(src_ptr, index);
+
+        element_type_->buildCopyInitializer(dst_element_ptr, src_element_ptr, context);
+    }
+}
+
 std::string lang::ArrayType::createMangledName()
 {
     return std::string("(") + element_type_->getMangledName() + ")x(" + std::to_string(size_) + std::string(")");
