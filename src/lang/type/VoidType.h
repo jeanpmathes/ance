@@ -23,6 +23,7 @@ namespace lang
 
         void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context) override;
         void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context) override;
+        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context) override;
         void buildNativeDeclaration(CompileContext* context) override;
         void buildNativeDefinition(CompileContext* context) override;
 

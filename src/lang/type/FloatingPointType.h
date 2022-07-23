@@ -46,6 +46,7 @@ namespace lang
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
+        [[nodiscard]] bool isTriviallyDestructible() const override;
 
       private:
         [[nodiscard]] virtual size_t getPrecision() const = 0;

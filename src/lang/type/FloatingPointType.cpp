@@ -168,3 +168,8 @@ bool lang::FloatingPointType::isTriviallyCopyConstructible() const
 {
     return true;
 }
+
+bool lang::FloatingPointType::isTriviallyDestructible() const
+{
+    return true;
+}

@@ -263,6 +263,11 @@ void lang::TypeAlias::buildCopyInitializer(llvm::Value* ptr, llvm::Value* count,
     actual_->buildCopyInitializer(ptr, count, context);
 }
 
+void lang::TypeAlias::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+{
+    actual_->buildFinalizer(ptr, count, context);
+}
+
 void lang::TypeAlias::buildNativeDeclaration(CompileContext*) {}
 
 void lang::TypeAlias::buildNativeDefinition(CompileContext*) {}

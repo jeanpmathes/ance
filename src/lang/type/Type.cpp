@@ -389,6 +389,18 @@ void lang::Type::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, C
     definition_->buildDefaultInitializer(ptr, count, context);
 }
 
+void lang::Type::buildFinalizer(llvm::Value* ptr, CompileContext* context)
+{
+    assert(isDefined());
+    definition_->buildFinalizer(ptr, context);
+}
+
+void lang::Type::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+{
+    assert(isDefined());
+    definition_->buildFinalizer(ptr, count, context);
+}
+
 void lang::Type::buildNativeDeclaration(CompileContext* context)
 {
     assert(isDefined());
@@ -510,4 +522,3 @@ lang::ResolvingHandle<lang::Type> lang::Type::toSeparateUndefined() const
 {
     return isDefined() ? self() : lang::makeHandled<lang::Type>(name());
 }
-

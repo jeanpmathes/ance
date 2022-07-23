@@ -41,6 +41,11 @@ bool lang::BooleanType::isTriviallyCopyConstructible() const
     return true;
 }
 
+bool lang::BooleanType::isTriviallyDestructible() const
+{
+    return true;
+}
+
 std::string lang::BooleanType::createMangledName()
 {
     return "b";

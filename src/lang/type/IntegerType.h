@@ -61,6 +61,7 @@ namespace lang
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
+        [[nodiscard]] bool isTriviallyDestructible() const override;
 
         std::string   createMangledName() override;
         llvm::DIType* createDebugType(CompileContext* context) override;

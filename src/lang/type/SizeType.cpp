@@ -184,6 +184,11 @@ bool lang::SizeType::isTriviallyCopyConstructible() const
     return true;
 }
 
+bool lang::SizeType::isTriviallyDestructible() const
+{
+    return true;
+}
+
 std::string lang::SizeType::createMangledName()
 {
     return std::string(name().text());
@@ -238,4 +243,3 @@ unsigned int lang::SizeType::getDiffWidth()
 {
     return diff_width_;
 }
-

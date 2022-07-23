@@ -203,6 +203,11 @@ void lang::ReferenceType::buildCopyInitializer(llvm::Value*, llvm::Value*, Compi
     throw std::logic_error("Reference does not have a copy value.");
 }
 
+void lang::ReferenceType::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+{
+    throw std::logic_error("Reference does not have a finalizer.");
+}
+
 void lang::ReferenceType::buildNativeDeclaration(CompileContext*) {}
 
 void lang::ReferenceType::buildNativeDefinition(CompileContext*) {}
@@ -273,4 +278,3 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::get(lang::ResolvingHandle
         return type;
     }
 }
-

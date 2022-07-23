@@ -61,7 +61,7 @@ namespace lang
          * @param is_safe Whether the type is currently safe to use. Set to false when endless loops could occur.
          * @return The annotated name.
          */
-        std::string getAnnotatedName(bool is_safe = true) const;
+        [[nodiscard]] std::string getAnnotatedName(bool is_safe = true) const;
 
         /**
          * Get the mangled name of this type. The mangled name can only be used after all type dependencies have been resolved.
@@ -476,6 +476,21 @@ namespace lang
          * @param context The current compile context.
          */
         void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context);
+
+        /**
+         * Build the destructor for this type.
+         * @param ptr The pointer to the value to destruct.
+         * @param context The current compile context.
+         */
+        void buildFinalizer(llvm::Value* ptr, CompileContext* context);
+
+        /**
+         * Build the default destructor for this type.
+         * @param ptr The pointer to the value to destruct.
+         * @param count The number of instances to destruct.
+         * @param context The current compile context.
+         */
+        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context);
 
         /**
          * Build the native backing required for the declaration.

@@ -159,6 +159,11 @@ bool lang::PointerType::isTriviallyCopyConstructible() const
     return true;
 }
 
+bool lang::PointerType::isTriviallyDestructible() const
+{
+    return true;
+}
+
 std::string lang::PointerType::createMangledName()
 {
     return std::string("ptr") + "(" + element_type_->getMangledName() + ")";

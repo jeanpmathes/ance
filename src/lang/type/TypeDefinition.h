@@ -138,6 +138,9 @@ namespace lang
         void         buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
         virtual void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context);
         virtual void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context);
+        void         buildFinalizer(llvm::Value* ptr, CompileContext* context);
+        virtual void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context);
+
         virtual void buildNativeDeclaration(CompileContext* context);
         virtual void buildNativeDefinition(CompileContext* context);
 
@@ -150,9 +153,14 @@ namespace lang
          * Whether this type can be copy-constructed by copying memory.
          */
         [[nodiscard]] virtual bool isTriviallyCopyConstructible() const;
+        /**
+         * Whether this type can be destructed by doing nothing.
+         */
+        [[nodiscard]] virtual bool isTriviallyDestructible() const;
 
         void defineDefaultInitializer(CompileContext* context);
         void defineCopyInitializer(CompileContext* context);
+        void defineDefaultFinalizer(CompileContext* context);
 
         /**
          * Build the part of the definition that default-initializes a single element of this type.
@@ -164,6 +172,10 @@ namespace lang
         virtual void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
                                                           llvm::Value*    src_ptr,
                                                           CompileContext* context);
+        /**
+         * Build the part of the definition that default-finalizes a single element of this type.
+         */
+        virtual void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext* context);
 
         virtual std::string createMangledName() = 0;
 
@@ -182,6 +194,13 @@ namespace lang
       protected:
         llvm::Function* default_initializer_ {nullptr};
         llvm::Function* copy_initializer_ {nullptr};
+        llvm::Function* default_finalizer_ {nullptr};
+
+      private:
+        void buildPointerIteration(llvm::Value*                                       ptr,
+                                   llvm::Value*                                       count,
+                                   std::function<void(llvm::Value*, CompileContext*)> operation,
+                                   CompileContext*                                    context);
 
       private:
         lang::Identifier name_;

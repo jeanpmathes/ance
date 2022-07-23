@@ -237,6 +237,11 @@ bool lang::IntegerType::isTriviallyCopyConstructible() const
     return true;
 }
 
+bool lang::IntegerType::isTriviallyDestructible() const
+{
+    return true;
+}
+
 std::string lang::IntegerType::createMangledName()
 {
     return std::string(name().text());
@@ -281,4 +286,3 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::get(uint64_t bit_size, bool
         return type;
     }
 }
-

@@ -46,6 +46,11 @@ void lang::VoidType::buildCopyInitializer(llvm::Value*, llvm::Value*, CompileCon
     throw std::logic_error("Void does not have a copy value.");
 }
 
+void lang::VoidType::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+{
+    throw std::logic_error("Void does not have a finalizer.");
+}
+
 void lang::VoidType::buildNativeDeclaration(CompileContext*) {}
 
 void lang::VoidType::buildNativeDefinition(CompileContext*) {}

@@ -36,6 +36,11 @@ bool lang::UnsignedIntegerPointerType::isTriviallyCopyConstructible() const
     return true;
 }
 
+bool lang::UnsignedIntegerPointerType::isTriviallyDestructible() const
+{
+    return true;
+}
+
 std::string lang::UnsignedIntegerPointerType::createMangledName()
 {
     return std::string(name().text());

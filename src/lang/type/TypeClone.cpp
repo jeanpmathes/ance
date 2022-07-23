@@ -220,6 +220,11 @@ void lang::TypeClone::buildCopyInitializer(llvm::Value* ptr, llvm::Value* origin
     original_->buildCopyInitializer(ptr, original, context);
 }
 
+void lang::TypeClone::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+{
+    original_->buildFinalizer(ptr, count, context);
+}
+
 void lang::TypeClone::buildNativeDeclaration(CompileContext*) {}
 
 void lang::TypeClone::buildNativeDefinition(CompileContext*) {}
