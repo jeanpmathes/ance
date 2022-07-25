@@ -258,3 +258,16 @@ void lang::LocalScope::buildFinalization(CompileContext* context)
 {
     for (auto& [name, variable] : active_variables_) { variable->buildFinalization(context); }
 }
+
+void lang::LocalScope::buildReturnFinalization(CompileContext* context)
+{
+    lang::Scope* current = this;
+
+    while (current->asLocalScope() != nullptr)
+    {
+        current->buildFinalization(context);
+        current = current->scope();
+    }
+
+    current->buildFinalization(context);
+}

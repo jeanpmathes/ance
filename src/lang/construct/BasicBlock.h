@@ -38,14 +38,16 @@ namespace lang
 
         /**
          * Create a basic block that returns from the function.
+         * @param scope The scope to return from.
          * @param expression The expression providing the return value, or nullptr if no value is returned.
          * @param return_location The location of the return statement.
          * @param function The function that contains the basic block.
          * @return The created basic block.
          */
-        static std::unique_ptr<BasicBlock> createReturning(Expression*    expression,
-                                                           lang::Location return_location,
-                                                           Function&      function);
+        static std::unique_ptr<BasicBlock> createReturning(lang::LocalScope* scope,
+                                                           Expression*       expression,
+                                                           lang::Location    return_location,
+                                                           Function&         function);
 
         /**
          * Create a basic block that branches depending on the value of an expression.
@@ -350,7 +352,7 @@ namespace lang
             class Returning : public Base
             {
               public:
-                explicit Returning(Expression* return_value, lang::Location return_location);
+                explicit Returning(lang::LocalScope* scope, Expression* return_value, lang::Location return_location);
                 ~Returning() override = default;
 
               public:
@@ -379,6 +381,7 @@ namespace lang
                 std::list<Statement*> statements_ {};
                 lang::BasicBlock*     unreachable_next_ {nullptr};
                 Expression*           return_value_;
+                lang::LocalScope*     scope_;
                 lang::Location        return_location_;
             };
 

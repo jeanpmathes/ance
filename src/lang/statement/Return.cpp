@@ -20,7 +20,8 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Return::createBasicBlocks(lang::B
                                                                          lang::Function&   function)
 {
     std::vector<std::unique_ptr<lang::BasicBlock>> blocks;
-    blocks.push_back(lang::BasicBlock::createReturning(return_value_.get(), location(), function));
+    blocks.push_back(
+        lang::BasicBlock::createReturning(scope()->asLocalScope(), return_value_.get(), location(), function));
 
     entry.link(*blocks.front());
 

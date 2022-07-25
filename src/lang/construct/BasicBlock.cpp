@@ -34,13 +34,14 @@ std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createSimple(Statement* stat
     return std::unique_ptr<BasicBlock>(block);
 }
 
-std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createReturning(Expression*    expression,
-                                                                    lang::Location return_location,
-                                                                    Function&      function)
+std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createReturning(lang::LocalScope* scope,
+                                                                    Expression*       expression,
+                                                                    lang::Location    return_location,
+                                                                    Function&         function)
 {
     auto block = new BasicBlock();
 
-    block->definition_ = std::make_unique<Definition::Returning>(expression, return_location);
+    block->definition_ = std::make_unique<Definition::Returning>(scope, expression, return_location);
     block->definition_->setSelf(block);
 
     block->setContainingFunction(function);

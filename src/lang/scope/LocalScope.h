@@ -107,6 +107,12 @@ namespace lang
 
         void buildFinalization(CompileContext* context) override;
 
+        /**
+         * Build all finalization of to the function.
+         * @param context The current compile context.
+         */
+        void buildReturnFinalization(CompileContext* context);
+
       private:
         lang::Scope*                   parent_;
         std::vector<lang::LocalScope*> sub_scopes_;

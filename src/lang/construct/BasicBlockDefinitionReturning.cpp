@@ -8,8 +8,11 @@
 #include "lang/expression/Expression.h"
 #include "validation/ValidationLogger.h"
 
-lang::BasicBlock::Definition::Returning::Returning(Expression* return_value, lang::Location return_location)
+lang::BasicBlock::Definition::Returning::Returning(lang::LocalScope* scope,
+                                                   Expression*       return_value,
+                                                   lang::Location    return_location)
     : return_value_(return_value)
+    , scope_(scope)
     , return_location_(return_location)
 {}
 
@@ -101,17 +104,20 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext* context)
 
     for (auto& statement : statements_) { statement->build(context); }
 
+    std::shared_ptr<lang::Value> return_value;
+
     if (return_value_)
     {
-        std::shared_ptr<lang::Value> return_value = return_value_->getValue();
+        return_value = return_value_->getValue();
         return_value = lang::Type::makeMatching(self()->containing_function_->returnType(), return_value, context);
 
         return_value->buildContentValue(context);
-        context->ir()->CreateRet(return_value->getContentValue());
     }
-    else {
-        context->ir()->CreateRetVoid();
-    }
+
+    scope_->buildReturnFinalization(context);
+
+    if (return_value_) { context->ir()->CreateRet(return_value->getContentValue()); }
+    else { context->ir()->CreateRetVoid(); }
 }
 
 std::string lang::BasicBlock::Definition::Returning::getExitRepresentation()
