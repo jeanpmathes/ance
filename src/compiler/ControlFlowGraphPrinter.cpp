@@ -20,7 +20,7 @@ std::any ControlFlowGraphPrinter::visit(lang::CustomFunction& function)
 
     for (auto& bb : function.getBasicBlocks()) { visit(*bb); }
 
-    printBlock("exit", NODE_EXIT, BlockStyle::IMPLICIT);
+    printBlock("exit", NODE_EXIT, BlockStyle::META);
     printGroup(function.signature().toString());
 
     out_ << nodes_.rdbuf();
@@ -36,11 +36,11 @@ std::any ControlFlowGraphPrinter::visit(lang::CustomFunction& function)
 std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
 {
     auto id       = static_cast<int32_t>(block.getId());
-    bool has_code = id > 0;
 
     std::string label;
+    BlockStyle  style;
 
-    if (has_code)
+    if (!block.isMeta())
     {
         std::stringstream code_stream;
         CodePrinter       code_printer(code_stream);
@@ -49,12 +49,18 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
 
         label = escape(code_stream.str());
         label += block.getExitRepresentation();
+
+        style = block.isUnreached() ? BlockStyle::UNREACHABLE_CODE : BlockStyle::NORMAL_CODE;
     }
-    else {
-        label = current_function_->name().text();
+    else
+    {
+        bool inside = id > 0;
+
+        label = inside ? block.getExitRepresentation() : current_function_->name().text();
+        style = BlockStyle::META;
     }
 
-    printBlock(label, id, block.isUnreached() ? BlockStyle::UNREACHABLE_CODE : BlockStyle::NORMAL_CODE);
+    printBlock(label, id, style);
 
     std::vector<lang::BasicBlock*> successors = block.getSuccessors();
 
@@ -81,8 +87,8 @@ void ControlFlowGraphPrinter::printBlock(const std::string& label, int32_t id, B
             color = "#A9A9A9";
             is_code = true;
             break;
-        case BlockStyle::IMPLICIT:
-            color = "#FCE205";
+        case BlockStyle::META:
+            color   = "#FCE205";
             is_code = false;
             break;
     }

@@ -182,8 +182,13 @@ namespace lang
          */
         std::string getExitRepresentation();
 
+        /**
+         * Check if this is a meta-block. A meta-block is not part of actual code.
+         * @return True if this is a meta-block, false otherwise.
+         */
+        [[nodiscard]] bool isMeta() const;
+
       private:
-        [[nodiscard]] bool   isMeta() const;
         void                 registerIncomingLink(BasicBlock& predecessor);
         void                 updateLink(BasicBlock* former, BasicBlock* updated);
         [[nodiscard]] size_t getIncomingLinkCount() const;

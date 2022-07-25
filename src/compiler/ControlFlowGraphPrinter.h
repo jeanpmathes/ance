@@ -12,7 +12,7 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitor
     {
         NORMAL_CODE,
         UNREACHABLE_CODE,
-        IMPLICIT
+        META
     };
 
   public:
