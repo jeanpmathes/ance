@@ -48,9 +48,6 @@ namespace lang
         void storeValue(std::shared_ptr<lang::Value> value, CompileContext* context) override;
 
       private:
-        void store(std::shared_ptr<lang::Value> value, CompileContext* context);
-
-      private:
         std::shared_ptr<lang::Value> initial_value_;
         unsigned                     parameter_no_;
 

@@ -64,7 +64,25 @@ void lang::LocalVariable::buildDefinition(CompileContext* context)
                                  location().getDebugLoc(context->llvmContext(), scope()->getDebugScope(context)),
                                  context->ir()->GetInsertBlock());
 
-    if (initial_value_) { store(initial_value_, context); }
+    if (initial_value_)
+    {
+        std::shared_ptr<lang::Value> value = lang::Type::makeMatching(type(), initial_value_, context);
+
+        if (type()->isReferenceType() || parameter_no_ != 0)
+        {
+            value->buildContentValue(context);
+            llvm::Value* stored = value->getContentValue();
+
+            context->ir()->CreateStore(stored, native_value_);
+        }
+        else
+        {
+            value->buildNativeValue(context);
+            llvm::Value* value_ptr = value->getNativeValue();
+
+            type()->buildCopyInitializer(native_value_, value_ptr, context);
+        }
+    }
     else { type()->buildDefaultInitializer(native_value_, context); }
 }
 
@@ -72,7 +90,7 @@ void lang::LocalVariable::buildFinalization(CompileContext* context)
 {
     assert(not finalized_);
 
-    type()->buildFinalizer(native_value_, context);
+    if (!type()->isReferenceType()) { type()->buildFinalizer(native_value_, context); }
 
     finalized_ = true;
 }
@@ -84,25 +102,10 @@ std::shared_ptr<lang::Value> lang::LocalVariable::getValue(CompileContext*)
 
 void lang::LocalVariable::storeValue(std::shared_ptr<lang::Value> value, CompileContext* context)
 {
-    store(value, context);
-}
-
-void lang::LocalVariable::store(std::shared_ptr<lang::Value> value, CompileContext* context)
-{
     value = lang::Type::makeMatching(type(), value, context);
 
-    if (type()->isReferenceType())
-    {
-        value->buildContentValue(context);
-        llvm::Value* stored = value->getContentValue();
+    value->buildNativeValue(context);
+    llvm::Value* value_ptr = value->getNativeValue();
 
-        context->ir()->CreateStore(stored, native_value_);
-    }
-    else
-    {
-        value->buildNativeValue(context);
-        llvm::Value* value_ptr = value->getNativeValue();
-
-        type()->buildCopyInitializer(native_value_, value_ptr, context);
-    }
+    type()->buildCopyInitializer(native_value_, value_ptr, context);
 }
