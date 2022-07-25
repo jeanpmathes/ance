@@ -63,7 +63,8 @@ namespace lang
         virtual void validate(ValidationLogger& validation_logger) const = 0;
 
         virtual void buildDeclaration(CompileContext* context) = 0;
-        virtual void buildDefinition(CompileContext* context)  = 0;
+        virtual void buildDefinition(CompileContext* context)   = 0;
+        virtual void buildFinalization(CompileContext* context) = 0;
 
         virtual std::shared_ptr<lang::Value> getValue(CompileContext* context) = 0;
         virtual void                         setValue(std::shared_ptr<lang::Value> value, CompileContext* context);

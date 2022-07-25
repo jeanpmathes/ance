@@ -52,6 +52,7 @@ namespace lang
 
         void buildDeclaration(CompileContext* context) override;
         void buildDefinition(CompileContext* context) override;
+        void buildFinalization(CompileContext* context) override;
 
         std::shared_ptr<lang::Value> getValue(CompileContext* context) override;
 
@@ -63,7 +64,8 @@ namespace lang
         bool                                is_constant_;
         std::unique_ptr<ConstantExpression> constant_init_;
 
-        llvm::GlobalVariable*           native_variable_ {nullptr};
+        llvm::GlobalVariable* native_variable_ {nullptr};
+        bool                  finalized_ {false};
     };
 }
 

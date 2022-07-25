@@ -99,6 +99,11 @@ void lang::Variable::buildDefinition(CompileContext* context)
     definition_->buildDefinition(context);
 }
 
+void lang::Variable::buildFinalization(CompileContext* context)
+{
+    definition_->buildFinalization(context);
+}
+
 bool lang::Variable::validateGetValue(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (!isDefined())
@@ -148,3 +153,4 @@ lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const
 {
     return lang::makeHandled<lang::Variable>(name());
 }
+

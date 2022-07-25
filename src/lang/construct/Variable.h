@@ -127,6 +127,12 @@ namespace lang
         void buildDefinition(CompileContext* context);
 
         /**
+         * Build the variable finalizer which cleans up the storage.
+         * @param context The current compile context.
+         */
+        void buildFinalization(CompileContext* context);
+
+        /**
          * Validate getting a value.
          * @param validation_logger A validation logger to log messages.
          * @param location The source location.

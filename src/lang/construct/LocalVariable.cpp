@@ -68,6 +68,15 @@ void lang::LocalVariable::buildDefinition(CompileContext* context)
     else { type()->buildDefaultInitializer(native_value_, context); }
 }
 
+void lang::LocalVariable::buildFinalization(CompileContext* context)
+{
+    assert(not finalized_);
+
+    type()->buildFinalizer(native_value_, context);
+
+    finalized_ = true;
+}
+
 std::shared_ptr<lang::Value> lang::LocalVariable::getValue(CompileContext*)
 {
     return std::make_shared<lang::WrappedNativeValue>(type(), native_value_);

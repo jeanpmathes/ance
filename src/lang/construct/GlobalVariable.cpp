@@ -142,6 +142,15 @@ void lang::GlobalVariable::buildDefinition(CompileContext* context)
     native_variable_->addDebugInfo(debug_info);
 }
 
+void lang::GlobalVariable::buildFinalization(CompileContext* context)
+{
+    assert(not finalized_);
+
+    type()->buildFinalizer(native_variable_, context);
+
+    finalized_ = true;
+}
+
 std::shared_ptr<lang::Value> lang::GlobalVariable::getValue(CompileContext*)
 {
     return std::make_shared<lang::WrappedNativeValue>(type(), native_variable_);

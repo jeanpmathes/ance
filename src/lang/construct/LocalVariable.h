@@ -40,6 +40,7 @@ namespace lang
 
         void buildDeclaration(CompileContext* context) override;
         void buildDefinition(CompileContext* context) override;
+        void buildFinalization(CompileContext* context) override;
 
         std::shared_ptr<lang::Value> getValue(CompileContext* context) override;
 
@@ -55,6 +56,7 @@ namespace lang
 
         llvm::Value*           native_value_ {};
         llvm::DILocalVariable* local_debug_variable_ {nullptr};
+        bool                   finalized_ {false};
     };
 }
 #endif
