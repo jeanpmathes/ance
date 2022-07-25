@@ -135,6 +135,12 @@ namespace lang
          */
         virtual void validate(ValidationLogger& validation_logger) const = 0;
 
+        /**
+         * Build the finalization for all entities in this scope.
+         * @param context The current compile context.
+         */
+        virtual void buildFinalization(CompileContext* context) = 0;
+
         ~Scope() override = default;
 
       protected:

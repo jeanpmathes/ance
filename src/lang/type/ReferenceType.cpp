@@ -203,7 +203,7 @@ void lang::ReferenceType::buildCopyInitializer(llvm::Value*, llvm::Value*, Compi
     throw std::logic_error("Reference does not have a copy value.");
 }
 
-void lang::ReferenceType::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+void lang::ReferenceType::buildFinalizer(llvm::Value*, llvm::Value*, CompileContext*)
 {
     throw std::logic_error("Reference does not have a finalizer.");
 }

@@ -253,3 +253,8 @@ void lang::LocalScope::buildDeclarations(CompileContext* context)
 
     for (auto& sub_scope : sub_scopes_) { sub_scope->buildDeclarations(context); }
 }
+
+void lang::LocalScope::buildFinalization(CompileContext* context)
+{
+    for (auto& [name, variable] : active_variables_) { variable->buildFinalization(context); }
+}

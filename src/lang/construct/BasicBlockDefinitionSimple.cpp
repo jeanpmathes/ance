@@ -10,11 +10,11 @@ lang::BasicBlock::Definition::Simple::Simple(Statement* statement)
     statements_.push_back(statement);
 }
 
-void lang::BasicBlock::Definition::Simple::finalize(size_t& index)
+void lang::BasicBlock::Definition::Simple::complete(size_t& index)
 {
     for (auto& statement : statements_) { self()->addChild(*statement); }
 
-    if (next_) next_->finalize(index);
+    if (next_) next_->complete(index);
 }
 
 void lang::BasicBlock::Definition::Simple::setLink(lang::BasicBlock& next)
@@ -41,8 +41,8 @@ void lang::BasicBlock::Definition::Simple::simplify()
 {
     if (!next_) { return; }
 
-    // This block is the only block entering the next block, or this block is unnecessary.
-    bool can_simplify = next_->getIncomingLinkCount() == 1 || statements_.empty();
+    // This block is the only block entering the next (real) block, or this block is unnecessary.
+    bool can_simplify = (next_->getIncomingLinkCount() == 1 && !next_->isMeta()) || statements_.empty();
 
     if (can_simplify)
     {

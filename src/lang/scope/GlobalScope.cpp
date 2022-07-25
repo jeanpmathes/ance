@@ -451,6 +451,11 @@ void lang::GlobalScope::buildFunctions(CompileContext* context)
     for (auto& [key, group] : defined_function_groups_) { group->build(context); }
 }
 
+void lang::GlobalScope::buildFinalization(CompileContext*)
+{
+    assert(false && "Not implemented.");
+}
+
 lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunctionGroup(Identifier name)
 {
     if (defined_function_groups_.find(name) != defined_function_groups_.end())
@@ -492,3 +497,4 @@ lang::OwningHandle<lang::Type> lang::GlobalScope::retrieveUndefinedType(Identifi
 
     return undefined;
 }
+

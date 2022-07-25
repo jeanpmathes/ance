@@ -163,6 +163,11 @@ void lang::Function::buildDeclarations(CompileContext* context)
     for (auto& [name, parameter] : defined_parameters_) { parameter->buildDeclaration(context); }
 }
 
+void lang::Function::buildFinalization(CompileContext* context)
+{
+    for (auto& [name, parameter] : defined_parameters_) { parameter->buildFinalization(context); }
+}
+
 bool lang::Function::validateCall(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
                                   lang::Location                                                              location,
                                   ValidationLogger& validation_logger)

@@ -23,6 +23,13 @@ namespace lang
         static std::unique_ptr<BasicBlock> createEmpty();
 
         /**
+         * Create a finalizing scope that is used to finalize a scope.
+         * @param scope The scope to finalize.
+         * @return The finalizing block.
+         */
+        static std::unique_ptr<BasicBlock> createFinalizing(lang::Scope* scope);
+
+        /**
          * Create a simple basic block that contains a single or no statement, and no links.
          * @param statement The statement to add to the basic block, or nullptr if no statement should be added.
          * @return The created basic block.
@@ -96,10 +103,10 @@ namespace lang
         void setContainingFunction(Function& function);
 
         /**
-         * Finalize the basic block.
+         * Complete the basic block.
          * @param index A reference to an index, initialized to 0, that is incremented for each block finalization.
          */
-        void finalize(size_t& index);
+        void complete(size_t& index);
 
         /**
          * Whether this basic block is actually usable, i.e. it contains statements and was not simplified away.
@@ -176,6 +183,7 @@ namespace lang
         std::string getExitRepresentation();
 
       private:
+        [[nodiscard]] bool   isMeta() const;
         void                 registerIncomingLink(BasicBlock& predecessor);
         void                 updateLink(BasicBlock* former, BasicBlock* updated);
         [[nodiscard]] size_t getIncomingLinkCount() const;
@@ -196,14 +204,16 @@ namespace lang
                 void        setSelf(BasicBlock* self);
                 BasicBlock* self();
 
+                virtual bool isMeta() const;
+
                 void                 setIndex(size_t& index);
                 [[nodiscard]] size_t getIndex() const;
-                virtual void         finalize(size_t& index) = 0;
+                virtual void         complete(size_t& index) = 0;
 
-                virtual void setLink(BasicBlock& next)                                             = 0;
-                virtual void updateLink(BasicBlock* former, BasicBlock* updated)                   = 0;
-                virtual void transferStatements(std::list<Statement*>& statements)                 = 0;
-                virtual void simplify()                                                            = 0;
+                virtual void setLink(BasicBlock& next)                             = 0;
+                virtual void updateLink(BasicBlock* former, BasicBlock* updated)   = 0;
+                virtual void transferStatements(std::list<Statement*>& statements) = 0;
+                virtual void simplify()                                            = 0;
 
                 void                 registerIncomingLink(BasicBlock& block);
                 [[nodiscard]] size_t getIncomingLinkCount() const;
@@ -239,7 +249,9 @@ namespace lang
                 ~Empty() override = default;
 
               public:
-                void finalize(size_t& index) override;
+                [[nodiscard]] bool isMeta() const override;
+
+                void complete(size_t& index) override;
 
                 void setLink(BasicBlock& next) override;
                 void updateLink(BasicBlock* former, BasicBlock* updated) override;
@@ -263,6 +275,40 @@ namespace lang
                 lang::BasicBlock* next_ {nullptr};
             };
 
+            class Finalizing : public Base
+            {
+              public:
+                explicit Finalizing(lang::Scope* scope);
+                ~Finalizing() override = default;
+
+              public:
+                [[nodiscard]] bool isMeta() const override;
+
+                void complete(size_t& index) override;
+
+                void setLink(BasicBlock& next) override;
+                void updateLink(BasicBlock* former, BasicBlock* updated) override;
+                void simplify() override;
+
+                void transferStatements(std::list<Statement*>& statements) override;
+
+                std::list<lang::BasicBlock*>   getLeaves() override;
+                std::vector<lang::BasicBlock*> getSuccessors() override;
+                lang::Location                 getStartLocation() override;
+                lang::Location                 getEndLocation() override;
+
+                void reach() override;
+
+                void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
+                void doBuild(CompileContext* context) override;
+
+                std::string getExitRepresentation() override;
+
+              private:
+                lang::BasicBlock* next_ {nullptr};
+                lang::Scope*      scope_ {nullptr};
+            };
+
             class Simple : public Base
             {
               public:
@@ -271,7 +317,7 @@ namespace lang
                 ~Simple() override = default;
 
               public:
-                void finalize(size_t& index) override;
+                void complete(size_t& index) override;
 
                 void setLink(BasicBlock& next) override;
                 void updateLink(BasicBlock* former, BasicBlock* updated) override;
@@ -303,7 +349,7 @@ namespace lang
                 ~Returning() override = default;
 
               public:
-                void finalize(size_t& index) override;
+                void complete(size_t& index) override;
 
                 void setLink(BasicBlock& next) override;
                 void updateLink(BasicBlock* former, BasicBlock* updated) override;
@@ -338,7 +384,7 @@ namespace lang
                 ~Branching() override = default;
 
               public:
-                void finalize(size_t& index) override;
+                void complete(size_t& index) override;
 
                 void setLink(BasicBlock& next) override;
                 void updateLink(BasicBlock* former, BasicBlock* updated) override;
@@ -374,7 +420,7 @@ namespace lang
                 ~Matching() override = default;
 
               public:
-                void finalize(size_t& index) override;
+                void complete(size_t& index) override;
 
                 void setLink(BasicBlock& next) override;
                 void updateLink(BasicBlock* former, BasicBlock* updated) override;

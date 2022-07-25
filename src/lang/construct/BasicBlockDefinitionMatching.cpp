@@ -11,10 +11,10 @@ lang::BasicBlock::Definition::Matching::Matching(Match* match, std::vector<std::
     , cases_(std::move(cases))
 {}
 
-void lang::BasicBlock::Definition::Matching::finalize(size_t& index)
+void lang::BasicBlock::Definition::Matching::complete(size_t& index)
 {
     for (auto& statement : statements_) { self()->addChild(*statement); }
-    for (auto& branch : branches_) { branch->finalize(index); }
+    for (auto& branch : branches_) { branch->complete(index); }
 }
 
 void lang::BasicBlock::Definition::Matching::setLink(lang::BasicBlock& next)

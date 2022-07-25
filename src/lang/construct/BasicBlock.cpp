@@ -13,6 +13,16 @@ std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createEmpty()
     return std::unique_ptr<BasicBlock>(block);
 }
 
+std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createFinalizing(lang::Scope* scope)
+{
+    auto block = new BasicBlock();
+
+    block->definition_ = std::make_unique<Definition::Finalizing>(scope);
+    block->definition_->setSelf(block);
+
+    return std::unique_ptr<BasicBlock>(block);
+}
+
 std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createSimple(Statement* statement)
 {
     auto block = new BasicBlock();
@@ -183,13 +193,13 @@ void lang::BasicBlock::setContainingFunction(Function& function)
     containing_function_ = &function;
 }
 
-void lang::BasicBlock::finalize(size_t& index)
+void lang::BasicBlock::complete(size_t& index)
 {
     if (finalized_) return;
     finalized_ = true;
 
     definition_->setIndex(index);
-    definition_->finalize(index);
+    definition_->complete(index);
 }
 
 bool lang::BasicBlock::isUsable() const
@@ -291,7 +301,7 @@ void lang::BasicBlock::reach()
 
 bool lang::BasicBlock::isUnreached() const
 {
-    return !reached_ && !unused_;
+    return !reached_ && !unused_ && !isMeta();
 }
 
 std::string lang::BasicBlock::getExitRepresentation()
@@ -309,6 +319,11 @@ lang::BasicBlock* lang::BasicBlock::Definition::Base::self()
     return self_;
 }
 
+bool lang::BasicBlock::Definition::Base::isMeta() const
+{
+    return false;
+}
+
 void lang::BasicBlock::Definition::Base::setIndex(size_t& index)
 {
     index_ = index;
@@ -318,6 +333,11 @@ void lang::BasicBlock::Definition::Base::setIndex(size_t& index)
 size_t lang::BasicBlock::Definition::Base::getIndex() const
 {
     return index_;
+}
+
+bool lang::BasicBlock::isMeta() const
+{
+    return definition_->isMeta();
 }
 
 void lang::BasicBlock::Definition::Base::registerIncomingLink(lang::BasicBlock& block)

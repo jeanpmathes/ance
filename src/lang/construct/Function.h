@@ -182,6 +182,8 @@ namespace lang
          */
         void buildDeclarations(CompileContext* context);
 
+        void buildFinalization(CompileContext* context) override;
+
         /**
          * Validate a call to this function.
          * @param arguments The arguments that will be passed to the function and their source location.

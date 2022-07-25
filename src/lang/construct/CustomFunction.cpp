@@ -134,6 +134,10 @@ void lang::CustomFunction::determineFlow()
 {
     blocks_ = code_->createBasicBlocks(*initial_block_, function());
 
+    lang::BasicBlock* last = blocks_.empty() ? initial_block_.get() : blocks_.back().get();
+    blocks_.push_back(lang::BasicBlock::createFinalizing(&function()));
+    last->link(*blocks_.back());
+
     initial_block_->setContainingFunction(function());
 
     for (auto& block : blocks_) { block->setContainingFunction(function()); }
@@ -143,12 +147,12 @@ void lang::CustomFunction::determineFlow()
     for (auto& block : blocks_) { block->simplify(); }
 
     size_t running_index = 0;
-    initial_block_->finalize(running_index);
+    initial_block_->complete(running_index);
     used_blocks_.push_back(initial_block_.get());
 
     for (auto& block : blocks_)
     {
-        block->finalize(running_index);
+        block->complete(running_index);
         if (block->isUsable()) { used_blocks_.push_back(block.get()); }
     }
 }

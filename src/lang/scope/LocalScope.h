@@ -105,6 +105,8 @@ namespace lang
          */
         void buildDeclarations(CompileContext* context);
 
+        void buildFinalization(CompileContext* context) override;
+
       private:
         lang::Scope*                   parent_;
         std::vector<lang::LocalScope*> sub_scopes_;

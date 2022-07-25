@@ -4,6 +4,7 @@ add_subdirectory(value)
 target_sources(ance PRIVATE
                BasicBlock.cpp
                BasicBlockDefinitionSimple.cpp
+               BasicBlockDefinitionFinalizing.cpp
                BasicBlockDefinitionEmpty.cpp
                BasicBlockDefinitionReturning.cpp
                BasicBlockDefinitionBranching.cpp

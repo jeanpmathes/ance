@@ -197,7 +197,8 @@ namespace lang
         llvm::Function* default_finalizer_ {nullptr};
 
       private:
-        void buildPointerIteration(llvm::Value*                                       ptr,
+        void buildPointerIteration(llvm::Function*                                    function,
+                                   llvm::Value*                                       ptr,
                                    llvm::Value*                                       count,
                                    std::function<void(llvm::Value*, CompileContext*)> operation,
                                    CompileContext*                                    context);

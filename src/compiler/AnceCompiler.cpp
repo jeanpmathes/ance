@@ -119,7 +119,7 @@ void AnceCompiler::compile(const std::filesystem::path& out)
                                       cgscc_analysis_manager,
                                       module_analysis_manager);
 
-    auto opt_level = llvm::OptimizationLevel::O1;
+    auto opt_level = llvm::OptimizationLevel::O0;
 
     if (opt_level != llvm::OptimizationLevel::O0)
     {

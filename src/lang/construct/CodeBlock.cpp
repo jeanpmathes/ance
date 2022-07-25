@@ -101,16 +101,25 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlock
 
     lang::BasicBlock* previous_block = &entry;
 
-    for (auto& sub : subs_)
-    {
-        std::vector<std::unique_ptr<BasicBlock>> new_blocks = sub->createBasicBlocks(*previous_block, function);
-
+    auto append_blocks = [&](std::vector<std::unique_ptr<BasicBlock>>&& new_blocks) {
         blocks.insert(blocks.end(),
                       std::make_move_iterator(new_blocks.begin()),
                       std::make_move_iterator(new_blocks.end()));
 
         assert(previous_block != blocks.back().get());
         previous_block = blocks.back().get();
+    };
+
+    for (auto& sub : subs_)
+    {
+        std::vector<std::unique_ptr<BasicBlock>> new_blocks = sub->createBasicBlocks(*previous_block, function);
+        append_blocks(std::move(new_blocks));
+    }
+
+    if (scoped_)
+    {
+        blocks.push_back(lang::BasicBlock::createFinalizing(scope_.get()));
+        previous_block->link(*blocks.back());
     }
 
     return blocks;

@@ -9,12 +9,12 @@
 
 lang::BasicBlock::Definition::Branching::Branching(Expression* condition) : condition_(condition) {}
 
-void lang::BasicBlock::Definition::Branching::finalize(size_t& index)
+void lang::BasicBlock::Definition::Branching::complete(size_t& index)
 {
     for (auto& statement : statements_) { self()->addChild(*statement); }
 
-    true_next_->finalize(index);
-    false_next_->finalize(index);
+    true_next_->complete(index);
+    false_next_->complete(index);
 }
 
 void lang::BasicBlock::Definition::Branching::setLink(lang::BasicBlock& next)

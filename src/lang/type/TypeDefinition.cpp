@@ -364,9 +364,9 @@ void lang::TypeDefinition::buildFinalizer(llvm::Value* ptr, CompileContext* cont
 
 void lang::TypeDefinition::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
 {
-    if (isTriviallyDestructible() || !default_initializer_) return;
+    if (isTriviallyDestructible() || !default_finalizer_) return;
 
-    context->ir()->CreateCall(default_initializer_, {ptr, count});
+    context->ir()->CreateCall(default_finalizer_, {ptr, count});
 }
 
 void lang::TypeDefinition::buildNativeDeclaration(CompileContext* context)
@@ -441,6 +441,7 @@ void lang::TypeDefinition::defineDefaultInitializer(CompileContext* context)
     llvm::Value* count = default_initializer_->getArg(1);
 
     buildPointerIteration(
+        default_initializer_,
         ptr,
         count,
         [&](llvm::Value* element_ptr, CompileContext* context) {
@@ -464,10 +465,11 @@ void lang::TypeDefinition::defineCopyInitializer(CompileContext* context)
 
 void lang::TypeDefinition::defineDefaultFinalizer(CompileContext* context)
 {
-    llvm::Value* ptr   = default_initializer_->getArg(0);
-    llvm::Value* count = default_initializer_->getArg(1);
+    llvm::Value* ptr   = default_finalizer_->getArg(0);
+    llvm::Value* count = default_finalizer_->getArg(1);
 
     buildPointerIteration(
+        default_finalizer_,
         ptr,
         count,
         [&](llvm::Value* element_ptr, CompileContext* context) {
@@ -547,16 +549,17 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::self() const
     return type_->self();
 }
 
-void lang::TypeDefinition::buildPointerIteration(llvm::Value*                                       ptr,
+void lang::TypeDefinition::buildPointerIteration(llvm::Function*                                    function,
+                                                 llvm::Value*                                       ptr,
                                                  llvm::Value*                                       count,
                                                  std::function<void(llvm::Value*, CompileContext*)> operation,
                                                  CompileContext*                                    context)
 {
     llvm::Type* size_type = SizeType::getSize()->getContentType(*context->llvmContext());
 
-    llvm::BasicBlock* init = llvm::BasicBlock::Create(*context->llvmContext(), "init", default_initializer_);
-    llvm::BasicBlock* body = llvm::BasicBlock::Create(*context->llvmContext(), "body", default_initializer_);
-    llvm::BasicBlock* end  = llvm::BasicBlock::Create(*context->llvmContext(), "end", default_initializer_);
+    llvm::BasicBlock* init = llvm::BasicBlock::Create(*context->llvmContext(), "init", function);
+    llvm::BasicBlock* body = llvm::BasicBlock::Create(*context->llvmContext(), "body", function);
+    llvm::BasicBlock* end  = llvm::BasicBlock::Create(*context->llvmContext(), "end", function);
 
     context->ir()->SetInsertPoint(init);
     {

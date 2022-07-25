@@ -196,6 +196,8 @@ namespace lang
          */
         void buildFunctions(CompileContext* context);
 
+        void buildFinalization(CompileContext* context) override;
+
       private:
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);
         lang::OwningHandle<lang::Type>             retrieveUndefinedType(Identifier name);

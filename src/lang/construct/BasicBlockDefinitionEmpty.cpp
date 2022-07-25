@@ -2,9 +2,14 @@
 
 #include "compiler/CompileContext.h"
 
-void lang::BasicBlock::Definition::Empty::finalize(size_t& index)
+bool lang::BasicBlock::Definition::Empty::isMeta() const
 {
-    if (next_) next_->finalize(index);
+    return true;
+}
+
+void lang::BasicBlock::Definition::Empty::complete(size_t& index)
+{
+    if (next_) next_->complete(index);
 }
 
 void lang::BasicBlock::Definition::Empty::setLink(lang::BasicBlock& next)
