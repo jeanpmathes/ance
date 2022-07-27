@@ -256,6 +256,17 @@ void lang::StructType::buildSingleCopyInitializerDefinition(llvm::Value*    dts_
     }
 }
 
+void lang::StructType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext* context)
+{
+    auto size = static_cast<int32_t>(members_.size());
+
+    for (int32_t index = 0; index < size; index++)
+    {
+        llvm::Value* member_ptr = buildGetElementPointer(ptr, index, context);
+        members_[index]->type()->buildFinalizer(member_ptr, context);
+    }
+}
+
 llvm::Value* lang::StructType::buildGetElementPointer(llvm::Value*    struct_ptr,
                                                       int32_t         member_index,
                                                       CompileContext* context)

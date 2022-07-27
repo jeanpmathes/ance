@@ -110,7 +110,7 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getOriginalType() const
 
 lang::AccessModifier lang::TypeDefinition::getAccessModifier() const
 {
-    return lang::AccessModifier::PUBLIC_ACCESS;
+    return lang::AccessModifier::PRIVATE_ACCESS;
 }
 
 void lang::TypeDefinition::setContainingScope(lang::Scope* scope)

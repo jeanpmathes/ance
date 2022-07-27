@@ -55,17 +55,21 @@ namespace lang
                                             const std::shared_ptr<lang::Value>& index,
                                             CompileContext*                     context);
 
+        llvm::Value* buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext* context);
+
       public:
         ~ArrayType() override = default;
 
       protected:
+        void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context) override;
         void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
                                                   llvm::Value*    src_ptr,
                                                   CompileContext* context) override;
+        void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext* context) override;
 
         std::string                        createMangledName() override;
-        llvm::DIType*                      createDebugType(CompileContext* context) override;
-        std::vector<lang::TypeDefinition*> getDependencies() const override;
+        llvm::DIType*                                    createDebugType(CompileContext* context) override;
+        [[nodiscard]] std::vector<lang::TypeDefinition*> getDependencies() const override;
 
       private:
         uint64_t                          size_;

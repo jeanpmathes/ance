@@ -138,26 +138,45 @@ llvm::Value* lang::ArrayType::buildGetElementPointer(const std::shared_ptr<lang:
     return element_ptr;
 }
 
+llvm::Value* lang::ArrayType::buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext* context)
+{
+    llvm::Value* zero         = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context->llvmContext()), 0);
+    llvm::Value* native_index = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context->llvmContext()), index);
+
+    return context->ir()->CreateGEP(getContentType(*context->llvmContext()),
+                                    indexed,
+                                    {zero, native_index},
+                                    indexed->getName() + ".gep");
+}
+
+void lang::ArrayType::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context)
+{
+    for (uint64_t index = 0; index < size_; index++)
+    {
+        llvm::Value* element_ptr = buildGetElementPointer(ptr, index, context);
+        element_type_->buildDefaultInitializer(element_ptr, context);
+    }
+}
+
 void lang::ArrayType::buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
                                                            llvm::Value*    src_ptr,
                                                            CompileContext* context)
 {
-    llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context->llvmContext()), 0);
-
-    auto build_gep = [&](llvm::Value* ptr, uint64_t index) -> llvm::Value* {
-        llvm::Value* native_index = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context->llvmContext()), index);
-        return context->ir()->CreateGEP(getContentType(*context->llvmContext()),
-                                        ptr,
-                                        {zero, native_index},
-                                        ptr->getName() + "gep");
-    };
-
     for (uint64_t index = 0; index < size_; index++)
     {
-        llvm::Value* dst_element_ptr = build_gep(dts_ptr, index);
-        llvm::Value* src_element_ptr = build_gep(src_ptr, index);
+        llvm::Value* dst_element_ptr = buildGetElementPointer(dts_ptr, index, context);
+        llvm::Value* src_element_ptr = buildGetElementPointer(src_ptr, index, context);
 
         element_type_->buildCopyInitializer(dst_element_ptr, src_element_ptr, context);
+    }
+}
+
+void lang::ArrayType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext* context)
+{
+    for (uint64_t index = 0; index < size_; index++)
+    {
+        llvm::Value* element_ptr = buildGetElementPointer(ptr, index, context);
+        element_type_->buildFinalizer(element_ptr, context);
     }
 }
 
