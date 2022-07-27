@@ -2,14 +2,14 @@
 
 #include <stdexcept>
 
+#include "compiler/CompileContext.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/type/IntegerType.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/SizeType.h"
-#include "lang/type/IntegerType.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Values.h"
-#include "compiler/CompileContext.h"
 
 void Runtime::init(CompileContext* context)
 {
@@ -119,14 +119,37 @@ std::shared_ptr<lang::Value> Runtime::allocate(Allocator                        
     return std::make_shared<lang::WrappedNativeValue>(ptr_type, native_ptr);
 }
 
-void Runtime::deleteDynamic(const std::shared_ptr<lang::Value>& value, bool, CompileContext* context)
+void Runtime::deleteDynamic(const std::shared_ptr<lang::Value>& value, bool delete_buffer, CompileContext* context)
 {
     assert(value->type()->isPointerType());
 
     value->buildContentValue(context);
 
     llvm::Value* ptr =
-        value->getContentValue();// While native value is a pointer too, it might not be the pointer we need.
+        value
+            ->getContentValue();// While native value is a pointer too, it is not the pointer we need (points to stack).
+
+    llvm::Type* size_content_type = lang::SizeType::getSize()->getContentType(*context->llvmContext());
+    llvm::Type* size_ptr_content_type =
+        lang::PointerType::get(lang::SizeType::getSize())->getContentType(*context->llvmContext());
+
+    if (delete_buffer)
+    {
+        llvm::Value* content_ptr =
+            context->ir()->CreateBitCast(ptr, size_ptr_content_type, ptr->getName() + ".bitcast");
+
+        llvm::Value* header_ptr = context->ir()->CreateGEP(
+            size_content_type,
+            content_ptr,
+            llvm::ConstantInt::get(llvm::IntegerType::getInt64Ty(*context->llvmContext()), -1, true),
+            content_ptr->getName() + ".gep");
+
+        llvm::Value* count = context->ir()->CreateLoad(size_content_type, header_ptr, header_ptr->getName() + ".load");
+
+        value->type()->getElementType()->buildFinalizer(ptr, count, context);
+    }
+    else { value->type()->getElementType()->buildFinalizer(ptr, context); }
+
     llvm::Value* opaque_ptr = context->ir()->CreateBitCast(ptr,
                                                            llvm::Type::getInt8PtrTy(*context->llvmContext()),
                                                            ptr->getName() + ".bitcast");
@@ -158,6 +181,8 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
                                       llvm::Value*                      count_value,
                                       CompileContext*                   context)
 {
+    llvm::Type* size_content_type = lang::SizeType::getSize()->getContentType(*context->llvmContext());
+
     // Set the zero init flag.
     llvm::Value* flags = llvm::ConstantInt::get(llvm::Type::getInt32Ty(*context->llvmContext()), 0x0040, false);
 
@@ -166,12 +191,19 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
 
     if (count_value)
     {
-        llvm::Value* element_size =
-            llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context->llvmContext()),
-                                   type->getContentSize(context->module()).getFixedSize(),
-                                   false);
+        llvm::Value* element_size = llvm::ConstantInt::get(
+            size_content_type,
+            context->module()->getDataLayout().getTypeAllocSize(type->getContentType(*context->llvmContext())),
+            false);
 
         size = context->ir()->CreateMul(count_value, element_size, count_value->getName() + ".mul");
+
+        llvm::Value* header_size =
+            llvm::ConstantInt::get(size_content_type,
+                                   context->module()->getDataLayout().getTypeAllocSize(size_content_type),
+                                   false);
+
+        size = context->ir()->CreateAdd(size, header_size, size->getName() + ".add");
     }
     else
     {
@@ -186,7 +218,33 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
                                                         allocate_dynamic_,
                                                         args,
                                                         allocate_dynamic_->getName() + ".call");
-    return context->ir()->CreateBitCast(opaque_ptr,
-                                        lang::PointerType::get(type)->getContentType(*context->llvmContext()),
-                                        opaque_ptr->getName() + ".bitcast");
+
+    llvm::Value* result_ptr;
+
+    llvm::Type* result_content_type = lang::PointerType::get(type)->getContentType(*context->llvmContext());
+    llvm::Type* size_ptr_content_type =
+        lang::PointerType::get(lang::SizeType::getSize())->getContentType(*context->llvmContext());
+
+    if (count_value)
+    {
+        llvm::Value* header_ptr =
+            context->ir()->CreateBitCast(opaque_ptr, size_ptr_content_type, opaque_ptr->getName() + ".bitcast");
+
+        context->ir()->CreateStore(count_value, header_ptr);
+
+        llvm::Value* content_ptr =
+            context->ir()->CreateGEP(size_content_type,
+                                     header_ptr,
+                                     llvm::ConstantInt::get(llvm::IntegerType::getInt64Ty(*context->llvmContext()), 1),
+                                     header_ptr->getName() + ".gep");
+
+        result_ptr =
+            context->ir()->CreateBitCast(content_ptr, result_content_type, content_ptr->getName() + ".bitcast");
+    }
+    else
+    {
+        result_ptr = context->ir()->CreateBitCast(opaque_ptr, result_content_type, opaque_ptr->getName() + ".bitcast");
+    }
+
+    return result_ptr;
 }
