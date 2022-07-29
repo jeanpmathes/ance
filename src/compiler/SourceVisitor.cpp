@@ -426,16 +426,26 @@ antlrcpp::Any SourceVisitor::visitMemberAccess(anceParser::MemberAccessContext* 
 
 antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
 {
-    lang::Identifier         identifier = ident(ctx->IDENTIFIER());
-    std::vector<Expression*> arguments  = visit(ctx->arguments()).as<std::vector<Expression*>>();
+    std::optional<lang::ResolvingHandle<lang::FunctionGroup>> function_group;
+    std::optional<lang::ResolvingHandle<lang::Type>>          constructed_type;
+
+    if (ctx->type()) { constructed_type = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>(); }
+    else
+    {
+        lang::Identifier identifier = ident(ctx->IDENTIFIER());
+
+        function_group   = lang::makeHandled<lang::FunctionGroup>(identifier);
+        constructed_type = lang::makeHandled<lang::Type>(identifier);
+    }
+
+    std::vector<Expression*> arguments = visit(ctx->arguments()).as<std::vector<Expression*>>();
 
     std::vector<std::unique_ptr<Expression>> unique_expressions;
     unique_expressions.reserve(arguments.size());
     for (Expression* argument_ptr : arguments) { unique_expressions.emplace_back(argument_ptr); }
 
-    auto function_group = lang::makeHandled<lang::FunctionGroup>(identifier);
-
-    return static_cast<Expression*>(new FunctionCall(function_group, std::move(unique_expressions), location(ctx)));
+    return static_cast<Expression*>(
+        new FunctionCall(function_group.value(), std::move(unique_expressions), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitArguments(anceParser::ArgumentsContext* ctx)

@@ -179,6 +179,7 @@ independentExpression
 
 functionCall
 	: IDENTIFIER '(' arguments ')'
+	| type '(' arguments ')'
 	;
 
 arguments

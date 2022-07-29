@@ -1102,6 +1102,7 @@ class anceParser : public antlr4::Parser
         virtual size_t              getRuleIndex() const override;
         antlr4::tree::TerminalNode* IDENTIFIER();
         ArgumentsContext*           arguments();
+        TypeContext*                type();
 
         virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
