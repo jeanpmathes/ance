@@ -24,15 +24,17 @@ class FunctionCall
   public:
     /**
      * Create a new function call.
-     * @param function_group The function group to call.
+     * @param function_group The function group to call, if there is any.
+     * @param type_function_group A type to be used instead of the function group, if necessary.
      * @param arguments The arguments to pass to the called function.
      * @param location The source location.
      */
-    FunctionCall(lang::ResolvingHandle<lang::FunctionGroup> function_group,
-                 std::vector<std::unique_ptr<Expression>>   arguments,
-                 lang::Location                             location);
+    FunctionCall(std::optional<lang::ResolvingHandle<lang::FunctionGroup>> function_group,
+                 lang::ResolvingHandle<lang::Type>                         type_function_group,
+                 std::vector<std::unique_ptr<Expression>>                  arguments,
+                 lang::Location                                            location);
 
-    [[nodiscard]] lang::ResolvingHandle<lang::FunctionGroup>      group() const;
+    [[nodiscard]] const lang::Callable&                           callable() const;
     [[nodiscard]] std::vector<std::reference_wrapper<Expression>> arguments() const;
 
   protected:
@@ -55,9 +57,11 @@ class FunctionCall
     std::vector<lang::ResolvingHandle<lang::Function>> function() const;
     std::vector<lang::ResolvingHandle<lang::Type>>     argumentTypes() const;
 
-    lang::ResolvingHandle<lang::FunctionGroup> function_group_;
-    std::vector<std::unique_ptr<Expression>>   arguments_;
+    std::optional<lang::ResolvingHandle<lang::FunctionGroup>> function_group_;
+    lang::ResolvingHandle<lang::Type>                         type_function_group_;
+    std::vector<std::unique_ptr<Expression>>                  arguments_;
 
+    mutable const lang::Callable*                              used_callable_ {};
     mutable bool                                               overload_resolved_ {false};
     mutable std::vector<lang::ResolvingHandle<lang::Function>> function_ {};
 };

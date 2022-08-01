@@ -445,7 +445,7 @@ antlrcpp::Any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* 
     for (Expression* argument_ptr : arguments) { unique_expressions.emplace_back(argument_ptr); }
 
     return static_cast<Expression*>(
-        new FunctionCall(function_group.value(), std::move(unique_expressions), location(ctx)));
+        new FunctionCall(function_group, constructed_type.value(), std::move(unique_expressions), location(ctx)));
 }
 
 antlrcpp::Any SourceVisitor::visitArguments(anceParser::ArgumentsContext* ctx)

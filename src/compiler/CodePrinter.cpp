@@ -1,5 +1,6 @@
 #include "CodePrinter.h"
 
+#include "lang/construct/Callable.h"
 #include "lang/type/VoidType.h"
 
 std::ostream& util::operator<<(std::ostream& os, const std::any&)
@@ -136,7 +137,7 @@ std::any CodePrinter::visit(ConstantLiteral& constant_literals)
 
 std::any CodePrinter::visit(FunctionCall& function_call)
 {
-    out_ << function_call.group()->name() << "(";
+    out_ << function_call.callable().name() << "(";
 
     bool first = true;
 

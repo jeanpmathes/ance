@@ -23,7 +23,7 @@ namespace lang
       public:
         explicit FunctionGroup(Identifier name);
 
-        [[nodiscard]] bool              isDefined() const;
+        [[nodiscard]] bool              isDefined() const override;
         [[nodiscard]] const Identifier& name() const override;
 
         void resolve();

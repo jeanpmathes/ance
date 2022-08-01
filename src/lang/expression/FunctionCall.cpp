@@ -2,24 +2,35 @@
 
 #include <utility>
 
-#include "lang/scope/GlobalScope.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "lang/scope/GlobalScope.h"
 #include "validation/ValidationLogger.h"
 
-FunctionCall::FunctionCall(lang::ResolvingHandle<lang::FunctionGroup> function_group,
-                           std::vector<std::unique_ptr<Expression>>   arguments,
-                           lang::Location                             location)
+FunctionCall::FunctionCall(std::optional<lang::ResolvingHandle<lang::FunctionGroup>> function_group,
+                           lang::ResolvingHandle<lang::Type>                         type_function_group,
+                           std::vector<std::unique_ptr<Expression>>                  arguments,
+                           lang::Location                                            location)
     : Expression(location)
     , function_group_(std::move(function_group))
+    , type_function_group_(std::move(type_function_group))
     , arguments_(std::move(arguments))
 {
     for (auto& argument : arguments_) { addSubexpression(*argument); }
 }
 
-lang::ResolvingHandle<lang::FunctionGroup> FunctionCall::group() const
+const lang::Callable& FunctionCall::callable() const
 {
-    return function_group_;
+    if (!used_callable_)
+    {
+        if (function_group_.has_value() && function_group_.value()->isDefined())
+        {
+            used_callable_ = &*function_group_.value();
+        }
+        else { used_callable_ = &*type_function_group_; }
+    }
+
+    return *used_callable_;
 }
 
 std::vector<std::reference_wrapper<Expression>> FunctionCall::arguments() const
@@ -36,7 +47,8 @@ void FunctionCall::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    scope()->registerUsage(function_group_);
+    if (function_group_.has_value()) scope()->registerUsage(function_group_.value());
+    if (!type_function_group_->isDefined()) scope()->registerUsage(type_function_group_);
 }
 
 lang::ResolvingHandle<lang::Type> FunctionCall::type() const
@@ -59,26 +71,25 @@ bool FunctionCall::validate(ValidationLogger& validation_logger) const
 
     if (!valid) return false;
 
-    if (!function_group_->isDefined())
+    if (!callable().isDefined())
     {
-        validation_logger.logError("Name '" + function_group_->name() + "' not defined in the current context",
-                                   location());
+        validation_logger.logError("Name '" + callable().name() + "' not defined in the current context", location());
         return false;
     }
 
-    bool is_resolving_valid = function_group_->validateResolution(argumentTypes(), location(), validation_logger);
+    bool is_resolving_valid = callable().validateResolution(argumentTypes(), location(), validation_logger);
     if (!is_resolving_valid) return false;
 
     std::vector<lang::ResolvingHandle<lang::Function>> potential_functions = function();
     if (potential_functions.empty())
     {
-        validation_logger.logError("Cannot resolve '" + function_group_->name() + "' function overload", location());
+        validation_logger.logError("Cannot resolve '" + callable().name() + "' function overload", location());
         return false;
     }
 
     if (potential_functions.size() > 1)
     {
-        validation_logger.logError("Ambiguous function call to '" + function_group_->name() + "'", location());
+        validation_logger.logError("Ambiguous function call to '" + callable().name() + "'", location());
         return false;
     }
 
@@ -94,8 +105,13 @@ bool FunctionCall::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion FunctionCall::expandWith(Expressions subexpressions) const
 {
+    std::optional<lang::ResolvingHandle<lang::FunctionGroup>> fng;
+
     return {Statements(),
-            std::make_unique<FunctionCall>(function_group_->toUndefined(), std::move(subexpressions), location()),
+            std::make_unique<FunctionCall>(function_group_ ? function_group_.value()->toUndefined() : fng,
+                                           type_function_group_->toUndefined(),
+                                           std::move(subexpressions),
+                                           location()),
             Statements()};
 }
 
@@ -117,7 +133,7 @@ std::vector<lang::ResolvingHandle<lang::Function>> FunctionCall::function() cons
 {
     if (!overload_resolved_)
     {
-        function_          = function_group_->resolveOverload(argumentTypes());
+        function_          = callable().resolveOverload(argumentTypes());
         overload_resolved_ = true;
     }
 

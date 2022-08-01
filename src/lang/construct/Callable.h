@@ -29,6 +29,8 @@ namespace lang
          */
         [[nodiscard]] virtual const Identifier& name() const = 0;
 
+        [[nodiscard]] virtual bool isDefined() const = 0;
+
         /**
          * Add a function to this group.
          * @param function The function. Must be named like the group.
@@ -39,7 +41,6 @@ namespace lang
          * Validate the resolution for given types.
          * This is only a rough check, and does not guarantee that an unambiguous resolution is possible.
          * @param types The types of the arguments.
-         * @param location The source location at which the resolution was requested.
          * @param validation_logger The validation logger.
          * @return True if the resolution is valid.
          */

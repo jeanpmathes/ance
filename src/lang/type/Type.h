@@ -58,7 +58,7 @@ namespace lang
          * Get the name of this type.
          * @return The name.
          */
-        [[nodiscard]] const lang::Identifier& name() const;
+        [[nodiscard]] const lang::Identifier& name() const override;
 
         /**
          * Get the name of this type with helpful annotations. Useful for validation messages.
@@ -76,7 +76,7 @@ namespace lang
         /**
          * Get whether this type is defined.
          */
-        [[nodiscard]] bool isDefined() const;
+        [[nodiscard]] bool isDefined() const override;
 
         /**
          * Define this type. Can only be used on undefined types.
