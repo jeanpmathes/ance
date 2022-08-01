@@ -145,8 +145,8 @@ namespace lang
          * @param context The current compile context.
          * @return The return value. Will be null for return type void.
          */
-        virtual std::shared_ptr<lang::Value> buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
-                                                       CompileContext* context) const = 0;
+        std::shared_ptr<lang::Value> buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
+                                               CompileContext*                                  context) const;
 
         /**
          * Get the parameter list as source, with parentheses.
@@ -183,6 +183,8 @@ namespace lang
                                   llvm::FunctionType*                              native_type,
                                   llvm::Function*                                  native_function,
                                   CompileContext*                                  context) const;
+
+        [[nodiscard]] virtual std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const = 0;
 
       public:
         lang::GlobalScope*        getGlobalScope();

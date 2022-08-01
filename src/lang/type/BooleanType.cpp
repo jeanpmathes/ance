@@ -1,10 +1,11 @@
 #include "BooleanType.h"
 
 #include "compiler/CompileContext.h"
-#include "lang/type/Type.h"
+#include "lang/construct/Function.h"
 #include "lang/construct/value/Value.h"
-#include "lang/utility/Values.h"
 #include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/type/Type.h"
+#include "lang/utility/Values.h"
 
 lang::BooleanType::BooleanType() : TypeDefinition(lang::Identifier::from("bool")) {}
 

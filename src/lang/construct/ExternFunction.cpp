@@ -94,17 +94,6 @@ void lang::ExternFunction::createNativeBacking(CompileContext* context)
 
 void lang::ExternFunction::build(CompileContext*) {}
 
-std::shared_ptr<lang::Value> lang::ExternFunction::buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
-                                                             CompileContext* context) const
-{
-    llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
-
-    if (returnType()->isVoidType()) { return nullptr; }
-
-    llvm::Value* native_value = lang::Values::contentToNative(returnType(), content_value, context);
-    return std::make_shared<lang::WrappedNativeValue>(returnType(), native_value);
-}
-
 llvm::DIScope* lang::ExternFunction::getDebugScope(CompileContext*)
 {
     return native_function_->getSubprogram();
@@ -119,4 +108,9 @@ const std::vector<lang::BasicBlock*>& lang::ExternFunction::getBasicBlocks() con
 {
     static std::vector<lang::BasicBlock*> empty;
     return empty;
+}
+
+std::pair<llvm::FunctionType*, llvm::Function*> lang::ExternFunction::getNativeRepresentation() const
+{
+    return std::make_pair(native_type_, native_function_);
 }

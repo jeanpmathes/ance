@@ -1,13 +1,14 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_FUNCTIONGROUP_H_
 #define ANCE_SRC_LANG_CONSTRUCT_FUNCTIONGROUP_H_
 
-#include "lang/utility/ResolvingHandle.h"
+#include "Callable.h"
 
 #include <string>
 #include <vector>
 
 #include "lang/construct/Function.h"
 #include "lang/utility/OwningHandle.h"
+#include "lang/utility/ResolvingHandle.h"
 
 class ValidationLogger;
 class CompileContext;
@@ -16,13 +17,14 @@ namespace lang
 {
     class FunctionGroup
         : public HandleTarget<FunctionGroup>
+        , public Callable
         , public Element<FunctionGroup, ANCE_CONSTRUCTS>
     {
       public:
         explicit FunctionGroup(Identifier name);
 
         [[nodiscard]] bool              isDefined() const;
-        [[nodiscard]] const Identifier& name() const;
+        [[nodiscard]] const Identifier& name() const override;
 
         void resolve();
         void validate(ValidationLogger& validation_logger) const;
@@ -33,39 +35,15 @@ namespace lang
         void build(CompileContext* compile_context);
 
         /**
-         * Add a function to this group.
-         * @param function The function. Must be named like the group.
-         */
-        void addFunction(lang::OwningHandle<lang::Function> function);
-
-        /**
-         * Validate the resolution for given types.
-         * This is only a rough check, and does not guarantee that an unambiguous resolution is possible.
-         * @param types The types of the arguments.
-         * @param location The source location at which the resolution was requested.
-         * @param validation_logger The validation logger.
-         * @return True if the resolution is valid.
-         */
-        bool validateResolution(const std::vector<lang::ResolvingHandle<lang::Type>>& types,
-                                lang::Location                                        location,
-                                ValidationLogger&                                     validation_logger) const;
-
-        /**
-         * Resolve a function overload.
-         * @param arguments The argument types to use for overload resolution.
-         * @return All functions that fit the given arguments.
-         */
-        std::vector<lang::ResolvingHandle<lang::Function>> resolveOverload(
-            const std::vector<lang::ResolvingHandle<lang::Type>>& arguments) const;
-
-        /**
          * Get an undefined function group with the same name.
          */
         [[nodiscard]] lang::ResolvingHandle<lang::FunctionGroup> toUndefined() const;
 
+      protected:
+        void onAddFunction(lang::Function& function) override;
+
       private:
-        lang::Identifier                                name_;
-        std::vector<lang::OwningHandle<lang::Function>> functions_;
+        lang::Identifier name_;
     };
 }
 

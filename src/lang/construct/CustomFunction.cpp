@@ -53,6 +53,11 @@ lang::CustomFunction::CustomFunction(Function&                                  
     }
 }
 
+std::pair<llvm::FunctionType*, llvm::Function*> lang::CustomFunction::getNativeRepresentation() const
+{
+    return std::make_pair(native_type_, native_function_);
+}
+
 void lang::CustomFunction::setupCode()
 {
     addChild(*code_);
@@ -283,17 +288,6 @@ void lang::CustomFunction::build(CompileContext* context)
     context->di()->finalizeSubprogram(native_function_->getSubprogram());
 }
 
-std::shared_ptr<lang::Value> lang::CustomFunction::buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
-                                                             CompileContext* context) const
-{
-    llvm::Value* content_value = buildCall(arguments, native_type_, native_function_, context);
-
-    if (returnType()->isVoidType()) { return nullptr; }
-
-    llvm::Value* native_value = lang::Values::contentToNative(returnType(), content_value, context);
-    return std::make_shared<lang::WrappedNativeValue>(returnType(), native_value);
-}
-
 llvm::DISubprogram* lang::CustomFunction::debugSubprogram()
 {
     return native_function_->getSubprogram();
@@ -313,3 +307,4 @@ llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext*)
 {
     return debugSubprogram();
 }
+

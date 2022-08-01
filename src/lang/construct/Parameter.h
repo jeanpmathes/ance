@@ -31,7 +31,7 @@ namespace lang
                   Identifier                        name,
                   lang::Location                    location);
 
-        lang::ResolvingHandle<lang::Type> type() const override;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const override;
         /**
          * Get the parameter name.
          * @return The name.

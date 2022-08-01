@@ -58,8 +58,6 @@ namespace lang
 
         void                         createNativeBacking(CompileContext* context) override;
         void                         build(CompileContext* context) override;
-        std::shared_ptr<lang::Value> buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
-                                               CompileContext*                                  context) const override;
 
         /**
          * Get the debug subprogram.
@@ -74,6 +72,8 @@ namespace lang
 
       protected:
         using FunctionDefinition::buildCall;
+
+        [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
 
       private:
         void setupCode();

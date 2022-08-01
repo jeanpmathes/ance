@@ -2,8 +2,10 @@
 
 #include <utility>
 
-#include "lang/construct/Function.h"
 #include "compiler/CompileContext.h"
+#include "lang/construct/Function.h"
+#include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
 lang::FunctionDefinition::FunctionDefinition(Function&                                     function,
@@ -87,6 +89,20 @@ bool lang::FunctionDefinition::validateCall(
     }
 
     return valid;
+}
+
+std::shared_ptr<lang::Value> lang::FunctionDefinition::buildCall(
+    const std::vector<std::shared_ptr<lang::Value>>& arguments,
+    CompileContext*                                  context) const
+{
+    auto [native_type, native_function] = getNativeRepresentation();
+
+    llvm::Value* content_value = buildCall(arguments, native_type, native_function, context);
+
+    if (returnType()->isVoidType()) { return nullptr; }
+
+    llvm::Value* native_value = lang::Values::contentToNative(returnType(), content_value, context);
+    return std::make_shared<lang::WrappedNativeValue>(returnType(), native_value);
 }
 
 std::string lang::FunctionDefinition::parameterSource() const

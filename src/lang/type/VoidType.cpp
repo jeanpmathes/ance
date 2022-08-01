@@ -1,7 +1,8 @@
 #include "VoidType.h"
 
-#include "lang/type/Type.h"
 #include "compiler/CompileContext.h"
+#include "lang/construct/Function.h"
+#include "lang/type/Type.h"
 
 lang::VoidType::VoidType() : TypeDefinition(lang::Identifier::from("void")) {}
 
@@ -46,7 +47,7 @@ void lang::VoidType::buildCopyInitializer(llvm::Value*, llvm::Value*, CompileCon
     throw std::logic_error("Void does not have a copy value.");
 }
 
-void lang::VoidType::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+void lang::VoidType::buildFinalizer(llvm::Value*, llvm::Value*, CompileContext*)
 {
     throw std::logic_error("Void does not have a finalizer.");
 }

@@ -21,6 +21,7 @@ namespace lang
     class Scope;
     class Value;
     class Type;
+    class Function;
 }
 
 class CompileContext;

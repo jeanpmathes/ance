@@ -8,19 +8,21 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 
+#include "lang/AccessModifier.h"
 #include "lang/BinaryOperator.h"
+#include "lang/UnaryOperator.h"
+#include "lang/construct/Callable.h"
+#include "lang/type/StateCount.h"
 #include "lang/type/TypeDefinition.h"
+#include "lang/utility/Identifier.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
-#include "lang/type/StateCount.h"
-#include "lang/UnaryOperator.h"
-#include "lang/utility/Identifier.h"
-#include "lang/AccessModifier.h"
 
 namespace lang
 {
     class Scope;
     class Value;
+    class Function;
 }
 
 class CompileContext;
@@ -31,7 +33,9 @@ namespace lang
     /**
      * Represents types in the ance language.
      */
-    class Type : public HandleTarget<lang::Type>
+    class Type
+        : public Callable
+        , public HandleTarget<lang::Type>
     {
       public:
         /**

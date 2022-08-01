@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_LANG_CONSTRUCT_EXTERNFUNCTION_H_
-#define ANCE_SRC_LANG_CONSTRUCT_EXTERNFUNCTION_H_
+#ifndef ANCE_SRC_LANG_CONSTRUCT_PREDEFINEDFUNCTION_H_
+#define ANCE_SRC_LANG_CONSTRUCT_PREDEFINEDFUNCTION_H_
 
 #include "FunctionDefinition.h"
 
@@ -13,19 +13,19 @@ namespace lang
 namespace lang
 {
     /**
-     * A function that is just declared, the actual definition is provided externally when linking.
+     * A function that is defined by the language itself using native representation, not by source code.
+     * Therefore a predefined does not require some steps like resolving.
      */
-    class ExternFunction
+    class PredefinedFunction
         : public lang::FunctionDefinition
-        , public lang::Element<ExternFunction, ANCE_CONSTRUCTS>
+        , public lang::Element<PredefinedFunction, ANCE_CONSTRUCTS>
     {
       public:
-        ExternFunction(Function&                                     function,
-                       Scope&                                        containing_scope,
-                       lang::ResolvingHandle<lang::Type>             return_type,
-                       lang::Location                                return_type_location,
-                       std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                       lang::Location                                location);
+        PredefinedFunction(Function&                                     function,
+                           Scope&                                        containing_scope,
+                           lang::ResolvingHandle<lang::Type>             return_type,
+                           std::vector<std::shared_ptr<lang::Parameter>> parameters,
+                           lang::Location                                location);
 
         [[nodiscard]] bool isMangled() const override;
 
@@ -34,14 +34,14 @@ namespace lang
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
-        void                         createNativeBacking(CompileContext* context) override;
-        void                         build(CompileContext* context) override;
+        void createNativeBacking(CompileContext* context) override;
+        void build(CompileContext* context) override;
 
         llvm::DIScope*                                      getDebugScope(CompileContext* context) override;
         lang::LocalScope*                                   getInsideScope() override;
         [[nodiscard]] const std::vector<lang::BasicBlock*>& getBasicBlocks() const override;
 
-      protected:
+      public:
         [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
 
       private:

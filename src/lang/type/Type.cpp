@@ -2,10 +2,11 @@
 
 #include <utility>
 
+#include "lang/construct/Function.h"
 #include "lang/construct/value/RoughlyCastedValue.h"
 #include "lang/type/ReferenceType.h"
-#include "validation/ValidationLogger.h"
 #include "lang/utility/Identifier.h"
+#include "validation/ValidationLogger.h"
 
 lang::Type::Type(Identifier name) : name_(std::move(name)) {}
 
@@ -522,3 +523,4 @@ lang::ResolvingHandle<lang::Type> lang::Type::toSeparateUndefined() const
 {
     return isDefined() ? self() : lang::makeHandled<lang::Type>(name());
 }
+

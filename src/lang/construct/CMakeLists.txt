@@ -12,6 +12,7 @@ target_sources(ance PRIVATE
                Function.cpp
                CustomFunction.cpp
                ExternFunction.cpp
+               PredefinedFunction.cpp
                GlobalVariable.cpp
                LocalVariable.cpp
                Parameter.cpp
@@ -19,6 +20,7 @@ target_sources(ance PRIVATE
                VariableDefinition.cpp
                FunctionDefinition.cpp
                FunctionGroup.cpp
+               Callable.cpp
                Signature.cpp
                Member.cpp
                CodeBlock.cpp)
