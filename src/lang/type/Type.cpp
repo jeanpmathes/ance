@@ -513,8 +513,7 @@ std::shared_ptr<lang::Value> lang::Type::makeActual(std::shared_ptr<lang::Value>
 
 lang::ResolvingHandle<lang::Type> lang::Type::toUndefined() const
 {
-    if (!isDefined()) return self();
-    if (!isCustom()) return self();
+    if (isDefined() && !isCustom()) return self();
 
     return lang::makeHandled<lang::Type>(name());
 }
