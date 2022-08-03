@@ -27,6 +27,7 @@ namespace lang
         [[nodiscard]] const Identifier& name() const override;
 
         void resolve();
+        void postResolve();
         void validate(ValidationLogger& validation_logger) const;
         void expand();
         void determineFlow();

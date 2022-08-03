@@ -282,8 +282,7 @@ void lang::Function::resolve()
 
         if (scope()->resolveDefinition(variable.handle())) { var_it = undefined_variables_.erase(var_it); }
         else {
-            ++var_it;
-        }
+            ++var_it; }
     }
 
     auto tp_it = undefined_types_.begin();
@@ -293,10 +292,13 @@ void lang::Function::resolve()
         auto& [name, type] = *tp_it;
 
         if (scope()->resolveDefinition(type.handle())) { tp_it = undefined_types_.erase(tp_it); }
-        else {
-            ++tp_it;
-        }
+        else { ++tp_it; }
     }
+}
+
+void lang::Function::postResolve()
+{
+    definition_->postResolve();
 }
 
 bool lang::Function::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)

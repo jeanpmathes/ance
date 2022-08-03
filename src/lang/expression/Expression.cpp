@@ -31,6 +31,11 @@ void Expression::walkDefinitions()
     for (auto& subexpression : subexpressions_) { subexpression.get().walkDefinitions(); }
 }
 
+void Expression::postResolve()
+{
+    for (auto& subexpression : subexpressions_) { subexpression.get().postResolve(); }
+}
+
 void Expression::setScope(lang::Scope& scope)
 {
     for (auto& subexpression : subexpressions_) { subexpression.get().setContainingScope(scope); }

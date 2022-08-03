@@ -70,6 +70,11 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      */
     virtual void walkDefinitions();
 
+    /**
+     * Called after all entities have been resolved.
+     */
+    virtual void postResolve();
+
   protected:
     /**
      * Override this to receive the containing function.

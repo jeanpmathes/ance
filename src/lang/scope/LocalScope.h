@@ -86,6 +86,7 @@ namespace lang
         void registerDefinition(lang::ResolvingHandle<lang::Type> type) override;
 
         void resolve() override;
+        void postResolve() override;
 
       protected:
         bool resolveDefinition(lang::ResolvingHandle<lang::Variable> variable) override;

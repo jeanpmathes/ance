@@ -54,6 +54,12 @@ void Statement::walkDefinitions()
     for (auto& substatement : substatements_) { substatement.get().walkDefinitions(); }
 }
 
+void Statement::postResolve()
+{
+    for (auto& subexpression : subexpressions_) { subexpression.get().postResolve(); }
+    for (auto& substatement : substatements_) { substatement.get().postResolve(); }
+}
+
 lang::Location Statement::location() const
 {
     return location_;
@@ -123,3 +129,4 @@ void Statement::addSubstatement(Statement& substatement)
     substatements_.emplace_back(substatement);
     addChild(substatement);
 }
+

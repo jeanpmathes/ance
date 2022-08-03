@@ -72,6 +72,7 @@ unsigned Application::getBitness() const
 void Application::preValidate()
 {
     global_scope_->resolve();
+    global_scope_->postResolve();
 }
 
 void Application::validate(ValidationLogger& validation_logger) const

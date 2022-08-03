@@ -109,6 +109,11 @@ namespace lang
         virtual void resolve() = 0;
 
         /**
+         * Perform operations that require resolved definitions and have to be done before validation.
+         */
+        virtual void postResolve() = 0;
+
+        /**
          * Resolve the definition of a function group.
          * @param function The function group to find a definition for.
          * @return True if a definition was found.

@@ -147,6 +147,7 @@ namespace lang
         void registerDefinition(lang::ResolvingHandle<lang::Type> type) override;
 
         void resolve() override;
+        void postResolve() override;
 
       protected:
         bool resolveDefinition(lang::ResolvingHandle<lang::Variable> variable) override;
@@ -154,8 +155,8 @@ namespace lang
         bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) override;
 
       private:
-        std::optional<lang::ResolvingHandle<lang::Function>> findEntry() const;
-        std::optional<lang::ResolvingHandle<lang::Function>> findExit() const;
+        [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Function>> findEntry() const;
+        [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Function>> findExit() const;
 
       public:
         /**
@@ -163,14 +164,14 @@ namespace lang
          * The default entry point is a main method returning ui32.
          * @return True if there is an entry point.
          */
-        bool hasEntry() const;
+        [[nodiscard]] bool hasEntry() const;
 
         /**
          * Check if this global scope has an exit point
          * The default exit point is an exit method taking a ui32.
          * @return True if there is an exit point.
          */
-        bool hasExit() const;
+        [[nodiscard]] bool hasExit() const;
 
         /**
          * Get the entry point. Fails if there is no entry point.

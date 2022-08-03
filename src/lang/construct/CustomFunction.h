@@ -51,6 +51,7 @@ namespace lang
         [[nodiscard]] lang::AccessModifier access() const;
         [[nodiscard]] Statement&           code() const;
 
+        void postResolve() override;
         void validate(ValidationLogger& validation_logger) const override;
         void expand() override;
         void determineFlow() override;

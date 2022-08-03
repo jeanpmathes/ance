@@ -185,8 +185,7 @@ void lang::LocalScope::resolve()
         if (scope()->resolveDefinition(variable.handle())) { var_it = undefined_variables_.erase(var_it); }
         else
         {
-            ++var_it;
-        }
+            ++var_it; }
     }
 
     auto tp_it = undefined_types_.begin();
@@ -196,12 +195,11 @@ void lang::LocalScope::resolve()
         auto& [name, type] = *tp_it;
 
         if (scope()->resolveDefinition(type.handle())) { tp_it = undefined_types_.erase(tp_it); }
-        else
-        {
-            ++tp_it;
-        }
+        else { ++tp_it; }
     }
 }
+
+void lang::LocalScope::postResolve() {}
 
 bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
 {

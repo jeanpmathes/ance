@@ -47,6 +47,11 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     virtual void walkDefinitions();
 
     /**
+     * Called after all entities have been resolved.
+     */
+    virtual void postResolve();
+
+    /**
      * Get whether this expression is a named value source.
      */
     [[nodiscard]] virtual bool isNamed();

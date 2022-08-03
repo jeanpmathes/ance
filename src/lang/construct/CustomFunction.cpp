@@ -9,7 +9,6 @@
 #include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
-#include "lang/utility/Values.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 #include "lang/AccessModifier.h"
@@ -82,6 +81,11 @@ lang::AccessModifier lang::CustomFunction::access() const
 Statement& lang::CustomFunction::code() const
 {
     return *code_;
+}
+
+void lang::CustomFunction::postResolve()
+{
+    code_->postResolve();
 }
 
 void lang::CustomFunction::validate(ValidationLogger& validation_logger) const
@@ -307,4 +311,3 @@ llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext*)
 {
     return debugSubprogram();
 }
-

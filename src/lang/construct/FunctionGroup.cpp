@@ -21,6 +21,11 @@ void lang::FunctionGroup::resolve()
     for (auto& function : functions()) function->resolve();
 }
 
+void lang::FunctionGroup::postResolve()
+{
+    for (auto& function : functions()) function->postResolve();
+}
+
 void lang::FunctionGroup::validate(ValidationLogger& validation_logger) const
 {
     {// Validate that every signature is unique
@@ -95,3 +100,4 @@ void lang::FunctionGroup::onAddFunction(lang::Function& function)
 {
     addChild(function);
 }
+

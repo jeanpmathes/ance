@@ -335,6 +335,11 @@ void lang::GlobalScope::resolve()
     }
 }
 
+void lang::GlobalScope::postResolve()
+{
+    for (auto& [key, group] : defined_function_groups_) { group->postResolve(); }
+}
+
 bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
 {
     if (global_defined_variables_.find(variable->name()) != global_defined_variables_.end())

@@ -94,6 +94,11 @@ namespace lang
         [[nodiscard]] virtual bool isMangled() const = 0;
 
         /**
+         * Called after the resolve step.
+         */
+        virtual void postResolve();
+
+        /**
          * Validate this function.
          * @param validation_logger A logger to log validation messages.
          */
