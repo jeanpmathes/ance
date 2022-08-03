@@ -162,6 +162,12 @@ lang::Scope* lang::Type::getContainingScope() const
     return definition_->scope();
 }
 
+void lang::Type::postResolve()
+{
+    assert(isDefined());
+    definition_->postResolve();
+}
+
 llvm::Constant* lang::Type::getDefaultContent(llvm::Module& m)
 {
     assert(isDefined());

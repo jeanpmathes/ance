@@ -1,10 +1,13 @@
 #include "TypeDefinition.h"
 
-#include <set>
 #include <map>
+#include <set>
 #include <stack>
 
 #include "compiler/CompileContext.h"
+#include "lang/construct/Function.h"
+#include "lang/construct/Parameter.h"
+#include "lang/construct/PredefinedFunction.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
@@ -119,6 +122,16 @@ void lang::TypeDefinition::setContainingScope(lang::Scope* scope)
     containing_scope_ = scope;
 
     onScope();
+}
+
+void lang::TypeDefinition::postResolve()
+{
+    createConstructors();
+}
+
+void lang::TypeDefinition::createConstructors()
+{
+    default_constructor_ = &createConstructor({});
 }
 
 void lang::TypeDefinition::onScope() {}
@@ -411,6 +424,8 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext* context)
                                                     "dtor_default$" + getMangledName(),
                                                     context->module());
     }
+
+    defineConstructors(context);
 }
 
 void lang::TypeDefinition::buildNativeDefinition(CompileContext* context)
@@ -418,6 +433,32 @@ void lang::TypeDefinition::buildNativeDefinition(CompileContext* context)
     if (!isTriviallyDefaultConstructible()) defineDefaultInitializer(context);
     if (!isTriviallyCopyConstructible()) defineCopyInitializer(context);
     if (!isTriviallyDestructible()) defineDefaultFinalizer(context);
+
+    buildConstructors(context);
+}
+
+void lang::TypeDefinition::defineConstructors(CompileContext* context)
+{
+    if (!default_constructor_) return;
+
+    default_constructor_->createNativeBacking(context);
+}
+
+void lang::TypeDefinition::buildConstructors(CompileContext* context)
+{
+    if (!default_constructor_) return;
+
+    lang::PredefinedFunction& default_constructor = *default_constructor_;
+    auto [native_fn_type, native_fn]              = default_constructor.getNativeRepresentation();
+
+    llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_fn);
+    context->ir()->SetInsertPoint(block);
+    {
+        llvm::Value* ptr = context->ir()->CreateAlloca(getContentType(*context->llvmContext()), nullptr, "alloca");
+        buildDefaultInitializer(ptr, context);
+        llvm::Value* val = context->ir()->CreateLoad(getContentType(*context->llvmContext()), ptr, "load");
+        context->ir()->CreateRet(val);
+    }
 }
 
 bool lang::TypeDefinition::isTriviallyDefaultConstructible() const
@@ -498,6 +539,21 @@ void lang::TypeDefinition::buildSingleDefaultFinalizerDefinition(llvm::Value*, C
 
 bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger) const
 {
+    if (hasCyclicDependency())
+    {
+        validation_logger.logError("Type " + self()->getAnnotatedName(false) + " has circular dependency",
+                                   this->getDefinitionLocation());
+
+        return false;
+    }
+
+    return true;
+}
+
+bool lang::TypeDefinition::hasCyclicDependency() const
+{
+    if (cyclic_dependency_.has_value()) { return cyclic_dependency_.value(); }
+
     const int visited  = 1;
     const int finished = 2;
 
@@ -520,9 +576,8 @@ bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger
 
             if (state[current] == visited)
             {
-                validation_logger.logError("Type " + self()->getAnnotatedName(false) + " has circular dependency",
-                                           this->getDefinitionLocation());
-                return false;
+                cyclic_dependency_ = true;
+                return true;
             }
 
             state[current] = visited;
@@ -535,12 +590,39 @@ bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger
         }
     }
 
-    return true;
+    cyclic_dependency_ = false;
+    return false;
 }
 
 std::vector<lang::TypeDefinition*> lang::TypeDefinition::getDependencies() const
 {
     return {};
+}
+
+lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
+    std::vector<lang::ResolvingHandle<lang::Type>> parameter_types)
+{
+    lang::OwningHandle<lang::Function> function =
+        lang::OwningHandle<lang::Function>::takeOwnership(lang::makeHandled<lang::Function>(lang::Identifier(name())));
+
+    size_t count = 1;
+
+    std::vector<std::shared_ptr<lang::Parameter>> parameters;
+    for (auto& parameter_type : parameter_types)
+    {
+        std::string parameter_name = "p" + std::to_string(count++);
+        parameters.push_back(std::make_shared<lang::Parameter>(parameter_type,
+                                                               lang::Location(0, 0, 0, 0),
+                                                               lang::Identifier::from(parameter_name),
+                                                               lang::Location(0, 0, 0, 0)));
+    }
+
+    lang::PredefinedFunction& predefined_function =
+        function->defineAsPredefined(self(), parameters, *scope(), lang::Location(0, 0, 0, 0));
+
+    self()->addFunction(std::move(function));
+
+    return predefined_function;
 }
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::self() const

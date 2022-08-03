@@ -22,6 +22,7 @@ namespace lang
     class Value;
     class Type;
     class Function;
+    class PredefinedFunction;
 }
 
 class CompileContext;
@@ -75,6 +76,8 @@ namespace lang
         void         setContainingScope(Scope* scope);
         virtual void onScope();
         Scope*       scope();
+
+        void postResolve();
 
         virtual llvm::Constant* getDefaultContent(llvm::Module& m) = 0;
 
@@ -146,6 +149,8 @@ namespace lang
         virtual void buildNativeDefinition(CompileContext* context);
 
       protected:
+        virtual void createConstructors();
+
         /**
          * Whether this type can be default-constructed by zeroing memory.
          */
@@ -162,6 +167,9 @@ namespace lang
         void defineDefaultInitializer(CompileContext* context);
         void defineCopyInitializer(CompileContext* context);
         void defineDefaultFinalizer(CompileContext* context);
+
+        void defineConstructors(CompileContext* context);
+        void buildConstructors(CompileContext* context);
 
         /**
          * Build the part of the definition that default-initializes a single element of this type.
@@ -188,7 +196,15 @@ namespace lang
          * @return True if the dependencies are valid.
          */
         bool checkDependencies(ValidationLogger& validation_logger) const;
+        bool hasCyclicDependency() const;
         [[nodiscard]] virtual std::vector<lang::TypeDefinition*> getDependencies() const;
+
+        /**
+         * Create a constructor for this type. The function is added to the overload list.
+         * @param parameter_types The parameter types of the function.
+         * @return The function.
+         */
+        lang::PredefinedFunction& createConstructor(std::vector<lang::ResolvingHandle<lang::Type>> parameter_types);
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self() const;
 
@@ -211,6 +227,10 @@ namespace lang
         lang::Type*      type_ {nullptr};
         lang::Scope*     containing_scope_ {nullptr};
         llvm::DIType*    debug_type_ {nullptr};
+
+        lang::PredefinedFunction* default_constructor_ {nullptr};
+
+        mutable std::optional<bool> cyclic_dependency_ {};
     };
 }
 

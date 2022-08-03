@@ -23,6 +23,7 @@ namespace lang
     class LocalScope;
     class Type;
     class CodeBlock;
+    class PredefinedFunction;
 }
 
 class CompileContext;
@@ -89,6 +90,19 @@ namespace lang
                             Scope&                                               containing_scope,
                             lang::Location                                       declaration_location,
                             lang::Location                                       definition_location);
+
+        /**
+         * Define this function as a predefined function.
+         * @param return_type The return type of the function.
+         * @param parameters The parameters for this function.
+         * @param containing_scope The scope containing the function.
+         * @param location The location of the function.
+         * @return The predefined function.
+         */
+        PredefinedFunction& defineAsPredefined(lang::ResolvingHandle<lang::Type>                    return_type,
+                                               const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                               Scope&                                               containing_scope,
+                                               lang::Location                                       location);
 
         /**
          * Define a local variable that is a parameter.

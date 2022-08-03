@@ -268,9 +268,23 @@ void lang::TypeAlias::buildFinalizer(llvm::Value* ptr, llvm::Value* count, Compi
     actual_->buildFinalizer(ptr, count, context);
 }
 
-void lang::TypeAlias::buildNativeDeclaration(CompileContext*) {}
+void lang::TypeAlias::createConstructors()
+{
+    if (hasCyclicDependency()) return;
+    if (isVoidType() || isReferenceType()) return;
 
-void lang::TypeAlias::buildNativeDefinition(CompileContext*) {}
+    TypeDefinition::createConstructors();
+}
+
+void lang::TypeAlias::buildNativeDeclaration(CompileContext* context)
+{
+    defineConstructors(context);
+}
+
+void lang::TypeAlias::buildNativeDefinition(CompileContext* context)
+{
+    buildConstructors(context);
+}
 
 std::string lang::TypeAlias::createMangledName()
 {

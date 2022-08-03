@@ -2,14 +2,15 @@
 
 #include <utility>
 
+#include "compiler/CompileContext.h"
+#include "lang/AccessModifier.h"
 #include "lang/construct/CustomFunction.h"
 #include "lang/construct/ExternFunction.h"
 #include "lang/construct/LocalVariable.h"
+#include "lang/construct/PredefinedFunction.h"
 #include "lang/scope/LocalScope.h"
-#include "compiler/CompileContext.h"
-#include "validation/ValidationLogger.h"
-#include "lang/AccessModifier.h"
 #include "lang/statement/Statement.h"
+#include "validation/ValidationLogger.h"
 
 lang::Function::Function(Identifier function_name) : name_(std::move(function_name)) {}
 
@@ -59,6 +60,24 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
                                                          definition_location);
 
     addChild(*definition_);
+}
+
+lang::PredefinedFunction& lang::Function::defineAsPredefined(
+    lang::ResolvingHandle<lang::Type>                    return_type,
+    const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+    lang::Scope&                                         containing_scope,
+    lang::Location                                       location)
+{
+
+    auto definition =
+        std::make_unique<lang::PredefinedFunction>(*this, containing_scope, return_type, parameters, location);
+
+    lang::PredefinedFunction& predefined_function = *definition;
+
+    definition_ = std::move(definition);
+    addChild(*definition_);
+
+    return predefined_function;
 }
 
 std::optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParameterVariable(

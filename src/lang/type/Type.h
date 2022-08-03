@@ -195,6 +195,8 @@ namespace lang
          */
         [[nodiscard]] lang::Scope* getContainingScope() const;
 
+        void postResolve();
+
         /**
          * Get the default content of a value of this type.
          * @param m The module.

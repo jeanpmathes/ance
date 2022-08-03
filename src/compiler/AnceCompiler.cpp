@@ -101,6 +101,8 @@ void AnceCompiler::compile(const std::filesystem::path& out)
     buildExit(exit_type, exit);
     buildStart(main, exit_type, exit);
 
+    llvm::verifyModule(module_, &llvm::errs());
+
     // Passes.
 
     llvm::PassBuilder pass_builder(target_machine_);

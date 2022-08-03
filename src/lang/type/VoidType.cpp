@@ -52,6 +52,8 @@ void lang::VoidType::buildFinalizer(llvm::Value*, llvm::Value*, CompileContext*)
     throw std::logic_error("Void does not have a finalizer.");
 }
 
+void lang::VoidType::createConstructors() {}
+
 void lang::VoidType::buildNativeDeclaration(CompileContext*) {}
 
 void lang::VoidType::buildNativeDefinition(CompileContext*) {}

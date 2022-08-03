@@ -225,9 +225,23 @@ void lang::TypeClone::buildFinalizer(llvm::Value* ptr, llvm::Value* count, Compi
     original_->buildFinalizer(ptr, count, context);
 }
 
-void lang::TypeClone::buildNativeDeclaration(CompileContext*) {}
+void lang::TypeClone::createConstructors()
+{
+    if (hasCyclicDependency()) return;
+    if (isVoidType() || isReferenceType()) return;
 
-void lang::TypeClone::buildNativeDefinition(CompileContext*) {}
+    TypeDefinition::createConstructors();
+}
+
+void lang::TypeClone::buildNativeDeclaration(CompileContext* context)
+{
+    defineConstructors(context);
+}
+
+void lang::TypeClone::buildNativeDefinition(CompileContext* context)
+{
+    buildConstructors(context);
+}
 
 llvm::DIType* lang::TypeClone::createDebugType(CompileContext* context)
 {

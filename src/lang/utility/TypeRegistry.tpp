@@ -73,6 +73,13 @@ void lang::TypeRegistry<OTHER_KEY>::resolve()
 
     types_ = std::move(merged);
 }
+
+template<typename OTHER_KEY>
+void lang::TypeRegistry<OTHER_KEY>::postResolve()
+{
+    for (auto& [key, type] : types_) { type->postResolve(); }
+}
+
 template<typename OTHER_KEY>
 void lang::TypeRegistry<OTHER_KEY>::buildNativeDeclarations(CompileContext* context)
 {

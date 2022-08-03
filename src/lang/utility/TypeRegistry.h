@@ -27,6 +27,11 @@ namespace lang
         virtual void resolve() = 0;
 
         /**
+         * Called after all entities have been resolved.
+         */
+        virtual void postResolve() = 0;
+
+        /**
          * Build all native declarations.
          * @param context The compile context.
          */
@@ -56,6 +61,7 @@ namespace lang
 
         void setDefaultContainingScope(lang::Scope* scope) override;
         void resolve() override;
+        void postResolve() override;
 
         void buildNativeDeclarations(CompileContext* context) override;
         void buildNativeDefinitions(CompileContext* context) override;

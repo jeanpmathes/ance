@@ -208,6 +208,8 @@ void lang::ReferenceType::buildFinalizer(llvm::Value*, llvm::Value*, CompileCont
     throw std::logic_error("Reference does not have a finalizer.");
 }
 
+void lang::ReferenceType::createConstructors() {}
+
 void lang::ReferenceType::buildNativeDeclaration(CompileContext*) {}
 
 void lang::ReferenceType::buildNativeDefinition(CompileContext*) {}
