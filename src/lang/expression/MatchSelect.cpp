@@ -30,9 +30,9 @@ std::vector<std::reference_wrapper<Case>> MatchSelect::cases() const
     return cases;
 }
 
-lang::ResolvingHandle<lang::Type> MatchSelect::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> MatchSelect::tryGetType() const
 {
-    return Case::getCommonType(cases_);
+    return Case::tryGetCommonType(cases_);
 }
 
 bool MatchSelect::validate(ValidationLogger& validation_logger) const

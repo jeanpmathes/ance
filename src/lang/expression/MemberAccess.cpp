@@ -22,9 +22,13 @@ const lang::Identifier& MemberAccess::member() const
     return member_;
 }
 
-lang::ResolvingHandle<lang::Type> MemberAccess::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> MemberAccess::tryGetType() const
 {
-    return lang::ReferenceType::get(value_->type()->getMemberType(member_));
+    auto value_type_opt = value_->tryGetType();
+    if (!value_type_opt) return std::nullopt;
+    auto value_type = *value_type_opt;
+
+    return lang::ReferenceType::get(value_type->getMemberType(member_));
 }
 
 bool MemberAccess::validate(ValidationLogger& validation_logger) const

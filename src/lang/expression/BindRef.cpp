@@ -18,18 +18,15 @@ Expression& BindRef::value() const
     return *value_;
 }
 
-lang::ResolvingHandle<lang::Type> BindRef::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> BindRef::tryGetType() const
 {
-    if (!type_)
-    {
-        lang::ResolvingHandle<lang::Type> element_type = value_->type();
+    auto element_type_opt = value_->tryGetType();
+    if (!element_type_opt) return std::nullopt;
+    auto element_type = *element_type_opt;
 
-        if (element_type->isReferenceType()) { element_type = element_type->getElementType(); }
+    if (element_type->isReferenceType()) { element_type = element_type->getElementType(); }
 
-        type_ = lang::ReferenceType::get(element_type);
-    }
-
-    return *type_;
+    return lang::ReferenceType::get(element_type);
 }
 
 bool BindRef::validate(ValidationLogger& validation_logger) const

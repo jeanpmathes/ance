@@ -28,9 +28,9 @@ Expression& And::right() const
     return *right_;
 }
 
-lang::ResolvingHandle<lang::Type> And::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> And::tryGetType() const
 {
-    return lang::ResolvingHandle<lang::Type>(lang::BooleanType::get());
+    return lang::BooleanType::get();
 }
 
 bool And::validate(ValidationLogger& validation_logger) const

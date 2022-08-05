@@ -23,9 +23,13 @@ Expression& Subscript::index() const
     return *index_;
 }
 
-lang::ResolvingHandle<lang::Type> Subscript::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> Subscript::tryGetType() const
 {
-    return indexed_->type()->getSubscriptReturnType();
+    auto indexed_type_opt = indexed_->tryGetType();
+    if (!indexed_type_opt) return std::nullopt;
+    auto indexed_type = *indexed_type_opt;
+
+    return indexed_type->getSubscriptReturnType();
 }
 
 bool Subscript::validate(ValidationLogger& validation_logger) const

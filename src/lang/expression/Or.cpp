@@ -29,9 +29,9 @@ Expression& Or::right() const
     return *right_;
 }
 
-lang::ResolvingHandle<lang::Type> Or::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> Or::tryGetType() const
 {
-    return lang::ResolvingHandle<lang::Type>(lang::BooleanType::get());
+    return lang::BooleanType::get();
 }
 
 bool Or::validate(ValidationLogger& validation_logger) const

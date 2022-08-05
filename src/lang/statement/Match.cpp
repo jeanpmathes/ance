@@ -196,6 +196,12 @@ lang::ResolvingHandle<lang::Type> Case::getCommonType(const std::vector<std::uni
     return std::get<std::unique_ptr<Expression>>(code)->type();
 }
 
+std::optional<lang::ResolvingHandle<lang::Type>> Case::tryGetCommonType(const std::vector<std::unique_ptr<Case>>& cases)
+{
+    auto& code = cases.front()->code_;
+    return std::get<std::unique_ptr<Expression>>(code)->tryGetType();
+}
+
 bool Case::validateReturnTypes(lang::Location                            location,
                                const std::vector<std::unique_ptr<Case>>& cases,
                                ValidationLogger&                         validation_logger)

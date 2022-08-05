@@ -21,9 +21,13 @@ lang::UnaryOperator UnaryOperation::op() const
     return op_;
 }
 
-lang::ResolvingHandle<lang::Type> UnaryOperation::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> UnaryOperation::tryGetType() const
 {
-    return operand_->type()->getOperatorResultType(op_);
+    auto operand_type_opt = operand_->tryGetType();
+    if (!operand_type_opt) return std::nullopt;
+    auto operand_type = *operand_type_opt;
+
+    return operand_type->getOperatorResultType(op_);
 }
 
 bool UnaryOperation::validate(ValidationLogger& validation_logger) const

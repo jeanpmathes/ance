@@ -78,6 +78,7 @@ namespace lang
         Scope*       scope();
 
         void postResolve();
+        void requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters);
 
         virtual llvm::Constant* getDefaultContent(llvm::Module& m) = 0;
 
@@ -206,6 +207,23 @@ namespace lang
          */
         lang::PredefinedFunction& createConstructor(std::vector<lang::ResolvingHandle<lang::Type>> parameter_types);
 
+        /**
+         * Decide whether a function (constructor) overload that is requested exists for this type.
+         * @param parameters The parameters of the function.
+         * @return True if the function exists.
+         */
+        virtual bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters);
+
+        /**
+         * Build a function (constructor) overload that was accepted before.
+         * @param parameters The parameters of the function overload.
+         * @param function The already declared function which has to be built.
+         * @param context The current compile context.
+         */
+        virtual void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                            lang::PredefinedFunction&                             function,
+                                            CompileContext*                                       context);
+
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self() const;
 
       protected:
@@ -231,6 +249,9 @@ namespace lang
         lang::PredefinedFunction* default_constructor_ {nullptr};
 
         mutable std::optional<bool> cyclic_dependency_ {};
+
+        std::vector<std::pair<std::vector<lang::ResolvingHandle<lang::Type>>, lang::PredefinedFunction*>>
+            requested_constructors_;
     };
 }
 

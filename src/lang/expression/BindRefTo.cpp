@@ -20,15 +20,14 @@ Expression& BindRefTo::address() const
     return *address_;
 }
 
-lang::ResolvingHandle<lang::Type> BindRefTo::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> BindRefTo::tryGetType() const
 {
-    if (!type_)
-    {
-        lang::ResolvingHandle<lang::Type> element_type = address_->type()->getElementType();
-        type_                                          = lang::ReferenceType::get(element_type);
-    }
+    auto arg_type_opt = address_->tryGetType();
+    if (!arg_type_opt) return std::nullopt;
+    auto arg_type = *arg_type_opt;
 
-    return *type_;
+    lang::ResolvingHandle<lang::Type> element_type = arg_type->getElementType();
+    return lang::ReferenceType::get(element_type);
 }
 
 bool BindRefTo::validate(ValidationLogger& validation_logger) const

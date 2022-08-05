@@ -17,9 +17,13 @@ Expression& Indirection::value() const
     return *value_;
 }
 
-lang::ResolvingHandle<lang::Type> Indirection::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> Indirection::tryGetType() const
 {
-    return lang::ReferenceType::get(value_->type()->getIndirectionType());
+    auto type_opt = value_->tryGetType();
+    if (!type_opt) return std::nullopt;
+    auto type = type_opt.value();
+
+    return lang::ReferenceType::get(type->getIndirectionType());
 }
 
 bool Indirection::validate(ValidationLogger& validation_logger) const

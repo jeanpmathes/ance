@@ -17,18 +17,15 @@ Expression& Addressof::argument() const
     return *arg_;
 }
 
-lang::ResolvingHandle<lang::Type> Addressof::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> Addressof::tryGetType() const
 {
-    if (!return_type_)
-    {
-        lang::ResolvingHandle<lang::Type> value_type = arg_->type();
+    auto value_type_opt = arg_->tryGetType();
+    if (!value_type_opt) return std::nullopt;
+    auto value_type = *value_type_opt;
 
-        if (value_type->isReferenceType()) { value_type = value_type->getElementType(); }
+    if (value_type->isReferenceType()) { value_type = value_type->getElementType(); }
 
-        return_type_ = lang::PointerType::get(value_type);
-    }
-
-    return *return_type_;
+    return lang::PointerType::get(value_type);
 }
 
 bool Addressof::validate(ValidationLogger& validation_logger) const

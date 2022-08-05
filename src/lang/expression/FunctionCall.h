@@ -37,11 +37,15 @@ class FunctionCall
     [[nodiscard]] const lang::Callable&                           callable() const;
     [[nodiscard]] std::vector<std::reference_wrapper<Expression>> arguments() const;
 
+  private:
+    lang::Callable& getCallable();
+
   protected:
     void walkDefinitions() override;
+    void postResolve() override;
 
   public:
-    lang::ResolvingHandle<lang::Type> type() const override;
+    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
 

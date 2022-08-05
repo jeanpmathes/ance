@@ -38,7 +38,7 @@ class Allocation
     void walkDefinitions() override;
 
   public:
-    lang::ResolvingHandle<lang::Type> type() const override;
+    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
 

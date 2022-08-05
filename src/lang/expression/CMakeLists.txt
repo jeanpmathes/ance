@@ -1,6 +1,5 @@
 target_sources(ance PRIVATE Expression.cpp
                ConstantExpression.cpp
-               BackingConstantExpression.cpp
                UnexpandedExpression.cpp
                MemberAccess.cpp
                Indirection.cpp

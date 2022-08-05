@@ -21,9 +21,10 @@ void VariableAccess::walkDefinitions()
     scope()->registerUsage(variable_);
 }
 
-lang::ResolvingHandle<lang::Type> VariableAccess::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> VariableAccess::tryGetType() const
 {
-    return variable_->type();
+    if (variable_->isDefined()) return variable_->type();
+    else return std::nullopt;
 }
 
 bool VariableAccess::isNamed()

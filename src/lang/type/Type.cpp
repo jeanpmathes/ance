@@ -168,6 +168,12 @@ void lang::Type::postResolve()
     definition_->postResolve();
 }
 
+void lang::Type::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters)
+{
+    assert(isDefined());
+    definition_->requestOverload(std::move(parameters));
+}
+
 llvm::Constant* lang::Type::getDefaultContent(llvm::Module& m)
 {
     assert(isDefined());
@@ -528,4 +534,3 @@ lang::ResolvingHandle<lang::Type> lang::Type::toSeparateUndefined() const
 {
     return isDefined() ? self() : lang::makeHandled<lang::Type>(name());
 }
-

@@ -21,8 +21,9 @@ class ConstantLiteral
      */
     ConstantLiteral(std::shared_ptr<lang::Constant> constant, lang::Location location);
 
-    [[nodiscard]] lang::Constant&     constant() const;
-    lang::ResolvingHandle<lang::Type> type() const override;
+    [[nodiscard]] lang::Constant& constant() const;
+
+    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
 

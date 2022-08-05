@@ -33,7 +33,7 @@ class VariableAccess
     void walkDefinitions() override;
 
   public:
-    lang::ResolvingHandle<lang::Type> type() const override;
+    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
 
     [[nodiscard]] bool isNamed() override;
 

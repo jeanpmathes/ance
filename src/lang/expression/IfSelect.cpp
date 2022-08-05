@@ -39,9 +39,9 @@ Expression& IfSelect::elseExpression() const
     return *else_expression_;
 }
 
-lang::ResolvingHandle<lang::Type> IfSelect::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> IfSelect::tryGetType() const
 {
-    return then_expression_->type();
+    return then_expression_->tryGetType();
 }
 
 bool IfSelect::validate(ValidationLogger& validation_logger) const

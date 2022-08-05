@@ -31,9 +31,15 @@ lang::BinaryOperator BinaryOperation::op() const
     return op_;
 }
 
-lang::ResolvingHandle<lang::Type> BinaryOperation::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> BinaryOperation::tryGetType() const
 {
-    return left_->type()->getOperatorResultType(op_, getRightType());
+    auto left_type_opt  = left_->tryGetType();
+    auto right_type_opt = right_->tryGetType();
+    if (!left_type_opt || !right_type_opt) return std::nullopt;
+
+    return left_type_opt.value()->getOperatorResultType(
+        op_,
+        getRightType(op_, left_type_opt.value(), right_type_opt.value()));
 }
 
 bool BinaryOperation::validate(ValidationLogger& validation_logger) const
@@ -93,15 +99,22 @@ void BinaryOperation::doBuild(CompileContext* context)
 
 lang::ResolvingHandle<lang::Type> BinaryOperation::getRightType() const
 {
-    if (lang::Type::areSame(left_->type(), right_->type())) return right_->type();
+    return getRightType(op_, left_->type(), right_->type());
+}
 
-    if (!left_->type()->isOperatorDefined(op_, right_->type()) && left_->type()->isOperatorDefined(op_, left_->type())
-        && right_->type()->isImplicitlyConvertibleTo(left_->type()))
+lang::ResolvingHandle<lang::Type> BinaryOperation::getRightType(lang::BinaryOperator              op,
+                                                                lang::ResolvingHandle<lang::Type> left,
+                                                                lang::ResolvingHandle<lang::Type> right)
+{
+    if (lang::Type::areSame(left, right)) return right;
+
+    if (!left->isOperatorDefined(op, right) && left->isOperatorDefined(op, left)
+        && right->isImplicitlyConvertibleTo(left))
     {
-        return left_->type();
+        return left;
     }
 
-    return right_->type();
+    return right;
 }
 
 BinaryOperation::~BinaryOperation() = default;

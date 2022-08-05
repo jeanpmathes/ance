@@ -29,7 +29,7 @@ class MatchSelect
     [[nodiscard]] std::vector<std::reference_wrapper<Case>> cases() const;
 
   public:
-    lang::ResolvingHandle<lang::Type> type() const override;
+    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
 
@@ -41,8 +41,6 @@ class MatchSelect
   private:
     std::unique_ptr<Expression>        condition_;
     std::vector<std::unique_ptr<Case>> cases_;
-
-    std::optional<lang::ResolvingHandle<lang::Type>> type_;
 };
 
 #endif

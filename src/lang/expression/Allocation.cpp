@@ -43,7 +43,7 @@ void Allocation::walkDefinitions()
     scope()->addType(allocated_type_);
 }
 
-lang::ResolvingHandle<lang::Type> Allocation::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> Allocation::tryGetType() const
 {
     return return_type_;
 }

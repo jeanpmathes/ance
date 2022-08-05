@@ -33,6 +33,11 @@ const lang::Callable& FunctionCall::callable() const
     return *used_callable_;
 }
 
+lang::Callable& FunctionCall::getCallable()
+{
+    return const_cast<lang::Callable&>(static_cast<const FunctionCall&>(*this).callable());
+}
+
 std::vector<std::reference_wrapper<Expression>> FunctionCall::arguments() const
 {
     std::vector<std::reference_wrapper<Expression>> arguments;
@@ -51,9 +56,34 @@ void FunctionCall::walkDefinitions()
     if (!type_function_group_->isDefined()) scope()->registerUsage(type_function_group_);
 }
 
-lang::ResolvingHandle<lang::Type> FunctionCall::type() const
+void FunctionCall::postResolve()
 {
-    assert(!function().empty());
+    Expression::postResolve();
+
+    if (not callable().isDefined()) return;
+
+    std::vector<lang::ResolvingHandle<lang::Type>> argument_types;
+    argument_types.reserve(arguments_.size());
+
+    for (auto& argument : arguments_)
+    {
+        auto argument_type_opt = argument->tryGetType();
+        if (not argument_type_opt.has_value()) return;
+        argument_types.emplace_back(argument_type_opt.value());
+    }
+
+    bool arguments_defined = true;
+
+    for (auto& argument_type : argument_types) { arguments_defined &= argument_type->isDefined(); }
+
+    if (not arguments_defined) return;
+
+    getCallable().requestOverload(argument_types);
+}
+
+std::optional<lang::ResolvingHandle<lang::Type>> FunctionCall::tryGetType() const
+{
+    if (function().empty()) return std::nullopt;
     return function().front()->returnType();
 }
 

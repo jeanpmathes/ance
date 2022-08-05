@@ -27,7 +27,7 @@ class Addressof
     [[nodiscard]] Expression& argument() const;
 
   public:
-    lang::ResolvingHandle<lang::Type> type() const override;
+    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
 
@@ -41,6 +41,5 @@ class Addressof
 
   private:
     std::unique_ptr<Expression>                              arg_;
-    mutable std::optional<lang::ResolvingHandle<lang::Type>> return_type_ {};
 };
 #endif

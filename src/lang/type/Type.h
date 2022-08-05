@@ -197,6 +197,8 @@ namespace lang
 
         void postResolve();
 
+        void requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
+
         /**
          * Get the default content of a value of this type.
          * @param m The module.

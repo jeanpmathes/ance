@@ -32,6 +32,12 @@ namespace lang
         [[nodiscard]] virtual bool isDefined() const = 0;
 
         /**
+         * Request a function overload from this callable. The callable can than offer this overload in later phases.
+         * The callable must be defined when requesting an overload.
+         */
+        virtual void requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) = 0;
+
+        /**
          * Add a function to this group.
          * @param function The function. Must be named like the group.
          */

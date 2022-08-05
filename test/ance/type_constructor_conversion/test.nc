@@ -5,8 +5,8 @@
 public main () : ui32
 {
     let i: size <: 12;
-    let j: ui32 <: ui32(a);
-    let k: size <: size(b);
+    let j: ui32 <: ui32(i);
+    let k: size <: size(j);
 
     let f1: single <: 12.0s;
     let f2: double <: f1;

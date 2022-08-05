@@ -20,6 +20,17 @@ lang::Scope* Expression::scope() const
     return containing_scope_;
 }
 
+lang::ResolvingHandle<lang::Type> Expression::type() const
+{
+    if (not type_.has_value())
+    {
+        type_ = tryGetType();
+        assert(type_.has_value());
+    }
+
+    return type_.value();
+}
+
 void Expression::setContainingScope(lang::Scope& scope)
 {
     containing_scope_ = &scope;

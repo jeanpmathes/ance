@@ -30,7 +30,7 @@ class BinaryOperation
     [[nodiscard]] lang::BinaryOperator op() const;
 
   public:
-    lang::ResolvingHandle<lang::Type> type() const override;
+    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
 
@@ -40,7 +40,10 @@ class BinaryOperation
     void doBuild(CompileContext* context) override;
 
   private:
-    lang::ResolvingHandle<lang::Type> getRightType() const;
+    [[nodiscard]] lang::ResolvingHandle<lang::Type> getRightType() const;
+    static lang::ResolvingHandle<lang::Type>        getRightType(lang::BinaryOperator              op,
+                                                                 lang::ResolvingHandle<lang::Type> left,
+                                                                 lang::ResolvingHandle<lang::Type> right);
 
   public:
     ~BinaryOperation() override;

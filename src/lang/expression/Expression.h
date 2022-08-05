@@ -98,9 +98,17 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
 
     /**
      * Get the return type of this expression.
+     * This operation assumes that the expression is valid, and should only be called after validation.
      * @return The type of the value of this expression.
      */
-    virtual lang::ResolvingHandle<lang::Type> type() const = 0;
+    [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
+
+    /**
+     * Try to get the type of this expression. This operation is always safe, even before validation.
+     * If a type is valid, it has to succeed.
+     * @return The type of the value of this expression, or empty.
+     */
+    [[nodiscard]] virtual std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const = 0;
 
     /**
      * Get the value returned by this expression.
@@ -130,6 +138,8 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     lang::Scope*   containing_scope_ {nullptr};
 
     std::vector<std::reference_wrapper<Expression>> subexpressions_;
+
+    mutable std::optional<lang::ResolvingHandle<lang::Type>> type_ {};
 };
 
 #endif

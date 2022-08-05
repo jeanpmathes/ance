@@ -16,6 +16,8 @@ const lang::Identifier& lang::FunctionGroup::name() const
     return name_;
 }
 
+void lang::FunctionGroup::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>>) {}
+
 void lang::FunctionGroup::resolve()
 {
     for (auto& function : functions()) function->resolve();
@@ -100,4 +102,3 @@ void lang::FunctionGroup::onAddFunction(lang::Function& function)
 {
     addChild(function);
 }
-

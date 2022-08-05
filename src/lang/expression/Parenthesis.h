@@ -30,7 +30,8 @@ class Parenthesis
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
-    lang::ResolvingHandle<lang::Type>          type() const override;
+    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
+
     [[nodiscard]] std::shared_ptr<lang::Value> getValue() const override;
 
   protected:

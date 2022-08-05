@@ -19,7 +19,7 @@ class BindRefTo
   public:
     [[nodiscard]] Expression& address() const;
 
-    lang::ResolvingHandle<lang::Type> type() const override;
+    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
 
@@ -33,8 +33,6 @@ class BindRefTo
 
   private:
     std::unique_ptr<Expression> address_;
-
-    mutable std::optional<lang::ResolvingHandle<lang::Type>> type_ {};
 };
 
 #endif

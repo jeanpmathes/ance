@@ -129,6 +129,19 @@ void lang::TypeDefinition::postResolve()
     createConstructors();
 }
 
+void lang::TypeDefinition::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters)
+{
+    for (const auto& [constructor_parameters, function] : requested_constructors_)
+    {
+        if (constructor_parameters == parameters) return;
+    }
+
+    if (acceptOverloadRequest(parameters))
+    {
+        requested_constructors_.emplace_back(std::make_pair(parameters, &createConstructor(parameters)));
+    }
+}
+
 void lang::TypeDefinition::createConstructors()
 {
     default_constructor_ = &createConstructor({});
@@ -439,6 +452,8 @@ void lang::TypeDefinition::buildNativeDefinition(CompileContext* context)
 
 void lang::TypeDefinition::defineConstructors(CompileContext* context)
 {
+    for (auto& [parameters, constructor] : requested_constructors_) { constructor->createNativeBacking(context); }
+
     if (!default_constructor_) return;
 
     default_constructor_->createNativeBacking(context);
@@ -446,6 +461,11 @@ void lang::TypeDefinition::defineConstructors(CompileContext* context)
 
 void lang::TypeDefinition::buildConstructors(CompileContext* context)
 {
+    for (auto& [parameters, constructor] : requested_constructors_)
+    {
+        buildRequestedOverload(parameters, *constructor, context);
+    }
+
     if (!default_constructor_) return;
 
     lang::PredefinedFunction& default_constructor = *default_constructor_;
@@ -624,6 +644,16 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
 
     return predefined_function;
 }
+
+bool lang::TypeDefinition::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>&)
+{
+    return false;
+}
+
+void lang::TypeDefinition::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>&,
+                                                  lang::PredefinedFunction&,
+                                                  CompileContext*)
+{}
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::self() const
 {
