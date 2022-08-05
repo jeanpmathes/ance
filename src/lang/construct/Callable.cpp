@@ -39,7 +39,8 @@ std::vector<lang::ResolvingHandle<lang::Function>> lang::Callable::resolveOverlo
     for (auto& function : functions_)
     {
         if (function->signature().isSame(arguments)) same_signatures.push_back(function.handle());
-        else if (function->signature().isMatching(arguments)) matching_signatures.push_back(function.handle());
+        else if (enableImplicitConversionOnCall() && function->signature().isMatching(arguments))
+            matching_signatures.push_back(function.handle());
     }
 
     if (same_signatures.empty()) return matching_signatures;
@@ -56,4 +57,9 @@ std::vector<lang::ResolvingHandle<lang::Function>>& lang::Callable::functions()
 const std::vector<lang::ResolvingHandle<lang::Function>>& lang::Callable::functions() const
 {
     return function_handles_;
+}
+
+bool lang::Callable::enableImplicitConversionOnCall() const
+{
+    return true;
 }

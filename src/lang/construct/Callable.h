@@ -67,6 +67,12 @@ namespace lang
         std::vector<lang::ResolvingHandle<lang::Function>>&                     functions();
         [[nodiscard]] const std::vector<lang::ResolvingHandle<lang::Function>>& functions() const;
 
+        /**
+         * Get whether implicit conversion should be considered for overload resolution.
+         * If not, the passed arguments must match the function signature exactly.
+         */
+        virtual bool enableImplicitConversionOnCall() const;
+
       private:
         std::vector<lang::OwningHandle<lang::Function>>    functions_;
         std::vector<lang::ResolvingHandle<lang::Function>> function_handles_;

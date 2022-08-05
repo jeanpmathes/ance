@@ -198,6 +198,7 @@ namespace lang
         void postResolve();
 
         void requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
+        bool enableImplicitConversionOnCall() const override;
 
         /**
          * Get the default content of a value of this type.

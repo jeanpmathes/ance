@@ -174,6 +174,11 @@ void lang::Type::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> 
     definition_->requestOverload(std::move(parameters));
 }
 
+bool lang::Type::enableImplicitConversionOnCall() const
+{
+    return false;
+}
+
 llvm::Constant* lang::Type::getDefaultContent(llvm::Module& m)
 {
     assert(isDefined());
