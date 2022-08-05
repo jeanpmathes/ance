@@ -231,6 +231,7 @@ bool lang::IntegerType::acceptOverloadRequest(const std::vector<lang::ResolvingH
     if (parameters.size() == 1)
     {
         if (parameters[0]->isIntegerType()) return true;
+        if (parameters[0]->isSizeType() || parameters[0]->isDiffType()) return true;
     }
 
     return false;
@@ -260,6 +261,7 @@ void lang::IntegerType::buildRequestedOverload(const std::vector<lang::Resolving
     if (parameters.size() == 1)
     {
         if (parameters[0]->isIntegerType()) { build_integer_conversion_ctor(); }
+        if (parameters[0]->isSizeType() || parameters[0]->isDiffType()) { build_integer_conversion_ctor(); }
     }
 }
 

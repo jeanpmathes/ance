@@ -1,11 +1,12 @@
 #include "SizeType.h"
 
-#include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/type/VoidType.h"
-#include "lang/type/BooleanType.h"
-#include "lang/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "lang/construct/PredefinedFunction.h"
+#include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/type/BooleanType.h"
+#include "lang/type/VoidType.h"
+#include "lang/utility/Values.h"
 
 lang::SizeType::SizeType(std::string name, Kind kind, llvm::Type*& backing)
     : TypeDefinition(lang::Identifier::from(name))
@@ -157,6 +158,45 @@ std::shared_ptr<lang::Value> lang::SizeType::buildOperator(lang::BinaryOperator 
     lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op, right->type());
     llvm::Value*                      native_result = lang::Values::contentToNative(result_type, result, context);
     return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
+}
+
+bool lang::SizeType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+{
+    if (parameters.size() == 1)
+    {
+        if (parameters[0]->isIntegerType()) return true;
+    }
+
+    return false;
+}
+
+void lang::SizeType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                            lang::PredefinedFunction&                             function,
+                                            CompileContext*                                       context)
+{
+    llvm::Function* native_function;
+    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
+
+    auto build_integer_conversion_ctor = [&]() {
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_function);
+        context->ir()->SetInsertPoint(block);
+        {
+            llvm::Value* original = native_function->getArg(0);
+
+            bool is_signed = isDiffType();
+
+            llvm::Value* converted = context->ir()->CreateIntCast(original,
+                                                                  getContentType(*context->llvmContext()),
+                                                                  is_signed,
+                                                                  original->getName() + ".icast");
+            context->ir()->CreateRet(converted);
+        }
+    };
+
+    if (parameters.size() == 1)
+    {
+        if (parameters[0]->isIntegerType()) { build_integer_conversion_ctor(); }
+    }
 }
 
 bool lang::SizeType::isSizeType() const
