@@ -25,11 +25,9 @@ llvm::Constant* lang::BooleanType::getDefaultContent(llvm::Module& m)
     return llvm::ConstantInt::get(getContentType(m.getContext()), 0, false);
 }
 
-llvm::Type* lang::BooleanType::getContentType(llvm::LLVMContext& c)
+llvm::Type* lang::BooleanType::getContentType(llvm::LLVMContext& c) const
 {
-    if (!native_type_) { native_type_ = llvm::Type::getInt1Ty(c); }
-
-    return native_type_;
+    return llvm::Type::getInt1Ty(c);
 }
 
 bool lang::BooleanType::isTriviallyDefaultConstructible() const
@@ -47,7 +45,7 @@ bool lang::BooleanType::isTriviallyDestructible() const
     return true;
 }
 
-std::string lang::BooleanType::createMangledName()
+std::string lang::BooleanType::createMangledName() const
 {
     return "b";
 }

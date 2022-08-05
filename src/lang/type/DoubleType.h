@@ -18,7 +18,7 @@ namespace lang
 
       public:
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
       private:
         inline static Type* instance_ = nullptr;

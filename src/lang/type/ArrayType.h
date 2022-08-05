@@ -35,7 +35,7 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
 
         llvm::Constant*  getDefaultContent(llvm::Module& m) override;
-        llvm::ArrayType* getContentType(llvm::LLVMContext& c) override;
+        llvm::ArrayType* getContentType(llvm::LLVMContext& c) const override;
 
         bool                              isSubscriptDefined() override;
         lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
@@ -67,7 +67,7 @@ namespace lang
                                                   CompileContext* context) override;
         void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext* context) override;
 
-        std::string                        createMangledName() override;
+        std::string                                      createMangledName() const override;
         llvm::DIType*                                    createDebugType(CompileContext* context) override;
         [[nodiscard]] std::vector<lang::TypeDefinition*> getDependencies() const override;
 
@@ -75,7 +75,6 @@ namespace lang
         uint64_t                          size_;
         lang::ResolvingHandle<lang::Type> element_type_;
         lang::ResolvingHandle<lang::Type> element_reference_;
-        llvm::ArrayType*                  type_ {nullptr};
 
       private:
         static lang::TypeRegistry<uint64_t>& getArrayTypes();

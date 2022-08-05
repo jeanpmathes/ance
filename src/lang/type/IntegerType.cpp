@@ -1,13 +1,14 @@
 #include "IntegerType.h"
 
-#include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/scope/GlobalScope.h"
-#include "lang/type/VoidType.h"
-#include "lang/type/SizeType.h"
-#include "lang/type/BooleanType.h"
-#include "lang/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "lang/construct/PredefinedFunction.h"
+#include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/scope/GlobalScope.h"
+#include "lang/type/BooleanType.h"
+#include "lang/type/SizeType.h"
+#include "lang/type/VoidType.h"
+#include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
 lang::IntegerType::IntegerType(uint64_t bit_size, bool is_signed)
@@ -37,11 +38,9 @@ llvm::Constant* lang::IntegerType::getDefaultContent(llvm::Module& m)
     return llvm::ConstantInt::get(getContentType(m.getContext()), 0, is_signed_);
 }
 
-llvm::Type* lang::IntegerType::getContentType(llvm::LLVMContext& c)
+llvm::Type* lang::IntegerType::getContentType(llvm::LLVMContext& c) const
 {
-    if (!type_) { type_ = llvm::Type::getIntNTy(c, bit_size_); }
-
-    return type_;
+    return llvm::Type::getIntNTy(c, bit_size_);
 }
 
 bool lang::IntegerType::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -227,6 +226,43 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
     return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
 }
 
+bool lang::IntegerType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+{
+    if (parameters.size() == 1)
+    {
+        if (parameters[0]->isIntegerType()) return true;
+    }
+
+    return false;
+}
+
+void lang::IntegerType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                               lang::PredefinedFunction&                             function,
+                                               CompileContext*                                       context)
+{
+    llvm::Function* native_function;
+    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
+
+    auto build_integer_conversion_ctor = [&]() {
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_function);
+        context->ir()->SetInsertPoint(block);
+        {
+            llvm::Value* original = native_function->getArg(0);
+
+            llvm::Value* converted = context->ir()->CreateIntCast(original,
+                                                                  getContentType(*context->llvmContext()),
+                                                                  is_signed_,
+                                                                  original->getName() + ".icast");
+            context->ir()->CreateRet(converted);
+        }
+    };
+
+    if (parameters.size() == 1)
+    {
+        if (parameters[0]->isIntegerType()) { build_integer_conversion_ctor(); }
+    }
+}
+
 bool lang::IntegerType::isTriviallyDefaultConstructible() const
 {
     return true;
@@ -242,7 +278,7 @@ bool lang::IntegerType::isTriviallyDestructible() const
     return true;
 }
 
-std::string lang::IntegerType::createMangledName()
+std::string lang::IntegerType::createMangledName() const
 {
     return std::string(name().text());
 }
@@ -286,3 +322,4 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::get(uint64_t bit_size, bool
         return type;
     }
 }
+

@@ -47,7 +47,7 @@ llvm::Constant* lang::StructType::getDefaultContent(llvm::Module& m)
     return llvm::ConstantStruct::get(getContentType(m.getContext()), values);
 }
 
-llvm::StructType* lang::StructType::getContentType(llvm::LLVMContext& c)
+llvm::StructType* lang::StructType::getContentType(llvm::LLVMContext& c) const
 {
     if (!native_type_)
     {
@@ -133,7 +133,7 @@ bool lang::StructType::validateDefinition(ValidationLogger& validation_logger) c
     return valid;
 }
 
-std::string lang::StructType::createMangledName()
+std::string lang::StructType::createMangledName() const
 {
     return "struct(" + name() + ")";
 }

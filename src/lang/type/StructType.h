@@ -25,7 +25,7 @@ namespace lang
         [[nodiscard]] StateCount getStateCount() const override;
 
         llvm::Constant*   getDefaultContent(llvm::Module& m) override;
-        llvm::StructType* getContentType(llvm::LLVMContext& c) override;
+        llvm::StructType* getContentType(llvm::LLVMContext& c) const override;
 
         [[nodiscard]] lang::AccessModifier getAccessModifier() const override;
 
@@ -47,7 +47,7 @@ namespace lang
                                                   CompileContext* context) override;
         void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext* context) override;
 
-        std::string   createMangledName() override;
+        std::string   createMangledName() const override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
         [[nodiscard]] std::vector<lang::TypeDefinition*> getDependencies() const override;
@@ -63,7 +63,7 @@ namespace lang
         std::map<lang::Identifier, int32_t>                              member_indices_ {};
         lang::Scope*                                                     scope_;
 
-        llvm::StructType* native_type_ {nullptr};
+        mutable llvm::StructType* native_type_ {nullptr};
     };
 }
 

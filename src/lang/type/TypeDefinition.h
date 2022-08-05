@@ -48,9 +48,9 @@ namespace lang
 
         void setType(lang::Type* type);
 
-        [[nodiscard]] const Identifier&  name() const;
-        const std::string&               getMangledName();
-        [[nodiscard]] lang::Location     getDefinitionLocation() const;
+        [[nodiscard]] const Identifier& name() const;
+        const std::string&              getMangledName() const;
+        [[nodiscard]] lang::Location    getDefinitionLocation() const;
         [[nodiscard]] bool               isCustom() const;
 
         [[nodiscard]] virtual StateCount getStateCount() const = 0;
@@ -82,8 +82,8 @@ namespace lang
 
         virtual llvm::Constant* getDefaultContent(llvm::Module& m) = 0;
 
-        llvm::Type*         getNativeType(llvm::LLVMContext& c);
-        virtual llvm::Type* getContentType(llvm::LLVMContext& c) = 0;
+        llvm::Type*         getNativeType(llvm::LLVMContext& c) const;
+        virtual llvm::Type* getContentType(llvm::LLVMContext& c) const = 0;
         llvm::DIType*       getDebugType(CompileContext* context);
 
         llvm::TypeSize getNativeSize(llvm::Module* m);
@@ -187,7 +187,7 @@ namespace lang
          */
         virtual void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext* context);
 
-        virtual std::string createMangledName() = 0;
+        virtual std::string createMangledName() const = 0;
 
         virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
 
@@ -240,9 +240,9 @@ namespace lang
 
       private:
         lang::Identifier name_;
-        lang::Location   location_;
-        std::string      mangled_name_ {};
-        lang::Type*      type_ {nullptr};
+        lang::Location      location_;
+        mutable std::string mangled_name_ {};
+        lang::Type*         type_ {nullptr};
         lang::Scope*     containing_scope_ {nullptr};
         llvm::DIType*    debug_type_ {nullptr};
 

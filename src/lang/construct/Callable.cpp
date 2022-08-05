@@ -5,8 +5,6 @@
 
 void lang::Callable::addFunction(lang::OwningHandle<lang::Function> function)
 {
-    assert(function->name().text() == name().text());
-
     onAddFunction(*function);
 
     functions_.push_back(std::move(function));

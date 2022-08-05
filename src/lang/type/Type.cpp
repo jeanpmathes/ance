@@ -36,7 +36,7 @@ std::string lang::Type::getAnnotatedName(bool is_safe) const
     return name;
 }
 
-const std::string& lang::Type::getMangledName()
+const std::string& lang::Type::getMangledName() const
 {
     assert(isDefined());
     return definition_->getMangledName();
@@ -185,13 +185,13 @@ llvm::Constant* lang::Type::getDefaultContent(llvm::Module& m)
     return definition_->getDefaultContent(m);
 }
 
-llvm::Type* lang::Type::getNativeType(llvm::LLVMContext& c)
+llvm::Type* lang::Type::getNativeType(llvm::LLVMContext& c) const
 {
     assert(isDefined());
     return definition_->getNativeType(c);
 }
 
-llvm::Type* lang::Type::getContentType(llvm::LLVMContext& c)
+llvm::Type* lang::Type::getContentType(llvm::LLVMContext& c) const
 {
     assert(isDefined());
     return definition_->getContentType(c);

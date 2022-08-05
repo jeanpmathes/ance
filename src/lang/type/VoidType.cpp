@@ -17,12 +17,12 @@ llvm::Constant* lang::VoidType::getDefaultContent(llvm::Module&)
     throw std::logic_error("Void does not have a default value.");
 }
 
-llvm::Type* lang::VoidType::getContentType(llvm::LLVMContext& c)
+llvm::Type* lang::VoidType::getContentType(llvm::LLVMContext& c) const
 {
     return llvm::Type::getVoidTy(c);
 }
 
-std::string lang::VoidType::createMangledName()
+std::string lang::VoidType::createMangledName() const
 {
     return std::string(name().text());
 }

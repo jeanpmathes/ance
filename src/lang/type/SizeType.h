@@ -41,7 +41,7 @@ namespace lang
         [[nodiscard]] StateCount getStateCount() const override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
         bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
@@ -86,7 +86,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        std::string   createMangledName() override;
+        std::string   createMangledName() const override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:

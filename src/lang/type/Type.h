@@ -71,7 +71,7 @@ namespace lang
          * Get the mangled name of this type. The mangled name can only be used after all type dependencies have been resolved.
          * @return The mangled name. Cannot contain any special characters, must be unique.
          */
-        const std::string& getMangledName();
+        const std::string& getMangledName() const;
 
         /**
          * Get whether this type is defined.
@@ -212,13 +212,13 @@ namespace lang
          * @param c The llvm context.
          * @return The native type.
          */
-        llvm::Type* getNativeType(llvm::LLVMContext& c);
+        llvm::Type* getNativeType(llvm::LLVMContext& c) const;
         /**
          * Get the content type. The semantic meaning of this type uses the content type.
          * @param c The llvm context.
          * @return The content type.
          */
-        llvm::Type* getContentType(llvm::LLVMContext& c);
+        llvm::Type* getContentType(llvm::LLVMContext& c) const;
 
         /**
          * Get the debug type, containing information for debuggers.

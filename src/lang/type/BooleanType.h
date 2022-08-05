@@ -18,7 +18,7 @@ namespace lang
         [[nodiscard]] bool       isBooleanType() const override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         bool                              isOperatorDefined(lang::UnaryOperator op) override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
@@ -34,7 +34,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        std::string   createMangledName() override;
+        std::string   createMangledName() const override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:
@@ -43,9 +43,6 @@ namespace lang
          * @return The boolean type.
          */
         static lang::ResolvingHandle<lang::Type> get();
-
-      private:
-        llvm::Type* native_type_ {nullptr};
     };
 }
 

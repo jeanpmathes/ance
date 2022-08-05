@@ -28,7 +28,7 @@ namespace lang
         [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
@@ -53,17 +53,21 @@ namespace lang
                                                         std::shared_ptr<Value> right,
                                                         CompileContext*        context) override;
 
+        bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
+        void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                    lang::PredefinedFunction&                             function,
+                                    CompileContext*                                       context) override;
+
       private:
-        uint64_t    bit_size_;
-        bool        is_signed_;
-        llvm::Type* type_ {nullptr};
+        uint64_t bit_size_;
+        bool     is_signed_;
 
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        std::string   createMangledName() override;
+        std::string   createMangledName() const override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:

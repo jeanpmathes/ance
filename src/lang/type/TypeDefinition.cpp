@@ -23,7 +23,7 @@ const lang::Identifier& lang::TypeDefinition::name() const
     return name_;
 }
 
-const std::string& lang::TypeDefinition::getMangledName()
+const std::string& lang::TypeDefinition::getMangledName() const
 {
     if (mangled_name_.empty()) { mangled_name_ = createMangledName(); }
 
@@ -155,7 +155,7 @@ lang::Scope* lang::TypeDefinition::scope()
     return containing_scope_;
 }
 
-llvm::Type* lang::TypeDefinition::getNativeType(llvm::LLVMContext& c)
+llvm::Type* lang::TypeDefinition::getNativeType(llvm::LLVMContext& c) const
 {
     return llvm::PointerType::get(getContentType(c), 0);
 }
@@ -622,8 +622,8 @@ std::vector<lang::TypeDefinition*> lang::TypeDefinition::getDependencies() const
 lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
     std::vector<lang::ResolvingHandle<lang::Type>> parameter_types)
 {
-    lang::OwningHandle<lang::Function> function =
-        lang::OwningHandle<lang::Function>::takeOwnership(lang::makeHandled<lang::Function>(lang::Identifier(name())));
+    lang::OwningHandle<lang::Function> function = lang::OwningHandle<lang::Function>::takeOwnership(
+        lang::makeHandled<lang::Function>(lang::Identifier::from(getMangledName())));
 
     size_t count = 1;
 

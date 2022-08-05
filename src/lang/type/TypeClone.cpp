@@ -89,7 +89,7 @@ llvm::Constant* lang::TypeClone::getDefaultContent(llvm::Module& m)
     return original_->getDefaultContent(m);
 }
 
-llvm::Type* lang::TypeClone::getContentType(llvm::LLVMContext& c)
+llvm::Type* lang::TypeClone::getContentType(llvm::LLVMContext& c) const
 {
     return original_->getContentType(c);
 }
@@ -255,7 +255,7 @@ std::vector<lang::TypeDefinition*> lang::TypeClone::getDependencies() const
 
     return dependencies;
 }
-std::string lang::TypeClone::createMangledName()
+std::string lang::TypeClone::createMangledName() const
 {
     return "clone(" + std::string(name().text()) + ")";
 }

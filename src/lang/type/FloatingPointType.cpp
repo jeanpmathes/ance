@@ -12,7 +12,7 @@ StateCount lang::FloatingPointType::getStateCount() const
     return SpecialCount::UNCOUNTABLE;
 }
 
-std::string lang::FloatingPointType::createMangledName()
+std::string lang::FloatingPointType::createMangledName() const
 {
     return std::string(name().text());
 }

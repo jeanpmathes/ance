@@ -26,7 +26,7 @@ namespace lang
         StateCount getStateCount() const override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         [[maybe_unused]] static llvm::Value* buildValue(llvm::Value* pointer, CompileContext* state);
 
@@ -39,7 +39,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        std::string   createMangledName() override;
+        std::string   createMangledName() const override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:

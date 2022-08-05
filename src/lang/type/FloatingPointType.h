@@ -11,7 +11,7 @@ namespace lang
     class FloatingPointType : virtual public lang::TypeDefinition
     {
       protected:
-        std::string   createMangledName() override;
+        std::string   createMangledName() const override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       public:

@@ -43,7 +43,7 @@ llvm::Constant* lang::ReferenceType::getDefaultContent(llvm::Module&)
     return nullptr;
 }
 
-llvm::PointerType* lang::ReferenceType::getContentType(llvm::LLVMContext& c)
+llvm::PointerType* lang::ReferenceType::getContentType(llvm::LLVMContext& c) const
 {
     return llvm::PointerType::get(element_type_->getContentType(c), 0);
 }
@@ -214,7 +214,7 @@ void lang::ReferenceType::buildNativeDeclaration(CompileContext*) {}
 
 void lang::ReferenceType::buildNativeDefinition(CompileContext*) {}
 
-std::string lang::ReferenceType::createMangledName()
+std::string lang::ReferenceType::createMangledName() const
 {
     return std::string("ref") + "(" + element_type_->getMangledName() + ")";
 }

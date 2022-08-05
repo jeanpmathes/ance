@@ -27,7 +27,7 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
 
         llvm::Constant*    getDefaultContent(llvm::Module& m) override;
-        llvm::PointerType* getContentType(llvm::LLVMContext& c) override;
+        llvm::PointerType* getContentType(llvm::LLVMContext& c) const override;
 
         bool isSubscriptDefined() override;
 
@@ -91,7 +91,7 @@ namespace lang
         lang::ResolvingHandle<lang::Type> element_type_;
 
       protected:
-        std::string   createMangledName() override;
+        std::string   createMangledName() const override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:

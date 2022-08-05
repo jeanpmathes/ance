@@ -99,7 +99,7 @@ llvm::Constant* lang::TypeAlias::getDefaultContent(llvm::Module& m)
     return actual_->getDefaultContent(m);
 }
 
-llvm::Type* lang::TypeAlias::getContentType(llvm::LLVMContext& c)
+llvm::Type* lang::TypeAlias::getContentType(llvm::LLVMContext& c) const
 {
     return actual_->getContentType(c);
 }
@@ -286,7 +286,7 @@ void lang::TypeAlias::buildNativeDefinition(CompileContext* context)
     buildConstructors(context);
 }
 
-std::string lang::TypeAlias::createMangledName()
+std::string lang::TypeAlias::createMangledName() const
 {
     return getActualType()->getMangledName();
 }

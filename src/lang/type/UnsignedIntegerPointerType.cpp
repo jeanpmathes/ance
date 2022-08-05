@@ -16,7 +16,7 @@ llvm::Constant* lang::UnsignedIntegerPointerType::getDefaultContent(llvm::Module
     return llvm::ConstantInt::get(getContentType(m.getContext()), 0, false);
 }
 
-llvm::Type* lang::UnsignedIntegerPointerType::getContentType(llvm::LLVMContext&)
+llvm::Type* lang::UnsignedIntegerPointerType::getContentType(llvm::LLVMContext&) const
 {
     return native_type_;
 }
@@ -41,7 +41,7 @@ bool lang::UnsignedIntegerPointerType::isTriviallyDestructible() const
     return true;
 }
 
-std::string lang::UnsignedIntegerPointerType::createMangledName()
+std::string lang::UnsignedIntegerPointerType::createMangledName() const
 {
     return std::string(name().text());
 }

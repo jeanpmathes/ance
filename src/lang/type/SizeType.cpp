@@ -23,7 +23,7 @@ llvm::Constant* lang::SizeType::getDefaultContent(llvm::Module& m)
     return llvm::ConstantInt::get(getContentType(m.getContext()), 0, false);
 }
 
-llvm::Type* lang::SizeType::getContentType(llvm::LLVMContext&)
+llvm::Type* lang::SizeType::getContentType(llvm::LLVMContext&) const
 {
     return backing_;
 }
@@ -189,7 +189,7 @@ bool lang::SizeType::isTriviallyDestructible() const
     return true;
 }
 
-std::string lang::SizeType::createMangledName()
+std::string lang::SizeType::createMangledName() const
 {
     return std::string(name().text());
 }

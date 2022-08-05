@@ -11,7 +11,7 @@ llvm::Constant* lang::HalfType::getDefaultContent(llvm::Module& m)
     return llvm::ConstantFP::get(getContentType(m.getContext()), 0);
 }
 
-llvm::Type* lang::HalfType::getContentType(llvm::LLVMContext& c)
+llvm::Type* lang::HalfType::getContentType(llvm::LLVMContext& c) const
 {
     return llvm::Type::getHalfTy(c);
 }

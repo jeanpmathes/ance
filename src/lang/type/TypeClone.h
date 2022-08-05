@@ -39,7 +39,7 @@ namespace lang
         void onScope() override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         bool validateDefinition(ValidationLogger& validation_logger) const override;
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
@@ -75,7 +75,7 @@ namespace lang
         void buildNativeDefinition(CompileContext* context) override;
 
       protected:
-        std::string                        createMangledName() override;
+        std::string                        createMangledName() const override;
         llvm::DIType*                      createDebugType(CompileContext* context) override;
         std::vector<lang::TypeDefinition*> getDependencies() const override;
 

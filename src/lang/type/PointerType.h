@@ -27,7 +27,7 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getActualType() const override;
 
         llvm::Constant*    getDefaultContent(llvm::Module& m) override;
-        llvm::PointerType* getContentType(llvm::LLVMContext& c) override;
+        llvm::PointerType* getContentType(llvm::LLVMContext& c) const override;
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
@@ -65,7 +65,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        std::string   createMangledName() override;
+        std::string   createMangledName() const override;
         llvm::DIType* createDebugType(CompileContext* context) override;
 
       private:

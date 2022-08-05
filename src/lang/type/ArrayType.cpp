@@ -46,11 +46,9 @@ llvm::Constant* lang::ArrayType::getDefaultContent(llvm::Module& m)
     return llvm::ConstantArray::get(getContentType(m.getContext()), content);
 }
 
-llvm::ArrayType* lang::ArrayType::getContentType(llvm::LLVMContext& c)
+llvm::ArrayType* lang::ArrayType::getContentType(llvm::LLVMContext& c) const
 {
-    if (!type_) { type_ = llvm::ArrayType::get(element_type_->getContentType(c), size_); }
-
-    return type_;
+    return llvm::ArrayType::get(element_type_->getContentType(c), size_);
 }
 
 bool lang::ArrayType::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -180,7 +178,7 @@ void lang::ArrayType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, Co
     }
 }
 
-std::string lang::ArrayType::createMangledName()
+std::string lang::ArrayType::createMangledName() const
 {
     return std::string("(") + element_type_->getMangledName() + ")x(" + std::to_string(size_) + std::string(")");
 }

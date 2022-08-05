@@ -46,14 +46,12 @@ llvm::Constant* lang::PointerType::getDefaultContent(llvm::Module& m)
     return llvm::ConstantPointerNull::get(getContentType(m.getContext()));
 }
 
-llvm::PointerType* lang::PointerType::getContentType(llvm::LLVMContext& c)
+llvm::PointerType* lang::PointerType::getContentType(llvm::LLVMContext& c) const
 {
     llvm::Type* native_type;
 
     if (element_type_->isVoidType()) { native_type = llvm::Type::getInt8PtrTy(c); }
-    else {
-        native_type = element_type_->getContentType(c);
-    }
+    else { native_type = element_type_->getContentType(c); }
 
     return llvm::PointerType::get(native_type, 0);
 }
@@ -164,7 +162,7 @@ bool lang::PointerType::isTriviallyDestructible() const
     return true;
 }
 
-std::string lang::PointerType::createMangledName()
+std::string lang::PointerType::createMangledName() const
 {
     return std::string("ptr") + "(" + element_type_->getMangledName() + ")";
 }
