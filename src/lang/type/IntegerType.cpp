@@ -238,6 +238,7 @@ bool lang::IntegerType::acceptOverloadRequest(const std::vector<lang::ResolvingH
         if (parameters[0]->isIntegerType()) return true;
         if (parameters[0]->isSizeType() || parameters[0]->isDiffType()) return true;
         if (parameters[0]->isBooleanType()) return true;
+        if (parameters[0]->isFloatingPointType()) return true;
     }
 
     return false;
@@ -270,6 +271,32 @@ void lang::IntegerType::buildRequestedOverload(const std::vector<lang::Resolving
         if (parameters[0]->isSizeType()) { build_integer_conversion_ctor(false); }
         if (parameters[0]->isDiffType()) { build_integer_conversion_ctor(true); }
         if (parameters[0]->isBooleanType()) { build_integer_conversion_ctor(false); }
+
+        if (parameters[0]->isFloatingPointType())
+        {
+            llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_function);
+            context->ir()->SetInsertPoint(block);
+            {
+                llvm::Value* original = native_function->getArg(0);
+
+                llvm::Value* converted;
+
+                if (is_signed_)
+                {
+                    converted = context->ir()->CreateFPToSI(original,
+                                                            getContentType(*context->llvmContext()),
+                                                            original->getName() + ".fptosi");
+                }
+                else
+                {
+                    converted = context->ir()->CreateFPToUI(original,
+                                                            getContentType(*context->llvmContext()),
+                                                            original->getName() + ".fptoui");
+                }
+
+                context->ir()->CreateRet(converted);
+            }
+        }
     }
 }
 

@@ -165,6 +165,7 @@ bool lang::FloatingPointType::acceptOverloadRequest(const std::vector<lang::Reso
     if (parameters.size() == 1)
     {
         if (parameters[0]->isFloatingPointType()) return true;
+        if (parameters[0]->isIntegerType()) return true;
     }
 
     return false;
@@ -189,6 +190,32 @@ void lang::FloatingPointType::buildRequestedOverload(const std::vector<lang::Res
                 llvm::Value* converted = context->ir()->CreateFPCast(original,
                                                                      getContentType(*context->llvmContext()),
                                                                      original->getName() + ".fcast");
+
+                context->ir()->CreateRet(converted);
+            }
+        }
+
+        if (parameters[0]->isIntegerType())
+        {
+            llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_function);
+            context->ir()->SetInsertPoint(block);
+            {
+                llvm::Value* original = native_function->getArg(0);
+
+                llvm::Value* converted;
+
+                if (parameters[0]->isSigned())
+                {
+                    converted = context->ir()->CreateSIToFP(original,
+                                                            getContentType(*context->llvmContext()),
+                                                            original->getName() + ".sitofp");
+                }
+                else
+                {
+                    converted = context->ir()->CreateUIToFP(original,
+                                                            getContentType(*context->llvmContext()),
+                                                            original->getName() + ".uitofp");
+                }
 
                 context->ir()->CreateRet(converted);
             }
