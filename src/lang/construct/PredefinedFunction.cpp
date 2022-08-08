@@ -60,3 +60,20 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::PredefinedFunction::getNat
 {
     return std::make_pair(native_type_, native_function_);
 }
+
+void lang::PredefinedFunction::setCallValidator(
+    std::function<bool(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>&,
+                       lang::Location,
+                       ValidationLogger&)> validator)
+{
+    call_validator_ = std::move(validator);
+}
+
+bool lang::PredefinedFunction::doCallValidation(
+    const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+    lang::Location                                                              location,
+    ValidationLogger&                                                           validation_logger) const
+{
+    if (call_validator_) { return call_validator_(arguments, location, validation_logger); }
+    return true;
+}

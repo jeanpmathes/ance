@@ -145,6 +145,14 @@ namespace lang
                                   ValidationLogger& validation_logger);
 
         /**
+         *This method is called in @see FunctionDefinition::validateCall.
+         */
+        virtual bool doCallValidation(
+            const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+            lang::Location                                                              location,
+            ValidationLogger&                                                           validation_logger) const;
+
+        /**
          * Build a call to this function.
          * @param arguments The arguments to pass to the function.
          * @param context The current compile context.

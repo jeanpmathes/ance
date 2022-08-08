@@ -44,9 +44,22 @@ namespace lang
       public:
         [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
 
+        void setCallValidator(
+            std::function<bool(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>&,
+                               lang::Location,
+                               ValidationLogger&)> validator);
+        bool doCallValidation(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+                              lang::Location                                                              location,
+                              ValidationLogger& validation_logger) const override;
+
       private:
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};
+
+        std::function<bool(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>&,
+                           lang::Location,
+                           ValidationLogger&)>
+            call_validator_ {};
     };
 }
 

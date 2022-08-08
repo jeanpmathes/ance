@@ -90,7 +90,17 @@ bool lang::FunctionDefinition::validateCall(
         valid &= lang::Type::checkMismatch(param->type(), arg_value->type(), arg_location, validation_logger);
     }
 
+    doCallValidation(arguments, location, validation_logger);
+
     return valid;
+}
+
+bool lang::FunctionDefinition::doCallValidation(
+    const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>&,
+    lang::Location,
+    ValidationLogger&) const
+{
+    return false;
 }
 
 std::shared_ptr<lang::Value> lang::FunctionDefinition::buildCall(

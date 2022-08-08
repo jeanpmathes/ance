@@ -645,6 +645,24 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
     lang::PredefinedFunction& predefined_function =
         function->defineAsPredefined(self(), parameters, *scope(), lang::Location(0, 0, 0, 0));
 
+    predefined_function.setCallValidator(
+        [this](const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+               lang::Location                                                              location,
+               ValidationLogger&                                                           validation_logger) {
+            if (arguments.size() == 1)
+            {
+                auto const& [argument, argument_location] = arguments[0];
+
+                if (argument->type()->isImplicitlyConvertibleTo(self()))
+                {
+                    validation_logger.logWarning("Unnecessary conversion constructor, use implicit conversion",
+                                                 location);
+                }
+            }
+
+            return true;
+        });
+
     self()->addFunction(std::move(function));
 
     return predefined_function;
