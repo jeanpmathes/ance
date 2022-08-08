@@ -26,6 +26,7 @@ namespace lang
 
         [[nodiscard]] bool isIntegerType() const override;
         [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
+        [[nodiscard]] bool isSigned() const override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;

@@ -78,6 +78,12 @@ bool lang::Type::isIntegerType(uint64_t bit_size, bool is_signed) const
     return definition_->isIntegerType(bit_size, is_signed);
 }
 
+bool lang::Type::isSigned() const
+{
+    assert(isDefined());
+    return definition_->isSigned();
+}
+
 bool lang::Type::isBooleanType() const
 {
     assert(isDefined());

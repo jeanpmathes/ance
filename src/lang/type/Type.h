@@ -71,7 +71,7 @@ namespace lang
          * Get the mangled name of this type. The mangled name can only be used after all type dependencies have been resolved.
          * @return The mangled name. Cannot contain any special characters, must be unique.
          */
-        const std::string& getMangledName() const;
+        [[nodiscard]] const std::string& getMangledName() const;
 
         /**
          * Get whether this type is defined.
@@ -109,6 +109,12 @@ namespace lang
          * @return True if this type is an integer type with the given size and signedness.
          */
         [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const;
+
+        /**
+         * Get whether this type is signed.
+         * @return True if this type is signed.
+         */
+        [[nodiscard]] bool isSigned() const;
 
         /**
          * Get whether this type is a boolean type.

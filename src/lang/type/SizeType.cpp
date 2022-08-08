@@ -165,6 +165,9 @@ bool lang::SizeType::acceptOverloadRequest(const std::vector<lang::ResolvingHand
     if (parameters.size() == 1)
     {
         if (parameters[0]->isIntegerType()) return true;
+        if (parameters[0]->isSizeType()) return true;
+        if (parameters[0]->isDiffType()) return true;
+        if (parameters[0]->isBooleanType()) return true;
     }
 
     return false;
@@ -177,13 +180,11 @@ void lang::SizeType::buildRequestedOverload(const std::vector<lang::ResolvingHan
     llvm::Function* native_function;
     std::tie(std::ignore, native_function) = function.getNativeRepresentation();
 
-    auto build_integer_conversion_ctor = [&]() {
+    auto build_integer_conversion_ctor = [&](bool is_signed) {
         llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_function);
         context->ir()->SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
-
-            bool is_signed = isDiffType();
 
             llvm::Value* converted = context->ir()->CreateIntCast(original,
                                                                   getContentType(*context->llvmContext()),
@@ -195,7 +196,10 @@ void lang::SizeType::buildRequestedOverload(const std::vector<lang::ResolvingHan
 
     if (parameters.size() == 1)
     {
-        if (parameters[0]->isIntegerType()) { build_integer_conversion_ctor(); }
+        if (parameters[0]->isIntegerType()) { build_integer_conversion_ctor(parameters[0]->isSigned()); }
+        if (parameters[0]->isSizeType()) { build_integer_conversion_ctor(false); }
+        if (parameters[0]->isDiffType()) { build_integer_conversion_ctor(true); }
+        if (parameters[0]->isBooleanType()) { build_integer_conversion_ctor(false); }
     }
 }
 

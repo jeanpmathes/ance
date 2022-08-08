@@ -33,6 +33,11 @@ bool lang::IntegerType::isIntegerType(uint64_t bit_size, bool is_signed) const
     return (bit_size_ == bit_size) && (is_signed_ == is_signed);
 }
 
+bool lang::IntegerType::isSigned() const
+{
+    return is_signed_;
+}
+
 llvm::Constant* lang::IntegerType::getDefaultContent(llvm::Module& m)
 {
     return llvm::ConstantInt::get(getContentType(m.getContext()), 0, is_signed_);
@@ -232,6 +237,7 @@ bool lang::IntegerType::acceptOverloadRequest(const std::vector<lang::ResolvingH
     {
         if (parameters[0]->isIntegerType()) return true;
         if (parameters[0]->isSizeType() || parameters[0]->isDiffType()) return true;
+        if (parameters[0]->isBooleanType()) return true;
     }
 
     return false;
@@ -244,7 +250,7 @@ void lang::IntegerType::buildRequestedOverload(const std::vector<lang::Resolving
     llvm::Function* native_function;
     std::tie(std::ignore, native_function) = function.getNativeRepresentation();
 
-    auto build_integer_conversion_ctor = [&]() {
+    auto build_integer_conversion_ctor = [&](bool is_signed) {
         llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_function);
         context->ir()->SetInsertPoint(block);
         {
@@ -252,7 +258,7 @@ void lang::IntegerType::buildRequestedOverload(const std::vector<lang::Resolving
 
             llvm::Value* converted = context->ir()->CreateIntCast(original,
                                                                   getContentType(*context->llvmContext()),
-                                                                  is_signed_,
+                                                                  is_signed,
                                                                   original->getName() + ".icast");
             context->ir()->CreateRet(converted);
         }
@@ -260,8 +266,10 @@ void lang::IntegerType::buildRequestedOverload(const std::vector<lang::Resolving
 
     if (parameters.size() == 1)
     {
-        if (parameters[0]->isIntegerType()) { build_integer_conversion_ctor(); }
-        if (parameters[0]->isSizeType() || parameters[0]->isDiffType()) { build_integer_conversion_ctor(); }
+        if (parameters[0]->isIntegerType()) { build_integer_conversion_ctor(parameters[0]->isSigned()); }
+        if (parameters[0]->isSizeType()) { build_integer_conversion_ctor(false); }
+        if (parameters[0]->isDiffType()) { build_integer_conversion_ctor(true); }
+        if (parameters[0]->isBooleanType()) { build_integer_conversion_ctor(false); }
     }
 }
 
@@ -324,4 +332,3 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::get(uint64_t bit_size, bool
         return type;
     }
 }
-

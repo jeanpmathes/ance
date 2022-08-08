@@ -2,6 +2,7 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/construct/Function.h"
+#include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/Type.h"
@@ -104,4 +105,47 @@ std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperato
     lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op);
     llvm::Value*                      native_result = lang::Values::contentToNative(result_type, result, context);
     return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
+}
+
+bool lang::BooleanType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+{
+    if (parameters.size() == 1)
+    {
+        return parameters[0]->isIntegerType() || parameters[0]->isSizeType() || parameters[0]->isDiffType();
+    }
+
+    return false;
+}
+
+void lang::BooleanType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                               lang::PredefinedFunction&                             function,
+                                               CompileContext*                                       context)
+{
+    llvm::Function* native_function;
+    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
+
+    if (parameters.size() == 1)
+    {
+        if (parameters[0]->isIntegerType() || parameters[0]->isSizeType() || parameters[0]->isDiffType())
+        {
+            llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_function);
+            context->ir()->SetInsertPoint(block);
+            {
+                llvm::Value* original = native_function->getArg(0);
+
+                llvm::Value* is_nonzero =
+                    context->ir()->CreateICmpNE(original,
+                                                llvm::ConstantInt::get(original->getType(), 0, false),
+                                                ".icmp");
+
+                llvm::Value* converted =
+                    context->ir()->CreateSelect(is_nonzero,
+                                                llvm::ConstantInt::getTrue(getContentType(*context->llvmContext())),
+                                                llvm::ConstantInt::getFalse(getContentType(*context->llvmContext())),
+                                                ".select");
+
+                context->ir()->CreateRet(converted);
+            }
+        }
+    }
 }

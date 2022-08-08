@@ -57,6 +57,7 @@ namespace lang
 
         [[nodiscard]] virtual bool isIntegerType() const;
         [[nodiscard]] virtual bool isIntegerType(uint64_t bit_size, bool is_signed) const;
+        [[nodiscard]] virtual bool isSigned() const;
         [[nodiscard]] virtual bool isBooleanType() const;
         [[nodiscard]] virtual bool isFloatingPointType() const;
         [[nodiscard]] virtual bool isFloatingPointType(size_t precision) const;

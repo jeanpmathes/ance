@@ -50,6 +50,11 @@ bool lang::TypeDefinition::isIntegerType(uint64_t, bool) const
     return false;
 }
 
+bool lang::TypeDefinition::isSigned() const
+{
+    return false;
+}
+
 bool lang::TypeDefinition::isBooleanType() const
 {
     return false;
