@@ -96,16 +96,6 @@ namespace lang
                                   lang::Location                                       definition_location);
 
         /**
-         * Define a type that behaves like another type.
-         * @param name The name of the new type.
-         * @param original The original type.
-         */
-        void defineTypeAsOther(Identifier                        name,
-                               lang::ResolvingHandle<lang::Type> original,
-                               lang::Location                    definition_location,
-                               lang::Location                    original_type_location);
-
-        /**
          * Define a type that is an alias for another type.
          * @param name The name of the alias.
          * @param actual The other type.

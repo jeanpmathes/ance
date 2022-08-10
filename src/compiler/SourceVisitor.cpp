@@ -217,16 +217,6 @@ antlrcpp::Any SourceVisitor::visitParameter(anceParser::ParameterContext* ctx)
     return new lang::Parameter(type, location(ctx->type()), identifier, location(ctx));
 }
 
-antlrcpp::Any SourceVisitor::visitDefineAs(anceParser::DefineAsContext* ctx)
-{
-    lang::ResolvingHandle<lang::Type> other      = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
-    lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
-
-    application_.globalScope().defineTypeAsOther(identifier, other, location(ctx), location(ctx->type()));
-
-    return {};
-}
-
 antlrcpp::Any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ctx)
 {
     lang::ResolvingHandle<lang::Type> other      = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();

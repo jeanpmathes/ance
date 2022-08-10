@@ -193,12 +193,6 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const;
 
         /**
-         * Get the original type.
-         * @return The original type, or the type itself if it already is an original type.
-         */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> getOriginalType() const;
-
-        /**
          * Get the access modifier for this type.
          * @return The access modifier.
          */

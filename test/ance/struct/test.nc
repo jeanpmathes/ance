@@ -3,7 +3,6 @@
 // The language allows to define structs, which hold together values.
 
 public define DataAlias alias Data;
-public define DataClone as Data;
 
 public struct Data
 {
@@ -12,7 +11,6 @@ public struct Data
     private x3: Vector3s;
     private x4: *Data;
     private x5: *DataAlias;
-    private x6: *DataClone;
 }
 
 private struct Vector3s

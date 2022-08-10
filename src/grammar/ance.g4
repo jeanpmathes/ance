@@ -22,13 +22,8 @@ parameter
 	;
 
 typeDefinition
-    : defineAs
-    | defineAlias
+    : defineAlias
     | structDefinition
-    ;
-
-defineAs
-    : accessModifier 'define' IDENTIFIER 'as' type ';'
     ;
 
 defineAlias

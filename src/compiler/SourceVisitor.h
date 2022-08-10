@@ -32,7 +32,6 @@ class SourceVisitor : public anceBaseVisitor
     antlrcpp::Any visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx) override;
     antlrcpp::Any visitParameters(anceParser::ParametersContext* ctx) override;
     antlrcpp::Any visitParameter(anceParser::ParameterContext* ctx) override;
-    antlrcpp::Any visitDefineAs(anceParser::DefineAsContext* ctx) override;
     antlrcpp::Any visitDefineAlias(anceParser::DefineAliasContext* ctx) override;
 
     // Statements

@@ -39,8 +39,6 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
-    virtual antlrcpp::Any visitDefineAs(anceParser::DefineAsContext* ctx) override { return visitChildren(ctx); }
-
     virtual antlrcpp::Any visitDefineAlias(anceParser::DefineAliasContext* ctx) override { return visitChildren(ctx); }
 
     virtual antlrcpp::Any visitStructDefinition(anceParser::StructDefinitionContext* ctx) override

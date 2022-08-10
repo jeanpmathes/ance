@@ -13,7 +13,6 @@ target_sources(ance PRIVATE
                ReferenceType.cpp
                FloatingPointType.cpp
                TypeDefinition.cpp
-               TypeClone.cpp
                TypeAlias.cpp
                StructType.cpp
                BooleanType.cpp)

@@ -7,7 +7,7 @@
 private std_out: Handle;
 private null_ptr: uiptr;
 
-public define Handle as *void;
+public define Handle alias *void;
 
 public main () : ui32
 {

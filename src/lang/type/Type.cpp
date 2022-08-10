@@ -163,12 +163,6 @@ lang::ResolvingHandle<lang::Type> lang::Type::getActualType() const
     return definition_->getActualType();
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::getOriginalType() const
-{
-    assert(isDefined());
-    return definition_->getOriginalType();
-}
-
 lang::AccessModifier lang::Type::getAccessModifier() const
 {
     assert(isDefined());

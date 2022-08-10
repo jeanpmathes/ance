@@ -6,7 +6,7 @@
 private std_out: Handle;
 private null_ptr: uiptr;
 
-public define Handle as *void;
+public define Handle alias *void;
 
 // Defined functions must be public or private.
 
@@ -32,7 +32,7 @@ private write (str: *ui8, len: ui32) : void
     WriteFile(std_out, str, len, written, null_ptr);
 }
 
-// Functions can be declared as extern.
+// Functions can be declared alias extern.
 
 extern WriteFile (hFile: Handle, lpBuffer: *ui8, nNumberOfBytesToWrite: ui32, lpNumberOfBytesWritten: *ui32, lpOverlapped: uiptr);
 extern GetStdHandle (nStdHandle: ui32) : Handle;

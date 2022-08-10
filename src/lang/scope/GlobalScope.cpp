@@ -8,7 +8,6 @@
 #include "lang/expression/ConstantExpression.h"
 #include "lang/type/IntegerType.h"
 #include "lang/type/TypeAlias.h"
-#include "lang/type/TypeClone.h"
 #include "validation/ValidationLogger.h"
 #include "lang/type/StructType.h"
 
@@ -154,30 +153,6 @@ void lang::GlobalScope::defineCustomFunction(Identifier                         
     lang::OwningHandle<lang::Function> defined = std::move(undefined);
 
     group->addFunction(std::move(defined));
-}
-
-void lang::GlobalScope::defineTypeAsOther(Identifier                        name,
-                                          lang::ResolvingHandle<lang::Type> original,
-                                          lang::Location                    definition_location,
-                                          lang::Location                    original_type_location)
-{
-    if (defined_names_.contains(name))
-    {
-        duplicated_names_.emplace_back(name, definition_location);
-        return;
-    }
-
-    defined_names_.emplace(name);
-
-    lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
-    std::unique_ptr<lang::TypeDefinition> cloned_definition =
-        std::make_unique<lang::TypeClone>(name, original, definition_location, original_type_location);
-
-    undefined->define(std::move(cloned_definition));
-    lang::OwningHandle<lang::Type> defined = std::move(undefined);
-
-    defined_types_[name] = std::move(defined);
-    defined_types_[name]->setContainingScope(this);
 }
 
 void lang::GlobalScope::defineTypeAliasOther(Identifier                        name,
