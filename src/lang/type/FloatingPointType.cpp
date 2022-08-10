@@ -91,7 +91,7 @@ lang::ResolvingHandle<lang::Type> lang::FloatingPointType::getOperatorResultType
     if (op.isArithmetic()) return self()->getActualType();
     if (op.isRelational() || op.isEquality()) return lang::BooleanType::get();
 
-    return lang::VoidType::get();
+    return lang::Type::getUndefined();
 }
 
 bool lang::FloatingPointType::validateOperator(lang::BinaryOperator,

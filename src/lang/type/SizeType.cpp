@@ -73,7 +73,7 @@ lang::ResolvingHandle<lang::Type> lang::SizeType::getOperatorResultType(lang::Bi
     if (op.isArithmetic()) return self()->getActualType();
     if (op.isRelational() || op.isEquality()) return lang::BooleanType::get();
 
-    return lang::VoidType::get();
+    return lang::Type::getUndefined();
 }
 
 bool lang::SizeType::validateOperator(lang::BinaryOperator,

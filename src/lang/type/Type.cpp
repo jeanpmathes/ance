@@ -8,7 +8,10 @@
 #include "lang/utility/Identifier.h"
 #include "validation/ValidationLogger.h"
 
-lang::Type::Type(Identifier name) : name_(std::move(name)) {}
+lang::Type::Type(Identifier name) : name_(std::move(name))
+{
+    assert(not name_.text().empty());
+}
 
 lang::Type::Type(std::unique_ptr<lang::TypeDefinition> definition)
     : name_(definition->name())
@@ -17,12 +20,20 @@ lang::Type::Type(std::unique_ptr<lang::TypeDefinition> definition)
     definition_->setType(this);
 }
 
+lang::Type::Type() : name_(lang::Identifier::from("")) {}
+
+lang::ResolvingHandle<lang::Type> lang::Type::getUndefined()
+{
+    static ResolvingHandle<Type> undefined(std::unique_ptr<Type>(new Type()));
+    return undefined;
+}
+
 const lang::Identifier& lang::Type::name() const
 {
+    static const lang::Identifier undefined = lang::Identifier::from("undefined");
+
     if (isDefined()) { return definition_->name(); }
-    else {
-        return name_;
-    }
+    else { return name_.text().empty() ? undefined : name_; }
 }
 
 std::string lang::Type::getAnnotatedName(bool is_safe) const
@@ -50,6 +61,8 @@ bool lang::Type::isDefined() const
 void lang::Type::define(std::unique_ptr<lang::TypeDefinition> definition)
 {
     assert(!isDefined());
+    assert(!name_.text().empty() && "Cannot define the undefined type.");
+
     definition_ = std::move(definition);
     definition_->setType(this);
 }

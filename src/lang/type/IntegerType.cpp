@@ -150,7 +150,7 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang:
     if (op.isArithmetic()) return self()->getActualType();
     if (op.isRelational() || op.isEquality()) return lang::BooleanType::get();
 
-    return lang::VoidType::get();
+    return lang::Type::getUndefined();
 }
 
 bool lang::IntegerType::validateOperator(lang::BinaryOperator,

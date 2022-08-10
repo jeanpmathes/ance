@@ -97,7 +97,7 @@ bool lang::TypeDefinition::isReferenceType() const
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getElementType() const
 {
-    return lang::VoidType::get();
+    return lang::Type::getUndefined();
 }
 
 void lang::TypeDefinition::setType(lang::Type* type)
@@ -193,7 +193,7 @@ bool lang::TypeDefinition::isSubscriptDefined()
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getSubscriptReturnType()
 {
-    return lang::VoidType::get();
+    return lang::Type::getUndefined();
 }
 
 bool lang::TypeDefinition::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type>)
@@ -209,12 +209,12 @@ bool lang::TypeDefinition::isOperatorDefined(lang::UnaryOperator)
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getOperatorResultType(lang::BinaryOperator,
                                                                               lang::ResolvingHandle<lang::Type>)
 {
-    return lang::VoidType::get();
+    return lang::Type::getUndefined();
 }
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getOperatorResultType(lang::UnaryOperator)
 {
-    return lang::VoidType::get();
+    return lang::Type::getUndefined();
 }
 
 bool lang::TypeDefinition::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type>)
@@ -229,7 +229,7 @@ bool lang::TypeDefinition::hasMember(const lang::Identifier&)
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getMemberType(const lang::Identifier&)
 {
-    return lang::VoidType::get();
+    return lang::Type::getUndefined();
 }
 
 bool lang::TypeDefinition::definesIndirection()
@@ -239,7 +239,7 @@ bool lang::TypeDefinition::definesIndirection()
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getIndirectionType()
 {
-    return lang::VoidType::get();
+    return lang::Type::getUndefined();
 }
 
 bool lang::TypeDefinition::validateDefinition(ValidationLogger&) const

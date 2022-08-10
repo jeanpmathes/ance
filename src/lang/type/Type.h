@@ -50,9 +50,18 @@ namespace lang
          */
         explicit Type(std::unique_ptr<lang::TypeDefinition> definition);
 
+      private:
+        Type();
+
       public:
         Type(const Type&) = delete;
         Type(Type&&)      = delete;
+
+        /**
+         * Get a special undefined type that cannot be defined.
+         * @return The undefined type.
+         */
+        static lang::ResolvingHandle<lang::Type> getUndefined();
 
         /**
          * Get the name of this type.
