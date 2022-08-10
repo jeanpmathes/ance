@@ -38,6 +38,11 @@ StateCount lang::StructType::getStateCount() const
     return SpecialCount::ABSTRACT;
 }
 
+bool lang::StructType::isStructType() const
+{
+    return true;
+}
+
 llvm::Constant* lang::StructType::getDefaultContent(llvm::Module& m)
 {
     std::vector<llvm::Constant*> values;

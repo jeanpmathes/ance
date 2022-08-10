@@ -145,6 +145,12 @@ bool lang::Type::isReferenceType() const
     return definition_->isReferenceType();
 }
 
+bool lang::Type::isStructType() const
+{
+    assert(isDefined());
+    return definition_->isStructType();
+}
+
 lang::ResolvingHandle<lang::Type> lang::Type::getElementType() const
 {
     assert(isDefined());

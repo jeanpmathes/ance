@@ -95,6 +95,11 @@ bool lang::TypeDefinition::isReferenceType() const
     return false;
 }
 
+bool lang::TypeDefinition::isStructType() const
+{
+    return false;
+}
+
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getElementType() const
 {
     return lang::Type::getUndefined();

@@ -175,6 +175,12 @@ namespace lang
         [[nodiscard]] bool isReferenceType() const;
 
         /**
+         * Get whether this type is a struct type.
+         * @return True if this type is a struct type.
+         */
+        [[nodiscard]] bool isStructType() const;
+
+        /**
          * Get the element type of this type. A type can have only exactly one element type. Currently, only arrays, pointers and references have element types.
          * @return The element type, or void if this type has no element type.
          */

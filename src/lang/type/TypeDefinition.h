@@ -66,6 +66,7 @@ namespace lang
         [[nodiscard]] virtual bool isVoidType() const;
         [[nodiscard]] virtual bool isPointerType() const;
         [[nodiscard]] virtual bool isReferenceType() const;
+        [[nodiscard]] virtual bool isStructType() const;
 
         [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getElementType() const;
 
