@@ -194,7 +194,7 @@ void lang::GlobalScope::defineStruct(lang::AccessModifier                       
 
     lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
     std::unique_ptr<lang::TypeDefinition> struct_definition =
-        std::make_unique<lang::StructType>(access, name, std::move(members), this, definition_location);
+        std::make_unique<lang::StructType>(access, name, std::move(members), definition_location);
 
     undefined->define(std::move(struct_definition));
     lang::OwningHandle<lang::Type> defined = std::move(undefined);

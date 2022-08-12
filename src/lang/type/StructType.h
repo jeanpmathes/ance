@@ -19,7 +19,6 @@ namespace lang
         StructType(lang::AccessModifier                       access_modifier,
                    lang::Identifier                           name,
                    std::vector<std::unique_ptr<lang::Member>> members,
-                   lang::Scope*                               scope,
                    lang::Location                             location);
 
         [[nodiscard]] StateCount getStateCount() const override;
@@ -62,7 +61,6 @@ namespace lang
         std::vector<std::unique_ptr<lang::Member>>                       members_;
         std::map<lang::Identifier, std::reference_wrapper<lang::Member>> member_map_ {};
         std::map<lang::Identifier, int32_t>                              member_indices_ {};
-        lang::Scope*                                                     scope_;
 
         mutable llvm::StructType* native_type_ {nullptr};
     };

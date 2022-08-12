@@ -14,12 +14,10 @@
 lang::StructType::StructType(lang::AccessModifier                       access_modifier,
                              lang::Identifier                           name,
                              std::vector<std::unique_ptr<lang::Member>> members,
-                             lang::Scope*                               scope,
                              lang::Location                             location)
     : TypeDefinition(name, location)
     , access_(access_modifier)
     , members_(std::move(members))
-    , scope_(scope)
 {
     int32_t index = 0;
 
@@ -156,7 +154,7 @@ llvm::DIType* lang::StructType::createDebugType(CompileContext* context)
 
     llvm::MDTuple* debug_type = llvm::MDNode::get(*context->llvmContext(), member_types);
 
-    return context->di()->createStructType(scope_->getDebugScope(context),
+    return context->di()->createStructType(scope()->getDebugScope(context),
                                            name().text(),
                                            context->sourceFile(),
                                            getDefinitionLocation().line(),
