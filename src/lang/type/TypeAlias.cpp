@@ -1,10 +1,11 @@
 #include "TypeAlias.h"
 
+#include "compiler/CompileContext.h"
 #include "lang/scope/Scope.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
-#include "validation/ValidationLogger.h"
 #include "lang/utility/Identifier.h"
+#include "validation/ValidationLogger.h"
 
 lang::TypeAlias::TypeAlias(lang::Identifier                  name,
                            lang::ResolvingHandle<lang::Type> actual,
@@ -293,7 +294,11 @@ std::string lang::TypeAlias::createMangledName() const
 
 llvm::DIType* lang::TypeAlias::createDebugType(CompileContext* context)
 {
-    return actual_->getDebugType(context);
+    return context->di()->createTypedef(actual_->getDebugType(context),
+                                        name().text(),
+                                        context->sourceFile(),
+                                        getDefinitionLocation().line(),
+                                        scope()->getDebugScope(context));
 }
 
 std::vector<lang::TypeDefinition*> lang::TypeAlias::getDependencies() const
