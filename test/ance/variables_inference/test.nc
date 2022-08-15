@@ -2,9 +2,9 @@
 
 // The type of local variable is not required to be declared explicitly.
 
-define ONE alias ui8;
-define TWO alias ui16;
-define FOUR alias ui32;
+public define ONE alias ui8;
+public define TWO alias ui16;
+public define FOUR alias ui32;
 
 public main () : ui32
 {
