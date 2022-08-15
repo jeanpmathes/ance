@@ -17,7 +17,7 @@ public main () : ui32
     let l1: ui32;
 
     let l2: ui32 <: 100:32;
-    let l3: ui32:= 100:32; // Final variable.
+    let l3: ui32 := 100:32; // Final variable.
 
     return 0:32;
 }
