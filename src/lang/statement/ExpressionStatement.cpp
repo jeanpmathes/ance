@@ -33,7 +33,7 @@ Statements ExpressionStatement::expandWith(Expressions subexpressions, Statement
     return statements;
 }
 
-void ExpressionStatement::doBuild(CompileContext* context)
+void ExpressionStatement::doBuild(CompileContext& context)
 {
     expression_->build(context);
 }

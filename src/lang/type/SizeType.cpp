@@ -43,15 +43,15 @@ bool lang::SizeType::validateImplicitConversion(lang::ResolvingHandle<lang::Type
 
 std::shared_ptr<lang::Value> lang::SizeType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                                      std::shared_ptr<Value>            value,
-                                                                     CompileContext*                   context)
+                                                                     CompileContext&                   context)
 {
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
 
-    llvm::Value* converted_value      = context->ir()->CreateIntCast(content_value,
-                                                                other->getContentType(*context->llvmContext()),
-                                                                false,
-                                                                content_value->getName() + ".icast");
+    llvm::Value* converted_value      = context.ir()->CreateIntCast(content_value,
+                                                               other->getContentType(*context.llvmContext()),
+                                                               false,
+                                                               content_value->getName() + ".icast");
     llvm::Value* native_content_value = lang::Values::contentToNative(other, converted_value, context);
 
     return std::make_shared<WrappedNativeValue>(other, native_content_value);
@@ -88,7 +88,7 @@ bool lang::SizeType::validateOperator(lang::BinaryOperator,
 std::shared_ptr<lang::Value> lang::SizeType::buildOperator(lang::BinaryOperator   op,
                                                            std::shared_ptr<Value> left,
                                                            std::shared_ptr<Value> right,
-                                                           CompileContext*        context)
+                                                           CompileContext&        context)
 {
     right = lang::Type::getValueOrReferencedValue(right, context);
 
@@ -103,55 +103,55 @@ std::shared_ptr<lang::Value> lang::SizeType::buildOperator(lang::BinaryOperator 
     switch (op)
     {
         case lang::BinaryOperator::ADDITION:
-            result = context->ir()->CreateAdd(left_value, right_value, left_value->getName() + ".add");
+            result = context.ir()->CreateAdd(left_value, right_value, left_value->getName() + ".add");
             break;
         case lang::BinaryOperator::SUBTRACTION:
-            result = context->ir()->CreateSub(left_value, right_value, left_value->getName() + ".sub");
+            result = context.ir()->CreateSub(left_value, right_value, left_value->getName() + ".sub");
             break;
         case lang::BinaryOperator::MULTIPLICATION:
-            result = context->ir()->CreateMul(left_value, right_value, left_value->getName() + ".mul");
+            result = context.ir()->CreateMul(left_value, right_value, left_value->getName() + ".mul");
             break;
         case lang::BinaryOperator::DIVISION:
             if (isSizeType())
-                result = context->ir()->CreateUDiv(left_value, right_value, left_value->getName() + ".udiv");
+                result = context.ir()->CreateUDiv(left_value, right_value, left_value->getName() + ".udiv");
             if (isDiffType())
-                result = context->ir()->CreateSDiv(left_value, right_value, left_value->getName() + ".sdiv");
+                result = context.ir()->CreateSDiv(left_value, right_value, left_value->getName() + ".sdiv");
             break;
         case lang::BinaryOperator::REMAINDER:
             if (isSizeType())
-                result = context->ir()->CreateURem(left_value, right_value, left_value->getName() + ".urem");
+                result = context.ir()->CreateURem(left_value, right_value, left_value->getName() + ".urem");
             if (isDiffType())
-                result = context->ir()->CreateSRem(left_value, right_value, left_value->getName() + ".srem");
+                result = context.ir()->CreateSRem(left_value, right_value, left_value->getName() + ".srem");
             break;
         case lang::BinaryOperator::LESS_THAN:
             if (isSizeType())
-                result = context->ir()->CreateICmpULT(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpULT(left_value, right_value, left_value->getName() + ".icmp");
             if (isDiffType())
-                result = context->ir()->CreateICmpSLT(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpSLT(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::LESS_THAN_OR_EQUAL:
             if (isSizeType())
-                result = context->ir()->CreateICmpULE(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpULE(left_value, right_value, left_value->getName() + ".icmp");
             if (isDiffType())
-                result = context->ir()->CreateICmpSLE(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpSLE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::GREATER_THAN:
             if (isSizeType())
-                result = context->ir()->CreateICmpUGT(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpUGT(left_value, right_value, left_value->getName() + ".icmp");
             if (isDiffType())
-                result = context->ir()->CreateICmpSGT(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpSGT(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::GREATER_THAN_OR_EQUAL:
             if (isSizeType())
-                result = context->ir()->CreateICmpUGE(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpUGE(left_value, right_value, left_value->getName() + ".icmp");
             if (isDiffType())
-                result = context->ir()->CreateICmpSGE(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpSGE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::EQUAL:
-            result = context->ir()->CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir()->CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::NOT_EQUAL:
-            result = context->ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
             break;
     }
 
@@ -175,22 +175,22 @@ bool lang::SizeType::acceptOverloadRequest(const std::vector<lang::ResolvingHand
 
 void lang::SizeType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
                                             lang::PredefinedFunction&                             function,
-                                            CompileContext*                                       context)
+                                            CompileContext&                                       context)
 {
     llvm::Function* native_function;
     std::tie(std::ignore, native_function) = function.getNativeRepresentation();
 
     auto build_integer_conversion_ctor = [&](bool is_signed) {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_function);
-        context->ir()->SetInsertPoint(block);
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
 
-            llvm::Value* converted = context->ir()->CreateIntCast(original,
-                                                                  getContentType(*context->llvmContext()),
-                                                                  is_signed,
-                                                                  original->getName() + ".icast");
-            context->ir()->CreateRet(converted);
+            llvm::Value* converted = context.ir()->CreateIntCast(original,
+                                                                 getContentType(*context.llvmContext()),
+                                                                 is_signed,
+                                                                 original->getName() + ".icast");
+            context.ir()->CreateRet(converted);
         }
     };
 
@@ -238,18 +238,18 @@ std::string lang::SizeType::createMangledName() const
     return std::string(name().text());
 }
 
-llvm::DIType* lang::SizeType::createDebugType(CompileContext* context)
+llvm::DIType* lang::SizeType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl = context->module()->getDataLayout();
+    const llvm::DataLayout& dl = context.module()->getDataLayout();
 
     std::string           name         = std::string(this->name().text());
-    uint64_t              size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
+    uint64_t              size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
     llvm::dwarf::TypeKind encoding;
 
     if (backing_ == size_backing_type_) encoding = llvm::dwarf::DW_ATE_unsigned;
     if (backing_ == diff_backing_type_) encoding = llvm::dwarf::DW_ATE_signed;
 
-    return context->di()->createBasicType(name, size_in_bits, encoding);
+    return context.di()->createBasicType(name, size_in_bits, encoding);
 }
 
 void lang::SizeType::init(llvm::LLVMContext& c, Application& app)

@@ -63,7 +63,7 @@ llvm::DIFile* CompileContext::sourceFile()
 void CompileContext::setDebugLocation(lang::Location location, lang::Scope* scope)
 {
     llvm::DebugLoc previous_location = ir()->getCurrentDebugLocation();
-    ir()->SetCurrentDebugLocation(location.getDebugLoc(llvmContext(), scope->getDebugScope(this)));
+    ir()->SetCurrentDebugLocation(location.getDebugLoc(llvmContext(), scope->getDebugScope(*this)));
 
     debug_loc_stack_.push(previous_location);
 }

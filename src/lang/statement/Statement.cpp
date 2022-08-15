@@ -111,11 +111,11 @@ Statements Statement::expand() const
     return final;
 }
 
-void Statement::build(CompileContext* context)
+void Statement::build(CompileContext& context)
 {
-    context->setDebugLocation(location(), scope());
+    context.setDebugLocation(location(), scope());
     doBuild(context);
-    context->resetDebugLocation();
+    context.resetDebugLocation();
 }
 
 void Statement::addSubexpression(Expression& subexpression)

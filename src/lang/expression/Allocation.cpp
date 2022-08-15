@@ -93,13 +93,13 @@ Expression::Expansion Allocation::expandWith(Expressions subexpressions) const
     }
 }
 
-void Allocation::doBuild(CompileContext* context)
+void Allocation::doBuild(CompileContext& context)
 {
     std::shared_ptr<lang::Value> count = {};
 
     if (count_) { count = lang::Type::makeMatching(lang::SizeType::getSize(), count_->getValue(), context); }
 
-    std::shared_ptr<lang::Value> ptr = context->runtime()->allocate(allocation_, allocated_type_, count, context);
+    std::shared_ptr<lang::Value> ptr = context.runtime()->allocate(allocation_, allocated_type_, count, context);
     setValue(ptr);
 }
 

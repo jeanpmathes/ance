@@ -61,13 +61,13 @@ Expression::Expansion VariableAccess::expandWith(Expressions) const
     return {Statements(), std::make_unique<VariableAccess>(variable_->toUndefined(), location()), Statements()};
 }
 
-void VariableAccess::doBuild(CompileContext* context)
+void VariableAccess::doBuild(CompileContext& context)
 {
     std::shared_ptr<lang::Value> value = variable_->getValue(context);
     setValue(value);
 }
 
-void VariableAccess::doAssign(std::shared_ptr<lang::Value> value, CompileContext* context)
+void VariableAccess::doAssign(std::shared_ptr<lang::Value> value, CompileContext& context)
 {
     variable_->setValue(value, context);
 }

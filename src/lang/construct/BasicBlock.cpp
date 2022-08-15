@@ -253,7 +253,7 @@ lang::Location lang::BasicBlock::getEndLocation()
     return definition_->getEndLocation();
 }
 
-void lang::BasicBlock::prepareBuild(CompileContext* context, llvm::Function* native_function)
+void lang::BasicBlock::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
     if (build_prepared_) return;
     build_prepared_ = true;
@@ -262,7 +262,7 @@ void lang::BasicBlock::prepareBuild(CompileContext* context, llvm::Function* nat
     definition_->prepareBuild(context, native_function);
 }
 
-void lang::BasicBlock::doBuild(CompileContext* context)
+void lang::BasicBlock::doBuild(CompileContext& context)
 {
     if (build_done_) return;
     build_done_ = true;

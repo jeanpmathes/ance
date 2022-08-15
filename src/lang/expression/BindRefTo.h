@@ -26,7 +26,7 @@ class BindRefTo
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
-    void doBuild(CompileContext* context) override;
+    void doBuild(CompileContext& context) override;
 
   public:
     ~BindRefTo() override;

@@ -39,7 +39,7 @@ namespace lang
                                                                 ValidationLogger&                 validation_logger) const override;
         std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                              std::shared_ptr<Value>            value,
-                                                             CompileContext*                   context) override;
+                                                             CompileContext&                   context) override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other) override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
@@ -52,12 +52,12 @@ namespace lang
         std::shared_ptr<lang::Value>      buildOperator(lang::BinaryOperator   op,
                                                         std::shared_ptr<Value> left,
                                                         std::shared_ptr<Value> right,
-                                                        CompileContext*        context) override;
+                                                        CompileContext&        context) override;
 
         bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
         void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
                                     lang::PredefinedFunction&                             function,
-                                    CompileContext*                                       context) override;
+                                    CompileContext&                                       context) override;
 
       private:
         uint64_t bit_size_;
@@ -69,7 +69,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext* context) override;
+        llvm::DIType* createDebugType(CompileContext& context) override;
 
       private:
         static lang::TypeRegistry<std::pair<uint64_t, bool>>& getIntegerTypes();

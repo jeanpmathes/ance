@@ -170,13 +170,13 @@ namespace lang
          * @param context The current compilation context.
          * @param native_function The native function to build into.
          */
-        void prepareBuild(CompileContext* context, llvm::Function* native_function);
+        void prepareBuild(CompileContext& context, llvm::Function* native_function);
 
         /**
          * Build this basic block, and all following blocks.
          * @param context The current compilation context.
          */
-        void doBuild(CompileContext* context);
+        void doBuild(CompileContext& context);
 
         /**
          * Get the exit type of this basic block represented as a string.
@@ -226,16 +226,16 @@ namespace lang
                 [[nodiscard]] size_t getIncomingLinkCount() const;
                 void                 updateIncomingLinks(BasicBlock* updated);
 
-                virtual std::list<lang::BasicBlock*>   getLeaves()                                   = 0;
-                virtual std::vector<lang::BasicBlock*> getSuccessors()                               = 0;
+                virtual std::list<lang::BasicBlock*>                                           getLeaves()     = 0;
+                virtual std::vector<lang::BasicBlock*>                                         getSuccessors() = 0;
                 virtual std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue();
                 virtual lang::Location                                                         getStartLocation() = 0;
                 virtual lang::Location                                                         getEndLocation()   = 0;
 
                 virtual void reach() = 0;
 
-                virtual void prepareBuild(CompileContext* context, llvm::Function* native_function) = 0;
-                virtual void doBuild(CompileContext* context)                                       = 0;
+                virtual void prepareBuild(CompileContext& context, llvm::Function* native_function) = 0;
+                virtual void doBuild(CompileContext& context)                                       = 0;
 
                 llvm::BasicBlock* getNativeBlock();
 
@@ -273,8 +273,8 @@ namespace lang
 
                 void reach() override;
 
-                void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
-                void doBuild(CompileContext* context) override;
+                void prepareBuild(CompileContext& context, llvm::Function* native_function) override;
+                void doBuild(CompileContext& context) override;
 
                 std::string getExitRepresentation() override;
 
@@ -306,8 +306,8 @@ namespace lang
 
                 void reach() override;
 
-                void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
-                void doBuild(CompileContext* context) override;
+                void prepareBuild(CompileContext& context, llvm::Function* native_function) override;
+                void doBuild(CompileContext& context) override;
 
                 std::string getExitRepresentation() override;
 
@@ -339,8 +339,8 @@ namespace lang
 
                 void reach() override;
 
-                void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
-                void doBuild(CompileContext* context) override;
+                void prepareBuild(CompileContext& context, llvm::Function* native_function) override;
+                void doBuild(CompileContext& context) override;
 
                 std::string getExitRepresentation() override;
 
@@ -364,16 +364,16 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                std::list<lang::BasicBlock*>   getLeaves() override;
-                std::vector<lang::BasicBlock*> getSuccessors() override;
+                std::list<lang::BasicBlock*>                                           getLeaves() override;
+                std::vector<lang::BasicBlock*>                                         getSuccessors() override;
                 std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> getReturnValue() override;
                 lang::Location                                                         getStartLocation() override;
                 lang::Location                                                         getEndLocation() override;
 
                 void reach() override;
 
-                void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
-                void doBuild(CompileContext* context) override;
+                void prepareBuild(CompileContext& context, llvm::Function* native_function) override;
+                void doBuild(CompileContext& context) override;
 
                 std::string getExitRepresentation() override;
 
@@ -407,8 +407,8 @@ namespace lang
 
                 void reach() override;
 
-                void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
-                void doBuild(CompileContext* context) override;
+                void prepareBuild(CompileContext& context, llvm::Function* native_function) override;
+                void doBuild(CompileContext& context) override;
 
                 std::string getExitRepresentation() override;
 
@@ -443,8 +443,8 @@ namespace lang
 
                 void reach() override;
 
-                void prepareBuild(CompileContext* context, llvm::Function* native_function) override;
-                void doBuild(CompileContext* context) override;
+                void prepareBuild(CompileContext& context, llvm::Function* native_function) override;
+                void doBuild(CompileContext& context) override;
 
                 std::string getExitRepresentation() override;
 

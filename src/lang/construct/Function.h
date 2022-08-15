@@ -182,21 +182,21 @@ namespace lang
          * Create the native content of this function, allowing building function code and calling this function.
          * @param context The current compile context.
          */
-        void createNativeBacking(CompileContext* context);
+        void createNativeBacking(CompileContext& context);
 
         /**
          * Build the function definition. This will be called after building the name.
          * @param context The current compile context.
          */
-        void build(CompileContext* context);
+        void build(CompileContext& context);
 
         /**
          * Build all parameter declarations.
          * @param context The current compile context.
          */
-        void buildDeclarations(CompileContext* context);
+        void buildDeclarations(CompileContext& context);
 
-        void buildFinalization(CompileContext* context) override;
+        void buildFinalization(CompileContext& context) override;
 
         /**
          * Validate a call to this function.
@@ -216,11 +216,11 @@ namespace lang
          * @return The return value. Will be null for return type void.
          */
         std::shared_ptr<lang::Value> buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
-                                               CompileContext*                                  context) const;
+                                               CompileContext&                                  context) const;
 
         lang::Scope*       scope() override;
         lang::GlobalScope* getGlobalScope() override;
-        llvm::DIScope*     getDebugScope(CompileContext* context) override;
+        llvm::DIScope*     getDebugScope(CompileContext& context) override;
 
         /**
          * Get the scope inside of this function, if there is any.

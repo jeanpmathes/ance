@@ -28,41 +28,40 @@ void lang::LocalVariable::validate(ValidationLogger&) const
     // Validation of initial value in declaring statement.
 }
 
-void lang::LocalVariable::buildDeclaration(CompileContext* context)
+void lang::LocalVariable::buildDeclaration(CompileContext& context)
 {
-    native_value_ =
-        context->ir()->CreateAlloca(type()->getContentType(*context->llvmContext()), nullptr, name().text());
+    native_value_ = context.ir()->CreateAlloca(type()->getContentType(*context.llvmContext()), nullptr, name().text());
 }
 
-void lang::LocalVariable::buildDefinition(CompileContext* context)
+void lang::LocalVariable::buildDefinition(CompileContext& context)
 {
     assert(native_value_);
 
     if (parameter_no_ == 0)
     {
-        local_debug_variable_ = context->di()->createAutoVariable(scope()->getDebugScope(context),
-                                                                  name().text(),
-                                                                  context->sourceFile(),
-                                                                  location().line(),
-                                                                  type()->getDebugType(context),
-                                                                  true);
+        local_debug_variable_ = context.di()->createAutoVariable(scope()->getDebugScope(context),
+                                                                 name().text(),
+                                                                 context.sourceFile(),
+                                                                 location().line(),
+                                                                 type()->getDebugType(context),
+                                                                 true);
     }
     else
     {
-        local_debug_variable_ = context->di()->createParameterVariable(scope()->getDebugScope(context),
-                                                                       name().text(),
-                                                                       parameter_no_,
-                                                                       context->sourceFile(),
-                                                                       location().line(),
-                                                                       type()->getDebugType(context),
-                                                                       true);
+        local_debug_variable_ = context.di()->createParameterVariable(scope()->getDebugScope(context),
+                                                                      name().text(),
+                                                                      parameter_no_,
+                                                                      context.sourceFile(),
+                                                                      location().line(),
+                                                                      type()->getDebugType(context),
+                                                                      true);
     }
 
-    context->di()->insertDeclare(native_value_,
-                                 local_debug_variable_,
-                                 context->di()->createExpression(),
-                                 location().getDebugLoc(context->llvmContext(), scope()->getDebugScope(context)),
-                                 context->ir()->GetInsertBlock());
+    context.di()->insertDeclare(native_value_,
+                                local_debug_variable_,
+                                context.di()->createExpression(),
+                                location().getDebugLoc(context.llvmContext(), scope()->getDebugScope(context)),
+                                context.ir()->GetInsertBlock());
 
     if (initial_value_)
     {
@@ -73,7 +72,7 @@ void lang::LocalVariable::buildDefinition(CompileContext* context)
             value->buildContentValue(context);
             llvm::Value* stored = value->getContentValue();
 
-            context->ir()->CreateStore(stored, native_value_);
+            context.ir()->CreateStore(stored, native_value_);
         }
         else
         {
@@ -86,7 +85,7 @@ void lang::LocalVariable::buildDefinition(CompileContext* context)
     else { type()->buildDefaultInitializer(native_value_, context); }
 }
 
-void lang::LocalVariable::buildFinalization(CompileContext* context)
+void lang::LocalVariable::buildFinalization(CompileContext& context)
 {
     assert(not finalized_);
 
@@ -95,12 +94,12 @@ void lang::LocalVariable::buildFinalization(CompileContext* context)
     finalized_ = true;
 }
 
-std::shared_ptr<lang::Value> lang::LocalVariable::getValue(CompileContext*)
+std::shared_ptr<lang::Value> lang::LocalVariable::getValue(CompileContext&)
 {
     return std::make_shared<lang::WrappedNativeValue>(type(), native_value_);
 }
 
-void lang::LocalVariable::storeValue(std::shared_ptr<lang::Value> value, CompileContext* context)
+void lang::LocalVariable::storeValue(std::shared_ptr<lang::Value> value, CompileContext& context)
 {
     value = lang::Type::makeMatching(type(), value, context);
 

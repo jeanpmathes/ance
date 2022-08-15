@@ -32,7 +32,7 @@ class Return
     Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
-    void doBuild(CompileContext* context) override;
+    void doBuild(CompileContext& context) override;
 
   private:
     std::unique_ptr<Expression> return_value_;

@@ -31,7 +31,7 @@ class SizeofExpression
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
-    void doBuild(CompileContext* context) override;
+    void doBuild(CompileContext& context) override;
 
   private:
     std::unique_ptr<Expression>  expression_;

@@ -92,15 +92,15 @@ lang::Location lang::BasicBlock::Definition::Returning::getEndLocation()
 
 void lang::BasicBlock::Definition::Returning::reach() {}
 
-void lang::BasicBlock::Definition::Returning::prepareBuild(CompileContext* context, llvm::Function* native_function)
+void lang::BasicBlock::Definition::Returning::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
     std::string name = "b" + std::to_string(index_);
-    native_block_    = llvm::BasicBlock::Create(*context->llvmContext(), name, native_function);
+    native_block_    = llvm::BasicBlock::Create(*context.llvmContext(), name, native_function);
 }
 
-void lang::BasicBlock::Definition::Returning::doBuild(CompileContext* context)
+void lang::BasicBlock::Definition::Returning::doBuild(CompileContext& context)
 {
-    context->ir()->SetInsertPoint(native_block_);
+    context.ir()->SetInsertPoint(native_block_);
 
     for (auto& statement : statements_) { statement->build(context); }
 
@@ -116,8 +116,8 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext* context)
 
     scope_->buildReturnFinalization(context);
 
-    if (return_value_) { context->ir()->CreateRet(return_value->getContentValue()); }
-    else { context->ir()->CreateRetVoid(); }
+    if (return_value_) { context.ir()->CreateRet(return_value->getContentValue()); }
+    else { context.ir()->CreateRetVoid(); }
 }
 
 std::string lang::BasicBlock::Definition::Returning::getExitRepresentation()

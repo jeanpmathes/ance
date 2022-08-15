@@ -27,15 +27,15 @@ llvm::Constant* lang::Constant::getContentConstant()
     return content_constant_;
 }
 
-void lang::Constant::buildNativeValue(CompileContext* context)
+void lang::Constant::buildNativeValue(CompileContext& context)
 {
-    buildContentConstant(context->module());
+    buildContentConstant(context.module());
     native_value_ = lang::Values::contentToNative(type(), content_constant_, context);
 }
 
-void lang::Constant::buildContentValue(CompileContext* context)
+void lang::Constant::buildContentValue(CompileContext& context)
 {
-    buildContentConstant(context->module());
+    buildContentConstant(context.module());
 }
 
 llvm::Value* lang::Constant::getNativeValue()

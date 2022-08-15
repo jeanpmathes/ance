@@ -27,7 +27,7 @@ namespace lang
          */
         void setValue(const std::shared_ptr<lang::Value>& value);
 
-        void         buildNativeValue(CompileContext* context) override;
+        void         buildNativeValue(CompileContext& context) override;
         llvm::Value* getNativeValue() override;
 
       private:

@@ -45,8 +45,8 @@ class VariableAccess
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
-    void doBuild(CompileContext* context) override;
-    void doAssign(std::shared_ptr<lang::Value> value, CompileContext* context) override;
+    void doBuild(CompileContext& context) override;
+    void doAssign(std::shared_ptr<lang::Value> value, CompileContext& context) override;
 
   public:
     ~VariableAccess() override;

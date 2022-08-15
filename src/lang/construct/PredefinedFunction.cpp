@@ -29,18 +29,18 @@ bool lang::PredefinedFunction::validateFlow(ValidationLogger&) const
     return true;
 }
 
-void lang::PredefinedFunction::createNativeBacking(CompileContext* context)
+void lang::PredefinedFunction::createNativeBacking(CompileContext& context)
 {
     std::tie(native_type_, native_function_) = createNativeFunction(llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-                                                                    *context->llvmContext(),
-                                                                    context->module());
+                                                                    *context.llvmContext(),
+                                                                    context.module());
 
     for (auto pair : zip(parameters(), native_function_->args())) { std::get<0>(pair)->wrap(&std::get<1>(pair)); }
 }
 
-void lang::PredefinedFunction::build(CompileContext*) {}
+void lang::PredefinedFunction::build(CompileContext&) {}
 
-llvm::DIScope* lang::PredefinedFunction::getDebugScope(CompileContext*)
+llvm::DIScope* lang::PredefinedFunction::getDebugScope(CompileContext&)
 {
     return native_function_->getSubprogram();
 }

@@ -46,7 +46,7 @@ std::shared_ptr<lang::Value> Parenthesis::getValue() const
     return expression_->getValue();
 }
 
-void Parenthesis::doAssign(std::shared_ptr<lang::Value> value, CompileContext* context)
+void Parenthesis::doAssign(std::shared_ptr<lang::Value> value, CompileContext& context)
 {
     expression_->assign(value, context);
 }

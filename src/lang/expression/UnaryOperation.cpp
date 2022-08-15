@@ -53,7 +53,7 @@ Expression::Expansion UnaryOperation::expandWith(Expressions subexpressions) con
             Statements()};
 }
 
-void UnaryOperation::doBuild(CompileContext* context)
+void UnaryOperation::doBuild(CompileContext& context)
 {
     std::shared_ptr<lang::Value> value = operand_->getValue();
 

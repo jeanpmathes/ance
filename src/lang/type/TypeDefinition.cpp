@@ -170,7 +170,7 @@ llvm::Type* lang::TypeDefinition::getNativeType(llvm::LLVMContext& c) const
     return llvm::PointerType::get(getContentType(c), 0);
 }
 
-llvm::DIType* lang::TypeDefinition::getDebugType(CompileContext* context)
+llvm::DIType* lang::TypeDefinition::getDebugType(CompileContext& context)
 {
     if (!debug_type_) { debug_type_ = createDebugType(context); }
 
@@ -298,7 +298,7 @@ bool lang::TypeDefinition::validateIndirection(lang::Location, ValidationLogger&
 
 std::shared_ptr<lang::Value> lang::TypeDefinition::buildSubscript(std::shared_ptr<Value>,
                                                                   std::shared_ptr<Value>,
-                                                                  CompileContext*)
+                                                                  CompileContext&)
 {
     return nullptr;
 }
@@ -306,152 +306,150 @@ std::shared_ptr<lang::Value> lang::TypeDefinition::buildSubscript(std::shared_pt
 std::shared_ptr<lang::Value> lang::TypeDefinition::buildOperator(lang::BinaryOperator,
                                                                  std::shared_ptr<Value>,
                                                                  std::shared_ptr<Value>,
-                                                                 CompileContext*)
+                                                                 CompileContext&)
 {
     return nullptr;
 }
 
 std::shared_ptr<lang::Value> lang::TypeDefinition::buildOperator(lang::UnaryOperator,
                                                                  std::shared_ptr<Value>,
-                                                                 CompileContext*)
+                                                                 CompileContext&)
 {
     return nullptr;
 }
 
 std::shared_ptr<lang::Value> lang::TypeDefinition::buildImplicitConversion(lang::ResolvingHandle<lang::Type>,
                                                                            std::shared_ptr<Value>,
-                                                                           CompileContext*)
+                                                                           CompileContext&)
 {
     return nullptr;
 }
 
 std::shared_ptr<lang::Value> lang::TypeDefinition::buildMemberAccess(std::shared_ptr<Value>,
                                                                      const lang::Identifier&,
-                                                                     CompileContext*)
+                                                                     CompileContext&)
 {
     return nullptr;
 }
 
-std::shared_ptr<lang::Value> lang::TypeDefinition::buildIndirection(std::shared_ptr<Value>, CompileContext*)
+std::shared_ptr<lang::Value> lang::TypeDefinition::buildIndirection(std::shared_ptr<Value>, CompileContext&)
 {
     return nullptr;
 }
 
-void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, CompileContext* context)
+void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, CompileContext& context)
 {
     llvm::APInt count_value = llvm::APInt(lang::SizeType::getSizeWidth(), 1);
-    llvm::Type* count_type  = lang::SizeType::getSize()->getContentType(*context->llvmContext());
+    llvm::Type* count_type  = lang::SizeType::getSize()->getContentType(*context.llvmContext());
 
     llvm::Value* count = llvm::ConstantInt::get(count_type, count_value);
 
     buildDefaultInitializer(ptr, count, context);
 }
 
-void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
 {
     if (isTriviallyDefaultConstructible())
     {
         llvm::Value* element_size =
-            llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context->llvmContext()),
-                                   getContentSize(context->module()).getFixedSize(),
+            llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context.llvmContext()),
+                                   getContentSize(context.module()).getFixedSize(),
                                    false);
 
-        llvm::Value* size = context->ir()->CreateMul(count, element_size, count->getName() + ".mul");
+        llvm::Value* size = context.ir()->CreateMul(count, element_size, count->getName() + ".mul");
 
-        context->ir()->CreateMemSet(ptr,
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context->llvmContext()), 0),
-                                    size,
-                                    llvm::Align(1));
+        context.ir()->CreateMemSet(ptr,
+                                   llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context.llvmContext()), 0),
+                                   size,
+                                   llvm::Align(1));
 
         return;
     }
 
     if (!default_initializer_) return;
 
-    context->ir()->CreateCall(default_initializer_, {ptr, count});
+    context.ir()->CreateCall(default_initializer_, {ptr, count});
 }
 
-void lang::TypeDefinition::buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context)
+void lang::TypeDefinition::buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context)
 {
     if (isTriviallyCopyConstructible())
     {
-        context->ir()->CreateMemCpy(ptr,
-                                    llvm::Align(1),
-                                    original,
-                                    llvm::Align(1),
-                                    getContentSize(context->module()).getFixedSize());
+        context.ir()->CreateMemCpy(ptr,
+                                   llvm::Align(1),
+                                   original,
+                                   llvm::Align(1),
+                                   getContentSize(context.module()).getFixedSize());
         return;
     }
 
     if (!copy_initializer_) return;
 
-    context->ir()->CreateCall(copy_initializer_, {ptr, original});
+    context.ir()->CreateCall(copy_initializer_, {ptr, original});
 }
 
-void lang::TypeDefinition::buildFinalizer(llvm::Value* ptr, CompileContext* context)
+void lang::TypeDefinition::buildFinalizer(llvm::Value* ptr, CompileContext& context)
 {
     llvm::APInt count_value = llvm::APInt(lang::SizeType::getSizeWidth(), 1);
-    llvm::Type* count_type  = lang::SizeType::getSize()->getContentType(*context->llvmContext());
+    llvm::Type* count_type  = lang::SizeType::getSize()->getContentType(*context.llvmContext());
 
     llvm::Value* count = llvm::ConstantInt::get(count_type, count_value);
 
     buildFinalizer(ptr, count, context);
 }
 
-void lang::TypeDefinition::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+void lang::TypeDefinition::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
 {
     if (isTriviallyDestructible() || !default_finalizer_) return;
 
-    context->ir()->CreateCall(default_finalizer_, {ptr, count});
+    context.ir()->CreateCall(default_finalizer_, {ptr, count});
 }
 
-void lang::TypeDefinition::buildNativeDeclaration(CompileContext* context)
+void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
 {
     if (!isTriviallyDefaultConstructible())
     {
-        llvm::FunctionType* default_initializer_type =
-            llvm::FunctionType::get(llvm::Type::getVoidTy(*context->llvmContext()),
-                                    {getNativeType(*context->llvmContext()),
-                                     lang::SizeType::getSize()->getContentType(*context->llvmContext())},
-                                    false);
+        llvm::FunctionType* default_initializer_type = llvm::FunctionType::get(
+            llvm::Type::getVoidTy(*context.llvmContext()),
+            {getNativeType(*context.llvmContext()), lang::SizeType::getSize()->getContentType(*context.llvmContext())},
+            false);
 
         default_initializer_ = llvm::Function::Create(default_initializer_type,
                                                       getAccessModifier().linkage(),
                                                       "ctor_default$" + getMangledName(),
-                                                      context->module());
+                                                      context.module());
     }
 
     if (!isTriviallyCopyConstructible())
     {
         llvm::FunctionType* copy_initializer_type =
-            llvm::FunctionType::get(llvm::Type::getVoidTy(*context->llvmContext()),
-                                    {getNativeType(*context->llvmContext()), getNativeType(*context->llvmContext())},
+            llvm::FunctionType::get(llvm::Type::getVoidTy(*context.llvmContext()),
+                                    {getNativeType(*context.llvmContext()), getNativeType(*context.llvmContext())},
                                     false);
 
         copy_initializer_ = llvm::Function::Create(copy_initializer_type,
                                                    getAccessModifier().linkage(),
                                                    "ctor_copy$" + getMangledName(),
-                                                   context->module());
+                                                   context.module());
     }
 
     if (!isTriviallyDestructible())
     {
-        llvm::FunctionType* default_finalizer_type =
-            llvm::FunctionType::get(llvm::Type::getVoidTy(*context->llvmContext()),
-                                    {getNativeType(*context->llvmContext()),
-                                     lang::SizeType::getSize()->getContentType(*context->llvmContext())},
-                                    false);
+        llvm::FunctionType* default_finalizer_type = llvm::FunctionType::get(
+            llvm::Type::getVoidTy(*context.llvmContext()),
+            {getNativeType(*context.llvmContext()), lang::SizeType::getSize()->getContentType(*context.llvmContext())},
+            false);
 
         default_finalizer_ = llvm::Function::Create(default_finalizer_type,
                                                     getAccessModifier().linkage(),
                                                     "dtor_default$" + getMangledName(),
-                                                    context->module());
+                                                    context.module());
     }
 
     defineConstructors(context);
 }
 
-void lang::TypeDefinition::buildNativeDefinition(CompileContext* context)
+void lang::TypeDefinition::buildNativeDefinition(CompileContext& context)
 {
     if (!isTriviallyDefaultConstructible()) defineDefaultInitializer(context);
     if (!isTriviallyCopyConstructible()) defineCopyInitializer(context);
@@ -460,7 +458,7 @@ void lang::TypeDefinition::buildNativeDefinition(CompileContext* context)
     buildConstructors(context);
 }
 
-void lang::TypeDefinition::defineConstructors(CompileContext* context)
+void lang::TypeDefinition::defineConstructors(CompileContext& context)
 {
     for (auto& [parameters, constructor] : requested_constructors_) { constructor->createNativeBacking(context); }
 
@@ -469,7 +467,7 @@ void lang::TypeDefinition::defineConstructors(CompileContext* context)
     default_constructor_->createNativeBacking(context);
 }
 
-void lang::TypeDefinition::buildConstructors(CompileContext* context)
+void lang::TypeDefinition::buildConstructors(CompileContext& context)
 {
     for (auto& [parameters, constructor] : requested_constructors_)
     {
@@ -481,13 +479,13 @@ void lang::TypeDefinition::buildConstructors(CompileContext* context)
     lang::PredefinedFunction& default_constructor = *default_constructor_;
     auto [native_fn_type, native_fn]              = default_constructor.getNativeRepresentation();
 
-    llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_fn);
-    context->ir()->SetInsertPoint(block);
+    llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_fn);
+    context.ir()->SetInsertPoint(block);
     {
-        llvm::Value* ptr = context->ir()->CreateAlloca(getContentType(*context->llvmContext()), nullptr, "alloca");
+        llvm::Value* ptr = context.ir()->CreateAlloca(getContentType(*context.llvmContext()), nullptr, "alloca");
         buildDefaultInitializer(ptr, context);
-        llvm::Value* val = context->ir()->CreateLoad(getContentType(*context->llvmContext()), ptr, "load");
-        context->ir()->CreateRet(val);
+        llvm::Value* val = context.ir()->CreateLoad(getContentType(*context.llvmContext()), ptr, "load");
+        context.ir()->CreateRet(val);
     }
 }
 
@@ -506,7 +504,7 @@ bool lang::TypeDefinition::isTriviallyDestructible() const
     return false;
 }
 
-void lang::TypeDefinition::defineDefaultInitializer(CompileContext* context)
+void lang::TypeDefinition::defineDefaultInitializer(CompileContext& context)
 {
     llvm::Value* ptr   = default_initializer_->getArg(0);
     llvm::Value* count = default_initializer_->getArg(1);
@@ -515,26 +513,26 @@ void lang::TypeDefinition::defineDefaultInitializer(CompileContext* context)
         default_initializer_,
         ptr,
         count,
-        [&](llvm::Value* element_ptr, CompileContext* context) {
+        [&](llvm::Value* element_ptr, CompileContext& context) {
             buildSingleDefaultInitializerDefinition(element_ptr, context);
         },
         context);
 }
 
-void lang::TypeDefinition::defineCopyInitializer(CompileContext* context)
+void lang::TypeDefinition::defineCopyInitializer(CompileContext& context)
 {
     llvm::Value* dst_ptr = copy_initializer_->getArg(0);
     llvm::Value* src_ptr = copy_initializer_->getArg(1);
 
-    llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", copy_initializer_);
-    context->ir()->SetInsertPoint(block);
+    llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", copy_initializer_);
+    context.ir()->SetInsertPoint(block);
     {
         buildSingleCopyInitializerDefinition(dst_ptr, src_ptr, context);
-        context->ir()->CreateRetVoid();
+        context.ir()->CreateRetVoid();
     }
 }
 
-void lang::TypeDefinition::defineDefaultFinalizer(CompileContext* context)
+void lang::TypeDefinition::defineDefaultFinalizer(CompileContext& context)
 {
     llvm::Value* ptr   = default_finalizer_->getArg(0);
     llvm::Value* count = default_finalizer_->getArg(1);
@@ -543,29 +541,29 @@ void lang::TypeDefinition::defineDefaultFinalizer(CompileContext* context)
         default_finalizer_,
         ptr,
         count,
-        [&](llvm::Value* element_ptr, CompileContext* context) {
+        [&](llvm::Value* element_ptr, CompileContext& context) {
             buildSingleDefaultFinalizerDefinition(element_ptr, context);
         },
         context);
 }
 
-void lang::TypeDefinition::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context)
+void lang::TypeDefinition::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context)
 {
-    llvm::Value* content = getDefaultContent(*context->module());
-    context->ir()->CreateStore(content, ptr);
+    llvm::Value* content = getDefaultContent(*context.module());
+    context.ir()->CreateStore(content, ptr);
 }
 
 void lang::TypeDefinition::buildSingleCopyInitializerDefinition(llvm::Value*    dst_ptr,
                                                                 llvm::Value*    src_ptr,
-                                                                CompileContext* context)
+                                                                CompileContext& context)
 {
-    llvm::Type* content_type = getContentType(*context->llvmContext());
+    llvm::Type* content_type = getContentType(*context.llvmContext());
 
-    llvm::Value* src_content = context->ir()->CreateLoad(content_type, src_ptr);
-    context->ir()->CreateStore(src_content, dst_ptr);
+    llvm::Value* src_content = context.ir()->CreateLoad(content_type, src_ptr);
+    context.ir()->CreateStore(src_content, dst_ptr);
 }
 
-void lang::TypeDefinition::buildSingleDefaultFinalizerDefinition(llvm::Value*, CompileContext*) {}
+void lang::TypeDefinition::buildSingleDefaultFinalizerDefinition(llvm::Value*, CompileContext&) {}
 
 bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger) const
 {
@@ -680,7 +678,7 @@ bool lang::TypeDefinition::acceptOverloadRequest(const std::vector<lang::Resolvi
 
 void lang::TypeDefinition::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>&,
                                                   lang::PredefinedFunction&,
-                                                  CompileContext*)
+                                                  CompileContext&)
 {}
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::self() const
@@ -692,38 +690,38 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::self() const
 void lang::TypeDefinition::buildPointerIteration(llvm::Function*                                    function,
                                                  llvm::Value*                                       ptr,
                                                  llvm::Value*                                       count,
-                                                 std::function<void(llvm::Value*, CompileContext*)> operation,
-                                                 CompileContext*                                    context)
+                                                 std::function<void(llvm::Value*, CompileContext&)> operation,
+                                                 CompileContext&                                    context)
 {
-    llvm::Type* size_type = SizeType::getSize()->getContentType(*context->llvmContext());
+    llvm::Type* size_type = SizeType::getSize()->getContentType(*context.llvmContext());
 
-    llvm::BasicBlock* init = llvm::BasicBlock::Create(*context->llvmContext(), "init", function);
-    llvm::BasicBlock* body = llvm::BasicBlock::Create(*context->llvmContext(), "body", function);
-    llvm::BasicBlock* end  = llvm::BasicBlock::Create(*context->llvmContext(), "end", function);
+    llvm::BasicBlock* init = llvm::BasicBlock::Create(*context.llvmContext(), "init", function);
+    llvm::BasicBlock* body = llvm::BasicBlock::Create(*context.llvmContext(), "body", function);
+    llvm::BasicBlock* end  = llvm::BasicBlock::Create(*context.llvmContext(), "end", function);
 
-    context->ir()->SetInsertPoint(init);
+    context.ir()->SetInsertPoint(init);
     {
-        context->ir()->CreateBr(body);
+        context.ir()->CreateBr(body);
     }
 
-    context->ir()->SetInsertPoint(body);
+    context.ir()->SetInsertPoint(body);
     {
-        llvm::PHINode* current = context->ir()->CreatePHI(size_type, 2, "i");
+        llvm::PHINode* current = context.ir()->CreatePHI(size_type, 2, "i");
         current->addIncoming(llvm::ConstantInt::get(size_type, 0), init);
 
         llvm::Value* element_ptr =
-            context->ir()->CreateInBoundsGEP(getContentType(*context->llvmContext()), ptr, current, "element_ptr");
+            context.ir()->CreateInBoundsGEP(getContentType(*context.llvmContext()), ptr, current, "element_ptr");
         operation(element_ptr, context);
 
-        llvm::Value* next = context->ir()->CreateAdd(current, llvm::ConstantInt::get(size_type, 1), "next");
+        llvm::Value* next = context.ir()->CreateAdd(current, llvm::ConstantInt::get(size_type, 1), "next");
         current->addIncoming(next, body);
 
-        llvm::Value* condition = context->ir()->CreateICmpULT(next, count, "condition");
-        context->ir()->CreateCondBr(condition, body, end);
+        llvm::Value* condition = context.ir()->CreateICmpULT(next, count, "condition");
+        context.ir()->CreateCondBr(condition, body, end);
     }
 
-    context->ir()->SetInsertPoint(end);
+    context.ir()->SetInsertPoint(end);
     {
-        context->ir()->CreateRetVoid();
+        context.ir()->CreateRetVoid();
     }
 }

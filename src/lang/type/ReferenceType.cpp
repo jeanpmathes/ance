@@ -93,7 +93,7 @@ bool lang::ReferenceType::validateSubscript(lang::Location                    in
 
 std::shared_ptr<lang::Value> lang::ReferenceType::buildSubscript(std::shared_ptr<Value> indexed,
                                                                  std::shared_ptr<Value> index,
-                                                                 CompileContext*        context)
+                                                                 CompileContext&        context)
 {
     return element_type_->buildSubscript(getReferenced(indexed, context), index, context);
 }
@@ -121,7 +121,7 @@ bool lang::ReferenceType::validateOperator(lang::BinaryOperator              op,
 std::shared_ptr<lang::Value> lang::ReferenceType::buildOperator(lang::BinaryOperator   op,
                                                                 std::shared_ptr<Value> left,
                                                                 std::shared_ptr<Value> right,
-                                                                CompileContext*        context)
+                                                                CompileContext&        context)
 {
     return element_type_->buildOperator(op, getReferenced(left, context), right, context);
 }
@@ -145,7 +145,7 @@ bool lang::ReferenceType::validateOperator(lang::UnaryOperator op,
 
 std::shared_ptr<lang::Value> lang::ReferenceType::buildOperator(lang::UnaryOperator    op,
                                                                 std::shared_ptr<Value> value,
-                                                                CompileContext*        context)
+                                                                CompileContext&        context)
 {
     return element_type_->buildOperator(op, getReferenced(value, context), context);
 }
@@ -167,7 +167,7 @@ bool lang::ReferenceType::validateMemberAccess(const lang::Identifier& name, Val
 
 std::shared_ptr<lang::Value> lang::ReferenceType::buildMemberAccess(std::shared_ptr<Value>  value,
                                                                     const lang::Identifier& name,
-                                                                    CompileContext*         context)
+                                                                    CompileContext&         context)
 {
     return element_type_->buildMemberAccess(value, name, context);
 }
@@ -188,47 +188,47 @@ bool lang::ReferenceType::validateIndirection(lang::Location location, Validatio
 }
 
 std::shared_ptr<lang::Value> lang::ReferenceType::buildIndirection(std::shared_ptr<Value> value,
-                                                                   CompileContext*        context)
+                                                                   CompileContext&        context)
 {
     return element_type_->buildIndirection(getReferenced(value, context), context);
 }
 
-void lang::ReferenceType::buildDefaultInitializer(llvm::Value*, llvm::Value*, CompileContext*)
+void lang::ReferenceType::buildDefaultInitializer(llvm::Value*, llvm::Value*, CompileContext&)
 {
     throw std::logic_error("Reference does not have a default value.");
 }
 
-void lang::ReferenceType::buildCopyInitializer(llvm::Value*, llvm::Value*, CompileContext*)
+void lang::ReferenceType::buildCopyInitializer(llvm::Value*, llvm::Value*, CompileContext&)
 {
     throw std::logic_error("Reference does not have a copy value.");
 }
 
-void lang::ReferenceType::buildFinalizer(llvm::Value*, llvm::Value*, CompileContext*)
+void lang::ReferenceType::buildFinalizer(llvm::Value*, llvm::Value*, CompileContext&)
 {
     throw std::logic_error("Reference does not have a finalizer.");
 }
 
 void lang::ReferenceType::createConstructors() {}
 
-void lang::ReferenceType::buildNativeDeclaration(CompileContext*) {}
+void lang::ReferenceType::buildNativeDeclaration(CompileContext&) {}
 
-void lang::ReferenceType::buildNativeDefinition(CompileContext*) {}
+void lang::ReferenceType::buildNativeDefinition(CompileContext&) {}
 
 std::string lang::ReferenceType::createMangledName() const
 {
     return std::string("ref") + "(" + element_type_->getMangledName() + ")";
 }
 
-llvm::DIType* lang::ReferenceType::createDebugType(CompileContext* context)
+llvm::DIType* lang::ReferenceType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl = context->module()->getDataLayout();
+    const llvm::DataLayout& dl = context.module()->getDataLayout();
 
-    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
+    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
 
     llvm::DIType* di_type;
 
     llvm::DIType* element_di_type = element_type_->getDebugType(context);
-    di_type = context->di()->createReferenceType(llvm::dwarf::DW_TAG_reference_type, element_di_type, size_in_bits);
+    di_type = context.di()->createReferenceType(llvm::dwarf::DW_TAG_reference_type, element_di_type, size_in_bits);
 
     return di_type;
 }
@@ -244,13 +244,13 @@ lang::TypeDefinitionRegistry* lang::ReferenceType::getRegistry()
     return &getReferenceTypes();
 }
 
-llvm::Value* lang::ReferenceType::getReferenced(llvm::Value* value, CompileContext* context)
+llvm::Value* lang::ReferenceType::getReferenced(llvm::Value* value, CompileContext& context)
 {
-    return context->ir()->CreateLoad(getContentType(*context->llvmContext()), value, value->getName() + ".load");
+    return context.ir()->CreateLoad(getContentType(*context.llvmContext()), value, value->getName() + ".load");
 }
 
 std::shared_ptr<lang::Value> lang::ReferenceType::getReferenced(const std::shared_ptr<lang::Value>& value,
-                                                                CompileContext*                     context)
+                                                                CompileContext&                     context)
 {
     value->buildNativeValue(context);
 

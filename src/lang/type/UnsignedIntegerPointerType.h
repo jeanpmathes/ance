@@ -28,7 +28,7 @@ namespace lang
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
-        [[maybe_unused]] static llvm::Value* buildValue(llvm::Value* pointer, CompileContext* state);
+        [[maybe_unused]] static llvm::Value* buildValue(llvm::Value* pointer, CompileContext& state);
 
       private:
         inline static Type*       instance_    = nullptr;
@@ -40,7 +40,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext* context) override;
+        llvm::DIType* createDebugType(CompileContext& context) override;
 
       public:
         /**

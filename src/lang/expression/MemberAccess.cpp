@@ -52,7 +52,7 @@ Expression::Expansion MemberAccess::expandWith(Expressions subexpressions) const
             Statements()};
 }
 
-void MemberAccess::doBuild(CompileContext* context)
+void MemberAccess::doBuild(CompileContext& context)
 {
     std::shared_ptr<lang::Value> value = value_->type()->buildMemberAccess(value_->getValue(), member_, context);
     setValue(value);

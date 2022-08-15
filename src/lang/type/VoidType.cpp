@@ -27,9 +27,9 @@ std::string lang::VoidType::createMangledName() const
     return std::string(name().text());
 }
 
-llvm::DIType* lang::VoidType::createDebugType(CompileContext* context)
+llvm::DIType* lang::VoidType::createDebugType(CompileContext& context)
 {
-    return context->di()->createUnspecifiedType(name().text());
+    return context.di()->createUnspecifiedType(name().text());
 }
 
 bool lang::VoidType::isVoidType() const
@@ -37,26 +37,26 @@ bool lang::VoidType::isVoidType() const
     return true;
 }
 
-void lang::VoidType::buildDefaultInitializer(llvm::Value*, llvm::Value*, CompileContext*)
+void lang::VoidType::buildDefaultInitializer(llvm::Value*, llvm::Value*, CompileContext&)
 {
     throw std::logic_error("Void does not have a default value.");
 }
 
-void lang::VoidType::buildCopyInitializer(llvm::Value*, llvm::Value*, CompileContext*)
+void lang::VoidType::buildCopyInitializer(llvm::Value*, llvm::Value*, CompileContext&)
 {
     throw std::logic_error("Void does not have a copy value.");
 }
 
-void lang::VoidType::buildFinalizer(llvm::Value*, llvm::Value*, CompileContext*)
+void lang::VoidType::buildFinalizer(llvm::Value*, llvm::Value*, CompileContext&)
 {
     throw std::logic_error("Void does not have a finalizer.");
 }
 
 void lang::VoidType::createConstructors() {}
 
-void lang::VoidType::buildNativeDeclaration(CompileContext*) {}
+void lang::VoidType::buildNativeDeclaration(CompileContext&) {}
 
-void lang::VoidType::buildNativeDefinition(CompileContext*) {}
+void lang::VoidType::buildNativeDefinition(CompileContext&) {}
 
 lang::ResolvingHandle<lang::Type> lang::VoidType::get()
 {

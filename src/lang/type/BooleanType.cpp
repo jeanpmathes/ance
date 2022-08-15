@@ -51,14 +51,14 @@ std::string lang::BooleanType::createMangledName() const
     return "b";
 }
 
-llvm::DIType* lang::BooleanType::createDebugType(CompileContext* context)
+llvm::DIType* lang::BooleanType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl = context->module()->getDataLayout();
+    const llvm::DataLayout& dl = context.module()->getDataLayout();
 
     std::string name         = std::string(this->name().text());
-    uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
+    uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
 
-    return context->di()->createBasicType(name, size_in_bits, llvm::dwarf::DW_ATE_boolean);
+    return context.di()->createBasicType(name, size_in_bits, llvm::dwarf::DW_ATE_boolean);
 }
 
 lang::ResolvingHandle<lang::Type> lang::BooleanType::get()
@@ -85,7 +85,7 @@ bool lang::BooleanType::validateOperator(lang::UnaryOperator, lang::Location, Va
 
 std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator    op,
                                                               std::shared_ptr<Value> value,
-                                                              CompileContext*        context)
+                                                              CompileContext&        context)
 {
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
@@ -95,7 +95,7 @@ std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperato
     switch (op)
     {
         case lang::UnaryOperator::NOT:
-            result = context->ir()->CreateNot(content_value, content_value->getName() + ".not");
+            result = context.ir()->CreateNot(content_value, content_value->getName() + ".not");
             break;
 
         default:
@@ -119,7 +119,7 @@ bool lang::BooleanType::acceptOverloadRequest(const std::vector<lang::ResolvingH
 
 void lang::BooleanType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
                                                lang::PredefinedFunction&                             function,
-                                               CompileContext*                                       context)
+                                               CompileContext&                                       context)
 {
     llvm::Function* native_function;
     std::tie(std::ignore, native_function) = function.getNativeRepresentation();
@@ -128,23 +128,23 @@ void lang::BooleanType::buildRequestedOverload(const std::vector<lang::Resolving
     {
         if (parameters[0]->isIntegerType() || parameters[0]->isSizeType() || parameters[0]->isDiffType())
         {
-            llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_function);
-            context->ir()->SetInsertPoint(block);
+            llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+            context.ir()->SetInsertPoint(block);
             {
                 llvm::Value* original = native_function->getArg(0);
 
                 llvm::Value* is_nonzero =
-                    context->ir()->CreateICmpNE(original,
-                                                llvm::ConstantInt::get(original->getType(), 0, false),
-                                                ".icmp");
+                    context.ir()->CreateICmpNE(original,
+                                               llvm::ConstantInt::get(original->getType(), 0, false),
+                                               ".icmp");
 
                 llvm::Value* converted =
-                    context->ir()->CreateSelect(is_nonzero,
-                                                llvm::ConstantInt::getTrue(getContentType(*context->llvmContext())),
-                                                llvm::ConstantInt::getFalse(getContentType(*context->llvmContext())),
-                                                ".select");
+                    context.ir()->CreateSelect(is_nonzero,
+                                               llvm::ConstantInt::getTrue(getContentType(*context.llvmContext())),
+                                               llvm::ConstantInt::getFalse(getContentType(*context.llvmContext())),
+                                               ".select");
 
-                context->ir()->CreateRet(converted);
+                context.ir()->CreateRet(converted);
             }
         }
     }

@@ -56,8 +56,8 @@ namespace lang
          */
         void wrap(llvm::Argument* argument);
 
-        void buildNativeValue(CompileContext* context) override;
-        void buildContentValue(CompileContext* context) override;
+        void buildNativeValue(CompileContext& context) override;
+        void buildContentValue(CompileContext& context) override;
 
         llvm::Value* getNativeValue() override;
         llvm::Value* getContentValue() override;

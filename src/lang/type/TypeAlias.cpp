@@ -160,7 +160,7 @@ bool lang::TypeAlias::validateSubscript(lang::Location                    indexe
 
 std::shared_ptr<lang::Value> lang::TypeAlias::buildSubscript(std::shared_ptr<Value> indexed,
                                                              std::shared_ptr<Value> index,
-                                                             CompileContext*        context)
+                                                             CompileContext&        context)
 {
     return actual_->buildSubscript(indexed, index, context);
 }
@@ -179,7 +179,7 @@ bool lang::TypeAlias::validateImplicitConversion(lang::ResolvingHandle<lang::Typ
 
 std::shared_ptr<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                                       std::shared_ptr<Value>            value,
-                                                                      CompileContext*                   context)
+                                                                      CompileContext&                   context)
 {
     return actual_->buildImplicitConversion(other, value, context);
 }
@@ -207,7 +207,7 @@ bool lang::TypeAlias::validateOperator(lang::BinaryOperator              op,
 std::shared_ptr<lang::Value> lang::TypeAlias::buildOperator(lang::BinaryOperator   op,
                                                             std::shared_ptr<Value> left,
                                                             std::shared_ptr<Value> right,
-                                                            CompileContext*        context)
+                                                            CompileContext&        context)
 {
     return actual_->buildOperator(op, left, right, context);
 }
@@ -229,7 +229,7 @@ bool lang::TypeAlias::validateMemberAccess(const lang::Identifier& name, Validat
 
 std::shared_ptr<lang::Value> lang::TypeAlias::buildMemberAccess(std::shared_ptr<Value>  value,
                                                                 const lang::Identifier& name,
-                                                                CompileContext*         context)
+                                                                CompileContext&         context)
 {
     return actual_->buildMemberAccess(value, name, context);
 }
@@ -249,22 +249,22 @@ bool lang::TypeAlias::validateIndirection(lang::Location location, ValidationLog
     return actual_->validateIndirection(location, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::TypeAlias::buildIndirection(std::shared_ptr<Value> value, CompileContext* context)
+std::shared_ptr<lang::Value> lang::TypeAlias::buildIndirection(std::shared_ptr<Value> value, CompileContext& context)
 {
     return actual_->buildIndirection(value, context);
 }
 
-void lang::TypeAlias::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+void lang::TypeAlias::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
 {
     actual_->buildDefaultInitializer(ptr, count, context);
 }
 
-void lang::TypeAlias::buildCopyInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+void lang::TypeAlias::buildCopyInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
 {
     actual_->buildCopyInitializer(ptr, count, context);
 }
 
-void lang::TypeAlias::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+void lang::TypeAlias::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
 {
     actual_->buildFinalizer(ptr, count, context);
 }
@@ -277,12 +277,12 @@ void lang::TypeAlias::createConstructors()
     TypeDefinition::createConstructors();
 }
 
-void lang::TypeAlias::buildNativeDeclaration(CompileContext* context)
+void lang::TypeAlias::buildNativeDeclaration(CompileContext& context)
 {
     defineConstructors(context);
 }
 
-void lang::TypeAlias::buildNativeDefinition(CompileContext* context)
+void lang::TypeAlias::buildNativeDefinition(CompileContext& context)
 {
     buildConstructors(context);
 }
@@ -292,13 +292,13 @@ std::string lang::TypeAlias::createMangledName() const
     return getActualType()->getMangledName();
 }
 
-llvm::DIType* lang::TypeAlias::createDebugType(CompileContext* context)
+llvm::DIType* lang::TypeAlias::createDebugType(CompileContext& context)
 {
-    return context->di()->createTypedef(actual_->getDebugType(context),
-                                        name().text(),
-                                        context->sourceFile(),
-                                        getDefinitionLocation().line(),
-                                        scope()->getDebugScope(context));
+    return context.di()->createTypedef(actual_->getDebugType(context),
+                                       name().text(),
+                                       context.sourceFile(),
+                                       getDefinitionLocation().line(),
+                                       scope()->getDebugScope(context));
 }
 
 std::vector<lang::TypeDefinition*> lang::TypeAlias::getDependencies() const

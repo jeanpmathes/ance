@@ -83,7 +83,7 @@ Expression::Expansion BinaryOperation::expandWith(Expressions subexpressions) co
         Statements()};
 }
 
-void BinaryOperation::doBuild(CompileContext* context)
+void BinaryOperation::doBuild(CompileContext& context)
 {
     std::shared_ptr<lang::Value> left_value  = left_->getValue();
     std::shared_ptr<lang::Value> right_value = right_->getValue();

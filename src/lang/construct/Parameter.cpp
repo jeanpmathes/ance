@@ -41,12 +41,12 @@ void lang::Parameter::wrap(llvm::Argument* argument)
     content_value_->setName(name_ + ".arg");
 }
 
-void lang::Parameter::buildNativeValue(CompileContext* context)
+void lang::Parameter::buildNativeValue(CompileContext& context)
 {
     if (!native_value_) { native_value_ = lang::Values::contentToNative(type(), content_value_, context); }
 }
 
-void lang::Parameter::buildContentValue(CompileContext* context)
+void lang::Parameter::buildContentValue(CompileContext& context)
 {
     if (!content_value_) { content_value_ = lang::Values::nativeToContent(type(), native_value_, context); }
 }

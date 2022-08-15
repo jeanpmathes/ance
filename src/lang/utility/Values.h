@@ -27,7 +27,7 @@ namespace lang
          */
         static llvm::Value* nativeToContent(lang::ResolvingHandle<lang::Type> type,
                                             llvm::Value*                      native,
-                                            CompileContext*                   context);
+                                            CompileContext&                   context);
         /**
          * Convert a content value to a native value.
          * @param type The type of the value.
@@ -37,7 +37,7 @@ namespace lang
          */
         static llvm::Value* contentToNative(lang::ResolvingHandle<lang::Type> type,
                                             llvm::Value*                      content,
-                                            CompileContext*                   context);
+                                            CompileContext&                   context);
     };
 }
 

@@ -157,7 +157,7 @@ class Match
     [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
-    void doBuild(CompileContext* context) override;
+    void doBuild(CompileContext& context) override;
 
   private:
     std::unique_ptr<Expression>        expression_;

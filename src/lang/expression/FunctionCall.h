@@ -52,7 +52,7 @@ class FunctionCall
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
-    void doBuild(CompileContext* context) override;
+    void doBuild(CompileContext& context) override;
 
   public:
     ~FunctionCall() override;

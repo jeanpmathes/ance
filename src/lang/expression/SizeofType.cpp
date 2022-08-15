@@ -45,9 +45,9 @@ Expression::Expansion SizeofType::expandWith(Expressions) const
     return {Statements(), std::make_unique<SizeofType>(type_->toUndefined(), type_location_, location()), Statements()};
 }
 
-void SizeofType::doBuild(CompileContext* context)
+void SizeofType::doBuild(CompileContext& context)
 {
-    llvm::Value* content_value = lang::SizeType::buildContentValue(type_->getContentSize(context->module()));
+    llvm::Value* content_value = lang::SizeType::buildContentValue(type_->getContentSize(context.module()));
     llvm::Value* native_value  = lang::Values::contentToNative(type(), content_value, context);
 
     std::shared_ptr<lang::WrappedNativeValue> value = std::make_shared<lang::WrappedNativeValue>(type(), native_value);

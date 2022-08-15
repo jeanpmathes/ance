@@ -240,7 +240,7 @@ namespace lang
          * @param context The current compile context.
          * @return The debug type.
          */
-        llvm::DIType* getDebugType(CompileContext* context);
+        llvm::DIType* getDebugType(CompileContext& context);
 
         /**
          * Get the size of the native type.
@@ -422,7 +422,7 @@ namespace lang
          */
         std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
-                                                    CompileContext*        context);
+                                                    CompileContext&        context);
 
         /**
          * Build a binary operation.
@@ -435,7 +435,7 @@ namespace lang
         std::shared_ptr<lang::Value> buildOperator(lang::BinaryOperator   op,
                                                    std::shared_ptr<Value> left,
                                                    std::shared_ptr<Value> right,
-                                                   CompileContext*        context);
+                                                   CompileContext&        context);
 
         /**
          * Build a unary operation.
@@ -446,7 +446,7 @@ namespace lang
          */
         std::shared_ptr<lang::Value> buildOperator(lang::UnaryOperator    op,
                                                    std::shared_ptr<Value> value,
-                                                   CompileContext*        context);
+                                                   CompileContext&        context);
 
         /**
          * Build an implicit conversion.
@@ -457,7 +457,7 @@ namespace lang
          */
         std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                              std::shared_ptr<Value>            value,
-                                                             CompileContext*                   context);
+                                                             CompileContext&                   context);
 
         /**
          * Build a member access.
@@ -468,7 +468,7 @@ namespace lang
          */
         std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
                                                        const lang::Identifier& name,
-                                                       CompileContext*         context);
+                                                       CompileContext&         context);
 
         /**
          * Build indirection.
@@ -476,14 +476,14 @@ namespace lang
          * @param context The current compile context.
          * @return The result value, which is a reference of indirection return type.
          */
-        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context);
+        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext& context);
 
         /**
          * Build the default initializer for this type.
          * @param ptr A pointer to where the value should be initialized.
          * @param context The current compile context.
          */
-        void buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
+        void buildDefaultInitializer(llvm::Value* ptr, CompileContext& context);
 
         /**
          * Build the default initializer for this type, initializing multiple instances.
@@ -491,7 +491,7 @@ namespace lang
          * @param count The number of instances to initialize.
          * @param context The current compile context.
          */
-        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context);
+        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context);
 
         /**
          * Build the copy initializer for this type.
@@ -499,14 +499,14 @@ namespace lang
          * @param original A pointer to the original value.
          * @param context The current compile context.
          */
-        void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context);
+        void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context);
 
         /**
          * Build the destructor for this type.
          * @param ptr The pointer to the value to destruct.
          * @param context The current compile context.
          */
-        void buildFinalizer(llvm::Value* ptr, CompileContext* context);
+        void buildFinalizer(llvm::Value* ptr, CompileContext& context);
 
         /**
          * Build the default destructor for this type.
@@ -514,19 +514,19 @@ namespace lang
          * @param count The number of instances to destruct.
          * @param context The current compile context.
          */
-        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context);
+        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context);
 
         /**
          * Build the native backing required for the declaration.
          * @param context The current compile context.
          */
-        void buildNativeDeclaration(CompileContext* context);
+        void buildNativeDeclaration(CompileContext& context);
 
         /**
          * Build the native backing required for the definition of this type.
          * @param context The current compile context.
          */
-        void buildNativeDefinition(CompileContext* context);
+        void buildNativeDefinition(CompileContext& context);
 
         [[nodiscard]] lang::TypeDefinition* getDefinition() const;
 
@@ -560,7 +560,7 @@ namespace lang
          */
         static std::shared_ptr<lang::Value> makeMatching(lang::ResolvingHandle<lang::Type> expected,
                                                          std::shared_ptr<lang::Value>      value,
-                                                         CompileContext*                   context);
+                                                         CompileContext&                   context);
 
         /**
          * Get the referenced type, meaning the type itself if it is not a reference type, or the element type.
@@ -576,7 +576,7 @@ namespace lang
          * @return The referenced value.
          */
         static std::shared_ptr<lang::Value> getValueOrReferencedValue(std::shared_ptr<lang::Value> value,
-                                                                      CompileContext*              context);
+                                                                      CompileContext&              context);
 
         /**
          * Check if the actual types of two types are the same.

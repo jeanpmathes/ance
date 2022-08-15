@@ -45,7 +45,7 @@ Expression::Expansion Indirection::expandWith(Expressions subexpressions) const
     return {Statements(), std::make_unique<Indirection>(std::move(subexpressions[0]), location()), Statements()};
 }
 
-void Indirection::doBuild(CompileContext* context)
+void Indirection::doBuild(CompileContext& context)
 {
     std::shared_ptr<lang::Value> ref = value_->type()->buildIndirection(value_->getValue(), context);
     setValue(ref);

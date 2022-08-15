@@ -27,12 +27,12 @@ namespace lang
                                                            ValidationLogger&   validation_logger) const override;
         std::shared_ptr<lang::Value>      buildOperator(lang::UnaryOperator    op,
                                                         std::shared_ptr<Value> value,
-                                                        CompileContext*        context) override;
+                                                        CompileContext&        context) override;
 
         bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
         void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
                                     lang::PredefinedFunction&                             function,
-                                    CompileContext*                                       context) override;
+                                    CompileContext&                                       context) override;
 
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
@@ -40,7 +40,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext* context) override;
+        llvm::DIType* createDebugType(CompileContext& context) override;
 
       public:
         /**

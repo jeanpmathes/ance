@@ -74,7 +74,7 @@ Statements If::expandWith(Expressions subexpressions, Statements substatements) 
     return statements;
 }
 
-void If::doBuild(CompileContext*)
+void If::doBuild(CompileContext&)
 {
     // Handled by basic block.
 }

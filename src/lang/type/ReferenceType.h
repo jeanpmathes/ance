@@ -41,7 +41,7 @@ namespace lang
                                                        ValidationLogger&                 validation_logger) const override;
         std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
-                                                    CompileContext*        context) override;
+                                                    CompileContext&        context) override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other) override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
@@ -54,7 +54,7 @@ namespace lang
         std::shared_ptr<lang::Value>      buildOperator(lang::BinaryOperator   op,
                                                         std::shared_ptr<Value> left,
                                                         std::shared_ptr<Value> right,
-                                                        CompileContext*        context) override;
+                                                        CompileContext&        context) override;
 
         bool                              isOperatorDefined(lang::UnaryOperator op) override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
@@ -63,27 +63,27 @@ namespace lang
                                                            ValidationLogger&   validation_logger) const override;
         std::shared_ptr<lang::Value>      buildOperator(lang::UnaryOperator    op,
                                                         std::shared_ptr<Value> value,
-                                                        CompileContext*        context) override;
+                                                        CompileContext&        context) override;
 
         bool                              hasMember(const lang::Identifier& name) override;
         lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name) override;
         bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const override;
         std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
                                                        const lang::Identifier& name,
-                                                       CompileContext*         context) override;
+                                                       CompileContext&         context) override;
 
         bool                              definesIndirection() override;
         lang::ResolvingHandle<lang::Type> getIndirectionType() override;
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
-        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context) override;
+        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext& context) override;
 
-        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context) override;
-        void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context) override;
-        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context) override;
+        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context) override;
+        void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context) override;
+        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context) override;
 
         void createConstructors() override;
-        void buildNativeDeclaration(CompileContext* context) override;
-        void buildNativeDefinition(CompileContext* context) override;
+        void buildNativeDeclaration(CompileContext& context) override;
+        void buildNativeDefinition(CompileContext& context) override;
 
         ~ReferenceType() override = default;
 
@@ -92,7 +92,7 @@ namespace lang
 
       protected:
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext* context) override;
+        llvm::DIType* createDebugType(CompileContext& context) override;
 
       private:
         static lang::TypeRegistry<>& getReferenceTypes();
@@ -106,7 +106,7 @@ namespace lang
          * @param context The current compile context.
          * @return A native value for the referenced value.
          */
-        llvm::Value* getReferenced(llvm::Value* value, CompileContext* context);
+        llvm::Value* getReferenced(llvm::Value* value, CompileContext& context);
 
         /**
          * Get the referenced value.
@@ -114,7 +114,7 @@ namespace lang
          * @param context The current compile context.
          * @return The referenced value.
          */
-        std::shared_ptr<lang::Value> getReferenced(const std::shared_ptr<lang::Value>& value, CompileContext* context);
+        std::shared_ptr<lang::Value> getReferenced(const std::shared_ptr<lang::Value>& value, CompileContext& context);
 
         /**
          * Get a reference type instance.

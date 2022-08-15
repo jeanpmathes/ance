@@ -35,7 +35,7 @@ class Parenthesis
     [[nodiscard]] std::shared_ptr<lang::Value> getValue() const override;
 
   protected:
-    void doAssign(std::shared_ptr<lang::Value> value, CompileContext* context) override;
+    void doAssign(std::shared_ptr<lang::Value> value, CompileContext& context) override;
 
   private:
     std::unique_ptr<Expression> expression_;

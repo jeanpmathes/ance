@@ -15,7 +15,7 @@ lang::ResolvingHandle<lang::Type> lang::WrappedNativeValue::type() const
     return type_;
 }
 
-void lang::WrappedNativeValue::buildNativeValue(CompileContext*) {}
+void lang::WrappedNativeValue::buildNativeValue(CompileContext&) {}
 
 llvm::Value* lang::WrappedNativeValue::getNativeValue()
 {

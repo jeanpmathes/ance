@@ -33,7 +33,7 @@ class Drop
     Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
-    void doBuild(CompileContext* context) override;
+    void doBuild(CompileContext& context) override;
 
   private:
     lang::ResolvingHandle<lang::Variable> variable_;

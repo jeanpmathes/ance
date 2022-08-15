@@ -48,7 +48,7 @@ Statements Drop::expandWith(Expressions, Statements) const
     return statements;
 }
 
-void Drop::doBuild(CompileContext* context)
+void Drop::doBuild(CompileContext& context)
 {
     variable_->buildFinalization(context);
 }

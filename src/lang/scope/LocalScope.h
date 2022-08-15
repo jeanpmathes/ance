@@ -37,7 +37,7 @@ namespace lang
 
         lang::GlobalScope* getGlobalScope() override;
         lang::LocalScope*  asLocalScope() override;
-        llvm::DIScope*     getDebugScope(CompileContext* context) override;
+        llvm::DIScope*     getDebugScope(CompileContext& context) override;
 
         [[nodiscard]] lang::Scope* scope() const;
 
@@ -104,15 +104,15 @@ namespace lang
          * Build all variable declarations.
          * @param context The current compile context.
          */
-        void buildDeclarations(CompileContext* context);
+        void buildDeclarations(CompileContext& context);
 
-        void buildFinalization(CompileContext* context) override;
+        void buildFinalization(CompileContext& context) override;
 
         /**
          * Build all finalization of to the function.
          * @param context The current compile context.
          */
-        void buildReturnFinalization(CompileContext* context);
+        void buildReturnFinalization(CompileContext& context);
 
       private:
         lang::Scope*                   parent_;

@@ -141,10 +141,10 @@ std::string lang::StructType::createMangledName() const
     return "struct(" + name() + ")";
 }
 
-llvm::DIType* lang::StructType::createDebugType(CompileContext* context)
+llvm::DIType* lang::StructType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl         = context->module()->getDataLayout();
-    llvm::Type*             array_type = getContentType(*context->llvmContext());
+    const llvm::DataLayout& dl         = context.module()->getDataLayout();
+    llvm::Type*             array_type = getContentType(*context.llvmContext());
 
     uint64_t size      = dl.getTypeSizeInBits(array_type);
     uint32_t alignment = dl.getABITypeAlignment(array_type);
@@ -152,17 +152,17 @@ llvm::DIType* lang::StructType::createDebugType(CompileContext* context)
     std::vector<llvm::Metadata*> member_types;
     for (auto& member : members_) { member_types.push_back(member->type()->getDebugType(context)); }
 
-    llvm::MDTuple* debug_type = llvm::MDNode::get(*context->llvmContext(), member_types);
+    llvm::MDTuple* debug_type = llvm::MDNode::get(*context.llvmContext(), member_types);
 
-    return context->di()->createStructType(scope()->getDebugScope(context),
-                                           name().text(),
-                                           context->sourceFile(),
-                                           getDefinitionLocation().line(),
-                                           size,
-                                           alignment,
-                                           llvm::DINode::FlagZero,
-                                           nullptr,
-                                           debug_type);
+    return context.di()->createStructType(scope()->getDebugScope(context),
+                                          name().text(),
+                                          context.sourceFile(),
+                                          getDefinitionLocation().line(),
+                                          size,
+                                          alignment,
+                                          llvm::DINode::FlagZero,
+                                          nullptr,
+                                          debug_type);
 }
 
 std::vector<lang::TypeDefinition*> lang::StructType::getDependencies() const
@@ -207,7 +207,7 @@ bool lang::StructType::validateMemberAccess(const lang::Identifier& name, Valida
 
 std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr<Value>  value,
                                                                  const lang::Identifier& name,
-                                                                 CompileContext*         context)
+                                                                 CompileContext&         context)
 {
     lang::ResolvingHandle<lang::Type> return_type = lang::ReferenceType::get(getMemberType(name));
 
@@ -234,7 +234,7 @@ std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr
     return std::make_shared<lang::WrappedNativeValue>(return_type, native_value);
 }
 
-void lang::StructType::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context)
+void lang::StructType::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context)
 {
     auto size = static_cast<int32_t>(members_.size());
 
@@ -247,7 +247,7 @@ void lang::StructType::buildSingleDefaultInitializerDefinition(llvm::Value* ptr,
 
 void lang::StructType::buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
                                                             llvm::Value*    src_ptr,
-                                                            CompileContext* context)
+                                                            CompileContext& context)
 {
     auto size = static_cast<int32_t>(members_.size());
 
@@ -259,7 +259,7 @@ void lang::StructType::buildSingleCopyInitializerDefinition(llvm::Value*    dts_
     }
 }
 
-void lang::StructType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext* context)
+void lang::StructType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context)
 {
     auto size = static_cast<int32_t>(members_.size());
 
@@ -272,10 +272,10 @@ void lang::StructType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, C
 
 llvm::Value* lang::StructType::buildGetElementPointer(llvm::Value*    struct_ptr,
                                                       int32_t         member_index,
-                                                      CompileContext* context)
+                                                      CompileContext& context)
 {
-    return context->ir()->CreateStructGEP(getContentType(*context->llvmContext()),
-                                          struct_ptr,
-                                          member_index,
-                                          struct_ptr->getName() + ".gep");
+    return context.ir()->CreateStructGEP(getContentType(*context.llvmContext()),
+                                         struct_ptr,
+                                         member_index,
+                                         struct_ptr->getName() + ".gep");
 }

@@ -216,7 +216,7 @@ llvm::Type* lang::Type::getContentType(llvm::LLVMContext& c) const
     return definition_->getContentType(c);
 }
 
-llvm::DIType* lang::Type::getDebugType(CompileContext* context)
+llvm::DIType* lang::Type::getDebugType(CompileContext& context)
 {
     assert(isDefined());
     return definition_->getDebugType(context);
@@ -363,7 +363,7 @@ bool lang::Type::validateIndirection(lang::Location location, ValidationLogger& 
 
 std::shared_ptr<lang::Value> lang::Type::buildSubscript(std::shared_ptr<Value> indexed,
                                                         std::shared_ptr<Value> index,
-                                                        CompileContext*        context)
+                                                        CompileContext&        context)
 {
     assert(isDefined());
     return definition_->buildSubscript(std::move(indexed), std::move(index), context);
@@ -372,7 +372,7 @@ std::shared_ptr<lang::Value> lang::Type::buildSubscript(std::shared_ptr<Value> i
 std::shared_ptr<lang::Value> lang::Type::buildOperator(lang::BinaryOperator   op,
                                                        std::shared_ptr<Value> left,
                                                        std::shared_ptr<Value> right,
-                                                       CompileContext*        context)
+                                                       CompileContext&        context)
 {
     assert(isDefined());
     return definition_->buildOperator(op, std::move(left), std::move(right), context);
@@ -380,7 +380,7 @@ std::shared_ptr<lang::Value> lang::Type::buildOperator(lang::BinaryOperator   op
 
 std::shared_ptr<lang::Value> lang::Type::buildOperator(lang::UnaryOperator    op,
                                                        std::shared_ptr<Value> value,
-                                                       CompileContext*        context)
+                                                       CompileContext&        context)
 {
     assert(isDefined());
     return definition_->buildOperator(op, std::move(value), context);
@@ -388,7 +388,7 @@ std::shared_ptr<lang::Value> lang::Type::buildOperator(lang::UnaryOperator    op
 
 std::shared_ptr<lang::Value> lang::Type::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                                  std::shared_ptr<Value>            value,
-                                                                 CompileContext*                   context)
+                                                                 CompileContext&                   context)
 {
     assert(isDefined());
     return definition_->buildImplicitConversion(other, std::move(value), context);
@@ -396,55 +396,55 @@ std::shared_ptr<lang::Value> lang::Type::buildImplicitConversion(lang::Resolving
 
 std::shared_ptr<lang::Value> lang::Type::buildMemberAccess(std::shared_ptr<Value>  value,
                                                            const lang::Identifier& name,
-                                                           CompileContext*         context)
+                                                           CompileContext&         context)
 {
     assert(isDefined());
     return definition_->buildMemberAccess(std::move(value), name, context);
 }
 
-std::shared_ptr<lang::Value> lang::Type::buildIndirection(std::shared_ptr<Value> value, CompileContext* context)
+std::shared_ptr<lang::Value> lang::Type::buildIndirection(std::shared_ptr<Value> value, CompileContext& context)
 {
     assert(isDefined());
     return definition_->buildIndirection(std::move(value), context);
 }
 
-void lang::Type::buildDefaultInitializer(llvm::Value* ptr, CompileContext* context)
+void lang::Type::buildDefaultInitializer(llvm::Value* ptr, CompileContext& context)
 {
     assert(isDefined());
     definition_->buildDefaultInitializer(ptr, context);
 }
 
-void lang::Type::buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context)
+void lang::Type::buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context)
 {
     assert(isDefined());
     definition_->buildCopyInitializer(ptr, original, context);
 }
 
-void lang::Type::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+void lang::Type::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
 {
     assert(isDefined());
     definition_->buildDefaultInitializer(ptr, count, context);
 }
 
-void lang::Type::buildFinalizer(llvm::Value* ptr, CompileContext* context)
+void lang::Type::buildFinalizer(llvm::Value* ptr, CompileContext& context)
 {
     assert(isDefined());
     definition_->buildFinalizer(ptr, context);
 }
 
-void lang::Type::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context)
+void lang::Type::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
 {
     assert(isDefined());
     definition_->buildFinalizer(ptr, count, context);
 }
 
-void lang::Type::buildNativeDeclaration(CompileContext* context)
+void lang::Type::buildNativeDeclaration(CompileContext& context)
 {
     assert(isDefined());
     definition_->buildNativeDeclaration(context);
 }
 
-void lang::Type::buildNativeDefinition(CompileContext* context)
+void lang::Type::buildNativeDefinition(CompileContext& context)
 {
     assert(isDefined());
     definition_->buildNativeDefinition(context);
@@ -497,7 +497,7 @@ bool lang::Type::checkMismatch(lang::ResolvingHandle<lang::Type> expected,
 
 std::shared_ptr<lang::Value> lang::Type::makeMatching(lang::ResolvingHandle<lang::Type> expected,
                                                       std::shared_ptr<lang::Value>      value,
-                                                      CompileContext*                   context)
+                                                      CompileContext&                   context)
 {
     if (areSame(expected, value->type())) return makeActual(value);
 
@@ -523,7 +523,7 @@ lang::ResolvingHandle<lang::Type> lang::Type::getReferencedType(lang::ResolvingH
 }
 
 std::shared_ptr<lang::Value> lang::Type::getValueOrReferencedValue(std::shared_ptr<lang::Value> value,
-                                                                   CompileContext*              context)
+                                                                   CompileContext&              context)
 {
     if (value->type()->isReferenceType())
     {

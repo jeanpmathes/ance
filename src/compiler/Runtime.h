@@ -28,7 +28,7 @@ class Runtime
      * Initialize the runtime.
      * @param context The current compile context.
      */
-    void init(CompileContext* context);
+    void init(CompileContext& context);
 
     /**
      * Set the exit point.
@@ -75,7 +75,7 @@ class Runtime
     std::shared_ptr<lang::Value> allocate(Allocator                           allocation,
                                           lang::ResolvingHandle<lang::Type>   type,
                                           const std::shared_ptr<lang::Value>& count,
-                                          CompileContext*                     context);
+                                          CompileContext&                     context);
 
     /**
      * Free dynamically allocated memory.
@@ -83,23 +83,23 @@ class Runtime
      * @param delete_buffer Whether the memory is a single element or a buffer of multiple elements.
      * @param context The current compile context.
      */
-    void deleteDynamic(const std::shared_ptr<lang::Value>& value, bool delete_buffer, CompileContext* context);
+    void deleteDynamic(const std::shared_ptr<lang::Value>& value, bool delete_buffer, CompileContext& context);
 
     /**
      * Build an assertion.
      * @param value The boolean value to assert.
      * @param context The current compile context.
      */
-    void buildAssert(const std::shared_ptr<lang::Value>& value, CompileContext* context);
+    void buildAssert(const std::shared_ptr<lang::Value>& value, CompileContext& context);
 
   private:
     llvm::Value* allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
                                    llvm::Value*                      count_value,
-                                   CompileContext*                   context);
+                                   CompileContext&                   context);
 
     llvm::Value* allocateDynamic(lang::ResolvingHandle<lang::Type> type,
                                  llvm::Value*                      count_value,
-                                 CompileContext*                   context);
+                                 CompileContext&                   context);
 };
 
 #endif

@@ -239,10 +239,10 @@ void lang::CustomFunction::validateUnreachable(ValidationLogger& validation_logg
     }
 }
 
-void lang::CustomFunction::createNativeBacking(CompileContext* context)
+void lang::CustomFunction::createNativeBacking(CompileContext& context)
 {
     std::tie(native_type_, native_function_) =
-        createNativeFunction(access_.linkage(), *context->llvmContext(), context->module());
+        createNativeFunction(access_.linkage(), *context.llvmContext(), context.module());
 
     std::vector<llvm::Metadata*> di_types;
     di_types.push_back(returnType()->getDebugType(context));
@@ -256,40 +256,40 @@ void lang::CustomFunction::createNativeBacking(CompileContext* context)
     }
 
     llvm::DISubroutineType* debug_type =
-        context->di()->createSubroutineType(context->di()->getOrCreateTypeArray(di_types));
+        context.di()->createSubroutineType(context.di()->getOrCreateTypeArray(di_types));
     llvm::DISubprogram* subprogram =
-        context->di()->createFunction(scope().getDebugScope(context),
-                                      name().text(),
-                                      signature_.getMangledName(),
-                                      context->sourceFile(),
-                                      location().line(),
-                                      debug_type,
-                                      definition_location_.line(),
-                                      llvm::DINode::DIFlags::FlagPrototyped,
-                                      llvm::DISubprogram::toSPFlags(false, true, false, 0U, name().text() == "main"));
+        context.di()->createFunction(scope().getDebugScope(context),
+                                     name().text(),
+                                     signature_.getMangledName(),
+                                     context.sourceFile(),
+                                     location().line(),
+                                     debug_type,
+                                     definition_location_.line(),
+                                     llvm::DINode::DIFlags::FlagPrototyped,
+                                     llvm::DISubprogram::toSPFlags(false, true, false, 0U, name().text() == "main"));
 
     native_function_->setSubprogram(subprogram);
 }
 
-void lang::CustomFunction::build(CompileContext* context)
+void lang::CustomFunction::build(CompileContext& context)
 {
-    llvm::BasicBlock* decl = llvm::BasicBlock::Create(*context->llvmContext(), "decl", native_function_);
+    llvm::BasicBlock* decl = llvm::BasicBlock::Create(*context.llvmContext(), "decl", native_function_);
 
-    context->ir()->SetInsertPoint(decl);
+    context.ir()->SetInsertPoint(decl);
     function().buildDeclarations(context);
     inside_scope_->buildDeclarations(context);
 
-    llvm::BasicBlock* defs = llvm::BasicBlock::Create(*context->llvmContext(), "defs", native_function_);
+    llvm::BasicBlock* defs = llvm::BasicBlock::Create(*context.llvmContext(), "defs", native_function_);
 
-    context->ir()->CreateBr(defs);
-    context->ir()->SetInsertPoint(defs);
+    context.ir()->CreateBr(defs);
+    context.ir()->SetInsertPoint(defs);
     for (auto& arg : arguments_) { (*arg)->buildDefinition(context); }
 
     initial_block_->prepareBuild(context, native_function_);
     initial_block_->doBuild(context);
 
-    context->ir()->SetCurrentDebugLocation(llvm::DebugLoc());
-    context->di()->finalizeSubprogram(native_function_->getSubprogram());
+    context.ir()->SetCurrentDebugLocation(llvm::DebugLoc());
+    context.di()->finalizeSubprogram(native_function_->getSubprogram());
 }
 
 llvm::DISubprogram* lang::CustomFunction::debugSubprogram()
@@ -307,7 +307,7 @@ const std::vector<lang::BasicBlock*>& lang::CustomFunction::getBasicBlocks() con
     return used_blocks_;
 }
 
-llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext*)
+llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext&)
 {
     return debugSubprogram();
 }

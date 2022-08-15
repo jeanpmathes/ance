@@ -45,7 +45,7 @@ Statements Return::expandWith(Expressions subexpressions, Statements) const
     return statements;
 }
 
-void Return::doBuild(CompileContext*)
+void Return::doBuild(CompileContext&)
 {
     // Handled by basic block.
 }

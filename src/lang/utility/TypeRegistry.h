@@ -35,13 +35,13 @@ namespace lang
          * Build all native declarations.
          * @param context The compile context.
          */
-        virtual void buildNativeDeclarations(CompileContext* context) = 0;
+        virtual void buildNativeDeclarations(CompileContext& context) = 0;
 
         /**
          * Build all native definitions.
          * @param context The compile context.
          */
-        virtual void buildNativeDefinitions(CompileContext* context) = 0;
+        virtual void buildNativeDefinitions(CompileContext& context) = 0;
     };
 
     /**
@@ -63,8 +63,8 @@ namespace lang
         void resolve() override;
         void postResolve() override;
 
-        void buildNativeDeclarations(CompileContext* context) override;
-        void buildNativeDefinitions(CompileContext* context) override;
+        void buildNativeDeclarations(CompileContext& context) override;
+        void buildNativeDefinitions(CompileContext& context) override;
 
       private:
         std::vector<Entry> types_;

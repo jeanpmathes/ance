@@ -86,7 +86,7 @@ namespace lang
 
         llvm::Type*         getNativeType(llvm::LLVMContext& c) const;
         virtual llvm::Type* getContentType(llvm::LLVMContext& c) const = 0;
-        llvm::DIType*       getDebugType(CompileContext* context);
+        llvm::DIType*       getDebugType(CompileContext& context);
 
         llvm::TypeSize getNativeSize(llvm::Module* m);
         llvm::TypeSize getContentSize(llvm::Module* m);
@@ -126,30 +126,30 @@ namespace lang
 
         virtual std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                             std::shared_ptr<Value> index,
-                                                            CompileContext*        context);
+                                                            CompileContext&        context);
         virtual std::shared_ptr<lang::Value> buildOperator(lang::BinaryOperator   op,
                                                            std::shared_ptr<Value> left,
                                                            std::shared_ptr<Value> right,
-                                                           CompileContext*        context);
+                                                           CompileContext&        context);
         virtual std::shared_ptr<lang::Value> buildOperator(lang::UnaryOperator    op,
                                                            std::shared_ptr<Value> value,
-                                                           CompileContext*        context);
+                                                           CompileContext&        context);
         virtual std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                                      std::shared_ptr<Value>            value,
-                                                                     CompileContext*                   context);
+                                                                     CompileContext&                   context);
         virtual std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
                                                                const lang::Identifier& name,
-                                                               CompileContext*         context);
-        virtual std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context);
+                                                               CompileContext&         context);
+        virtual std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext& context);
 
-        void         buildDefaultInitializer(llvm::Value* ptr, CompileContext* context);
-        virtual void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context);
-        virtual void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context);
-        void         buildFinalizer(llvm::Value* ptr, CompileContext* context);
-        virtual void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context);
+        void         buildDefaultInitializer(llvm::Value* ptr, CompileContext& context);
+        virtual void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context);
+        virtual void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context);
+        void         buildFinalizer(llvm::Value* ptr, CompileContext& context);
+        virtual void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context);
 
-        virtual void buildNativeDeclaration(CompileContext* context);
-        virtual void buildNativeDefinition(CompileContext* context);
+        virtual void buildNativeDeclaration(CompileContext& context);
+        virtual void buildNativeDefinition(CompileContext& context);
 
       protected:
         virtual void createConstructors();
@@ -167,31 +167,31 @@ namespace lang
          */
         [[nodiscard]] virtual bool isTriviallyDestructible() const;
 
-        void defineDefaultInitializer(CompileContext* context);
-        void defineCopyInitializer(CompileContext* context);
-        void defineDefaultFinalizer(CompileContext* context);
+        void defineDefaultInitializer(CompileContext& context);
+        void defineCopyInitializer(CompileContext& context);
+        void defineDefaultFinalizer(CompileContext& context);
 
-        void defineConstructors(CompileContext* context);
-        void buildConstructors(CompileContext* context);
+        void defineConstructors(CompileContext& context);
+        void buildConstructors(CompileContext& context);
 
         /**
          * Build the part of the definition that default-initializes a single element of this type.
          */
-        virtual void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context);
+        virtual void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context);
         /**
          * Build the part of the definition that copies a single element of this type.
          */
         virtual void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
                                                           llvm::Value*    src_ptr,
-                                                          CompileContext* context);
+                                                          CompileContext& context);
         /**
          * Build the part of the definition that default-finalizes a single element of this type.
          */
-        virtual void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext* context);
+        virtual void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context);
 
         virtual std::string createMangledName() const = 0;
 
-        virtual llvm::DIType* createDebugType(CompileContext* context) = 0;
+        virtual llvm::DIType* createDebugType(CompileContext& context) = 0;
 
         /**
          * Check the dependencies of the type definition for cyclic dependencies.
@@ -224,7 +224,7 @@ namespace lang
          */
         virtual void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
                                             lang::PredefinedFunction&                             function,
-                                            CompileContext*                                       context);
+                                            CompileContext&                                       context);
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self() const;
 
@@ -237,8 +237,8 @@ namespace lang
         void buildPointerIteration(llvm::Function*                                    function,
                                    llvm::Value*                                       ptr,
                                    llvm::Value*                                       count,
-                                   std::function<void(llvm::Value*, CompileContext*)> operation,
-                                   CompileContext*                                    context);
+                                   std::function<void(llvm::Value*, CompileContext&)> operation,
+                                   CompileContext&                                    context);
 
       private:
         lang::Identifier name_;

@@ -145,7 +145,7 @@ Expression::Expansion FunctionCall::expandWith(Expressions subexpressions) const
             Statements()};
 }
 
-void FunctionCall::doBuild(CompileContext* context)
+void FunctionCall::doBuild(CompileContext& context)
 {
     std::vector<std::shared_ptr<lang::Value>> arg_values;
 

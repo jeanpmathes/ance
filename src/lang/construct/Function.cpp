@@ -167,22 +167,22 @@ void lang::Function::validateFlow(ValidationLogger& validation_logger) const
     definition_->validateFlow(validation_logger);
 }
 
-void lang::Function::createNativeBacking(CompileContext* context)
+void lang::Function::createNativeBacking(CompileContext& context)
 {
     definition_->createNativeBacking(context);
 }
 
-void lang::Function::build(CompileContext* context)
+void lang::Function::build(CompileContext& context)
 {
     definition_->build(context);
 }
 
-void lang::Function::buildDeclarations(CompileContext* context)
+void lang::Function::buildDeclarations(CompileContext& context)
 {
     for (auto& [name, parameter] : defined_parameters_) { parameter->buildDeclaration(context); }
 }
 
-void lang::Function::buildFinalization(CompileContext* context)
+void lang::Function::buildFinalization(CompileContext& context)
 {
     for (auto& [name, parameter] : defined_parameters_) { parameter->buildFinalization(context); }
 }
@@ -195,7 +195,7 @@ bool lang::Function::validateCall(const std::vector<std::pair<std::shared_ptr<la
 }
 
 std::shared_ptr<lang::Value> lang::Function::buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
-                                                       CompileContext*                                  context) const
+                                                       CompileContext&                                  context) const
 {
     return definition_->buildCall(arguments, context);
 }
@@ -210,7 +210,7 @@ lang::GlobalScope* lang::Function::getGlobalScope()
     return definition_->getGlobalScope();
 }
 
-llvm::DIScope* lang::Function::getDebugScope(CompileContext* context)
+llvm::DIScope* lang::Function::getDebugScope(CompileContext& context)
 {
     return definition_->getDebugScope(context);
 }

@@ -23,7 +23,7 @@ namespace lang
 
         lang::ResolvingHandle<lang::Type> type() const override;
 
-        void         buildNativeValue(CompileContext* context) override;
+        void         buildNativeValue(CompileContext& context) override;
         llvm::Value* getNativeValue() override;
 
       private:

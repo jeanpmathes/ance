@@ -105,7 +105,7 @@ bool lang::FunctionDefinition::doCallValidation(
 
 std::shared_ptr<lang::Value> lang::FunctionDefinition::buildCall(
     const std::vector<std::shared_ptr<lang::Value>>& arguments,
-    CompileContext*                                  context) const
+    CompileContext&                                  context) const
 {
     auto [native_type, native_function] = getNativeRepresentation();
 
@@ -159,7 +159,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::FunctionDefinition::create
 llvm::CallInst* lang::FunctionDefinition::buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
                                                     llvm::FunctionType*                              native_type,
                                                     llvm::Function*                                  native_function,
-                                                    CompileContext*                                  context) const
+                                                    CompileContext&                                  context) const
 {
     std::vector<llvm::Value*> args;
     args.reserve(arguments.size());
@@ -172,7 +172,7 @@ llvm::CallInst* lang::FunctionDefinition::buildCall(const std::vector<std::share
         args.push_back(matched_arg->getContentValue());
     }
 
-    auto* content_value = context->ir()->CreateCall(native_type, native_function, args);
+    auto* content_value = context.ir()->CreateCall(native_type, native_function, args);
     if (!native_type->getReturnType()->isVoidTy()) content_value->setName(name() + ".call");
     return content_value;
 }

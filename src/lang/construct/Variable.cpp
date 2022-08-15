@@ -89,17 +89,17 @@ void lang::Variable::validate(ValidationLogger& validation_logger) const
     definition_->validate(validation_logger);
 }
 
-void lang::Variable::buildDeclaration(CompileContext* context)
+void lang::Variable::buildDeclaration(CompileContext& context)
 {
     definition_->buildDeclaration(context);
 }
 
-void lang::Variable::buildDefinition(CompileContext* context)
+void lang::Variable::buildDefinition(CompileContext& context)
 {
     definition_->buildDefinition(context);
 }
 
-void lang::Variable::buildFinalization(CompileContext* context)
+void lang::Variable::buildFinalization(CompileContext& context)
 {
     definition_->buildFinalization(context);
 }
@@ -139,12 +139,12 @@ bool lang::Variable::validateSetValue(const std::shared_ptr<lang::Value>& value,
     return lang::Type::checkMismatch(target_type, value->type(), assigned_location, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::Variable::getValue(CompileContext* context)
+std::shared_ptr<lang::Value> lang::Variable::getValue(CompileContext& context)
 {
     return definition_->getValue(context);
 }
 
-void lang::Variable::setValue(const std::shared_ptr<lang::Value>& value, CompileContext* context)
+void lang::Variable::setValue(const std::shared_ptr<lang::Value>& value, CompileContext& context)
 {
     definition_->setValue(value, context);
 }

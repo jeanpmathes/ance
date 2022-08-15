@@ -35,7 +35,7 @@ class SizeofType
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
-    void doBuild(CompileContext* context) override;
+    void doBuild(CompileContext& context) override;
 
   private:
     lang::ResolvingHandle<lang::Type> type_;

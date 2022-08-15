@@ -113,14 +113,14 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * Build this statement.
      * @param context The current compile context.
      */
-    void build(CompileContext* context);
+    void build(CompileContext& context);
 
   protected:
     /**
      * Build this statement. Do not call this method, use build instead.
      * @param context The current compile context.
      */
-    virtual void doBuild(CompileContext* context) = 0;
+    virtual void doBuild(CompileContext& context) = 0;
 
     /**
      * Add a subexpression to the current statement.

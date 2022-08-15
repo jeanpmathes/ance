@@ -57,8 +57,8 @@ namespace lang
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
-        void                         createNativeBacking(CompileContext* context) override;
-        void                         build(CompileContext* context) override;
+        void createNativeBacking(CompileContext& context) override;
+        void build(CompileContext& context) override;
 
         /**
          * Get the debug subprogram.
@@ -66,7 +66,7 @@ namespace lang
          */
         llvm::DISubprogram* debugSubprogram();
 
-        llvm::DIScope*    getDebugScope(CompileContext* context) override;
+        llvm::DIScope*    getDebugScope(CompileContext& context) override;
         lang::LocalScope* getInsideScope() override;
 
         [[nodiscard]] const std::vector<lang::BasicBlock*>& getBasicBlocks() const override;

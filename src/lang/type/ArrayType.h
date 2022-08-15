@@ -48,27 +48,27 @@ namespace lang
                                                        ValidationLogger&                 validation_logger) const override;
         std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
-                                                    CompileContext*        context) override;
+                                                    CompileContext&        context) override;
 
       private:
         llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
                                             const std::shared_ptr<lang::Value>& index,
-                                            CompileContext*                     context);
+                                            CompileContext&                     context);
 
-        llvm::Value* buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext* context);
+        llvm::Value* buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context);
 
       public:
         ~ArrayType() override = default;
 
       protected:
-        void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context) override;
+        void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context) override;
         void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
                                                   llvm::Value*    src_ptr,
-                                                  CompileContext* context) override;
-        void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext* context) override;
+                                                  CompileContext& context) override;
+        void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context) override;
 
         std::string                                      createMangledName() const override;
-        llvm::DIType*                                    createDebugType(CompileContext* context) override;
+        llvm::DIType*                                    createDebugType(CompileContext& context) override;
         [[nodiscard]] std::vector<lang::TypeDefinition*> getDependencies() const override;
 
       private:

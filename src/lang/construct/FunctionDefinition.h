@@ -125,13 +125,13 @@ namespace lang
          * Create the native content of this function, allowing building function code and calling this function.
          * @param context The current compile context.
          */
-        virtual void createNativeBacking(CompileContext* context) = 0;
+        virtual void createNativeBacking(CompileContext& context) = 0;
 
         /**
          * Build the function definition. This will be called after building the name.
          * @param context The current compile context.
          */
-        virtual void build(CompileContext* context) = 0;
+        virtual void build(CompileContext& context) = 0;
 
         /**
          * Validate a call to this function.
@@ -159,7 +159,7 @@ namespace lang
          * @return The return value. Will be null for return type void.
          */
         std::shared_ptr<lang::Value> buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
-                                               CompileContext*                                  context) const;
+                                               CompileContext&                                  context) const;
 
         /**
          * Get the parameter list as source, with parentheses.
@@ -195,13 +195,13 @@ namespace lang
         llvm::CallInst* buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
                                   llvm::FunctionType*                              native_type,
                                   llvm::Function*                                  native_function,
-                                  CompileContext*                                  context) const;
+                                  CompileContext&                                  context) const;
 
         [[nodiscard]] virtual std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const = 0;
 
       public:
         lang::GlobalScope*        getGlobalScope();
-        virtual llvm::DIScope*    getDebugScope(CompileContext* context) = 0;
+        virtual llvm::DIScope*    getDebugScope(CompileContext& context) = 0;
         virtual lang::LocalScope* getInsideScope()                       = 0;
 
         [[nodiscard]] virtual const std::vector<lang::BasicBlock*>& getBasicBlocks() const = 0;

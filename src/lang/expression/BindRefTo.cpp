@@ -53,7 +53,7 @@ Expression::Expansion BindRefTo::expandWith(Expressions subexpressions) const
     return {Statements(), std::make_unique<BindRefTo>(std::move(subexpressions[0]), location()), Statements()};
 }
 
-void BindRefTo::doBuild(CompileContext*)
+void BindRefTo::doBuild(CompileContext&)
 {
     setValue(std::make_shared<lang::RoughlyCastedValue>(type(), address_->getValue()));
 }

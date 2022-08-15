@@ -21,17 +21,17 @@ namespace lang
 
         [[nodiscard]] bool isVoidType() const override;
 
-        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext* context) override;
-        void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext* context) override;
-        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext* context) override;
+        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context) override;
+        void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context) override;
+        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context) override;
 
         void createConstructors() override;
-        void buildNativeDeclaration(CompileContext* context) override;
-        void buildNativeDefinition(CompileContext* context) override;
+        void buildNativeDeclaration(CompileContext& context) override;
+        void buildNativeDefinition(CompileContext& context) override;
 
       protected:
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext* context) override;
+        llvm::DIType* createDebugType(CompileContext& context) override;
 
       public:
         /**

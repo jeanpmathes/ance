@@ -53,7 +53,7 @@ Statements While::expandWith(Expressions subexpressions, Statements substatement
     return statements;
 }
 
-void While::doBuild(CompileContext*)
+void While::doBuild(CompileContext&)
 {
     // Handled by basic block.
 }

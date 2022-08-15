@@ -90,11 +90,11 @@ llvm::Constant* lang::Member::getConstantInitializer(llvm::Module& m) const
     else { return type()->getDefaultContent(m); }
 }
 
-void lang::Member::buildInitialization(llvm::Value* ptr, CompileContext* context)
+void lang::Member::buildInitialization(llvm::Value* ptr, CompileContext& context)
 {
     if (constant_init_)
     {
-        llvm::Value* content   = getInitialValue(*context->module());
+        llvm::Value* content   = getInitialValue(*context.module());
         llvm::Value* value_ptr = lang::Values::contentToNative(type(), content, context);
 
         type()->buildCopyInitializer(ptr, value_ptr, context);

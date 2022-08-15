@@ -75,12 +75,12 @@ AnceCompiler::AnceCompiler(Application& app)
 
 void AnceCompiler::compile(const std::filesystem::path& out)
 {
-    context_->runtime()->init(context_.get());
+    context_->runtime()->init(*context_);
 
-    application_.globalScope().createNativeBacking(context_.get());
+    application_.globalScope().createNativeBacking(*context_);
     context_->runtime()->setExit(application_.globalScope().getExit());
 
-    application_.globalScope().buildFunctions(context_.get());
+    application_.globalScope().buildFunctions(*context_);
 
     assert(context_->allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
 
@@ -181,11 +181,11 @@ void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& ex
     lang::ResolvingHandle<lang::Function> user_exit = application_.globalScope().getExit();
 
     std::vector<std::shared_ptr<lang::Value>> args;
-    args.push_back(std::make_shared<lang::WrappedNativeValue>(
-        exitcode_type,
-        lang::Values::contentToNative(exitcode_type, exitcode, context_.get())));
+    args.push_back(
+        std::make_shared<lang::WrappedNativeValue>(exitcode_type,
+                                                   lang::Values::contentToNative(exitcode_type, exitcode, *context_)));
 
-    user_exit->buildCall(args, context_.get());
+    user_exit->buildCall(args, *context_);
 
     ir_.CreateRetVoid();
 }
@@ -203,9 +203,9 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main,
     ir_.SetInsertPoint(start_block);
 
     std::vector<std::shared_ptr<lang::Value>> args;
-    std::shared_ptr<lang::Value>              exitcode = main->buildCall(args, context_.get());
+    std::shared_ptr<lang::Value>              exitcode = main->buildCall(args, *context_);
 
-    exitcode->buildContentValue(context_.get());
+    exitcode->buildContentValue(*context_);
     llvm::Value* native_exitcode = exitcode->getContentValue();
 
     llvm::Value* exit_args = {native_exitcode};

@@ -60,8 +60,8 @@ namespace lang
          */
         virtual bool equals(const lang::Constant* other) const = 0;
 
-        void buildNativeValue(CompileContext* context) final;
-        void buildContentValue(CompileContext* context) final;
+        void buildNativeValue(CompileContext& context) final;
+        void buildContentValue(CompileContext& context) final;
 
         llvm::Value* getNativeValue() final;
         llvm::Value* getContentValue() final;

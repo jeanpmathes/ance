@@ -111,7 +111,7 @@ Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressio
     return statements;
 }
 
-void LocalReferenceVariableDefinition::doBuild(CompileContext* context)
+void LocalReferenceVariableDefinition::doBuild(CompileContext& context)
 {
     (*variable_)->buildDefinition(context);
 }

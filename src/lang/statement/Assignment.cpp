@@ -62,7 +62,7 @@ Statements Assignment::expandWith(Expressions subexpressions, Statements) const
     return statements;
 }
 
-void Assignment::doBuild(CompileContext* context)
+void Assignment::doBuild(CompileContext& context)
 {
     assignable_->assign(assigned_->getValue(), context);
 }

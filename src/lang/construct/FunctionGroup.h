@@ -34,8 +34,8 @@ namespace lang
         void expand();
         void determineFlow();
         void validateFlow(ValidationLogger& validation_logger) const;
-        void createNativeBacking(CompileContext* compile_context);
-        void build(CompileContext* compile_context);
+        void createNativeBacking(CompileContext& compile_context);
+        void build(CompileContext& compile_context);
 
         /**
          * Get an undefined function group with the same name.

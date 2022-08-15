@@ -118,19 +118,19 @@ namespace lang
          * Build the variable declaration which prepares the storage.
          * @param context The current compile context.
          */
-        void buildDeclaration(CompileContext* context);
+        void buildDeclaration(CompileContext& context);
 
         /**
          * Build the variable definition which initializes the storage.
          * @param context The current compile context.
          */
-        void buildDefinition(CompileContext* context);
+        void buildDefinition(CompileContext& context);
 
         /**
          * Build the variable finalizer which cleans up the storage.
          * @param context The current compile context.
          */
-        void buildFinalization(CompileContext* context);
+        void buildFinalization(CompileContext& context);
 
         /**
          * Validate getting a value.
@@ -157,13 +157,13 @@ namespace lang
          * @param context The current compile context.
          * @return The current value.
          */
-        std::shared_ptr<lang::Value> getValue(CompileContext* context);
+        std::shared_ptr<lang::Value> getValue(CompileContext& context);
         /**
          * Set the current value of the variable.
          * @param value The new value.
          * @param context The current compile context.
          */
-        void setValue(const std::shared_ptr<lang::Value>& value, CompileContext* context);
+        void setValue(const std::shared_ptr<lang::Value>& value, CompileContext& context);
 
         /**
          * Get an undefined variable with the same name.

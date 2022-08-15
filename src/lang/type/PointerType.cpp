@@ -94,7 +94,7 @@ bool lang::PointerType::validateSubscript(lang::Location,
 
 std::shared_ptr<lang::Value> lang::PointerType::buildSubscript(std::shared_ptr<Value> indexed,
                                                                std::shared_ptr<Value> index,
-                                                               CompileContext*        context)
+                                                               CompileContext&        context)
 {
     index = lang::Type::makeMatching(lang::SizeType::getSize(), index, context);
 
@@ -106,7 +106,7 @@ std::shared_ptr<lang::Value> lang::PointerType::buildSubscript(std::shared_ptr<V
 
 llvm::Value* lang::PointerType::buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
                                                        const std::shared_ptr<lang::Value>& index,
-                                                       CompileContext*                     context)
+                                                       CompileContext&                     context)
 {
     indexed->buildContentValue(context);
     index->buildContentValue(context);
@@ -116,10 +116,10 @@ llvm::Value* lang::PointerType::buildGetElementPointer(const std::shared_ptr<lan
 
     llvm::Value* ptr = indexed->getContentValue();//Pointer to content is instead of pointer to pointer is required.
 
-    llvm::Value* element_ptr = context->ir()->CreateGEP(element_type_->getContentType(*context->llvmContext()),
-                                                        ptr,
-                                                        indices,
-                                                        ptr->getName() + ".gep");
+    llvm::Value* element_ptr = context.ir()->CreateGEP(element_type_->getContentType(*context.llvmContext()),
+                                                       ptr,
+                                                       indices,
+                                                       ptr->getName() + ".gep");
     return element_ptr;
 }
 
@@ -138,7 +138,7 @@ bool lang::PointerType::validateIndirection(lang::Location, ValidationLogger&) c
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::PointerType::buildIndirection(std::shared_ptr<Value> value, CompileContext* context)
+std::shared_ptr<lang::Value> lang::PointerType::buildIndirection(std::shared_ptr<Value> value, CompileContext& context)
 {
     value->buildContentValue(context);
     llvm::Value* ptr = value->getContentValue();
@@ -167,11 +167,11 @@ std::string lang::PointerType::createMangledName() const
     return std::string("ptr") + "(" + element_type_->getMangledName() + ")";
 }
 
-llvm::DIType* lang::PointerType::createDebugType(CompileContext* context)
+llvm::DIType* lang::PointerType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl = context->module()->getDataLayout();
+    const llvm::DataLayout& dl = context.module()->getDataLayout();
 
-    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
+    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
 
     llvm::DIType* di_type;
 
@@ -180,12 +180,12 @@ llvm::DIType* lang::PointerType::createDebugType(CompileContext* context)
         std::string name     = std::string(this->name().text());
         auto        encoding = llvm::dwarf::DW_ATE_address;
 
-        di_type = context->di()->createBasicType(name, size_in_bits, encoding);
+        di_type = context.di()->createBasicType(name, size_in_bits, encoding);
     }
     else {
         llvm::DIType* element_di_type = element_type_->getDebugType(context);
 
-        di_type = context->di()->createPointerType(element_di_type, size_in_bits);
+        di_type = context.di()->createPointerType(element_di_type, size_in_bits);
     }
 
     return di_type;

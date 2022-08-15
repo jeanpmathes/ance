@@ -94,7 +94,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @param value The value to assign.
      * @param context The current compile context.
      */
-    void assign(std::shared_ptr<lang::Value> value, CompileContext* context);
+    void assign(std::shared_ptr<lang::Value> value, CompileContext& context);
 
     /**
      * Get the return type of this expression.
@@ -125,7 +125,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      */
     virtual void setScope(lang::Scope& scope);
 
-    virtual void doAssign(std::shared_ptr<lang::Value> value, CompileContext* context);
+    virtual void doAssign(std::shared_ptr<lang::Value> value, CompileContext& context);
 
     /**
      * Add a subexpression to this expression.

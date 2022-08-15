@@ -65,7 +65,7 @@ Expression::Expansion Subscript::expandWith(Expressions subexpressions) const
             Statements()};
 }
 
-void Subscript::doBuild(CompileContext* context)
+void Subscript::doBuild(CompileContext& context)
 {
     std::shared_ptr<lang::Value> return_value =
         indexed_->type()->buildSubscript(indexed_->getValue(), index_->getValue(), context);

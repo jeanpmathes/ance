@@ -41,17 +41,17 @@ namespace lang
                                                        ValidationLogger&                 validation_logger) const override;
         std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
-                                                    CompileContext*        context) override;
+                                                    CompileContext&        context) override;
 
         bool                              definesIndirection() override;
         lang::ResolvingHandle<lang::Type> getIndirectionType() override;
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
-        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext* context) override;
+        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext& context) override;
 
       private:
         llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
                                             const std::shared_ptr<lang::Value>& index,
-                                            CompileContext*                     context);
+                                            CompileContext&                     context);
 
       public:
         ~PointerType() override = default;
@@ -66,7 +66,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext* context) override;
+        llvm::DIType* createDebugType(CompileContext& context) override;
 
       private:
         static lang::TypeRegistry<>& getPointerTypes();

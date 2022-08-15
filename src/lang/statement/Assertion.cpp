@@ -37,7 +37,7 @@ Statements Assertion::expandWith(Expressions subexpressions, Statements) const
     return statements;
 }
 
-void Assertion::doBuild(CompileContext* context)
+void Assertion::doBuild(CompileContext& context)
 {
-    context->runtime()->buildAssert(condition_->getValue(), context);
+    context.runtime()->buildAssert(condition_->getValue(), context);
 }

@@ -74,14 +74,14 @@ bool Expression::validateAssignment(const std::shared_ptr<lang::Value>& value,
     }
 }
 
-void Expression::assign(std::shared_ptr<lang::Value> value, CompileContext* context)
+void Expression::assign(std::shared_ptr<lang::Value> value, CompileContext& context)
 {
-    context->setDebugLocation(location(), containing_scope_);
+    context.setDebugLocation(location(), containing_scope_);
     doAssign(std::move(value), context);
-    context->resetDebugLocation();
+    context.resetDebugLocation();
 }
 
-void Expression::doAssign(std::shared_ptr<lang::Value> value, CompileContext* context)
+void Expression::doAssign(std::shared_ptr<lang::Value> value, CompileContext& context)
 {
     assert(type()->isReferenceType());
 

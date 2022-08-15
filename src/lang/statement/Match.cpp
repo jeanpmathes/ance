@@ -451,7 +451,7 @@ bool Match::validateCases(lang::Location                            location,
     return valid;
 }
 
-void Match::doBuild(CompileContext*)
+void Match::doBuild(CompileContext&)
 {
     // Handled by basic block.
 }

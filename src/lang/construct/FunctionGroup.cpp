@@ -83,12 +83,12 @@ void lang::FunctionGroup::validateFlow(ValidationLogger& validation_logger) cons
     for (auto& function : functions()) function->validateFlow(validation_logger);
 }
 
-void lang::FunctionGroup::createNativeBacking(CompileContext* compile_context)
+void lang::FunctionGroup::createNativeBacking(CompileContext& compile_context)
 {
     for (auto& function : functions()) function->createNativeBacking(compile_context);
 }
 
-void lang::FunctionGroup::build(CompileContext* compile_context)
+void lang::FunctionGroup::build(CompileContext& compile_context)
 {
     for (auto& function : functions()) function->build(compile_context);
 }

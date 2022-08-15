@@ -20,7 +20,7 @@ lang::LocalScope* lang::LocalScope::asLocalScope()
     return this;
 }
 
-llvm::DIScope* lang::LocalScope::getDebugScope(CompileContext* context)
+llvm::DIScope* lang::LocalScope::getDebugScope(CompileContext& context)
 {
     return parent_->getDebugScope(context);
 }
@@ -242,7 +242,7 @@ void lang::LocalScope::validate(ValidationLogger& validation_logger) const
     }
 }
 
-void lang::LocalScope::buildDeclarations(CompileContext* context)
+void lang::LocalScope::buildDeclarations(CompileContext& context)
 {
     for (auto& [name, variables] : defined_local_variables_)
     {
@@ -252,12 +252,12 @@ void lang::LocalScope::buildDeclarations(CompileContext* context)
     for (auto& sub_scope : sub_scopes_) { sub_scope->buildDeclarations(context); }
 }
 
-void lang::LocalScope::buildFinalization(CompileContext* context)
+void lang::LocalScope::buildFinalization(CompileContext& context)
 {
     for (auto& [name, variable] : active_variables_) { variable->buildFinalization(context); }
 }
 
-void lang::LocalScope::buildReturnFinalization(CompileContext* context)
+void lang::LocalScope::buildReturnFinalization(CompileContext& context)
 {
     lang::Scope* current = this;
 

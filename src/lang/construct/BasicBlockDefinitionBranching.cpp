@@ -114,18 +114,18 @@ void lang::BasicBlock::Definition::Branching::reach()
     false_next_->reach();
 }
 
-void lang::BasicBlock::Definition::Branching::prepareBuild(CompileContext* context, llvm::Function* native_function)
+void lang::BasicBlock::Definition::Branching::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
     std::string name = "b" + std::to_string(index_);
-    native_block_    = llvm::BasicBlock::Create(*context->llvmContext(), name, native_function);
+    native_block_    = llvm::BasicBlock::Create(*context.llvmContext(), name, native_function);
 
     true_next_->prepareBuild(context, native_function);
     false_next_->prepareBuild(context, native_function);
 }
 
-void lang::BasicBlock::Definition::Branching::doBuild(CompileContext* context)
+void lang::BasicBlock::Definition::Branching::doBuild(CompileContext& context)
 {
-    context->ir()->SetInsertPoint(native_block_);
+    context.ir()->SetInsertPoint(native_block_);
 
     for (auto& statement : statements_) { statement->build(context); }
 
@@ -134,9 +134,9 @@ void lang::BasicBlock::Definition::Branching::doBuild(CompileContext* context)
 
     boolean_truth->buildContentValue(context);
 
-    context->ir()->CreateCondBr(truth->getContentValue(),
-                                true_next_->definition_->getNativeBlock(),
-                                false_next_->definition_->getNativeBlock());
+    context.ir()->CreateCondBr(truth->getContentValue(),
+                               true_next_->definition_->getNativeBlock(),
+                               false_next_->definition_->getNativeBlock());
 
     true_next_->doBuild(context);
     false_next_->doBuild(context);

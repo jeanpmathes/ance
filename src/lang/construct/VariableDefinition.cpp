@@ -46,7 +46,7 @@ bool lang::VariableDefinition::isFinal() const
     return is_final_;
 }
 
-void lang::VariableDefinition::setValue(std::shared_ptr<lang::Value> value, CompileContext* context)
+void lang::VariableDefinition::setValue(std::shared_ptr<lang::Value> value, CompileContext& context)
 {
     if (type()->isReferenceType())
     {

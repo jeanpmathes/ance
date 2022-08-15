@@ -159,7 +159,7 @@ Statements lang::CodeBlock::expandWith(Expressions, Statements substatements) co
     return statements;
 }
 
-void lang::CodeBlock::doBuild(CompileContext*)
+void lang::CodeBlock::doBuild(CompileContext&)
 {
     assert(false && "Build step must use code-block free hierarchy.");// Building uses BBs.
 }

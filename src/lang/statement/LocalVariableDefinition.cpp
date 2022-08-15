@@ -114,7 +114,7 @@ Statements LocalVariableDefinition::expandWith(Expressions subexpressions, State
     return statements;
 }
 
-void LocalVariableDefinition::doBuild(CompileContext* context)
+void LocalVariableDefinition::doBuild(CompileContext& context)
 {
     (*variable_)->buildDefinition(context);
 }

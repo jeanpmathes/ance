@@ -28,12 +28,12 @@ namespace lang
          * Build the native value. The native value is the value actually used in the IR.
          * @param context The native value.
          */
-        virtual void buildNativeValue(CompileContext* context) = 0;
+        virtual void buildNativeValue(CompileContext& context) = 0;
         /**
          * Build the content value. The content value is the value stored in the native value.
          * @param context The content value.
          */
-        virtual void buildContentValue(CompileContext* context);
+        virtual void buildContentValue(CompileContext& context);
 
         /**
          * Get the native value. It must be built before accessing it.

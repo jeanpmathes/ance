@@ -65,7 +65,7 @@ namespace lang
          * @param context The current compile context.
          * @return The debug scope.
          */
-        virtual llvm::DIScope* getDebugScope(CompileContext* context) = 0;
+        virtual llvm::DIScope* getDebugScope(CompileContext& context) = 0;
 
         /**
          * Create a local scope in this scope.
@@ -144,7 +144,7 @@ namespace lang
          * Build the finalization for all entities in this scope.
          * @param context The current compile context.
          */
-        virtual void buildFinalization(CompileContext* context) = 0;
+        virtual void buildFinalization(CompileContext& context) = 0;
 
         ~Scope() override = default;
 

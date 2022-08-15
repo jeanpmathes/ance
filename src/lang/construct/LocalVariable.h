@@ -38,14 +38,14 @@ namespace lang
 
         void validate(ValidationLogger& validation_logger) const override;
 
-        void buildDeclaration(CompileContext* context) override;
-        void buildDefinition(CompileContext* context) override;
-        void buildFinalization(CompileContext* context) override;
+        void buildDeclaration(CompileContext& context) override;
+        void buildDefinition(CompileContext& context) override;
+        void buildFinalization(CompileContext& context) override;
 
-        std::shared_ptr<lang::Value> getValue(CompileContext* context) override;
+        std::shared_ptr<lang::Value> getValue(CompileContext& context) override;
 
       protected:
-        void storeValue(std::shared_ptr<lang::Value> value, CompileContext* context) override;
+        void storeValue(std::shared_ptr<lang::Value> value, CompileContext& context) override;
 
       private:
         std::shared_ptr<lang::Value> initial_value_;

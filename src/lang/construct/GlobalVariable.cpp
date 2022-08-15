@@ -109,8 +109,8 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
     }
 }
 
-void lang::GlobalVariable::buildDeclaration(CompileContext*) {}
-void lang::GlobalVariable::buildDefinition(CompileContext* context)
+void lang::GlobalVariable::buildDeclaration(CompileContext&) {}
+void lang::GlobalVariable::buildDefinition(CompileContext& context)
 {
     llvm::GlobalValue::LinkageTypes linkage = access_.linkage();
 
@@ -119,30 +119,30 @@ void lang::GlobalVariable::buildDefinition(CompileContext* context)
     if (constant_init_)
     {
         std::shared_ptr<lang::Constant> initial_value = constant_init_->getConstantValue();
-        initial_value->buildContentConstant(context->module());
+        initial_value->buildContentConstant(context.module());
         native_initializer = initial_value->getContentConstant();
     }
-    else { native_initializer = type()->getDefaultContent(*context->module()); }
+    else { native_initializer = type()->getDefaultContent(*context.module()); }
 
-    native_variable_ = new llvm::GlobalVariable(*context->module(),
-                                                type()->getContentType(context->module()->getContext()),
+    native_variable_ = new llvm::GlobalVariable(*context.module(),
+                                                type()->getContentType(context.module()->getContext()),
                                                 is_constant_,
                                                 linkage,
                                                 native_initializer,
                                                 name().text());
 
-    auto* debug_info = context->di()->createGlobalVariableExpression(context->unit(),
-                                                                     name().text(),
-                                                                     name().text(),
-                                                                     context->sourceFile(),
-                                                                     location().line(),
-                                                                     type()->getDebugType(context),
-                                                                     true);
+    auto* debug_info = context.di()->createGlobalVariableExpression(context.unit(),
+                                                                    name().text(),
+                                                                    name().text(),
+                                                                    context.sourceFile(),
+                                                                    location().line(),
+                                                                    type()->getDebugType(context),
+                                                                    true);
 
     native_variable_->addDebugInfo(debug_info);
 }
 
-void lang::GlobalVariable::buildFinalization(CompileContext* context)
+void lang::GlobalVariable::buildFinalization(CompileContext& context)
 {
     assert(not finalized_);
 
@@ -151,12 +151,12 @@ void lang::GlobalVariable::buildFinalization(CompileContext* context)
     finalized_ = true;
 }
 
-std::shared_ptr<lang::Value> lang::GlobalVariable::getValue(CompileContext*)
+std::shared_ptr<lang::Value> lang::GlobalVariable::getValue(CompileContext&)
 {
     return std::make_shared<lang::WrappedNativeValue>(type(), native_variable_);
 }
 
-void lang::GlobalVariable::storeValue(std::shared_ptr<lang::Value> value, CompileContext* context)
+void lang::GlobalVariable::storeValue(std::shared_ptr<lang::Value> value, CompileContext& context)
 {
     value = lang::Type::makeMatching(type(), value, context);
 

@@ -102,7 +102,7 @@ bool lang::IntegerType::validateImplicitConversion(lang::ResolvingHandle<lang::T
 
 std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                                         std::shared_ptr<Value>            value,
-                                                                        CompileContext*                   context)
+                                                                        CompileContext&                   context)
 {
     llvm::Value* native_converted_value;
 
@@ -116,14 +116,15 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Re
         value->buildNativeValue(context);
         native_converted_value = value->getNativeValue();
     }
-    else {
+    else
+    {
         value->buildContentValue(context);
         llvm::Value* content_value = value->getContentValue();
 
-        llvm::Value* converted_value = context->ir()->CreateIntCast(content_value,
-                                                                    other->getContentType(*context->llvmContext()),
-                                                                    is_signed_,
-                                                                    content_value->getName() + ".icast");
+        llvm::Value* converted_value = context.ir()->CreateIntCast(content_value,
+                                                                   other->getContentType(*context.llvmContext()),
+                                                                   is_signed_,
+                                                                   content_value->getName() + ".icast");
         native_converted_value       = lang::Values::contentToNative(other, converted_value, context);
     }
 
@@ -165,7 +166,7 @@ bool lang::IntegerType::validateOperator(lang::BinaryOperator,
 std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator   op,
                                                               std::shared_ptr<Value> left,
                                                               std::shared_ptr<Value> right,
-                                                              CompileContext*        context)
+                                                              CompileContext&        context)
 {
     right = lang::Type::getValueOrReferencedValue(right, context);
 
@@ -180,49 +181,47 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
     switch (op)
     {
         case lang::BinaryOperator::ADDITION:
-            result = context->ir()->CreateAdd(left_value, right_value, left_value->getName() + ".add");
+            result = context.ir()->CreateAdd(left_value, right_value, left_value->getName() + ".add");
             break;
         case lang::BinaryOperator::SUBTRACTION:
-            result = context->ir()->CreateSub(left_value, right_value, left_value->getName() + ".sub");
+            result = context.ir()->CreateSub(left_value, right_value, left_value->getName() + ".sub");
             break;
         case lang::BinaryOperator::MULTIPLICATION:
-            result = context->ir()->CreateMul(left_value, right_value, left_value->getName() + ".mul");
+            result = context.ir()->CreateMul(left_value, right_value, left_value->getName() + ".mul");
             break;
         case lang::BinaryOperator::DIVISION:
-            if (is_signed_)
-                result = context->ir()->CreateSDiv(left_value, right_value, left_value->getName() + ".sdiv");
-            else result = context->ir()->CreateUDiv(left_value, right_value, left_value->getName() + ".udiv");
+            if (is_signed_) result = context.ir()->CreateSDiv(left_value, right_value, left_value->getName() + ".sdiv");
+            else result = context.ir()->CreateUDiv(left_value, right_value, left_value->getName() + ".udiv");
             break;
         case lang::BinaryOperator::REMAINDER:
-            if (is_signed_)
-                result = context->ir()->CreateSRem(left_value, right_value, left_value->getName() + ".srem");
-            else result = context->ir()->CreateURem(left_value, right_value, left_value->getName() + ".urem");
+            if (is_signed_) result = context.ir()->CreateSRem(left_value, right_value, left_value->getName() + ".srem");
+            else result = context.ir()->CreateURem(left_value, right_value, left_value->getName() + ".urem");
             break;
         case lang::BinaryOperator::LESS_THAN:
             if (is_signed_)
-                result = context->ir()->CreateICmpSLT(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context->ir()->CreateICmpULT(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpSLT(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir()->CreateICmpULT(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::LESS_THAN_OR_EQUAL:
             if (is_signed_)
-                result = context->ir()->CreateICmpSLE(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context->ir()->CreateICmpULE(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpSLE(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir()->CreateICmpULE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::GREATER_THAN:
             if (is_signed_)
-                result = context->ir()->CreateICmpSGT(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context->ir()->CreateICmpUGT(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpSGT(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir()->CreateICmpUGT(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::GREATER_THAN_OR_EQUAL:
             if (is_signed_)
-                result = context->ir()->CreateICmpSGE(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context->ir()->CreateICmpUGE(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir()->CreateICmpSGE(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir()->CreateICmpUGE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::EQUAL:
-            result = context->ir()->CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir()->CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::NOT_EQUAL:
-            result = context->ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
             break;
     }
 
@@ -246,22 +245,22 @@ bool lang::IntegerType::acceptOverloadRequest(const std::vector<lang::ResolvingH
 
 void lang::IntegerType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
                                                lang::PredefinedFunction&                             function,
-                                               CompileContext*                                       context)
+                                               CompileContext&                                       context)
 {
     llvm::Function* native_function;
     std::tie(std::ignore, native_function) = function.getNativeRepresentation();
 
     auto build_integer_conversion_ctor = [&](bool is_signed) {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_function);
-        context->ir()->SetInsertPoint(block);
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
 
-            llvm::Value* converted = context->ir()->CreateIntCast(original,
-                                                                  getContentType(*context->llvmContext()),
-                                                                  is_signed,
-                                                                  original->getName() + ".icast");
-            context->ir()->CreateRet(converted);
+            llvm::Value* converted = context.ir()->CreateIntCast(original,
+                                                                 getContentType(*context.llvmContext()),
+                                                                 is_signed,
+                                                                 original->getName() + ".icast");
+            context.ir()->CreateRet(converted);
         }
     };
 
@@ -274,8 +273,8 @@ void lang::IntegerType::buildRequestedOverload(const std::vector<lang::Resolving
 
         if (parameters[0]->isFloatingPointType())
         {
-            llvm::BasicBlock* block = llvm::BasicBlock::Create(*context->llvmContext(), "block", native_function);
-            context->ir()->SetInsertPoint(block);
+            llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+            context.ir()->SetInsertPoint(block);
             {
                 llvm::Value* original = native_function->getArg(0);
 
@@ -283,18 +282,18 @@ void lang::IntegerType::buildRequestedOverload(const std::vector<lang::Resolving
 
                 if (is_signed_)
                 {
-                    converted = context->ir()->CreateFPToSI(original,
-                                                            getContentType(*context->llvmContext()),
-                                                            original->getName() + ".fptosi");
+                    converted = context.ir()->CreateFPToSI(original,
+                                                           getContentType(*context.llvmContext()),
+                                                           original->getName() + ".fptosi");
                 }
                 else
                 {
-                    converted = context->ir()->CreateFPToUI(original,
-                                                            getContentType(*context->llvmContext()),
-                                                            original->getName() + ".fptoui");
+                    converted = context.ir()->CreateFPToUI(original,
+                                                           getContentType(*context.llvmContext()),
+                                                           original->getName() + ".fptoui");
                 }
 
-                context->ir()->CreateRet(converted);
+                context.ir()->CreateRet(converted);
             }
         }
     }
@@ -320,15 +319,15 @@ std::string lang::IntegerType::createMangledName() const
     return std::string(name().text());
 }
 
-llvm::DIType* lang::IntegerType::createDebugType(CompileContext* context)
+llvm::DIType* lang::IntegerType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl = context->module()->getDataLayout();
+    const llvm::DataLayout& dl = context.module()->getDataLayout();
 
     std::string name         = std::string(this->name().text());
-    uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context->llvmContext()));
+    uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
     auto        encoding     = is_signed_ ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned;
 
-    return context->di()->createBasicType(name, size_in_bits, encoding);
+    return context.di()->createBasicType(name, size_in_bits, encoding);
 }
 
 lang::TypeRegistry<std::pair<uint64_t, bool>>& lang::IntegerType::getIntegerTypes()

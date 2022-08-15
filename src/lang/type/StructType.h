@@ -38,22 +38,22 @@ namespace lang
         bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const override;
         std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
                                                        const lang::Identifier& name,
-                                                       CompileContext*         context) override;
+                                                       CompileContext&         context) override;
 
       protected:
-        void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext* context) override;
+        void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context) override;
         void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
                                                   llvm::Value*    src_ptr,
-                                                  CompileContext* context) override;
-        void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext* context) override;
+                                                  CompileContext& context) override;
+        void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context) override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext* context) override;
+        llvm::DIType* createDebugType(CompileContext& context) override;
 
         [[nodiscard]] std::vector<lang::TypeDefinition*> getDependencies() const override;
 
       private:
-        llvm::Value* buildGetElementPointer(llvm::Value* struct_ptr, int32_t member_index, CompileContext* context);
+        llvm::Value* buildGetElementPointer(llvm::Value* struct_ptr, int32_t member_index, CompileContext& context);
 
       private:
         [[maybe_unused]] lang::AccessModifier access_;

@@ -15,14 +15,14 @@ class BuildableExpression : public virtual Expression
      * Build the expression.
      * @param context The current compile context.
      */
-    void build(CompileContext* context);
+    void build(CompileContext& context);
 
   protected:
     /**
     * Build the expression. This method should not be called, use build instead.
     * @param context The current compile context.
     */
-    virtual void doBuild(CompileContext* context) = 0;
+    virtual void doBuild(CompileContext& context) = 0;
 };
 
 #endif

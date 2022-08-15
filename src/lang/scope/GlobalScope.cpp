@@ -21,9 +21,9 @@ lang::GlobalScope* lang::GlobalScope::getGlobalScope()
     return this;
 }
 
-llvm::DIScope* lang::GlobalScope::getDebugScope(CompileContext* context)
+llvm::DIScope* lang::GlobalScope::getDebugScope(CompileContext& context)
 {
-    return context->unit();
+    return context.unit();
 }
 
 void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
@@ -413,7 +413,7 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::getExit()
     return potential_function.value();
 }
 
-void lang::GlobalScope::createNativeBacking(CompileContext* context)
+void lang::GlobalScope::createNativeBacking(CompileContext& context)
 {
     for (auto& [key, val] : defined_function_groups_) { val->createNativeBacking(context); }
 
@@ -430,12 +430,12 @@ void lang::GlobalScope::createNativeBacking(CompileContext* context)
     for (auto& registry : type_registries_) { registry->buildNativeDefinitions(context); }
 }
 
-void lang::GlobalScope::buildFunctions(CompileContext* context)
+void lang::GlobalScope::buildFunctions(CompileContext& context)
 {
     for (auto& [key, group] : defined_function_groups_) { group->build(context); }
 }
 
-void lang::GlobalScope::buildFinalization(CompileContext*)
+void lang::GlobalScope::buildFinalization(CompileContext&)
 {
     assert(false && "Not implemented.");
 }

@@ -35,7 +35,7 @@ namespace lang
         lang::Scope* scope() override;
 
         lang::GlobalScope* getGlobalScope() override;
-        llvm::DIScope*     getDebugScope(CompileContext* context) override;
+        llvm::DIScope*     getDebugScope(CompileContext& context) override;
 
         void validate(ValidationLogger& validation_logger) const override;
 
@@ -179,15 +179,15 @@ namespace lang
          * Create the native content backing methods and functions. It is required for the actual build.
          * @param context The current compile context.
          */
-        void createNativeBacking(CompileContext* context);
+        void createNativeBacking(CompileContext& context);
 
         /**
          * Build all functions in this scope.
          * @param context The current compile context.
          */
-        void buildFunctions(CompileContext* context);
+        void buildFunctions(CompileContext& context);
 
-        void buildFinalization(CompileContext* context) override;
+        void buildFinalization(CompileContext& context) override;
 
       private:
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);

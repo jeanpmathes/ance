@@ -70,7 +70,7 @@ namespace lang
 
         Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
-        void doBuild(CompileContext* context) override;
+        void doBuild(CompileContext& context) override;
 
       private:
         bool                                    scoped_;

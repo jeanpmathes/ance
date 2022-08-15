@@ -2,7 +2,7 @@
 
 #include "lang/utility/Values.h"
 
-void lang::Value::buildContentValue(CompileContext* context)
+void lang::Value::buildContentValue(CompileContext& context)
 {
     buildNativeValue(context);
     content_value_ = lang::Values::nativeToContent(type(), getNativeValue(), context);

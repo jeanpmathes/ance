@@ -16,10 +16,10 @@ lang::ResolvingHandle<lang::Type> lang::RoughlyCastedValue::type() const
     return target_type_;
 }
 
-void lang::RoughlyCastedValue::buildNativeValue(CompileContext* context)
+void lang::RoughlyCastedValue::buildNativeValue(CompileContext& context)
 {
-    assert(target_type_->getNativeType(*context->llvmContext())
-               == original_->type()->getNativeType(*context->llvmContext())
+    assert(target_type_->getNativeType(*context.llvmContext())
+               == original_->type()->getNativeType(*context.llvmContext())
            && "Native type has to be equal.");
 
     original_->buildNativeValue(context);
