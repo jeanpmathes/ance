@@ -10,7 +10,7 @@ lang::PredefinedFunction::PredefinedFunction(lang::Function&                    
     : lang::FunctionDefinition(function,
                                containing_scope,
                                return_type,
-                               lang::Location(0, 0, 0, 0),
+                               lang::Location::global(),
                                std::move(parameters),
                                location)
 {}

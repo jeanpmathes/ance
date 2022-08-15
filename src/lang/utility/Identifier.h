@@ -24,7 +24,7 @@ namespace lang
          * @param string The text of the identifier.
          * @return The identifier.
          */
-        static Identifier from(const std::string& string, lang::Location location = lang::Location(0, 0, 0, 0));
+        static Identifier from(const std::string& string, lang::Location location = lang::Location::global());
 
         [[nodiscard]] std::string_view text() const;
         [[nodiscard]] lang::Location   location() const;

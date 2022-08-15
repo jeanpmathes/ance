@@ -65,12 +65,12 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Empty::getSuccessor
 
 lang::Location lang::BasicBlock::Definition::Empty::getStartLocation()
 {
-    return {0, 0, 0, 0};
+    return lang::Location::global();
 }
 
 lang::Location lang::BasicBlock::Definition::Empty::getEndLocation()
 {
-    return {0, 0, 0, 0};
+    return lang::Location::global();
 }
 
 void lang::BasicBlock::Definition::Empty::reach()

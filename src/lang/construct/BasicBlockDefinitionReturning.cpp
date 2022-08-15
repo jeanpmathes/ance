@@ -78,14 +78,14 @@ std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> lang::Bas
 
 lang::Location lang::BasicBlock::Definition::Returning::getStartLocation()
 {
-    if (statements_.empty()) { return {0, 0, 0, 0}; }
+    if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
 lang::Location lang::BasicBlock::Definition::Returning::getEndLocation()
 {
-    if (statements_.empty()) { return {0, 0, 0, 0}; }
+    if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }

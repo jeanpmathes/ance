@@ -66,12 +66,12 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Finalizing::getSucc
 
 lang::Location lang::BasicBlock::Definition::Finalizing::getStartLocation()
 {
-    return {0, 0, 0, 0};
+    return lang::Location::global();
 }
 
 lang::Location lang::BasicBlock::Definition::Finalizing::getEndLocation()
 {
-    return {0, 0, 0, 0};
+    return lang::Location::global();
 }
 
 void lang::BasicBlock::Definition::Finalizing::reach()

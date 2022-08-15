@@ -81,12 +81,12 @@ void Application::validate(ValidationLogger& validation_logger) const
 
     if (!global_scope_->hasEntry())
     {
-        validation_logger.logError("Entry point 'ui32 main()' could not be found", lang::Location(0, 0, 0, 0));
+        validation_logger.logError("Entry point 'ui32 main()' could not be found", lang::Location::global());
     }
 
     if (!global_scope_->hasExit())
     {
-        validation_logger.logError("Exit point 'void exit(ui32)' could not be found", lang::Location(0, 0, 0, 0));
+        validation_logger.logError("Exit point 'void exit(ui32)' could not be found", lang::Location::global());
     }
 }
 

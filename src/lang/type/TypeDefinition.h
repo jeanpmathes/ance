@@ -41,7 +41,7 @@ namespace lang
          * @param name The name of the defined type.
          * @param location The location of the defined type. Use a non-global location for custom types.
          */
-        explicit TypeDefinition(lang::Identifier name, lang::Location location = lang::Location(0, 0, 0, 0));
+        explicit TypeDefinition(lang::Identifier name, lang::Location location = lang::Location::global());
 
       public:
         virtual ~TypeDefinition() = default;

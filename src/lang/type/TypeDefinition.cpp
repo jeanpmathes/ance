@@ -642,13 +642,13 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
     {
         std::string parameter_name = "p" + std::to_string(count++);
         parameters.push_back(std::make_shared<lang::Parameter>(parameter_type,
-                                                               lang::Location(0, 0, 0, 0),
+                                                               lang::Location::global(),
                                                                lang::Identifier::from(parameter_name),
-                                                               lang::Location(0, 0, 0, 0)));
+                                                               lang::Location::global()));
     }
 
     lang::PredefinedFunction& predefined_function =
-        function->defineAsPredefined(self(), parameters, *scope(), lang::Location(0, 0, 0, 0));
+        function->defineAsPredefined(self(), parameters, *scope(), lang::Location::global());
 
     predefined_function.setCallValidator(
         [this](const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,

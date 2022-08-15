@@ -14,6 +14,11 @@ lang::Location::Location(unsigned int start_line,
     , end_column_(end_column)
 {}
 
+lang::Location lang::Location::global()
+{
+    return {0, 0, 0, 0};
+}
+
 unsigned lang::Location::line() const
 {
     return start_line_;

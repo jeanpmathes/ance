@@ -13,12 +13,18 @@ namespace lang
       public:
         /**
          * Create a source file location.
-         * @param start_line The line number of the start of the location.
+         * @param start_line The line number of the start of the location. Actual line numbers start with 1, not 0.
          * @param start_column The column number of the start of the location.
          * @param end_line The line end of the location.
          * @param end_column The column end of the location.
          */
         Location(unsigned int start_line, unsigned int start_column, unsigned int end_line, unsigned int end_column);
+
+        /**
+         * Create a global location. A global location is used for code that is not in a source file.
+         * @return A global location.
+         */
+        static Location global();
 
         /**
          * Get the line number.

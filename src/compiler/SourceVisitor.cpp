@@ -154,7 +154,7 @@ antlrcpp::Any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinit
     shared_parameters.reserve(parameters.size());
     for (lang::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
-    lang::Location return_type_location = ctx->type() ? location(ctx->type()) : lang::Location(0, 0, 0, 0);
+    lang::Location return_type_location = ctx->type() ? location(ctx->type()) : lang::Location::global();
 
     auto function_block = lang::CodeBlock::makeInitial(location(ctx));
 
@@ -189,7 +189,7 @@ antlrcpp::Any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFu
     shared_parameters.reserve(parameters.size());
     for (lang::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(parameter_ptr); }
 
-    lang::Location return_type_location = ctx->type() ? location(ctx->type()) : lang::Location(0, 0, 0, 0);
+    lang::Location return_type_location = ctx->type() ? location(ctx->type()) : lang::Location::global();
 
     application_.globalScope().defineExternFunction(identifier,
                                                     return_type,

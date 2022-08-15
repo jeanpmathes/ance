@@ -83,14 +83,14 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Simple::getSuccesso
 
 lang::Location lang::BasicBlock::Definition::Simple::getStartLocation()
 {
-    if (statements_.empty()) { return {0, 0, 0, 0}; }
+    if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.front()->location();
 }
 
 lang::Location lang::BasicBlock::Definition::Simple::getEndLocation()
 {
-    if (statements_.empty()) { return {0, 0, 0, 0}; }
+    if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }

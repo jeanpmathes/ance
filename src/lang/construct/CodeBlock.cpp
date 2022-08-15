@@ -22,7 +22,7 @@ lang::CodeBlock* lang::CodeBlock::wrapStatement(std::unique_ptr<Statement> state
 
 std::unique_ptr<lang::CodeBlock> lang::CodeBlock::wrapStatements(std::vector<std::unique_ptr<Statement>> statements)
 {
-    lang::Location location(0, 0, 0, 0);
+    lang::Location location = Location::global();
 
     for (auto& statement : statements) { location.extend(statement->location()); }
 

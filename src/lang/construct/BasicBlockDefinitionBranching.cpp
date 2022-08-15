@@ -96,14 +96,14 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Branching::getSucce
 
 lang::Location lang::BasicBlock::Definition::Branching::getStartLocation()
 {
-    if (statements_.empty()) { return {0, 0, 0, 0}; }
+    if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
 lang::Location lang::BasicBlock::Definition::Branching::getEndLocation()
 {
-    if (statements_.empty()) { return {0, 0, 0, 0}; }
+    if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
