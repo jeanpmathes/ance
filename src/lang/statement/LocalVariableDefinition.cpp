@@ -8,20 +8,23 @@
 #include "validation/ValidationLogger.h"
 #include "lang/Assigner.h"
 
-LocalVariableDefinition::LocalVariableDefinition(lang::Identifier                  name,
-                                                 lang::ResolvingHandle<lang::Type> type,
-                                                 lang::Location                    type_location,
-                                                 lang::Assigner                    assigner,
-                                                 std::unique_ptr<Expression>       assigned,
-                                                 lang::Location                    location)
+LocalVariableDefinition::LocalVariableDefinition(lang::Identifier                                 name,
+                                                 std::optional<lang::ResolvingHandle<lang::Type>> type,
+                                                 lang::Location                                   type_location,
+                                                 lang::Assigner                                   assigner,
+                                                 std::unique_ptr<Expression>                      assigned,
+                                                 lang::Location                                   location)
     : Statement(location)
     , name_(std::move(name))
-    , type_(type)
+    , type_opt_(std::move(type))
+    , type_(lang::Type::getUndefined())
     , type_location_(type_location)
     , assigner_(assigner)
     , assigned_(std::move(assigned))
 {
     if (assigned_) { addSubexpression(*assigned_); }
+
+    if (type_opt_) { type_ = type_opt_.value(); }
 }
 
 const lang::Identifier& LocalVariableDefinition::name() const
@@ -29,9 +32,9 @@ const lang::Identifier& LocalVariableDefinition::name() const
     return name_;
 }
 
-lang::ResolvingHandle<lang::Type> LocalVariableDefinition::type() const
+std::optional<lang::ResolvingHandle<lang::Type>> LocalVariableDefinition::type() const
 {
-    return type_;
+    return type_opt_;
 }
 
 lang::Assigner LocalVariableDefinition::assigner() const
@@ -55,6 +58,8 @@ void LocalVariableDefinition::walkDefinitions()
 {
     Statement::walkDefinitions();
 
+    rerouteIfNeeded();
+
     variable_ = scope()->asLocalScope()->defineLocalVariable(name_,
                                                              type_,
                                                              type_location_,
@@ -62,7 +67,14 @@ void LocalVariableDefinition::walkDefinitions()
                                                              assigned_ ? assigned_->getValue() : nullptr,
                                                              location());
 
-    scope()->addType(type_);
+    if (type_opt_) scope()->addType(type_opt_.value());
+}
+
+void LocalVariableDefinition::postResolve()
+{
+    Statement::postResolve();
+
+    rerouteIfNeeded();
 }
 
 void LocalVariableDefinition::validate(ValidationLogger& validation_logger) const
@@ -70,14 +82,27 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
     assert(variable_);
     auto variable = *variable_;
 
-    if (!variable->type()->isDefined())
+    assert(variable->type() == type_);
+
+    if (assigned_)
+    {
+        if (!assigned_->validate(validation_logger)) return;
+    }
+
+    if (not type_opt_.has_value() && assigned_ == nullptr)
+    {
+        validation_logger.logError("Default-initialized local variable must have an explicit type", location());
+        return;
+    }
+
+    if (!type_->isDefined())
     {
         validation_logger.logError("Type " + variable->type()->getAnnotatedName() + " not defined", type_location_);
 
         return;
     }
 
-    if (!variable->type()->validate(validation_logger, type_location_)) return;
+    if (!type_->validate(validation_logger, type_location_)) return;
 
     if (type_->isVoidType())
     {
@@ -93,8 +118,6 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
 
     if (assigned_)
     {
-        if (!assigned_->validate(validation_logger)) return;
-
         lang::Type::checkMismatch(variable->type(), assigned_->type(), assigned_->location(), validation_logger);
     }
 }
@@ -103,9 +126,12 @@ Statements LocalVariableDefinition::expandWith(Expressions subexpressions, State
 {
     Statements statements;
 
+    std::optional<lang::ResolvingHandle<lang::Type>> type;
+    if (type_opt_) type = type_opt_.value()->toUndefined();
+
     statements.push_back(
         std::make_unique<LocalVariableDefinition>(name_,
-                                                  type_->toUndefined(),
+                                                  type,
                                                   type_location_,
                                                   assigner_,
                                                   subexpressions.size() == 1 ? std::move(subexpressions[0]) : nullptr,
@@ -117,4 +143,13 @@ Statements LocalVariableDefinition::expandWith(Expressions subexpressions, State
 void LocalVariableDefinition::doBuild(CompileContext& context)
 {
     (*variable_)->buildDefinition(context);
+}
+
+void LocalVariableDefinition::rerouteIfNeeded()
+{
+    if (assigned_ && not type_opt_.has_value())
+    {
+        auto assigned_type = assigned_->tryGetType();
+        if (assigned_type && assigned_type.value() != type_) { type_.reroute(assigned_type.value()); }
+    }
 }

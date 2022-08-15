@@ -25,7 +25,7 @@ lang::LocalVariable::LocalVariable(Identifier                        name,
 
 void lang::LocalVariable::validate(ValidationLogger&) const
 {
-    // Validation of initial value in declaring statement.
+    // Validation of variable declaring statement.
 }
 
 void lang::LocalVariable::buildDeclaration(CompileContext& context)

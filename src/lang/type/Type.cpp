@@ -24,13 +24,12 @@ lang::Type::Type() : name_(lang::Identifier::from("")) {}
 
 lang::ResolvingHandle<lang::Type> lang::Type::getUndefined()
 {
-    static ResolvingHandle<Type> undefined(std::unique_ptr<Type>(new Type()));
-    return undefined;
+    return ResolvingHandle<Type>(std::unique_ptr<Type>(new Type()));
 }
 
 const lang::Identifier& lang::Type::name() const
 {
-    static const lang::Identifier undefined = lang::Identifier::from("undefined");
+    static const lang::Identifier undefined = lang::Identifier::from("$undefined");
 
     if (isDefined()) { return definition_->name(); }
     else { return name_.text().empty() ? undefined : name_; }

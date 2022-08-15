@@ -59,6 +59,7 @@ namespace lang
 
         /**
          * Get a special undefined type that cannot be defined.
+         * All undefined type handles are separate from each other.
          * @return The undefined type.
          */
         static lang::ResolvingHandle<lang::Type> getUndefined();

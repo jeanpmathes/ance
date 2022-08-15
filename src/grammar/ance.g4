@@ -71,7 +71,7 @@ expressionStatement
 	;
 
 localVariableDefinition
-	: 'let' IDENTIFIER ':' type ( assigner expression )? ';'
+	: 'let' IDENTIFIER (':' type )? ( assigner expression )? ';'
 	;
 
 localReferenceDefinition

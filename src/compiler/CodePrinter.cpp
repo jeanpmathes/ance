@@ -356,7 +356,7 @@ std::any CodePrinter::visit(LocalReferenceVariableDefinition& local_reference_va
 std::any CodePrinter::visit(LocalVariableDefinition& local_variable_definition)
 {
     out_ << "let " << local_variable_definition.name();
-    out_ << ": " << local_variable_definition.type()->name();
+    if (local_variable_definition.type()) out_ << ": " << local_variable_definition.type().value()->name();
 
     if (local_variable_definition.assigned())
     {

@@ -83,6 +83,13 @@ void FunctionCall::postResolve()
 
 std::optional<lang::ResolvingHandle<lang::Type>> FunctionCall::tryGetType() const
 {
+    if (!used_callable_) return std::nullopt;
+
+    for (auto& argument : tryArgumentTypes())
+    {
+        if (not argument.has_value()) return std::nullopt;
+    }
+
     if (function().empty()) return std::nullopt;
     return function().front()->returnType();
 }
@@ -175,6 +182,15 @@ std::vector<lang::ResolvingHandle<lang::Type>> FunctionCall::argumentTypes() con
     std::vector<lang::ResolvingHandle<lang::Type>> arg_types;
     arg_types.reserve(arguments_.size());
     for (auto& arg : arguments_) { arg_types.push_back(arg->type()); }
+
+    return arg_types;
+}
+
+std::vector<std::optional<lang::ResolvingHandle<lang::Type>>> FunctionCall::tryArgumentTypes() const
+{
+    std::vector<std::optional<lang::ResolvingHandle<lang::Type>>> arg_types;
+    arg_types.reserve(arguments_.size());
+    for (auto& arg : arguments_) { arg_types.push_back(arg->tryGetType()); }
 
     return arg_types;
 }

@@ -194,6 +194,7 @@ namespace lang
         lang::OwningHandle<lang::Type>             retrieveUndefinedType(Identifier name);
 
         std::vector<lang::TypeDefinitionRegistry*> type_registries_;
+        bool                                       expanded_ = false;
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_defined_variables_;

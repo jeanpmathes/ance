@@ -94,6 +94,7 @@ void Application::preBuild()
 {
     global_scope_->expand();
     global_scope_->resolve();
+    global_scope_->postResolve();
     global_scope_->determineFlow();
 }
 

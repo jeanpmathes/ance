@@ -253,8 +253,10 @@ antlrcpp::Any SourceVisitor::visitExpressionStatement(anceParser::ExpressionStat
 
 antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx)
 {
-    lang::ResolvingHandle<lang::Type> type       = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
-    lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
+    lang::Identifier identifier = ident(ctx->IDENTIFIER());
+
+    std::optional<lang::ResolvingHandle<lang::Type>> type;
+    if (ctx->type()) type = visit(ctx->type()).as<lang::ResolvingHandle<lang::Type>>();
 
     lang::Assigner assigner {};
     Expression*    assigned;
@@ -264,17 +266,18 @@ antlrcpp::Any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVaria
         assigner = visit(ctx->assigner()).as<lang::Assigner>();
         assigned = visit(ctx->expression()).as<Expression*>();
     }
-    else {
+    else
+    {
         assigner = lang::Assigner::UNSPECIFIED;
         assigned = nullptr;
     }
 
     auto statement = std::make_unique<LocalVariableDefinition>(identifier,
-                                                               type,
-                                                               location(ctx->type()),
-                                                               assigner,
-                                                               std::unique_ptr<Expression>(assigned),
-                                                               location(ctx));
+                                                  type,
+                                                  ctx->type() ? location(ctx->type()) : lang::Location::global(),
+                                                  assigner,
+                                                  std::unique_ptr<Expression>(assigned),
+                                                  location(ctx));
     return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 

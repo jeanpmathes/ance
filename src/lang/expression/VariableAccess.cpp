@@ -23,7 +23,7 @@ void VariableAccess::walkDefinitions()
 
 std::optional<lang::ResolvingHandle<lang::Type>> VariableAccess::tryGetType() const
 {
-    if (variable_->isDefined()) return variable_->type();
+    if (variable_->isDefined() && variable_->type()->isDefined()) return variable_->type();
     else return std::nullopt;
 }
 

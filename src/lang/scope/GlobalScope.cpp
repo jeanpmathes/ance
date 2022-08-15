@@ -47,6 +47,8 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 void lang::GlobalScope::expand()
 {
     for (auto& [key, function] : defined_function_groups_) { function->expand(); }
+
+    expanded_ = true;
 }
 
 void lang::GlobalScope::determineFlow()
@@ -312,11 +314,14 @@ void lang::GlobalScope::resolve()
 
 void lang::GlobalScope::postResolve()
 {
+    if (!expanded_)
+    {
+        for (auto& [name, type] : defined_types_) { type->postResolve(); }
+
+        for (auto& registry : type_registries_) { registry->postResolve(); }
+    }
+
     for (auto& [key, group] : defined_function_groups_) { group->postResolve(); }
-
-    for (auto& [name, type] : defined_types_) { type->postResolve(); }
-
-    for (auto& registry : type_registries_) { registry->postResolve(); }
 }
 
 bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)

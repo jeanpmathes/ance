@@ -59,7 +59,8 @@ class FunctionCall
 
   private:
     std::vector<lang::ResolvingHandle<lang::Function>> function() const;
-    std::vector<lang::ResolvingHandle<lang::Type>>     argumentTypes() const;
+    std::vector<lang::ResolvingHandle<lang::Type>>                argumentTypes() const;
+    std::vector<std::optional<lang::ResolvingHandle<lang::Type>>> tryArgumentTypes() const;
 
     std::optional<lang::ResolvingHandle<lang::FunctionGroup>> function_group_;
     lang::ResolvingHandle<lang::Type>                         type_function_group_;

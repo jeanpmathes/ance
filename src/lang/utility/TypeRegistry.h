@@ -68,6 +68,7 @@ namespace lang
 
       private:
         std::vector<Entry> types_;
+        lang::Scope*       scope_ {nullptr};
     };
 }
 

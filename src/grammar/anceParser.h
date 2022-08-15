@@ -500,8 +500,8 @@ class anceParser : public antlr4::Parser
         LocalVariableDefinitionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
         antlr4::tree::TerminalNode* IDENTIFIER();
-        TypeContext*                type();
         antlr4::tree::TerminalNode* SEMICOLON();
+        TypeContext*                type();
         AssignerContext*            assigner();
         ExpressionContext*          expression();
 
