@@ -32,7 +32,14 @@ std::vector<std::reference_wrapper<Case>> MatchSelect::cases() const
 
 std::optional<lang::ResolvingHandle<lang::Type>> MatchSelect::tryGetType() const
 {
-    return Case::tryGetCommonType(cases_);
+    auto potential_common_types = Case::tryGetCommonType(cases_);
+
+    if (potential_common_types.has_value() && potential_common_types.value().size() == 1)
+    {
+        return potential_common_types.value().front();
+    }
+
+    return std::nullopt;
 }
 
 bool MatchSelect::validate(ValidationLogger& validation_logger) const

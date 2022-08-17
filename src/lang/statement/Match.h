@@ -64,14 +64,15 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
      * @param cases The cases to get the common type from.
      * @return The common type.
      */
-    static lang::ResolvingHandle<lang::Type> getCommonType(const std::vector<std::unique_ptr<Case>>& cases);
+    static std::vector<lang::ResolvingHandle<lang::Type>> getCommonType(
+        const std::vector<std::unique_ptr<Case>>& cases);
 
     /**
      * Try to get the common type of the cases. The cases must be expression-based.
      * @param cases The cases to get the common type from.
      * @return The common type, or none.
      */
-    static std::optional<lang::ResolvingHandle<lang::Type>> tryGetCommonType(
+    static std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> tryGetCommonType(
         const std::vector<std::unique_ptr<Case>>& cases);
 
     /**

@@ -190,29 +190,49 @@ bool Case::validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLog
     return valid;
 }
 
-lang::ResolvingHandle<lang::Type> Case::getCommonType(const std::vector<std::unique_ptr<Case>>& cases)
+std::vector<lang::ResolvingHandle<lang::Type>> Case::getCommonType(const std::vector<std::unique_ptr<Case>>& cases)
 {
-    auto& code = cases.front()->code_;
-    return std::get<std::unique_ptr<Expression>>(code)->type();
+    std::vector<lang::ResolvingHandle<lang::Type>> types;
+
+    for (auto& case_instance : cases)
+    {
+        types.push_back(std::get<std::unique_ptr<Expression>>(case_instance->code_)->type());
+    }
+
+    return lang::Type::getCommonType(types);
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> Case::tryGetCommonType(const std::vector<std::unique_ptr<Case>>& cases)
+std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> Case::tryGetCommonType(
+    const std::vector<std::unique_ptr<Case>>& cases)
 {
-    auto& code = cases.front()->code_;
-    return std::get<std::unique_ptr<Expression>>(code)->tryGetType();
+    std::vector<lang::ResolvingHandle<lang::Type>> types;
+
+    for (auto& case_instance : cases)
+    {
+        auto type = std::get<std::unique_ptr<Expression>>(case_instance->code_)->tryGetType();
+        if (type.has_value()) { types.push_back(type.value()); }
+        else { return std::nullopt; }
+    }
+
+    return lang::Type::getCommonType(types);
 }
 
 bool Case::validateReturnTypes(lang::Location                            location,
                                const std::vector<std::unique_ptr<Case>>& cases,
                                ValidationLogger&                         validation_logger)
 {
-    lang::ResolvingHandle<lang::Type> common_type = getCommonType(cases);
+    std::vector<lang::ResolvingHandle<lang::Type>> common_types = getCommonType(cases);
 
     for (auto& case_ptr : cases)
     {
         lang::ResolvingHandle<lang::Type> case_type = std::get<std::unique_ptr<Expression>>(case_ptr->code_)->type();
 
-        if (!lang::Type::areSame(case_type, common_type))
+        if (common_types.empty() || common_types.size() > 1)
+        {
+            validation_logger.logError("Cases must have unambiguous common return type", location);
+        }
+
+        if (!lang::Type::areSame(case_type, common_types.front()))
         {
             validation_logger.logError("Cases must all provide same return type", location);
 
@@ -287,7 +307,6 @@ ssize_t Case::getCoverageCount()
     if (conditions_.empty()) { return -1; }
     return coverage_count_;
 }
-
 Match::Match(std::vector<std::unique_ptr<Case>> cases, std::unique_ptr<Expression> expression, lang::Location location)
     : Statement(location)
     , expression_(std::move(expression))

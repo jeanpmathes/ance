@@ -557,3 +557,45 @@ lang::ResolvingHandle<lang::Type> lang::Type::toSeparateUndefined() const
 {
     return isDefined() ? self() : lang::makeHandled<lang::Type>(name());
 }
+
+std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::getCommonType(
+    const std::vector<lang::ResolvingHandle<lang::Type>>& types)
+{
+    std::vector<lang::ResolvingHandle<lang::Type>> common_types;
+
+    {// Check if all types are the same, which means we have a trivial common type.
+        const lang::ResolvingHandle<lang::Type>& first = types.front();
+
+        bool all_same = true;
+
+        for (auto& current : types)
+        {
+            if (not areSame(first, current))
+            {
+                all_same = false;
+                break;
+            }
+        }
+
+        if (all_same)
+        {
+            common_types.push_back(first);
+            return common_types;
+        }
+    }
+
+    {// Check for each type if it is a type all other types are convertible to.
+        for (auto& candidate : types)
+        {
+            if (std::ranges::all_of(
+                    types,
+                    [&](const lang::ResolvingHandle<lang::Type>& current) { return isMatching(candidate, current); })
+                && std::find(common_types.begin(), common_types.end(), candidate) == common_types.end())
+            {
+                common_types.push_back(candidate);
+            }
+        }
+    }
+
+    return common_types;
+}

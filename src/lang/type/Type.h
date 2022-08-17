@@ -606,6 +606,14 @@ namespace lang
          */
         [[nodiscard]] lang::ResolvingHandle<lang::Type> toSeparateUndefined() const;
 
+        /**
+         * Get the common types from a list of types.
+         * @param types The types to get the common types from.
+         * @return A list of common types. It can be empty if there are no common types.
+         */
+        static std::vector<lang::ResolvingHandle<lang::Type>> getCommonType(
+            const std::vector<lang::ResolvingHandle<lang::Type>>& types);
+
       private:
         lang::Identifier                      name_;
         std::unique_ptr<lang::TypeDefinition> definition_ {};
