@@ -41,7 +41,22 @@ Expression& IfSelect::elseExpression() const
 
 std::optional<lang::ResolvingHandle<lang::Type>> IfSelect::tryGetType() const
 {
-    return then_expression_->tryGetType();
+    auto then_type = thenExpression().tryGetType();
+    auto else_type = elseExpression().tryGetType();
+
+    if (then_type.has_value() && else_type.has_value())
+    {
+        std::vector<lang::ResolvingHandle<lang::Type>> types;
+
+        types.push_back(then_type.value());
+        types.push_back(else_type.value());
+
+        auto common_types = lang::Type::getCommonType(types);
+
+        if (common_types.size() == 1) { return common_types.front(); }
+    }
+
+    return std::nullopt;
 }
 
 bool IfSelect::validate(ValidationLogger& validation_logger) const
@@ -59,10 +74,12 @@ bool IfSelect::validate(ValidationLogger& validation_logger) const
                                        condition_->location(),
                                        validation_logger);
 
-    if (!lang::Type::areSame(then_expression_->type(), else_expression_->type()))
+    auto common_types = lang::Type::getCommonType({then_expression_->type(), else_expression_->type()});
+
+    if (common_types.empty() || common_types.size() > 1)
     {
-        validation_logger.logError("Both branches must have same type", location());
-        valid = false;
+        validation_logger.logError("Branches must have unambiguous common return type", location());
+        return false;
     }
 
     return valid;

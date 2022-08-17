@@ -223,21 +223,10 @@ bool Case::validateReturnTypes(lang::Location                            locatio
 {
     std::vector<lang::ResolvingHandle<lang::Type>> common_types = getCommonType(cases);
 
-    for (auto& case_ptr : cases)
+    if (common_types.empty() || common_types.size() > 1)
     {
-        lang::ResolvingHandle<lang::Type> case_type = std::get<std::unique_ptr<Expression>>(case_ptr->code_)->type();
-
-        if (common_types.empty() || common_types.size() > 1)
-        {
-            validation_logger.logError("Cases must have unambiguous common return type", location);
-        }
-
-        if (!lang::Type::areSame(case_type, common_types.front()))
-        {
-            validation_logger.logError("Cases must all provide same return type", location);
-
-            return false;
-        }
+        validation_logger.logError("Cases must have unambiguous common return type", location);
+        return false;
     }
 
     return true;
