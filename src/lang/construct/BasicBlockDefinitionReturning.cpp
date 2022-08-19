@@ -18,7 +18,7 @@ lang::BasicBlock::Definition::Returning::Returning(lang::LocalScope* scope,
 
 void lang::BasicBlock::Definition::Returning::complete(size_t& index)
 {
-    for (auto& statement : statements_) { self()->addChild(*statement); }
+    for (auto& statement : statements_) { self()->addStatement(*statement); }
 
     if (unreachable_next_) unreachable_next_->complete(index);
 }

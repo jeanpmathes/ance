@@ -190,11 +190,21 @@ namespace lang
          */
         [[nodiscard]] bool isMeta() const;
 
+        /**
+         * Get all statements in this basic block.t
+         * @return References to all statements in this basic block.
+         */
+        [[nodiscard]] const std::vector<std::reference_wrapper<Statement>>& statements() const;
+
       private:
         void                 registerIncomingLink(BasicBlock& predecessor);
         void                 updateLink(BasicBlock* former, BasicBlock* updated);
         [[nodiscard]] size_t getIncomingLinkCount() const;
         void                 transferStatements(std::list<Statement*>& statements);
+
+        void addStatement(Statement& statement);
+
+        std::vector<std::reference_wrapper<Statement>> statements_;
 
         BasicBlock() = default;
 

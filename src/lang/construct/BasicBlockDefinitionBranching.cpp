@@ -11,7 +11,7 @@ lang::BasicBlock::Definition::Branching::Branching(Expression* condition) : cond
 
 void lang::BasicBlock::Definition::Branching::complete(size_t& index)
 {
-    for (auto& statement : statements_) { self()->addChild(*statement); }
+    for (auto& statement : statements_) { self()->addStatement(*statement); }
 
     true_next_->complete(index);
     false_next_->complete(index);

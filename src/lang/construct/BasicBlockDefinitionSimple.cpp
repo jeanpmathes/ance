@@ -12,7 +12,7 @@ lang::BasicBlock::Definition::Simple::Simple(Statement* statement)
 
 void lang::BasicBlock::Definition::Simple::complete(size_t& index)
 {
-    for (auto& statement : statements_) { self()->addChild(*statement); }
+    for (auto& statement : statements_) { self()->addStatement(*statement); }
 
     if (next_) next_->complete(index);
 }

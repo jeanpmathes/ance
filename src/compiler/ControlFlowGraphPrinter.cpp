@@ -42,14 +42,18 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
 
     if (!block.isMeta())
     {
-        std::stringstream code_stream;
-        CodePrinter       code_printer(code_stream);
+        for (auto& statement : block.statements())
+        {
+            std::stringstream code_stream;
+            CodePrinter       code_printer(code_stream);
 
-        code_printer.visit(block);
+            code_printer.visitTree(statement);
 
-        label = escape(code_stream.str());
+            label += escape(code_stream.str());
+            label += '\n';
+        }
+
         label += block.getExitRepresentation();
-
         style = block.isUnreached() ? BlockStyle::UNREACHABLE_CODE : BlockStyle::NORMAL_CODE;
     }
     else

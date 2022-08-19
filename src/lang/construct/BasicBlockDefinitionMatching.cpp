@@ -13,7 +13,7 @@ lang::BasicBlock::Definition::Matching::Matching(Match* match, std::vector<std::
 
 void lang::BasicBlock::Definition::Matching::complete(size_t& index)
 {
-    for (auto& statement : statements_) { self()->addChild(*statement); }
+    for (auto& statement : statements_) { self()->addStatement(*statement); }
     for (auto& branch : branches_) { branch->complete(index); }
 }
 

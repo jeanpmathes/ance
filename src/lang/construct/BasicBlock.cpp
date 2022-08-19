@@ -341,6 +341,17 @@ bool lang::BasicBlock::isMeta() const
     return definition_->isMeta();
 }
 
+const std::vector<std::reference_wrapper<Statement>>& lang::BasicBlock::statements() const
+{
+    return statements_;
+}
+
+void lang::BasicBlock::addStatement(Statement& statement)
+{
+    statements_.emplace_back(statement);
+    addChild(statement);
+}
+
 void lang::BasicBlock::Definition::Base::registerIncomingLink(lang::BasicBlock& block)
 {
     incoming_links_.push_back(&block);
