@@ -120,6 +120,12 @@ void ControlFlowGraphPrinter::printLink(int32_t from, int32_t to)
     edges_ << "\tedge [" << std::endl;
     edges_ << "\t\tsource " << map(from) << std::endl;
     edges_ << "\t\ttarget " << map(to) << std::endl;
+
+    edges_ << "\t\tgraphics [" << std::endl;
+    edges_ << "\t\t\tfill \"#000000\"" << std::endl;
+    edges_ << "\t\t\ttargetArrow \"short\"" << std::endl;
+    edges_ << "\t\t]" << std::endl;
+
     edges_ << "\t]" << std::endl;
 }
 
