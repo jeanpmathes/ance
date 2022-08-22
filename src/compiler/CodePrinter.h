@@ -37,6 +37,7 @@ class CodePrinter : public lang::ApplicationVisitor
     std::any visit(Subscript& subscript) override;
     std::any visit(UnaryOperation& unary_operation) override;
     std::any visit(VariableAccess& variable_access) override;
+    std::any visit(MemberAccess& member_access) override;
 
     std::any visit(lang::CodeBlock& code_block) override;
 

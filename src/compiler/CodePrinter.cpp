@@ -244,6 +244,13 @@ std::any CodePrinter::visit(VariableAccess& variable_access)
     return {};
 }
 
+std::any CodePrinter::visit(MemberAccess& member_access)
+{
+    out_ << visitTree(member_access.value()) << " " << member_access.member();
+
+    return {};
+}
+
 std::any CodePrinter::visit(lang::CodeBlock& code_block)
 {
     if (code_block.isCompound())
@@ -433,4 +440,3 @@ void CodePrinter::indent()
 {
     out_ << std::string(indent_ * 4, ' ');
 }
-
