@@ -38,6 +38,7 @@ class CodePrinter : public lang::ApplicationVisitor
     std::any visit(UnaryOperation& unary_operation) override;
     std::any visit(VariableAccess& variable_access) override;
     std::any visit(MemberAccess& member_access) override;
+    std::any visit(Indirection& indirection) override;
 
     std::any visit(lang::CodeBlock& code_block) override;
 
@@ -53,8 +54,23 @@ class CodePrinter : public lang::ApplicationVisitor
     std::any visit(Return& return_statement) override;
     std::any visit(While& while_statement) override;
 
+  protected:
+    void postVisit(lang::Visitable<ANCE_CONSTRUCTS>&) override;
+
   private:
     void indent();
+
+    void consumeWhitespace();
+    void emitWhitespace();
+
+    enum ConsumeWhitespace
+    {
+        CONSUME_WS_DISABLED,
+        CONSUME_WS_ACTIVE,
+        CONSUME_WS_ENABLED
+    };
+
+    ConsumeWhitespace consume_whitespace_ = CONSUME_WS_DISABLED;
 
     std::ostream& out_;
     size_t        indent_ = 0;

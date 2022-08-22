@@ -246,7 +246,17 @@ std::any CodePrinter::visit(VariableAccess& variable_access)
 
 std::any CodePrinter::visit(MemberAccess& member_access)
 {
-    out_ << visitTree(member_access.value()) << " " << member_access.member();
+    out_ << visitTree(member_access.value());
+    emitWhitespace();
+    out_ << member_access.member();
+
+    return {};
+}
+
+std::any CodePrinter::visit(Indirection& indirection)
+{
+    out_ << visitTree(indirection.value()) << ".";
+    consumeWhitespace();
 
     return {};
 }
@@ -429,14 +439,35 @@ std::any CodePrinter::visit(While& while_statement)
         indent();
         visitTree(while_statement.body());
     }
-    else {
-        out_ << " " << visitTree(while_statement.body());
-    }
+    else { out_ << " " << visitTree(while_statement.body()); }
 
     return {};
+}
+
+void CodePrinter::postVisit(lang::Visitable<ANCE_CONSTRUCTS>&)
+{
+    switch (consume_whitespace_)
+    {
+        case CONSUME_WS_DISABLED:
+        case CONSUME_WS_ACTIVE:
+            consume_whitespace_ = CONSUME_WS_DISABLED;
+            break;
+        case CONSUME_WS_ENABLED:
+            consume_whitespace_ = CONSUME_WS_ACTIVE;
+            break;
+    }
 }
 
 void CodePrinter::indent()
 {
     out_ << std::string(indent_ * 4, ' ');
+}
+
+void CodePrinter::consumeWhitespace()
+{
+    consume_whitespace_ = CONSUME_WS_ENABLED;
+}
+void CodePrinter::emitWhitespace()
+{
+    if (consume_whitespace_ != CONSUME_WS_ACTIVE) { out_ << " "; }
 }
