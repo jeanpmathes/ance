@@ -28,7 +28,7 @@ void data::File::read()
     DataVisitor visitor;
 
     antlr4::tree::ParseTree* tree    = parser.element();
-    data::Element*           element = visitor.visit(tree).as<data::Element*>();
+    data::Element*           element = any_cast<data::Element*>(visitor.visit(tree));
     element_.reset(element);
 }
 

@@ -11,7 +11,7 @@ antlrcpp::Any DataVisitor::visitDictionary(dataParser::DictionaryContext* ctx)
 
     for (auto entry : ctx->entry())
     {
-        auto p = visit(entry).as<std::pair<std::string, data::Element*>>();
+        auto p = std::any_cast<std::pair<std::string, data::Element*>>(visit(entry));
 
         std::string    key;
         data::Element* value;
@@ -26,7 +26,7 @@ antlrcpp::Any DataVisitor::visitDictionary(dataParser::DictionaryContext* ctx)
 antlrcpp::Any DataVisitor::visitEntry(dataParser::EntryContext* ctx)
 {
     std::string key   = ctx->KEY()->getText();
-    auto*       value = visit(ctx->element()).as<data::Element*>();
+    auto*       value = std::any_cast<data::Element*>(visit(ctx->element()));
 
     return std::make_pair(key, value);
 }
@@ -37,7 +37,7 @@ antlrcpp::Any DataVisitor::visitList(dataParser::ListContext* ctx)
 
     for (auto e : ctx->element())
     {
-        auto* entry = visit(e).as<data::Element*>();
+        auto* entry = any_cast<data::Element*>(visit(e));
         element->put(std::unique_ptr<data::Element>(entry));
     }
 

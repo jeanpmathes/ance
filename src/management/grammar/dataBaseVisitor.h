@@ -1,5 +1,5 @@
 
-// Generated from ./src/management/grammar/data.g4 by ANTLR 4.9.3
+// Generated from ./src/management/grammar/data.g4 by ANTLR 4.10.1
 
 #pragma once
 
@@ -14,35 +14,18 @@
  */
 class  dataBaseVisitor : public dataVisitor {
 public:
+  virtual std::any visitElement(dataParser::ElementContext* ctx) override { return visitChildren(ctx); }
 
-  virtual antlrcpp::Any visitElement(dataParser::ElementContext *ctx) override {
-    return visitChildren(ctx);
-  }
+  virtual std::any visitDictionary(dataParser::DictionaryContext* ctx) override { return visitChildren(ctx); }
 
-  virtual antlrcpp::Any visitDictionary(dataParser::DictionaryContext *ctx) override {
-    return visitChildren(ctx);
-  }
+  virtual std::any visitEntry(dataParser::EntryContext* ctx) override { return visitChildren(ctx); }
 
-  virtual antlrcpp::Any visitEntry(dataParser::EntryContext *ctx) override {
-    return visitChildren(ctx);
-  }
+  virtual std::any visitList(dataParser::ListContext* ctx) override { return visitChildren(ctx); }
 
-  virtual antlrcpp::Any visitList(dataParser::ListContext *ctx) override {
-    return visitChildren(ctx);
-  }
+  virtual std::any visitString(dataParser::StringContext* ctx) override { return visitChildren(ctx); }
 
-  virtual antlrcpp::Any visitString(dataParser::StringContext *ctx) override {
-    return visitChildren(ctx);
-  }
+  virtual std::any visitTrue(dataParser::TrueContext* ctx) override { return visitChildren(ctx); }
 
-  virtual antlrcpp::Any visitTrue(dataParser::TrueContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitFalse(dataParser::FalseContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-
+  virtual std::any visitFalse(dataParser::FalseContext* ctx) override { return visitChildren(ctx); }
 };
 

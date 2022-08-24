@@ -1,21 +1,110 @@
 
-// Generated from ./src/management/grammar/data.g4 by ANTLR 4.9.3
+// Generated from ./src/management/grammar/data.g4 by ANTLR 4.10.1
 
 #include "dataVisitor.h"
 
 #include "dataParser.h"
 
 using namespace antlrcpp;
+
 using namespace antlr4;
 
-dataParser::dataParser(TokenStream* input) : Parser(input)
+namespace
 {
-    _interpreter = new atn::ParserATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
+
+    struct DataParserStaticData final {
+        DataParserStaticData(std::vector<std::string> ruleNames,
+                             std::vector<std::string> literalNames,
+                             std::vector<std::string> symbolicNames)
+            : ruleNames(std::move(ruleNames))
+            , literalNames(std::move(literalNames))
+            , symbolicNames(std::move(symbolicNames))
+            , vocabulary(this->literalNames, this->symbolicNames)
+        {}
+
+        DataParserStaticData(const DataParserStaticData&)            = delete;
+        DataParserStaticData(DataParserStaticData&&)                 = delete;
+        DataParserStaticData& operator=(const DataParserStaticData&) = delete;
+        DataParserStaticData& operator=(DataParserStaticData&&)      = delete;
+
+        std::vector<antlr4::dfa::DFA>       decisionToDFA;
+        antlr4::atn::PredictionContextCache sharedContextCache;
+        const std::vector<std::string>      ruleNames;
+        const std::vector<std::string>      literalNames;
+        const std::vector<std::string>      symbolicNames;
+        const antlr4::dfa::Vocabulary       vocabulary;
+        antlr4::atn::SerializedATNView      serializedATN;
+        std::unique_ptr<antlr4::atn::ATN>   atn;
+    };
+
+    std::once_flag        dataParserOnceFlag;
+    DataParserStaticData* dataParserStaticData = nullptr;
+
+    void dataParserInitialize()
+    {
+        assert(dataParserStaticData == nullptr);
+        auto staticData = std::make_unique<DataParserStaticData>(
+            std::vector<std::string> {"element", "dictionary", "entry", "list", "string", "boolean"},
+            std::vector<std::string> {"", "'{'", "','", "'}'", "':'", "'['", "']'", "'true'", "'false'"},
+            std::vector<
+                std::string> {"", "", "", "", "", "", "", "", "", "KEY", "STRING", "WHITESPACE", "LINE_COMMENT"});
+        static const int32_t serializedATNSegment[] = {
+            4,  1, 12, 55, 2,  0,  7,  0,  2,  1,  7,  1,  2,  2,  7,  2,  2,  3,  7,  3,  2,  4,  7,  4,  2,  5,  7,
+            5,  1, 0,  1,  0,  1,  0,  1,  0,  3,  0,  17, 8,  0,  1,  1,  1,  1,  1,  1,  1,  1,  5,  1,  23, 8,  1,
+            10, 1, 12, 1,  26, 9,  1,  3,  1,  28, 8,  1,  1,  1,  1,  1,  1,  2,  1,  2,  1,  2,  1,  2,  1,  3,  1,
+            3,  1, 3,  1,  3,  5,  3,  40, 8,  3,  10, 3,  12, 3,  43, 9,  3,  3,  3,  45, 8,  3,  1,  3,  1,  3,  1,
+            4,  1, 4,  1,  5,  1,  5,  3,  5,  53, 8,  5,  1,  5,  0,  0,  6,  0,  2,  4,  6,  8,  10, 0,  0,  56, 0,
+            16, 1, 0,  0,  0,  2,  18, 1,  0,  0,  0,  4,  31, 1,  0,  0,  0,  6,  35, 1,  0,  0,  0,  8,  48, 1,  0,
+            0,  0, 10, 52, 1,  0,  0,  0,  12, 17, 3,  2,  1,  0,  13, 17, 3,  6,  3,  0,  14, 17, 3,  8,  4,  0,  15,
+            17, 3, 10, 5,  0,  16, 12, 1,  0,  0,  0,  16, 13, 1,  0,  0,  0,  16, 14, 1,  0,  0,  0,  16, 15, 1,  0,
+            0,  0, 17, 1,  1,  0,  0,  0,  18, 27, 5,  1,  0,  0,  19, 24, 3,  4,  2,  0,  20, 21, 5,  2,  0,  0,  21,
+            23, 3, 4,  2,  0,  22, 20, 1,  0,  0,  0,  23, 26, 1,  0,  0,  0,  24, 22, 1,  0,  0,  0,  24, 25, 1,  0,
+            0,  0, 25, 28, 1,  0,  0,  0,  26, 24, 1,  0,  0,  0,  27, 19, 1,  0,  0,  0,  27, 28, 1,  0,  0,  0,  28,
+            29, 1, 0,  0,  0,  29, 30, 5,  3,  0,  0,  30, 3,  1,  0,  0,  0,  31, 32, 5,  9,  0,  0,  32, 33, 5,  4,
+            0,  0, 33, 34, 3,  0,  0,  0,  34, 5,  1,  0,  0,  0,  35, 44, 5,  5,  0,  0,  36, 41, 3,  0,  0,  0,  37,
+            38, 5, 2,  0,  0,  38, 40, 3,  0,  0,  0,  39, 37, 1,  0,  0,  0,  40, 43, 1,  0,  0,  0,  41, 39, 1,  0,
+            0,  0, 41, 42, 1,  0,  0,  0,  42, 45, 1,  0,  0,  0,  43, 41, 1,  0,  0,  0,  44, 36, 1,  0,  0,  0,  44,
+            45, 1, 0,  0,  0,  45, 46, 1,  0,  0,  0,  46, 47, 5,  6,  0,  0,  47, 7,  1,  0,  0,  0,  48, 49, 5,  10,
+            0,  0, 49, 9,  1,  0,  0,  0,  50, 53, 5,  7,  0,  0,  51, 53, 5,  8,  0,  0,  52, 50, 1,  0,  0,  0,  52,
+            51, 1, 0,  0,  0,  53, 11, 1,  0,  0,  0,  6,  16, 24, 27, 41, 44, 52};
+        staticData->serializedATN =
+            antlr4::atn::SerializedATNView(serializedATNSegment,
+                                           sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
+
+        antlr4::atn::ATNDeserializer deserializer;
+        staticData->atn = deserializer.deserialize(staticData->serializedATN);
+
+        const size_t count = staticData->atn->getNumberOfDecisions();
+        staticData->decisionToDFA.reserve(count);
+        for (size_t i = 0; i < count; i++)
+        {
+            staticData->decisionToDFA.emplace_back(staticData->atn->getDecisionState(i), i);
+        }
+        dataParserStaticData = staticData.release();
+    }
+
+}
+
+dataParser::dataParser(TokenStream* input) : dataParser(input, antlr4::atn::ParserATNSimulatorOptions()) {}
+
+dataParser::dataParser(TokenStream* input, const antlr4::atn::ParserATNSimulatorOptions& options) : Parser(input)
+{
+    dataParser::initialize();
+    _interpreter = new atn::ParserATNSimulator(this,
+                                               *dataParserStaticData->atn,
+                                               dataParserStaticData->decisionToDFA,
+                                               dataParserStaticData->sharedContextCache,
+                                               options);
 }
 
 dataParser::~dataParser()
 {
     delete _interpreter;
+}
+
+const atn::ATN& dataParser::getATN() const
+{
+    return *dataParserStaticData->atn;
 }
 
 std::string dataParser::getGrammarFileName() const
@@ -25,12 +114,17 @@ std::string dataParser::getGrammarFileName() const
 
 const std::vector<std::string>& dataParser::getRuleNames() const
 {
-    return _ruleNames;
+    return dataParserStaticData->ruleNames;
 }
 
-dfa::Vocabulary& dataParser::getVocabulary() const
+const dfa::Vocabulary& dataParser::getVocabulary() const
 {
-    return _vocabulary;
+    return dataParserStaticData->vocabulary;
+}
+
+antlr4::atn::SerializedATNView dataParser::getSerializedATN() const
+{
+    return dataParserStaticData->serializedATN;
 }
 
 //----------------- ElementContext ------------------------------------------------------------------
@@ -64,7 +158,7 @@ size_t dataParser::ElementContext::getRuleIndex() const
     return dataParser::RuleElement;
 }
 
-antlrcpp::Any dataParser::ElementContext::accept(tree::ParseTreeVisitor* visitor)
+std::any dataParser::ElementContext::accept(tree::ParseTreeVisitor* visitor)
 {
     if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitElement(this);
     else return visitor->visitChildren(this);
@@ -156,7 +250,7 @@ size_t dataParser::DictionaryContext::getRuleIndex() const
     return dataParser::RuleDictionary;
 }
 
-antlrcpp::Any dataParser::DictionaryContext::accept(tree::ParseTreeVisitor* visitor)
+std::any dataParser::DictionaryContext::accept(tree::ParseTreeVisitor* visitor)
 {
     if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitDictionary(this);
     else return visitor->visitChildren(this);
@@ -236,7 +330,7 @@ size_t dataParser::EntryContext::getRuleIndex() const
     return dataParser::RuleEntry;
 }
 
-antlrcpp::Any dataParser::EntryContext::accept(tree::ParseTreeVisitor* visitor)
+std::any dataParser::EntryContext::accept(tree::ParseTreeVisitor* visitor)
 {
     if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitEntry(this);
     else return visitor->visitChildren(this);
@@ -295,7 +389,7 @@ size_t dataParser::ListContext::getRuleIndex() const
     return dataParser::RuleList;
 }
 
-antlrcpp::Any dataParser::ListContext::accept(tree::ParseTreeVisitor* visitor)
+std::any dataParser::ListContext::accept(tree::ParseTreeVisitor* visitor)
 {
     if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitList(this);
     else return visitor->visitChildren(this);
@@ -374,7 +468,7 @@ size_t dataParser::StringContext::getRuleIndex() const
     return dataParser::RuleString;
 }
 
-antlrcpp::Any dataParser::StringContext::accept(tree::ParseTreeVisitor* visitor)
+std::any dataParser::StringContext::accept(tree::ParseTreeVisitor* visitor)
 {
     if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitString(this);
     else return visitor->visitChildren(this);
@@ -431,7 +525,7 @@ dataParser::TrueContext::TrueContext(BooleanContext* ctx)
     copyFrom(ctx);
 }
 
-antlrcpp::Any dataParser::TrueContext::accept(tree::ParseTreeVisitor* visitor)
+std::any dataParser::TrueContext::accept(tree::ParseTreeVisitor* visitor)
 {
     if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitTrue(this);
     else return visitor->visitChildren(this);
@@ -443,7 +537,7 @@ dataParser::FalseContext::FalseContext(BooleanContext* ctx)
     copyFrom(ctx);
 }
 
-antlrcpp::Any dataParser::FalseContext::accept(tree::ParseTreeVisitor* visitor)
+std::any dataParser::FalseContext::accept(tree::ParseTreeVisitor* visitor)
 {
     if (auto parserVisitor = dynamic_cast<dataVisitor*>(visitor)) return parserVisitor->visitFalse(this);
     else return visitor->visitChildren(this);
@@ -498,81 +592,7 @@ dataParser::BooleanContext* dataParser::boolean()
     return _localctx;
 }
 
-// Static vars and initialization.
-std::vector<dfa::DFA>       dataParser::_decisionToDFA;
-atn::PredictionContextCache dataParser::_sharedContextCache;
-
-// We own the ATN which in turn owns the ATN states.
-atn::ATN              dataParser::_atn;
-std::vector<uint16_t> dataParser::_serializedATN;
-
-std::vector<std::string> dataParser::_ruleNames = {"element", "dictionary", "entry", "list", "string", "boolean"};
-
-std::vector<std::string> dataParser::_literalNames =
-    {"", "'{'", "','", "'}'", "':'", "'['", "']'", "'true'", "'false'"};
-
-std::vector<std::string> dataParser::_symbolicNames =
-    {"", "", "", "", "", "", "", "", "", "KEY", "STRING", "WHITESPACE", "LINE_COMMENT"};
-
-dfa::Vocabulary dataParser::_vocabulary(_literalNames, _symbolicNames);
-
-std::vector<std::string> dataParser::_tokenNames;
-
-dataParser::Initializer::Initializer()
+void dataParser::initialize()
 {
-    for (size_t i = 0; i < _symbolicNames.size(); ++i)
-    {
-        std::string name = _vocabulary.getLiteralName(i);
-        if (name.empty()) { name = _vocabulary.getSymbolicName(i); }
-
-        if (name.empty()) { _tokenNames.push_back("<INVALID>"); }
-        else { _tokenNames.push_back(name); }
-    }
-
-    static const uint16_t serializedATNSegment0[] = {
-        0x3,  0x608b, 0xa72a, 0x8133, 0xb9ed, 0x417c, 0x3be7, 0x7786, 0x5964, 0x3,  0xe,  0x39, 0x4,  0x2,  0x9,  0x2,
-        0x4,  0x3,    0x9,    0x3,    0x4,    0x4,    0x9,    0x4,    0x4,    0x5,  0x9,  0x5,  0x4,  0x6,  0x9,  0x6,
-        0x4,  0x7,    0x9,    0x7,    0x3,    0x2,    0x3,    0x2,    0x3,    0x2,  0x3,  0x2,  0x5,  0x2,  0x13, 0xa,
-        0x2,  0x3,    0x3,    0x3,    0x3,    0x3,    0x3,    0x3,    0x3,    0x7,  0x3,  0x19, 0xa,  0x3,  0xc,  0x3,
-        0xe,  0x3,    0x1c,   0xb,    0x3,    0x5,    0x3,    0x1e,   0xa,    0x3,  0x3,  0x3,  0x3,  0x3,  0x3,  0x4,
-        0x3,  0x4,    0x3,    0x4,    0x3,    0x4,    0x3,    0x5,    0x3,    0x5,  0x3,  0x5,  0x3,  0x5,  0x7,  0x5,
-        0x2a, 0xa,    0x5,    0xc,    0x5,    0xe,    0x5,    0x2d,   0xb,    0x5,  0x5,  0x5,  0x2f, 0xa,  0x5,  0x3,
-        0x5,  0x3,    0x5,    0x3,    0x6,    0x3,    0x6,    0x3,    0x7,    0x3,  0x7,  0x5,  0x7,  0x37, 0xa,  0x7,
-        0x3,  0x7,    0x2,    0x2,    0x8,    0x2,    0x4,    0x6,    0x8,    0xa,  0xc,  0x2,  0x2,  0x2,  0x3a, 0x2,
-        0x12, 0x3,    0x2,    0x2,    0x2,    0x4,    0x14,   0x3,    0x2,    0x2,  0x2,  0x6,  0x21, 0x3,  0x2,  0x2,
-        0x2,  0x8,    0x25,   0x3,    0x2,    0x2,    0x2,    0xa,    0x32,   0x3,  0x2,  0x2,  0x2,  0xc,  0x36, 0x3,
-        0x2,  0x2,    0x2,    0xe,    0x13,   0x5,    0x4,    0x3,    0x2,    0xf,  0x13, 0x5,  0x8,  0x5,  0x2,  0x10,
-        0x13, 0x5,    0xa,    0x6,    0x2,    0x11,   0x13,   0x5,    0xc,    0x7,  0x2,  0x12, 0xe,  0x3,  0x2,  0x2,
-        0x2,  0x12,   0xf,    0x3,    0x2,    0x2,    0x2,    0x12,   0x10,   0x3,  0x2,  0x2,  0x2,  0x12, 0x11, 0x3,
-        0x2,  0x2,    0x2,    0x13,   0x3,    0x3,    0x2,    0x2,    0x2,    0x14, 0x1d, 0x7,  0x3,  0x2,  0x2,  0x15,
-        0x1a, 0x5,    0x6,    0x4,    0x2,    0x16,   0x17,   0x7,    0x4,    0x2,  0x2,  0x17, 0x19, 0x5,  0x6,  0x4,
-        0x2,  0x18,   0x16,   0x3,    0x2,    0x2,    0x2,    0x19,   0x1c,   0x3,  0x2,  0x2,  0x2,  0x1a, 0x18, 0x3,
-        0x2,  0x2,    0x2,    0x1a,   0x1b,   0x3,    0x2,    0x2,    0x2,    0x1b, 0x1e, 0x3,  0x2,  0x2,  0x2,  0x1c,
-        0x1a, 0x3,    0x2,    0x2,    0x2,    0x1d,   0x15,   0x3,    0x2,    0x2,  0x2,  0x1d, 0x1e, 0x3,  0x2,  0x2,
-        0x2,  0x1e,   0x1f,   0x3,    0x2,    0x2,    0x2,    0x1f,   0x20,   0x7,  0x5,  0x2,  0x2,  0x20, 0x5,  0x3,
-        0x2,  0x2,    0x2,    0x21,   0x22,   0x7,    0xb,    0x2,    0x2,    0x22, 0x23, 0x7,  0x6,  0x2,  0x2,  0x23,
-        0x24, 0x5,    0x2,    0x2,    0x2,    0x24,   0x7,    0x3,    0x2,    0x2,  0x2,  0x25, 0x2e, 0x7,  0x7,  0x2,
-        0x2,  0x26,   0x2b,   0x5,    0x2,    0x2,    0x2,    0x27,   0x28,   0x7,  0x4,  0x2,  0x2,  0x28, 0x2a, 0x5,
-        0x2,  0x2,    0x2,    0x29,   0x27,   0x3,    0x2,    0x2,    0x2,    0x2a, 0x2d, 0x3,  0x2,  0x2,  0x2,  0x2b,
-        0x29, 0x3,    0x2,    0x2,    0x2,    0x2b,   0x2c,   0x3,    0x2,    0x2,  0x2,  0x2c, 0x2f, 0x3,  0x2,  0x2,
-        0x2,  0x2d,   0x2b,   0x3,    0x2,    0x2,    0x2,    0x2e,   0x26,   0x3,  0x2,  0x2,  0x2,  0x2e, 0x2f, 0x3,
-        0x2,  0x2,    0x2,    0x2f,   0x30,   0x3,    0x2,    0x2,    0x2,    0x30, 0x31, 0x7,  0x8,  0x2,  0x2,  0x31,
-        0x9,  0x3,    0x2,    0x2,    0x2,    0x32,   0x33,   0x7,    0xc,    0x2,  0x2,  0x33, 0xb,  0x3,  0x2,  0x2,
-        0x2,  0x34,   0x37,   0x7,    0x9,    0x2,    0x2,    0x35,   0x37,   0x7,  0xa,  0x2,  0x2,  0x36, 0x34, 0x3,
-        0x2,  0x2,    0x2,    0x36,   0x35,   0x3,    0x2,    0x2,    0x2,    0x37, 0xd,  0x3,  0x2,  0x2,  0x2,  0x8,
-        0x12, 0x1a,   0x1d,   0x2b,   0x2e,   0x36,
-    };
-
-    _serializedATN.insert(_serializedATN.end(),
-                          serializedATNSegment0,
-                          serializedATNSegment0 + sizeof(serializedATNSegment0) / sizeof(serializedATNSegment0[0]));
-
-    atn::ATNDeserializer deserializer;
-    _atn = deserializer.deserialize(_serializedATN);
-
-    size_t count = _atn.getNumberOfDecisions();
-    _decisionToDFA.reserve(count);
-    for (size_t i = 0; i < count; i++) { _decisionToDFA.emplace_back(_atn.getDecisionState(i), i); }
+    std::call_once(dataParserOnceFlag, dataParserInitialize);
 }
-
-dataParser::Initializer dataParser::_init;
