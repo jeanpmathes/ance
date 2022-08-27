@@ -19,7 +19,7 @@ public main () : ui32
 
     // Operations are performed component-wise.
 
-    let z = x + y;
+    let z <: x + y;
 
     // Elements can be accessed using the index operator.
 
