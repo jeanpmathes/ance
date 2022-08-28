@@ -1,13 +1,13 @@
 #include "ArrayType.h"
 
+#include "compiler/Application.h"
+#include "compiler/CompileContext.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
 #include "lang/utility/Values.h"
-#include "compiler/Application.h"
-#include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
 lang::ArrayType::ArrayType(lang::ResolvingHandle<lang::Type> element_type, const uint64_t size)
@@ -16,6 +16,11 @@ lang::ArrayType::ArrayType(lang::ResolvingHandle<lang::Type> element_type, const
     , element_type_(element_type)
     , element_reference_(lang::ReferenceType::get(element_type))
 {}
+
+bool lang::ArrayType::isArrayType() const
+{
+    return true;
+}
 
 StateCount lang::ArrayType::getStateCount() const
 {
@@ -55,7 +60,7 @@ bool lang::ArrayType::validate(ValidationLogger& validation_logger, lang::Locati
 {
     if (size_ > MAX_ARRAY_TYPE_SIZE)
     {
-        validation_logger.logError("Integer type size cannot be larger than " + std::to_string(MAX_ARRAY_TYPE_SIZE),
+        validation_logger.logError("Array type size cannot be larger than " + std::to_string(MAX_ARRAY_TYPE_SIZE),
                                    location);
         return false;
     }
@@ -188,7 +193,7 @@ llvm::DIType* lang::ArrayType::createDebugType(CompileContext& context)
     const llvm::DataLayout& dl         = context.module()->getDataLayout();
     llvm::Type*             array_type = getContentType(*context.llvmContext());
 
-    uint64_t      size            = dl.getTypeSizeInBits(array_type) / 8;
+    uint64_t      size            = dl.getTypeSizeInBits(array_type);
     uint32_t      alignment       = dl.getABITypeAlignment(array_type);
     llvm::DIType* element_di_type = element_type_->getDebugType(context);
 

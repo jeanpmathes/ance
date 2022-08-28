@@ -150,6 +150,30 @@ bool lang::Type::isStructType() const
     return definition_->isStructType();
 }
 
+const lang::VectorizableType* lang::Type::isVectorizable() const
+{
+    assert(isDefined());
+    return definition_->isVectorizable();
+}
+
+lang::VectorizableType* lang::Type::isVectorizable()
+{
+    assert(isDefined());
+    return definition_->isVectorizable();
+}
+
+bool lang::Type::isVectorType() const
+{
+    assert(isDefined());
+    return definition_->isVectorType();
+}
+
+bool lang::Type::isArrayType() const
+{
+    assert(isDefined());
+    return definition_->isArrayType();
+}
+
 lang::ResolvingHandle<lang::Type> lang::Type::getElementType() const
 {
     assert(isDefined());

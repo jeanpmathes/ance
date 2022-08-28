@@ -23,6 +23,7 @@ namespace lang
     class Scope;
     class Value;
     class Function;
+    class VectorizableType;
 }
 
 class CompileContext;
@@ -182,8 +183,34 @@ namespace lang
         [[nodiscard]] bool isStructType() const;
 
         /**
-         * Get the element type of this type. A type can have only exactly one element type. Currently, only arrays, pointers and references have element types.
-         * @return The element type, or void if this type has no element type.
+         * Get whether this type is vectorizable.
+         * All types can be vector elements, but for vectorizable types this is natively supported.
+         * @return The vectorizable type.
+         */
+        [[nodiscard]] const lang::VectorizableType* isVectorizable() const;
+
+        /**
+         * Get whether this type is vectorizable.
+         * All types can be vector elements, but for vectorizable types this is natively supported.
+         * @return The vectorizable type.
+         */
+        [[nodiscard]] lang::VectorizableType* isVectorizable();
+
+        /**
+         * Get whether this type is a vector type.
+         * @return True if this type is a vector type.
+         */
+        [[nodiscard]] bool isVectorType() const;
+
+        /**
+         * Get whether this type is an array type.
+         * @return True if this type is an array type.
+         */
+        [[nodiscard]] bool isArrayType() const;
+
+        /**
+         * Get the element type of this type. A type can have only exactly one element type. Currently, only arrays, vectors, pointers and references have element types.
+         * @return The element type, or undefined if this type has no element type.
          */
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const;
 

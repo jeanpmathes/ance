@@ -1,14 +1,14 @@
 #ifndef ANCE_SRC_LANG_TYPE_FLOATINGPOINTTYPE_H_
 #define ANCE_SRC_LANG_TYPE_FLOATINGPOINTTYPE_H_
 
-#include "TypeDefinition.h"
+#include "VectorizableType.h"
 
 namespace lang
 {
     /**
      * The base class of all floating point types.
      */
-    class FloatingPointType : virtual public lang::TypeDefinition
+    class FloatingPointType : virtual public lang::VectorizableType
     {
       protected:
         std::string   createMangledName() const override;
@@ -42,6 +42,12 @@ namespace lang
                                                         std::shared_ptr<Value> left,
                                                         std::shared_ptr<Value> right,
                                                         CompileContext&        context) override;
+
+        std::shared_ptr<Value> buildOperator(lang::BinaryOperator              op,
+                                             std::shared_ptr<Value>            left,
+                                             std::shared_ptr<Value>            right,
+                                             lang::ResolvingHandle<lang::Type> return_type,
+                                             CompileContext&                   context) override;
 
         bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
         void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,

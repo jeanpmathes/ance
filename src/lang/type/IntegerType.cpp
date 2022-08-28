@@ -168,6 +168,15 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
                                                               std::shared_ptr<Value> right,
                                                               CompileContext&        context)
 {
+    return buildOperator(op, left, right, getOperatorResultType(op, right->type()), context);
+}
+
+std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator              op,
+                                                              std::shared_ptr<Value>            left,
+                                                              std::shared_ptr<Value>            right,
+                                                              lang::ResolvingHandle<lang::Type> return_type,
+                                                              CompileContext&                   context)
+{
     right = lang::Type::getValueOrReferencedValue(right, context);
 
     left->buildContentValue(context);
@@ -225,9 +234,8 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
             break;
     }
 
-    lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op, right->type());
-    llvm::Value*                      native_result = lang::Values::contentToNative(result_type, result, context);
-    return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
+    llvm::Value* native_result = lang::Values::contentToNative(return_type, result, context);
+    return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
 bool lang::IntegerType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)

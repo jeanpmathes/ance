@@ -23,6 +23,7 @@ namespace lang
     class Type;
     class Function;
     class PredefinedFunction;
+    class VectorizableType;
 }
 
 class CompileContext;
@@ -51,22 +52,26 @@ namespace lang
         [[nodiscard]] const Identifier& name() const;
         const std::string&              getMangledName() const;
         [[nodiscard]] lang::Location    getDefinitionLocation() const;
-        [[nodiscard]] bool               isCustom() const;
+        [[nodiscard]] bool              isCustom() const;
 
         [[nodiscard]] virtual StateCount getStateCount() const = 0;
 
-        [[nodiscard]] virtual bool isIntegerType() const;
-        [[nodiscard]] virtual bool isIntegerType(uint64_t bit_size, bool is_signed) const;
-        [[nodiscard]] virtual bool isSigned() const;
-        [[nodiscard]] virtual bool isBooleanType() const;
-        [[nodiscard]] virtual bool isFloatingPointType() const;
-        [[nodiscard]] virtual bool isFloatingPointType(size_t precision) const;
-        [[nodiscard]] virtual bool isSizeType() const;
-        [[nodiscard]] virtual bool isDiffType() const;
-        [[nodiscard]] virtual bool isVoidType() const;
-        [[nodiscard]] virtual bool isPointerType() const;
-        [[nodiscard]] virtual bool isReferenceType() const;
-        [[nodiscard]] virtual bool isStructType() const;
+        [[nodiscard]] virtual bool                    isIntegerType() const;
+        [[nodiscard]] virtual bool                    isIntegerType(uint64_t bit_size, bool is_signed) const;
+        [[nodiscard]] virtual bool                    isSigned() const;
+        [[nodiscard]] virtual bool                    isBooleanType() const;
+        [[nodiscard]] virtual bool                    isFloatingPointType() const;
+        [[nodiscard]] virtual bool                    isFloatingPointType(size_t precision) const;
+        [[nodiscard]] virtual bool                    isSizeType() const;
+        [[nodiscard]] virtual bool                    isDiffType() const;
+        [[nodiscard]] virtual bool                    isVoidType() const;
+        [[nodiscard]] virtual bool                    isPointerType() const;
+        [[nodiscard]] virtual bool                    isReferenceType() const;
+        [[nodiscard]] virtual bool                    isStructType() const;
+        [[nodiscard]] virtual const VectorizableType* isVectorizable() const;
+        [[nodiscard]] virtual VectorizableType*       isVectorizable();
+        [[nodiscard]] virtual bool                    isVectorType() const;
+        [[nodiscard]] virtual bool                    isArrayType() const;
 
         [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getElementType() const;
 
@@ -151,7 +156,6 @@ namespace lang
         virtual void buildNativeDeclaration(CompileContext& context);
         virtual void buildNativeDefinition(CompileContext& context);
 
-      protected:
         virtual void createConstructors();
 
         /**

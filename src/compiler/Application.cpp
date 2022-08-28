@@ -18,6 +18,7 @@
 #include "lang/type/IntegerType.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/ReferenceType.h"
+#include "lang/type/VectorType.h"
 
 #include "lang/type/SizeType.h"
 #include "lang/type/UnsignedIntegerPointerType.h"
@@ -43,6 +44,7 @@ Application::Application(Project& project) : Application(project, std::make_uniq
 
     global_scope_->addTypeRegistry(lang::IntegerType::getRegistry());
     global_scope_->addTypeRegistry(lang::ArrayType::getRegistry());
+    global_scope_->addTypeRegistry(lang::VectorType::getRegistry());
     global_scope_->addTypeRegistry(lang::PointerType::getRegistry());
     global_scope_->addTypeRegistry(lang::ReferenceType::getRegistry());
 }

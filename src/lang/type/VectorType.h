@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_LANG_TYPE_ARRAYTYPE_H_
-#define ANCE_SRC_LANG_TYPE_ARRAYTYPE_H_
+#ifndef ANCE_SRC_LANG_TYPE_VECTORTYPE_H_
+#define ANCE_SRC_LANG_TYPE_VECTORTYPE_H_
 
 #include "TypeDefinition.h"
 
@@ -19,25 +19,25 @@ class Application;
 namespace lang
 {
     /**
-     * Represents array types. Array types have an element type and a length.
+     * Represents a vector type.
      */
-    class ArrayType : public lang::TypeDefinition
+    class VectorType : public lang::TypeDefinition
     {
       private:
-        ArrayType(lang::ResolvingHandle<lang::Type> element_type, uint64_t size);
+        VectorType(lang::ResolvingHandle<lang::Type> element_type, uint64_t size);
 
       public:
-        static const uint64_t MAX_ARRAY_TYPE_SIZE = 1ll << 32;
+        static const uint64_t MAX_VECTOR_TYPE_SIZE = 1ll << 32;
 
-        bool isArrayType() const override;
+        bool isVectorType() const override;
 
         [[nodiscard]] StateCount getStateCount() const override;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const override;
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
 
-        llvm::Constant*  getDefaultContent(llvm::Module& m) override;
-        llvm::ArrayType* getContentType(llvm::LLVMContext& c) const override;
+        llvm::Constant*   getDefaultContent(llvm::Module& m) override;
+        llvm::VectorType* getContentType(llvm::LLVMContext& c) const override;
 
         bool                              isSubscriptDefined() override;
         lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
@@ -52,6 +52,19 @@ namespace lang
                                                     std::shared_ptr<Value> index,
                                                     CompileContext&        context) override;
 
+        bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other) override;
+        lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
+                                                                lang::ResolvingHandle<lang::Type> other) override;
+        bool                              validateOperator(lang::BinaryOperator              op,
+                                                           lang::ResolvingHandle<lang::Type> other,
+                                                           lang::Location                    left_location,
+                                                           lang::Location                    right_location,
+                                                           ValidationLogger&                 validation_logger) const override;
+        std::shared_ptr<lang::Value>      buildOperator(lang::BinaryOperator   op,
+                                                        std::shared_ptr<Value> left,
+                                                        std::shared_ptr<Value> right,
+                                                        CompileContext&        context) override;
+
       private:
         llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
                                             const std::shared_ptr<lang::Value>& index,
@@ -60,7 +73,7 @@ namespace lang
         llvm::Value* buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context);
 
       public:
-        ~ArrayType() override = default;
+        ~VectorType() override = default;
 
       protected:
         void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context) override;
@@ -79,16 +92,20 @@ namespace lang
         lang::ResolvingHandle<lang::Type> element_reference_;
 
       private:
-        static lang::TypeRegistry<uint64_t>& getArrayTypes();
+        static lang::TypeRegistry<uint64_t>& getVectorTypes();
 
       public:
+        [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
+        [[nodiscard]] bool isTriviallyCopyConstructible() const override;
+        [[nodiscard]] bool isTriviallyDestructible() const override;
+
         static lang::TypeDefinitionRegistry* getRegistry();
 
         /**
-         * Get an array type instance.
-         * @param element_type The element type of the array.
-         * @param size The size of the array. Must be greater than zero.
-         * @return The array type instance.
+         * Get an vector type instance.
+         * @param element_type The element type of the vector.
+         * @param size The size of the vector. Must be greater than zero.
+         * @return The vector type instance.
          */
         static lang::ResolvingHandle<lang::Type> get(lang::ResolvingHandle<lang::Type> element_type, uint64_t size);
     };

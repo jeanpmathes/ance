@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_TYPE_INTEGERTYPE_H_
 #define ANCE_SRC_LANG_TYPE_INTEGERTYPE_H_
 
-#include "TypeDefinition.h"
+#include "VectorizableType.h"
 
 #include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -14,7 +14,7 @@ namespace lang
     /**
      * Represents an integer type. Integers can have any precision and can be signed or unsigned.
      */
-    class IntegerType : public lang::TypeDefinition
+    class IntegerType : public lang::VectorizableType
     {
       private:
         IntegerType(uint64_t bit_size, bool is_signed);
@@ -53,6 +53,12 @@ namespace lang
                                                         std::shared_ptr<Value> left,
                                                         std::shared_ptr<Value> right,
                                                         CompileContext&        context) override;
+
+        std::shared_ptr<Value> buildOperator(lang::BinaryOperator              op,
+                                             std::shared_ptr<Value>            left,
+                                             std::shared_ptr<Value>            right,
+                                             lang::ResolvingHandle<lang::Type> return_type,
+                                             CompileContext&                   context) override;
 
         bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
         void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,

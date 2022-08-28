@@ -100,6 +100,26 @@ bool lang::TypeDefinition::isStructType() const
     return false;
 }
 
+const lang::VectorizableType* lang::TypeDefinition::isVectorizable() const
+{
+    return nullptr;
+}
+
+lang::VectorizableType* lang::TypeDefinition::isVectorizable()
+{
+    return nullptr;
+}
+
+bool lang::TypeDefinition::isVectorType() const
+{
+    return false;
+}
+
+bool lang::TypeDefinition::isArrayType() const
+{
+    return false;
+}
+
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getElementType() const
 {
     return lang::Type::getUndefined();

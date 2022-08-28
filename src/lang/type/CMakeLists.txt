@@ -1,5 +1,6 @@
 target_sources(ance PRIVATE
                ArrayType.cpp
+               VectorType.cpp
                DoubleType.cpp
                HalfType.cpp
                IntegerType.cpp
@@ -12,6 +13,7 @@ target_sources(ance PRIVATE
                PointerType.cpp
                ReferenceType.cpp
                FloatingPointType.cpp
+               VectorizableType.cpp
                TypeDefinition.cpp
                TypeAlias.cpp
                StructType.cpp

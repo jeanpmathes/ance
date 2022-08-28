@@ -5,6 +5,7 @@
 #include "compiler/Application.h"
 
 #include "lang/type/ArrayType.h"
+#include "lang/type/BooleanType.h"
 #include "lang/type/DoubleType.h"
 #include "lang/type/HalfType.h"
 #include "lang/type/IntegerType.h"
@@ -12,7 +13,7 @@
 #include "lang/type/QuadType.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SingleType.h"
-#include "lang/type/BooleanType.h"
+#include "lang/type/VectorType.h"
 #include "lang/type/VoidType.h"
 
 #include "lang/statement/Assignment.h"
@@ -780,7 +781,15 @@ std::any SourceVisitor::visitArrayType(anceParser::ArrayTypeContext* ctx)
     return type;
 }
 
-std::any SourceVisitor::visitVectorType(anceParser::VectorTypeContext* ctx) {}
+std::any SourceVisitor::visitVectorType(anceParser::VectorTypeContext* ctx)
+{
+    lang::ResolvingHandle<lang::Type> element_type =
+        std::any_cast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
+    uint64_t                          size = parseCompoundTypeSize(ctx->INTEGER()->getText());
+    lang::ResolvingHandle<lang::Type> type = lang::VectorType::get(element_type, size);
+
+    return type;
+}
 
 std::any SourceVisitor::visitKeywordType(anceParser::KeywordTypeContext* ctx)
 {
