@@ -22,102 +22,103 @@ class SourceVisitor : public anceBaseVisitor
 
     // Declarations
 
-    antlrcpp::Any visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx) override;
-    antlrcpp::Any visitStructDefinition(anceParser::StructDefinitionContext* ctx) override;
-    antlrcpp::Any visitMember(anceParser::MemberContext* ctx) override;
+    std::any visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx) override;
+    std::any visitStructDefinition(anceParser::StructDefinitionContext* ctx) override;
+    std::any visitMember(anceParser::MemberContext* ctx) override;
 
     // Functions
 
-    antlrcpp::Any visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx) override;
-    antlrcpp::Any visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx) override;
-    antlrcpp::Any visitParameters(anceParser::ParametersContext* ctx) override;
-    antlrcpp::Any visitParameter(anceParser::ParameterContext* ctx) override;
-    antlrcpp::Any visitDefineAlias(anceParser::DefineAliasContext* ctx) override;
+    std::any visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx) override;
+    std::any visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx) override;
+    std::any visitParameters(anceParser::ParametersContext* ctx) override;
+    std::any visitParameter(anceParser::ParameterContext* ctx) override;
+    std::any visitDefineAlias(anceParser::DefineAliasContext* ctx) override;
 
     // Statements
 
-    antlrcpp::Any visitBlock(anceParser::BlockContext* ctx) override;
+    std::any visitBlock(anceParser::BlockContext* ctx) override;
 
-    antlrcpp::Any visitExpressionStatement(anceParser::ExpressionStatementContext* ctx) override;
-    antlrcpp::Any visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx) override;
-    antlrcpp::Any visitLocalReferenceDefinition(anceParser::LocalReferenceDefinitionContext* ctx) override;
-    antlrcpp::Any visitDropStatement(anceParser::DropStatementContext* ctx) override;
-    antlrcpp::Any visitAssignment(anceParser::AssignmentContext* ctx) override;
-    antlrcpp::Any visitDeleteStatement(anceParser::DeleteStatementContext* ctx) override;
-    antlrcpp::Any visitReturnStatement(anceParser::ReturnStatementContext* ctx) override;
-    antlrcpp::Any visitAssertStatement(anceParser::AssertStatementContext* ctx) override;
-    antlrcpp::Any visitIfStatement(anceParser::IfStatementContext* ctx) override;
-    antlrcpp::Any visitWhileStatement(anceParser::WhileStatementContext* ctx) override;
-    antlrcpp::Any visitMatchStatement(anceParser::MatchStatementContext* ctx) override;
-    antlrcpp::Any visitLiteralCase(anceParser::LiteralCaseContext* ctx) override;
-    antlrcpp::Any visitDefaultCase(anceParser::DefaultCaseContext* ctx) override;
+    std::any visitExpressionStatement(anceParser::ExpressionStatementContext* ctx) override;
+    std::any visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx) override;
+    std::any visitLocalReferenceDefinition(anceParser::LocalReferenceDefinitionContext* ctx) override;
+    std::any visitDropStatement(anceParser::DropStatementContext* ctx) override;
+    std::any visitAssignment(anceParser::AssignmentContext* ctx) override;
+    std::any visitDeleteStatement(anceParser::DeleteStatementContext* ctx) override;
+    std::any visitReturnStatement(anceParser::ReturnStatementContext* ctx) override;
+    std::any visitAssertStatement(anceParser::AssertStatementContext* ctx) override;
+    std::any visitIfStatement(anceParser::IfStatementContext* ctx) override;
+    std::any visitWhileStatement(anceParser::WhileStatementContext* ctx) override;
+    std::any visitMatchStatement(anceParser::MatchStatementContext* ctx) override;
+    std::any visitLiteralCase(anceParser::LiteralCaseContext* ctx) override;
+    std::any visitDefaultCase(anceParser::DefaultCaseContext* ctx) override;
 
     // Expressions
 
-    antlrcpp::Any visitMemberAccess(anceParser::MemberAccessContext* ctx) override;
-    antlrcpp::Any visitFunctionCall(anceParser::FunctionCallContext* ctx) override;
-    antlrcpp::Any visitArguments(anceParser::ArgumentsContext* ctx) override;
-    antlrcpp::Any visitVariableAccess(anceParser::VariableAccessContext* ctx) override;
-    antlrcpp::Any visitAllocation(anceParser::AllocationContext* ctx) override;
-    antlrcpp::Any visitAddressof(anceParser::AddressofContext* ctx) override;
-    antlrcpp::Any visitBindReference(anceParser::BindReferenceContext* ctx) override;
-    antlrcpp::Any visitBindReferenceToAddress(anceParser::BindReferenceToAddressContext* ctx) override;
-    antlrcpp::Any visitSizeofType(anceParser::SizeofTypeContext* ctx) override;
-    antlrcpp::Any visitSizeofExpression(anceParser::SizeofExpressionContext* ctx) override;
-    antlrcpp::Any visitSubscript(anceParser::SubscriptContext* ctx) override;
-    antlrcpp::Any visitBinaryOperation(anceParser::BinaryOperationContext* ctx) override;
-    antlrcpp::Any visitParenthesis(anceParser::ParenthesisContext* ctx) override;
-    antlrcpp::Any visitNotOperation(anceParser::NotOperationContext* ctx) override;
-    antlrcpp::Any visitLogicalAnd(anceParser::LogicalAndContext* ctx) override;
-    antlrcpp::Any visitLogicalOr(anceParser::LogicalOrContext* ctx) override;
-    antlrcpp::Any visitIfExpression(anceParser::IfExpressionContext* ctx) override;
-    antlrcpp::Any visitDefaultExpressionCase(anceParser::DefaultExpressionCaseContext* ctx) override;
-    antlrcpp::Any visitLiteralExpressionCase(anceParser::LiteralExpressionCaseContext* ctx) override;
-    antlrcpp::Any visitMatchExpression(anceParser::MatchExpressionContext* ctx) override;
-    antlrcpp::Any visitIndirection(anceParser::IndirectionContext* ctx) override;
+    std::any visitMemberAccess(anceParser::MemberAccessContext* ctx) override;
+    std::any visitFunctionCall(anceParser::FunctionCallContext* ctx) override;
+    std::any visitArguments(anceParser::ArgumentsContext* ctx) override;
+    std::any visitVariableAccess(anceParser::VariableAccessContext* ctx) override;
+    std::any visitAllocation(anceParser::AllocationContext* ctx) override;
+    std::any visitAddressof(anceParser::AddressofContext* ctx) override;
+    std::any visitBindReference(anceParser::BindReferenceContext* ctx) override;
+    std::any visitBindReferenceToAddress(anceParser::BindReferenceToAddressContext* ctx) override;
+    std::any visitSizeofType(anceParser::SizeofTypeContext* ctx) override;
+    std::any visitSizeofExpression(anceParser::SizeofExpressionContext* ctx) override;
+    std::any visitSubscript(anceParser::SubscriptContext* ctx) override;
+    std::any visitBinaryOperation(anceParser::BinaryOperationContext* ctx) override;
+    std::any visitParenthesis(anceParser::ParenthesisContext* ctx) override;
+    std::any visitNotOperation(anceParser::NotOperationContext* ctx) override;
+    std::any visitLogicalAnd(anceParser::LogicalAndContext* ctx) override;
+    std::any visitLogicalOr(anceParser::LogicalOrContext* ctx) override;
+    std::any visitIfExpression(anceParser::IfExpressionContext* ctx) override;
+    std::any visitDefaultExpressionCase(anceParser::DefaultExpressionCaseContext* ctx) override;
+    std::any visitLiteralExpressionCase(anceParser::LiteralExpressionCaseContext* ctx) override;
+    std::any visitMatchExpression(anceParser::MatchExpressionContext* ctx) override;
+    std::any visitIndirection(anceParser::IndirectionContext* ctx) override;
 
     // Literals and Types
 
-    antlrcpp::Any visitStringLiteral(anceParser::StringLiteralContext* ctx) override;
-    antlrcpp::Any visitByteLiteral(anceParser::ByteLiteralContext* ctx) override;
-    antlrcpp::Any visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext* ctx) override;
-    antlrcpp::Any visitTrue(anceParser::TrueContext* ctx) override;
-    antlrcpp::Any visitFalse(anceParser::FalseContext* ctx) override;
-    antlrcpp::Any visitSizeLiteral(anceParser::SizeLiteralContext* ctx) override;
-    antlrcpp::Any visitDiffLiteral(anceParser::DiffLiteralContext* ctx) override;
-    antlrcpp::Any visitNormalInteger(anceParser::NormalIntegerContext* ctx) override;
-    antlrcpp::Any visitSpecialInteger(anceParser::SpecialIntegerContext* ctx) override;
-    antlrcpp::Any visitIntegerType(anceParser::IntegerTypeContext* ctx) override;
-    antlrcpp::Any visitBooleanType(anceParser::BooleanTypeContext* ctx) override;
-    antlrcpp::Any visitArrayType(anceParser::ArrayTypeContext* ctx) override;
-    antlrcpp::Any visitKeywordType(anceParser::KeywordTypeContext* ctx) override;
-    antlrcpp::Any visitPointer(anceParser::PointerContext* ctx) override;
-    antlrcpp::Any visitReference(anceParser::ReferenceContext* ctx) override;
-    antlrcpp::Any visitCustom(anceParser::CustomContext* ctx) override;
+    std::any visitStringLiteral(anceParser::StringLiteralContext* ctx) override;
+    std::any visitByteLiteral(anceParser::ByteLiteralContext* ctx) override;
+    std::any visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext* ctx) override;
+    std::any visitTrue(anceParser::TrueContext* ctx) override;
+    std::any visitFalse(anceParser::FalseContext* ctx) override;
+    std::any visitSizeLiteral(anceParser::SizeLiteralContext* ctx) override;
+    std::any visitDiffLiteral(anceParser::DiffLiteralContext* ctx) override;
+    std::any visitNormalInteger(anceParser::NormalIntegerContext* ctx) override;
+    std::any visitSpecialInteger(anceParser::SpecialIntegerContext* ctx) override;
+    std::any visitIntegerType(anceParser::IntegerTypeContext* ctx) override;
+    std::any visitBooleanType(anceParser::BooleanTypeContext* ctx) override;
+    std::any visitArrayType(anceParser::ArrayTypeContext* ctx) override;
+    std::any visitVectorType(anceParser::VectorTypeContext* ctx) override;
+    std::any visitKeywordType(anceParser::KeywordTypeContext* ctx) override;
+    std::any visitPointer(anceParser::PointerContext* ctx) override;
+    std::any visitReference(anceParser::ReferenceContext* ctx) override;
+    std::any visitCustom(anceParser::CustomContext* ctx) override;
 
     // Other
 
-    antlrcpp::Any visitPublic(anceParser::PublicContext* ctx) override;
-    antlrcpp::Any visitPrivate(anceParser::PrivateContext* ctx) override;
+    std::any visitPublic(anceParser::PublicContext* ctx) override;
+    std::any visitPrivate(anceParser::PrivateContext* ctx) override;
 
-    antlrcpp::Any visitAutomatic(anceParser::AutomaticContext* ctx) override;
-    antlrcpp::Any visitDynamic(anceParser::DynamicContext* ctx) override;
+    std::any visitAutomatic(anceParser::AutomaticContext* ctx) override;
+    std::any visitDynamic(anceParser::DynamicContext* ctx) override;
 
-    antlrcpp::Any visitCopyAssignment(anceParser::CopyAssignmentContext* ctx) override;
-    antlrcpp::Any visitMoveAssignment(anceParser::MoveAssignmentContext* ctx) override;
-    antlrcpp::Any visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext* ctx) override;
+    std::any visitCopyAssignment(anceParser::CopyAssignmentContext* ctx) override;
+    std::any visitMoveAssignment(anceParser::MoveAssignmentContext* ctx) override;
+    std::any visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext* ctx) override;
 
-    antlrcpp::Any visitAddition(anceParser::AdditionContext* ctx) override;
-    antlrcpp::Any visitSubtraction(anceParser::SubtractionContext* ctx) override;
-    antlrcpp::Any visitMultiplication(anceParser::MultiplicationContext* ctx) override;
-    antlrcpp::Any visitDivision(anceParser::DivisionContext* ctx) override;
-    antlrcpp::Any visitRemainder(anceParser::RemainderContext* ctx) override;
-    antlrcpp::Any visitLessThan(anceParser::LessThanContext* ctx) override;
-    antlrcpp::Any visitLessThanOrEqual(anceParser::LessThanOrEqualContext* ctx) override;
-    antlrcpp::Any visitGreaterThan(anceParser::GreaterThanContext* ctx) override;
-    antlrcpp::Any visitGreaterThanOrEqual(anceParser::GreaterThanOrEqualContext* ctx) override;
-    antlrcpp::Any visitEqual(anceParser::EqualContext* ctx) override;
-    antlrcpp::Any visitNotEqual(anceParser::NotEqualContext* ctx) override;
+    std::any visitAddition(anceParser::AdditionContext* ctx) override;
+    std::any visitSubtraction(anceParser::SubtractionContext* ctx) override;
+    std::any visitMultiplication(anceParser::MultiplicationContext* ctx) override;
+    std::any visitDivision(anceParser::DivisionContext* ctx) override;
+    std::any visitRemainder(anceParser::RemainderContext* ctx) override;
+    std::any visitLessThan(anceParser::LessThanContext* ctx) override;
+    std::any visitLessThanOrEqual(anceParser::LessThanOrEqualContext* ctx) override;
+    std::any visitGreaterThan(anceParser::GreaterThanContext* ctx) override;
+    std::any visitGreaterThanOrEqual(anceParser::GreaterThanOrEqualContext* ctx) override;
+    std::any visitEqual(anceParser::EqualContext* ctx) override;
+    std::any visitNotEqual(anceParser::NotEqualContext* ctx) override;
 
   protected:
     static lang::Location   location(antlr4::ParserRuleContext* ctx);
@@ -125,7 +126,7 @@ class SourceVisitor : public anceBaseVisitor
     static lang::Identifier createIdentifier(const std::string& text, lang::Location location);
 
     static uint64_t parseIntegerTypeSize(const std::string& str);
-    static uint64_t parseArrayTypeSize(const std::string& str);
+    static uint64_t parseCompoundTypeSize(const std::string& str);
 
     static uint64_t parseInRange(const std::string& str, uint64_t max);
 

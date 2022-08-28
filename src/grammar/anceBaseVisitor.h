@@ -253,6 +253,8 @@ class anceBaseVisitor : public anceVisitor
 
     virtual std::any visitArray(anceParser::ArrayContext* ctx) override { return visitChildren(ctx); }
 
+    virtual std::any visitVector(anceParser::VectorContext* ctx) override { return visitChildren(ctx); }
+
     virtual std::any visitKeyword(anceParser::KeywordContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitPointer(anceParser::PointerContext* ctx) override { return visitChildren(ctx); }
@@ -264,6 +266,8 @@ class anceBaseVisitor : public anceVisitor
     virtual std::any visitIntegerType(anceParser::IntegerTypeContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitArrayType(anceParser::ArrayTypeContext* ctx) override { return visitChildren(ctx); }
+
+    virtual std::any visitVectorType(anceParser::VectorTypeContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitKeywordType(anceParser::KeywordTypeContext* ctx) override { return visitChildren(ctx); }
 

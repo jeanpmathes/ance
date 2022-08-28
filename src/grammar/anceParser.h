@@ -156,12 +156,13 @@ class anceParser : public antlr4::Parser
         RuleType                         = 53,
         RuleIntegerType                  = 54,
         RuleArrayType                    = 55,
-        RuleKeywordType                  = 56,
-        RuleFloatingPointType            = 57,
-        RuleTargetDependentType          = 58,
-        RuleBooleanType                  = 59,
-        RuleVoidType                     = 60,
-        RuleCustomType                   = 61
+        RuleVectorType                   = 56,
+        RuleKeywordType                  = 57,
+        RuleFloatingPointType            = 58,
+        RuleTargetDependentType          = 59,
+        RuleBooleanType                  = 60,
+        RuleVoidType                     = 61,
+        RuleCustomType                   = 62
     };
 
     explicit anceParser(antlr4::TokenStream* input);
@@ -236,6 +237,7 @@ class anceParser : public antlr4::Parser
     class TypeContext;
     class IntegerTypeContext;
     class ArrayTypeContext;
+    class VectorTypeContext;
     class KeywordTypeContext;
     class FloatingPointTypeContext;
     class TargetDependentTypeContext;
@@ -1515,6 +1517,16 @@ class anceParser : public antlr4::Parser
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class VectorContext : public TypeContext
+    {
+      public:
+        VectorContext(TypeContext* ctx);
+
+        VectorTypeContext* vectorType();
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     TypeContext* type();
 
     class IntegerTypeContext : public antlr4::ParserRuleContext
@@ -1542,6 +1554,20 @@ class anceParser : public antlr4::Parser
     };
 
     ArrayTypeContext* arrayType();
+
+    class VectorTypeContext : public antlr4::ParserRuleContext
+    {
+      public:
+        VectorTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t              getRuleIndex() const override;
+        TypeContext*                type();
+        antlr4::tree::TerminalNode* SEMICOLON();
+        antlr4::tree::TerminalNode* INTEGER();
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    VectorTypeContext* vectorType();
 
     class KeywordTypeContext : public antlr4::ParserRuleContext
     {

@@ -3,7 +3,6 @@
 
 #pragma once
 
-
 #include "antlr4-runtime.h"
 
 class dataLexer : public antlr4::Lexer

@@ -276,6 +276,7 @@ diffLiteral
 type
 	: integerType # Integer
 	| arrayType # Array
+	| vectorType # Vector
 	| keywordType # Keyword
 	| '*' type # Pointer
 	| '&' type # Reference
@@ -289,6 +290,10 @@ integerType
 arrayType
 	: '[' type ';' INTEGER ']'
 	;
+
+vectorType
+    : '<' type ';' INTEGER '>'
+    ;
 
 keywordType
     : floatingPointType

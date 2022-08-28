@@ -6,11 +6,9 @@
 
 #include "antlr4-runtime.h"
 
-
-
-
-class  dataParser : public antlr4::Parser {
-public:
+class dataParser : public antlr4::Parser
+{
+  public:
     enum
     {
         T__0         = 1,
@@ -63,62 +61,66 @@ public:
     class ElementContext : public antlr4::ParserRuleContext
     {
       public:
-    ElementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    DictionaryContext *dictionary();
-    ListContext *list();
-    StringContext *string();
-    BooleanContext *boolean();
+        ElementContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t     getRuleIndex() const override;
+        DictionaryContext* dictionary();
+        ListContext*       list();
+        StringContext*     string();
+        BooleanContext*    boolean();
 
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-  ElementContext* element();
+    ElementContext* element();
 
-  class  DictionaryContext : public antlr4::ParserRuleContext {
-  public:
-    DictionaryContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<EntryContext *> entry();
-    EntryContext* entry(size_t i);
+    class DictionaryContext : public antlr4::ParserRuleContext
+    {
+      public:
+        DictionaryContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t             getRuleIndex() const override;
+        std::vector<EntryContext*> entry();
+        EntryContext*              entry(size_t i);
 
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-  };
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
 
   DictionaryContext* dictionary();
 
-  class  EntryContext : public antlr4::ParserRuleContext {
-  public:
-    dataParser::ElementContext* value = nullptr;
-    EntryContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *KEY();
-    ElementContext *element();
+  class EntryContext : public antlr4::ParserRuleContext
+  {
+    public:
+      dataParser::ElementContext* value = nullptr;
+      EntryContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+      virtual size_t              getRuleIndex() const override;
+      antlr4::tree::TerminalNode* KEY();
+      ElementContext*             element();
 
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+      virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
   };
 
   EntryContext* entry();
 
-  class  ListContext : public antlr4::ParserRuleContext {
-  public:
-    ListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<ElementContext *> element();
-    ElementContext* element(size_t i);
+  class ListContext : public antlr4::ParserRuleContext
+  {
+    public:
+      ListContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+      virtual size_t               getRuleIndex() const override;
+      std::vector<ElementContext*> element();
+      ElementContext*              element(size_t i);
 
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+      virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
   };
 
   ListContext* list();
 
-  class  StringContext : public antlr4::ParserRuleContext {
-  public:
-    StringContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    antlr4::tree::TerminalNode *STRING();
+  class StringContext : public antlr4::ParserRuleContext
+  {
+    public:
+      StringContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+      virtual size_t              getRuleIndex() const override;
+      antlr4::tree::TerminalNode* STRING();
 
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+      virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
   };
 
   StringContext* string();
@@ -136,14 +138,16 @@ public:
    
   };
 
-  class  TrueContext : public BooleanContext {
-  public:
-    TrueContext(BooleanContext *ctx);
+  class TrueContext : public BooleanContext
+  {
+    public:
+      TrueContext(BooleanContext* ctx);
 
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+      virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
   };
 
-  class  FalseContext : public BooleanContext {
+  class FalseContext : public BooleanContext
+  {
     public:
       FalseContext(BooleanContext* ctx);
 
