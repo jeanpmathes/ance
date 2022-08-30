@@ -108,6 +108,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual std::any visitLogicalAnd(anceParser::LogicalAndContext* context) = 0;
 
+    virtual std::any visitVectorDefinition(anceParser::VectorDefinitionContext* context) = 0;
+
     virtual std::any visitSizeOf(anceParser::SizeOfContext* context) = 0;
 
     virtual std::any visitIndirection(anceParser::IndirectionContext* context) = 0;

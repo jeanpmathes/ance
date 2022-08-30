@@ -12,7 +12,7 @@
 #include "validation/ValidationLogger.h"
 
 lang::VectorType::VectorType(lang::ResolvingHandle<lang::Type> element_type, uint64_t size)
-    : TypeDefinition(lang::Identifier::from("[" + element_type->name() + "; " + std::to_string(size) + "]"))
+    : TypeDefinition(lang::Identifier::from("<" + element_type->name() + "; " + std::to_string(size) + ">"))
     , size_(size)
     , element_type_(element_type)
     , element_reference_(lang::ReferenceType::get(element_type))
@@ -69,6 +69,12 @@ bool lang::VectorType::validate(ValidationLogger& validation_logger, lang::Locat
     {
         validation_logger.logError("Vector type size cannot be larger than " + std::to_string(MAX_VECTOR_TYPE_SIZE),
                                    location);
+        return false;
+    }
+
+    if (size_ == 0)
+    {
+        validation_logger.logError("Vector type size cannot be zero", location);
         return false;
     }
 
@@ -152,8 +158,10 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperato
     }
     else
     {
-        llvm::Value* result_ptr = context.ir()->CreateAlloca(
-            getOperatorResultType(op, right->type())->getContentType(*context.llvmContext()));
+        llvm::Value* result_ptr =
+            context.ir()->CreateAlloca(getOperatorResultType(op, right->type())->getContentType(*context.llvmContext()),
+                                       nullptr,
+                                       "alloca");
 
         for (uint64_t index = 0; index < size_; index++)
         {
@@ -332,4 +340,20 @@ lang::ResolvingHandle<lang::Type> lang::VectorType::get(lang::ResolvingHandle<la
 
         return type;
     }
+}
+
+std::shared_ptr<lang::Value> lang::VectorType::createValue(std::vector<std::shared_ptr<lang::Value>> values,
+                                                           CompileContext&                           context)
+{
+    llvm::Value* vector_ptr = context.ir()->CreateAlloca(getContentType(*context.llvmContext()), nullptr, "alloca");
+
+    for (uint64_t index = 0; index < size_; index++)
+    {
+        values[index]->buildContentValue(context);
+
+        llvm::Value* element_ptr = buildGetElementPointer(vector_ptr, index, context);
+        context.ir()->CreateStore(values[index]->getContentValue(), element_ptr);
+    }
+
+    return std::make_shared<lang::WrappedNativeValue>(self(), vector_ptr);
 }

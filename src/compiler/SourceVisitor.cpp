@@ -28,25 +28,26 @@
 #include "lang/statement/While.h"
 #include "lang/statement/Match.h"
 
-#include "lang/expression/MemberAccess.h"
 #include "lang/expression/Addressof.h"
 #include "lang/expression/Allocation.h"
+#include "lang/expression/And.h"
 #include "lang/expression/BinaryOperation.h"
-#include "lang/expression/UnaryOperation.h"
 #include "lang/expression/BindRef.h"
 #include "lang/expression/BindRefTo.h"
 #include "lang/expression/ConstantLiteral.h"
 #include "lang/expression/FunctionCall.h"
+#include "lang/expression/IfSelect.h"
+#include "lang/expression/Indirection.h"
+#include "lang/expression/MatchSelect.h"
+#include "lang/expression/MemberAccess.h"
+#include "lang/expression/Or.h"
+#include "lang/expression/Parenthesis.h"
 #include "lang/expression/SizeofExpression.h"
 #include "lang/expression/SizeofType.h"
 #include "lang/expression/Subscript.h"
+#include "lang/expression/UnaryOperation.h"
 #include "lang/expression/VariableAccess.h"
-#include "lang/expression/Parenthesis.h"
-#include "lang/expression/And.h"
-#include "lang/expression/Or.h"
-#include "lang/expression/IfSelect.h"
-#include "lang/expression/MatchSelect.h"
-#include "lang/expression/Indirection.h"
+#include "lang/expression/VectorDefinition.h"
 
 #include "lang/construct/constant/BooleanConstant.h"
 #include "lang/construct/constant/ByteConstant.h"
@@ -598,6 +599,27 @@ std::any SourceVisitor::visitIndirection(anceParser::IndirectionContext* ctx)
 {
     Expression* value = std::any_cast<Expression*>(visit(ctx->expression()));
     return static_cast<Expression*>(new Indirection(std::unique_ptr<Expression>(value), location(ctx)));
+}
+
+std::any SourceVisitor::visitVectorDefinition(anceParser::VectorDefinitionContext* ctx)
+{
+    std::optional<lang::ResolvingHandle<lang::Type>> type;
+    lang::Location                                   type_location = lang::Location::global();
+
+    if (ctx->type())
+    {
+        type          = std::any_cast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
+        type_location = location(ctx->type());
+    }
+
+    std::vector<std::unique_ptr<Expression>> elements;
+
+    for (auto& element_ctx : ctx->expression())
+    {
+        elements.push_back(std::unique_ptr<Expression>(std::any_cast<Expression*>(visit(element_ctx))));
+    }
+
+    return static_cast<Expression*>(new VectorDefinition(type, type_location, std::move(elements), location(ctx)));
 }
 
 std::any SourceVisitor::visitDefaultExpressionCase(anceParser::DefaultExpressionCaseContext* ctx)

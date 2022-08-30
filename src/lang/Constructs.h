@@ -58,6 +58,7 @@ class LocalVariableDefinition;
 class Match;
 class Return;
 class While;
+class VectorDefinition;
 
 #define ANCE_CONSTRUCTS                                                                                                \
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction,                      \
@@ -66,7 +67,7 @@ class While;
         ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType, Subscript, VariableAccess,           \
         MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope, lang::LocalScope, Assertion,     \
         Assignment, Delete, ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Drop,      \
-        Return, If, While, Match, Case
+        Return, If, While, Match, Case, VectorDefinition
 #endif
 
 class Statement;

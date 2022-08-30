@@ -143,6 +143,7 @@ expression
     | left=expression 'or' right=expression # LogicalOr
     | 'if' condition=expression 'then' thenBlock=expression 'else' elseBlock=expression # IfExpression
     | matchExpression # Match
+    | '<' ( type '|' ) ? expression ( ',' expression )* '>' # VectorDefinition
 	;
 
 binaryOperatorMultiplicative

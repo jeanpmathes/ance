@@ -75,6 +75,15 @@ namespace lang
       public:
         ~VectorType() override = default;
 
+        /**
+         * Create a value of this type.
+         * @param values The elements of the vector.
+         * @param context The compile context.
+         * @return The value.
+         */
+        std::shared_ptr<lang::Value> createValue(std::vector<std::shared_ptr<lang::Value>> values,
+                                                 CompileContext&                           context);
+
       protected:
         void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context) override;
         void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,

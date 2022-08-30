@@ -141,6 +141,11 @@ class anceBaseVisitor : public anceVisitor
 
     virtual std::any visitLogicalAnd(anceParser::LogicalAndContext* ctx) override { return visitChildren(ctx); }
 
+    virtual std::any visitVectorDefinition(anceParser::VectorDefinitionContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
     virtual std::any visitSizeOf(anceParser::SizeOfContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitIndirection(anceParser::IndirectionContext* ctx) override { return visitChildren(ctx); }
