@@ -249,8 +249,8 @@ llvm::Value* lang::ReferenceType::getReferenced(llvm::Value* value, CompileConte
     return context.ir()->CreateLoad(getContentType(*context.llvmContext()), value, value->getName() + ".load");
 }
 
-std::shared_ptr<lang::Value> lang::ReferenceType::getReferenced(const std::shared_ptr<lang::Value>& value,
-                                                                CompileContext&                     context)
+std::shared_ptr<lang::Value> lang::ReferenceType::getReferenced(std::shared_ptr<lang::Value> value,
+                                                                CompileContext&              context)
 {
     value->buildNativeValue(context);
 

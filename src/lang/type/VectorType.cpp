@@ -50,9 +50,17 @@ llvm::Constant* lang::VectorType::getDefaultContent(llvm::Module& m)
     return llvm::ConstantVector::get(content);
 }
 
-llvm::VectorType* lang::VectorType::getContentType(llvm::LLVMContext& c) const
+llvm::Type* lang::VectorType::getContentType(llvm::LLVMContext& c) const
 {
-    return llvm::FixedVectorType::get(element_type_->getContentType(c), size_);
+    llvm::Type* content_type;
+
+    if (element_type_->isVectorizable())
+    {
+        content_type = llvm::FixedVectorType::get(element_type_->getContentType(c), size_);
+    }
+    else { content_type = llvm::ArrayType::get(element_type_->getContentType(c), size_); }
+
+    return content_type;
 }
 
 bool lang::VectorType::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -105,7 +113,7 @@ std::shared_ptr<lang::Value> lang::VectorType::buildSubscript(std::shared_ptr<Va
     index = lang::Type::makeMatching(lang::SizeType::getSize(), index, context);
 
     llvm::Value* element_ptr  = buildGetElementPointer(indexed, index, context);
-    llvm::Value* native_value = lang::Values::contentToNative(element_reference_, element_ptr, context);
+    llvm::Value* native_value = lang::Values::contentToNative(getSubscriptReturnType(), element_ptr, context);
 
     return std::make_shared<lang::WrappedNativeValue>(getSubscriptReturnType(), native_value);
 }
@@ -121,7 +129,7 @@ bool lang::VectorType::isOperatorDefined(lang::BinaryOperator op, lang::Resolvin
 lang::ResolvingHandle<lang::Type> lang::VectorType::getOperatorResultType(lang::BinaryOperator              op,
                                                                           lang::ResolvingHandle<lang::Type> other)
 {
-    return get(getElementType()->getOperatorResultType(op, other), size_);
+    return get(element_type_->getOperatorResultType(op, other), size_);
 }
 
 bool lang::VectorType::validateOperator(lang::BinaryOperator              op,
@@ -130,7 +138,7 @@ bool lang::VectorType::validateOperator(lang::BinaryOperator              op,
                                         lang::Location                    right_location,
                                         ValidationLogger&                 validation_logger) const
 {
-    return getElementType()->validateOperator(op, other, left_location, right_location, validation_logger);
+    return element_type_->validateOperator(op, other, left_location, right_location, validation_logger);
 }
 
 std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperator   op,
@@ -138,9 +146,39 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperato
                                                              std::shared_ptr<Value> right,
                                                              CompileContext&        context)
 {
-    if (auto element_vector = getElementType()->isVectorizable())
+    if (auto element_vector = element_type_->isVectorizable())
     {
         return element_vector->buildOperator(op, left, right, getOperatorResultType(op, right->type()), context);
+    }
+    else
+    {
+        llvm::Value* result_ptr = context.ir()->CreateAlloca(
+            getOperatorResultType(op, right->type())->getContentType(*context.llvmContext()));
+
+        for (uint64_t index = 0; index < size_; index++)
+        {
+            llvm::Constant* index_content =
+                llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context.llvmContext()), index);
+
+            auto index_value = [&]() {
+                llvm::Value* index_native =
+                    lang::Values::contentToNative(lang::SizeType::getSize(), index_content, context);
+                return std::make_shared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
+            };
+
+            auto left_element =
+                lang::Type::getValueOrReferencedValue(buildSubscript(left, index_value(), context), context);
+            auto right_element =
+                lang::Type::getValueOrReferencedValue(buildSubscript(right, index_value(), context), context);
+
+            auto result_element = element_type_->buildOperator(op, left_element, right_element, context);
+            result_element->buildContentValue(context);
+
+            llvm::Value* result_dst_ptr = buildGetElementPointer(result_ptr, index, context);
+            context.ir()->CreateStore(result_element->getContentValue(), result_dst_ptr);
+        }
+
+        return std::make_shared<lang::WrappedNativeValue>(getOperatorResultType(op, right->type()), result_ptr);
     }
 
     return {};
@@ -148,7 +186,7 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperato
 
 llvm::Value* lang::VectorType::buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
                                                       const std::shared_ptr<lang::Value>& index,
-                                                      CompileContext&                     context)
+                                                      CompileContext&                     context) const
 {
     indexed->buildNativeValue(context);
     index->buildContentValue(context);
@@ -157,8 +195,8 @@ llvm::Value* lang::VectorType::buildGetElementPointer(const std::shared_ptr<lang
     llvm::Value* native_index = index->getContentValue();
     llvm::Value* indices[]    = {zero, native_index};
 
-    llvm::Value* array_ptr =
-        indexed->getNativeValue();// This is a pointer as the internal storage of arrays is using pointers.
+    llvm::Value* vector_ptr =
+        indexed->getNativeValue();// This is a pointer as the internal storage of vectors is using pointers.
 
     // Check if index is smaller than size.
     llvm::Value* native_size =
@@ -170,13 +208,15 @@ llvm::Value* lang::VectorType::buildGetElementPointer(const std::shared_ptr<lang
     // todo: use in_bounds bool to throw exception
 
     llvm::Value* element_ptr = context.ir()->CreateGEP(getContentType(*context.llvmContext()),
-                                                       array_ptr,
+                                                       vector_ptr,
                                                        indices,
-                                                       array_ptr->getName() + ".gep");
+                                                       vector_ptr->getName() + ".gep");
     return element_ptr;
 }
 
-llvm::Value* lang::VectorType::buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context)
+llvm::Value* lang::VectorType::buildGetElementPointer(llvm::Value*    indexed,
+                                                      uint64_t        index,
+                                                      CompileContext& context) const
 {
     llvm::Value* zero         = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context.llvmContext()), 0);
     llvm::Value* native_index = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context.llvmContext()), index);
@@ -249,8 +289,8 @@ std::vector<lang::TypeDefinition*> lang::VectorType::getDependencies() const
 
 lang::TypeRegistry<uint64_t>& lang::VectorType::getVectorTypes()
 {
-    static lang::TypeRegistry<uint64_t> array_types;
-    return array_types;
+    static lang::TypeRegistry<uint64_t> vector_types;
+    return vector_types;
 }
 
 bool lang::VectorType::isTriviallyDefaultConstructible() const
@@ -285,9 +325,9 @@ lang::ResolvingHandle<lang::Type> lang::VectorType::get(lang::ResolvingHandle<la
     if (defined_type.has_value()) { return defined_type.value(); }
     else
     {
-        auto*                             array_type = new lang::VectorType(element_type, size);
+        auto*                             vector_type = new lang::VectorType(element_type, size);
         lang::ResolvingHandle<lang::Type> type =
-            lang::makeHandled<lang::Type>(std::unique_ptr<lang::VectorType>(array_type));
+            lang::makeHandled<lang::Type>(std::unique_ptr<lang::VectorType>(vector_type));
         getVectorTypes().add(std::move(used_types), size, type);
 
         return type;

@@ -114,7 +114,7 @@ namespace lang
          * @param context The current compile context.
          * @return The referenced value.
          */
-        std::shared_ptr<lang::Value> getReferenced(const std::shared_ptr<lang::Value>& value, CompileContext& context);
+        std::shared_ptr<lang::Value> getReferenced(std::shared_ptr<lang::Value> value, CompileContext& context);
 
         /**
          * Get a reference type instance.

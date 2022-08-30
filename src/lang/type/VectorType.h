@@ -36,8 +36,8 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const override;
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
 
-        llvm::Constant*   getDefaultContent(llvm::Module& m) override;
-        llvm::VectorType* getContentType(llvm::LLVMContext& c) const override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) override;
+        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         bool                              isSubscriptDefined() override;
         lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
@@ -68,9 +68,9 @@ namespace lang
       private:
         llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
                                             const std::shared_ptr<lang::Value>& index,
-                                            CompileContext&                     context);
+                                            CompileContext&                     context) const;
 
-        llvm::Value* buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context);
+        llvm::Value* buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context) const;
 
       public:
         ~VectorType() override = default;
