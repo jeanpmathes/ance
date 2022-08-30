@@ -15,7 +15,7 @@ public main () : ui32
     // A vector literal is a list of elements and optionally the vector type.
 
     let x <: <i32 | 1, 2, 3, 4>;
-    let y: <i32; 4> <: <1:32, 2:32, 3:32, 4:32>;
+    let y: <i32; 4> <: <+1:32, +2:32, +3:32, +4:32>;
 
     // Operations are performed component-wise.
 
@@ -25,10 +25,10 @@ public main () : ui32
 
     z[0] <: 0;
 
-    assert z[0] == 0;
-    assert z[1] == 4;
-    assert z[2] == 6;
-    assert z[3] == 8;
+    assert z[0] == +0:32;
+    assert z[1] == +4:32;
+    assert z[2] == +6:32;
+    assert z[3] == +8:32;
 
     // All types can be used as element types.
 
