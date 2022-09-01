@@ -104,12 +104,20 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Re
                                                                         std::shared_ptr<Value>            value,
                                                                         CompileContext&                   context)
 {
+    return buildImplicitConversion(other, other, value, context);
+}
+
+std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                                        lang::ResolvingHandle<lang::Type> other_element,
+                                                                        std::shared_ptr<Value>            value,
+                                                                        CompileContext&                   context)
+{
     llvm::Value* native_converted_value;
 
     bool can_directly_convert_to_size =
-        other->isSizeType() && !is_signed_ && (bit_size_ == lang::SizeType::MINIMUM_BIT_SIZE);
+        other_element->isSizeType() && !is_signed_ && (bit_size_ == lang::SizeType::getSizeWidth());
     bool can_directly_convert_to_diff =
-        other->isDiffType() && is_signed_ && (bit_size_ == lang::SizeType::MINIMUM_DIFF_BIT_SIZE);
+        other_element->isDiffType() && is_signed_ && (bit_size_ == lang::SizeType::getDiffWidth());
 
     if (can_directly_convert_to_size || can_directly_convert_to_diff)
     {

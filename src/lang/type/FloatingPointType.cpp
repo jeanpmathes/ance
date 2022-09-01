@@ -60,6 +60,15 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(la
                                                                               std::shared_ptr<Value>            value,
                                                                               CompileContext&                   context)
 {
+    return buildImplicitConversion(other, other, value, context);
+}
+
+std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(
+    lang::ResolvingHandle<lang::Type> other,
+    lang::ResolvingHandle<lang::Type> other_element,
+    std::shared_ptr<Value>            value,
+    CompileContext&                   context)
+{
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
 

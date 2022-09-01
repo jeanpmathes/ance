@@ -24,6 +24,7 @@ namespace lang
     class Value;
     class Function;
     class VectorizableType;
+    class VectorType;
 }
 
 class CompileContext;
@@ -200,7 +201,7 @@ namespace lang
          * Get whether this type is a vector type.
          * @return True if this type is a vector type.
          */
-        [[nodiscard]] bool isVectorType() const;
+        [[nodiscard]] const lang::VectorType* isVectorType() const;
 
         /**
          * Get whether this type is an array type.

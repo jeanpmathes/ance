@@ -110,9 +110,9 @@ lang::VectorizableType* lang::TypeDefinition::isVectorizable()
     return nullptr;
 }
 
-bool lang::TypeDefinition::isVectorType() const
+const lang::VectorType* lang::TypeDefinition::isVectorType() const
 {
-    return false;
+    return nullptr;
 }
 
 bool lang::TypeDefinition::isArrayType() const

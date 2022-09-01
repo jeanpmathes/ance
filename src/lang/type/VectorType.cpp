@@ -18,9 +18,9 @@ lang::VectorType::VectorType(lang::ResolvingHandle<lang::Type> element_type, uin
     , element_reference_(lang::ReferenceType::get(element_type))
 {}
 
-bool lang::VectorType::isVectorType() const
+const lang::VectorType* lang::VectorType::isVectorType() const
 {
-    return true;
+    return this;
 }
 
 StateCount lang::VectorType::getStateCount() const
@@ -124,12 +124,76 @@ std::shared_ptr<lang::Value> lang::VectorType::buildSubscript(std::shared_ptr<Va
     return std::make_shared<lang::WrappedNativeValue>(getSubscriptReturnType(), native_value);
 }
 
+bool lang::VectorType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
+{
+    if (auto other_as_vector = other->isVectorType())
+    {
+        if (other_as_vector->size_ != this->size_) return false;
+
+        other = other->getElementType();
+        return element_type_->isImplicitlyConvertibleTo(other);
+    }
+
+    return false;
+}
+
+bool lang::VectorType::validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                  lang::Location                    location,
+                                                  ValidationLogger&                 validation_logger) const
+{
+    return element_type_->validateImplicitConversion(other->getElementType(), location, validation_logger);
+}
+
+std::shared_ptr<lang::Value> lang::VectorType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                                       std::shared_ptr<Value>            value,
+                                                                       CompileContext&                   context)
+{
+    if (auto element_vector = element_type_->isVectorizable())
+    {
+        return element_vector->buildImplicitConversion(other, other->getElementType(), value, context);
+    }
+    else
+    {
+        llvm::Value* result_ptr =
+            context.ir()->CreateAlloca(other->getContentType(*context.llvmContext()), nullptr, "alloca");
+
+        for (uint64_t index = 0; index < size_; index++)
+        {
+            llvm::Constant* index_content =
+                llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context.llvmContext()), index);
+
+            auto index_value = [&]() {
+                llvm::Value* index_native =
+                    lang::Values::contentToNative(lang::SizeType::getSize(), index_content, context);
+                return std::make_shared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
+            };
+
+            auto current_element =
+                lang::Type::getValueOrReferencedValue(buildSubscript(value, index_value(), context), context);
+
+            auto result_element =
+                element_type_->buildImplicitConversion(other->getElementType(), current_element, context);
+            result_element->buildContentValue(context);
+
+            llvm::Value* result_dst_ptr = buildGetElementPointer(result_ptr, index, context);
+            context.ir()->CreateStore(result_element->getContentValue(), result_dst_ptr);
+        }
+
+        return std::make_shared<lang::WrappedNativeValue>(other, result_ptr);
+    }
+}
+
 bool lang::VectorType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
 {
-    if (not other->isVectorType()) return false;
-    other = other->getElementType();
+    if (auto other_as_vector = other->isVectorType())
+    {
+        if (other_as_vector->size_ != this->size_) return false;
 
-    return getElementType()->isOperatorDefined(op, other);
+        other = other->getElementType();
+        return getElementType()->isOperatorDefined(op, other);
+    }
+
+    return false;
 }
 
 lang::ResolvingHandle<lang::Type> lang::VectorType::getOperatorResultType(lang::BinaryOperator              op,
@@ -188,8 +252,6 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperato
 
         return std::make_shared<lang::WrappedNativeValue>(getOperatorResultType(op, right->type()), result_ptr);
     }
-
-    return {};
 }
 
 llvm::Value* lang::VectorType::buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,

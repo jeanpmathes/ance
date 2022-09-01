@@ -24,6 +24,7 @@ namespace lang
     class Function;
     class PredefinedFunction;
     class VectorizableType;
+    class VectorType;
 }
 
 class CompileContext;
@@ -70,7 +71,7 @@ namespace lang
         [[nodiscard]] virtual bool                    isStructType() const;
         [[nodiscard]] virtual const VectorizableType* isVectorizable() const;
         [[nodiscard]] virtual VectorizableType*       isVectorizable();
-        [[nodiscard]] virtual bool                    isVectorType() const;
+        [[nodiscard]] virtual const VectorType*       isVectorType() const;
         [[nodiscard]] virtual bool                    isArrayType() const;
 
         [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getElementType() const;

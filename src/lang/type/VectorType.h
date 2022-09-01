@@ -29,7 +29,7 @@ namespace lang
       public:
         static const uint64_t MAX_VECTOR_TYPE_SIZE = 1ll << 32;
 
-        bool isVectorType() const override;
+        const VectorType* isVectorType() const override;
 
         [[nodiscard]] StateCount getStateCount() const override;
 
@@ -51,6 +51,14 @@ namespace lang
         std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
                                                     std::shared_ptr<Value> index,
                                                     CompileContext&        context) override;
+
+        bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
+        bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                                lang::Location                    location,
+                                                                ValidationLogger&                 validation_logger) const override;
+        std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                             std::shared_ptr<Value>            value,
+                                                             CompileContext&                   context) override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other) override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,

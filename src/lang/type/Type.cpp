@@ -162,7 +162,7 @@ lang::VectorizableType* lang::Type::isVectorizable()
     return definition_->isVectorizable();
 }
 
-bool lang::Type::isVectorType() const
+const lang::VectorType* lang::Type::isVectorType() const
 {
     assert(isDefined());
     return definition_->isVectorType();
