@@ -38,6 +38,13 @@ namespace lang
         static llvm::Value* contentToNative(lang::ResolvingHandle<lang::Type> type,
                                             llvm::Value*                      content,
                                             CompileContext&                   context);
+
+        /**
+         * Get a clone of a value. Both values will then refer to the same native value.
+         * @param value The value to clone. The native value must be built.
+         * @return The new value.
+         */
+        static std::shared_ptr<lang::Value> clone(const std::shared_ptr<lang::Value>& value);
     };
 }
 

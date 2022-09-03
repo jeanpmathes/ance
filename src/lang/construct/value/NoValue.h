@@ -17,7 +17,7 @@ namespace lang
         explicit NoValue(UnexpandedExpression& unexpanded_expression);
         ~NoValue() override = default;
 
-        lang::ResolvingHandle<lang::Type> type() const override;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const override;
 
         void buildNativeValue(CompileContext& context) override;
         void buildContentValue(CompileContext& context) override;

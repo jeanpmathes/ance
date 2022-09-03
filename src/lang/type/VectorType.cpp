@@ -165,6 +165,8 @@ std::shared_ptr<lang::Value> lang::VectorType::buildImplicitConversion(lang::Res
 
         VectorType* other_as_vector = other->isVectorType();
 
+        value->buildNativeValue(context);
+
         for (uint64_t index = 0; index < size_; index++)
         {
             llvm::Constant* index_content =
@@ -176,8 +178,9 @@ std::shared_ptr<lang::Value> lang::VectorType::buildImplicitConversion(lang::Res
                 return std::make_shared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
             };
 
-            auto current_element =
-                lang::Type::getValueOrReferencedValue(buildSubscript(value, index_value(), context), context);
+            auto current_element = lang::Type::getValueOrReferencedValue(
+                buildSubscript(lang::Values::clone(value), index_value(), context),
+                context);
 
             auto result_element =
                 element_type_->buildImplicitConversion(other->getElementType(), current_element, context);
@@ -237,6 +240,9 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperato
 
         VectorType* result_type_as_vector = getOperatorResultType(op, right->type())->isVectorType();
 
+        left->buildNativeValue(context);
+        right->buildNativeValue(context);
+
         for (uint64_t index = 0; index < size_; index++)
         {
             llvm::Constant* index_content =
@@ -248,12 +254,12 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperato
                 return std::make_shared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
             };
 
-            auto left_element =
-                lang::Type::getValueOrReferencedValue(left->type()->buildSubscript(left, index_value(), context),
-                                                      context);
-            auto right_element =
-                lang::Type::getValueOrReferencedValue(right->type()->buildSubscript(right, index_value(), context),
-                                                      context);
+            auto left_element = lang::Type::getValueOrReferencedValue(
+                left->type()->buildSubscript(lang::Values::clone(left), index_value(), context),
+                context);
+            auto right_element = lang::Type::getValueOrReferencedValue(
+                right->type()->buildSubscript(lang::Values::clone(right), index_value(), context),
+                context);
 
             auto result_element = element_type_->buildOperator(op, left_element, right_element, context);
             result_element->buildContentValue(context);
