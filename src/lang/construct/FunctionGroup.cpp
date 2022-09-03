@@ -16,7 +16,10 @@ const lang::Identifier& lang::FunctionGroup::name() const
     return name_;
 }
 
-void lang::FunctionGroup::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>>) {}
+bool lang::FunctionGroup::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>>)
+{
+    return false;
+}
 
 void lang::FunctionGroup::resolve()
 {

@@ -2,6 +2,7 @@
 
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
@@ -19,6 +20,11 @@ lang::VectorType::VectorType(lang::ResolvingHandle<lang::Type> element_type, uin
 {}
 
 const lang::VectorType* lang::VectorType::isVectorType() const
+{
+    return this;
+}
+
+lang::VectorType* lang::VectorType::isVectorType()
 {
     return this;
 }
@@ -157,6 +163,8 @@ std::shared_ptr<lang::Value> lang::VectorType::buildImplicitConversion(lang::Res
         llvm::Value* result_ptr =
             context.ir()->CreateAlloca(other->getContentType(*context.llvmContext()), nullptr, "alloca");
 
+        VectorType* other_as_vector = other->isVectorType();
+
         for (uint64_t index = 0; index < size_; index++)
         {
             llvm::Constant* index_content =
@@ -175,7 +183,7 @@ std::shared_ptr<lang::Value> lang::VectorType::buildImplicitConversion(lang::Res
                 element_type_->buildImplicitConversion(other->getElementType(), current_element, context);
             result_element->buildContentValue(context);
 
-            llvm::Value* result_dst_ptr = buildGetElementPointer(result_ptr, index, context);
+            llvm::Value* result_dst_ptr = other_as_vector->buildGetElementPointer(result_ptr, index, context);
             context.ir()->CreateStore(result_element->getContentValue(), result_dst_ptr);
         }
 
@@ -227,6 +235,8 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperato
                                        nullptr,
                                        "alloca");
 
+        VectorType* result_type_as_vector = getOperatorResultType(op, right->type())->isVectorType();
+
         for (uint64_t index = 0; index < size_; index++)
         {
             llvm::Constant* index_content =
@@ -239,18 +249,97 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperato
             };
 
             auto left_element =
-                lang::Type::getValueOrReferencedValue(buildSubscript(left, index_value(), context), context);
+                lang::Type::getValueOrReferencedValue(left->type()->buildSubscript(left, index_value(), context),
+                                                      context);
             auto right_element =
-                lang::Type::getValueOrReferencedValue(buildSubscript(right, index_value(), context), context);
+                lang::Type::getValueOrReferencedValue(right->type()->buildSubscript(right, index_value(), context),
+                                                      context);
 
             auto result_element = element_type_->buildOperator(op, left_element, right_element, context);
             result_element->buildContentValue(context);
 
-            llvm::Value* result_dst_ptr = buildGetElementPointer(result_ptr, index, context);
+            llvm::Value* result_dst_ptr = result_type_as_vector->buildGetElementPointer(result_ptr, index, context);
             context.ir()->CreateStore(result_element->getContentValue(), result_dst_ptr);
         }
 
         return std::make_shared<lang::WrappedNativeValue>(getOperatorResultType(op, right->type()), result_ptr);
+    }
+}
+
+bool lang::VectorType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+{
+    if (parameters.size() != 1) return false;
+
+    lang::ResolvingHandle<lang::Type> other = parameters.front();
+
+    if (auto other_as_vector = other->isVectorType())
+    {
+        if (other_as_vector->size_ != this->size_) return false;
+
+        return element_type_->requestOverload({other->getElementType()});
+    }
+
+    return false;
+}
+
+void lang::VectorType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                              lang::PredefinedFunction&                             function,
+                                              CompileContext&                                       context)
+{
+    lang::ResolvingHandle<lang::Type> other_type         = parameters.front();
+    lang::ResolvingHandle<lang::Type> other_element_type = other_type->getElementType();
+
+    if (auto element_vector = element_type_->isVectorizable())
+    {
+        element_vector->buildRequestedOverload(other_element_type, self(), function, context);
+    }
+    else
+    {
+        std::vector<lang::ResolvingHandle<Function>> overloads = element_type_->resolveOverload({other_element_type});
+
+        assert(overloads.size() == 1);
+        lang::ResolvingHandle<Function> element_ctor = overloads.front();
+
+        llvm::Function* native_function;
+        std::tie(std::ignore, native_function) = function.getNativeRepresentation();
+
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
+        {
+            llvm::Value* original_content = native_function->getArg(0);
+            llvm::Value* original_native  = lang::Values::contentToNative(other_type, original_content, context);
+
+            std::shared_ptr<lang::Value> original_value =
+                std::make_shared<lang::WrappedNativeValue>(other_type, original_native);
+
+            llvm::Value* result_ptr =
+                context.ir()->CreateAlloca(getContentType(*context.llvmContext()), nullptr, "alloca");
+
+            for (uint64_t index = 0; index < size_; index++)
+            {
+                llvm::Constant* index_content =
+                    llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context.llvmContext()), index);
+
+                auto index_value = [&]() {
+                    llvm::Value* index_native =
+                        lang::Values::contentToNative(lang::SizeType::getSize(), index_content, context);
+                    return std::make_shared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
+                };
+
+                auto element_ref       = other_type->buildSubscript(original_value, index_value(), context);
+                auto original_element  = lang::Type::getValueOrReferencedValue(element_ref, context);
+                auto converted_element = element_ctor->buildCall({original_element}, context);
+
+                converted_element->buildContentValue(context);
+
+                llvm::Value* result_dst_ptr = buildGetElementPointer(result_ptr, index, context);
+                context.ir()->CreateStore(converted_element->getContentValue(), result_dst_ptr);
+            }
+
+            llvm::Value* converted = lang::Values::nativeToContent(self(), result_ptr, context);
+
+            context.ir()->CreateRet(converted);
+        }
     }
 }
 

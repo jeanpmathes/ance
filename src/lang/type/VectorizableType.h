@@ -42,6 +42,20 @@ namespace lang
                                                                      lang::ResolvingHandle<lang::Type> other_element,
                                                                      std::shared_ptr<Value>            value,
                                                                      CompileContext&                   context) = 0;
+
+        using TypeDefinition::buildRequestedOverload;
+
+        /**
+         * Build a requested overload for a value of this type or a vector of values of this type.
+         * @param parameter_element The element type of the parameter type of the overload.
+         * @param return_type The return type.
+         * @param function The function to build.
+         * @param context The current compilation context.
+         */
+        virtual void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                            lang::ResolvingHandle<lang::Type> return_type,
+                                            lang::PredefinedFunction&         function,
+                                            CompileContext&                   context) = 0;
     };
 }
 

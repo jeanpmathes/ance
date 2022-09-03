@@ -30,6 +30,7 @@ namespace lang
         static const uint64_t MAX_VECTOR_TYPE_SIZE = 1ll << 32;
 
         const VectorType* isVectorType() const override;
+        VectorType*       isVectorType() override;
 
         [[nodiscard]] StateCount getStateCount() const override;
 
@@ -72,6 +73,11 @@ namespace lang
                                                         std::shared_ptr<Value> left,
                                                         std::shared_ptr<Value> right,
                                                         CompileContext&        context) override;
+
+        bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
+        void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                    lang::PredefinedFunction&                             function,
+                                    CompileContext&                                       context) override;
 
       private:
         llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,

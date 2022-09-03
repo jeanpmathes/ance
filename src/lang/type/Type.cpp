@@ -168,6 +168,12 @@ const lang::VectorType* lang::Type::isVectorType() const
     return definition_->isVectorType();
 }
 
+lang::VectorType* lang::Type::isVectorType()
+{
+    assert(isDefined());
+    return definition_->isVectorType();
+}
+
 bool lang::Type::isArrayType() const
 {
     assert(isDefined());
@@ -210,10 +216,10 @@ void lang::Type::postResolve()
     definition_->postResolve();
 }
 
-void lang::Type::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters)
+bool lang::Type::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters)
 {
     assert(isDefined());
-    definition_->requestOverload(std::move(parameters));
+    return definition_->requestOverload(std::move(parameters));
 }
 
 bool lang::Type::enableImplicitConversionOnCall() const

@@ -72,6 +72,7 @@ namespace lang
         [[nodiscard]] virtual const VectorizableType* isVectorizable() const;
         [[nodiscard]] virtual VectorizableType*       isVectorizable();
         [[nodiscard]] virtual const VectorType*       isVectorType() const;
+        [[nodiscard]] virtual VectorType*             isVectorType();
         [[nodiscard]] virtual bool                    isArrayType() const;
 
         [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getElementType() const;
@@ -86,7 +87,7 @@ namespace lang
         Scope*       scope();
 
         void postResolve();
-        void requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters);
+        bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters);
 
         virtual llvm::Constant* getDefaultContent(llvm::Module& m) = 0;
 

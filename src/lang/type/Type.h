@@ -204,6 +204,12 @@ namespace lang
         [[nodiscard]] const lang::VectorType* isVectorType() const;
 
         /**
+         * Get whether this type is a vector type.
+         * @return True if this type is a vector type.
+         */
+        [[nodiscard]] lang::VectorType* isVectorType();
+
+        /**
          * Get whether this type is an array type.
          * @return True if this type is an array type.
          */
@@ -241,7 +247,7 @@ namespace lang
 
         void postResolve();
 
-        void requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
+        bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
         bool enableImplicitConversionOnCall() const override;
 
         /**

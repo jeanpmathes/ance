@@ -34,8 +34,9 @@ namespace lang
         /**
          * Request a function overload from this callable. The callable can than offer this overload in later phases.
          * The callable must be defined when requesting an overload.
+         * @returns True if the overload was accepted. An accepted overload will be available when resolving.
          */
-        virtual void requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) = 0;
+        virtual bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) = 0;
 
         /**
          * Add a function to this group.

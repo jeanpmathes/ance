@@ -263,6 +263,14 @@ void lang::IntegerType::buildRequestedOverload(const std::vector<lang::Resolving
                                                lang::PredefinedFunction&                             function,
                                                CompileContext&                                       context)
 {
+    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
+}
+
+void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                               lang::ResolvingHandle<lang::Type> return_type,
+                                               lang::PredefinedFunction&         function,
+                                               CompileContext&                   context)
+{
     llvm::Function* native_function;
     std::tie(std::ignore, native_function) = function.getNativeRepresentation();
 
@@ -273,44 +281,41 @@ void lang::IntegerType::buildRequestedOverload(const std::vector<lang::Resolving
             llvm::Value* original = native_function->getArg(0);
 
             llvm::Value* converted = context.ir()->CreateIntCast(original,
-                                                                 getContentType(*context.llvmContext()),
+                                                                 return_type->getContentType(*context.llvmContext()),
                                                                  is_signed,
                                                                  original->getName() + ".icast");
             context.ir()->CreateRet(converted);
         }
     };
 
-    if (parameters.size() == 1)
+    if (parameter_element->isIntegerType()) { build_integer_conversion_ctor(parameter_element->isSigned()); }
+    if (parameter_element->isSizeType()) { build_integer_conversion_ctor(false); }
+    if (parameter_element->isDiffType()) { build_integer_conversion_ctor(true); }
+    if (parameter_element->isBooleanType()) { build_integer_conversion_ctor(false); }
+
+    if (parameter_element->isFloatingPointType())
     {
-        if (parameters[0]->isIntegerType()) { build_integer_conversion_ctor(parameters[0]->isSigned()); }
-        if (parameters[0]->isSizeType()) { build_integer_conversion_ctor(false); }
-        if (parameters[0]->isDiffType()) { build_integer_conversion_ctor(true); }
-        if (parameters[0]->isBooleanType()) { build_integer_conversion_ctor(false); }
-
-        if (parameters[0]->isFloatingPointType())
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
         {
-            llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-            context.ir()->SetInsertPoint(block);
+            llvm::Value* original = native_function->getArg(0);
+
+            llvm::Value* converted;
+
+            if (is_signed_)
             {
-                llvm::Value* original = native_function->getArg(0);
-
-                llvm::Value* converted;
-
-                if (is_signed_)
-                {
-                    converted = context.ir()->CreateFPToSI(original,
-                                                           getContentType(*context.llvmContext()),
-                                                           original->getName() + ".fptosi");
-                }
-                else
-                {
-                    converted = context.ir()->CreateFPToUI(original,
-                                                           getContentType(*context.llvmContext()),
-                                                           original->getName() + ".fptoui");
-                }
-
-                context.ir()->CreateRet(converted);
+                converted = context.ir()->CreateFPToSI(original,
+                                                       return_type->getContentType(*context.llvmContext()),
+                                                       original->getName() + ".fptosi");
             }
+            else
+            {
+                converted = context.ir()->CreateFPToUI(original,
+                                                       return_type->getContentType(*context.llvmContext()),
+                                                       original->getName() + ".fptoui");
+            }
+
+            context.ir()->CreateRet(converted);
         }
     }
 }

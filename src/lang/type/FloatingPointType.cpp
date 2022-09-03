@@ -63,11 +63,10 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(la
     return buildImplicitConversion(other, other, value, context);
 }
 
-std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(
-    lang::ResolvingHandle<lang::Type> other,
-    lang::ResolvingHandle<lang::Type> other_element,
-    std::shared_ptr<Value>            value,
-    CompileContext&                   context)
+std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                                              lang::ResolvingHandle<lang::Type>,
+                                                                              std::shared_ptr<Value> value,
+                                                                              CompileContext&        context)
 {
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
@@ -191,50 +190,55 @@ void lang::FloatingPointType::buildRequestedOverload(const std::vector<lang::Res
                                                      lang::PredefinedFunction&                             function,
                                                      CompileContext&                                       context)
 {
+    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
+}
+
+void lang::FloatingPointType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                                     lang::ResolvingHandle<lang::Type> return_type,
+                                                     lang::PredefinedFunction&         function,
+                                                     CompileContext&                   context)
+{
     llvm::Function* native_function;
     std::tie(std::ignore, native_function) = function.getNativeRepresentation();
 
-    if (parameters.size() == 1)
+    if (parameter_element->isFloatingPointType())
     {
-        if (parameters[0]->isFloatingPointType())
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
         {
-            llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-            context.ir()->SetInsertPoint(block);
-            {
-                llvm::Value* original = native_function->getArg(0);
+            llvm::Value* original = native_function->getArg(0);
 
-                llvm::Value* converted = context.ir()->CreateFPCast(original,
-                                                                    getContentType(*context.llvmContext()),
-                                                                    original->getName() + ".fcast");
+            llvm::Value* converted = context.ir()->CreateFPCast(original,
+                                                                return_type->getContentType(*context.llvmContext()),
+                                                                original->getName() + ".fcast");
 
-                context.ir()->CreateRet(converted);
-            }
+            context.ir()->CreateRet(converted);
         }
+    }
 
-        if (parameters[0]->isIntegerType())
+    if (parameter_element->isIntegerType())
+    {
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
         {
-            llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-            context.ir()->SetInsertPoint(block);
+            llvm::Value* original = native_function->getArg(0);
+
+            llvm::Value* converted;
+
+            if (parameter_element->isSigned())
             {
-                llvm::Value* original = native_function->getArg(0);
-
-                llvm::Value* converted;
-
-                if (parameters[0]->isSigned())
-                {
-                    converted = context.ir()->CreateSIToFP(original,
-                                                           getContentType(*context.llvmContext()),
-                                                           original->getName() + ".sitofp");
-                }
-                else
-                {
-                    converted = context.ir()->CreateUIToFP(original,
-                                                           getContentType(*context.llvmContext()),
-                                                           original->getName() + ".uitofp");
-                }
-
-                context.ir()->CreateRet(converted);
+                converted = context.ir()->CreateSIToFP(original,
+                                                       return_type->getContentType(*context.llvmContext()),
+                                                       original->getName() + ".sitofp");
             }
+            else
+            {
+                converted = context.ir()->CreateUIToFP(original,
+                                                       return_type->getContentType(*context.llvmContext()),
+                                                       original->getName() + ".uitofp");
+            }
+
+            context.ir()->CreateRet(converted);
         }
     }
 }

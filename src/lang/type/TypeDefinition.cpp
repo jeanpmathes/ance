@@ -115,6 +115,11 @@ const lang::VectorType* lang::TypeDefinition::isVectorType() const
     return nullptr;
 }
 
+lang::VectorType* lang::TypeDefinition::isVectorType()
+{
+    return nullptr;
+}
+
 bool lang::TypeDefinition::isArrayType() const
 {
     return false;
@@ -159,17 +164,20 @@ void lang::TypeDefinition::postResolve()
     createConstructors();
 }
 
-void lang::TypeDefinition::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters)
+bool lang::TypeDefinition::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters)
 {
     for (const auto& [constructor_parameters, function] : requested_constructors_)
     {
-        if (constructor_parameters == parameters) return;
+        if (constructor_parameters == parameters) return true;
     }
 
     if (acceptOverloadRequest(parameters))
     {
         requested_constructors_.emplace_back(std::make_pair(parameters, &createConstructor(parameters)));
+        return true;
     }
+
+    return false;
 }
 
 void lang::TypeDefinition::createConstructors()

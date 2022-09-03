@@ -57,16 +57,20 @@ namespace lang
                                                         std::shared_ptr<Value> left,
                                                         std::shared_ptr<Value> right,
                                                         CompileContext&        context) override;
-        std::shared_ptr<Value> buildOperator(lang::BinaryOperator              op,
-                                             std::shared_ptr<Value>            left,
-                                             std::shared_ptr<Value>            right,
-                                             lang::ResolvingHandle<lang::Type> return_type,
-                                             CompileContext&                   context) override;
+        std::shared_ptr<Value>            buildOperator(lang::BinaryOperator              op,
+                                                        std::shared_ptr<Value>            left,
+                                                        std::shared_ptr<Value>            right,
+                                                        lang::ResolvingHandle<lang::Type> return_type,
+                                                        CompileContext&                   context) override;
 
         bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
         void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
                                     lang::PredefinedFunction&                             function,
                                     CompileContext&                                       context) override;
+        void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                    lang::ResolvingHandle<lang::Type> return_type,
+                                    lang::PredefinedFunction&         function,
+                                    CompileContext&                   context) override;
 
       private:
         uint64_t bit_size_;

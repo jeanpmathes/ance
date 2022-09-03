@@ -26,7 +26,7 @@ namespace lang
         [[nodiscard]] bool              isDefined() const override;
         [[nodiscard]] const Identifier& name() const override;
 
-        void requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
+        bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
 
         void resolve();
         void postResolve();
