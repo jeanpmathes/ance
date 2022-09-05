@@ -12,9 +12,7 @@
 #include "validation/ValidationLogger.h"
 
 lang::PointerType::PointerType(lang::ResolvingHandle<lang::Type> element_type)
-    : TypeDefinition(lang::Identifier::from("*" + element_type->name()))
-    , element_type_(element_type)
-    , element_reference_(lang::ReferenceType::get(element_type))
+    : SequenceType(lang::Identifier::from("*" + element_type->name()), element_type, std::nullopt)
 {}
 
 StateCount lang::PointerType::getStateCount() const
@@ -25,11 +23,6 @@ StateCount lang::PointerType::getStateCount() const
 bool lang::PointerType::isPointerType() const
 {
     return true;
-}
-
-lang::ResolvingHandle<lang::Type> lang::PointerType::getElementType() const
-{
-    return element_type_;
 }
 
 lang::ResolvingHandle<lang::Type> lang::PointerType::getActualType() const
@@ -74,55 +67,6 @@ bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Loca
     return true;
 }
 
-bool lang::PointerType::isSubscriptDefined()
-{
-    return true;
-}
-
-lang::ResolvingHandle<lang::Type> lang::PointerType::getSubscriptReturnType()
-{
-    return element_reference_;
-}
-
-bool lang::PointerType::validateSubscript(lang::Location,
-                                          lang::ResolvingHandle<lang::Type> index_type,
-                                          lang::Location                    index_location,
-                                          ValidationLogger&                 validation_logger) const
-{
-    return lang::Type::checkMismatch(lang::SizeType::getSize(), index_type, index_location, validation_logger);
-}
-
-std::shared_ptr<lang::Value> lang::PointerType::buildSubscript(std::shared_ptr<Value> indexed,
-                                                               std::shared_ptr<Value> index,
-                                                               CompileContext&        context)
-{
-    index = lang::Type::makeMatching(lang::SizeType::getSize(), index, context);
-
-    llvm::Value* element_ptr  = buildGetElementPointer(indexed, index, context);
-    llvm::Value* native_value = lang::Values::contentToNative(element_reference_, element_ptr, context);
-
-    return std::make_shared<lang::WrappedNativeValue>(getSubscriptReturnType(), native_value);
-}
-
-llvm::Value* lang::PointerType::buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
-                                                       const std::shared_ptr<lang::Value>& index,
-                                                       CompileContext&                     context)
-{
-    indexed->buildContentValue(context);
-    index->buildContentValue(context);
-
-    llvm::Value* native_index = index->getContentValue();
-    llvm::Value* indices[]    = {native_index};
-
-    llvm::Value* ptr = indexed->getContentValue();//Pointer to content is instead of pointer to pointer is required.
-
-    llvm::Value* element_ptr = context.ir()->CreateGEP(element_type_->getContentType(*context.llvmContext()),
-                                                       ptr,
-                                                       indices,
-                                                       ptr->getName() + ".gep");
-    return element_ptr;
-}
-
 bool lang::PointerType::definesIndirection()
 {
     return true;
@@ -145,6 +89,22 @@ std::shared_ptr<lang::Value> lang::PointerType::buildIndirection(std::shared_ptr
 
     llvm::Value* native_value = lang::Values::contentToNative(element_reference_, ptr, context);
     return std::make_shared<lang::WrappedNativeValue>(element_reference_, native_value);
+}
+
+llvm::Type* lang::PointerType::getIndexedType(CompileContext& context) const
+{
+    return element_type_->getContentType(*context.llvmContext());
+}
+
+llvm::Value* lang::PointerType::getIndexingPointer(std::shared_ptr<Value> indexed, CompileContext& context)
+{
+    indexed->buildContentValue(context);
+    return indexed->getContentValue();
+}
+
+llvm::SmallVector<llvm::Value*> lang::PointerType::getNativeIndices(llvm::Value*, llvm::Value* index)
+{
+    return {index};
 }
 
 bool lang::PointerType::isTriviallyDefaultConstructible() const
@@ -221,4 +181,9 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::get(lang::ResolvingHandle<l
 
         return type;
     }
+}
+
+std::vector<lang::TypeDefinition*> lang::PointerType::getDependencies() const
+{
+    return {};// A pointer does not depend on the pointee type.
 }

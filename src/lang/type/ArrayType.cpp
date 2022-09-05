@@ -3,18 +3,15 @@
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 #include "lang/construct/value/Value.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
-#include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
 lang::ArrayType::ArrayType(lang::ResolvingHandle<lang::Type> element_type, const uint64_t size)
-    : TypeDefinition(lang::Identifier::from("[" + element_type->name() + "; " + std::to_string(size) + "]"))
-    , size_(size)
-    , element_type_(element_type)
-    , element_reference_(lang::ReferenceType::get(element_type))
+    : SequenceType(lang::Identifier::from("[" + element_type->name() + "; " + std::to_string(size) + "]"),
+                   element_type,
+                   size)
 {}
 
 bool lang::ArrayType::isArrayType() const
@@ -22,38 +19,22 @@ bool lang::ArrayType::isArrayType() const
     return true;
 }
 
-StateCount lang::ArrayType::getStateCount() const
-{
-    StateCount state_count = element_type_->getStateCount();
-
-    if (auto* size = std::get_if<size_t>(&state_count)) { *size *= size_; }
-
-    return state_count;
-}
-
-lang::ResolvingHandle<lang::Type> lang::ArrayType::getElementType() const
-{
-    return element_type_;
-}
-
 lang::ResolvingHandle<lang::Type> lang::ArrayType::getActualType() const
 {
     lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
     if (actual_element_type == element_type_) { return self(); }
-    else {
-        return lang::ArrayType::get(actual_element_type, size_);
-    }
+    else { return lang::ArrayType::get(actual_element_type, size_.value()); }
 }
 
 llvm::Constant* lang::ArrayType::getDefaultContent(llvm::Module& m)
 {
-    std::vector<llvm::Constant*> content(size_, element_type_->getDefaultContent(m));
+    std::vector<llvm::Constant*> content(size_.value(), element_type_->getDefaultContent(m));
     return llvm::ConstantArray::get(getContentType(m.getContext()), content);
 }
 
 llvm::ArrayType* lang::ArrayType::getContentType(llvm::LLVMContext& c) const
 {
-    return llvm::ArrayType::get(element_type_->getContentType(c), size_);
+    return llvm::ArrayType::get(element_type_->getContentType(c), size_.value());
 }
 
 bool lang::ArrayType::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -81,111 +62,10 @@ bool lang::ArrayType::validate(ValidationLogger& validation_logger, lang::Locati
     return true;
 }
 
-bool lang::ArrayType::isSubscriptDefined()
-{
-    return true;
-}
-
-lang::ResolvingHandle<lang::Type> lang::ArrayType::getSubscriptReturnType()
-{
-    return element_reference_;
-}
-
-bool lang::ArrayType::validateSubscript(lang::Location,
-                                        lang::ResolvingHandle<lang::Type> index_type,
-                                        lang::Location                    index_location,
-                                        ValidationLogger&                 validation_logger) const
-{
-    return lang::Type::checkMismatch(lang::SizeType::getSize(), index_type, index_location, validation_logger);
-}
-
-std::shared_ptr<lang::Value> lang::ArrayType::buildSubscript(std::shared_ptr<Value> indexed,
-                                                             std::shared_ptr<Value> index,
-                                                             CompileContext&        context)
-{
-    index = lang::Type::makeMatching(lang::SizeType::getSize(), index, context);
-
-    llvm::Value* element_ptr  = buildGetElementPointer(indexed, index, context);
-    llvm::Value* native_value = lang::Values::contentToNative(element_reference_, element_ptr, context);
-
-    return std::make_shared<lang::WrappedNativeValue>(getSubscriptReturnType(), native_value);
-}
-
-llvm::Value* lang::ArrayType::buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
-                                                     const std::shared_ptr<lang::Value>& index,
-                                                     CompileContext&                     context)
-{
-    indexed->buildNativeValue(context);
-    index->buildContentValue(context);
-
-    llvm::Value* zero         = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context.llvmContext()), 0);
-    llvm::Value* native_index = index->getContentValue();
-    llvm::Value* indices[]    = {zero, native_index};
-
-    llvm::Value* array_ptr =
-        indexed->getNativeValue();// This is a pointer as the internal storage of arrays is using pointers.
-
-    // Check if index is smaller than size.
-    llvm::Value* native_size =
-        llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context.llvmContext()), size_);
-    llvm::Value* in_bounds = context.ir()->CreateICmpULT(native_index, native_size, native_index->getName() + ".icmp");
-
-    in_bounds->setName("..inbounds");
-
-    // todo: use in_bounds bool to throw exception
-
-    llvm::Value* element_ptr = context.ir()->CreateGEP(getContentType(*context.llvmContext()),
-                                                       array_ptr,
-                                                       indices,
-                                                       array_ptr->getName() + ".gep");
-    return element_ptr;
-}
-
-llvm::Value* lang::ArrayType::buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context)
-{
-    llvm::Value* zero         = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context.llvmContext()), 0);
-    llvm::Value* native_index = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context.llvmContext()), index);
-
-    return context.ir()->CreateGEP(getContentType(*context.llvmContext()),
-                                   indexed,
-                                   {zero, native_index},
-                                   indexed->getName() + ".gep");
-}
-
-void lang::ArrayType::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context)
-{
-    for (uint64_t index = 0; index < size_; index++)
-    {
-        llvm::Value* element_ptr = buildGetElementPointer(ptr, index, context);
-        element_type_->buildDefaultInitializer(element_ptr, context);
-    }
-}
-
-void lang::ArrayType::buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
-                                                           llvm::Value*    src_ptr,
-                                                           CompileContext& context)
-{
-    for (uint64_t index = 0; index < size_; index++)
-    {
-        llvm::Value* dst_element_ptr = buildGetElementPointer(dts_ptr, index, context);
-        llvm::Value* src_element_ptr = buildGetElementPointer(src_ptr, index, context);
-
-        element_type_->buildCopyInitializer(dst_element_ptr, src_element_ptr, context);
-    }
-}
-
-void lang::ArrayType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context)
-{
-    for (uint64_t index = 0; index < size_; index++)
-    {
-        llvm::Value* element_ptr = buildGetElementPointer(ptr, index, context);
-        element_type_->buildFinalizer(element_ptr, context);
-    }
-}
-
 std::string lang::ArrayType::createMangledName() const
 {
-    return std::string("(") + element_type_->getMangledName() + ")x(" + std::to_string(size_) + std::string(")");
+    return std::string("(") + element_type_->getMangledName() + ")x(" + std::to_string(size_.value())
+         + std::string(")");
 }
 
 llvm::DIType* lang::ArrayType::createDebugType(CompileContext& context)
@@ -198,18 +78,9 @@ llvm::DIType* lang::ArrayType::createDebugType(CompileContext& context)
     llvm::DIType* element_di_type = element_type_->getDebugType(context);
 
     llvm::SmallVector<llvm::Metadata*, 1> subscripts;
-    subscripts.push_back(context.di()->getOrCreateSubrange(0, (int64_t) size_));
+    subscripts.push_back(context.di()->getOrCreateSubrange(0, (int64_t) size_.value()));
 
     return context.di()->createArrayType(size, alignment, element_di_type, context.di()->getOrCreateArray(subscripts));
-}
-
-std::vector<lang::TypeDefinition*> lang::ArrayType::getDependencies() const
-{
-    std::vector<lang::TypeDefinition*> dependencies;
-
-    if (element_type_->getDefinition()) dependencies.push_back(element_type_->getDefinition());
-
-    return dependencies;
 }
 
 lang::TypeRegistry<uint64_t>& lang::ArrayType::getArrayTypes()

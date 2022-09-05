@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_TYPE_VECTORTYPE_H_
 #define ANCE_SRC_LANG_TYPE_VECTORTYPE_H_
 
-#include "TypeDefinition.h"
+#include "SequenceType.h"
 
 #include <llvm/IR/DerivedTypes.h>
 
@@ -21,7 +21,7 @@ namespace lang
     /**
      * Represents a vector type.
      */
-    class VectorType : public lang::TypeDefinition
+    class VectorType : public lang::SequenceType
     {
       private:
         VectorType(lang::ResolvingHandle<lang::Type> element_type, uint64_t size);
@@ -32,26 +32,12 @@ namespace lang
         const VectorType* isVectorType() const override;
         VectorType*       isVectorType() override;
 
-        [[nodiscard]] StateCount getStateCount() const override;
-
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const override;
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
-        bool                              isSubscriptDefined() override;
-        lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
-
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
-
-        bool                         validateSubscript(lang::Location                    indexed_location,
-                                                       lang::ResolvingHandle<lang::Type> index_type,
-                                                       lang::Location                    index_location,
-                                                       ValidationLogger&                 validation_logger) const override;
-        std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
-                                                    std::shared_ptr<Value> index,
-                                                    CompileContext&        context) override;
 
         bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
         bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
@@ -79,13 +65,6 @@ namespace lang
                                     lang::PredefinedFunction&                             function,
                                     CompileContext&                                       context) override;
 
-      private:
-        llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
-                                            const std::shared_ptr<lang::Value>& index,
-                                            CompileContext&                     context) const;
-
-        llvm::Value* buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context) const;
-
       public:
         ~VectorType() override = default;
 
@@ -99,29 +78,13 @@ namespace lang
                                                  CompileContext&                           context);
 
       protected:
-        void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context) override;
-        void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
-                                                  llvm::Value*    src_ptr,
-                                                  CompileContext& context) override;
-        void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context) override;
-
         std::string                                      createMangledName() const override;
         llvm::DIType*                                    createDebugType(CompileContext& context) override;
-        [[nodiscard]] std::vector<lang::TypeDefinition*> getDependencies() const override;
-
-      private:
-        uint64_t                          size_;
-        lang::ResolvingHandle<lang::Type> element_type_;
-        lang::ResolvingHandle<lang::Type> element_reference_;
 
       private:
         static lang::TypeRegistry<uint64_t>& getVectorTypes();
 
       public:
-        [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
-        [[nodiscard]] bool isTriviallyCopyConstructible() const override;
-        [[nodiscard]] bool isTriviallyDestructible() const override;
-
         static lang::TypeDefinitionRegistry* getRegistry();
 
         /**

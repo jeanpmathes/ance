@@ -18,6 +18,7 @@ llvm::Value* lang::Values::contentToNative(lang::ResolvingHandle<lang::Type> typ
                                            CompileContext&                   context)
 {
     llvm::Value* native = context.ir()->CreateAlloca(type->getContentType(*context.llvmContext()), nullptr, "alloca");
+
     context.ir()->CreateStore(content, native);
     return native;
 }

@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_TYPE_ARRAYTYPE_H_
 #define ANCE_SRC_LANG_TYPE_ARRAYTYPE_H_
 
-#include "TypeDefinition.h"
+#include "SequenceType.h"
 
 #include <llvm/IR/DerivedTypes.h>
 
@@ -21,7 +21,7 @@ namespace lang
     /**
      * Represents array types. Array types have an element type and a length.
      */
-    class ArrayType : public lang::TypeDefinition
+    class ArrayType : public lang::SequenceType
     {
       private:
         ArrayType(lang::ResolvingHandle<lang::Type> element_type, uint64_t size);
@@ -31,52 +31,19 @@ namespace lang
 
         bool isArrayType() const override;
 
-        [[nodiscard]] StateCount getStateCount() const override;
-
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const override;
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
 
         llvm::Constant*  getDefaultContent(llvm::Module& m) override;
         llvm::ArrayType* getContentType(llvm::LLVMContext& c) const override;
 
-        bool                              isSubscriptDefined() override;
-        lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
-
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
-
-        bool                         validateSubscript(lang::Location                    indexed_location,
-                                                       lang::ResolvingHandle<lang::Type> index_type,
-                                                       lang::Location                    index_location,
-                                                       ValidationLogger&                 validation_logger) const override;
-        std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
-                                                    std::shared_ptr<Value> index,
-                                                    CompileContext&        context) override;
-
-      private:
-        llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
-                                            const std::shared_ptr<lang::Value>& index,
-                                            CompileContext&                     context);
-
-        llvm::Value* buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context);
 
       public:
         ~ArrayType() override = default;
 
       protected:
-        void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context) override;
-        void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
-                                                  llvm::Value*    src_ptr,
-                                                  CompileContext& context) override;
-        void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context) override;
-
         std::string                                      createMangledName() const override;
         llvm::DIType*                                    createDebugType(CompileContext& context) override;
-        [[nodiscard]] std::vector<lang::TypeDefinition*> getDependencies() const override;
-
-      private:
-        uint64_t                          size_;
-        lang::ResolvingHandle<lang::Type> element_type_;
-        lang::ResolvingHandle<lang::Type> element_reference_;
 
       private:
         static lang::TypeRegistry<uint64_t>& getArrayTypes();
