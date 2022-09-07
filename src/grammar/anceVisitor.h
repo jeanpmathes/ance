@@ -198,6 +198,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual std::any visitPointer(anceParser::PointerContext* context) = 0;
 
+    virtual std::any visitBuffer(anceParser::BufferContext* context) = 0;
+
     virtual std::any visitReference(anceParser::ReferenceContext* context) = 0;
 
     virtual std::any visitCustom(anceParser::CustomContext* context) = 0;

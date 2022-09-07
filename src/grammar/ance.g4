@@ -280,6 +280,7 @@ type
 	| vectorType # Vector
 	| keywordType # Keyword
 	| '*' type # Pointer
+	| '[]' type # Buffer
 	| '&' type # Reference
 	| customType # Custom
 	;

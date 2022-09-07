@@ -1489,6 +1489,17 @@ class anceParser : public antlr4::Parser
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class BufferContext : public TypeContext
+    {
+      public:
+        BufferContext(TypeContext* ctx);
+
+        antlr4::tree::TerminalNode* BUFFER();
+        TypeContext*                type();
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     class KeywordContext : public TypeContext
     {
       public:

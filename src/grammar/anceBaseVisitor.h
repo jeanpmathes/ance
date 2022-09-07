@@ -264,6 +264,8 @@ class anceBaseVisitor : public anceVisitor
 
     virtual std::any visitPointer(anceParser::PointerContext* ctx) override { return visitChildren(ctx); }
 
+    virtual std::any visitBuffer(anceParser::BufferContext* ctx) override { return visitChildren(ctx); }
+
     virtual std::any visitReference(anceParser::ReferenceContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitCustom(anceParser::CustomContext* ctx) override { return visitChildren(ctx); }
