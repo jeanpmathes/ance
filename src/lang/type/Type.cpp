@@ -138,6 +138,12 @@ bool lang::Type::isPointerType() const
     return definition_->isPointerType();
 }
 
+bool lang::Type::isBufferType() const
+{
+    assert(isDefined());
+    return definition_->isBufferType();
+}
+
 bool lang::Type::isReferenceType() const
 {
     assert(isDefined());

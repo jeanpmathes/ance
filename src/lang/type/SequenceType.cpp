@@ -7,11 +7,8 @@
 #include "lang/type/SizeType.h"
 #include "lang/utility/Values.h"
 
-lang::SequenceType::SequenceType(lang::Identifier                  name,
-                                 lang::ResolvingHandle<lang::Type> element_type,
-                                 std::optional<size_t>             size)
-    : TypeDefinition(name)
-    , element_type_(std::move(element_type))
+lang::SequenceType::SequenceType(lang::ResolvingHandle<lang::Type> element_type, std::optional<size_t> size)
+    : element_type_(std::move(element_type))
     , element_reference_(lang::ReferenceType::get(element_type_))
     , size_(size)
 {}

@@ -127,7 +127,7 @@ class dataParser : public antlr4::Parser
     class BooleanContext : public antlr4::ParserRuleContext
     {
       public:
-        BooleanContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+        BooleanContext(antlr4::ParserRuleContext* parent, size_t invokingState);
 
         BooleanContext() = default;
         void copyFrom(BooleanContext* context);
@@ -157,8 +157,8 @@ class dataParser : public antlr4::Parser
     // By default the static state used to implement the parser is lazily initialized during the first
     // call to the constructor. You can call this function if you wish to initialize the static state
     // ahead of time.
-  static void initialize();
+    static void initialize();
 
-private:
+  private:
 };
 

@@ -94,6 +94,7 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitVectorType(anceParser::VectorTypeContext* ctx) override;
     std::any visitKeywordType(anceParser::KeywordTypeContext* ctx) override;
     std::any visitPointer(anceParser::PointerContext* ctx) override;
+    std::any visitBuffer(anceParser::BufferContext* ctx) override;
     std::any visitReference(anceParser::ReferenceContext* ctx) override;
     std::any visitCustom(anceParser::CustomContext* ctx) override;
 

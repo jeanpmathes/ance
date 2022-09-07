@@ -15,6 +15,7 @@
 #include "lang/type/SingleType.h"
 
 #include "lang/type/ArrayType.h"
+#include "lang/type/BufferType.h"
 #include "lang/type/IntegerType.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/ReferenceType.h"
@@ -46,6 +47,7 @@ Application::Application(Project& project) : Application(project, std::make_uniq
     global_scope_->addTypeRegistry(lang::ArrayType::getRegistry());
     global_scope_->addTypeRegistry(lang::VectorType::getRegistry());
     global_scope_->addTypeRegistry(lang::PointerType::getRegistry());
+    global_scope_->addTypeRegistry(lang::BufferType::getRegistry());
     global_scope_->addTypeRegistry(lang::ReferenceType::getRegistry());
 }
 

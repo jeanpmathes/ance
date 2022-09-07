@@ -13,9 +13,8 @@
 #include "validation/ValidationLogger.h"
 
 lang::VectorType::VectorType(lang::ResolvingHandle<lang::Type> element_type, uint64_t size)
-    : SequenceType(lang::Identifier::from("<" + element_type->name() + "; " + std::to_string(size) + ">"),
-                   element_type,
-                   size)
+    : TypeDefinition(lang::Identifier::from("<" + element_type->name() + "; " + std::to_string(size) + ">"))
+    , SequenceType(element_type, size)
 {}
 
 const lang::VectorType* lang::VectorType::isVectorType() const

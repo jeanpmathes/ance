@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_LANG_TYPE_POINTERTYPE_H_
-#define ANCE_SRC_LANG_TYPE_POINTERTYPE_H_
+#ifndef ANCE_SRC_LANG_TYPE_BUFFERTYPE_H_
+#define ANCE_SRC_LANG_TYPE_BUFFERTYPE_H_
 
 #include "IndirectType.h"
 #include "SequenceType.h"
@@ -13,19 +13,19 @@ class Application;
 namespace lang
 {
     /**
-     * Represents a pointer type. A pointer type has an element type, which is the type of the value pointed too.
+     * Represents a buffer type. It points to a sequence of values.
      */
-    class PointerType
+    class BufferType
         : public lang::SequenceType
         , public lang::IndirectType
     {
       private:
-        explicit PointerType(lang::ResolvingHandle<lang::Type> element_type);
+        explicit BufferType(lang::ResolvingHandle<lang::Type> element_type);
 
       public:
         StateCount getStateCount() const override;
 
-        bool                              isPointerType() const override;
+        bool                              isBufferType() const override;
         lang::ResolvingHandle<lang::Type> getActualType() const override;
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
@@ -36,25 +36,25 @@ namespace lang
         llvm::SmallVector<llvm::Value*> getNativeIndices(llvm::Value* zero, llvm::Value* index) override;
 
       public:
-        ~PointerType() override = default;
+        ~BufferType() override = default;
 
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        std::string                         createMangledName() const override;
-        llvm::DIType*                       createDebugType(CompileContext& context) override;
-        std::vector<lang::TypeDefinition*>  getDependencies() const override;
+        std::string                        createMangledName() const override;
+        llvm::DIType*                      createDebugType(CompileContext& context) override;
+        std::vector<lang::TypeDefinition*> getDependencies() const override;
 
       private:
-        static lang::TypeRegistry<>& getPointerTypes();
+        static lang::TypeRegistry<>& getBufferTypes();
 
       public:
         static lang::TypeDefinitionRegistry* getRegistry();
 
         /**
-         * Get a pointer type instance.
+         * Get a buffer type instance.
          * @param element_type The element type.
          * @return The instance.
          */

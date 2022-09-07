@@ -10,16 +10,15 @@ namespace lang
      * A sequence type is a type that is a sequence of elements of the same type.
      * Examples are arrays, vectors and also pointers.
      */
-    class SequenceType : public lang::TypeDefinition
+    class SequenceType : public virtual lang::TypeDefinition
     {
       public:
         /**
          * Create a new sequence type.
-         * @param name The name of the type.
          * @param element_type The type of the elements.
          * @param size An optional size.
          */
-        SequenceType(lang::Identifier name, lang::ResolvingHandle<lang::Type> element_type, std::optional<size_t> size);
+        SequenceType(lang::ResolvingHandle<lang::Type> element_type, std::optional<size_t> size);
         ~SequenceType() override = default;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const final;

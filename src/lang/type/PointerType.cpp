@@ -1,18 +1,18 @@
 #include "PointerType.h"
 
 #include "lang/construct/value/Value.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/VoidType.h"
-#include "lang/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
 lang::PointerType::PointerType(lang::ResolvingHandle<lang::Type> element_type)
-    : SequenceType(lang::Identifier::from("*" + element_type->name()), element_type, std::nullopt)
+    : TypeDefinition(lang::Identifier::from("*" + element_type->name()))
+    , SequenceType(element_type, std::nullopt)
+    , IndirectType(element_type)
 {}
 
 StateCount lang::PointerType::getStateCount() const
@@ -34,21 +34,6 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::getActualType() const
     }
 }
 
-llvm::Constant* lang::PointerType::getDefaultContent(llvm::Module& m)
-{
-    return llvm::ConstantPointerNull::get(getContentType(m.getContext()));
-}
-
-llvm::PointerType* lang::PointerType::getContentType(llvm::LLVMContext& c) const
-{
-    llvm::Type* native_type;
-
-    if (element_type_->isVoidType()) { native_type = llvm::Type::getInt8PtrTy(c); }
-    else { native_type = element_type_->getContentType(c); }
-
-    return llvm::PointerType::get(native_type, 0);
-}
-
 bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (!element_type_->isDefined())
@@ -65,30 +50,6 @@ bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Loca
     }
 
     return true;
-}
-
-bool lang::PointerType::definesIndirection()
-{
-    return true;
-}
-
-lang::ResolvingHandle<lang::Type> lang::PointerType::getIndirectionType()
-{
-    return element_type_;
-}
-
-bool lang::PointerType::validateIndirection(lang::Location, ValidationLogger&) const
-{
-    return true;
-}
-
-std::shared_ptr<lang::Value> lang::PointerType::buildIndirection(std::shared_ptr<Value> value, CompileContext& context)
-{
-    value->buildContentValue(context);
-    llvm::Value* ptr = value->getContentValue();
-
-    llvm::Value* native_value = lang::Values::contentToNative(element_reference_, ptr, context);
-    return std::make_shared<lang::WrappedNativeValue>(element_reference_, native_value);
 }
 
 llvm::Type* lang::PointerType::getIndexedType(CompileContext& context) const
@@ -142,13 +103,19 @@ llvm::DIType* lang::PointerType::createDebugType(CompileContext& context)
 
         di_type = context.di()->createBasicType(name, size_in_bits, encoding);
     }
-    else {
+    else
+    {
         llvm::DIType* element_di_type = element_type_->getDebugType(context);
 
         di_type = context.di()->createPointerType(element_di_type, size_in_bits);
     }
 
     return di_type;
+}
+
+std::vector<lang::TypeDefinition*> lang::PointerType::getDependencies() const
+{
+    return {};// A pointer does not depend on the pointee type.
 }
 
 lang::TypeRegistry<>& lang::PointerType::getPointerTypes()
@@ -181,9 +148,4 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::get(lang::ResolvingHandle<l
 
         return type;
     }
-}
-
-std::vector<lang::TypeDefinition*> lang::PointerType::getDependencies() const
-{
-    return {};// A pointer does not depend on the pointee type.
 }

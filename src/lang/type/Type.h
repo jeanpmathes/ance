@@ -172,6 +172,12 @@ namespace lang
         [[nodiscard]] bool isPointerType() const;
 
         /**
+         * Get whether this type is a buffer type.
+         * @return True if this type is a buffer type.
+         */
+        [[nodiscard]] bool isBufferType() const;
+
+        /**
          * Get whether this type is a reference type.
          * @return True if this type is a reference type.
          */

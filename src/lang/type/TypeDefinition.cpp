@@ -90,6 +90,11 @@ bool lang::TypeDefinition::isPointerType() const
     return false;
 }
 
+bool lang::TypeDefinition::isBufferType() const
+{
+    return false;
+}
+
 bool lang::TypeDefinition::isReferenceType() const
 {
     return false;

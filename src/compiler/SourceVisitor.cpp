@@ -6,6 +6,7 @@
 
 #include "lang/type/ArrayType.h"
 #include "lang/type/BooleanType.h"
+#include "lang/type/BufferType.h"
 #include "lang/type/DoubleType.h"
 #include "lang/type/HalfType.h"
 #include "lang/type/IntegerType.h"
@@ -823,6 +824,15 @@ std::any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)
     lang::ResolvingHandle<lang::Type> element_type =
         std::any_cast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
     lang::ResolvingHandle<lang::Type> type = lang::PointerType::get(element_type);
+
+    return type;
+}
+
+std::any SourceVisitor::visitBuffer(anceParser::BufferContext* ctx)
+{
+    lang::ResolvingHandle<lang::Type> element_type =
+        std::any_cast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
+    lang::ResolvingHandle<lang::Type> type = lang::BufferType::get(element_type);
 
     return type;
 }
