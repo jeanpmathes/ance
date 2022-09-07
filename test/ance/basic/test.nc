@@ -32,7 +32,7 @@ private write (str: *ui8, len: ui32) : void
     WriteFile(std_out, str, len, written, null_ptr);
 }
 
-// Functions can be declared alias extern.
+// Functions can be declared as extern.
 
 extern WriteFile (hFile: Handle, lpBuffer: *ui8, nNumberOfBytesToWrite: ui32, lpNumberOfBytesWritten: *ui32, lpOverlapped: uiptr);
 extern GetStdHandle (nStdHandle: ui32) : Handle;

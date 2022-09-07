@@ -8,14 +8,18 @@ private null_ptr: uiptr;
 
 public define Handle alias *void;
 
-// Defined functions must be public or private.
-
 public main () : ui32
 {
     std_out <: GetStdHandle(4294967285:32);
 
     // Dynamic memory is allocated using new.
-    let str: *ui8 <: new[3] dynamic ui8;
+    let ptr_to_int: *i32 <: new dynamic i32;
+
+    // Dynamically allocated memory must be freed using delete.
+    delete ptr_to_int;
+
+    // Allocating buffers returns a buffer-pointer.
+    let str: []ui8 <: new[3] dynamic ui8;
 
     str[0] <: 'A';
     str[1] <: 'B';
@@ -23,8 +27,8 @@ public main () : ui32
 
     write(str, 3:32);
 
-    // Dynamically allocated memory must be freed using delete.
-    delete str;
+    // Buffers must be freed using delete[].
+    delete[] str;
 
     return 0:32;
 }
@@ -42,7 +46,7 @@ private write (str: *ui8, len: ui32) : void
     WriteFile(std_out, str, len, written, null_ptr);
 }
 
-// Functions can be declared alias extern.
+// Functions can be declared as extern.
 
 extern WriteFile (hFile: Handle, lpBuffer: *ui8, nNumberOfBytesToWrite: ui32, lpNumberOfBytesWritten: *ui32, lpOverlapped: uiptr);
 extern GetStdHandle (nStdHandle: ui32) : Handle;
