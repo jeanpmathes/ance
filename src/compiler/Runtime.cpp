@@ -5,6 +5,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/type/BufferType.h"
 #include "lang/type/IntegerType.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/SizeType.h"
@@ -110,7 +111,7 @@ std::shared_ptr<lang::Value> Runtime::allocate(Allocator                        
             throw std::invalid_argument("Unsupported allocation type.");
     }
 
-    lang::ResolvingHandle<lang::Type> ptr_type   = lang::PointerType::get(type);
+    lang::ResolvingHandle<lang::Type> ptr_type   = count ? lang::BufferType::get(type) : lang::PointerType::get(type);
     llvm::Value*                      native_ptr = lang::Values::contentToNative(ptr_type, ptr_to_allocated, context);
 
     if (count_value) { type->buildDefaultInitializer(ptr_to_allocated, count_value, context); }
@@ -121,7 +122,8 @@ std::shared_ptr<lang::Value> Runtime::allocate(Allocator                        
 
 void Runtime::deleteDynamic(const std::shared_ptr<lang::Value>& value, bool delete_buffer, CompileContext& context)
 {
-    assert(value->type()->isPointerType());
+    assert(delete_buffer || value->type()->isPointerType());// Not deleting a buffer implies a pointer type.
+    assert(!delete_buffer || value->type()->isBufferType());// Deleting a buffer implies a buffer type.
 
     value->buildContentValue(context);
 

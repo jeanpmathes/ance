@@ -29,10 +29,17 @@ void Delete::validate(ValidationLogger& validation_logger) const
 {
     if (to_delete_->validate(validation_logger))
     {
-        if (!to_delete_->type()->isPointerType())
+        if (delete_buffer_ && !to_delete_->type()->isBufferType())
         {
             validation_logger.logError("Value of type " + to_delete_->type()->getAnnotatedName()
-                                           + " given to 'delete' cannot be used as pointer type",
+                                           + " given to 'delete[]' must be a buffer pointer",
+                                       to_delete_->location());
+        }
+
+        if (!delete_buffer_ && !to_delete_->type()->isPointerType())
+        {
+            validation_logger.logError("Value of type " + to_delete_->type()->getAnnotatedName()
+                                           + " given to 'delete' must be a pointer",
                                        to_delete_->location());
         }
     }

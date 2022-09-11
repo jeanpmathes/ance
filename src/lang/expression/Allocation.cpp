@@ -1,9 +1,10 @@
 #include "Allocation.h"
 
+#include "compiler/CompileContext.h"
 #include "lang/scope/Scope.h"
+#include "lang/type/BufferType.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/SizeType.h"
-#include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
 Allocation::Allocation(Runtime::Allocator                allocation,
@@ -16,7 +17,7 @@ Allocation::Allocation(Runtime::Allocator                allocation,
     , allocated_type_(type)
     , allocated_type_location_(allocated_type_location)
     , count_(std::move(count))
-    , return_type_(lang::PointerType::get(type))
+    , return_type_(count_ ? lang::BufferType::get(type) : lang::PointerType::get(type))
 {
     if (count_) addSubexpression(*count_);
 }
