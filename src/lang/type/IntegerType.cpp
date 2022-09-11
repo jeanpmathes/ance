@@ -23,9 +23,9 @@ StateCount lang::IntegerType::getStateCount() const
     return state_count;
 }
 
-bool lang::IntegerType::isIntegerType() const
+const lang::IntegerType* lang::IntegerType::isIntegerType() const
 {
-    return true;
+    return this;
 }
 
 bool lang::IntegerType::isIntegerType(uint64_t bit_size, bool is_signed) const
@@ -68,14 +68,10 @@ bool lang::IntegerType::validate(ValidationLogger& validation_logger, lang::Loca
 
 bool lang::IntegerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
 {
-    if (other->isIntegerType())
+    if (auto other_int = other->isIntegerType())
     {
-        auto* other_type = dynamic_cast<IntegerType*>(other->getActualType()->getDefinition());
-
-        if (!other_type) return false;// Cloned integer types do not allow implicit conversion.
-
-        bool can_enlarge   = (bit_size_ < other_type->bit_size_) && (is_signed_ == other_type->is_signed_);
-        bool can_gain_sign = (bit_size_ < other_type->bit_size_) && !is_signed_ && other_type->is_signed_;
+        bool can_enlarge   = (bit_size_ < other_int->bit_size_) && (is_signed_ == other_int->is_signed_);
+        bool can_gain_sign = (bit_size_ < other_int->bit_size_) && !is_signed_ && other_int->is_signed_;
 
         return can_enlarge || can_gain_sign;
     }

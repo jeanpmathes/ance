@@ -1,6 +1,8 @@
 #ifndef ANCE_SRC_LANG_TYPE_TYPEALIAS_H_
 #define ANCE_SRC_LANG_TYPE_TYPEALIAS_H_
 
+#include "FloatingPointType.h"
+#include "IntegerType.h"
 #include "TypeDefinition.h"
 #include "lang/utility/Identifier.h"
 
@@ -21,11 +23,11 @@ namespace lang
 
         StateCount getStateCount() const override;
 
-        [[nodiscard]] bool isIntegerType() const override;
-        [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const override;
-        [[nodiscard]] bool isBooleanType() const override;
-        [[nodiscard]] bool isFloatingPointType() const override;
-        [[nodiscard]] bool isFloatingPointType(size_t precision) const override;
+        [[nodiscard]] const IntegerType*       isIntegerType() const override;
+        [[nodiscard]] bool                     isIntegerType(uint64_t bit_size, bool is_signed) const override;
+        [[nodiscard]] bool                     isBooleanType() const override;
+        [[nodiscard]] const FloatingPointType* isFloatingPointType() const override;
+        [[nodiscard]] bool                     isFloatingPointType(size_t precision) const override;
         [[nodiscard]] bool isSizeType() const override;
         [[nodiscard]] bool isDiffType() const override;
         [[nodiscard]] bool isVoidType() const override;

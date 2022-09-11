@@ -78,7 +78,7 @@ bool lang::Type::isCustom() const
     return definition_->isCustom();
 }
 
-bool lang::Type::isIntegerType() const
+const lang::IntegerType* lang::Type::isIntegerType() const
 {
     assert(isDefined());
     return definition_->isIntegerType();
@@ -102,7 +102,7 @@ bool lang::Type::isBooleanType() const
     return definition_->isBooleanType();
 }
 
-bool lang::Type::isFloatingPointType() const
+const lang::FloatingPointType* lang::Type::isFloatingPointType() const
 {
     assert(isDefined());
     return definition_->isFloatingPointType();

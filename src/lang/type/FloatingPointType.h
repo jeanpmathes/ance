@@ -19,8 +19,8 @@ namespace lang
 
         StateCount getStateCount() const override;
 
-        [[nodiscard]] bool isFloatingPointType() const override;
-        [[nodiscard]] bool isFloatingPointType(size_t precision) const override;
+        [[nodiscard]] const FloatingPointType* isFloatingPointType() const override;
+        [[nodiscard]] bool                     isFloatingPointType(size_t precision) const override;
 
         bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
         bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,

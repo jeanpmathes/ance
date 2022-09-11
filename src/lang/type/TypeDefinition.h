@@ -8,13 +8,13 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 
+#include "lang/AccessModifier.h"
 #include "lang/BinaryOperator.h"
 #include "lang/UnaryOperator.h"
-#include "lang/utility/Location.h"
-#include "lang/utility/ResolvingHandle.h"
 #include "lang/type/StateCount.h"
 #include "lang/utility/Identifier.h"
-#include "lang/AccessModifier.h"
+#include "lang/utility/Location.h"
+#include "lang/utility/ResolvingHandle.h"
 
 namespace lang
 {
@@ -24,6 +24,8 @@ namespace lang
     class Function;
     class PredefinedFunction;
     class VectorizableType;
+    class FloatingPointType;
+    class IntegerType;
     class VectorType;
 }
 
@@ -57,12 +59,12 @@ namespace lang
 
         [[nodiscard]] virtual StateCount getStateCount() const = 0;
 
-        [[nodiscard]] virtual bool                    isIntegerType() const;
-        [[nodiscard]] virtual bool                    isIntegerType(uint64_t bit_size, bool is_signed) const;
+        [[nodiscard]] virtual const IntegerType*       isIntegerType() const;
+        [[nodiscard]] virtual bool                     isIntegerType(uint64_t bit_size, bool is_signed) const;
         [[nodiscard]] virtual bool                    isSigned() const;
-        [[nodiscard]] virtual bool                    isBooleanType() const;
-        [[nodiscard]] virtual bool                    isFloatingPointType() const;
-        [[nodiscard]] virtual bool                    isFloatingPointType(size_t precision) const;
+        [[nodiscard]] virtual bool                     isBooleanType() const;
+        [[nodiscard]] virtual const FloatingPointType* isFloatingPointType() const;
+        [[nodiscard]] virtual bool                     isFloatingPointType(size_t precision) const;
         [[nodiscard]] virtual bool                    isSizeType() const;
         [[nodiscard]] virtual bool                    isDiffType() const;
         [[nodiscard]] virtual bool                    isVoidType() const;

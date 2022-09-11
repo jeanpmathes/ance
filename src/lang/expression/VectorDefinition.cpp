@@ -130,7 +130,8 @@ void VectorDefinition::doBuild(CompileContext& context)
         elements.push_back(lang::Type::makeMatching(type()->getElementType(), element->getValue(), context));
     }
 
-    auto vector_type = dynamic_cast<lang::VectorType*>(type()->getDefinition());
+    auto vector_type = type()->isVectorType();
+    assert(vector_type);
 
     auto value = vector_type->createValue(std::move(elements), context);
     setValue(value);

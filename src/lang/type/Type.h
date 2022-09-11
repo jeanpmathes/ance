@@ -24,6 +24,8 @@ namespace lang
     class Value;
     class Function;
     class VectorizableType;
+    class FloatingPointType;
+    class IntegerType;
     class VectorType;
 }
 
@@ -110,9 +112,9 @@ namespace lang
 
         /**
          * Get whether this type is an integer type. Integer types have a fixed size.
-         * @return True if this type is an integer type.
+         * @return A pointer to the integer type if this type is an integer type, null otherwise.
          */
-        [[nodiscard]] bool isIntegerType() const;
+        [[nodiscard]] const IntegerType* isIntegerType() const;
 
         /**
          * Get whether this type is an integer type with a given size and signedness.
@@ -136,9 +138,9 @@ namespace lang
 
         /**
          * Get whether this type is a floating point type.
-         * @return True if this type is a floating point type.
+         * @return A pointer to the floating point type if this type is a floating point type, null otherwise.
          */
-        [[nodiscard]] bool isFloatingPointType() const;
+        [[nodiscard]] const FloatingPointType* isFloatingPointType() const;
 
         /**
          * Get whether this type is a floating point type with a given precision.

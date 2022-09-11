@@ -1,7 +1,6 @@
 #include "TypeDefinition.h"
 
 #include <map>
-#include <set>
 #include <stack>
 
 #include "compiler/CompileContext.h"
@@ -40,9 +39,9 @@ bool lang::TypeDefinition::isCustom() const
     return !location_.isGlobal();
 }
 
-bool lang::TypeDefinition::isIntegerType() const
+const lang::IntegerType* lang::TypeDefinition::isIntegerType() const
 {
-    return false;
+    return nullptr;
 }
 
 bool lang::TypeDefinition::isIntegerType(uint64_t, bool) const
@@ -60,9 +59,9 @@ bool lang::TypeDefinition::isBooleanType() const
     return false;
 }
 
-bool lang::TypeDefinition::isFloatingPointType() const
+const lang::FloatingPointType* lang::TypeDefinition::isFloatingPointType() const
 {
-    return false;
+    return nullptr;
 }
 
 bool lang::TypeDefinition::isFloatingPointType(size_t) const

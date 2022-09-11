@@ -28,9 +28,9 @@ llvm::DIType* lang::FloatingPointType::createDebugType(CompileContext& context)
     return context.di()->createBasicType(name, size_in_bits, encoding);
 }
 
-bool lang::FloatingPointType::isFloatingPointType() const
+const lang::FloatingPointType* lang::FloatingPointType::isFloatingPointType() const
 {
-    return true;
+    return this;
 }
 
 bool lang::FloatingPointType::isFloatingPointType(size_t precision) const
@@ -40,13 +40,9 @@ bool lang::FloatingPointType::isFloatingPointType(size_t precision) const
 
 bool lang::FloatingPointType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
 {
-    if (!other->isFloatingPointType()) return false;
+    if (auto other_float = other->isFloatingPointType()) { return getPrecision() < other_float->getPrecision(); }
 
-    auto* other_float = dynamic_cast<FloatingPointType*>(other->getDefinition());
-
-    if (!other_float) return false;// Cloned floating point types do not allow implicit conversion.
-
-    return getPrecision() < other_float->getPrecision();
+    return false;
 }
 
 bool lang::FloatingPointType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,

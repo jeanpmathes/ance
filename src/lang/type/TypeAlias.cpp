@@ -21,7 +21,7 @@ StateCount lang::TypeAlias::getStateCount() const
     return actual_->getStateCount();
 }
 
-bool lang::TypeAlias::isIntegerType() const
+const lang::IntegerType* lang::TypeAlias::isIntegerType() const
 {
     return actual_->isIntegerType();
 }
@@ -36,7 +36,7 @@ bool lang::TypeAlias::isBooleanType() const
     return actual_->isBooleanType();
 }
 
-bool lang::TypeAlias::isFloatingPointType() const
+const lang::FloatingPointType* lang::TypeAlias::isFloatingPointType() const
 {
     return actual_->isFloatingPointType();
 }
