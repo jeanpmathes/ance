@@ -4,14 +4,15 @@
 
 #include <llvm/ADT/SmallVector.h>// critical, missing include will cause linking error
 
+#include "compiler/CompileContext.h"
+#include "lang/AccessModifier.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
-#include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
-#include "lang/AccessModifier.h"
 
 lang::CustomFunction::CustomFunction(Function&                                     function,
                                      lang::AccessModifier                          access,
@@ -99,7 +100,7 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger) const
 
     returnType()->validate(validation_logger, returnTypeLocation());
 
-    for (const auto& [parameter, argument] : llvm::zip(parameters(), arguments_))
+    for (const auto [parameter, argument] : llvm::zip(parameters(), arguments_))
     {
         if (!argument)
         {
@@ -247,7 +248,7 @@ void lang::CustomFunction::createNativeBacking(CompileContext& context)
     std::vector<llvm::Metadata*> di_types;
     di_types.push_back(returnType()->getDebugType(context));
 
-    for (const auto& pair : llvm::zip(parameters(), native_function_->args()))
+    for (const auto pair : llvm::zip(parameters(), native_function_->args()))
     {
         const auto& [parameter, argument] = pair;
         parameter->wrap(&argument);
@@ -262,9 +263,9 @@ void lang::CustomFunction::createNativeBacking(CompileContext& context)
                                      name().text(),
                                      signature_.getMangledName(),
                                      context.sourceFile(),
-                                     location().line(),
+                                     static_cast<unsigned>(location().line()),
                                      debug_type,
-                                     definition_location_.line(),
+                                     static_cast<unsigned>(definition_location_.line()),
                                      llvm::DINode::DIFlags::FlagPrototyped,
                                      llvm::DISubprogram::toSPFlags(false, true, false, 0U, name().text() == "main"));
 
@@ -311,3 +312,4 @@ llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext&)
 {
     return debugSubprogram();
 }
+

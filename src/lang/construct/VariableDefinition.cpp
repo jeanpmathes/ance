@@ -65,3 +65,4 @@ void lang::VariableDefinition::setValue(std::shared_ptr<lang::Value> value, Comp
         storeValue(value, context);
     }
 }
+

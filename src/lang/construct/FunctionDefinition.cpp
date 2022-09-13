@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/utility/Values.h"
@@ -84,7 +85,7 @@ bool lang::FunctionDefinition::validateCall(
 
     bool valid = true;
 
-    for (const auto& [param, arg] : llvm::zip(parameters_, arguments))
+    for (const auto [param, arg] : llvm::zip(parameters_, arguments))
     {
         auto [arg_value, arg_location] = arg;
         valid &= lang::Type::checkMismatch(param->type(), arg_value->type(), arg_location, validation_logger);
@@ -164,7 +165,7 @@ llvm::CallInst* lang::FunctionDefinition::buildCall(const std::vector<std::share
     std::vector<llvm::Value*> args;
     args.reserve(arguments.size());
 
-    for (const auto& [param, arg] : llvm::zip(parameters_, arguments))
+    for (const auto [param, arg] : llvm::zip(parameters_, arguments))
     {
         std::shared_ptr<lang::Value> matched_arg = lang::Type::makeMatching(param->type(), arg, context);
 

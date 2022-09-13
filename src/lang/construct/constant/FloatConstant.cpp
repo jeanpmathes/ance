@@ -39,3 +39,4 @@ bool lang::FloatConstant::equals(const lang::Constant* other) const
 
     return this->float_ == other_float->float_;
 }
+

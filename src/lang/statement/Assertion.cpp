@@ -1,12 +1,13 @@
 #include "Assertion.h"
 
-#include "lang/construct/Function.h"
-#include "lang/expression/Expression.h"
 #include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
-#include "validation/ValidationLogger.h"
-#include "lang/type/Type.h"
+#include "lang/ApplicationVisitor.h"
+#include "lang/construct/Function.h"
+#include "lang/expression/Expression.h"
 #include "lang/type/BooleanType.h"
+#include "lang/type/Type.h"
+#include "validation/ValidationLogger.h"
 
 Assertion::Assertion(std::unique_ptr<Expression> condition, lang::Location location)
     : Statement(location)
@@ -41,3 +42,4 @@ void Assertion::doBuild(CompileContext& context)
 {
     context.runtime()->buildAssert(condition_->getValue(), context);
 }
+

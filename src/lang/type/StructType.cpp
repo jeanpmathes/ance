@@ -147,7 +147,7 @@ llvm::DIType* lang::StructType::createDebugType(CompileContext& context)
     llvm::Type*             array_type = getContentType(*context.llvmContext());
 
     uint64_t size      = dl.getTypeSizeInBits(array_type);
-    uint32_t alignment = dl.getABITypeAlignment(array_type);
+    auto     alignment = static_cast<uint32_t>(dl.getABITypeAlignment(array_type));
 
     std::vector<llvm::Metadata*> member_types;
     for (auto& member : members_) { member_types.push_back(member->type()->getDebugType(context)); }
@@ -157,7 +157,7 @@ llvm::DIType* lang::StructType::createDebugType(CompileContext& context)
     return context.di()->createStructType(scope()->getDebugScope(context),
                                           name().text(),
                                           context.sourceFile(),
-                                          getDefinitionLocation().line(),
+                                          static_cast<unsigned>(getDefinitionLocation().line()),
                                           size,
                                           alignment,
                                           llvm::DINode::FlagZero,
@@ -236,11 +236,9 @@ std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr
 
 void lang::StructType::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context)
 {
-    auto size = static_cast<int32_t>(members_.size());
-
-    for (int32_t index = 0; index < size; index++)
+    for (size_t index = 0; index < members_.size(); index++)
     {
-        llvm::Value* member_ptr = buildGetElementPointer(ptr, index, context);
+        llvm::Value* member_ptr = buildGetElementPointer(ptr, static_cast<int32_t>(index), context);
         members_[index]->buildInitialization(member_ptr, context);
     }
 }
@@ -249,23 +247,19 @@ void lang::StructType::buildSingleCopyInitializerDefinition(llvm::Value*    dts_
                                                             llvm::Value*    src_ptr,
                                                             CompileContext& context)
 {
-    auto size = static_cast<int32_t>(members_.size());
-
-    for (int32_t index = 0; index < size; index++)
+    for (size_t index = 0; index < members_.size(); index++)
     {
-        llvm::Value* dst_member_ptr = buildGetElementPointer(dts_ptr, index, context);
-        llvm::Value* src_member_ptr = buildGetElementPointer(src_ptr, index, context);
+        llvm::Value* dst_member_ptr = buildGetElementPointer(dts_ptr, static_cast<int32_t>(index), context);
+        llvm::Value* src_member_ptr = buildGetElementPointer(src_ptr, static_cast<int32_t>(index), context);
         members_[index]->type()->buildCopyInitializer(dst_member_ptr, src_member_ptr, context);
     }
 }
 
 void lang::StructType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context)
 {
-    auto size = static_cast<int32_t>(members_.size());
-
-    for (int32_t index = 0; index < size; index++)
+    for (size_t index = 0; index < members_.size(); index++)
     {
-        llvm::Value* member_ptr = buildGetElementPointer(ptr, index, context);
+        llvm::Value* member_ptr = buildGetElementPointer(ptr, static_cast<int32_t>(index), context);
         members_[index]->type()->buildFinalizer(member_ptr, context);
     }
 }
@@ -276,6 +270,7 @@ llvm::Value* lang::StructType::buildGetElementPointer(llvm::Value*    struct_ptr
 {
     return context.ir()->CreateStructGEP(getContentType(*context.llvmContext()),
                                          struct_ptr,
-                                         member_index,
+                                         static_cast<unsigned>(member_index),
                                          struct_ptr->getName() + ".gep");
 }
+

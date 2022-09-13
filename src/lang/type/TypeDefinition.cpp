@@ -4,6 +4,7 @@
 #include <stack>
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/Parameter.h"
 #include "lang/construct/PredefinedFunction.h"
@@ -545,8 +546,8 @@ void lang::TypeDefinition::defineDefaultInitializer(CompileContext& context)
         default_initializer_,
         ptr,
         count,
-        [&](llvm::Value* element_ptr, CompileContext& context) {
-            buildSingleDefaultInitializerDefinition(element_ptr, context);
+        [&](llvm::Value* element_ptr, CompileContext& c_context) {
+            buildSingleDefaultInitializerDefinition(element_ptr, c_context);
         },
         context);
 }
@@ -573,8 +574,8 @@ void lang::TypeDefinition::defineDefaultFinalizer(CompileContext& context)
         default_finalizer_,
         ptr,
         count,
-        [&](llvm::Value* element_ptr, CompileContext& context) {
-            buildSingleDefaultFinalizerDefinition(element_ptr, context);
+        [&](llvm::Value* element_ptr, CompileContext& c_context) {
+            buildSingleDefaultFinalizerDefinition(element_ptr, c_context);
         },
         context);
 }
@@ -757,3 +758,4 @@ void lang::TypeDefinition::buildPointerIteration(llvm::Function*                
         context.ir()->CreateRetVoid();
     }
 }
+

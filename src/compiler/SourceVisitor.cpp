@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 #include "compiler/Application.h"
+#include "lang/ApplicationVisitor.h"
 
 #include "lang/type/ArrayType.h"
 #include "lang/type/BooleanType.h"
@@ -964,11 +965,11 @@ std::any SourceVisitor::visitNotEqual(anceParser::NotEqualContext*)
 
 lang::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)
 {
-    unsigned start_line   = ctx->getStart()->getLine();
-    unsigned start_column = ctx->getStart()->getCharPositionInLine() + 1;
+    size_t start_line   = ctx->getStart()->getLine();
+    size_t start_column = ctx->getStart()->getCharPositionInLine() + 1;
 
-    unsigned end_line   = ctx->getStop()->getLine();
-    unsigned end_column = ctx->getStop()->getCharPositionInLine() + ctx->getStop()->getText().size();
+    size_t end_line   = ctx->getStop()->getLine();
+    size_t end_column = ctx->getStop()->getCharPositionInLine() + ctx->getStop()->getText().size();
 
     return {start_line, start_column, end_line, end_column};
 }
@@ -977,12 +978,12 @@ lang::Identifier SourceVisitor::ident(antlr4::tree::TerminalNode* i)
 {
     std::string text = i->getText();
 
-    auto     token        = i->getSymbol();
-    unsigned start_line   = token->getLine();
-    unsigned start_column = token->getCharPositionInLine() + 1;
+    auto   token        = i->getSymbol();
+    size_t start_line   = token->getLine();
+    size_t start_column = token->getCharPositionInLine() + 1;
 
-    unsigned end_line   = start_line;
-    unsigned end_column = start_column + text.size() - 1;
+    size_t end_line   = start_line;
+    size_t end_column = start_column + text.size() - 1;
 
     return createIdentifier(text, {start_line, start_column, end_line, end_column});
 }
@@ -1010,7 +1011,7 @@ uint64_t SourceVisitor::parseInRange(const std::string& str, uint64_t max)
     {
         value = std::stoull(str);
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
         value = max + 1;
     }

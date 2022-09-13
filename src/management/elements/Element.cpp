@@ -26,3 +26,4 @@ std::optional<bool> data::Element::asBool() const
 }
 
 data::Element::~Element() {}
+

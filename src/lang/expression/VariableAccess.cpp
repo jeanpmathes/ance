@@ -2,8 +2,9 @@
 
 #include <utility>
 
-#include "lang/scope/Scope.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/LocalScope.h"
+#include "lang/scope/Scope.h"
 #include "validation/ValidationLogger.h"
 
 VariableAccess::VariableAccess(lang::ResolvingHandle<lang::Variable> variable, lang::Location location)

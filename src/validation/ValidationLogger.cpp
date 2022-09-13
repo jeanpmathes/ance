@@ -41,11 +41,11 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
 
     for (auto& entry : entries_)
     {
-        unsigned int start = 0;
+        size_t start = 0;
 
         std::cout << "ance-c: ";
 
-        switch (entry.level)
+        switch (entry.level_)
         {
             case LogLevel::ERROR:
                 std::cout << ansi::ColorRed << "error" << ansi::ColorReset << ": ";
@@ -53,21 +53,19 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
             case LogLevel::WARNING:
                 std::cout << ansi::ColorYellow << "warning" << ansi::ColorReset << ": ";
                 break;
-            default:
-                assert(false && "Add a case for every log level.");
         }
 
-        std::cout << entry.location << " " << entry.message << std::endl;
+        std::cout << entry.location_ << " " << entry.message_ << std::endl;
         std::cout << std::endl;
 
-        if (entry.location.isGlobal()) continue;
+        if (entry.location_.isGlobal()) continue;
 
-        std::cout << '\t' << trim(source_file.getLine(entry.location.line()), start) << std::endl;
+        std::cout << '\t' << trim(source_file.getLine(entry.location_.line()), start) << std::endl;
 
-        if (entry.location.isSingleLine())
+        if (entry.location_.isSingleLine())
         {
-            unsigned int marker_start  = entry.location.column() - start;
-            unsigned int marker_length = entry.location.columnEnd() - entry.location.column() + 1;
+            size_t marker_start  = entry.location_.column() - start;
+            size_t marker_length = entry.location_.columnEnd() - entry.location_.column() + 1;
 
             std::cout << '\t' << std::string(marker_start - 1, ' ') << std::string(marker_length, '~') << std::endl;
             std::cout << std::endl;
@@ -76,3 +74,4 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
 
     entries_.clear();
 }
+

@@ -471,3 +471,4 @@ void CodePrinter::emitWhitespace()
 {
     if (consume_whitespace_ != CONSUME_WS_ACTIVE) { out_ << " "; }
 }
+

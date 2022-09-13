@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 #include "lang/statement/Statement.h"
 
@@ -34,3 +35,4 @@ std::shared_ptr<lang::Constant> ConstantLiteral::getConstantValue() const
 {
     return constant_;
 }
+

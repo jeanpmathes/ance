@@ -8,3 +8,4 @@ std::optional<std::reference_wrapper<const std::string>> data::StringElement::as
 {
     return string_;
 }
+

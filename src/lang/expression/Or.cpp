@@ -3,6 +3,7 @@
 #include "lang/scope/Scope.h"
 #include "lang/type/BooleanType.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/expression/UnaryOperation.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/statement/Assignment.h"
@@ -83,3 +84,4 @@ Expression::Expansion Or::expandWith(Expressions subexpressions) const
 }
 
 Or::~Or() = default;
+

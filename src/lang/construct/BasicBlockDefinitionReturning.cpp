@@ -3,9 +3,10 @@
 #include "BasicBlock.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
-#include "lang/type/Type.h"
 #include "lang/expression/Expression.h"
+#include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
 lang::BasicBlock::Definition::Returning::Returning(lang::LocalScope* scope,
@@ -124,3 +125,4 @@ std::string lang::BasicBlock::Definition::Returning::getExitRepresentation()
 {
     return "// return";
 }
+

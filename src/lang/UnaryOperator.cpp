@@ -13,9 +13,6 @@ std::string lang::UnaryOperator::toString() const
     {
         case NOT:
             return "not";
-
-        default:
-            assert(false);
-            return "";
     }
 }
+

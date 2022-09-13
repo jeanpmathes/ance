@@ -4,10 +4,7 @@
 
 #include <llvm/IR/DIBuilder.h>
 
-lang::Location::Location(unsigned int start_line,
-                         unsigned int start_column,
-                         unsigned int end_line,
-                         unsigned int end_column)
+lang::Location::Location(size_t start_line, size_t start_column, size_t end_line, size_t end_column)
     : start_line_(start_line)
     , start_column_(start_column)
     , end_line_(end_line)
@@ -19,17 +16,17 @@ lang::Location lang::Location::global()
     return {0, 0, 0, 0};
 }
 
-unsigned lang::Location::line() const
+size_t lang::Location::line() const
 {
     return start_line_;
 }
 
-unsigned lang::Location::column() const
+size_t lang::Location::column() const
 {
     return start_column_;
 }
 
-unsigned lang::Location::columnEnd() const
+size_t lang::Location::columnEnd() const
 {
     return end_column_;
 }
@@ -46,7 +43,7 @@ bool lang::Location::isSingleLine() const
 
 llvm::DebugLoc lang::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope) const
 {
-    return llvm::DILocation::get(*llvm_context, line(), column(), scope);
+    return llvm::DILocation::get(*llvm_context, static_cast<unsigned>(line()), static_cast<unsigned>(column()), scope);
 }
 
 void lang::Location::extend(lang::Location location)
@@ -72,3 +69,4 @@ std::ostream& lang::operator<<(std::ostream& os, const lang::Location& location)
 
     return os;
 }
+

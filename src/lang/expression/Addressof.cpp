@@ -1,5 +1,6 @@
 #include "Addressof.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/PointerType.h"
 #include "lang/utility/Values.h"
@@ -59,3 +60,4 @@ void Addressof::doBuild(CompileContext& context)
 }
 
 Addressof::~Addressof() = default;
+

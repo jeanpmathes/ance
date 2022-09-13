@@ -1,8 +1,9 @@
 #include "Subscript.h"
 
+#include "lang/ApplicationVisitor.h"
+#include "lang/statement/Statement.h"
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
-#include "lang/statement/Statement.h"
 
 Subscript::Subscript(std::unique_ptr<Expression> indexed, std::unique_ptr<Expression> index, lang::Location location)
     : Expression(location)
@@ -73,3 +74,4 @@ void Subscript::doBuild(CompileContext& context)
 }
 
 Subscript::~Subscript() = default;
+

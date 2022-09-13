@@ -1,6 +1,7 @@
 #include "PredefinedFunction.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 
 lang::PredefinedFunction::PredefinedFunction(lang::Function&                               function,
                                              lang::Scope&                                  containing_scope,
@@ -77,3 +78,4 @@ bool lang::PredefinedFunction::doCallValidation(
     if (call_validator_) { return call_validator_(arguments, location, validation_logger); }
     return true;
 }
+

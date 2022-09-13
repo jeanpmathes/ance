@@ -9,3 +9,4 @@ lang::VectorizableType* lang::VectorizableType::isVectorizable()
 {
     return this;
 }
+

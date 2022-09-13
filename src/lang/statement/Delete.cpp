@@ -1,10 +1,11 @@
 #include "Delete.h"
 
+#include "compiler/CompileContext.h"
+#include "compiler/Runtime.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
 #include "lang/scope/LocalScope.h"
-#include "compiler/CompileContext.h"
-#include "compiler/Runtime.h"
 #include "validation/ValidationLogger.h"
 
 Delete::Delete(std::unique_ptr<Expression> to_delete, bool delete_buffer, lang::Location location)
@@ -58,3 +59,4 @@ void Delete::doBuild(CompileContext& context)
 {
     context.runtime()->deleteDynamic(to_delete_->getValue(), delete_buffer_, context);
 }
+

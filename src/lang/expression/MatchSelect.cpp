@@ -1,5 +1,6 @@
 #include "MatchSelect.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/scope/Scope.h"
 #include "lang/statement/LocalVariableDefinition.h"
@@ -87,3 +88,4 @@ Expression::Expansion MatchSelect::expandWith(Expressions subexpressions) const
 }
 
 MatchSelect::~MatchSelect() = default;
+

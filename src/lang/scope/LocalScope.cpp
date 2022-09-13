@@ -1,7 +1,8 @@
 #include "LocalScope.h"
 
-#include "lang/scope/GlobalScope.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/Assigner.h"
+#include "lang/scope/GlobalScope.h"
 
 lang::LocalScope::LocalScope(lang::Scope* parent) : parent_(parent) {}
 
@@ -269,3 +270,4 @@ void lang::LocalScope::buildReturnFinalization(CompileContext& context)
 
     current->buildFinalization(context);
 }
+

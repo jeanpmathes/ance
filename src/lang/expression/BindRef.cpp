@@ -1,10 +1,11 @@
 #include "BindRef.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/expression/Addressof.h"
+#include "lang/expression/BindRefTo.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
-#include "lang/expression/BindRefTo.h"
 
 BindRef::BindRef(std::unique_ptr<Expression> value, lang::Location location)
     : UnexpandedExpression(location)
@@ -52,3 +53,4 @@ Expression::Expansion BindRef::expandWith(Expressions subexpressions) const
 }
 
 BindRef::~BindRef() = default;
+

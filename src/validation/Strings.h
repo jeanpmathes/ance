@@ -9,6 +9,7 @@
  * @param start The index of the new string start in the old string is assigned to this.
  * @return The trimmed string view.
  */
-std::string_view trim(std::string_view str, unsigned int& start);
+std::string_view trim(std::string_view str, size_t& start);
 
 #endif
+

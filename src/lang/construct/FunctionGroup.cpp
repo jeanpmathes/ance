@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "lang/ApplicationVisitor.h"
 #include "validation/ValidationLogger.h"
 
 lang::FunctionGroup::FunctionGroup(Identifier name) : name_(name) {}
@@ -105,3 +106,4 @@ void lang::FunctionGroup::onAddFunction(lang::Function& function)
 {
     addChild(function);
 }
+

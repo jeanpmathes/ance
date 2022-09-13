@@ -1,6 +1,7 @@
 #include "BasicBlock.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 
 lang::BasicBlock::Definition::Simple::Simple() = default;
@@ -126,3 +127,4 @@ std::string lang::BasicBlock::Definition::Simple::getExitRepresentation()
 {
     return "// ---";
 }
+

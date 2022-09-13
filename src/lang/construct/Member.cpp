@@ -113,3 +113,4 @@ llvm::Constant* lang::Member::getInitialValue(llvm::Module& m) const
 
     return initial_value_;
 }
+

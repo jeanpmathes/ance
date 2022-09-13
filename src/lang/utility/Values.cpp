@@ -28,3 +28,4 @@ std::shared_ptr<lang::Value> lang::Values::clone(const std::shared_ptr<lang::Val
     llvm::Value* native = value->getNativeValue();
     return std::make_shared<lang::WrappedNativeValue>(value->type(), native);
 }
+

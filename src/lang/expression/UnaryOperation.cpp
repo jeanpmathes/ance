@@ -1,7 +1,8 @@
 #include "UnaryOperation.h"
 
-#include "validation/ValidationLogger.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/statement/Statement.h"
+#include "validation/ValidationLogger.h"
 
 UnaryOperation::UnaryOperation(lang::UnaryOperator op, std::unique_ptr<Expression> operand, lang::Location location)
     : Expression(location)
@@ -62,3 +63,4 @@ void UnaryOperation::doBuild(CompileContext& context)
 }
 
 UnaryOperation::~UnaryOperation() = default;
+

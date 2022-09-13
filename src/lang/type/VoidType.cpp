@@ -1,6 +1,7 @@
 #include "VoidType.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/type/Type.h"
 
@@ -64,3 +65,4 @@ lang::ResolvingHandle<lang::Type> lang::VoidType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new VoidType()));
     return instance;
 }
+

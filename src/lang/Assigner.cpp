@@ -34,3 +34,4 @@ std::string lang::Assigner::getSymbol() const
             return "";
     }
 }
+

@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/BufferType.h"
@@ -106,9 +107,6 @@ std::shared_ptr<lang::Value> Runtime::allocate(Allocator                        
         case DYNAMIC:
             ptr_to_allocated = allocateDynamic(type, count_value, context);
             break;
-
-        default:
-            throw std::invalid_argument("Unsupported allocation type.");
     }
 
     lang::ResolvingHandle<lang::Type> ptr_type   = count ? lang::BufferType::get(type) : lang::PointerType::get(type);
@@ -139,11 +137,12 @@ void Runtime::deleteDynamic(const std::shared_ptr<lang::Value>& value, bool dele
     {
         llvm::Value* content_ptr = context.ir()->CreateBitCast(ptr, size_ptr_content_type, ptr->getName() + ".bitcast");
 
-        llvm::Value* header_ptr = context.ir()->CreateGEP(
-            size_content_type,
-            content_ptr,
-            llvm::ConstantInt::get(llvm::IntegerType::getInt64Ty(*context.llvmContext()), -1, true),
-            content_ptr->getName() + ".gep");
+        llvm::Value* header_ptr = context.ir()->CreateGEP(size_content_type,
+                                    content_ptr,
+                                    llvm::ConstantInt::get(llvm::IntegerType::getInt64Ty(*context.llvmContext()),
+                                                           static_cast<uint64_t>(-1),
+                                                           true),
+                                    content_ptr->getName() + ".gep");
 
         llvm::Value* count = context.ir()->CreateLoad(size_content_type, header_ptr, header_ptr->getName() + ".load");
 
@@ -247,3 +246,4 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
 
     return result_ptr;
 }
+

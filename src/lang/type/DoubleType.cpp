@@ -1,5 +1,6 @@
 #include "DoubleType.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
 
 lang::DoubleType::DoubleType() : TypeDefinition(lang::Identifier::from("double")) {}
@@ -25,3 +26,4 @@ lang::ResolvingHandle<lang::Type> lang::DoubleType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new DoubleType()));
     return instance;
 }
+

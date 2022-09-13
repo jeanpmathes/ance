@@ -1,9 +1,10 @@
 #include "If.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
-#include "validation/ValidationLogger.h"
 #include "lang/type/BooleanType.h"
+#include "validation/ValidationLogger.h"
 
 If::If(std::unique_ptr<Expression> condition,
        std::unique_ptr<Statement>  if_block,
@@ -78,3 +79,4 @@ void If::doBuild(CompileContext&)
 {
     // Handled by basic block.
 }
+

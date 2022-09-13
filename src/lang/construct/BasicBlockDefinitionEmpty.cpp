@@ -103,3 +103,4 @@ std::string lang::BasicBlock::Definition::Empty::getExitRepresentation()
 {
     return "// entry ";
 }
+

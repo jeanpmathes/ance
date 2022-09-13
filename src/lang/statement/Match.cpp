@@ -1,11 +1,12 @@
 #include "Match.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/CodeBlock.h"
 #include "lang/construct/constant/Constant.h"
-#include "validation/ValidationLogger.h"
 #include "lang/expression/Expression.h"
-#include "lang/statement/Assignment.h"
 #include "lang/expression/VariableAccess.h"
+#include "lang/statement/Assignment.h"
+#include "validation/ValidationLogger.h"
 
 Case* Case::createDefault(std::unique_ptr<Statement> code)
 {

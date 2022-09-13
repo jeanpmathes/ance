@@ -3,13 +3,14 @@
 #include <set>
 #include <utility>
 
+#include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/Scope.h"
+#include "lang/statement/Statement.h"
 #include "lang/type/VoidType.h"
 #include "lang/utility/Values.h"
-#include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
-#include "lang/statement/Statement.h"
 
 lang::ExternFunction::ExternFunction(Function&                                     function,
                                      Scope&                                        containing_scope,
@@ -119,3 +120,4 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::ExternFunction::getNativeR
 {
     return std::make_pair(native_type_, native_function_);
 }
+

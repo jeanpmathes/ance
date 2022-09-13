@@ -11,12 +11,13 @@
 #include "compiler/AnceCompiler.h"
 #include "compiler/AnceLinker.h"
 #include "compiler/Application.h"
+#include "compiler/Project.h"
 #include "compiler/SourceVisitor.h"
+#include "lang/ApplicationVisitor.h"
 #include "management/File.h"
 #include "validation/AnceSyntaxErrorHandler.h"
 #include "validation/SourceFile.h"
 #include "validation/ValidationLogger.h"
-#include "compiler/Project.h"
 
 int main(int argc, char** argv)
 {

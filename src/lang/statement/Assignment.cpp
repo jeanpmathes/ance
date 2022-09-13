@@ -1,10 +1,10 @@
 #include "Assignment.h"
 
+#include "lang/ApplicationVisitor.h"
+#include "lang/Assigner.h"
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
-#include "lang/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
-#include "lang/Assigner.h"
 
 Assignment::Assignment(std::unique_ptr<Expression> assignable,
                        lang::Assigner              assigner,
@@ -66,3 +66,4 @@ void Assignment::doBuild(CompileContext& context)
 {
     assignable_->assign(assigned_->getValue(), context);
 }
+

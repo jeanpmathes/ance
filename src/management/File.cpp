@@ -37,3 +37,4 @@ const data::Element& data::File::root()
     assert(element_.get() && "Element has to be read before accessing it.");
     return *element_;
 }
+

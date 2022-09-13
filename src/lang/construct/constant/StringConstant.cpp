@@ -89,3 +89,4 @@ lang::ResolvingHandle<lang::Type> lang::StringConstant::resolveType(std::string&
 
     return lang::ArrayType::get(lang::IntegerType::get(8, false), string.size());
 }
+

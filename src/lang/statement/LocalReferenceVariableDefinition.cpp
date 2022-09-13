@@ -3,12 +3,13 @@
 #include <memory>
 #include <utility>
 
+#include "lang/ApplicationVisitor.h"
+#include "lang/Assigner.h"
 #include "lang/construct/Function.h"
 #include "lang/expression/Addressof.h"
 #include "lang/expression/BindRef.h"
 #include "lang/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
-#include "lang/Assigner.h"
 
 LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(lang::Identifier                  name,
                                                                    lang::ResolvingHandle<lang::Type> type,
@@ -115,3 +116,4 @@ void LocalReferenceVariableDefinition::doBuild(CompileContext& context)
 {
     (*variable_)->buildDefinition(context);
 }
+

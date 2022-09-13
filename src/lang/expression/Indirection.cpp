@@ -1,5 +1,6 @@
 #include "Indirection.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/statement/Statement.h"
 #include "lang/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
@@ -52,3 +53,4 @@ void Indirection::doBuild(CompileContext& context)
 }
 
 Indirection::~Indirection() = default;
+

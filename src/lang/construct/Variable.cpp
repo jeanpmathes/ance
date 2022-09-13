@@ -3,14 +3,15 @@
 #include <utility>
 #include <iostream>
 
+#include "compiler/CompileContext.h"
+#include "lang/AccessModifier.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/GlobalVariable.h"
 #include "lang/construct/LocalVariable.h"
 #include "lang/construct/Parameter.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
-#include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
-#include "lang/AccessModifier.h"
 
 lang::Variable::Variable(lang::Identifier name) : name_(std::move(name)) {}
 

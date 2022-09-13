@@ -1,5 +1,6 @@
 #include "Project.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "management/File.h"
 #include "management/elements/Element.h"
 
@@ -48,3 +49,4 @@ Application& Project::getApplication()
 {
     return application_;
 }
+

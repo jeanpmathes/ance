@@ -42,6 +42,8 @@ namespace lang
          * @param context The compile context.
          */
         virtual void buildNativeDefinitions(CompileContext& context) = 0;
+
+        virtual ~TypeDefinitionRegistry() = default;
     };
 
     /**
@@ -75,3 +77,4 @@ namespace lang
 #include "TypeRegistry.tpp"
 
 #endif
+

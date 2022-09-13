@@ -213,3 +213,4 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main,
 
     ir_.CreateRetVoid();
 }
+

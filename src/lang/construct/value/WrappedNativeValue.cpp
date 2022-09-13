@@ -21,3 +21,4 @@ llvm::Value* lang::WrappedNativeValue::getNativeValue()
 {
     return value_;
 }
+

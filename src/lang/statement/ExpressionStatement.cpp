@@ -1,8 +1,8 @@
 #include "ExpressionStatement.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/expression/BuildableExpression.h"
-#include "lang/scope/LocalScope.h"
 
 ExpressionStatement::ExpressionStatement(std::unique_ptr<BuildableExpression> expression, lang::Location location)
     : Statement(location)
@@ -37,3 +37,4 @@ void ExpressionStatement::doBuild(CompileContext& context)
 {
     expression_->build(context);
 }
+

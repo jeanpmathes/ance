@@ -2,9 +2,10 @@
 
 #include <utility>
 
+#include "compiler/Application.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
-#include "compiler/Application.h"
 #include "validation/ValidationLogger.h"
 
 lang::SizeConstant::SizeConstant(std::string value) : type_(lang::SizeType::getSize()), value_(std::move(value)) {}
@@ -48,3 +49,4 @@ bool lang::SizeConstant::equals(const lang::Constant* other) const
 
     return this_value == other_value;
 }
+

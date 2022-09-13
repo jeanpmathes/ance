@@ -2,6 +2,7 @@
 
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
@@ -46,7 +47,8 @@ llvm::Type* lang::VectorType::getContentType(llvm::LLVMContext& c) const
 
     if (element_type_->isVectorizable())
     {
-        content_type = llvm::FixedVectorType::get(element_type_->getContentType(c), size_.value());
+        content_type =
+            llvm::FixedVectorType::get(element_type_->getContentType(c), static_cast<unsigned>(size_.value()));
     }
     else { content_type = llvm::ArrayType::get(element_type_->getContentType(c), size_.value()); }
 
@@ -315,11 +317,11 @@ llvm::DIType* lang::VectorType::createDebugType(CompileContext& context)
     llvm::Type*             vector_type = getContentType(*context.llvmContext());
 
     uint64_t      size            = dl.getTypeSizeInBits(vector_type);
-    uint32_t      alignment       = dl.getABITypeAlignment(vector_type);
+    auto          alignment       = static_cast<uint32_t>(dl.getABITypeAlignment(vector_type));
     llvm::DIType* element_di_type = element_type_->getDebugType(context);
 
     llvm::SmallVector<llvm::Metadata*, 1> subscripts;
-    subscripts.push_back(context.di()->getOrCreateSubrange(0, (int64_t) size_.value()));
+    subscripts.push_back(context.di()->getOrCreateSubrange(0, static_cast<int64_t>(size_.value())));
 
     return context.di()->createVectorType(size, alignment, element_di_type, context.di()->getOrCreateArray(subscripts));
 }
@@ -371,3 +373,4 @@ std::shared_ptr<lang::Value> lang::VectorType::createValue(std::vector<std::shar
 
     return std::make_shared<lang::WrappedNativeValue>(self(), vector_ptr);
 }
+

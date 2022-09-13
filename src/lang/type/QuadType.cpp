@@ -1,5 +1,6 @@
 #include "QuadType.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
 
 lang::QuadType::QuadType() : TypeDefinition(lang::Identifier::from("quad")) {}
@@ -25,3 +26,4 @@ lang::ResolvingHandle<lang::Type> lang::QuadType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new QuadType()));
     return instance;
 }
+

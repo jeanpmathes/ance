@@ -18,3 +18,4 @@ void data::DictionaryElement::put(const std::string& key, std::unique_ptr<data::
 {
     dict_.insert({key, std::move(element)});
 }
+

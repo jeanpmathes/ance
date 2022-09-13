@@ -55,3 +55,4 @@ std::string operator+(const char* str, const lang::Identifier& identifier);
 std::string operator+(const lang::Identifier& identifier, const char* str);
 
 #endif
+

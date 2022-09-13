@@ -11,3 +11,4 @@ UnexpandedExpression::UnexpandedExpression(lang::Location location)
     : Expression(location)
     , value_(std::make_shared<lang::NoValue>(*this))
 {}
+

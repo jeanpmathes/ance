@@ -297,7 +297,7 @@ llvm::DIType* lang::TypeAlias::createDebugType(CompileContext& context)
     return context.di()->createTypedef(actual_->getDebugType(context),
                                        name().text(),
                                        context.sourceFile(),
-                                       getDefinitionLocation().line(),
+                                       static_cast<unsigned>(getDefinitionLocation().line()),
                                        scope()->getDebugScope(context));
 }
 
@@ -308,3 +308,4 @@ std::vector<lang::TypeDefinition*> lang::TypeAlias::getDependencies() const
 
     return dependencies;
 }
+

@@ -2,10 +2,11 @@
 
 #include <utility>
 
+#include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Parameter.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/LocalScope.h"
-#include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
 lang::LocalVariable::LocalVariable(Identifier                        name,
@@ -42,7 +43,7 @@ void lang::LocalVariable::buildDefinition(CompileContext& context)
         local_debug_variable_ = context.di()->createAutoVariable(scope()->getDebugScope(context),
                                                                  name().text(),
                                                                  context.sourceFile(),
-                                                                 location().line(),
+                                                                 static_cast<unsigned>(location().line()),
                                                                  type()->getDebugType(context),
                                                                  true);
     }
@@ -52,7 +53,7 @@ void lang::LocalVariable::buildDefinition(CompileContext& context)
                                                                       name().text(),
                                                                       parameter_no_,
                                                                       context.sourceFile(),
-                                                                      location().line(),
+                                                                      static_cast<unsigned>(location().line()),
                                                                       type()->getDebugType(context),
                                                                       true);
     }
@@ -108,3 +109,4 @@ void lang::LocalVariable::storeValue(std::shared_ptr<lang::Value> value, Compile
 
     type()->buildCopyInitializer(native_value_, value_ptr, context);
 }
+

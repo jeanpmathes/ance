@@ -18,7 +18,7 @@ namespace lang
          * @param end_line The line end of the location.
          * @param end_column The column end of the location.
          */
-        Location(unsigned int start_line, unsigned int start_column, unsigned int end_line, unsigned int end_column);
+        Location(size_t start_line, size_t start_column, size_t end_line, size_t end_column);
 
         /**
          * Create a global location. A global location is used for code that is not in a source file.
@@ -30,19 +30,19 @@ namespace lang
          * Get the line number.
          * @return The line number.
          */
-        [[nodiscard]] unsigned line() const;
+        [[nodiscard]] size_t line() const;
 
         /**
          * Get the column number.
          * @return The column number.
          */
-        [[nodiscard]] unsigned column() const;
+        [[nodiscard]] size_t column() const;
 
         /**
          * Get the last column of this location.
          * @return The last column number. Can be equal to column for single character locations.
          */
-        [[nodiscard]] unsigned columnEnd() const;
+        [[nodiscard]] size_t columnEnd() const;
 
         /**
          * Get whether this location is global, meaning not an actual source location.
@@ -73,11 +73,12 @@ namespace lang
         friend std::ostream& operator<<(std::ostream& os, const lang::Location& location);
 
       private:
-        unsigned                  start_line_;
-        unsigned                  start_column_;
-        [[maybe_unused]] unsigned end_line_;
-        [[maybe_unused]] unsigned end_column_;
+        size_t                  start_line_;
+        size_t                  start_column_;
+        [[maybe_unused]] size_t end_line_;
+        [[maybe_unused]] size_t end_column_;
     };
 }
 
 #endif
+

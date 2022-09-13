@@ -20,3 +20,4 @@ std::string_view lang::StringStorage::store(const std::string& string)
 
     return view;
 }
+

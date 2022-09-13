@@ -146,3 +146,4 @@ std::string lang::BasicBlock::Definition::Branching::getExitRepresentation()
 {
     return "// branch";
 }
+

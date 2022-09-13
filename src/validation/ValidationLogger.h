@@ -27,14 +27,14 @@ class ValidationLogger
     };
 
     struct LogEntry {
-        LogLevel       level;
-        std::string    message;
-        lang::Location location;
+        LogLevel       level_;
+        std::string    message_;
+        lang::Location location_;
 
         LogEntry(LogLevel level, std::string message, lang::Location location)
-            : level(level)
-            , message(std::move(message))
-            , location(location)
+            : level_(level)
+            , message_(std::move(message))
+            , location_(location)
         {}
     };
 
@@ -82,3 +82,4 @@ class ValidationLogger
 };
 
 #endif
+

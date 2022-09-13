@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/scope/Scope.h"
 #include "validation/ValidationLogger.h"

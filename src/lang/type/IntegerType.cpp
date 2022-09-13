@@ -2,12 +2,12 @@
 
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/BooleanType.h"
 #include "lang/type/SizeType.h"
-#include "lang/type/VoidType.h"
 #include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
@@ -45,7 +45,7 @@ llvm::Constant* lang::IntegerType::getDefaultContent(llvm::Module& m)
 
 llvm::Type* lang::IntegerType::getContentType(llvm::LLVMContext& c) const
 {
-    return llvm::Type::getIntNTy(c, bit_size_);
+    return llvm::Type::getIntNTy(c, static_cast<unsigned>(bit_size_));
 }
 
 bool lang::IntegerType::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -375,3 +375,4 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::get(uint64_t bit_size, bool
         return type;
     }
 }
+

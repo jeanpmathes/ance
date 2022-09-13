@@ -26,3 +26,4 @@ enum class SpecialCount
 using StateCount = std::variant<SpecialCount, size_t>;
 
 #endif
+

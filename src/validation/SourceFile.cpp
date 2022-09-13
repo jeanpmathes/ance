@@ -12,12 +12,12 @@ SourceFile::SourceFile(const std::filesystem::path& path)
     file.close();
 }
 
-std::string_view SourceFile::getLine(unsigned int line) const
+std::string_view SourceFile::getLine(size_t line) const
 {
     return std::string_view(lines_[line - 1]);
 }
 
-std::string_view SourceFile::getLineSlice(unsigned int line, unsigned int column_start, unsigned int column_end) const
+std::string_view SourceFile::getLineSlice(size_t line, unsigned int column_start, unsigned int column_end) const
 {
     column_start--;
     column_end--;

@@ -93,3 +93,4 @@ bool lang::Signature::areSame(const lang::Signature& a, const lang::Signature& b
     if (a.function_name_.text() != b.function_name_.text()) return false;
     return a.isSame(b.types_);
 }
+

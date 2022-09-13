@@ -46,3 +46,4 @@ std::string operator+(const lang::Identifier& identifier, const char* str)
 {
     return std::string(identifier.text()) + str;
 }
+

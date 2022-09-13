@@ -64,12 +64,12 @@ namespace lang
 
         /**
          * Create a basic block that loops as long as the condition is true.
-         * @param condition The expression providing the condition.
+         * @param new_block The expression providing the condition.
          * @param code_block The block to execute as long as the condition is true.
          * @param function The function containing the basic block.
          * @return The created basic blocks.
          */
-        static std::vector<std::unique_ptr<BasicBlock>> createLooping(Expression* condition,
+        static std::vector<std::unique_ptr<BasicBlock>> createLooping(Expression* new_block,
                                                                       Statement*  code_block,
                                                                       Function&   function);
 
@@ -484,3 +484,4 @@ namespace lang
 }
 
 #endif
+

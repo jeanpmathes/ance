@@ -88,14 +88,14 @@ void AnceSyntaxErrorHandler::emitMessages(const SourceFile& source_file)
         auto& [line, char_position] = location;
         size_t column               = char_position + 1;
 
-        unsigned int start;
+        size_t start;
 
         std::cout << "ance-c: " << ansi::ColorRed << "syntax" << ansi::ColorReset << ": (" << line << ", " << column
                   << ") " << message << std::endl;
         std::cout << std::endl;
         std::cout << '\t' << trim(source_file.getLine(line), start) << std::endl;
 
-        unsigned int marker_position = column - start - 1;
+        size_t marker_position = column - start - 1;
 
         std::cout << '\t' << std::string(marker_position, ' ') << '^' << std::endl;
         std::cout << std::endl;
@@ -106,3 +106,4 @@ size_t AnceSyntaxErrorHandler::fatalSyntaxErrorCount() const
 {
     return fatal_error_count_;
 }
+

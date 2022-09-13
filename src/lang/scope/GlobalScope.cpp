@@ -4,12 +4,13 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/Assigner.h"
 #include "lang/expression/ConstantExpression.h"
 #include "lang/type/IntegerType.h"
+#include "lang/type/StructType.h"
 #include "lang/type/TypeAlias.h"
 #include "validation/ValidationLogger.h"
-#include "lang/type/StructType.h"
 
 lang::Scope* lang::GlobalScope::scope()
 {

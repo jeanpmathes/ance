@@ -2,11 +2,12 @@
 
 #include <utility>
 
+#include "lang/ApplicationVisitor.h"
+#include "lang/Assigner.h"
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
-#include "lang/Assigner.h"
 
 LocalVariableDefinition::LocalVariableDefinition(lang::Identifier                                 name,
                                                  std::optional<lang::ResolvingHandle<lang::Type>> type,
@@ -153,3 +154,4 @@ void LocalVariableDefinition::rerouteIfNeeded()
         if (assigned_type && assigned_type.value() != type_) { type_.reroute(assigned_type.value()); }
     }
 }
+

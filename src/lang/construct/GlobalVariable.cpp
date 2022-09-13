@@ -1,15 +1,15 @@
 #include "GlobalVariable.h"
 
+#include "compiler/CompileContext.h"
+#include "lang/AccessModifier.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Parameter.h"
 #include "lang/construct/constant/Constant.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/expression/ConstantExpression.h"
 #include "lang/scope/GlobalScope.h"
-#include "lang/type/ReferenceType.h"
 #include "lang/type/VoidType.h"
-#include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
-#include "lang/AccessModifier.h"
 
 namespace llvm
 {
@@ -135,7 +135,7 @@ void lang::GlobalVariable::buildDefinition(CompileContext& context)
                                                                     name().text(),
                                                                     name().text(),
                                                                     context.sourceFile(),
-                                                                    location().line(),
+                                                                    static_cast<unsigned>(location().line()),
                                                                     type()->getDebugType(context),
                                                                     true);
 
@@ -165,3 +165,4 @@ void lang::GlobalVariable::storeValue(std::shared_ptr<lang::Value> value, Compil
     llvm::Value* value_ptr = value->getNativeValue();
     type()->buildCopyInitializer(native_variable_, value_ptr, context);
 }
+

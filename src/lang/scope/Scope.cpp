@@ -1,5 +1,6 @@
 #include "Scope.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
 
@@ -29,3 +30,4 @@ void lang::Scope::addType(lang::ResolvingHandle<lang::Type> type)
 }
 
 void lang::Scope::onSubScope(lang::LocalScope*) {}
+

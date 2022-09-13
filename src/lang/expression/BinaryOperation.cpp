@@ -1,7 +1,8 @@
 #include "BinaryOperation.h"
 
-#include "validation/ValidationLogger.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/statement/Statement.h"
+#include "validation/ValidationLogger.h"
 
 BinaryOperation::BinaryOperation(std::unique_ptr<Expression> left,
                                  lang::BinaryOperator        op,
@@ -118,3 +119,4 @@ lang::ResolvingHandle<lang::Type> BinaryOperation::getRightType(lang::BinaryOper
 }
 
 BinaryOperation::~BinaryOperation() = default;
+

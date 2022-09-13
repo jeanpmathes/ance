@@ -1,6 +1,7 @@
 #include "BooleanType.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/Value.h"
@@ -97,9 +98,6 @@ std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperato
         case lang::UnaryOperator::NOT:
             result = context.ir()->CreateNot(content_value, content_value->getName() + ".not");
             break;
-
-        default:
-            throw std::logic_error("Unsupported unary operator.");
     }
 
     lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op);
@@ -149,3 +147,4 @@ void lang::BooleanType::buildRequestedOverload(const std::vector<lang::Resolving
         }
     }
 }
+

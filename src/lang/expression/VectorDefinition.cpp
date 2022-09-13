@@ -1,5 +1,6 @@
 #include "VectorDefinition.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/type/VectorType.h"
 #include "validation/ValidationLogger.h"
 
@@ -138,3 +139,4 @@ void VectorDefinition::doBuild(CompileContext& context)
 }
 
 VectorDefinition::~VectorDefinition() = default;
+

@@ -27,8 +27,9 @@ namespace lang
          * @param visitor The visitor to accept.
          * @return The return value.
          */
-        virtual std::any accept(Visitor<TList...>& visitor) { return visitor.visit(static_cast<Derived&>(*this)); }
+        std::any accept(Visitor<TList...>& visitor) override { return visitor.visit(static_cast<Derived&>(*this)); }
     };
 }
 
 #endif
+

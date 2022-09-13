@@ -2,8 +2,9 @@
 
 #include <utility>
 
-#include "lang/type/SizeType.h"
 #include "compiler/Application.h"
+#include "lang/ApplicationVisitor.h"
+#include "lang/type/SizeType.h"
 #include "validation/ValidationLogger.h"
 
 lang::DiffConstant::DiffConstant(std::string value) : type_(lang::SizeType::getDiff()), value_(std::move(value)) {}
@@ -47,3 +48,4 @@ bool lang::DiffConstant::equals(const lang::Constant* other) const
 
     return this_value == other_value;
 }
+

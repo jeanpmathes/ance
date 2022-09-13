@@ -165,3 +165,4 @@ bool lang::HandleTarget<SELF>::equalsTarget(SELF* other)
 {
     return this == other;
 }
+

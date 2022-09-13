@@ -2,9 +2,9 @@
 #define ANCE_SRC_LANG_VISITOR_H_
 
 #include <any>
+#include <cassert>
 #include <memory>
 #include <utility>
-#include <assert.h>
 
 #include "Constructs.h"
 
@@ -32,6 +32,8 @@ namespace lang
 
       public:
         virtual std::any visit(T& visitable) { return this->defaultVisit(&visitable); }
+
+        virtual ~Visitor() = default;
     };
 
     template<typename T, typename... TList>
@@ -130,10 +132,10 @@ namespace lang
             return result;
         }
 
-        virtual ~VisitorBase() = default;
+        ~VisitorBase() override = default;
 
       protected:
-        virtual std::any defaultVisit(VisitableBase* ptr)
+        std::any defaultVisit(VisitableBase* ptr) override
         {
             auto* visitable = dynamic_cast<Visitable<TList...>*>(ptr);
             assert(visitable != nullptr && "Visitable is not of the correct type.");
@@ -143,3 +145,4 @@ namespace lang
 }
 
 #endif
+

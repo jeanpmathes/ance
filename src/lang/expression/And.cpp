@@ -3,6 +3,7 @@
 #include "lang/scope/Scope.h"
 #include "lang/type/BooleanType.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/statement/Assignment.h"
 #include "lang/statement/Drop.h"
@@ -80,3 +81,4 @@ Expression::Expansion And::expandWith(Expressions subexpressions) const
 }
 
 And::~And() = default;
+

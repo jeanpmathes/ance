@@ -4,12 +4,12 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/CustomFunction.h"
 #include "lang/construct/ExternFunction.h"
 #include "lang/construct/LocalVariable.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/scope/LocalScope.h"
-#include "lang/statement/Statement.h"
 #include "validation/ValidationLogger.h"
 
 lang::Function::Function(Identifier function_name) : name_(std::move(function_name)) {}

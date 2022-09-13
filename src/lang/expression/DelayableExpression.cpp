@@ -9,3 +9,4 @@ void DelayableExpression::setValue(const std::shared_ptr<lang::Value>& value)
 {
     value_->setValue(value);
 }
+

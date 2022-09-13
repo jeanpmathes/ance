@@ -95,3 +95,4 @@ void lang::TypeRegistry<OTHER_KEY>::buildNativeDefinitions(CompileContext& conte
 {
     for (auto& [key, type] : types_) { type->buildNativeDefinition(context); }
 }
+

@@ -4,6 +4,7 @@
 #include "lang/type/BooleanType.h"
 #include "validation/ValidationLogger.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/statement/Assignment.h"
 #include "lang/statement/Drop.h"
@@ -124,3 +125,4 @@ Expression::Expansion IfSelect::expandWith(Expressions subexpressions) const
 }
 
 IfSelect::~IfSelect() = default;
+

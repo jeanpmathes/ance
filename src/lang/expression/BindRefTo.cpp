@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/RoughlyCastedValue.h"
 #include "lang/statement/Statement.h"
 #include "lang/type/PointerType.h"
@@ -59,3 +60,4 @@ void BindRefTo::doBuild(CompileContext&)
 }
 
 BindRefTo::~BindRefTo() = default;
+

@@ -1,5 +1,6 @@
 #include "MemberAccess.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/statement/Statement.h"
 #include "lang/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
@@ -59,3 +60,4 @@ void MemberAccess::doBuild(CompileContext& context)
 }
 
 MemberAccess::~MemberAccess() = default;
+

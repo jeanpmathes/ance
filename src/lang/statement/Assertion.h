@@ -36,3 +36,4 @@ class Assertion
 };
 
 #endif
+

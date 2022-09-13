@@ -206,7 +206,7 @@ namespace lang
 
         [[nodiscard]] virtual const std::vector<lang::BasicBlock*>& getBasicBlocks() const = 0;
 
-        virtual ~FunctionDefinition() = default;
+        ~FunctionDefinition() override = default;
 
       private:
         lang::Function& function_;
@@ -223,3 +223,4 @@ namespace lang
 }
 
 #endif
+

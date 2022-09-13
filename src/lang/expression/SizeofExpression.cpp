@@ -1,11 +1,12 @@
 #include "SizeofExpression.h"
 
+#include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
+#include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/statement/Statement.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
-#include "compiler/CompileContext.h"
-#include "lang/statement/Statement.h"
 #include "lang/utility/Values.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 
 SizeofExpression::SizeofExpression(std::unique_ptr<Expression> expression, lang::Location location)
     : Expression(location)
@@ -43,3 +44,4 @@ void SizeofExpression::doBuild(CompileContext& context)
     std::shared_ptr<lang::WrappedNativeValue> value = std::make_shared<lang::WrappedNativeValue>(type(), native_value);
     setValue(value);
 }
+

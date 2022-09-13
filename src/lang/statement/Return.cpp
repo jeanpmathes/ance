@@ -1,5 +1,6 @@
 #include "Return.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
 #include "validation/ValidationLogger.h"

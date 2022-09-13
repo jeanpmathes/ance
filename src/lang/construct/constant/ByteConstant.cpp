@@ -1,7 +1,8 @@
 #include "ByteConstant.h"
 
-#include "lang/type/IntegerType.h"
 #include "compiler/Application.h"
+#include "lang/ApplicationVisitor.h"
+#include "lang/type/IntegerType.h"
 
 lang::ByteConstant::ByteConstant(uint8_t byte) : type_(lang::IntegerType::get(8, false)), byte_(byte) {}
 
@@ -68,8 +69,8 @@ std::string lang::ByteConstant::escape(char content)
 
 uint8_t lang::ByteConstant::parse(const std::string& unparsed)
 {
-    uint8_t byte;
-    bool    escaped = false;
+    char byte    = 0;
+    bool escaped = false;
 
     for (char const& c : unparsed)
     {
@@ -88,5 +89,6 @@ uint8_t lang::ByteConstant::parse(const std::string& unparsed)
         }
     }
 
-    return byte;
+    return static_cast<uint8_t>(byte);
 }
+

@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/value/RoughlyCastedValue.h"
 #include "lang/type/ReferenceType.h"
@@ -635,3 +636,4 @@ std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::getCommonType(
 
     return common_types;
 }
+

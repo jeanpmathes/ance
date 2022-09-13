@@ -2,6 +2,7 @@
 
 #include "lang/scope/GlobalScope.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/type/Type.h"
 
 lang::HalfType::HalfType() : TypeDefinition(lang::Identifier::from("half")) {}
@@ -27,3 +28,4 @@ lang::ResolvingHandle<lang::Type> lang::HalfType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new HalfType()));
     return instance;
 }
+

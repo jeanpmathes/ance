@@ -28,3 +28,4 @@ llvm::Value* lang::DelayedValue::getNativeValue()
 {
     return value_->getNativeValue();
 }
+

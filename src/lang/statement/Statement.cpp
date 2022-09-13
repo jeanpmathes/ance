@@ -1,8 +1,9 @@
 #include "Statement.h"
 
-#include "lang/construct/Function.h"
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/BasicBlock.h"
+#include "lang/construct/Function.h"
 
 Statement::Statement(lang::Location location) : location_(location) {}
 

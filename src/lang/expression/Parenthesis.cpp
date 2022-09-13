@@ -1,5 +1,6 @@
 #include "Parenthesis.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/statement/Statement.h"
 
 Parenthesis::Parenthesis(std::unique_ptr<Expression> expression, lang::Location location)
@@ -50,3 +51,4 @@ void Parenthesis::doAssign(std::shared_ptr<lang::Value> value, CompileContext& c
 {
     expression_->assign(value, context);
 }
+

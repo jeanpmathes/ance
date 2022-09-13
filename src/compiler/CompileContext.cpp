@@ -80,3 +80,4 @@ bool CompileContext::allDebugLocationsPopped()
 {
     return debug_loc_stack_.empty();
 }
+

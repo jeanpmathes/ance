@@ -63,3 +63,4 @@ bool AnceLinker::link(const std::filesystem::path& obj, const std::filesystem::p
 
     return lld::mingw::link(args, llvm::outs(), llvm::errs(), false, false);
 }
+

@@ -1,5 +1,6 @@
 #include "CodeBlock.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/LocalScope.h"
 
 lang::CodeBlock::CodeBlock(bool scoped, lang::Location location) : Statement(location), scoped_(scoped) {}
@@ -163,3 +164,4 @@ void lang::CodeBlock::doBuild(CompileContext&)
 {
     assert(false && "Build step must use code-block free hierarchy.");// Building uses BBs.
 }
+

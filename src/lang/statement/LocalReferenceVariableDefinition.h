@@ -66,3 +66,4 @@ class LocalReferenceVariableDefinition
 };
 
 #endif
+

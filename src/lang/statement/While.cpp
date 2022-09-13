@@ -1,9 +1,10 @@
 #include "While.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
-#include "validation/ValidationLogger.h"
 #include "lang/type/BooleanType.h"
+#include "validation/ValidationLogger.h"
 
 While::While(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> block, lang::Location location)
     : Statement(location)
@@ -57,3 +58,4 @@ void While::doBuild(CompileContext&)
 {
     // Handled by basic block.
 }
+

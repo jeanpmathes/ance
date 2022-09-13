@@ -2,6 +2,7 @@
 
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/ReferenceType.h"
@@ -73,11 +74,11 @@ llvm::DIType* lang::ArrayType::createDebugType(CompileContext& context)
     llvm::Type*             array_type = getContentType(*context.llvmContext());
 
     uint64_t      size            = dl.getTypeSizeInBits(array_type);
-    uint32_t      alignment       = dl.getABITypeAlignment(array_type);
+    auto          alignment       = static_cast<uint32_t>(dl.getABITypeAlignment(array_type));
     llvm::DIType* element_di_type = element_type_->getDebugType(context);
 
     llvm::SmallVector<llvm::Metadata*, 1> subscripts;
-    subscripts.push_back(context.di()->getOrCreateSubrange(0, (int64_t) size_.value()));
+    subscripts.push_back(context.di()->getOrCreateSubrange(0, static_cast<int64_t>(size_.value())));
 
     return context.di()->createArrayType(size, alignment, element_di_type, context.di()->getOrCreateArray(subscripts));
 }
@@ -113,3 +114,4 @@ lang::ResolvingHandle<lang::Type> lang::ArrayType::get(lang::ResolvingHandle<lan
         return type;
     }
 }
+

@@ -1,12 +1,13 @@
 #include "SizeofType.h"
 
-#include "lang/scope/Scope.h"
-#include "lang/type/SizeType.h"
 #include "compiler/CompileContext.h"
-#include "validation/ValidationLogger.h"
-#include "lang/statement/Statement.h"
-#include "lang/utility/Values.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/scope/Scope.h"
+#include "lang/statement/Statement.h"
+#include "lang/type/SizeType.h"
+#include "lang/utility/Values.h"
+#include "validation/ValidationLogger.h"
 
 SizeofType::SizeofType(lang::ResolvingHandle<lang::Type> type, lang::Location type_location, lang::Location location)
     : Expression(location)
@@ -53,3 +54,4 @@ void SizeofType::doBuild(CompileContext& context)
     std::shared_ptr<lang::WrappedNativeValue> value = std::make_shared<lang::WrappedNativeValue>(type(), native_value);
     setValue(value);
 }
+

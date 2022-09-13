@@ -1,6 +1,7 @@
 #include "Allocation.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 #include "lang/type/BufferType.h"
 #include "lang/type/PointerType.h"
@@ -105,3 +106,4 @@ void Allocation::doBuild(CompileContext& context)
 }
 
 Allocation::~Allocation() = default;
+

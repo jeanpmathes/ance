@@ -2,10 +2,10 @@
 
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/BooleanType.h"
-#include "lang/type/VoidType.h"
 #include "lang/utility/Values.h"
 
 lang::SizeType::SizeType(std::string name, Kind kind, llvm::Type*& backing)
@@ -98,7 +98,7 @@ std::shared_ptr<lang::Value> lang::SizeType::buildOperator(lang::BinaryOperator 
     llvm::Value* left_value  = left->getContentValue();
     llvm::Value* right_value = right->getContentValue();
 
-    llvm::Value* result;
+    llvm::Value* result = nullptr;
 
     switch (op)
     {
@@ -244,7 +244,7 @@ llvm::DIType* lang::SizeType::createDebugType(CompileContext& context)
 
     std::string           name         = std::string(this->name().text());
     uint64_t              size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
-    llvm::dwarf::TypeKind encoding;
+    llvm::dwarf::TypeKind encoding     = llvm::dwarf::DW_ATE_unsigned;
 
     if (backing_ == size_backing_type_) encoding = llvm::dwarf::DW_ATE_unsigned;
     if (backing_ == diff_backing_type_) encoding = llvm::dwarf::DW_ATE_signed;
@@ -287,3 +287,4 @@ unsigned int lang::SizeType::getDiffWidth()
 {
     return diff_width_;
 }
+

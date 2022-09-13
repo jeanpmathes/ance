@@ -1,5 +1,6 @@
 #include "Callable.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "validation/ValidationLogger.h"
 
@@ -61,3 +62,4 @@ bool lang::Callable::enableImplicitConversionOnCall() const
 {
     return true;
 }
+

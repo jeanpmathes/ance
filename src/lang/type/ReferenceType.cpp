@@ -1,11 +1,12 @@
 #include "ReferenceType.h"
 
+#include "compiler/Application.h"
+#include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/VoidType.h"
-#include "compiler/Application.h"
-#include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
 lang::ReferenceType::ReferenceType(lang::ResolvingHandle<lang::Type> element_type)
@@ -280,3 +281,4 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::get(lang::ResolvingHandle
         return type;
     }
 }
+

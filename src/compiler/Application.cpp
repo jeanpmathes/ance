@@ -122,3 +122,4 @@ lang::GlobalScope& Application::globalScope()
 {
     return *global_scope_;
 }
+

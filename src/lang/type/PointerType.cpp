@@ -1,12 +1,13 @@
 #include "PointerType.h"
 
+#include "compiler/Application.h"
+#include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/VoidType.h"
-#include "compiler/Application.h"
-#include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
 lang::PointerType::PointerType(lang::ResolvingHandle<lang::Type> element_type)
@@ -149,3 +150,4 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::get(lang::ResolvingHandle<l
         return type;
     }
 }
+

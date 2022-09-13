@@ -33,10 +33,6 @@ std::string lang::BinaryOperator::toString() const
             return "==";
         case NOT_EQUAL:
             return "!=";
-
-        default:
-            assert(false);
-            return "";
     }
 }
 
@@ -60,9 +56,6 @@ lang::BinaryOperator::Category lang::BinaryOperator::getCategory() const
         case EQUAL:
         case NOT_EQUAL:
             return Category::EQUALITY;
-
-        default:
-            assert(false);
     }
 }
 
@@ -80,3 +73,4 @@ bool lang::BinaryOperator::isArithmetic() const
 {
     return getCategory() == Category::ARITHMETIC;
 }
+

@@ -6,7 +6,7 @@
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
-lang::IntegerConstant::IntegerConstant(std::string integer, int64_t size, bool is_signed, int radix)
+lang::IntegerConstant::IntegerConstant(std::string integer, uint64_t size, bool is_signed, uint8_t radix)
     : text_(std::move(integer))
     , size_(size)
     , radix_(radix)
@@ -60,13 +60,9 @@ bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::
         llvm::APInt tmp(needed_bits, text_, radix_);
 
         unsigned log = tmp.logBase2();
-        if (log == (unsigned) -1) { return is_negative + 1; }
-        else if (is_negative && tmp.isPowerOf2()) {
-            return is_negative + log;
-        }
-        else {
-            return is_negative + log + 1;
-        }
+        if (log == static_cast<unsigned>(-1)) { return is_negative + 1; }
+        else if (is_negative && tmp.isPowerOf2()) { return is_negative + log; }
+        else { return is_negative + log + 1; }
     }
 
     if (needed_bits > size_)
@@ -85,7 +81,7 @@ lang::ResolvingHandle<lang::Type> lang::IntegerConstant::type() const
 
 llvm::Constant* lang::IntegerConstant::buildContent(llvm::Module* m)
 {
-    llvm::APInt integer(size_, text_, radix_);
+    llvm::APInt integer(static_cast<unsigned int>(size_), text_, radix_);
     return llvm::ConstantInt::get(type_->getContentType(m->getContext()), integer);
 }
 
@@ -94,8 +90,8 @@ bool lang::IntegerConstant::equals(const lang::Constant* other) const
     auto other_int = dynamic_cast<const IntegerConstant*>(other);
     if (!other_int) return false;
 
-    llvm::APInt this_value(size_, text_, radix_);
-    llvm::APInt other_value(other_int->size_, other_int->text_, other_int->radix_);
+    llvm::APInt this_value(static_cast<unsigned int>(size_), text_, radix_);
+    llvm::APInt other_value(static_cast<unsigned int>(other_int->size_), other_int->text_, other_int->radix_);
 
     if (this_value.getBitWidth() != other_value.getBitWidth()) return false;
 

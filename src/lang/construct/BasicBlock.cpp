@@ -1,6 +1,7 @@
 #include "BasicBlock.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/CodeBlock.h"
 
 std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createEmpty()
@@ -101,8 +102,8 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(E
 
     std::unique_ptr<lang::BasicBlock> end_block = lang::BasicBlock::createSimple();
 
-    auto append_code_block = [&](Statement* code_block, lang::BasicBlock& next) {
-        auto new_basic_blocks = code_block->createBasicBlocks(*block, function);
+    auto append_code_block = [&](Statement* new_block, lang::BasicBlock& next) {
+        auto new_basic_blocks = new_block->createBasicBlocks(*block, function);
         assert(!new_basic_blocks.empty());
 
         blocks.insert(blocks.end(),
@@ -379,3 +380,4 @@ llvm::BasicBlock* lang::BasicBlock::Definition::Base::getNativeBlock()
 {
     return native_block_;
 }
+

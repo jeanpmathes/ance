@@ -179,3 +179,4 @@ std::vector<lang::TypeDefinition*> lang::SequenceType::getDependencies() const
 
     return dependencies;
 }
+

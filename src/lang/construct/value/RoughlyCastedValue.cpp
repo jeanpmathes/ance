@@ -29,3 +29,4 @@ llvm::Value* lang::RoughlyCastedValue::getNativeValue()
 {
     return original_->getNativeValue();
 }
+

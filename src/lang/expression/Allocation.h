@@ -59,3 +59,4 @@ class Allocation
 };
 
 #endif
+

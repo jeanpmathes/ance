@@ -253,3 +253,4 @@ bool lang::FloatingPointType::isTriviallyDestructible() const
 {
     return true;
 }
+

@@ -1,5 +1,6 @@
 #include "SingleType.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
 
 lang::SingleType::SingleType() : TypeDefinition(lang::Identifier::from("single")) {}
@@ -25,3 +26,4 @@ lang::ResolvingHandle<lang::Type> lang::SingleType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new SingleType()));
     return instance;
 }
+

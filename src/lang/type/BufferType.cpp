@@ -2,6 +2,7 @@
 
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/ReferenceType.h"
@@ -148,3 +149,4 @@ lang::ResolvingHandle<lang::Type> lang::BufferType::get(lang::ResolvingHandle<la
         return type;
     }
 }
+
