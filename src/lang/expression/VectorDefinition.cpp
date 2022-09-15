@@ -2,6 +2,7 @@
 
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/VectorType.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 VectorDefinition::VectorDefinition(std::optional<lang::ResolvingHandle<lang::Type>> type,
@@ -75,11 +76,7 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
     {
         lang::ResolvingHandle<lang::Type> type = type_.value();
 
-        if (!type->isDefined())
-        {
-            validation_logger.logError("Type " + type->getAnnotatedName() + " not defined", type_location_);
-            return false;
-        }
+        if (lang::validation::isTypeUndefined(type, type_location_, validation_logger)) return false;
 
         assert(this->type()->getElementType() == type_.value());
     }

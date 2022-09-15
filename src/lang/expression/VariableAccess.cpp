@@ -35,11 +35,7 @@ bool VariableAccess::isNamed()
 
 bool VariableAccess::validate(ValidationLogger& validation_logger) const
 {
-    if (!variable_->isDefined() && scope()->asLocalScope()->wasVariableDropped(variable_))
-    {
-        validation_logger.logError("Variable with name '" + variable_->name() + "' was dropped", location());
-        return false;
-    }
+    if (isVariableDropped(validation_logger)) return false;
 
     return variable_->validateGetValue(validation_logger, location());
 }
@@ -48,13 +44,20 @@ bool VariableAccess::validateAssignment(const std::shared_ptr<lang::Value>& valu
                                         lang::Location                      value_location,
                                         ValidationLogger&                   validation_logger)
 {
+    if (isVariableDropped(validation_logger)) return false;
+
+    return variable_->validateSetValue(value, validation_logger, location(), value_location);
+}
+
+bool VariableAccess::isVariableDropped(ValidationLogger& validation_logger) const
+{
     if (!variable_->isDefined() && scope()->asLocalScope()->wasVariableDropped(variable_))
     {
         validation_logger.logError("Variable with name '" + variable_->name() + "' was dropped", location());
-        return false;
+        return true;
     }
 
-    return variable_->validateSetValue(value, validation_logger, location(), value_location);
+    return false;
 }
 
 Expression::Expansion VariableAccess::expandWith(Expressions) const

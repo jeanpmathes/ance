@@ -11,6 +11,7 @@
 #include "lang/type/SizeType.h"
 #include "lang/type/VectorizableType.h"
 #include "lang/utility/Values.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::VectorType::VectorType(lang::ResolvingHandle<lang::Type> element_type, uint64_t size)
@@ -70,12 +71,8 @@ bool lang::VectorType::validate(ValidationLogger& validation_logger, lang::Locat
         return false;
     }
 
-    if (!element_type_->isDefined())
-    {
-        validation_logger.logError("Cannot declare vector of undefined type " + element_type_->getAnnotatedName(),
-                                   location);
+    if (lang::validation::isTypeUndefined(element_type_, element_type_->name().location(), validation_logger))
         return false;
-    }
 
     if (element_type_->isReferenceType())
     {

@@ -3,13 +3,15 @@
 #include <llvm/IR/Constant.h>
 
 #include "compiler/CompileContext.h"
-#include "lang/scope/Scope.h"
-#include "validation/ValidationLogger.h"
-#include "lang/type/VoidType.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/utility/Values.h"
+#include "lang/scope/Scope.h"
 #include "lang/type/ReferenceType.h"
+#include "lang/type/VoidType.h"
+#include "lang/utility/Values.h"
+#include "validation/Utilities.h"
+#include "validation/ValidationLogger.h"
 
 lang::StructType::StructType(lang::AccessModifier                       access_modifier,
                              lang::Identifier                           name,
@@ -86,9 +88,7 @@ bool lang::StructType::validateDefinition(ValidationLogger& validation_logger) c
 
         if (!type->isDefined())
         {
-            validation_logger.logError("Cannot declare member of undefined type " + type->getAnnotatedName(),
-                                       member->location());
-            valid = false;
+            valid = not lang::validation::isTypeUndefined(type, member->location(), validation_logger);
             continue;
         }
 

@@ -7,6 +7,7 @@
 #include "lang/statement/Statement.h"
 #include "lang/type/SizeType.h"
 #include "lang/utility/Values.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 SizeofType::SizeofType(lang::ResolvingHandle<lang::Type> type, lang::Location type_location, lang::Location location)
@@ -32,11 +33,7 @@ std::optional<lang::ResolvingHandle<lang::Type>> SizeofType::tryGetType() const
 
 bool SizeofType::validate(ValidationLogger& validation_logger) const
 {
-    if (!type_->isDefined())
-    {
-        validation_logger.logError("Type " + type_->getAnnotatedName() + " not defined", type_location_);
-        return false;
-    }
+    if (lang::validation::isTypeUndefined(type_, type_location_, validation_logger)) return false;
 
     return type_->validate(validation_logger, type_location_);
 }

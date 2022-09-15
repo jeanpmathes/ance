@@ -13,9 +13,7 @@
 #include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
-lang::TypeDefinition::TypeDefinition(lang::Identifier name, lang::Location location)
-    : name_(std::move(name))
-    , location_(location)
+lang::TypeDefinition::TypeDefinition(lang::Identifier name, lang::Location location) : name_(name), location_(location)
 {}
 
 const lang::Identifier& lang::TypeDefinition::name() const
@@ -664,7 +662,7 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
     std::vector<lang::ResolvingHandle<lang::Type>> parameter_types)
 {
     lang::OwningHandle<lang::Function> function = lang::OwningHandle<lang::Function>::takeOwnership(
-        lang::makeHandled<lang::Function>(lang::Identifier::from(getMangledName())));
+        lang::makeHandled<lang::Function>(lang::Identifier::from(name() + "$constructor")));
 
     size_t count = 1;
 

@@ -6,6 +6,7 @@
 #include "lang/type/BufferType.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/SizeType.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 Allocation::Allocation(Runtime::Allocator                allocation,
@@ -52,11 +53,7 @@ std::optional<lang::ResolvingHandle<lang::Type>> Allocation::tryGetType() const
 
 bool Allocation::validate(ValidationLogger& validation_logger) const
 {
-    if (!allocated_type_->isDefined())
-    {
-        validation_logger.logError("Cannot allocate undefined type", allocated_type_location_);
-        return false;
-    }
+    if (lang::validation::isTypeUndefined(allocated_type_, allocated_type_location_, validation_logger)) return false;
 
     bool is_valid = allocated_type_->validate(validation_logger, location())
                  && return_type_->validate(validation_logger, location());

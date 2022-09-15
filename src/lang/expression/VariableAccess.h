@@ -48,6 +48,9 @@ class VariableAccess
     void doBuild(CompileContext& context) override;
     void doAssign(std::shared_ptr<lang::Value> value, CompileContext& context) override;
 
+  private:
+    bool isVariableDropped(ValidationLogger& validation_logger) const;
+
   public:
     ~VariableAccess() override;
 

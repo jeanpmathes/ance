@@ -7,6 +7,7 @@
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
 #include "lang/type/Type.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 LocalVariableDefinition::LocalVariableDefinition(lang::Identifier                                 name,
@@ -16,7 +17,7 @@ LocalVariableDefinition::LocalVariableDefinition(lang::Identifier               
                                                  std::unique_ptr<Expression>                      assigned,
                                                  lang::Location                                   location)
     : Statement(location)
-    , name_(std::move(name))
+    , name_(name)
     , type_opt_(std::move(type))
     , type_(lang::Type::getUndefined())
     , type_location_(type_location)
@@ -96,12 +97,7 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
         return;
     }
 
-    if (!type_->isDefined())
-    {
-        validation_logger.logError("Type " + variable->type()->getAnnotatedName() + " not defined", type_location_);
-
-        return;
-    }
+    if (lang::validation::isTypeUndefined(type_, type_location_, validation_logger)) return;
 
     if (!type_->validate(validation_logger, type_location_)) return;
 

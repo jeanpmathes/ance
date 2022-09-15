@@ -7,6 +7,7 @@
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/VoidType.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::ReferenceType::ReferenceType(lang::ResolvingHandle<lang::Type> element_type)
@@ -51,12 +52,8 @@ llvm::PointerType* lang::ReferenceType::getContentType(llvm::LLVMContext& c) con
 
 bool lang::ReferenceType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
-    if (!element_type_->isDefined())
-    {
-        validation_logger.logError("Cannot declare reference to undefined type " + element_type_->getAnnotatedName(),
-                                   location);
+    if (lang::validation::isTypeUndefined(element_type_, element_type_->name().location(), validation_logger))
         return false;
-    }
 
     if (element_type_->isVoidType())
     {

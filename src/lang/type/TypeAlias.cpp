@@ -1,10 +1,12 @@
 #include "TypeAlias.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
 #include "lang/utility/Identifier.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::TypeAlias::TypeAlias(lang::Identifier                  name,
@@ -117,11 +119,7 @@ bool lang::TypeAlias::validateDefinition(ValidationLogger& validation_logger) co
         valid = false;
     }
 
-    if (!actual_->isDefined())
-    {
-        validation_logger.logError("Cannot alias undefined type " + actual_->getAnnotatedName(), actual_type_location_);
-        valid = false;
-    }
+    if (lang::validation::isTypeUndefined(actual_, actual_type_location_, validation_logger)) { valid = false; }
 
     if (actual_ == lang::VoidType::get())// Prevent infinite recursion.
     {

@@ -5,11 +5,9 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/Scope.h"
-#include "lang/statement/Statement.h"
 #include "lang/type/VoidType.h"
-#include "lang/utility/Values.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::ExternFunction::ExternFunction(Function&                                     function,
@@ -42,12 +40,7 @@ void lang::ExternFunction::validate(ValidationLogger& validation_logger) const
         validation_logger.logError("Reserved name '_start' cannot be used by non-mangled functions", name().location());
     }
 
-    if (!returnType()->isDefined())
-    {
-        validation_logger.logError("Return type " + returnType()->getAnnotatedName() + " not defined.",
-                                   returnTypeLocation());
-        return;
-    }
+    if (lang::validation::isTypeUndefined(returnType(), returnTypeLocation(), validation_logger)) return;
 
     returnType()->validate(validation_logger, returnTypeLocation());
 
@@ -63,13 +56,7 @@ void lang::ExternFunction::validate(ValidationLogger& validation_logger) const
                                        parameter->name().location());
         }
 
-        if (!parameter->type()->isDefined())
-        {
-            validation_logger.logError("Parameter type " + parameter->type()->getAnnotatedName() + " not defined.",
-                                       parameter->typeLocation());
-
-            return;
-        }
+        if (lang::validation::isTypeUndefined(parameter->type(), parameter->typeLocation(), validation_logger)) return;
 
         parameter->type()->validate(validation_logger, parameter->typeLocation());
 

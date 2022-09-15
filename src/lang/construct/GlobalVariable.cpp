@@ -3,12 +3,12 @@
 #include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/Parameter.h"
 #include "lang/construct/constant/Constant.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/expression/ConstantExpression.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/VoidType.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 namespace llvm
@@ -64,11 +64,7 @@ lang::Constant* lang::GlobalVariable::init() const
 
 void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
 {
-    if (!type()->isDefined())
-    {
-        validation_logger.logError("Variable type " + type()->getAnnotatedName() + " not defined", typeLocation());
-        return;
-    }
+    if (lang::validation::isTypeUndefined(type(), typeLocation(), validation_logger)) return;
 
     if (!type()->validate(validation_logger, typeLocation())) return;
 

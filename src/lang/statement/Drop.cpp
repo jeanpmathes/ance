@@ -5,6 +5,7 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/scope/Scope.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 Drop::Drop(lang::ResolvingHandle<lang::Variable> variable, lang::Location location)
@@ -25,12 +26,7 @@ void Drop::walkDefinitions()
 
 void Drop::validate(ValidationLogger& validation_logger) const
 {
-    if (!variable_->isDefined())
-    {
-        validation_logger.logError("Name '" + variable_->name() + "' not defined in the current context",
-                                   variable_->name().location());
-        return;
-    }
+    if (lang::validation::isNameUndefined(variable_, location(), validation_logger)) return;
 
     if (!dropped_)
     {

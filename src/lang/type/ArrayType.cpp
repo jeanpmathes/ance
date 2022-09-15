@@ -7,6 +7,7 @@
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::ArrayType::ArrayType(lang::ResolvingHandle<lang::Type> element_type, const uint64_t size)
@@ -46,12 +47,8 @@ bool lang::ArrayType::validate(ValidationLogger& validation_logger, lang::Locati
         return false;
     }
 
-    if (!element_type_->isDefined())
-    {
-        validation_logger.logError("Cannot declare array of undefined type " + element_type_->getAnnotatedName(),
-                                   location);
+    if (lang::validation::isTypeUndefined(element_type_, element_type_->name().location(), validation_logger))
         return false;
-    }
 
     if (element_type_->isReferenceType())
     {

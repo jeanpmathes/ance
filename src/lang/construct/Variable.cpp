@@ -11,6 +11,7 @@
 #include "lang/construct/Parameter.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::Variable::Variable(lang::Identifier name) : name_(std::move(name)) {}
@@ -107,13 +108,7 @@ void lang::Variable::buildFinalization(CompileContext& context)
 
 bool lang::Variable::validateGetValue(ValidationLogger& validation_logger, lang::Location location) const
 {
-    if (!isDefined())
-    {
-        validation_logger.logError("Name '" + name() + "' not defined in the current context", location);
-        return false;
-    }
-
-    return true;
+    return not lang::validation::isNameUndefined(self(), location, validation_logger);
 }
 
 bool lang::Variable::validateSetValue(const std::shared_ptr<lang::Value>& value,
@@ -121,11 +116,8 @@ bool lang::Variable::validateSetValue(const std::shared_ptr<lang::Value>& value,
                                       lang::Location                      assignable_location,
                                       lang::Location                      assigned_location) const
 {
-    if (!isDefined())
-    {
-        validation_logger.logError("Name '" + name() + "' not defined in the current context", assignable_location);
-        return false;// The following variable methods require that the variable is defined.
-    }
+    if (lang::validation::isNameUndefined(self(), assignable_location, validation_logger)) return false;
+    // The following variable methods require that the variable is defined.
 
     if (isFinal())
     {

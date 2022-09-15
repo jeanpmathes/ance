@@ -9,7 +9,7 @@
 #include "lang/utility/Identifier.h"
 #include "validation/ValidationLogger.h"
 
-lang::Type::Type(Identifier name) : name_(std::move(name))
+lang::Type::Type(Identifier name) : name_(name)
 {
     assert(not name_.text().empty());
 }

@@ -6,6 +6,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 FunctionCall::FunctionCall(std::optional<lang::ResolvingHandle<lang::FunctionGroup>> function_group,
@@ -111,7 +112,7 @@ bool FunctionCall::validate(ValidationLogger& validation_logger) const
 
     if (!callable().isDefined())
     {
-        validation_logger.logError("Name '" + callable().name() + "' not defined in the current context", location());
+        validation_logger.logError("Name '" + callable().name() + "' is undefined in current context", location());
         return false;
     }
 
@@ -132,11 +133,8 @@ bool FunctionCall::validate(ValidationLogger& validation_logger) const
     }
 
     lang::ResolvingHandle<lang::Function> actual_function = potential_functions.front();
-    if (!actual_function->isDefined())
-    {
-        validation_logger.logError("Function '" + actual_function->name() + "' is not defined", location());
-        return false;
-    }
+
+    if (lang::validation::isFunctionUndefined(actual_function, location(), validation_logger)) return false;
 
     return actual_function->validateCall(arguments, location(), validation_logger);
 }

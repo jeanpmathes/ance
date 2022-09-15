@@ -8,6 +8,7 @@
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/VoidType.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::PointerType::PointerType(lang::ResolvingHandle<lang::Type> element_type)
@@ -37,12 +38,8 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::getActualType() const
 
 bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
-    if (!element_type_->isDefined())
-    {
-        validation_logger.logError("Cannot declare pointer to undefined type " + element_type_->getAnnotatedName(),
-                                   element_type_->name().location());
+    if (lang::validation::isTypeUndefined(element_type_, element_type_->name().location(), validation_logger))
         return false;
-    }
 
     if (element_type_->isReferenceType())
     {

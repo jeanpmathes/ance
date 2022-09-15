@@ -8,7 +8,7 @@
 #include "lang/construct/Function.h"
 #include "lang/expression/Addressof.h"
 #include "lang/expression/BindRef.h"
-#include "lang/scope/LocalScope.h"
+#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(lang::Identifier                  name,
@@ -65,12 +65,7 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
 {
     assert(variable_);
 
-    if (!type_->isDefined())
-    {
-        validation_logger.logError("Cannot bind reference to variable of undefined type " + type_->getAnnotatedName(),
-                                   type_location_);
-        return;
-    }
+    if (lang::validation::isTypeUndefined(type_, type_location_, validation_logger)) return;
 
     if (!type_->isReferenceType())
     {
