@@ -10,7 +10,7 @@ private arr5: [*ui8; 32];
 private arr6: [[i1; 2]; 64];
 private arr7: [[[i1; 2]; 2]; 128];
 
-// Strings are the only arrays that currently have literals.
+// String arrays have special literals, that allow to declare array contents in a readable form.
 
 private arr8: [ui8; 3] <: "abc";
 
@@ -22,6 +22,15 @@ public main () : ui32
     arr1[0] <: e;
 
     // The return types of indexers are references to the element type.
+
+    // For all array types, array definition expressions can be used to define a value.
+    // The element type can be specified or inferred.
+
+    let a1 <: [ 1:32, 2:32, 3:32, 4:32 ];
+    let a2 <: [ ui32 | 1, 2, 3, 4 ];
+
+    assert a1[0] == 1:32;
+    assert sizeof(a1) == sizeof(ui32) * 4:size;
 
     return 0:32;
 }
