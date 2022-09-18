@@ -181,7 +181,13 @@ lang::VectorType* lang::Type::isVectorType()
     return definition_->isVectorType();
 }
 
-bool lang::Type::isArrayType() const
+const lang::ArrayType* lang::Type::isArrayType() const
+{
+    assert(isDefined());
+    return definition_->isArrayType();
+}
+
+lang::ArrayType* lang::Type::isArrayType()
 {
     assert(isDefined());
     return definition_->isArrayType();

@@ -27,6 +27,7 @@ namespace lang
     class FloatingPointType;
     class IntegerType;
     class VectorType;
+    class ArrayType;
 }
 
 class CompileContext;
@@ -219,9 +220,15 @@ namespace lang
 
         /**
          * Get whether this type is an array type.
-         * @return True if this type is an array type.
+         * @return The array type if this type is an array type, null otherwise.
          */
-        [[nodiscard]] bool isArrayType() const;
+        [[nodiscard]] const lang::ArrayType* isArrayType() const;
+
+        /**
+         * Get whether this type is an array type.
+         * @return The array type if this type is an array type, null otherwise.
+         */
+        [[nodiscard]] lang::ArrayType* isArrayType();
 
         /**
          * Get the element type of this type. A type can have only exactly one element type. Currently, only arrays, vectors, pointers and references have element types.

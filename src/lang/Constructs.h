@@ -59,6 +59,7 @@ class Match;
 class Return;
 class While;
 class VectorDefinition;
+class ArrayDefinition;
 
 #define ANCE_CONSTRUCTS                                                                                                \
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction,                      \
@@ -67,7 +68,7 @@ class VectorDefinition;
         ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType, Subscript, VariableAccess,           \
         MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope, lang::LocalScope, Assertion,     \
         Assignment, Delete, ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Drop,      \
-        Return, If, While, Match, Case, VectorDefinition
+        Return, If, While, Match, Case, VectorDefinition, ArrayDefinition
 #endif
 
 class Statement;

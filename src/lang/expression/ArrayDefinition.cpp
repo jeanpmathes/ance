@@ -1,14 +1,14 @@
-#include "VectorDefinition.h"
+#include "ArrayDefinition.h"
 
 #include "lang/ApplicationVisitor.h"
-#include "lang/type/VectorType.h"
+#include "lang/type/ArrayType.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-VectorDefinition::VectorDefinition(std::optional<lang::ResolvingHandle<lang::Type>> type,
-                                   lang::Location                                   type_location,
-                                   std::vector<std::unique_ptr<Expression>>         elements,
-                                   lang::Location                                   location)
+ArrayDefinition::ArrayDefinition(std::optional<lang::ResolvingHandle<lang::Type>> type,
+                                 lang::Location                                   type_location,
+                                 std::vector<std::unique_ptr<Expression>>         elements,
+                                 lang::Location                                   location)
     : Expression(location)
     , type_(std::move(type))
     , type_location_(type_location)
@@ -17,12 +17,12 @@ VectorDefinition::VectorDefinition(std::optional<lang::ResolvingHandle<lang::Typ
     for (auto& element : elements_) { addSubexpression(*element); }
 }
 
-const std::optional<lang::ResolvingHandle<lang::Type>>& VectorDefinition::elementType() const
+const std::optional<lang::ResolvingHandle<lang::Type>>& ArrayDefinition::elementType() const
 {
     return type_;
 }
 
-std::vector<std::reference_wrapper<Expression>> VectorDefinition::values() const
+std::vector<std::reference_wrapper<Expression>> ArrayDefinition::values() const
 {
     std::vector<std::reference_wrapper<Expression>> values;
 
@@ -32,27 +32,27 @@ std::vector<std::reference_wrapper<Expression>> VectorDefinition::values() const
     return values;
 }
 
-void VectorDefinition::walkDefinitions()
+void ArrayDefinition::walkDefinitions()
 {
     Expression::walkDefinitions();
 
     if (type_.has_value()) scope()->addType(type_.value());
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> VectorDefinition::tryGetType() const
+std::optional<lang::ResolvingHandle<lang::Type>> ArrayDefinition::tryGetType() const
 {
-    if (type_.has_value()) return lang::VectorType::get(type_.value(), elements_.size());
+    if (type_.has_value()) return lang::ArrayType::get(type_.value(), elements_.size());
 
     auto types = Expression::tryGetTypes(elements_);
     if (not types.has_value()) return std::nullopt;
 
     auto common_types = lang::Type::getCommonType(types.value());
 
-    if (common_types.size() == 1) { return lang::VectorType::get(common_types.front(), elements_.size()); }
+    if (common_types.size() == 1) { return lang::ArrayType::get(common_types.front(), elements_.size()); }
     else { return std::nullopt; }
 }
 
-bool VectorDefinition::validate(ValidationLogger& validation_logger) const
+bool ArrayDefinition::validate(ValidationLogger& validation_logger) const
 {
     bool valid = true;
 
@@ -62,7 +62,7 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
 
     if (elements_.empty())
     {
-        validation_logger.logError("Vector definition has no elements", location());
+        validation_logger.logError("Array definition has no elements", location());
         return false;
     }
 
@@ -82,7 +82,7 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
 
         if (common_types.empty() || common_types.size() > 1)
         {
-            validation_logger.logError("Vector definition has no common type", location());
+            validation_logger.logError("Array definition has no common type", location());
             return false;
         }
 
@@ -100,17 +100,17 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
     return valid;
 }
 
-Expression::Expansion VectorDefinition::expandWith(Expressions subexpressions) const
+Expression::Expansion ArrayDefinition::expandWith(Expressions subexpressions) const
 {
     std::optional<lang::ResolvingHandle<lang::Type>> type;
     if (type_.has_value()) type = type_.value()->toUndefined();
 
     return {Statements(),
-            std::make_unique<VectorDefinition>(type, type_location_, std::move(subexpressions), location()),
+            std::make_unique<ArrayDefinition>(type, type_location_, std::move(subexpressions), location()),
             Statements()};
 }
 
-void VectorDefinition::doBuild(CompileContext& context)
+void ArrayDefinition::doBuild(CompileContext& context)
 {
     std::vector<std::shared_ptr<lang::Value>> elements;
 
@@ -119,12 +119,11 @@ void VectorDefinition::doBuild(CompileContext& context)
         elements.push_back(lang::Type::makeMatching(type()->getElementType(), element->getValue(), context));
     }
 
-    auto vector_type = type()->isVectorType();
-    assert(vector_type);
+    auto array_type = type()->isArrayType();
+    assert(array_type);
 
-    auto value = vector_type->createValue(std::move(elements), context);
+    auto value = array_type->createValue(std::move(elements), context);
     setValue(value);
 }
 
-VectorDefinition::~VectorDefinition() = default;
-
+ArrayDefinition::~ArrayDefinition() = default;

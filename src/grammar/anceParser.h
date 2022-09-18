@@ -914,6 +914,18 @@ class anceParser : public antlr4::Parser
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class ArrayDefinitionContext : public ExpressionContext
+    {
+      public:
+        ArrayDefinitionContext(ExpressionContext* ctx);
+
+        std::vector<ExpressionContext*> expression();
+        ExpressionContext*              expression(size_t i);
+        TypeContext*                    type();
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     class SizeOfContext : public ExpressionContext
     {
       public:

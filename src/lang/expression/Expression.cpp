@@ -136,3 +136,29 @@ std::tuple<Statements, std::unique_ptr<Expression>, Statements> Expression::expa
     return std::make_tuple(std::move(before), std::move(expanded_expression), std::move(after));
 }
 
+std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> Expression::tryGetTypes(
+    const std::vector<std::unique_ptr<Expression>>& expressions)
+{
+    std::vector<lang::ResolvingHandle<lang::Type>> types;
+    types.reserve(expressions.size());
+
+    for (auto& expression : expressions)
+    {
+        auto type = expression->tryGetType();
+        if (not type.has_value()) return std::nullopt;
+        types.push_back(type.value());
+    }
+
+    return types;
+}
+
+std::vector<lang::ResolvingHandle<lang::Type>> Expression::getTypes(
+    const std::vector<std::unique_ptr<Expression>>& expressions)
+{
+    std::vector<lang::ResolvingHandle<lang::Type>> types;
+    types.reserve(expressions.size());
+
+    for (auto& expression : expressions) { types.push_back(expression->type()); }
+
+    return types;
+}

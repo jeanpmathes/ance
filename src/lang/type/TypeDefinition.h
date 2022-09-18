@@ -27,6 +27,7 @@ namespace lang
     class FloatingPointType;
     class IntegerType;
     class VectorType;
+    class ArrayType;
 }
 
 class CompileContext;
@@ -66,17 +67,18 @@ namespace lang
         [[nodiscard]] virtual const FloatingPointType* isFloatingPointType() const;
         [[nodiscard]] virtual bool                     isFloatingPointType(size_t precision) const;
         [[nodiscard]] virtual bool                    isSizeType() const;
-        [[nodiscard]] virtual bool                    isDiffType() const;
-        [[nodiscard]] virtual bool                    isVoidType() const;
-        [[nodiscard]] virtual bool                    isPointerType() const;
-        [[nodiscard]] virtual bool                    isBufferType() const;
-        [[nodiscard]] virtual bool                    isReferenceType() const;
-        [[nodiscard]] virtual bool                    isStructType() const;
-        [[nodiscard]] virtual const VectorizableType* isVectorizable() const;
-        [[nodiscard]] virtual VectorizableType*       isVectorizable();
-        [[nodiscard]] virtual const VectorType*       isVectorType() const;
-        [[nodiscard]] virtual VectorType*             isVectorType();
-        [[nodiscard]] virtual bool                    isArrayType() const;
+        [[nodiscard]] virtual bool                     isDiffType() const;
+        [[nodiscard]] virtual bool                     isVoidType() const;
+        [[nodiscard]] virtual bool                     isPointerType() const;
+        [[nodiscard]] virtual bool                     isBufferType() const;
+        [[nodiscard]] virtual bool                     isReferenceType() const;
+        [[nodiscard]] virtual bool                     isStructType() const;
+        [[nodiscard]] virtual const VectorizableType*  isVectorizable() const;
+        [[nodiscard]] virtual VectorizableType*        isVectorizable();
+        [[nodiscard]] virtual const VectorType*        isVectorType() const;
+        [[nodiscard]] virtual VectorType*              isVectorType();
+        [[nodiscard]] virtual const ArrayType*         isArrayType() const;
+        [[nodiscard]] virtual ArrayType*               isArrayType();
 
         [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getElementType() const;
 

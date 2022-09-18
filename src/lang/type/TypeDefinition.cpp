@@ -123,9 +123,14 @@ lang::VectorType* lang::TypeDefinition::isVectorType()
     return nullptr;
 }
 
-bool lang::TypeDefinition::isArrayType() const
+const lang::ArrayType* lang::TypeDefinition::isArrayType() const
 {
-    return false;
+    return nullptr;
+}
+
+lang::ArrayType* lang::TypeDefinition::isArrayType()
+{
+    return nullptr;
 }
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getElementType() const

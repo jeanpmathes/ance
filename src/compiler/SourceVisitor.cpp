@@ -33,6 +33,7 @@
 #include "lang/expression/Addressof.h"
 #include "lang/expression/Allocation.h"
 #include "lang/expression/And.h"
+#include "lang/expression/ArrayDefinition.h"
 #include "lang/expression/BinaryOperation.h"
 #include "lang/expression/BindRef.h"
 #include "lang/expression/BindRefTo.h"
@@ -622,6 +623,27 @@ std::any SourceVisitor::visitVectorDefinition(anceParser::VectorDefinitionContex
     }
 
     return static_cast<Expression*>(new VectorDefinition(type, type_location, std::move(elements), location(ctx)));
+}
+
+std::any SourceVisitor::visitArrayDefinition(anceParser::ArrayDefinitionContext* ctx)
+{
+    std::optional<lang::ResolvingHandle<lang::Type>> type;
+    lang::Location                                   type_location = lang::Location::global();
+
+    if (ctx->type())
+    {
+        type          = std::any_cast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
+        type_location = location(ctx->type());
+    }
+
+    std::vector<std::unique_ptr<Expression>> elements;
+
+    for (auto& element_ctx : ctx->expression())
+    {
+        elements.push_back(std::unique_ptr<Expression>(std::any_cast<Expression*>(visit(element_ctx))));
+    }
+
+    return static_cast<Expression*>(new ArrayDefinition(type, type_location, std::move(elements), location(ctx)));
 }
 
 std::any SourceVisitor::visitDefaultExpressionCase(anceParser::DefaultExpressionCaseContext* ctx)

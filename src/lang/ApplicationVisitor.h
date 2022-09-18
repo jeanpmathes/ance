@@ -25,6 +25,7 @@ namespace lang
 #include "lang/expression/Addressof.h"
 #include "lang/expression/Allocation.h"
 #include "lang/expression/And.h"
+#include "lang/expression/ArrayDefinition.h"
 #include "lang/expression/BinaryOperation.h"
 #include "lang/expression/BindRef.h"
 #include "lang/expression/BindRefTo.h"

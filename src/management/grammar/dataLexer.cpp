@@ -169,4 +169,3 @@ void dataLexer::initialize()
 {
     std::call_once(datalexerLexerOnceFlag, datalexerLexerInitialize);
 }
-

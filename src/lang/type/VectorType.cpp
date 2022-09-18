@@ -1,5 +1,7 @@
 #include "VectorType.h"
 
+#include <utility>
+
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
@@ -358,16 +360,5 @@ lang::ResolvingHandle<lang::Type> lang::VectorType::get(lang::ResolvingHandle<la
 std::shared_ptr<lang::Value> lang::VectorType::createValue(std::vector<std::shared_ptr<lang::Value>> values,
                                                            CompileContext&                           context)
 {
-    llvm::Value* vector_ptr = context.ir()->CreateAlloca(getContentType(*context.llvmContext()), nullptr, "alloca");
-
-    for (uint64_t index = 0; index < size_; index++)
-    {
-        values[index]->buildContentValue(context);
-
-        llvm::Value* element_ptr = buildGetElementPointer(vector_ptr, index, context);
-        context.ir()->CreateStore(values[index]->getContentValue(), element_ptr);
-    }
-
-    return std::make_shared<lang::WrappedNativeValue>(self(), vector_ptr);
+    return SequenceType::createValue(std::move(values), context);
 }
-

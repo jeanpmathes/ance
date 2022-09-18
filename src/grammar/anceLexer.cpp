@@ -628,4 +628,3 @@ void anceLexer::initialize()
 {
     std::call_once(ancelexerLexerOnceFlag, ancelexerLexerInitialize);
 }
-

@@ -3,7 +3,7 @@
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/Value.h"
+#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
@@ -15,9 +15,14 @@ lang::ArrayType::ArrayType(lang::ResolvingHandle<lang::Type> element_type, const
     , SequenceType(element_type, size)
 {}
 
-bool lang::ArrayType::isArrayType() const
+const lang::ArrayType* lang::ArrayType::isArrayType() const
 {
-    return true;
+    return this;
+}
+
+lang::ArrayType* lang::ArrayType::isArrayType()
+{
+    return this;
 }
 
 lang::ResolvingHandle<lang::Type> lang::ArrayType::getActualType() const
@@ -112,3 +117,8 @@ lang::ResolvingHandle<lang::Type> lang::ArrayType::get(lang::ResolvingHandle<lan
     }
 }
 
+std::shared_ptr<lang::Value> lang::ArrayType::createValue(std::vector<std::shared_ptr<lang::Value>> values,
+                                                          CompileContext&                           context)
+{
+    return SequenceType::createValue(std::move(values), context);
+}

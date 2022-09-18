@@ -180,3 +180,21 @@ std::vector<lang::TypeDefinition*> lang::SequenceType::getDependencies() const
     return dependencies;
 }
 
+std::shared_ptr<lang::Value> lang::SequenceType::createValue(std::vector<std::shared_ptr<lang::Value>> values,
+                                                             CompileContext&                           context)
+{
+    assert(size_.has_value());
+    assert(values.size() == size_.value());
+
+    llvm::Value* sequence_ptr = context.ir()->CreateAlloca(getContentType(*context.llvmContext()), nullptr, "alloca");
+
+    for (uint64_t index = 0; index < size_; index++)
+    {
+        values[index]->buildContentValue(context);
+
+        llvm::Value* element_ptr = buildGetElementPointer(sequence_ptr, index, context);
+        context.ir()->CreateStore(values[index]->getContentValue(), element_ptr);
+    }
+
+    return std::make_shared<lang::WrappedNativeValue>(self(), sequence_ptr);
+}

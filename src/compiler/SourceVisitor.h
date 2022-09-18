@@ -76,6 +76,7 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitMatchExpression(anceParser::MatchExpressionContext* ctx) override;
     std::any visitIndirection(anceParser::IndirectionContext* ctx) override;
     std::any visitVectorDefinition(anceParser::VectorDefinitionContext* ctx) override;
+    std::any visitArrayDefinition(anceParser::ArrayDefinitionContext* ctx) override;
 
     // Literals and Types
 

@@ -29,7 +29,8 @@ namespace lang
       public:
         static const uint64_t MAX_ARRAY_TYPE_SIZE = 1ll << 32;
 
-        bool isArrayType() const override;
+        const ArrayType* isArrayType() const override;
+        ArrayType*       isArrayType() override;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
 
@@ -39,11 +40,20 @@ namespace lang
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
       public:
+        /**
+         * Create an array value.
+         * @param values The elements of the array.
+         * @param context The current context.
+         * @return The array value.
+         */
+        std::shared_ptr<lang::Value> createValue(std::vector<std::shared_ptr<lang::Value>> values,
+                                                 CompileContext&                           context);
+
         ~ArrayType() override = default;
 
       protected:
-        std::string                                      createMangledName() const override;
-        llvm::DIType*                                    createDebugType(CompileContext& context) override;
+        std::string   createMangledName() const override;
+        llvm::DIType* createDebugType(CompileContext& context) override;
 
       private:
         static lang::TypeRegistry<uint64_t>& getArrayTypes();

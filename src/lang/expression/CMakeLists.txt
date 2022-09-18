@@ -21,5 +21,6 @@ target_sources(ance PRIVATE Expression.cpp
                UnaryOperation.cpp
                IfSelect.cpp
                VectorDefinition.cpp
+               ArrayDefinition.cpp
                MatchSelect.cpp
                Parenthesis.cpp)

@@ -60,6 +60,16 @@ namespace lang
         void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context) override;
 
       protected:
+        /**
+         * Create a value with the given elements. Only valid if the type is sized.
+         * @param values The elements of the value. All values must be of the element type, and the count must match the size.
+         * @param context The current compile context.
+         * @return The value.
+         */
+        std::shared_ptr<lang::Value> createValue(std::vector<std::shared_ptr<lang::Value>> values,
+                                                 CompileContext&                           context);
+
+      protected:
         lang::ResolvingHandle<lang::Type> element_type_;
         lang::ResolvingHandle<lang::Type> element_reference_;
 

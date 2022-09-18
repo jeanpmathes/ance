@@ -30,7 +30,7 @@ public main () : ui32
     let a2 <: [ ui32 | 1, 2, 3, 4 ];
 
     assert a1[0] == 1:32;
-    assert sizeof(a1) == sizeof(ui32) * 4:size;
+    assert sizeof(a1) == sizeof ui32 * 4:size;
 
     return 0:32;
 }

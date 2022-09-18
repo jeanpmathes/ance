@@ -144,6 +144,7 @@ expression
     | 'if' condition=expression 'then' thenBlock=expression 'else' elseBlock=expression # IfExpression
     | matchExpression # Match
     | '<' ( type '|' ) ? expression ( ',' expression )* '>' # VectorDefinition
+    | '[' ( type '|' ) ? expression ( ',' expression )* ']' # ArrayDefinition
 	;
 
 binaryOperatorMultiplicative
