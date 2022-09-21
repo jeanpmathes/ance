@@ -58,6 +58,11 @@ bool lang::TypeDefinition::isBooleanType() const
     return false;
 }
 
+bool lang::TypeDefinition::isUnsignedIntegerPointerType() const
+{
+    return false;
+}
+
 const lang::FloatingPointType* lang::TypeDefinition::isFloatingPointType() const
 {
     return nullptr;
@@ -761,4 +766,3 @@ void lang::TypeDefinition::buildPointerIteration(llvm::Function*                
         context.ir()->CreateRetVoid();
     }
 }
-

@@ -28,6 +28,8 @@ namespace lang
          */
         static const size_t MINIMUM_BIT_SIZE = 64;
 
+        bool isUnsignedIntegerPointerType() const override;
+
         StateCount getStateCount() const override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) override;

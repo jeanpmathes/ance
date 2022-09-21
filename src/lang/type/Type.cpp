@@ -103,6 +103,12 @@ bool lang::Type::isBooleanType() const
     return definition_->isBooleanType();
 }
 
+bool lang::Type::isUnsignedIntegerPointerType() const
+{
+    assert(isDefined());
+    return definition_->isUnsignedIntegerPointerType();
+}
+
 const lang::FloatingPointType* lang::Type::isFloatingPointType() const
 {
     assert(isDefined());
@@ -642,4 +648,3 @@ std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::getCommonType(
 
     return common_types;
 }
-

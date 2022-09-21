@@ -753,7 +753,9 @@ std::any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ctx)
 
 std::any SourceVisitor::visitUiptrLiteral(anceParser::UiptrLiteralContext* ctx)
 {
-    std::string                     value    = ctx->HEX_INTEGER()->getText();
+    std::string value = ctx->HEX_INTEGER()->getText();
+    value.erase(0, 2);
+
     std::shared_ptr<lang::Constant> constant = std::make_shared<lang::UiptrConstant>(value);
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));

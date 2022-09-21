@@ -7,6 +7,11 @@
 
 lang::UnsignedIntegerPointerType::UnsignedIntegerPointerType() : TypeDefinition(lang::Identifier::from("uiptr")) {}
 
+bool lang::UnsignedIntegerPointerType::isUnsignedIntegerPointerType() const
+{
+    return true;
+}
+
 StateCount lang::UnsignedIntegerPointerType::getStateCount() const
 {
     return SpecialCount::PLATFORM_DEPENDENT;

@@ -12,7 +12,7 @@ lang::UiptrConstant::UiptrConstant(std::string value) : value_(std::move(value))
 
 std::string lang::UiptrConstant::toString() const
 {
-    return value_ + ":size";
+    return "0x" + value_ + ":uiptr";
 }
 
 bool lang::UiptrConstant::validate(ValidationLogger& validation_logger, lang::Location location) const

@@ -387,9 +387,10 @@ bool Match::validateType(Expression& expression, ValidationLogger& validation_lo
 {
     lang::ResolvingHandle<lang::Type> type = expression.type();
 
-    if (!type->isIntegerType() && !type->isBooleanType() && !type->isSizeType() && !type->isDiffType())
+    if (!type->isIntegerType() && !type->isBooleanType() && !type->isSizeType() && !type->isDiffType()
+        && !type->isUnsignedIntegerPointerType())
     {
-        validation_logger.logError("Cannot match non-numeric or logical type " + type->getAnnotatedName(),
+        validation_logger.logError("Cannot match non-integer or boolean type " + type->getAnnotatedName(),
                                    expression.location());
 
         return false;

@@ -138,6 +138,12 @@ namespace lang
         [[nodiscard]] bool isBooleanType() const;
 
         /**
+         * Get whether this type is an unsigned integer pointer type.
+         * @return True if this type is an unsigned integer pointer type.
+         */
+        [[nodiscard]] bool isUnsignedIntegerPointerType() const;
+
+        /**
          * Get whether this type is a floating point type.
          * @return A pointer to the floating point type if this type is a floating point type, null otherwise.
          */
