@@ -17,11 +17,16 @@ private bin2: ui16 <: 0b11111111:16;
 private bin3: ui32 <: 0b11111111:32;
 private bin4: ui64 <: 0b11111111:64;
 
-// Byte literals.
+// Byte literals can either by a single character or an escape sequence.
 
 private byte1: ui8 <: 'A';
 private byte2: ui8 <: '\0';
 private byte3: ui8 <: '\n';
+
+// Unsigned integer pointer literals are always hexadecimals.
+
+private p1: uiptr <: 0x1234:uiptr;
+private p2: uiptr <: 0x0000:uiptr;
 
 public main () : ui32
 {
