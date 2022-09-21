@@ -259,6 +259,8 @@ class anceBaseVisitor : public anceVisitor
 
     virtual std::any visitDiffLiteral(anceParser::DiffLiteralContext* ctx) override { return visitChildren(ctx); }
 
+    virtual std::any visitUiptrLiteral(anceParser::UiptrLiteralContext* ctx) override { return visitChildren(ctx); }
+
     virtual std::any visitInteger(anceParser::IntegerContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitArray(anceParser::ArrayContext* ctx) override { return visitChildren(ctx); }

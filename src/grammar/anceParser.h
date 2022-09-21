@@ -153,16 +153,17 @@ class anceParser : public antlr4::Parser
         RuleBooleanLiteral               = 50,
         RuleSizeLiteral                  = 51,
         RuleDiffLiteral                  = 52,
-        RuleType                         = 53,
-        RuleIntegerType                  = 54,
-        RuleArrayType                    = 55,
-        RuleVectorType                   = 56,
-        RuleKeywordType                  = 57,
-        RuleFloatingPointType            = 58,
-        RuleTargetDependentType          = 59,
-        RuleBooleanType                  = 60,
-        RuleVoidType                     = 61,
-        RuleCustomType                   = 62
+        RuleUiptrLiteral                 = 53,
+        RuleType                         = 54,
+        RuleIntegerType                  = 55,
+        RuleArrayType                    = 56,
+        RuleVectorType                   = 57,
+        RuleKeywordType                  = 58,
+        RuleFloatingPointType            = 59,
+        RuleTargetDependentType          = 60,
+        RuleBooleanType                  = 61,
+        RuleVoidType                     = 62,
+        RuleCustomType                   = 63
     };
 
     explicit anceParser(antlr4::TokenStream* input);
@@ -234,6 +235,7 @@ class anceParser : public antlr4::Parser
     class BooleanLiteralContext;
     class SizeLiteralContext;
     class DiffLiteralContext;
+    class UiptrLiteralContext;
     class TypeContext;
     class IntegerTypeContext;
     class ArrayTypeContext;
@@ -1322,6 +1324,7 @@ class anceParser : public antlr4::Parser
         BooleanLiteralContext*       booleanLiteral();
         SizeLiteralContext*          sizeLiteral();
         DiffLiteralContext*          diffLiteral();
+        UiptrLiteralContext*         uiptrLiteral();
 
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -1468,6 +1471,18 @@ class anceParser : public antlr4::Parser
     };
 
     DiffLiteralContext* diffLiteral();
+
+    class UiptrLiteralContext : public antlr4::ParserRuleContext
+    {
+      public:
+        UiptrLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t              getRuleIndex() const override;
+        antlr4::tree::TerminalNode* HEX_INTEGER();
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    UiptrLiteralContext* uiptrLiteral();
 
     class TypeContext : public antlr4::ParserRuleContext
     {

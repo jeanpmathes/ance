@@ -230,6 +230,7 @@ literalExpression
 	| booleanLiteral
 	| sizeLiteral
 	| diffLiteral
+	| uiptrLiteral
 	;
 
 stringLiteral
@@ -273,6 +274,10 @@ sizeLiteral
 
 diffLiteral
     : SIGNED_INTEGER ':' 'diff'
+    ;
+
+uiptrLiteral
+    : HEX_INTEGER ':' 'uiptr'
     ;
 
 type

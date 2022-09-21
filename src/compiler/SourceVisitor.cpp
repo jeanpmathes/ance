@@ -59,6 +59,7 @@
 #include "lang/construct/constant/IntegerConstant.h"
 #include "lang/construct/constant/SizeConstant.h"
 #include "lang/construct/constant/StringConstant.h"
+#include "lang/construct/constant/UiptrConstant.h"
 
 #include "lang/construct/CodeBlock.h"
 #include "lang/construct/Member.h"
@@ -746,6 +747,14 @@ std::any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ctx)
 {
     std::string                     value    = ctx->SIGNED_INTEGER()->getText();
     std::shared_ptr<lang::Constant> constant = std::make_shared<lang::DiffConstant>(value);
+
+    return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
+}
+
+std::any SourceVisitor::visitUiptrLiteral(anceParser::UiptrLiteralContext* ctx)
+{
+    std::string                     value    = ctx->HEX_INTEGER()->getText();
+    std::shared_ptr<lang::Constant> constant = std::make_shared<lang::UiptrConstant>(value);
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }

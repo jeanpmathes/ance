@@ -61,7 +61,15 @@ llvm::DIType* lang::UnsignedIntegerPointerType::createDebugType(CompileContext& 
 void lang::UnsignedIntegerPointerType::init(llvm::LLVMContext& llvm_context, llvm::DataLayout& data_layout)
 {
     assert(!native_type_);
-    native_type_ = llvm::Type::getIntNTy(llvm_context, data_layout.getPointerSizeInBits());
+
+    size_        = std::max(static_cast<unsigned int>(MINIMUM_BIT_SIZE), data_layout.getPointerSizeInBits());
+    native_type_ = llvm::Type::getIntNTy(llvm_context, size_);
+}
+
+unsigned int lang::UnsignedIntegerPointerType::sizeInBits()
+{
+    assert(native_type_);
+    return size_;
 }
 
 lang::ResolvingHandle<lang::Type> lang::UnsignedIntegerPointerType::get()
@@ -70,4 +78,3 @@ lang::ResolvingHandle<lang::Type> lang::UnsignedIntegerPointerType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new UnsignedIntegerPointerType()));
     return instance;
 }
-

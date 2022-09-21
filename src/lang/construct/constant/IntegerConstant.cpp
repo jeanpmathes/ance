@@ -56,13 +56,17 @@ bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::
         // Code from llvm::APInt::getBitsNeeded
         // Required as the required size can be larger than needed
 
-        unsigned    is_negative = text_[0] == '-';
-        llvm::APInt tmp(needed_bits, text_, radix_);
+        auto get_needed_bits_corrected = [&] {
+            unsigned    is_negative = text_[0] == '-';
+            llvm::APInt tmp(needed_bits, text_, radix_);
 
-        unsigned log = tmp.logBase2();
-        if (log == static_cast<unsigned>(-1)) { return is_negative + 1; }
-        else if (is_negative && tmp.isPowerOf2()) { return is_negative + log; }
-        else { return is_negative + log + 1; }
+            unsigned log = tmp.logBase2();
+            if (log == static_cast<unsigned>(-1)) { return is_negative + 1; }
+            else if (is_negative && tmp.isPowerOf2()) { return is_negative + log; }
+            else { return is_negative + log + 1; }
+        };
+
+        needed_bits = get_needed_bits_corrected();
     }
 
     if (needed_bits > size_)

@@ -23,6 +23,11 @@ namespace lang
         UnsignedIntegerPointerType();
 
       public:
+        /**
+         * The minimum bit size of uiptr value.
+         */
+        static const size_t MINIMUM_BIT_SIZE = 64;
+
         StateCount getStateCount() const override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
@@ -31,8 +36,9 @@ namespace lang
         [[maybe_unused]] static llvm::Value* buildValue(llvm::Value* pointer, CompileContext& state);
 
       private:
-        inline static Type*       instance_    = nullptr;
-        inline static llvm::Type* native_type_ = nullptr;
+        inline static Type*        instance_    = nullptr;
+        inline static llvm::Type*  native_type_ = nullptr;
+        inline static unsigned int size_        = 0;
 
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
@@ -49,6 +55,12 @@ namespace lang
          * @param data_layout The data layout of the current build target.
          */
         static void init(llvm::LLVMContext& llvm_context, llvm::DataLayout& data_layout);
+
+        /**
+         * Get the bit size of the type.
+         * @return The size of the type.
+         */
+        static unsigned int sizeInBits();
 
         /**
          * Get the uiptr type instance.
