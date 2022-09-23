@@ -8,26 +8,7 @@
 #include "lang/type/BooleanType.h"
 #include "lang/utility/Values.h"
 
-lang::SizeType::SizeType(std::string name, Kind kind, llvm::Type*& backing)
-    : TypeDefinition(lang::Identifier::from(name))
-    , kind_(kind)
-    , backing_(backing)
-{}
-
-StateCount lang::SizeType::getStateCount() const
-{
-    return SpecialCount::PLATFORM_DEPENDENT;
-}
-
-llvm::Constant* lang::SizeType::getDefaultContent(llvm::Module& m)
-{
-    return llvm::ConstantInt::get(getContentType(m.getContext()), 0, false);
-}
-
-llvm::Type* lang::SizeType::getContentType(llvm::LLVMContext&) const
-{
-    return backing_;
-}
+lang::SizeType::SizeType(std::string name, Kind kind) : TypeDefinition(lang::Identifier::from(name)), kind_(kind) {}
 
 bool lang::SizeType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
 {
@@ -213,24 +194,9 @@ bool lang::SizeType::isDiffType() const
     return (kind_ == DIFF_KIND);
 }
 
-llvm::Value* lang::SizeType::buildContentValue(llvm::TypeSize size)
+llvm::Value* lang::SizeType::buildContentValue(llvm::TypeSize size, CompileContext& contex)
 {
-    return llvm::ConstantInt::get(size_backing_type_, size.getFixedSize(), false);
-}
-
-bool lang::SizeType::isTriviallyDefaultConstructible() const
-{
-    return true;
-}
-
-bool lang::SizeType::isTriviallyCopyConstructible() const
-{
-    return true;
-}
-
-bool lang::SizeType::isTriviallyDestructible() const
-{
-    return true;
+    return llvm::ConstantInt::get(getSize()->getContentType(*contex.llvmContext()), size.getFixedSize(), false);
 }
 
 std::string lang::SizeType::createMangledName() const
@@ -238,36 +204,19 @@ std::string lang::SizeType::createMangledName() const
     return std::string(name().text());
 }
 
-llvm::DIType* lang::SizeType::createDebugType(CompileContext& context)
+void lang::SizeType::init(llvm::LLVMContext&, Application& app)
 {
-    const llvm::DataLayout& dl = context.module()->getDataLayout();
-
-    std::string           name         = std::string(this->name().text());
-    uint64_t              size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
-    llvm::dwarf::TypeKind encoding     = llvm::dwarf::DW_ATE_unsigned;
-
-    if (backing_ == size_backing_type_) encoding = llvm::dwarf::DW_ATE_unsigned;
-    if (backing_ == diff_backing_type_) encoding = llvm::dwarf::DW_ATE_signed;
-
-    return context.di()->createBasicType(name, size_in_bits, encoding);
-}
-
-void lang::SizeType::init(llvm::LLVMContext& c, Application& app)
-{
-    assert(!size_backing_type_);
-    assert(!diff_backing_type_);
+    assert(size_width_ == 0);
+    assert(diff_width_ == 0);
 
     size_width_ = std::max(app.getBitness(), static_cast<unsigned int>(MINIMUM_BIT_SIZE));
     diff_width_ = size_width_ * 2;
-
-    size_backing_type_ = llvm::Type::getIntNTy(c, size_width_);
-    diff_backing_type_ = llvm::Type::getIntNTy(c, diff_width_);
 }
 
 lang::ResolvingHandle<lang::Type> lang::SizeType::getSize()
 {
-    static lang::ResolvingHandle<lang::Type> instance = lang::makeHandled<lang::Type>(
-        std::unique_ptr<lang::TypeDefinition>(new SizeType("size", SIZE_KIND, size_backing_type_)));
+    static lang::ResolvingHandle<lang::Type> instance =
+        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new SizeType("size", SIZE_KIND)));
     return instance;
 }
 
@@ -278,8 +227,8 @@ unsigned int lang::SizeType::getSizeWidth()
 
 lang::ResolvingHandle<lang::Type> lang::SizeType::getDiff()
 {
-    static lang::ResolvingHandle<lang::Type> instance = lang::makeHandled<lang::Type>(
-        std::unique_ptr<lang::TypeDefinition>(new SizeType("diff", DIFF_KIND, diff_backing_type_)));
+    static lang::ResolvingHandle<lang::Type> instance =
+        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new SizeType("diff", DIFF_KIND)));
     return instance;
 }
 
@@ -288,3 +237,21 @@ unsigned int lang::SizeType::getDiffWidth()
     return diff_width_;
 }
 
+std::optional<size_t> lang::SizeType::getBitSize() const
+{
+    return std::nullopt;
+}
+
+size_t lang::SizeType::getNativeBitSize() const
+{
+    if (kind_ == SIZE_KIND) return size_width_;
+    if (kind_ == DIFF_KIND) return diff_width_;
+
+    assert(false);
+    return 0;
+}
+
+bool lang::SizeType::isSigned() const
+{
+    return (kind_ == DIFF_KIND);
+}

@@ -17,12 +17,6 @@ lang::FixedWidthIntegerType::FixedWidthIntegerType(uint64_t bit_size, bool is_si
     , is_signed_(is_signed)
 {}
 
-StateCount lang::FixedWidthIntegerType::getStateCount() const
-{
-    size_t state_count = 1 << bit_size_;
-    return state_count;
-}
-
 const lang::FixedWidthIntegerType* lang::FixedWidthIntegerType::isFixedWidthIntegerType() const
 {
     return this;
@@ -31,21 +25,6 @@ const lang::FixedWidthIntegerType* lang::FixedWidthIntegerType::isFixedWidthInte
 bool lang::FixedWidthIntegerType::isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const
 {
     return (bit_size_ == bit_size) && (is_signed_ == is_signed);
-}
-
-bool lang::FixedWidthIntegerType::isSigned() const
-{
-    return is_signed_;
-}
-
-llvm::Constant* lang::FixedWidthIntegerType::getDefaultContent(llvm::Module& m)
-{
-    return llvm::ConstantInt::get(getContentType(m.getContext()), 0, is_signed_);
-}
-
-llvm::Type* lang::FixedWidthIntegerType::getContentType(llvm::LLVMContext& c) const
-{
-    return llvm::Type::getIntNTy(c, static_cast<unsigned>(bit_size_));
 }
 
 bool lang::FixedWidthIntegerType::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -320,35 +299,9 @@ void lang::FixedWidthIntegerType::buildRequestedOverload(lang::ResolvingHandle<l
     }
 }
 
-bool lang::FixedWidthIntegerType::isTriviallyDefaultConstructible() const
-{
-    return true;
-}
-
-bool lang::FixedWidthIntegerType::isTriviallyCopyConstructible() const
-{
-    return true;
-}
-
-bool lang::FixedWidthIntegerType::isTriviallyDestructible() const
-{
-    return true;
-}
-
 std::string lang::FixedWidthIntegerType::createMangledName() const
 {
     return std::string(name().text());
-}
-
-llvm::DIType* lang::FixedWidthIntegerType::createDebugType(CompileContext& context)
-{
-    const llvm::DataLayout& dl = context.module()->getDataLayout();
-
-    std::string name         = std::string(this->name().text());
-    uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
-    auto        encoding     = is_signed_ ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned;
-
-    return context.di()->createBasicType(name, size_in_bits, encoding);
 }
 
 lang::TypeRegistry<std::pair<uint64_t, bool>>& lang::FixedWidthIntegerType::getIntegerTypes()
@@ -381,3 +334,17 @@ lang::ResolvingHandle<lang::Type> lang::FixedWidthIntegerType::get(uint64_t bit_
     }
 }
 
+std::optional<size_t> lang::FixedWidthIntegerType::getBitSize() const
+{
+    return bit_size_;
+}
+
+size_t lang::FixedWidthIntegerType::getNativeBitSize() const
+{
+    return bit_size_;
+}
+
+bool lang::FixedWidthIntegerType::isSigned() const
+{
+    return is_signed_;
+}

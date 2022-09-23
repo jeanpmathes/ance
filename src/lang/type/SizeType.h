@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_TYPE_SIZETYPE_H_
 #define ANCE_SRC_LANG_TYPE_SIZETYPE_H_
 
-#include "TypeDefinition.h"
+#include "IntegerType.h"
 
 #include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -13,7 +13,7 @@ namespace lang
     /**
      * Represents an unsigned integer capable of holding the size of the largest possible array as well as a type of holding all possible differences of such sizes.
      */
-    class SizeType : public lang::TypeDefinition
+    class SizeType : public IntegerType
     {
       private:
         enum Kind
@@ -22,10 +22,9 @@ namespace lang
             DIFF_KIND
         };
 
-        SizeType(std::string name, Kind kind, llvm::Type*& backing);
+        SizeType(std::string name, Kind kind);
 
         Kind         kind_;
-        llvm::Type*& backing_;
 
       public:
         /**
@@ -37,11 +36,6 @@ namespace lang
          * The minimum size of a diff value.
          */
         static const size_t MINIMUM_DIFF_BIT_SIZE = MINIMUM_BIT_SIZE * 2;
-
-        [[nodiscard]] StateCount getStateCount() const override;
-
-        llvm::Constant* getDefaultContent(llvm::Module& m) override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
         bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
@@ -75,24 +69,21 @@ namespace lang
         /**
          * Build a value of the size type from a given type size.
          * @param size The type size to use as value.
+         * @param context The current compile context.
          * @return The content value containing the given type size.
          */
-        static llvm::Value* buildContentValue(llvm::TypeSize size);
+        static llvm::Value* buildContentValue(llvm::TypeSize size, CompileContext& context);
 
       private:
-        inline static unsigned int size_width_        = 0;
-        inline static llvm::Type*  size_backing_type_ = nullptr;
-
-        inline static unsigned int diff_width_        = 0;
-        inline static llvm::Type*  diff_backing_type_ = nullptr;
+        inline static unsigned int size_width_ = 0;
+        inline static unsigned int diff_width_ = 0;
 
       protected:
-        [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
-        [[nodiscard]] bool isTriviallyCopyConstructible() const override;
-        [[nodiscard]] bool isTriviallyDestructible() const override;
+        std::string createMangledName() const override;
 
-        std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) override;
+        std::optional<size_t> getBitSize() const override;
+        size_t                getNativeBitSize() const override;
+        bool                  isSigned() const override;
 
       public:
         /**

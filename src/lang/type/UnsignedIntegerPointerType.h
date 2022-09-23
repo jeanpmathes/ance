@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_TYPE_UNSIGNEDINTEGERPOINTERTYPE_H_
 #define ANCE_SRC_LANG_TYPE_UNSIGNEDINTEGERPOINTERTYPE_H_
 
-#include "TypeDefinition.h"
+#include "IntegerType.h"
 
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
@@ -17,7 +17,7 @@ namespace lang
     /**
      * Represents the unsigned integer pointer type. It is capable of holding any pointer as an integer.
      */
-    class UnsignedIntegerPointerType : public lang::TypeDefinition
+    class UnsignedIntegerPointerType : public IntegerType
     {
       private:
         UnsignedIntegerPointerType();
@@ -30,25 +30,17 @@ namespace lang
 
         bool isUnsignedIntegerPointerType() const override;
 
-        StateCount getStateCount() const override;
-
-        llvm::Constant* getDefaultContent(llvm::Module& m) override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
-
         [[maybe_unused]] static llvm::Value* buildValue(llvm::Value* pointer, CompileContext& state);
 
       private:
-        inline static Type*        instance_    = nullptr;
-        inline static llvm::Type*  native_type_ = nullptr;
-        inline static unsigned int size_        = 0;
+        inline static unsigned int size_ = 0;
 
       protected:
-        [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
-        [[nodiscard]] bool isTriviallyCopyConstructible() const override;
-        [[nodiscard]] bool isTriviallyDestructible() const override;
+        std::string createMangledName() const override;
 
-        std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) override;
+        std::optional<size_t> getBitSize() const override;
+        size_t                getNativeBitSize() const override;
+        bool                  isSigned() const override;
 
       public:
         /**

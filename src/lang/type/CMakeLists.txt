@@ -20,4 +20,5 @@ target_sources(ance PRIVATE
                TypeAlias.cpp
                StructType.cpp
                SequenceType.cpp
+               IntegerType.cpp
                BooleanType.cpp)

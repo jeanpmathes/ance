@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_TYPE_FIXEDWIDTHINTEGERTYPE_H_
 #define ANCE_SRC_LANG_TYPE_FIXEDWIDTHINTEGERTYPE_H_
 
-#include "VectorizableType.h"
+#include "IntegerType.h"
 
 #include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -14,7 +14,9 @@ namespace lang
     /**
      * Represents a fixed width integer type. They can an arbitrary but fixed bit size and can be signed or unsigned.
      */
-    class FixedWidthIntegerType : public lang::VectorizableType
+    class FixedWidthIntegerType
+        : public IntegerType
+        , public lang::VectorizableType
     {
       private:
         FixedWidthIntegerType(uint64_t bit_size, bool is_signed);
@@ -22,14 +24,8 @@ namespace lang
       public:
         static const int64_t MAX_INTEGER_SIZE = 1ll << 16;
 
-        StateCount getStateCount() const override;
-
         [[nodiscard]] const FixedWidthIntegerType* isFixedWidthIntegerType() const override;
         [[nodiscard]] bool isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
-        [[nodiscard]] bool isSigned() const override;
-
-        llvm::Constant* getDefaultContent(llvm::Module& m) override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
@@ -44,6 +40,8 @@ namespace lang
                                                              lang::ResolvingHandle<lang::Type> other_element,
                                                              std::shared_ptr<Value>            value,
                                                              CompileContext&                   context) override;
+
+        using TypeDefinition::buildOperator;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other) override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
@@ -77,12 +75,11 @@ namespace lang
         bool     is_signed_;
 
       protected:
-        [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
-        [[nodiscard]] bool isTriviallyCopyConstructible() const override;
-        [[nodiscard]] bool isTriviallyDestructible() const override;
+        std::string createMangledName() const override;
 
-        std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) override;
+        std::optional<size_t> getBitSize() const override;
+        size_t                getNativeBitSize() const override;
+        bool                  isSigned() const override;
 
       private:
         static lang::TypeRegistry<std::pair<uint64_t, bool>>& getIntegerTypes();
