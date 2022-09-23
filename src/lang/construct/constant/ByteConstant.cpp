@@ -2,9 +2,9 @@
 
 #include "compiler/Application.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/type/IntegerType.h"
+#include "lang/type/FixedWidthIntegerType.h"
 
-lang::ByteConstant::ByteConstant(uint8_t byte) : type_(lang::IntegerType::get(8, false)), byte_(byte) {}
+lang::ByteConstant::ByteConstant(uint8_t byte) : type_(lang::FixedWidthIntegerType::get(8, false)), byte_(byte) {}
 
 std::string lang::ByteConstant::toString() const
 {

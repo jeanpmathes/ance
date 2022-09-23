@@ -23,14 +23,14 @@ StateCount lang::TypeAlias::getStateCount() const
     return actual_->getStateCount();
 }
 
-const lang::IntegerType* lang::TypeAlias::isIntegerType() const
+const lang::FixedWidthIntegerType* lang::TypeAlias::isFixedWidthIntegerType() const
 {
-    return actual_->isIntegerType();
+    return actual_->isFixedWidthIntegerType();
 }
 
-bool lang::TypeAlias::isIntegerType(uint64_t bit_size, bool is_signed) const
+bool lang::TypeAlias::isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const
 {
-    return actual_->isIntegerType(bit_size, is_signed);
+    return actual_->isFixedWidthIntegerType(bit_size, is_signed);
 }
 
 bool lang::TypeAlias::isBooleanType() const

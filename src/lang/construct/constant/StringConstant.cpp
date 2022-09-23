@@ -4,7 +4,7 @@
 
 #include "lang/construct/constant/ByteConstant.h"
 #include "lang/type/ArrayType.h"
-#include "lang/type/IntegerType.h"
+#include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/PointerType.h"
 
 lang::StringConstant::StringConstant(std::string prefix, std::string string)
@@ -85,8 +85,8 @@ std::string lang::StringConstant::parse(const std::string& unparsed)
 
 lang::ResolvingHandle<lang::Type> lang::StringConstant::resolveType(std::string& prefix, std::string& string)
 {
-    if (prefix == "c") { return lang::PointerType::get(lang::IntegerType::get(8, false)); }
+    if (prefix == "c") { return lang::PointerType::get(lang::FixedWidthIntegerType::get(8, false)); }
 
-    return lang::ArrayType::get(lang::IntegerType::get(8, false), string.size());
+    return lang::ArrayType::get(lang::FixedWidthIntegerType::get(8, false), string.size());
 }
 

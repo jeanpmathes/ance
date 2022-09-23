@@ -9,8 +9,8 @@
 #include "lang/type/BooleanType.h"
 #include "lang/type/BufferType.h"
 #include "lang/type/DoubleType.h"
+#include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/HalfType.h"
-#include "lang/type/IntegerType.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/QuadType.h"
 #include "lang/type/ReferenceType.h"
@@ -819,7 +819,7 @@ std::any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ctx)
     bool     is_unsigned = integer_type_str[0] == 'u';
     uint64_t size        = parseIntegerTypeSize(integer_type_str.substr(1 + integer_type_str.find('i')));
 
-    lang::ResolvingHandle<lang::Type> type = lang::IntegerType::get(size, !is_unsigned);
+    lang::ResolvingHandle<lang::Type> type = lang::FixedWidthIntegerType::get(size, !is_unsigned);
     return type;
 }
 
@@ -1028,7 +1028,7 @@ lang::Identifier SourceVisitor::createIdentifier(const std::string& text, lang::
 
 uint64_t SourceVisitor::parseIntegerTypeSize(const std::string& str)
 {
-    return parseInRange(str, lang::IntegerType::MAX_INTEGER_SIZE);
+    return parseInRange(str, lang::FixedWidthIntegerType::MAX_INTEGER_SIZE);
 }
 
 uint64_t SourceVisitor::parseCompoundTypeSize(const std::string& str)

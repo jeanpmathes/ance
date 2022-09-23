@@ -164,7 +164,7 @@ bool lang::SizeType::acceptOverloadRequest(const std::vector<lang::ResolvingHand
 {
     if (parameters.size() == 1)
     {
-        if (parameters[0]->isIntegerType()) return true;
+        if (parameters[0]->isFixedWidthIntegerType()) return true;
         if (parameters[0]->isSizeType()) return true;
         if (parameters[0]->isDiffType()) return true;
         if (parameters[0]->isBooleanType()) return true;
@@ -196,7 +196,7 @@ void lang::SizeType::buildRequestedOverload(const std::vector<lang::ResolvingHan
 
     if (parameters.size() == 1)
     {
-        if (parameters[0]->isIntegerType()) { build_integer_conversion_ctor(parameters[0]->isSigned()); }
+        if (parameters[0]->isFixedWidthIntegerType()) { build_integer_conversion_ctor(parameters[0]->isSigned()); }
         if (parameters[0]->isSizeType()) { build_integer_conversion_ctor(false); }
         if (parameters[0]->isDiffType()) { build_integer_conversion_ctor(true); }
         if (parameters[0]->isBooleanType()) { build_integer_conversion_ctor(false); }

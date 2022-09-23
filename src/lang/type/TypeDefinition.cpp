@@ -38,12 +38,12 @@ bool lang::TypeDefinition::isCustom() const
     return !location_.isGlobal();
 }
 
-const lang::IntegerType* lang::TypeDefinition::isIntegerType() const
+const lang::FixedWidthIntegerType* lang::TypeDefinition::isFixedWidthIntegerType() const
 {
     return nullptr;
 }
 
-bool lang::TypeDefinition::isIntegerType(uint64_t, bool) const
+bool lang::TypeDefinition::isFixedWidthIntegerType(uint64_t, bool) const
 {
     return false;
 }

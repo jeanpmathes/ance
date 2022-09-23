@@ -25,7 +25,7 @@ namespace lang
     class Function;
     class VectorizableType;
     class FloatingPointType;
-    class IntegerType;
+    class FixedWidthIntegerType;
     class VectorType;
     class ArrayType;
 }
@@ -112,10 +112,10 @@ namespace lang
         [[nodiscard]] bool isCustom() const;
 
         /**
-         * Get whether this type is an integer type. Integer types have a fixed size.
+         * Get whether this type is a fixed width integer type.
          * @return A pointer to the integer type if this type is an integer type, null otherwise.
          */
-        [[nodiscard]] const IntegerType* isIntegerType() const;
+        [[nodiscard]] const FixedWidthIntegerType* isFixedWidthIntegerType() const;
 
         /**
          * Get whether this type is an integer type with a given size and signedness.
@@ -123,7 +123,7 @@ namespace lang
          * @param is_signed The signedness.
          * @return True if this type is an integer type with the given size and signedness.
          */
-        [[nodiscard]] bool isIntegerType(uint64_t bit_size, bool is_signed) const;
+        [[nodiscard]] bool isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const;
 
         /**
          * Get whether this type is signed.

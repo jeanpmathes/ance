@@ -25,7 +25,7 @@ namespace lang
     class PredefinedFunction;
     class VectorizableType;
     class FloatingPointType;
-    class IntegerType;
+    class FixedWidthIntegerType;
     class VectorType;
     class ArrayType;
 }
@@ -60,14 +60,14 @@ namespace lang
 
         [[nodiscard]] virtual StateCount getStateCount() const = 0;
 
-        [[nodiscard]] virtual const IntegerType*       isIntegerType() const;
-        [[nodiscard]] virtual bool                     isIntegerType(uint64_t bit_size, bool is_signed) const;
-        [[nodiscard]] virtual bool                    isSigned() const;
+        [[nodiscard]] virtual const FixedWidthIntegerType* isFixedWidthIntegerType() const;
+        [[nodiscard]] virtual bool                     isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const;
+        [[nodiscard]] virtual bool                     isSigned() const;
         [[nodiscard]] virtual bool                     isBooleanType() const;
         [[nodiscard]] virtual bool                     isUnsignedIntegerPointerType() const;
         [[nodiscard]] virtual const FloatingPointType* isFloatingPointType() const;
         [[nodiscard]] virtual bool                     isFloatingPointType(size_t precision) const;
-        [[nodiscard]] virtual bool                    isSizeType() const;
+        [[nodiscard]] virtual bool                     isSizeType() const;
         [[nodiscard]] virtual bool                     isDiffType() const;
         [[nodiscard]] virtual bool                     isVoidType() const;
         [[nodiscard]] virtual bool                     isPointerType() const;

@@ -176,7 +176,7 @@ bool lang::FloatingPointType::acceptOverloadRequest(const std::vector<lang::Reso
     if (parameters.size() == 1)
     {
         if (parameters[0]->isFloatingPointType()) return true;
-        if (parameters[0]->isIntegerType()) return true;
+        if (parameters[0]->isFixedWidthIntegerType()) return true;
     }
 
     return false;
@@ -212,7 +212,7 @@ void lang::FloatingPointType::buildRequestedOverload(lang::ResolvingHandle<lang:
         }
     }
 
-    if (parameter_element->isIntegerType())
+    if (parameter_element->isFixedWidthIntegerType())
     {
         llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
         context.ir()->SetInsertPoint(block);

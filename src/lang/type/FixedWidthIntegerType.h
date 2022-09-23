@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_LANG_TYPE_INTEGERTYPE_H_
-#define ANCE_SRC_LANG_TYPE_INTEGERTYPE_H_
+#ifndef ANCE_SRC_LANG_TYPE_FIXEDWIDTHINTEGERTYPE_H_
+#define ANCE_SRC_LANG_TYPE_FIXEDWIDTHINTEGERTYPE_H_
 
 #include "VectorizableType.h"
 
@@ -12,20 +12,20 @@ class Application;
 namespace lang
 {
     /**
-     * Represents an integer type. Integers can have any precision and can be signed or unsigned.
+     * Represents a fixed width integer type. They can an arbitrary but fixed bit size and can be signed or unsigned.
      */
-    class IntegerType : public lang::VectorizableType
+    class FixedWidthIntegerType : public lang::VectorizableType
     {
       private:
-        IntegerType(uint64_t bit_size, bool is_signed);
+        FixedWidthIntegerType(uint64_t bit_size, bool is_signed);
 
       public:
         static const int64_t MAX_INTEGER_SIZE = 1ll << 16;
 
         StateCount getStateCount() const override;
 
-        [[nodiscard]] const IntegerType* isIntegerType() const override;
-        [[nodiscard]] bool               isIntegerType(uint64_t bit_size, bool is_signed) const override;
+        [[nodiscard]] const FixedWidthIntegerType* isFixedWidthIntegerType() const override;
+        [[nodiscard]] bool isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
         [[nodiscard]] bool isSigned() const override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) override;

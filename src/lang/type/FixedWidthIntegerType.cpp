@@ -1,4 +1,4 @@
-#include "IntegerType.h"
+#include "FixedWidthIntegerType.h"
 
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
@@ -11,44 +11,44 @@
 #include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
-lang::IntegerType::IntegerType(uint64_t bit_size, bool is_signed)
+lang::FixedWidthIntegerType::FixedWidthIntegerType(uint64_t bit_size, bool is_signed)
     : TypeDefinition(lang::Identifier::from((is_signed ? "i" : "ui") + std::to_string(bit_size)))
     , bit_size_(bit_size)
     , is_signed_(is_signed)
 {}
 
-StateCount lang::IntegerType::getStateCount() const
+StateCount lang::FixedWidthIntegerType::getStateCount() const
 {
     size_t state_count = 1 << bit_size_;
     return state_count;
 }
 
-const lang::IntegerType* lang::IntegerType::isIntegerType() const
+const lang::FixedWidthIntegerType* lang::FixedWidthIntegerType::isFixedWidthIntegerType() const
 {
     return this;
 }
 
-bool lang::IntegerType::isIntegerType(uint64_t bit_size, bool is_signed) const
+bool lang::FixedWidthIntegerType::isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const
 {
     return (bit_size_ == bit_size) && (is_signed_ == is_signed);
 }
 
-bool lang::IntegerType::isSigned() const
+bool lang::FixedWidthIntegerType::isSigned() const
 {
     return is_signed_;
 }
 
-llvm::Constant* lang::IntegerType::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::FixedWidthIntegerType::getDefaultContent(llvm::Module& m)
 {
     return llvm::ConstantInt::get(getContentType(m.getContext()), 0, is_signed_);
 }
 
-llvm::Type* lang::IntegerType::getContentType(llvm::LLVMContext& c) const
+llvm::Type* lang::FixedWidthIntegerType::getContentType(llvm::LLVMContext& c) const
 {
     return llvm::Type::getIntNTy(c, static_cast<unsigned>(bit_size_));
 }
 
-bool lang::IntegerType::validate(ValidationLogger& validation_logger, lang::Location location) const
+bool lang::FixedWidthIntegerType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (bit_size_ == 0)
     {
@@ -66,9 +66,9 @@ bool lang::IntegerType::validate(ValidationLogger& validation_logger, lang::Loca
     return true;
 }
 
-bool lang::IntegerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
+bool lang::FixedWidthIntegerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
 {
-    if (auto other_int = other->isIntegerType())
+    if (auto other_int = other->isFixedWidthIntegerType())
     {
         bool can_enlarge   = (bit_size_ < other_int->bit_size_) && (is_signed_ == other_int->is_signed_);
         bool can_gain_sign = (bit_size_ < other_int->bit_size_) && !is_signed_ && other_int->is_signed_;
@@ -89,24 +89,26 @@ bool lang::IntegerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Ty
     return false;
 }
 
-bool lang::IntegerType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
-                                                   lang::Location,
-                                                   ValidationLogger&) const
+bool lang::FixedWidthIntegerType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
+                                                             lang::Location,
+                                                             ValidationLogger&) const
 {
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                        std::shared_ptr<Value>            value,
-                                                                        CompileContext&                   context)
+std::shared_ptr<lang::Value> lang::FixedWidthIntegerType::buildImplicitConversion(
+    lang::ResolvingHandle<lang::Type> other,
+    std::shared_ptr<Value>            value,
+    CompileContext&                   context)
 {
     return buildImplicitConversion(other, other, value, context);
 }
 
-std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                        lang::ResolvingHandle<lang::Type> other_element,
-                                                                        std::shared_ptr<Value>            value,
-                                                                        CompileContext&                   context)
+std::shared_ptr<lang::Value> lang::FixedWidthIntegerType::buildImplicitConversion(
+    lang::ResolvingHandle<lang::Type> other,
+    lang::ResolvingHandle<lang::Type> other_element,
+    std::shared_ptr<Value>            value,
+    CompileContext&                   context)
 {
     llvm::Value* native_converted_value;
 
@@ -135,11 +137,11 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Re
     return std::make_shared<WrappedNativeValue>(other, native_converted_value);
 }
 
-bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type> other)
+bool lang::FixedWidthIntegerType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type> other)
 {
     other = lang::Type::getReferencedType(other);
 
-    if (other->isIntegerType())
+    if (other->isFixedWidthIntegerType())
     {
         auto* other_type = other->getActualType()->getDefinition();
         auto* this_type  = self()->getActualType()->getDefinition();
@@ -149,8 +151,8 @@ bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingH
     return false;
 }
 
-lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang::BinaryOperator op,
-                                                                           lang::ResolvingHandle<lang::Type>)
+lang::ResolvingHandle<lang::Type> lang::FixedWidthIntegerType::getOperatorResultType(lang::BinaryOperator op,
+                                                                                     lang::ResolvingHandle<lang::Type>)
 {
     if (op.isArithmetic()) return self()->getActualType();
     if (op.isRelational() || op.isEquality()) return lang::BooleanType::get();
@@ -158,28 +160,28 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang:
     return lang::Type::getUndefined();
 }
 
-bool lang::IntegerType::validateOperator(lang::BinaryOperator,
-                                         lang::ResolvingHandle<lang::Type>,
-                                         lang::Location,
-                                         lang::Location,
-                                         ValidationLogger&) const
+bool lang::FixedWidthIntegerType::validateOperator(lang::BinaryOperator,
+                                                   lang::ResolvingHandle<lang::Type>,
+                                                   lang::Location,
+                                                   lang::Location,
+                                                   ValidationLogger&) const
 {
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator   op,
-                                                              std::shared_ptr<Value> left,
-                                                              std::shared_ptr<Value> right,
-                                                              CompileContext&        context)
+std::shared_ptr<lang::Value> lang::FixedWidthIntegerType::buildOperator(lang::BinaryOperator   op,
+                                                                        std::shared_ptr<Value> left,
+                                                                        std::shared_ptr<Value> right,
+                                                                        CompileContext&        context)
 {
     return buildOperator(op, left, right, getOperatorResultType(op, right->type()), context);
 }
 
-std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator              op,
-                                                              std::shared_ptr<Value>            left,
-                                                              std::shared_ptr<Value>            right,
-                                                              lang::ResolvingHandle<lang::Type> return_type,
-                                                              CompileContext&                   context)
+std::shared_ptr<lang::Value> lang::FixedWidthIntegerType::buildOperator(lang::BinaryOperator              op,
+                                                                        std::shared_ptr<Value>            left,
+                                                                        std::shared_ptr<Value>            right,
+                                                                        lang::ResolvingHandle<lang::Type> return_type,
+                                                                        CompileContext&                   context)
 {
     right = lang::Type::getValueOrReferencedValue(right, context);
 
@@ -242,11 +244,12 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
     return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
-bool lang::IntegerType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+bool lang::FixedWidthIntegerType::acceptOverloadRequest(
+    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
 {
     if (parameters.size() == 1)
     {
-        if (parameters[0]->isIntegerType()) return true;
+        if (parameters[0]->isFixedWidthIntegerType()) return true;
         if (parameters[0]->isSizeType() || parameters[0]->isDiffType()) return true;
         if (parameters[0]->isBooleanType()) return true;
         if (parameters[0]->isFloatingPointType()) return true;
@@ -255,17 +258,18 @@ bool lang::IntegerType::acceptOverloadRequest(const std::vector<lang::ResolvingH
     return false;
 }
 
-void lang::IntegerType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
-                                               lang::PredefinedFunction&                             function,
-                                               CompileContext&                                       context)
+void lang::FixedWidthIntegerType::buildRequestedOverload(
+    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+    lang::PredefinedFunction&                             function,
+    CompileContext&                                       context)
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }
 
-void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                               lang::ResolvingHandle<lang::Type> return_type,
-                                               lang::PredefinedFunction&         function,
-                                               CompileContext&                   context)
+void lang::FixedWidthIntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                                         lang::ResolvingHandle<lang::Type> return_type,
+                                                         lang::PredefinedFunction&         function,
+                                                         CompileContext&                   context)
 {
     llvm::Function* native_function;
     std::tie(std::ignore, native_function) = function.getNativeRepresentation();
@@ -284,7 +288,7 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
         }
     };
 
-    if (parameter_element->isIntegerType()) { build_integer_conversion_ctor(parameter_element->isSigned()); }
+    if (parameter_element->isFixedWidthIntegerType()) { build_integer_conversion_ctor(parameter_element->isSigned()); }
     if (parameter_element->isSizeType()) { build_integer_conversion_ctor(false); }
     if (parameter_element->isDiffType()) { build_integer_conversion_ctor(true); }
     if (parameter_element->isBooleanType()) { build_integer_conversion_ctor(false); }
@@ -316,27 +320,27 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
     }
 }
 
-bool lang::IntegerType::isTriviallyDefaultConstructible() const
+bool lang::FixedWidthIntegerType::isTriviallyDefaultConstructible() const
 {
     return true;
 }
 
-bool lang::IntegerType::isTriviallyCopyConstructible() const
+bool lang::FixedWidthIntegerType::isTriviallyCopyConstructible() const
 {
     return true;
 }
 
-bool lang::IntegerType::isTriviallyDestructible() const
+bool lang::FixedWidthIntegerType::isTriviallyDestructible() const
 {
     return true;
 }
 
-std::string lang::IntegerType::createMangledName() const
+std::string lang::FixedWidthIntegerType::createMangledName() const
 {
     return std::string(name().text());
 }
 
-llvm::DIType* lang::IntegerType::createDebugType(CompileContext& context)
+llvm::DIType* lang::FixedWidthIntegerType::createDebugType(CompileContext& context)
 {
     const llvm::DataLayout& dl = context.module()->getDataLayout();
 
@@ -347,18 +351,18 @@ llvm::DIType* lang::IntegerType::createDebugType(CompileContext& context)
     return context.di()->createBasicType(name, size_in_bits, encoding);
 }
 
-lang::TypeRegistry<std::pair<uint64_t, bool>>& lang::IntegerType::getIntegerTypes()
+lang::TypeRegistry<std::pair<uint64_t, bool>>& lang::FixedWidthIntegerType::getIntegerTypes()
 {
     static TypeRegistry<std::pair<uint64_t, bool>> integer_types;
     return integer_types;
 }
 
-lang::TypeDefinitionRegistry* lang::IntegerType::getRegistry()
+lang::TypeDefinitionRegistry* lang::FixedWidthIntegerType::getRegistry()
 {
     return &getIntegerTypes();
 }
 
-lang::ResolvingHandle<lang::Type> lang::IntegerType::get(uint64_t bit_size, bool is_signed)
+lang::ResolvingHandle<lang::Type> lang::FixedWidthIntegerType::get(uint64_t bit_size, bool is_signed)
 {
     std::vector<lang::ResolvingHandle<lang::Type>> used_types;
 
@@ -366,10 +370,11 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::get(uint64_t bit_size, bool
         getIntegerTypes().get(used_types, std::make_pair(bit_size, is_signed));
 
     if (defined_type.has_value()) { return defined_type.value(); }
-    else {
-        auto*                             integer_type = new lang::IntegerType(bit_size, is_signed);
+    else
+    {
+        auto*                             integer_type = new lang::FixedWidthIntegerType(bit_size, is_signed);
         lang::ResolvingHandle<lang::Type> type =
-            lang::makeHandled<lang::Type>(std::unique_ptr<lang::IntegerType>(integer_type));
+            lang::makeHandled<lang::Type>(std::unique_ptr<lang::FixedWidthIntegerType>(integer_type));
         getIntegerTypes().add(std::move(used_types), std::make_pair(bit_size, is_signed), type);
 
         return type;

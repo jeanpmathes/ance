@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "lang/type/IntegerType.h"
+#include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
@@ -10,7 +10,7 @@ lang::IntegerConstant::IntegerConstant(std::string integer, uint64_t size, bool 
     : text_(std::move(integer))
     , size_(size)
     , radix_(radix)
-    , type_(lang::IntegerType::get(size, is_signed))
+    , type_(lang::FixedWidthIntegerType::get(size, is_signed))
 {
     text_.erase(0, std::min(text_.find_first_not_of('0'), text_.size() - 1));
 }

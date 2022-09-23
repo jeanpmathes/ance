@@ -79,16 +79,16 @@ bool lang::Type::isCustom() const
     return definition_->isCustom();
 }
 
-const lang::IntegerType* lang::Type::isIntegerType() const
+const lang::FixedWidthIntegerType* lang::Type::isFixedWidthIntegerType() const
 {
     assert(isDefined());
-    return definition_->isIntegerType();
+    return definition_->isFixedWidthIntegerType();
 }
 
-bool lang::Type::isIntegerType(uint64_t bit_size, bool is_signed) const
+bool lang::Type::isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const
 {
     assert(isDefined());
-    return definition_->isIntegerType(bit_size, is_signed);
+    return definition_->isFixedWidthIntegerType(bit_size, is_signed);
 }
 
 bool lang::Type::isSigned() const

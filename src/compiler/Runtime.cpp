@@ -7,7 +7,7 @@
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/BufferType.h"
-#include "lang/type/IntegerType.h"
+#include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
@@ -63,7 +63,7 @@ void Runtime::setExit(lang::ResolvingHandle<lang::Function> exit)
 
     context_->ir()->SetInsertPoint(abort_block);
     {
-        lang::ResolvingHandle<lang::Type> exit_value_type = lang::IntegerType::get(32, false);
+        lang::ResolvingHandle<lang::Type> exit_value_type = lang::FixedWidthIntegerType::get(32, false);
         llvm::Value* exit_value_content = llvm::ConstantInt::get(exit_value_type->getContentType(llvm_context), 3);
         llvm::Value* exit_value_native  = lang::Values::contentToNative(exit_value_type, exit_value_content, *context_);
         std::shared_ptr<lang::Value> exit_value =

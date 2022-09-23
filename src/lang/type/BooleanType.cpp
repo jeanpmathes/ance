@@ -109,7 +109,7 @@ bool lang::BooleanType::acceptOverloadRequest(const std::vector<lang::ResolvingH
 {
     if (parameters.size() == 1)
     {
-        return parameters[0]->isIntegerType() || parameters[0]->isSizeType() || parameters[0]->isDiffType();
+        return parameters[0]->isFixedWidthIntegerType() || parameters[0]->isSizeType() || parameters[0]->isDiffType();
     }
 
     return false;
@@ -124,7 +124,7 @@ void lang::BooleanType::buildRequestedOverload(const std::vector<lang::Resolving
 
     if (parameters.size() == 1)
     {
-        if (parameters[0]->isIntegerType() || parameters[0]->isSizeType() || parameters[0]->isDiffType())
+        if (parameters[0]->isFixedWidthIntegerType() || parameters[0]->isSizeType() || parameters[0]->isDiffType())
         {
             llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
             context.ir()->SetInsertPoint(block);

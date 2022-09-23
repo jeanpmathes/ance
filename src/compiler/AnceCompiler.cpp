@@ -7,20 +7,20 @@
 
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Verifier.h>
+#include <llvm/MC/TargetRegistry.h>
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
-#include <llvm/MC/TargetRegistry.h>
 
-#include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/scope/GlobalScope.h"
-#include "lang/type/IntegerType.h"
-#include "lang/type/SizeType.h"
-#include "lang/type/UnsignedIntegerPointerType.h"
-#include "lang/utility/Values.h"
 #include "compiler/Application.h"
 #include "compiler/ControlFlowGraphPrinter.h"
 #include "compiler/Project.h"
+#include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/scope/GlobalScope.h"
+#include "lang/type/FixedWidthIntegerType.h"
+#include "lang/type/SizeType.h"
+#include "lang/type/UnsignedIntegerPointerType.h"
+#include "lang/utility/Values.h"
 
 AnceCompiler::AnceCompiler(Application& app)
     : application_(app)
@@ -166,7 +166,7 @@ void AnceCompiler::emitObject(const std::filesystem::path& out)
 
 void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit)
 {
-    lang::ResolvingHandle<lang::Type> exitcode_type = lang::IntegerType::get(32, false);
+    lang::ResolvingHandle<lang::Type> exitcode_type = lang::FixedWidthIntegerType::get(32, false);
 
     llvm::Type* exit_params[] = {exitcode_type->getContentType(llvm_context_)};
     exit_type                 = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), exit_params, false);

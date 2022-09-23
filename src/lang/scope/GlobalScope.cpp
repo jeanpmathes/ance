@@ -7,7 +7,7 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/Assigner.h"
 #include "lang/expression/ConstantExpression.h"
-#include "lang/type/IntegerType.h"
+#include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/StructType.h"
 #include "lang/type/TypeAlias.h"
 #include "validation/ValidationLogger.h"
@@ -372,7 +372,7 @@ std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntr
 
     lang::Function& function = *(potential_function.front());
 
-    if (function.returnType()->isIntegerType(32, false)) return potential_function.front();
+    if (function.returnType()->isFixedWidthIntegerType(32, false)) return potential_function.front();
     else return {};
 }
 
@@ -384,7 +384,7 @@ std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findExit
     auto& [name, group] = *c;
 
     std::vector<lang::ResolvingHandle<lang::Type>> arg_types;
-    arg_types.push_back(lang::IntegerType::get(32, false));
+    arg_types.push_back(lang::FixedWidthIntegerType::get(32, false));
 
     auto potential_function = group->resolveOverload(arg_types);
     if (potential_function.size() != 1) return {};
