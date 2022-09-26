@@ -9,7 +9,9 @@ namespace lang
     /**
      * An abstract class for all integer types.
      */
-    class IntegerType : public virtual lang::TypeDefinition
+    class IntegerType
+        : public virtual lang::TypeDefinition
+        , public virtual lang::VectorizableType
     {
       public:
         [[nodiscard]] StateCount getStateCount() const override;
@@ -53,7 +55,7 @@ namespace lang
         void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
                                     lang::ResolvingHandle<lang::Type> return_type,
                                     lang::PredefinedFunction&         function,
-                                    CompileContext&                   context);
+                                    CompileContext&                   context) override;
 
         using TypeDefinition::buildOperator;
 
@@ -73,7 +75,7 @@ namespace lang
                                                         std::shared_ptr<Value>            left,
                                                         std::shared_ptr<Value>            right,
                                                         lang::ResolvingHandle<lang::Type> return_type,
-                                                        CompileContext&                   context);
+                                                        CompileContext&                   context) override;
 
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;

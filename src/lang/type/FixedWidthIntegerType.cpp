@@ -8,7 +8,6 @@
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/BooleanType.h"
 #include "lang/type/SizeType.h"
-#include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
 lang::FixedWidthIntegerType::FixedWidthIntegerType(uint64_t bit_size, bool is_signed)
@@ -43,56 +42,6 @@ bool lang::FixedWidthIntegerType::validate(ValidationLogger& validation_logger, 
     }
 
     return true;
-}
-
-std::shared_ptr<lang::Value> lang::FixedWidthIntegerType::buildImplicitConversion(
-    lang::ResolvingHandle<lang::Type> other,
-    lang::ResolvingHandle<lang::Type> other_element,
-    std::shared_ptr<Value>            value,
-    CompileContext&                   context)
-{
-    llvm::Value* native_converted_value;
-
-    bool can_directly_convert_to_size =
-        other_element->isSizeType() && !is_signed_ && (bit_size_ == lang::SizeType::getSizeWidth());
-    bool can_directly_convert_to_diff =
-        other_element->isDiffType() && is_signed_ && (bit_size_ == lang::SizeType::getDiffWidth());
-
-    if (can_directly_convert_to_size || can_directly_convert_to_diff)
-    {
-        value->buildNativeValue(context);
-        native_converted_value = value->getNativeValue();
-    }
-    else
-    {
-        value->buildContentValue(context);
-        llvm::Value* content_value = value->getContentValue();
-
-        llvm::Value* converted_value = context.ir()->CreateIntCast(content_value,
-                                                                   other->getContentType(*context.llvmContext()),
-                                                                   is_signed_,
-                                                                   content_value->getName() + ".icast");
-        native_converted_value       = lang::Values::contentToNative(other, converted_value, context);
-    }
-
-    return std::make_shared<WrappedNativeValue>(other, native_converted_value);
-}
-
-std::shared_ptr<lang::Value> lang::FixedWidthIntegerType::buildOperator(lang::BinaryOperator              op,
-                                                                        std::shared_ptr<Value>            left,
-                                                                        std::shared_ptr<Value>            right,
-                                                                        lang::ResolvingHandle<lang::Type> return_type,
-                                                                        CompileContext&                   context)
-{
-    return IntegerType::buildOperator(op, left, right, return_type, context);
-}
-
-void lang::FixedWidthIntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                                         lang::ResolvingHandle<lang::Type> return_type,
-                                                         lang::PredefinedFunction&         function,
-                                                         CompileContext&                   context)
-{
-    IntegerType::buildRequestedOverload(parameter_element, return_type, function, context);
 }
 
 std::string lang::FixedWidthIntegerType::createMangledName() const

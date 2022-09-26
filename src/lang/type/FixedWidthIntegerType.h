@@ -16,7 +16,6 @@ namespace lang
      */
     class FixedWidthIntegerType
         : public IntegerType
-        , public lang::VectorizableType
     {
       private:
         FixedWidthIntegerType(uint64_t bit_size, bool is_signed);
@@ -28,26 +27,6 @@ namespace lang
         [[nodiscard]] bool isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
-
-        using IntegerType::buildImplicitConversion;
-        std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                             lang::ResolvingHandle<lang::Type> other_element,
-                                                             std::shared_ptr<Value>            value,
-                                                             CompileContext&                   context) override;
-
-        using TypeDefinition::buildOperator;
-
-        std::shared_ptr<Value>            buildOperator(lang::BinaryOperator              op,
-                                                        std::shared_ptr<Value>            left,
-                                                        std::shared_ptr<Value>            right,
-                                                        lang::ResolvingHandle<lang::Type> return_type,
-                                                        CompileContext&                   context) override;
-
-        using TypeDefinition::buildRequestedOverload;
-        void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                    lang::ResolvingHandle<lang::Type> return_type,
-                                    lang::PredefinedFunction&         function,
-                                    CompileContext&                   context) override;
 
       private:
         uint64_t bit_size_;

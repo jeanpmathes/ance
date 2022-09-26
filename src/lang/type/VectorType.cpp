@@ -116,7 +116,7 @@ std::shared_ptr<lang::Value> lang::VectorType::buildImplicitConversion(lang::Res
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
-        return element_vector->buildImplicitConversion(other, other->getElementType(), value, context);
+        return element_vector->buildImplicitConversion(other, value, context);
     }
     else
     {
