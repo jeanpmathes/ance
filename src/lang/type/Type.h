@@ -28,6 +28,7 @@ namespace lang
     class FixedWidthIntegerType;
     class VectorType;
     class ArrayType;
+    class IntegerType;
 }
 
 class CompileContext;
@@ -130,6 +131,12 @@ namespace lang
          * @return True if this type is signed.
          */
         [[nodiscard]] bool isSigned() const;
+
+        /**
+         * Get whether this type is an integer type.
+         * @return The integer type if this type is an integer type, null otherwise.
+         */
+        [[nodiscard]] const IntegerType* isIntegerType() const;
 
         /**
          * Get whether this type is a boolean type.

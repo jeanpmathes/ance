@@ -29,13 +29,7 @@ namespace lang
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
-        bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
-        bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                lang::Location                    location,
-                                                                ValidationLogger&                 validation_logger) const override;
-        std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                             std::shared_ptr<Value>            value,
-                                                             CompileContext&                   context) override;
+        using IntegerType::buildImplicitConversion;
         std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                              lang::ResolvingHandle<lang::Type> other_element,
                                                              std::shared_ptr<Value>            value,
@@ -80,6 +74,7 @@ namespace lang
         std::optional<size_t> getBitSize() const override;
         size_t                getNativeBitSize() const override;
         bool                  isSigned() const override;
+        size_t                getMinimumBitSize() const override;
 
       private:
         static lang::TypeRegistry<std::pair<uint64_t, bool>>& getIntegerTypes();

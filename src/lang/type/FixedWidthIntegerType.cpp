@@ -45,44 +45,6 @@ bool lang::FixedWidthIntegerType::validate(ValidationLogger& validation_logger, 
     return true;
 }
 
-bool lang::FixedWidthIntegerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
-{
-    if (auto other_int = other->isFixedWidthIntegerType())
-    {
-        bool can_enlarge   = (bit_size_ < other_int->bit_size_) && (is_signed_ == other_int->is_signed_);
-        bool can_gain_sign = (bit_size_ < other_int->bit_size_) && !is_signed_ && other_int->is_signed_;
-
-        return can_enlarge || can_gain_sign;
-    }
-
-    if (other->isSizeType()) { return !is_signed_ && (bit_size_ <= lang::SizeType::MINIMUM_BIT_SIZE); }
-
-    if (other->isDiffType())
-    {
-        bool can_enlarge   = is_signed_ && (bit_size_ <= lang::SizeType::MINIMUM_DIFF_BIT_SIZE);
-        bool can_gain_sign = !is_signed_ && (bit_size_ < lang::SizeType::MINIMUM_DIFF_BIT_SIZE);
-
-        return can_enlarge || can_gain_sign;
-    }
-
-    return false;
-}
-
-bool lang::FixedWidthIntegerType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
-                                                             lang::Location,
-                                                             ValidationLogger&) const
-{
-    return true;
-}
-
-std::shared_ptr<lang::Value> lang::FixedWidthIntegerType::buildImplicitConversion(
-    lang::ResolvingHandle<lang::Type> other,
-    std::shared_ptr<Value>            value,
-    CompileContext&                   context)
-{
-    return buildImplicitConversion(other, other, value, context);
-}
-
 std::shared_ptr<lang::Value> lang::FixedWidthIntegerType::buildImplicitConversion(
     lang::ResolvingHandle<lang::Type> other,
     lang::ResolvingHandle<lang::Type> other_element,
@@ -347,4 +309,9 @@ size_t lang::FixedWidthIntegerType::getNativeBitSize() const
 bool lang::FixedWidthIntegerType::isSigned() const
 {
     return is_signed_;
+}
+
+size_t lang::FixedWidthIntegerType::getMinimumBitSize() const
+{
+    return bit_size_;
 }

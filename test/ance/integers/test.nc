@@ -1,6 +1,6 @@
 // valid
 
-// Different integer types and their literals.
+// Different fixed-width integer types and their literals.
 
 private x1: i1 <: +0:1;
 private x2: i2 <: +0:2;
@@ -72,7 +72,7 @@ private x64: ui2048 <: 0:2048;
 
 public main () : ui32
 {
-    // Integer literals without type suffixes use the smallest possible integer type.
+    // Integer literals without type suffixes use the smallest possible fixed-width integer type.
     let x65: i32 <: 5;
     let x66: i32 <: -5;
     let x67: ui32 <: 5;

@@ -28,6 +28,7 @@ namespace lang
     class FixedWidthIntegerType;
     class VectorType;
     class ArrayType;
+    class IntegerType;
 }
 
 class CompileContext;
@@ -62,8 +63,9 @@ namespace lang
 
         [[nodiscard]] virtual const FixedWidthIntegerType* isFixedWidthIntegerType() const;
         [[nodiscard]] virtual bool                     isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const;
-        [[nodiscard]] virtual bool                     isSigned() const;
-        [[nodiscard]] virtual bool                     isBooleanType() const;
+        [[nodiscard]] virtual bool                         isSigned() const;
+        [[nodiscard]] virtual const IntegerType*           isIntegerType() const;
+        [[nodiscard]] virtual bool                         isBooleanType() const;
         [[nodiscard]] virtual bool                     isUnsignedIntegerPointerType() const;
         [[nodiscard]] virtual const FloatingPointType* isFloatingPointType() const;
         [[nodiscard]] virtual bool                     isFloatingPointType(size_t precision) const;

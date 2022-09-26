@@ -53,6 +53,11 @@ bool lang::TypeDefinition::isSigned() const
     return false;
 }
 
+const lang::IntegerType* lang::TypeDefinition::isIntegerType() const
+{
+    return nullptr;
+}
+
 bool lang::TypeDefinition::isBooleanType() const
 {
     return false;

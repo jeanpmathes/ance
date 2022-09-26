@@ -58,3 +58,8 @@ bool lang::UnsignedIntegerPointerType::isSigned() const
 {
     return false;
 }
+
+size_t lang::UnsignedIntegerPointerType::getMinimumBitSize() const
+{
+    return MINIMUM_BIT_SIZE;
+}

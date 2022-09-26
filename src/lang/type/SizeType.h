@@ -37,14 +37,6 @@ namespace lang
          */
         static const size_t MINIMUM_DIFF_BIT_SIZE = MINIMUM_BIT_SIZE * 2;
 
-        bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
-        bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                lang::Location                    location,
-                                                                ValidationLogger&                 validation_logger) const override;
-        std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                             std::shared_ptr<Value>            value,
-                                                             CompileContext&                   context) override;
-
         bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other) override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
                                                                 lang::ResolvingHandle<lang::Type> other) override;
@@ -84,6 +76,7 @@ namespace lang
         std::optional<size_t> getBitSize() const override;
         size_t                getNativeBitSize() const override;
         bool                  isSigned() const override;
+        size_t                getMinimumBitSize() const override;
 
       public:
         /**

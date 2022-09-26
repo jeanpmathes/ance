@@ -17,6 +17,8 @@ namespace lang
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
+        const IntegerType* isIntegerType() const override;
+
       protected:
         /**
          * Get the bit size of the integer type, if a fixed size is defined.
@@ -29,6 +31,20 @@ namespace lang
          * @return The native size of the integer.
          */
         virtual size_t getNativeBitSize() const = 0;
+
+        /**
+         * Get the minimum bit size of the type. No matter the target, the type will always be at least this big.
+         * @return The minimum bit size.
+         */
+        virtual size_t getMinimumBitSize() const = 0;
+
+        bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
+        bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                                lang::Location                    location,
+                                                                ValidationLogger&                 validation_logger) const override;
+        std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                             std::shared_ptr<Value>            value,
+                                                             CompileContext&                   context) override;
 
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;

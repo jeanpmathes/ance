@@ -10,34 +10,6 @@
 
 lang::SizeType::SizeType(std::string name, Kind kind) : TypeDefinition(lang::Identifier::from(name)), kind_(kind) {}
 
-bool lang::SizeType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
-{
-    return self()->isSizeType() && other->isDiffType();
-}
-
-bool lang::SizeType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
-                                                lang::Location,
-                                                ValidationLogger&) const
-{
-    return true;
-}
-
-std::shared_ptr<lang::Value> lang::SizeType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                     std::shared_ptr<Value>            value,
-                                                                     CompileContext&                   context)
-{
-    value->buildContentValue(context);
-    llvm::Value* content_value = value->getContentValue();
-
-    llvm::Value* converted_value      = context.ir()->CreateIntCast(content_value,
-                                                               other->getContentType(*context.llvmContext()),
-                                                               false,
-                                                               content_value->getName() + ".icast");
-    llvm::Value* native_content_value = lang::Values::contentToNative(other, converted_value, context);
-
-    return std::make_shared<WrappedNativeValue>(other, native_content_value);
-}
-
 bool lang::SizeType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type> other)
 {
     other = lang::Type::getReferencedType(other);
@@ -254,4 +226,13 @@ size_t lang::SizeType::getNativeBitSize() const
 bool lang::SizeType::isSigned() const
 {
     return (kind_ == DIFF_KIND);
+}
+
+size_t lang::SizeType::getMinimumBitSize() const
+{
+    if (kind_ == SIZE_KIND) return MINIMUM_BIT_SIZE;
+    if (kind_ == DIFF_KIND) return MINIMUM_DIFF_BIT_SIZE;
+
+    assert(false);
+    return 0;
 }

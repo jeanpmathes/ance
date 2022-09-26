@@ -41,6 +41,7 @@ namespace lang
         std::optional<size_t> getBitSize() const override;
         size_t                getNativeBitSize() const override;
         bool                  isSigned() const override;
+        size_t                getMinimumBitSize() const override;
 
       public:
         /**
