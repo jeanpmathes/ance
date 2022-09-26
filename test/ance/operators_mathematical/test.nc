@@ -4,7 +4,7 @@
 
 public main () : ui32
 {
-    // All mathematical operators are supported for all integer types.
+    // All mathematical operators are supported for all fixed-width integer types.
 
     let a1: i32 <: +5:32;
     let b1: i32 <: -5:32;
@@ -50,6 +50,17 @@ public main () : ui32
     let x22: diff <: a4 * b4;
     let x23: diff <: a4 / b4;
     let x24: diff <: a4 % b4;
+
+    // All mathematical operators are supported for the uiptr type.
+
+    let a5: uiptr <: 0x01:uiptr;
+    let b5: uiptr <: 0x02:uiptr;
+
+    let x25: uiptr <: a5 + b5;
+    let x26: uiptr <: a5 - b5;
+    let x27: uiptr <: a5 * b5;
+    let x28: uiptr <: a5 / b5;
+    let x29: uiptr <: a5 % b5;
 
     return 0:32;
 }

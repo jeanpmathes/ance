@@ -4,14 +4,15 @@
 
 public main () : ui32
 {
-    test_integer_math();
+    test_fw_integer_math();
     test_float_math();
     test_size_math();
+    test_uiptr_math();
 
     return 0:32;
 }
 
-private test_integer_math ()
+private test_fw_integer_math ()
 {
     let x1: i32 <: -1:32;
     let x2: i32 <: +1:32;
@@ -64,6 +65,14 @@ private test_size_math ()
     assert 2:size + 3:size * 2:size == 8:size;
     assert 2:size * 3:size + 2:size == 8:size;
     assert 2:size * (3:size + 2:size) != 8:size;
+}
+
+private test_uiptr_math ()
+{
+    let x1: uiptr <: 0x00000001:uiptr;
+    let x2: uiptr <: 0x00000002:uiptr;
+
+    assert x1 + x2 == 0x00000003:uiptr;
 }
 
 public exit (exitcode: ui32)
