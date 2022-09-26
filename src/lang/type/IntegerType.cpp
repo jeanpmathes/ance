@@ -1,5 +1,6 @@
 #include "IntegerType.h"
 
+#include "BooleanType.h"
 #include "compiler/CompileContext.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/WrappedNativeValue.h"
@@ -140,6 +141,119 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
             context.ir()->CreateRet(converted);
         }
     }
+}
+
+bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type> other)
+{
+    other = lang::Type::getReferencedType(other);
+
+    if (auto other_integer = other->isIntegerType())
+    {
+        if (this == other_integer) return true;
+
+        auto this_bit_size  = getBitSize();
+        auto other_bit_size = other_integer->getBitSize();
+
+        if (this_bit_size.has_value() && other_bit_size.has_value())
+        {
+            return this_bit_size.value() == other_bit_size.value();
+        }
+    }
+
+    return false;
+}
+
+lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang::BinaryOperator op,
+                                                                           lang::ResolvingHandle<lang::Type>)
+{
+    if (op.isArithmetic()) return self()->getActualType();
+    if (op.isRelational() || op.isEquality()) return lang::BooleanType::get();
+
+    return lang::Type::getUndefined();
+}
+
+bool lang::IntegerType::validateOperator(lang::BinaryOperator,
+                                         lang::ResolvingHandle<lang::Type>,
+                                         lang::Location,
+                                         lang::Location,
+                                         ValidationLogger&) const
+{
+    return true;
+}
+
+std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator   op,
+                                                              std::shared_ptr<Value> left,
+                                                              std::shared_ptr<Value> right,
+                                                              CompileContext&        context)
+{
+    return buildOperator(op, left, right, getOperatorResultType(op, right->type()), context);
+}
+
+std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator              op,
+                                                              std::shared_ptr<Value>            left,
+                                                              std::shared_ptr<Value>            right,
+                                                              lang::ResolvingHandle<lang::Type> return_type,
+                                                              CompileContext&                   context)
+{
+    right = lang::Type::getValueOrReferencedValue(right, context);
+
+    left->buildContentValue(context);
+    right->buildContentValue(context);
+
+    llvm::Value* left_value  = left->getContentValue();
+    llvm::Value* right_value = right->getContentValue();
+
+    llvm::Value* result;
+
+    switch (op)
+    {
+        case lang::BinaryOperator::ADDITION:
+            result = context.ir()->CreateAdd(left_value, right_value, left_value->getName() + ".add");
+            break;
+        case lang::BinaryOperator::SUBTRACTION:
+            result = context.ir()->CreateSub(left_value, right_value, left_value->getName() + ".sub");
+            break;
+        case lang::BinaryOperator::MULTIPLICATION:
+            result = context.ir()->CreateMul(left_value, right_value, left_value->getName() + ".mul");
+            break;
+        case lang::BinaryOperator::DIVISION:
+            if (isSigned()) result = context.ir()->CreateSDiv(left_value, right_value, left_value->getName() + ".sdiv");
+            else result = context.ir()->CreateUDiv(left_value, right_value, left_value->getName() + ".udiv");
+            break;
+        case lang::BinaryOperator::REMAINDER:
+            if (isSigned()) result = context.ir()->CreateSRem(left_value, right_value, left_value->getName() + ".srem");
+            else result = context.ir()->CreateURem(left_value, right_value, left_value->getName() + ".urem");
+            break;
+        case lang::BinaryOperator::LESS_THAN:
+            if (isSigned())
+                result = context.ir()->CreateICmpSLT(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir()->CreateICmpULT(left_value, right_value, left_value->getName() + ".icmp");
+            break;
+        case lang::BinaryOperator::LESS_THAN_OR_EQUAL:
+            if (isSigned())
+                result = context.ir()->CreateICmpSLE(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir()->CreateICmpULE(left_value, right_value, left_value->getName() + ".icmp");
+            break;
+        case lang::BinaryOperator::GREATER_THAN:
+            if (isSigned())
+                result = context.ir()->CreateICmpSGT(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir()->CreateICmpUGT(left_value, right_value, left_value->getName() + ".icmp");
+            break;
+        case lang::BinaryOperator::GREATER_THAN_OR_EQUAL:
+            if (isSigned())
+                result = context.ir()->CreateICmpSGE(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir()->CreateICmpUGE(left_value, right_value, left_value->getName() + ".icmp");
+            break;
+        case lang::BinaryOperator::EQUAL:
+            result = context.ir()->CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
+            break;
+        case lang::BinaryOperator::NOT_EQUAL:
+            result = context.ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
+            break;
+    }
+
+    llvm::Value* native_result = lang::Values::contentToNative(return_type, result, context);
+    return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
 bool lang::IntegerType::isTriviallyDefaultConstructible() const
