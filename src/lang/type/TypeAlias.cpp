@@ -38,6 +38,11 @@ bool lang::TypeAlias::isBooleanType() const
     return actual_->isBooleanType();
 }
 
+const lang::IntegerType* lang::TypeAlias::isIntegerType() const
+{
+    return actual_->isIntegerType();
+}
+
 const lang::FloatingPointType* lang::TypeAlias::isFloatingPointType() const
 {
     return actual_->isFloatingPointType();

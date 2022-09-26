@@ -24,8 +24,9 @@ namespace lang
         StateCount getStateCount() const override;
 
         [[nodiscard]] const FixedWidthIntegerType* isFixedWidthIntegerType() const override;
-        [[nodiscard]] bool isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
-        [[nodiscard]] bool isBooleanType() const override;
+        [[nodiscard]] bool               isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
+        [[nodiscard]] const IntegerType* isIntegerType() const override;
+        [[nodiscard]] bool               isBooleanType() const override;
         [[nodiscard]] const FloatingPointType* isFloatingPointType() const override;
         [[nodiscard]] bool                     isFloatingPointType(size_t precision) const override;
         [[nodiscard]] bool                     isSizeType() const override;

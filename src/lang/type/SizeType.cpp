@@ -113,49 +113,6 @@ std::shared_ptr<lang::Value> lang::SizeType::buildOperator(lang::BinaryOperator 
     return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
 }
 
-bool lang::SizeType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
-{
-    if (parameters.size() == 1)
-    {
-        if (parameters[0]->isFixedWidthIntegerType()) return true;
-        if (parameters[0]->isSizeType()) return true;
-        if (parameters[0]->isDiffType()) return true;
-        if (parameters[0]->isBooleanType()) return true;
-    }
-
-    return false;
-}
-
-void lang::SizeType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
-                                            lang::PredefinedFunction&                             function,
-                                            CompileContext&                                       context)
-{
-    llvm::Function* native_function;
-    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
-
-    auto build_integer_conversion_ctor = [&](bool is_signed) {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
-        {
-            llvm::Value* original = native_function->getArg(0);
-
-            llvm::Value* converted = context.ir()->CreateIntCast(original,
-                                                                 getContentType(*context.llvmContext()),
-                                                                 is_signed,
-                                                                 original->getName() + ".icast");
-            context.ir()->CreateRet(converted);
-        }
-    };
-
-    if (parameters.size() == 1)
-    {
-        if (parameters[0]->isFixedWidthIntegerType()) { build_integer_conversion_ctor(parameters[0]->isSigned()); }
-        if (parameters[0]->isSizeType()) { build_integer_conversion_ctor(false); }
-        if (parameters[0]->isDiffType()) { build_integer_conversion_ctor(true); }
-        if (parameters[0]->isBooleanType()) { build_integer_conversion_ctor(false); }
-    }
-}
-
 bool lang::SizeType::isSizeType() const
 {
     return (kind_ == SIZE_KIND);

@@ -55,10 +55,7 @@ namespace lang
                                                         lang::ResolvingHandle<lang::Type> return_type,
                                                         CompileContext&                   context) override;
 
-        bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
-        void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
-                                    lang::PredefinedFunction&                             function,
-                                    CompileContext&                                       context) override;
+        using TypeDefinition::buildRequestedOverload;
         void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
                                     lang::ResolvingHandle<lang::Type> return_type,
                                     lang::PredefinedFunction&         function,

@@ -185,80 +185,12 @@ std::shared_ptr<lang::Value> lang::FixedWidthIntegerType::buildOperator(lang::Bi
     return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
-bool lang::FixedWidthIntegerType::acceptOverloadRequest(
-    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
-{
-    if (parameters.size() == 1)
-    {
-        if (parameters[0]->isFixedWidthIntegerType()) return true;
-        if (parameters[0]->isSizeType() || parameters[0]->isDiffType()) return true;
-        if (parameters[0]->isBooleanType()) return true;
-        if (parameters[0]->isFloatingPointType()) return true;
-    }
-
-    return false;
-}
-
-void lang::FixedWidthIntegerType::buildRequestedOverload(
-    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
-    lang::PredefinedFunction&                             function,
-    CompileContext&                                       context)
-{
-    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
-}
-
 void lang::FixedWidthIntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
                                                          lang::ResolvingHandle<lang::Type> return_type,
                                                          lang::PredefinedFunction&         function,
                                                          CompileContext&                   context)
 {
-    llvm::Function* native_function;
-    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
-
-    auto build_integer_conversion_ctor = [&](bool is_signed) {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
-        {
-            llvm::Value* original = native_function->getArg(0);
-
-            llvm::Value* converted = context.ir()->CreateIntCast(original,
-                                                                 return_type->getContentType(*context.llvmContext()),
-                                                                 is_signed,
-                                                                 original->getName() + ".icast");
-            context.ir()->CreateRet(converted);
-        }
-    };
-
-    if (parameter_element->isFixedWidthIntegerType()) { build_integer_conversion_ctor(parameter_element->isSigned()); }
-    if (parameter_element->isSizeType()) { build_integer_conversion_ctor(false); }
-    if (parameter_element->isDiffType()) { build_integer_conversion_ctor(true); }
-    if (parameter_element->isBooleanType()) { build_integer_conversion_ctor(false); }
-
-    if (parameter_element->isFloatingPointType())
-    {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
-        {
-            llvm::Value* original = native_function->getArg(0);
-
-            llvm::Value* converted;
-
-            if (is_signed_)
-            {
-                converted = context.ir()->CreateFPToSI(original,
-                                                       return_type->getContentType(*context.llvmContext()),
-                                                       original->getName() + ".fptosi");
-            }
-            else
-            {
-                converted = context.ir()->CreateFPToUI(original,
-                                                       return_type->getContentType(*context.llvmContext()),
-                                                       original->getName() + ".fptoui");
-            }
-
-            context.ir()->CreateRet(converted);
-        }
-    }
+    IntegerType::buildRequestedOverload(parameter_element, return_type, function, context);
 }
 
 std::string lang::FixedWidthIntegerType::createMangledName() const

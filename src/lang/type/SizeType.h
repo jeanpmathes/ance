@@ -50,11 +50,6 @@ namespace lang
                                                         std::shared_ptr<Value> right,
                                                         CompileContext&        context) override;
 
-        bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
-        void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
-                                    lang::PredefinedFunction&                             function,
-                                    CompileContext&                                       context) override;
-
         [[nodiscard]] bool isSizeType() const override;
         [[nodiscard]] bool isDiffType() const override;
 

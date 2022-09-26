@@ -1,6 +1,7 @@
 #include "IntegerType.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/utility/Values.h"
 
@@ -71,6 +72,74 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Re
     llvm::Value* native_converted_value = lang::Values::contentToNative(other, converted_value, context);
 
     return std::make_shared<WrappedNativeValue>(other, native_converted_value);
+}
+
+bool lang::IntegerType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+{
+    if (parameters.size() == 1)
+    {
+        if (parameters[0]->isIntegerType()) return true;
+        if (parameters[0]->isBooleanType()) return true;
+        if (parameters[0]->isFloatingPointType()) return true;
+    }
+
+    return false;
+}
+
+void lang::IntegerType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                               lang::PredefinedFunction&                             function,
+                                               CompileContext&                                       context)
+{
+    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
+}
+
+void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                               lang::ResolvingHandle<lang::Type> return_type,
+                                               lang::PredefinedFunction&         function,
+                                               CompileContext&                   context)
+{
+    llvm::Function* native_function;
+    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
+
+    if (parameter_element->isIntegerType() || parameter_element->isBooleanType())
+    {
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
+        {
+            llvm::Value* original = native_function->getArg(0);
+
+            llvm::Value* converted = context.ir()->CreateIntCast(original,
+                                                                 return_type->getContentType(*context.llvmContext()),
+                                                                 parameter_element->isSigned(),
+                                                                 original->getName() + ".icast");
+            context.ir()->CreateRet(converted);
+        }
+    }
+
+    if (parameter_element->isFloatingPointType())
+    {
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
+        {
+            llvm::Value* original = native_function->getArg(0);
+            llvm::Value* converted;
+
+            if (isSigned())
+            {
+                converted = context.ir()->CreateFPToSI(original,
+                                                       return_type->getContentType(*context.llvmContext()),
+                                                       original->getName() + ".fptosi");
+            }
+            else
+            {
+                converted = context.ir()->CreateFPToUI(original,
+                                                       return_type->getContentType(*context.llvmContext()),
+                                                       original->getName() + ".fptoui");
+            }
+
+            context.ir()->CreateRet(converted);
+        }
+    }
 }
 
 bool lang::IntegerType::isTriviallyDefaultConstructible() const

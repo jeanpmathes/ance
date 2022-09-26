@@ -31,6 +31,11 @@ lang::VectorType* lang::VectorType::isVectorType()
     return this;
 }
 
+bool lang::VectorType::isSigned() const
+{
+    return element_type_->isSigned();
+}
+
 lang::ResolvingHandle<lang::Type> lang::VectorType::getActualType() const
 {
     lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();

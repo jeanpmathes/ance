@@ -32,6 +32,8 @@ namespace lang
         const VectorType* isVectorType() const override;
         VectorType*       isVectorType() override;
 
+        bool isSigned() const override;
+
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
