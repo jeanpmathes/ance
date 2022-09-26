@@ -15,20 +15,22 @@
 #include "lang/type/QuadType.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SingleType.h"
+#include "lang/type/SizeType.h"
+#include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/type/VectorType.h"
 #include "lang/type/VoidType.h"
 
+#include "lang/statement/Assertion.h"
 #include "lang/statement/Assignment.h"
 #include "lang/statement/Delete.h"
+#include "lang/statement/Drop.h"
 #include "lang/statement/ExpressionStatement.h"
+#include "lang/statement/If.h"
 #include "lang/statement/LocalReferenceVariableDefinition.h"
 #include "lang/statement/LocalVariableDefinition.h"
-#include "lang/statement/Drop.h"
-#include "lang/statement/Return.h"
-#include "lang/statement/Assertion.h"
-#include "lang/statement/If.h"
-#include "lang/statement/While.h"
 #include "lang/statement/Match.h"
+#include "lang/statement/Return.h"
+#include "lang/statement/While.h"
 
 #include "lang/expression/Addressof.h"
 #include "lang/expression/Allocation.h"
@@ -54,12 +56,9 @@
 
 #include "lang/construct/constant/BooleanConstant.h"
 #include "lang/construct/constant/ByteConstant.h"
-#include "lang/construct/constant/DiffConstant.h"
 #include "lang/construct/constant/FloatConstant.h"
 #include "lang/construct/constant/IntegerConstant.h"
-#include "lang/construct/constant/SizeConstant.h"
 #include "lang/construct/constant/StringConstant.h"
-#include "lang/construct/constant/UiptrConstant.h"
 
 #include "lang/construct/CodeBlock.h"
 #include "lang/construct/Member.h"
@@ -737,16 +736,18 @@ std::any SourceVisitor::visitFalse(anceParser::FalseContext* ctx)
 
 std::any SourceVisitor::visitSizeLiteral(anceParser::SizeLiteralContext* ctx)
 {
-    std::string                     value    = ctx->INTEGER()->getText();
-    std::shared_ptr<lang::Constant> constant = std::make_shared<lang::SizeConstant>(value);
+    std::string                     value = ctx->INTEGER()->getText();
+    std::shared_ptr<lang::Constant> constant =
+        std::make_shared<lang::IntegerConstant>(value, 10, lang::SizeType::getSize());
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ctx)
 {
-    std::string                     value    = ctx->SIGNED_INTEGER()->getText();
-    std::shared_ptr<lang::Constant> constant = std::make_shared<lang::DiffConstant>(value);
+    std::string                     value = ctx->SIGNED_INTEGER()->getText();
+    std::shared_ptr<lang::Constant> constant =
+        std::make_shared<lang::IntegerConstant>(value, 10, lang::SizeType::getDiff());
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
@@ -756,7 +757,8 @@ std::any SourceVisitor::visitUiptrLiteral(anceParser::UiptrLiteralContext* ctx)
     std::string value = ctx->HEX_INTEGER()->getText();
     value.erase(0, 2);
 
-    std::shared_ptr<lang::Constant> constant = std::make_shared<lang::UiptrConstant>(value);
+    std::shared_ptr<lang::Constant> constant =
+        std::make_shared<lang::IntegerConstant>(value, 16, lang::UnsignedIntegerPointerType::get());
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
@@ -771,7 +773,9 @@ std::any SourceVisitor::visitNormalInteger(anceParser::NormalIntegerContext* ctx
     if (ctx->width)
     {
         uint64_t size    = parseIntegerTypeSize(ctx->width->getText());
-        integer_constant = std::make_shared<lang::IntegerConstant>(literal_text, size, is_signed);
+        integer_constant = std::make_shared<lang::IntegerConstant>(literal_text,
+                                                                   10,
+                                                                   lang::FixedWidthIntegerType::get(size, is_signed));
     }
     else {
         integer_constant = std::make_shared<lang::IntegerConstant>(literal_text, is_signed);
@@ -808,7 +812,7 @@ std::any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerContext* c
     integer_str.erase(0, 2);
 
     std::shared_ptr<lang::Constant> integer_constant =
-        std::make_shared<lang::IntegerConstant>(integer_str, size, false, radix);
+        std::make_shared<lang::IntegerConstant>(integer_str, radix, lang::FixedWidthIntegerType::get(size, false));
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 

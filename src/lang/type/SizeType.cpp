@@ -88,3 +88,12 @@ size_t lang::SizeType::getMinimumBitSize() const
     assert(false);
     return 0;
 }
+
+std::string lang::SizeType::getSuffix() const
+{
+    if (kind_ == SIZE_KIND) return "size";
+    if (kind_ == DIFF_KIND) return "diff";
+
+    assert(false);
+    return "";
+}

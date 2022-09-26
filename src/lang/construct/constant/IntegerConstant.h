@@ -10,6 +10,11 @@ class Application;
 
 namespace lang
 {
+    class IntegerType;
+}
+
+namespace lang
+{
     /**
      * An integer constant using any of the integer types.
      */
@@ -19,14 +24,13 @@ namespace lang
         /**
          * Create a new integer constant.
          * @param integer The integer value to use, encoded as a string.
-         * @param size The size of the integer, in bits.
-         * @param is_signed Whether the integer should be signed or unsigned.
          * @param radix The radix to use when parsing the integer.
+         * @param type The type of the constant. Must be an integer type.
          */
-        IntegerConstant(std::string integer, uint64_t size, bool is_signed, uint8_t radix = 10);
+        IntegerConstant(std::string integer, uint8_t radix, lang::ResolvingHandle<lang::Type> type);
 
         /**
-         * Create a new integer constant that selects it's size to be large enough to hold the given value.
+         * Create a new fixed-width integer constant that selects it's size to be large enough to hold the given value.
          * @param integer The integer value to use, encoded as a string. Radix is assumed to be 10.
          * @param is_signed Whether the integer value is signed or unsigned.
          */
@@ -43,9 +47,9 @@ namespace lang
 
       private:
         std::string                       text_;
-        std::uint64_t                     size_;
         std::uint8_t                      radix_;
         lang::ResolvingHandle<lang::Type> type_;
+        const IntegerType*                integer_type_;
     };
 }
 

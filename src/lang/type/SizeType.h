@@ -59,6 +59,7 @@ namespace lang
         size_t                getNativeBitSize() const override;
         bool                  isSigned() const override;
         size_t                getMinimumBitSize() const override;
+        std::string           getSuffix() const override;
 
       public:
         /**

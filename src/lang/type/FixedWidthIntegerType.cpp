@@ -98,3 +98,8 @@ size_t lang::FixedWidthIntegerType::getMinimumBitSize() const
 {
     return bit_size_;
 }
+
+std::string lang::FixedWidthIntegerType::getSuffix() const
+{
+    return std::to_string(bit_size_);
+}

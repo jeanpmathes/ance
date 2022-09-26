@@ -3,20 +3,21 @@
 #include <utility>
 
 #include "lang/type/FixedWidthIntegerType.h"
+#include "lang/type/IntegerType.h"
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
-lang::IntegerConstant::IntegerConstant(std::string integer, uint64_t size, bool is_signed, uint8_t radix)
+lang::IntegerConstant::IntegerConstant(std::string integer, uint8_t radix, lang::ResolvingHandle<lang::Type> type)
     : text_(std::move(integer))
-    , size_(size)
     , radix_(radix)
-    , type_(lang::FixedWidthIntegerType::get(size, is_signed))
+    , type_(type)
+    , integer_type_(type->isIntegerType())
 {
     text_.erase(0, std::min(text_.find_first_not_of('0'), text_.size() - 1));
 }
 
 lang::IntegerConstant::IntegerConstant(const std::string& integer, bool is_signed)
-    : IntegerConstant(integer, llvm::APInt::getBitsNeeded(integer, 10), is_signed, 10)
+    : IntegerConstant(integer, 10, lang::FixedWidthIntegerType::get(llvm::APInt::getBitsNeeded(integer, 10), is_signed))
 {}
 
 std::string lang::IntegerConstant::toString() const
@@ -41,7 +42,7 @@ std::string lang::IntegerConstant::toString() const
             throw std::runtime_error("Invalid radix");
     }
 
-    return prefix + text_ + ":" + std::to_string(size_);
+    return prefix + text_ + ":" + integer_type_->getSuffix();
 }
 
 bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -69,10 +70,29 @@ bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::
         needed_bits = get_needed_bits_corrected();
     }
 
-    if (needed_bits > size_)
+    auto bit_size = integer_type_->getBitSize();
+
+    if (bit_size.has_value())
     {
-        validation_logger.logError("Integer constant too large for its type", location);
-        return false;
+        if (needed_bits > bit_size.value())
+        {
+            validation_logger.logError("Integer literal larger than the fixed " + std::to_string(bit_size.value())
+                                           + " bit size",
+                                       location);
+            return false;
+        }
+    }
+    else
+    {
+        size_t min_bit_size = integer_type_->getMinimumBitSize();
+
+        if (needed_bits > min_bit_size)
+        {
+            validation_logger.logError("Integer literal larger than minimum ensured " + std::to_string(min_bit_size)
+                                           + " bits",
+                                       location);
+            return false;
+        }
     }
 
     return true;
@@ -85,7 +105,7 @@ lang::ResolvingHandle<lang::Type> lang::IntegerConstant::type() const
 
 llvm::Constant* lang::IntegerConstant::buildContent(llvm::Module* m)
 {
-    llvm::APInt integer(static_cast<unsigned int>(size_), text_, radix_);
+    llvm::APInt integer(static_cast<unsigned int>(integer_type_->getNativeBitSize()), text_, radix_);
     return llvm::ConstantInt::get(type_->getContentType(m->getContext()), integer);
 }
 
@@ -94,8 +114,16 @@ bool lang::IntegerConstant::equals(const lang::Constant* other) const
     auto other_int = dynamic_cast<const IntegerConstant*>(other);
     if (!other_int) return false;
 
-    llvm::APInt this_value(static_cast<unsigned int>(size_), text_, radix_);
-    llvm::APInt other_value(static_cast<unsigned int>(other_int->size_), other_int->text_, other_int->radix_);
+    if (other_int->integer_type_ != integer_type_) return false;
+
+    llvm::APInt this_value(
+        static_cast<unsigned int>(integer_type_->getBitSize().value_or(integer_type_->getMinimumBitSize())),
+        text_,
+        radix_);
+    llvm::APInt other_value(static_cast<unsigned int>(other_int->integer_type_->getBitSize().value_or(
+                                other_int->integer_type_->getMinimumBitSize())),
+                            other_int->text_,
+                            other_int->radix_);
 
     if (this_value.getBitWidth() != other_value.getBitWidth()) return false;
 

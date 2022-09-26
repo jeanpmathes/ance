@@ -21,7 +21,6 @@ namespace lang
 
         const IntegerType* isIntegerType() const override;
 
-      protected:
         /**
          * Get the bit size of the integer type, if a fixed size is defined.
          * @return The size or none.
@@ -40,6 +39,13 @@ namespace lang
          */
         virtual size_t getMinimumBitSize() const = 0;
 
+        /**
+         * Get the suffix used in literals.
+         * @return The suffix.
+         */
+        virtual std::string getSuffix() const = 0;
+
+      protected:
         bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
         bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                                 lang::Location                    location,

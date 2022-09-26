@@ -39,6 +39,7 @@ namespace lang
         size_t                getNativeBitSize() const override;
         bool                  isSigned() const override;
         size_t                getMinimumBitSize() const override;
+        std::string           getSuffix() const override;
 
       private:
         static lang::TypeRegistry<std::pair<uint64_t, bool>>& getIntegerTypes();

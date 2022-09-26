@@ -63,3 +63,8 @@ size_t lang::UnsignedIntegerPointerType::getMinimumBitSize() const
 {
     return MINIMUM_BIT_SIZE;
 }
+
+std::string lang::UnsignedIntegerPointerType::getSuffix() const
+{
+    return "uiptr";
+}

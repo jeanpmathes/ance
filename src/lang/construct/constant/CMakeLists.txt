@@ -4,7 +4,4 @@ target_sources(ance PRIVATE
                Constant.cpp
                FloatConstant.cpp
                IntegerConstant.cpp
-               SizeConstant.cpp
-               UiptrConstant.cpp
-               StringConstant.cpp
-               DiffConstant.cpp)
+               StringConstant.cpp)
