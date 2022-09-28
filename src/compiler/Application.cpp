@@ -22,6 +22,7 @@
 #include "lang/type/VectorType.h"
 
 #include "lang/type/BooleanType.h"
+#include "lang/type/NullPointerType.h"
 #include "lang/type/OpaquePointerType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/UnsignedIntegerPointerType.h"
@@ -42,6 +43,7 @@ Application::Application(Project& project) : Application(project, std::make_uniq
     global_scope_->registerDefinition(lang::SizeType::getDiff());
     global_scope_->registerDefinition(lang::UnsignedIntegerPointerType::get());
     global_scope_->registerDefinition(lang::OpaquePointerType::get());
+    global_scope_->registerDefinition(lang::NullPointerType::get());
 
     // Add type registries
 

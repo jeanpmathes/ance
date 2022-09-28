@@ -188,6 +188,12 @@ namespace lang
         [[nodiscard]] bool isPointerType() const;
 
         /**
+         * Get whether this type is a type that represents a memory address.
+         * @return True if this type is a memory address type.
+         */
+        [[nodiscard]] bool isAddressType() const;
+
+        /**
          * Get whether this type is a buffer type.
          * @return True if this type is a buffer type.
          */

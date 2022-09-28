@@ -255,6 +255,8 @@ class anceBaseVisitor : public anceVisitor
 
     virtual std::any visitFalse(anceParser::FalseContext* ctx) override { return visitChildren(ctx); }
 
+    virtual std::any visitNull(anceParser::NullContext* ctx) override { return visitChildren(ctx); }
+
     virtual std::any visitSizeLiteral(anceParser::SizeLiteralContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitDiffLiteral(anceParser::DiffLiteralContext* ctx) override { return visitChildren(ctx); }
@@ -296,6 +298,11 @@ class anceBaseVisitor : public anceVisitor
     }
 
     virtual std::any visitBooleanType(anceParser::BooleanTypeContext* ctx) override { return visitChildren(ctx); }
+
+    virtual std::any visitNullPointerType(anceParser::NullPointerTypeContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
 
     virtual std::any visitVoidType(anceParser::VoidTypeContext* ctx) override { return visitChildren(ctx); }
 

@@ -11,6 +11,7 @@ namespace lang
     class AddressType : public virtual TypeDefinition
     {
       public:
+        bool       isAddressType() const override;
         StateCount getStateCount() const override;
     };
 }

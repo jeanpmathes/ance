@@ -228,6 +228,7 @@ literalExpression
 	| integerLiteral
 	| floatingPointLiteral
 	| booleanLiteral
+	| nullLiteral
 	| sizeLiteral
 	| diffLiteral
 	| uiptrLiteral
@@ -266,6 +267,10 @@ floatingPointLiteral
 booleanLiteral
     : 'true' # True
     | 'false' # False
+    ;
+
+nullLiteral
+    : 'null' # Null
     ;
 
 sizeLiteral
@@ -307,6 +312,7 @@ keywordType
     : floatingPointType
     | targetDependentType
     | booleanType
+    | nullPointerType
     | voidType
     ;
 
@@ -327,6 +333,10 @@ targetDependentType
 booleanType
 	: 'bool'
 	;
+
+nullPointerType
+    : 'nullptr'
+    ;
 
 voidType
 	: 'void'

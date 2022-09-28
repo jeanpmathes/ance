@@ -77,26 +77,28 @@ class anceParser : public antlr4::Parser
         T__64               = 65,
         T__65               = 66,
         T__66               = 67,
-        NATIVE_INTEGER_TYPE = 68,
-        SIGNED_INTEGER      = 69,
-        HEX_INTEGER         = 70,
-        BIN_INTEGER         = 71,
-        OCT_INTEGER         = 72,
-        HALF                = 73,
-        SINGLE              = 74,
-        DOUBLE              = 75,
-        QUAD                = 76,
-        DECIMAL             = 77,
-        STRING              = 78,
-        BYTE                = 79,
-        INTEGER             = 80,
-        BUFFER              = 81,
-        CONST               = 82,
-        IDENTIFIER          = 83,
-        SEMICOLON           = 84,
-        WHITESPACE          = 85,
-        BLOCK_COMMENT       = 86,
-        LINE_COMMENT        = 87
+        T__67               = 68,
+        T__68               = 69,
+        NATIVE_INTEGER_TYPE = 70,
+        SIGNED_INTEGER      = 71,
+        HEX_INTEGER         = 72,
+        BIN_INTEGER         = 73,
+        OCT_INTEGER         = 74,
+        HALF                = 75,
+        SINGLE              = 76,
+        DOUBLE              = 77,
+        QUAD                = 78,
+        DECIMAL             = 79,
+        STRING              = 80,
+        BYTE                = 81,
+        INTEGER             = 82,
+        BUFFER              = 83,
+        CONST               = 84,
+        IDENTIFIER          = 85,
+        SEMICOLON           = 86,
+        WHITESPACE          = 87,
+        BLOCK_COMMENT       = 88,
+        LINE_COMMENT        = 89
     };
 
     enum
@@ -152,19 +154,21 @@ class anceParser : public antlr4::Parser
         RuleSpecialInteger               = 48,
         RuleFloatingPointLiteral         = 49,
         RuleBooleanLiteral               = 50,
-        RuleSizeLiteral                  = 51,
-        RuleDiffLiteral                  = 52,
-        RuleUiptrLiteral                 = 53,
-        RuleType                         = 54,
-        RuleIntegerType                  = 55,
-        RuleArrayType                    = 56,
-        RuleVectorType                   = 57,
-        RuleKeywordType                  = 58,
-        RuleFloatingPointType            = 59,
-        RuleTargetDependentType          = 60,
-        RuleBooleanType                  = 61,
-        RuleVoidType                     = 62,
-        RuleCustomType                   = 63
+        RuleNullLiteral                  = 51,
+        RuleSizeLiteral                  = 52,
+        RuleDiffLiteral                  = 53,
+        RuleUiptrLiteral                 = 54,
+        RuleType                         = 55,
+        RuleIntegerType                  = 56,
+        RuleArrayType                    = 57,
+        RuleVectorType                   = 58,
+        RuleKeywordType                  = 59,
+        RuleFloatingPointType            = 60,
+        RuleTargetDependentType          = 61,
+        RuleBooleanType                  = 62,
+        RuleNullPointerType              = 63,
+        RuleVoidType                     = 64,
+        RuleCustomType                   = 65
     };
 
     explicit anceParser(antlr4::TokenStream* input);
@@ -234,6 +238,7 @@ class anceParser : public antlr4::Parser
     class SpecialIntegerContext;
     class FloatingPointLiteralContext;
     class BooleanLiteralContext;
+    class NullLiteralContext;
     class SizeLiteralContext;
     class DiffLiteralContext;
     class UiptrLiteralContext;
@@ -245,6 +250,7 @@ class anceParser : public antlr4::Parser
     class FloatingPointTypeContext;
     class TargetDependentTypeContext;
     class BooleanTypeContext;
+    class NullPointerTypeContext;
     class VoidTypeContext;
     class CustomTypeContext;
 
@@ -1323,6 +1329,7 @@ class anceParser : public antlr4::Parser
         IntegerLiteralContext*       integerLiteral();
         FloatingPointLiteralContext* floatingPointLiteral();
         BooleanLiteralContext*       booleanLiteral();
+        NullLiteralContext*          nullLiteral();
         SizeLiteralContext*          sizeLiteral();
         DiffLiteralContext*          diffLiteral();
         UiptrLiteralContext*         uiptrLiteral();
@@ -1448,6 +1455,28 @@ class anceParser : public antlr4::Parser
     };
 
     BooleanLiteralContext* booleanLiteral();
+
+    class NullLiteralContext : public antlr4::ParserRuleContext
+    {
+      public:
+        NullLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+        NullLiteralContext() = default;
+        void copyFrom(NullLiteralContext* context);
+        using antlr4::ParserRuleContext::copyFrom;
+
+        virtual size_t getRuleIndex() const override;
+    };
+
+    class NullContext : public NullLiteralContext
+    {
+      public:
+        NullContext(NullLiteralContext* ctx);
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    NullLiteralContext* nullLiteral();
 
     class SizeLiteralContext : public antlr4::ParserRuleContext
     {
@@ -1628,6 +1657,7 @@ class anceParser : public antlr4::Parser
         FloatingPointTypeContext*   floatingPointType();
         TargetDependentTypeContext* targetDependentType();
         BooleanTypeContext*         booleanType();
+        NullPointerTypeContext*     nullPointerType();
         VoidTypeContext*            voidType();
 
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
@@ -1667,6 +1697,17 @@ class anceParser : public antlr4::Parser
     };
 
     BooleanTypeContext* booleanType();
+
+    class NullPointerTypeContext : public antlr4::ParserRuleContext
+    {
+      public:
+        NullPointerTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t getRuleIndex() const override;
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    NullPointerTypeContext* nullPointerType();
 
     class VoidTypeContext : public antlr4::ParserRuleContext
     {

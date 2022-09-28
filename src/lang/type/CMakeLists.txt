@@ -19,6 +19,7 @@ target_sources(ance PRIVATE
                FloatingPointType.cpp
                VectorizableType.cpp
                TypeDefinition.cpp
+               NullPointerType.cpp
                TypeAlias.cpp
                StructType.cpp
                SequenceType.cpp

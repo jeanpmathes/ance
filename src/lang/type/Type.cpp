@@ -151,6 +151,12 @@ bool lang::Type::isPointerType() const
     return definition_->isPointerType();
 }
 
+bool lang::Type::isAddressType() const
+{
+    assert(isDefined());
+    return definition_->isAddressType();
+}
+
 bool lang::Type::isBufferType() const
 {
     assert(isDefined());

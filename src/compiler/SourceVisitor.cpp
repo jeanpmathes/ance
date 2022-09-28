@@ -58,6 +58,7 @@
 #include "lang/construct/constant/ByteConstant.h"
 #include "lang/construct/constant/FloatConstant.h"
 #include "lang/construct/constant/IntegerConstant.h"
+#include "lang/construct/constant/NullConstant.h"
 #include "lang/construct/constant/StringConstant.h"
 
 #include "lang/construct/CodeBlock.h"
@@ -731,6 +732,12 @@ std::any SourceVisitor::visitTrue(anceParser::TrueContext* ctx)
 std::any SourceVisitor::visitFalse(anceParser::FalseContext* ctx)
 {
     std::shared_ptr<lang::Constant> constant = lang::BooleanConstant::createFalse();
+    return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
+}
+
+std::any SourceVisitor::visitNull(anceParser::NullContext* ctx)
+{
+    std::shared_ptr<lang::Constant> constant = lang::NullConstant::create();
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 

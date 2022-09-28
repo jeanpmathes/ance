@@ -63,9 +63,9 @@ namespace lang
 
         [[nodiscard]] virtual const FixedWidthIntegerType* isFixedWidthIntegerType() const;
         [[nodiscard]] virtual bool                     isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const;
-        [[nodiscard]] virtual bool                         isSigned() const;
-        [[nodiscard]] virtual const IntegerType*           isIntegerType() const;
-        [[nodiscard]] virtual bool                         isBooleanType() const;
+        [[nodiscard]] virtual bool                     isSigned() const;
+        [[nodiscard]] virtual const IntegerType*       isIntegerType() const;
+        [[nodiscard]] virtual bool                     isBooleanType() const;
         [[nodiscard]] virtual bool                     isUnsignedIntegerPointerType() const;
         [[nodiscard]] virtual const FloatingPointType* isFloatingPointType() const;
         [[nodiscard]] virtual bool                     isFloatingPointType(size_t precision) const;
@@ -73,9 +73,10 @@ namespace lang
         [[nodiscard]] virtual bool                     isDiffType() const;
         [[nodiscard]] virtual bool                     isVoidType() const;
         [[nodiscard]] virtual bool                     isPointerType() const;
-        [[nodiscard]] virtual bool                         isBufferType() const;
-        [[nodiscard]] virtual bool                         isOpaquePointerType() const;
-        [[nodiscard]] virtual bool                         isReferenceType() const;
+        [[nodiscard]] virtual bool                     isAddressType() const;
+        [[nodiscard]] virtual bool                     isBufferType() const;
+        [[nodiscard]] virtual bool                     isOpaquePointerType() const;
+        [[nodiscard]] virtual bool                     isReferenceType() const;
         [[nodiscard]] virtual bool                     isStructType() const;
         [[nodiscard]] virtual const VectorizableType*  isVectorizable() const;
         [[nodiscard]] virtual VectorizableType*        isVectorizable();
@@ -256,12 +257,12 @@ namespace lang
                                    CompileContext&                                    context);
 
       private:
-        lang::Identifier name_;
+        lang::Identifier    name_;
         lang::Location      location_;
         mutable std::string mangled_name_ {};
         lang::Type*         type_ {nullptr};
-        lang::Scope*     containing_scope_ {nullptr};
-        llvm::DIType*    debug_type_ {nullptr};
+        lang::Scope*        containing_scope_ {nullptr};
+        llvm::DIType*       debug_type_ {nullptr};
 
         lang::PredefinedFunction* default_constructor_ {nullptr};
 
@@ -273,4 +274,3 @@ namespace lang
 }
 
 #endif
-

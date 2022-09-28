@@ -98,6 +98,11 @@ bool lang::TypeDefinition::isPointerType() const
     return false;
 }
 
+bool lang::TypeDefinition::isAddressType() const
+{
+    return false;
+}
+
 bool lang::TypeDefinition::isBufferType() const
 {
     return false;

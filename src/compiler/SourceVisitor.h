@@ -85,6 +85,7 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext* ctx) override;
     std::any visitTrue(anceParser::TrueContext* ctx) override;
     std::any visitFalse(anceParser::FalseContext* ctx) override;
+    std::any visitNull(anceParser::NullContext* ctx) override;
     std::any visitSizeLiteral(anceParser::SizeLiteralContext* ctx) override;
     std::any visitDiffLiteral(anceParser::DiffLiteralContext* ctx) override;
     std::any visitUiptrLiteral(anceParser::UiptrLiteralContext* ctx) override;

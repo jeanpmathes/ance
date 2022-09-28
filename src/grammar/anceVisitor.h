@@ -186,6 +186,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual std::any visitFalse(anceParser::FalseContext* context) = 0;
 
+    virtual std::any visitNull(anceParser::NullContext* context) = 0;
+
     virtual std::any visitSizeLiteral(anceParser::SizeLiteralContext* context) = 0;
 
     virtual std::any visitDiffLiteral(anceParser::DiffLiteralContext* context) = 0;
@@ -221,6 +223,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
     virtual std::any visitTargetDependentType(anceParser::TargetDependentTypeContext* context) = 0;
 
     virtual std::any visitBooleanType(anceParser::BooleanTypeContext* context) = 0;
+
+    virtual std::any visitNullPointerType(anceParser::NullPointerTypeContext* context) = 0;
 
     virtual std::any visitVoidType(anceParser::VoidTypeContext* context) = 0;
 
