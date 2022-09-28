@@ -6,7 +6,7 @@
 private std_out: Handle;
 private null_ptr: uiptr;
 
-public define Handle alias *void;
+public define Handle alias ptr;
 
 // Defined functions must be public or private.
 
