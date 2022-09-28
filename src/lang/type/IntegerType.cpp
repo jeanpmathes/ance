@@ -156,7 +156,7 @@ bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingH
 
         if (this_bit_size.has_value() && other_bit_size.has_value())
         {
-            return this_bit_size.value() == other_bit_size.value();
+            return (this_bit_size.value() == other_bit_size.value()) && (isSigned() == other_integer->isSigned());
         }
     }
 
