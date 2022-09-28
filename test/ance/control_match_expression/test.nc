@@ -4,7 +4,6 @@
 // To select a value, match-expressions can be used.
 
 private std_out: Handle;
-private null_ptr: uiptr;
 
 public define Handle alias ptr;
 
@@ -36,9 +35,9 @@ public exit (exitcode: ui32)
 private write (str: *ui8, len: ui32) : void
 {
     let written: *ui32 <: new automatic ui32;
-    WriteFile(std_out, str, len, written, null_ptr);
+    WriteFile(std_out, str, len, written, null);
 }
 
-extern WriteFile (hFile: Handle, lpBuffer: *ui8, nNumberOfBytesToWrite: ui32, lpNumberOfBytesWritten: *ui32, lpOverlapped: uiptr);
+extern WriteFile (hFile: Handle, lpBuffer: *ui8, nNumberOfBytesToWrite: ui32, lpNumberOfBytesWritten: *ui32, lpOverlapped: ptr);
 extern GetStdHandle (nStdHandle: ui32) : Handle;
 extern ExitProcess (uExitCode: ui32);
