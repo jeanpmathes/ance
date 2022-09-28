@@ -157,6 +157,12 @@ bool lang::Type::isBufferType() const
     return definition_->isBufferType();
 }
 
+bool lang::Type::isOpaquePointerType() const
+{
+    assert(isDefined());
+    return definition_->isOpaquePointerType();
+}
+
 bool lang::Type::isReferenceType() const
 {
     assert(isDefined());

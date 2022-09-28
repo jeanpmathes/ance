@@ -19,7 +19,7 @@ lang::BufferType::BufferType(lang::ResolvingHandle<lang::Type> element_type)
 
 StateCount lang::BufferType::getStateCount() const
 {
-    return SpecialCount::ABSTRACT;
+    return AddressType::getStateCount();
 }
 
 bool lang::BufferType::isBufferType() const

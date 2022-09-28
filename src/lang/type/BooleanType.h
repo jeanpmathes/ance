@@ -8,7 +8,7 @@ namespace lang
     /**
      * The boolean type.
      */
-    class BooleanType : virtual public lang::TypeDefinition
+    class BooleanType : public lang::TypeDefinition
     {
       public:
         BooleanType();

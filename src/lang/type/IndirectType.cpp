@@ -17,11 +17,7 @@ llvm::Constant* lang::IndirectType::getDefaultContent(llvm::Module& m)
 
 llvm::PointerType* lang::IndirectType::getContentType(llvm::LLVMContext& c) const
 {
-    llvm::Type* native_type;
-
-    if (value_type_->isVoidType()) { native_type = llvm::Type::getInt8PtrTy(c); }
-    else { native_type = value_type_->getContentType(c); }
-
+    llvm::Type* native_type = value_type_->getContentType(c);
     return llvm::PointerType::get(native_type, 0);
 }
 

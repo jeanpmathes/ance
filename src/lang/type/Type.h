@@ -182,7 +182,7 @@ namespace lang
         [[nodiscard]] bool isVoidType() const;
 
         /**
-         * Get whether this type is a pointer type.
+         * Get whether this type is a normal pointer type. This excludes opaque pointer types.
          * @return True if this type is a pointer type.
          */
         [[nodiscard]] bool isPointerType() const;
@@ -192,6 +192,12 @@ namespace lang
          * @return True if this type is a buffer type.
          */
         [[nodiscard]] bool isBufferType() const;
+
+        /**
+         * Get whether this type is an opaque pointer type.
+         * @return True if this type is an opaque pointer type.
+         */
+        [[nodiscard]] bool isOpaquePointerType() const;
 
         /**
          * Get whether this type is a reference type.

@@ -103,6 +103,11 @@ bool lang::TypeDefinition::isBufferType() const
     return false;
 }
 
+bool lang::TypeDefinition::isOpaquePointerType() const
+{
+    return false;
+}
+
 bool lang::TypeDefinition::isReferenceType() const
 {
     return false;

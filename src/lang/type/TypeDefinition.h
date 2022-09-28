@@ -73,8 +73,9 @@ namespace lang
         [[nodiscard]] virtual bool                     isDiffType() const;
         [[nodiscard]] virtual bool                     isVoidType() const;
         [[nodiscard]] virtual bool                     isPointerType() const;
-        [[nodiscard]] virtual bool                     isBufferType() const;
-        [[nodiscard]] virtual bool                     isReferenceType() const;
+        [[nodiscard]] virtual bool                         isBufferType() const;
+        [[nodiscard]] virtual bool                         isOpaquePointerType() const;
+        [[nodiscard]] virtual bool                         isReferenceType() const;
         [[nodiscard]] virtual bool                     isStructType() const;
         [[nodiscard]] virtual const VectorizableType*  isVectorizable() const;
         [[nodiscard]] virtual VectorizableType*        isVectorizable();

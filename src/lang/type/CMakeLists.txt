@@ -11,6 +11,8 @@ target_sources(ance PRIVATE
                Type.cpp
                VoidType.cpp
                PointerType.cpp
+               OpaquePointerType.cpp
+               AddressType.cpp
                BufferType.cpp
                IndirectType.cpp
                ReferenceType.cpp

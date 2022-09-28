@@ -19,7 +19,7 @@ lang::PointerType::PointerType(lang::ResolvingHandle<lang::Type> element_type)
 
 StateCount lang::PointerType::getStateCount() const
 {
-    return SpecialCount::ABSTRACT;
+    return AddressType::getStateCount();
 }
 
 bool lang::PointerType::isPointerType() const
@@ -44,6 +44,12 @@ bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Loca
     if (element_type_->isReferenceType())
     {
         validation_logger.logError("Cannot declare pointers to reference types", location);
+        return false;
+    }
+
+    if (element_type_->isVoidType())
+    {
+        validation_logger.logError("Cannot declare pointers to void type", location);
         return false;
     }
 
@@ -83,7 +89,7 @@ bool lang::PointerType::isTriviallyDestructible() const
 
 std::string lang::PointerType::createMangledName() const
 {
-    return std::string("ptr") + "(" + element_type_->getMangledName() + ")";
+    return std::string("p") + "(" + element_type_->getMangledName() + ")";
 }
 
 llvm::DIType* lang::PointerType::createDebugType(CompileContext& context)
@@ -92,21 +98,8 @@ llvm::DIType* lang::PointerType::createDebugType(CompileContext& context)
 
     uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
 
-    llvm::DIType* di_type;
-
-    if (element_type_->isVoidType())
-    {
-        std::string name     = std::string(this->name().text());
-        auto        encoding = llvm::dwarf::DW_ATE_address;
-
-        di_type = context.di()->createBasicType(name, size_in_bits, encoding);
-    }
-    else
-    {
-        llvm::DIType* element_di_type = element_type_->getDebugType(context);
-
-        di_type = context.di()->createPointerType(element_di_type, size_in_bits);
-    }
+    llvm::DIType* element_di_type = element_type_->getDebugType(context);
+    llvm::DIType* di_type         = context.di()->createPointerType(element_di_type, size_in_bits);
 
     return di_type;
 }

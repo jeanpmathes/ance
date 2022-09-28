@@ -1,6 +1,7 @@
 #ifndef ANCE_SRC_LANG_TYPE_BUFFERTYPE_H_
 #define ANCE_SRC_LANG_TYPE_BUFFERTYPE_H_
 
+#include "AddressType.h"
 #include "IndirectType.h"
 #include "SequenceType.h"
 
@@ -18,6 +19,7 @@ namespace lang
     class BufferType
         : public lang::SequenceType
         , public lang::IndirectType
+        , public lang::AddressType
     {
       private:
         explicit BufferType(lang::ResolvingHandle<lang::Type> element_type);

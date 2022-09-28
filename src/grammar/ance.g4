@@ -321,6 +321,7 @@ targetDependentType
     : 'size'
     | 'diff'
     | 'uiptr'
+    | 'ptr'
     ;
 
 booleanType

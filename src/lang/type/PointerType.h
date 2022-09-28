@@ -1,6 +1,7 @@
 #ifndef ANCE_SRC_LANG_TYPE_POINTERTYPE_H_
 #define ANCE_SRC_LANG_TYPE_POINTERTYPE_H_
 
+#include "AddressType.h"
 #include "IndirectType.h"
 #include "SequenceType.h"
 
@@ -18,6 +19,7 @@ namespace lang
     class PointerType
         : public lang::SequenceType
         , public lang::IndirectType
+        , public lang::AddressType
     {
       private:
         explicit PointerType(lang::ResolvingHandle<lang::Type> element_type);
