@@ -1,12 +1,13 @@
 #ifndef ANCE_SRC_LANG_TYPE_TYPEALIAS_H_
 #define ANCE_SRC_LANG_TYPE_TYPEALIAS_H_
 
-#include "FixedWidthIntegerType.h"
-#include "FloatingPointType.h"
 #include "TypeDefinition.h"
-#include "lang/utility/Identifier.h"
 
 #include <optional>
+
+#include "lang/type/FixedWidthIntegerType.h"
+#include "lang/type/FloatingPointType.h"
+#include "lang/utility/Identifier.h"
 
 namespace lang
 {
@@ -25,15 +26,28 @@ namespace lang
 
         [[nodiscard]] const FixedWidthIntegerType* isFixedWidthIntegerType() const override;
         [[nodiscard]] bool               isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
+        [[nodiscard]] bool               isSigned() const override;
         [[nodiscard]] const IntegerType* isIntegerType() const override;
         [[nodiscard]] bool               isBooleanType() const override;
+        [[nodiscard]] bool               isUnsignedIntegerPointerType() const override;
         [[nodiscard]] const FloatingPointType* isFloatingPointType() const override;
         [[nodiscard]] bool                     isFloatingPointType(size_t precision) const override;
         [[nodiscard]] bool                     isSizeType() const override;
         [[nodiscard]] bool                     isDiffType() const override;
         [[nodiscard]] bool                     isVoidType() const override;
+        [[nodiscard]] bool                     isNullValueType() const override;
         [[nodiscard]] bool                     isPointerType() const override;
+        [[nodiscard]] bool                     isAddressType() const override;
+        [[nodiscard]] bool                     isBufferType() const override;
+        [[nodiscard]] bool                     isOpaquePointerType() const override;
         [[nodiscard]] bool                     isReferenceType() const override;
+        [[nodiscard]] bool                     isStructType() const override;
+        [[nodiscard]] const VectorizableType*  isVectorizable() const override;
+        [[nodiscard]] VectorizableType*        isVectorizable() override;
+        [[nodiscard]] const VectorType*        isVectorType() const override;
+        [[nodiscard]] VectorType*              isVectorType() override;
+        [[nodiscard]] const ArrayType*         isArrayType() const override;
+        [[nodiscard]] ArrayType*               isArrayType() override;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const override;
 

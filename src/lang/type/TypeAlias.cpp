@@ -28,6 +28,11 @@ const lang::FixedWidthIntegerType* lang::TypeAlias::isFixedWidthIntegerType() co
     return actual_->isFixedWidthIntegerType();
 }
 
+bool lang::TypeAlias::isSigned() const
+{
+    return actual_->isSigned();
+}
+
 bool lang::TypeAlias::isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const
 {
     return actual_->isFixedWidthIntegerType(bit_size, is_signed);
@@ -81,6 +86,66 @@ bool lang::TypeAlias::isReferenceType() const
 lang::ResolvingHandle<lang::Type> lang::TypeAlias::getElementType() const
 {
     return actual_->getElementType();
+}
+
+bool lang::TypeAlias::isUnsignedIntegerPointerType() const
+{
+    return actual_->isUnsignedIntegerPointerType();
+}
+
+bool lang::TypeAlias::isNullValueType() const
+{
+    return actual_->isNullValueType();
+}
+
+bool lang::TypeAlias::isAddressType() const
+{
+    return actual_->isAddressType();
+}
+
+bool lang::TypeAlias::isBufferType() const
+{
+    return actual_->isBufferType();
+}
+
+bool lang::TypeAlias::isOpaquePointerType() const
+{
+    return actual_->isOpaquePointerType();
+}
+
+bool lang::TypeAlias::isStructType() const
+{
+    return actual_->isStructType();
+}
+
+const lang::VectorizableType* lang::TypeAlias::isVectorizable() const
+{
+    return actual_->isVectorizable();
+}
+
+lang::VectorizableType* lang::TypeAlias::isVectorizable()
+{
+    return actual_->isVectorizable();
+}
+
+const lang::VectorType* lang::TypeAlias::isVectorType() const
+{
+    return actual_->isVectorType();
+}
+
+lang::VectorType* lang::TypeAlias::isVectorType()
+{
+    return actual_->isVectorType();
+}
+
+const lang::ArrayType* lang::TypeAlias::isArrayType() const
+{
+    return actual_->isArrayType();
+}
+
+lang::ArrayType* lang::TypeAlias::isArrayType()
+{
+    return actual_->isArrayType();
 }
 
 lang::ResolvingHandle<lang::Type> lang::TypeAlias::getActualType() const
@@ -311,4 +376,3 @@ std::vector<lang::TypeDefinition*> lang::TypeAlias::getDependencies() const
 
     return dependencies;
 }
-
