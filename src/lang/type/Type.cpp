@@ -145,6 +145,12 @@ bool lang::Type::isVoidType() const
     return definition_->isVoidType();
 }
 
+bool lang::Type::isNullValueType() const
+{
+    assert(isDefined());
+    return definition_->isNullValueType();
+}
+
 bool lang::Type::isPointerType() const
 {
     assert(isDefined());

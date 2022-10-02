@@ -182,6 +182,12 @@ namespace lang
         [[nodiscard]] bool isVoidType() const;
 
         /**
+         * Get whether this type is the null value type used by the null literal.
+         * @return True if this type is the null value type.
+         */
+        [[nodiscard]] bool isNullValueType() const;
+
+        /**
          * Get whether this type is a normal pointer type. This excludes opaque pointer types.
          * @return True if this type is a pointer type.
          */

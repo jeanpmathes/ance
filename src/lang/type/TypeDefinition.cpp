@@ -93,6 +93,11 @@ bool lang::TypeDefinition::isVoidType() const
     return false;
 }
 
+bool lang::TypeDefinition::isNullValueType() const
+{
+    return false;
+}
+
 bool lang::TypeDefinition::isPointerType() const
 {
     return false;

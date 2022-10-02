@@ -16,6 +16,8 @@ namespace lang
       public:
         ~NullPointerType() override = default;
 
+        bool isNullValueType() const override;
+
         bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
         bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                                 lang::Location                    location,

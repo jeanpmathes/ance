@@ -9,6 +9,11 @@
 
 lang::NullPointerType::NullPointerType() : TypeDefinition(lang::Identifier::from("nullptr")) {}
 
+bool lang::NullPointerType::isNullValueType() const
+{
+    return true;
+}
+
 bool lang::NullPointerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
 {
     return other->isAddressType();

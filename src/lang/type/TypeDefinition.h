@@ -71,8 +71,9 @@ namespace lang
         [[nodiscard]] virtual bool                     isFloatingPointType(size_t precision) const;
         [[nodiscard]] virtual bool                     isSizeType() const;
         [[nodiscard]] virtual bool                     isDiffType() const;
-        [[nodiscard]] virtual bool                     isVoidType() const;
-        [[nodiscard]] virtual bool                     isPointerType() const;
+        [[nodiscard]] virtual bool                         isVoidType() const;
+        [[nodiscard]] virtual bool                         isNullValueType() const;
+        [[nodiscard]] virtual bool                         isPointerType() const;
         [[nodiscard]] virtual bool                     isAddressType() const;
         [[nodiscard]] virtual bool                     isBufferType() const;
         [[nodiscard]] virtual bool                     isOpaquePointerType() const;
