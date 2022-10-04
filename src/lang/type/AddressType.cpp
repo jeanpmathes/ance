@@ -1,6 +1,7 @@
 #include "AddressType.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/BooleanType.h"
@@ -72,4 +73,55 @@ std::shared_ptr<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperat
     llvm::Value*                      native_result = lang::Values::contentToNative(result_type, result, context);
 
     return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
+}
+
+bool lang::AddressType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+{
+    return parameters.size() == 1 && (parameters[0]->isAddressType() || parameters[0]->isUnsignedIntegerPointerType());
+}
+
+void lang::AddressType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                               lang::PredefinedFunction&                             function,
+                                               CompileContext&                                       context)
+{
+    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
+}
+
+void lang::AddressType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                               lang::ResolvingHandle<lang::Type> return_type,
+                                               lang::PredefinedFunction&         function,
+                                               CompileContext&                   context)
+{
+    llvm::Function* native_function;
+    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
+
+    if (parameter_element->isAddressType())
+    {
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
+        {
+            llvm::Value* original = native_function->getArg(0);
+
+            llvm::Value* converted = context.ir()->CreateBitCast(original,
+                                                                 return_type->getContentType(*context.llvmContext()),
+                                                                 original->getName() + ".bitcast");
+
+            context.ir()->CreateRet(converted);
+        }
+    }
+
+    if (parameter_element->isUnsignedIntegerPointerType())
+    {
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
+        {
+            llvm::Value* original = native_function->getArg(0);
+
+            llvm::Value* converted = context.ir()->CreateIntToPtr(original,
+                                                                  return_type->getContentType(*context.llvmContext()),
+                                                                  original->getName() + ".inttoptr");
+
+            context.ir()->CreateRet(converted);
+        }
+    }
 }

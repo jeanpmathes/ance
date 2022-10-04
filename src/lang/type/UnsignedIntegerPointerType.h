@@ -30,7 +30,14 @@ namespace lang
 
         bool isUnsignedIntegerPointerType() const override;
 
-        [[maybe_unused]] static llvm::Value* buildValue(llvm::Value* pointer, CompileContext& state);
+        bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
+        void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                    lang::PredefinedFunction&                             function,
+                                    CompileContext&                                       context) override;
+        void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                    lang::ResolvingHandle<lang::Type> return_type,
+                                    lang::PredefinedFunction&         function,
+                                    CompileContext&                   context) override;
 
       private:
         inline static unsigned int size_ = 0;

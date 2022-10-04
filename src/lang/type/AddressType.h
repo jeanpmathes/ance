@@ -26,6 +26,15 @@ namespace lang
                                                         std::shared_ptr<Value> left,
                                                         std::shared_ptr<Value> right,
                                                         CompileContext&        context) override;
+
+        bool        acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
+        void        buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                           lang::PredefinedFunction&                             function,
+                                           CompileContext&                                       context) override;
+        static void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                           lang::ResolvingHandle<lang::Type> return_type,
+                                           lang::PredefinedFunction&         function,
+                                           CompileContext&                   context);
     };
 }
 

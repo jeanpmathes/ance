@@ -12,11 +12,50 @@ bool lang::UnsignedIntegerPointerType::isUnsignedIntegerPointerType() const
     return true;
 }
 
-llvm::Value* lang::UnsignedIntegerPointerType::buildValue(llvm::Value* pointer, CompileContext& context)
+bool lang::UnsignedIntegerPointerType::acceptOverloadRequest(
+    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
 {
-    return context.ir()->CreatePtrToInt(pointer,
-                                        get()->getNativeType(*context.llvmContext()),
-                                        pointer->getName() + ".ptrtoint");
+    if (parameters.size() == 1 && parameters[0]->isAddressType()) return true;
+
+    return IntegerType::acceptOverloadRequest(parameters);
+}
+
+void lang::UnsignedIntegerPointerType::buildRequestedOverload(
+    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+    lang::PredefinedFunction&                             function,
+    CompileContext&                                       context)
+{
+    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
+}
+
+void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                                              lang::ResolvingHandle<lang::Type> return_type,
+                                                              lang::PredefinedFunction&         function,
+                                                              CompileContext&                   context)
+{
+    llvm::Function* native_function;
+    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
+
+    std::string a = std::string(parameter_element->name().text()) + " -> " + std::string(return_type->name().text());
+
+    if (parameter_element->isAddressType())
+    {
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
+        {
+            llvm::Value* original = native_function->getArg(0);
+
+            llvm::Value* converted = context.ir()->CreatePtrToInt(original,
+                                                                  return_type->getContentType(*context.llvmContext()),
+                                                                  original->getName() + ".ptrtoint");
+
+            context.ir()->CreateRet(converted);
+        }
+
+        return;
+    }
+
+    IntegerType::buildRequestedOverload(parameter_element, return_type, function, context);
 }
 
 std::string lang::UnsignedIntegerPointerType::createMangledName() const
