@@ -36,6 +36,7 @@ bool VariableAccess::isNamed()
 bool VariableAccess::validate(ValidationLogger& validation_logger) const
 {
     if (isVariableDropped(validation_logger)) return false;
+    if (not variable_->type()->isDefined()) return false;// No log needed, this is done in the variable.
 
     return variable_->validateGetValue(validation_logger, location());
 }
