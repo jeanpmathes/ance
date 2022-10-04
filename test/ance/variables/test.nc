@@ -19,14 +19,6 @@ public main () : ui32
     let l2: ui32 <: 100:32;
     let l3: ui32 := 100:32; // Final variable.
 
-    // The default value of pointers is null.
-    let l4: *ui32;
-    let l5: *ui32 <: null;
-    assert l4 == l5;
-
-    // The null literal has the special nullptr type.
-    let l6: nullptr <: null;
-
     return 0:32;
 }
 
