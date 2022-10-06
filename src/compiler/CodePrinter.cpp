@@ -99,6 +99,26 @@ std::any CodePrinter::visit(And& an_and)
     return {};
 }
 
+std::any CodePrinter::visit(ArrayDefinition& array_definition)
+{
+    out_ << "[";
+
+    if (array_definition.elementType().has_value()) { out_ << array_definition.elementType().value()->name() << " | "; }
+
+    bool is_first = true;
+    for (auto& value : array_definition.values())
+    {
+        if (not is_first) out_ << ", ";
+        is_first = false;
+
+        visitTree(value);
+    }
+
+    out_ << "]";
+
+    return {};
+}
+
 std::any CodePrinter::visit(BinaryOperation& binary_operation)
 {
     out_ << visitTree(binary_operation.left()) << " ";
@@ -240,6 +260,29 @@ std::any CodePrinter::visit(UnaryOperation& unary_operation)
 std::any CodePrinter::visit(VariableAccess& variable_access)
 {
     out_ << variable_access.variable()->name();
+
+    return {};
+}
+
+std::any CodePrinter::visit(VectorDefinition& vector_definition)
+{
+    out_ << "<";
+
+    if (vector_definition.elementType().has_value())
+    {
+        out_ << vector_definition.elementType().value()->name() << " | ";
+    }
+
+    bool is_first = true;
+    for (auto& value : vector_definition.values())
+    {
+        if (not is_first) out_ << ", ";
+        is_first = false;
+
+        visitTree(value);
+    }
+
+    out_ << ">";
 
     return {};
 }
@@ -471,4 +514,3 @@ void CodePrinter::emitWhitespace()
 {
     if (consume_whitespace_ != CONSUME_WS_ACTIVE) { out_ << " "; }
 }
-

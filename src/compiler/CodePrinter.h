@@ -23,13 +23,16 @@ class CodePrinter : public lang::ApplicationVisitor
     std::any visit(Addressof& addressof) override;
     std::any visit(Allocation& allocation) override;
     std::any visit(And& an_and) override;
+    std::any visit(ArrayDefinition& array_definition) override;
     std::any visit(BinaryOperation& binary_operation) override;
     std::any visit(BindRef& bind_ref) override;
     std::any visit(BindRefTo& bind_ref_to) override;
     std::any visit(ConstantLiteral& constant_literal) override;
     std::any visit(FunctionCall& function_call) override;
     std::any visit(IfSelect& if_select) override;
+    std::any visit(Indirection& indirection) override;
     std::any visit(MatchSelect& match_select) override;
+    std::any visit(MemberAccess& member_access) override;
     std::any visit(Or& an_or) override;
     std::any visit(Parenthesis& parenthesis) override;
     std::any visit(SizeofExpression& sizeof_expression) override;
@@ -37,8 +40,7 @@ class CodePrinter : public lang::ApplicationVisitor
     std::any visit(Subscript& subscript) override;
     std::any visit(UnaryOperation& unary_operation) override;
     std::any visit(VariableAccess& variable_access) override;
-    std::any visit(MemberAccess& member_access) override;
-    std::any visit(Indirection& indirection) override;
+    std::any visit(VectorDefinition& vector_definition) override;
 
     std::any visit(lang::CodeBlock& code_block) override;
 
