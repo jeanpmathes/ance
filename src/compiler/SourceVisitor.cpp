@@ -555,20 +555,22 @@ std::any SourceVisitor::visitNotOperation(anceParser::NotOperationContext* ctx)
 
 std::any SourceVisitor::visitLogicalAnd(anceParser::LogicalAndContext* ctx)
 {
-    Expression* left  = std::any_cast<Expression*>(visit(ctx->left));
+    bool        negated = ctx->NOT();
+    Expression* left    = std::any_cast<Expression*>(visit(ctx->left));
     Expression* right = std::any_cast<Expression*>(visit(ctx->right));
 
     return static_cast<Expression*>(
-        new And(std::unique_ptr<Expression>(left), std::unique_ptr<Expression>(right), location(ctx)));
+        new And(negated, std::unique_ptr<Expression>(left), std::unique_ptr<Expression>(right), location(ctx)));
 }
 
 std::any SourceVisitor::visitLogicalOr(anceParser::LogicalOrContext* ctx)
 {
-    Expression* left  = std::any_cast<Expression*>(visit(ctx->left));
+    bool        negated = ctx->NOT();
+    Expression* left    = std::any_cast<Expression*>(visit(ctx->left));
     Expression* right = std::any_cast<Expression*>(visit(ctx->right));
 
     return static_cast<Expression*>(
-        new Or(std::unique_ptr<Expression>(left), std::unique_ptr<Expression>(right), location(ctx)));
+        new Or(negated, std::unique_ptr<Expression>(left), std::unique_ptr<Expression>(right), location(ctx)));
 }
 
 std::any SourceVisitor::visitIfExpression(anceParser::IfExpressionContext* ctx)

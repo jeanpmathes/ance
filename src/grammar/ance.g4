@@ -139,12 +139,12 @@ expression
 	| left=expression binaryOperatorAdditive right=expression # BinaryOperation
 	| left=expression binaryOperatorRelational right=expression # BinaryOperation
 	| left=expression binaryOperatorEquality right=expression # BinaryOperation
-	| left=expression 'and' right=expression # LogicalAnd
-    | left=expression 'or' right=expression # LogicalOr
+	| left=expression ( NOT )? 'and' right=expression # LogicalAnd
+    | left=expression ( NOT )? 'or' right=expression # LogicalOr
     | 'if' condition=expression 'then' thenBlock=expression 'else' elseBlock=expression # IfExpression
     | matchExpression # Match
-    | '<' ( type '|' ) ? expression ( ',' expression )* '>' # VectorDefinition
-    | '[' ( type '|' ) ? expression ( ',' expression )* ']' # ArrayDefinition
+    | '<' ( type '|' )? expression ( ',' expression )* '>' # VectorDefinition
+    | '[' ( type '|' )? expression ( ',' expression )* ']' # ArrayDefinition
 	;
 
 binaryOperatorMultiplicative
@@ -366,6 +366,7 @@ INTEGER : [0-9]+ ;
 
 BUFFER : '[]' ;
 CONST : 'const' ;
+NOT : 'not' ;
 
 IDENTIFIER : [_]* [a-zA-Z] [_a-zA-Z0-9]* ;
 

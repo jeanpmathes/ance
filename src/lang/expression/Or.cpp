@@ -11,13 +11,19 @@
 #include "lang/statement/If.h"
 #include "lang/statement/LocalVariableDefinition.h"
 
-Or::Or(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, lang::Location location)
+Or::Or(bool negate, std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, lang::Location location)
     : UnexpandedExpression(location)
+    , negate_(negate)
     , left_(std::move(left))
     , right_(std::move(right))
 {
     addSubexpression(*left_);
     addSubexpression(*right_);
+}
+
+bool Or::negate() const
+{
+    return negate_;
 }
 
 Expression& Or::left() const
@@ -49,10 +55,10 @@ bool Or::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion Or::expandWith(Expressions subexpressions) const
 {
-    auto        temp_name          = lang::Identifier::from(scope()->getTemporaryName(), location());
-    auto        make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
-    auto lhs = std::move(subexpressions[0]);
-    auto        rhs                = std::move(subexpressions[1]);
+    auto temp_name          = lang::Identifier::from(scope()->getTemporaryName(), location());
+    auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
+    auto lhs                = std::move(subexpressions[0]);
+    auto rhs                = std::move(subexpressions[1]);
 
     Statements before;
 
@@ -75,6 +81,8 @@ Expression::Expansion Or::expandWith(Expressions subexpressions) const
         location()));
 
     std::unique_ptr<Expression> result = std::make_unique<VariableAccess>(make_temp_variable(), location());
+
+    if (negate_) { result = std::make_unique<UnaryOperation>(lang::UnaryOperator::NOT, std::move(result), location()); }
 
     Statements after;
 

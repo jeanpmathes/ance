@@ -15,12 +15,14 @@ class Or
   public:
     /**
      * Create a new logical 'or' expression.
+     * @param negate Whether to negate the result.
      * @param left The left operand.
      * @param right The right operand.
      * @param location The source location of the operation.
      */
-    Or(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, lang::Location location);
+    Or(bool negate, std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, lang::Location location);
 
+    [[nodiscard]] bool        negate() const;
     [[nodiscard]] Expression& left() const;
     [[nodiscard]] Expression& right() const;
 
@@ -35,6 +37,7 @@ class Or
     ~Or() override;
 
   private:
+    bool                        negate_;
     std::unique_ptr<Expression> left_;
     std::unique_ptr<Expression> right_;
 };

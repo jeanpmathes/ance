@@ -4,19 +4,26 @@
 #include "lang/type/BooleanType.h"
 
 #include "lang/ApplicationVisitor.h"
+#include "lang/expression/UnaryOperation.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/statement/Assignment.h"
 #include "lang/statement/Drop.h"
 #include "lang/statement/If.h"
 #include "lang/statement/LocalVariableDefinition.h"
 
-And::And(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, lang::Location location)
+And::And(bool negate, std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, lang::Location location)
     : UnexpandedExpression(location)
+    , negate_(negate)
     , left_(std::move(left))
     , right_(std::move(right))
 {
     addSubexpression(*left_);
     addSubexpression(*right_);
+}
+
+bool And::negate() const
+{
+    return negate_;
 }
 
 Expression& And::left() const
@@ -48,10 +55,10 @@ bool And::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion And::expandWith(Expressions subexpressions) const
 {
-    auto        temp_name          = lang::Identifier::from(scope()->getTemporaryName(), location());
-    auto        make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
-    auto lhs = std::move(subexpressions[0]);
-    auto        rhs                = std::move(subexpressions[1]);
+    auto temp_name          = lang::Identifier::from(scope()->getTemporaryName(), location());
+    auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
+    auto lhs                = std::move(subexpressions[0]);
+    auto rhs                = std::move(subexpressions[1]);
 
     Statements before;
 
@@ -72,6 +79,8 @@ Expression::Expansion And::expandWith(Expressions subexpressions) const
         location()));
 
     std::unique_ptr<Expression> result = std::make_unique<VariableAccess>(make_temp_variable(), location());
+
+    if (negate_) { result = std::make_unique<UnaryOperation>(lang::UnaryOperator::NOT, std::move(result), location()); }
 
     Statements after;
 

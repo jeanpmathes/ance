@@ -78,22 +78,22 @@ class anceParser : public antlr4::Parser
         T__65               = 66,
         T__66               = 67,
         T__67               = 68,
-        T__68               = 69,
-        NATIVE_INTEGER_TYPE = 70,
-        SIGNED_INTEGER      = 71,
-        HEX_INTEGER         = 72,
-        BIN_INTEGER         = 73,
-        OCT_INTEGER         = 74,
-        HALF                = 75,
-        SINGLE              = 76,
-        DOUBLE              = 77,
-        QUAD                = 78,
-        DECIMAL             = 79,
-        STRING              = 80,
-        BYTE                = 81,
-        INTEGER             = 82,
-        BUFFER              = 83,
-        CONST               = 84,
+        NATIVE_INTEGER_TYPE = 69,
+        SIGNED_INTEGER      = 70,
+        HEX_INTEGER         = 71,
+        BIN_INTEGER         = 72,
+        OCT_INTEGER         = 73,
+        HALF                = 74,
+        SINGLE              = 75,
+        DOUBLE              = 76,
+        QUAD                = 77,
+        DECIMAL             = 78,
+        STRING              = 79,
+        BYTE                = 80,
+        INTEGER             = 81,
+        BUFFER              = 82,
+        CONST               = 83,
+        NOT                 = 84,
         IDENTIFIER          = 85,
         SEMICOLON           = 86,
         WHITESPACE          = 87,
@@ -795,7 +795,8 @@ class anceParser : public antlr4::Parser
       public:
         NotOperationContext(ExpressionContext* ctx);
 
-        ExpressionContext* expression();
+        antlr4::tree::TerminalNode* NOT();
+        ExpressionContext*          expression();
 
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -822,6 +823,7 @@ class anceParser : public antlr4::Parser
         anceParser::ExpressionContext*  right = nullptr;
         std::vector<ExpressionContext*> expression();
         ExpressionContext*              expression(size_t i);
+        antlr4::tree::TerminalNode*     NOT();
 
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
@@ -907,6 +909,7 @@ class anceParser : public antlr4::Parser
         anceParser::ExpressionContext*  right = nullptr;
         std::vector<ExpressionContext*> expression();
         ExpressionContext*              expression(size_t i);
+        antlr4::tree::TerminalNode*     NOT();
 
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };

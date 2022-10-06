@@ -15,12 +15,14 @@ class And
   public:
     /**
      * Create a new logical 'and' expression.
+     * @param negate Whether to negate the result.
      * @param left The left operand.
      * @param right The right operand.
      * @param location The source location of the operation.
      */
-    And(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, lang::Location location);
+    And(bool negate, std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, lang::Location location);
 
+    [[nodiscard]] bool        negate() const;
     [[nodiscard]] Expression& left() const;
     [[nodiscard]] Expression& right() const;
 
@@ -35,6 +37,7 @@ class And
     ~And() override;
 
   private:
+    bool                        negate_;
     std::unique_ptr<Expression> left_;
     std::unique_ptr<Expression> right_;
 };
