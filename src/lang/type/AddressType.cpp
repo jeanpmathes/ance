@@ -18,8 +18,10 @@ StateCount lang::AddressType::getStateCount() const
     return SpecialCount::ABSTRACT;
 }
 
-bool lang::AddressType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type> other)
+bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
 {
+    if (not op.isEquality()) return false;
+
     other = lang::Type::getReferencedType(other);
     return lang::Type::areSame(other, self());
 }
