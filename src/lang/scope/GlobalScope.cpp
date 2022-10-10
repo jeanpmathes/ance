@@ -442,9 +442,9 @@ void lang::GlobalScope::buildInitialization(CompileContext& context)
     for (auto& [name, variable] : global_defined_variables_) { variable->buildDefinition(context); }
 }
 
-void lang::GlobalScope::buildFinalization(CompileContext&)
+void lang::GlobalScope::buildFinalization(CompileContext& context)
 {
-    assert(false && "Not implemented.");
+    for (auto& [name, variable] : global_defined_variables_) { variable->buildFinalization(context); }
 }
 
 lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunctionGroup(Identifier name)
