@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_CUSTOMFUNCTION_H_
 #define ANCE_SRC_LANG_CONSTRUCT_CUSTOMFUNCTION_H_
 
-#include "FunctionDefinition.h"
+#include "StatementFunction.h"
 
 #include <list>
 #include <optional>
@@ -31,9 +31,7 @@ namespace lang
     /**
      * A function that is defined in code.
      */
-    class CustomFunction
-        : public lang::FunctionDefinition
-        , public lang::Element<CustomFunction, ANCE_CONSTRUCTS>
+    class CustomFunction : public lang::StatementFunction
     {
       public:
         CustomFunction(Function&                                     function,
@@ -48,17 +46,10 @@ namespace lang
 
         [[nodiscard]] bool isMangled() const override;
 
-        [[nodiscard]] lang::AccessModifier access() const;
-        [[nodiscard]] Statement&           code() const;
-
-        void postResolve() override;
         void validate(ValidationLogger& validation_logger) const override;
-        void expand() override;
-        void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
         void createNativeBacking(CompileContext& context) override;
-        void build(CompileContext& context) override;
 
         /**
          * Get the debug subprogram.
@@ -67,35 +58,16 @@ namespace lang
         llvm::DISubprogram* debugSubprogram();
 
         llvm::DIScope*    getDebugScope(CompileContext& context) override;
-        lang::LocalScope* getInsideScope() override;
-
-        [[nodiscard]] const std::vector<lang::BasicBlock*>& getBasicBlocks() const override;
 
       protected:
         using FunctionDefinition::buildCall;
 
-        [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
-
       private:
-        void setupCode();
         void validateReturn(ValidationLogger& validation_logger) const;
         void validateUnreachable(ValidationLogger& validation_logger) const;
 
       private:
-        std::unique_ptr<Statement> code_;
-        lang::LocalScope*          inside_scope_ {nullptr};
-
-        lang::AccessModifier access_;
         lang::Location       definition_location_;
-
-        std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>> arguments_ {};
-
-        std::unique_ptr<lang::BasicBlock>              initial_block_;
-        std::vector<std::unique_ptr<lang::BasicBlock>> blocks_ {};
-        std::vector<lang::BasicBlock*>                 used_blocks_ {};
-
-        llvm::FunctionType* native_type_ {nullptr};
-        llvm::Function*     native_function_ {nullptr};
     };
 }
 

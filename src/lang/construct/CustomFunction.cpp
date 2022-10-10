@@ -24,70 +24,22 @@ lang::CustomFunction::CustomFunction(Function&                                  
                                      Scope&                                        containing_scope,
                                      lang::Location                                declaration_location,
                                      lang::Location                                definition_location)
-    : lang::FunctionDefinition(function,
-                               containing_scope,
-                               return_type,
-                               return_type_location,
-                               std::move(parameters),
-                               declaration_location)
-    , code_(std::move(code))
-    , access_(access)
+    : lang::StatementFunction(function,
+                              access,
+                              return_type,
+                              return_type_location,
+                              std::move(parameters),
+                              std::move(code),
+                              containing_scope,
+                              declaration_location)
     , definition_location_(definition_location)
-    , initial_block_(lang::BasicBlock::createEmpty())
 {
-    setupCode();
 
-    containing_scope.addType(return_type);
-
-    unsigned no = 1;
-    for (const auto& parameter : this->parameters())
-    {
-        containing_scope.addType(parameter->type());
-
-        auto arg = function.defineParameterVariable(parameter->name(),
-                                                    parameter->type(),
-                                                    parameter->typeLocation(),
-                                                    parameter,
-                                                    no++,
-                                                    parameter->location());
-        arguments_.push_back(arg);
-    }
-}
-
-std::pair<llvm::FunctionType*, llvm::Function*> lang::CustomFunction::getNativeRepresentation() const
-{
-    return std::make_pair(native_type_, native_function_);
-}
-
-void lang::CustomFunction::setupCode()
-{
-    addChild(*code_);
-
-    code_->setContainingScope(this->function());
-    inside_scope_ = code_->getBlockScope();
-    assert(inside_scope_);
-
-    code_->walkDefinitions();
 }
 
 bool lang::CustomFunction::isMangled() const
 {
     return true;
-}
-
-lang::AccessModifier lang::CustomFunction::access() const
-{
-    return access_;
-}
-
-Statement& lang::CustomFunction::code() const
-{
-    return *code_;
-}
-
-void lang::CustomFunction::postResolve()
-{
-    code_->postResolve();
 }
 
 void lang::CustomFunction::validate(ValidationLogger& validation_logger) const
@@ -96,7 +48,7 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger) const
 
     returnType()->validate(validation_logger, returnTypeLocation());
 
-    for (const auto [parameter, argument] : llvm::zip(parameters(), arguments_))
+    for (const auto [parameter, argument] : llvm::zip(parameters(), arguments()))
     {
         if (!argument)
         {
@@ -114,47 +66,7 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger) const
         }
     }
 
-    inside_scope_->validate(validation_logger);
-    code_->validate(validation_logger);
-}
-
-void lang::CustomFunction::expand()
-{
-    clearChildren();
-
-    Statements expanded_statements = code_->expand();
-    assert(expanded_statements.size() == 1);
-
-    code_ = std::move(expanded_statements.front());
-
-    setupCode();
-}
-
-void lang::CustomFunction::determineFlow()
-{
-    blocks_ = code_->createBasicBlocks(*initial_block_, function());
-
-    lang::BasicBlock* last = blocks_.empty() ? initial_block_.get() : blocks_.back().get();
-    blocks_.push_back(lang::BasicBlock::createFinalizing(&function()));
-    last->link(*blocks_.back());
-
-    initial_block_->setContainingFunction(function());
-
-    for (auto& block : blocks_) { block->setContainingFunction(function()); }
-
-    initial_block_->simplify();
-
-    for (auto& block : blocks_) { block->simplify(); }
-
-    size_t running_index = 0;
-    initial_block_->complete(running_index);
-    used_blocks_.push_back(initial_block_.get());
-
-    for (auto& block : blocks_)
-    {
-        block->complete(running_index);
-        if (block->isUsable()) { used_blocks_.push_back(block.get()); }
-    }
+    StatementFunction::validate(validation_logger);
 }
 
 bool lang::CustomFunction::validateFlow(ValidationLogger& validation_logger) const
@@ -167,7 +79,7 @@ bool lang::CustomFunction::validateFlow(ValidationLogger& validation_logger) con
 
 void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger) const
 {
-    std::list<lang::BasicBlock*> final_blocks = initial_block_->getLeaves();
+    std::list<lang::BasicBlock*> final_blocks = getInitialBlock().getLeaves();
 
     std::optional<lang::Location> missing_return_location;
 
@@ -215,14 +127,7 @@ void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger) c
 
 void lang::CustomFunction::validateUnreachable(ValidationLogger& validation_logger) const
 {
-    initial_block_->reach();
-
-    std::optional<lang::Location> unreachable_code_location;
-
-    for (auto& block : blocks_)
-    {
-        if (block->isUnreached()) { unreachable_code_location = block->getStartLocation(); }
-    }
+    std::optional<lang::Location> unreachable_code_location = findUnreachableCode();
 
     if (unreachable_code_location)
     {
@@ -232,17 +137,16 @@ void lang::CustomFunction::validateUnreachable(ValidationLogger& validation_logg
 
 void lang::CustomFunction::createNativeBacking(CompileContext& context)
 {
-    std::tie(native_type_, native_function_) =
-        createNativeFunction(access_.linkage(), *context.llvmContext(), context.module());
+    StatementFunction::createNativeBacking(context);
+
+    auto [native_type, native_function] = getNativeRepresentation();
 
     std::vector<llvm::Metadata*> di_types;
     di_types.push_back(returnType()->getDebugType(context));
 
-    for (const auto pair : llvm::zip(parameters(), native_function_->args()))
+    for (const auto pair : llvm::zip(parameters(), native_function->args()))
     {
         const auto& [parameter, argument] = pair;
-        parameter->wrap(&argument);
-
         di_types.push_back(parameter->type()->getDebugType(context));
     }
 
@@ -259,47 +163,16 @@ void lang::CustomFunction::createNativeBacking(CompileContext& context)
                                      llvm::DINode::DIFlags::FlagPrototyped,
                                      llvm::DISubprogram::toSPFlags(false, true, false, 0U, name().text() == "main"));
 
-    native_function_->setSubprogram(subprogram);
-}
-
-void lang::CustomFunction::build(CompileContext& context)
-{
-    llvm::BasicBlock* decl = llvm::BasicBlock::Create(*context.llvmContext(), "decl", native_function_);
-
-    context.ir()->SetInsertPoint(decl);
-    function().buildDeclarations(context);
-    inside_scope_->buildDeclarations(context);
-
-    llvm::BasicBlock* defs = llvm::BasicBlock::Create(*context.llvmContext(), "defs", native_function_);
-
-    context.ir()->CreateBr(defs);
-    context.ir()->SetInsertPoint(defs);
-    for (auto& arg : arguments_) { (*arg)->buildDefinition(context); }
-
-    initial_block_->prepareBuild(context, native_function_);
-    initial_block_->doBuild(context);
-
-    context.ir()->SetCurrentDebugLocation(llvm::DebugLoc());
-    context.di()->finalizeSubprogram(native_function_->getSubprogram());
+    native_function->setSubprogram(subprogram);
 }
 
 llvm::DISubprogram* lang::CustomFunction::debugSubprogram()
 {
-    return native_function_->getSubprogram();
-}
-
-lang::LocalScope* lang::CustomFunction::getInsideScope()
-{
-    return inside_scope_;
-}
-
-const std::vector<lang::BasicBlock*>& lang::CustomFunction::getBasicBlocks() const
-{
-    return used_blocks_;
+    auto [native_type, native_function] = getNativeRepresentation();
+    return native_function->getSubprogram();
 }
 
 llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext&)
 {
     return debugSubprogram();
 }
-

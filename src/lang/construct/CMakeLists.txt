@@ -13,6 +13,7 @@ target_sources(ance PRIVATE
                CustomFunction.cpp
                ExternFunction.cpp
                PredefinedFunction.cpp
+               StatementFunction.cpp
                GlobalVariable.cpp
                LocalVariable.cpp
                Parameter.cpp
