@@ -7,6 +7,7 @@
 private g1: ui32 <: 100:32;
 private g2: ui32 <: 100:32 + 200:32;
 private g3: ui32 <: get_value() + 500:32;
+private g4: ui32 <: if true then 200:32 else 100:32;
 
 // The initial value is implicitly converted if necessary.
 private g4: ui32 <: 100:16;
@@ -29,6 +30,7 @@ public main () : ui32
     assert g1 == 100:32;
     assert g2 == 300:32;
     assert g3 == 600:32;
+    assert g4 == 200:32;
 
     return 0:32;
 }
