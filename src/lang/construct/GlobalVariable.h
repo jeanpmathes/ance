@@ -33,20 +33,20 @@ namespace lang
         /**
          * Create a new global variable definition.
          */
-        GlobalVariable(Identifier                          name,
-                       lang::ResolvingHandle<lang::Type>   type,
-                       lang::Location                      type_location,
-                       GlobalScope&                        containing_scope,
-                       lang::AccessModifier                access,
-                       std::unique_ptr<ConstantExpression> constant_init,
-                       bool                                is_final,
-                       bool                                is_constant,
-                       lang::Location                      location);
+        GlobalVariable(Identifier                        name,
+                       lang::ResolvingHandle<lang::Type> type,
+                       lang::Location                    type_location,
+                       GlobalScope&                      containing_scope,
+                       lang::AccessModifier              access,
+                       std::unique_ptr<Expression>       init,
+                       bool                              is_final,
+                       bool                              is_constant,
+                       lang::Location                    location);
 
         [[nodiscard]] lang::AccessModifier access() const;
         [[nodiscard]] bool                 isConstant() const;
         [[nodiscard]] lang::Assigner       assigner() const;
-        [[nodiscard]] lang::Constant*      init() const;
+        [[nodiscard]] Expression*          init() const;
 
         void validate(ValidationLogger& validation_logger) const override;
 
@@ -60,9 +60,10 @@ namespace lang
         void storeValue(std::shared_ptr<lang::Value> value, CompileContext& context) override;
 
       private:
-        lang::AccessModifier                access_;
-        bool                                is_constant_;
-        std::unique_ptr<ConstantExpression> constant_init_;
+        lang::AccessModifier        access_;
+        bool                        is_constant_;
+        std::unique_ptr<Expression> init_;
+        ConstantExpression*         constant_init_;
 
         llvm::GlobalVariable* native_variable_ {nullptr};
         bool                  finalized_ {false};

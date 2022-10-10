@@ -55,19 +55,19 @@ namespace lang
          * @param type_location The location of the type.
          * @param containing_scope The containing scope.
          * @param access The access modifier.
-         * @param constant_init The constant used for initialization.
+         * @param init The expression used for initialization.
          * @param is_final Whether the variable is final.
          * @param is_constant Whether the variable is constant.
          * @param location The source location.
          */
-        void defineAsGlobal(lang::ResolvingHandle<lang::Type>   type,
-                            lang::Location                      type_location,
-                            GlobalScope&                        containing_scope,
-                            lang::AccessModifier                access,
-                            std::unique_ptr<ConstantExpression> constant_init,
-                            bool                                is_final,
-                            bool                                is_constant,
-                            lang::Location                      location);
+        void defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
+                            lang::Location                    type_location,
+                            GlobalScope&                      containing_scope,
+                            lang::AccessModifier              access,
+                            std::unique_ptr<Expression>       init,
+                            bool                              is_final,
+                            bool                              is_constant,
+                            lang::Location                    location);
 
         /**
          * Define this variable as a local variable.

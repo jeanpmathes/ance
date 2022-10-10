@@ -62,14 +62,14 @@ void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger) const
     for (auto& [key, function] : defined_function_groups_) { function->validateFlow(validation_logger); }
 }
 
-void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                access,
-                                             bool                                is_constant,
-                                             lang::Identifier                    name,
-                                             lang::ResolvingHandle<lang::Type>   type,
-                                             lang::Location                      type_location,
-                                             lang::Assigner                      assigner,
-                                             std::unique_ptr<ConstantExpression> initializer,
-                                             lang::Location                      location)
+void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier              access,
+                                             bool                              is_constant,
+                                             lang::Identifier                  name,
+                                             lang::ResolvingHandle<lang::Type> type,
+                                             lang::Location                    type_location,
+                                             lang::Assigner                    assigner,
+                                             std::unique_ptr<Expression>       initializer,
+                                             lang::Location                    location)
 {
     if (defined_names_.contains(name))
     {
@@ -423,11 +423,7 @@ void lang::GlobalScope::createNativeBacking(CompileContext& context)
 {
     for (auto& [key, val] : defined_function_groups_) { val->createNativeBacking(context); }
 
-    for (auto& [name, variable] : global_defined_variables_)
-    {
-        variable->buildDeclaration(context);
-        variable->buildDefinition(context);
-    }
+    for (auto& [name, variable] : global_defined_variables_) { variable->buildDeclaration(context); }
 
     for (auto& [name, type] : defined_types_) { type->buildNativeDeclaration(context); }
     for (auto& registry : type_registries_) { registry->buildNativeDeclarations(context); }
@@ -439,6 +435,11 @@ void lang::GlobalScope::createNativeBacking(CompileContext& context)
 void lang::GlobalScope::buildFunctions(CompileContext& context)
 {
     for (auto& [key, group] : defined_function_groups_) { group->build(context); }
+}
+
+void lang::GlobalScope::buildInitialization(CompileContext& context)
+{
+    for (auto& [name, variable] : global_defined_variables_) { variable->buildDefinition(context); }
 }
 
 void lang::GlobalScope::buildFinalization(CompileContext&)
@@ -487,4 +488,3 @@ lang::OwningHandle<lang::Type> lang::GlobalScope::retrieveUndefinedType(Identifi
 
     return undefined;
 }
-

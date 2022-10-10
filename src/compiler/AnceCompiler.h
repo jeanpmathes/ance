@@ -37,8 +37,9 @@ class AnceCompiler
     void emitObject(const std::filesystem::path& out);
 
   private:
-    void buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit);
-    void buildStart(lang::ResolvingHandle<lang::Function> main, llvm::FunctionType* exit_type, llvm::Function* exit);
+    llvm::Function* buildInit();
+    llvm::Function* buildExit();
+    void            buildStart(lang::ResolvingHandle<lang::Function> main, llvm::Function* init, llvm::Function* exit);
 
   private:
     Application&      application_;

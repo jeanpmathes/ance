@@ -283,7 +283,7 @@ class anceParser : public antlr4::Parser
         antlr4::tree::TerminalNode* SEMICOLON();
         antlr4::tree::TerminalNode* CONST();
         AssignerContext*            assigner();
-        LiteralExpressionContext*   literalExpression();
+        ExpressionContext*          expression();
 
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };

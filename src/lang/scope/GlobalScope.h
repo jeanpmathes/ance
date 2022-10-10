@@ -51,17 +51,17 @@ namespace lang
          * @param name The name of the variable.
          * @param type The type of the variable.
          * @param assigner The assigner to use for the initial assignment.
-         * @param initializer The constant initializer.
+         * @param initializer The initializer.
          * @param location The source location.
          */
-        void defineGlobalVariable(lang::AccessModifier                access,
-                                  bool                                is_constant,
-                                  lang::Identifier                    name,
-                                  lang::ResolvingHandle<lang::Type>   type,
-                                  lang::Location                      type_location,
-                                  lang::Assigner                      assigner,
-                                  std::unique_ptr<ConstantExpression> initializer,
-                                  lang::Location                      location);
+        void defineGlobalVariable(lang::AccessModifier              access,
+                                  bool                              is_constant,
+                                  lang::Identifier                  name,
+                                  lang::ResolvingHandle<lang::Type> type,
+                                  lang::Location                    type_location,
+                                  lang::Assigner                    assigner,
+                                  std::unique_ptr<Expression>       initializer,
+                                  lang::Location                    location);
 
         /**
          * Define an extern function in this scope.
@@ -187,6 +187,11 @@ namespace lang
          */
         void buildFunctions(CompileContext& context);
 
+        /**
+         * Build all initialization required by global entities.
+         * @param context The current compile context.
+         */
+        void buildInitialization(CompileContext& context);
         void buildFinalization(CompileContext& context) override;
 
       private:

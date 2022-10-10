@@ -385,7 +385,7 @@ namespace
             140, 141, 5,   0,   0,   1,   141, 1,   1,   0,   0,   0,   142, 144, 3,   18,  9,   0,   143, 145, 5,
             83,  0,   0,   144, 143, 1,   0,   0,   0,   144, 145, 1,   0,   0,   0,   145, 146, 1,   0,   0,   0,
             146, 147, 5,   85,  0,   0,   147, 148, 5,   1,   0,   0,   148, 152, 3,   110, 55,  0,   149, 150, 3,
-            36,  18,  0,   150, 151, 3,   86,  43,  0,   151, 153, 1,   0,   0,   0,   152, 149, 1,   0,   0,   0,
+            36,  18,  0,   150, 151, 3,   52,  26,  0,   151, 153, 1,   0,   0,   0,   152, 149, 1,   0,   0,   0,
             152, 153, 1,   0,   0,   0,   153, 154, 1,   0,   0,   0,   154, 155, 5,   86,  0,   0,   155, 3,   1,
             0,   0,   0,   156, 157, 3,   18,  9,   0,   157, 158, 5,   85,  0,   0,   158, 159, 5,   2,   0,   0,
             159, 160, 3,   6,   3,   0,   160, 163, 5,   3,   0,   0,   161, 162, 5,   1,   0,   0,   162, 164, 3,
@@ -785,9 +785,9 @@ anceParser::AssignerContext* anceParser::VariableDeclarationContext::assigner()
     return getRuleContext<anceParser::AssignerContext>(0);
 }
 
-anceParser::LiteralExpressionContext* anceParser::VariableDeclarationContext::literalExpression()
+anceParser::ExpressionContext* anceParser::VariableDeclarationContext::expression()
 {
-    return getRuleContext<anceParser::LiteralExpressionContext>(0);
+    return getRuleContext<anceParser::ExpressionContext>(0);
 }
 
 size_t anceParser::VariableDeclarationContext::getRuleIndex() const
@@ -846,7 +846,7 @@ anceParser::VariableDeclarationContext* anceParser::variableDeclaration()
             setState(149);
             assigner();
             setState(150);
-            literalExpression();
+            expression(0);
         }
         setState(154);
         match(anceParser::SEMICOLON);

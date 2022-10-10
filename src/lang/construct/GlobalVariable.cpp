@@ -16,26 +16,27 @@ namespace llvm
     class Constant;
 }
 
-lang::GlobalVariable::GlobalVariable(Identifier                          name,
-                                     lang::ResolvingHandle<lang::Type>   type,
-                                     lang::Location                      type_location,
-                                     GlobalScope&                        containing_scope,
-                                     lang::AccessModifier                access,
-                                     std::unique_ptr<ConstantExpression> constant_init,
-                                     bool                                is_final,
-                                     bool                                is_constant,
-                                     lang::Location                      location)
+lang::GlobalVariable::GlobalVariable(Identifier                        name,
+                                     lang::ResolvingHandle<lang::Type> type,
+                                     lang::Location                    type_location,
+                                     GlobalScope&                      containing_scope,
+                                     lang::AccessModifier              access,
+                                     std::unique_ptr<Expression>       init,
+                                     bool                              is_final,
+                                     bool                              is_constant,
+                                     lang::Location                    location)
     : VariableDefinition(name, type, type_location, containing_scope, is_final, location)
     , access_(access)
     , is_constant_(is_constant)
-    , constant_init_(std::move(constant_init))
+    , init_(std::move(init))
+    , constant_init_(dynamic_cast<ConstantExpression*>(init_.get()))
 {
     containing_scope.addType(type);
 
-    if (constant_init_)
+    if (init_)
     {
-        constant_init_->setContainingScope(containing_scope);
-        addChild(*constant_init_);
+        init_->setContainingScope(containing_scope);
+        addChild(*init_);
     }
 }
 
@@ -57,9 +58,9 @@ lang::Assigner lang::GlobalVariable::assigner() const
     }
 }
 
-lang::Constant* lang::GlobalVariable::init() const
+Expression* lang::GlobalVariable::init() const
 {
-    return constant_init_ ? constant_init_->getConstantValue().get() : nullptr;
+    return init_.get();
 }
 
 void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
@@ -80,9 +81,15 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
         return;
     }
 
+    if (!init_ && is_constant_)
+    {
+        validation_logger.logError("Constants require an explicit constant initializer", location());
+        return;
+    }
+
     if (!constant_init_ && is_constant_)
     {
-        validation_logger.logError("Constants require an explicit initializer", location());
+        validation_logger.logError("Initializer for constant variable must be constant", location());
         return;
     }
 
@@ -92,21 +99,28 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
         return;
     }
 
-    if (constant_init_)
+    if (init_)
     {
-        if (!constant_init_->validate(validation_logger)) return;
+        if (!init_->validate(validation_logger)) return;
 
-        if (!lang::Type::areSame(type(), constant_init_->getConstantValue()->type()))
+        if (is_constant_)
         {
-            validation_logger.logError("Constant initializer must be of variable type " + type()->getAnnotatedName(),
-                                       typeLocation());
-            return;
+            if (!lang::Type::areSame(type(), constant_init_->type()))
+            {
+                validation_logger.logError("Constant initializer must be of variable type "
+                                               + type()->getAnnotatedName(),
+                                           typeLocation());
+                return;
+            }
+        }
+        else
+        {
+            if (!lang::Type::checkMismatch(type(), init_->type(), init_->location(), validation_logger)) return;
         }
     }
 }
 
-void lang::GlobalVariable::buildDeclaration(CompileContext&) {}
-void lang::GlobalVariable::buildDefinition(CompileContext& context)
+void lang::GlobalVariable::buildDeclaration(CompileContext& context)
 {
     llvm::GlobalValue::LinkageTypes linkage = access_.linkage();
 
@@ -117,6 +131,10 @@ void lang::GlobalVariable::buildDefinition(CompileContext& context)
         std::shared_ptr<lang::Constant> initial_value = constant_init_->getConstantValue();
         initial_value->buildContentConstant(context.module());
         native_initializer = initial_value->getContentConstant();
+    }
+    else if (init_)
+    {
+        native_initializer = nullptr;// Will be initialized at startup.
     }
     else { native_initializer = type()->getDefaultContent(*context.module()); }
 
@@ -136,6 +154,13 @@ void lang::GlobalVariable::buildDefinition(CompileContext& context)
                                                                     true);
 
     native_variable_->addDebugInfo(debug_info);
+}
+
+void lang::GlobalVariable::buildDefinition(CompileContext& context)
+{
+    if (constant_init_) return;// Definition done in declaration.
+
+    if (init_) { storeValue(init_->getValue(), context); }
 }
 
 void lang::GlobalVariable::buildFinalization(CompileContext& context)

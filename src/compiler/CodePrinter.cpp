@@ -26,7 +26,7 @@ std::any CodePrinter::visit(lang::GlobalVariable& variable)
     if (variable.init())
     {
         out_ << " " << variable.assigner().getSymbol() << " ";
-        out_ << variable.init()->toString();
+        visitTree(*variable.init());
     }
 
     out_ << ";" << std::endl;

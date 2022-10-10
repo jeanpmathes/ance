@@ -76,18 +76,15 @@ std::any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclaration
     lang::ResolvingHandle<lang::Type> type       = std::any_cast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
     lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
 
-    ConstantExpression* const_expr;
-    lang::Assigner      assigner = lang::Assigner::UNSPECIFIED;
+    Expression*    initial_value;
+    lang::Assigner assigner = lang::Assigner::UNSPECIFIED;
 
-    if (ctx->literalExpression())
+    if (ctx->expression())
     {
-        assigner = std::any_cast<lang::Assigner>(visit(ctx->assigner()));
-
-        Expression* expr = std::any_cast<Expression*>(visit(ctx->literalExpression()));
-        const_expr       = dynamic_cast<ConstantExpression*>(expr);
+        assigner      = std::any_cast<lang::Assigner>(visit(ctx->assigner()));
+        initial_value = std::any_cast<Expression*>(visit(ctx->expression()));
     }
-    else
-    { const_expr = nullptr; }
+    else { initial_value = nullptr; }
 
     application_.globalScope().defineGlobalVariable(access,
                                                     is_constant,
@@ -95,7 +92,7 @@ std::any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclaration
                                                     type,
                                                     location(ctx->type()),
                                                     assigner,
-                                                    std::unique_ptr<ConstantExpression>(const_expr),
+                                                    std::unique_ptr<Expression>(initial_value),
                                                     location(ctx));
 
     return {};

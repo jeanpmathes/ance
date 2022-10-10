@@ -95,11 +95,9 @@ void AnceCompiler::compile(const std::filesystem::path& out)
 
     lang::ResolvingHandle<lang::Function> main = application_.globalScope().getEntry();
 
-    llvm::FunctionType* exit_type;
-    llvm::Function*     exit;
-
-    buildExit(exit_type, exit);
-    buildStart(main, exit_type, exit);
+    llvm::Function* init_function = buildInit();
+    llvm::Function* exit_function = buildExit();
+    buildStart(main, init_function, exit_function);
 
     llvm::verifyModule(module_, &llvm::errs());
 
@@ -164,13 +162,30 @@ void AnceCompiler::emitObject(const std::filesystem::path& out)
     s.flush();
 }
 
-void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& exit)
+llvm::Function* AnceCompiler::buildInit()
+{
+    llvm::FunctionType* init_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
+    llvm::Function*     init =
+        llvm::Function::Create(init_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_init", module_);
+
+    llvm::BasicBlock* start_block = llvm::BasicBlock::Create(llvm_context_, "entry", init);
+
+    ir_.SetInsertPoint(start_block);
+
+    application_.globalScope().buildInitialization(*context_);
+
+    ir_.CreateRetVoid();
+    return init;
+}
+
+llvm::Function* AnceCompiler::buildExit()
 {
     lang::ResolvingHandle<lang::Type> exitcode_type = lang::FixedWidthIntegerType::get(32, false);
 
-    llvm::Type* exit_params[] = {exitcode_type->getContentType(llvm_context_)};
-    exit_type                 = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), exit_params, false);
-    exit = llvm::Function::Create(exit_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_exit", module_);
+    llvm::Type*         exit_params[] = {exitcode_type->getContentType(llvm_context_)};
+    llvm::FunctionType* exit_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), exit_params, false);
+    llvm::Function*     exit =
+        llvm::Function::Create(exit_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_exit", module_);
 
     llvm::Value* exitcode = exit->getArg(0);
     exitcode->setName("exitcode");
@@ -188,11 +203,10 @@ void AnceCompiler::buildExit(llvm::FunctionType*& exit_type, llvm::Function*& ex
     user_exit->buildCall(args, *context_);
 
     ir_.CreateRetVoid();
+    return exit;
 }
 
-void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main,
-                              llvm::FunctionType*                   exit_type,
-                              llvm::Function*                       exit)
+void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::Function* init, llvm::Function* exit)
 {
     llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
     llvm::Function*     start =
@@ -202,15 +216,12 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main,
 
     ir_.SetInsertPoint(start_block);
 
-    std::vector<std::shared_ptr<lang::Value>> args;
-    std::shared_ptr<lang::Value>              exitcode = main->buildCall(args, *context_);
+    ir_.CreateCall(init);
 
+    std::shared_ptr<lang::Value> exitcode = main->buildCall({}, *context_);
     exitcode->buildContentValue(*context_);
-    llvm::Value* native_exitcode = exitcode->getContentValue();
 
-    llvm::Value* exit_args = {native_exitcode};
-    ir_.CreateCall(exit_type, exit, exit_args);
+    ir_.CreateCall(exit, {exitcode->getContentValue()});
 
     ir_.CreateRetVoid();
 }
-
