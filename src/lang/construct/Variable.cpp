@@ -30,7 +30,7 @@ void lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
                                     bool                              is_constant,
                                     lang::Location                    location)
 {
-    definition_ = std::make_unique<lang::GlobalVariable>(name(),
+    definition_ = std::make_unique<lang::GlobalVariable>(self(),
                                                          type,
                                                          type_location,
                                                          containing_scope,
@@ -147,3 +147,32 @@ lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const
     return lang::makeHandled<lang::Variable>(name());
 }
 
+void lang::Variable::expand()
+{
+    definition_->expand();
+}
+
+void lang::Variable::determineFlow()
+{
+    definition_->determineFlow();
+}
+
+void lang::Variable::validateFlow(ValidationLogger& validation_logger) const
+{
+    definition_->validateFlow(validation_logger);
+}
+
+void lang::Variable::resolve()
+{
+    definition_->resolve();
+}
+
+void lang::Variable::postResolve()
+{
+    definition_->postResolve();
+}
+
+void lang::Variable::createNativeBacking(CompileContext& context)
+{
+    definition_->createNativeBacking(context);
+}

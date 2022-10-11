@@ -7,6 +7,7 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/CustomFunction.h"
 #include "lang/construct/ExternFunction.h"
+#include "lang/construct/InitializerFunction.h"
 #include "lang/construct/LocalVariable.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/scope/LocalScope.h"
@@ -78,6 +79,20 @@ lang::PredefinedFunction& lang::Function::defineAsPredefined(
     addChild(*definition_);
 
     return predefined_function;
+}
+
+void lang::Function::defineAsInit(lang::ResolvingHandle<lang::Variable> variable,
+                                  lang::Assigner                        assigner,
+                                  std::unique_ptr<Expression>           initializer,
+                                  lang::Scope&                          containing_scope)
+{
+
+    definition_ = std::make_unique<lang::InitializerFunction>(*this,
+                                                              variable,
+                                                              assigner,
+                                                              std::move(initializer),
+                                                              containing_scope);
+    addChild(*definition_);
 }
 
 std::optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParameterVariable(
@@ -340,4 +355,3 @@ bool lang::Function::resolveDefinition(lang::ResolvingHandle<lang::Type> type)
 {
     return scope()->resolveDefinition(type);
 }
-

@@ -46,6 +46,13 @@ bool lang::VariableDefinition::isFinal() const
     return is_final_;
 }
 
+void lang::VariableDefinition::expand() {}
+void lang::VariableDefinition::determineFlow() {}
+void lang::VariableDefinition::validateFlow(ValidationLogger&) const {}
+void lang::VariableDefinition::resolve() {}
+void lang::VariableDefinition::postResolve() {}
+void lang::VariableDefinition::createNativeBacking(CompileContext&) {}
+
 void lang::VariableDefinition::setValue(std::shared_ptr<lang::Value> value, CompileContext& context)
 {
     if (type()->isReferenceType())
@@ -65,4 +72,3 @@ void lang::VariableDefinition::setValue(std::shared_ptr<lang::Value> value, Comp
         storeValue(value, context);
     }
 }
-

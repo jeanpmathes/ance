@@ -32,7 +32,6 @@ namespace lang
      */
     class StatementFunction
         : public lang::FunctionDefinition
-        , public lang::Element<CustomFunction, ANCE_CONSTRUCTS>
     {
       public:
         StatementFunction(Function&                                     function,
@@ -51,6 +50,7 @@ namespace lang
         void validate(ValidationLogger& validation_logger) const override;
         void expand() override;
         void determineFlow() override;
+        bool validateFlow(ValidationLogger& validation_logger) const override;
 
         void createNativeBacking(CompileContext& context) override;
         void build(CompileContext& context) override;

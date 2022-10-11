@@ -10,7 +10,7 @@ private g3: ui32 <: get_value() + 500:32;
 private g4: ui32 <: if true then 200:32 else 100:32;
 
 // The initial value is implicitly converted if necessary.
-private g4: ui32 <: 100:16;
+private g5: ui32 <: 100:16;
 
 // If no initial value is given, the default value of the variable type is used.
 private gt: ui32;

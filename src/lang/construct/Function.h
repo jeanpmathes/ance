@@ -105,6 +105,18 @@ namespace lang
                                                lang::Location                                       location);
 
         /**
+         * Define this function as a variable initialization function.
+         * @param variable The variable to initialize.
+         * @param assigner The assigner.
+         * @param initializer The initializer.
+         * @param containing_scope The scope containing the function.
+         */
+        void defineAsInit(lang::ResolvingHandle<lang::Variable> variable,
+                          lang::Assigner                        assigner,
+                          std::unique_ptr<Expression>           initializer,
+                          Scope&                                containing_scope);
+
+        /**
          * Define a local variable that is a parameter.
          * @param name The name.
          * @param type The type.

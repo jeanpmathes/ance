@@ -56,6 +56,13 @@ namespace lang
          */
         [[nodiscard]] bool isFinal() const;
 
+        virtual void expand();
+        virtual void determineFlow();
+        virtual void validateFlow(ValidationLogger& validation_logger) const;
+        virtual void resolve();
+        virtual void postResolve();
+        virtual void createNativeBacking(CompileContext& context);
+
         /**
          * Validate this variable declaration.
          * @param validation_logger The logger to use for validation.

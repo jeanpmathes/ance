@@ -48,6 +48,7 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 void lang::GlobalScope::expand()
 {
     for (auto& [key, function] : defined_function_groups_) { function->expand(); }
+    for (auto& [name, variable] : global_defined_variables_) { variable->expand(); }
 
     expanded_ = true;
 }
@@ -55,11 +56,13 @@ void lang::GlobalScope::expand()
 void lang::GlobalScope::determineFlow()
 {
     for (auto& [key, function] : defined_function_groups_) { function->determineFlow(); }
+    for (auto& [name, variable] : global_defined_variables_) { variable->determineFlow(); }
 }
 
 void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger) const
 {
     for (auto& [key, function] : defined_function_groups_) { function->validateFlow(validation_logger); }
+    for (auto& [name, variable] : global_defined_variables_) { variable->validateFlow(validation_logger); }
 }
 
 void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier              access,
@@ -303,6 +306,7 @@ void lang::GlobalScope::registerDefinition(lang::ResolvingHandle<lang::Type> typ
 void lang::GlobalScope::resolve()
 {
     for (auto& [key, group] : defined_function_groups_) { group->resolve(); }
+    for (auto& [key, variable] : global_defined_variables_) { variable->resolve(); }
 
     // Type registries are currently incorrect, as they resolve type dependencies in an incorrect scope.
 
@@ -323,6 +327,7 @@ void lang::GlobalScope::postResolve()
     }
 
     for (auto& [key, group] : defined_function_groups_) { group->postResolve(); }
+    for (auto& [key, variable] : global_defined_variables_) { variable->postResolve(); }
 }
 
 bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
@@ -422,6 +427,7 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::getExit()
 void lang::GlobalScope::createNativeBacking(CompileContext& context)
 {
     for (auto& [key, val] : defined_function_groups_) { val->createNativeBacking(context); }
+    for (auto& [key, val] : global_defined_variables_) { val->createNativeBacking(context); }
 
     for (auto& [name, variable] : global_defined_variables_) { variable->buildDeclaration(context); }
 

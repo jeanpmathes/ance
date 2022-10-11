@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 
             application.emitAsSource(obj_dir / "input.nc");
             application.preBuild();
-            application.emitAsSource(obj_dir / "input_prebuilt.nc");
+            application.emitAsSource(obj_dir / "input_prebuild.nc");
 
             application.validateFlow(validation_logger);
 

@@ -16,26 +16,35 @@ namespace llvm
     class Constant;
 }
 
-lang::GlobalVariable::GlobalVariable(Identifier                        name,
-                                     lang::ResolvingHandle<lang::Type> type,
-                                     lang::Location                    type_location,
-                                     GlobalScope&                      containing_scope,
-                                     lang::AccessModifier              access,
-                                     std::unique_ptr<Expression>       init,
-                                     bool                              is_final,
-                                     bool                              is_constant,
-                                     lang::Location                    location)
-    : VariableDefinition(name, type, type_location, containing_scope, is_final, location)
+lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
+                                     lang::ResolvingHandle<lang::Type>     type,
+                                     lang::Location                        type_location,
+                                     GlobalScope&                          containing_scope,
+                                     lang::AccessModifier                  access,
+                                     std::unique_ptr<Expression>           init,
+                                     bool                                  is_final,
+                                     bool                                  is_constant,
+                                     lang::Location                        location)
+    : VariableDefinition(self->name(), type, type_location, containing_scope, is_final, location)
     , access_(access)
     , is_constant_(is_constant)
-    , init_(std::move(init))
-    , constant_init_(dynamic_cast<ConstantExpression*>(init_.get()))
+    , constant_init_(is_constant_ ? dynamic_cast<ConstantExpression*>(init.get()) : nullptr)
+    , init_(init.get())
+    , init_owner_(std::move(init))
+    , init_function_(init_ && not constant_init_
+                         ? std::make_unique<lang::Function>(lang::Identifier::from(self->name() + "$init"))
+                         : nullptr)
 {
     containing_scope.addType(type);
 
     if (init_)
     {
-        init_->setContainingScope(containing_scope);
+        if (constant_init_) { constant_init_->setContainingScope(containing_scope); }
+        else
+        {
+            init_function_->defineAsInit(self->toUndefined(), assigner(), std::move(init_owner_), containing_scope);
+        }
+
         addChild(*init_);
     }
 }
@@ -60,7 +69,7 @@ lang::Assigner lang::GlobalVariable::assigner() const
 
 Expression* lang::GlobalVariable::init() const
 {
-    return init_.get();
+    return init_;
 }
 
 void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
@@ -101,7 +110,11 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
 
     if (init_)
     {
-        if (!init_->validate(validation_logger)) return;
+        if (init_function_)
+        {
+            init_function_->validate(validation_logger);
+            return;
+        }
 
         if (is_constant_)
         {
@@ -120,10 +133,45 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
     }
 }
 
+void lang::GlobalVariable::expand()
+{
+    if (init_function_)
+    {
+        clearChildren();
+        init_ = nullptr;
+        init_owner_.reset();
+
+        init_function_->expand();
+    }
+}
+
+void lang::GlobalVariable::determineFlow()
+{
+    if (init_function_) { init_function_->determineFlow(); }
+}
+
+void lang::GlobalVariable::validateFlow(ValidationLogger& validation_logger) const
+{
+    if (init_function_) { init_function_->validateFlow(validation_logger); }
+}
+
+void lang::GlobalVariable::resolve()
+{
+    if (init_function_) { init_function_->resolve(); }
+}
+
+void lang::GlobalVariable::postResolve()
+{
+    if (init_function_) { init_function_->postResolve(); }
+}
+
+void lang::GlobalVariable::createNativeBacking(CompileContext& context)
+{
+    if (init_function_) { init_function_->createNativeBacking(context); }
+}
+
 void lang::GlobalVariable::buildDeclaration(CompileContext& context)
 {
-    llvm::GlobalValue::LinkageTypes linkage = access_.linkage();
-
     llvm::Constant* native_initializer;
 
     if (constant_init_)
@@ -132,16 +180,17 @@ void lang::GlobalVariable::buildDeclaration(CompileContext& context)
         initial_value->buildContentConstant(context.module());
         native_initializer = initial_value->getContentConstant();
     }
-    else if (init_)
+    else if (init_function_)
     {
-        native_initializer = nullptr;// Will be initialized at startup.
+        // Will be initialized at startup.
+        native_initializer = llvm::Constant::getNullValue(type()->getContentType(*context.llvmContext()));
     }
     else { native_initializer = type()->getDefaultContent(*context.module()); }
 
     native_variable_ = new llvm::GlobalVariable(*context.module(),
                                                 type()->getContentType(context.module()->getContext()),
                                                 is_constant_,
-                                                linkage,
+                                                access_.linkage(),
                                                 native_initializer,
                                                 name().text());
 
@@ -154,13 +203,15 @@ void lang::GlobalVariable::buildDeclaration(CompileContext& context)
                                                                     true);
 
     native_variable_->addDebugInfo(debug_info);
+
+    if (init_function_) { init_function_->build(context); }
 }
 
 void lang::GlobalVariable::buildDefinition(CompileContext& context)
 {
     if (constant_init_) return;// Definition done in declaration.
 
-    if (init_) { storeValue(init_->getValue(), context); }
+    if (init_function_) { init_function_->buildCall({}, context); }
 }
 
 void lang::GlobalVariable::buildFinalization(CompileContext& context)
@@ -179,11 +230,10 @@ std::shared_ptr<lang::Value> lang::GlobalVariable::getValue(CompileContext&)
 
 void lang::GlobalVariable::storeValue(std::shared_ptr<lang::Value> value, CompileContext& context)
 {
-    value = lang::Type::makeMatching(type(), value, context);
+    assert(native_variable_);
 
+    value = lang::Type::makeMatching(type(), value, context);
     value->buildNativeValue(context);
 
-    llvm::Value* value_ptr = value->getNativeValue();
-    type()->buildCopyInitializer(native_variable_, value_ptr, context);
+    type()->buildCopyInitializer(native_variable_, value->getNativeValue(), context);
 }
-

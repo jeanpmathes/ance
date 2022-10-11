@@ -9,7 +9,6 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
 #include "validation/Utilities.h"
@@ -155,7 +154,7 @@ void lang::CustomFunction::createNativeBacking(CompileContext& context)
     llvm::DISubprogram* subprogram =
         context.di()->createFunction(scope().getDebugScope(context),
                                      name().text(),
-                                     signature_.getMangledName(),
+                                     isMangled() ? signature_.getMangledName() : name().text(),
                                      context.sourceFile(),
                                      static_cast<unsigned>(location().line()),
                                      debug_type,

@@ -13,6 +13,7 @@ namespace lang
 #include "lang/construct/CustomFunction.h"
 #include "lang/construct/ExternFunction.h"
 #include "lang/construct/Function.h"
+#include "lang/construct/InitializerFunction.h"
 #include "lang/construct/PredefinedFunction.h"
 
 #include "lang/construct/BasicBlock.h"

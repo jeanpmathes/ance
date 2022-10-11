@@ -8,11 +8,9 @@
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
-#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::StatementFunction::StatementFunction(Function&                                     function,
@@ -126,6 +124,11 @@ void lang::StatementFunction::determineFlow()
         block->complete(running_index);
         if (block->isUsable()) { used_blocks_.push_back(block.get()); }
     }
+}
+
+bool lang::StatementFunction::validateFlow(ValidationLogger&) const
+{
+    return true;
 }
 
 lang::BasicBlock& lang::StatementFunction::getInitialBlock() const

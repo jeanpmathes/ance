@@ -170,6 +170,14 @@ namespace lang
          */
         [[nodiscard]] lang::ResolvingHandle<lang::Variable> toUndefined() const;
 
+        // These methods are required by global variables for their initialization function.
+        void expand();
+        void determineFlow();
+        void validateFlow(ValidationLogger& validation_logger) const;
+        void resolve();
+        void postResolve();
+        void createNativeBacking(CompileContext& context);
+
       private:
         lang::Identifier                          name_;
         std::unique_ptr<lang::VariableDefinition> definition_ {};

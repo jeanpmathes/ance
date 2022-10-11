@@ -31,7 +31,9 @@ namespace lang
     /**
      * A function that is defined in code.
      */
-    class CustomFunction : public lang::StatementFunction
+    class CustomFunction
+        : public lang::StatementFunction
+        , public lang::Element<CustomFunction, ANCE_CONSTRUCTS>
     {
       public:
         CustomFunction(Function&                                     function,

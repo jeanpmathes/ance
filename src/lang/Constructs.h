@@ -11,6 +11,7 @@ namespace lang
     class CustomFunction;
     class ExternFunction;
     class PredefinedFunction;
+    class InitializerFunction;
 
     class BasicBlock;
     class CodeBlock;
@@ -64,12 +65,12 @@ class While;
 
 #define ANCE_CONSTRUCTS                                                                                                \
     Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction,                      \
-        lang::PredefinedFunction, lang::BasicBlock, lang::CodeBlock, lang::Variable, lang::GlobalVariable,             \
-        lang::LocalVariable, Addressof, Allocation, BinaryOperation, UnaryOperation, BindRef, BindRefTo,               \
-        ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType, Subscript, VariableAccess,           \
-        MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope, lang::LocalScope, Assertion,     \
-        Assignment, Delete, ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Drop,      \
-        Return, If, While, Match, Case, VectorDefinition, ArrayDefinition
+        lang::PredefinedFunction, lang::InitializerFunction, lang::BasicBlock, lang::CodeBlock, lang::Variable,        \
+        lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation, BinaryOperation, UnaryOperation, BindRef,    \
+        BindRefTo, ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType, Subscript,                \
+        VariableAccess, MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope,                  \
+        lang::LocalScope, Assertion, Assignment, Delete, ExpressionStatement, LocalReferenceVariableDefinition,        \
+        LocalVariableDefinition, Drop, Return, If, While, Match, Case, VectorDefinition, ArrayDefinition
 #endif
 
 class Statement;
