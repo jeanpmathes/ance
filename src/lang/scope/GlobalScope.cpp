@@ -441,6 +441,7 @@ void lang::GlobalScope::createNativeBacking(CompileContext& context)
 void lang::GlobalScope::buildFunctions(CompileContext& context)
 {
     for (auto& [key, group] : defined_function_groups_) { group->build(context); }
+    for (auto& [key, variable] : global_defined_variables_) { variable->build(context); }
 }
 
 void lang::GlobalScope::buildInitialization(CompileContext& context)

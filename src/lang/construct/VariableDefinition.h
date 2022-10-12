@@ -62,6 +62,7 @@ namespace lang
         virtual void resolve();
         virtual void postResolve();
         virtual void createNativeBacking(CompileContext& context);
+        virtual void build(CompileContext& context);
 
         /**
          * Validate this variable declaration.

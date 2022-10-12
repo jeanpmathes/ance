@@ -3,7 +3,9 @@
 lang::WrappedNativeValue::WrappedNativeValue(lang::ResolvingHandle<lang::Type> type, llvm::Value* value)
     : type_(type)
     , value_(value)
-{}
+{
+    assert(value_);
+}
 
 void lang::WrappedNativeValue::setValue(llvm::Value* value)
 {

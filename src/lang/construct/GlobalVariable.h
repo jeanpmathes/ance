@@ -56,6 +56,7 @@ namespace lang
         void resolve() override;
         void postResolve() override;
         void createNativeBacking(CompileContext& context) override;
+        void build(CompileContext& context) override;
 
         void buildDeclaration(CompileContext& context) override;
         void buildDefinition(CompileContext& context) override;

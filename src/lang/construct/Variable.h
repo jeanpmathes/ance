@@ -163,7 +163,7 @@ namespace lang
          * @param value The new value.
          * @param context The current compile context.
          */
-        void setValue(const std::shared_ptr<lang::Value>& value, CompileContext& context);
+        void setValue(std::shared_ptr<Value> value, CompileContext& context);
 
         /**
          * Get an undefined variable with the same name.
@@ -177,6 +177,7 @@ namespace lang
         void resolve();
         void postResolve();
         void createNativeBacking(CompileContext& context);
+        void build(CompileContext& context);
 
       private:
         lang::Identifier                          name_;

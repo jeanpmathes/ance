@@ -110,13 +110,11 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
 
     if (init_)
     {
-        if (init_function_)
-        {
-            init_function_->validate(validation_logger);
-            return;
-        }
+        if (init_function_) { init_function_->validate(validation_logger); }
 
-        if (is_constant_)
+        if (!init_->validate(validation_logger)) return;
+
+        if (constant_init_)
         {
             if (!lang::Type::areSame(type(), constant_init_->type()))
             {
@@ -170,6 +168,11 @@ void lang::GlobalVariable::createNativeBacking(CompileContext& context)
     if (init_function_) { init_function_->createNativeBacking(context); }
 }
 
+void lang::GlobalVariable::build(CompileContext& context)
+{
+    if (init_function_) { init_function_->build(context); }
+}
+
 void lang::GlobalVariable::buildDeclaration(CompileContext& context)
 {
     llvm::Constant* native_initializer;
@@ -203,8 +206,6 @@ void lang::GlobalVariable::buildDeclaration(CompileContext& context)
                                                                     true);
 
     native_variable_->addDebugInfo(debug_info);
-
-    if (init_function_) { init_function_->build(context); }
 }
 
 void lang::GlobalVariable::buildDefinition(CompileContext& context)
@@ -225,6 +226,7 @@ void lang::GlobalVariable::buildFinalization(CompileContext& context)
 
 std::shared_ptr<lang::Value> lang::GlobalVariable::getValue(CompileContext&)
 {
+    assert(native_variable_);
     return std::make_shared<lang::WrappedNativeValue>(type(), native_variable_);
 }
 

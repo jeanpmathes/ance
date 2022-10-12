@@ -52,6 +52,7 @@ void lang::VariableDefinition::validateFlow(ValidationLogger&) const {}
 void lang::VariableDefinition::resolve() {}
 void lang::VariableDefinition::postResolve() {}
 void lang::VariableDefinition::createNativeBacking(CompileContext&) {}
+void lang::VariableDefinition::build(CompileContext&) {}
 
 void lang::VariableDefinition::setValue(std::shared_ptr<lang::Value> value, CompileContext& context)
 {
