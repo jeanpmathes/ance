@@ -1,16 +1,8 @@
 // invalid
 
-// Structs cannot have circular type dependencies.
+// Global variables are not allowed to have cyclic dependencies on themselves.
 
-public struct Data1
-{
-    private d: Data2;
-}
-
-public struct Data2
-{
-    private d: Data1;
-}
+public a: i32 <: a;
 
 public main () : ui32
 {

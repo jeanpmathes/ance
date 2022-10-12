@@ -1,6 +1,7 @@
 // valid
 
 // A program can define global variables. Global variables must be public or private.
+// Global variables are defined without order, they can be used above declaration.
 
 // The value of global variables can be directly set when defining.
 // All expressions are valid as initial values.
