@@ -25,15 +25,15 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
                                      bool                                  is_final,
                                      bool                                  is_constant,
                                      lang::Location                        location)
-    : VariableDefinition(self->name(), type, type_location, containing_scope, is_final, location)
+    : VariableDefinition(self, type, type_location, containing_scope, is_final, location)
     , access_(access)
     , is_constant_(is_constant)
     , constant_init_(is_constant_ ? dynamic_cast<ConstantExpression*>(init.get()) : nullptr)
     , init_(init.get())
     , init_owner_(std::move(init))
-    , init_function_(init_ && not constant_init_
-                         ? std::make_unique<lang::Function>(lang::Identifier::from(self->name() + "$init"))
-                         : nullptr)
+    , init_function_(init_ && not constant_init_ ? lang::OwningHandle<lang::Function>::takeOwnership(
+                         lang::makeHandled<lang::Function>(lang::Identifier::from(self->name() + "$init")))
+                                                 : std::optional<lang::OwningHandle<lang::Function>>())
 {
     containing_scope.addType(type);
 
@@ -42,7 +42,10 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
         if (constant_init_) { constant_init_->setContainingScope(containing_scope); }
         else
         {
-            init_function_->defineAsInit(self->toUndefined(), assigner(), std::move(init_owner_), containing_scope);
+            init_function_.value()->defineAsInit(self->toUndefined(),
+                                                 assigner(),
+                                                 std::move(init_owner_),
+                                                 containing_scope);
         }
 
         addChild(*init_);
@@ -110,8 +113,6 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
 
     if (init_)
     {
-        if (init_function_) { init_function_->validate(validation_logger); }
-
         if (!init_->validate(validation_logger)) return;
 
         if (constant_init_)
@@ -139,38 +140,38 @@ void lang::GlobalVariable::expand()
         init_ = nullptr;
         init_owner_.reset();
 
-        init_function_->expand();
+        init_function_.value()->expand();
     }
 }
 
 void lang::GlobalVariable::determineFlow()
 {
-    if (init_function_) { init_function_->determineFlow(); }
+    if (init_function_) { init_function_.value()->determineFlow(); }
 }
 
 void lang::GlobalVariable::validateFlow(ValidationLogger& validation_logger) const
 {
-    if (init_function_) { init_function_->validateFlow(validation_logger); }
+    if (init_function_) { init_function_.value()->validateFlow(validation_logger); }
 }
 
 void lang::GlobalVariable::resolve()
 {
-    if (init_function_) { init_function_->resolve(); }
+    if (init_function_) { init_function_.value()->resolve(); }
 }
 
 void lang::GlobalVariable::postResolve()
 {
-    if (init_function_) { init_function_->postResolve(); }
+    if (init_function_) { init_function_.value()->postResolve(); }
 }
 
 void lang::GlobalVariable::createNativeBacking(CompileContext& context)
 {
-    if (init_function_) { init_function_->createNativeBacking(context); }
+    if (init_function_) { init_function_.value()->createNativeBacking(context); }
 }
 
 void lang::GlobalVariable::build(CompileContext& context)
 {
-    if (init_function_) { init_function_->build(context); }
+    if (init_function_) { init_function_.value()->build(context); }
 }
 
 void lang::GlobalVariable::buildDeclaration(CompileContext& context)
@@ -212,7 +213,7 @@ void lang::GlobalVariable::buildDefinition(CompileContext& context)
 {
     if (constant_init_) return;// Definition done in declaration.
 
-    if (init_function_) { init_function_->buildCall({}, context); }
+    if (init_function_) { init_function_.value()->buildCall({}, context); }
 }
 
 void lang::GlobalVariable::buildFinalization(CompileContext& context)
@@ -222,6 +223,23 @@ void lang::GlobalVariable::buildFinalization(CompileContext& context)
     type()->buildFinalizer(native_variable_, context);
 
     finalized_ = true;
+}
+
+std::set<lang::ResolvingHandle<lang::Function>> lang::GlobalVariable::getFunctionDependencies() const
+{
+    if (init_function_) return init_function_.value()->getFunctionDependencies();
+    else return {};
+}
+
+std::set<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::getVariableDependencies() const
+{
+    if (init_function_)
+    {
+        auto dependencies = init_function_.value()->getVariableDependencies();
+        dependencies.erase(self());
+        return dependencies;
+    }
+    else return {};
 }
 
 std::shared_ptr<lang::Value> lang::GlobalVariable::getValue(CompileContext&)
@@ -238,4 +256,87 @@ void lang::GlobalVariable::storeValue(std::shared_ptr<lang::Value> value, Compil
     value->buildNativeValue(context);
 
     type()->buildCopyInitializer(native_variable_, value->getNativeValue(), context);
+}
+
+std::set<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::getAllVariableDependencies(
+    lang::ResolvingHandle<lang::Variable> variable)
+{
+    std::set<lang::ResolvingHandle<lang::Variable>> dependencies = variable->getVariableDependencies();
+
+    std::vector<lang::ResolvingHandle<lang::Function>> functions_to_check;
+    std::set<lang::ResolvingHandle<lang::Function>>    functions_checked;
+
+    auto function_dependencies = variable->getFunctionDependencies();
+    functions_to_check.insert(functions_to_check.end(), function_dependencies.begin(), function_dependencies.end());
+
+    while (!functions_to_check.empty())
+    {
+        auto function = functions_to_check.back();
+        functions_to_check.pop_back();
+
+        if (functions_checked.contains(function)) continue;
+        functions_checked.insert(function);
+
+        auto function_variable_dependencies = function->getVariableDependencies();
+        dependencies.insert(function_variable_dependencies.begin(), function_variable_dependencies.end());
+
+        auto function_function_dependencies = function->getFunctionDependencies();
+        functions_to_check.insert(functions_to_check.end(),
+                                  function_function_dependencies.begin(),
+                                  function_function_dependencies.end());
+    }
+
+    return dependencies;
+}
+
+std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::determineOrder(
+    std::vector<lang::ResolvingHandle<lang::Variable>> variables,
+    ValidationLogger&                                  validation_logger)
+{
+    const int visited  = 1;
+    const int finished = 2;
+
+    std::stack<std::pair<lang::ResolvingHandle<lang::Variable>, bool>> to_check;
+    std::map<lang::ResolvingHandle<lang::Variable>, int>               state;
+    std::vector<lang::ResolvingHandle<lang::Variable>>                 ordered_variables;
+
+    for (const auto& variable : variables)
+    {
+        if (!state.contains(variable)) to_check.emplace(variable, false);
+
+        while (!to_check.empty())
+        {
+            auto [current_variable, visited_children] = to_check.top();
+
+            if (visited_children)
+            {
+                ordered_variables.push_back(current_variable);
+                state[current_variable] = finished;
+                to_check.pop();
+            }
+            else
+            {
+                to_check.top() = std::make_pair(current_variable, true);
+
+                if (state[current_variable] == visited)
+                {
+                    validation_logger.logError("Variable '" + current_variable->name()
+                                                   + "' part of circular dependency",
+                                               current_variable->name().location());
+                    return {};
+                }
+
+                state[current_variable] = visited;
+
+                for (const auto& dependency : getAllVariableDependencies(current_variable))
+                {
+                    if (state[dependency] == finished) continue;
+                    to_check.emplace(dependency, false);
+                }
+            }
+        }
+    }
+
+    assert(variables.size() == ordered_variables.size());
+    return ordered_variables;
 }

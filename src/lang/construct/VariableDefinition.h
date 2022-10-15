@@ -22,12 +22,12 @@ namespace lang
     class VariableDefinition : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     {
       public:
-        VariableDefinition(Identifier                        name,
-                           lang::ResolvingHandle<lang::Type> type,
-                           lang::Location                    type_location,
-                           Scope&                            containing_scope,
-                           bool                              is_final,
-                           lang::Location                    location);
+        VariableDefinition(lang::ResolvingHandle<lang::Variable> self,
+                           lang::ResolvingHandle<lang::Type>     type,
+                           lang::Location                        type_location,
+                           Scope&                                containing_scope,
+                           bool                                  is_final,
+                           lang::Location                        location);
 
         [[nodiscard]] const Identifier& name() const;
 
@@ -64,6 +64,9 @@ namespace lang
         virtual void createNativeBacking(CompileContext& context);
         virtual void build(CompileContext& context);
 
+        [[nodiscard]] virtual std::set<lang::ResolvingHandle<lang::Variable>> getVariableDependencies() const;
+        [[nodiscard]] virtual std::set<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() const;
+
         /**
          * Validate this variable declaration.
          * @param validation_logger The logger to use for validation.
@@ -81,9 +84,10 @@ namespace lang
 
       protected:
         virtual void storeValue(std::shared_ptr<lang::Value> value, CompileContext& context) = 0;
+        [[nodiscard]] lang::ResolvingHandle<lang::Variable> self() const;
 
       private:
-        lang::Identifier name_;
+        lang::ResolvingHandle<lang::Variable> self_;
 
         lang::ResolvingHandle<lang::Type> type_;
         lang::Location                    type_location_;

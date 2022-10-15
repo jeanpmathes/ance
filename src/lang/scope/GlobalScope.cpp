@@ -6,6 +6,7 @@
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Assigner.h"
+#include "lang/construct/GlobalVariable.h"
 #include "lang/expression/ConstantExpression.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/StructType.h"
@@ -43,6 +44,11 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 
     for (auto& [key, function] : defined_function_groups_) { function->validate(validation_logger); }
     for (auto& [name, variable] : global_defined_variables_) { variable->validate(validation_logger); }
+
+    std::vector<lang::ResolvingHandle<lang::Variable>> global_variables;
+    for (auto& [name, variable] : global_defined_variables_) { global_variables.push_back(variable.handle()); }
+
+    global_variables = lang::GlobalVariable::determineOrder(global_variables, validation_logger);
 }
 
 void lang::GlobalScope::expand()
@@ -446,7 +452,7 @@ void lang::GlobalScope::buildFunctions(CompileContext& context)
 
 void lang::GlobalScope::buildInitialization(CompileContext& context)
 {
-    for (auto& [name, variable] : global_defined_variables_) { variable->buildDefinition(context); }
+    for (auto& variable : global_variables_) { variable->buildDefinition(context); }
 }
 
 void lang::GlobalScope::buildFinalization(CompileContext& context)

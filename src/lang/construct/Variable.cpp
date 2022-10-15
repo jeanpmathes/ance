@@ -51,7 +51,7 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
                                    unsigned int                        parameter_no,
                                    lang::Location                      location)
 {
-    definition_ = std::make_unique<lang::LocalVariable>(name(),
+    definition_ = std::make_unique<lang::LocalVariable>(self(),
                                                         type,
                                                         type_location,
                                                         containing_scope,
@@ -108,7 +108,7 @@ void lang::Variable::buildFinalization(CompileContext& context)
 
 bool lang::Variable::validateGetValue(ValidationLogger& validation_logger, lang::Location location) const
 {
-    return not lang::validation::isNameUndefined(self(), location, validation_logger);
+    return not lang::validation::isNameUndefined(self(), location, validation_logger) && type()->isDefined();
 }
 
 bool lang::Variable::validateSetValue(const std::shared_ptr<lang::Value>& value,
@@ -180,4 +180,14 @@ void lang::Variable::createNativeBacking(CompileContext& context)
 void lang::Variable::build(CompileContext& context)
 {
     definition_->build(context);
+}
+
+std::set<lang::ResolvingHandle<lang::Variable>> lang::Variable::getVariableDependencies() const
+{
+    return definition_->getVariableDependencies();
+}
+
+std::set<lang::ResolvingHandle<lang::Function>> lang::Variable::getFunctionDependencies() const
+{
+    return definition_->getFunctionDependencies();
 }

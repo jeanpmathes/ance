@@ -146,6 +146,21 @@ namespace lang
          */
         virtual void buildFinalization(CompileContext& context) = 0;
 
+        /**
+         * Add a dependency on a variable.
+         * @param variable The variable to add a dependency on. Must be defined.
+         */
+        void addDependency(lang::ResolvingHandle<lang::Variable> variable);
+
+        /**
+         * Add a dependency on a function.
+         * @param function The function to add a dependency on. Must be defined.
+         */
+        void addDependency(lang::ResolvingHandle<lang::Function> function);
+
+        std::set<lang::ResolvingHandle<lang::Variable>> getVariableDependencies() const;
+        std::set<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() const;
+
         ~Scope() override = default;
 
       protected:
@@ -153,6 +168,9 @@ namespace lang
 
       private:
         size_t temp_name_counter_ = 0;
+
+        std::set<lang::ResolvingHandle<lang::Variable>> variable_dependencies_;
+        std::set<lang::ResolvingHandle<lang::Function>> function_dependencies_;
     };
 }
 #endif

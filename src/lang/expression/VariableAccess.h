@@ -31,6 +31,7 @@ class VariableAccess
 
   protected:
     void walkDefinitions() override;
+    void postResolve() override;
 
   public:
     [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;

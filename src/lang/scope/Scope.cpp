@@ -31,3 +31,34 @@ void lang::Scope::addType(lang::ResolvingHandle<lang::Type> type)
 
 void lang::Scope::onSubScope(lang::LocalScope*) {}
 
+void lang::Scope::addDependency(lang::ResolvingHandle<lang::Variable> variable)
+{
+    assert(variable->isDefined());
+
+    if (variable->scope() == this) return;
+
+    variable_dependencies_.insert(variable);
+
+    scope()->addDependency(variable);
+}
+
+void lang::Scope::addDependency(lang::ResolvingHandle<lang::Function> function)
+{
+    assert(function->isDefined());
+
+    if (function->scope() == this) return;
+
+    function_dependencies_.insert(function);
+
+    scope()->addDependency(function);
+}
+
+std::set<lang::ResolvingHandle<lang::Variable>> lang::Scope::getVariableDependencies() const
+{
+    return variable_dependencies_;
+}
+
+std::set<lang::ResolvingHandle<lang::Function>> lang::Scope::getFunctionDependencies() const
+{
+    return function_dependencies_;
+}

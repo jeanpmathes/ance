@@ -81,6 +81,8 @@ void FunctionCall::postResolve()
     if (not arguments_defined) return;
 
     getCallable().requestOverload(argument_types);
+
+    if (function().size() == 1 && function().front()->isDefined()) scope()->addDependency(function().front());
 }
 
 std::optional<lang::ResolvingHandle<lang::Type>> FunctionCall::tryGetType() const

@@ -166,6 +166,18 @@ namespace lang
         void setValue(std::shared_ptr<Value> value, CompileContext& context);
 
         /**
+         * Get the variable dependencies of this variable. Only variables in unordered scope have dependencies.
+         * @return The dependencies.
+         */
+        [[nodiscard]] std::set<lang::ResolvingHandle<lang::Variable>> getVariableDependencies() const;
+
+        /**
+         * Get the function dependencies of this variable. Only variables in unordered scope have dependencies.
+         * @return The dependencies.
+         */
+        [[nodiscard]] std::set<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() const;
+
+        /**
          * Get an undefined variable with the same name.
          */
         [[nodiscard]] lang::ResolvingHandle<lang::Variable> toUndefined() const;

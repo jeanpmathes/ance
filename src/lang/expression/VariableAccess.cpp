@@ -22,6 +22,13 @@ void VariableAccess::walkDefinitions()
     scope()->registerUsage(variable_);
 }
 
+void VariableAccess::postResolve()
+{
+    Expression::postResolve();
+
+    if (variable_->isDefined()) { scope()->addDependency(variable_); }
+}
+
 std::optional<lang::ResolvingHandle<lang::Type>> VariableAccess::tryGetType() const
 {
     if (variable_->isDefined() && variable_->type()->isDefined()) return variable_->type();
@@ -36,8 +43,6 @@ bool VariableAccess::isNamed()
 bool VariableAccess::validate(ValidationLogger& validation_logger) const
 {
     if (isVariableDropped(validation_logger)) return false;
-    if (not variable_->type()->isDefined()) return false;// No log needed, this is done in the variable.
-
     return variable_->validateGetValue(validation_logger, location());
 }
 

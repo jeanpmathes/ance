@@ -27,14 +27,14 @@ namespace lang
         /**
          * Create a new local variable definition.
          */
-        LocalVariable(Identifier                        name,
-                      lang::ResolvingHandle<lang::Type> type,
-                      lang::Location                    type_location,
-                      Scope&                            containing_scope,
-                      bool                              is_final,
-                      std::shared_ptr<lang::Value>      value,
-                      unsigned                          parameter_no,
-                      lang::Location                    location);
+        LocalVariable(lang::ResolvingHandle<lang::Variable> self,
+                      lang::ResolvingHandle<lang::Type>     type,
+                      lang::Location                        type_location,
+                      Scope&                                containing_scope,
+                      bool                                  is_final,
+                      std::shared_ptr<lang::Value>          value,
+                      unsigned                              parameter_no,
+                      lang::Location                        location);
 
         void validate(ValidationLogger& validation_logger) const override;
 

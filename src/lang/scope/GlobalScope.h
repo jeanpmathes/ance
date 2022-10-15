@@ -212,6 +212,8 @@ namespace lang
 
         std::set<lang::Identifier>                                defined_names_;
         std::vector<std::tuple<lang::Identifier, lang::Location>> duplicated_names_;
+
+        std::vector<lang::ResolvingHandle<lang::Variable>> global_variables_;
     };
 }
 #endif

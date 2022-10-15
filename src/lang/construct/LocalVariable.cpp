@@ -9,15 +9,15 @@
 #include "lang/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
 
-lang::LocalVariable::LocalVariable(Identifier                        name,
-                                   lang::ResolvingHandle<lang::Type> type,
-                                   lang::Location                    type_location,
-                                   Scope&                            containing_scope,
-                                   bool                              is_final,
-                                   std::shared_ptr<lang::Value>      value,
-                                   unsigned                          parameter_no,
-                                   lang::Location                    location)
-    : VariableDefinition(name, type, type_location, containing_scope, is_final, location)
+lang::LocalVariable::LocalVariable(lang::ResolvingHandle<lang::Variable> self,
+                                   lang::ResolvingHandle<lang::Type>     type,
+                                   lang::Location                        type_location,
+                                   Scope&                                containing_scope,
+                                   bool                                  is_final,
+                                   std::shared_ptr<lang::Value>          value,
+                                   unsigned                              parameter_no,
+                                   lang::Location                        location)
+    : VariableDefinition(self, type, type_location, containing_scope, is_final, location)
     , initial_value_(std::move(value))
     , parameter_no_(parameter_no)
 {

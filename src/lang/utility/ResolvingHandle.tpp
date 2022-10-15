@@ -83,6 +83,15 @@ bool lang::ResolvingHandle<T>::operator!=(const lang::ResolvingHandle<T>& other)
 }
 
 template<typename T>
+bool lang::ResolvingHandle<T>::operator<(const lang::ResolvingHandle<T>& other) const
+{
+    T* target       = get();
+    T* other_target = other.get();
+
+    return target < other_target;
+}
+
+template<typename T>
 lang::ResolvingHandle<T>::HandleNavigator::HandleNavigator(std::shared_ptr<HandleNavigator> next) : next_(next)
 {}
 
@@ -150,6 +159,7 @@ lang::ResolvingHandle<T> lang::makeHandled(ARGS&&... args)
 template<typename SELF>
 void lang::HandleTarget<SELF>::setSelf(lang::ResolvingHandle<SELF> handle)
 {
+    assert(!self_);
     self_ = std::make_optional<lang::ResolvingHandle<SELF>>(handle);
 }
 

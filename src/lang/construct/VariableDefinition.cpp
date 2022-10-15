@@ -1,15 +1,16 @@
 #include "VariableDefinition.h"
 
-#include "lang/type/ReferenceType.h"
 #include "compiler/CompileContext.h"
+#include "lang/construct/Variable.h"
+#include "lang/type/ReferenceType.h"
 
-lang::VariableDefinition::VariableDefinition(Identifier                        name,
-                                             lang::ResolvingHandle<lang::Type> type,
-                                             lang::Location                    type_location,
-                                             Scope&                            containing_scope,
-                                             bool                              is_final,
-                                             lang::Location                    location)
-    : name_(name)
+lang::VariableDefinition::VariableDefinition(lang::ResolvingHandle<lang::Variable> self,
+                                             lang::ResolvingHandle<lang::Type>     type,
+                                             lang::Location                        type_location,
+                                             Scope&                                containing_scope,
+                                             bool                                  is_final,
+                                             lang::Location                        location)
+    : self_(self)
     , type_(type)
     , type_location_(type_location)
     , scope_(containing_scope)
@@ -19,7 +20,7 @@ lang::VariableDefinition::VariableDefinition(Identifier                        n
 
 const lang::Identifier& lang::VariableDefinition::name() const
 {
-    return name_;
+    return self_->name();
 }
 
 lang::Scope* lang::VariableDefinition::scope() const
@@ -54,6 +55,16 @@ void lang::VariableDefinition::postResolve() {}
 void lang::VariableDefinition::createNativeBacking(CompileContext&) {}
 void lang::VariableDefinition::build(CompileContext&) {}
 
+std::set<lang::ResolvingHandle<lang::Variable>> lang::VariableDefinition::getVariableDependencies() const
+{
+    return {};
+}
+
+std::set<lang::ResolvingHandle<lang::Function>> lang::VariableDefinition::getFunctionDependencies() const
+{
+    return {};
+}
+
 void lang::VariableDefinition::setValue(std::shared_ptr<lang::Value> value, CompileContext& context)
 {
     if (type()->isReferenceType())
@@ -68,8 +79,10 @@ void lang::VariableDefinition::setValue(std::shared_ptr<lang::Value> value, Comp
 
         target_type->buildCopyInitializer(reference->getContentValue(), value->getNativeValue(), context);
     }
-    else
-    {
-        storeValue(value, context);
-    }
+    else { storeValue(value, context); }
+}
+
+lang::ResolvingHandle<lang::Variable> lang::VariableDefinition::self() const
+{
+    return self_;
 }
