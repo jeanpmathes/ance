@@ -158,8 +158,17 @@ namespace lang
          */
         void addDependency(lang::ResolvingHandle<lang::Function> function);
 
-        std::set<lang::ResolvingHandle<lang::Variable>> getVariableDependencies() const;
-        std::set<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() const;
+        /**
+         * Get the variable dependencies and their count.
+         * @return The variable dependencies.
+         */
+        [[nodiscard]] std::map<lang::ResolvingHandle<lang::Variable>, size_t> getVariableDependencies() const;
+
+        /**
+         * Get the function dependencies.
+         * @return The function dependencies.
+         */
+        [[nodiscard]] std::set<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() const;
 
         ~Scope() override = default;
 
@@ -169,8 +178,8 @@ namespace lang
       private:
         size_t temp_name_counter_ = 0;
 
-        std::set<lang::ResolvingHandle<lang::Variable>> variable_dependencies_;
-        std::set<lang::ResolvingHandle<lang::Function>> function_dependencies_;
+        std::map<lang::ResolvingHandle<lang::Variable>, size_t> variable_dependencies_;
+        std::set<lang::ResolvingHandle<lang::Function>>         function_dependencies_;
     };
 }
 #endif

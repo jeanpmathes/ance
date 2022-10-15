@@ -236,8 +236,15 @@ std::set<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::getVariabl
     if (init_function_)
     {
         auto dependencies = init_function_.value()->getVariableDependencies();
-        dependencies.erase(self());
-        return dependencies;
+
+        std::set<lang::ResolvingHandle<lang::Variable>> result;
+
+        for (auto& [dependency, count] : dependencies)
+        {
+            if (dependency != self() || count > 1) result.insert(dependency);
+        }
+
+        return result;
     }
     else return {};
 }
@@ -278,7 +285,7 @@ std::set<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::getAllVari
         functions_checked.insert(function);
 
         auto function_variable_dependencies = function->getVariableDependencies();
-        dependencies.insert(function_variable_dependencies.begin(), function_variable_dependencies.end());
+        for (auto& [dependency, count] : function_variable_dependencies) dependencies.insert(dependency);
 
         auto function_function_dependencies = function->getFunctionDependencies();
         functions_to_check.insert(functions_to_check.end(),

@@ -37,7 +37,7 @@ void lang::Scope::addDependency(lang::ResolvingHandle<lang::Variable> variable)
 
     if (variable->scope() == this) return;
 
-    variable_dependencies_.insert(variable);
+    variable_dependencies_[variable]++;
 
     scope()->addDependency(variable);
 }
@@ -53,7 +53,7 @@ void lang::Scope::addDependency(lang::ResolvingHandle<lang::Function> function)
     scope()->addDependency(function);
 }
 
-std::set<lang::ResolvingHandle<lang::Variable>> lang::Scope::getVariableDependencies() const
+std::map<lang::ResolvingHandle<lang::Variable>, size_t> lang::Scope::getVariableDependencies() const
 {
     return variable_dependencies_;
 }
