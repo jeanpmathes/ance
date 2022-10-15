@@ -48,7 +48,7 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
     std::vector<lang::ResolvingHandle<lang::Variable>> global_variables;
     for (auto& [name, variable] : global_defined_variables_) { global_variables.push_back(variable.handle()); }
 
-    global_variables = lang::GlobalVariable::determineOrder(global_variables, validation_logger);
+    global_variables_ = lang::GlobalVariable::determineOrder(global_variables, validation_logger);
 }
 
 void lang::GlobalScope::expand()
