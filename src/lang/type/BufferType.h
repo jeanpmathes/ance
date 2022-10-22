@@ -49,6 +49,8 @@ namespace lang
         llvm::DIType*                      createDebugType(CompileContext& context) override;
         std::vector<lang::TypeDefinition*> getDependencies() const override;
 
+        std::optional<lang::ResolvingHandle<lang::Type>> getPointeeType() const override;
+
       private:
         static lang::TypeRegistry<>& getBufferTypes();
 

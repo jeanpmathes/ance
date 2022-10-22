@@ -146,3 +146,7 @@ lang::ResolvingHandle<lang::Type> lang::BufferType::get(lang::ResolvingHandle<la
     }
 }
 
+std::optional<lang::ResolvingHandle<lang::Type>> lang::BufferType::getPointeeType() const
+{
+    return element_type_;
+}

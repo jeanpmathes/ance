@@ -763,16 +763,6 @@ class anceParser : public antlr4::Parser
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    class AdressOfContext : public ExpressionContext
-    {
-      public:
-        AdressOfContext(ExpressionContext* ctx);
-
-        AddressofContext* addressof();
-
-        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
     class BinaryOperationContext : public ExpressionContext
     {
       public:
@@ -922,6 +912,16 @@ class anceParser : public antlr4::Parser
         std::vector<ExpressionContext*> expression();
         ExpressionContext*              expression(size_t i);
         TypeContext*                    type();
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class AddressOfContext : public ExpressionContext
+    {
+      public:
+        AddressOfContext(ExpressionContext* ctx);
+
+        AddressofContext* addressof();
 
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };

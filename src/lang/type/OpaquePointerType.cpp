@@ -47,3 +47,8 @@ lang::ResolvingHandle<lang::Type> lang::OpaquePointerType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new OpaquePointerType()));
     return instance;
 }
+
+std::optional<lang::ResolvingHandle<lang::Type>> lang::OpaquePointerType::getPointeeType() const
+{
+    return std::nullopt;
+}

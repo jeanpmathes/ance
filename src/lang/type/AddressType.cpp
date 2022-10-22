@@ -5,6 +5,7 @@
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/BooleanType.h"
+#include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Values.h"
 
@@ -20,16 +21,29 @@ StateCount lang::AddressType::getStateCount() const
 
 bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
 {
-    if (not op.isEquality()) return false;
-
     other = lang::Type::getReferencedType(other);
-    return lang::Type::areSame(other, self());
+
+    if (op.isEquality() || (op == lang::BinaryOperator::SUBTRACTION && getPointeeType().has_value()))
+    {
+        return lang::Type::areSame(other, self());
+    }
+
+    if (op == lang::BinaryOperator::ADDITION && getPointeeType().has_value())
+    {
+        return lang::Type::areSame(other, lang::SizeType::getDiff());
+    }
+
+    return false;
 }
 
 lang::ResolvingHandle<lang::Type> lang::AddressType::getOperatorResultType(lang::BinaryOperator op,
                                                                            lang::ResolvingHandle<lang::Type>)
 {
     if (op.isEquality()) return lang::BooleanType::get();
+
+    if (op == lang::BinaryOperator::ADDITION) return self();
+
+    if (op == lang::BinaryOperator::SUBTRACTION) return lang::SizeType::getDiff();
 
     return lang::Type::getUndefined();
 }
@@ -65,6 +79,22 @@ std::shared_ptr<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperat
             break;
         case lang::BinaryOperator::NOT_EQUAL:
             result = context.ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
+            break;
+        case lang::BinaryOperator::ADDITION:
+            result = context.ir()->CreateGEP(getPointeeType().value()->getContentType(*context.llvmContext()),
+                                             left_value,
+                                             right_value,
+                                             left_value->getName() + ".gep");
+            break;
+        case lang::BinaryOperator::SUBTRACTION:
+            result = context.ir()->CreatePtrDiff(getPointeeType().value()->getContentType(*context.llvmContext()),
+                                                 left_value,
+                                                 right_value,
+                                                 left_value->getName() + ".ptrdiff");
+            result = context.ir()->CreateIntCast(result,
+                                                 lang::SizeType::getDiff()->getContentType(*context.llvmContext()),
+                                                 true,
+                                                 left_value->getName() + ".icast");
             break;
 
         default:

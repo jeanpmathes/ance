@@ -128,7 +128,7 @@ expression
 	| value=expression '.' # Indirection
 	| indexed=expression '[' index=expression ']' # Subscript
 	| accessed=expression IDENTIFIER # MemberAccess
-	| addressof # AdressOf
+	| addressof # AddressOf
     | bindRef # Ref
     | sizeofType # SizeOf
     | sizeofExpression # SizeOf

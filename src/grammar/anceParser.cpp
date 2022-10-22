@@ -3190,23 +3190,6 @@ std::any anceParser::VariableContext::accept(tree::ParseTreeVisitor* visitor)
     if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitVariable(this);
     else return visitor->visitChildren(this);
 }
-//----------------- AdressOfContext ------------------------------------------------------------------
-
-anceParser::AddressofContext* anceParser::AdressOfContext::addressof()
-{
-    return getRuleContext<anceParser::AddressofContext>(0);
-}
-
-anceParser::AdressOfContext::AdressOfContext(ExpressionContext* ctx)
-{
-    copyFrom(ctx);
-}
-
-std::any anceParser::AdressOfContext::accept(tree::ParseTreeVisitor* visitor)
-{
-    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitAdressOf(this);
-    else return visitor->visitChildren(this);
-}
 //----------------- BinaryOperationContext ------------------------------------------------------------------
 
 anceParser::BinaryOperatorMultiplicativeContext* anceParser::BinaryOperationContext::binaryOperatorMultiplicative()
@@ -3498,6 +3481,23 @@ std::any anceParser::VectorDefinitionContext::accept(tree::ParseTreeVisitor* vis
     if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitVectorDefinition(this);
     else return visitor->visitChildren(this);
 }
+//----------------- AddressOfContext ------------------------------------------------------------------
+
+anceParser::AddressofContext* anceParser::AddressOfContext::addressof()
+{
+    return getRuleContext<anceParser::AddressofContext>(0);
+}
+
+anceParser::AddressOfContext::AddressOfContext(ExpressionContext* ctx)
+{
+    copyFrom(ctx);
+}
+
+std::any anceParser::AddressOfContext::accept(tree::ParseTreeVisitor* visitor)
+{
+    if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor)) return parserVisitor->visitAddressOf(this);
+    else return visitor->visitChildren(this);
+}
 //----------------- ArrayDefinitionContext ------------------------------------------------------------------
 
 std::vector<anceParser::ExpressionContext*> anceParser::ArrayDefinitionContext::expression()
@@ -3630,7 +3630,7 @@ anceParser::ExpressionContext* anceParser::expression(int precedence)
 
             case 4:
             {
-                _localctx       = _tracker.createInstance<AdressOfContext>(_localctx);
+                _localctx       = _tracker.createInstance<AddressOfContext>(_localctx);
                 _ctx            = _localctx;
                 previousContext = _localctx;
                 setState(364);

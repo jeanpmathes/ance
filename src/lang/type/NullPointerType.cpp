@@ -74,3 +74,8 @@ lang::ResolvingHandle<lang::Type> lang::NullPointerType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new NullPointerType()));
     return instance;
 }
+
+std::optional<lang::ResolvingHandle<lang::Type>> lang::NullPointerType::getPointeeType() const
+{
+    return std::nullopt;
+}

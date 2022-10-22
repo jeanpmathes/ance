@@ -35,6 +35,9 @@ namespace lang
                                            lang::ResolvingHandle<lang::Type> return_type,
                                            lang::PredefinedFunction&         function,
                                            CompileContext&                   context);
+
+      protected:
+        [[nodiscard]] virtual std::optional<lang::ResolvingHandle<lang::Type>> getPointeeType() const = 0;
     };
 }
 

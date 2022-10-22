@@ -112,8 +112,6 @@ class anceBaseVisitor : public anceVisitor
 
     virtual std::any visitVariable(anceParser::VariableContext* ctx) override { return visitChildren(ctx); }
 
-    virtual std::any visitAdressOf(anceParser::AdressOfContext* ctx) override { return visitChildren(ctx); }
-
     virtual std::any visitBinaryOperation(anceParser::BinaryOperationContext* ctx) override
     {
         return visitChildren(ctx);
@@ -145,6 +143,8 @@ class anceBaseVisitor : public anceVisitor
     {
         return visitChildren(ctx);
     }
+
+    virtual std::any visitAddressOf(anceParser::AddressOfContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitArrayDefinition(anceParser::ArrayDefinitionContext* ctx) override
     {

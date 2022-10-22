@@ -141,3 +141,7 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::get(lang::ResolvingHandle<l
     }
 }
 
+std::optional<lang::ResolvingHandle<lang::Type>> lang::PointerType::getPointeeType() const
+{
+    return element_type_;
+}

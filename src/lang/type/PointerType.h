@@ -45,9 +45,11 @@ namespace lang
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        std::string                         createMangledName() const override;
-        llvm::DIType*                       createDebugType(CompileContext& context) override;
-        std::vector<lang::TypeDefinition*>  getDependencies() const override;
+        std::string                        createMangledName() const override;
+        llvm::DIType*                      createDebugType(CompileContext& context) override;
+        std::vector<lang::TypeDefinition*> getDependencies() const override;
+
+        std::optional<lang::ResolvingHandle<lang::Type>> getPointeeType() const override;
 
       private:
         static lang::TypeRegistry<>& getPointerTypes();

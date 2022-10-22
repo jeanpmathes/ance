@@ -33,6 +33,8 @@ namespace lang
         std::string   createMangledName() const override;
         llvm::DIType* createDebugType(CompileContext& context) override;
 
+        std::optional<lang::ResolvingHandle<lang::Type>> getPointeeType() const override;
+
       public:
         static lang::ResolvingHandle<lang::Type> get();
     };
