@@ -26,13 +26,6 @@ public main () : ui32
     let a11 <: ptr(a8);
     let a12 <: uiptr(a7);
 
-    // The 'uiptr' type is used for pointer arithmetic.
-    let p1 <: 0x100:uiptr;
-    let p2 <: 0x200:uiptr;
-    let p3 <: p1 + 0x100:uiptr;
-    assert p3 == p2;
-    assert ptr(p3) == ptr(p2);
-
     return 0:32;
 }
 
