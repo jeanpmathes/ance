@@ -49,7 +49,7 @@ bool AnceLinker::link(const std::filesystem::path& obj, const std::filesystem::p
     args.push_back("/machine:x64");
     args.push_back("/subsystem:console");
 
-    args.push_back("/entry:_start");
+    args.push_back("/entry:start$lang");
 
     std::string out = "/out:" + exe.string();
     args.push_back(out.c_str());

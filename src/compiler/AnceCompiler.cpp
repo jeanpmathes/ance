@@ -165,8 +165,10 @@ void AnceCompiler::emitObject(const std::filesystem::path& out)
 llvm::Function* AnceCompiler::buildInit()
 {
     llvm::FunctionType* init_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
-    llvm::Function*     init =
-        llvm::Function::Create(init_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_init", module_);
+    llvm::Function*     init      = llvm::Function::Create(init_type,
+                                                  llvm::GlobalValue::LinkageTypes::PrivateLinkage,
+                                                  getInternalFunctionName("init"),
+                                                  module_);
 
     llvm::BasicBlock* start_block = llvm::BasicBlock::Create(llvm_context_, "entry", init);
 
@@ -184,8 +186,10 @@ llvm::Function* AnceCompiler::buildExit()
 
     llvm::Type*         exit_params[] = {exitcode_type->getContentType(llvm_context_)};
     llvm::FunctionType* exit_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), exit_params, false);
-    llvm::Function*     exit =
-        llvm::Function::Create(exit_type, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "_exit", module_);
+    llvm::Function*     exit      = llvm::Function::Create(exit_type,
+                                                  llvm::GlobalValue::LinkageTypes::PrivateLinkage,
+                                                  getInternalFunctionName("exit"),
+                                                  module_);
 
     llvm::Value* exitcode = exit->getArg(0);
     exitcode->setName("exitcode");
@@ -209,8 +213,10 @@ llvm::Function* AnceCompiler::buildExit()
 void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::Function* init, llvm::Function* exit)
 {
     llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
-    llvm::Function*     start =
-        llvm::Function::Create(start_type, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "_start", module_);
+    llvm::Function*     start      = llvm::Function::Create(start_type,
+                                                   llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+                                                   getInternalFunctionName("start"),
+                                                   module_);
 
     llvm::BasicBlock* start_block = llvm::BasicBlock::Create(llvm_context_, "entry", start);
 
@@ -224,4 +230,9 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::
     ir_.CreateCall(exit, {exitcode->getContentValue()});
 
     ir_.CreateRetVoid();
+}
+
+std::string AnceCompiler::getInternalFunctionName(const std::string& name)
+{
+    return name + INTERNAL_FUNCTION_SUFFIX;
 }

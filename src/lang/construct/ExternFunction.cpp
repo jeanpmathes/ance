@@ -35,11 +35,6 @@ bool lang::ExternFunction::isMangled() const
 
 void lang::ExternFunction::validate(ValidationLogger& validation_logger) const
 {
-    if (name().text() == "_start")
-    {
-        validation_logger.logError("Reserved name '_start' cannot be used by non-mangled functions", name().location());
-    }
-
     if (lang::validation::isTypeUndefined(returnType(), returnTypeLocation(), validation_logger)) return;
 
     returnType()->validate(validation_logger, returnTypeLocation());

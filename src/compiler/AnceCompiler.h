@@ -40,8 +40,11 @@ class AnceCompiler
     llvm::Function* buildInit();
     llvm::Function* buildExit();
     void            buildStart(lang::ResolvingHandle<lang::Function> main, llvm::Function* init, llvm::Function* exit);
+    static std::string getInternalFunctionName(const std::string& name);
 
   private:
+    static constexpr const char* INTERNAL_FUNCTION_SUFFIX = "$lang";
+
     Application&      application_;
     llvm::LLVMContext llvm_context_;
     llvm::Module      module_;
