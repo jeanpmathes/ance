@@ -63,6 +63,11 @@ bool lang::TypeDefinition::isBooleanType() const
     return false;
 }
 
+bool lang::TypeDefinition::isCharType() const
+{
+    return false;
+}
+
 bool lang::TypeDefinition::isUnsignedIntegerPointerType() const
 {
     return false;

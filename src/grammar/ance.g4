@@ -312,6 +312,7 @@ keywordType
     : floatingPointType
     | targetDependentType
     | booleanType
+    | charType
     | nullPointerType
     | voidType
     ;
@@ -333,6 +334,10 @@ targetDependentType
 booleanType
 	: 'bool'
 	;
+
+charType
+    : 'char'
+    ;
 
 nullPointerType
     : 'nullptr'

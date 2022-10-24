@@ -145,6 +145,12 @@ namespace lang
         [[nodiscard]] bool isBooleanType() const;
 
         /**
+         * Get whether this type is a char type.
+         * @return True if this type is a char type.
+         */
+        [[nodiscard]] bool isCharType() const;
+
+        /**
          * Get whether this type is an unsigned integer pointer type.
          * @return True if this type is an unsigned integer pointer type.
          */

@@ -109,6 +109,12 @@ bool lang::Type::isBooleanType() const
     return definition_->isBooleanType();
 }
 
+bool lang::Type::isCharType() const
+{
+    assert(isDefined());
+    return definition_->isCharType();
+}
+
 bool lang::Type::isUnsignedIntegerPointerType() const
 {
     assert(isDefined());

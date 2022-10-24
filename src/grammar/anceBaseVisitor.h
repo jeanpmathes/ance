@@ -299,6 +299,8 @@ class anceBaseVisitor : public anceVisitor
 
     virtual std::any visitBooleanType(anceParser::BooleanTypeContext* ctx) override { return visitChildren(ctx); }
 
+    virtual std::any visitCharType(anceParser::CharTypeContext* ctx) override { return visitChildren(ctx); }
+
     virtual std::any visitNullPointerType(anceParser::NullPointerTypeContext* ctx) override
     {
         return visitChildren(ctx);

@@ -78,27 +78,28 @@ class anceParser : public antlr4::Parser
         T__65               = 66,
         T__66               = 67,
         T__67               = 68,
-        NATIVE_INTEGER_TYPE = 69,
-        SIGNED_INTEGER      = 70,
-        HEX_INTEGER         = 71,
-        BIN_INTEGER         = 72,
-        OCT_INTEGER         = 73,
-        HALF                = 74,
-        SINGLE              = 75,
-        DOUBLE              = 76,
-        QUAD                = 77,
-        DECIMAL             = 78,
-        STRING              = 79,
-        BYTE                = 80,
-        INTEGER             = 81,
-        BUFFER              = 82,
-        CONST               = 83,
-        NOT                 = 84,
-        IDENTIFIER          = 85,
-        SEMICOLON           = 86,
-        WHITESPACE          = 87,
-        BLOCK_COMMENT       = 88,
-        LINE_COMMENT        = 89
+        T__68               = 69,
+        NATIVE_INTEGER_TYPE = 70,
+        SIGNED_INTEGER      = 71,
+        HEX_INTEGER         = 72,
+        BIN_INTEGER         = 73,
+        OCT_INTEGER         = 74,
+        HALF                = 75,
+        SINGLE              = 76,
+        DOUBLE              = 77,
+        QUAD                = 78,
+        DECIMAL             = 79,
+        STRING              = 80,
+        BYTE                = 81,
+        INTEGER             = 82,
+        BUFFER              = 83,
+        CONST               = 84,
+        NOT                 = 85,
+        IDENTIFIER          = 86,
+        SEMICOLON           = 87,
+        WHITESPACE          = 88,
+        BLOCK_COMMENT       = 89,
+        LINE_COMMENT        = 90
     };
 
     enum
@@ -166,9 +167,10 @@ class anceParser : public antlr4::Parser
         RuleFloatingPointType            = 60,
         RuleTargetDependentType          = 61,
         RuleBooleanType                  = 62,
-        RuleNullPointerType              = 63,
-        RuleVoidType                     = 64,
-        RuleCustomType                   = 65
+        RuleCharType                     = 63,
+        RuleNullPointerType              = 64,
+        RuleVoidType                     = 65,
+        RuleCustomType                   = 66
     };
 
     explicit anceParser(antlr4::TokenStream* input);
@@ -250,6 +252,7 @@ class anceParser : public antlr4::Parser
     class FloatingPointTypeContext;
     class TargetDependentTypeContext;
     class BooleanTypeContext;
+    class CharTypeContext;
     class NullPointerTypeContext;
     class VoidTypeContext;
     class CustomTypeContext;
@@ -1660,6 +1663,7 @@ class anceParser : public antlr4::Parser
         FloatingPointTypeContext*   floatingPointType();
         TargetDependentTypeContext* targetDependentType();
         BooleanTypeContext*         booleanType();
+        CharTypeContext*            charType();
         NullPointerTypeContext*     nullPointerType();
         VoidTypeContext*            voidType();
 
@@ -1700,6 +1704,17 @@ class anceParser : public antlr4::Parser
     };
 
     BooleanTypeContext* booleanType();
+
+    class CharTypeContext : public antlr4::ParserRuleContext
+    {
+      public:
+        CharTypeContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t getRuleIndex() const override;
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    CharTypeContext* charType();
 
     class NullPointerTypeContext : public antlr4::ParserRuleContext
     {

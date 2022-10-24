@@ -22,6 +22,7 @@
 #include "lang/type/VectorType.h"
 
 #include "lang/type/BooleanType.h"
+#include "lang/type/CharType.h"
 #include "lang/type/NullPointerType.h"
 #include "lang/type/OpaquePointerType.h"
 #include "lang/type/SizeType.h"
@@ -39,6 +40,7 @@ Application::Application(Project& project) : Application(project, std::make_uniq
 
     global_scope_->registerDefinition(lang::VoidType::get());
     global_scope_->registerDefinition(lang::BooleanType::get());
+    global_scope_->registerDefinition(lang::CharType::get());
     global_scope_->registerDefinition(lang::SizeType::getSize());
     global_scope_->registerDefinition(lang::SizeType::getDiff());
     global_scope_->registerDefinition(lang::UnsignedIntegerPointerType::get());

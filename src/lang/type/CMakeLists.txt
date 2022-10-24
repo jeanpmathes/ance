@@ -3,6 +3,7 @@ target_sources(ance PRIVATE
                VectorType.cpp
                DoubleType.cpp
                HalfType.cpp
+               CharType.cpp
                FixedWidthIntegerType.cpp
                QuadType.cpp
                SingleType.cpp
