@@ -59,21 +59,19 @@ std::string lang::StringConstant::parse(const std::string& unparsed)
 
     bool escaped = false;
 
-    for (char const& c : unparsed)
+    bool s;
+
+    for (size_t index = 0; index < unparsed.size(); ++index)
     {
+        char const& c = unparsed[index];
+
         if (escaped)
         {
-            builder << lang::CharConstant::resolveEscaped(c);
+            builder << lang::CharConstant::readEscapedByte(unparsed, index, s);
             escaped = false;
         }
-        else
-        {
-            if (c == '\\') { escaped = true; }
-            else if (c != '"')
-            {
-                builder << c;
-            }
-        }
+        else if (c == '\\') { escaped = true; }
+        else if (c != '"') { builder << c; }
     }
 
     return builder.str();

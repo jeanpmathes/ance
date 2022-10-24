@@ -59,7 +59,7 @@ uint32_t lang::CharConstant::parseChar(const std::string& unparsed)
 
         if (escaped)
         {
-            content = readEscaped(unparsed, index, s);
+            content = readEscapedChar(unparsed, index, s);
             escaped = false;
         }
         else if (c == '\\') { escaped = true; }
@@ -69,7 +69,7 @@ uint32_t lang::CharConstant::parseChar(const std::string& unparsed)
     return content;
 }
 
-uint32_t lang::CharConstant::readEscaped(const std::string& unparsed, size_t& index, bool& success)
+uint32_t lang::CharConstant::readEscapedChar(const std::string& unparsed, size_t& index, bool& success)
 {
     char const& c = unparsed[index++];
     switch (c)
@@ -115,7 +115,48 @@ uint32_t lang::CharConstant::readEscaped(const std::string& unparsed, size_t& in
                 return 0;
             }
 
-            return static_cast<uint32_t>(std::stoul(hex, nullptr, 16));
+            try
+            {
+                return static_cast<uint32_t>(std::stoul(hex, nullptr, 16));
+            }
+            catch (std::invalid_argument&)
+            {
+                success = false;
+                return 0;
+            }
+            catch (std::out_of_range&)
+            {
+                success = false;
+                return 0;
+            }
+        }
+
+        case 'x':// Read a hex 8-byte character with the format \xXX
+        {
+            if (unparsed.size() - index < 2)
+            {
+                success = false;
+                return 0;
+            }
+
+            std::string hex;
+            hex += unparsed[index++];
+            hex += unparsed[index++];
+
+            try
+            {
+                return static_cast<uint8_t>(std::stoul(hex, nullptr, 16));
+            }
+            catch (std::invalid_argument&)
+            {
+                success = false;
+                return 0;
+            }
+            catch (std::out_of_range&)
+            {
+                success = false;
+                return 0;
+            }
         }
 
         default:
@@ -125,29 +166,31 @@ uint32_t lang::CharConstant::readEscaped(const std::string& unparsed, size_t& in
 
 uint8_t lang::CharConstant::parseByte(const std::string& unparsed)
 {
-    char byte    = 0;
-    bool escaped = false;
+    uint8_t content = 0;
+    bool    escaped = false;
 
-    for (char const& c : unparsed)
+    bool s;
+
+    for (size_t index = 0; index < unparsed.size(); ++index)
     {
+        char const& c = unparsed[index];
+
         if (escaped)
         {
-            byte    = resolveEscaped(c);
+            content = readEscapedByte(unparsed, index, s);
             escaped = false;
         }
-        else
-        {
-            if (c == '\\') { escaped = true; }
-            else if (c != '\'') { byte = c; }
-        }
+        else if (c == '\\') { escaped = true; }
+        else if (c != '\'') { content = static_cast<uint8_t>(static_cast<unsigned char>(c)); }
     }
 
-    return static_cast<uint8_t>(byte);
+    return content;
 }
 
-char lang::CharConstant::resolveEscaped(char content)
+uint8_t lang::CharConstant::readEscapedByte(const std::string& unparsed, size_t& index, bool& success)
 {
-    switch (content)
+    char const& c = unparsed[index++];
+    switch (c)
     {
         case 'n':
             return '\n';
@@ -155,7 +198,53 @@ char lang::CharConstant::resolveEscaped(char content)
         case '0':
             return '\0';
 
+        case 't':
+            return '\t';
+
+        case 'r':
+            return '\r';
+
+        case 'v':
+            return '\v';
+
+        case 'b':
+            return '\b';
+
+        case 'a':
+            return '\a';
+
+        case 'f':
+            return '\f';
+
+        case 'x':// Read a hex 8-byte character with the format \xXX
+        {
+            if (unparsed.size() - index < 2)
+            {
+                success = false;
+                return 0;
+            }
+
+            std::string hex;
+            hex += unparsed[index++];
+            hex += unparsed[index++];
+
+            try
+            {
+                return static_cast<uint8_t>(std::stoul(hex, nullptr, 16));
+            }
+            catch (std::invalid_argument&)
+            {
+                success = false;
+                return 0;
+            }
+            catch (std::out_of_range&)
+            {
+                success = false;
+                return 0;
+            }
+        }
+
         default:
-            return content;
+            return static_cast<uint8_t>(static_cast<unsigned char>(c));
     }
 }
