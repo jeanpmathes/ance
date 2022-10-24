@@ -19,9 +19,9 @@ private bin4: ui64 <: 0b11111111:64;
 
 // Byte literals can either by a single character or an escape sequence.
 
-private byte1: ui8 <: 'A';
-private byte2: ui8 <: '\0';
-private byte3: ui8 <: '\n';
+private byte1: ui8 <: 8'A';
+private byte2: ui8 <: 8'\0';
+private byte3: ui8 <: 8'\n';
 
 // Unsigned integer pointer literals are always hexadecimals.
 
