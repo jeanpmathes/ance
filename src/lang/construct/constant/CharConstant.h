@@ -48,6 +48,15 @@ namespace lang
         static uint8_t parseByte(const std::string& unparsed);
 
         /**
+         * Read an escaped character from a string.
+         * @param unparsed The unparsed string.
+         * @param index The index of the character to read.
+         * @param success Whether the read was successful.
+         * @return The parsed character.
+         */
+        static uint32_t readEscaped(const std::string& unparsed, size_t& index, bool& success);
+
+        /**
          * Get the char value for an escaped char.
          * @param c The char after the escape character.
          * @return The value of the escaped char.

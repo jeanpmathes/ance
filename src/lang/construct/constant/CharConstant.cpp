@@ -48,24 +48,79 @@ bool lang::CharConstant::equals(const lang::Constant* other) const
 
 uint32_t lang::CharConstant::parseChar(const std::string& unparsed)
 {
-    char byte    = 0;
-    bool escaped = false;
+    uint32_t content = 0;
+    bool     escaped = false;
 
-    for (char const& c : unparsed)
+    bool s;
+
+    for (size_t index = 0; index < unparsed.size(); ++index)
     {
+        char const& c = unparsed[index];
+
         if (escaped)
         {
-            byte    = resolveEscaped(c);
+            content = readEscaped(unparsed, index, s);
             escaped = false;
         }
-        else
-        {
-            if (c == '\\') { escaped = true; }
-            else if (c != '\'') { byte = c; }
-        }
+        else if (c == '\\') { escaped = true; }
+        else if (c != '\'') { content = static_cast<uint32_t>(static_cast<unsigned char>(c)); }
     }
 
-    return static_cast<uint32_t>(byte);
+    return content;
+}
+
+uint32_t lang::CharConstant::readEscaped(const std::string& unparsed, size_t& index, bool& success)
+{
+    char const& c = unparsed[index++];
+    switch (c)
+    {
+        case 'n':
+            return '\n';
+
+        case '0':
+            return '\0';
+
+        case 't':
+            return '\t';
+
+        case 'r':
+            return '\r';
+
+        case 'v':
+            return '\v';
+
+        case 'b':
+            return '\b';
+
+        case 'a':
+            return '\a';
+
+        case 'f':
+            return '\f';
+
+        case 'u':// Read a unicode code point in the format \u{XXXX}
+        {
+            if (unparsed[index++] != '{')
+            {
+                success = false;
+                return 0;
+            }
+
+            std::string hex;
+            while (unparsed[index] != '}') { hex += unparsed[index++]; }
+
+            if (unparsed[index++] != '}')
+            {
+                success = false;
+                return 0;
+            }
+
+            return static_cast<uint32_t>(std::stoul(hex, nullptr, 16));
+        }
+
+        default:
+            return static_cast<uint32_t>(static_cast<unsigned char>(c));
+    }
 }
 
 uint8_t lang::CharConstant::parseByte(const std::string& unparsed)
