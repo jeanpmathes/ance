@@ -90,7 +90,7 @@ class anceParser : public antlr4::Parser
         QUAD                = 78,
         DECIMAL             = 79,
         STRING              = 80,
-        BYTE                = 81,
+        CHAR                = 81,
         INTEGER             = 82,
         BUFFER              = 83,
         CONST               = 84,
@@ -149,7 +149,7 @@ class anceParser : public antlr4::Parser
         RuleMatchExpressionCase          = 42,
         RuleLiteralExpression            = 43,
         RuleStringLiteral                = 44,
-        RuleByteLiteral                  = 45,
+        RuleCharLiteral                  = 45,
         RuleIntegerLiteral               = 46,
         RuleNormalInteger                = 47,
         RuleSpecialInteger               = 48,
@@ -234,7 +234,7 @@ class anceParser : public antlr4::Parser
     class MatchExpressionCaseContext;
     class LiteralExpressionContext;
     class StringLiteralContext;
-    class ByteLiteralContext;
+    class CharLiteralContext;
     class IntegerLiteralContext;
     class NormalIntegerContext;
     class SpecialIntegerContext;
@@ -1331,7 +1331,7 @@ class anceParser : public antlr4::Parser
         LiteralExpressionContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t               getRuleIndex() const override;
         StringLiteralContext*        stringLiteral();
-        ByteLiteralContext*          byteLiteral();
+        CharLiteralContext*          charLiteral();
         IntegerLiteralContext*       integerLiteral();
         FloatingPointLiteralContext* floatingPointLiteral();
         BooleanLiteralContext*       booleanLiteral();
@@ -1359,17 +1359,20 @@ class anceParser : public antlr4::Parser
 
     StringLiteralContext* stringLiteral();
 
-    class ByteLiteralContext : public antlr4::ParserRuleContext
+    class CharLiteralContext : public antlr4::ParserRuleContext
     {
       public:
-        ByteLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        antlr4::Token* prefix = nullptr;
+        CharLiteralContext(antlr4::ParserRuleContext* parent, size_t invokingState);
         virtual size_t              getRuleIndex() const override;
-        antlr4::tree::TerminalNode* BYTE();
+        antlr4::tree::TerminalNode* CHAR();
+        antlr4::tree::TerminalNode* IDENTIFIER();
+        antlr4::tree::TerminalNode* INTEGER();
 
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
-    ByteLiteralContext* byteLiteral();
+    CharLiteralContext* charLiteral();
 
     class IntegerLiteralContext : public antlr4::ParserRuleContext
     {

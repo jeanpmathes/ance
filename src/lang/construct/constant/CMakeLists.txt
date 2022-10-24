@@ -1,6 +1,6 @@
 target_sources(ance PRIVATE
                BooleanConstant.cpp
-               ByteConstant.cpp
+               CharConstant.cpp
                Constant.cpp
                FloatConstant.cpp
                IntegerConstant.cpp

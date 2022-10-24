@@ -172,7 +172,7 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual std::any visitStringLiteral(anceParser::StringLiteralContext* context) = 0;
 
-    virtual std::any visitByteLiteral(anceParser::ByteLiteralContext* context) = 0;
+    virtual std::any visitCharLiteral(anceParser::CharLiteralContext* context) = 0;
 
     virtual std::any visitIntegerLiteral(anceParser::IntegerLiteralContext* context) = 0;
 

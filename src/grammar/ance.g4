@@ -224,7 +224,7 @@ matchExpressionCase
 
 literalExpression
 	: stringLiteral
-	| byteLiteral
+	| charLiteral
 	| integerLiteral
 	| floatingPointLiteral
 	| booleanLiteral
@@ -238,8 +238,8 @@ stringLiteral
 	: ( prefix=IDENTIFIER )? STRING
 	;
 
-byteLiteral
-    : BYTE
+charLiteral
+    : ( prefix=(IDENTIFIER | INTEGER) )? CHAR
     ;
 
 integerLiteral
@@ -366,7 +366,7 @@ QUAD : DECIMAL 'q' ;
 DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ;
 
 STRING : '"' ('\\'. | .)*? '"' ;
-BYTE : '\'' ( . | '\\' . ) '\'' ;
+CHAR : '\'' ( . | '\\' . ) '\'' ;
 INTEGER : [0-9]+ ;
 
 BUFFER : '[]' ;

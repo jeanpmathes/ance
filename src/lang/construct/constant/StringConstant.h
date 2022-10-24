@@ -41,11 +41,11 @@ namespace lang
         static lang::ResolvingHandle<lang::Type> resolveType(std::string& prefix, std::string& string);
 
       private:
-        lang::ResolvingHandle<lang::Type> type_;
         std::string                       prefix_;
-        std::string                       string_;
+        std::string                       literal_;
+        std::string                       data_;
+        lang::ResolvingHandle<lang::Type> type_;
     };
 }
 
 #endif
-

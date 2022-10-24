@@ -90,7 +90,7 @@ class anceLexer : public antlr4::Lexer
         QUAD                = 78,
         DECIMAL             = 79,
         STRING              = 80,
-        BYTE                = 81,
+        CHAR                = 81,
         INTEGER             = 82,
         BUFFER              = 83,
         CONST               = 84,

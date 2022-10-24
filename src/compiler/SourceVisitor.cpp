@@ -55,7 +55,7 @@
 #include "lang/expression/VectorDefinition.h"
 
 #include "lang/construct/constant/BooleanConstant.h"
-#include "lang/construct/constant/ByteConstant.h"
+#include "lang/construct/constant/CharConstant.h"
 #include "lang/construct/constant/FloatConstant.h"
 #include "lang/construct/constant/IntegerConstant.h"
 #include "lang/construct/constant/NullConstant.h"
@@ -673,17 +673,17 @@ std::any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx
 
     if (ctx->prefix) { prefix = ctx->prefix->getText(); }
 
-    std::string str = lang::StringConstant::parse(ctx->STRING()->getText());
-
-    std::shared_ptr<lang::Constant> string = std::make_shared<lang::StringConstant>(prefix, str);
+    std::shared_ptr<lang::Constant> string = std::make_shared<lang::StringConstant>(prefix, ctx->STRING()->getText());
     return static_cast<Expression*>(new ConstantLiteral(string, location(ctx)));
 }
 
-std::any SourceVisitor::visitByteLiteral(anceParser::ByteLiteralContext* ctx)
+std::any SourceVisitor::visitCharLiteral(anceParser::CharLiteralContext* ctx)
 {
-    uint8_t b = lang::ByteConstant::parse(ctx->BYTE()->getText());
+    std::string prefix;
 
-    std::shared_ptr<lang::Constant> byte = std::make_shared<lang::ByteConstant>(b);
+    if (ctx->prefix) { prefix = ctx->prefix->getText(); }
+
+    std::shared_ptr<lang::Constant> byte = std::make_shared<lang::CharConstant>(prefix, ctx->CHAR()->getText());
     return static_cast<Expression*>(new ConstantLiteral(byte, location(ctx)));
 }
 

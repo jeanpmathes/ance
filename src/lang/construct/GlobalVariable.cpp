@@ -121,7 +121,7 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
             {
                 validation_logger.logError("Constant initializer must be of variable type "
                                                + type()->getAnnotatedName(),
-                                           typeLocation());
+                                           constant_init_->location());
                 return;
             }
         }

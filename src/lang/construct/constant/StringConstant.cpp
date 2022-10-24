@@ -1,25 +1,23 @@
 #include "StringConstant.h"
 
 #include <sstream>
+#include <utility>
 
-#include "lang/construct/constant/ByteConstant.h"
+#include "lang/construct/constant/CharConstant.h"
 #include "lang/type/ArrayType.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/PointerType.h"
 
 lang::StringConstant::StringConstant(std::string prefix, std::string string)
-    : type_(resolveType(prefix, string))
-    , prefix_(prefix)
-    , string_(string)
+    : prefix_(std::move(prefix))
+    , literal_(std::move(string))
+    , data_(parse(literal_))
+    , type_(resolveType(prefix_, data_))
 {}
 
 std::string lang::StringConstant::toString() const
 {
-    std::string escaped;
-
-    for (auto& c : string_) { escaped += lang::ByteConstant::escape(c); }
-
-    return prefix_ + "\"" + escaped + "\"";
+    return prefix_ + "\"" + literal_ + "\"";
 }
 
 lang::ResolvingHandle<lang::Type> lang::StringConstant::type() const
@@ -31,7 +29,7 @@ llvm::Constant* lang::StringConstant::buildContent(llvm::Module* m)
 {
     if (prefix_ == "c")
     {
-        llvm::Constant* content     = llvm::ConstantDataArray::getString(m->getContext(), string_, true);
+        llvm::Constant* content     = llvm::ConstantDataArray::getString(m->getContext(), data_, true);
         auto*           str_arr_ptr = new llvm::GlobalVariable(*m,
                                                      content->getType(),
                                                      true,
@@ -44,9 +42,7 @@ llvm::Constant* lang::StringConstant::buildContent(llvm::Module* m)
 
         return llvm::ConstantExpr::getInBoundsGetElementPtr(str_arr_ptr->getValueType(), str_arr_ptr, indices);
     }
-    else {
-        return llvm::ConstantDataArray::getString(m->getContext(), string_, false);
-    }
+    else { return llvm::ConstantDataArray::getString(m->getContext(), data_, false); }
 }
 
 bool lang::StringConstant::equals(const lang::Constant* other) const
@@ -54,7 +50,7 @@ bool lang::StringConstant::equals(const lang::Constant* other) const
     auto other_diff = dynamic_cast<const StringConstant*>(other);
     if (!other_diff) return false;
 
-    return this->prefix_ == other_diff->prefix_ && this->string_ == other_diff->string_;
+    return this->prefix_ == other_diff->prefix_ && this->data_ == other_diff->data_;
 }
 
 std::string lang::StringConstant::parse(const std::string& unparsed)
@@ -67,7 +63,7 @@ std::string lang::StringConstant::parse(const std::string& unparsed)
     {
         if (escaped)
         {
-            builder << lang::ByteConstant::resolveEscaped(c);
+            builder << lang::CharConstant::resolveEscaped(c);
             escaped = false;
         }
         else
