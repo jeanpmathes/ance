@@ -7,13 +7,17 @@
 #include "lang/type/ArrayType.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/PointerType.h"
+#include "validation/ValidationLogger.h"
 
 lang::StringConstant::StringConstant(std::string prefix, std::string string)
     : prefix_(std::move(prefix))
     , literal_(std::move(string))
-    , data_(parse(literal_))
-    , type_(resolveType(prefix_, data_))
-{}
+    , data_(parse(literal_, is_literal_valid_))
+    , type_(resolveType(prefix_, data_, is_prefix_valid_))
+{
+    is_literal_valid_ &= true;
+    is_prefix_valid_ &= true;
+}
 
 std::string lang::StringConstant::toString() const
 {
@@ -53,13 +57,28 @@ bool lang::StringConstant::equals(const lang::Constant* other) const
     return this->prefix_ == other_diff->prefix_ && this->data_ == other_diff->data_;
 }
 
-std::string lang::StringConstant::parse(const std::string& unparsed)
+bool lang::StringConstant::validate(ValidationLogger& validation_logger, lang::Location location) const
+{
+    if (!is_prefix_valid_)
+    {
+        validation_logger.logError("Invalid string prefix: " + prefix_, location);
+        return false;
+    }
+
+    if (!is_literal_valid_)
+    {
+        validation_logger.logError("Invalid string literal: " + literal_, location);
+        return false;
+    }
+
+    return true;
+}
+
+std::string lang::StringConstant::parse(const std::string& unparsed, bool& valid)
 {
     std::stringstream builder;
 
     bool escaped = false;
-
-    bool s;
 
     for (size_t index = 0; index < unparsed.size(); ++index)
     {
@@ -67,7 +86,7 @@ std::string lang::StringConstant::parse(const std::string& unparsed)
 
         if (escaped)
         {
-            builder << lang::CharConstant::readEscapedByte(unparsed, index, s);
+            builder << lang::CharConstant::readEscapedByte(unparsed, index, valid);
             escaped = false;
         }
         else if (c == '\\') { escaped = true; }
@@ -77,10 +96,13 @@ std::string lang::StringConstant::parse(const std::string& unparsed)
     return builder.str();
 }
 
-lang::ResolvingHandle<lang::Type> lang::StringConstant::resolveType(std::string& prefix, std::string& string)
+lang::ResolvingHandle<lang::Type> lang::StringConstant::resolveType(std::string& prefix,
+                                                                    std::string& string,
+                                                                    bool&        valid)
 {
-    if (prefix == "c") { return lang::PointerType::get(lang::FixedWidthIntegerType::get(8, false)); }
+    if (prefix.empty()) return lang::ArrayType::get(lang::FixedWidthIntegerType::get(8, false), string.size());
+    if (prefix == "c") return lang::PointerType::get(lang::FixedWidthIntegerType::get(8, false));
 
-    return lang::ArrayType::get(lang::FixedWidthIntegerType::get(8, false), string.size());
+    valid = false;
+    return lang::PointerType::get(lang::FixedWidthIntegerType::get(8, false));
 }
-

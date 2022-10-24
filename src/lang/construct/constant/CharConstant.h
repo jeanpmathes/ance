@@ -32,20 +32,23 @@ namespace lang
         llvm::Constant*                                 buildContent(llvm::Module* m) override;
 
         bool equals(const lang::Constant* other) const override;
+        bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
         /**
          * Parse a character from a string.
          * @param unparsed The unparsed string.
+         * @param valid Whether the parsing was successful.
          * @return The parsed character.
          */
-        static uint32_t parseChar(const std::string& unparsed);
+        static uint32_t parseChar(const std::string& unparsed, bool& valid);
 
         /**
          * Parse a byte from a string.
          * @param unparsed The unparsed string.
+         * @param valid Whether the parsing was successful.
          * @return The parsed byte.
          */
-        static uint8_t parseByte(const std::string& unparsed);
+        static uint8_t parseByte(const std::string& unparsed, bool& valid);
 
         /**
          * Read an escaped character from a string.
@@ -66,6 +69,9 @@ namespace lang
         static uint8_t readEscapedByte(const std::string& unparsed, size_t& index, bool& success);
 
       private:
+        bool is_literal_valid_ = true;
+        bool is_prefix_valid_  = true;
+
         lang::ResolvingHandle<lang::Type> type_;
         std::string                       prefix_;
         std::string                       content_;

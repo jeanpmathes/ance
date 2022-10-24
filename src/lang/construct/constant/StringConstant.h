@@ -30,17 +30,16 @@ namespace lang
 
         bool equals(const lang::Constant* other) const override;
 
-        /**
-         * Parse a given string to remove quotes and resolve escape sequences.
-         * @param unparsed The unparsed string.
-         * @return The parsed string.
-         */
-        static std::string parse(const std::string& unparsed);
+        bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
       private:
-        static lang::ResolvingHandle<lang::Type> resolveType(std::string& prefix, std::string& string);
+        static std::string                       parse(const std::string& unparsed, bool& valid);
+        static lang::ResolvingHandle<lang::Type> resolveType(std::string& prefix, std::string& string, bool& valid);
 
       private:
+        bool is_prefix_valid_  = true;
+        bool is_literal_valid_ = true;
+
         std::string                       prefix_;
         std::string                       literal_;
         std::string                       data_;

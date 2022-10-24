@@ -4,9 +4,10 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/CharType.h"
 #include "lang/type/FixedWidthIntegerType.h"
+#include "validation/ValidationLogger.h"
 
 lang::CharConstant::CharConstant(const std::string& prefix, const std::string& content)
-    : type_(lang::Type::getUndefined())
+    : type_(lang::CharType::get())
     , prefix_(prefix)
     , content_(content)
     , char_(0)
@@ -14,13 +15,14 @@ lang::CharConstant::CharConstant(const std::string& prefix, const std::string& c
     if (prefix.empty())
     {
         type_ = lang::CharType::get();
-        char_ = parseChar(content);
+        char_ = parseChar(content, is_literal_valid_);
     }
     else if (prefix == "8")
     {
         type_ = lang::FixedWidthIntegerType::get(8, false);
-        char_ = parseByte(content);
+        char_ = parseByte(content, is_literal_valid_);
     }
+    else { is_prefix_valid_ = false; }
 }
 
 std::string lang::CharConstant::toString() const
@@ -46,27 +48,60 @@ bool lang::CharConstant::equals(const lang::Constant* other) const
     return this->char_ == other_byte->char_ && lang::Type::areSame(this->type_, other_byte->type_);
 }
 
-uint32_t lang::CharConstant::parseChar(const std::string& unparsed)
+bool lang::CharConstant::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
-    uint32_t content = 0;
-    bool     escaped = false;
+    if (!is_prefix_valid_)
+    {
+        validation_logger.logError("Invalid char prefix: " + prefix_, location);
+        return false;
+    }
 
-    bool s;
+    if (!is_literal_valid_)
+    {
+        validation_logger.logError("Invalid char literal: " + content_, location);
+        return false;
+    }
+
+    return true;
+}
+
+uint32_t lang::CharConstant::parseChar(const std::string& unparsed, bool& valid)
+{
+    if (unparsed.size() <= 2)
+    {
+        valid = false;
+        return 0;
+    }
+
+    std::optional<uint32_t> content;
+    bool                    escaped = false;
 
     for (size_t index = 0; index < unparsed.size(); ++index)
     {
+        if (content.has_value())
+        {
+            valid = false;
+            return 0;
+        }
+
         char const& c = unparsed[index];
 
         if (escaped)
         {
-            content = readEscapedChar(unparsed, index, s);
+            content = readEscapedChar(unparsed, index, valid);
             escaped = false;
         }
         else if (c == '\\') { escaped = true; }
         else if (c != '\'') { content = static_cast<uint32_t>(static_cast<unsigned char>(c)); }
     }
 
-    return content;
+    if (!content.has_value())
+    {
+        valid = false;
+        return 0;
+    }
+
+    return content.value();
 }
 
 uint32_t lang::CharConstant::readEscapedChar(const std::string& unparsed, size_t& index, bool& success)
@@ -100,16 +135,16 @@ uint32_t lang::CharConstant::readEscapedChar(const std::string& unparsed, size_t
 
         case 'u':// Read a unicode code point in the format \u{XXXX}
         {
-            if (unparsed[index++] != '{')
+            if (index >= unparsed.size() || unparsed[index++] != '{')
             {
                 success = false;
                 return 0;
             }
 
             std::string hex;
-            while (unparsed[index] != '}') { hex += unparsed[index++]; }
+            while (index < unparsed.size() && unparsed[index] != '}') { hex += unparsed[index++]; }
 
-            if (unparsed[index++] != '}')
+            if (index >= unparsed.size() || unparsed[index++] != '}')
             {
                 success = false;
                 return 0;
@@ -164,12 +199,10 @@ uint32_t lang::CharConstant::readEscapedChar(const std::string& unparsed, size_t
     }
 }
 
-uint8_t lang::CharConstant::parseByte(const std::string& unparsed)
+uint8_t lang::CharConstant::parseByte(const std::string& unparsed, bool& valid)
 {
     uint8_t content = 0;
     bool    escaped = false;
-
-    bool s;
 
     for (size_t index = 0; index < unparsed.size(); ++index)
     {
@@ -177,7 +210,7 @@ uint8_t lang::CharConstant::parseByte(const std::string& unparsed)
 
         if (escaped)
         {
-            content = readEscapedByte(unparsed, index, s);
+            content = readEscapedByte(unparsed, index, valid);
             escaped = false;
         }
         else if (c == '\\') { escaped = true; }
