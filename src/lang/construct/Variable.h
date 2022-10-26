@@ -51,7 +51,7 @@ namespace lang
 
         /**
          * Define this variable as a global variable.
-         * @param type The type.
+         * @param type The type, if there is one.
          * @param type_location The location of the type.
          * @param containing_scope The containing scope.
          * @param access The access modifier.
@@ -60,14 +60,14 @@ namespace lang
          * @param is_constant Whether the variable is constant.
          * @param location The source location.
          */
-        void defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
-                            lang::Location                    type_location,
-                            GlobalScope&                      containing_scope,
-                            lang::AccessModifier              access,
-                            std::unique_ptr<Expression>       init,
-                            bool                              is_final,
-                            bool                              is_constant,
-                            lang::Location                    location);
+        void defineAsGlobal(std::optional<lang::ResolvingHandle<lang::Type>> type,
+                            lang::Location                                   type_location,
+                            GlobalScope&                                     containing_scope,
+                            lang::AccessModifier                             access,
+                            std::unique_ptr<Expression>                      init,
+                            bool                                             is_final,
+                            bool                                             is_constant,
+                            lang::Location                                   location);
 
         /**
          * Define this variable as a local variable.

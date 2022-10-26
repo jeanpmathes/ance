@@ -33,15 +33,15 @@ namespace lang
         /**
          * Create a new global variable definition.
          */
-        GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
-                       lang::ResolvingHandle<lang::Type>     type,
-                       lang::Location                        type_location,
-                       GlobalScope&                          containing_scope,
-                       lang::AccessModifier                  access,
-                       std::unique_ptr<Expression>           init,
-                       bool                                  is_final,
-                       bool                                  is_constant,
-                       lang::Location                        location);
+        GlobalVariable(lang::ResolvingHandle<lang::Variable>            self,
+                       std::optional<lang::ResolvingHandle<lang::Type>> type,
+                       lang::Location                                   type_location,
+                       GlobalScope&                                     containing_scope,
+                       lang::AccessModifier                             access,
+                       std::unique_ptr<Expression>                      init,
+                       bool                                             is_final,
+                       bool                                             is_constant,
+                       lang::Location                                   location);
 
         [[nodiscard]] lang::AccessModifier access() const;
         [[nodiscard]] bool                 isConstant() const;
@@ -89,10 +89,13 @@ namespace lang
         void storeValue(std::shared_ptr<lang::Value> value, CompileContext& context) override;
 
       private:
-        lang::AccessModifier            access_;
-        bool                            is_constant_;
-        ConstantExpression*             constant_init_;
-        Expression*                     init_;
+        void rerouteIfNeeded();
+
+        std::optional<lang::ResolvingHandle<lang::Type>>  type_opt_;
+        lang::AccessModifier                              access_;
+        bool                                              is_constant_;
+        ConstantExpression*                               constant_init_;
+        Expression*                                       init_;
         std::unique_ptr<Expression>                       init_owner_;
         std::optional<lang::OwningHandle<lang::Function>> init_function_;
 

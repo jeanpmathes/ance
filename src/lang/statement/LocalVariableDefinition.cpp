@@ -93,7 +93,7 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
 
     if (not type_opt_.has_value() && assigned_ == nullptr)
     {
-        validation_logger.logError("Default-initialized local variable must have an explicit type", location());
+        validation_logger.logError("Default-initialized local variable must have explicit type", location());
         return;
     }
 

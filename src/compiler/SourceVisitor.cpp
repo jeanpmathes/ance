@@ -71,10 +71,19 @@ SourceVisitor::SourceVisitor(Application& application) : application_(applicatio
 
 std::any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx)
 {
-    lang::AccessModifier              access      = std::any_cast<lang::AccessModifier>(visit(ctx->accessModifier()));
-    bool                              is_constant = ctx->CONST();
-    lang::ResolvingHandle<lang::Type> type       = std::any_cast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
-    lang::Identifier                  identifier = ident(ctx->IDENTIFIER());
+    lang::AccessModifier access      = std::any_cast<lang::AccessModifier>(visit(ctx->accessModifier()));
+    bool                 is_constant = ctx->CONST();
+
+    std::optional<lang::ResolvingHandle<lang::Type>> type;
+    lang::Location                                   type_location = lang::Location::global();
+
+    if (ctx->type())
+    {
+        type          = std::any_cast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
+        type_location = location(ctx->type());
+    }
+
+    lang::Identifier identifier = ident(ctx->IDENTIFIER());
 
     Expression*    initial_value;
     lang::Assigner assigner = lang::Assigner::UNSPECIFIED;
@@ -90,7 +99,7 @@ std::any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclaration
                                                     is_constant,
                                                     identifier,
                                                     type,
-                                                    location(ctx->type()),
+                                                    type_location,
                                                     assigner,
                                                     std::unique_ptr<Expression>(initial_value),
                                                     location(ctx));

@@ -71,14 +71,14 @@ void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger) const
     for (auto& [name, variable] : global_defined_variables_) { variable->validateFlow(validation_logger); }
 }
 
-void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier              access,
-                                             bool                              is_constant,
-                                             lang::Identifier                  name,
-                                             lang::ResolvingHandle<lang::Type> type,
-                                             lang::Location                    type_location,
-                                             lang::Assigner                    assigner,
-                                             std::unique_ptr<Expression>       initializer,
-                                             lang::Location                    location)
+void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                             access,
+                                             bool                                             is_constant,
+                                             lang::Identifier                                 name,
+                                             std::optional<lang::ResolvingHandle<lang::Type>> type,
+                                             lang::Location                                   type_location,
+                                             lang::Assigner                                   assigner,
+                                             std::unique_ptr<Expression>                      initializer,
+                                             lang::Location                                   location)
 {
     if (defined_names_.contains(name))
     {

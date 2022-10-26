@@ -5,7 +5,7 @@ file
 	;
 
 variableDeclaration
-	: accessModifier ( CONST )? IDENTIFIER ':' type ( assigner expression )? ';'
+	: accessModifier ( CONST )? IDENTIFIER ( ':' type )? ( assigner expression )? ';'
 	;
 
 function

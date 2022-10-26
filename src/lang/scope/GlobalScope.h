@@ -54,14 +54,14 @@ namespace lang
          * @param initializer The initializer.
          * @param location The source location.
          */
-        void defineGlobalVariable(lang::AccessModifier              access,
-                                  bool                              is_constant,
-                                  lang::Identifier                  name,
-                                  lang::ResolvingHandle<lang::Type> type,
-                                  lang::Location                    type_location,
-                                  lang::Assigner                    assigner,
-                                  std::unique_ptr<Expression>       initializer,
-                                  lang::Location                    location);
+        void defineGlobalVariable(lang::AccessModifier                             access,
+                                  bool                                             is_constant,
+                                  lang::Identifier                                 name,
+                                  std::optional<lang::ResolvingHandle<lang::Type>> type,
+                                  lang::Location                                   type_location,
+                                  lang::Assigner                                   assigner,
+                                  std::unique_ptr<Expression>                      initializer,
+                                  lang::Location                                   location);
 
         /**
          * Define an extern function in this scope.

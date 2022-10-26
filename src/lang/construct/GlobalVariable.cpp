@@ -16,16 +16,22 @@ namespace llvm
     class Constant;
 }
 
-lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
-                                     lang::ResolvingHandle<lang::Type>     type,
-                                     lang::Location                        type_location,
-                                     GlobalScope&                          containing_scope,
-                                     lang::AccessModifier                  access,
-                                     std::unique_ptr<Expression>           init,
-                                     bool                                  is_final,
-                                     bool                                  is_constant,
-                                     lang::Location                        location)
-    : VariableDefinition(self, type, type_location, containing_scope, is_final, location)
+lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable>            self,
+                                     std::optional<lang::ResolvingHandle<lang::Type>> type,
+                                     lang::Location                                   type_location,
+                                     GlobalScope&                                     containing_scope,
+                                     lang::AccessModifier                             access,
+                                     std::unique_ptr<Expression>                      init,
+                                     bool                                             is_final,
+                                     bool                                             is_constant,
+                                     lang::Location                                   location)
+    : VariableDefinition(self,
+                         type.value_or(lang::Type::getUndefined()),
+                         type_location,
+                         containing_scope,
+                         is_final,
+                         location)
+    , type_opt_(type)
     , access_(access)
     , is_constant_(is_constant)
     , constant_init_(is_constant_ ? dynamic_cast<ConstantExpression*>(init.get()) : nullptr)
@@ -35,7 +41,7 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
                          lang::makeHandled<lang::Function>(lang::Identifier::from(self->name() + "$init")))
                                                  : std::optional<lang::OwningHandle<lang::Function>>())
 {
-    containing_scope.addType(type);
+    if (type.has_value()) containing_scope.addType(type.value());
 
     if (init_)
     {
@@ -77,20 +83,23 @@ Expression* lang::GlobalVariable::init() const
 
 void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isTypeUndefined(type(), typeLocation(), validation_logger)) return;
-
-    if (!type()->validate(validation_logger, typeLocation())) return;
-
-    if (type()->isVoidType())
+    if (type_opt_.has_value())
     {
-        validation_logger.logError("Global variable cannot have 'void' type", typeLocation());
-        return;
-    }
+        if (lang::validation::isTypeUndefined(type(), typeLocation(), validation_logger)) return;
 
-    if (type()->isReferenceType())
-    {
-        validation_logger.logError("Global variable cannot have reference type", typeLocation());
-        return;
+        if (!type()->validate(validation_logger, typeLocation())) return;
+
+        if (type()->isVoidType())
+        {
+            validation_logger.logError("Global variable cannot have 'void' type", typeLocation());
+            return;
+        }
+
+        if (type()->isReferenceType())
+        {
+            validation_logger.logError("Global variable cannot have reference type", typeLocation());
+            return;
+        }
     }
 
     if (!init_ && is_constant_)
@@ -130,6 +139,11 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
             if (!lang::Type::checkMismatch(type(), init_->type(), init_->location(), validation_logger)) return;
         }
     }
+    else if (!type_opt_.has_value())
+    {
+        validation_logger.logError("Default-initialized global variable must have explicit type", location());
+        return;
+    }
 }
 
 void lang::GlobalVariable::expand()
@@ -161,6 +175,8 @@ void lang::GlobalVariable::resolve()
 
 void lang::GlobalVariable::postResolve()
 {
+    rerouteIfNeeded();
+
     if (init_function_) { init_function_.value()->postResolve(); }
 }
 
@@ -346,4 +362,13 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::determi
 
     assert(variables.size() == ordered_variables.size());
     return ordered_variables;
+}
+
+void lang::GlobalVariable::rerouteIfNeeded()
+{
+    if (init_ && not type_opt_.has_value())
+    {
+        auto assigned_type = init_->tryGetType();
+        if (assigned_type && assigned_type.value() != type()) { type().reroute(assigned_type.value()); }
+    }
 }

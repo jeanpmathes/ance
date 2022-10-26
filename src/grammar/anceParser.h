@@ -282,9 +282,9 @@ class anceParser : public antlr4::Parser
         virtual size_t              getRuleIndex() const override;
         AccessModifierContext*      accessModifier();
         antlr4::tree::TerminalNode* IDENTIFIER();
-        TypeContext*                type();
         antlr4::tree::TerminalNode* SEMICOLON();
         antlr4::tree::TerminalNode* CONST();
+        TypeContext*                type();
         AssignerContext*            assigner();
         ExpressionContext*          expression();
 
