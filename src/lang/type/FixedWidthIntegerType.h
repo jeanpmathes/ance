@@ -28,6 +28,15 @@ namespace lang
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
+        bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
+        void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                    lang::PredefinedFunction&                             function,
+                                    CompileContext&                                       context) override;
+        void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                    lang::ResolvingHandle<lang::Type> return_type,
+                                    lang::PredefinedFunction&         function,
+                                    CompileContext&                   context) override;
+
       private:
         uint64_t bit_size_;
         bool     is_signed_;

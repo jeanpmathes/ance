@@ -4,10 +4,7 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/PredefinedFunction.h"
-#include "lang/construct/value/Value.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/Type.h"
-#include "lang/utility/Values.h"
 
 lang::CharType::CharType() : TypeDefinition(lang::Identifier::from("char")) {}
 
@@ -30,6 +27,33 @@ llvm::Constant* lang::CharType::getDefaultContent(llvm::Module& m)
 llvm::Type* lang::CharType::getContentType(llvm::LLVMContext& c) const
 {
     return llvm::Type::getIntNTy(c, static_cast<unsigned>(SIZE_IN_BITS));
+}
+
+bool lang::CharType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+{
+    if (parameters.size() == 1 && parameters[0]->isFixedWidthIntegerType(SIZE_IN_BITS, false)) return true;
+
+    return false;
+}
+
+void lang::CharType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+                                            lang::PredefinedFunction&                             function,
+                                            CompileContext&                                       context)
+{
+    llvm::Function* native_function;
+    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
+
+    if (parameters.size() == 1 && parameters[0]->isFixedWidthIntegerType(SIZE_IN_BITS, false))
+    {
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
+        {
+            llvm::Value* original = native_function->getArg(0);
+            context.ir()->CreateRet(original);
+        }
+
+        return;
+    }
 }
 
 bool lang::CharType::isTriviallyDefaultConstructible() const

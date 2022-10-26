@@ -4,9 +4,9 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/BooleanType.h"
+#include "lang/type/CharType.h"
 #include "lang/type/SizeType.h"
 #include "validation/ValidationLogger.h"
 
@@ -42,6 +42,49 @@ bool lang::FixedWidthIntegerType::validate(ValidationLogger& validation_logger, 
     }
 
     return true;
+}
+
+bool lang::FixedWidthIntegerType::acceptOverloadRequest(
+    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+{
+    if (parameters.size() == 1 && parameters[0]->isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS
+        && !is_signed_)
+    {
+        return true;
+    }
+
+    return IntegerType::acceptOverloadRequest(parameters);
+}
+
+void lang::FixedWidthIntegerType::buildRequestedOverload(
+    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+    lang::PredefinedFunction&                             function,
+    CompileContext&                                       context)
+{
+    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
+}
+
+void lang::FixedWidthIntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                                         lang::ResolvingHandle<lang::Type> return_type,
+                                                         lang::PredefinedFunction&         function,
+                                                         CompileContext&                   context)
+{
+    llvm::Function* native_function;
+    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
+
+    if (parameter_element->isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_)
+    {
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
+        context.ir()->SetInsertPoint(block);
+        {
+            llvm::Value* original = native_function->getArg(0);
+            context.ir()->CreateRet(original);
+        }
+
+        return;
+    }
+
+    IntegerType::buildRequestedOverload(parameter_element, return_type, function, context);
 }
 
 std::string lang::FixedWidthIntegerType::createMangledName() const

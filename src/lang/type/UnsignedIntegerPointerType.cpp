@@ -1,9 +1,7 @@
 #include "UnsignedIntegerPointerType.h"
 
-#include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/scope/GlobalScope.h"
 
 lang::UnsignedIntegerPointerType::UnsignedIntegerPointerType() : TypeDefinition(lang::Identifier::from("uiptr")) {}
 
@@ -35,8 +33,6 @@ void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::ResolvingHan
 {
     llvm::Function* native_function;
     std::tie(std::ignore, native_function) = function.getNativeRepresentation();
-
-    std::string a = std::string(parameter_element->name().text()) + " -> " + std::string(return_type->name().text());
 
     if (parameter_element->isAddressType())
     {
