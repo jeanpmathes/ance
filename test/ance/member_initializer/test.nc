@@ -14,7 +14,7 @@ public main () : ui32
     let v: Values; // Struct members are initialized here.
 
     assert v a == +15:32;
-    assert v b[0] == 'A';
+    assert v b[0] == 8'A';
     assert not v c;
 
     // Allocating a value will also initialize it.
