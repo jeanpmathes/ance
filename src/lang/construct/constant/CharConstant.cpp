@@ -52,13 +52,13 @@ bool lang::CharConstant::validate(ValidationLogger& validation_logger, lang::Loc
 {
     if (!is_prefix_valid_)
     {
-        validation_logger.logError("Invalid char prefix: " + prefix_, location);
+        validation_logger.logError("Invalid character prefix: " + prefix_, location);
         return false;
     }
 
     if (!is_literal_valid_)
     {
-        validation_logger.logError("Invalid char literal: " + content_, location);
+        validation_logger.logError("Invalid character literal: " + content_, location);
         return false;
     }
 
@@ -67,18 +67,12 @@ bool lang::CharConstant::validate(ValidationLogger& validation_logger, lang::Loc
 
 uint32_t lang::CharConstant::parseChar(const std::string& unparsed, bool& valid)
 {
-    if (unparsed.size() <= 2)
-    {
-        valid = false;
-        return 0;
-    }
-
     std::optional<uint32_t> content;
     bool                    escaped = false;
 
     for (size_t index = 0; index < unparsed.size(); ++index)
     {
-        if (content.has_value())
+        if (content.has_value() && index != unparsed.size() - 1)
         {
             valid = false;
             return 0;
@@ -201,11 +195,17 @@ uint32_t lang::CharConstant::readEscapedChar(const std::string& unparsed, size_t
 
 uint8_t lang::CharConstant::parseByte(const std::string& unparsed, bool& valid)
 {
-    uint8_t content = 0;
-    bool    escaped = false;
+    std::optional<uint8_t> content;
+    bool                   escaped = false;
 
     for (size_t index = 0; index < unparsed.size(); ++index)
     {
+        if (content.has_value() && index != unparsed.size() - 1)
+        {
+            valid = false;
+            return 0;
+        }
+
         char const& c = unparsed[index];
 
         if (escaped)
@@ -217,7 +217,13 @@ uint8_t lang::CharConstant::parseByte(const std::string& unparsed, bool& valid)
         else if (c != '\'') { content = static_cast<uint8_t>(static_cast<unsigned char>(c)); }
     }
 
-    return content;
+    if (!content.has_value())
+    {
+        valid = false;
+        return 0;
+    }
+
+    return content.value();
 }
 
 uint8_t lang::CharConstant::readEscapedByte(const std::string& unparsed, size_t& index, bool& success)

@@ -20,9 +20,9 @@ public main () : ui32
     // Allocating buffers returns a buffer-pointer.
     let str: []ui8 <: new[3] dynamic ui8;
 
-    str[0] <: 'A';
-    str[1] <: 'B';
-    str[2] <: 'C';
+    str[0] <: 8'A';
+    str[1] <: 8'B';
+    str[2] <: 8'C';
 
     write(str, 3:32);
 
