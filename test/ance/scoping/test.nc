@@ -2,20 +2,20 @@
 
 // In function scopes, more anonymous scopes can be defined.
 
-public main () :  u32
+public main () : u32
 {
-    let x :  u32 <: 0:32;
+    let x : u32 <: 0:32;
 
     {
-        let x :  u32 <: 1:32;
+        let x : u32 <: 1:32;
     }
 
     return x;
 }
 
-public exit (exitcode:  u32)
+public exit (exitcode: u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode:  u32);
+extern ExitProcess (uExitCode: u32);

@@ -2,14 +2,14 @@
 
 // The sizeof expressions allow to get the size of a type.
 
-public main () :  u32
+public main () : u32
 {
     // Two variants of the expression exist, one for types and one for the types returned by an expression.
     // Both variants return a value of type size.
 
     // The variant for types:
 
-    let s1: size <: sizeof  u8;
+    let s1: size <: sizeof u8;
     assert s1 == 1;
 
     // The variant for expressions:
@@ -23,9 +23,9 @@ public main () :  u32
     return 0:32;
 }
 
-public exit (exitcode:  u32)
+public exit (exitcode: u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode:  u32);
+extern ExitProcess (uExitCode: u32);

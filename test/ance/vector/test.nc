@@ -9,7 +9,7 @@ public struct Data
     public z: single;
 }
 
-public main () :  u32
+public main () : u32
 {
     // A vector type consists of element type and element count.
     // A vector literal is a list of elements and optionally the vector type.
@@ -37,9 +37,9 @@ public main () :  u32
     return 0:32;
 }
 
-public exit (exitcode:  u32)
+public exit (exitcode: u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode:  u32);
+extern ExitProcess (uExitCode: u32);

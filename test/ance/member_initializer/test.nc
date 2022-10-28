@@ -5,11 +5,11 @@
 private struct Values
 {
     public a: i32 <: +15:32;
-    public b: * u8 <: c"A";
+    public b: *u8 <: c"A";
     public c: bool;
 }
 
-public main () :  u32
+public main () : u32
 {
     let v: Values; // Struct members are initialized here.
 
@@ -38,9 +38,9 @@ public main () :  u32
     return 0:32;
 }
 
-public exit (exitcode:  u32)
+public exit (exitcode: u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode:  u32);
+extern ExitProcess (uExitCode: u32);

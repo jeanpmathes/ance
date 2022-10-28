@@ -13,7 +13,7 @@ public define Alias4 alias Alias1;
 // Reference types can be aliased too, but double-refs still aren't allowed.
 public define Ref alias &size;
 
-public main () :  u32
+public main () : u32
 {
     // Type aliases can be used alias if they were the actual type.
     let a: size <: 42;
@@ -33,9 +33,9 @@ public main () :  u32
     return 0:32;
 }
 
-public exit (exitcode:  u32)
+public exit (exitcode: u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode:  u32);
+extern ExitProcess (uExitCode: u32);

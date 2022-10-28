@@ -2,7 +2,7 @@
 
 // The basic mathematical operators.
 
-public main () :  u32
+public main () : u32
 {
     // All mathematical operators are supported for all fixed-width integer types.
 
@@ -65,9 +65,9 @@ public main () :  u32
     return 0:32;
 }
 
-public exit (exitcode:  u32)
+public exit (exitcode: u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode:  u32);
+extern ExitProcess (uExitCode: u32);

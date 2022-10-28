@@ -2,7 +2,7 @@
 
 // Testing the results of many of the mathematical operators.
 
-public main () :  u32
+public main () : u32
 {
     test_fw_integer_math();
     test_float_math();
@@ -29,8 +29,8 @@ private test_fw_integer_math ()
     assert x1 / x2 == -1:32;
     assert x1 % x2 == +0:32;
 
-    let x3:  u32 <: 1:32;
-    let x4:  u32 <: 2:32;
+    let x3: u32 <: 1:32;
+    let x4: u32 <: 2:32;
 
     assert x3 + x4 == 3:32;
     assert x4 - x3 == 1:32;
@@ -75,9 +75,9 @@ private test_uiptr_math ()
     assert x1 + x2 == 0x00000003:uiptr;
 }
 
-public exit (exitcode:  u32)
+public exit (exitcode: u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode:  u32);
+extern ExitProcess (uExitCode: u32);

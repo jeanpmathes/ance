@@ -2,7 +2,7 @@
 
 // Both references and pointers can be used.
 
-public main () :  u32
+public main () : u32
 {
     let num: size <: 100;
 
@@ -32,9 +32,9 @@ private modify_num (num: &size)
     num <: 0;
 }
 
-public exit (exitcode:  u32)
+public exit (exitcode: u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode:  u32);
+extern ExitProcess (uExitCode: u32);

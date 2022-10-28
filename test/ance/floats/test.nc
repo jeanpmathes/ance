@@ -22,14 +22,14 @@ private s4: single <: -0.0s;
 private d4: double <: -0.0d;
 private q4: quad <: -0.0q;
 
-public main () :  u32
+public main () : u32
 {
     return 0:32;
 }
 
-public exit (exitcode:  u32)
+public exit (exitcode: u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode:  u32);
+extern ExitProcess (uExitCode: u32);

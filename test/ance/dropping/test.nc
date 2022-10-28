@@ -2,7 +2,7 @@
 
 // Variables can be dropped in the scope that they are declared in.
 
-public main () :  u32
+public main () : u32
 {
     let x: size <: 15;
     let y: size <: x;
@@ -14,9 +14,9 @@ public main () :  u32
     return 0:32;
 }
 
-public exit (exitcode:  u32)
+public exit (exitcode: u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode:  u32);
+extern ExitProcess (uExitCode: u32);
