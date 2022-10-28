@@ -13,6 +13,9 @@ std::string lang::UnaryOperator::toString() const
     {
         case NOT:
             return "not";
+
+        case BITWISE_NOT:
+            return "<not>";
     }
 }
 

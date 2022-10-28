@@ -135,8 +135,10 @@ expression
 	| independentExpression # Independent
 	| '(' expression ')' # Parenthesis
     | 'not' expression # NotOperation
+    | '<not>' expression # BitwiseNotOperation
 	| left=expression binaryOperatorMultiplicative right=expression # BinaryOperation
 	| left=expression binaryOperatorAdditive right=expression # BinaryOperation
+	| left=expression binaryOperatorBitwise right=expression # BinaryOperation
 	| left=expression binaryOperatorRelational right=expression # BinaryOperation
 	| left=expression binaryOperatorEquality right=expression # BinaryOperation
 	| left=expression ( NOT )? 'and' right=expression # LogicalAnd
@@ -156,6 +158,12 @@ binaryOperatorMultiplicative
 binaryOperatorAdditive
     : '+' # Addition
     | '-' # Subtraction
+    ;
+
+binaryOperatorBitwise
+    : '<and>' # BitwiseAnd
+    | '<or>' # BitwiseOr
+    | '<xor>' # BitwiseXor
     ;
 
 binaryOperatorRelational

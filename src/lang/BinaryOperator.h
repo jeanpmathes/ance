@@ -15,7 +15,8 @@ namespace lang
         {
             ARITHMETIC,
             RELATIONAL,
-            EQUALITY
+            EQUALITY,
+            BITWISE
         };
 
       private:
@@ -67,7 +68,19 @@ namespace lang
             /**
             * The inequality relational operator.
             */
-            NOT_EQUAL
+            NOT_EQUAL,
+            /**
+             * The bitwise and operator.
+             */
+            BITWISE_AND,
+            /**
+             * The bitwise or operator.
+             */
+            BITWISE_OR,
+            /**
+             * The bitwise xor operator.
+             */
+            BITWISE_XOR
         };
 
         BinaryOperator() = default;
@@ -97,6 +110,11 @@ namespace lang
          * @return True if the operator is an arithmetic operator, false otherwise.
          */
         [[nodiscard]] bool isArithmetic() const;
+        /**
+         * Whether the operator is a bitwise operator. A bitwise operator commonly returns a value of similar type as its operands.
+         * @return True if the operator is a bitwise operator, false otherwise.
+         */
+        [[nodiscard]] bool isBitwise() const;
 
       private:
         Value value_;

@@ -68,6 +68,7 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitBinaryOperation(anceParser::BinaryOperationContext* ctx) override;
     std::any visitParenthesis(anceParser::ParenthesisContext* ctx) override;
     std::any visitNotOperation(anceParser::NotOperationContext* ctx) override;
+    std::any visitBitwiseNotOperation(anceParser::BitwiseNotOperationContext* ctx) override;
     std::any visitLogicalAnd(anceParser::LogicalAndContext* ctx) override;
     std::any visitLogicalOr(anceParser::LogicalOrContext* ctx) override;
     std::any visitIfExpression(anceParser::IfExpressionContext* ctx) override;
@@ -124,6 +125,9 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitGreaterThanOrEqual(anceParser::GreaterThanOrEqualContext* ctx) override;
     std::any visitEqual(anceParser::EqualContext* ctx) override;
     std::any visitNotEqual(anceParser::NotEqualContext* ctx) override;
+    std::any visitBitwiseAnd(anceParser::BitwiseAndContext* ctx) override;
+    std::any visitBitwiseOr(anceParser::BitwiseOrContext* ctx) override;
+    std::any visitBitwiseXor(anceParser::BitwiseXorContext* ctx) override;
 
   protected:
     static lang::Location   location(antlr4::ParserRuleContext* ctx);

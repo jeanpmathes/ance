@@ -67,8 +67,10 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(la
     return std::make_shared<WrappedNativeValue>(other, native_content_value);
 }
 
-bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type> other)
+bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
 {
+    if (!op.isArithmetic() && !op.isRelational() && !op.isEquality()) return false;
+
     other = lang::Type::getReferencedType(other);
 
     if (other->isFloatingPointType())
@@ -157,6 +159,10 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::Binary
         case lang::BinaryOperator::NOT_EQUAL:
             result = context.ir()->CreateFCmpONE(left_value, right_value, left_value->getName() + ".fcmp");
             break;
+
+        default:
+            assert(false);
+            result = nullptr;
     }
 
     llvm::Value* native_result = lang::Values::contentToNative(return_type, result, context);

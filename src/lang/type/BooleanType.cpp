@@ -71,7 +71,7 @@ lang::ResolvingHandle<lang::Type> lang::BooleanType::get()
 
 bool lang::BooleanType::isOperatorDefined(lang::UnaryOperator op)
 {
-    return op == lang::UnaryOperator::NOT;
+    return op == lang::UnaryOperator::NOT || op == lang::UnaryOperator::BITWISE_NOT;
 }
 
 lang::ResolvingHandle<lang::Type> lang::BooleanType::getOperatorResultType(lang::UnaryOperator)
@@ -96,6 +96,7 @@ std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperato
     switch (op)
     {
         case lang::UnaryOperator::NOT:
+        case lang::UnaryOperator::BITWISE_NOT:
             result = context.ir()->CreateNot(content_value, content_value->getName() + ".not");
             break;
     }
@@ -107,7 +108,7 @@ std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperato
 
 bool lang::BooleanType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
 {
-    if (not op.isEquality()) return false;
+    if (!op.isEquality() && !op.isBitwise()) return false;
 
     other = lang::Type::getReferencedType(other);
     return other->isBooleanType();
@@ -116,7 +117,7 @@ bool lang::BooleanType::isOperatorDefined(lang::BinaryOperator op, lang::Resolvi
 lang::ResolvingHandle<lang::Type> lang::BooleanType::getOperatorResultType(lang::BinaryOperator op,
                                                                            lang::ResolvingHandle<lang::Type>)
 {
-    if (op.isEquality()) return self();
+    if (op.isEquality() || op.isBitwise()) return self();
 
     return lang::Type::getUndefined();
 }
@@ -152,6 +153,15 @@ std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperat
             break;
         case lang::BinaryOperator::NOT_EQUAL:
             result = context.ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
+            break;
+        case lang::BinaryOperator::BITWISE_AND:
+            result = context.ir()->CreateAnd(left_value, right_value, left_value->getName() + ".and");
+            break;
+        case lang::BinaryOperator::BITWISE_OR:
+            result = context.ir()->CreateOr(left_value, right_value, left_value->getName() + ".or");
+            break;
+        case lang::BinaryOperator::BITWISE_XOR:
+            result = context.ir()->CreateXor(left_value, right_value, left_value->getName() + ".xor");
             break;
 
         default:

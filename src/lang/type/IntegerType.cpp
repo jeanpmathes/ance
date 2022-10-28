@@ -143,8 +143,50 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
     }
 }
 
-bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type> other)
+bool lang::IntegerType::isOperatorDefined(lang::UnaryOperator op)
 {
+    return op == lang::UnaryOperator::BITWISE_NOT;
+}
+
+lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang::UnaryOperator)
+{
+    return self();
+}
+
+bool lang::IntegerType::validateOperator(lang::UnaryOperator, lang::Location, ValidationLogger&) const
+{
+    return true;
+}
+
+std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator    op,
+                                                              std::shared_ptr<Value> value,
+                                                              CompileContext&        context)
+{
+    value->buildContentValue(context);
+    llvm::Value* content_value = value->getContentValue();
+
+    llvm::Value* result;
+
+    switch (op)
+    {
+        case lang::UnaryOperator::BITWISE_NOT:
+            result = context.ir()->CreateNot(content_value, content_value->getName() + ".not");
+            break;
+
+        default:
+            assert(false);
+            result = nullptr;
+    }
+
+    lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op);
+    llvm::Value*                      native_result = lang::Values::contentToNative(result_type, result, context);
+    return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
+}
+
+bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
+{
+    if (!op.isArithmetic() && !op.isBitwise() && !op.isRelational() && !op.isEquality()) return false;
+
     other = lang::Type::getReferencedType(other);
 
     if (auto other_integer = other->isIntegerType())
@@ -166,7 +208,7 @@ bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator, lang::ResolvingH
 lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang::BinaryOperator op,
                                                                            lang::ResolvingHandle<lang::Type>)
 {
-    if (op.isArithmetic()) return self()->getActualType();
+    if (op.isArithmetic() || op.isBitwise()) return self()->getActualType();
     if (op.isRelational() || op.isEquality()) return lang::BooleanType::get();
 
     return lang::Type::getUndefined();
@@ -249,6 +291,15 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
             break;
         case lang::BinaryOperator::NOT_EQUAL:
             result = context.ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
+            break;
+        case lang::BinaryOperator::BITWISE_AND:
+            result = context.ir()->CreateAnd(left_value, right_value, left_value->getName() + ".and");
+            break;
+        case lang::BinaryOperator::BITWISE_OR:
+            result = context.ir()->CreateOr(left_value, right_value, left_value->getName() + ".or");
+            break;
+        case lang::BinaryOperator::BITWISE_XOR:
+            result = context.ir()->CreateXor(left_value, right_value, left_value->getName() + ".xor");
             break;
     }
 

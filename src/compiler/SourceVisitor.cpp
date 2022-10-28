@@ -532,12 +532,15 @@ std::any SourceVisitor::visitBinaryOperation(anceParser::BinaryOperationContext*
     Expression* right = std::any_cast<Expression*>(visit(ctx->right));
 
     std::optional<lang::BinaryOperator> op;
+
     if (ctx->binaryOperatorMultiplicative())
         op = std::any_cast<lang::BinaryOperator>(visit(ctx->binaryOperatorMultiplicative()));
     if (ctx->binaryOperatorAdditive()) op = std::any_cast<lang::BinaryOperator>(visit(ctx->binaryOperatorAdditive()));
     if (ctx->binaryOperatorRelational())
         op = std::any_cast<lang::BinaryOperator>(visit(ctx->binaryOperatorRelational()));
     if (ctx->binaryOperatorEquality()) op = std::any_cast<lang::BinaryOperator>(visit(ctx->binaryOperatorEquality()));
+    if (ctx->binaryOperatorBitwise()) op = std::any_cast<lang::BinaryOperator>(visit(ctx->binaryOperatorBitwise()));
+
     assert(op.has_value());
 
     return static_cast<Expression*>(new BinaryOperation(std::unique_ptr<Expression>(left),
@@ -559,11 +562,18 @@ std::any SourceVisitor::visitNotOperation(anceParser::NotOperationContext* ctx)
         new UnaryOperation(lang::UnaryOperator::NOT, std::unique_ptr<Expression>(value), location(ctx)));
 }
 
+std::any SourceVisitor::visitBitwiseNotOperation(anceParser::BitwiseNotOperationContext* ctx)
+{
+    Expression* value = std::any_cast<Expression*>(visit(ctx->expression()));
+    return static_cast<Expression*>(
+        new UnaryOperation(lang::UnaryOperator::BITWISE_NOT, std::unique_ptr<Expression>(value), location(ctx)));
+}
+
 std::any SourceVisitor::visitLogicalAnd(anceParser::LogicalAndContext* ctx)
 {
     bool        negated = ctx->NOT();
     Expression* left    = std::any_cast<Expression*>(visit(ctx->left));
-    Expression* right = std::any_cast<Expression*>(visit(ctx->right));
+    Expression* right   = std::any_cast<Expression*>(visit(ctx->right));
 
     return static_cast<Expression*>(
         new And(negated, std::unique_ptr<Expression>(left), std::unique_ptr<Expression>(right), location(ctx)));
@@ -1012,6 +1022,24 @@ std::any SourceVisitor::visitEqual(anceParser::EqualContext*)
 std::any SourceVisitor::visitNotEqual(anceParser::NotEqualContext*)
 {
     lang::BinaryOperator op = lang::BinaryOperator::NOT_EQUAL;
+    return op;
+}
+
+std::any SourceVisitor::visitBitwiseAnd(anceParser::BitwiseAndContext*)
+{
+    lang::BinaryOperator op = lang::BinaryOperator::BITWISE_AND;
+    return op;
+}
+
+std::any SourceVisitor::visitBitwiseOr(anceParser::BitwiseOrContext*)
+{
+    lang::BinaryOperator op = lang::BinaryOperator::BITWISE_OR;
+    return op;
+}
+
+std::any SourceVisitor::visitBitwiseXor(anceParser::BitwiseXorContext*)
+{
+    lang::BinaryOperator op = lang::BinaryOperator::BITWISE_XOR;
     return op;
 }
 

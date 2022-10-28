@@ -17,6 +17,11 @@ namespace lang
              * The logical not operator.
              */
             NOT,
+
+            /**
+             * The bitwise not operator.
+             */
+            BITWISE_NOT
         };
 
         UnaryOperator() = default;

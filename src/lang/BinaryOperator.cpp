@@ -33,6 +33,12 @@ std::string lang::BinaryOperator::toString() const
             return "==";
         case NOT_EQUAL:
             return "!=";
+        case BITWISE_AND:
+            return "<and>";
+        case BITWISE_OR:
+            return "<or>";
+        case BITWISE_XOR:
+            return "<xor>";
     }
 }
 
@@ -56,6 +62,11 @@ lang::BinaryOperator::Category lang::BinaryOperator::getCategory() const
         case EQUAL:
         case NOT_EQUAL:
             return Category::EQUALITY;
+
+        case BITWISE_AND:
+        case BITWISE_OR:
+        case BITWISE_XOR:
+            return Category::BITWISE;
     }
 }
 
@@ -74,3 +85,7 @@ bool lang::BinaryOperator::isArithmetic() const
     return getCategory() == Category::ARITHMETIC;
 }
 
+bool lang::BinaryOperator::isBitwise() const
+{
+    return getCategory() == Category::BITWISE;
+}

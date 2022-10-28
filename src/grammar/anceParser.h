@@ -79,27 +79,31 @@ class anceParser : public antlr4::Parser
         T__66               = 67,
         T__67               = 68,
         T__68               = 69,
-        NATIVE_INTEGER_TYPE = 70,
-        SIGNED_INTEGER      = 71,
-        HEX_INTEGER         = 72,
-        BIN_INTEGER         = 73,
-        OCT_INTEGER         = 74,
-        HALF                = 75,
-        SINGLE              = 76,
-        DOUBLE              = 77,
-        QUAD                = 78,
-        DECIMAL             = 79,
-        STRING              = 80,
-        CHAR                = 81,
-        INTEGER             = 82,
-        BUFFER              = 83,
-        CONST               = 84,
-        NOT                 = 85,
-        IDENTIFIER          = 86,
-        SEMICOLON           = 87,
-        WHITESPACE          = 88,
-        BLOCK_COMMENT       = 89,
-        LINE_COMMENT        = 90
+        T__69               = 70,
+        T__70               = 71,
+        T__71               = 72,
+        T__72               = 73,
+        NATIVE_INTEGER_TYPE = 74,
+        SIGNED_INTEGER      = 75,
+        HEX_INTEGER         = 76,
+        BIN_INTEGER         = 77,
+        OCT_INTEGER         = 78,
+        HALF                = 79,
+        SINGLE              = 80,
+        DOUBLE              = 81,
+        QUAD                = 82,
+        DECIMAL             = 83,
+        STRING              = 84,
+        CHAR                = 85,
+        INTEGER             = 86,
+        BUFFER              = 87,
+        CONST               = 88,
+        NOT                 = 89,
+        IDENTIFIER          = 90,
+        SEMICOLON           = 91,
+        WHITESPACE          = 92,
+        BLOCK_COMMENT       = 93,
+        LINE_COMMENT        = 94
     };
 
     enum
@@ -133,44 +137,45 @@ class anceParser : public antlr4::Parser
         RuleExpression                   = 26,
         RuleBinaryOperatorMultiplicative = 27,
         RuleBinaryOperatorAdditive       = 28,
-        RuleBinaryOperatorRelational     = 29,
-        RuleBinaryOperatorEquality       = 30,
-        RuleIndependentExpression        = 31,
-        RuleFunctionCall                 = 32,
-        RuleArguments                    = 33,
-        RuleVariableAccess               = 34,
-        RuleAllocation                   = 35,
-        RuleAllocator                    = 36,
-        RuleAddressof                    = 37,
-        RuleBindRef                      = 38,
-        RuleSizeofType                   = 39,
-        RuleSizeofExpression             = 40,
-        RuleMatchExpression              = 41,
-        RuleMatchExpressionCase          = 42,
-        RuleLiteralExpression            = 43,
-        RuleStringLiteral                = 44,
-        RuleCharLiteral                  = 45,
-        RuleIntegerLiteral               = 46,
-        RuleNormalInteger                = 47,
-        RuleSpecialInteger               = 48,
-        RuleFloatingPointLiteral         = 49,
-        RuleBooleanLiteral               = 50,
-        RuleNullLiteral                  = 51,
-        RuleSizeLiteral                  = 52,
-        RuleDiffLiteral                  = 53,
-        RuleUiptrLiteral                 = 54,
-        RuleType                         = 55,
-        RuleIntegerType                  = 56,
-        RuleArrayType                    = 57,
-        RuleVectorType                   = 58,
-        RuleKeywordType                  = 59,
-        RuleFloatingPointType            = 60,
-        RuleTargetDependentType          = 61,
-        RuleBooleanType                  = 62,
-        RuleCharType                     = 63,
-        RuleNullPointerType              = 64,
-        RuleVoidType                     = 65,
-        RuleCustomType                   = 66
+        RuleBinaryOperatorBitwise        = 29,
+        RuleBinaryOperatorRelational     = 30,
+        RuleBinaryOperatorEquality       = 31,
+        RuleIndependentExpression        = 32,
+        RuleFunctionCall                 = 33,
+        RuleArguments                    = 34,
+        RuleVariableAccess               = 35,
+        RuleAllocation                   = 36,
+        RuleAllocator                    = 37,
+        RuleAddressof                    = 38,
+        RuleBindRef                      = 39,
+        RuleSizeofType                   = 40,
+        RuleSizeofExpression             = 41,
+        RuleMatchExpression              = 42,
+        RuleMatchExpressionCase          = 43,
+        RuleLiteralExpression            = 44,
+        RuleStringLiteral                = 45,
+        RuleCharLiteral                  = 46,
+        RuleIntegerLiteral               = 47,
+        RuleNormalInteger                = 48,
+        RuleSpecialInteger               = 49,
+        RuleFloatingPointLiteral         = 50,
+        RuleBooleanLiteral               = 51,
+        RuleNullLiteral                  = 52,
+        RuleSizeLiteral                  = 53,
+        RuleDiffLiteral                  = 54,
+        RuleUiptrLiteral                 = 55,
+        RuleType                         = 56,
+        RuleIntegerType                  = 57,
+        RuleArrayType                    = 58,
+        RuleVectorType                   = 59,
+        RuleKeywordType                  = 60,
+        RuleFloatingPointType            = 61,
+        RuleTargetDependentType          = 62,
+        RuleBooleanType                  = 63,
+        RuleCharType                     = 64,
+        RuleNullPointerType              = 65,
+        RuleVoidType                     = 66,
+        RuleCustomType                   = 67
     };
 
     explicit anceParser(antlr4::TokenStream* input);
@@ -218,6 +223,7 @@ class anceParser : public antlr4::Parser
     class ExpressionContext;
     class BinaryOperatorMultiplicativeContext;
     class BinaryOperatorAdditiveContext;
+    class BinaryOperatorBitwiseContext;
     class BinaryOperatorRelationalContext;
     class BinaryOperatorEqualityContext;
     class IndependentExpressionContext;
@@ -777,6 +783,7 @@ class anceParser : public antlr4::Parser
         std::vector<ExpressionContext*>      expression();
         ExpressionContext*                   expression(size_t i);
         BinaryOperatorAdditiveContext*       binaryOperatorAdditive();
+        BinaryOperatorBitwiseContext*        binaryOperatorBitwise();
         BinaryOperatorRelationalContext*     binaryOperatorRelational();
         BinaryOperatorEqualityContext*       binaryOperatorEquality();
 
@@ -952,6 +959,16 @@ class anceParser : public antlr4::Parser
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class BitwiseNotOperationContext : public ExpressionContext
+    {
+      public:
+        BitwiseNotOperationContext(ExpressionContext* ctx);
+
+        ExpressionContext* expression();
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     class IndirectionContext : public ExpressionContext
     {
       public:
@@ -1032,6 +1049,44 @@ class anceParser : public antlr4::Parser
     };
 
     BinaryOperatorAdditiveContext* binaryOperatorAdditive();
+
+    class BinaryOperatorBitwiseContext : public antlr4::ParserRuleContext
+    {
+      public:
+        BinaryOperatorBitwiseContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+
+        BinaryOperatorBitwiseContext() = default;
+        void copyFrom(BinaryOperatorBitwiseContext* context);
+        using antlr4::ParserRuleContext::copyFrom;
+
+        virtual size_t getRuleIndex() const override;
+    };
+
+    class BitwiseOrContext : public BinaryOperatorBitwiseContext
+    {
+      public:
+        BitwiseOrContext(BinaryOperatorBitwiseContext* ctx);
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class BitwiseXorContext : public BinaryOperatorBitwiseContext
+    {
+      public:
+        BitwiseXorContext(BinaryOperatorBitwiseContext* ctx);
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class BitwiseAndContext : public BinaryOperatorBitwiseContext
+    {
+      public:
+        BitwiseAndContext(BinaryOperatorBitwiseContext* ctx);
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    BinaryOperatorBitwiseContext* binaryOperatorBitwise();
 
     class BinaryOperatorRelationalContext : public antlr4::ParserRuleContext
     {

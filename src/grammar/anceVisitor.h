@@ -114,6 +114,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual std::any visitSizeOf(anceParser::SizeOfContext* context) = 0;
 
+    virtual std::any visitBitwiseNotOperation(anceParser::BitwiseNotOperationContext* context) = 0;
+
     virtual std::any visitIndirection(anceParser::IndirectionContext* context) = 0;
 
     virtual std::any visitMultiplication(anceParser::MultiplicationContext* context) = 0;
@@ -125,6 +127,12 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
     virtual std::any visitAddition(anceParser::AdditionContext* context) = 0;
 
     virtual std::any visitSubtraction(anceParser::SubtractionContext* context) = 0;
+
+    virtual std::any visitBitwiseAnd(anceParser::BitwiseAndContext* context) = 0;
+
+    virtual std::any visitBitwiseOr(anceParser::BitwiseOrContext* context) = 0;
+
+    virtual std::any visitBitwiseXor(anceParser::BitwiseXorContext* context) = 0;
 
     virtual std::any visitLessThan(anceParser::LessThanContext* context) = 0;
 

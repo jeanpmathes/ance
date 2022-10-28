@@ -153,6 +153,11 @@ class anceBaseVisitor : public anceVisitor
 
     virtual std::any visitSizeOf(anceParser::SizeOfContext* ctx) override { return visitChildren(ctx); }
 
+    virtual std::any visitBitwiseNotOperation(anceParser::BitwiseNotOperationContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
     virtual std::any visitIndirection(anceParser::IndirectionContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitMultiplication(anceParser::MultiplicationContext* ctx) override { return visitChildren(ctx); }
@@ -164,6 +169,12 @@ class anceBaseVisitor : public anceVisitor
     virtual std::any visitAddition(anceParser::AdditionContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitSubtraction(anceParser::SubtractionContext* ctx) override { return visitChildren(ctx); }
+
+    virtual std::any visitBitwiseAnd(anceParser::BitwiseAndContext* ctx) override { return visitChildren(ctx); }
+
+    virtual std::any visitBitwiseOr(anceParser::BitwiseOrContext* ctx) override { return visitChildren(ctx); }
+
+    virtual std::any visitBitwiseXor(anceParser::BitwiseXorContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitLessThan(anceParser::LessThanContext* ctx) override { return visitChildren(ctx); }
 
