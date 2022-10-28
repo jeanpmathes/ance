@@ -835,10 +835,10 @@ std::any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ctx)
 {
     std::string integer_type_str = ctx->NATIVE_INTEGER_TYPE()->getText();
 
-    bool     is_unsigned = integer_type_str[0] == 'u';
-    uint64_t size        = parseIntegerTypeSize(integer_type_str.substr(1 + integer_type_str.find('i')));
+    bool     is_signed = integer_type_str[0] == 'i';
+    uint64_t size      = parseIntegerTypeSize(integer_type_str.substr(1));
 
-    lang::ResolvingHandle<lang::Type> type = lang::FixedWidthIntegerType::get(size, !is_unsigned);
+    lang::ResolvingHandle<lang::Type> type = lang::FixedWidthIntegerType::get(size, is_signed);
     return type;
 }
 

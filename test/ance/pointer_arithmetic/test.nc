@@ -2,7 +2,7 @@
 
 // Pointers can be used for some arithmetic operations.
 
-public main () : ui32
+public main () :  u32
 {
     // The 'uiptr' type is used for numerical operations on pointers.
     let v1 <: 0x100:uiptr;
@@ -27,9 +27,9 @@ public main () : ui32
     return 0:32;
 }
 
-public exit (exitcode: ui32)
+public exit (exitcode:  u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode: ui32);
+extern ExitProcess (uExitCode:  u32);

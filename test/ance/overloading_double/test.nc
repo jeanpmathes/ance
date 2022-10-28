@@ -2,17 +2,17 @@
 
 // Every overload must have a unique signature.
 
-public main () : ui32
+public main () :  u32
 {
     return 0:32;
 }
 
-public exit (exitcode: ui32)
+public exit (exitcode:  u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode: ui32);
+extern ExitProcess (uExitCode:  u32);
 
-extern overloaded (x: ui32);
-extern overloaded (y: ui32);
+extern overloaded (x:  u32);
+extern overloaded (y:  u32);

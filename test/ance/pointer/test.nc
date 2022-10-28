@@ -2,15 +2,15 @@
 
 // Pointer types are available for most types.
 
-public main () : ui32
+public main () :  u32
 {
-    let a1: *ui32;
+    let a1: * u32;
     let a2: *size;
     let a3: ****single;
 
     // The default value of pointers is null.
-    let a4: *ui32;
-    let a5: *ui32 <: null;
+    let a4: * u32;
+    let a5: * u32 <: null;
     assert a4 == a5;
 
     // The null literal has the special nullptr type.
@@ -21,17 +21,17 @@ public main () : ui32
     let a8 <: uiptr(a1);
 
     // Values of both of these types can be converted back to pointers and to each other.
-    let a9 <: *ui32(a7);
-    let a10 <: *ui32(a8);
+    let a9 <: * u32(a7);
+    let a10 <: * u32(a8);
     let a11 <: ptr(a8);
     let a12 <: uiptr(a7);
 
     return 0:32;
 }
 
-public exit (exitcode: ui32)
+public exit (exitcode:  u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode: ui32);
+extern ExitProcess (uExitCode:  u32);

@@ -7,7 +7,7 @@ private std_out: Handle;
 
 public define Handle alias ptr;
 
-public main () : ui32
+public main () :  u32
 {
     std_out <: GetStdHandle(4294967285:32);
 
@@ -24,14 +24,14 @@ public main () : ui32
 
 // The void return type can be omitted.
 
-public exit (exitcode: ui32)
+public exit (exitcode:  u32)
 {
     ExitProcess(exitcode);
 }
 
-private write (str: *ui8, len: ui32) : void
+private write (str: * u8, len:  u32) : void
 {
-    let written: *ui32 <: new automatic ui32;
+    let written: * u32 <: new automatic  u32;
     WriteFile(std_out, str, len, written, null);
 }
 
@@ -40,17 +40,17 @@ public overloaded ()
     write(c"A", 1:32);
 }
 
-private overloaded (x: ui32)
+private overloaded (x:  u32)
 {
     write(c"B", 1:32);
 }
 
-private overloaded (x: ui64)
+private overloaded (x:  u64)
 {
     write(c"C", 1:32);
 }
 
-private overloaded (x: ui32, y: ui32)
+private overloaded (x:  u32, y:  u32)
 {
     write(c"D", 1:32);
 }
@@ -60,6 +60,6 @@ private overloaded (x: single)
     write(c"E", 1:32);
 }
 
-extern WriteFile (hFile: Handle, lpBuffer: *ui8, nNumberOfBytesToWrite: ui32, lpNumberOfBytesWritten: *ui32, lpOverlapped: ptr);
-extern GetStdHandle (nStdHandle: ui32) : Handle;
-extern ExitProcess (uExitCode: ui32);
+extern WriteFile (hFile: Handle, lpBuffer: * u8, nNumberOfBytesToWrite:  u32, lpNumberOfBytesWritten: * u32, lpOverlapped: ptr);
+extern GetStdHandle (nStdHandle:  u32) : Handle;
+extern ExitProcess (uExitCode:  u32);

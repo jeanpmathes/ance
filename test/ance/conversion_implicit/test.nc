@@ -4,15 +4,15 @@
 
 public define int alias i64;
 
-public main () : ui32
+public main () :  u32
 {
     let x1: i32 <: +1:16;
     let x2: i64 <: -1:32;
 
     assert x2 == -1:64;
 
-    let x3: ui182 <: 1:64;
-    let x4: ui3 <: 1:2;
+    let x3:  u182 <: 1:64;
+    let x4:  u3 <: 1:2;
 
     // Unsigned values can be implicitly converted to signed values of larger size.
 
@@ -44,9 +44,9 @@ private get_quad() : quad
     return 1.0h;
 }
 
-public exit (exitcode: ui32)
+public exit (exitcode:  u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode: ui32);
+extern ExitProcess (uExitCode:  u32);

@@ -351,7 +351,7 @@ customType
     : IDENTIFIER
     ;
 
-NATIVE_INTEGER_TYPE : 'u'? 'i' INTEGER ;
+NATIVE_INTEGER_TYPE : ( 'u' | 'i' ) INTEGER ;
 
 SIGNED_INTEGER : ( '+' | '-' ) INTEGER ;
 HEX_INTEGER : '0' [xX] [0-9a-fA-F]+ ;

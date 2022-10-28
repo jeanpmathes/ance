@@ -2,21 +2,21 @@
 
 // Variables defined in scopes hide outer variables. They also block access before definition.
 
-public main () : ui32
+public main () :  u32
 {
-    let x : ui32 <: 0:32;
+    let x :  u32 <: 0:32;
 
     {
         x <: 1:32; // Not valid, because x will be defined later.
-        let x : ui32 <: 1:32;
+        let x :  u32 <: 1:32;
     }
 
     return x;
 }
 
-public exit (exitcode: ui32)
+public exit (exitcode:  u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode: ui32);
+extern ExitProcess (uExitCode:  u32);

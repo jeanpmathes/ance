@@ -2,10 +2,10 @@
 
 // Many basic types have a default constructor.
 
-public main () : ui32
+public main () :  u32
 {
-    let i: ui32; // Not specifying an assignment will cause the default constructor to be called.
-    let j: ui32 <: ui32();
+    let i:  u32; // Not specifying an assignment will cause the default constructor to be called.
+    let j:  u32 <:  u32();
 
     // Both approaches produce the same value, but are not equivalent as the second includes a copy constructor call.
     assert i == j;
@@ -18,9 +18,9 @@ public main () : ui32
 
 private struct S { }
 
-public exit (exitcode: ui32)
+public exit (exitcode:  u32)
 {
     ExitProcess(exitcode);
 }
 
-extern ExitProcess (uExitCode: ui32);
+extern ExitProcess (uExitCode:  u32);
