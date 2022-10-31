@@ -176,6 +176,10 @@ class anceBaseVisitor : public anceVisitor
 
     virtual std::any visitBitwiseXor(anceParser::BitwiseXorContext* ctx) override { return visitChildren(ctx); }
 
+    virtual std::any visitLeftShift(anceParser::LeftShiftContext* ctx) override { return visitChildren(ctx); }
+
+    virtual std::any visitRightShift(anceParser::RightShiftContext* ctx) override { return visitChildren(ctx); }
+
     virtual std::any visitLessThan(anceParser::LessThanContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitLessThanOrEqual(anceParser::LessThanOrEqualContext* ctx) override

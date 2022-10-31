@@ -185,12 +185,14 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperato
 
 bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
 {
-    if (!op.isArithmetic() && !op.isBitwise() && !op.isRelational() && !op.isEquality()) return false;
+    if (!op.isArithmetic() && !op.isBitwise() && !op.isRelational() && !op.isEquality() && !op.isShift()) return false;
 
     other = lang::Type::getReferencedType(other);
 
     if (auto other_integer = other->isIntegerType())
     {
+        if (op.isShift()) return !other_integer->isSigned();
+
         if (this == other_integer) return true;
 
         auto this_bit_size  = getBitSize();
@@ -208,7 +210,7 @@ bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator op, lang::Resolvi
 lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang::BinaryOperator op,
                                                                            lang::ResolvingHandle<lang::Type>)
 {
-    if (op.isArithmetic() || op.isBitwise()) return self()->getActualType();
+    if (op.isArithmetic() || op.isBitwise() || op.isShift()) return self()->getActualType();
     if (op.isRelational() || op.isEquality()) return lang::BooleanType::get();
 
     return lang::Type::getUndefined();
@@ -300,6 +302,15 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
             break;
         case lang::BinaryOperator::BITWISE_XOR:
             result = context.ir()->CreateXor(left_value, right_value, left_value->getName() + ".xor");
+            break;
+        case lang::BinaryOperator::SHIFT_LEFT:
+            right_value = context.ir()->CreateIntCast(right_value, left_value->getType(), false);
+            result      = context.ir()->CreateShl(left_value, right_value, left_value->getName() + ".shl");
+            break;
+        case lang::BinaryOperator::SHIFT_RIGHT:
+            right_value = context.ir()->CreateIntCast(right_value, left_value->getType(), false);
+            if (isSigned()) result = context.ir()->CreateAShr(left_value, right_value, left_value->getName() + ".ashr");
+            else result = context.ir()->CreateLShr(left_value, right_value, left_value->getName() + ".lshr");
             break;
     }
 

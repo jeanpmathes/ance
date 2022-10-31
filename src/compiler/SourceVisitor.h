@@ -128,6 +128,8 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitBitwiseAnd(anceParser::BitwiseAndContext* ctx) override;
     std::any visitBitwiseOr(anceParser::BitwiseOrContext* ctx) override;
     std::any visitBitwiseXor(anceParser::BitwiseXorContext* ctx) override;
+    std::any visitLeftShift(anceParser::LeftShiftContext* ctx) override;
+    std::any visitRightShift(anceParser::RightShiftContext* ctx) override;
 
   protected:
     static lang::Location   location(antlr4::ParserRuleContext* ctx);

@@ -16,7 +16,8 @@ namespace lang
             ARITHMETIC,
             RELATIONAL,
             EQUALITY,
-            BITWISE
+            BITWISE,
+            BITWISE_SHIFT,
         };
 
       private:
@@ -80,7 +81,15 @@ namespace lang
             /**
              * The bitwise xor operator.
              */
-            BITWISE_XOR
+            BITWISE_XOR,
+            /**
+             * The bitwise left shift operator.
+             */
+            SHIFT_LEFT,
+            /**
+             * The bitwise right shift operator.
+             */
+            SHIFT_RIGHT
         };
 
         BinaryOperator() = default;
@@ -115,6 +124,11 @@ namespace lang
          * @return True if the operator is a bitwise operator, false otherwise.
          */
         [[nodiscard]] bool isBitwise() const;
+        /**
+         * Whether the operator is a shift operator. A shift operator commonly returns a value of similar type as its operands.
+         * @return True if the operator is a shift operator, false otherwise.
+         */
+        [[nodiscard]] bool isShift() const;
 
       private:
         Value value_;

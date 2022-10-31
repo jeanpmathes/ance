@@ -134,6 +134,10 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual std::any visitBitwiseXor(anceParser::BitwiseXorContext* context) = 0;
 
+    virtual std::any visitLeftShift(anceParser::LeftShiftContext* context) = 0;
+
+    virtual std::any visitRightShift(anceParser::RightShiftContext* context) = 0;
+
     virtual std::any visitLessThan(anceParser::LessThanContext* context) = 0;
 
     virtual std::any visitLessThanOrEqual(anceParser::LessThanOrEqualContext* context) = 0;

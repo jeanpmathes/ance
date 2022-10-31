@@ -139,6 +139,7 @@ expression
 	| left=expression binaryOperatorMultiplicative right=expression # BinaryOperation
 	| left=expression binaryOperatorAdditive right=expression # BinaryOperation
 	| left=expression binaryOperatorBitwise right=expression # BinaryOperation
+	| left=expression binaryOperatorShift right=expression # BinaryOperation
 	| left=expression binaryOperatorRelational right=expression # BinaryOperation
 	| left=expression binaryOperatorEquality right=expression # BinaryOperation
 	| left=expression ( NOT )? 'and' right=expression # LogicalAnd
@@ -164,6 +165,11 @@ binaryOperatorBitwise
     : '<and>' # BitwiseAnd
     | '<or>' # BitwiseOr
     | '<xor>' # BitwiseXor
+    ;
+
+binaryOperatorShift
+    : '<sl>' # LeftShift
+    | '<sr>' # RightShift
     ;
 
 binaryOperatorRelational

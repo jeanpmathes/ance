@@ -39,6 +39,10 @@ std::string lang::BinaryOperator::toString() const
             return "<or>";
         case BITWISE_XOR:
             return "<xor>";
+        case SHIFT_LEFT:
+            return "<sl>";
+        case SHIFT_RIGHT:
+            return "<sr>";
     }
 }
 
@@ -67,6 +71,10 @@ lang::BinaryOperator::Category lang::BinaryOperator::getCategory() const
         case BITWISE_OR:
         case BITWISE_XOR:
             return Category::BITWISE;
+
+        case SHIFT_LEFT:
+        case SHIFT_RIGHT:
+            return Category::BITWISE_SHIFT;
     }
 }
 
@@ -88,4 +96,9 @@ bool lang::BinaryOperator::isArithmetic() const
 bool lang::BinaryOperator::isBitwise() const
 {
     return getCategory() == Category::BITWISE;
+}
+
+bool lang::BinaryOperator::isShift() const
+{
+    return getCategory() == Category::BITWISE_SHIFT;
 }

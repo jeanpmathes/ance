@@ -540,6 +540,7 @@ std::any SourceVisitor::visitBinaryOperation(anceParser::BinaryOperationContext*
         op = std::any_cast<lang::BinaryOperator>(visit(ctx->binaryOperatorRelational()));
     if (ctx->binaryOperatorEquality()) op = std::any_cast<lang::BinaryOperator>(visit(ctx->binaryOperatorEquality()));
     if (ctx->binaryOperatorBitwise()) op = std::any_cast<lang::BinaryOperator>(visit(ctx->binaryOperatorBitwise()));
+    if (ctx->binaryOperatorShift()) op = std::any_cast<lang::BinaryOperator>(visit(ctx->binaryOperatorShift()));
 
     assert(op.has_value());
 
@@ -1040,6 +1041,18 @@ std::any SourceVisitor::visitBitwiseOr(anceParser::BitwiseOrContext*)
 std::any SourceVisitor::visitBitwiseXor(anceParser::BitwiseXorContext*)
 {
     lang::BinaryOperator op = lang::BinaryOperator::BITWISE_XOR;
+    return op;
+}
+
+std::any SourceVisitor::visitLeftShift(anceParser::LeftShiftContext*)
+{
+    lang::BinaryOperator op = lang::BinaryOperator::SHIFT_LEFT;
+    return op;
+}
+
+std::any SourceVisitor::visitRightShift(anceParser::RightShiftContext*)
+{
+    lang::BinaryOperator op = lang::BinaryOperator::SHIFT_RIGHT;
     return op;
 }
 
