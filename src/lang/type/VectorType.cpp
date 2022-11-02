@@ -154,6 +154,68 @@ std::shared_ptr<lang::Value> lang::VectorType::buildImplicitConversion(lang::Res
     }
 }
 
+bool lang::VectorType::isOperatorDefined(lang::UnaryOperator op)
+{
+    return getElementType()->isOperatorDefined(op);
+}
+
+lang::ResolvingHandle<lang::Type> lang::VectorType::getOperatorResultType(lang::UnaryOperator op)
+{
+    return get(element_type_->getOperatorResultType(op), size_.value());
+}
+
+bool lang::VectorType::validateOperator(lang::UnaryOperator op,
+                                        lang::Location      location,
+                                        ValidationLogger&   validation_logger) const
+{
+    return element_type_->validateOperator(op, location, validation_logger);
+}
+
+std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::UnaryOperator    op,
+                                                             std::shared_ptr<Value> value,
+                                                             CompileContext&        context)
+{
+    /*if (auto element_vector = element_type_->isVectorizable())
+    {
+        return element_vector->buildOperator(op, left, right, getOperatorResultType(op, right->type()), context);
+    }
+    else*/
+    {
+        llvm::Value* result_ptr =
+            context.ir()->CreateAlloca(getOperatorResultType(op)->getContentType(*context.llvmContext()),
+                                       nullptr,
+                                       "alloca");
+
+        VectorType* result_type_as_vector = getOperatorResultType(op)->isVectorType();
+
+        value->buildNativeValue(context);
+
+        for (uint64_t index = 0; index < size_; index++)
+        {
+            llvm::Constant* index_content =
+                llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context.llvmContext()), index);
+
+            auto index_value = [&]() {
+                llvm::Value* index_native =
+                    lang::Values::contentToNative(lang::SizeType::getSize(), index_content, context);
+                return std::make_shared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
+            };
+
+            auto element = lang::Type::getValueOrReferencedValue(
+                value->type()->buildSubscript(lang::Values::clone(value), index_value(), context),
+                context);
+
+            auto result_element = element_type_->buildOperator(op, element, context);
+            result_element->buildContentValue(context);
+
+            llvm::Value* result_dst_ptr = result_type_as_vector->buildGetElementPointer(result_ptr, index, context);
+            context.ir()->CreateStore(result_element->getContentValue(), result_dst_ptr);
+        }
+
+        return std::make_shared<lang::WrappedNativeValue>(getOperatorResultType(op), result_ptr);
+    }
+}
+
 bool lang::VectorType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
 {
     if (auto other_as_vector = other->isVectorType())
