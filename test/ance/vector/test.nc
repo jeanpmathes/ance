@@ -19,16 +19,22 @@ public main () : u32
 
     // Operations are performed component-wise.
 
-    let z <: x + y;
+    let r1 <: x + y;
+    let r2 <: <not> x;
 
     // Elements can be accessed using the index operator.
 
-    z[0] <: 0;
+    r1[0] <: 0;
 
-    assert z[0] == +0:32;
-    assert z[1] == +4:32;
-    assert z[2] == +6:32;
-    assert z[3] == +8:32;
+    assert r1[0] == +0:32;
+    assert r1[1] == +4:32;
+    assert r1[2] == +6:32;
+    assert r1[3] == +8:32;
+
+    assert r2[0] == (<not> +1:32);
+    assert r2[1] == (<not> +2:32);
+    assert r2[2] == (<not> +3:32);
+    assert r2[3] == (<not> +4:32);
 
     // All types can be used as element types.
 
