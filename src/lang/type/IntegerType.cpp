@@ -145,7 +145,7 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
 
 bool lang::IntegerType::isOperatorDefined(lang::UnaryOperator op)
 {
-    return op == lang::UnaryOperator::BITWISE_NOT;
+    return op == lang::UnaryOperator::BITWISE_NOT || op == lang::UnaryOperator::NEGATION;
 }
 
 lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang::UnaryOperator)
@@ -179,6 +179,10 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperato
     {
         case lang::UnaryOperator::BITWISE_NOT:
             result = context.ir()->CreateNot(content_value, content_value->getName() + ".not");
+            break;
+
+        case lang::UnaryOperator::NEGATION:
+            result = context.ir()->CreateNeg(content_value, content_value->getName() + ".neg");
             break;
 
         default:

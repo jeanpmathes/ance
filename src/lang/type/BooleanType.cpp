@@ -99,6 +99,10 @@ std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperato
         case lang::UnaryOperator::BITWISE_NOT:
             result = context.ir()->CreateNot(content_value, content_value->getName() + ".not");
             break;
+
+        default:
+            assert(false);
+            result = nullptr;
     }
 
     lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op);

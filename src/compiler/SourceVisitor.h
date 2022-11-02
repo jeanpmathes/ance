@@ -65,10 +65,9 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitSizeofType(anceParser::SizeofTypeContext* ctx) override;
     std::any visitSizeofExpression(anceParser::SizeofExpressionContext* ctx) override;
     std::any visitSubscript(anceParser::SubscriptContext* ctx) override;
+    std::any visitUnaryOperation(anceParser::UnaryOperationContext* ctx) override;
     std::any visitBinaryOperation(anceParser::BinaryOperationContext* ctx) override;
     std::any visitParenthesis(anceParser::ParenthesisContext* ctx) override;
-    std::any visitNotOperation(anceParser::NotOperationContext* ctx) override;
-    std::any visitBitwiseNotOperation(anceParser::BitwiseNotOperationContext* ctx) override;
     std::any visitLogicalAnd(anceParser::LogicalAndContext* ctx) override;
     std::any visitLogicalOr(anceParser::LogicalOrContext* ctx) override;
     std::any visitIfExpression(anceParser::IfExpressionContext* ctx) override;
@@ -113,6 +112,10 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitCopyAssignment(anceParser::CopyAssignmentContext* ctx) override;
     std::any visitMoveAssignment(anceParser::MoveAssignmentContext* ctx) override;
     std::any visitFinalCopyAssignment(anceParser::FinalCopyAssignmentContext* ctx) override;
+
+    std::any visitBitwiseNot(anceParser::BitwiseNotContext* ctx) override;
+    std::any visitNot(anceParser::NotContext* ctx) override;
+    std::any visitNegation(anceParser::NegationContext* ctx) override;
 
     std::any visitAddition(anceParser::AdditionContext* ctx) override;
     std::any visitSubtraction(anceParser::SubtractionContext* ctx) override;

@@ -526,6 +526,14 @@ std::any SourceVisitor::visitSubscript(anceParser::SubscriptContext* ctx)
         new Subscript(std::unique_ptr<Expression>(indexed), std::unique_ptr<Expression>(index), location(ctx)));
 }
 
+std::any SourceVisitor::visitUnaryOperation(anceParser::UnaryOperationContext* ctx)
+{
+    lang::UnaryOperator op    = std::any_cast<lang::UnaryOperator>(visit(ctx->unaryOperator()));
+    Expression*         value = std::any_cast<Expression*>(visit(ctx->expression()));
+
+    return static_cast<Expression*>(new UnaryOperation(op, std::unique_ptr<Expression>(value), location(ctx)));
+}
+
 std::any SourceVisitor::visitBinaryOperation(anceParser::BinaryOperationContext* ctx)
 {
     Expression* left  = std::any_cast<Expression*>(visit(ctx->left));
@@ -554,20 +562,6 @@ std::any SourceVisitor::visitParenthesis(anceParser::ParenthesisContext* ctx)
 {
     Expression* contained = std::any_cast<Expression*>(visit(ctx->expression()));
     return static_cast<Expression*>(new Parenthesis(std::unique_ptr<Expression>(contained), location(ctx)));
-}
-
-std::any SourceVisitor::visitNotOperation(anceParser::NotOperationContext* ctx)
-{
-    Expression* value = std::any_cast<Expression*>(visit(ctx->expression()));
-    return static_cast<Expression*>(
-        new UnaryOperation(lang::UnaryOperator::NOT, std::unique_ptr<Expression>(value), location(ctx)));
-}
-
-std::any SourceVisitor::visitBitwiseNotOperation(anceParser::BitwiseNotOperationContext* ctx)
-{
-    Expression* value = std::any_cast<Expression*>(visit(ctx->expression()));
-    return static_cast<Expression*>(
-        new UnaryOperation(lang::UnaryOperator::BITWISE_NOT, std::unique_ptr<Expression>(value), location(ctx)));
 }
 
 std::any SourceVisitor::visitLogicalAnd(anceParser::LogicalAndContext* ctx)
@@ -958,6 +952,24 @@ std::any SourceVisitor::visitFinalCopyAssignment(anceParser::FinalCopyAssignment
 {
     lang::Assigner assigner = lang::Assigner::FINAL_COPY_ASSIGNMENT;
     return assigner;
+}
+
+std::any SourceVisitor::visitBitwiseNot(anceParser::BitwiseNotContext*)
+{
+    lang::UnaryOperator op = lang::UnaryOperator::BITWISE_NOT;
+    return op;
+}
+
+std::any SourceVisitor::visitNot(anceParser::NotContext*)
+{
+    lang::UnaryOperator op = lang::UnaryOperator::NOT;
+    return op;
+}
+
+std::any SourceVisitor::visitNegation(anceParser::NegationContext*)
+{
+    lang::UnaryOperator op = lang::UnaryOperator::NEGATION;
+    return op;
 }
 
 std::any SourceVisitor::visitAddition(anceParser::AdditionContext*)

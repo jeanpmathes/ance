@@ -134,8 +134,7 @@ expression
     | sizeofExpression # SizeOf
 	| independentExpression # Independent
 	| '(' expression ')' # Parenthesis
-    | 'not' expression # NotOperation
-    | '<not>' expression # BitwiseNotOperation
+    | unaryOperator expression # UnaryOperation
 	| left=expression binaryOperatorMultiplicative right=expression # BinaryOperation
 	| left=expression binaryOperatorAdditive right=expression # BinaryOperation
 	| left=expression binaryOperatorBitwise right=expression # BinaryOperation
@@ -149,6 +148,12 @@ expression
     | '<' ( type '|' )? expression ( ',' expression )* '>' # VectorDefinition
     | '[' ( type '|' )? expression ( ',' expression )* ']' # ArrayDefinition
 	;
+
+unaryOperator
+    : 'not' # Not
+    | '<not>' # BitwiseNot
+    | '-' # Negation
+    ;
 
 binaryOperatorMultiplicative
     : '*' # Multiplication

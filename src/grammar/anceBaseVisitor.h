@@ -112,12 +112,12 @@ class anceBaseVisitor : public anceVisitor
 
     virtual std::any visitVariable(anceParser::VariableContext* ctx) override { return visitChildren(ctx); }
 
+    virtual std::any visitUnaryOperation(anceParser::UnaryOperationContext* ctx) override { return visitChildren(ctx); }
+
     virtual std::any visitBinaryOperation(anceParser::BinaryOperationContext* ctx) override
     {
         return visitChildren(ctx);
     }
-
-    virtual std::any visitNotOperation(anceParser::NotOperationContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitSubscript(anceParser::SubscriptContext* ctx) override { return visitChildren(ctx); }
 
@@ -153,12 +153,13 @@ class anceBaseVisitor : public anceVisitor
 
     virtual std::any visitSizeOf(anceParser::SizeOfContext* ctx) override { return visitChildren(ctx); }
 
-    virtual std::any visitBitwiseNotOperation(anceParser::BitwiseNotOperationContext* ctx) override
-    {
-        return visitChildren(ctx);
-    }
-
     virtual std::any visitIndirection(anceParser::IndirectionContext* ctx) override { return visitChildren(ctx); }
+
+    virtual std::any visitNot(anceParser::NotContext* ctx) override { return visitChildren(ctx); }
+
+    virtual std::any visitBitwiseNot(anceParser::BitwiseNotContext* ctx) override { return visitChildren(ctx); }
+
+    virtual std::any visitNegation(anceParser::NegationContext* ctx) override { return visitChildren(ctx); }
 
     virtual std::any visitMultiplication(anceParser::MultiplicationContext* ctx) override { return visitChildren(ctx); }
 

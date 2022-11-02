@@ -67,14 +67,52 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(la
     return std::make_shared<WrappedNativeValue>(other, native_content_value);
 }
 
-std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator,
-                                                                    std::shared_ptr<Value>,
-                                                                    lang::ResolvingHandle<lang::Type>,
-                                                                    CompileContext&)
+bool lang::FloatingPointType::isOperatorDefined(lang::UnaryOperator op)
 {
-    return nullptr;
+    return op == lang::UnaryOperator::NEGATION;
 }
 
+lang::ResolvingHandle<lang::Type> lang::FloatingPointType::getOperatorResultType(lang::UnaryOperator)
+{
+    return self();
+}
+
+bool lang::FloatingPointType::validateOperator(lang::UnaryOperator, lang::Location, ValidationLogger&) const
+{
+    return true;
+}
+
+std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator    op,
+                                                                    std::shared_ptr<Value> value,
+                                                                    CompileContext&        context)
+{
+    return buildOperator(op, value, getOperatorResultType(op), context);
+}
+
+std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator               op,
+                                                                    std::shared_ptr<Value>            value,
+                                                                    lang::ResolvingHandle<lang::Type> return_type,
+                                                                    CompileContext&                   context)
+{
+    value->buildContentValue(context);
+    llvm::Value* content_value = value->getContentValue();
+
+    llvm::Value* result;
+
+    switch (op)
+    {
+        case lang::UnaryOperator::NEGATION:
+            result = context.ir()->CreateFNeg(content_value, content_value->getName() + ".neg");
+            break;
+
+        default:
+            assert(false);
+            result = nullptr;
+    }
+
+    llvm::Value* native_result = lang::Values::contentToNative(return_type, result, context);
+    return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
+}
 bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
 {
     if (!op.isArithmetic() && !op.isRelational() && !op.isEquality()) return false;

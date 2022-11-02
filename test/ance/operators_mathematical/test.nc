@@ -62,6 +62,10 @@ public main () : u32
     let x28: uiptr <: a5 / b5;
     let x29: uiptr <: a5 % b5;
 
+    // Signed values can be negated.
+
+    let x30: i32 <: -a1;
+
     return 0:32;
 }
 

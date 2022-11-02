@@ -21,7 +21,12 @@ namespace lang
             /**
              * The bitwise not operator.
              */
-            BITWISE_NOT
+            BITWISE_NOT,
+
+            /**
+             * The unary minus operator.
+             */
+            NEGATION,
         };
 
         UnaryOperator() = default;

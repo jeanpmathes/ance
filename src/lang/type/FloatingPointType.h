@@ -30,10 +30,18 @@ namespace lang
                                                              std::shared_ptr<Value>            value,
                                                              CompileContext&                   context) override;
 
-        std::shared_ptr<lang::Value> buildOperator(lang::UnaryOperator               op,
-                                                   std::shared_ptr<Value>            value,
-                                                   lang::ResolvingHandle<lang::Type> return_type,
-                                                   CompileContext&                   context) override;
+        bool                              isOperatorDefined(lang::UnaryOperator op) override;
+        lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
+        bool                              validateOperator(lang::UnaryOperator op,
+                                                           lang::Location      location,
+                                                           ValidationLogger&   validation_logger) const override;
+        std::shared_ptr<lang::Value>      buildOperator(lang::UnaryOperator    op,
+                                                        std::shared_ptr<Value> value,
+                                                        CompileContext&        context) override;
+        std::shared_ptr<lang::Value>      buildOperator(lang::UnaryOperator               op,
+                                                        std::shared_ptr<Value>            value,
+                                                        lang::ResolvingHandle<lang::Type> return_type,
+                                                        CompileContext&                   context) override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other) override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
