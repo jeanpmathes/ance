@@ -28,6 +28,14 @@ namespace lang
                                                      lang::ResolvingHandle<lang::Type> return_type,
                                                      CompileContext&                   context) = 0;
 
+        /**
+         * Build an operation with values of this type or vectors of values of this type.
+         */
+        virtual std::shared_ptr<Value> buildOperator(lang::UnaryOperator               op,
+                                                     std::shared_ptr<Value>            value,
+                                                     lang::ResolvingHandle<lang::Type> return_type,
+                                                     CompileContext&                   context) = 0;
+
         using TypeDefinition::buildRequestedOverload;
 
         /**

@@ -162,6 +162,14 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperato
                                                               std::shared_ptr<Value> value,
                                                               CompileContext&        context)
 {
+    return buildOperator(op, value, getOperatorResultType(op), context);
+}
+
+std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator               op,
+                                                              std::shared_ptr<Value>            value,
+                                                              lang::ResolvingHandle<lang::Type> return_type,
+                                                              CompileContext&                   context)
+{
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
 
@@ -178,9 +186,8 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperato
             result = nullptr;
     }
 
-    lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op);
-    llvm::Value*                      native_result = lang::Values::contentToNative(result_type, result, context);
-    return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
+    llvm::Value* native_result = lang::Values::contentToNative(return_type, result, context);
+    return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
 bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)

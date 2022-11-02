@@ -67,6 +67,14 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(la
     return std::make_shared<WrappedNativeValue>(other, native_content_value);
 }
 
+std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator,
+                                                                    std::shared_ptr<Value>,
+                                                                    lang::ResolvingHandle<lang::Type>,
+                                                                    CompileContext&)
+{
+    return nullptr;
+}
+
 bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
 {
     if (!op.isArithmetic() && !op.isRelational() && !op.isEquality()) return false;
@@ -251,4 +259,3 @@ bool lang::FloatingPointType::isTriviallyDestructible() const
 {
     return true;
 }
-

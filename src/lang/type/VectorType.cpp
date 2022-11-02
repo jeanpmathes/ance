@@ -175,11 +175,11 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::UnaryOperator
                                                              std::shared_ptr<Value> value,
                                                              CompileContext&        context)
 {
-    /*if (auto element_vector = element_type_->isVectorizable())
+    if (auto element_vector = element_type_->isVectorizable())
     {
-        return element_vector->buildOperator(op, left, right, getOperatorResultType(op, right->type()), context);
+        return element_vector->buildOperator(op, value, getOperatorResultType(op), context);
     }
-    else*/
+    else
     {
         llvm::Value* result_ptr =
             context.ir()->CreateAlloca(getOperatorResultType(op)->getContentType(*context.llvmContext()),
