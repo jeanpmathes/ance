@@ -55,7 +55,7 @@ def unescape_str(s: str) -> str:
 
 
 def create_test(project: Project) -> Optional[Test]:
-    code_path: str = os.path.join(project.directory_path, "test.nc")
+    code_path: str = os.path.join(project.directory_path, "src", "test.nc")
     if not os.path.exists(code_path):
         return None
 

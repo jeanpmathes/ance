@@ -26,23 +26,11 @@ std::filesystem::path Project::getProjectFile() const
 
 std::filesystem::path Project::getSourceFile() const
 {
-    auto src = project_.root()["src"];
+    std::filesystem::path source_directory = "src";
+    std::filesystem::path source_file      = source_directory / (getName() + ".nc");
 
-    if (!src) return {};
-
-    for (auto src_file : src->get())
-    {
-        auto src_file_str = src_file.get().asString();
-
-        if (!src_file_str) continue;
-
-        std::filesystem::path path_to_src(src_file_str->get());
-        std::filesystem::path path_to_project = getProjectFile();
-
-        return path_to_project.replace_filename(path_to_src);
-    }
-
-    return {};
+    std::filesystem::path path_to_project = getProjectFile();
+    return path_to_project.replace_filename(source_file);
 }
 
 Application& Project::getApplication()
