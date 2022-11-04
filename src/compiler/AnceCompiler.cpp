@@ -28,7 +28,7 @@ AnceCompiler::AnceCompiler(Application& app)
     , ir_(llvm_context_)
     , di_(module_)
 {
-    module_.setSourceFileName(application_.getProject().getSourceFile().filename().string());
+    module_.setSourceFileName(application_.getProject().getProjectFile().filename().string());
 
     llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
 
@@ -57,8 +57,8 @@ AnceCompiler::AnceCompiler(Application& app)
     module_.addModuleFlag(llvm::Module::Warning, "Dwarf Version", llvm::dwarf::DWARF_VERSION);
     module_.addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
 
-    llvm::DIFile* src_file = di_.createFile(application_.getProject().getSourceFile().filename().generic_string(),
-                                            application_.getProject().getSourceFile().parent_path().generic_string());
+    llvm::DIFile* src_file = di_.createFile(application_.getProject().getProjectFile().filename().generic_string(),
+                                            application_.getProject().getProjectFile().parent_path().generic_string());
 
     llvm::DICompileUnit* unit = di_.createCompileUnit(llvm::dwarf::DW_LANG_C, src_file, "ancec-0", false, "", 0);
 

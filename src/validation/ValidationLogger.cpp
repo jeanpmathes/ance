@@ -35,7 +35,7 @@ void ValidationLogger::log(ValidationLogger::LogLevel level, const std::string& 
     entries_.emplace_back(level, message, location);
 }
 
-void ValidationLogger::emitMessages(const SourceFile& source_file)
+void ValidationLogger::emitMessages(const std::vector<std::reference_wrapper<SourceFile>>& source_files)
 {
     std::cout << "ance-c: validation: " << warningCount() << " warnings, " << errorCount() << " errors" << std::endl;
 
@@ -60,7 +60,7 @@ void ValidationLogger::emitMessages(const SourceFile& source_file)
 
         if (entry.location_.isGlobal()) continue;
 
-        std::cout << '\t' << trim(source_file.getLine(entry.location_.line()), start) << std::endl;
+        std::cout << '\t' << trim(source_files.front().get().getLine(entry.location_.line()), start) << std::endl;
 
         if (entry.location_.isSingleLine())
         {

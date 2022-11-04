@@ -579,7 +579,7 @@ void lang::TypeDefinition::defineDefaultInitializer(CompileContext& context)
         default_initializer_,
         ptr,
         count,
-        [&](llvm::Value* element_ptr, CompileContext& c_context) {
+        [this](llvm::Value* element_ptr, CompileContext& c_context) {
             buildSingleDefaultInitializerDefinition(element_ptr, c_context);
         },
         context);
@@ -607,7 +607,7 @@ void lang::TypeDefinition::defineDefaultFinalizer(CompileContext& context)
         default_finalizer_,
         ptr,
         count,
-        [&](llvm::Value* element_ptr, CompileContext& c_context) {
+        [this](llvm::Value* element_ptr, CompileContext& c_context) {
             buildSingleDefaultFinalizerDefinition(element_ptr, c_context);
         },
         context);

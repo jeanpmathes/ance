@@ -1,22 +1,17 @@
 #include <filesystem>
 #include <iostream>
 
-#include "grammar/anceLexer.h"
-#include "grammar/anceParser.h"
-#include <antlr4-runtime.h>
-
 #include <llvm/Support/ManagedStatic.h>
 #include <llvm/Support/TargetSelect.h>
 
 #include "compiler/AnceCompiler.h"
 #include "compiler/AnceLinker.h"
+#include "compiler/AnceReader.h"
 #include "compiler/Application.h"
 #include "compiler/Project.h"
 #include "compiler/SourceVisitor.h"
 #include "lang/ApplicationVisitor.h"
 #include "management/File.h"
-#include "validation/AnceSyntaxErrorHandler.h"
-#include "validation/SourceFile.h"
 #include "validation/ValidationLogger.h"
 
 int main(int argc, char** argv)
@@ -35,33 +30,20 @@ int main(int argc, char** argv)
     Project project(project_file);
 
     Application& application = project.getApplication();
-    SourceFile   source_file(project.getSourceFile());
 
     std::cout << "============ Build [ " << project.getName() << " ] ============" << std::endl;
 
-    std::fstream code;
-    code.open(project.getSourceFile());
+    AnceReader reader(application);
+    size_t     count = reader.readSource();
 
-    AnceSyntaxErrorHandler syntax_error_listener;
+    std::cout << "ance-c: input: " << count << " source file(s) read." << std::endl;
 
-    antlr4::ANTLRInputStream input(code);
-    anceLexer                lexer(&input);
-    lexer.removeErrorListeners();
-    lexer.addErrorListener(syntax_error_listener.lexerErrorListener());
+    size_t fatal_syntax_error_count = reader.emitMessages();
 
-    antlr4::CommonTokenStream tokens(&lexer);
-    anceParser                parser(&tokens);
-    parser.removeErrorListeners();
-    parser.addErrorListener(syntax_error_listener.parserErrorListener());
-
-    auto source_visitor = new SourceVisitor(application);
-
-    antlr4::tree::ParseTree* tree = parser.file();
-    syntax_error_listener.emitMessages(source_file);
-
-    if (syntax_error_listener.fatalSyntaxErrorCount() == 0)
+    if (fatal_syntax_error_count == 0)
     {
-        source_visitor->visit(tree);
+        SourceVisitor source_visitor(application);
+        reader.visit(source_visitor);
 
         application.preValidate();
 
@@ -84,7 +66,7 @@ int main(int argc, char** argv)
 
             if (validation_logger.errorCount() == 0)
             {
-                validation_logger.emitMessages(source_file);
+                validation_logger.emitMessages(reader.getSourceFiles());
 
                 llvm::InitializeAllTargetInfos();
                 llvm::InitializeAllTargets();
@@ -111,13 +93,9 @@ int main(int argc, char** argv)
 
                 return ok ? EXIT_SUCCESS : EXIT_FAILURE;
             }
-            else {
-                validation_logger.emitMessages(source_file);
-            }
+            else { validation_logger.emitMessages(reader.getSourceFiles()); }
         }
-        else {
-            validation_logger.emitMessages(source_file);
-        }
+        else { validation_logger.emitMessages(reader.getSourceFiles()); }
     }
 
     return EXIT_FAILURE;

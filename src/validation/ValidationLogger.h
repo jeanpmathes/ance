@@ -70,9 +70,9 @@ class ValidationLogger
 
     /**
      * Emit all logged messages.
-     * @param source_file The source file containing the code that was validated with this logger.
+     * @param source_files The source file containing the code that was validated with this logger.
      */
-    void emitMessages(const SourceFile& source_file);
+    void emitMessages(const std::vector<std::reference_wrapper<SourceFile>>& source_files);
 
   private:
     std::vector<LogEntry> entries_;

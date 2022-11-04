@@ -33,7 +33,7 @@ size_t lang::Location::columnEnd() const
 
 bool lang::Location::isGlobal() const
 {
-    return start_line_ == 0;
+    return true;//start_line_ == 0;
 }
 
 bool lang::Location::isSingleLine() const
