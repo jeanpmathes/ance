@@ -1,8 +1,5 @@
 {
     name: "test",
-    src: [
-        "test.nc"
-    ],
     link: {
         lib: [
             "kernel32",
