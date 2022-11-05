@@ -44,16 +44,19 @@ class AnceReader
 
   private:
     struct SourceFileReadResult {
+        std::unique_ptr<FileContext>               file_context;
         std::unique_ptr<AnceSyntaxErrorHandler>    syntax_error_handler;
         std::unique_ptr<SourceFile>                source_file;
         std::unique_ptr<antlr4::ANTLRInputStream>  input;
         std::unique_ptr<anceLexer>                 lexer;
         std::unique_ptr<antlr4::CommonTokenStream> tokens;
         std::unique_ptr<anceParser>                parser;
-        antlr4::tree::ParseTree*                   tree;
+        antlr4::tree::ParseTree*                   tree {};
     };
 
-    static SourceFileReadResult readSourceFile(std::filesystem::path file_path);
+    static SourceFileReadResult readSourceFile(const std::filesystem::path& project_path,
+                                               const std::filesystem::path& file_path,
+                                               size_t                       file_index);
 
   private:
     Application&                      application_;

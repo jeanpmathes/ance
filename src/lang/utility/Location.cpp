@@ -4,16 +4,17 @@
 
 #include <llvm/IR/DIBuilder.h>
 
-lang::Location::Location(size_t start_line, size_t start_column, size_t end_line, size_t end_column)
+lang::Location::Location(size_t start_line, size_t start_column, size_t end_line, size_t end_column, size_t file_index)
     : start_line_(start_line)
     , start_column_(start_column)
     , end_line_(end_line)
     , end_column_(end_column)
+    , file_index_(file_index)
 {}
 
 lang::Location lang::Location::global()
 {
-    return {0, 0, 0, 0};
+    return {0, 0, 0, 0, 0};
 }
 
 size_t lang::Location::line() const
@@ -31,9 +32,14 @@ size_t lang::Location::columnEnd() const
     return end_column_;
 }
 
+size_t lang::Location::file() const
+{
+    return file_index_;
+}
+
 bool lang::Location::isGlobal() const
 {
-    return true;//start_line_ == 0;
+    return start_line_ == 0;
 }
 
 bool lang::Location::isSingleLine() const
@@ -48,10 +54,10 @@ llvm::DebugLoc lang::Location::getDebugLoc(llvm::LLVMContext* llvm_context, llvm
 
 void lang::Location::extend(lang::Location location)
 {
+    assert(location.file() == file());
+
     if (this->isGlobal()) { *this = location; }
-    else if (location.isGlobal()) {
-        return;
-    }
+    else if (location.isGlobal()) { return; }
 
     start_line_   = std::min(start_line_, location.start_line_);
     start_column_ = std::min(start_column_, location.start_column_);
@@ -69,4 +75,3 @@ std::ostream& lang::operator<<(std::ostream& os, const lang::Location& location)
 
     return os;
 }
-

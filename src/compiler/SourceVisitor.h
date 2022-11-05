@@ -3,8 +3,9 @@
 
 #include "grammar/anceBaseVisitor.h"
 
-#include "lang/utility/Location.h"
+#include "compiler/FileContext.h"
 #include "lang/utility/Identifier.h"
+#include "lang/utility/Location.h"
 
 class Application;
 
@@ -19,6 +20,12 @@ class SourceVisitor : public anceBaseVisitor
      * @param application The application to fill.
      */
     explicit SourceVisitor(Application& application);
+
+    /**
+     * Set the current file context;
+     * @param file_context The file context.
+     */
+    void setFileContext(FileContext& file_context);
 
     // Declarations
 
@@ -135,8 +142,8 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitRightShift(anceParser::RightShiftContext* ctx) override;
 
   protected:
-    static lang::Location   location(antlr4::ParserRuleContext* ctx);
-    static lang::Identifier ident(antlr4::tree::TerminalNode* i);
+    lang::Location          location(antlr4::ParserRuleContext* ctx);
+    lang::Identifier        ident(antlr4::tree::TerminalNode* i);
     static lang::Identifier createIdentifier(const std::string& text, lang::Location location);
 
     static uint64_t parseIntegerTypeSize(const std::string& str);
@@ -145,6 +152,7 @@ class SourceVisitor : public anceBaseVisitor
     static uint64_t parseInRange(const std::string& str, uint64_t max);
 
   private:
+    FileContext* file_context_;
     Application& application_;
 };
 

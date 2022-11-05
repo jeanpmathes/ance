@@ -3,13 +3,15 @@
 #include <fstream>
 #include <string>
 
-SourceFile::SourceFile(const std::filesystem::path& path)
+SourceFile::SourceFile(const std::filesystem::path& project_directory, const std::filesystem::path& file) : path_(file)
 {
-    std::ifstream file(path);
+    std::filesystem::path full_path = project_directory / file;
 
-    for (std::string line; std::getline(file, line);) { lines_.push_back(std::move(line)); }
+    std::ifstream file_stream(full_path);
 
-    file.close();
+    for (std::string line; std::getline(file_stream, line);) { lines_.push_back(std::move(line)); }
+
+    file_stream.close();
 }
 
 std::string_view SourceFile::getLine(size_t line) const
@@ -24,4 +26,9 @@ std::string_view SourceFile::getLineSlice(size_t line, unsigned int column_start
 
     unsigned int length = column_end - column_start + 1;
     return getLine(line).substr(column_start, length);
+}
+
+const std::filesystem::path& SourceFile::getPath() const
+{
+    return path_;
 }

@@ -67,7 +67,12 @@
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
 
-SourceVisitor::SourceVisitor(Application& application) : application_(application) {}
+SourceVisitor::SourceVisitor(Application& application) : file_context_(nullptr), application_(application) {}
+
+void SourceVisitor::setFileContext(FileContext& file_context)
+{
+    file_context_ = &file_context;
+}
 
 std::any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx)
 {
@@ -1076,7 +1081,7 @@ lang::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)
     size_t end_line   = ctx->getStop()->getLine();
     size_t end_column = ctx->getStop()->getCharPositionInLine() + ctx->getStop()->getText().size();
 
-    return {start_line, start_column, end_line, end_column};
+    return {start_line, start_column, end_line, end_column, file_context_->getFileIndex()};
 }
 
 lang::Identifier SourceVisitor::ident(antlr4::tree::TerminalNode* i)
@@ -1090,7 +1095,7 @@ lang::Identifier SourceVisitor::ident(antlr4::tree::TerminalNode* i)
     size_t end_line   = start_line;
     size_t end_column = start_column + text.size() - 1;
 
-    return createIdentifier(text, {start_line, start_column, end_line, end_column});
+    return createIdentifier(text, {start_line, start_column, end_line, end_column, file_context_->getFileIndex()});
 }
 
 lang::Identifier SourceVisitor::createIdentifier(const std::string& text, lang::Location location)

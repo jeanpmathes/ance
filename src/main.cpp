@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     AnceReader reader(application);
     size_t     count = reader.readSource();
 
-    std::cout << "ance-c: input: " << count << " source file(s) read." << std::endl;
+    std::cout << "ance-c: input: " << count << " source file(s) read" << std::endl;
 
     size_t fatal_syntax_error_count = reader.emitMessages();
 

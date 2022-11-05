@@ -12,9 +12,10 @@ class SourceFile
   public:
     /**
      * Create a source file from a file in the file system.
-     * @param path The path to the source file.
+     * @param project_directory The project directory.
+     * @param file The path to the file from the project directory.
      */
-    explicit SourceFile(const std::filesystem::path& path);
+    SourceFile(const std::filesystem::path& project_directory, const std::filesystem::path& file);
 
     SourceFile(const SourceFile& other) = delete;
     SourceFile(SourceFile&& other)      = delete;
@@ -35,8 +36,15 @@ class SourceFile
      */
     [[nodiscard]] std::string_view getLineSlice(size_t line, unsigned int column_start, unsigned int column_end) const;
 
+    /**
+     * Get the path to the source file.
+     * @return The path, relative to the project directory.
+     */
+    [[nodiscard]] const std::filesystem::path& getPath() const;
+
   private:
     std::vector<std::string> lines_;
+    std::filesystem::path    path_;
 };
 
 #endif

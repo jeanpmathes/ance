@@ -24,17 +24,26 @@ std::filesystem::path Project::getProjectFile() const
     return project_.path();
 }
 
+std::filesystem::path Project::getProjectDirectory() const
+{
+    return project_.path().parent_path();
+}
+
 std::vector<std::filesystem::path> Project::getSourceFiles() const
 {
+    std::filesystem::path project_directory = getProjectDirectory();
     std::filesystem::path src               = "src";
-    std::filesystem::path project_directory = project_.path().parent_path();
-    std::filesystem::path src_directory     = getProjectFile().parent_path() / src;
+    std::filesystem::path src_directory     = project_directory / src;
 
     std::vector<std::filesystem::path> files;
 
     for (auto& entry : std::filesystem::recursive_directory_iterator(src_directory))
     {
-        if (entry.is_regular_file() && entry.path().extension() == ".nc") { files.push_back(entry.path()); }
+        if (entry.is_regular_file() && entry.path().extension() == ".nc")
+        {
+            std::filesystem::path relative_path = entry.path().lexically_relative(project_directory);
+            files.push_back(relative_path);
+        }
     }
 
     return files;

@@ -17,8 +17,9 @@ namespace lang
          * @param start_column The column number of the start of the location.
          * @param end_line The line end of the location.
          * @param end_column The column end of the location.
+         * @param file_index The index of the file the location is in.
          */
-        Location(size_t start_line, size_t start_column, size_t end_line, size_t end_column);
+        Location(size_t start_line, size_t start_column, size_t end_line, size_t end_column, size_t file_index);
 
         /**
          * Create a global location. A global location is used for code that is not in a source file.
@@ -43,6 +44,12 @@ namespace lang
          * @return The last column number. Can be equal to column for single character locations.
          */
         [[nodiscard]] size_t columnEnd() const;
+
+        /**
+         * Get the file index of this location.
+         * @return The file index.
+         */
+        [[nodiscard]] size_t file() const;
 
         /**
          * Get whether this location is global, meaning not an actual source location.
@@ -77,6 +84,7 @@ namespace lang
         size_t                  start_column_;
         [[maybe_unused]] size_t end_line_;
         [[maybe_unused]] size_t end_column_;
+        size_t                  file_index_;
     };
 }
 

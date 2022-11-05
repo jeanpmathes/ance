@@ -32,9 +32,16 @@ class Project
      * @return The project file.
      */
     [[nodiscard]] std::filesystem::path getProjectFile() const;
+
+    /**
+     * Get the path to the project directory.
+     * @return The project directory.
+     */
+    [[nodiscard]] std::filesystem::path getProjectDirectory() const;
+
     /**
      * Get the paths to all source files.
-     * @return The source files.
+     * @return The source file paths, relative to the project directory.
      */
     [[nodiscard]] std::vector<std::filesystem::path> getSourceFiles() const;
 

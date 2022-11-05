@@ -9,11 +9,14 @@ AnceReader::AnceReader(Application& application) : application_(application) {}
 
 size_t AnceReader::readSource()
 {
+    std::filesystem::path              project_path = application_.getProject().getProjectDirectory();
+    std::vector<std::filesystem::path> source_files = application_.getProject().getSourceFiles();
+
     std::vector<std::future<SourceFileReadResult>> futures;
 
-    for (auto& file_path : application_.getProject().getSourceFiles())
+    for (size_t index = 0; index < source_files.size(); index++)
     {
-        auto result = std::async(std::launch::async, readSourceFile, file_path);
+        auto result = std::async(std::launch::async, readSourceFile, project_path, source_files[index], index);
         futures.push_back(std::move(result));
     }
 
@@ -26,14 +29,16 @@ size_t AnceReader::readSource()
     return source_files_.size();
 }
 
-AnceReader::SourceFileReadResult AnceReader::readSourceFile(std::filesystem::path file_path)
+AnceReader::SourceFileReadResult AnceReader::readSourceFile(const std::filesystem::path& project_path,
+                                                            const std::filesystem::path& file_path,
+                                                            size_t                       index)
 {
-    std::unique_ptr<SourceFile> source_file = std::make_unique<SourceFile>(file_path);
+    std::unique_ptr<SourceFile> source_file = std::make_unique<SourceFile>(project_path, file_path);
 
     std::unique_ptr<AnceSyntaxErrorHandler> syntax_error_listener = std::make_unique<AnceSyntaxErrorHandler>();
 
     std::fstream code;
-    code.open(file_path);
+    code.open(project_path / file_path);
 
     std::unique_ptr<antlr4::ANTLRInputStream> input = std::make_unique<antlr4::ANTLRInputStream>(code);
     std::unique_ptr<anceLexer>                lexer = std::make_unique<anceLexer>(input.get());
@@ -47,13 +52,16 @@ AnceReader::SourceFileReadResult AnceReader::readSourceFile(std::filesystem::pat
 
     antlr4::tree::ParseTree* tree = parser->file();
 
-    return SourceFileReadResult {std::move(syntax_error_listener),
-                                 std::move(source_file),
-                                 std::move(input),
-                                 std::move(lexer),
-                                 std::move(tokens),
-                                 std::move(parser),
-                                 tree};
+    std::unique_ptr<FileContext> file_context = std::make_unique<FileContext>(index);
+
+    return {std::move(file_context),
+            std::move(syntax_error_listener),
+            std::move(source_file),
+            std::move(input),
+            std::move(lexer),
+            std::move(tokens),
+            std::move(parser),
+            tree};
 }
 
 size_t AnceReader::emitMessages()
@@ -71,7 +79,11 @@ size_t AnceReader::emitMessages()
 
 void AnceReader::visit(SourceVisitor& visitor)
 {
-    for (auto& source_file : source_files_) { visitor.visit(source_file.tree); }
+    for (auto& source_file : source_files_)
+    {
+        visitor.setFileContext(*source_file.file_context);
+        visitor.visit(source_file.tree);
+    }
 }
 
 std::vector<std::reference_wrapper<SourceFile>> AnceReader::getSourceFiles()

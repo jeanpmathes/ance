@@ -55,12 +55,20 @@ void ValidationLogger::emitMessages(const std::vector<std::reference_wrapper<Sou
                 break;
         }
 
+        if (entry.location_.isGlobal())
+        {
+            std::cout << entry.message_ << std::endl;
+            std::cout << std::endl;
+            continue;
+        }
+
+        SourceFile& source_file = source_files[entry.location_.file()].get();
+
+        std::cout << source_file.getPath().generic_string() << " ";
         std::cout << entry.location_ << " " << entry.message_ << std::endl;
         std::cout << std::endl;
 
-        if (entry.location_.isGlobal()) continue;
-
-        std::cout << '\t' << trim(source_files.front().get().getLine(entry.location_.line()), start) << std::endl;
+        std::cout << '\t' << trim(source_file.getLine(entry.location_.line()), start) << std::endl;
 
         if (entry.location_.isSingleLine())
         {
