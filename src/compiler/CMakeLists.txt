@@ -1,7 +1,7 @@
 target_sources(ance PRIVATE AnceCompiler.cpp
                AnceLinker.cpp
                Application.cpp
-               AnceReader.cpp
+               SourceTree.cpp
                FileContext.cpp
                CompileContext.cpp
                Runtime.cpp

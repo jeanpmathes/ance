@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_COMPILER_ANCEREADER_H_
-#define ANCE_SRC_COMPILER_ANCEREADER_H_
+#ifndef ANCE_SRC_COMPILER_SOURCETREE_H_
+#define ANCE_SRC_COMPILER_SOURCETREE_H_
 
 #include "grammar/anceLexer.h"
 #include "grammar/anceParser.h"
@@ -13,16 +13,16 @@
 /**
  * Read and parses all source files.
  */
-class AnceReader
+class SourceTree
 {
   public:
-    explicit AnceReader(Application& application);
+    explicit SourceTree(Application& application);
 
     /**
      * Read in and parse all source files.
      * @return The number of source files.
      */
-    size_t readSource();
+    size_t parse();
 
     /**
      * Emit error and other messages.
@@ -34,7 +34,7 @@ class AnceReader
      * Visit all source files with the given visitor.
      * @param visitor The visitor.
      */
-    void visit(SourceVisitor& visitor);
+    void accept(SourceVisitor& visitor);
 
     /**
      * Get all source files.

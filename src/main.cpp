@@ -6,9 +6,9 @@
 
 #include "compiler/AnceCompiler.h"
 #include "compiler/AnceLinker.h"
-#include "compiler/AnceReader.h"
 #include "compiler/Application.h"
 #include "compiler/Project.h"
+#include "compiler/SourceTree.h"
 #include "compiler/SourceVisitor.h"
 #include "lang/ApplicationVisitor.h"
 #include "management/File.h"
@@ -33,17 +33,17 @@ int main(int argc, char** argv)
 
     std::cout << "============ Build [ " << project.getName() << " ] ============" << std::endl;
 
-    AnceReader reader(application);
-    size_t     count = reader.readSource();
+    SourceTree tree(application);
+    size_t     count = tree.parse();
 
     std::cout << "ance-c: input: " << count << " source file(s) read" << std::endl;
 
-    size_t fatal_syntax_error_count = reader.emitMessages();
+    size_t fatal_syntax_error_count = tree.emitMessages();
 
     if (fatal_syntax_error_count == 0)
     {
         SourceVisitor source_visitor(application);
-        reader.visit(source_visitor);
+        tree.accept(source_visitor);
 
         application.preValidate();
 
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 
             if (validation_logger.errorCount() == 0)
             {
-                validation_logger.emitMessages(reader.getSourceFiles());
+                validation_logger.emitMessages(tree.getSourceFiles());
 
                 llvm::InitializeAllTargetInfos();
                 llvm::InitializeAllTargets();
@@ -93,9 +93,9 @@ int main(int argc, char** argv)
 
                 return ok ? EXIT_SUCCESS : EXIT_FAILURE;
             }
-            else { validation_logger.emitMessages(reader.getSourceFiles()); }
+            else { validation_logger.emitMessages(tree.getSourceFiles()); }
         }
-        else { validation_logger.emitMessages(reader.getSourceFiles()); }
+        else { validation_logger.emitMessages(tree.getSourceFiles()); }
     }
 
     return EXIT_FAILURE;

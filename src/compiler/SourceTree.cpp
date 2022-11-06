@@ -1,13 +1,13 @@
-#include "AnceReader.h"
+#include "SourceTree.h"
 
 #include <future>
 
 #include "compiler/Project.h"
 #include "lang/ApplicationVisitor.h"
 
-AnceReader::AnceReader(Application& application) : application_(application) {}
+SourceTree::SourceTree(Application& application) : application_(application) {}
 
-size_t AnceReader::readSource()
+size_t SourceTree::parse()
 {
     std::filesystem::path              project_path = application_.getProject().getProjectDirectory();
     std::vector<std::filesystem::path> source_files = application_.getProject().getSourceFiles();
@@ -29,7 +29,7 @@ size_t AnceReader::readSource()
     return source_files_.size();
 }
 
-AnceReader::SourceFileReadResult AnceReader::readSourceFile(const std::filesystem::path& project_path,
+SourceTree::SourceFileReadResult SourceTree::readSourceFile(const std::filesystem::path& project_path,
                                                             const std::filesystem::path& file_path,
                                                             size_t                       index)
 {
@@ -64,7 +64,7 @@ AnceReader::SourceFileReadResult AnceReader::readSourceFile(const std::filesyste
             tree};
 }
 
-size_t AnceReader::emitMessages()
+size_t SourceTree::emitMessages()
 {
     size_t fatal_error_count = 0;
 
@@ -77,7 +77,7 @@ size_t AnceReader::emitMessages()
     return fatal_error_count;
 }
 
-void AnceReader::visit(SourceVisitor& visitor)
+void SourceTree::accept(SourceVisitor& visitor)
 {
     for (auto& source_file : source_files_)
     {
@@ -86,7 +86,7 @@ void AnceReader::visit(SourceVisitor& visitor)
     }
 }
 
-std::vector<std::reference_wrapper<SourceFile>> AnceReader::getSourceFiles()
+std::vector<std::reference_wrapper<SourceFile>> SourceTree::getSourceFiles()
 {
     std::vector<std::reference_wrapper<SourceFile>> result;
 
