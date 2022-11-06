@@ -22,7 +22,7 @@
 #include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/utility/Values.h"
 
-AnceCompiler::AnceCompiler(Application& app)
+AnceCompiler::AnceCompiler(Application& app, SourceTree& tree)
     : application_(app)
     , module_(application_.getProject().getName(), llvm_context_)
     , ir_(llvm_context_)
@@ -57,10 +57,10 @@ AnceCompiler::AnceCompiler(Application& app)
     module_.addModuleFlag(llvm::Module::Warning, "Dwarf Version", llvm::dwarf::DWARF_VERSION);
     module_.addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
 
-    llvm::DIFile* src_file = di_.createFile(application_.getProject().getProjectFile().filename().generic_string(),
-                                            application_.getProject().getProjectFile().parent_path().generic_string());
+    llvm::DIFile* project_file = di_.createFile(application_.getProject().getProjectFile().filename().generic_string(),
+                                                application_.getProject().getProjectDirectory().generic_string());
 
-    llvm::DICompileUnit* unit = di_.createCompileUnit(llvm::dwarf::DW_LANG_C, src_file, "ancec-0", false, "", 0);
+    llvm::DICompileUnit* unit = di_.createCompileUnit(llvm::dwarf::DW_LANG_C, project_file, "ance-c-000", false, "", 0);
 
     runtime_ = std::make_unique<Runtime>();
     context_ = std::make_unique<CompileContext>(&application_,
@@ -70,7 +70,7 @@ AnceCompiler::AnceCompiler(Application& app)
                                                 &ir_,
                                                 &di_,
                                                 unit,
-                                                src_file);
+                                                tree);
 }
 
 void AnceCompiler::compile(const std::filesystem::path& out)

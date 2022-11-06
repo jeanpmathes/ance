@@ -40,11 +40,23 @@ class SourceFile
      * Get the path to the source file.
      * @return The path, relative to the project directory.
      */
-    [[nodiscard]] const std::filesystem::path& getPath() const;
+    [[nodiscard]] const std::filesystem::path& getRelativePath() const;
+
+    /**
+     * Get the path from the project directory to the directory containing the source file.
+     * @return The path to the directory.
+     */
+    [[nodiscard]] std::filesystem::path getDirectory() const;
+
+    /**
+     * Get the file name.
+     * @return The file name.
+     */
+    [[nodiscard]] std::filesystem::path getFilename() const;
 
   private:
     std::vector<std::string> lines_;
-    std::filesystem::path    path_;
+    std::filesystem::path    relative_path_;
 };
 
 #endif

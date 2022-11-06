@@ -1,9 +1,9 @@
 #include "Constant.h"
 
+#include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Values.h"
-
-#include "compiler/CompileContext.h"
 
 Expression* lang::Constant::getBackingExpression() const
 {

@@ -13,6 +13,7 @@ namespace lang
     class Scope;
 }
 
+class SourceTree;
 class Application;
 class Runtime;
 
@@ -31,7 +32,7 @@ class CompileContext
      * @param ir The IR builder.
      * @param di The DI builder.
      * @param unit The compile unit.
-     * @param src_file The source file.
+     * @param source_tree The source tree.
      */
     CompileContext(Application*         app,
                    Runtime*             runtime,
@@ -40,7 +41,7 @@ class CompileContext
                    llvm::IRBuilder<>*   ir,
                    llvm::DIBuilder*     di,
                    llvm::DICompileUnit* unit,
-                   llvm::DIFile*        src_file);
+                   SourceTree&          source_tree);
 
     /**
      * Get the application.
@@ -85,10 +86,11 @@ class CompileContext
     llvm::DICompileUnit* unit();
 
     /**
-     * Get the source file.
-     * @return The source file.
+     * Get the debug information for a source file that contains the given location.
+     * @param location The location.
+     * @return The debug information for the source file.
      */
-    llvm::DIFile* sourceFile();
+    llvm::DIFile* getSourceFile(lang::Location location);
 
     /**
      * Set the current debug location.
@@ -116,7 +118,8 @@ class CompileContext
     llvm::IRBuilder<>*   ir_builder_;
     llvm::DIBuilder*     di_builder_;
     llvm::DICompileUnit* unit_;
-    llvm::DIFile*        src_file_;
+
+    std::vector<llvm::DIFile*> source_files_ {};
 
     std::stack<llvm::DebugLoc, std::vector<llvm::DebugLoc>> debug_loc_stack_;
 };

@@ -22,8 +22,9 @@ class AnceCompiler
     /**
      * Create a new compiler for an application.
      * @param app The application.
+     * @param tree The source tree.
      */
-    explicit AnceCompiler(Application& app);
+    AnceCompiler(Application& app, SourceTree& tree);
 
     /**
      * Compile the application.

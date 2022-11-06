@@ -217,7 +217,7 @@ void lang::GlobalVariable::buildDeclaration(CompileContext& context)
     auto* debug_info = context.di()->createGlobalVariableExpression(context.unit(),
                                                                     name().text(),
                                                                     name().text(),
-                                                                    context.sourceFile(),
+                                                                    context.getSourceFile(location()),
                                                                     static_cast<unsigned>(location().line()),
                                                                     type()->getDebugType(context),
                                                                     true);

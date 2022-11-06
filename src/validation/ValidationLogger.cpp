@@ -64,7 +64,7 @@ void ValidationLogger::emitMessages(const std::vector<std::reference_wrapper<Sou
 
         SourceFile& source_file = source_files[entry.location_.file()].get();
 
-        std::cout << source_file.getPath().generic_string() << " ";
+        std::cout << source_file.getRelativePath().generic_string() << " ";
         std::cout << entry.location_ << " " << entry.message_ << std::endl;
         std::cout << std::endl;
 

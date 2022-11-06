@@ -42,7 +42,7 @@ void lang::LocalVariable::buildDefinition(CompileContext& context)
     {
         local_debug_variable_ = context.di()->createAutoVariable(scope()->getDebugScope(context),
                                                                  name().text(),
-                                                                 context.sourceFile(),
+                                                                 context.getSourceFile(location()),
                                                                  static_cast<unsigned>(location().line()),
                                                                  type()->getDebugType(context),
                                                                  true);
@@ -52,7 +52,7 @@ void lang::LocalVariable::buildDefinition(CompileContext& context)
         local_debug_variable_ = context.di()->createParameterVariable(scope()->getDebugScope(context),
                                                                       name().text(),
                                                                       parameter_no_,
-                                                                      context.sourceFile(),
+                                                                      context.getSourceFile(location()),
                                                                       static_cast<unsigned>(location().line()),
                                                                       type()->getDebugType(context),
                                                                       true);

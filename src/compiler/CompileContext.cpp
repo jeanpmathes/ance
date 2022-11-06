@@ -1,5 +1,7 @@
 #include "CompileContext.h"
 
+#include "compiler/SourceTree.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 
 CompileContext::CompileContext(Application*         app,
@@ -9,7 +11,7 @@ CompileContext::CompileContext(Application*         app,
                                llvm::IRBuilder<>*   ir,
                                llvm::DIBuilder*     di,
                                llvm::DICompileUnit* unit,
-                               llvm::DIFile*        src_file)
+                               SourceTree&          source_tree)
     : application_(app)
     , runtime_(runtime)
     , context_(c)
@@ -17,8 +19,15 @@ CompileContext::CompileContext(Application*         app,
     , ir_builder_(ir)
     , di_builder_(di)
     , unit_(unit)
-    , src_file_(src_file)
-{}
+{
+    for (auto& source_file : source_tree.getSourceFiles())
+    {
+        llvm::DIFile* project_file = di_builder_->createFile(source_file.get().getFilename().generic_string(),
+                                                             source_file.get().getDirectory().generic_string());
+
+        source_files_.emplace_back(project_file);
+    }
+}
 
 Application* CompileContext::application()
 {
@@ -55,9 +64,11 @@ llvm::DICompileUnit* CompileContext::unit()
     return unit_;
 }
 
-llvm::DIFile* CompileContext::sourceFile()
+llvm::DIFile* CompileContext::getSourceFile(lang::Location location)
 {
-    return src_file_;
+    if (location.isGlobal()) return nullptr;
+
+    return source_files_[location.file()];
 }
 
 void CompileContext::setDebugLocation(lang::Location location, lang::Scope* scope)
@@ -80,4 +91,3 @@ bool CompileContext::allDebugLocationsPopped()
 {
     return debug_loc_stack_.empty();
 }
-

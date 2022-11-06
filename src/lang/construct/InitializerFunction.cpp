@@ -59,7 +59,7 @@ void lang::InitializerFunction::createNativeBacking(CompileContext& context)
         context.di()->createFunction(scope().getDebugScope(context),
                                      name().text(),
                                      name().text(),
-                                     context.sourceFile(),
+                                     nullptr,
                                      0,
                                      debug_type,
                                      0,

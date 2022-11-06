@@ -156,7 +156,7 @@ llvm::DIType* lang::StructType::createDebugType(CompileContext& context)
 
     return context.di()->createStructType(scope()->getDebugScope(context),
                                           name().text(),
-                                          context.sourceFile(),
+                                          context.getSourceFile(getDefinitionLocation()),
                                           static_cast<unsigned>(getDefinitionLocation().line()),
                                           size,
                                           alignment,

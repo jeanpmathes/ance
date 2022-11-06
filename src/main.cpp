@@ -74,7 +74,7 @@ int main(int argc, char** argv)
                 llvm::InitializeAllAsmParsers();
                 llvm::InitializeAllAsmPrinters();
 
-                AnceCompiler compiler(application);
+                AnceCompiler compiler(application, tree);
                 AnceLinker   linker(project_file.root()["link"]);
 
                 std::filesystem::create_directory(obj_dir);

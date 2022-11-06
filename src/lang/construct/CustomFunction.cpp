@@ -155,7 +155,7 @@ void lang::CustomFunction::createNativeBacking(CompileContext& context)
         context.di()->createFunction(scope().getDebugScope(context),
                                      name().text(),
                                      isMangled() ? signature_.getMangledName() : name().text(),
-                                     context.sourceFile(),
+                                     context.getSourceFile(location()),
                                      static_cast<unsigned>(location().line()),
                                      debug_type,
                                      static_cast<unsigned>(definition_location_.line()),

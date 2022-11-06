@@ -3,7 +3,8 @@
 #include <fstream>
 #include <string>
 
-SourceFile::SourceFile(const std::filesystem::path& project_directory, const std::filesystem::path& file) : path_(file)
+SourceFile::SourceFile(const std::filesystem::path& project_directory, const std::filesystem::path& file)
+    : relative_path_(file)
 {
     std::filesystem::path full_path = project_directory / file;
 
@@ -28,7 +29,17 @@ std::string_view SourceFile::getLineSlice(size_t line, unsigned int column_start
     return getLine(line).substr(column_start, length);
 }
 
-const std::filesystem::path& SourceFile::getPath() const
+const std::filesystem::path& SourceFile::getRelativePath() const
 {
-    return path_;
+    return relative_path_;
+}
+
+std::filesystem::path SourceFile::getDirectory() const
+{
+    return relative_path_.parent_path();
+}
+
+std::filesystem::path SourceFile::getFilename() const
+{
+    return relative_path_.filename();
 }
