@@ -8,8 +8,8 @@
 namespace lang
 {
     /**
- * Stores strings and provides views of them. The views are valid as long as the storage exists.
- */
+     * Stores strings and provides views of them. The views are valid as long as the storage exists.
+     */
     class StringStorage
     {
       private:
