@@ -1,0 +1,18 @@
+{
+    name: "test",
+    link: {
+        lib: [
+            "kernel32",
+            "ucrt",
+            "libucrt",
+            "msvcrt",
+            "libcmt",
+            "libvcruntime"
+        ],
+        libpath: [
+            "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.19041.0\\um\\x64",
+            "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.19041.0\\ucrt\\x64",
+            "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.30.30705\\lib\\x64"
+        ]
+    }
+}
