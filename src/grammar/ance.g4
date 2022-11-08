@@ -396,7 +396,7 @@ IDENTIFIER : [_]* [a-zA-Z] [_a-zA-Z0-9]* ;
 
 SEMICOLON : ';' ;
 
-WHITESPACE : [ \t\r\n]+ -> skip ;
+WHITESPACE : [\p{White_Space}] -> skip ;
 
 BLOCK_COMMENT : '/*' .*? '*/' -> skip;
 LINE_COMMENT : '//' ~[\r\n]* -> skip;
