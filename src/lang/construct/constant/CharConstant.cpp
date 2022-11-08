@@ -1,5 +1,7 @@
 #include "CharConstant.h"
 
+#include <boost/locale/encoding_utf.hpp>
+
 #include "compiler/Application.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/CharType.h"
@@ -15,7 +17,7 @@ lang::CharConstant::CharConstant(const std::string& prefix, const std::string& c
     if (prefix.empty())
     {
         type_ = lang::CharType::get();
-        char_ = parseChar(content, is_literal_valid_);
+        char_ = parseChar(boost::locale::conv::utf_to_utf<char32_t>(content), is_literal_valid_);
     }
     else if (prefix == "8")
     {
@@ -42,10 +44,10 @@ llvm::Constant* lang::CharConstant::buildContent(llvm::Module* m)
 
 bool lang::CharConstant::equals(const lang::Constant* other) const
 {
-    auto other_byte = dynamic_cast<const CharConstant*>(other);
-    if (!other_byte) return false;
+    auto other_char = dynamic_cast<const CharConstant*>(other);
+    if (!other_char) return false;
 
-    return this->char_ == other_byte->char_ && lang::Type::areSame(this->type_, other_byte->type_);
+    return this->char_ == other_char->char_ && lang::Type::areSame(this->type_, other_char->type_);
 }
 
 bool lang::CharConstant::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -65,9 +67,9 @@ bool lang::CharConstant::validate(ValidationLogger& validation_logger, lang::Loc
     return true;
 }
 
-uint32_t lang::CharConstant::parseChar(const std::string& unparsed, bool& valid)
+char32_t lang::CharConstant::parseChar(const std::basic_string<char32_t>& unparsed, bool& valid)
 {
-    std::optional<uint32_t> content;
+    std::optional<char32_t> content;
     bool                    escaped = false;
 
     for (size_t index = 0; index < unparsed.size(); ++index)
@@ -78,7 +80,7 @@ uint32_t lang::CharConstant::parseChar(const std::string& unparsed, bool& valid)
             return 0;
         }
 
-        char const& c = unparsed[index];
+        char32_t const& c = unparsed[index];
 
         if (escaped)
         {
@@ -86,7 +88,7 @@ uint32_t lang::CharConstant::parseChar(const std::string& unparsed, bool& valid)
             escaped = false;
         }
         else if (c == '\\') { escaped = true; }
-        else if (c != '\'') { content = static_cast<uint32_t>(static_cast<unsigned char>(c)); }
+        else if (c != '\'') { content = static_cast<char32_t>(static_cast<unsigned char>(c)); }
     }
 
     if (!content.has_value())
@@ -98,9 +100,9 @@ uint32_t lang::CharConstant::parseChar(const std::string& unparsed, bool& valid)
     return content.value();
 }
 
-uint32_t lang::CharConstant::readEscapedChar(const std::string& unparsed, size_t& index, bool& success)
+char32_t lang::CharConstant::readEscapedChar(const std::basic_string<char32_t>& unparsed, size_t& index, bool& success)
 {
-    char const& c = unparsed[index++];
+    char32_t const& c = unparsed[index++];
     switch (c)
     {
         case 'n':
@@ -135,7 +137,7 @@ uint32_t lang::CharConstant::readEscapedChar(const std::string& unparsed, size_t
                 return 0;
             }
 
-            std::string hex;
+            std::basic_string<char32_t> hex;
             while (index < unparsed.size() && unparsed[index] != '}') { hex += unparsed[index++]; }
 
             if (index >= unparsed.size() || unparsed[index++] != '}')
@@ -146,7 +148,7 @@ uint32_t lang::CharConstant::readEscapedChar(const std::string& unparsed, size_t
 
             try
             {
-                return static_cast<uint32_t>(std::stoul(hex, nullptr, 16));
+                return static_cast<char32_t>(std::stoul(boost::locale::conv::utf_to_utf<char>(hex), nullptr, 16));
             }
             catch (std::invalid_argument&)
             {
@@ -168,13 +170,13 @@ uint32_t lang::CharConstant::readEscapedChar(const std::string& unparsed, size_t
                 return 0;
             }
 
-            std::string hex;
+            std::basic_string<char32_t> hex;
             hex += unparsed[index++];
             hex += unparsed[index++];
 
             try
             {
-                return static_cast<uint8_t>(std::stoul(hex, nullptr, 16));
+                return static_cast<uint8_t>(std::stoul(boost::locale::conv::utf_to_utf<char>(hex), nullptr, 16));
             }
             catch (std::invalid_argument&)
             {
