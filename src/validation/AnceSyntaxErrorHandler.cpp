@@ -90,9 +90,13 @@ void AnceSyntaxErrorHandler::emitMessages(const SourceFile& source_file)
 
         size_t start;
 
-        std::cout << "ance-c: " << ansi::ColorRed << "syntax" << ansi::ColorReset << ": (" << line << ", " << column
-                  << ") " << message << std::endl;
+        std::cout << "ance-c: " << ansi::ColorRed << "syntax" << ansi::ColorReset;
+        std::cout << ": " << source_file.getRelativePath().generic_string() << " ";
+        std::cout << "(" << line << ", " << column << ") ";
+        std::cout << message << std::endl;
+
         std::cout << std::endl;
+
         std::cout << '\t' << trim(source_file.getLine(line), start) << std::endl;
 
         size_t marker_position = column - start - 1;

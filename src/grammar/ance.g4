@@ -186,7 +186,7 @@ binaryOperatorRelational
 
 binaryOperatorEquality
     : '==' # Equal
-    | '!=' # NotEqual
+    | '/=' # NotEqual
     ;
 
 independentExpression

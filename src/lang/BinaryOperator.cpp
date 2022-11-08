@@ -32,7 +32,7 @@ std::string lang::BinaryOperator::toString() const
         case EQUAL:
             return "==";
         case NOT_EQUAL:
-            return "!=";
+            return "/=";
         case BITWISE_AND:
             return "<and>";
         case BITWISE_OR:

@@ -64,7 +64,7 @@ private test_size_math ()
 
     assert 2:size + 3:size * 2:size == 8:size;
     assert 2:size * 3:size + 2:size == 8:size;
-    assert 2:size * (3:size + 2:size) != 8:size;
+    assert 2:size * (3:size + 2:size) /= 8:size;
 }
 
 private test_uiptr_math ()
