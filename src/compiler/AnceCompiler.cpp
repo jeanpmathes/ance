@@ -60,7 +60,7 @@ AnceCompiler::AnceCompiler(Application& app, SourceTree& tree)
     llvm::DIFile* project_file = di_.createFile(application_.getProject().getProjectFile().filename().generic_string(),
                                                 application_.getProject().getProjectDirectory().generic_string());
 
-    llvm::DICompileUnit* unit = di_.createCompileUnit(llvm::dwarf::DW_LANG_C, project_file, "ance-c-000", false, "", 0);
+    llvm::DICompileUnit* unit = di_.createCompileUnit(llvm::dwarf::DW_LANG_C, project_file, "ance-000", false, "", 0);
 
     runtime_ = std::make_unique<Runtime>();
     context_ = std::make_unique<CompileContext>(&application_,

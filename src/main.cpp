@@ -16,9 +16,9 @@
 
 int main(int argc, char** argv)
 {
-    if (argc != 3)
+    if (argc != 2)
     {
-        std::cout << "ance-c: command: Requires exactly two parameters." << std::endl;
+        std::cout << "ance: command: Requires exactly one parameter." << std::endl;
 
         return EXIT_FAILURE;
     }
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     SourceTree tree(application);
     size_t     count = tree.parse();
 
-    std::cout << "ance-c: input: " << count << " source file(s) read" << std::endl;
+    std::cout << "ance: input: " << count << " source file(s) read" << std::endl;
 
     size_t fatal_syntax_error_count = tree.emitMessages();
 
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 
         if (validation_logger.errorCount() == 0)
         {
-            std::filesystem::path out_dir(argv[2]);
+            std::filesystem::path out_dir = project_file_path.parent_path() / "out";
 
             std::filesystem::path obj_dir = out_dir / "obj";
             std::filesystem::path bin_dir = out_dir / "bin";

@@ -90,7 +90,7 @@ void AnceSyntaxErrorHandler::emitMessages(const SourceFile& source_file)
 
         size_t start;
 
-        std::cout << "ance-c: " << ansi::ColorRed << "syntax" << ansi::ColorReset;
+        std::cout << "ance: " << ansi::ColorRed << "syntax" << ansi::ColorReset;
         std::cout << ": " << source_file.getRelativePath().generic_string() << " ";
         std::cout << "(" << line << ", " << column << ") ";
         std::cout << message << std::endl;

@@ -37,13 +37,13 @@ void ValidationLogger::log(ValidationLogger::LogLevel level, const std::string& 
 
 void ValidationLogger::emitMessages(const std::vector<std::reference_wrapper<SourceFile>>& source_files)
 {
-    std::cout << "ance-c: validation: " << warningCount() << " warnings, " << errorCount() << " errors" << std::endl;
+    std::cout << "ance: validation: " << warningCount() << " warnings, " << errorCount() << " errors" << std::endl;
 
     for (auto& entry : entries_)
     {
         size_t start = 0;
 
-        std::cout << "ance-c: ";
+        std::cout << "ance: ";
 
         switch (entry.level_)
         {
