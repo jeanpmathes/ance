@@ -26,7 +26,7 @@ find_package(LLD CONFIG REQUIRED)
 message(STATUS "Found LLDConfig.cmake in ${LLD_CMAKE_DIR}")
 include_directories(SYSTEM ${LLD_INCLUDE_DIRS})
 
-find_package(Boost REQUIRED COMPONENTS locale)
+find_package(Boost REQUIRED COMPONENTS locale regex)
 
 include_directories(src)
 add_subdirectory(src)

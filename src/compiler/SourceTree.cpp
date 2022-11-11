@@ -52,7 +52,7 @@ SourceTree::SourceFileReadResult SourceTree::readSourceFile(const std::filesyste
 
     antlr4::tree::ParseTree* tree = parser->file();
 
-    std::unique_ptr<FileContext> file_context = std::make_unique<FileContext>(index);
+    std::unique_ptr<FileContext> file_context = std::make_unique<FileContext>(index, *source_file);
 
     return {std::move(file_context),
             std::move(syntax_error_listener),

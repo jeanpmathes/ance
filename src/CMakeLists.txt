@@ -10,7 +10,7 @@ include_directories(.)
 
 set(LLD_AVAILABLE_LIBS lldCommon;lldCOFF;lldELF;lldMachO;lldMinGW;lldWasm)
 target_link_libraries(ance PRIVATE ${ANTLR4_LIB} ${LLVM_AVAILABLE_LIBS} ${LLD_AVAILABLE_LIBS})
-target_link_libraries(ance PRIVATE Boost::boost Boost::locale)
+target_link_libraries(ance PRIVATE Boost::boost Boost::locale Boost::regex)
 
 set(ERROR_OPTIONS
     -Werror -Weverything

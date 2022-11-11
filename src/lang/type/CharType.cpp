@@ -143,7 +143,7 @@ llvm::DIType* lang::CharType::createDebugType(CompileContext& context)
 {
     std::string name = std::string(this->name().text());
 
-    return context.di()->createBasicType(name, SIZE_IN_BITS, llvm::dwarf::DW_ATE_unsigned_char);
+    return context.di()->createBasicType(name, SIZE_IN_BITS, llvm::dwarf::DW_ATE_UCS);
 }
 
 lang::ResolvingHandle<lang::Type> lang::CharType::get()

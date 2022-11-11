@@ -54,6 +54,14 @@ class SourceFile
      */
     [[nodiscard]] std::filesystem::path getFilename() const;
 
+    /**
+     * Get the UTF-8 column index for a given UTF-32 column index.
+     * @param line The line index.
+     * @param utf_32_column The UTF-32 column index.
+     * @return The UTF-8 column index.
+     */
+    [[nodiscard]] size_t getUtf8Index(size_t line, size_t utf_32_column) const;
+
   private:
     std::vector<std::string> lines_;
     std::filesystem::path    relative_path_;

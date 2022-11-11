@@ -1076,10 +1076,11 @@ std::any SourceVisitor::visitRightShift(anceParser::RightShiftContext*)
 lang::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)
 {
     size_t start_line   = ctx->getStart()->getLine();
-    size_t start_column = ctx->getStart()->getCharPositionInLine() + 1;
+    size_t start_column = file_context_->getUtf8Index(start_line, ctx->getStart()->getCharPositionInLine()) + 1;
 
     size_t end_line   = ctx->getStop()->getLine();
-    size_t end_column = ctx->getStop()->getCharPositionInLine() + ctx->getStop()->getText().size();
+    size_t end_column = file_context_->getUtf8Index(end_line, ctx->getStop()->getCharPositionInLine())
+                      + ctx->getStop()->getText().size() + 1;
 
     return {start_line, start_column, end_line, end_column, file_context_->getFileIndex()};
 }
@@ -1090,10 +1091,10 @@ lang::Identifier SourceVisitor::ident(antlr4::tree::TerminalNode* i)
 
     auto   token        = i->getSymbol();
     size_t start_line   = token->getLine();
-    size_t start_column = token->getCharPositionInLine() + 1;
+    size_t start_column = file_context_->getUtf8Index(start_line, token->getCharPositionInLine()) + 1;
 
     size_t end_line   = start_line;
-    size_t end_column = start_column + text.size() - 1;
+    size_t end_column = start_column + text.size();
 
     return createIdentifier(text, {start_line, start_column, end_line, end_column, file_context_->getFileIndex()});
 }

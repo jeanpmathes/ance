@@ -3,6 +3,9 @@
 #include <fstream>
 #include <string>
 
+#include <boost/locale/utf.hpp>
+#include <boost/regex/v5/unicode_iterator.hpp>
+
 SourceFile::SourceFile(const std::filesystem::path& project_directory, const std::filesystem::path& file)
     : relative_path_(file)
 {
@@ -42,4 +45,20 @@ std::filesystem::path SourceFile::getDirectory() const
 std::filesystem::path SourceFile::getFilename() const
 {
     return relative_path_.filename();
+}
+
+size_t SourceFile::getUtf8Index(size_t line, size_t utf_32_column) const
+{
+    std::string_view line_view    = getLine(line);
+    int              utf_8_column = 0;
+
+    boost::u8_to_u32_iterator<std::string_view::const_iterator> utf_32_iterator(line_view.begin());
+
+    for (size_t utf_32_index = 0; utf_32_index < utf_32_column; utf_32_index++)
+    {
+        utf_8_column += boost::locale::utf::utf_traits<char8_t>::width(*utf_32_iterator);
+        utf_32_iterator++;
+    }
+
+    return static_cast<size_t>(utf_8_column);
 }

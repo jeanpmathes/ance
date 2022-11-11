@@ -42,8 +42,6 @@ bool AnceLinker::link(const std::filesystem::path& obj, const std::filesystem::p
     std::vector<const char*> args;
     args.push_back("lld");
 
-    args.push_back("/verbose");
-
     args.push_back("/debug:FULL");
 
     args.push_back("/machine:x64");
