@@ -21,7 +21,7 @@ lang::StringConstant::StringConstant(std::string prefix, std::string string)
 
 std::string lang::StringConstant::toString() const
 {
-    return prefix_ + "\"" + literal_ + "\"";
+    return prefix_ + literal_;
 }
 
 lang::ResolvingHandle<lang::Type> lang::StringConstant::type() const

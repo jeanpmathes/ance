@@ -29,7 +29,7 @@ lang::CharConstant::CharConstant(const std::string& prefix, const std::string& c
 
 std::string lang::CharConstant::toString() const
 {
-    return prefix_ + "'" + content_ + "'";
+    return prefix_ + content_;
 }
 
 lang::ResolvingHandle<lang::Type> lang::CharConstant::type() const
