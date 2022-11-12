@@ -34,6 +34,8 @@ void AnceSyntaxErrorHandler::ParserErrorListener::syntaxError(antlr4::Recognizer
                                                               const std::string&,
                                                               std::exception_ptr)
 {
+    char_position_in_line = parent_.source_file_.getUtf8Index(line, char_position_in_line);
+
     auto* parser = dynamic_cast<anceParser*>(recognizer);
     if (!parser) return;
 
@@ -52,8 +54,10 @@ void AnceSyntaxErrorHandler::ParserErrorListener::syntaxError(antlr4::Recognizer
 
     if (previous_symbol)
     {
-        previous_line          = previous_symbol->getLine();
-        previous_char_position = previous_symbol->getCharPositionInLine() + previous_symbol->getText().size();
+        previous_line = previous_symbol->getLine();
+        previous_char_position =
+            parent_.source_file_.getUtf8Index(previous_line, previous_symbol->getCharPositionInLine())
+            + previous_symbol->getText().size();
     }
 
     if (expected == anceLexer::SEMICOLON)
@@ -76,12 +80,14 @@ antlr4::BaseErrorListener* AnceSyntaxErrorHandler::parserErrorListener()
     return &parser_error_listener_;
 }
 
+AnceSyntaxErrorHandler::AnceSyntaxErrorHandler(const SourceFile& source_file) : source_file_(source_file) {}
+
 void AnceSyntaxErrorHandler::log(const std::string& message, size_t line, size_t char_position)
 {
     syntax_errors_.emplace_back(message, std::make_pair(line, char_position));
 }
 
-void AnceSyntaxErrorHandler::emitMessages(const SourceFile& source_file)
+void AnceSyntaxErrorHandler::emitMessages()
 {
     for (auto& [message, location] : syntax_errors_)
     {
@@ -91,15 +97,18 @@ void AnceSyntaxErrorHandler::emitMessages(const SourceFile& source_file)
         size_t start;
 
         std::cout << "ance: " << ansi::ColorRed << "syntax" << ansi::ColorReset;
-        std::cout << ": " << source_file.getRelativePath().generic_string() << " ";
+        std::cout << ": " << source_file_.getRelativePath().generic_string() << " ";
         std::cout << "(" << line << ", " << column << ") ";
         std::cout << message << std::endl;
 
         std::cout << std::endl;
 
-        std::cout << '\t' << trim(source_file.getLine(line), start) << std::endl;
+        std::string_view line_view = trim(source_file_.getLine(line), start);
 
-        size_t marker_position = column - start - 1;
+        std::cout << '\t' << line_view << std::endl;
+
+        std::string_view text_to_mark    = line_view.substr(0, column - start - 1);
+        size_t           marker_position = estimateWidth(text_to_mark);
 
         std::cout << '\t' << std::string(marker_position, ' ') << '^' << std::endl;
         std::cout << std::endl;
@@ -110,4 +119,3 @@ size_t AnceSyntaxErrorHandler::fatalSyntaxErrorCount() const
 {
     return fatal_error_count_;
 }
-

@@ -27,6 +27,9 @@ message(STATUS "Found LLDConfig.cmake in ${LLD_CMAKE_DIR}")
 include_directories(SYSTEM ${LLD_INCLUDE_DIRS})
 
 find_package(Boost REQUIRED COMPONENTS locale regex)
+message(STATUS "Found boost includes at: ${Boost_INCLUDE_DIRS}")
+
+find_package(ICU REQUIRED COMPONENTS data i18n io tu uc)
 
 include_directories(src)
 add_subdirectory(src)

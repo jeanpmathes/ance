@@ -9,8 +9,11 @@ add_subdirectory(validation)
 include_directories(.)
 
 set(LLD_AVAILABLE_LIBS lldCommon;lldCOFF;lldELF;lldMachO;lldMinGW;lldWasm)
-target_link_libraries(ance PRIVATE ${ANTLR4_LIB} ${LLVM_AVAILABLE_LIBS} ${LLD_AVAILABLE_LIBS})
+
+target_link_libraries(ance PRIVATE ${ANTLR4_LIB})
+target_link_libraries(ance PRIVATE ${LLVM_AVAILABLE_LIBS} ${LLD_AVAILABLE_LIBS})
 target_link_libraries(ance PRIVATE Boost::boost Boost::locale Boost::regex)
+target_link_libraries(ance PRIVATE ICU ICU::data ICU::i18n ICU::io ICU::tu ICU::uc)
 
 set(ERROR_OPTIONS
     -Werror -Weverything

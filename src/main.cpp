@@ -4,6 +4,8 @@
 #include <llvm/Support/ManagedStatic.h>
 #include <llvm/Support/TargetSelect.h>
 
+#include <boost/locale.hpp>
+
 #include "compiler/AnceCompiler.h"
 #include "compiler/AnceLinker.h"
 #include "compiler/Application.h"
@@ -22,6 +24,9 @@ int main(int argc, char** argv)
 
         return EXIT_FAILURE;
     }
+
+    boost::locale::generator gen;
+    std::locale::global(gen(""));
 
     std::filesystem::path project_file_path(argv[1]);
     data::File            project_file(project_file_path);

@@ -68,12 +68,19 @@ void ValidationLogger::emitMessages(const std::vector<std::reference_wrapper<Sou
         std::cout << entry.location_ << " " << entry.message_ << std::endl;
         std::cout << std::endl;
 
-        std::cout << '\t' << trim(source_file.getLine(entry.location_.line()), start) << std::endl;
+        std::string_view line_view = trim(source_file.getLine(entry.location_.line()), start);
+        std::cout << '\t' << line_view << std::endl;
 
         if (entry.location_.isSingleLine())
         {
-            size_t marker_start  = entry.location_.column() - start;
-            size_t marker_length = entry.location_.columnEnd() - entry.location_.column() + 1;
+            size_t length_to_mark = entry.location_.column() - start;
+            size_t length_of_mark = entry.location_.columnEnd() - entry.location_.column() + 1;
+
+            std::string_view text_to_mark   = line_view.substr(0, length_to_mark);
+            std::string_view text_with_mark = line_view.substr(length_to_mark, length_of_mark);
+
+            size_t marker_start  = estimateWidth(text_to_mark);
+            size_t marker_length = estimateWidth(text_with_mark);
 
             std::cout << '\t' << std::string(marker_start - 1, ' ') << std::string(marker_length, '~') << std::endl;
             std::cout << std::endl;

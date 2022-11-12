@@ -50,10 +50,15 @@ class AnceSyntaxErrorHandler
 
   public:
     /**
-     * Emit all messages describing found syntax errors.
-     * @param source_file The source file that was validated.
+     * Create a new syntax error handler.
+     * @param source_file The source file that is being parsed.
      */
-    void emitMessages(const SourceFile& source_file);
+    explicit AnceSyntaxErrorHandler(const SourceFile& source_file);
+
+    /**
+     * Emit all messages describing found syntax errors.
+     */
+    void emitMessages();
 
     /**
      * Get the number of fatal syntax errors. Visiting the parse tree is not safe if fatal syntax errors occured.
@@ -62,6 +67,8 @@ class AnceSyntaxErrorHandler
     [[nodiscard]] size_t fatalSyntaxErrorCount() const;
 
   private:
+    const SourceFile& source_file_;
+
     LexerErrorListener  lexer_error_listener_ {*this};
     ParserErrorListener parser_error_listener_ {*this};
 

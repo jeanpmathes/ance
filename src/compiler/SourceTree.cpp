@@ -35,7 +35,8 @@ SourceTree::SourceFileReadResult SourceTree::readSourceFile(const std::filesyste
 {
     std::unique_ptr<SourceFile> source_file = std::make_unique<SourceFile>(project_path, file_path);
 
-    std::unique_ptr<AnceSyntaxErrorHandler> syntax_error_listener = std::make_unique<AnceSyntaxErrorHandler>();
+    std::unique_ptr<AnceSyntaxErrorHandler> syntax_error_listener =
+        std::make_unique<AnceSyntaxErrorHandler>(*source_file);
 
     std::fstream code;
     code.open(project_path / file_path);
@@ -70,7 +71,7 @@ size_t SourceTree::emitMessages()
 
     for (auto& source_file : source_files_)
     {
-        source_file.syntax_error_handler->emitMessages(*source_file.source_file);
+        source_file.syntax_error_handler->emitMessages();
         fatal_error_count += source_file.syntax_error_handler->fatalSyntaxErrorCount();
     }
 
