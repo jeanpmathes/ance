@@ -1,4 +1,6 @@
 import tempfile
+import shutil
+import os
 from typing import Optional
 
 import ance
@@ -59,9 +61,10 @@ class TestRun:
 
 def run_test(test: discovery.Test) -> TestRun:
     with tempfile.TemporaryDirectory() as temp:
-        output_path: str = temp
+        temp_project_dir: str = os.path.join(temp, test.test_name)
+        shutil.copytree(test.project_dir_path, temp_project_dir)
 
-        compile_result, compile_output = ance.compile_project(test.project_path, output_path)
+        compile_result, compile_output = ance.compile_project(temp_project_dir)
 
         if compile_result != COMPILE_VALID and compile_result != COMPILE_INVALID:
             compile_result = COMPILE_ERROR
@@ -69,6 +72,7 @@ def run_test(test: discovery.Test) -> TestRun:
         if compile_result != COMPILE_VALID:
             return TestRun(test, compile_result, compile_output, False, None)
 
+        output_path: str = os.path.join(temp_project_dir, 'out')
         run_result, run_output = ance.run_project(output_path, "test")
         return TestRun(test, compile_result, compile_output, run_result == 0, run_output)
 

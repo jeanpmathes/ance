@@ -11,9 +11,9 @@ class Project:
 
 
 class Test:
-    def __init__(self, test_name: str, project_path: str, is_valid: bool, expected_result: Optional[str]):
+    def __init__(self, test_name: str, project_dir_path: str, is_valid: bool, expected_result: Optional[str]):
         self.test_name: str = test_name
-        self.project_path: str = project_path
+        self.project_dir_path: str = project_dir_path
         self.is_valid: bool = is_valid
         self.expected_result: Optional[str] = expected_result
 
@@ -81,4 +81,4 @@ def create_test(project: Project) -> Optional[Test]:
 
             idx += 1
 
-        return Test(project.directory_name, project.project_path, is_valid, expected_result)
+        return Test(project.directory_name, project.directory_path, is_valid, expected_result)
