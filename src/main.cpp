@@ -29,7 +29,9 @@ int main(int argc, char** argv)
     std::locale::global(gen(""));
 
     std::filesystem::path project_file_path(argv[1]);
-    data::File            project_file(project_file_path);
+    if (project_file_path.is_relative()) project_file_path = std::filesystem::absolute(project_file_path);
+
+    data::File project_file(project_file_path);
     project_file.read();
 
     Project project(project_file);
@@ -82,8 +84,8 @@ int main(int argc, char** argv)
                 AnceCompiler compiler(application, tree);
                 AnceLinker   linker(project_file.root()["link"]);
 
-                std::filesystem::create_directory(obj_dir);
-                std::filesystem::create_directory(bin_dir);
+                std::filesystem::create_directories(obj_dir);
+                std::filesystem::create_directories(bin_dir);
 
                 std::filesystem::path ilr = obj_dir / (project.getName() + ".ll");
                 std::filesystem::path obj = obj_dir / (project.getName() + ".o");
