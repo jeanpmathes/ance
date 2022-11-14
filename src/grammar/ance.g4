@@ -392,7 +392,8 @@ BUFFER : '[]' ;
 CONST : 'const' ;
 NOT : 'not' ;
 
-IDENTIFIER : [_]* [a-zA-Z] [_a-zA-Z0-9]* ;
+IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{General_Category=Other_Letter}]* )
+           | [\p{Emoji}] ;
 
 SEMICOLON : ';' ;
 
