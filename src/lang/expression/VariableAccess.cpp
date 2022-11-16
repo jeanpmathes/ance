@@ -46,7 +46,7 @@ bool VariableAccess::validate(ValidationLogger& validation_logger) const
     return variable_->validateGetValue(validation_logger, location());
 }
 
-bool VariableAccess::validateAssignment(const std::shared_ptr<lang::Value>& value,
+bool VariableAccess::validateAssignment(std::shared_ptr<lang::Value> const& value,
                                         lang::Location                      value_location,
                                         ValidationLogger&                   validation_logger)
 {

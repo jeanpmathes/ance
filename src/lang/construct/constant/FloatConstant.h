@@ -20,14 +20,14 @@ namespace lang
          * @param semantics The semantics of the constant.
          * @param type The type of float to use.
          */
-        FloatConstant(std::string number, const llvm::fltSemantics& semantics, lang::ResolvingHandle<lang::Type> type);
+        FloatConstant(std::string number, llvm::fltSemantics const& semantics, lang::ResolvingHandle<lang::Type> type);
 
         [[nodiscard]] std::string toString() const override;
 
         lang::ResolvingHandle<lang::Type> type() const override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
 
-        bool equals(const lang::Constant* other) const override;
+        bool equals(lang::Constant const* other) const override;
 
       private:
         std::string                       text_;
@@ -37,4 +37,3 @@ namespace lang
 }
 
 #endif
-

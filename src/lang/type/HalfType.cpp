@@ -28,4 +28,3 @@ lang::ResolvingHandle<lang::Type> lang::HalfType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new HalfType()));
     return instance;
 }
-

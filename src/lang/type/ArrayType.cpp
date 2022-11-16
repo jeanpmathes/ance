@@ -15,7 +15,7 @@ lang::ArrayType::ArrayType(lang::ResolvingHandle<lang::Type> element_type, const
     , SequenceType(element_type, size)
 {}
 
-const lang::ArrayType* lang::ArrayType::isArrayType() const
+lang::ArrayType const* lang::ArrayType::isArrayType() const
 {
     return this;
 }
@@ -72,7 +72,7 @@ std::string lang::ArrayType::createMangledName() const
 
 llvm::DIType* lang::ArrayType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl         = context.module()->getDataLayout();
+    llvm::DataLayout const& dl         = context.module()->getDataLayout();
     llvm::Type*             array_type = getContentType(*context.llvmContext());
 
     uint64_t      size            = dl.getTypeSizeInBits(array_type);

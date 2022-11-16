@@ -66,4 +66,3 @@ void Assignment::doBuild(CompileContext& context)
 {
     assignable_->assign(assigned_->getValue(), context);
 }
-

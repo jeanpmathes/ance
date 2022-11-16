@@ -54,7 +54,7 @@ std::string lang::BooleanType::createMangledName() const
 
 llvm::DIType* lang::BooleanType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.module()->getDataLayout();
 
     std::string name         = std::string(this->name().text());
     uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
@@ -178,7 +178,7 @@ std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperat
     return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
 }
 
-bool lang::BooleanType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+bool lang::BooleanType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
 {
     if (parameters.size() == 1)
     {
@@ -188,7 +188,7 @@ bool lang::BooleanType::acceptOverloadRequest(const std::vector<lang::ResolvingH
     return false;
 }
 
-void lang::BooleanType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+void lang::BooleanType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
                                                lang::PredefinedFunction&                             function,
                                                CompileContext&                                       context)
 {

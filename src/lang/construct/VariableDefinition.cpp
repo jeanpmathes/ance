@@ -18,7 +18,7 @@ lang::VariableDefinition::VariableDefinition(lang::ResolvingHandle<lang::Variabl
     , location_(location)
 {}
 
-const lang::Identifier& lang::VariableDefinition::name() const
+lang::Identifier const& lang::VariableDefinition::name() const
 {
     return self_->name();
 }

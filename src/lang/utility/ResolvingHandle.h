@@ -54,7 +54,7 @@ namespace lang
             friend class lang::ResolvingHandle<T>;
 
           public:
-            HandleNavigator(const HandleNavigator& other) = delete;
+            HandleNavigator(HandleNavigator const& other) = delete;
             HandleNavigator(HandleNavigator&& other)      = delete;
         };
 
@@ -65,10 +65,10 @@ namespace lang
         const T* operator->() const noexcept;
         const T& operator*() const noexcept;
 
-        bool operator==(const ResolvingHandle<T>& other) const;
-        bool operator!=(const ResolvingHandle<T>& other) const;
+        bool operator==(ResolvingHandle<T> const& other) const;
+        bool operator!=(ResolvingHandle<T> const& other) const;
 
-        bool operator<(const ResolvingHandle<T>& other) const;
+        bool operator<(ResolvingHandle<T> const& other) const;
 
       private:
         std::shared_ptr<HandleNavigator> getRootNavigator();
@@ -102,4 +102,3 @@ namespace lang
 #include "ResolvingHandle.tpp"
 
 #endif
-

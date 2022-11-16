@@ -58,7 +58,7 @@ namespace lang
         typedef std::pair<UsedTypes, OTHER_KEY> Key;
         typedef std::pair<Key, TypeHandle>      Entry;
 
-        std::optional<TypeHandle> get(const UsedTypes& type_keys, const OTHER_KEY& other_keys) const;
+        std::optional<TypeHandle> get(UsedTypes const& type_keys, const OTHER_KEY& other_keys) const;
         void                      add(UsedTypes&& type_keys, OTHER_KEY other_key, TypeHandle type);
 
         void setDefaultContainingScope(lang::Scope* scope) override;
@@ -77,4 +77,3 @@ namespace lang
 #include "TypeRegistry.tpp"
 
 #endif
-

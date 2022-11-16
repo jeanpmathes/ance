@@ -2,9 +2,9 @@
 
 #include <iostream>
 
+#include "validation/ANSI.h"
 #include "validation/SourceFile.h"
 #include "validation/Strings.h"
-#include "validation/ANSI.h"
 
 ValidationLogger::ValidationLogger() = default;
 
@@ -18,24 +18,24 @@ size_t ValidationLogger::errorCount() const
     return error_count_;
 }
 
-void ValidationLogger::logWarning(const std::string& message, lang::Location location)
+void ValidationLogger::logWarning(std::string const& message, lang::Location location)
 {
     warning_count_++;
     log(LogLevel::WARNING, message, location);
 }
 
-void ValidationLogger::logError(const std::string& message, lang::Location location)
+void ValidationLogger::logError(std::string const& message, lang::Location location)
 {
     error_count_++;
     log(LogLevel::ERROR, message, location);
 }
 
-void ValidationLogger::log(ValidationLogger::LogLevel level, const std::string& message, lang::Location location)
+void ValidationLogger::log(ValidationLogger::LogLevel level, std::string const& message, lang::Location location)
 {
     entries_.emplace_back(level, message, location);
 }
 
-void ValidationLogger::emitMessages(const std::vector<std::reference_wrapper<SourceFile>>& source_files)
+void ValidationLogger::emitMessages(std::vector<std::reference_wrapper<SourceFile>> const& source_files)
 {
     std::cout << "ance: validation: " << warningCount() << " warnings, " << errorCount() << " errors" << std::endl;
 
@@ -89,4 +89,3 @@ void ValidationLogger::emitMessages(const std::vector<std::reference_wrapper<Sou
 
     entries_.clear();
 }
-

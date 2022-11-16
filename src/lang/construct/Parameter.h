@@ -36,7 +36,7 @@ namespace lang
          * Get the parameter name.
          * @return The name.
          */
-        const Identifier& name();
+        Identifier const& name();
 
         /**
          * Get the source location.

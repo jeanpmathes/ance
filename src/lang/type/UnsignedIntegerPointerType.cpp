@@ -11,7 +11,7 @@ bool lang::UnsignedIntegerPointerType::isUnsignedIntegerPointerType() const
 }
 
 bool lang::UnsignedIntegerPointerType::acceptOverloadRequest(
-    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+    std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
 {
     if (parameters.size() == 1 && parameters[0]->isAddressType()) return true;
 
@@ -19,7 +19,7 @@ bool lang::UnsignedIntegerPointerType::acceptOverloadRequest(
 }
 
 void lang::UnsignedIntegerPointerType::buildRequestedOverload(
-    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+    std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
     lang::PredefinedFunction&                             function,
     CompileContext&                                       context)
 {

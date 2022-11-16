@@ -17,7 +17,7 @@ VectorDefinition::VectorDefinition(std::optional<lang::ResolvingHandle<lang::Typ
     for (auto& element : elements_) { addSubexpression(*element); }
 }
 
-const std::optional<lang::ResolvingHandle<lang::Type>>& VectorDefinition::elementType() const
+std::optional<lang::ResolvingHandle<lang::Type>> const& VectorDefinition::elementType() const
 {
     return type_;
 }
@@ -27,7 +27,7 @@ std::vector<std::reference_wrapper<Expression>> VectorDefinition::values() const
     std::vector<std::reference_wrapper<Expression>> values;
 
     values.reserve(elements_.size());
-    for (const auto& element : elements_) { values.emplace_back(*element); }
+    for (auto const& element : elements_) { values.emplace_back(*element); }
 
     return values;
 }
@@ -127,4 +127,3 @@ void VectorDefinition::doBuild(CompileContext& context)
 }
 
 VectorDefinition::~VectorDefinition() = default;
-

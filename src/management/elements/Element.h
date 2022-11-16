@@ -18,7 +18,7 @@ namespace data
          * @param key The key.
          * @return An optional element.
          */
-        virtual std::optional<std::reference_wrapper<const data::Element>> operator[](const std::string& key) const;
+        virtual std::optional<std::reference_wrapper<const data::Element>> operator[](std::string const& key) const;
 
         [[nodiscard]] virtual std::vector<std::reference_wrapper<const data::Element>>::const_iterator begin() const;
 
@@ -44,4 +44,3 @@ namespace data
 }
 
 #endif
-

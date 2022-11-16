@@ -3,10 +3,10 @@
 
 #include "lang/statement/Statement.h"
 
+#include "lang/Element.h"
 #include "lang/construct/BasicBlock.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/scope/Scope.h"
-#include "lang/Element.h"
 
 namespace lang
 {
@@ -81,4 +81,3 @@ namespace lang
 }
 
 #endif
-

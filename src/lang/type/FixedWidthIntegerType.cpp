@@ -16,7 +16,7 @@ lang::FixedWidthIntegerType::FixedWidthIntegerType(uint64_t bit_size, bool is_si
     , is_signed_(is_signed)
 {}
 
-const lang::FixedWidthIntegerType* lang::FixedWidthIntegerType::isFixedWidthIntegerType() const
+lang::FixedWidthIntegerType const* lang::FixedWidthIntegerType::isFixedWidthIntegerType() const
 {
     return this;
 }
@@ -45,7 +45,7 @@ bool lang::FixedWidthIntegerType::validate(ValidationLogger& validation_logger, 
 }
 
 bool lang::FixedWidthIntegerType::acceptOverloadRequest(
-    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+    std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
 {
     if (parameters.size() == 1 && parameters[0]->isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS
         && !is_signed_)
@@ -57,7 +57,7 @@ bool lang::FixedWidthIntegerType::acceptOverloadRequest(
 }
 
 void lang::FixedWidthIntegerType::buildRequestedOverload(
-    const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+    std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
     lang::PredefinedFunction&                             function,
     CompileContext&                                       context)
 {

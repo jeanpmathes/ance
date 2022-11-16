@@ -4,8 +4,8 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "lang/utility/Location.h"
 #include "lang/Element.h"
+#include "lang/utility/Location.h"
 
 namespace lang
 {

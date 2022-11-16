@@ -3,12 +3,12 @@
 
 #include <vector>
 
+#include "lang/Element.h"
+#include "lang/construct/BasicBlock.h"
 #include "lang/construct/Parameter.h"
 #include "lang/construct/Signature.h"
-#include "lang/utility/Location.h"
 #include "lang/utility/Identifier.h"
-#include "lang/construct/BasicBlock.h"
-#include "lang/Element.h"
+#include "lang/utility/Location.h"
 
 namespace lang
 {
@@ -38,7 +38,7 @@ namespace lang
          * Get the name of this function.
          * @return The name.
          */
-        [[nodiscard]] const Identifier& name() const;
+        [[nodiscard]] Identifier const& name() const;
 
         /**
          * Get the containing scope.
@@ -60,7 +60,7 @@ namespace lang
          * Get the function signature.
          * @return The function signature.
          */
-        [[nodiscard]] const lang::Signature& signature() const;
+        [[nodiscard]] lang::Signature const& signature() const;
 
         /**
          * Get the location of the return type.
@@ -140,7 +140,7 @@ namespace lang
          * @param validation_logger A logger to log validation messages.
          * @return True if the call is valid.
          */
-        virtual bool validateCall(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+        virtual bool validateCall(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
                                   lang::Location                                                              location,
                                   ValidationLogger& validation_logger);
 
@@ -148,7 +148,7 @@ namespace lang
          *This method is called in @see FunctionDefinition::validateCall.
          */
         virtual bool doCallValidation(
-            const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+            std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
             lang::Location                                                              location,
             ValidationLogger&                                                           validation_logger) const;
 
@@ -158,7 +158,7 @@ namespace lang
          * @param context The current compile context.
          * @return The return value. Will be null for return type void.
          */
-        std::shared_ptr<lang::Value> buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
+        std::shared_ptr<lang::Value> buildCall(std::vector<std::shared_ptr<lang::Value>> const& arguments,
                                                CompileContext&                                  context) const;
 
         /**
@@ -171,7 +171,7 @@ namespace lang
          * Get the function parameters.
          * @return A vector containing the parameters.
          */
-        [[nodiscard]] const std::vector<std::shared_ptr<lang::Parameter>>& parameters() const;
+        [[nodiscard]] std::vector<std::shared_ptr<lang::Parameter>> const& parameters() const;
 
         /**
          * A helper to create a native function.
@@ -192,7 +192,7 @@ namespace lang
          * @param context The current compile context.
          * @return The return value.
          */
-        llvm::CallInst* buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
+        llvm::CallInst* buildCall(std::vector<std::shared_ptr<lang::Value>> const& arguments,
                                   llvm::FunctionType*                              native_type,
                                   llvm::Function*                                  native_function,
                                   CompileContext&                                  context) const;
@@ -204,7 +204,7 @@ namespace lang
         virtual llvm::DIScope*    getDebugScope(CompileContext& context) = 0;
         virtual lang::LocalScope* getInsideScope()                       = 0;
 
-        [[nodiscard]] virtual const std::vector<lang::BasicBlock*>& getBasicBlocks() const = 0;
+        [[nodiscard]] virtual std::vector<lang::BasicBlock*> const& getBasicBlocks() const = 0;
 
         ~FunctionDefinition() override = default;
 
@@ -223,4 +223,3 @@ namespace lang
 }
 
 #endif
-

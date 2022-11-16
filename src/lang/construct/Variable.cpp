@@ -1,7 +1,7 @@
 #include "Variable.h"
 
-#include <utility>
 #include <iostream>
+#include <utility>
 
 #include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
@@ -47,7 +47,7 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
                                    lang::Location                      type_location,
                                    Scope&                              containing_scope,
                                    bool                                is_final,
-                                   const std::shared_ptr<lang::Value>& value,
+                                   std::shared_ptr<lang::Value> const& value,
                                    unsigned int                        parameter_no,
                                    lang::Location                      location)
 {
@@ -63,7 +63,7 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
     addChild(*definition_);
 }
 
-const lang::Identifier& lang::Variable::name() const
+lang::Identifier const& lang::Variable::name() const
 {
     return name_;
 }
@@ -111,7 +111,7 @@ bool lang::Variable::validateGetValue(ValidationLogger& validation_logger, lang:
     return not lang::validation::isNameUndefined(self(), location, validation_logger) && type()->isDefined();
 }
 
-bool lang::Variable::validateSetValue(const std::shared_ptr<lang::Value>& value,
+bool lang::Variable::validateSetValue(std::shared_ptr<lang::Value> const& value,
                                       ValidationLogger&                   validation_logger,
                                       lang::Location                      assignable_location,
                                       lang::Location                      assigned_location) const

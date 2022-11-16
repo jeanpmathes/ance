@@ -63,4 +63,3 @@ void UnaryOperation::doBuild(CompileContext& context)
 }
 
 UnaryOperation::~UnaryOperation() = default;
-

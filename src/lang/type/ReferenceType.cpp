@@ -34,9 +34,7 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::getActualType() const
 {
     lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
     if (actual_element_type == element_type_) { return self(); }
-    else {
-        return lang::ReferenceType::get(actual_element_type);
-    }
+    else { return lang::ReferenceType::get(actual_element_type); }
 }
 
 llvm::Constant* lang::ReferenceType::getDefaultContent(llvm::Module&)
@@ -148,23 +146,23 @@ std::shared_ptr<lang::Value> lang::ReferenceType::buildOperator(lang::UnaryOpera
     return element_type_->buildOperator(op, getReferenced(value, context), context);
 }
 
-bool lang::ReferenceType::hasMember(const lang::Identifier& name)
+bool lang::ReferenceType::hasMember(lang::Identifier const& name)
 {
     return element_type_->hasMember(name);
 }
 
-lang::ResolvingHandle<lang::Type> lang::ReferenceType::getMemberType(const lang::Identifier& name)
+lang::ResolvingHandle<lang::Type> lang::ReferenceType::getMemberType(lang::Identifier const& name)
 {
     return element_type_->getMemberType(name);
 }
 
-bool lang::ReferenceType::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const
+bool lang::ReferenceType::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const
 {
     return element_type_->validateMemberAccess(name, validation_logger);
 }
 
 std::shared_ptr<lang::Value> lang::ReferenceType::buildMemberAccess(std::shared_ptr<Value>  value,
-                                                                    const lang::Identifier& name,
+                                                                    lang::Identifier const& name,
                                                                     CompileContext&         context)
 {
     return element_type_->buildMemberAccess(value, name, context);
@@ -219,7 +217,7 @@ std::string lang::ReferenceType::createMangledName() const
 
 llvm::DIType* lang::ReferenceType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.module()->getDataLayout();
 
     uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
 
@@ -278,4 +276,3 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::get(lang::ResolvingHandle
         return type;
     }
 }
-

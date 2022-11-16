@@ -26,4 +26,3 @@ llvm::Value* lang::NoValue::getContentValue()
 {
     throw std::logic_error("Cannot get value provided by unexpanded expression.");
 }
-

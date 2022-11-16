@@ -104,7 +104,8 @@ std::vector<std::pair<ConstantExpression*, Statement*>> Case::getConditions()
     std::vector<std::pair<ConstantExpression*, Statement*>> conditions;
 
     if (conditions_.empty()) { conditions.emplace_back(nullptr, std::get<std::unique_ptr<Statement>>(code_).get()); }
-    else {
+    else
+    {
         for (auto& condition : conditions_)
         {
             conditions.emplace_back(condition.get(), std::get<std::unique_ptr<Statement>>(code_).get());
@@ -191,7 +192,7 @@ bool Case::validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLog
     return valid;
 }
 
-std::vector<lang::ResolvingHandle<lang::Type>> Case::getCommonType(const std::vector<std::unique_ptr<Case>>& cases)
+std::vector<lang::ResolvingHandle<lang::Type>> Case::getCommonType(std::vector<std::unique_ptr<Case>> const& cases)
 {
     std::vector<lang::ResolvingHandle<lang::Type>> types;
 
@@ -204,7 +205,7 @@ std::vector<lang::ResolvingHandle<lang::Type>> Case::getCommonType(const std::ve
 }
 
 std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> Case::tryGetCommonType(
-    const std::vector<std::unique_ptr<Case>>& cases)
+    std::vector<std::unique_ptr<Case>> const& cases)
 {
     std::vector<lang::ResolvingHandle<lang::Type>> types;
 
@@ -219,7 +220,7 @@ std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> Case::tryGetCommon
 }
 
 bool Case::validateReturnTypes(lang::Location                            location,
-                               const std::vector<std::unique_ptr<Case>>& cases,
+                               std::vector<std::unique_ptr<Case>> const& cases,
                                ValidationLogger&                         validation_logger)
 {
     std::vector<lang::ResolvingHandle<lang::Type>> common_types = getCommonType(cases);
@@ -401,7 +402,7 @@ bool Match::validateType(Expression& expression, ValidationLogger& validation_lo
 
 bool Match::validateCases(lang::Location                            location,
                           Expression&                               expression,
-                          const std::vector<std::unique_ptr<Case>>& cases,
+                          std::vector<std::unique_ptr<Case>> const& cases,
                           ValidationLogger&                         validation_logger)
 {
     bool valid = true;
@@ -435,9 +436,7 @@ bool Match::validateCases(lang::Location                            location,
         {
             uncovered = static_cast<ssize_t>(*count) != covered_cases;
         }
-        else {
-            uncovered = true;
-        }
+        else { uncovered = true; }
 
         if (uncovered)
         {

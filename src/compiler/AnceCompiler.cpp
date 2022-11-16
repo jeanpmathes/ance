@@ -33,7 +33,7 @@ AnceCompiler::AnceCompiler(Application& app, SourceTree& tree)
     llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
 
     std::string         err;
-    const llvm::Target* t = llvm::TargetRegistry::lookupTarget(triple.str(), err);
+    llvm::Target const* t = llvm::TargetRegistry::lookupTarget(triple.str(), err);
 
     llvm::Optional<llvm::Reloc::Model> rm;
     rm = llvm::Reloc::Static;
@@ -73,7 +73,7 @@ AnceCompiler::AnceCompiler(Application& app, SourceTree& tree)
                                                 tree);
 }
 
-void AnceCompiler::compile(const std::filesystem::path& out)
+void AnceCompiler::compile(std::filesystem::path const& out)
 {
     context_->runtime()->init(*context_);
 
@@ -143,7 +143,7 @@ void AnceCompiler::compile(const std::filesystem::path& out)
     module_.print(out_stream, nullptr);
 }
 
-void AnceCompiler::emitObject(const std::filesystem::path& out)
+void AnceCompiler::emitObject(std::filesystem::path const& out)
 {
     std::error_code      ec;
     llvm::raw_fd_ostream s(out.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
@@ -232,7 +232,7 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::
     ir_.CreateRetVoid();
 }
 
-std::string AnceCompiler::getInternalFunctionName(const std::string& name)
+std::string AnceCompiler::getInternalFunctionName(std::string const& name)
 {
     return name + INTERNAL_FUNCTION_SUFFIX;
 }

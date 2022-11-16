@@ -54,8 +54,8 @@ class SourceTree
         antlr4::tree::ParseTree*                   tree {};
     };
 
-    static SourceFileReadResult readSourceFile(const std::filesystem::path& project_path,
-                                               const std::filesystem::path& file_path,
+    static SourceFileReadResult readSourceFile(std::filesystem::path const& project_path,
+                                               std::filesystem::path const& file_path,
                                                size_t                       file_index);
 
   private:

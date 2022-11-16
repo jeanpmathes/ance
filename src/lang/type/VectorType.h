@@ -29,7 +29,7 @@ namespace lang
       public:
         static const uint64_t MAX_VECTOR_TYPE_SIZE = 1ll << 32;
 
-        const VectorType* isVectorType() const override;
+        VectorType const* isVectorType() const override;
         VectorType*       isVectorType() override;
 
         bool isSigned() const override;
@@ -71,8 +71,8 @@ namespace lang
                                                         std::shared_ptr<Value> right,
                                                         CompileContext&        context) override;
 
-        bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
-        void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+        bool acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters) override;
+        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
                                     lang::PredefinedFunction&                             function,
                                     CompileContext&                                       context) override;
 
@@ -89,8 +89,8 @@ namespace lang
                                                  CompileContext&                           context);
 
       protected:
-        std::string                                      createMangledName() const override;
-        llvm::DIType*                                    createDebugType(CompileContext& context) override;
+        std::string   createMangledName() const override;
+        llvm::DIType* createDebugType(CompileContext& context) override;
 
       private:
         static lang::TypeRegistry<uint64_t>& getVectorTypes();
@@ -109,4 +109,3 @@ namespace lang
 }
 
 #endif
-

@@ -4,8 +4,8 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "lang/utility/ResolvingHandle.h"
 #include "lang/type/Type.h"
+#include "lang/utility/ResolvingHandle.h"
 
 class Expression;
 class CompileContext;

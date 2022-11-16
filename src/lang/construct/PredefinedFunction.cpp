@@ -51,7 +51,7 @@ lang::LocalScope* lang::PredefinedFunction::getInsideScope()
     return nullptr;
 }
 
-const std::vector<lang::BasicBlock*>& lang::PredefinedFunction::getBasicBlocks() const
+std::vector<lang::BasicBlock*> const& lang::PredefinedFunction::getBasicBlocks() const
 {
     static std::vector<lang::BasicBlock*> empty;
     return empty;
@@ -63,7 +63,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::PredefinedFunction::getNat
 }
 
 void lang::PredefinedFunction::setCallValidator(
-    std::function<bool(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>&,
+    std::function<bool(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const&,
                        lang::Location,
                        ValidationLogger&)> validator)
 {
@@ -71,11 +71,10 @@ void lang::PredefinedFunction::setCallValidator(
 }
 
 bool lang::PredefinedFunction::doCallValidation(
-    const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+    std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
     lang::Location                                                              location,
     ValidationLogger&                                                           validation_logger) const
 {
     if (call_validator_) { return call_validator_(arguments, location, validation_logger); }
     return true;
 }
-

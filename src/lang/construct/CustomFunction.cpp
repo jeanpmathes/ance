@@ -32,9 +32,7 @@ lang::CustomFunction::CustomFunction(Function&                                  
                               containing_scope,
                               declaration_location)
     , definition_location_(definition_location)
-{
-
-}
+{}
 
 bool lang::CustomFunction::isMangled() const
 {
@@ -47,7 +45,7 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger) const
 
     returnType()->validate(validation_logger, returnTypeLocation());
 
-    for (const auto [parameter, argument] : llvm::zip(parameters(), arguments()))
+    for (auto const [parameter, argument] : llvm::zip(parameters(), arguments()))
     {
         if (!argument)
         {
@@ -97,18 +95,19 @@ void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger) c
                     validation_logger.logError("Cannot return value in void function '" + name() + "'",
                                                this->location());
                 }
-                else {
-                    lang::Type::checkMismatch(returnType(), value->type(), location, validation_logger);
-                }
+                else { lang::Type::checkMismatch(returnType(), value->type(), location, validation_logger); }
             }
-            else if (!returnType()->isVoidType()) {
+            else if (!returnType()->isVoidType())
+            {
                 validation_logger.logError("Missing return value in function '" + name() + "'", location);
             }
-            else {
+            else
+            {
                 // No value, but void return type -> OK
             }
         }
-        else {
+        else
+        {
             if (!returnType()->isVoidType())
             {
                 lang::Location end = block->getEndLocation();
@@ -143,9 +142,9 @@ void lang::CustomFunction::createNativeBacking(CompileContext& context)
     std::vector<llvm::Metadata*> di_types;
     di_types.push_back(returnType()->getDebugType(context));
 
-    for (const auto pair : llvm::zip(parameters(), native_function->args()))
+    for (auto const pair : llvm::zip(parameters(), native_function->args()))
     {
-        const auto& [parameter, argument] = pair;
+        auto const& [parameter, argument] = pair;
         di_types.push_back(parameter->type()->getDebugType(context));
     }
 

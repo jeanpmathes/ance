@@ -15,4 +15,3 @@ void data::ListElement::put(std::unique_ptr<data::Element> element)
     const_list_.emplace_back(*element);
     list_.push_back(std::move(element));
 }
-

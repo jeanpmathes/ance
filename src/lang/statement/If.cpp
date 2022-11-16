@@ -65,7 +65,8 @@ Statements If::expandWith(Expressions subexpressions, Statements substatements) 
         statements.push_back(
             std::make_unique<If>(std::move(subexpressions[0]), std::move(substatements[0]), nullptr, location()));
     }
-    else {
+    else
+    {
         statements.push_back(std::make_unique<If>(std::move(subexpressions[0]),
                                                   std::move(substatements[0]),
                                                   std::move(substatements[1]),
@@ -79,4 +80,3 @@ void If::doBuild(CompileContext&)
 {
     // Handled by basic block.
 }
-

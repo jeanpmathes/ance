@@ -71,9 +71,7 @@ bool lang::GlobalVariable::isConstant() const
 lang::Assigner lang::GlobalVariable::assigner() const
 {
     if (isFinal()) { return lang::Assigner::FINAL_COPY_ASSIGNMENT; }
-    else {
-        return lang::Assigner::COPY_ASSIGNMENT;
-    }
+    else { return lang::Assigner::COPY_ASSIGNMENT; }
 }
 
 Expression* lang::GlobalVariable::init() const
@@ -316,14 +314,14 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::determi
     std::vector<lang::ResolvingHandle<lang::Variable>> variables,
     ValidationLogger&                                  validation_logger)
 {
-    const int visited  = 1;
-    const int finished = 2;
+    int const visited  = 1;
+    int const finished = 2;
 
     std::stack<std::pair<lang::ResolvingHandle<lang::Variable>, bool>> to_check;
     std::map<lang::ResolvingHandle<lang::Variable>, int>               state;
     std::vector<lang::ResolvingHandle<lang::Variable>>                 ordered_variables;
 
-    for (const auto& variable : variables)
+    for (auto const& variable : variables)
     {
         if (!state.contains(variable)) to_check.emplace(variable, false);
 
@@ -351,7 +349,7 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::determi
 
                 state[current_variable] = visited;
 
-                for (const auto& dependency : getAllVariableDependencies(current_variable))
+                for (auto const& dependency : getAllVariableDependencies(current_variable))
                 {
                     if (state[dependency] == finished) continue;
                     to_check.emplace(dependency, false);

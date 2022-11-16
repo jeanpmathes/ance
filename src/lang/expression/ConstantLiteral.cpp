@@ -35,4 +35,3 @@ std::shared_ptr<lang::Constant> ConstantLiteral::getConstantValue() const
 {
     return constant_;
 }
-

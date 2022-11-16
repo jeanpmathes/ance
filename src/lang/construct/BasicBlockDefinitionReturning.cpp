@@ -125,4 +125,3 @@ std::string lang::BasicBlock::Definition::Returning::getExitRepresentation()
 {
     return "// return";
 }
-

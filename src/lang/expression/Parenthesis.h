@@ -24,7 +24,7 @@ class Parenthesis
     bool isNamed() override;
 
     bool validate(ValidationLogger& validation_logger) const override;
-    bool validateAssignment(const std::shared_ptr<lang::Value>& value,
+    bool validateAssignment(std::shared_ptr<lang::Value> const& value,
                             lang::Location                      value_location,
                             ValidationLogger&                   validation_logger) override;
 
@@ -42,4 +42,3 @@ class Parenthesis
 };
 
 #endif
-

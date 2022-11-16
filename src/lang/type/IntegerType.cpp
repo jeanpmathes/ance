@@ -28,7 +28,7 @@ llvm::Type* lang::IntegerType::getContentType(llvm::LLVMContext& c) const
     return llvm::Type::getIntNTy(c, static_cast<unsigned>(getNativeBitSize()));
 }
 
-const lang::IntegerType* lang::IntegerType::isIntegerType() const
+lang::IntegerType const* lang::IntegerType::isIntegerType() const
 {
     return this;
 }
@@ -75,7 +75,7 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Re
     return std::make_shared<WrappedNativeValue>(other, native_converted_value);
 }
 
-bool lang::IntegerType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+bool lang::IntegerType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
 {
     if (parameters.size() == 1)
     {
@@ -87,7 +87,7 @@ bool lang::IntegerType::acceptOverloadRequest(const std::vector<lang::ResolvingH
     return false;
 }
 
-void lang::IntegerType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+void lang::IntegerType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
                                                lang::PredefinedFunction&                             function,
                                                CompileContext&                                       context)
 {
@@ -346,7 +346,7 @@ bool lang::IntegerType::isTriviallyDestructible() const
 
 llvm::DIType* lang::IntegerType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.module()->getDataLayout();
 
     std::string name         = std::string(this->name().text());
     uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));

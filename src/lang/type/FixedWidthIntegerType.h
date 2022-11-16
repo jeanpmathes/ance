@@ -14,8 +14,7 @@ namespace lang
     /**
      * Represents a fixed width integer type. They can an arbitrary but fixed bit size and can be signed or unsigned.
      */
-    class FixedWidthIntegerType
-        : public IntegerType
+    class FixedWidthIntegerType : public IntegerType
     {
       private:
         FixedWidthIntegerType(uint64_t bit_size, bool is_signed);
@@ -23,13 +22,13 @@ namespace lang
       public:
         static const int64_t MAX_INTEGER_SIZE = 1ll << 16;
 
-        [[nodiscard]] const FixedWidthIntegerType* isFixedWidthIntegerType() const override;
+        [[nodiscard]] FixedWidthIntegerType const* isFixedWidthIntegerType() const override;
         [[nodiscard]] bool isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
-        bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
-        void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+        bool acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters) override;
+        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
                                     lang::PredefinedFunction&                             function,
                                     CompileContext&                                       context) override;
         void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,

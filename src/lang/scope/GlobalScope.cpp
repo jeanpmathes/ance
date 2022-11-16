@@ -97,9 +97,7 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
         undefined = std::move(global_undefined_variables_[name]);
         global_undefined_variables_.erase(name);
     }
-    else {
-        undefined = lang::OwningHandle<lang::Variable>::takeOwnership(lang::makeHandled<lang::Variable>(name));
-    }
+    else { undefined = lang::OwningHandle<lang::Variable>::takeOwnership(lang::makeHandled<lang::Variable>(name)); }
 
     undefined
         ->defineAsGlobal(type, type_location, *this, access, std::move(initializer), is_final, is_constant, location);
@@ -112,7 +110,7 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
 void lang::GlobalScope::defineExternFunction(Identifier                                           name,
                                              lang::ResolvingHandle<lang::Type>                    return_type,
                                              lang::Location                                       return_type_location,
-                                             const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                             std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
                                              lang::Location                                       location)
 {
     if (defined_names_.contains(name) && !defined_function_groups_.contains(name))
@@ -137,7 +135,7 @@ void lang::GlobalScope::defineCustomFunction(Identifier                         
                                              lang::AccessModifier                                 access,
                                              lang::ResolvingHandle<lang::Type>                    return_type,
                                              lang::Location                                       return_type_location,
-                                             const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                             std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
                                              std::unique_ptr<lang::CodeBlock>                     code,
                                              lang::Location                                       declaration_location,
                                              lang::Location                                       definition_location)
@@ -224,9 +222,7 @@ std::optional<lang::ResolvingHandle<lang::Type>> lang::GlobalScope::getType(Iden
         auto& [name, type] = *it;
         return type.handle();
     }
-    else {
-        return {};
-    }
+    else { return {}; }
 }
 
 void lang::GlobalScope::addTypeRegistry(lang::TypeDefinitionRegistry* registry)
@@ -474,7 +470,8 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunc
         undefined = std::move(undefined_function_groups_[name]);
         undefined_function_groups_.erase(name);
     }
-    else {
+    else
+    {
         undefined =
             lang::OwningHandle<lang::FunctionGroup>::takeOwnership(lang::makeHandled<lang::FunctionGroup>(name));
     }
@@ -495,9 +492,7 @@ lang::OwningHandle<lang::Type> lang::GlobalScope::retrieveUndefinedType(Identifi
         undefined = std::move(undefined_types_[name]);
         undefined_types_.erase(name);
     }
-    else {
-        undefined = lang::OwningHandle<lang::Type>::takeOwnership(lang::makeHandled<lang::Type>(name));
-    }
+    else { undefined = lang::OwningHandle<lang::Type>::takeOwnership(lang::makeHandled<lang::Type>(name)); }
 
     return undefined;
 }

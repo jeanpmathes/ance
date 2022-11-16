@@ -24,7 +24,7 @@ namespace lang
         explicit FunctionGroup(Identifier name);
 
         [[nodiscard]] bool              isDefined() const override;
-        [[nodiscard]] const Identifier& name() const override;
+        [[nodiscard]] Identifier const& name() const override;
 
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
 
@@ -51,4 +51,3 @@ namespace lang
 }
 
 #endif
-

@@ -58,4 +58,3 @@ void While::doBuild(CompileContext&)
 {
     // Handled by basic block.
 }
-

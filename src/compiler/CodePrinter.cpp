@@ -3,7 +3,7 @@
 #include "lang/construct/Callable.h"
 #include "lang/type/VoidType.h"
 
-std::ostream& util::operator<<(std::ostream& os, const std::any&)
+std::ostream& util::operator<<(std::ostream& os, std::any const&)
 {
     return os;
 }
@@ -148,9 +148,7 @@ std::any CodePrinter::visit(ConstantLiteral& constant_literals)
     {
         out_ << visitTree(*constant_literals.constant().getBackingExpression());
     }
-    else {
-        out_ << constant_literals.constant().toString();
-    }
+    else { out_ << constant_literals.constant().toString(); }
 
     return {};
 }
@@ -322,7 +320,8 @@ std::any CodePrinter::visit(lang::CodeBlock& code_block)
         indent();
         out_ << "}";
     }
-    else {
+    else
+    {
         assert(code_block.statements().size() == 1);
         visitTree(code_block.statements()[0]);
     }
@@ -380,9 +379,7 @@ std::any CodePrinter::visit(If& if_statement)
         indent();
         visitTree(*if_statement.ifBlock());
     }
-    else {
-        out_ << " " << visitTree(*if_statement.ifBlock());
-    }
+    else { out_ << " " << visitTree(*if_statement.ifBlock()); }
 
     if (if_statement.elseBlock())
     {
@@ -396,9 +393,7 @@ std::any CodePrinter::visit(If& if_statement)
             indent();
             visitTree(*if_statement.elseBlock());
         }
-        else {
-            out_ << " " << visitTree(*if_statement.elseBlock());
-        }
+        else { out_ << " " << visitTree(*if_statement.elseBlock()); }
     }
 
     return {};

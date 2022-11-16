@@ -22,7 +22,7 @@ namespace lang
 
         llvm::Constant* buildContent(llvm::Module* m) override;
 
-        bool equals(const lang::Constant* other) const override;
+        bool equals(lang::Constant const* other) const override;
 
         /**
          * Create a null constant.

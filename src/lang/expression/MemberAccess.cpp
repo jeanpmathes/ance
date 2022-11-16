@@ -18,7 +18,7 @@ Expression& MemberAccess::value() const
     return *value_;
 }
 
-const lang::Identifier& MemberAccess::member() const
+lang::Identifier const& MemberAccess::member() const
 {
     return member_;
 }
@@ -60,4 +60,3 @@ void MemberAccess::doBuild(CompileContext& context)
 }
 
 MemberAccess::~MemberAccess() = default;
-

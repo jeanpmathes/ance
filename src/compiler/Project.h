@@ -57,4 +57,3 @@ class Project
 };
 
 #endif
-

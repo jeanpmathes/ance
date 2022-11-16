@@ -7,13 +7,12 @@
 #include <set>
 
 #include "lang/Assigner.h"
+#include "lang/Element.h"
 #include "lang/construct/FunctionGroup.h"
 #include "lang/construct/Variable.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/OwningHandle.h"
-#include "lang/Assigner.h"
-#include "lang/Element.h"
 
 class Expression;
 
@@ -62,7 +61,7 @@ namespace lang
                                                                   lang::ResolvingHandle<lang::Type>   type,
                                                                   lang::Location                      type_location,
                                                                   lang::Assigner                      assigner,
-                                                                  const std::shared_ptr<lang::Value>& value,
+                                                                  std::shared_ptr<lang::Value> const& value,
                                                                   lang::Location                      location);
 
         /**
@@ -134,4 +133,3 @@ namespace lang
     };
 }
 #endif
-

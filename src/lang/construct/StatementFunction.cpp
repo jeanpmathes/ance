@@ -36,7 +36,7 @@ lang::StatementFunction::StatementFunction(Function&                            
     containing_scope.addType(return_type);
 
     unsigned no = 1;
-    for (const auto& parameter : this->parameters())
+    for (auto const& parameter : this->parameters())
     {
         containing_scope.addType(parameter->type());
 
@@ -155,9 +155,9 @@ void lang::StatementFunction::createNativeBacking(CompileContext& context)
     std::tie(native_type_, native_function_) =
         createNativeFunction(access_.linkage(), *context.llvmContext(), context.module());
 
-    for (const auto pair : llvm::zip(parameters(), native_function_->args()))
+    for (auto const pair : llvm::zip(parameters(), native_function_->args()))
     {
-        const auto& [parameter, argument] = pair;
+        auto const& [parameter, argument] = pair;
         parameter->wrap(&argument);
     }
 }
@@ -188,7 +188,7 @@ lang::LocalScope* lang::StatementFunction::getInsideScope()
     return inside_scope_;
 }
 
-const std::vector<lang::BasicBlock*>& lang::StatementFunction::getBasicBlocks() const
+std::vector<lang::BasicBlock*> const& lang::StatementFunction::getBasicBlocks() const
 {
     return used_blocks_;
 }
@@ -198,7 +198,7 @@ llvm::DIScope* lang::StatementFunction::getDebugScope(CompileContext&)
     return native_function_->getSubprogram();
 }
 
-const std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>>& lang::StatementFunction::arguments() const
+std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>> const& lang::StatementFunction::arguments() const
 {
     return arguments_;
 }

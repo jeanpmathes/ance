@@ -17,13 +17,13 @@ namespace data
          * Create a new data file from a file in the filesystem. No actual reading occurs.
          * @param path The path to the file.
          */
-        explicit File(const std::filesystem::path& path);
+        explicit File(std::filesystem::path const& path);
 
         /**
          * Get the path to the file.
          * @return The path.
          */
-        const std::filesystem::path& path();
+        std::filesystem::path const& path();
 
         /**
          * Read the element structure from the file.
@@ -34,13 +34,12 @@ namespace data
          * Get the root element of the element structure stored in the file.
          * @return The root element.
          */
-        const data::Element& root();
+        data::Element const& root();
 
       private:
-        const std::filesystem::path&   path_;
+        std::filesystem::path const&   path_;
         std::unique_ptr<data::Element> element_;
     };
 }
 
 #endif
-

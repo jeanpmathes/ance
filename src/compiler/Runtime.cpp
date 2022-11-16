@@ -83,7 +83,7 @@ void Runtime::setExit(lang::ResolvingHandle<lang::Function> exit)
 
 std::shared_ptr<lang::Value> Runtime::allocate(Allocator                           allocation,
                                                lang::ResolvingHandle<lang::Type>   type,
-                                               const std::shared_ptr<lang::Value>& count,
+                                               std::shared_ptr<lang::Value> const& count,
                                                CompileContext&                     context)
 {
     llvm::Value* count_value = nullptr;
@@ -118,7 +118,7 @@ std::shared_ptr<lang::Value> Runtime::allocate(Allocator                        
     return std::make_shared<lang::WrappedNativeValue>(ptr_type, native_ptr);
 }
 
-void Runtime::deleteDynamic(const std::shared_ptr<lang::Value>& value, bool delete_buffer, CompileContext& context)
+void Runtime::deleteDynamic(std::shared_ptr<lang::Value> const& value, bool delete_buffer, CompileContext& context)
 {
     assert(delete_buffer || value->type()->isPointerType());// Not deleting a buffer implies a pointer type.
     assert(!delete_buffer || value->type()->isBufferType());// Deleting a buffer implies a buffer type.
@@ -137,7 +137,8 @@ void Runtime::deleteDynamic(const std::shared_ptr<lang::Value>& value, bool dele
     {
         llvm::Value* content_ptr = context.ir()->CreateBitCast(ptr, size_ptr_content_type, ptr->getName() + ".bitcast");
 
-        llvm::Value* header_ptr = context.ir()->CreateGEP(size_content_type,
+        llvm::Value* header_ptr =
+            context.ir()->CreateGEP(size_content_type,
                                     content_ptr,
                                     llvm::ConstantInt::get(llvm::IntegerType::getInt64Ty(*context.llvmContext()),
                                                            static_cast<uint64_t>(-1),
@@ -159,7 +160,7 @@ void Runtime::deleteDynamic(const std::shared_ptr<lang::Value>& value, bool dele
     success->setName(delete_dynamic_->getName() + ".call");
 }
 
-void Runtime::buildAssert(const std::shared_ptr<lang::Value>& value, CompileContext& context)
+void Runtime::buildAssert(std::shared_ptr<lang::Value> const& value, CompileContext& context)
 {
     assert(value->type()->isBooleanType());
 
@@ -246,4 +247,3 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
 
     return result_ptr;
 }
-

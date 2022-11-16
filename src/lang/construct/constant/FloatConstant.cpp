@@ -3,7 +3,7 @@
 #include "lang/type/Type.h"
 
 lang::FloatConstant::FloatConstant(std::string                       number,
-                                   const llvm::fltSemantics&         semantics,
+                                   llvm::fltSemantics const&         semantics,
                                    lang::ResolvingHandle<lang::Type> type)
     : text_(number)
     , type_(type)
@@ -32,11 +32,10 @@ llvm::Constant* lang::FloatConstant::buildContent(llvm::Module* m)
     return llvm::ConstantFP::get(type_->getContentType(m->getContext()), float_);
 }
 
-bool lang::FloatConstant::equals(const lang::Constant* other) const
+bool lang::FloatConstant::equals(lang::Constant const* other) const
 {
-    auto other_float = dynamic_cast<const FloatConstant*>(other);
+    auto other_float = dynamic_cast<FloatConstant const*>(other);
     if (!other_float) return false;
 
     return this->float_ == other_float->float_;
 }
-

@@ -54,37 +54,37 @@ namespace lang
 
         void setType(lang::Type* type);
 
-        [[nodiscard]] const Identifier& name() const;
-        const std::string&              getMangledName() const;
+        [[nodiscard]] Identifier const& name() const;
+        std::string const&              getMangledName() const;
         [[nodiscard]] lang::Location    getDefinitionLocation() const;
         [[nodiscard]] bool              isCustom() const;
 
         [[nodiscard]] virtual StateCount getStateCount() const = 0;
 
-        [[nodiscard]] virtual const FixedWidthIntegerType* isFixedWidthIntegerType() const;
+        [[nodiscard]] virtual FixedWidthIntegerType const* isFixedWidthIntegerType() const;
         [[nodiscard]] virtual bool                     isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const;
         [[nodiscard]] virtual bool                     isSigned() const;
-        [[nodiscard]] virtual const IntegerType*       isIntegerType() const;
-        [[nodiscard]] virtual bool                         isBooleanType() const;
-        [[nodiscard]] virtual bool                         isCharType() const;
-        [[nodiscard]] virtual bool                         isUnsignedIntegerPointerType() const;
-        [[nodiscard]] virtual const FloatingPointType* isFloatingPointType() const;
+        [[nodiscard]] virtual IntegerType const*       isIntegerType() const;
+        [[nodiscard]] virtual bool                     isBooleanType() const;
+        [[nodiscard]] virtual bool                     isCharType() const;
+        [[nodiscard]] virtual bool                     isUnsignedIntegerPointerType() const;
+        [[nodiscard]] virtual FloatingPointType const* isFloatingPointType() const;
         [[nodiscard]] virtual bool                     isFloatingPointType(size_t precision) const;
         [[nodiscard]] virtual bool                     isSizeType() const;
         [[nodiscard]] virtual bool                     isDiffType() const;
-        [[nodiscard]] virtual bool                         isVoidType() const;
-        [[nodiscard]] virtual bool                         isNullValueType() const;
-        [[nodiscard]] virtual bool                         isPointerType() const;
+        [[nodiscard]] virtual bool                     isVoidType() const;
+        [[nodiscard]] virtual bool                     isNullValueType() const;
+        [[nodiscard]] virtual bool                     isPointerType() const;
         [[nodiscard]] virtual bool                     isAddressType() const;
         [[nodiscard]] virtual bool                     isBufferType() const;
         [[nodiscard]] virtual bool                     isOpaquePointerType() const;
         [[nodiscard]] virtual bool                     isReferenceType() const;
         [[nodiscard]] virtual bool                     isStructType() const;
-        [[nodiscard]] virtual const VectorizableType*  isVectorizable() const;
+        [[nodiscard]] virtual VectorizableType const*  isVectorizable() const;
         [[nodiscard]] virtual VectorizableType*        isVectorizable();
-        [[nodiscard]] virtual const VectorType*        isVectorType() const;
+        [[nodiscard]] virtual VectorType const*        isVectorType() const;
         [[nodiscard]] virtual VectorType*              isVectorType();
-        [[nodiscard]] virtual const ArrayType*         isArrayType() const;
+        [[nodiscard]] virtual ArrayType const*         isArrayType() const;
         [[nodiscard]] virtual ArrayType*               isArrayType();
 
         [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getElementType() const;
@@ -118,8 +118,8 @@ namespace lang
                                                                         lang::ResolvingHandle<lang::Type> other);
         virtual lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op);
         virtual bool                              isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other);
-        virtual bool                              hasMember(const lang::Identifier& name);
-        virtual lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name);
+        virtual bool                              hasMember(lang::Identifier const& name);
+        virtual lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name);
         virtual bool                              definesIndirection();
         virtual lang::ResolvingHandle<lang::Type> getIndirectionType();
 
@@ -140,7 +140,7 @@ namespace lang
         virtual bool validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                 lang::Location                    location,
                                                 ValidationLogger&                 validation_logger) const;
-        virtual bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const;
+        virtual bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const;
         virtual bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const;
 
         virtual std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
@@ -157,7 +157,7 @@ namespace lang
                                                                      std::shared_ptr<Value>            value,
                                                                      CompileContext&                   context);
         virtual std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
-                                                               const lang::Identifier& name,
+                                                               lang::Identifier const& name,
                                                                CompileContext&         context);
         virtual std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext& context);
 
@@ -232,7 +232,7 @@ namespace lang
          * @param parameters The parameters of the function.
          * @return True if the function exists.
          */
-        virtual bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters);
+        virtual bool acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters);
 
         /**
          * Build a function (constructor) overload that was accepted before.
@@ -240,7 +240,7 @@ namespace lang
          * @param function The already declared function which has to be built.
          * @param context The current compile context.
          */
-        virtual void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+        virtual void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
                                             lang::PredefinedFunction&                             function,
                                             CompileContext&                                       context);
 

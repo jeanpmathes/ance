@@ -39,7 +39,7 @@ namespace lang
 
         llvm::DIScope*                                      getDebugScope(CompileContext& context) override;
         lang::LocalScope*                                   getInsideScope() override;
-        [[nodiscard]] const std::vector<lang::BasicBlock*>& getBasicBlocks() const override;
+        [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 
       protected:
         [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
@@ -51,4 +51,3 @@ namespace lang
 }
 
 #endif
-

@@ -107,12 +107,12 @@ std::shared_ptr<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperat
     return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
 }
 
-bool lang::AddressType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+bool lang::AddressType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
 {
     return parameters.size() == 1 && (parameters[0]->isAddressType() || parameters[0]->isUnsignedIntegerPointerType());
 }
 
-void lang::AddressType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+void lang::AddressType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
                                                lang::PredefinedFunction&                             function,
                                                CompileContext&                                       context)
 {

@@ -13,4 +13,3 @@ llvm::Value* lang::Value::getContentValue()
     assert(content_value_ && "Content value must be built before accessing it.");
     return content_value_;
 }
-

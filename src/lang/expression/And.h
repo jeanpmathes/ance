@@ -43,4 +43,3 @@ class And
 };
 
 #endif
-

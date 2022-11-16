@@ -7,9 +7,9 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Target/TargetMachine.h>
 
-#include "lang/construct/Function.h"
 #include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
+#include "lang/construct/Function.h"
 
 class Application;
 
@@ -30,21 +30,21 @@ class AnceCompiler
      * Compile the application.
      * @param out Path to emit the llvm IR at.
      */
-    void compile(const std::filesystem::path& out);
+    void compile(std::filesystem::path const& out);
     /**
      * Emit object files.
      * @param out The path of the object files.
      */
-    void emitObject(const std::filesystem::path& out);
+    void emitObject(std::filesystem::path const& out);
 
   private:
     llvm::Function* buildInit();
     llvm::Function* buildExit();
     void            buildStart(lang::ResolvingHandle<lang::Function> main, llvm::Function* init, llvm::Function* exit);
-    static std::string getInternalFunctionName(const std::string& name);
+    static std::string getInternalFunctionName(std::string const& name);
 
   private:
-    static constexpr const char* INTERNAL_FUNCTION_SUFFIX = "$lang";
+    static constexpr char const* INTERNAL_FUNCTION_SUFFIX = "$lang";
 
     Application&      application_;
     llvm::LLVMContext llvm_context_;

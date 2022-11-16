@@ -6,16 +6,16 @@
 
 std::string_view trim(std::string_view str, size_t& start)
 {
-    const auto begin = str.find_first_not_of(" \t");
-    const auto end   = str.find_last_not_of(" \t");
+    auto const begin = str.find_first_not_of(" \t");
+    auto const end   = str.find_last_not_of(" \t");
 
     start = begin;
 
-    const auto range = end - begin + 1;
+    auto const range = end - begin + 1;
     return str.substr(begin, range);
 }
 
-size_t estimateWidth(const std::string_view& str)
+size_t estimateWidth(std::string_view const& str)
 {
     size_t width = 0;
 

@@ -65,7 +65,7 @@ std::shared_ptr<typename lang::ResolvingHandle<T>::HandleNavigator> lang::Resolv
 }
 
 template<typename T>
-bool lang::ResolvingHandle<T>::operator==(const ResolvingHandle<T>& other) const
+bool lang::ResolvingHandle<T>::operator==(ResolvingHandle<T> const& other) const
 {
     T* target       = get();
     T* other_target = other.get();
@@ -74,7 +74,7 @@ bool lang::ResolvingHandle<T>::operator==(const ResolvingHandle<T>& other) const
 }
 
 template<typename T>
-bool lang::ResolvingHandle<T>::operator!=(const lang::ResolvingHandle<T>& other) const
+bool lang::ResolvingHandle<T>::operator!=(lang::ResolvingHandle<T> const& other) const
 {
     T* target       = get();
     T* other_target = other.get();
@@ -83,7 +83,7 @@ bool lang::ResolvingHandle<T>::operator!=(const lang::ResolvingHandle<T>& other)
 }
 
 template<typename T>
-bool lang::ResolvingHandle<T>::operator<(const lang::ResolvingHandle<T>& other) const
+bool lang::ResolvingHandle<T>::operator<(lang::ResolvingHandle<T> const& other) const
 {
     T* target       = get();
     T* other_target = other.get();
@@ -111,9 +111,7 @@ std::shared_ptr<typename lang::ResolvingHandle<T>::HandleNavigator> lang::Resolv
 
         return next_;
     }
-    else {
-        return {};
-    }
+    else { return {}; }
 }
 
 template<typename T>
@@ -175,4 +173,3 @@ bool lang::HandleTarget<SELF>::equalsTarget(SELF* other)
 {
     return this == other;
 }
-

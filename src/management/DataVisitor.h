@@ -23,4 +23,3 @@ class DataVisitor : public dataBaseVisitor
 };
 
 #endif
-

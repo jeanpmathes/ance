@@ -8,8 +8,8 @@
 #include <llvm/IR/LLVMContext.h>
 
 #include "lang/AccessModifier.h"
-#include "lang/Element.h"
 #include "lang/Assigner.h"
+#include "lang/Element.h"
 
 namespace lang
 {
@@ -105,4 +105,3 @@ namespace lang
 }
 
 #endif
-

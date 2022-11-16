@@ -9,7 +9,7 @@ lang::ResolvingHandle<lang::Type> lang::DelayedValue::type() const
     return expression_.type();
 }
 
-void lang::DelayedValue::setValue(const std::shared_ptr<lang::Value>& value)
+void lang::DelayedValue::setValue(std::shared_ptr<lang::Value> const& value)
 {
     assert(!value_);
     assert(lang::Type::areSame(value->type(), type()) && "Type has to match.");
@@ -28,4 +28,3 @@ llvm::Value* lang::DelayedValue::getNativeValue()
 {
     return value_->getNativeValue();
 }
-

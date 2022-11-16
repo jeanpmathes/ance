@@ -49,4 +49,3 @@ class If
 };
 
 #endif
-

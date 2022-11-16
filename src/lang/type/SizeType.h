@@ -24,7 +24,7 @@ namespace lang
 
         SizeType(std::string name, Kind kind);
 
-        Kind         kind_;
+        Kind kind_;
 
       public:
         /**

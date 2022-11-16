@@ -1,9 +1,9 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_VARIABLEDEFINITION_H_
 #define ANCE_SRC_LANG_CONSTRUCT_VARIABLEDEFINITION_H_
 
+#include "lang/Element.h"
 #include "lang/construct/value/Value.h"
 #include "lang/utility/Location.h"
-#include "lang/Element.h"
 
 namespace lang
 {
@@ -29,7 +29,7 @@ namespace lang
                            bool                                  is_final,
                            lang::Location                        location);
 
-        [[nodiscard]] const Identifier& name() const;
+        [[nodiscard]] Identifier const& name() const;
 
         /**
          * Get the scope in which this variable is defined.

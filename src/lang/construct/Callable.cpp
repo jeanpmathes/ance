@@ -12,7 +12,7 @@ void lang::Callable::addFunction(lang::OwningHandle<lang::Function> function)
     function_handles_.push_back(functions_.back().handle());
 }
 
-bool lang::Callable::validateResolution(const std::vector<lang::ResolvingHandle<lang::Type>>& types,
+bool lang::Callable::validateResolution(std::vector<lang::ResolvingHandle<lang::Type>> const& types,
                                         lang::Location                                        location,
                                         ValidationLogger&                                     validation_logger) const
 {
@@ -30,7 +30,7 @@ bool lang::Callable::validateResolution(const std::vector<lang::ResolvingHandle<
 }
 
 std::vector<lang::ResolvingHandle<lang::Function>> lang::Callable::resolveOverload(
-    const std::vector<lang::ResolvingHandle<lang::Type>>& arguments) const
+    std::vector<lang::ResolvingHandle<lang::Type>> const& arguments) const
 {
     std::vector<lang::ResolvingHandle<lang::Function>> same_signatures;
     std::vector<lang::ResolvingHandle<lang::Function>> matching_signatures;
@@ -53,7 +53,7 @@ std::vector<lang::ResolvingHandle<lang::Function>>& lang::Callable::functions()
     return function_handles_;
 }
 
-const std::vector<lang::ResolvingHandle<lang::Function>>& lang::Callable::functions() const
+std::vector<lang::ResolvingHandle<lang::Function>> const& lang::Callable::functions() const
 {
     return function_handles_;
 }
@@ -62,4 +62,3 @@ bool lang::Callable::enableImplicitConversionOnCall() const
 {
     return true;
 }
-

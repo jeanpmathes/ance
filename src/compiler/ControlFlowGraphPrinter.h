@@ -25,13 +25,13 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitor
     std::any visit(lang::BasicBlock& block) override;
 
   private:
-    void printBlock(const std::string& label, int32_t id, BlockStyle style);
+    void printBlock(std::string const& label, int32_t id, BlockStyle style);
     void printLink(int32_t from, int32_t to);
-    void printGroup(const std::string& label);
+    void printGroup(std::string const& label);
 
     uint32_t map(int32_t i);
 
-    static std::string escape(const std::string& s);
+    static std::string escape(std::string const& s);
 
   private:
     enum SpecialNodes
@@ -52,4 +52,3 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitor
 };
 
 #endif
-

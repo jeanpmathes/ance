@@ -1,13 +1,13 @@
 #include "Application.h"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-#include "management/elements/Element.h"
-#include "management/File.h"
-#include "validation/ValidationLogger.h"
-#include "compiler/Project.h"
 #include "compiler/CodePrinter.h"
+#include "compiler/Project.h"
+#include "management/File.h"
+#include "management/elements/Element.h"
+#include "validation/ValidationLogger.h"
 
 #include "lang/type/DoubleType.h"
 #include "lang/type/HalfType.h"
@@ -128,4 +128,3 @@ lang::GlobalScope& Application::globalScope()
 {
     return *global_scope_;
 }
-

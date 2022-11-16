@@ -101,7 +101,7 @@ void lang::BasicBlock::Definition::Matching::doBuild(CompileContext& context)
 
     llvm::BasicBlock* default_block = nullptr;
 
-    for (const auto [case_value, branch_block] : llvm::zip(cases_, branches_))
+    for (auto const [case_value, branch_block] : llvm::zip(cases_, branches_))
     {
         if (case_value.empty())
         {
@@ -115,7 +115,7 @@ void lang::BasicBlock::Definition::Matching::doBuild(CompileContext& context)
     auto switch_instance =
         context.ir()->CreateSwitch(value->getContentValue(), default_block, static_cast<unsigned>(cases_.size()));
 
-    for (const auto [case_value, branch_block] : llvm::zip(cases_, branches_))
+    for (auto const [case_value, branch_block] : llvm::zip(cases_, branches_))
     {
         llvm::BasicBlock* branch_native_block = branch_block->definition_->getNativeBlock();
 
@@ -139,4 +139,3 @@ std::string lang::BasicBlock::Definition::Matching::getExitRepresentation()
 {
     return "// match";
 }
-

@@ -13,7 +13,7 @@ namespace lang
     class Signature
     {
       private:
-        explicit Signature(const Identifier& name, std::vector<lang::ResolvingHandle<lang::Type>>& types);
+        explicit Signature(Identifier const& name, std::vector<lang::ResolvingHandle<lang::Type>>& types);
 
       public:
         [[nodiscard]] size_t getParameterCount() const;
@@ -25,27 +25,27 @@ namespace lang
          * @return The signature.
          */
         static Signature fromParameters(Identifier                                           name,
-                                        const std::vector<std::shared_ptr<lang::Parameter>>& parameters);
+                                        std::vector<std::shared_ptr<lang::Parameter>> const& parameters);
 
         /**
          * Get whether the signature can be considered same as the given types.
          * @param arguments The argument types.
          * @return Whether the signature can be considered same as the given types.
          */
-        [[nodiscard]] bool isSame(const std::vector<lang::ResolvingHandle<lang::Type>>& arguments) const;
+        [[nodiscard]] bool isSame(std::vector<lang::ResolvingHandle<lang::Type>> const& arguments) const;
 
         /**
          * Get whether the signature matches the given argument types.
          * @param arguments The argument types.
          * @return Whether the signature matches the given argument types.
          */
-        [[nodiscard]] bool isMatching(const std::vector<lang::ResolvingHandle<lang::Type>>& arguments) const;
+        [[nodiscard]] bool isMatching(std::vector<lang::ResolvingHandle<lang::Type>> const& arguments) const;
 
         /**
          * Get the mangled name. Will create the mangled name if it has not been created yet.
          * @return The mangled name.
          */
-        [[nodiscard]] const std::string& getMangledName();
+        [[nodiscard]] std::string const& getMangledName();
 
         /**
          * Get a string representation of the signature.
@@ -54,8 +54,8 @@ namespace lang
          */
         [[nodiscard]] std::string toString() const;
 
-        bool operator==(const Signature& other) const;
-        bool operator!=(const Signature& other) const;
+        bool operator==(Signature const& other) const;
+        bool operator!=(Signature const& other) const;
 
         /**
          * Check if two given signatures are the same.
@@ -63,7 +63,7 @@ namespace lang
          * @param b The second signature.
          * @return True if the signatures are the same, false otherwise.
          */
-        static bool areSame(const Signature& a, const Signature& b);
+        static bool areSame(Signature const& a, Signature const& b);
 
       private:
         lang::Identifier                               function_name_;
@@ -73,4 +73,3 @@ namespace lang
 }
 
 #endif
-

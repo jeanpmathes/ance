@@ -8,9 +8,9 @@
 
 #include "DataVisitor.h"
 
-data::File::File(const std::filesystem::path& path) : path_(path) {}
+data::File::File(std::filesystem::path const& path) : path_(path) {}
 
-const std::filesystem::path& data::File::path()
+std::filesystem::path const& data::File::path()
 {
     return path_;
 }
@@ -32,9 +32,8 @@ void data::File::read()
     element_.reset(element);
 }
 
-const data::Element& data::File::root()
+data::Element const& data::File::root()
 {
     assert(element_.get() && "Element has to be read before accessing it.");
     return *element_;
 }
-

@@ -17,7 +17,7 @@ class AnceSyntaxErrorHandler
                          antlr4::Token*      offending_symbol,
                          size_t              line,
                          size_t              char_position_in_line,
-                         const std::string&  msg,
+                         std::string const&  msg,
                          std::exception_ptr  e) override;
 
         AnceSyntaxErrorHandler& parent_;
@@ -35,7 +35,7 @@ class AnceSyntaxErrorHandler
                          antlr4::Token*      offending_symbol,
                          size_t              line,
                          size_t              char_position_in_line,
-                         const std::string&  msg,
+                         std::string const&  msg,
                          std::exception_ptr  e) override;
 
         AnceSyntaxErrorHandler& parent_;
@@ -46,14 +46,14 @@ class AnceSyntaxErrorHandler
     antlr4::BaseErrorListener* parserErrorListener();
 
   private:
-    void log(const std::string& message, size_t line, size_t char_position);
+    void log(std::string const& message, size_t line, size_t char_position);
 
   public:
     /**
      * Create a new syntax error handler.
      * @param source_file The source file that is being parsed.
      */
-    explicit AnceSyntaxErrorHandler(const SourceFile& source_file);
+    explicit AnceSyntaxErrorHandler(SourceFile const& source_file);
 
     /**
      * Emit all messages describing found syntax errors.
@@ -67,7 +67,7 @@ class AnceSyntaxErrorHandler
     [[nodiscard]] size_t fatalSyntaxErrorCount() const;
 
   private:
-    const SourceFile& source_file_;
+    SourceFile const& source_file_;
 
     LexerErrorListener  lexer_error_listener_ {*this};
     ParserErrorListener parser_error_listener_ {*this};
@@ -78,4 +78,3 @@ class AnceSyntaxErrorHandler
 };
 
 #endif
-

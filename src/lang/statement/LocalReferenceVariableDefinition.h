@@ -6,9 +6,9 @@
 #include <optional>
 
 #include "lang/Assigner.h"
+#include "lang/Element.h"
 #include "lang/construct/Variable.h"
 #include "lang/utility/ResolvingHandle.h"
-#include "lang/Element.h"
 
 namespace lang
 {
@@ -41,7 +41,7 @@ class LocalReferenceVariableDefinition
                                      lang::Location                    location);
 
   public:
-    [[nodiscard]] const lang::Identifier&           name() const;
+    [[nodiscard]] lang::Identifier const&           name() const;
     [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
     [[nodiscard]] Expression&                       reference() const;
 
@@ -66,4 +66,3 @@ class LocalReferenceVariableDefinition
 };
 
 #endif
-

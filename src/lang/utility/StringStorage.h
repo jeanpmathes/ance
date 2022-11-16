@@ -16,7 +16,7 @@ namespace lang
         StringStorage() = default;
 
       public:
-        StringStorage(const StringStorage& storage) = delete;
+        StringStorage(StringStorage const& storage) = delete;
         StringStorage(StringStorage&& storage)      = delete;
 
         /**
@@ -32,7 +32,7 @@ namespace lang
      * @param string The string of which a copy is stored.
      * @return A view to a string with same content.
      */
-        std::string_view store(const std::string& string);
+        std::string_view store(std::string const& string);
 
       private:
         std::set<std::string> storage_ {};
@@ -40,4 +40,3 @@ namespace lang
 }
 
 #endif
-

@@ -29,7 +29,7 @@ namespace lang
       public:
         static const uint64_t MAX_ARRAY_TYPE_SIZE = 1ll << 32;
 
-        const ArrayType* isArrayType() const override;
+        ArrayType const* isArrayType() const override;
         ArrayType*       isArrayType() override;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
@@ -72,4 +72,3 @@ namespace lang
 }
 
 #endif
-

@@ -53,4 +53,3 @@ Expression::Expansion BindRef::expandWith(Expressions subexpressions) const
 }
 
 BindRef::~BindRef() = default;
-

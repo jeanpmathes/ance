@@ -42,4 +42,3 @@ void Assertion::doBuild(CompileContext& context)
 {
     context.runtime()->buildAssert(condition_->getValue(), context);
 }
-

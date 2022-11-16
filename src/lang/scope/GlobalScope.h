@@ -6,19 +6,18 @@
 #include <optional>
 #include <vector>
 
-#include "lang/Assigner.h"
-#include "lang/construct/Function.h"
-#include "lang/construct/FunctionGroup.h"
-#include "lang/construct/Variable.h"
-#include "lang/type/Type.h"
-#include "lang/utility/OwningHandle.h"
-#include "lang/utility/TypeRegistry.h"
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
 #include "lang/Element.h"
-#include "lang/utility/Identifier.h"
 #include "lang/construct/CodeBlock.h"
+#include "lang/construct/Function.h"
+#include "lang/construct/FunctionGroup.h"
 #include "lang/construct/Member.h"
+#include "lang/construct/Variable.h"
+#include "lang/type/Type.h"
+#include "lang/utility/Identifier.h"
+#include "lang/utility/OwningHandle.h"
+#include "lang/utility/TypeRegistry.h"
 
 class ConstantExpression;
 
@@ -73,7 +72,7 @@ namespace lang
         void defineExternFunction(Identifier                                           name,
                                   lang::ResolvingHandle<lang::Type>                    return_type,
                                   lang::Location                                       return_type_location,
-                                  const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                  std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
                                   lang::Location                                       location);
 
         /**
@@ -90,7 +89,7 @@ namespace lang
                                   lang::AccessModifier                                 access,
                                   lang::ResolvingHandle<lang::Type>                    return_type,
                                   lang::Location                                       return_type_location,
-                                  const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                  std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
                                   std::unique_ptr<lang::CodeBlock>                     code,
                                   lang::Location                                       declaration_location,
                                   lang::Location                                       definition_location);
@@ -217,4 +216,3 @@ namespace lang
     };
 }
 #endif
-

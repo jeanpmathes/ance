@@ -26,4 +26,3 @@ lang::ResolvingHandle<lang::Type> lang::DoubleType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new DoubleType()));
     return instance;
 }
-

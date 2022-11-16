@@ -44,9 +44,8 @@ namespace lang
          * @param value The value to clone. The native value must be built.
          * @return The new value.
          */
-        static std::shared_ptr<lang::Value> clone(const std::shared_ptr<lang::Value>& value);
+        static std::shared_ptr<lang::Value> clone(std::shared_ptr<lang::Value> const& value);
     };
 }
 
 #endif
-

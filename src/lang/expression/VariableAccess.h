@@ -3,9 +3,9 @@
 
 #include "DelayableExpression.h"
 
+#include "lang/Element.h"
 #include "lang/construct/Variable.h"
 #include "lang/utility/ResolvingHandle.h"
-#include "lang/Element.h"
 
 namespace lang
 {
@@ -39,7 +39,7 @@ class VariableAccess
     [[nodiscard]] bool isNamed() override;
 
     bool validate(ValidationLogger& validation_logger) const override;
-    bool validateAssignment(const std::shared_ptr<lang::Value>& value,
+    bool validateAssignment(std::shared_ptr<lang::Value> const& value,
                             lang::Location                      value_location,
                             ValidationLogger&                   validation_logger) override;
 

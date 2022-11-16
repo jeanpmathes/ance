@@ -14,7 +14,7 @@ namespace lang
       public:
         ~VectorizableType() override = default;
 
-        const VectorizableType* isVectorizable() const override;
+        VectorizableType const* isVectorizable() const override;
         VectorizableType*       isVectorizable() override;
 
         using TypeDefinition::buildOperator;
@@ -53,4 +53,3 @@ namespace lang
 }
 
 #endif
-

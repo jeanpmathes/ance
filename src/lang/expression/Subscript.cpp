@@ -51,7 +51,8 @@ bool Subscript::validate(ValidationLogger& validation_logger) const
                                                index_->location(),
                                                validation_logger);
     }
-    else {
+    else
+    {
         validation_logger.logError("Type " + indexed_type->getAnnotatedName() + " does not provide subscript",
                                    location());
 
@@ -74,4 +75,3 @@ void Subscript::doBuild(CompileContext& context)
 }
 
 Subscript::~Subscript() = default;
-

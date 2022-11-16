@@ -33,11 +33,11 @@ namespace lang
 
         bool validateDefinition(ValidationLogger& validation_logger) const override;
 
-        bool                              hasMember(const lang::Identifier& name) override;
-        lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name) override;
-        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const override;
+        bool                              hasMember(lang::Identifier const& name) override;
+        lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name) override;
+        bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
         std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
-                                                       const lang::Identifier& name,
+                                                       lang::Identifier const& name,
                                                        CompileContext&         context) override;
 
       protected:
@@ -67,4 +67,3 @@ namespace lang
 }
 
 #endif
-

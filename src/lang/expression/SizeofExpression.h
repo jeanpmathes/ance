@@ -34,7 +34,7 @@ class SizeofExpression
     void doBuild(CompileContext& context) override;
 
   private:
-    std::unique_ptr<Expression>  expression_;
+    std::unique_ptr<Expression> expression_;
 };
 
 #endif

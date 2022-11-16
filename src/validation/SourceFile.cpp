@@ -6,7 +6,7 @@
 #include <boost/locale/utf.hpp>
 #include <boost/regex/v5/unicode_iterator.hpp>
 
-SourceFile::SourceFile(const std::filesystem::path& project_directory, const std::filesystem::path& file)
+SourceFile::SourceFile(std::filesystem::path const& project_directory, std::filesystem::path const& file)
     : relative_path_(file)
 {
     std::filesystem::path full_path = project_directory / file;
@@ -32,7 +32,7 @@ std::string_view SourceFile::getLineSlice(size_t line, unsigned int column_start
     return getLine(line).substr(column_start, length);
 }
 
-const std::filesystem::path& SourceFile::getRelativePath() const
+std::filesystem::path const& SourceFile::getRelativePath() const
 {
     return relative_path_;
 }

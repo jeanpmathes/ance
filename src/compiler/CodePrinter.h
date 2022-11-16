@@ -5,7 +5,7 @@
 
 namespace util
 {
-    std::ostream& operator<<(std::ostream& os, const std::any& any);
+    std::ostream& operator<<(std::ostream& os, std::any const& any);
 }
 
 class CodePrinter : public lang::ApplicationVisitor
@@ -79,4 +79,3 @@ class CodePrinter : public lang::ApplicationVisitor
 };
 
 #endif
-

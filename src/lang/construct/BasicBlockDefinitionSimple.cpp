@@ -66,9 +66,7 @@ std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Simple::getLeaves()
     std::list<lang::BasicBlock*> leaves;
 
     if (next_) { leaves.splice(leaves.end(), next_->getLeaves()); }
-    else {
-        leaves.push_back(self());
-    }
+    else { leaves.push_back(self()); }
 
     return leaves;
 }
@@ -127,4 +125,3 @@ std::string lang::BasicBlock::Definition::Simple::getExitRepresentation()
 {
     return "// ---";
 }
-

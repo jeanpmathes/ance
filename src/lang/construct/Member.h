@@ -3,8 +3,8 @@
 
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
-#include "lang/type/Type.h"
 #include "lang/expression/ConstantExpression.h"
+#include "lang/type/Type.h"
 
 class ConstantExpression;
 
@@ -35,7 +35,7 @@ namespace lang
                lang::Location                      type_location);
 
         [[nodiscard]] lang::AccessModifier              access() const;
-        [[nodiscard]] const lang::Identifier&           name() const;
+        [[nodiscard]] lang::Identifier const&           name() const;
         [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
         [[nodiscard]] lang::Assigner                    assigner() const;
         [[nodiscard]] lang::Location                    location() const;
@@ -83,4 +83,3 @@ namespace lang
 }
 
 #endif
-

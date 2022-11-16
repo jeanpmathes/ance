@@ -39,9 +39,7 @@ Statements Return::expandWith(Expressions subexpressions, Statements) const
     Statements statements;
 
     if (return_value_) { statements.push_back(std::make_unique<Return>(std::move(subexpressions[0]), location())); }
-    else {
-        statements.push_back(std::make_unique<Return>(nullptr, location()));
-    }
+    else { statements.push_back(std::make_unique<Return>(nullptr, location())); }
 
     return statements;
 }

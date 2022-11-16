@@ -8,7 +8,7 @@
 #include "lang/type/FixedWidthIntegerType.h"
 #include "validation/ValidationLogger.h"
 
-lang::CharConstant::CharConstant(const std::string& prefix, const std::string& content)
+lang::CharConstant::CharConstant(std::string const& prefix, std::string const& content)
     : type_(lang::CharType::get())
     , prefix_(prefix)
     , content_(content)
@@ -42,9 +42,9 @@ llvm::Constant* lang::CharConstant::buildContent(llvm::Module* m)
     return llvm::ConstantInt::get(type_->getContentType(m->getContext()), char_, false);
 }
 
-bool lang::CharConstant::equals(const lang::Constant* other) const
+bool lang::CharConstant::equals(lang::Constant const* other) const
 {
-    auto other_char = dynamic_cast<const CharConstant*>(other);
+    auto other_char = dynamic_cast<CharConstant const*>(other);
     if (!other_char) return false;
 
     return this->char_ == other_char->char_ && lang::Type::areSame(this->type_, other_char->type_);
@@ -195,7 +195,7 @@ char32_t lang::CharConstant::readEscapedChar(std::u32string const& unparsed, siz
     }
 }
 
-uint8_t lang::CharConstant::parseByte(const std::string& unparsed, bool& valid)
+uint8_t lang::CharConstant::parseByte(std::string const& unparsed, bool& valid)
 {
     std::optional<uint8_t> content;
     bool                   escaped = false;
@@ -228,7 +228,7 @@ uint8_t lang::CharConstant::parseByte(const std::string& unparsed, bool& valid)
     return content.value();
 }
 
-uint8_t lang::CharConstant::readEscapedByte(const std::string& unparsed, size_t& index, bool& success)
+uint8_t lang::CharConstant::readEscapedByte(std::string const& unparsed, size_t& index, bool& success)
 {
     char const& c = unparsed[index++];
     switch (c)

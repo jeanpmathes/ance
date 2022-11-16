@@ -62,7 +62,8 @@ void lang::CodeBlock::append(std::unique_ptr<CodeBlock> block)
 
         addSubstatement(*last_ptr);
     }
-    else {
+    else
+    {
         for (auto& sub : block->subs_)
         {
             addSubstatement(*sub);
@@ -91,8 +92,7 @@ void lang::CodeBlock::setScope(Scope& scope)
 
 void lang::CodeBlock::walkDefinitions()
 {
-    for (auto& sub : subs_)
-    { sub->walkDefinitions(); }
+    for (auto& sub : subs_) { sub->walkDefinitions(); }
 }
 
 std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlocks(lang::BasicBlock& entry,
@@ -164,4 +164,3 @@ void lang::CodeBlock::doBuild(CompileContext&)
 {
     assert(false && "Build step must use code-block free hierarchy.");// Building uses BBs.
 }
-

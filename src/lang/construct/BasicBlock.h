@@ -1,10 +1,10 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_BASICBLOCK_H_
 #define ANCE_SRC_LANG_CONSTRUCT_BASICBLOCK_H_
 
-#include "lang/statement/Statement.h"
-#include "lang/construct/value/Value.h"
 #include "lang/Element.h"
+#include "lang/construct/value/Value.h"
 #include "lang/expression/ConstantExpression.h"
+#include "lang/statement/Statement.h"
 
 namespace lang
 {
@@ -194,7 +194,7 @@ namespace lang
          * Get all statements in this basic block.t
          * @return References to all statements in this basic block.
          */
-        [[nodiscard]] const std::vector<std::reference_wrapper<Statement>>& statements() const;
+        [[nodiscard]] std::vector<std::reference_wrapper<Statement>> const& statements() const;
 
       private:
         void                 registerIncomingLink(BasicBlock& predecessor);
@@ -484,4 +484,3 @@ namespace lang
 }
 
 #endif
-

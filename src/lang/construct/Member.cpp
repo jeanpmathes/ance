@@ -28,7 +28,7 @@ lang::AccessModifier lang::Member::access() const
     return access_;
 }
 
-const lang::Identifier& lang::Member::name() const
+lang::Identifier const& lang::Member::name() const
 {
     return name_;
 }
@@ -113,4 +113,3 @@ llvm::Constant* lang::Member::getInitialValue(llvm::Module& m) const
 
     return initial_value_;
 }
-

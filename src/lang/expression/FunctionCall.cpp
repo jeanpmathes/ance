@@ -21,7 +21,7 @@ FunctionCall::FunctionCall(std::optional<lang::ResolvingHandle<lang::FunctionGro
     for (auto& argument : arguments_) { addSubexpression(*argument); }
 }
 
-const lang::Callable& FunctionCall::callable() const
+lang::Callable const& FunctionCall::callable() const
 {
     if (!used_callable_)
     {
@@ -37,7 +37,7 @@ const lang::Callable& FunctionCall::callable() const
 
 lang::Callable& FunctionCall::getCallable()
 {
-    return const_cast<lang::Callable&>(static_cast<const FunctionCall&>(*this).callable());
+    return const_cast<lang::Callable&>(static_cast<FunctionCall const&>(*this).callable());
 }
 
 std::vector<std::reference_wrapper<Expression>> FunctionCall::arguments() const

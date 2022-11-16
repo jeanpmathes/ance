@@ -17,7 +17,7 @@ class ValidationLogger
     ValidationLogger();
 
     ValidationLogger(ValidationLogger&& validation_logger)      = delete;
-    ValidationLogger(const ValidationLogger& validation_logger) = delete;
+    ValidationLogger(ValidationLogger const& validation_logger) = delete;
 
   private:
     enum class LogLevel
@@ -44,17 +44,17 @@ class ValidationLogger
      * @param message A message describing the warning.
      * @param location The source location of the code triggering this warning.
      */
-    void logWarning(const std::string& message, lang::Location location);
+    void logWarning(std::string const& message, lang::Location location);
 
     /**
      * Log an error.
      * @param message A message describing the error.
      * @param location The source location of the code triggering this error.
      */
-    void logError(const std::string& message, lang::Location location);
+    void logError(std::string const& message, lang::Location location);
 
   private:
-    void log(LogLevel level, const std::string& message, lang::Location location);
+    void log(LogLevel level, std::string const& message, lang::Location location);
 
   public:
     /**
@@ -72,7 +72,7 @@ class ValidationLogger
      * Emit all logged messages.
      * @param source_files The source file containing the code that was validated with this logger.
      */
-    void emitMessages(const std::vector<std::reference_wrapper<SourceFile>>& source_files);
+    void emitMessages(std::vector<std::reference_wrapper<SourceFile>> const& source_files);
 
   private:
     std::vector<LogEntry> entries_;
@@ -82,4 +82,3 @@ class ValidationLogger
 };
 
 #endif
-

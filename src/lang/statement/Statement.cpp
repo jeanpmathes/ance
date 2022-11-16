@@ -130,4 +130,3 @@ void Statement::addSubstatement(Statement& substatement)
     substatements_.emplace_back(substatement);
     addChild(substatement);
 }
-

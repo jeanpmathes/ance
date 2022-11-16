@@ -25,7 +25,7 @@ LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(lang::Identif
     addSubexpression(*reference_);
 }
 
-const lang::Identifier& LocalReferenceVariableDefinition::name() const
+lang::Identifier const& LocalReferenceVariableDefinition::name() const
 {
     return name_;
 }
@@ -111,4 +111,3 @@ void LocalReferenceVariableDefinition::doBuild(CompileContext& context)
 {
     (*variable_)->buildDefinition(context);
 }
-

@@ -34,7 +34,7 @@ namespace lang
          * @param integer The integer value to use, encoded as a string. Radix is assumed to be 10.
          * @param is_signed Whether the integer value is signed or unsigned.
          */
-        IntegerConstant(const std::string& integer, bool is_signed);
+        IntegerConstant(std::string const& integer, bool is_signed);
 
         [[nodiscard]] std::string toString() const override;
 
@@ -43,15 +43,14 @@ namespace lang
         lang::ResolvingHandle<lang::Type> type() const override;
         llvm::Constant*                   buildContent(llvm::Module* m) override;
 
-        bool equals(const lang::Constant* other) const override;
+        bool equals(lang::Constant const* other) const override;
 
       private:
         std::string                       text_;
         std::uint8_t                      radix_;
         lang::ResolvingHandle<lang::Type> type_;
-        const IntegerType*                integer_type_;
+        IntegerType const*                integer_type_;
     };
 }
 
 #endif
-

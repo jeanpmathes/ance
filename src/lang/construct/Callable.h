@@ -27,7 +27,7 @@ namespace lang
          * Get the name of this callable.
          * @return The name.
          */
-        [[nodiscard]] virtual const Identifier& name() const = 0;
+        [[nodiscard]] virtual Identifier const& name() const = 0;
 
         [[nodiscard]] virtual bool isDefined() const = 0;
 
@@ -51,7 +51,7 @@ namespace lang
          * @param validation_logger The validation logger.
          * @return True if the resolution is valid.
          */
-        bool validateResolution(const std::vector<lang::ResolvingHandle<lang::Type>>& types,
+        bool validateResolution(std::vector<lang::ResolvingHandle<lang::Type>> const& types,
                                 lang::Location                                        location,
                                 ValidationLogger&                                     validation_logger) const;
 
@@ -61,12 +61,12 @@ namespace lang
          * @return All functions that fit the given arguments.
          */
         [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Function>> resolveOverload(
-            const std::vector<lang::ResolvingHandle<lang::Type>>& arguments) const;
+            std::vector<lang::ResolvingHandle<lang::Type>> const& arguments) const;
 
       protected:
         virtual void                                                            onAddFunction(lang::Function& function);
         std::vector<lang::ResolvingHandle<lang::Function>>&                     functions();
-        [[nodiscard]] const std::vector<lang::ResolvingHandle<lang::Function>>& functions() const;
+        [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Function>> const& functions() const;
 
         /**
          * Get whether implicit conversion should be considered for overload resolution.
@@ -81,4 +81,3 @@ namespace lang
 }
 
 #endif
-

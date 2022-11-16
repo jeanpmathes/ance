@@ -3,8 +3,8 @@
 
 #include "ConstantExpression.h"
 
-#include "lang/construct/constant/Constant.h"
 #include "lang/Element.h"
+#include "lang/construct/constant/Constant.h"
 
 /**
  * Wraps a constant.
@@ -36,4 +36,3 @@ class ConstantLiteral
 };
 
 #endif
-

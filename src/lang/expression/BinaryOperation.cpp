@@ -59,7 +59,8 @@ bool BinaryOperation::validate(ValidationLogger& validation_logger) const
                                            + op_.toString() + "'",
                                        location());
         }
-        else {
+        else
+        {
             validation_logger.logError("Type " + left_->type()->getAnnotatedName() + " does not provide operator '"
                                            + op_.toString() + "' with type " + right_->type()->getAnnotatedName(),
                                        location());
@@ -67,7 +68,8 @@ bool BinaryOperation::validate(ValidationLogger& validation_logger) const
 
         return false;
     }
-    else if (!lang::Type::areSame(right_type, right_->type())) {
+    else if (!lang::Type::areSame(right_type, right_->type()))
+    {
         bool can_convert =
             right_->type()->validateImplicitConversion(right_type, right_->location(), validation_logger);
         if (!can_convert) return false;
@@ -119,4 +121,3 @@ lang::ResolvingHandle<lang::Type> BinaryOperation::getRightType(lang::BinaryOper
 }
 
 BinaryOperation::~BinaryOperation() = default;
-

@@ -1,7 +1,7 @@
 #include "TypeRegistry.h"
 
 template<typename OTHER_KEY>
-std::optional<TypeHandle> lang::TypeRegistry<OTHER_KEY>::get(const UsedTypes& type_keys,
+std::optional<TypeHandle> lang::TypeRegistry<OTHER_KEY>::get(UsedTypes const& type_keys,
                                                              const OTHER_KEY& other_keys) const
 {
     for (auto& [current_key, current_type] : types_)
@@ -95,4 +95,3 @@ void lang::TypeRegistry<OTHER_KEY>::buildNativeDefinitions(CompileContext& conte
 {
     for (auto& [key, type] : types_) { type->buildNativeDefinition(context); }
 }
-

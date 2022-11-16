@@ -33,14 +33,14 @@ llvm::Type* lang::CharType::getContentType(llvm::LLVMContext& c) const
     return llvm::Type::getIntNTy(c, static_cast<unsigned>(SIZE_IN_BITS));
 }
 
-bool lang::CharType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+bool lang::CharType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
 {
     if (parameters.size() == 1 && parameters[0]->isFixedWidthIntegerType(SIZE_IN_BITS, false)) return true;
 
     return false;
 }
 
-void lang::CharType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+void lang::CharType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
                                             lang::PredefinedFunction&                             function,
                                             CompileContext&                                       context)
 {

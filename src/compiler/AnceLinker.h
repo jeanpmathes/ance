@@ -23,7 +23,7 @@ class AnceLinker
      * @param exe The path of the finished executable.
      * @return True if the linking was successful, false otherwise.
      */
-    bool link(const std::filesystem::path& obj, const std::filesystem::path& exe);
+    bool link(std::filesystem::path const& obj, std::filesystem::path const& exe);
 
   private:
     std::vector<std::string> lib_paths_;
@@ -31,4 +31,3 @@ class AnceLinker
 };
 
 #endif
-

@@ -90,4 +90,3 @@ Expression::Expansion And::expandWith(Expressions subexpressions) const
 }
 
 And::~And() = default;
-

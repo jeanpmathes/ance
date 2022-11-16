@@ -51,14 +51,13 @@ namespace lang
 #include "lang/statement/Assertion.h"
 #include "lang/statement/Assignment.h"
 #include "lang/statement/Delete.h"
+#include "lang/statement/Drop.h"
 #include "lang/statement/ExpressionStatement.h"
+#include "lang/statement/If.h"
 #include "lang/statement/LocalReferenceVariableDefinition.h"
 #include "lang/statement/LocalVariableDefinition.h"
-#include "lang/statement/Drop.h"
-#include "lang/statement/Return.h"
-#include "lang/statement/If.h"
-#include "lang/statement/While.h"
 #include "lang/statement/Match.h"
+#include "lang/statement/Return.h"
+#include "lang/statement/While.h"
 
 #endif
-

@@ -1,6 +1,6 @@
 #include "Signature.h"
 
-lang::Signature::Signature(const Identifier& name, std::vector<lang::ResolvingHandle<lang::Type>>& types)
+lang::Signature::Signature(Identifier const& name, std::vector<lang::ResolvingHandle<lang::Type>>& types)
     : function_name_(name)
     , types_(types)
 {}
@@ -11,7 +11,7 @@ size_t lang::Signature::getParameterCount() const
 }
 
 lang::Signature lang::Signature::fromParameters(Identifier                                           name,
-                                                const std::vector<std::shared_ptr<lang::Parameter>>& parameters)
+                                                std::vector<std::shared_ptr<lang::Parameter>> const& parameters)
 {
     std::vector<ResolvingHandle<Type>> types;
 
@@ -21,27 +21,27 @@ lang::Signature lang::Signature::fromParameters(Identifier                      
     return Signature(name, types);
 }
 
-bool lang::Signature::isSame(const std::vector<lang::ResolvingHandle<lang::Type>>& arguments) const
+bool lang::Signature::isSame(std::vector<lang::ResolvingHandle<lang::Type>> const& arguments) const
 {
     if (types_.size() != arguments.size()) return false;
 
     auto types = llvm::zip(types_, arguments);
-    return std::all_of(types.begin(), types.end(), [](const auto& pair) {
+    return std::all_of(types.begin(), types.end(), [](auto const& pair) {
         return lang::Type::areSame(std::get<0>(pair), std::get<1>(pair));
     });
 }
 
-bool lang::Signature::isMatching(const std::vector<lang::ResolvingHandle<lang::Type>>& arguments) const
+bool lang::Signature::isMatching(std::vector<lang::ResolvingHandle<lang::Type>> const& arguments) const
 {
     if (types_.size() != arguments.size()) return false;
 
     auto types = llvm::zip(types_, arguments);
-    return std::all_of(types.begin(), types.end(), [](const auto& pair) {
+    return std::all_of(types.begin(), types.end(), [](auto const& pair) {
         return lang::Type::isMatching(std::get<0>(pair), std::get<1>(pair));
     });
 }
 
-const std::string& lang::Signature::getMangledName()
+std::string const& lang::Signature::getMangledName()
 {
     if (!mangled_name_.empty()) return mangled_name_;
 
@@ -78,19 +78,18 @@ std::string lang::Signature::toString() const
     return string;
 }
 
-bool lang::Signature::operator==(const lang::Signature& other) const
+bool lang::Signature::operator==(lang::Signature const& other) const
 {
     return areSame(*this, other);
 }
 
-bool lang::Signature::operator!=(const lang::Signature& other) const
+bool lang::Signature::operator!=(lang::Signature const& other) const
 {
     return !areSame(*this, other);
 }
 
-bool lang::Signature::areSame(const lang::Signature& a, const lang::Signature& b)
+bool lang::Signature::areSame(lang::Signature const& a, lang::Signature const& b)
 {
     if (a.function_name_.text() != b.function_name_.text()) return false;
     return a.isSame(b.types_);
 }
-

@@ -5,11 +5,10 @@
 
 namespace ansi
 {
-    inline const char* ColorRed    = "\x1B[31m";
-    inline const char* ColorYellow = "\x1B[33m";
+    inline char const* ColorRed    = "\x1B[31m";
+    inline char const* ColorYellow = "\x1B[33m";
 
-    inline const char* ColorReset = "\x1B[0m";
+    inline char const* ColorReset = "\x1B[0m";
 }
 
 #endif
-

@@ -35,4 +35,3 @@ namespace lang
 #include "OwningHandle.tpp"
 
 #endif
-

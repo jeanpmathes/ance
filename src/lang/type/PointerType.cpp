@@ -31,9 +31,7 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::getActualType() const
 {
     lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
     if (actual_element_type == element_type_) { return self(); }
-    else {
-        return lang::PointerType::get(actual_element_type);
-    }
+    else { return lang::PointerType::get(actual_element_type); }
 }
 
 bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -94,7 +92,7 @@ std::string lang::PointerType::createMangledName() const
 
 llvm::DIType* lang::PointerType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.module()->getDataLayout();
 
     uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
 

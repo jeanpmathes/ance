@@ -20,7 +20,7 @@ lang::ResolvingHandle<lang::Type> lang::Parameter::type() const
     return type_;
 }
 
-const lang::Identifier& lang::Parameter::name()
+lang::Identifier const& lang::Parameter::name()
 {
     return name_;
 }
@@ -60,4 +60,3 @@ llvm::Value* lang::Parameter::getContentValue()
 {
     return content_value_;
 }
-

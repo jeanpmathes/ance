@@ -29,8 +29,8 @@ size_t SourceTree::parse()
     return source_files_.size();
 }
 
-SourceTree::SourceFileReadResult SourceTree::readSourceFile(const std::filesystem::path& project_path,
-                                                            const std::filesystem::path& file_path,
+SourceTree::SourceFileReadResult SourceTree::readSourceFile(std::filesystem::path const& project_path,
+                                                            std::filesystem::path const& file_path,
                                                             size_t                       index)
 {
     std::unique_ptr<SourceFile> source_file = std::make_unique<SourceFile>(project_path, file_path);

@@ -21,4 +21,3 @@ std::string lang::UnaryOperator::toString() const
             return "-";
     }
 }
-

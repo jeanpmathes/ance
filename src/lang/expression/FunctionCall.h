@@ -5,9 +5,9 @@
 
 #include <set>
 
+#include "lang/Element.h"
 #include "lang/construct/Function.h"
 #include "lang/utility/ResolvingHandle.h"
-#include "lang/Element.h"
 
 namespace lang
 {
@@ -34,7 +34,7 @@ class FunctionCall
                  std::vector<std::unique_ptr<Expression>>                  arguments,
                  lang::Location                                            location);
 
-    [[nodiscard]] const lang::Callable&                           callable() const;
+    [[nodiscard]] lang::Callable const&                           callable() const;
     [[nodiscard]] std::vector<std::reference_wrapper<Expression>> arguments() const;
 
   private:
@@ -58,7 +58,7 @@ class FunctionCall
     ~FunctionCall() override;
 
   private:
-    std::vector<lang::ResolvingHandle<lang::Function>> function() const;
+    std::vector<lang::ResolvingHandle<lang::Function>>            function() const;
     std::vector<lang::ResolvingHandle<lang::Type>>                argumentTypes() const;
     std::vector<std::optional<lang::ResolvingHandle<lang::Type>>> tryArgumentTypes() const;
 
@@ -66,7 +66,7 @@ class FunctionCall
     lang::ResolvingHandle<lang::Type>                         type_function_group_;
     std::vector<std::unique_ptr<Expression>>                  arguments_;
 
-    mutable const lang::Callable*                              used_callable_ {};
+    mutable lang::Callable const*                              used_callable_ {};
     mutable bool                                               overload_resolved_ {false};
     mutable std::vector<lang::ResolvingHandle<lang::Function>> function_ {};
 };

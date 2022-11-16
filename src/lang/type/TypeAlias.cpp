@@ -23,7 +23,7 @@ StateCount lang::TypeAlias::getStateCount() const
     return actual_->getStateCount();
 }
 
-const lang::FixedWidthIntegerType* lang::TypeAlias::isFixedWidthIntegerType() const
+lang::FixedWidthIntegerType const* lang::TypeAlias::isFixedWidthIntegerType() const
 {
     return actual_->isFixedWidthIntegerType();
 }
@@ -43,12 +43,12 @@ bool lang::TypeAlias::isBooleanType() const
     return actual_->isBooleanType();
 }
 
-const lang::IntegerType* lang::TypeAlias::isIntegerType() const
+lang::IntegerType const* lang::TypeAlias::isIntegerType() const
 {
     return actual_->isIntegerType();
 }
 
-const lang::FloatingPointType* lang::TypeAlias::isFloatingPointType() const
+lang::FloatingPointType const* lang::TypeAlias::isFloatingPointType() const
 {
     return actual_->isFloatingPointType();
 }
@@ -118,7 +118,7 @@ bool lang::TypeAlias::isStructType() const
     return actual_->isStructType();
 }
 
-const lang::VectorizableType* lang::TypeAlias::isVectorizable() const
+lang::VectorizableType const* lang::TypeAlias::isVectorizable() const
 {
     return actual_->isVectorizable();
 }
@@ -128,7 +128,7 @@ lang::VectorizableType* lang::TypeAlias::isVectorizable()
     return actual_->isVectorizable();
 }
 
-const lang::VectorType* lang::TypeAlias::isVectorType() const
+lang::VectorType const* lang::TypeAlias::isVectorType() const
 {
     return actual_->isVectorType();
 }
@@ -138,7 +138,7 @@ lang::VectorType* lang::TypeAlias::isVectorType()
     return actual_->isVectorType();
 }
 
-const lang::ArrayType* lang::TypeAlias::isArrayType() const
+lang::ArrayType const* lang::TypeAlias::isArrayType() const
 {
     return actual_->isArrayType();
 }
@@ -280,23 +280,23 @@ std::shared_ptr<lang::Value> lang::TypeAlias::buildOperator(lang::BinaryOperator
     return actual_->buildOperator(op, left, right, context);
 }
 
-bool lang::TypeAlias::hasMember(const lang::Identifier& name)
+bool lang::TypeAlias::hasMember(lang::Identifier const& name)
 {
     return actual_->hasMember(name);
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeAlias::getMemberType(const lang::Identifier& name)
+lang::ResolvingHandle<lang::Type> lang::TypeAlias::getMemberType(lang::Identifier const& name)
 {
     return actual_->getMemberType(name);
 }
 
-bool lang::TypeAlias::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const
+bool lang::TypeAlias::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const
 {
     return actual_->validateMemberAccess(name, validation_logger);
 }
 
 std::shared_ptr<lang::Value> lang::TypeAlias::buildMemberAccess(std::shared_ptr<Value>  value,
-                                                                const lang::Identifier& name,
+                                                                lang::Identifier const& name,
                                                                 CompileContext&         context)
 {
     return actual_->buildMemberAccess(value, name, context);

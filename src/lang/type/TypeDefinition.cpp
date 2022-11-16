@@ -16,12 +16,12 @@
 lang::TypeDefinition::TypeDefinition(lang::Identifier name, lang::Location location) : name_(name), location_(location)
 {}
 
-const lang::Identifier& lang::TypeDefinition::name() const
+lang::Identifier const& lang::TypeDefinition::name() const
 {
     return name_;
 }
 
-const std::string& lang::TypeDefinition::getMangledName() const
+std::string const& lang::TypeDefinition::getMangledName() const
 {
     if (mangled_name_.empty()) { mangled_name_ = createMangledName(); }
 
@@ -38,7 +38,7 @@ bool lang::TypeDefinition::isCustom() const
     return !location_.isGlobal();
 }
 
-const lang::FixedWidthIntegerType* lang::TypeDefinition::isFixedWidthIntegerType() const
+lang::FixedWidthIntegerType const* lang::TypeDefinition::isFixedWidthIntegerType() const
 {
     return nullptr;
 }
@@ -53,7 +53,7 @@ bool lang::TypeDefinition::isSigned() const
     return false;
 }
 
-const lang::IntegerType* lang::TypeDefinition::isIntegerType() const
+lang::IntegerType const* lang::TypeDefinition::isIntegerType() const
 {
     return nullptr;
 }
@@ -73,7 +73,7 @@ bool lang::TypeDefinition::isUnsignedIntegerPointerType() const
     return false;
 }
 
-const lang::FloatingPointType* lang::TypeDefinition::isFloatingPointType() const
+lang::FloatingPointType const* lang::TypeDefinition::isFloatingPointType() const
 {
     return nullptr;
 }
@@ -133,7 +133,7 @@ bool lang::TypeDefinition::isStructType() const
     return false;
 }
 
-const lang::VectorizableType* lang::TypeDefinition::isVectorizable() const
+lang::VectorizableType const* lang::TypeDefinition::isVectorizable() const
 {
     return nullptr;
 }
@@ -143,7 +143,7 @@ lang::VectorizableType* lang::TypeDefinition::isVectorizable()
     return nullptr;
 }
 
-const lang::VectorType* lang::TypeDefinition::isVectorType() const
+lang::VectorType const* lang::TypeDefinition::isVectorType() const
 {
     return nullptr;
 }
@@ -153,7 +153,7 @@ lang::VectorType* lang::TypeDefinition::isVectorType()
     return nullptr;
 }
 
-const lang::ArrayType* lang::TypeDefinition::isArrayType() const
+lang::ArrayType const* lang::TypeDefinition::isArrayType() const
 {
     return nullptr;
 }
@@ -204,7 +204,7 @@ void lang::TypeDefinition::postResolve()
 
 bool lang::TypeDefinition::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters)
 {
-    for (const auto& [constructor_parameters, function] : requested_constructors_)
+    for (auto const& [constructor_parameters, function] : requested_constructors_)
     {
         if (constructor_parameters == parameters) return true;
     }
@@ -293,12 +293,12 @@ bool lang::TypeDefinition::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang:
     return false;
 }
 
-bool lang::TypeDefinition::hasMember(const lang::Identifier&)
+bool lang::TypeDefinition::hasMember(lang::Identifier const&)
 {
     return false;
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getMemberType(const lang::Identifier&)
+lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getMemberType(lang::Identifier const&)
 {
     return lang::Type::getUndefined();
 }
@@ -352,7 +352,7 @@ bool lang::TypeDefinition::validateImplicitConversion(lang::ResolvingHandle<lang
     return false;
 }
 
-bool lang::TypeDefinition::validateMemberAccess(const lang::Identifier&, ValidationLogger&) const
+bool lang::TypeDefinition::validateMemberAccess(lang::Identifier const&, ValidationLogger&) const
 {
     return false;
 }
@@ -392,7 +392,7 @@ std::shared_ptr<lang::Value> lang::TypeDefinition::buildImplicitConversion(lang:
 }
 
 std::shared_ptr<lang::Value> lang::TypeDefinition::buildMemberAccess(std::shared_ptr<Value>,
-                                                                     const lang::Identifier&,
+                                                                     lang::Identifier const&,
                                                                      CompileContext&)
 {
     return nullptr;
@@ -648,11 +648,11 @@ bool lang::TypeDefinition::hasCyclicDependency() const
 {
     if (cyclic_dependency_.has_value()) { return cyclic_dependency_.value(); }
 
-    const int visited  = 1;
-    const int finished = 2;
+    int const visited  = 1;
+    int const finished = 2;
 
-    std::stack<std::pair<const lang::TypeDefinition*, bool>> to_check;
-    std::map<const lang::TypeDefinition*, int>               state;
+    std::stack<std::pair<lang::TypeDefinition const*, bool>> to_check;
+    std::map<lang::TypeDefinition const*, int>               state;
 
     to_check.emplace(this, false);
 
@@ -665,7 +665,8 @@ bool lang::TypeDefinition::hasCyclicDependency() const
             to_check.pop();
             state[current] = finished;
         }
-        else {
+        else
+        {
             to_check.top() = std::make_pair(current, true);
 
             if (state[current] == visited)
@@ -715,7 +716,7 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
         function->defineAsPredefined(self(), parameters, *scope(), lang::Location::global());
 
     predefined_function.setCallValidator(
-        [this](const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+        [this](std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
                lang::Location                                                              location,
                ValidationLogger&                                                           validation_logger) {
             if (arguments.size() == 1)
@@ -737,12 +738,12 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
     return predefined_function;
 }
 
-bool lang::TypeDefinition::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>&)
+bool lang::TypeDefinition::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const&)
 {
     return false;
 }
 
-void lang::TypeDefinition::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>&,
+void lang::TypeDefinition::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const&,
                                                   lang::PredefinedFunction&,
                                                   CompileContext&)
 {}

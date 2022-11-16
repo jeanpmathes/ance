@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "lang/type/Type.h"
 #include "compiler/CompileContext.h"
+#include "lang/type/Type.h"
 
 lang::RoughlyCastedValue::RoughlyCastedValue(lang::ResolvingHandle<lang::Type> target_type,
                                              std::shared_ptr<lang::Value>      original)
@@ -29,4 +29,3 @@ llvm::Value* lang::RoughlyCastedValue::getNativeValue()
 {
     return original_->getNativeValue();
 }
-

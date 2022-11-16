@@ -42,4 +42,3 @@ class Subscript
 };
 
 #endif
-

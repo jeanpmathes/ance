@@ -17,7 +17,7 @@ ArrayDefinition::ArrayDefinition(std::optional<lang::ResolvingHandle<lang::Type>
     for (auto& element : elements_) { addSubexpression(*element); }
 }
 
-const std::optional<lang::ResolvingHandle<lang::Type>>& ArrayDefinition::elementType() const
+std::optional<lang::ResolvingHandle<lang::Type>> const& ArrayDefinition::elementType() const
 {
     return type_;
 }
@@ -27,7 +27,7 @@ std::vector<std::reference_wrapper<Expression>> ArrayDefinition::values() const
     std::vector<std::reference_wrapper<Expression>> values;
 
     values.reserve(elements_.size());
-    for (const auto& element : elements_) { values.emplace_back(*element); }
+    for (auto const& element : elements_) { values.emplace_back(*element); }
 
     return values;
 }

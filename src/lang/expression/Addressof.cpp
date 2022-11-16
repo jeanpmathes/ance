@@ -60,4 +60,3 @@ void Addressof::doBuild(CompileContext& context)
 }
 
 Addressof::~Addressof() = default;
-

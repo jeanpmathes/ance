@@ -23,9 +23,8 @@ llvm::Value* lang::Values::contentToNative(lang::ResolvingHandle<lang::Type> typ
     return native;
 }
 
-std::shared_ptr<lang::Value> lang::Values::clone(const std::shared_ptr<lang::Value>& value)
+std::shared_ptr<lang::Value> lang::Values::clone(std::shared_ptr<lang::Value> const& value)
 {
     llvm::Value* native = value->getNativeValue();
     return std::make_shared<lang::WrappedNativeValue>(value->type(), native);
 }
-

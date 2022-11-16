@@ -60,7 +60,7 @@ namespace lang
         Type();
 
       public:
-        Type(const Type&) = delete;
+        Type(Type const&) = delete;
         Type(Type&&)      = delete;
 
         /**
@@ -74,7 +74,7 @@ namespace lang
          * Get the name of this type.
          * @return The name.
          */
-        [[nodiscard]] const lang::Identifier& name() const override;
+        [[nodiscard]] lang::Identifier const& name() const override;
 
         /**
          * Get the name of this type with helpful annotations. Useful for validation messages.
@@ -87,7 +87,7 @@ namespace lang
          * Get the mangled name of this type. The mangled name can only be used after all type dependencies have been resolved.
          * @return The mangled name. Cannot contain any special characters, must be unique.
          */
-        [[nodiscard]] const std::string& getMangledName() const;
+        [[nodiscard]] std::string const& getMangledName() const;
 
         /**
          * Get whether this type is defined.
@@ -116,7 +116,7 @@ namespace lang
          * Get whether this type is a fixed width integer type.
          * @return A pointer to the integer type if this type is an integer type, null otherwise.
          */
-        [[nodiscard]] const FixedWidthIntegerType* isFixedWidthIntegerType() const;
+        [[nodiscard]] FixedWidthIntegerType const* isFixedWidthIntegerType() const;
 
         /**
          * Get whether this type is an integer type with a given size and signedness.
@@ -136,7 +136,7 @@ namespace lang
          * Get whether this type is an integer type.
          * @return The integer type if this type is an integer type, null otherwise.
          */
-        [[nodiscard]] const IntegerType* isIntegerType() const;
+        [[nodiscard]] IntegerType const* isIntegerType() const;
 
         /**
          * Get whether this type is a boolean type.
@@ -160,7 +160,7 @@ namespace lang
          * Get whether this type is a floating point type.
          * @return A pointer to the floating point type if this type is a floating point type, null otherwise.
          */
-        [[nodiscard]] const FloatingPointType* isFloatingPointType() const;
+        [[nodiscard]] FloatingPointType const* isFloatingPointType() const;
 
         /**
          * Get whether this type is a floating point type with a given precision.
@@ -234,7 +234,7 @@ namespace lang
          * All types can be vector elements, but for vectorizable types this is natively supported.
          * @return The vectorizable type.
          */
-        [[nodiscard]] const lang::VectorizableType* isVectorizable() const;
+        [[nodiscard]] lang::VectorizableType const* isVectorizable() const;
 
         /**
          * Get whether this type is vectorizable.
@@ -247,7 +247,7 @@ namespace lang
          * Get whether this type is a vector type.
          * @return True if this type is a vector type.
          */
-        [[nodiscard]] const lang::VectorType* isVectorType() const;
+        [[nodiscard]] lang::VectorType const* isVectorType() const;
 
         /**
          * Get whether this type is a vector type.
@@ -259,7 +259,7 @@ namespace lang
          * Get whether this type is an array type.
          * @return The array type if this type is an array type, null otherwise.
          */
-        [[nodiscard]] const lang::ArrayType* isArrayType() const;
+        [[nodiscard]] lang::ArrayType const* isArrayType() const;
 
         /**
          * Get whether this type is an array type.
@@ -397,14 +397,14 @@ namespace lang
          * @param name The name of the member.
          * @return True if the member exists.
          */
-        bool hasMember(const lang::Identifier& name);
+        bool hasMember(lang::Identifier const& name);
 
         /**
          * Get the type of a member.
          * @param name The name of the member.
          * @return The type of the member.
          */
-        lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name);
+        lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name);
 
         /**
          * Get whether this type defines the indirection operator.
@@ -490,7 +490,7 @@ namespace lang
          * @param validation_logger The validation logger to use.
          * @return True if the member access is valid.
          */
-        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const;
+        bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const;
 
         /**
          * Validate indirection.
@@ -554,7 +554,7 @@ namespace lang
          * @return The result value.
          */
         std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
-                                                       const lang::Identifier& name,
+                                                       lang::Identifier const& name,
                                                        CompileContext&         context);
 
         /**
@@ -698,7 +698,7 @@ namespace lang
          * @return A list of common types. It can be empty if there are no common types.
          */
         static std::vector<lang::ResolvingHandle<lang::Type>> getCommonType(
-            const std::vector<lang::ResolvingHandle<lang::Type>>& types);
+            std::vector<lang::ResolvingHandle<lang::Type>> const& types);
 
       private:
         lang::Identifier                      name_;

@@ -26,4 +26,3 @@ lang::ResolvingHandle<lang::Type> lang::QuadType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new QuadType()));
     return instance;
 }
-

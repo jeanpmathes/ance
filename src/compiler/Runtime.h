@@ -7,9 +7,9 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 
+#include "lang/construct/Function.h"
 #include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
-#include "lang/construct/Function.h"
 
 class CompileContext;
 
@@ -74,7 +74,7 @@ class Runtime
      */
     std::shared_ptr<lang::Value> allocate(Allocator                           allocation,
                                           lang::ResolvingHandle<lang::Type>   type,
-                                          const std::shared_ptr<lang::Value>& count,
+                                          std::shared_ptr<lang::Value> const& count,
                                           CompileContext&                     context);
 
     /**
@@ -83,14 +83,14 @@ class Runtime
      * @param delete_buffer Whether the memory is a single element or a buffer of multiple elements.
      * @param context The current compile context.
      */
-    void deleteDynamic(const std::shared_ptr<lang::Value>& value, bool delete_buffer, CompileContext& context);
+    void deleteDynamic(std::shared_ptr<lang::Value> const& value, bool delete_buffer, CompileContext& context);
 
     /**
      * Build an assertion.
      * @param value The boolean value to assert.
      * @param context The current compile context.
      */
-    void buildAssert(const std::shared_ptr<lang::Value>& value, CompileContext& context);
+    void buildAssert(std::shared_ptr<lang::Value> const& value, CompileContext& context);
 
   private:
     llvm::Value* allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
@@ -103,4 +103,3 @@ class Runtime
 };
 
 #endif
-

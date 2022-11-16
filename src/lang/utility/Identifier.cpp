@@ -4,7 +4,7 @@
 
 lang::Identifier::Identifier(std::string_view string, lang::Location location) : string_(string), location_(location) {}
 
-lang::Identifier lang::Identifier::from(const std::string& string, lang::Location location)
+lang::Identifier lang::Identifier::from(std::string const& string, lang::Location location)
 {
     std::string_view view = lang::StringStorage::shared().store(string);
 
@@ -21,29 +21,28 @@ lang::Location lang::Identifier::location() const
     return location_;
 }
 
-std::ostream& operator<<(std::ostream& os, const lang::Identifier& identifier)
+std::ostream& operator<<(std::ostream& os, lang::Identifier const& identifier)
 {
     os << identifier.text();
     return os;
 }
 
-std::string operator+(const std::string& str, const lang::Identifier& identifier)
+std::string operator+(std::string const& str, lang::Identifier const& identifier)
 {
     return str + std::string(identifier.text());
 }
 
-std::string operator+(const lang::Identifier& identifier, const std::string& str)
+std::string operator+(lang::Identifier const& identifier, std::string const& str)
 {
     return std::string(identifier.text()) + str;
 }
 
-std::string operator+(const char* str, const lang::Identifier& identifier)
+std::string operator+(char const* str, lang::Identifier const& identifier)
 {
     return str + std::string(identifier.text());
 }
 
-std::string operator+(const lang::Identifier& identifier, const char* str)
+std::string operator+(lang::Identifier const& identifier, char const* str)
 {
     return std::string(identifier.text()) + str;
 }
-

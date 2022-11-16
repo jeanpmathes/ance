@@ -77,7 +77,7 @@ namespace lang
          */
         void extend(lang::Location location);
 
-        friend std::ostream& operator<<(std::ostream& os, const lang::Location& location);
+        friend std::ostream& operator<<(std::ostream& os, lang::Location const& location);
 
       private:
         size_t                  start_line_;
@@ -89,4 +89,3 @@ namespace lang
 }
 
 #endif
-

@@ -4,8 +4,8 @@
 #include <filesystem>
 #include <memory>
 
-#include "lang/scope/GlobalScope.h"
 #include "lang/Element.h"
+#include "lang/scope/GlobalScope.h"
 
 namespace lang
 {
@@ -38,7 +38,7 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
     Application(Project& project, std::unique_ptr<lang::GlobalScope>&& scope);
 
   public:
-    Application(const Application&) = delete;
+    Application(Application const&) = delete;
     Application(Application&&)      = delete;
 
   public:

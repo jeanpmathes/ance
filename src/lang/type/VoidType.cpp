@@ -65,4 +65,3 @@ lang::ResolvingHandle<lang::Type> lang::VoidType::get()
         lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new VoidType()));
     return instance;
 }
-

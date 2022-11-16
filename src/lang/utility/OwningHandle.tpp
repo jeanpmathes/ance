@@ -46,4 +46,3 @@ const T& lang::OwningHandle<T>::operator*() const noexcept
 {
     return *owner_;
 }
-

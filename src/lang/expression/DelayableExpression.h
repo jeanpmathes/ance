@@ -21,11 +21,10 @@ class DelayableExpression
      * Set the value of the delayable value.
      * @param value The value to use.
      */
-    void setValue(const std::shared_ptr<lang::Value>& value);
+    void setValue(std::shared_ptr<lang::Value> const& value);
 
   private:
     std::shared_ptr<lang::DelayedValue> value_ {std::make_shared<lang::DelayedValue>(*this)};
 };
 
 #endif
-

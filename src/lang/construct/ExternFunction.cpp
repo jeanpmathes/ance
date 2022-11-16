@@ -25,7 +25,7 @@ lang::ExternFunction::ExternFunction(Function&                                  
 {
     containing_scope.addType(return_type);
 
-    for (const auto& parameter : this->parameters()) { containing_scope.addType(parameter->type()); }
+    for (auto const& parameter : this->parameters()) { containing_scope.addType(parameter->type()); }
 }
 
 bool lang::ExternFunction::isMangled() const
@@ -41,7 +41,7 @@ void lang::ExternFunction::validate(ValidationLogger& validation_logger) const
 
     std::set<lang::Identifier> names;
 
-    for (const auto& parameter : parameters())
+    for (auto const& parameter : parameters())
     {
         auto [it, inserted] = names.insert(parameter->name());
 
@@ -92,7 +92,7 @@ lang::LocalScope* lang::ExternFunction::getInsideScope()
     return nullptr;
 }
 
-const std::vector<lang::BasicBlock*>& lang::ExternFunction::getBasicBlocks() const
+std::vector<lang::BasicBlock*> const& lang::ExternFunction::getBasicBlocks() const
 {
     static std::vector<lang::BasicBlock*> empty;
     return empty;
@@ -102,4 +102,3 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::ExternFunction::getNativeR
 {
     return std::make_pair(native_type_, native_function_);
 }
-

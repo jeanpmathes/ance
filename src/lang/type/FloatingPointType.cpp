@@ -19,7 +19,7 @@ std::string lang::FloatingPointType::createMangledName() const
 
 llvm::DIType* lang::FloatingPointType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.module()->getDataLayout();
 
     std::string name         = std::string(this->name().text());
     uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
@@ -28,7 +28,7 @@ llvm::DIType* lang::FloatingPointType::createDebugType(CompileContext& context)
     return context.di()->createBasicType(name, size_in_bits, encoding);
 }
 
-const lang::FloatingPointType* lang::FloatingPointType::isFloatingPointType() const
+lang::FloatingPointType const* lang::FloatingPointType::isFloatingPointType() const
 {
     return this;
 }
@@ -215,7 +215,7 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::Binary
     return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
-bool lang::FloatingPointType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+bool lang::FloatingPointType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
 {
     if (parameters.size() == 1)
     {
@@ -226,7 +226,7 @@ bool lang::FloatingPointType::acceptOverloadRequest(const std::vector<lang::Reso
     return false;
 }
 
-void lang::FloatingPointType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+void lang::FloatingPointType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
                                                      lang::PredefinedFunction&                             function,
                                                      CompileContext&                                       context)
 {

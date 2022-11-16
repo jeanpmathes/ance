@@ -6,4 +6,3 @@ std::optional<bool> data::BooleanElement::asBool() const
 {
     return b_;
 }
-

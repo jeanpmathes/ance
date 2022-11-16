@@ -19,7 +19,7 @@ namespace lang
 
         StateCount getStateCount() const override;
 
-        [[nodiscard]] const FloatingPointType* isFloatingPointType() const override;
+        [[nodiscard]] FloatingPointType const* isFloatingPointType() const override;
         [[nodiscard]] bool                     isFloatingPointType(size_t precision) const override;
 
         bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
@@ -61,8 +61,8 @@ namespace lang
                                                         lang::ResolvingHandle<lang::Type> return_type,
                                                         CompileContext&                   context) override;
 
-        bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
-        void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+        bool acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters) override;
+        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
                                     lang::PredefinedFunction&                             function,
                                     CompileContext&                                       context) override;
         void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,

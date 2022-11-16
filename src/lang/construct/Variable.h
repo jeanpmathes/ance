@@ -8,10 +8,10 @@
 #include <llvm/IR/Value.h>
 
 #include "lang/AccessModifier.h"
-#include "lang/construct/VariableDefinition.h"
-#include "lang/utility/Location.h"
 #include "lang/Element.h"
+#include "lang/construct/VariableDefinition.h"
 #include "lang/utility/Identifier.h"
+#include "lang/utility/Location.h"
 
 namespace lang
 {
@@ -83,7 +83,7 @@ namespace lang
                            lang::Location                      type_location,
                            Scope&                              containing_scope,
                            bool                                is_final,
-                           const std::shared_ptr<lang::Value>& value,
+                           std::shared_ptr<lang::Value> const& value,
                            unsigned                            parameter_no,
                            lang::Location                      location);
 
@@ -91,7 +91,7 @@ namespace lang
          * Get the name.
          * @return The name.
          */
-        [[nodiscard]] const Identifier& name() const;
+        [[nodiscard]] Identifier const& name() const;
         /**
          * Get the containing scope.
          * @return The scope.
@@ -147,7 +147,7 @@ namespace lang
          * @param assignable_location The source location of the assignable.
          * @param assigned_location The source location of the value that is assigned to the assignable.
          */
-        bool validateSetValue(const std::shared_ptr<lang::Value>& value,
+        bool validateSetValue(std::shared_ptr<lang::Value> const& value,
                               ValidationLogger&                   validation_logger,
                               lang::Location                      assignable_location,
                               lang::Location                      assigned_location) const;

@@ -58,7 +58,7 @@ namespace lang
          * @param other The other constant.
          * @return True if the constants are equal.
          */
-        virtual bool equals(const lang::Constant* other) const = 0;
+        virtual bool equals(lang::Constant const* other) const = 0;
 
         void buildNativeValue(CompileContext& context) final;
         void buildContentValue(CompileContext& context) final;

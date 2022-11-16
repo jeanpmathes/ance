@@ -65,7 +65,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
      * @return The common type.
      */
     static std::vector<lang::ResolvingHandle<lang::Type>> getCommonType(
-        const std::vector<std::unique_ptr<Case>>& cases);
+        std::vector<std::unique_ptr<Case>> const& cases);
 
     /**
      * Try to get the common type of the cases. The cases must be expression-based.
@@ -73,7 +73,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
      * @return The common type, or none.
      */
     static std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> tryGetCommonType(
-        const std::vector<std::unique_ptr<Case>>& cases);
+        std::vector<std::unique_ptr<Case>> const& cases);
 
     /**
      * Validate the return types of the case-expressions.
@@ -83,7 +83,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
      * @return True if the return types are valid, false otherwise.
      */
     static bool validateReturnTypes(lang::Location                            location,
-                                    const std::vector<std::unique_ptr<Case>>& cases,
+                                    std::vector<std::unique_ptr<Case>> const& cases,
                                     ValidationLogger&                         validation_logger);
 
     /**
@@ -152,7 +152,7 @@ class Match
      */
     static bool validateCases(lang::Location                            location,
                               Expression&                               expression,
-                              const std::vector<std::unique_ptr<Case>>& cases,
+                              std::vector<std::unique_ptr<Case>> const& cases,
                               ValidationLogger&                         validation_logger);
 
     [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
@@ -166,4 +166,3 @@ class Match
 };
 
 #endif
-

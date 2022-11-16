@@ -44,4 +44,3 @@ class MatchSelect
 };
 
 #endif
-

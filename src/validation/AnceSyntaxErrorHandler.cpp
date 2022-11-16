@@ -2,9 +2,9 @@
 
 #include "grammar/anceLexer.h"
 #include "grammar/anceParser.h"
+#include "validation/ANSI.h"
 #include "validation/SourceFile.h"
 #include "validation/Strings.h"
-#include "validation/ANSI.h"
 
 AnceSyntaxErrorHandler::LexerErrorListener::LexerErrorListener(AnceSyntaxErrorHandler& parent) : parent_(parent) {}
 
@@ -12,7 +12,7 @@ void AnceSyntaxErrorHandler::LexerErrorListener::syntaxError(antlr4::Recognizer*
                                                              antlr4::Token*,
                                                              size_t line,
                                                              size_t char_position_in_line,
-                                                             const std::string&,
+                                                             std::string const&,
                                                              std::exception_ptr)
 {
     auto [previous_line, previous_column] = previous_position_;
@@ -31,7 +31,7 @@ void AnceSyntaxErrorHandler::ParserErrorListener::syntaxError(antlr4::Recognizer
                                                               antlr4::Token*      offending_symbol,
                                                               size_t              line,
                                                               size_t              char_position_in_line,
-                                                              const std::string&,
+                                                              std::string const&,
                                                               std::exception_ptr)
 {
     char_position_in_line = parent_.source_file_.getUtf8Index(line, char_position_in_line);
@@ -80,9 +80,9 @@ antlr4::BaseErrorListener* AnceSyntaxErrorHandler::parserErrorListener()
     return &parser_error_listener_;
 }
 
-AnceSyntaxErrorHandler::AnceSyntaxErrorHandler(const SourceFile& source_file) : source_file_(source_file) {}
+AnceSyntaxErrorHandler::AnceSyntaxErrorHandler(SourceFile const& source_file) : source_file_(source_file) {}
 
-void AnceSyntaxErrorHandler::log(const std::string& message, size_t line, size_t char_position)
+void AnceSyntaxErrorHandler::log(std::string const& message, size_t line, size_t char_position)
 {
     syntax_errors_.emplace_back(message, std::make_pair(line, char_position));
 }

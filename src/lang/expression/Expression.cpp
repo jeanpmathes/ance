@@ -2,10 +2,10 @@
 
 #include <utility>
 
+#include "compiler/CompileContext.h"
 #include "lang/construct/value/Value.h"
 #include "lang/statement/Statement.h"
 #include "lang/type/Type.h"
-#include "compiler/CompileContext.h"
 #include "validation/ValidationLogger.h"
 
 Expression::Expression(lang::Location location) : location_(location) {}
@@ -57,7 +57,7 @@ bool Expression::isNamed()
     return type()->isReferenceType();
 }
 
-bool Expression::validateAssignment(const std::shared_ptr<lang::Value>& value,
+bool Expression::validateAssignment(std::shared_ptr<lang::Value> const& value,
                                     lang::Location                      value_location,
                                     ValidationLogger&                   validation_logger)
 {
@@ -68,7 +68,8 @@ bool Expression::validateAssignment(const std::shared_ptr<lang::Value>& value,
         lang::ResolvingHandle<lang::Type> target_type = type()->getElementType();
         return lang::Type::checkMismatch(target_type, value->type(), value_location, validation_logger);
     }
-    else {
+    else
+    {
         validation_logger.logError("Cannot assign to this expression", location());
         return false;
     }
@@ -137,7 +138,7 @@ std::tuple<Statements, std::unique_ptr<Expression>, Statements> Expression::expa
 }
 
 std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> Expression::tryGetTypes(
-    const std::vector<std::unique_ptr<Expression>>& expressions)
+    std::vector<std::unique_ptr<Expression>> const& expressions)
 {
     std::vector<lang::ResolvingHandle<lang::Type>> types;
     types.reserve(expressions.size());
@@ -153,7 +154,7 @@ std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> Expression::tryGet
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> Expression::getTypes(
-    const std::vector<std::unique_ptr<Expression>>& expressions)
+    std::vector<std::unique_ptr<Expression>> const& expressions)
 {
     std::vector<lang::ResolvingHandle<lang::Type>> types;
     types.reserve(expressions.size());

@@ -144,12 +144,12 @@ class SourceVisitor : public anceBaseVisitor
   protected:
     lang::Location          location(antlr4::ParserRuleContext* ctx);
     lang::Identifier        ident(antlr4::tree::TerminalNode* i);
-    static lang::Identifier createIdentifier(const std::string& text, lang::Location location);
+    static lang::Identifier createIdentifier(std::string const& text, lang::Location location);
 
-    static uint64_t parseIntegerTypeSize(const std::string& str);
-    static uint64_t parseCompoundTypeSize(const std::string& str);
+    static uint64_t parseIntegerTypeSize(std::string const& str);
+    static uint64_t parseCompoundTypeSize(std::string const& str);
 
-    static uint64_t parseInRange(const std::string& str, uint64_t max);
+    static uint64_t parseInRange(std::string const& str, uint64_t max);
 
   private:
     FileContext* file_context_;

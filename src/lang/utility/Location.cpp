@@ -66,12 +66,10 @@ void lang::Location::extend(lang::Location location)
     end_column_ = std::max(end_column_, location.end_column_);
 }
 
-std::ostream& lang::operator<<(std::ostream& os, const lang::Location& location)
+std::ostream& lang::operator<<(std::ostream& os, lang::Location const& location)
 {
     if (!location.isGlobal()) { os << "(" << location.start_line_ << ", " << location.start_column_ << ")"; }
-    else {
-        os << "()";
-    }
+    else { os << "()"; }
 
     return os;
 }

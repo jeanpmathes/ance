@@ -24,14 +24,14 @@ namespace lang
 
         StateCount getStateCount() const override;
 
-        [[nodiscard]] const FixedWidthIntegerType* isFixedWidthIntegerType() const override;
+        [[nodiscard]] FixedWidthIntegerType const* isFixedWidthIntegerType() const override;
         [[nodiscard]] bool               isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
-        [[nodiscard]] bool               isSigned() const override;
-        [[nodiscard]] const IntegerType* isIntegerType() const override;
-        [[nodiscard]] bool               isBooleanType() const override;
-        [[nodiscard]] bool               isUnsignedIntegerPointerType() const override;
-        [[nodiscard]] const FloatingPointType* isFloatingPointType() const override;
-        [[nodiscard]] bool                     isFloatingPointType(size_t precision) const override;
+        [[nodiscard]] bool                         isSigned() const override;
+        [[nodiscard]] IntegerType const*           isIntegerType() const override;
+        [[nodiscard]] bool                         isBooleanType() const override;
+        [[nodiscard]] bool                         isUnsignedIntegerPointerType() const override;
+        [[nodiscard]] FloatingPointType const*     isFloatingPointType() const override;
+        [[nodiscard]] bool                         isFloatingPointType(size_t precision) const override;
         [[nodiscard]] bool                     isSizeType() const override;
         [[nodiscard]] bool                     isDiffType() const override;
         [[nodiscard]] bool                     isVoidType() const override;
@@ -41,13 +41,13 @@ namespace lang
         [[nodiscard]] bool                     isBufferType() const override;
         [[nodiscard]] bool                     isOpaquePointerType() const override;
         [[nodiscard]] bool                     isReferenceType() const override;
-        [[nodiscard]] bool                     isStructType() const override;
-        [[nodiscard]] const VectorizableType*  isVectorizable() const override;
-        [[nodiscard]] VectorizableType*        isVectorizable() override;
-        [[nodiscard]] const VectorType*        isVectorType() const override;
-        [[nodiscard]] VectorType*              isVectorType() override;
-        [[nodiscard]] const ArrayType*         isArrayType() const override;
-        [[nodiscard]] ArrayType*               isArrayType() override;
+        [[nodiscard]] bool                         isStructType() const override;
+        [[nodiscard]] VectorizableType const*      isVectorizable() const override;
+        [[nodiscard]] VectorizableType*            isVectorizable() override;
+        [[nodiscard]] VectorType const*            isVectorType() const override;
+        [[nodiscard]] VectorType*                  isVectorType() override;
+        [[nodiscard]] ArrayType const*             isArrayType() const override;
+        [[nodiscard]] ArrayType*                   isArrayType() override;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const override;
 
@@ -93,11 +93,11 @@ namespace lang
                                                         std::shared_ptr<Value> right,
                                                         CompileContext&        context) override;
 
-        bool                              hasMember(const lang::Identifier& name) override;
-        lang::ResolvingHandle<lang::Type> getMemberType(const lang::Identifier& name) override;
-        bool validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const override;
+        bool                              hasMember(lang::Identifier const& name) override;
+        lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name) override;
+        bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
         std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
-                                                       const lang::Identifier& name,
+                                                       lang::Identifier const& name,
                                                        CompileContext&         context) override;
 
         bool                              definesIndirection() override;
@@ -129,4 +129,3 @@ namespace lang
 }
 
 #endif
-

@@ -4,10 +4,10 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
+#include "lang/Element.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
-#include "lang/Element.h"
 
 namespace lang
 {
@@ -85,7 +85,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @param validation_logger The validation logger to use.
      * @return True if assigning is valid.
      */
-    virtual bool validateAssignment(const std::shared_ptr<lang::Value>& value,
+    virtual bool validateAssignment(std::shared_ptr<lang::Value> const& value,
                                     lang::Location                      value_location,
                                     ValidationLogger&                   validation_logger);
 
@@ -137,13 +137,13 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * Try get all return types of the given expressions. If any expression does not have a type, the result is empty.
      */
     static std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> tryGetTypes(
-        const std::vector<std::unique_ptr<Expression>>& expressions);
+        std::vector<std::unique_ptr<Expression>> const& expressions);
 
     /**
      * Get all return types of the given expressions. This operation assumes that all expressions are valid, and should only be called after validation.
      */
     static std::vector<lang::ResolvingHandle<lang::Type>> getTypes(
-        const std::vector<std::unique_ptr<Expression>>& expressions);
+        std::vector<std::unique_ptr<Expression>> const& expressions);
 
   private:
     lang::Location location_;

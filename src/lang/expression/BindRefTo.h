@@ -36,4 +36,3 @@ class BindRefTo
 };
 
 #endif
-

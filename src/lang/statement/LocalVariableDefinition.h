@@ -6,10 +6,9 @@
 #include <optional>
 
 #include "lang/Assigner.h"
+#include "lang/Element.h"
 #include "lang/construct/Variable.h"
 #include "lang/utility/ResolvingHandle.h"
-#include "lang/Assigner.h"
-#include "lang/Element.h"
 
 namespace lang
 {
@@ -42,10 +41,10 @@ class LocalVariableDefinition
                             std::unique_ptr<Expression>                      assigned,
                             lang::Location                                   location);
 
-    [[nodiscard]] const lang::Identifier&                          name() const;
+    [[nodiscard]] lang::Identifier const&                          name() const;
     [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> type() const;
     [[nodiscard]] lang::Assigner                                   assigner() const;
-    [[nodiscard]] Expression*                       assigned() const;
+    [[nodiscard]] Expression*                                      assigned() const;
 
     void setScope(lang::Scope& scope) override;
     void walkDefinitions() override;

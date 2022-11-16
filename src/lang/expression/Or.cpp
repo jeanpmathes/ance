@@ -92,4 +92,3 @@ Expression::Expansion Or::expandWith(Expressions subexpressions) const
 }
 
 Or::~Or() = default;
-

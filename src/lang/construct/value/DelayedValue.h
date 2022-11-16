@@ -25,7 +25,7 @@ namespace lang
          * Set the value to use. This method should be called once or never by the delayable expression.
          * @param value The value.
          */
-        void setValue(const std::shared_ptr<lang::Value>& value);
+        void setValue(std::shared_ptr<lang::Value> const& value);
 
         void         buildNativeValue(CompileContext& context) override;
         llvm::Value* getNativeValue() override;
@@ -37,4 +37,3 @@ namespace lang
 }
 
 #endif
-

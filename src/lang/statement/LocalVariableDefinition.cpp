@@ -29,7 +29,7 @@ LocalVariableDefinition::LocalVariableDefinition(lang::Identifier               
     if (type_opt_) { type_ = type_opt_.value(); }
 }
 
-const lang::Identifier& LocalVariableDefinition::name() const
+lang::Identifier const& LocalVariableDefinition::name() const
 {
     return name_;
 }
@@ -150,4 +150,3 @@ void LocalVariableDefinition::rerouteIfNeeded()
         if (assigned_type && assigned_type.value() != type_) { type_.reroute(assigned_type.value()); }
     }
 }
-

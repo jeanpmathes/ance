@@ -27,7 +27,7 @@ class VectorDefinition
                      std::vector<std::unique_ptr<Expression>>         elements,
                      lang::Location                                   location);
 
-    [[nodiscard]] const std::optional<lang::ResolvingHandle<lang::Type>>& elementType() const;
+    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> const& elementType() const;
     [[nodiscard]] std::vector<std::reference_wrapper<Expression>>         values() const;
 
   protected:
@@ -53,4 +53,3 @@ class VectorDefinition
 };
 
 #endif
-

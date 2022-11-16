@@ -19,9 +19,9 @@ llvm::Constant* lang::NullConstant::buildContent(llvm::Module* m)
     return lang::NullPointerType::get()->getDefaultContent(*m);
 }
 
-bool lang::NullConstant::equals(const lang::Constant* other) const
+bool lang::NullConstant::equals(lang::Constant const* other) const
 {
-    auto* other_null = dynamic_cast<const NullConstant*>(other);
+    auto* other_null = dynamic_cast<NullConstant const*>(other);
     return other_null != nullptr;
 }
 

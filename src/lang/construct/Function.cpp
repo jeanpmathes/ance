@@ -15,7 +15,7 @@
 
 lang::Function::Function(Identifier function_name) : name_(std::move(function_name)) {}
 
-const lang::Identifier& lang::Function::name() const
+lang::Identifier const& lang::Function::name() const
 {
     return name_;
 }
@@ -28,7 +28,7 @@ bool lang::Function::isDefined() const
 void lang::Function::defineAsExtern(Scope&                                               containing_scope,
                                     lang::ResolvingHandle<lang::Type>                    return_type,
                                     lang::Location                                       return_type_location,
-                                    const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                    std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
                                     lang::Location                                       location)
 {
     definition_ = std::make_unique<lang::ExternFunction>(*this,
@@ -44,7 +44,7 @@ void lang::Function::defineAsExtern(Scope&                                      
 void lang::Function::defineAsCustom(lang::AccessModifier                                 access,
                                     lang::ResolvingHandle<lang::Type>                    return_type,
                                     lang::Location                                       return_type_location,
-                                    const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                    std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
                                     std::unique_ptr<lang::CodeBlock>                     block,
                                     Scope&                                               containing_scope,
                                     lang::Location                                       declaration_location,
@@ -65,7 +65,7 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
 
 lang::PredefinedFunction& lang::Function::defineAsPredefined(
     lang::ResolvingHandle<lang::Type>                    return_type,
-    const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+    std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
     lang::Scope&                                         containing_scope,
     lang::Location                                       location)
 {
@@ -96,10 +96,10 @@ void lang::Function::defineAsInit(lang::ResolvingHandle<lang::Variable> variable
 }
 
 std::optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParameterVariable(
-    const Identifier&                   name,
+    Identifier const&                   name,
     lang::ResolvingHandle<lang::Type>   type,
     lang::Location                      type_location,
-    const std::shared_ptr<lang::Value>& value,
+    std::shared_ptr<lang::Value> const& value,
     unsigned int                        parameter_no,
     lang::Location                      location)
 {
@@ -115,9 +115,7 @@ std::optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParam
 
         return std::make_optional(variable);
     }
-    else {
-        return {};
-    }
+    else { return {}; }
 }
 
 lang::ResolvingHandle<lang::Type> lang::Function::returnType() const
@@ -126,7 +124,7 @@ lang::ResolvingHandle<lang::Type> lang::Function::returnType() const
     return definition_->returnType();
 }
 
-const lang::Signature& lang::Function::signature() const
+lang::Signature const& lang::Function::signature() const
 {
     assert(isDefined());
     return definition_->signature();
@@ -202,14 +200,14 @@ void lang::Function::buildFinalization(CompileContext& context)
     for (auto& [name, parameter] : defined_parameters_) { parameter->buildFinalization(context); }
 }
 
-bool lang::Function::validateCall(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+bool lang::Function::validateCall(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
                                   lang::Location                                                              location,
                                   ValidationLogger& validation_logger)
 {
     return definition_->validateCall(arguments, location, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::Function::buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
+std::shared_ptr<lang::Value> lang::Function::buildCall(std::vector<std::shared_ptr<lang::Value>> const& arguments,
                                                        CompileContext&                                  context) const
 {
     return definition_->buildCall(arguments, context);
@@ -235,7 +233,7 @@ lang::LocalScope* lang::Function::getInsideScope()
     return definition_->getInsideScope();
 }
 
-const std::vector<lang::BasicBlock*>& lang::Function::getBasicBlocks() const
+std::vector<lang::BasicBlock*> const& lang::Function::getBasicBlocks() const
 {
     return definition_->getBasicBlocks();
 }
@@ -303,9 +301,7 @@ void lang::Function::resolve()
         auto& [name, function_group] = *fn_it;
 
         if (scope()->resolveDefinition(function_group.handle())) { fn_it = undefined_function_groups_.erase(fn_it); }
-        else {
-            ++fn_it;
-        }
+        else { ++fn_it; }
     }
 
     auto var_it = undefined_variables_.begin();
@@ -315,8 +311,7 @@ void lang::Function::resolve()
         auto& [name, variable] = *var_it;
 
         if (scope()->resolveDefinition(variable.handle())) { var_it = undefined_variables_.erase(var_it); }
-        else {
-            ++var_it; }
+        else { ++var_it; }
     }
 
     auto tp_it = undefined_types_.begin();

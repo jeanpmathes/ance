@@ -24,7 +24,7 @@ lang::FunctionDefinition::FunctionDefinition(Function&                          
     , signature_(lang::Signature::fromParameters(name(), parameters_))
 {}
 
-const lang::Identifier& lang::FunctionDefinition::name() const
+lang::Identifier const& lang::FunctionDefinition::name() const
 {
     return function_.name();
 }
@@ -44,7 +44,7 @@ lang::ResolvingHandle<lang::Type> lang::FunctionDefinition::returnType() const
     return return_type_;
 }
 
-const lang::Signature& lang::FunctionDefinition::signature() const
+lang::Signature const& lang::FunctionDefinition::signature() const
 {
     return signature_;
 }
@@ -72,7 +72,7 @@ lang::Location lang::FunctionDefinition::location() const
 void lang::FunctionDefinition::postResolve() {}
 
 bool lang::FunctionDefinition::validateCall(
-    const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+    std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
     lang::Location                                                              location,
     ValidationLogger&                                                           validation_logger)
 {
@@ -85,7 +85,7 @@ bool lang::FunctionDefinition::validateCall(
 
     bool valid = true;
 
-    for (const auto [param, arg] : llvm::zip(parameters_, arguments))
+    for (auto const [param, arg] : llvm::zip(parameters_, arguments))
     {
         auto [arg_value, arg_location] = arg;
         valid &= lang::Type::checkMismatch(param->type(), arg_value->type(), arg_location, validation_logger);
@@ -97,7 +97,7 @@ bool lang::FunctionDefinition::validateCall(
 }
 
 bool lang::FunctionDefinition::doCallValidation(
-    const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>&,
+    std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const&,
     lang::Location,
     ValidationLogger&) const
 {
@@ -105,7 +105,7 @@ bool lang::FunctionDefinition::doCallValidation(
 }
 
 std::shared_ptr<lang::Value> lang::FunctionDefinition::buildCall(
-    const std::vector<std::shared_ptr<lang::Value>>& arguments,
+    std::vector<std::shared_ptr<lang::Value>> const& arguments,
     CompileContext&                                  context) const
 {
     auto [native_type, native_function] = getNativeRepresentation();
@@ -134,7 +134,7 @@ std::string lang::FunctionDefinition::parameterSource() const
     return source + ")";
 }
 
-const std::vector<std::shared_ptr<lang::Parameter>>& lang::FunctionDefinition::parameters() const
+std::vector<std::shared_ptr<lang::Parameter>> const& lang::FunctionDefinition::parameters() const
 {
     return parameters_;
 }
@@ -144,7 +144,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::FunctionDefinition::create
     llvm::LLVMContext&              c,
     llvm::Module*                   m)
 {
-    const std::string& native_name = isMangled() ? signature_.getMangledName() : std::string(function_.name().text());
+    std::string const& native_name = isMangled() ? signature_.getMangledName() : std::string(function_.name().text());
 
     std::vector<llvm::Type*> param_types;
     param_types.reserve(parameters_.size());
@@ -157,7 +157,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::FunctionDefinition::create
     return {native_type, native_function};
 }
 
-llvm::CallInst* lang::FunctionDefinition::buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
+llvm::CallInst* lang::FunctionDefinition::buildCall(std::vector<std::shared_ptr<lang::Value>> const& arguments,
                                                     llvm::FunctionType*                              native_type,
                                                     llvm::Function*                                  native_function,
                                                     CompileContext&                                  context) const
@@ -165,7 +165,7 @@ llvm::CallInst* lang::FunctionDefinition::buildCall(const std::vector<std::share
     std::vector<llvm::Value*> args;
     args.reserve(arguments.size());
 
-    for (const auto [param, arg] : llvm::zip(parameters_, arguments))
+    for (auto const [param, arg] : llvm::zip(parameters_, arguments))
     {
         std::shared_ptr<lang::Value> matched_arg = lang::Type::makeMatching(param->type(), arg, context);
 

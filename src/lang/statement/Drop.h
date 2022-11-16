@@ -40,4 +40,3 @@ class Drop
     bool                                  dropped_;
 };
 #endif
-

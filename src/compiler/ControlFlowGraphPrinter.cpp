@@ -35,7 +35,7 @@ std::any ControlFlowGraphPrinter::visit(lang::CustomFunction& function)
 
 std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
 {
-    auto id       = static_cast<int32_t>(block.getId());
+    auto id = static_cast<int32_t>(block.getId());
 
     std::string label;
     BlockStyle  style;
@@ -69,14 +69,15 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
     std::vector<lang::BasicBlock*> successors = block.getSuccessors();
 
     if (successors.empty()) { printLink(id, NODE_EXIT); }
-    else {
+    else
+    {
         for (lang::BasicBlock* successor : successors) { printLink(id, static_cast<int32_t>(successor->getId())); }
     }
 
     return {};
 }
 
-void ControlFlowGraphPrinter::printBlock(const std::string& label, int32_t id, BlockStyle style)
+void ControlFlowGraphPrinter::printBlock(std::string const& label, int32_t id, BlockStyle style)
 {
     std::string color;
     bool        is_code;
@@ -84,11 +85,11 @@ void ControlFlowGraphPrinter::printBlock(const std::string& label, int32_t id, B
     switch (style)
     {
         case BlockStyle::NORMAL_CODE:
-            color = "#F8F8F8";
+            color   = "#F8F8F8";
             is_code = true;
             break;
         case BlockStyle::UNREACHABLE_CODE:
-            color = "#A9A9A9";
+            color   = "#A9A9A9";
             is_code = true;
             break;
         case BlockStyle::META:
@@ -129,7 +130,7 @@ void ControlFlowGraphPrinter::printLink(int32_t from, int32_t to)
     edges_ << "\t]" << std::endl;
 }
 
-void ControlFlowGraphPrinter::printGroup(const std::string& label)
+void ControlFlowGraphPrinter::printGroup(std::string const& label)
 {
     nodes_ << "\tnode [" << std::endl;
     nodes_ << "\t\tlabel \"" << label << "\"" << std::endl;
@@ -150,7 +151,7 @@ uint32_t ControlFlowGraphPrinter::map(int32_t i)
     return id;
 }
 
-std::string ControlFlowGraphPrinter::escape(const std::string& s)
+std::string ControlFlowGraphPrinter::escape(std::string const& s)
 {
     std::string result;
 
@@ -171,4 +172,3 @@ std::string ControlFlowGraphPrinter::escape(const std::string& s)
 
     return result;
 }
-

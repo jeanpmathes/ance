@@ -81,7 +81,8 @@ Expression::Expansion Allocation::expandWith(Expressions subexpressions) const
                                              allocated_type_location_),
                 Statements()};
     }
-    else {
+    else
+    {
         return {Statements(),
                 std::make_unique<Allocation>(allocation_,
                                              allocated_type_->toUndefined(),
@@ -103,4 +104,3 @@ void Allocation::doBuild(CompileContext& context)
 }
 
 Allocation::~Allocation() = default;
-

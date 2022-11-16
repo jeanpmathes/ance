@@ -53,4 +53,3 @@ void Indirection::doBuild(CompileContext& context)
 }
 
 Indirection::~Indirection() = default;
-

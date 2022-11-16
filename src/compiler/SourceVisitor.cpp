@@ -289,7 +289,8 @@ std::any SourceVisitor::visitLocalVariableDefinition(anceParser::LocalVariableDe
         assigned = nullptr;
     }
 
-    auto statement = std::make_unique<LocalVariableDefinition>(identifier,
+    auto statement =
+        std::make_unique<LocalVariableDefinition>(identifier,
                                                   type,
                                                   ctx->type() ? location(ctx->type()) : lang::Location::global(),
                                                   assigner,
@@ -583,7 +584,7 @@ std::any SourceVisitor::visitLogicalOr(anceParser::LogicalOrContext* ctx)
 {
     bool        negated = ctx->NOT();
     Expression* left    = std::any_cast<Expression*>(visit(ctx->left));
-    Expression* right = std::any_cast<Expression*>(visit(ctx->right));
+    Expression* right   = std::any_cast<Expression*>(visit(ctx->right));
 
     return static_cast<Expression*>(
         new Or(negated, std::unique_ptr<Expression>(left), std::unique_ptr<Expression>(right), location(ctx)));
@@ -802,9 +803,7 @@ std::any SourceVisitor::visitNormalInteger(anceParser::NormalIntegerContext* ctx
                                                                    10,
                                                                    lang::FixedWidthIntegerType::get(size, is_signed));
     }
-    else {
-        integer_constant = std::make_shared<lang::IntegerConstant>(literal_text, is_signed);
-    }
+    else { integer_constant = std::make_shared<lang::IntegerConstant>(literal_text, is_signed); }
 
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
@@ -1099,22 +1098,22 @@ lang::Identifier SourceVisitor::ident(antlr4::tree::TerminalNode* i)
     return createIdentifier(text, {start_line, start_column, end_line, end_column, file_context_->getFileIndex()});
 }
 
-lang::Identifier SourceVisitor::createIdentifier(const std::string& text, lang::Location location)
+lang::Identifier SourceVisitor::createIdentifier(std::string const& text, lang::Location location)
 {
     return lang::Identifier::from(text, location);
 }
 
-uint64_t SourceVisitor::parseIntegerTypeSize(const std::string& str)
+uint64_t SourceVisitor::parseIntegerTypeSize(std::string const& str)
 {
     return parseInRange(str, lang::FixedWidthIntegerType::MAX_INTEGER_SIZE);
 }
 
-uint64_t SourceVisitor::parseCompoundTypeSize(const std::string& str)
+uint64_t SourceVisitor::parseCompoundTypeSize(std::string const& str)
 {
     return parseInRange(str, lang::ArrayType::MAX_ARRAY_TYPE_SIZE);
 }
 
-uint64_t SourceVisitor::parseInRange(const std::string& str, uint64_t max)
+uint64_t SourceVisitor::parseInRange(std::string const& str, uint64_t max)
 {
     uint64_t value;
 
@@ -1122,7 +1121,7 @@ uint64_t SourceVisitor::parseInRange(const std::string& str, uint64_t max)
     {
         value = std::stoull(str);
     }
-    catch (const std::exception&)
+    catch (std::exception const&)
     {
         value = max + 1;
     }

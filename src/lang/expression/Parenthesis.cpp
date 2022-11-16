@@ -25,7 +25,7 @@ bool Parenthesis::validate(ValidationLogger& validation_logger) const
     return expression_->validate(validation_logger);
 }
 
-bool Parenthesis::validateAssignment(const std::shared_ptr<lang::Value>& value,
+bool Parenthesis::validateAssignment(std::shared_ptr<lang::Value> const& value,
                                      lang::Location                      value_location,
                                      ValidationLogger&                   validation_logger)
 {
@@ -51,4 +51,3 @@ void Parenthesis::doAssign(std::shared_ptr<lang::Value> value, CompileContext& c
 {
     expression_->assign(value, context);
 }
-

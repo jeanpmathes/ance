@@ -16,7 +16,7 @@ lang::IntegerConstant::IntegerConstant(std::string integer, uint8_t radix, lang:
     text_.erase(0, std::min(text_.find_first_not_of('0'), text_.size() - 1));
 }
 
-lang::IntegerConstant::IntegerConstant(const std::string& integer, bool is_signed)
+lang::IntegerConstant::IntegerConstant(std::string const& integer, bool is_signed)
     : IntegerConstant(integer, 10, lang::FixedWidthIntegerType::get(llvm::APInt::getBitsNeeded(integer, 10), is_signed))
 {}
 
@@ -109,9 +109,9 @@ llvm::Constant* lang::IntegerConstant::buildContent(llvm::Module* m)
     return llvm::ConstantInt::get(type_->getContentType(m->getContext()), integer);
 }
 
-bool lang::IntegerConstant::equals(const lang::Constant* other) const
+bool lang::IntegerConstant::equals(lang::Constant const* other) const
 {
-    auto other_int = dynamic_cast<const IntegerConstant*>(other);
+    auto other_int = dynamic_cast<IntegerConstant const*>(other);
     if (!other_int) return false;
 
     if (other_int->integer_type_ != integer_type_) return false;

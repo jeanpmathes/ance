@@ -20,9 +20,9 @@ llvm::Constant* lang::BooleanConstant::buildContent(llvm::Module* m)
                     : llvm::ConstantInt::getFalse(type_->getContentType(m->getContext()));
 }
 
-bool lang::BooleanConstant::equals(const lang::Constant* other) const
+bool lang::BooleanConstant::equals(lang::Constant const* other) const
 {
-    auto* other_boolean = dynamic_cast<const BooleanConstant*>(other);
+    auto* other_boolean = dynamic_cast<BooleanConstant const*>(other);
     if (!other_boolean) return false;
 
     return this->boolean_ == other_boolean->boolean_;

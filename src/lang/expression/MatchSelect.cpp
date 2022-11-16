@@ -88,4 +88,3 @@ Expression::Expansion MatchSelect::expandWith(Expressions subexpressions) const
 }
 
 MatchSelect::~MatchSelect() = default;
-

@@ -24,14 +24,14 @@ namespace lang
          * @param prefix The prefix of the constant.
          * @param content The content of the constant.
          */
-        explicit CharConstant(const std::string& prefix, const std::string& content);
+        explicit CharConstant(std::string const& prefix, std::string const& content);
 
         [[nodiscard]] std::string toString() const override;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const override;
         llvm::Constant*                                 buildContent(llvm::Module* m) override;
 
-        bool equals(const lang::Constant* other) const override;
+        bool equals(lang::Constant const* other) const override;
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
         /**
@@ -48,7 +48,7 @@ namespace lang
          * @param valid Whether the parsing was successful.
          * @return The parsed byte.
          */
-        static uint8_t parseByte(const std::string& unparsed, bool& valid);
+        static uint8_t parseByte(std::string const& unparsed, bool& valid);
 
         /**
          * Read an escaped character from a string.
@@ -66,7 +66,7 @@ namespace lang
          * @param success Whether the read was successful.
          * @return The parsed character.
          */
-        static uint8_t readEscapedByte(const std::string& unparsed, size_t& index, bool& success);
+        static uint8_t readEscapedByte(std::string const& unparsed, size_t& index, bool& success);
 
       private:
         bool is_literal_valid_ = true;
@@ -80,4 +80,3 @@ namespace lang
 }
 
 #endif
-

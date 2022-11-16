@@ -11,10 +11,9 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "lang/AccessModifier.h"
-#include "lang/utility/ResolvingHandle.h"
-#include "lang/AccessModifier.h"
 #include "lang/Element.h"
 #include "lang/construct/CodeBlock.h"
+#include "lang/utility/ResolvingHandle.h"
 
 namespace lang
 {
@@ -59,7 +58,7 @@ namespace lang
          */
         llvm::DISubprogram* debugSubprogram();
 
-        llvm::DIScope*    getDebugScope(CompileContext& context) override;
+        llvm::DIScope* getDebugScope(CompileContext& context) override;
 
       protected:
         using FunctionDefinition::buildCall;
@@ -69,9 +68,8 @@ namespace lang
         void validateUnreachable(ValidationLogger& validation_logger) const;
 
       private:
-        lang::Location       definition_location_;
+        lang::Location definition_location_;
     };
 }
 
 #endif
-

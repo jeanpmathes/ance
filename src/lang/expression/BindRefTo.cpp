@@ -60,4 +60,3 @@ void BindRefTo::doBuild(CompileContext&)
 }
 
 BindRefTo::~BindRefTo() = default;
-

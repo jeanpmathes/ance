@@ -29,7 +29,7 @@ class MemberAccess
     MemberAccess(std::unique_ptr<Expression> value, lang::Identifier member, lang::Location location);
 
     [[nodiscard]] Expression&             value() const;
-    [[nodiscard]] const lang::Identifier& member() const;
+    [[nodiscard]] lang::Identifier const& member() const;
 
   public:
     [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
@@ -50,4 +50,3 @@ class MemberAccess
 };
 
 #endif
-

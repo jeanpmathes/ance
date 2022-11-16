@@ -33,4 +33,3 @@ llvm::GlobalValue::LinkageTypes lang::AccessModifier::linkage()
 
     return linkage;
 }
-

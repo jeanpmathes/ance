@@ -45,4 +45,3 @@ class While
 };
 
 #endif
-

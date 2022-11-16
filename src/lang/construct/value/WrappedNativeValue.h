@@ -38,4 +38,3 @@ namespace lang
     };
 }
 #endif
-

@@ -109,4 +109,3 @@ void lang::LocalVariable::storeValue(std::shared_ptr<lang::Value> value, Compile
 
     type()->buildCopyInitializer(native_value_, value_ptr, context);
 }
-

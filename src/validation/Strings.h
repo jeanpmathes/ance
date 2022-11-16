@@ -16,6 +16,6 @@ std::string_view trim(std::string_view str, size_t& start);
  * @param str The string view to estimate the width of.
  * @return The width, in number of occupied columns.
  */
-size_t estimateWidth(const std::string_view& str);
+size_t estimateWidth(std::string_view const& str);
 
 #endif

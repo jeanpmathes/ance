@@ -9,9 +9,8 @@ namespace lang
     class Empty
     {
       public:
-        bool operator==(const Empty&) const;
+        bool operator==(Empty const&) const;
     };
 }
 
 #endif
-

@@ -19,7 +19,7 @@ namespace lang
         llvm::Constant* getDefaultContent(llvm::Module& m) override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
-        const IntegerType* isIntegerType() const override;
+        IntegerType const* isIntegerType() const override;
 
         /**
          * Get the bit size of the integer type, if a fixed size is defined.
@@ -54,8 +54,8 @@ namespace lang
                                                              std::shared_ptr<Value>            value,
                                                              CompileContext&                   context) override;
 
-        bool acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters) override;
-        void buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+        bool acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters) override;
+        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
                                     lang::PredefinedFunction&                             function,
                                     CompileContext&                                       context) override;
         void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,

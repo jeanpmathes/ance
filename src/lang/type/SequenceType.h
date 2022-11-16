@@ -36,8 +36,8 @@ namespace lang
                                                          CompileContext&        context) override;
 
       protected:
-        llvm::Value* buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
-                                            const std::shared_ptr<lang::Value>& index,
+        llvm::Value* buildGetElementPointer(std::shared_ptr<lang::Value> const& indexed,
+                                            std::shared_ptr<lang::Value> const& index,
                                             CompileContext&                     context);
 
         llvm::Value* buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context);
@@ -78,4 +78,3 @@ namespace lang
 }
 
 #endif
-

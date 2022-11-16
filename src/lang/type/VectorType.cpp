@@ -21,7 +21,7 @@ lang::VectorType::VectorType(lang::ResolvingHandle<lang::Type> element_type, uin
     , SequenceType(element_type, size)
 {}
 
-const lang::VectorType* lang::VectorType::isVectorType() const
+lang::VectorType const* lang::VectorType::isVectorType() const
 {
     return this;
 }
@@ -294,7 +294,7 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperato
     }
 }
 
-bool lang::VectorType::acceptOverloadRequest(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters)
+bool lang::VectorType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
 {
     if (parameters.size() != 1) return false;
 
@@ -310,7 +310,7 @@ bool lang::VectorType::acceptOverloadRequest(const std::vector<lang::ResolvingHa
     return false;
 }
 
-void lang::VectorType::buildRequestedOverload(const std::vector<lang::ResolvingHandle<lang::Type>>& parameters,
+void lang::VectorType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
                                               lang::PredefinedFunction&                             function,
                                               CompileContext&                                       context)
 {
@@ -379,7 +379,7 @@ std::string lang::VectorType::createMangledName() const
 
 llvm::DIType* lang::VectorType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl          = context.module()->getDataLayout();
+    llvm::DataLayout const& dl          = context.module()->getDataLayout();
     llvm::Type*             vector_type = getContentType(*context.llvmContext());
 
     uint64_t      size            = dl.getTypeSizeInBits(vector_type);

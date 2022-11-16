@@ -6,7 +6,7 @@ AnceLinker::AnceLinker(std::optional<std::reference_wrapper<const data::Element>
 {
     if (link_config)
     {
-        const auto& link_config_root = link_config->get();
+        auto const& link_config_root = link_config->get();
 
         auto libpath_list = link_config_root["libpath"];
 
@@ -37,9 +37,9 @@ AnceLinker::AnceLinker(std::optional<std::reference_wrapper<const data::Element>
     }
 }
 
-bool AnceLinker::link(const std::filesystem::path& obj, const std::filesystem::path& exe)
+bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path const& exe)
 {
-    std::vector<const char*> args;
+    std::vector<char const*> args;
     args.push_back("lld");
 
     args.push_back("/debug:FULL");
@@ -52,13 +52,12 @@ bool AnceLinker::link(const std::filesystem::path& obj, const std::filesystem::p
     std::string out = "/out:" + exe.string();
     args.push_back(out.c_str());
 
-    for (const auto& libpath : lib_paths_) { args.push_back(libpath.c_str()); }
+    for (auto const& libpath : lib_paths_) { args.push_back(libpath.c_str()); }
 
-    for (const auto& lib : libs_) { args.push_back(lib.c_str()); }
+    for (auto const& lib : libs_) { args.push_back(lib.c_str()); }
 
     std::string in = obj.string();
     args.push_back(in.c_str());
 
     return lld::mingw::link(args, llvm::outs(), llvm::errs(), false, false);
 }
-

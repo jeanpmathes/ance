@@ -38,4 +38,3 @@ class BindRef
 };
 
 #endif
-

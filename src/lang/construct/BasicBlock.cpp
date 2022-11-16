@@ -342,7 +342,7 @@ bool lang::BasicBlock::isMeta() const
     return definition_->isMeta();
 }
 
-const std::vector<std::reference_wrapper<Statement>>& lang::BasicBlock::statements() const
+std::vector<std::reference_wrapper<Statement>> const& lang::BasicBlock::statements() const
 {
     return statements_;
 }
@@ -380,4 +380,3 @@ llvm::BasicBlock* lang::BasicBlock::Definition::Base::getNativeBlock()
 {
     return native_block_;
 }
-

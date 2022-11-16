@@ -40,6 +40,6 @@ class Addressof
     ~Addressof() override;
 
   private:
-    std::unique_ptr<Expression>                              arg_;
+    std::unique_ptr<Expression> arg_;
 };
 #endif

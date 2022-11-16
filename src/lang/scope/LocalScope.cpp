@@ -40,7 +40,7 @@ lang::ResolvingHandle<lang::Variable> lang::LocalScope::defineLocalVariable(Iden
                                                                             lang::ResolvingHandle<lang::Type> type,
                                                                             lang::Location type_location,
                                                                             lang::Assigner assigner,
-                                                                            const std::shared_ptr<lang::Value>& value,
+                                                                            std::shared_ptr<lang::Value> const& value,
                                                                             lang::Location location)
 {
     assert(blockers_.contains(name));
@@ -90,9 +90,7 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Variable> varia
         {
             variable.reroute(blocked_variables_[variable->name()].handle());
         }
-        else {
-            blocked_variables_[variable->name()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
-        }
+        else { blocked_variables_[variable->name()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable); }
 
         return;
     }
@@ -119,7 +117,8 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::FunctionGroup> 
         {
             function_group.reroute(blocked_function_groups_[function_group->name()].handle());
         }
-        else {
+        else
+        {
             blocked_function_groups_[function_group->name()] =
                 lang::OwningHandle<lang::FunctionGroup>::takeOwnership(function_group);
         }
@@ -144,9 +143,7 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Type> type)
     if (blockers_.contains(type->name()))
     {
         if (blocked_types_.contains(type->name())) { type.reroute(blocked_types_[type->name()].handle()); }
-        else {
-            blocked_types_[type->name()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
-        }
+        else { blocked_types_[type->name()] = lang::OwningHandle<lang::Type>::takeOwnership(type); }
 
         return;
     }
@@ -172,9 +169,7 @@ void lang::LocalScope::resolve()
         auto& [name, function_group] = *fn_it;
 
         if (scope()->resolveDefinition(function_group.handle())) { fn_it = undefined_function_groups_.erase(fn_it); }
-        else {
-            ++fn_it;
-        }
+        else { ++fn_it; }
     }
 
     auto var_it = undefined_variables_.begin();
@@ -184,9 +179,7 @@ void lang::LocalScope::resolve()
         auto& [name, variable] = *var_it;
 
         if (scope()->resolveDefinition(variable.handle())) { var_it = undefined_variables_.erase(var_it); }
-        else
-        {
-            ++var_it; }
+        else { ++var_it; }
     }
 
     auto tp_it = undefined_types_.begin();
@@ -270,4 +263,3 @@ void lang::LocalScope::buildReturnFinalization(CompileContext& context)
 
     current->buildFinalization(context);
 }
-

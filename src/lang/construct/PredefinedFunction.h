@@ -39,16 +39,16 @@ namespace lang
 
         llvm::DIScope*                                      getDebugScope(CompileContext& context) override;
         lang::LocalScope*                                   getInsideScope() override;
-        [[nodiscard]] const std::vector<lang::BasicBlock*>& getBasicBlocks() const override;
+        [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 
       public:
         [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
 
         void setCallValidator(
-            std::function<bool(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>&,
+            std::function<bool(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const&,
                                lang::Location,
                                ValidationLogger&)> validator);
-        bool doCallValidation(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+        bool doCallValidation(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
                               lang::Location                                                              location,
                               ValidationLogger& validation_logger) const override;
 
@@ -56,7 +56,7 @@ namespace lang
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};
 
-        std::function<bool(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>&,
+        std::function<bool(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const&,
                            lang::Location,
                            ValidationLogger&)>
             call_validator_ {};
@@ -64,4 +64,3 @@ namespace lang
 }
 
 #endif
-

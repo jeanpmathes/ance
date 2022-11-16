@@ -59,8 +59,8 @@ std::shared_ptr<lang::Value> lang::SequenceType::buildSubscript(std::shared_ptr<
     return std::make_shared<lang::WrappedNativeValue>(getSubscriptReturnType(), native_value);
 }
 
-llvm::Value* lang::SequenceType::buildGetElementPointer(const std::shared_ptr<lang::Value>& indexed,
-                                                        const std::shared_ptr<lang::Value>& index,
+llvm::Value* lang::SequenceType::buildGetElementPointer(std::shared_ptr<lang::Value> const& indexed,
+                                                        std::shared_ptr<lang::Value> const& index,
                                                         CompileContext&                     context)
 {
     index->buildContentValue(context);

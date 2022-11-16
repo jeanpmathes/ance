@@ -56,7 +56,7 @@ std::string lang::NullPointerType::createMangledName() const
 
 llvm::DIType* lang::NullPointerType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.module()->getDataLayout();
 
     uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
 

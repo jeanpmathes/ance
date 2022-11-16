@@ -30,8 +30,7 @@ namespace lang
     /**
      * Abstract base class for functions that are defined by a statement.
      */
-    class StatementFunction
-        : public lang::FunctionDefinition
+    class StatementFunction : public lang::FunctionDefinition
     {
       public:
         StatementFunction(Function&                                     function,
@@ -58,7 +57,7 @@ namespace lang
         llvm::DIScope*    getDebugScope(CompileContext& context) override;
         lang::LocalScope* getInsideScope() override;
 
-        [[nodiscard]] const std::vector<lang::BasicBlock*>& getBasicBlocks() const override;
+        [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 
       protected:
         using FunctionDefinition::buildCall;
@@ -68,7 +67,7 @@ namespace lang
         [[nodiscard]] BasicBlock&                   getInitialBlock() const;
         [[nodiscard]] std::optional<lang::Location> findUnreachableCode() const;
 
-        [[nodiscard]] const std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>>& arguments() const;
+        [[nodiscard]] std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>> const& arguments() const;
 
       private:
         void setupCode();

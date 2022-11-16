@@ -1,6 +1,6 @@
 #include "Element.h"
 
-std::optional<std::reference_wrapper<const data::Element>> data::Element::operator[](const std::string&) const
+std::optional<std::reference_wrapper<const data::Element>> data::Element::operator[](std::string const&) const
 {
     return {};
 }
@@ -26,4 +26,3 @@ std::optional<bool> data::Element::asBool() const
 }
 
 data::Element::~Element() {}
-

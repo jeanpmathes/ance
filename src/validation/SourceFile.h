@@ -15,9 +15,9 @@ class SourceFile
      * @param project_directory The project directory.
      * @param file The path to the file from the project directory.
      */
-    SourceFile(const std::filesystem::path& project_directory, const std::filesystem::path& file);
+    SourceFile(std::filesystem::path const& project_directory, std::filesystem::path const& file);
 
-    SourceFile(const SourceFile& other) = delete;
+    SourceFile(SourceFile const& other) = delete;
     SourceFile(SourceFile&& other)      = delete;
 
     /**
@@ -40,7 +40,7 @@ class SourceFile
      * Get the path to the source file.
      * @return The path, relative to the project directory.
      */
-    [[nodiscard]] const std::filesystem::path& getRelativePath() const;
+    [[nodiscard]] std::filesystem::path const& getRelativePath() const;
 
     /**
      * Get the path from the project directory to the directory containing the source file.
@@ -68,4 +68,3 @@ class SourceFile
 };
 
 #endif
-

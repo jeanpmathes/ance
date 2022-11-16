@@ -28,7 +28,7 @@ lang::ResolvingHandle<lang::Type> lang::Type::getUndefined()
     return ResolvingHandle<Type>(std::unique_ptr<Type>(new Type()));
 }
 
-const lang::Identifier& lang::Type::name() const
+lang::Identifier const& lang::Type::name() const
 {
     static const lang::Identifier undefined = lang::Identifier::from("$undefined");
 
@@ -47,7 +47,7 @@ std::string lang::Type::getAnnotatedName(bool is_safe) const
     return name;
 }
 
-const std::string& lang::Type::getMangledName() const
+std::string const& lang::Type::getMangledName() const
 {
     assert(isDefined());
     return definition_->getMangledName();
@@ -79,7 +79,7 @@ bool lang::Type::isCustom() const
     return definition_->isCustom();
 }
 
-const lang::FixedWidthIntegerType* lang::Type::isFixedWidthIntegerType() const
+lang::FixedWidthIntegerType const* lang::Type::isFixedWidthIntegerType() const
 {
     assert(isDefined());
     return definition_->isFixedWidthIntegerType();
@@ -97,7 +97,7 @@ bool lang::Type::isSigned() const
     return definition_->isSigned();
 }
 
-const lang::IntegerType* lang::Type::isIntegerType() const
+lang::IntegerType const* lang::Type::isIntegerType() const
 {
     assert(isDefined());
     return definition_->isIntegerType();
@@ -121,7 +121,7 @@ bool lang::Type::isUnsignedIntegerPointerType() const
     return definition_->isUnsignedIntegerPointerType();
 }
 
-const lang::FloatingPointType* lang::Type::isFloatingPointType() const
+lang::FloatingPointType const* lang::Type::isFloatingPointType() const
 {
     assert(isDefined());
     return definition_->isFloatingPointType();
@@ -193,7 +193,7 @@ bool lang::Type::isStructType() const
     return definition_->isStructType();
 }
 
-const lang::VectorizableType* lang::Type::isVectorizable() const
+lang::VectorizableType const* lang::Type::isVectorizable() const
 {
     assert(isDefined());
     return definition_->isVectorizable();
@@ -205,7 +205,7 @@ lang::VectorizableType* lang::Type::isVectorizable()
     return definition_->isVectorizable();
 }
 
-const lang::VectorType* lang::Type::isVectorType() const
+lang::VectorType const* lang::Type::isVectorType() const
 {
     assert(isDefined());
     return definition_->isVectorType();
@@ -217,7 +217,7 @@ lang::VectorType* lang::Type::isVectorType()
     return definition_->isVectorType();
 }
 
-const lang::ArrayType* lang::Type::isArrayType() const
+lang::ArrayType const* lang::Type::isArrayType() const
 {
     assert(isDefined());
     return definition_->isArrayType();
@@ -355,13 +355,13 @@ bool lang::Type::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> oth
     return definition_->isImplicitlyConvertibleTo(other);
 }
 
-bool lang::Type::hasMember(const lang::Identifier& name)
+bool lang::Type::hasMember(lang::Identifier const& name)
 {
     assert(isDefined());
     return definition_->hasMember(name);
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::getMemberType(const lang::Identifier& name)
+lang::ResolvingHandle<lang::Type> lang::Type::getMemberType(lang::Identifier const& name)
 {
     assert(isDefined());
     return definition_->getMemberType(name);
@@ -427,7 +427,7 @@ bool lang::Type::validateImplicitConversion(lang::ResolvingHandle<lang::Type> ot
     return definition_->validateImplicitConversion(std::move(other), location, validation_logger);
 }
 
-bool lang::Type::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const
+bool lang::Type::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const
 {
     assert(isDefined());
     return definition_->validateMemberAccess(name, validation_logger);
@@ -473,7 +473,7 @@ std::shared_ptr<lang::Value> lang::Type::buildImplicitConversion(lang::Resolving
 }
 
 std::shared_ptr<lang::Value> lang::Type::buildMemberAccess(std::shared_ptr<Value>  value,
-                                                           const lang::Identifier& name,
+                                                           lang::Identifier const& name,
                                                            CompileContext&         context)
 {
     assert(isDefined());
@@ -638,12 +638,12 @@ lang::ResolvingHandle<lang::Type> lang::Type::toSeparateUndefined() const
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::getCommonType(
-    const std::vector<lang::ResolvingHandle<lang::Type>>& types)
+    std::vector<lang::ResolvingHandle<lang::Type>> const& types)
 {
     std::vector<lang::ResolvingHandle<lang::Type>> common_types;
 
     {// Check if all types are the same, which means we have a trivial common type.
-        const lang::ResolvingHandle<lang::Type>& first = types.front();
+        lang::ResolvingHandle<lang::Type> const& first = types.front();
 
         bool all_same = true;
 
@@ -668,7 +668,7 @@ std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::getCommonType(
         {
             if (std::ranges::all_of(
                     types,
-                    [&](const lang::ResolvingHandle<lang::Type>& current) { return isMatching(candidate, current); })
+                    [&](lang::ResolvingHandle<lang::Type> const& current) { return isMatching(candidate, current); })
                 && std::find(common_types.begin(), common_types.end(), candidate) == common_types.end())
             {
                 common_types.push_back(candidate);

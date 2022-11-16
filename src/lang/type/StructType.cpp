@@ -143,7 +143,7 @@ std::string lang::StructType::createMangledName() const
 
 llvm::DIType* lang::StructType::createDebugType(CompileContext& context)
 {
-    const llvm::DataLayout& dl         = context.module()->getDataLayout();
+    llvm::DataLayout const& dl         = context.module()->getDataLayout();
     llvm::Type*             array_type = getContentType(*context.llvmContext());
 
     uint64_t size      = dl.getTypeSizeInBits(array_type);
@@ -184,17 +184,17 @@ std::vector<lang::TypeDefinition*> lang::StructType::getDependencies() const
     return dependencies;
 }
 
-bool lang::StructType::hasMember(const lang::Identifier& name)
+bool lang::StructType::hasMember(lang::Identifier const& name)
 {
     return member_map_.contains(name);
 }
 
-lang::ResolvingHandle<lang::Type> lang::StructType::getMemberType(const lang::Identifier& name)
+lang::ResolvingHandle<lang::Type> lang::StructType::getMemberType(lang::Identifier const& name)
 {
     return member_map_.at(name).get().type();
 }
 
-bool lang::StructType::validateMemberAccess(const lang::Identifier& name, ValidationLogger& validation_logger) const
+bool lang::StructType::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const
 {
     if (member_map_.at(name).get().access() == AccessModifier::PRIVATE_ACCESS)
     {
@@ -206,7 +206,7 @@ bool lang::StructType::validateMemberAccess(const lang::Identifier& name, Valida
 }
 
 std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr<Value>  value,
-                                                                 const lang::Identifier& name,
+                                                                 lang::Identifier const& name,
                                                                  CompileContext&         context)
 {
     lang::ResolvingHandle<lang::Type> return_type = lang::ReferenceType::get(getMemberType(name));
@@ -273,4 +273,3 @@ llvm::Value* lang::StructType::buildGetElementPointer(llvm::Value*    struct_ptr
                                          static_cast<unsigned>(member_index),
                                          struct_ptr->getName() + ".gep");
 }
-

@@ -44,4 +44,3 @@ void SizeofExpression::doBuild(CompileContext& context)
     std::shared_ptr<lang::WrappedNativeValue> value = std::make_shared<lang::WrappedNativeValue>(type(), native_value);
     setValue(value);
 }
-

@@ -8,13 +8,13 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "lang/construct/FunctionDefinition.h"
-#include "lang/construct/Parameter.h"
-#include "lang/construct/Signature.h"
 #include "lang/AccessModifier.h"
 #include "lang/Element.h"
 #include "lang/construct/BasicBlock.h"
 #include "lang/construct/CodeBlock.h"
+#include "lang/construct/FunctionDefinition.h"
+#include "lang/construct/Parameter.h"
+#include "lang/construct/Signature.h"
 #include "lang/utility/OwningHandle.h"
 
 namespace lang
@@ -50,7 +50,7 @@ namespace lang
          * Get the name of this function.
          * @return The name.
          */
-        [[nodiscard]] const Identifier& name() const;
+        [[nodiscard]] Identifier const& name() const;
 
         /**
          * Get whether this function is defined.
@@ -68,7 +68,7 @@ namespace lang
         void defineAsExtern(Scope&                                               containing_scope,
                             lang::ResolvingHandle<lang::Type>                    return_type,
                             lang::Location                                       return_type_location,
-                            const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                            std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
                             lang::Location                                       location);
 
         /**
@@ -85,7 +85,7 @@ namespace lang
         void defineAsCustom(lang::AccessModifier                                 access,
                             lang::ResolvingHandle<lang::Type>                    return_type,
                             lang::Location                                       return_type_location,
-                            const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                            std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
                             std::unique_ptr<lang::CodeBlock>                     block,
                             Scope&                                               containing_scope,
                             lang::Location                                       declaration_location,
@@ -100,7 +100,7 @@ namespace lang
          * @return The predefined function.
          */
         PredefinedFunction& defineAsPredefined(lang::ResolvingHandle<lang::Type>                    return_type,
-                                               const std::vector<std::shared_ptr<lang::Parameter>>& parameters,
+                                               std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
                                                Scope&                                               containing_scope,
                                                lang::Location                                       location);
 
@@ -127,10 +127,10 @@ namespace lang
          * @return The defined variable or nothing if defining is not possible.
          */
         std::optional<lang::ResolvingHandle<lang::Variable>> defineParameterVariable(
-            const Identifier&                   name,
+            Identifier const&                   name,
             lang::ResolvingHandle<lang::Type>   type,
             lang::Location                      type_location,
-            const std::shared_ptr<lang::Value>& value,
+            std::shared_ptr<lang::Value> const& value,
             unsigned                            parameter_no,
             lang::Location                      location);
 
@@ -144,7 +144,7 @@ namespace lang
          * Get the signature of this function.
          * @return The function signature.
          */
-        [[nodiscard]] const lang::Signature& signature() const;
+        [[nodiscard]] lang::Signature const& signature() const;
 
         /**
          * Get the type of a parameter.
@@ -217,7 +217,7 @@ namespace lang
          * @param validation_logger A logger to log validation messages.
          * @return True if the call is valid.
          */
-        bool validateCall(const std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>>& arguments,
+        bool validateCall(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
                           lang::Location                                                              location,
                           ValidationLogger& validation_logger);
 
@@ -227,7 +227,7 @@ namespace lang
          * @param context The current compile context.
          * @return The return value. Will be null for return type void.
          */
-        std::shared_ptr<lang::Value> buildCall(const std::vector<std::shared_ptr<lang::Value>>& arguments,
+        std::shared_ptr<lang::Value> buildCall(std::vector<std::shared_ptr<lang::Value>> const& arguments,
                                                CompileContext&                                  context) const;
 
         lang::Scope*       scope() override;
@@ -244,7 +244,7 @@ namespace lang
          * Get the basic blocks for this function.
          * @return A vector containing all basic blocks.
          */
-        const std::vector<lang::BasicBlock*>& getBasicBlocks() const;
+        std::vector<lang::BasicBlock*> const& getBasicBlocks() const;
 
         void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
         void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;

@@ -8,9 +8,9 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "lang/AccessModifier.h"
+#include "lang/Element.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
-#include "lang/Element.h"
 
 namespace lang
 {

@@ -12,7 +12,7 @@ bool lang::FunctionGroup::isDefined() const
     return !functions().empty();
 }
 
-const lang::Identifier& lang::FunctionGroup::name() const
+lang::Identifier const& lang::FunctionGroup::name() const
 {
     return name_;
 }
@@ -106,4 +106,3 @@ void lang::FunctionGroup::onAddFunction(lang::Function& function)
 {
     addChild(function);
 }
-
