@@ -12,7 +12,7 @@ private arr7: [[[i1; 2]; 2]; 128];
 
 // String arrays have special literals, that allow to declare array contents in a readable form.
 
-private arr8: [u8; 3] <: "abc";
+private arr8: [u8; 3] <: 8"abc";
 
 public main () : u32
 {
