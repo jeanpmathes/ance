@@ -24,9 +24,9 @@ namespace
             , vocabulary(this->literalNames, this->symbolicNames)
         {}
 
-        AnceLexerStaticData(const AnceLexerStaticData&)            = delete;
+        AnceLexerStaticData(AnceLexerStaticData const&)            = delete;
         AnceLexerStaticData(AnceLexerStaticData&&)                 = delete;
-        AnceLexerStaticData& operator=(const AnceLexerStaticData&) = delete;
+        AnceLexerStaticData& operator=(AnceLexerStaticData const&) = delete;
         AnceLexerStaticData& operator=(AnceLexerStaticData&&)      = delete;
 
         std::vector<antlr4::dfa::DFA>       decisionToDFA;
@@ -996,22 +996,20 @@ std::string anceLexer::getGrammarFileName() const
     return "ance.g4";
 }
 
-const std::vector<std::string>& anceLexer::getRuleNames() const
-{
-    return ancelexerLexerStaticData->ruleNames;
+std::vector<std::string>& anceLexer::getRuleNames() const {
+  return ancelexerLexerStaticData->ruleNames;
 }
 
-const std::vector<std::string>& anceLexer::getChannelNames() const
+std::vector<std::string> const& anceLexer::getChannelNames() const
 {
     return ancelexerLexerStaticData->channelNames;
 }
 
-const std::vector<std::string>& anceLexer::getModeNames() const
-{
-    return ancelexerLexerStaticData->modeNames;
+std::vector<std::string>& anceLexer::getModeNames() const {
+  return ancelexerLexerStaticData->modeNames;
 }
 
-const dfa::Vocabulary& anceLexer::getVocabulary() const
+dfa::Vocabulary const& anceLexer::getVocabulary() const
 {
     return ancelexerLexerStaticData->vocabulary;
 }
@@ -1021,7 +1019,7 @@ antlr4::atn::SerializedATNView anceLexer::getSerializedATN() const
     return ancelexerLexerStaticData->serializedATN;
 }
 
-const atn::ATN& anceLexer::getATN() const
+atn::ATN const& anceLexer::getATN() const
 {
     return *ancelexerLexerStaticData->atn;
 }

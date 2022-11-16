@@ -36,17 +36,17 @@ class dataParser : public antlr4::Parser
 
     explicit dataParser(antlr4::TokenStream* input);
 
-    dataParser(antlr4::TokenStream* input, const antlr4::atn::ParserATNSimulatorOptions& options);
+    dataParser(antlr4::TokenStream* input, antlr4::atn::ParserATNSimulatorOptions const& options);
 
     ~dataParser() override;
 
     std::string getGrammarFileName() const override;
 
-    const antlr4::atn::ATN& getATN() const override;
+    antlr4::atn::ATN const& getATN() const override;
 
-    const std::vector<std::string>& getRuleNames() const override;
+    std::vector<std::string> const& getRuleNames() const override;
 
-    const antlr4::dfa::Vocabulary& getVocabulary() const override;
+    antlr4::dfa::Vocabulary const& getVocabulary() const override;
 
     antlr4::atn::SerializedATNView getSerializedATN() const override;
 

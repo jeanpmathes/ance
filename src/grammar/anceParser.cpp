@@ -22,9 +22,9 @@ namespace
             , vocabulary(this->literalNames, this->symbolicNames)
         {}
 
-        AnceParserStaticData(const AnceParserStaticData&)            = delete;
+        AnceParserStaticData(AnceParserStaticData const&)            = delete;
         AnceParserStaticData(AnceParserStaticData&&)                 = delete;
-        AnceParserStaticData& operator=(const AnceParserStaticData&) = delete;
+        AnceParserStaticData& operator=(AnceParserStaticData const&) = delete;
         AnceParserStaticData& operator=(AnceParserStaticData&&)      = delete;
 
         std::vector<antlr4::dfa::DFA>       decisionToDFA;
@@ -565,7 +565,7 @@ namespace
             112, 56,  0,   609, 611, 3,   114, 57,  0,   610, 601, 1,   0,   0,   0,   610, 602, 1,   0,   0,   0,
             610, 603, 1,   0,   0,   0,   610, 604, 1,   0,   0,   0,   610, 605, 1,   0,   0,   0,   610, 606, 1,
             0,   0,   0,   610, 607, 1,   0,   0,   0,   610, 608, 1,   0,   0,   0,   610, 609, 1,   0,   0,   0,
-            611, 93,  1,   0,   0,   0,   612, 614, 5,   92,  0,   0,   613, 612, 1,   0,   0,   0,   613, 614, 1,
+            611, 93,  1,   0,   0,   0,   612, 614, 7,   0,   0,   0,   613, 612, 1,   0,   0,   0,   613, 614, 1,
             0,   0,   0,   614, 615, 1,   0,   0,   0,   615, 616, 5,   86,  0,   0,   616, 95,  1,   0,   0,   0,
             617, 619, 7,   0,   0,   0,   618, 617, 1,   0,   0,   0,   618, 619, 1,   0,   0,   0,   619, 620, 1,
             0,   0,   0,   620, 621, 5,   87,  0,   0,   621, 97,  1,   0,   0,   0,   622, 625, 3,   100, 50,  0,
@@ -624,7 +624,7 @@ namespace
 
 anceParser::anceParser(TokenStream* input) : anceParser(input, antlr4::atn::ParserATNSimulatorOptions()) {}
 
-anceParser::anceParser(TokenStream* input, const antlr4::atn::ParserATNSimulatorOptions& options) : Parser(input)
+anceParser::anceParser(TokenStream* input, antlr4::atn::ParserATNSimulatorOptions const& options) : Parser(input)
 {
     anceParser::initialize();
     _interpreter = new atn::ParserATNSimulator(this,
@@ -639,9 +639,8 @@ anceParser::~anceParser()
     delete _interpreter;
 }
 
-const atn::ATN& anceParser::getATN() const
-{
-    return *anceParserStaticData->atn;
+atn::ATN& anceParser::getATN() const {
+  return *anceParserStaticData->atn;
 }
 
 std::string anceParser::getGrammarFileName() const
@@ -649,12 +648,11 @@ std::string anceParser::getGrammarFileName() const
     return "ance.g4";
 }
 
-const std::vector<std::string>& anceParser::getRuleNames() const
-{
-    return anceParserStaticData->ruleNames;
+std::vector<std::string>& anceParser::getRuleNames() const {
+  return anceParserStaticData->ruleNames;
 }
 
-const dfa::Vocabulary& anceParser::getVocabulary() const
+dfa::Vocabulary const& anceParser::getVocabulary() const
 {
     return anceParserStaticData->vocabulary;
 }
@@ -6031,6 +6029,11 @@ tree::TerminalNode* anceParser::StringLiteralContext::IDENTIFIER()
     return getToken(anceParser::IDENTIFIER, 0);
 }
 
+tree::TerminalNode* anceParser::StringLiteralContext::INTEGER()
+{
+    return getToken(anceParser::INTEGER, 0);
+}
+
 size_t anceParser::StringLiteralContext::getRuleIndex() const
 {
     return anceParser::RuleStringLiteral;
@@ -6062,10 +6065,24 @@ anceParser::StringLiteralContext* anceParser::stringLiteral()
         _errHandler->sync(this);
 
         _la = _input->LA(1);
-        if (_la == anceParser::IDENTIFIER)
+        if (_la == anceParser::INTEGER
+
+            || _la == anceParser::IDENTIFIER)
         {
             setState(612);
-            antlrcpp::downCast<StringLiteralContext*>(_localctx)->prefix = match(anceParser::IDENTIFIER);
+            antlrcpp::downCast<StringLiteralContext*>(_localctx)->prefix = _input->LT(1);
+            _la                                                          = _input->LA(1);
+            if (!(_la == anceParser::INTEGER
+
+                  || _la == anceParser::IDENTIFIER))
+            {
+                antlrcpp::downCast<StringLiteralContext*>(_localctx)->prefix = _errHandler->recoverInline(this);
+            }
+            else
+            {
+                _errHandler->reportMatch(this);
+                consume();
+            }
         }
         setState(615);
         match(anceParser::STRING);

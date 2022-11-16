@@ -40,7 +40,7 @@ namespace lang
          * @param valid Whether the parsing was successful.
          * @return The parsed character.
          */
-        static char32_t parseChar(const std::basic_string<char32_t>& unparsed, bool& valid);
+        static char32_t parseChar(std::u32string const& unparsed, bool& valid);
 
         /**
          * Parse a byte from a string.
@@ -57,7 +57,7 @@ namespace lang
          * @param success Whether the read was successful.
          * @return The parsed character.
          */
-        static char32_t readEscapedChar(const std::basic_string<char32_t>& unparsed, size_t& index, bool& success);
+        static char32_t readEscapedChar(std::u32string const& unparsed, size_t& index, bool& success);
 
         /**
          * Read an escaped character from a string.

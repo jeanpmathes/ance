@@ -28,21 +28,35 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const override;
         llvm::Constant*                                 buildContent(llvm::Module* m) override;
 
-        bool equals(const lang::Constant* other) const override;
+        bool equals(lang::Constant const* other) const override;
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
       private:
-        static std::string                       parse(const std::string& unparsed, bool& valid);
-        static lang::ResolvingHandle<lang::Type> resolveType(std::string& prefix, std::string& string, bool& valid);
+        enum Kind
+        {
+            BYTE,
+            CHAR,
+            C_STRING
+        };
+
+        using Data = std::variant<std::string, std::u32string>;
+
+      private:
+        static Kind                              resolveKind(std::string const& prefix, bool* valid);
+        static std::u32string                    parse(std::u32string const& unparsed, bool* valid);
+        static Data                              createData(std::string const& literal, Kind kind, bool* valid);
+        static lang::ResolvingHandle<lang::Type> resolveType(Kind kind, Data const& data);
 
       private:
         bool is_prefix_valid_  = true;
         bool is_literal_valid_ = true;
 
-        std::string                       prefix_;
-        std::string                       literal_;
-        std::string                       data_;
+        std::string prefix_;
+        std::string literal_;
+
+        Kind                              kind_;
+        Data                              data_;
         lang::ResolvingHandle<lang::Type> type_;
     };
 }

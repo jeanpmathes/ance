@@ -254,7 +254,7 @@ literalExpression
 	;
 
 stringLiteral
-	: ( prefix=IDENTIFIER )? STRING
+	: ( prefix=(IDENTIFIER | INTEGER) )? STRING
 	;
 
 charLiteral

@@ -67,7 +67,7 @@ bool lang::CharConstant::validate(ValidationLogger& validation_logger, lang::Loc
     return true;
 }
 
-char32_t lang::CharConstant::parseChar(const std::basic_string<char32_t>& unparsed, bool& valid)
+char32_t lang::CharConstant::parseChar(std::u32string const& unparsed, bool& valid)
 {
     std::optional<char32_t> content;
     bool                    escaped = false;
@@ -100,7 +100,7 @@ char32_t lang::CharConstant::parseChar(const std::basic_string<char32_t>& unpars
     return content.value();
 }
 
-char32_t lang::CharConstant::readEscapedChar(const std::basic_string<char32_t>& unparsed, size_t& index, bool& success)
+char32_t lang::CharConstant::readEscapedChar(std::u32string const& unparsed, size_t& index, bool& success)
 {
     char32_t const& c = unparsed[index++];
     switch (c)
@@ -137,7 +137,7 @@ char32_t lang::CharConstant::readEscapedChar(const std::basic_string<char32_t>& 
                 return 0;
             }
 
-            std::basic_string<char32_t> hex;
+            std::u32string hex;
             while (index < unparsed.size() && unparsed[index] != '}') { hex += unparsed[index++]; }
 
             if (index >= unparsed.size() || unparsed[index++] != '}')
@@ -170,7 +170,7 @@ char32_t lang::CharConstant::readEscapedChar(const std::basic_string<char32_t>& 
                 return 0;
             }
 
-            std::basic_string<char32_t> hex;
+            std::u32string hex;
             hex += unparsed[index++];
             hex += unparsed[index++];
 

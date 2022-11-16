@@ -184,17 +184,17 @@ class anceParser : public antlr4::Parser
 
     explicit anceParser(antlr4::TokenStream* input);
 
-    anceParser(antlr4::TokenStream* input, const antlr4::atn::ParserATNSimulatorOptions& options);
+    anceParser(antlr4::TokenStream* input, antlr4::atn::ParserATNSimulatorOptions const& options);
 
     ~anceParser() override;
 
     std::string getGrammarFileName() const override;
 
-    const antlr4::atn::ATN& getATN() const override;
+    antlr4::atn::ATN const& getATN() const override;
 
-    const std::vector<std::string>& getRuleNames() const override;
+    std::vector<std::string> const& getRuleNames() const override;
 
-    const antlr4::dfa::Vocabulary& getVocabulary() const override;
+    antlr4::dfa::Vocabulary const& getVocabulary() const override;
 
     antlr4::atn::SerializedATNView getSerializedATN() const override;
 
@@ -1475,6 +1475,7 @@ class anceParser : public antlr4::Parser
         virtual size_t              getRuleIndex() const override;
         antlr4::tree::TerminalNode* STRING();
         antlr4::tree::TerminalNode* IDENTIFIER();
+        antlr4::tree::TerminalNode* INTEGER();
 
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };

@@ -22,9 +22,9 @@ namespace
             , vocabulary(this->literalNames, this->symbolicNames)
         {}
 
-        DataParserStaticData(const DataParserStaticData&)            = delete;
+        DataParserStaticData(DataParserStaticData const&)            = delete;
         DataParserStaticData(DataParserStaticData&&)                 = delete;
-        DataParserStaticData& operator=(const DataParserStaticData&) = delete;
+        DataParserStaticData& operator=(DataParserStaticData const&) = delete;
         DataParserStaticData& operator=(DataParserStaticData&&)      = delete;
 
         std::vector<antlr4::dfa::DFA>       decisionToDFA;
@@ -87,7 +87,7 @@ namespace
 
 dataParser::dataParser(TokenStream* input) : dataParser(input, antlr4::atn::ParserATNSimulatorOptions()) {}
 
-dataParser::dataParser(TokenStream* input, const antlr4::atn::ParserATNSimulatorOptions& options) : Parser(input)
+dataParser::dataParser(TokenStream* input, antlr4::atn::ParserATNSimulatorOptions const& options) : Parser(input)
 {
     dataParser::initialize();
     _interpreter = new atn::ParserATNSimulator(this,
@@ -102,9 +102,8 @@ dataParser::~dataParser()
     delete _interpreter;
 }
 
-const atn::ATN& dataParser::getATN() const
-{
-    return *dataParserStaticData->atn;
+atn::ATN& dataParser::getATN() const {
+  return *dataParserStaticData->atn;
 }
 
 std::string dataParser::getGrammarFileName() const
@@ -112,12 +111,11 @@ std::string dataParser::getGrammarFileName() const
     return "data.g4";
 }
 
-const std::vector<std::string>& dataParser::getRuleNames() const
-{
-    return dataParserStaticData->ruleNames;
+std::vector<std::string>& dataParser::getRuleNames() const {
+  return dataParserStaticData->ruleNames;
 }
 
-const dfa::Vocabulary& dataParser::getVocabulary() const
+dfa::Vocabulary const& dataParser::getVocabulary() const
 {
     return dataParserStaticData->vocabulary;
 }

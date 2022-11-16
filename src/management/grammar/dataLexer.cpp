@@ -24,9 +24,9 @@ namespace
             , vocabulary(this->literalNames, this->symbolicNames)
         {}
 
-        DataLexerStaticData(const DataLexerStaticData&)            = delete;
+        DataLexerStaticData(DataLexerStaticData const&)            = delete;
         DataLexerStaticData(DataLexerStaticData&&)                 = delete;
-        DataLexerStaticData& operator=(const DataLexerStaticData&) = delete;
+        DataLexerStaticData& operator=(DataLexerStaticData const&) = delete;
         DataLexerStaticData& operator=(DataLexerStaticData&&)      = delete;
 
         std::vector<antlr4::dfa::DFA>       decisionToDFA;
@@ -135,22 +135,20 @@ std::string dataLexer::getGrammarFileName() const
     return "data.g4";
 }
 
-const std::vector<std::string>& dataLexer::getRuleNames() const
-{
-    return datalexerLexerStaticData->ruleNames;
+std::vector<std::string>& dataLexer::getRuleNames() const {
+  return datalexerLexerStaticData->ruleNames;
 }
 
-const std::vector<std::string>& dataLexer::getChannelNames() const
+std::vector<std::string> const& dataLexer::getChannelNames() const
 {
     return datalexerLexerStaticData->channelNames;
 }
 
-const std::vector<std::string>& dataLexer::getModeNames() const
-{
-    return datalexerLexerStaticData->modeNames;
+std::vector<std::string>& dataLexer::getModeNames() const {
+  return datalexerLexerStaticData->modeNames;
 }
 
-const dfa::Vocabulary& dataLexer::getVocabulary() const
+dfa::Vocabulary const& dataLexer::getVocabulary() const
 {
     return datalexerLexerStaticData->vocabulary;
 }
@@ -160,7 +158,7 @@ antlr4::atn::SerializedATNView dataLexer::getSerializedATN() const
     return datalexerLexerStaticData->serializedATN;
 }
 
-const atn::ATN& dataLexer::getATN() const
+atn::ATN const& dataLexer::getATN() const
 {
     return *datalexerLexerStaticData->atn;
 }
