@@ -53,6 +53,8 @@ class Case;
 
 class Assertion;
 class Assignment;
+class Break;
+class Continue;
 class Delete;
 class Drop;
 class ExpressionStatement;
@@ -69,8 +71,9 @@ class While;
         lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation, BinaryOperation, UnaryOperation, BindRef,    \
         BindRefTo, ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType, Subscript,                \
         VariableAccess, MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope,                  \
-        lang::LocalScope, Assertion, Assignment, Delete, ExpressionStatement, LocalReferenceVariableDefinition,        \
-        LocalVariableDefinition, Drop, Return, If, While, Match, Case, VectorDefinition, ArrayDefinition
+        lang::LocalScope, Assertion, Assignment, Break, Continue, Delete, ExpressionStatement,                         \
+        LocalReferenceVariableDefinition, LocalVariableDefinition, Drop, Return, If, While, Match, Case,               \
+        VectorDefinition, ArrayDefinition
 #endif
 
 class Statement;

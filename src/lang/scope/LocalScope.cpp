@@ -220,6 +220,10 @@ bool lang::LocalScope::findExistingLocalDeclaration(lang::ResolvingHandle<lang::
         return true;
     }
 
+    lang::LocalScope* parent = scope()->asLocalScope();
+
+    if (parent != nullptr && parent->findExistingLocalDeclaration(variable)) return true;
+
     return false;
 }
 

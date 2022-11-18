@@ -64,6 +64,10 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual std::any visitDeleteStatement(anceParser::DeleteStatementContext* context) = 0;
 
+    virtual std::any visitBreakStatement(anceParser::BreakStatementContext* context) = 0;
+
+    virtual std::any visitContinueStatement(anceParser::ContinueStatementContext* context) = 0;
+
     virtual std::any visitReturnStatement(anceParser::ReturnStatementContext* context) = 0;
 
     virtual std::any visitAssertStatement(anceParser::AssertStatementContext* context) = 0;

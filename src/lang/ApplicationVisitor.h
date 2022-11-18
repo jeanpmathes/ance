@@ -50,6 +50,8 @@ namespace lang
 
 #include "lang/statement/Assertion.h"
 #include "lang/statement/Assignment.h"
+#include "lang/statement/Break.h"
+#include "lang/statement/Continue.h"
 #include "lang/statement/Delete.h"
 #include "lang/statement/Drop.h"
 #include "lang/statement/ExpressionStatement.h"

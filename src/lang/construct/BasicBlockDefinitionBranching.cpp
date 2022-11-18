@@ -21,15 +21,12 @@ void lang::BasicBlock::Definition::Branching::setLink(lang::BasicBlock& next)
 {
     lang::BasicBlock* next_ptr = &next;
 
-    assert(next_ptr->definition_.get() != this);
     assert(!true_next_ || !false_next_);
 
     if (!true_next_)
     {
         true_next_ = next_ptr;
         next.registerIncomingLink(*self());
-
-        assert(true_next_ != false_next_);
 
         return;
     }
@@ -38,8 +35,6 @@ void lang::BasicBlock::Definition::Branching::setLink(lang::BasicBlock& next)
     {
         false_next_ = next_ptr;
         next.registerIncomingLink(*self());
-
-        assert(true_next_ != false_next_);
 
         return;
     }
@@ -54,8 +49,6 @@ void lang::BasicBlock::Definition::Branching::updateLink(lang::BasicBlock* forme
 
         target = updated;
         updated->registerIncomingLink(*self());
-
-        assert(true_next_ != false_next_);
     };
 
     if (true_next_ == former) { update(true_next_); }

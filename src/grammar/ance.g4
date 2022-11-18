@@ -59,6 +59,8 @@ statement
 	| dropStatement
 	| assignment
 	| deleteStatement
+	| breakStatement
+	| continueStatement
 	| returnStatement
 	| assertStatement
 	| ifStatement
@@ -94,6 +96,14 @@ assigner
 
 deleteStatement
     : 'delete' ( BUFFER )? expression ';'
+    ;
+
+breakStatement
+    : 'break' ';'
+    ;
+
+continueStatement
+    : 'continue' ';'
     ;
 
 returnStatement

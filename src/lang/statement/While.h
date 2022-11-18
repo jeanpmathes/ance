@@ -38,10 +38,14 @@ class While
   protected:
     void doBuild(CompileContext& context) override;
 
-  private:
-    std::unique_ptr<Expression> condition_;
+    [[nodiscard]] bool                                            isLoop() const override;
+    [[nodiscard]] std::pair<lang::BasicBlock*, lang::BasicBlock*> getLoopParts() const override;
 
-    std::unique_ptr<Statement> block_;
+  private:
+    std::pair<lang::BasicBlock*, lang::BasicBlock*> loop_parts_ {nullptr, nullptr};
+
+    std::unique_ptr<Expression> condition_;
+    std::unique_ptr<Statement>  block_;
 };
 
 #endif

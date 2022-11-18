@@ -135,9 +135,8 @@ std::string dataLexer::getGrammarFileName() const
     return "data.g4";
 }
 
-std::vector<std::string> const& dataLexer::getRuleNames() const
-{
-    return datalexerLexerStaticData->ruleNames;
+std::vector<std::string>& dataLexer::getRuleNames() const {
+  return datalexerLexerStaticData->ruleNames;
 }
 
 std::vector<std::string> const& dataLexer::getChannelNames() const
@@ -145,9 +144,8 @@ std::vector<std::string> const& dataLexer::getChannelNames() const
     return datalexerLexerStaticData->channelNames;
 }
 
-std::vector<std::string> const& dataLexer::getModeNames() const
-{
-    return datalexerLexerStaticData->modeNames;
+std::vector<std::string>& dataLexer::getModeNames() const {
+  return datalexerLexerStaticData->modeNames;
 }
 
 dfa::Vocabulary const& dataLexer::getVocabulary() const

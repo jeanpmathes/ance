@@ -40,6 +40,25 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
                                                                              lang::Function&   function);
 
     /**
+     * Get the parent statement, if any.
+     * @return The parent statement, or nullptr.
+     */
+    [[nodiscard]] Statement const* parent() const;
+
+    /**
+     * Get whether this statement is a loop statement.
+     * @return True if this statement is a loop statement.
+     */
+    [[nodiscard]] virtual bool isLoop() const;
+
+    /**
+     * Get the begin and end blocks, if this is a loop statement.
+     * This may only be called during basic block creation.
+     * @return The begin and end blocks.
+     */
+    [[nodiscard]] virtual std::pair<lang::BasicBlock*, lang::BasicBlock*> getLoopParts() const;
+
+    /**
      * Set the scope that contains this statement.
      * @param scope The containing scope.
      */
@@ -139,6 +158,8 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
 
   private:
     lang::Location location_;
+
+    Statement* parent_ = nullptr;
 
     lang::Scope* containing_scope_ = nullptr;
 

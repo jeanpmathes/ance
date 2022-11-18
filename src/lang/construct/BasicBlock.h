@@ -66,12 +66,15 @@ namespace lang
          * Create a basic block that loops as long as the condition is true.
          * @param new_block The expression providing the condition.
          * @param code_block The block to execute as long as the condition is true.
+         * @param loop_parts The loop parts to set that are used by loop control statements.
          * @param function The function containing the basic block.
          * @return The created basic blocks.
          */
-        static std::vector<std::unique_ptr<BasicBlock>> createLooping(Expression* new_block,
-                                                                      Statement*  code_block,
-                                                                      Function&   function);
+        static std::vector<std::unique_ptr<BasicBlock>> createLooping(
+            Expression*                                      new_block,
+            Statement*                                       code_block,
+            std::pair<lang::BasicBlock*, lang::BasicBlock*>* loop_parts,
+            Function&                                        function);
 
         /**
          * Create basis blocks that match a case for a given value.
@@ -84,6 +87,14 @@ namespace lang
             Match*                                                  match,
             std::vector<std::pair<ConstantExpression*, Statement*>> cases,
             Function&                                               function);
+
+        /**
+         * Create a jump to a basic block.
+         * @param from The block to jump from.
+         * @param to The block to jump to.
+         * @return The created basic block.
+         */
+        static std::vector<std::unique_ptr<BasicBlock>> createJump(lang::BasicBlock& from, lang::BasicBlock& to);
 
       public:
         /**

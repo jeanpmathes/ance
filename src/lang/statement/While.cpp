@@ -28,7 +28,7 @@ Statement& While::body()
 std::vector<std::unique_ptr<lang::BasicBlock>> While::createBasicBlocks(lang::BasicBlock& entry,
                                                                         lang::Function&   function)
 {
-    auto blocks = lang::BasicBlock::createLooping(condition_.get(), block_.get(), function);
+    auto blocks = lang::BasicBlock::createLooping(condition_.get(), block_.get(), &loop_parts_, function);
 
     entry.link(*blocks.front());
 
@@ -57,4 +57,14 @@ Statements While::expandWith(Expressions subexpressions, Statements substatement
 void While::doBuild(CompileContext&)
 {
     // Handled by basic block.
+}
+
+bool While::isLoop() const
+{
+    return true;
+}
+
+std::pair<lang::BasicBlock*, lang::BasicBlock*> While::getLoopParts() const
+{
+    return loop_parts_;
 }

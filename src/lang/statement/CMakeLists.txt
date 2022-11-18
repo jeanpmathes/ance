@@ -3,6 +3,8 @@ target_sources(ance PRIVATE Assignment.cpp
                LocalReferenceVariableDefinition.cpp
                Drop.cpp
                Delete.cpp
+               Break.cpp
+               Continue.cpp
                Return.cpp
                ExpressionStatement.cpp
                Assertion.cpp

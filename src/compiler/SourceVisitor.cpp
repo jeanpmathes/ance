@@ -20,40 +20,6 @@
 #include "lang/type/VectorType.h"
 #include "lang/type/VoidType.h"
 
-#include "lang/statement/Assertion.h"
-#include "lang/statement/Assignment.h"
-#include "lang/statement/Delete.h"
-#include "lang/statement/Drop.h"
-#include "lang/statement/ExpressionStatement.h"
-#include "lang/statement/If.h"
-#include "lang/statement/LocalReferenceVariableDefinition.h"
-#include "lang/statement/LocalVariableDefinition.h"
-#include "lang/statement/Match.h"
-#include "lang/statement/Return.h"
-#include "lang/statement/While.h"
-
-#include "lang/expression/Addressof.h"
-#include "lang/expression/Allocation.h"
-#include "lang/expression/And.h"
-#include "lang/expression/ArrayDefinition.h"
-#include "lang/expression/BinaryOperation.h"
-#include "lang/expression/BindRef.h"
-#include "lang/expression/BindRefTo.h"
-#include "lang/expression/ConstantLiteral.h"
-#include "lang/expression/FunctionCall.h"
-#include "lang/expression/IfSelect.h"
-#include "lang/expression/Indirection.h"
-#include "lang/expression/MatchSelect.h"
-#include "lang/expression/MemberAccess.h"
-#include "lang/expression/Or.h"
-#include "lang/expression/Parenthesis.h"
-#include "lang/expression/SizeofExpression.h"
-#include "lang/expression/SizeofType.h"
-#include "lang/expression/Subscript.h"
-#include "lang/expression/UnaryOperation.h"
-#include "lang/expression/VariableAccess.h"
-#include "lang/expression/VectorDefinition.h"
-
 #include "lang/construct/constant/BooleanConstant.h"
 #include "lang/construct/constant/CharConstant.h"
 #include "lang/construct/constant/FloatConstant.h"
@@ -344,6 +310,18 @@ std::any SourceVisitor::visitDeleteStatement(anceParser::DeleteStatementContext*
 
     auto statement = std::make_unique<Delete>(std::unique_ptr<Expression>(expression), delete_buffer, location(ctx));
 
+    return lang::CodeBlock::wrapStatement(std::move(statement));
+}
+
+std::any SourceVisitor::visitBreakStatement(anceParser::BreakStatementContext* ctx)
+{
+    auto statement = std::make_unique<Break>(location(ctx));
+    return lang::CodeBlock::wrapStatement(std::move(statement));
+}
+
+std::any SourceVisitor::visitContinueStatement(anceParser::ContinueStatementContext* ctx)
+{
+    auto statement = std::make_unique<Continue>(location(ctx));
     return lang::CodeBlock::wrapStatement(std::move(statement));
 }
 
@@ -1079,7 +1057,7 @@ lang::Location SourceVisitor::location(antlr4::ParserRuleContext* ctx)
 
     size_t end_line   = ctx->getStop()->getLine();
     size_t end_column = file_context_->getUtf8Index(end_line, ctx->getStop()->getCharPositionInLine())
-                      + ctx->getStop()->getText().size() + 1;
+                      + ctx->getStop()->getText().size();
 
     return {start_line, start_column, end_line, end_column, file_context_->getFileIndex()};
 }

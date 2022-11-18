@@ -88,6 +88,13 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
+    virtual std::any visitBreakStatement(anceParser::BreakStatementContext* ctx) override { return visitChildren(ctx); }
+
+    virtual std::any visitContinueStatement(anceParser::ContinueStatementContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
     virtual std::any visitReturnStatement(anceParser::ReturnStatementContext* ctx) override
     {
         return visitChildren(ctx);

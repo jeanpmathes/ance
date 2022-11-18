@@ -28,6 +28,21 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Statement::createBasicBlocks(lang
     return blocks;
 }
 
+Statement const* Statement::parent() const
+{
+    return parent_;
+}
+
+bool Statement::isLoop() const
+{
+    return false;
+}
+
+std::pair<lang::BasicBlock*, lang::BasicBlock*> Statement::getLoopParts() const
+{
+    return {nullptr, nullptr};
+}
+
 void Statement::setScope(lang::Scope& scope)
 {
     for (auto& subexpression : subexpressions_) { subexpression.get().setContainingScope(scope); }
@@ -129,4 +144,6 @@ void Statement::addSubstatement(Statement& substatement)
 {
     substatements_.emplace_back(substatement);
     addChild(substatement);
+
+    substatement.parent_ = this;
 }

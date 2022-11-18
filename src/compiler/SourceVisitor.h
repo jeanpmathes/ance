@@ -51,6 +51,8 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitDropStatement(anceParser::DropStatementContext* ctx) override;
     std::any visitAssignment(anceParser::AssignmentContext* ctx) override;
     std::any visitDeleteStatement(anceParser::DeleteStatementContext* ctx) override;
+    std::any visitBreakStatement(anceParser::BreakStatementContext* ctx) override;
+    std::any visitContinueStatement(anceParser::ContinueStatementContext* ctx) override;
     std::any visitReturnStatement(anceParser::ReturnStatementContext* ctx) override;
     std::any visitAssertStatement(anceParser::AssertStatementContext* ctx) override;
     std::any visitIfStatement(anceParser::IfStatementContext* ctx) override;

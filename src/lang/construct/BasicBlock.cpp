@@ -88,9 +88,11 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createBranching
     return blocks;
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(Expression* condition,
-                                                                               Statement*  code_block,
-                                                                               Function&   function)
+std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(
+    Expression*                                      condition,
+    Statement*                                       code_block,
+    std::pair<lang::BasicBlock*, lang::BasicBlock*>* loop_parts,
+    Function&                                        function)
 {
     std::vector<std::unique_ptr<BasicBlock>> blocks;
 
@@ -101,6 +103,8 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(E
     block->definition_->setSelf(block);
 
     std::unique_ptr<lang::BasicBlock> end_block = lang::BasicBlock::createSimple();
+
+    *loop_parts = std::make_pair(block, end_block.get());
 
     auto append_code_block = [&](Statement* new_block, lang::BasicBlock& next) {
         auto new_basic_blocks = new_block->createBasicBlocks(*block, function);
@@ -119,6 +123,18 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(E
     blocks.push_back(std::move(end_block));
 
     for (auto& new_block : blocks) new_block->setContainingFunction(function);
+
+    return blocks;
+}
+
+std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createJump(lang::BasicBlock& from,
+                                                                            lang::BasicBlock& to)
+{
+    from.link(to);
+
+    // Blocks after the jump might be unreachable, but still need a block to link to.
+    std::vector<std::unique_ptr<BasicBlock>> blocks;
+    blocks.push_back(createSimple());
 
     return blocks;
 }

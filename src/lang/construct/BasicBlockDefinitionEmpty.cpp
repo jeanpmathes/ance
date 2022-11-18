@@ -99,5 +99,5 @@ void lang::BasicBlock::Definition::Empty::doBuild(CompileContext& context)
 
 std::string lang::BasicBlock::Definition::Empty::getExitRepresentation()
 {
-    return "// entry ";
+    return "// meta ";
 }
