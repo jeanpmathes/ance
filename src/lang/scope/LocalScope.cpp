@@ -82,21 +82,10 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Variable> varia
         return;
     }
 
-    if (findExistingLocalDeclaration(variable)) return;
-
-    if (blockers_.contains(variable->name()))
-    {
-        if (blocked_variables_.contains(variable->name()))
-        {
-            variable.reroute(blocked_variables_[variable->name()].handle());
-        }
-        else { blocked_variables_[variable->name()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable); }
-
-        return;
-    }
+    if (searchUsageInLocalScopes(variable)) return;
 
     lang::LocalScope* parent = scope()->asLocalScope();
-    if (parent && parent->findExistingLocalDeclaration(variable)) return;
+    if (parent && parent->searchUsageInLocalScopes(variable)) return;
 
     undefined_variables_[variable->name()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
@@ -210,7 +199,7 @@ bool lang::LocalScope::resolveDefinition(lang::ResolvingHandle<lang::Type> type)
     return scope()->resolveDefinition(type);
 }
 
-bool lang::LocalScope::findExistingLocalDeclaration(lang::ResolvingHandle<lang::Variable> variable)
+bool lang::LocalScope::searchUsageInLocalScopes(lang::ResolvingHandle<lang::Variable> variable)
 {
     auto it = active_variables_.find(variable->name());
 
@@ -220,9 +209,20 @@ bool lang::LocalScope::findExistingLocalDeclaration(lang::ResolvingHandle<lang::
         return true;
     }
 
+    if (blockers_.contains(variable->name()))
+    {
+        if (blocked_variables_.contains(variable->name()))
+        {
+            variable.reroute(blocked_variables_[variable->name()].handle());
+        }
+        else { blocked_variables_[variable->name()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable); }
+
+        return true;
+    }
+
     lang::LocalScope* parent = scope()->asLocalScope();
 
-    if (parent != nullptr && parent->findExistingLocalDeclaration(variable)) return true;
+    if (parent != nullptr && parent->searchUsageInLocalScopes(variable)) return true;
 
     return false;
 }

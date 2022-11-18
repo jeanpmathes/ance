@@ -3,162 +3,157 @@
 
 #pragma once
 
+
 #include "antlr4-runtime.h"
 
-class dataParser : public antlr4::Parser
-{
+
+
+
+class  dataParser : public antlr4::Parser {
+public:
+  enum {
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
+    T__7 = 8, KEY = 9, STRING = 10, WHITESPACE = 11, LINE_COMMENT = 12
+  };
+
+  enum {
+    RuleElement = 0, RuleDictionary = 1, RuleEntry = 2, RuleList = 3, RuleString = 4, 
+    RuleBoolean = 5
+  };
+
+  explicit dataParser(antlr4::TokenStream *input);
+
+  dataParser(antlr4::TokenStream *input, const antlr4::atn::ParserATNSimulatorOptions &options);
+
+  ~dataParser() override;
+
+  std::string getGrammarFileName() const override;
+
+  const antlr4::atn::ATN& getATN() const override;
+
+  const std::vector<std::string>& getRuleNames() const override;
+
+  const antlr4::dfa::Vocabulary& getVocabulary() const override;
+
+  antlr4::atn::SerializedATNView getSerializedATN() const override;
+
+
+  class ElementContext;
+  class DictionaryContext;
+  class EntryContext;
+  class ListContext;
+  class StringContext;
+  class BooleanContext; 
+
+  class  ElementContext : public antlr4::ParserRuleContext {
   public:
-    enum
-    {
-        T__0         = 1,
-        T__1         = 2,
-        T__2         = 3,
-        T__3         = 4,
-        T__4         = 5,
-        T__5         = 6,
-        T__6         = 7,
-        T__7         = 8,
-        KEY          = 9,
-        STRING       = 10,
-        WHITESPACE   = 11,
-        LINE_COMMENT = 12
-    };
+    ElementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    DictionaryContext *dictionary();
+    ListContext *list();
+    StringContext *string();
+    BooleanContext *boolean();
 
-    enum
-    {
-        RuleElement    = 0,
-        RuleDictionary = 1,
-        RuleEntry      = 2,
-        RuleList       = 3,
-        RuleString     = 4,
-        RuleBoolean    = 5
-    };
 
-    explicit dataParser(antlr4::TokenStream* input);
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
 
-    dataParser(antlr4::TokenStream* input, antlr4::atn::ParserATNSimulatorOptions const& options);
+  ElementContext* element();
 
-    ~dataParser() override;
+  class  DictionaryContext : public antlr4::ParserRuleContext {
+  public:
+    DictionaryContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<EntryContext *> entry();
+    EntryContext* entry(size_t i);
 
-    std::string getGrammarFileName() const override;
 
-    antlr4::atn::ATN const& getATN() const override;
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
 
-    std::vector<std::string> const& getRuleNames() const override;
+  DictionaryContext* dictionary();
 
-    antlr4::dfa::Vocabulary const& getVocabulary() const override;
+  class  EntryContext : public antlr4::ParserRuleContext {
+  public:
+    dataParser::ElementContext *value = nullptr;
+    EntryContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *KEY();
+    ElementContext *element();
 
-    antlr4::atn::SerializedATNView getSerializedATN() const override;
 
-    class ElementContext;
-    class DictionaryContext;
-    class EntryContext;
-    class ListContext;
-    class StringContext;
-    class BooleanContext;
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
 
-    class ElementContext : public antlr4::ParserRuleContext
-    {
-      public:
-        ElementContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t     getRuleIndex() const override;
-        DictionaryContext* dictionary();
-        ListContext*       list();
-        StringContext*     string();
-        BooleanContext*    boolean();
+  EntryContext* entry();
 
-        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
+  class  ListContext : public antlr4::ParserRuleContext {
+  public:
+    ListContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<ElementContext *> element();
+    ElementContext* element(size_t i);
 
-    ElementContext* element();
 
-    class DictionaryContext : public antlr4::ParserRuleContext
-    {
-      public:
-        DictionaryContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t             getRuleIndex() const override;
-        std::vector<EntryContext*> entry();
-        EntryContext*              entry(size_t i);
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
 
-        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
+  ListContext* list();
 
-    DictionaryContext* dictionary();
+  class  StringContext : public antlr4::ParserRuleContext {
+  public:
+    StringContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *STRING();
 
-    class EntryContext : public antlr4::ParserRuleContext
-    {
-      public:
-        dataParser::ElementContext* value = nullptr;
-        EntryContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t              getRuleIndex() const override;
-        antlr4::tree::TerminalNode* KEY();
-        ElementContext*             element();
 
-        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
 
-    EntryContext* entry();
+  StringContext* string();
 
-    class ListContext : public antlr4::ParserRuleContext
-    {
-      public:
-        ListContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t               getRuleIndex() const override;
-        std::vector<ElementContext*> element();
-        ElementContext*              element(size_t i);
+  class  BooleanContext : public antlr4::ParserRuleContext {
+  public:
+    BooleanContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    BooleanContext() = default;
+    void copyFrom(BooleanContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
 
-        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
+    virtual size_t getRuleIndex() const override;
 
-    ListContext* list();
+   
+  };
 
-    class StringContext : public antlr4::ParserRuleContext
-    {
-      public:
-        StringContext(antlr4::ParserRuleContext* parent, size_t invokingState);
-        virtual size_t              getRuleIndex() const override;
-        antlr4::tree::TerminalNode* STRING();
+  class  TrueContext : public BooleanContext {
+  public:
+    TrueContext(BooleanContext *ctx);
 
-        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
 
-    StringContext* string();
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
 
-    class BooleanContext : public antlr4::ParserRuleContext
-    {
-      public:
-        BooleanContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+  class  FalseContext : public BooleanContext {
+  public:
+    FalseContext(BooleanContext *ctx);
 
-        BooleanContext() = default;
-        void copyFrom(BooleanContext* context);
-        using antlr4::ParserRuleContext::copyFrom;
 
-        virtual size_t getRuleIndex() const override;
-    };
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
 
-    class TrueContext : public BooleanContext
-    {
-      public:
-        TrueContext(BooleanContext* ctx);
+  BooleanContext* boolean();
 
-        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
 
-    class FalseContext : public BooleanContext
-    {
-      public:
-        FalseContext(BooleanContext* ctx);
+  // By default the static state used to implement the parser is lazily initialized during the first
+  // call to the constructor. You can call this function if you wish to initialize the static state
+  // ahead of time.
+  static void initialize();
 
-        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
-    };
-
-    BooleanContext* boolean();
-
-    // By default the static state used to implement the parser is lazily initialized during the first
-    // call to the constructor. You can call this function if you wish to initialize the static state
-    // ahead of time.
-    static void initialize();
-
-  private:
+private:
 };
 

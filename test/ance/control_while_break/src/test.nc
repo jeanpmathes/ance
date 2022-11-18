@@ -19,7 +19,7 @@ public main () : u32
 
         // The continue can be nested in a block.
         {
-            if count == 0 then continue;
+            if count == 3 then continue;
         }
 
         write(c"A", 1:32);

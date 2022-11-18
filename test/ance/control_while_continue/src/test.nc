@@ -28,7 +28,7 @@ public main () : u32
             write(c"A", 1:32);
         }
 
-        if inner_count == 1 then break;
+        if count == 1 then break;
     }
 
     return 0:32;

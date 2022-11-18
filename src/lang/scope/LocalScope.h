@@ -92,7 +92,7 @@ namespace lang
         bool resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
         bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) override;
 
-        bool findExistingLocalDeclaration(lang::ResolvingHandle<lang::Variable> variable);
+        bool searchUsageInLocalScopes(lang::ResolvingHandle<lang::Variable> variable);
 
         void onSubScope(lang::LocalScope* sub_scope) override;
 

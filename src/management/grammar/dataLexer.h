@@ -3,53 +3,48 @@
 
 #pragma once
 
+
 #include "antlr4-runtime.h"
 
-class dataLexer : public antlr4::Lexer
-{
-  public:
-    enum
-    {
-        T__0         = 1,
-        T__1         = 2,
-        T__2         = 3,
-        T__3         = 4,
-        T__4         = 5,
-        T__5         = 6,
-        T__6         = 7,
-        T__7         = 8,
-        KEY          = 9,
-        STRING       = 10,
-        WHITESPACE   = 11,
-        LINE_COMMENT = 12
-    };
 
-    explicit dataLexer(antlr4::CharStream* input);
 
-    ~dataLexer() override;
 
-    std::string getGrammarFileName() const override;
+class  dataLexer : public antlr4::Lexer {
+public:
+  enum {
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
+    T__7 = 8, KEY = 9, STRING = 10, WHITESPACE = 11, LINE_COMMENT = 12
+  };
 
-    std::vector<std::string> const& getRuleNames() const override;
+  explicit dataLexer(antlr4::CharStream *input);
 
-    std::vector<std::string> const& getChannelNames() const override;
+  ~dataLexer() override;
 
-    std::vector<std::string> const& getModeNames() const override;
 
-    antlr4::dfa::Vocabulary const& getVocabulary() const override;
+  std::string getGrammarFileName() const override;
 
-    antlr4::atn::SerializedATNView getSerializedATN() const override;
+  const std::vector<std::string>& getRuleNames() const override;
 
-    antlr4::atn::ATN const& getATN() const override;
+  const std::vector<std::string>& getChannelNames() const override;
 
-    // By default the static state used to implement the lexer is lazily initialized during the first
-    // call to the constructor. You can call this function if you wish to initialize the static state
-    // ahead of time.
-    static void initialize();
+  const std::vector<std::string>& getModeNames() const override;
 
-  private:
-    // Individual action functions triggered by action() above.
+  const antlr4::dfa::Vocabulary& getVocabulary() const override;
 
-    // Individual semantic predicate functions triggered by sempred() above.
+  antlr4::atn::SerializedATNView getSerializedATN() const override;
+
+  const antlr4::atn::ATN& getATN() const override;
+
+  // By default the static state used to implement the lexer is lazily initialized during the first
+  // call to the constructor. You can call this function if you wish to initialize the static state
+  // ahead of time.
+  static void initialize();
+
+private:
+
+  // Individual action functions triggered by action() above.
+
+  // Individual semantic predicate functions triggered by sempred() above.
+
 };
 
