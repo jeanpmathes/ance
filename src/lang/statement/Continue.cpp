@@ -16,19 +16,14 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Continue::createBasicBlocks(lang:
     assert(loop_parent != nullptr);
 
     std::vector<lang::Scope*> scopes;
-    std::set<lang::Scope*>    visited_scopes;
-    Statement const*          current = this;
+    lang::Scope*              current = scope();
 
-    while (current != loop_parent)
+    while (current != loop_parent->scope())
     {
-        if (!visited_scopes.contains(current->scope()))
-        {
-            scopes.push_back(current->scope());
-            visited_scopes.insert(current->scope());
-        }
-
-        current = current->parent();
+        scopes.push_back(current);
+        current = current->scope();
     }
+
     auto const& [start, end] = loop_parent->getLoopParts();
 
     return lang::BasicBlock::createJump(entry, *start, scopes);

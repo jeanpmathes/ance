@@ -46,6 +46,8 @@ class CodePrinter : public lang::ApplicationVisitor
 
     std::any visit(Assertion& assertion) override;
     std::any visit(Assignment& assignment_statement) override;
+    std::any visit(Break& break_statement) override;
+    std::any visit(Continue& continue_statement) override;
     std::any visit(Delete& delete_statement) override;
     std::any visit(Drop& drop_statement) override;
     std::any visit(ExpressionStatement& expression_statement) override;

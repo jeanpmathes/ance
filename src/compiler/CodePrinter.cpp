@@ -345,6 +345,20 @@ std::any CodePrinter::visit(Assignment& assignment_statement)
     return {};
 }
 
+std::any CodePrinter::visit(Break&)
+{
+    out_ << "break;";
+
+    return {};
+}
+
+std::any CodePrinter::visit(Continue&)
+{
+    out_ << "continue;";
+
+    return {};
+}
+
 std::any CodePrinter::visit(Delete& delete_statement)
 {
     out_ << "delete";
