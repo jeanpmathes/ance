@@ -26,10 +26,13 @@ class Continue
     std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
                                                                      lang::Function&   function) override;
 
-    Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+    [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
     void doBuild(CompileContext& context) override;
+
+  private:
+    [[nodiscard]] Statement const* getLoopParent() const;
 };
 
 #endif
