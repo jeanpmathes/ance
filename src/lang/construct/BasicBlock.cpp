@@ -14,11 +14,11 @@ std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createEmpty()
     return std::unique_ptr<BasicBlock>(block);
 }
 
-std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createFinalizing(lang::Scope* scope)
+std::unique_ptr<lang::BasicBlock> lang::BasicBlock::createFinalizing(lang::Scope* scope, std::string info)
 {
     auto block = new BasicBlock();
 
-    block->definition_ = std::make_unique<Definition::Finalizing>(scope);
+    block->definition_ = std::make_unique<Definition::Finalizing>(scope, std::move(info));
     block->definition_->setSelf(block);
 
     return std::unique_ptr<BasicBlock>(block);
@@ -127,13 +127,24 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createLooping(
     return blocks;
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createJump(lang::BasicBlock& from,
-                                                                            lang::BasicBlock& to)
+std::vector<std::unique_ptr<lang::BasicBlock>> lang::BasicBlock::createJump(lang::BasicBlock&                from,
+                                                                            lang::BasicBlock&                to,
+                                                                            std::vector<lang::Scope*> const& scopes)
 {
-    from.link(to);
+    std::vector<std::unique_ptr<BasicBlock>> blocks;
+    lang::BasicBlock*                        current_block = &from;
+
+    for (auto scope : scopes)
+    {
+        blocks.push_back(createFinalizing(scope, "jump"));
+
+        current_block->link(*blocks.back());
+        current_block = blocks.back().get();
+    }
+
+    current_block->link(to);
 
     // Blocks after the jump might be unreachable, but still need a block to link to.
-    std::vector<std::unique_ptr<BasicBlock>> blocks;
     blocks.push_back(createSimple());
 
     return blocks;

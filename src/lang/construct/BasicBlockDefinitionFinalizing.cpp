@@ -3,7 +3,10 @@
 #include "compiler/CompileContext.h"
 #include "lang/scope/Scope.h"
 
-lang::BasicBlock::Definition::Finalizing::Finalizing(lang::Scope* scope) : scope_(scope) {}
+lang::BasicBlock::Definition::Finalizing::Finalizing(lang::Scope* scope, std::string info)
+    : scope_(scope)
+    , info_(std::move(info))
+{}
 
 bool lang::BasicBlock::Definition::Finalizing::isMeta() const
 {
@@ -103,5 +106,5 @@ void lang::BasicBlock::Definition::Finalizing::doBuild(CompileContext& context)
 
 std::string lang::BasicBlock::Definition::Finalizing::getExitRepresentation()
 {
-    return "// finalize ";
+    return "// finalize (" + info_ + ")";
 }

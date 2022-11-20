@@ -104,7 +104,7 @@ void lang::StatementFunction::determineFlow()
     blocks_ = code_->createBasicBlocks(*initial_block_, function());
 
     lang::BasicBlock* last = blocks_.empty() ? initial_block_.get() : blocks_.back().get();
-    blocks_.push_back(lang::BasicBlock::createFinalizing(&function()));
+    blocks_.push_back(lang::BasicBlock::createFinalizing(&function(), "function"));
     last->link(*blocks_.back());
 
     initial_block_->setContainingFunction(function());

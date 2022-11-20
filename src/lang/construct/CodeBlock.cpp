@@ -119,7 +119,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlock
 
     if (scoped_)
     {
-        blocks.push_back(lang::BasicBlock::createFinalizing(scope_.get()));
+        blocks.push_back(lang::BasicBlock::createFinalizing(scope_.get(), "block"));
         previous_block->link(*blocks.back());
     }
 

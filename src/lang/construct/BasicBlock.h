@@ -25,9 +25,10 @@ namespace lang
         /**
          * Create a finalizing scope that is used to finalize a scope.
          * @param scope The scope to finalize.
+         * @param info Information about the scope.
          * @return The finalizing block.
          */
-        static std::unique_ptr<BasicBlock> createFinalizing(lang::Scope* scope);
+        static std::unique_ptr<BasicBlock> createFinalizing(lang::Scope* scope, std::string info);
 
         /**
          * Create a simple basic block that contains a single or no statement, and no links.
@@ -92,9 +93,12 @@ namespace lang
          * Create a jump to a basic block.
          * @param from The block to jump from.
          * @param to The block to jump to.
+         * @param scopes The scopes to jump over. These scopes will be finalized.
          * @return The created basic block.
          */
-        static std::vector<std::unique_ptr<BasicBlock>> createJump(lang::BasicBlock& from, lang::BasicBlock& to);
+        static std::vector<std::unique_ptr<BasicBlock>> createJump(lang::BasicBlock&                from,
+                                                                   lang::BasicBlock&                to,
+                                                                   std::vector<lang::Scope*> const& scopes);
 
       public:
         /**
@@ -306,7 +310,7 @@ namespace lang
             class Finalizing : public Base
             {
               public:
-                explicit Finalizing(lang::Scope* scope);
+                Finalizing(lang::Scope* scope, std::string info);
                 ~Finalizing() override = default;
 
               public:
@@ -335,6 +339,7 @@ namespace lang
               private:
                 lang::BasicBlock* next_ {nullptr};
                 lang::Scope*      scope_ {nullptr};
+                std::string       info_ {};
             };
 
             class Simple : public Base

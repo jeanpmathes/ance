@@ -15,9 +15,23 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Continue::createBasicBlocks(lang:
     Statement const* loop_parent = getLoopParent();
     assert(loop_parent != nullptr);
 
+    std::vector<lang::Scope*> scopes;
+    std::set<lang::Scope*>    visited_scopes;
+    Statement const*          current = this;
+
+    while (current != loop_parent)
+    {
+        if (!visited_scopes.contains(current->scope()))
+        {
+            scopes.push_back(current->scope());
+            visited_scopes.insert(current->scope());
+        }
+
+        current = current->parent();
+    }
     auto const& [start, end] = loop_parent->getLoopParts();
 
-    return lang::BasicBlock::createJump(entry, *start);
+    return lang::BasicBlock::createJump(entry, *start, scopes);
 }
 
 Statements Continue::expandWith(Expressions, Statements) const
