@@ -16,6 +16,8 @@ SourceFile::SourceFile(std::filesystem::path const& project_directory, std::file
     for (std::string line; std::getline(file_stream, line);) { lines_.push_back(std::move(line)); }
 
     file_stream.close();
+
+    lines_.emplace_back("");
 }
 
 std::string_view SourceFile::getLine(size_t line) const
@@ -49,6 +51,8 @@ std::filesystem::path SourceFile::getFilename() const
 
 size_t SourceFile::getUtf8Index(size_t line, size_t utf_32_column) const
 {
+    if (utf_32_column == 0) return 0;
+
     std::string_view line_view    = getLine(line);
     int              utf_8_column = 0;
 

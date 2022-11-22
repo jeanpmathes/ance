@@ -6,8 +6,13 @@
 
 std::string_view trim(std::string_view str, size_t& start)
 {
-    auto const begin = str.find_first_not_of(" \t");
-    auto const end   = str.find_last_not_of(" \t");
+    if (str.empty()) return str;
+
+    size_t begin = str.find_first_not_of(" \t");
+    size_t end   = str.find_last_not_of(" \t");
+
+    if (begin == std::string_view::npos) begin = 0;
+    if (end == std::string_view::npos) end = str.size() - 1;
 
     start = begin;
 
