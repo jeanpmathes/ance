@@ -53,7 +53,6 @@ namespace lang
 
         llvm::Value*           native_value_ {};
         llvm::DILocalVariable* local_debug_variable_ {nullptr};
-        bool                   finalized_ {false};
     };
 }
 #endif

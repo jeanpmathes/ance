@@ -60,6 +60,12 @@ void AnceSyntaxErrorHandler::ParserErrorListener::syntaxError(antlr4::Recognizer
             + previous_symbol->getText().size();
     }
 
+    if (offending_symbol->getType() == anceLexer::ERROR_CHAR)
+    {
+        parent_.log("Unexpected character", line, char_position_in_line);
+        return;
+    }
+
     if (expected == anceLexer::SEMICOLON)
     {
         parent_.log("Expected ';' here", previous_line, previous_char_position);

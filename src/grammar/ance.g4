@@ -394,8 +394,8 @@ QUAD : DECIMAL 'q' ;
 
 DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ;
 
-STRING : '"' ('\\'. | .)*? '"' ;
-CHAR : '\'' ( '\\' . | . )*? '\'' ;
+STRING : '"' ('\\'~[\r\n] | ~[\r\n])*? '"' ;
+CHAR : '\'' ( '\\' ~[\r\n] | ~[\r\n] )*? '\'' ;
 INTEGER : [0-9]+ ;
 
 BUFFER : '[]' ;
@@ -411,3 +411,5 @@ WHITESPACE : [\p{White_Space}] -> skip ;
 
 BLOCK_COMMENT : '/*' .*? '*/' -> skip;
 LINE_COMMENT : '//' ~[\r\n]* -> skip;
+
+ERROR_CHAR : . ;

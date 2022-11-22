@@ -88,11 +88,7 @@ void lang::LocalVariable::buildDefinition(CompileContext& context)
 
 void lang::LocalVariable::buildFinalization(CompileContext& context)
 {
-    assert(not finalized_);
-
     if (!type()->isReferenceType()) { type()->buildFinalizer(native_value_, context); }
-
-    finalized_ = true;
 }
 
 std::shared_ptr<lang::Value> lang::LocalVariable::getValue(CompileContext&)
