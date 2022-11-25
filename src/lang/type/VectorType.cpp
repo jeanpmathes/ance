@@ -134,12 +134,12 @@ std::shared_ptr<lang::Value> lang::VectorType::buildImplicitConversion(lang::Res
 
             auto index_value = [&]() {
                 llvm::Value* index_native =
-                    lang::Values::contentToNative(lang::SizeType::getSize(), index_content, context);
+                    lang::values::contentToNative(lang::SizeType::getSize(), index_content, context);
                 return std::make_shared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
             };
 
             auto current_element = lang::Type::getValueOrReferencedValue(
-                buildSubscript(lang::Values::clone(value), index_value(), context),
+                buildSubscript(lang::values::clone(value), index_value(), context),
                 context);
 
             auto result_element =
@@ -197,12 +197,12 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::UnaryOperator
 
             auto index_value = [&]() {
                 llvm::Value* index_native =
-                    lang::Values::contentToNative(lang::SizeType::getSize(), index_content, context);
+                    lang::values::contentToNative(lang::SizeType::getSize(), index_content, context);
                 return std::make_shared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
             };
 
             auto element = lang::Type::getValueOrReferencedValue(
-                value->type()->buildSubscript(lang::Values::clone(value), index_value(), context),
+                value->type()->buildSubscript(lang::values::clone(value), index_value(), context),
                 context);
 
             auto result_element = element_type_->buildOperator(op, element, context);
@@ -272,15 +272,15 @@ std::shared_ptr<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperato
 
             auto index_value = [&]() {
                 llvm::Value* index_native =
-                    lang::Values::contentToNative(lang::SizeType::getSize(), index_content, context);
+                    lang::values::contentToNative(lang::SizeType::getSize(), index_content, context);
                 return std::make_shared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
             };
 
             auto left_element = lang::Type::getValueOrReferencedValue(
-                left->type()->buildSubscript(lang::Values::clone(left), index_value(), context),
+                left->type()->buildSubscript(lang::values::clone(left), index_value(), context),
                 context);
             auto right_element = lang::Type::getValueOrReferencedValue(
-                right->type()->buildSubscript(lang::Values::clone(right), index_value(), context),
+                right->type()->buildSubscript(lang::values::clone(right), index_value(), context),
                 context);
 
             auto result_element = element_type_->buildOperator(op, left_element, right_element, context);
@@ -335,7 +335,7 @@ void lang::VectorType::buildRequestedOverload(std::vector<lang::ResolvingHandle<
         context.ir()->SetInsertPoint(block);
         {
             llvm::Value* original_content = native_function->getArg(0);
-            llvm::Value* original_native  = lang::Values::contentToNative(other_type, original_content, context);
+            llvm::Value* original_native  = lang::values::contentToNative(other_type, original_content, context);
 
             std::shared_ptr<lang::Value> original_value =
                 std::make_shared<lang::WrappedNativeValue>(other_type, original_native);
@@ -350,7 +350,7 @@ void lang::VectorType::buildRequestedOverload(std::vector<lang::ResolvingHandle<
 
                 auto index_value = [&]() {
                     llvm::Value* index_native =
-                        lang::Values::contentToNative(lang::SizeType::getSize(), index_content, context);
+                        lang::values::contentToNative(lang::SizeType::getSize(), index_content, context);
                     return std::make_shared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
                 };
 
@@ -364,7 +364,7 @@ void lang::VectorType::buildRequestedOverload(std::vector<lang::ResolvingHandle<
                 context.ir()->CreateStore(converted_element->getContentValue(), result_dst_ptr);
             }
 
-            llvm::Value* converted = lang::Values::nativeToContent(self(), result_ptr, context);
+            llvm::Value* converted = lang::values::nativeToContent(self(), result_ptr, context);
 
             context.ir()->CreateRet(converted);
         }

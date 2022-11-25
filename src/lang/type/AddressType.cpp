@@ -102,7 +102,7 @@ std::shared_ptr<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperat
     }
 
     lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op, right->type());
-    llvm::Value*                      native_result = lang::Values::contentToNative(result_type, result, context);
+    llvm::Value*                      native_result = lang::values::contentToNative(result_type, result, context);
 
     return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
 }

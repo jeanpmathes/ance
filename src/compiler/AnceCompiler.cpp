@@ -202,7 +202,7 @@ llvm::Function* AnceCompiler::buildExit()
     std::vector<std::shared_ptr<lang::Value>> args;
     args.push_back(
         std::make_shared<lang::WrappedNativeValue>(exitcode_type,
-                                                   lang::Values::contentToNative(exitcode_type, exitcode, *context_)));
+                                                   lang::values::contentToNative(exitcode_type, exitcode, *context_)));
 
     user_exit->buildCall(args, *context_);
 

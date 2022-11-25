@@ -34,7 +34,7 @@ std::shared_ptr<lang::Value> lang::NullPointerType::buildImplicitConversion(lang
     assert(other_type->isPointerTy());
 
     llvm::Value* null         = llvm::ConstantPointerNull::get(llvm::dyn_cast<llvm::PointerType>(other_type));
-    llvm::Value* native_value = lang::Values::contentToNative(other, null, context);
+    llvm::Value* native_value = lang::values::contentToNative(other, null, context);
 
     return std::make_shared<lang::WrappedNativeValue>(other, native_value);
 }

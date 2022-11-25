@@ -70,7 +70,7 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Re
                                                                other->getContentType(*context.llvmContext()),
                                                                isSigned(),
                                                                content_value->getName() + ".icast");
-    llvm::Value* native_converted_value = lang::Values::contentToNative(other, converted_value, context);
+    llvm::Value* native_converted_value = lang::values::contentToNative(other, converted_value, context);
 
     return std::make_shared<WrappedNativeValue>(other, native_converted_value);
 }
@@ -190,7 +190,7 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperato
             result = nullptr;
     }
 
-    llvm::Value* native_result = lang::Values::contentToNative(return_type, result, context);
+    llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
     return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
@@ -325,7 +325,7 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
             break;
     }
 
-    llvm::Value* native_result = lang::Values::contentToNative(return_type, result, context);
+    llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
     return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
 }
 

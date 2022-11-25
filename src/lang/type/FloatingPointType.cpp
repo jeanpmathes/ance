@@ -62,7 +62,7 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(la
     llvm::Value* converted_value      = context.ir()->CreateFPCast(content_value,
                                                               other->getContentType(*context.llvmContext()),
                                                               content_value->getName() + ".fcast");
-    llvm::Value* native_content_value = lang::Values::contentToNative(other, converted_value, context);
+    llvm::Value* native_content_value = lang::values::contentToNative(other, converted_value, context);
 
     return std::make_shared<WrappedNativeValue>(other, native_content_value);
 }
@@ -110,7 +110,7 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryO
             result = nullptr;
     }
 
-    llvm::Value* native_result = lang::Values::contentToNative(return_type, result, context);
+    llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
     return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
 }
 bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
@@ -211,7 +211,7 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::Binary
             result = nullptr;
     }
 
-    llvm::Value* native_result = lang::Values::contentToNative(return_type, result, context);
+    llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
     return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
 }
 

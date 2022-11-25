@@ -65,7 +65,7 @@ void Runtime::setExit(lang::ResolvingHandle<lang::Function> exit)
     {
         lang::ResolvingHandle<lang::Type> exit_value_type = lang::FixedWidthIntegerType::get(32, false);
         llvm::Value* exit_value_content = llvm::ConstantInt::get(exit_value_type->getContentType(llvm_context), 3);
-        llvm::Value* exit_value_native  = lang::Values::contentToNative(exit_value_type, exit_value_content, *context_);
+        llvm::Value* exit_value_native  = lang::values::contentToNative(exit_value_type, exit_value_content, *context_);
         std::shared_ptr<lang::Value> exit_value =
             std::make_shared<lang::WrappedNativeValue>(exit_value_type, exit_value_native);
 
@@ -110,7 +110,7 @@ std::shared_ptr<lang::Value> Runtime::allocate(Allocator                        
     }
 
     lang::ResolvingHandle<lang::Type> ptr_type   = count ? lang::BufferType::get(type) : lang::PointerType::get(type);
-    llvm::Value*                      native_ptr = lang::Values::contentToNative(ptr_type, ptr_to_allocated, context);
+    llvm::Value*                      native_ptr = lang::values::contentToNative(ptr_type, ptr_to_allocated, context);
 
     if (count_value) { type->buildDefaultInitializer(ptr_to_allocated, count_value, context); }
     else { type->buildDefaultInitializer(ptr_to_allocated, context); }

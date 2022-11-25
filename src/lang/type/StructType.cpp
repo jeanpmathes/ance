@@ -229,7 +229,7 @@ std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr
     }
 
     llvm::Value* member_ptr   = buildGetElementPointer(struct_ptr, member_index, context);
-    llvm::Value* native_value = lang::Values::contentToNative(return_type, member_ptr, context);
+    llvm::Value* native_value = lang::values::contentToNative(return_type, member_ptr, context);
 
     return std::make_shared<lang::WrappedNativeValue>(return_type, native_value);
 }

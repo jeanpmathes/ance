@@ -54,7 +54,7 @@ std::shared_ptr<lang::Value> lang::SequenceType::buildSubscript(std::shared_ptr<
     index = lang::Type::makeMatching(lang::SizeType::getSize(), index, context);
 
     llvm::Value* element_ptr  = buildGetElementPointer(indexed, index, context);
-    llvm::Value* native_value = lang::Values::contentToNative(element_reference_, element_ptr, context);
+    llvm::Value* native_value = lang::values::contentToNative(element_reference_, element_ptr, context);
 
     return std::make_shared<lang::WrappedNativeValue>(getSubscriptReturnType(), native_value);
 }

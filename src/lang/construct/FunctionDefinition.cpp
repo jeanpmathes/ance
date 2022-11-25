@@ -114,7 +114,7 @@ std::shared_ptr<lang::Value> lang::FunctionDefinition::buildCall(
 
     if (returnType()->isVoidType()) { return nullptr; }
 
-    llvm::Value* native_value = lang::Values::contentToNative(returnType(), content_value, context);
+    llvm::Value* native_value = lang::values::contentToNative(returnType(), content_value, context);
     return std::make_shared<lang::WrappedNativeValue>(returnType(), native_value);
 }
 

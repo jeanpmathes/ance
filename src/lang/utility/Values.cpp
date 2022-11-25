@@ -4,7 +4,7 @@
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 
-llvm::Value* lang::Values::nativeToContent(lang::ResolvingHandle<lang::Type> type,
+llvm::Value* lang::values::nativeToContent(lang::ResolvingHandle<lang::Type> type,
                                            llvm::Value*                      native,
                                            CompileContext&                   context)
 {
@@ -13,7 +13,7 @@ llvm::Value* lang::Values::nativeToContent(lang::ResolvingHandle<lang::Type> typ
     return content;
 }
 
-llvm::Value* lang::Values::contentToNative(lang::ResolvingHandle<lang::Type> type,
+llvm::Value* lang::values::contentToNative(lang::ResolvingHandle<lang::Type> type,
                                            llvm::Value*                      content,
                                            CompileContext&                   context)
 {
@@ -23,7 +23,7 @@ llvm::Value* lang::Values::contentToNative(lang::ResolvingHandle<lang::Type> typ
     return native;
 }
 
-std::shared_ptr<lang::Value> lang::Values::clone(std::shared_ptr<lang::Value> const& value)
+std::shared_ptr<lang::Value> lang::values::clone(std::shared_ptr<lang::Value> const& value)
 {
     llvm::Value* native = value->getNativeValue();
     return std::make_shared<lang::WrappedNativeValue>(value->type(), native);

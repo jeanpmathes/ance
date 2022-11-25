@@ -54,7 +54,7 @@ void Addressof::doBuild(CompileContext& context)
     value->buildNativeValue(context);
 
     llvm::Value* address = value->getNativeValue();
-    if (!arg_->type()->isReferenceType()) address = lang::Values::contentToNative(type(), address, context);
+    if (!arg_->type()->isReferenceType()) address = lang::values::contentToNative(type(), address, context);
 
     setValue(std::make_shared<lang::WrappedNativeValue>(type(), address));
 }

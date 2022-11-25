@@ -5,7 +5,7 @@
 void lang::Value::buildContentValue(CompileContext& context)
 {
     buildNativeValue(context);
-    content_value_ = lang::Values::nativeToContent(type(), getNativeValue(), context);
+    content_value_ = lang::values::nativeToContent(type(), getNativeValue(), context);
 }
 
 llvm::Value* lang::Value::getContentValue()

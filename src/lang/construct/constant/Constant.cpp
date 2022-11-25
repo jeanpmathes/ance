@@ -30,7 +30,7 @@ llvm::Constant* lang::Constant::getContentConstant()
 void lang::Constant::buildNativeValue(CompileContext& context)
 {
     buildContentConstant(context.module());
-    native_value_ = lang::Values::contentToNative(type(), content_constant_, context);
+    native_value_ = lang::values::contentToNative(type(), content_constant_, context);
 }
 
 void lang::Constant::buildContentValue(CompileContext& context)

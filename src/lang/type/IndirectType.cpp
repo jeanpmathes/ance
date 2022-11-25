@@ -41,6 +41,6 @@ std::shared_ptr<lang::Value> lang::IndirectType::buildIndirection(std::shared_pt
     value->buildContentValue(context);
     llvm::Value* ptr = value->getContentValue();
 
-    llvm::Value* native_value = lang::Values::contentToNative(value_reference_, ptr, context);
+    llvm::Value* native_value = lang::values::contentToNative(value_reference_, ptr, context);
     return std::make_shared<lang::WrappedNativeValue>(value_reference_, native_value);
 }
