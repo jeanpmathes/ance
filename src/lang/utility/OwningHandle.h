@@ -11,23 +11,24 @@ namespace lang
     class OwningHandle
     {
       private:
-        OwningHandle(std::unique_ptr<T> owner, lang::ResolvingHandle<T> handle);
+        OwningHandle(Owned<T> owner, lang::ResolvingHandle<T> handle);
 
       public:
-        OwningHandle();
-
         static lang::OwningHandle<T> takeOwnership(lang::ResolvingHandle<T> handle);
 
-        lang::ResolvingHandle<T> handle() const;
+        lang::ResolvingHandle<T>                               handle();
+        std::reference_wrapper<lang::ResolvingHandle<T> const> handle() const;
+
+        T const& get() const;
 
         T* operator->() noexcept;
         T& operator*() noexcept;
 
-        const T* operator->() const noexcept;
-        const T& operator*() const noexcept;
+        T const* operator->() const noexcept;
+        T const& operator*() const noexcept;
 
       private:
-        std::unique_ptr<T>       owner_ {};
+        Owned<T>                 owner_ {};
         lang::ResolvingHandle<T> handle_;
     };
 }

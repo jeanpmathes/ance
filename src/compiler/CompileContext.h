@@ -31,17 +31,15 @@ class CompileContext
      * @param m The llvm module.
      * @param ir The IR builder.
      * @param di The DI builder.
-     * @param unit The compile unit.
      * @param source_tree The source tree.
      */
-    CompileContext(Application*         app,
-                   Runtime*             runtime,
-                   llvm::LLVMContext*   c,
-                   llvm::Module*        m,
-                   llvm::IRBuilder<>*   ir,
-                   llvm::DIBuilder*     di,
-                   llvm::DICompileUnit* unit,
-                   SourceTree&          source_tree);
+    CompileContext(Application&       app,
+                   Runtime&           runtime,
+                   llvm::LLVMContext& c,
+                   llvm::Module&      m,
+                   llvm::IRBuilder<>& ir,
+                   llvm::DIBuilder&   di,
+                   SourceTree&        source_tree);
 
     /**
      * Get the application.
@@ -111,13 +109,13 @@ class CompileContext
     bool allDebugLocationsPopped();
 
   private:
-    Application*         application_;
-    Runtime*             runtime_;
-    llvm::LLVMContext*   context_;
-    llvm::Module*        module_;
-    llvm::IRBuilder<>*   ir_builder_;
-    llvm::DIBuilder*     di_builder_;
-    llvm::DICompileUnit* unit_;
+    Application&         application_;
+    Runtime&             runtime_;
+    llvm::LLVMContext&   context_;
+    llvm::Module&        module_;
+    llvm::IRBuilder<>&   ir_builder_;
+    llvm::DIBuilder&     di_builder_;
+    llvm::DICompileUnit* unit_ {nullptr};
 
     std::vector<llvm::DIFile*> source_files_ {};
 

@@ -4,52 +4,64 @@
 #include <memory>
 #include <optional>
 
+#include "lang/utility/Owners.h"
+
 namespace lang
 {
     /**
-     * A handle that helps resolving entities that can be used before defining them.
-     * For that purpose the handle supports some rerouting operations.
-     * @tparam T The type of the handled entity. Must conform to the handle target interface.
+     * A get that helps resolving entities that can be used before defining them.
+     * For that purpose the get supports some rerouting operations.
+     * @tparam T The type of the handled entity. Must conform to the get target interface.
      */
     template<typename T>
     class ResolvingHandle
     {
       public:
-        explicit ResolvingHandle(std::unique_ptr<T> handled);
+        explicit ResolvingHandle(Owned<T> handled);
+
+        ResolvingHandle(ResolvingHandle<T>&& value) noexcept;
+        ResolvingHandle(ResolvingHandle<T>& value) noexcept;
+        ResolvingHandle(ResolvingHandle<T> const& value) = delete;
+
+        ResolvingHandle<T>& operator=(ResolvingHandle<T> value) noexcept;
 
       private:
-        T* get() const;
+        T*       get();
+        T const* get() const;
 
       public:
         /**
          * Take ownership over the handled object.
          */
-        std::unique_ptr<T> take();
+        Owned<T> take();
 
         /**
-         * Reroute this handle to forget the currently handled object and target a new object.
-         * @param target A handle to the new target.
+         * Reroute this get to forget the currently handled object and target a new object.
+         * @param target A get to the new target.
          */
         void reroute(lang::ResolvingHandle<T> target);
 
       private:
         class HandleNavigator
         {
-            std::shared_ptr<HandleNavigator> next_ {};
+            Optional<Shared<HandleNavigator>> next_ {};
 
-            std::unique_ptr<T> owned_element_ {};
+            Optional<Owned<T>> owned_element_ {};
             T*                 element_ {nullptr};
 
-            explicit HandleNavigator(std::shared_ptr<HandleNavigator> next);
-            explicit HandleNavigator(std::unique_ptr<T> element);
+            explicit HandleNavigator(Shared<HandleNavigator> next);
+            explicit HandleNavigator(Owned<T> element);
 
-            std::shared_ptr<HandleNavigator> sRoot();
-            HandleNavigator*                 root();
+            Optional<Shared<HandleNavigator>> sRoot();
 
-            T*                 get();
-            std::unique_ptr<T> take();
+            HandleNavigator*       root();
+            HandleNavigator const* root() const;
 
-            void target(std::shared_ptr<HandleNavigator> next);
+            T*       get();
+            T const* get() const;
+            Owned<T> take();
+
+            void target(Shared<HandleNavigator> next);
 
             friend class lang::ResolvingHandle<T>;
 
@@ -62,8 +74,11 @@ namespace lang
         T* operator->() noexcept;
         T& operator*() noexcept;
 
-        const T* operator->() const noexcept;
-        const T& operator*() const noexcept;
+        T const* operator->() const noexcept;
+        T const& operator*() const noexcept;
+
+        operator T&() noexcept;            // NOLINT(google-explicit-constructor)
+        operator T const&() const noexcept;// NOLINT(google-explicit-constructor)
 
         bool operator==(ResolvingHandle<T> const& other) const;
         bool operator!=(ResolvingHandle<T> const& other) const;
@@ -71,9 +86,9 @@ namespace lang
         bool operator<(ResolvingHandle<T> const& other) const;
 
       private:
-        std::shared_ptr<HandleNavigator> getRootNavigator();
+        Shared<HandleNavigator> getRootNavigator();
 
-        std::shared_ptr<HandleNavigator> navigator_;
+        Shared<HandleNavigator> navigator_;
     };
 
     template<typename T, class... ARGS>
@@ -88,15 +103,40 @@ namespace lang
     {
       public:
         void                        setSelf(lang::ResolvingHandle<SELF> handle);
-        lang::ResolvingHandle<SELF> self() const;
+        SELF const&                 self() const;
+        lang::ResolvingHandle<SELF> self();
 
-        virtual bool equalsTarget(SELF* other);
+        virtual bool equalsTarget(SELF const* other) const;
 
         virtual ~HandleTarget() = default;
 
       private:
-        std::optional<lang::ResolvingHandle<SELF>> self_ {};
+        Optional<lang::ResolvingHandle<SELF>> self_ {};
     };
+}
+
+template<typename T>
+T& deref(T* value)
+{
+    return *value;
+}
+
+template<typename T>
+T& deref(T& value)
+{
+    return value;
+}
+
+template<typename T>
+T& deref(lang::ResolvingHandle<T>& value)
+{
+    return *value;
+}
+
+template<typename T>
+T& deref(std::reference_wrapper<T> value)
+{
+    return value.get();
 }
 
 #include "ResolvingHandle.tpp"

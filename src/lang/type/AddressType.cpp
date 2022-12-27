@@ -19,18 +19,18 @@ StateCount lang::AddressType::getStateCount() const
     return SpecialCount::ABSTRACT;
 }
 
-bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
+bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
 {
-    other = lang::Type::getReferencedType(other);
+    lang::Type const& real_other = lang::Type::getReferencedType(other);
 
-    if (op.isEquality() || (op == lang::BinaryOperator::SUBTRACTION && getPointeeType().has_value()))
+    if (op.isEquality() || (op == lang::BinaryOperator::SUBTRACTION && getPointeeType() != nullptr))
     {
-        return lang::Type::areSame(other, self());
+        return lang::Type::areSame(real_other, self());
     }
 
-    if (op == lang::BinaryOperator::ADDITION && getPointeeType().has_value())
+    if (op == lang::BinaryOperator::ADDITION && getPointeeType() != nullptr)
     {
-        return lang::Type::areSame(other, lang::SizeType::getDiff());
+        return lang::Type::areSame(real_other, lang::SizeType::getDiff());
     }
 
     return false;
@@ -49,7 +49,7 @@ lang::ResolvingHandle<lang::Type> lang::AddressType::getOperatorResultType(lang:
 }
 
 bool lang::AddressType::validateOperator(lang::BinaryOperator,
-                                         lang::ResolvingHandle<lang::Type>,
+                                         lang::Type const&,
                                          lang::Location,
                                          lang::Location,
                                          ValidationLogger&) const
@@ -57,10 +57,10 @@ bool lang::AddressType::validateOperator(lang::BinaryOperator,
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator   op,
-                                                              std::shared_ptr<Value> left,
-                                                              std::shared_ptr<Value> right,
-                                                              CompileContext&        context)
+Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
+                                                     Shared<Value>        left,
+                                                     Shared<Value>        right,
+                                                     CompileContext&      context)
 {
     right = lang::Type::getValueOrReferencedValue(right, context);
 
@@ -98,23 +98,23 @@ std::shared_ptr<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperat
             break;
 
         default:
-            return nullptr;
+            throw std::logic_error("Invalid operator for address type");
     }
 
     lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op, right->type());
     llvm::Value*                      native_result = lang::values::contentToNative(result_type, result, context);
 
-    return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
+    return makeShared<lang::WrappedNativeValue>(result_type, native_result);
 }
 
-bool lang::AddressType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
+bool lang::AddressType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
 {
     return parameters.size() == 1 && (parameters[0]->isAddressType() || parameters[0]->isUnsignedIntegerPointerType());
 }
 
-void lang::AddressType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
-                                               lang::PredefinedFunction&                             function,
-                                               CompileContext&                                       context)
+void lang::AddressType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                               lang::PredefinedFunction&                      function,
+                                               CompileContext&                                context)
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }

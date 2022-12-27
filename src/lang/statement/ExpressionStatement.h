@@ -20,18 +20,18 @@ class ExpressionStatement
      * @param expression The expression to use for this statement.
      * @param location The source location.
      */
-    ExpressionStatement(std::unique_ptr<BuildableExpression> expression, lang::Location location);
+    ExpressionStatement(Owned<BuildableExpression> expression, lang::Location location);
 
-    [[nodiscard]] BuildableExpression& expression() const;
+    [[nodiscard]] BuildableExpression const& expression() const;
 
     void validate(ValidationLogger& validation_logger) const override;
 
-    Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+    [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
     void doBuild(CompileContext& context) override;
 
   private:
-    std::unique_ptr<BuildableExpression> expression_;
+    Owned<BuildableExpression> expression_;
 };
 #endif

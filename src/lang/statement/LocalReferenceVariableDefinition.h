@@ -37,13 +37,13 @@ class LocalReferenceVariableDefinition
     LocalReferenceVariableDefinition(lang::Identifier                  name,
                                      lang::ResolvingHandle<lang::Type> type,
                                      lang::Location                    type_location,
-                                     std::unique_ptr<Expression>       reference,
+                                     Owned<Expression>                 reference,
                                      lang::Location                    location);
 
   public:
-    [[nodiscard]] lang::Identifier const&           name() const;
-    [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
-    [[nodiscard]] Expression&                       reference() const;
+    [[nodiscard]] lang::Identifier const& name() const;
+    [[nodiscard]] lang::Type const&       type() const;
+    [[nodiscard]] Expression const&       reference() const;
 
   public:
     void setScope(lang::Scope& scope) override;
@@ -51,7 +51,7 @@ class LocalReferenceVariableDefinition
 
     void validate(ValidationLogger& validation_logger) const override;
 
-    Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+    [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
     void doBuild(CompileContext& context) override;
@@ -60,9 +60,9 @@ class LocalReferenceVariableDefinition
     lang::Identifier                  name_;
     lang::ResolvingHandle<lang::Type> type_;
     lang::Location                    type_location_;
-    std::unique_ptr<Expression>       reference_;
+    Owned<Expression>                 reference_;
 
-    std::optional<lang::ResolvingHandle<lang::Variable>> variable_ {};
+    Optional<lang::ResolvingHandle<lang::Variable>> variable_ {};
 };
 
 #endif

@@ -47,9 +47,9 @@ void lang::BasicBlock::Definition::Matching::transferStatements(std::list<Statem
     statements_.splice(statements_.begin(), statements);
 }
 
-std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Matching::getLeaves()
+std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Matching::getLeaves() const
 {
-    std::list<lang::BasicBlock*> leaves;
+    std::list<lang::BasicBlock const*> leaves;
 
     for (auto& branch : branches_)
     {
@@ -63,28 +63,28 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Matching::getSucces
     return branches_;
 }
 
-lang::Location lang::BasicBlock::Definition::Matching::getStartLocation()
+lang::Location lang::BasicBlock::Definition::Matching::getStartLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
-lang::Location lang::BasicBlock::Definition::Matching::getEndLocation()
+lang::Location lang::BasicBlock::Definition::Matching::getEndLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
-void lang::BasicBlock::Definition::Matching::reach()
+void lang::BasicBlock::Definition::Matching::reach() const
 {
     for (auto& branch : branches_) { branch->reach(); }
 }
 
 void lang::BasicBlock::Definition::Matching::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
-    std::string name = "b" + std::to_string(index_);
+    std::string const name = "b" + std::to_string(index_);
     native_block_    = llvm::BasicBlock::Create(*context.llvmContext(), name, native_function);
 
     for (auto& branch : branches_) { branch->prepareBuild(context, native_function); }
@@ -96,7 +96,7 @@ void lang::BasicBlock::Definition::Matching::doBuild(CompileContext& context)
 
     for (auto& statement : statements_) { statement->build(context); }
 
-    std::shared_ptr<lang::Value> value = match_->expression().getValue();
+    Shared<lang::Value> value = match_->expression().getValue();
     value->buildContentValue(context);
 
     llvm::BasicBlock* default_block = nullptr;
@@ -123,7 +123,7 @@ void lang::BasicBlock::Definition::Matching::doBuild(CompileContext& context)
 
         for (auto& case_value_expression : case_value)
         {
-            std::shared_ptr<lang::Constant> constant = case_value_expression->getConstantValue();
+            Shared<lang::Constant> constant = case_value_expression->getConstantValue();
             constant->buildContentConstant(context.module());
             llvm::Constant* native_constant = constant->getContentConstant();
 

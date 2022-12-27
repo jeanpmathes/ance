@@ -25,7 +25,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    boost::locale::generator gen;
+    boost::locale::generator const gen;
     std::locale::global(gen(""));
 
     std::filesystem::path project_file_path(argv[1]);
@@ -40,12 +40,12 @@ int main(int argc, char** argv)
 
     std::cout << "============ Build [ " << project.getName() << " ] ============" << std::endl;
 
-    SourceTree tree(application);
-    size_t     count = tree.parse();
+    SourceTree   tree(application);
+    size_t const count = tree.parse();
 
     std::cout << "ance: input: " << count << " source file(s) read" << std::endl;
 
-    size_t fatal_syntax_error_count = tree.emitMessages();
+    size_t const fatal_syntax_error_count = tree.emitMessages();
 
     if (fatal_syntax_error_count == 0)
     {
@@ -60,10 +60,10 @@ int main(int argc, char** argv)
 
         if (validation_logger.errorCount() == 0)
         {
-            std::filesystem::path out_dir = project_file_path.parent_path() / "out";
+            std::filesystem::path const out_dir = project_file_path.parent_path() / "out";
 
-            std::filesystem::path obj_dir = out_dir / "obj";
-            std::filesystem::path bin_dir = out_dir / "bin";
+            std::filesystem::path const obj_dir = out_dir / "obj";
+            std::filesystem::path const bin_dir = out_dir / "bin";
 
             application.emitAsSource(obj_dir / "input.nc");
             application.preBuild();
@@ -87,14 +87,14 @@ int main(int argc, char** argv)
                 std::filesystem::create_directories(obj_dir);
                 std::filesystem::create_directories(bin_dir);
 
-                std::filesystem::path ilr = obj_dir / (project.getName() + ".ll");
-                std::filesystem::path obj = obj_dir / (project.getName() + ".o");
-                std::filesystem::path exe = bin_dir / (project.getName() + ".exe");
+                std::filesystem::path const ilr = obj_dir / (project.getName() + ".ll");
+                std::filesystem::path const obj = obj_dir / (project.getName() + ".o");
+                std::filesystem::path const exe = bin_dir / (project.getName() + ".exe");
 
                 compiler.compile(ilr);
                 compiler.emitObject(obj);
 
-                bool ok = linker.link(obj, exe);
+                bool const ok = linker.link(obj, exe);
 
                 llvm::llvm_shutdown();
 

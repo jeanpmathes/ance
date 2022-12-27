@@ -39,7 +39,11 @@ namespace lang
         /**
          * Get the type of this variable.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> type();
+        /**
+         * Get the type of this variable.
+         */
+        [[nodiscard]] lang::Type const& type() const;
 
         /**
          * Get the source location of the variable definition.
@@ -64,8 +68,8 @@ namespace lang
         virtual void createNativeBacking(CompileContext& context);
         virtual void build(CompileContext& context);
 
-        [[nodiscard]] virtual std::set<lang::ResolvingHandle<lang::Variable>> getVariableDependencies() const;
-        [[nodiscard]] virtual std::set<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() const;
+        [[nodiscard]] virtual std::vector<lang::ResolvingHandle<lang::Variable>> getVariableDependencies();
+        [[nodiscard]] virtual std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies();
 
         /**
          * Validate this variable declaration.
@@ -77,14 +81,15 @@ namespace lang
         virtual void buildDefinition(CompileContext& context)   = 0;
         virtual void buildFinalization(CompileContext& context) = 0;
 
-        virtual std::shared_ptr<lang::Value> getValue(CompileContext& context) = 0;
-        virtual void                         setValue(std::shared_ptr<lang::Value> value, CompileContext& context);
+        virtual Shared<lang::Value> getValue(CompileContext& context) = 0;
+        virtual void                setValue(Shared<lang::Value> value, CompileContext& context);
 
         ~VariableDefinition() override = default;
 
       protected:
-        virtual void storeValue(std::shared_ptr<lang::Value> value, CompileContext& context) = 0;
-        [[nodiscard]] lang::ResolvingHandle<lang::Variable> self() const;
+        virtual void                          storeValue(Shared<lang::Value> value, CompileContext& context) = 0;
+        lang::ResolvingHandle<lang::Variable> self();
+        [[nodiscard]] lang::Variable const&   self() const;
 
       private:
         lang::ResolvingHandle<lang::Variable> self_;

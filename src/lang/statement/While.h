@@ -23,17 +23,16 @@ class While
      * @param block The block to execute if the condition is true.
      * @param location The source location of the statement.
      */
-    While(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> block, lang::Location location);
+    While(Owned<Expression> condition, Owned<Statement> block, lang::Location location);
 
-    [[nodiscard]] Expression& condition();
-    [[nodiscard]] Statement&  body();
+    [[nodiscard]] Expression const& condition() const;
+    [[nodiscard]] Statement const&  body() const;
 
-    std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
-                                                                     lang::Function&   function) override;
+    std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, lang::Function& function) override;
 
     void validate(ValidationLogger& validation_logger) const override;
 
-    Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+    [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
     void doBuild(CompileContext& context) override;
@@ -44,8 +43,8 @@ class While
   private:
     std::pair<lang::BasicBlock*, lang::BasicBlock*> loop_parts_ {nullptr, nullptr};
 
-    std::unique_ptr<Expression> condition_;
-    std::unique_ptr<Statement>  block_;
+    Owned<Expression> condition_;
+    Owned<Statement>  block_;
 };
 
 #endif

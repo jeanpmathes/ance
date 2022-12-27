@@ -24,22 +24,21 @@ namespace lang
          * @param parameters The parameters of the function.
          * @return The signature.
          */
-        static Signature fromParameters(Identifier                                           name,
-                                        std::vector<std::shared_ptr<lang::Parameter>> const& parameters);
+        static Signature fromParameters(Identifier name, std::vector<Shared<lang::Parameter>> parameters);
 
         /**
          * Get whether the signature can be considered same as the given types.
          * @param arguments The argument types.
          * @return Whether the signature can be considered same as the given types.
          */
-        [[nodiscard]] bool isSame(std::vector<lang::ResolvingHandle<lang::Type>> const& arguments) const;
+        [[nodiscard]] bool isSame(std::vector<std::reference_wrapper<lang::Type const>> const& arguments) const;
 
         /**
          * Get whether the signature matches the given argument types.
          * @param arguments The argument types.
          * @return Whether the signature matches the given argument types.
          */
-        [[nodiscard]] bool isMatching(std::vector<lang::ResolvingHandle<lang::Type>> const& arguments) const;
+        [[nodiscard]] bool isMatching(std::vector<std::reference_wrapper<lang::Type const>> const& arguments) const;
 
         /**
          * Get the mangled name. Will create the mangled name if it has not been created yet.

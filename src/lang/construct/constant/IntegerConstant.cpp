@@ -47,7 +47,7 @@ std::string lang::IntegerConstant::toString() const
 
 bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
-    bool valid = type()->validate(validation_logger, location);
+    bool const valid = type().validate(validation_logger, location);
     if (!valid) return false;
 
     unsigned int needed_bits = llvm::APInt::getBitsNeeded(text_, radix_);
@@ -58,10 +58,10 @@ bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::
         // Required as the required size can be larger than needed
 
         auto get_needed_bits_corrected = [&] {
-            unsigned    is_negative = text_[0] == '-';
-            llvm::APInt tmp(needed_bits, text_, radix_);
+            unsigned const    is_negative = text_[0] == '-';
+            llvm::APInt const tmp(needed_bits, text_, radix_);
 
-            unsigned log = tmp.logBase2();
+            unsigned const log = tmp.logBase2();
             if (log == static_cast<unsigned>(-1)) { return is_negative + 1; }
             else if (is_negative && tmp.isPowerOf2()) { return is_negative + log; }
             else { return is_negative + log + 1; }
@@ -72,7 +72,7 @@ bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::
 
     auto bit_size = integer_type_->getBitSize();
 
-    if (bit_size.has_value())
+    if (bit_size.hasValue())
     {
         if (needed_bits > bit_size.value())
         {
@@ -84,7 +84,7 @@ bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::
     }
     else
     {
-        size_t min_bit_size = integer_type_->getMinimumBitSize();
+        size_t const min_bit_size = integer_type_->getMinimumBitSize();
 
         if (needed_bits > min_bit_size)
         {
@@ -98,14 +98,19 @@ bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::
     return true;
 }
 
-lang::ResolvingHandle<lang::Type> lang::IntegerConstant::type() const
+lang::ResolvingHandle<lang::Type> lang::IntegerConstant::type()
 {
     return type_;
 }
 
-llvm::Constant* lang::IntegerConstant::buildContent(llvm::Module* m)
+lang::Type const& lang::IntegerConstant::type() const
 {
-    llvm::APInt integer(static_cast<unsigned int>(integer_type_->getNativeBitSize()), text_, radix_);
+    return type_;
+}
+
+llvm::Constant* lang::IntegerConstant::createContent(llvm::Module* m)
+{
+    llvm::APInt const integer(static_cast<unsigned int>(integer_type_->getNativeBitSize()), text_, radix_);
     return llvm::ConstantInt::get(type_->getContentType(m->getContext()), integer);
 }
 
@@ -116,16 +121,21 @@ bool lang::IntegerConstant::equals(lang::Constant const* other) const
 
     if (other_int->integer_type_ != integer_type_) return false;
 
-    llvm::APInt this_value(
-        static_cast<unsigned int>(integer_type_->getBitSize().value_or(integer_type_->getMinimumBitSize())),
+    llvm::APInt const this_value(
+        static_cast<unsigned int>(integer_type_->getBitSize().valueOr(integer_type_->getMinimumBitSize())),
         text_,
         radix_);
-    llvm::APInt other_value(static_cast<unsigned int>(other_int->integer_type_->getBitSize().value_or(
-                                other_int->integer_type_->getMinimumBitSize())),
-                            other_int->text_,
-                            other_int->radix_);
+    llvm::APInt const other_value(static_cast<unsigned int>(other_int->integer_type_->getBitSize().valueOr(
+                                      other_int->integer_type_->getMinimumBitSize())),
+                                  other_int->text_,
+                                  other_int->radix_);
 
     if (this_value.getBitWidth() != other_value.getBitWidth()) return false;
 
     return this_value == other_value;
+}
+
+Shared<lang::Constant> lang::IntegerConstant::clone() const
+{
+    return Shared<Constant>(*(new IntegerConstant(text_, radix_, type_->createUndefinedClone())));
 }

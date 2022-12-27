@@ -35,7 +35,7 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
     explicit Application(Project& project);
 
   private:
-    Application(Project& project, std::unique_ptr<lang::GlobalScope>&& scope);
+    Application(Project& project, Owned<lang::GlobalScope>&& scope);
 
   public:
     Application(Application const&) = delete;
@@ -52,7 +52,7 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
      * Get the containing project.
      * @return The project.
      */
-    Project& getProject() const;
+    [[nodiscard]] Project& getProject() const;
 
     /**
      * Get the bitness of the application.
@@ -80,7 +80,7 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
      * Emit the parsed and processed application as source.
      * @param out The file to emit to.
      */
-    void emitAsSource(std::filesystem::path out);
+    void emitAsSource(std::filesystem::path const& out);
 
     /**
      * Validate the application before compilation.
@@ -97,7 +97,7 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
   private:
     Project& project_;
 
-    std::unique_ptr<lang::GlobalScope> global_scope_;
+    Owned<lang::GlobalScope> global_scope_;
 
     unsigned pointer_size_ {0};
 };

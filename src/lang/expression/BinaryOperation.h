@@ -20,38 +20,37 @@ class BinaryOperation
      * @param right The right operand.
      * @param location The source location of the operation.
      */
-    BinaryOperation(std::unique_ptr<Expression> left,
-                    lang::BinaryOperator        op,
-                    std::unique_ptr<Expression> right,
-                    lang::Location              location);
+    BinaryOperation(Owned<Expression> left, lang::BinaryOperator op, Owned<Expression> right, lang::Location location);
 
-    [[nodiscard]] Expression&          left() const;
-    [[nodiscard]] Expression&          right() const;
+    [[nodiscard]] Expression const&    left() const;
+    [[nodiscard]] Expression const&    right() const;
     [[nodiscard]] lang::BinaryOperator op() const;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
     void doBuild(CompileContext& context) override;
 
   private:
-    [[nodiscard]] lang::ResolvingHandle<lang::Type> getRightType() const;
-    static lang::ResolvingHandle<lang::Type>        getRightType(lang::BinaryOperator              op,
-                                                                 lang::ResolvingHandle<lang::Type> left,
-                                                                 lang::ResolvingHandle<lang::Type> right);
+    lang::ResolvingHandle<lang::Type> getRightType();
+    [[nodiscard]] lang::Type const&   getRightType() const;
+
+    static lang::ResolvingHandle<lang::Type> getRightType(lang::BinaryOperator              op,
+                                                          lang::ResolvingHandle<lang::Type> left,
+                                                          lang::ResolvingHandle<lang::Type> right);
+    static lang::Type const& getRightTypeC(lang::BinaryOperator op, lang::Type const& left, lang::Type const& right);
 
   public:
     ~BinaryOperation() override;
 
   private:
-    std::unique_ptr<Expression> left_;
-    lang::BinaryOperator        op_;
-    std::unique_ptr<Expression> right_;
+    Owned<Expression>    left_;
+    lang::BinaryOperator op_;
+    Owned<Expression>    right_;
 };
 
 #endif

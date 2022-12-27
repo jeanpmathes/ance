@@ -5,14 +5,14 @@
 #include "lang/construct/Function.h"
 #include "lang/type/Type.h"
 
-lang::OpaquePointerType::OpaquePointerType() : TypeDefinition(lang::Identifier::from("ptr")) {}
+lang::OpaquePointerType::OpaquePointerType() : TypeDefinition(lang::Identifier::like("ptr")) {}
 
 bool lang::OpaquePointerType::isOpaquePointerType() const
 {
     return true;
 }
 
-llvm::Constant* lang::OpaquePointerType::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::OpaquePointerType::getDefaultContent(llvm::Module& m) const
 {
     return llvm::ConstantPointerNull::get(llvm::PointerType::get(llvm::Type::getInt8Ty(m.getContext()), 0));
 }
@@ -27,14 +27,14 @@ std::string lang::OpaquePointerType::createMangledName() const
     return "ptr";
 }
 
-llvm::DIType* lang::OpaquePointerType::createDebugType(CompileContext& context)
+llvm::DIType* lang::OpaquePointerType::createDebugType(CompileContext& context) const
 {
     llvm::DataLayout const& dl = context.module()->getDataLayout();
 
-    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
 
-    std::string name     = std::string(this->name().text());
-    auto        encoding = llvm::dwarf::DW_ATE_address;
+    std::string const name     = std::string(this->name().text());
+    auto              encoding = llvm::dwarf::DW_ATE_address;
 
     llvm::DIType* di_type = context.di()->createBasicType(name, size_in_bits, encoding);
 
@@ -44,11 +44,21 @@ llvm::DIType* lang::OpaquePointerType::createDebugType(CompileContext& context)
 lang::ResolvingHandle<lang::Type> lang::OpaquePointerType::get()
 {
     static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new OpaquePointerType()));
+        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new OpaquePointerType())));
     return instance;
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> lang::OpaquePointerType::getPointeeType() const
+Optional<lang::ResolvingHandle<lang::Type>> lang::OpaquePointerType::getPointeeType()
 {
     return std::nullopt;
+}
+
+lang::Type const* lang::OpaquePointerType::getPointeeType() const
+{
+    return nullptr;
+}
+
+lang::ResolvingHandle<lang::Type> lang::OpaquePointerType::clone() const
+{
+    return get();
 }

@@ -19,26 +19,26 @@ namespace lang
         [[nodiscard]] StateCount getStateCount() const override;
         bool                     isCharType() const override;
 
-        llvm::Constant* getDefaultContent(llvm::Module& m) override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) const override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
-        bool acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters) override;
-        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
-                                    lang::PredefinedFunction&                             function,
-                                    CompileContext&                                       context) override;
+        bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
+        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                    lang::PredefinedFunction&                      function,
+                                    CompileContext&                                context) override;
 
-        bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other) override;
+        bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
                                                                 lang::ResolvingHandle<lang::Type> other) override;
-        bool                              validateOperator(lang::BinaryOperator              op,
-                                                           lang::ResolvingHandle<lang::Type> other,
-                                                           lang::Location                    left_location,
-                                                           lang::Location                    right_location,
-                                                           ValidationLogger&                 validation_logger) const override;
-        std::shared_ptr<lang::Value>      buildOperator(lang::BinaryOperator   op,
-                                                        std::shared_ptr<Value> left,
-                                                        std::shared_ptr<Value> right,
-                                                        CompileContext&        context) override;
+        bool                              validateOperator(lang::BinaryOperator op,
+                                                           lang::Type const&    other,
+                                                           lang::Location       left_location,
+                                                           lang::Location       right_location,
+                                                           ValidationLogger&    validation_logger) const override;
+        Shared<lang::Value>               buildOperator(lang::BinaryOperator op,
+                                                        Shared<Value>        left,
+                                                        Shared<Value>        right,
+                                                        CompileContext&      context) override;
 
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
@@ -46,7 +46,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) override;
+        llvm::DIType* createDebugType(CompileContext& context) const override;
 
       public:
         /**
@@ -54,6 +54,8 @@ namespace lang
          * @return The char type.
          */
         static lang::ResolvingHandle<lang::Type> get();
+
+        ResolvingHandle<lang::Type> clone() const override;
     };
 }
 

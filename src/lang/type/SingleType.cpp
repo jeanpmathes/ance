@@ -3,9 +3,9 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
 
-lang::SingleType::SingleType() : TypeDefinition(lang::Identifier::from("single")) {}
+lang::SingleType::SingleType() : TypeDefinition(lang::Identifier::like("single")) {}
 
-llvm::Constant* lang::SingleType::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::SingleType::getDefaultContent(llvm::Module& m) const
 {
     return llvm::ConstantFP::get(getContentType(m.getContext()), 0);
 }
@@ -23,6 +23,11 @@ size_t lang::SingleType::getPrecision() const
 lang::ResolvingHandle<lang::Type> lang::SingleType::get()
 {
     static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new SingleType()));
+        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new SingleType())));
     return instance;
+}
+
+lang::ResolvingHandle<lang::Type> lang::SingleType::clone() const
+{
+    return get();
 }

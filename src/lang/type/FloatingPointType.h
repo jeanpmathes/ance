@@ -12,7 +12,7 @@ namespace lang
     {
       protected:
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) override;
+        llvm::DIType* createDebugType(CompileContext& context) const override;
 
       public:
         ~FloatingPointType() override = default;
@@ -22,49 +22,49 @@ namespace lang
         [[nodiscard]] FloatingPointType const* isFloatingPointType() const override;
         [[nodiscard]] bool                     isFloatingPointType(size_t precision) const override;
 
-        bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
-        bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                lang::Location                    location,
-                                                                ValidationLogger&                 validation_logger) const override;
-        std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                             std::shared_ptr<Value>            value,
-                                                             CompileContext&                   context) override;
+        bool                isImplicitlyConvertibleTo(lang::Type const& other) const override;
+        bool                validateImplicitConversion(lang::Type const& other,
+                                                       lang::Location    location,
+                                                       ValidationLogger& validation_logger) const override;
+        Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                    Shared<Value>                     value,
+                                                    CompileContext&                   context) override;
 
-        bool                              isOperatorDefined(lang::UnaryOperator op) override;
+        bool                              isOperatorDefined(lang::UnaryOperator op) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
         bool                              validateOperator(lang::UnaryOperator op,
                                                            lang::Location      location,
                                                            ValidationLogger&   validation_logger) const override;
-        std::shared_ptr<lang::Value>      buildOperator(lang::UnaryOperator    op,
-                                                        std::shared_ptr<Value> value,
-                                                        CompileContext&        context) override;
-        std::shared_ptr<lang::Value>      buildOperator(lang::UnaryOperator               op,
-                                                        std::shared_ptr<Value>            value,
+        Shared<lang::Value>               buildOperator(lang::UnaryOperator op,
+                                                        Shared<Value>       value,
+                                                        CompileContext&     context) override;
+        Shared<lang::Value>               buildOperator(lang::UnaryOperator               op,
+                                                        Shared<Value>                     value,
                                                         lang::ResolvingHandle<lang::Type> return_type,
                                                         CompileContext&                   context) override;
 
-        bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other) override;
+        bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
                                                                 lang::ResolvingHandle<lang::Type> other) override;
-        bool                              validateOperator(lang::BinaryOperator              op,
-                                                           lang::ResolvingHandle<lang::Type> other,
-                                                           lang::Location                    left_location,
-                                                           lang::Location                    right_location,
-                                                           ValidationLogger&                 validation_logger) const override;
-        std::shared_ptr<lang::Value>      buildOperator(lang::BinaryOperator   op,
-                                                        std::shared_ptr<Value> left,
-                                                        std::shared_ptr<Value> right,
-                                                        CompileContext&        context) override;
-        std::shared_ptr<Value>            buildOperator(lang::BinaryOperator              op,
-                                                        std::shared_ptr<Value>            left,
-                                                        std::shared_ptr<Value>            right,
+        bool                              validateOperator(lang::BinaryOperator op,
+                                                           lang::Type const&    other,
+                                                           lang::Location       left_location,
+                                                           lang::Location       right_location,
+                                                           ValidationLogger&    validation_logger) const override;
+        Shared<lang::Value>               buildOperator(lang::BinaryOperator op,
+                                                        Shared<Value>        left,
+                                                        Shared<Value>        right,
+                                                        CompileContext&      context) override;
+        Shared<Value>                     buildOperator(lang::BinaryOperator              op,
+                                                        Shared<Value>                     left,
+                                                        Shared<Value>                     right,
                                                         lang::ResolvingHandle<lang::Type> return_type,
                                                         CompileContext&                   context) override;
 
-        bool acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters) override;
-        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
-                                    lang::PredefinedFunction&                             function,
-                                    CompileContext&                                       context) override;
+        bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
+        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                    lang::PredefinedFunction&                      function,
+                                    CompileContext&                                context) override;
         void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
                                     lang::ResolvingHandle<lang::Type> return_type,
                                     lang::PredefinedFunction&         function,

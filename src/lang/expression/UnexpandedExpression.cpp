@@ -2,12 +2,17 @@
 
 #include "lang/construct/value/NoValue.h"
 
-std::shared_ptr<lang::Value> UnexpandedExpression::getValue() const
+UnexpandedExpression::UnexpandedExpression(lang::Location location)
+    : Expression(location)
+    , value_(makeShared<lang::NoValue>(pass(*this)))
+{}
+
+Shared<lang::Value> UnexpandedExpression::getValue()
 {
     return value_;
 }
 
-UnexpandedExpression::UnexpandedExpression(lang::Location location)
-    : Expression(location)
-    , value_(std::make_shared<lang::NoValue>(*this))
-{}
+lang::Value const& UnexpandedExpression::getValue() const
+{
+    return *value_;
+}

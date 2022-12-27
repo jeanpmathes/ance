@@ -20,14 +20,20 @@ namespace lang
          * @param semantics The semantics of the constant.
          * @param type The type of float to use.
          */
-        FloatConstant(std::string number, llvm::fltSemantics const& semantics, lang::ResolvingHandle<lang::Type> type);
+        FloatConstant(std::string const&                number,
+                      llvm::fltSemantics const&         semantics,
+                      lang::ResolvingHandle<lang::Type> type);
 
         [[nodiscard]] std::string toString() const override;
 
-        lang::ResolvingHandle<lang::Type> type() const override;
-        llvm::Constant*                   buildContent(llvm::Module* m) override;
+        lang::ResolvingHandle<lang::Type> type() override;
+        [[nodiscard]] lang::Type const&   type() const override;
+
+        llvm::Constant* createContent(llvm::Module* m) override;
 
         bool equals(lang::Constant const* other) const override;
+
+        Shared<Constant> clone() const override;
 
       private:
         std::string                       text_;

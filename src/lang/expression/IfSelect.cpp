@@ -11,10 +11,10 @@
 #include "lang/statement/If.h"
 #include "lang/statement/LocalVariableDefinition.h"
 
-IfSelect::IfSelect(std::unique_ptr<Expression> condition,
-                   std::unique_ptr<Expression> then_expression,
-                   std::unique_ptr<Expression> else_expression,
-                   lang::Location              location)
+IfSelect::IfSelect(Owned<Expression> condition,
+                   Owned<Expression> then_expression,
+                   Owned<Expression> else_expression,
+                   lang::Location    location)
     : UnexpandedExpression(location)
     , condition_(std::move(condition))
     , then_expression_(std::move(then_expression))
@@ -25,39 +25,37 @@ IfSelect::IfSelect(std::unique_ptr<Expression> condition,
     addSubexpression(*else_expression_);
 }
 
-Expression& IfSelect::condition() const
+Expression const& IfSelect::condition() const
 {
     return *condition_;
 }
 
-Expression& IfSelect::thenExpression() const
+Expression const& IfSelect::thenExpression() const
 {
     return *then_expression_;
 }
 
-Expression& IfSelect::elseExpression() const
+Expression const& IfSelect::elseExpression() const
 {
     return *else_expression_;
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> IfSelect::tryGetType() const
+void IfSelect::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    auto then_type = thenExpression().tryGetType();
-    auto else_type = elseExpression().tryGetType();
+    auto then_type = then_expression_->type();
+    auto else_type = else_expression_->type();
 
-    if (then_type.has_value() && else_type.has_value())
+    if (then_type->isDefined() && else_type->isDefined())
     {
         std::vector<lang::ResolvingHandle<lang::Type>> types;
 
-        types.push_back(then_type.value());
-        types.push_back(else_type.value());
+        types.emplace_back(then_type);
+        types.emplace_back(else_type);
 
         auto common_types = lang::Type::getCommonType(types);
 
-        if (common_types.size() == 1) { return common_types.front(); }
+        if (common_types.size() == 1) { type.reroute(common_types.front()); }
     }
-
-    return std::nullopt;
 }
 
 bool IfSelect::validate(ValidationLogger& validation_logger) const
@@ -88,7 +86,7 @@ bool IfSelect::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion IfSelect::expandWith(Expressions subexpressions) const
 {
-    auto temp_name          = lang::Identifier::from(scope()->getTemporaryName(), location());
+    auto temp_name          = lang::Identifier::like(scope()->getTemporaryName(), location());
     auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
     auto condition          = std::move(subexpressions[0]);
     auto then_expression    = std::move(subexpressions[1]);
@@ -96,30 +94,30 @@ Expression::Expansion IfSelect::expandWith(Expressions subexpressions) const
 
     Statements before;
 
-    before.push_back(std::make_unique<LocalVariableDefinition>(temp_name,
-                                                               type()->toUndefined(),
-                                                               location(),
-                                                               lang::Assigner::COPY_ASSIGNMENT,
-                                                               nullptr,
-                                                               location()));
+    before.emplace_back(makeOwned<LocalVariableDefinition>(temp_name,
+                                                           type().createUndefinedClone(),
+                                                           location(),
+                                                           lang::Assigner::COPY_ASSIGNMENT,
+                                                           std::nullopt,
+                                                           location()));
 
-    before.push_back(std::make_unique<If>(
-        std::move(condition),
-        std::make_unique<Assignment>(std::make_unique<VariableAccess>(make_temp_variable(), location()),
-                                     lang::Assigner::COPY_ASSIGNMENT,
-                                     std::move(then_expression),
-                                     location()),
-        std::make_unique<Assignment>(std::make_unique<VariableAccess>(make_temp_variable(), location()),
-                                     lang::Assigner::COPY_ASSIGNMENT,
-                                     std::move(else_expression),
-                                     location()),
-        location()));
+    before.emplace_back(makeOwned<If>(std::move(condition),
+                                      makeOwned<Assignment>(makeOwned<VariableAccess>(make_temp_variable(), location()),
+                                                            lang::Assigner::COPY_ASSIGNMENT,
+                                                            std::move(then_expression),
+                                                            location()),
+                                      makeOptional<Owned<Statement>>(makeOwned<Assignment>(
+                                          makeOwned<VariableAccess>(make_temp_variable(), location()),
+                                          lang::Assigner::COPY_ASSIGNMENT,
+                                          std::move(else_expression),
+                                          location())),
+                                      location()));
 
-    std::unique_ptr<Expression> result = std::make_unique<VariableAccess>(make_temp_variable(), location());
+    Owned<Expression> result = makeOwned<VariableAccess>(make_temp_variable(), location());
 
     Statements after;
 
-    after.push_back(std::make_unique<Drop>(make_temp_variable(), location()));
+    after.emplace_back(makeOwned<Drop>(make_temp_variable(), location()));
 
     return {std::move(before), std::move(result), std::move(after)};
 }

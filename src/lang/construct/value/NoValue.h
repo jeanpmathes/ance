@@ -14,19 +14,20 @@ namespace lang
     class NoValue : public lang::Value
     {
       public:
-        explicit NoValue(UnexpandedExpression& unexpanded_expression);
+        explicit NoValue(Passed<UnexpandedExpression> unexpanded_expression);
         ~NoValue() override = default;
 
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const override;
+        lang::ResolvingHandle<lang::Type> type() override;
+        [[nodiscard]] lang::Type const&   type() const override;
 
         void buildNativeValue(CompileContext& context) override;
         void buildContentValue(CompileContext& context) override;
 
-        llvm::Value* getNativeValue() override;
-        llvm::Value* getContentValue() override;
+        [[nodiscard]] llvm::Value* getNativeValue() const override;
+        [[nodiscard]] llvm::Value* getContentValue() const override;
 
       private:
-        UnexpandedExpression& unexpanded_expression_;
+        Passed<UnexpandedExpression> unexpanded_expression_;
     };
 }
 

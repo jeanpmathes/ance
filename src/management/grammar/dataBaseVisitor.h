@@ -10,7 +10,7 @@
 
 /**
  * This class provides an empty implementation of dataVisitor, which can be
- * extended to create a visitor which only needs to handle a subset of the available methods.
+ * extended to create a visitor which only needs to get a subset of the available methods.
  */
 class  dataBaseVisitor : public dataVisitor {
 public:

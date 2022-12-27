@@ -3,6 +3,8 @@
 
 #include "Statement.h"
 
+#include <optional>
+
 #include "lang/Element.h"
 
 class Expression;
@@ -20,22 +22,21 @@ class Return
      * @param return_value An expression producing the return value.
      * @param location The source location.
      */
-    Return(std::unique_ptr<Expression> return_value, lang::Location location);
+    Return(Optional<Owned<Expression>> return_value, lang::Location location);
 
-    [[nodiscard]] Expression* expression();
+    [[nodiscard]] Expression const* expression() const;
 
-    std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
-                                                                     lang::Function&   function) override;
+    std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, lang::Function& function) override;
 
     void validate(ValidationLogger& validation_logger) const override;
 
-    Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+    [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
     void doBuild(CompileContext& context) override;
 
   private:
-    std::unique_ptr<Expression> return_value_;
+    Optional<Owned<Expression>> return_value_;
 };
 
 #endif

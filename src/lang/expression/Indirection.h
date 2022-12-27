@@ -24,25 +24,24 @@ class Indirection
      * @param expression The expression to access.
      * @param location The location of the indirection.
      */
-    Indirection(std::unique_ptr<Expression> expression, lang::Location location);
+    Indirection(Owned<Expression> expression, lang::Location location);
 
-    [[nodiscard]] Expression& value() const;
+    [[nodiscard]] Expression const& value() const;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
     void doBuild(CompileContext& context) override;
 
   public:
     ~Indirection() override;
 
   private:
-    std::unique_ptr<Expression> value_;
+    Owned<Expression> value_;
 };
 
 #endif

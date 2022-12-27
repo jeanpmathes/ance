@@ -27,10 +27,11 @@ namespace lang
          */
         void setValue(llvm::Value* value);
 
-        lang::ResolvingHandle<lang::Type> type() const override;
+        lang::ResolvingHandle<lang::Type> type() override;
+        [[nodiscard]] lang::Type const&   type() const override;
 
-        void         buildNativeValue(CompileContext& context) override;
-        llvm::Value* getNativeValue() override;
+        void                       buildNativeValue(CompileContext& context) override;
+        [[nodiscard]] llvm::Value* getNativeValue() const override;
 
       private:
         lang::ResolvingHandle<lang::Type> type_;

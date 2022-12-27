@@ -32,12 +32,17 @@ std::string lang::CharConstant::toString() const
     return prefix_ + content_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::CharConstant::type() const
+lang::ResolvingHandle<lang::Type> lang::CharConstant::type()
 {
     return type_;
 }
 
-llvm::Constant* lang::CharConstant::buildContent(llvm::Module* m)
+lang::Type const& lang::CharConstant::type() const
+{
+    return type_;
+}
+
+llvm::Constant* lang::CharConstant::createContent(llvm::Module* m)
 {
     return llvm::ConstantInt::get(type_->getContentType(m->getContext()), char_, false);
 }
@@ -67,14 +72,19 @@ bool lang::CharConstant::validate(ValidationLogger& validation_logger, lang::Loc
     return true;
 }
 
+Shared<lang::Constant> lang::CharConstant::clone() const
+{
+    return Shared<CharConstant>(*(new CharConstant(prefix_, content_)));
+}
+
 char32_t lang::CharConstant::parseChar(std::u32string const& unparsed, bool& valid)
 {
-    std::optional<char32_t> content;
-    bool                    escaped = false;
+    Optional<char32_t> content;
+    bool               escaped = false;
 
     for (size_t index = 0; index < unparsed.size(); ++index)
     {
-        if (content.has_value() && index != unparsed.size() - 1)
+        if (content.hasValue() && index != unparsed.size() - 1)
         {
             valid = false;
             return 0;
@@ -91,7 +101,7 @@ char32_t lang::CharConstant::parseChar(std::u32string const& unparsed, bool& val
         else if (c != '\'') { content = static_cast<char32_t>(static_cast<unsigned char>(c)); }
     }
 
-    if (!content.has_value())
+    if (!content.hasValue())
     {
         valid = false;
         return 0;
@@ -197,12 +207,12 @@ char32_t lang::CharConstant::readEscapedChar(std::u32string const& unparsed, siz
 
 uint8_t lang::CharConstant::parseByte(std::string const& unparsed, bool& valid)
 {
-    std::optional<uint8_t> content;
-    bool                   escaped = false;
+    Optional<uint8_t> content;
+    bool              escaped = false;
 
     for (size_t index = 0; index < unparsed.size(); ++index)
     {
-        if (content.has_value() && index != unparsed.size() - 1)
+        if (content.hasValue() && index != unparsed.size() - 1)
         {
             valid = false;
             return 0;
@@ -219,7 +229,7 @@ uint8_t lang::CharConstant::parseByte(std::string const& unparsed, bool& valid)
         else if (c != '\'') { content = static_cast<uint8_t>(static_cast<unsigned char>(c)); }
     }
 
-    if (!content.has_value())
+    if (!content.hasValue())
     {
         valid = false;
         return 0;

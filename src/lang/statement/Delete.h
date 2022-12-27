@@ -21,21 +21,21 @@ class Delete
      * @param delete_buffer Whether to delete a single element or a buffer.
      * @param location The source location.
      */
-    Delete(std::unique_ptr<Expression> to_delete, bool delete_buffer, lang::Location location);
+    Delete(Owned<Expression> to_delete, bool delete_buffer, lang::Location location);
 
-    [[nodiscard]] Expression& toDelete() const;
-    [[nodiscard]] bool        isBufferDelete() const;
+    [[nodiscard]] Expression const& toDelete() const;
+    [[nodiscard]] bool              isBufferDelete() const;
 
     void validate(ValidationLogger& validation_logger) const override;
 
-    Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+    [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
     void doBuild(CompileContext& context) override;
 
   private:
-    std::unique_ptr<Expression> to_delete_;
-    bool                        delete_buffer_;
+    Owned<Expression> to_delete_;
+    bool              delete_buffer_;
 };
 
 #endif

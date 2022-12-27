@@ -44,19 +44,20 @@ class SourceTree
 
   private:
     struct SourceFileReadResult {
-        std::unique_ptr<FileContext>               file_context;
-        std::unique_ptr<AnceSyntaxErrorHandler>    syntax_error_handler;
-        std::unique_ptr<SourceFile>                source_file;
-        std::unique_ptr<antlr4::ANTLRInputStream>  input;
-        std::unique_ptr<anceLexer>                 lexer;
-        std::unique_ptr<antlr4::CommonTokenStream> tokens;
-        std::unique_ptr<anceParser>                parser;
+        Optional<Owned<FileContext>>               file_context {};
+        Optional<Owned<AnceSyntaxErrorHandler>>    syntax_error_handler {};
+        Optional<Owned<SourceFile>>                source_file {};
+        Optional<Owned<antlr4::ANTLRInputStream>>  input {};
+        Optional<Owned<anceLexer>>                 lexer {};
+        Optional<Owned<antlr4::CommonTokenStream>> tokens {};
+        Optional<Owned<anceParser>>                parser {};
         antlr4::tree::ParseTree*                   tree {};
     };
 
-    static SourceFileReadResult readSourceFile(std::filesystem::path const& project_path,
-                                               std::filesystem::path const& file_path,
-                                               size_t                       file_index);
+    static void readSourceFile(std::filesystem::path const&                 project_path,
+                               std::filesystem::path const&                 file_path,
+                               size_t                                       file_index,
+                               std::reference_wrapper<SourceFileReadResult> result);
 
   private:
     Application&                      application_;

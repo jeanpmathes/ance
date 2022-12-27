@@ -22,24 +22,23 @@ class Addressof
      * @param arg The argument to get the address of.
      * @param location The source location of the expression.
      */
-    Addressof(std::unique_ptr<Expression> arg, lang::Location location);
+    Addressof(Owned<Expression> arg, lang::Location location);
 
-    [[nodiscard]] Expression& argument() const;
+    [[nodiscard]] Expression const& argument() const;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
     void doBuild(CompileContext& context) override;
 
   public:
     ~Addressof() override;
 
   private:
-    std::unique_ptr<Expression> arg_;
+    Owned<Expression> arg_;
 };
 #endif

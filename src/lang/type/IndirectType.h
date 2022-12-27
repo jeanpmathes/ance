@@ -18,13 +18,13 @@ namespace lang
         explicit IndirectType(lang::ResolvingHandle<lang::Type> element_type);
         ~IndirectType() override = default;
 
-        llvm::Constant*    getDefaultContent(llvm::Module& m) override;
+        llvm::Constant*    getDefaultContent(llvm::Module& m) const override;
         llvm::PointerType* getContentType(llvm::LLVMContext& c) const override;
 
-        bool                              definesIndirection() override;
+        bool                              definesIndirection() const override;
         lang::ResolvingHandle<lang::Type> getIndirectionType() override;
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
-        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext& context) override;
+        Shared<lang::Value> buildIndirection(Shared<Value> value, CompileContext& context) override;
 
       private:
         lang::ResolvingHandle<lang::Type> value_type_;

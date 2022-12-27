@@ -54,9 +54,9 @@ void lang::BasicBlock::Definition::Returning::transferStatements(std::list<State
     statements_.splice(statements_.begin(), statements);
 }
 
-std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Returning::getLeaves()
+std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Returning::getLeaves() const
 {
-    std::list<lang::BasicBlock*> leaves;
+    std::list<lang::BasicBlock const*> leaves;
 
     leaves.push_back(self());
 
@@ -68,30 +68,32 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Returning::getSucce
     return {};
 }
 
-std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> lang::BasicBlock::Definition::Returning::
-    getReturnValue()
+Optional<std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>> lang::BasicBlock::Definition::
+    Returning::getReturnValue() const
 {
-    lang::Location               location = return_value_ ? return_value_->location() : return_location_;
-    std::shared_ptr<lang::Value> value    = return_value_ ? return_value_->getValue() : nullptr;
+    lang::Location const location = return_value_ ? return_value_->location() : return_location_;
+    Optional<std::reference_wrapper<lang::Value const>> value =
+        return_value_ ? makeOptional(std::cref(const_cast<Expression const*>(return_value_)->getValue()))
+                      : std::nullopt;
 
     return std::make_pair(value, location);
 }
 
-lang::Location lang::BasicBlock::Definition::Returning::getStartLocation()
+lang::Location lang::BasicBlock::Definition::Returning::getStartLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
-lang::Location lang::BasicBlock::Definition::Returning::getEndLocation()
+lang::Location lang::BasicBlock::Definition::Returning::getEndLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
-void lang::BasicBlock::Definition::Returning::reach() {}
+void lang::BasicBlock::Definition::Returning::reach() const {}
 
 void lang::BasicBlock::Definition::Returning::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
@@ -105,19 +107,19 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext& context)
 
     for (auto& statement : statements_) { statement->build(context); }
 
-    std::shared_ptr<lang::Value> return_value;
-
-    if (return_value_)
-    {
-        return_value = return_value_->getValue();
-        return_value = lang::Type::makeMatching(self()->containing_function_->returnType(), return_value, context);
-
-        return_value->buildContentValue(context);
-    }
+    if (return_value_) {}
 
     scope_->buildReturnFinalization(context);
 
-    if (return_value_) { context.ir()->CreateRet(return_value->getContentValue()); }
+    if (return_value_)
+    {
+        Shared<lang::Value> return_value = return_value_->getValue();
+
+        return_value = lang::Type::makeMatching(self()->containing_function_->returnType(), return_value, context);
+        return_value->buildContentValue(context);
+
+        context.ir()->CreateRet(return_value->getContentValue());
+    }
     else { context.ir()->CreateRetVoid(); }
 }
 

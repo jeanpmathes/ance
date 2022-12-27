@@ -34,7 +34,7 @@ namespace lang
         lang::Scope* scope() override;
 
         lang::GlobalScope* getGlobalScope() override;
-        llvm::DIScope*     getDebugScope(CompileContext& context) override;
+        llvm::DIScope*     getDebugScope(CompileContext& context) const override;
 
         void validate(ValidationLogger& validation_logger) const override;
 
@@ -53,14 +53,14 @@ namespace lang
          * @param initializer The initializer.
          * @param location The source location.
          */
-        void defineGlobalVariable(lang::AccessModifier                             access,
-                                  bool                                             is_constant,
-                                  lang::Identifier                                 name,
-                                  std::optional<lang::ResolvingHandle<lang::Type>> type,
-                                  lang::Location                                   type_location,
-                                  lang::Assigner                                   assigner,
-                                  std::unique_ptr<Expression>                      initializer,
-                                  lang::Location                                   location);
+        void defineGlobalVariable(lang::AccessModifier                        access,
+                                  bool                                        is_constant,
+                                  lang::Identifier                            name,
+                                  Optional<lang::ResolvingHandle<lang::Type>> type,
+                                  lang::Location                              type_location,
+                                  lang::Assigner                              assigner,
+                                  Optional<Owned<Expression>>                 initializer,
+                                  lang::Location                              location);
 
         /**
          * Define an extern function in this scope.
@@ -69,11 +69,11 @@ namespace lang
          * @param parameters The parameters.
          * @param location The location of the function declaration.
          */
-        void defineExternFunction(Identifier                                           name,
-                                  lang::ResolvingHandle<lang::Type>                    return_type,
-                                  lang::Location                                       return_type_location,
-                                  std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
-                                  lang::Location                                       location);
+        void defineExternFunction(Identifier                                  name,
+                                  lang::ResolvingHandle<lang::Type>           return_type,
+                                  lang::Location                              return_type_location,
+                                  std::vector<Shared<lang::Parameter>> const& parameters,
+                                  lang::Location                              location);
 
         /**
          * Define a custom function in this scope.
@@ -85,14 +85,14 @@ namespace lang
          * @param declaration_location The location of the function declaration.
          * @param definition_location The location of the function definition, meaning its code.
          */
-        void defineCustomFunction(Identifier                                           name,
-                                  lang::AccessModifier                                 access,
-                                  lang::ResolvingHandle<lang::Type>                    return_type,
-                                  lang::Location                                       return_type_location,
-                                  std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
-                                  std::unique_ptr<lang::CodeBlock>                     code,
-                                  lang::Location                                       declaration_location,
-                                  lang::Location                                       definition_location);
+        void defineCustomFunction(Identifier                                  name,
+                                  lang::AccessModifier                        access,
+                                  lang::ResolvingHandle<lang::Type>           return_type,
+                                  lang::Location                              return_type_location,
+                                  std::vector<Shared<lang::Parameter>> const& parameters,
+                                  Owned<lang::CodeBlock>                      code,
+                                  lang::Location                              declaration_location,
+                                  lang::Location                              definition_location);
 
         /**
          * Define a type that is an alias for another type.
@@ -111,17 +111,17 @@ namespace lang
          * @param members The members of the struct.
          * @param definition_location The location of the struct definition.
          */
-        void defineStruct(lang::AccessModifier                       access,
-                          Identifier                                 name,
-                          std::vector<std::unique_ptr<lang::Member>> members,
-                          lang::Location                             definition_location);
+        void defineStruct(lang::AccessModifier             access,
+                          Identifier                       name,
+                          std::vector<Owned<lang::Member>> members,
+                          lang::Location                   definition_location);
 
         /**
          * Get a type defined in this scope by it's name.
          * @param string The name of the type.
          * @return The type, or nothing if no such type is defined.
          */
-        std::optional<lang::ResolvingHandle<lang::Type>> getType(Identifier string);
+        Optional<lang::ResolvingHandle<lang::Type>> getType(Identifier string);
 
         /**
          * Add a type registry so it will get the chance to resolve types.
@@ -144,8 +144,8 @@ namespace lang
         bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) override;
 
       private:
-        [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Function>> findEntry() const;
-        [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Function>> findExit() const;
+        [[nodiscard]] Optional<lang::ResolvingHandle<lang::Function>> findEntry();
+        [[nodiscard]] Optional<lang::ResolvingHandle<lang::Function>> findExit();
 
       public:
         /**
@@ -198,7 +198,6 @@ namespace lang
         lang::OwningHandle<lang::Type>             retrieveUndefinedType(Identifier name);
 
         std::vector<lang::TypeDefinitionRegistry*> type_registries_;
-        bool                                       expanded_ = false;
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_defined_variables_;
@@ -213,6 +212,8 @@ namespace lang
         std::vector<std::tuple<lang::Identifier, lang::Location>> duplicated_names_;
 
         mutable std::vector<lang::ResolvingHandle<lang::Variable>> global_variables_;
+
+        bool expanded_ = false;
     };
 }
 #endif

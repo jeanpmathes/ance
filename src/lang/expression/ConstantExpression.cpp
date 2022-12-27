@@ -2,7 +2,12 @@
 
 #include "lang/construct/constant/Constant.h"
 
-std::shared_ptr<lang::Value> ConstantExpression::getValue() const
+Shared<lang::Value> ConstantExpression::getValue()
+{
+    return getConstantValue();
+}
+
+lang::Value const& ConstantExpression::getValue() const
 {
     return getConstantValue();
 }

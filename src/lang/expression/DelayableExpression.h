@@ -14,17 +14,19 @@ class DelayableExpression
     , public BuildableExpression
 {
   public:
-    [[nodiscard]] std::shared_ptr<lang::Value> getValue() const override;
+    Shared<lang::Value>              getValue() override;
+    [[nodiscard]] lang::Value const& getValue() const override;
 
   protected:
     /**
      * Set the value of the delayable value.
      * @param value The value to use.
      */
-    void setValue(std::shared_ptr<lang::Value> const& value);
+    void setValue(Shared<lang::Value> value);
 
   private:
-    std::shared_ptr<lang::DelayedValue> value_ {std::make_shared<lang::DelayedValue>(*this)};
+    Shared<lang::DelayedValue> delayed_value_ {makeShared<lang::DelayedValue>(pass(*this))};
+    Shared<lang::Value>        value_ {delayed_value_};
 };
 
 #endif

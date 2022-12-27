@@ -14,18 +14,18 @@ namespace lang
 {
     /**
      * A function that is defined by the language itself using native representation, not by source code.
-     * Therefore a predefined does not require some steps like resolving.
+     * Therefore a predefined function does not require some steps like resolving.
      */
     class PredefinedFunction
         : public lang::FunctionDefinition
         , public lang::Element<PredefinedFunction, ANCE_CONSTRUCTS>
     {
       public:
-        PredefinedFunction(Function&                                     function,
-                           Scope&                                        containing_scope,
-                           lang::ResolvingHandle<lang::Type>             return_type,
-                           std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                           lang::Location                                location);
+        PredefinedFunction(Function&                            function,
+                           Scope&                               containing_scope,
+                           lang::ResolvingHandle<lang::Type>    return_type,
+                           std::vector<Shared<lang::Parameter>> parameters,
+                           lang::Location                       location);
 
         [[nodiscard]] bool isMangled() const override;
 
@@ -37,7 +37,7 @@ namespace lang
         void createNativeBacking(CompileContext& context) override;
         void build(CompileContext& context) override;
 
-        llvm::DIScope*                                      getDebugScope(CompileContext& context) override;
+        llvm::DIScope*                                      getDebugScope(CompileContext& context) const override;
         lang::LocalScope*                                   getInsideScope() override;
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 
@@ -45,18 +45,19 @@ namespace lang
         [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
 
         void setCallValidator(
-            std::function<bool(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const&,
+            std::function<bool(std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const&,
                                lang::Location,
                                ValidationLogger&)> validator);
-        bool doCallValidation(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
-                              lang::Location                                                              location,
-                              ValidationLogger& validation_logger) const override;
+        bool doCallValidation(
+            std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
+            lang::Location                                                                           location,
+            ValidationLogger& validation_logger) const override;
 
       private:
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};
 
-        std::function<bool(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const&,
+        std::function<bool(std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const&,
                            lang::Location,
                            ValidationLogger&)>
             call_validator_ {};

@@ -1,7 +1,5 @@
 #include "GlobalScope.h"
 
-#include <ostream>
-
 #include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
@@ -23,7 +21,7 @@ lang::GlobalScope* lang::GlobalScope::getGlobalScope()
     return this;
 }
 
-llvm::DIScope* lang::GlobalScope::getDebugScope(CompileContext& context)
+llvm::DIScope* lang::GlobalScope::getDebugScope(CompileContext& context) const
 {
     return context.unit();
 }
@@ -46,14 +44,21 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
     for (auto& [name, variable] : global_defined_variables_) { variable->validate(validation_logger); }
 
     std::vector<lang::ResolvingHandle<lang::Variable>> global_variables;
-    for (auto& [name, variable] : global_defined_variables_) { global_variables.push_back(variable.handle()); }
+    for (auto& [name, variable] : const_cast<GlobalScope*>(this)->global_defined_variables_)
+    {
+        global_variables.emplace_back(variable.handle());
+    }
 
     global_variables_ = lang::GlobalVariable::determineOrder(global_variables, validation_logger);
 }
 
 void lang::GlobalScope::expand()
 {
-    for (auto& [key, function] : defined_function_groups_) { function->expand(); }
+    for (auto& registry : type_registries_) { registry->clear(); }
+
+    for (auto& [name, type] : defined_types_) { type->expand(); }
+
+    for (auto& [name, function] : defined_function_groups_) { function->expand(); }
     for (auto& [name, variable] : global_defined_variables_) { variable->expand(); }
 
     expanded_ = true;
@@ -71,14 +76,14 @@ void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger) const
     for (auto& [name, variable] : global_defined_variables_) { variable->validateFlow(validation_logger); }
 }
 
-void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                             access,
-                                             bool                                             is_constant,
-                                             lang::Identifier                                 name,
-                                             std::optional<lang::ResolvingHandle<lang::Type>> type,
-                                             lang::Location                                   type_location,
-                                             lang::Assigner                                   assigner,
-                                             std::unique_ptr<Expression>                      initializer,
-                                             lang::Location                                   location)
+void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                        access,
+                                             bool                                        is_constant,
+                                             lang::Identifier                            name,
+                                             Optional<lang::ResolvingHandle<lang::Type>> type,
+                                             lang::Location                              type_location,
+                                             lang::Assigner                              assigner,
+                                             Optional<Owned<Expression>>                 initializer,
+                                             lang::Location                              location)
 {
     if (defined_names_.contains(name))
     {
@@ -88,30 +93,30 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
 
     defined_names_.emplace(name);
 
-    bool is_final = assigner.isFinal();
+    bool const is_final = assigner.isFinal();
 
-    lang::OwningHandle<lang::Variable> undefined;
+    Optional<lang::OwningHandle<lang::Variable>> undefined;
 
-    if (global_undefined_variables_.find(name) != global_undefined_variables_.end())
+    if (global_undefined_variables_.contains(name))
     {
-        undefined = std::move(global_undefined_variables_[name]);
+        undefined = std::move(global_undefined_variables_.at(name));
         global_undefined_variables_.erase(name);
     }
     else { undefined = lang::OwningHandle<lang::Variable>::takeOwnership(lang::makeHandled<lang::Variable>(name)); }
 
-    undefined
+    undefined.value()
         ->defineAsGlobal(type, type_location, *this, access, std::move(initializer), is_final, is_constant, location);
-    lang::OwningHandle<lang::Variable> defined = std::move(undefined);
+    lang::OwningHandle<lang::Variable> defined = std::move(undefined.value());
 
     addChild(*defined);
-    global_defined_variables_[name] = std::move(defined);
+    global_defined_variables_.emplace(name, std::move(defined));
 }
 
-void lang::GlobalScope::defineExternFunction(Identifier                                           name,
-                                             lang::ResolvingHandle<lang::Type>                    return_type,
-                                             lang::Location                                       return_type_location,
-                                             std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
-                                             lang::Location                                       location)
+void lang::GlobalScope::defineExternFunction(Identifier                                  name,
+                                             lang::ResolvingHandle<lang::Type>           return_type,
+                                             lang::Location                              return_type_location,
+                                             std::vector<Shared<lang::Parameter>> const& parameters,
+                                             lang::Location                              location)
 {
     if (defined_names_.contains(name) && !defined_function_groups_.contains(name))
     {
@@ -131,14 +136,14 @@ void lang::GlobalScope::defineExternFunction(Identifier                         
     group->addFunction(std::move(defined));
 }
 
-void lang::GlobalScope::defineCustomFunction(Identifier                                           name,
-                                             lang::AccessModifier                                 access,
-                                             lang::ResolvingHandle<lang::Type>                    return_type,
-                                             lang::Location                                       return_type_location,
-                                             std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
-                                             std::unique_ptr<lang::CodeBlock>                     code,
-                                             lang::Location                                       declaration_location,
-                                             lang::Location                                       definition_location)
+void lang::GlobalScope::defineCustomFunction(Identifier                                  name,
+                                             lang::AccessModifier                        access,
+                                             lang::ResolvingHandle<lang::Type>           return_type,
+                                             lang::Location                              return_type_location,
+                                             std::vector<Shared<lang::Parameter>> const& parameters,
+                                             Owned<lang::CodeBlock>                      code,
+                                             lang::Location                              declaration_location,
+                                             lang::Location                              definition_location)
 {
     if (defined_names_.contains(name) && !defined_function_groups_.contains(name))
     {
@@ -178,21 +183,20 @@ void lang::GlobalScope::defineTypeAliasOther(Identifier                        n
 
     defined_names_.emplace(name);
 
-    lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
-    std::unique_ptr<lang::TypeDefinition> alias_definition =
-        std::make_unique<lang::TypeAlias>(name, actual, definition_location, actual_type_location);
+    lang::OwningHandle<lang::Type> undefined = retrieveUndefinedType(name);
+    Owned<lang::TypeDefinition>    alias_definition =
+        makeOwned<lang::TypeAlias>(name, actual, definition_location, actual_type_location);
 
     undefined->define(std::move(alias_definition));
     lang::OwningHandle<lang::Type> defined = std::move(undefined);
 
-    defined_types_[name] = std::move(defined);
-    defined_types_[name]->setContainingScope(this);
+    defined_types_.emplace(name, std::move(defined));
 }
 
-void lang::GlobalScope::defineStruct(lang::AccessModifier                       access,
-                                     lang::Identifier                           name,
-                                     std::vector<std::unique_ptr<lang::Member>> members,
-                                     lang::Location                             definition_location)
+void lang::GlobalScope::defineStruct(lang::AccessModifier             access,
+                                     lang::Identifier                 name,
+                                     std::vector<Owned<lang::Member>> members,
+                                     lang::Location                   definition_location)
 {
     if (defined_names_.contains(name))
     {
@@ -202,18 +206,17 @@ void lang::GlobalScope::defineStruct(lang::AccessModifier                       
 
     defined_names_.emplace(name);
 
-    lang::OwningHandle<lang::Type>        undefined = retrieveUndefinedType(name);
-    std::unique_ptr<lang::TypeDefinition> struct_definition =
-        std::make_unique<lang::StructType>(access, name, std::move(members), definition_location);
+    lang::OwningHandle<lang::Type> undefined = retrieveUndefinedType(name);
+    Owned<lang::TypeDefinition>    struct_definition =
+        makeOwned<lang::StructType>(access, name, std::move(members), definition_location);
 
     undefined->define(std::move(struct_definition));
     lang::OwningHandle<lang::Type> defined = std::move(undefined);
 
-    defined_types_[name] = std::move(defined);
-    defined_types_[name]->setContainingScope(this);
+    defined_types_.emplace(name, std::move(defined));
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> lang::GlobalScope::getType(Identifier string)
+Optional<lang::ResolvingHandle<lang::Type>> lang::GlobalScope::getType(Identifier string)
 {
     auto it = defined_types_.find(string);
 
@@ -236,17 +239,17 @@ void lang::GlobalScope::registerUsage(lang::ResolvingHandle<lang::Variable> vari
 
     if (global_undefined_variables_.find(variable->name()) != global_undefined_variables_.end())
     {
-        variable.reroute(global_undefined_variables_[variable->name()].handle());
+        variable.reroute(global_undefined_variables_.at(variable->name()).handle());
         return;
     }
 
     if (global_defined_variables_.find(variable->name()) != global_defined_variables_.end())
     {
-        variable.reroute(global_defined_variables_[variable->name()].handle());
+        variable.reroute(global_defined_variables_.at(variable->name()).handle());
         return;
     }
 
-    global_undefined_variables_[variable->name()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+    global_undefined_variables_.at(variable->name()) = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 
 void lang::GlobalScope::registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
@@ -255,17 +258,17 @@ void lang::GlobalScope::registerUsage(lang::ResolvingHandle<lang::FunctionGroup>
 
     if (undefined_function_groups_.find(function_group->name()) != undefined_function_groups_.end())
     {
-        function_group.reroute(undefined_function_groups_[function_group->name()].handle());
+        function_group.reroute(undefined_function_groups_.at(function_group->name()).handle());
         return;
     }
 
     if (defined_function_groups_.find(function_group->name()) != defined_function_groups_.end())
     {
-        function_group.reroute(defined_function_groups_[function_group->name()].handle());
+        function_group.reroute(defined_function_groups_.at(function_group->name()).handle());
         return;
     }
 
-    undefined_function_groups_[function_group->name()] =
+    undefined_function_groups_.at(function_group->name()) =
         lang::OwningHandle<lang::FunctionGroup>::takeOwnership(function_group);
 }
 
@@ -273,32 +276,32 @@ void lang::GlobalScope::registerUsage(lang::ResolvingHandle<lang::Type> type)
 {
     assert(!type->isDefined());
 
-    if (undefined_types_.find(type->name()) != undefined_types_.end())
+    if (undefined_types_.contains(type->name()))
     {
-        type.reroute(undefined_types_[type->name()].handle());
+        type.reroute(undefined_types_.at(type->name()).handle());
         return;
     }
 
-    if (defined_types_.find(type->name()) != defined_types_.end())
+    if (defined_types_.contains(type->name()))
     {
-        type.reroute(defined_types_[type->name()].handle());
+        type.reroute(defined_types_.at(type->name()).handle());
         return;
     }
 
-    undefined_types_[type->name()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
+    undefined_types_.emplace(type->name(), lang::OwningHandle<lang::Type>::takeOwnership(type));
 }
 
 void lang::GlobalScope::registerDefinition(lang::ResolvingHandle<lang::Type> type)
 {
     assert(type->isDefined());
-    assert(defined_types_.find(type->name()) == defined_types_.end());
+    assert(not defined_types_.contains(type->name()));
 
-    defined_types_[type->name()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
+    defined_types_.emplace(type->name(), lang::OwningHandle<lang::Type>::takeOwnership(type));
     type->setContainingScope(this);
 
-    if (undefined_types_.find(type->name()) != undefined_types_.end())
+    if (undefined_types_.contains(type->name()))
     {
-        lang::OwningHandle<lang::Type> undefined = std::move(undefined_types_[type->name()]);
+        lang::OwningHandle<lang::Type> undefined = std::move(undefined_types_.at(type->name()));
         undefined_types_.erase(type->name());
 
         undefined.handle().reroute(type);
@@ -309,6 +312,8 @@ void lang::GlobalScope::resolve()
 {
     for (auto& [key, group] : defined_function_groups_) { group->resolve(); }
     for (auto& [key, variable] : global_defined_variables_) { variable->resolve(); }
+
+    for (auto& [key, type] : defined_types_) { type->setContainingScope(this); }
 
     // Type registries are currently incorrect, as they resolve type dependencies in an incorrect scope.
 
@@ -322,12 +327,11 @@ void lang::GlobalScope::resolve()
 void lang::GlobalScope::postResolve()
 {
     if (!expanded_)
-    {
+    {// Ugly, not necessary with full expansion.
         for (auto& [name, type] : defined_types_) { type->postResolve(); }
-
-        for (auto& registry : type_registries_) { registry->postResolve(); }
     }
 
+    for (auto& registry : type_registries_) { registry->postResolve(); }
     for (auto& [key, group] : defined_function_groups_) { group->postResolve(); }
     for (auto& [key, variable] : global_defined_variables_) { variable->postResolve(); }
 }
@@ -336,7 +340,7 @@ bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> 
 {
     if (global_defined_variables_.find(variable->name()) != global_defined_variables_.end())
     {
-        variable.reroute(global_defined_variables_[variable->name()].handle());
+        variable.reroute(global_defined_variables_.at(variable->name()).handle());
         return true;
     }
 
@@ -347,7 +351,7 @@ bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::FunctionGr
 {
     if (defined_function_groups_.find(function_group->name()) != defined_function_groups_.end())
     {
-        function_group.reroute(defined_function_groups_[function_group->name()].handle());
+        function_group.reroute(defined_function_groups_.at(function_group->name()).handle());
         return true;
     }
 
@@ -358,71 +362,73 @@ bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Type> type
 {
     if (defined_types_.contains(type->name()))
     {
-        type.reroute(defined_types_[type->name()].handle());
+        type.reroute(defined_types_.at(type->name()).handle());
         return true;
     }
 
     return false;
 }
 
-std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntry() const
+Optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntry()
 {
-    auto c = defined_function_groups_.find(lang::Identifier::from("main"));
+    auto c = defined_function_groups_.find(lang::Identifier::like("main"));
     if (c == defined_function_groups_.end()) return {};
 
     auto& [name, group] = *c;
 
-    std::vector<lang::ResolvingHandle<lang::Type>> arg_types;
-
-    auto potential_function = group->resolveOverload(arg_types);
+    auto potential_function = group->resolveOverload({});
     if (potential_function.size() != 1) return {};
 
-    lang::Function& function = *(potential_function.front());
+    lang::Function const& function = *(potential_function.front());
 
-    if (function.returnType()->isFixedWidthIntegerType(32, false)) return potential_function.front();
+    if (function.returnType().isFixedWidthIntegerType(32, false)) return potential_function.front();
     else return {};
 }
 
-std::optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findExit() const
+Optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findExit()
 {
-    auto c = defined_function_groups_.find(lang::Identifier::from("exit"));
+    auto c = defined_function_groups_.find(lang::Identifier::like("exit"));
     if (c == defined_function_groups_.end()) return {};
 
     auto& [name, group] = *c;
 
-    std::vector<lang::ResolvingHandle<lang::Type>> arg_types;
-    arg_types.push_back(lang::FixedWidthIntegerType::get(32, false));
+    auto input_arg_type = lang::FixedWidthIntegerType::get(32, false);
+
+    std::vector<std::reference_wrapper<lang::Type const>> arg_types;
+    arg_types.emplace_back(input_arg_type);
 
     auto potential_function = group->resolveOverload(arg_types);
     if (potential_function.size() != 1) return {};
 
-    lang::Function& function = *potential_function.front();
+    lang::Function const& function = *potential_function.front();
 
-    if (function.returnType()->isVoidType()) return potential_function.front();
+    if (function.returnType().isVoidType()) return potential_function.front();
     else return {};
 }
 
 bool lang::GlobalScope::hasEntry() const
 {
-    return findEntry().has_value();
+    // The findEntry function is non-const because it returns a non-const handle, but it doesn't modify this object.
+    return const_cast<GlobalScope*>(this)->findEntry().hasValue();
 }
 
 bool lang::GlobalScope::hasExit() const
 {
-    return findExit().has_value();
+    // The findExit function is non-const because it returns a non-const handle, but it doesn't modify this object.
+    return const_cast<GlobalScope*>(this)->findExit().hasValue();
 }
 
 lang::ResolvingHandle<lang::Function> lang::GlobalScope::getEntry()
 {
-    std::optional<lang::ResolvingHandle<lang::Function>> potential_function = findEntry();
-    assert(potential_function.has_value());
+    Optional<lang::ResolvingHandle<lang::Function>> potential_function = findEntry();
+    assert(potential_function.hasValue());
     return potential_function.value();
 }
 
 lang::ResolvingHandle<lang::Function> lang::GlobalScope::getExit()
 {
-    std::optional<lang::ResolvingHandle<lang::Function>> potential_function = findExit();
-    assert(potential_function.has_value());
+    Optional<lang::ResolvingHandle<lang::Function>> potential_function = findExit();
+    assert(potential_function.hasValue());
     return potential_function.value();
 }
 
@@ -460,14 +466,14 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunc
 {
     if (defined_function_groups_.find(name) != defined_function_groups_.end())
     {
-        return defined_function_groups_[name].handle();
+        return defined_function_groups_.at(name).handle();
     }
 
-    lang::OwningHandle<lang::FunctionGroup> undefined;
+    Optional<lang::OwningHandle<lang::FunctionGroup>> undefined;
 
-    if (undefined_function_groups_.find(name) != undefined_function_groups_.end())
+    if (undefined_function_groups_.contains(name))
     {
-        undefined = std::move(undefined_function_groups_[name]);
+        undefined = std::move(undefined_function_groups_.at(name));
         undefined_function_groups_.erase(name);
     }
     else
@@ -476,8 +482,8 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunc
             lang::OwningHandle<lang::FunctionGroup>::takeOwnership(lang::makeHandled<lang::FunctionGroup>(name));
     }
 
-    lang::ResolvingHandle<lang::FunctionGroup> defined = undefined.handle();
-    defined_function_groups_[name]                     = std::move(undefined);
+    lang::ResolvingHandle<lang::FunctionGroup> defined = undefined->handle();
+    defined_function_groups_.emplace(name, std::move(undefined.value()));
     addChild(*defined);
 
     return defined;
@@ -485,14 +491,14 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunc
 
 lang::OwningHandle<lang::Type> lang::GlobalScope::retrieveUndefinedType(Identifier name)
 {
-    lang::OwningHandle<lang::Type> undefined;
+    Optional<lang::OwningHandle<lang::Type>> undefined;
 
     if (undefined_types_.find(name) != undefined_types_.end())
     {
-        undefined = std::move(undefined_types_[name]);
+        undefined = std::move(undefined_types_.at(name));
         undefined_types_.erase(name);
     }
     else { undefined = lang::OwningHandle<lang::Type>::takeOwnership(lang::makeHandled<lang::Type>(name)); }
 
-    return undefined;
+    return std::move(undefined.value());
 }

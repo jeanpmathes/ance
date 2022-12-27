@@ -28,11 +28,15 @@ namespace lang
 
         [[nodiscard]] std::string toString() const override;
 
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const override;
-        llvm::Constant*                                 buildContent(llvm::Module* m) override;
+        lang::ResolvingHandle<lang::Type> type() override;
+        [[nodiscard]] lang::Type const&   type() const override;
+
+        llvm::Constant* createContent(llvm::Module* m) override;
 
         bool equals(lang::Constant const* other) const override;
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
+
+        Shared<Constant> clone() const override;
 
         /**
          * Parse a character from a string.

@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "lang/utility/Owners.h"
+
 namespace data
 {
     /**
@@ -18,7 +20,7 @@ namespace data
          * @param key The key.
          * @return An optional element.
          */
-        virtual std::optional<std::reference_wrapper<const data::Element>> operator[](std::string const& key) const;
+        virtual Optional<std::reference_wrapper<const data::Element>> operator[](std::string const& key) const;
 
         [[nodiscard]] virtual std::vector<std::reference_wrapper<const data::Element>>::const_iterator begin() const;
 
@@ -28,13 +30,13 @@ namespace data
          * Get the value of this element as string.
          * @return An optional string, only filled if this element is actually a string.
          */
-        [[nodiscard]] virtual std::optional<std::reference_wrapper<const std::string>> asString() const;
+        [[nodiscard]] virtual Optional<std::reference_wrapper<const std::string>> asString() const;
 
         /**
          * Get the value of this element as bool.
          * @return An optional bool, only filled if this element is actually a bool.
          */
-        [[nodiscard]] virtual std::optional<bool> asBool() const;
+        [[nodiscard]] virtual Optional<bool> asBool() const;
 
         virtual ~Element() = 0;
 

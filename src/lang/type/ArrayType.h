@@ -32,31 +32,25 @@ namespace lang
         ArrayType const* isArrayType() const override;
         ArrayType*       isArrayType() override;
 
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const override;
+        lang::ResolvingHandle<lang::Type> getActualType() override;
+        [[nodiscard]] lang::Type const&   getActualType() const override;
 
-        llvm::Constant*  getDefaultContent(llvm::Module& m) override;
+        llvm::Constant*  getDefaultContent(llvm::Module& m) const override;
         llvm::ArrayType* getContentType(llvm::LLVMContext& c) const override;
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
       public:
-        /**
-         * Create an array value.
-         * @param values The elements of the array.
-         * @param context The current context.
-         * @return The array value.
-         */
-        std::shared_ptr<lang::Value> createValue(std::vector<std::shared_ptr<lang::Value>> values,
-                                                 CompileContext&                           context);
-
         ~ArrayType() override = default;
 
       protected:
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) override;
+        llvm::DIType* createDebugType(CompileContext& context) const override;
 
       private:
         static lang::TypeRegistry<uint64_t>& getArrayTypes();
+
+        Optional<lang::ResolvingHandle<lang::Type>> actual_type_ {};
 
       public:
         static lang::TypeDefinitionRegistry* getRegistry();
@@ -68,6 +62,8 @@ namespace lang
          * @return The array type instance.
          */
         static lang::ResolvingHandle<lang::Type> get(lang::ResolvingHandle<lang::Type> element_type, uint64_t size);
+
+        ResolvingHandle<lang::Type> clone() const override;
     };
 }
 

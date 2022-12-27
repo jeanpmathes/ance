@@ -7,20 +7,25 @@
 #include "lang/type/SizeType.h"
 #include "lang/utility/Values.h"
 
-lang::SequenceType::SequenceType(lang::ResolvingHandle<lang::Type> element_type, std::optional<size_t> size)
+lang::SequenceType::SequenceType(lang::ResolvingHandle<lang::Type> element_type, Optional<size_t> size)
     : element_type_(std::move(element_type))
     , element_reference_(lang::ReferenceType::get(element_type_))
     , size_(size)
 {}
 
-lang::ResolvingHandle<lang::Type> lang::SequenceType::getElementType() const
+lang::ResolvingHandle<lang::Type> lang::SequenceType::getElementType()
+{
+    return element_type_;
+}
+
+lang::Type const& lang::SequenceType::getElementType() const
 {
     return element_type_;
 }
 
 StateCount lang::SequenceType::getStateCount() const
 {
-    assert(size_.has_value() && "State count cannot be determined for sequence types without a size.");
+    assert(size_.hasValue() && "State count cannot be determined for sequence types without a size.");
 
     StateCount state_count = element_type_->getStateCount();
 
@@ -29,7 +34,7 @@ StateCount lang::SequenceType::getStateCount() const
     return state_count;
 }
 
-bool lang::SequenceType::isSubscriptDefined()
+bool lang::SequenceType::isSubscriptDefined() const
 {
     return true;
 }
@@ -40,28 +45,28 @@ lang::ResolvingHandle<lang::Type> lang::SequenceType::getSubscriptReturnType()
 }
 
 bool lang::SequenceType::validateSubscript(lang::Location,
-                                           lang::ResolvingHandle<lang::Type> index_type,
-                                           lang::Location                    index_location,
-                                           ValidationLogger&                 validation_logger) const
+                                           lang::Type const& index_type,
+                                           lang::Location    index_location,
+                                           ValidationLogger& validation_logger) const
 {
     return lang::Type::checkMismatch(lang::SizeType::getSize(), index_type, index_location, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::SequenceType::buildSubscript(std::shared_ptr<Value> indexed,
-                                                                std::shared_ptr<Value> index,
-                                                                CompileContext&        context)
+Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<Value>   indexed,
+                                                       Shared<Value>   index,
+                                                       CompileContext& context)
 {
     index = lang::Type::makeMatching(lang::SizeType::getSize(), index, context);
 
     llvm::Value* element_ptr  = buildGetElementPointer(indexed, index, context);
     llvm::Value* native_value = lang::values::contentToNative(element_reference_, element_ptr, context);
 
-    return std::make_shared<lang::WrappedNativeValue>(getSubscriptReturnType(), native_value);
+    return makeShared<lang::WrappedNativeValue>(getSubscriptReturnType(), native_value);
 }
 
-llvm::Value* lang::SequenceType::buildGetElementPointer(std::shared_ptr<lang::Value> const& indexed,
-                                                        std::shared_ptr<lang::Value> const& index,
-                                                        CompileContext&                     context)
+llvm::Value* lang::SequenceType::buildGetElementPointer(Shared<Value>   indexed,
+                                                        Shared<Value>   index,
+                                                        CompileContext& context)
 {
     index->buildContentValue(context);
 
@@ -70,7 +75,7 @@ llvm::Value* lang::SequenceType::buildGetElementPointer(std::shared_ptr<lang::Va
 
     llvm::Value* sequence_ptr = getIndexingPointer(indexed, context);
 
-    if (size_.has_value())// Check if index is in bounds.
+    if (size_.hasValue())// Check if index is in bounds.
     {
         llvm::Value* native_size =
             llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context.llvmContext()), size_.value());
@@ -105,7 +110,7 @@ llvm::Type* lang::SequenceType::getIndexedType(CompileContext& context) const
     return getContentType(*context.llvmContext());
 }
 
-llvm::Value* lang::SequenceType::getIndexingPointer(std::shared_ptr<Value> indexed, CompileContext& context)
+llvm::Value* lang::SequenceType::getIndexingPointer(Shared<Value> indexed, CompileContext& context)
 {
     indexed->buildNativeValue(context);
     return indexed->getNativeValue();
@@ -133,7 +138,7 @@ bool lang::SequenceType::isTriviallyDestructible() const
 
 void lang::SequenceType::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context)
 {
-    if (size_.has_value())
+    if (size_.hasValue())
     {
         for (uint64_t index = 0; index < size_.value(); index++)
         {
@@ -147,7 +152,7 @@ void lang::SequenceType::buildSingleCopyInitializerDefinition(llvm::Value*    dt
                                                               llvm::Value*    src_ptr,
                                                               CompileContext& context)
 {
-    if (size_.has_value())
+    if (size_.hasValue())
     {
         for (uint64_t index = 0; index < size_.value(); index++)
         {
@@ -161,7 +166,7 @@ void lang::SequenceType::buildSingleCopyInitializerDefinition(llvm::Value*    dt
 
 void lang::SequenceType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context)
 {
-    if (size_.has_value())
+    if (size_.hasValue())
     {
         for (uint64_t index = 0; index < size_.value(); index++)
         {
@@ -171,24 +176,19 @@ void lang::SequenceType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr,
     }
 }
 
-std::vector<lang::TypeDefinition*> lang::SequenceType::getDependencies() const
+std::vector<std::reference_wrapper<lang::Type const>> lang::SequenceType::getContained() const
 {
-    std::vector<lang::TypeDefinition*> dependencies;
-
-    if (element_type_->getDefinition()) dependencies.push_back(element_type_->getDefinition());
-
-    return dependencies;
+    return {element_type_};
 }
 
-std::shared_ptr<lang::Value> lang::SequenceType::createValue(std::vector<std::shared_ptr<lang::Value>> values,
-                                                             CompileContext&                           context)
+Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Value>> values, CompileContext& context)
 {
-    assert(size_.has_value());
+    assert(size_.hasValue());
     assert(values.size() == size_.value());
 
     llvm::Value* sequence_ptr = context.ir()->CreateAlloca(getContentType(*context.llvmContext()), nullptr, "alloca");
 
-    for (uint64_t index = 0; index < size_; index++)
+    for (uint64_t index = 0; index < size_.value(); index++)
     {
         values[index]->buildContentValue(context);
 
@@ -196,5 +196,5 @@ std::shared_ptr<lang::Value> lang::SequenceType::createValue(std::vector<std::sh
         context.ir()->CreateStore(values[index]->getContentValue(), element_ptr);
     }
 
-    return std::make_shared<lang::WrappedNativeValue>(self(), sequence_ptr);
+    return makeShared<lang::WrappedNativeValue>(self(), sequence_ptr);
 }

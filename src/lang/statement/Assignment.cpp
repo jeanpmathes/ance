@@ -6,10 +6,10 @@
 #include "lang/expression/Expression.h"
 #include "validation/ValidationLogger.h"
 
-Assignment::Assignment(std::unique_ptr<Expression> assignable,
-                       lang::Assigner              assigner,
-                       std::unique_ptr<Expression> assigned,
-                       lang::Location              location)
+Assignment::Assignment(Owned<Expression> assignable,
+                       lang::Assigner    assigner,
+                       Owned<Expression> assigned,
+                       lang::Location    location)
     : Statement(location)
     , assignable_(std::move(assignable))
     , assigner_(assigner)
@@ -21,7 +21,7 @@ Assignment::Assignment(std::unique_ptr<Expression> assignable,
     addSubexpression(*assigned_);
 }
 
-Expression& Assignment::assignable() const
+Expression const& Assignment::assignable() const
 {
     return *assignable_;
 }
@@ -31,7 +31,7 @@ lang::Assigner Assignment::assigner() const
     return assigner_;
 }
 
-Expression& Assignment::assigned() const
+Expression const& Assignment::assigned() const
 {
     return *assigned_;
 }
@@ -54,10 +54,8 @@ Statements Assignment::expandWith(Expressions subexpressions, Statements) const
 {
     Statements statements;
 
-    statements.push_back(std::make_unique<Assignment>(std::move(subexpressions[0]),
-                                                      assigner_,
-                                                      std::move(subexpressions[1]),
-                                                      location()));
+    statements.emplace_back(
+        makeOwned<Assignment>(std::move(subexpressions[0]), assigner_, std::move(subexpressions[1]), location()));
 
     return statements;
 }

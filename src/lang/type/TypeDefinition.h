@@ -54,6 +54,12 @@ namespace lang
 
         void setType(lang::Type* type);
 
+        /**
+         * Get whether all contained types are defined.
+         * @return True if all contained types are defined.
+         */
+        [[nodiscard]] bool isFullyDefined() const;
+
         [[nodiscard]] Identifier const& name() const;
         std::string const&              getMangledName() const;
         [[nodiscard]] lang::Location    getDefinitionLocation() const;
@@ -77,89 +83,93 @@ namespace lang
         [[nodiscard]] virtual bool                     isPointerType() const;
         [[nodiscard]] virtual bool                     isAddressType() const;
         [[nodiscard]] virtual bool                     isBufferType() const;
-        [[nodiscard]] virtual bool                     isOpaquePointerType() const;
-        [[nodiscard]] virtual bool                     isReferenceType() const;
-        [[nodiscard]] virtual bool                     isStructType() const;
-        [[nodiscard]] virtual VectorizableType const*  isVectorizable() const;
-        [[nodiscard]] virtual VectorizableType*        isVectorizable();
-        [[nodiscard]] virtual VectorType const*        isVectorType() const;
-        [[nodiscard]] virtual VectorType*              isVectorType();
-        [[nodiscard]] virtual ArrayType const*         isArrayType() const;
-        [[nodiscard]] virtual ArrayType*               isArrayType();
+        [[nodiscard]] virtual bool                         isOpaquePointerType() const;
+        [[nodiscard]] virtual bool                         isReferenceType() const;
+        [[nodiscard]] virtual bool                         isStructType() const;
+        [[nodiscard]] virtual VectorizableType const*      isVectorizable() const;
+        [[nodiscard]] virtual VectorizableType*            isVectorizable();
+        [[nodiscard]] virtual VectorType const*            isVectorType() const;
+        [[nodiscard]] virtual VectorType*                  isVectorType();
+        [[nodiscard]] virtual ArrayType const*             isArrayType() const;
+        [[nodiscard]] virtual ArrayType*                   isArrayType();
 
-        [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getElementType() const;
+        virtual lang::ResolvingHandle<lang::Type> getElementType();
+        [[nodiscard]] virtual lang::Type const&   getElementType() const;
 
-        [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getActualType() const;
-        [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getOriginalType() const;
+        [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> getActualType();
+        [[nodiscard]] virtual lang::Type const&                 getActualType() const;
+
+        /**
+         * Get a non-const handle to this type. This is only possible for non-custom types.
+         * @return The handle to this type. The actual type is not cloned.
+         */
+        [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> clone() const;
 
         [[nodiscard]] virtual lang::AccessModifier getAccessModifier() const;
 
         void         setContainingScope(Scope* scope);
         virtual void onScope();
         Scope*       scope();
+        Scope const* scope() const;
 
         void postResolve();
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters);
 
-        virtual llvm::Constant* getDefaultContent(llvm::Module& m) = 0;
+        virtual llvm::Constant* getDefaultContent(llvm::Module& m) const = 0;
 
         llvm::Type*         getNativeType(llvm::LLVMContext& c) const;
         virtual llvm::Type* getContentType(llvm::LLVMContext& c) const = 0;
-        llvm::DIType*       getDebugType(CompileContext& context);
+        llvm::DIType*       getDebugType(CompileContext& context) const;
 
         llvm::TypeSize getNativeSize(llvm::Module* m);
         llvm::TypeSize getContentSize(llvm::Module* m);
 
-        virtual bool                              isSubscriptDefined();
+        virtual bool                              isSubscriptDefined() const;
         virtual lang::ResolvingHandle<lang::Type> getSubscriptReturnType();
-        virtual bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other);
-        virtual bool isOperatorDefined(lang::UnaryOperator op);
+        virtual bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const;
+        virtual bool isOperatorDefined(lang::UnaryOperator op) const;
         virtual lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
                                                                         lang::ResolvingHandle<lang::Type> other);
         virtual lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op);
-        virtual bool                              isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other);
-        virtual bool                              hasMember(lang::Identifier const& name);
+        virtual bool                              isImplicitlyConvertibleTo(lang::Type const& other) const;
+        virtual bool                              hasMember(lang::Identifier const& name) const;
         virtual lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name);
-        virtual bool                              definesIndirection();
+        virtual bool                              definesIndirection() const;
         virtual lang::ResolvingHandle<lang::Type> getIndirectionType();
 
         virtual bool validateDefinition(ValidationLogger& validation_logger) const;
         virtual bool validate(ValidationLogger& validation_logger, lang::Location location) const;
-        virtual bool validateSubscript(lang::Location                    indexed_location,
-                                       lang::ResolvingHandle<lang::Type> index_type,
-                                       lang::Location                    index_location,
-                                       ValidationLogger&                 validation_logger) const;
-        virtual bool validateOperator(lang::BinaryOperator              op,
-                                      lang::ResolvingHandle<lang::Type> other,
-                                      lang::Location                    left_location,
-                                      lang::Location                    right_location,
-                                      ValidationLogger&                 validation_logger) const;
+        virtual bool validateSubscript(lang::Location    indexed_location,
+                                       lang::Type const& index_type,
+                                       lang::Location    index_location,
+                                       ValidationLogger& validation_logger) const;
+        virtual bool validateOperator(lang::BinaryOperator op,
+                                      lang::Type const&    other,
+                                      lang::Location       left_location,
+                                      lang::Location       right_location,
+                                      ValidationLogger&    validation_logger) const;
         virtual bool validateOperator(lang::UnaryOperator op,
                                       lang::Location      location,
                                       ValidationLogger&   validation_logger) const;
-        virtual bool validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                lang::Location                    location,
-                                                ValidationLogger&                 validation_logger) const;
+        virtual bool validateImplicitConversion(lang::Type const& other,
+                                                lang::Location    location,
+                                                ValidationLogger& validation_logger) const;
         virtual bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const;
         virtual bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const;
 
-        virtual std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
-                                                            std::shared_ptr<Value> index,
-                                                            CompileContext&        context);
-        virtual std::shared_ptr<lang::Value> buildOperator(lang::BinaryOperator   op,
-                                                           std::shared_ptr<Value> left,
-                                                           std::shared_ptr<Value> right,
-                                                           CompileContext&        context);
-        virtual std::shared_ptr<lang::Value> buildOperator(lang::UnaryOperator    op,
-                                                           std::shared_ptr<Value> value,
-                                                           CompileContext&        context);
-        virtual std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                     std::shared_ptr<Value>            value,
-                                                                     CompileContext&                   context);
-        virtual std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
-                                                               lang::Identifier const& name,
-                                                               CompileContext&         context);
-        virtual std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext& context);
+        virtual Shared<lang::Value> buildSubscript(Shared<Value> indexed, Shared<Value> index, CompileContext& context);
+        virtual Shared<lang::Value> buildOperator(lang::BinaryOperator op,
+                                                  Shared<Value>        left,
+                                                  Shared<Value>        right,
+                                                  CompileContext&      context);
+        virtual Shared<lang::Value> buildOperator(lang::UnaryOperator op, Shared<Value> value, CompileContext& context);
+        virtual Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                            Shared<Value>                     value,
+                                                            CompileContext&                   context);
+        virtual Shared<lang::Value> buildMemberAccess(Shared<Value>           value,
+                                                      lang::Identifier const& name,
+                                                      CompileContext&         context);
+        virtual Shared<lang::Value> buildIndirection(Shared<Value> value, CompileContext& context);
 
         void         buildDefaultInitializer(llvm::Value* ptr, CompileContext& context);
         virtual void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context);
@@ -209,7 +219,7 @@ namespace lang
 
         virtual std::string createMangledName() const = 0;
 
-        virtual llvm::DIType* createDebugType(CompileContext& context) = 0;
+        virtual llvm::DIType* createDebugType(CompileContext& context) const = 0;
 
         /**
          * Check the dependencies of the type definition for cyclic dependencies.
@@ -218,7 +228,20 @@ namespace lang
          */
         bool checkDependencies(ValidationLogger& validation_logger) const;
         bool hasCyclicDependency() const;
-        [[nodiscard]] virtual std::vector<lang::TypeDefinition*> getDependencies() const;
+
+        /**
+         * Get the type dependencies of this type.
+         * A type depends on another, if the memory layout of the type depends on the other.
+         * @return The type dependencies.
+         */
+        [[nodiscard]] virtual std::vector<lang::TypeDefinition const*> getDependencies() const;
+
+        /**
+         * Get the types contained in this type.
+         * To consider a type is defined and valid, all types it contains must be defined.
+         * @return The types contained in this type.
+         */
+        [[nodiscard]] virtual std::vector<std::reference_wrapper<lang::Type const>> getContained() const;
 
         /**
          * Create a constructor for this type. The function is added to the overload list.
@@ -232,7 +255,7 @@ namespace lang
          * @param parameters The parameters of the function.
          * @return True if the function exists.
          */
-        virtual bool acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters);
+        virtual bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters);
 
         /**
          * Build a function (constructor) overload that was accepted before.
@@ -240,9 +263,11 @@ namespace lang
          * @param function The already declared function which has to be built.
          * @param context The current compile context.
          */
-        virtual void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
-                                            lang::PredefinedFunction&                             function,
-                                            CompileContext&                                       context);
+        virtual void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                            lang::PredefinedFunction&                      function,
+                                            CompileContext&                                context);
+
+        virtual void expand();
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self() const;
 
@@ -263,12 +288,12 @@ namespace lang
         lang::Location      location_;
         mutable std::string mangled_name_ {};
         lang::Type*         type_ {nullptr};
-        lang::Scope*        containing_scope_ {nullptr};
-        llvm::DIType*       debug_type_ {nullptr};
+        lang::Scope*          containing_scope_ {nullptr};
+        mutable llvm::DIType* debug_type_ {nullptr};
 
         lang::PredefinedFunction* default_constructor_ {nullptr};
 
-        mutable std::optional<bool> cyclic_dependency_ {};
+        mutable Optional<bool> cyclic_dependency_ {};
 
         std::vector<std::pair<std::vector<lang::ResolvingHandle<lang::Type>>, lang::PredefinedFunction*>>
             requested_constructors_;

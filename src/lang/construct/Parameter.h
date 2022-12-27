@@ -31,12 +31,14 @@ namespace lang
                   Identifier                        name,
                   lang::Location                    location);
 
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const override;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() override;
+        [[nodiscard]] lang::Type const&                 type() const override;
+
         /**
          * Get the parameter name.
          * @return The name.
          */
-        Identifier const& name();
+        [[nodiscard]] Identifier const& name() const;
 
         /**
          * Get the source location.
@@ -56,11 +58,13 @@ namespace lang
          */
         void wrap(llvm::Argument* argument);
 
+        void expand();
+
         void buildNativeValue(CompileContext& context) override;
         void buildContentValue(CompileContext& context) override;
 
-        llvm::Value* getNativeValue() override;
-        llvm::Value* getContentValue() override;
+        [[nodiscard]] llvm::Value* getNativeValue() const override;
+        [[nodiscard]] llvm::Value* getContentValue() const override;
 
       private:
         lang::ResolvingHandle<lang::Type> type_;

@@ -17,7 +17,7 @@ namespace lang
         QuadType();
 
       public:
-        llvm::Constant* getDefaultContent(llvm::Module& m) override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) const override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         /**
@@ -25,6 +25,8 @@ namespace lang
          * @return The instance.
          */
         static lang::ResolvingHandle<lang::Type> get();
+
+        ResolvingHandle<lang::Type> clone() const override;
 
       private:
         [[nodiscard]] size_t getPrecision() const override;

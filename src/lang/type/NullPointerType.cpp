@@ -7,28 +7,26 @@
 #include "lang/type/Type.h"
 #include "lang/utility/Values.h"
 
-lang::NullPointerType::NullPointerType() : TypeDefinition(lang::Identifier::from("nullptr")) {}
+lang::NullPointerType::NullPointerType() : TypeDefinition(lang::Identifier::like("nullptr")) {}
 
 bool lang::NullPointerType::isNullValueType() const
 {
     return true;
 }
 
-bool lang::NullPointerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
+bool lang::NullPointerType::isImplicitlyConvertibleTo(lang::Type const& other) const
 {
-    return other->isAddressType();
+    return other.isAddressType();
 }
 
-bool lang::NullPointerType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
-                                                       lang::Location,
-                                                       ValidationLogger&) const
+bool lang::NullPointerType::validateImplicitConversion(lang::Type const&, lang::Location, ValidationLogger&) const
 {
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::NullPointerType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                            std::shared_ptr<Value>,
-                                                                            CompileContext& context)
+Shared<lang::Value> lang::NullPointerType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                                   Shared<Value>,
+                                                                   CompileContext& context)
 {
     llvm::Type* other_type = other->getContentType(*context.llvmContext());
     assert(other_type->isPointerTy());
@@ -36,10 +34,10 @@ std::shared_ptr<lang::Value> lang::NullPointerType::buildImplicitConversion(lang
     llvm::Value* null         = llvm::ConstantPointerNull::get(llvm::dyn_cast<llvm::PointerType>(other_type));
     llvm::Value* native_value = lang::values::contentToNative(other, null, context);
 
-    return std::make_shared<lang::WrappedNativeValue>(other, native_value);
+    return makeShared<lang::WrappedNativeValue>(other, native_value);
 }
 
-llvm::Constant* lang::NullPointerType::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::NullPointerType::getDefaultContent(llvm::Module& m) const
 {
     return llvm::ConstantPointerNull::get(llvm::PointerType::get(llvm::Type::getInt8Ty(m.getContext()), 0));
 }
@@ -54,14 +52,14 @@ std::string lang::NullPointerType::createMangledName() const
     return "nullptr";
 }
 
-llvm::DIType* lang::NullPointerType::createDebugType(CompileContext& context)
+llvm::DIType* lang::NullPointerType::createDebugType(CompileContext& context) const
 {
     llvm::DataLayout const& dl = context.module()->getDataLayout();
 
-    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
 
-    std::string name     = std::string(this->name().text());
-    auto        encoding = llvm::dwarf::DW_ATE_address;
+    std::string const name     = std::string(this->name().text());
+    auto              encoding = llvm::dwarf::DW_ATE_address;
 
     llvm::DIType* di_type = context.di()->createBasicType(name, size_in_bits, encoding);
 
@@ -71,11 +69,21 @@ llvm::DIType* lang::NullPointerType::createDebugType(CompileContext& context)
 lang::ResolvingHandle<lang::Type> lang::NullPointerType::get()
 {
     static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new NullPointerType()));
+        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new NullPointerType())));
     return instance;
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> lang::NullPointerType::getPointeeType() const
+Optional<lang::ResolvingHandle<lang::Type>> lang::NullPointerType::getPointeeType()
 {
     return std::nullopt;
+}
+
+lang::Type const* lang::NullPointerType::getPointeeType() const
+{
+    return nullptr;
+}
+
+lang::ResolvingHandle<lang::Type> lang::NullPointerType::clone() const
+{
+    return get();
 }

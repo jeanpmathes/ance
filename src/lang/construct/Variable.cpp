@@ -14,53 +14,53 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::Variable::Variable(lang::Identifier name) : name_(std::move(name)) {}
+lang::Variable::Variable(lang::Identifier name) : name_(name) {}
 
 bool lang::Variable::isDefined() const
 {
-    return (definition_ != nullptr);
+    return definition_.hasValue();
 }
 
-void lang::Variable::defineAsGlobal(std::optional<lang::ResolvingHandle<lang::Type>> type,
-                                    lang::Location                                   type_location,
-                                    GlobalScope&                                     containing_scope,
-                                    lang::AccessModifier                             access,
-                                    std::unique_ptr<Expression>                      init,
-                                    bool                                             is_final,
-                                    bool                                             is_constant,
-                                    lang::Location                                   location)
+void lang::Variable::defineAsGlobal(Optional<lang::ResolvingHandle<lang::Type>> type,
+                                    lang::Location                              type_location,
+                                    GlobalScope&                                containing_scope,
+                                    lang::AccessModifier                        access,
+                                    Optional<Owned<Expression>>                 init,
+                                    bool                                        is_final,
+                                    bool                                        is_constant,
+                                    lang::Location                              location)
 {
-    definition_ = std::make_unique<lang::GlobalVariable>(self(),
-                                                         type,
-                                                         type_location,
-                                                         containing_scope,
-                                                         access,
-                                                         std::move(init),
-                                                         is_final,
-                                                         is_constant,
-                                                         location);
+    definition_ = makeOwned<lang::GlobalVariable>(self(),
+                                                  type,
+                                                  type_location,
+                                                  containing_scope,
+                                                  access,
+                                                  std::move(init),
+                                                  is_final,
+                                                  is_constant,
+                                                  location);
 
-    addChild(*definition_);
+    addChild(**definition_);
 }
 
-void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
-                                   lang::Location                      type_location,
-                                   Scope&                              containing_scope,
-                                   bool                                is_final,
-                                   std::shared_ptr<lang::Value> const& value,
-                                   unsigned int                        parameter_no,
-                                   lang::Location                      location)
+void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type> type,
+                                   lang::Location                    type_location,
+                                   Scope&                            containing_scope,
+                                   bool                              is_final,
+                                   Optional<Shared<lang::Value>>     value,
+                                   unsigned int                      parameter_no,
+                                   lang::Location                    location)
 {
-    definition_ = std::make_unique<lang::LocalVariable>(self(),
-                                                        type,
-                                                        type_location,
-                                                        containing_scope,
-                                                        is_final,
-                                                        value,
-                                                        parameter_no,
-                                                        location);
+    definition_ = makeOwned<lang::LocalVariable>(self(),
+                                                 type,
+                                                 type_location,
+                                                 containing_scope,
+                                                 is_final,
+                                                 value,
+                                                 parameter_no,
+                                                 location);
 
-    addChild(*definition_);
+    addChild(**definition_);
 }
 
 lang::Identifier const& lang::Variable::name() const
@@ -70,51 +70,57 @@ lang::Identifier const& lang::Variable::name() const
 
 lang::Scope* lang::Variable::scope() const
 {
-    assert(definition_);
-    return definition_->scope();
+    assert(definition_.hasValue());
+    return definition_.value()->scope();
 }
 
-lang::ResolvingHandle<lang::Type> lang::Variable::type() const
+lang::ResolvingHandle<lang::Type> lang::Variable::type()
 {
-    assert(definition_);
-    return definition_->type();
+    assert(definition_.hasValue());
+    return definition_.value()->type();
+}
+
+lang::Type const& lang::Variable::type() const
+{
+    assert(definition_.hasValue());
+    return definition_.value()->type();
 }
 
 bool lang::Variable::isFinal() const
 {
-    assert(definition_);
-    return definition_->isFinal();
+    assert(definition_.hasValue());
+    return definition_.value()->isFinal();
 }
 
 void lang::Variable::validate(ValidationLogger& validation_logger) const
 {
-    definition_->validate(validation_logger);
+    definition_.value()->validate(validation_logger);
 }
 
 void lang::Variable::buildDeclaration(CompileContext& context)
 {
-    definition_->buildDeclaration(context);
+    definition_.value()->buildDeclaration(context);
 }
 
 void lang::Variable::buildDefinition(CompileContext& context)
 {
-    definition_->buildDefinition(context);
+    definition_.value()->buildDefinition(context);
 }
 
 void lang::Variable::buildFinalization(CompileContext& context)
 {
-    definition_->buildFinalization(context);
+    definition_.value()->buildFinalization(context);
 }
 
 bool lang::Variable::validateGetValue(ValidationLogger& validation_logger, lang::Location location) const
 {
-    return not lang::validation::isNameUndefined(self(), location, validation_logger) && type()->isDefined();
+    return not lang::validation::isNameUndefined(self(), location, validation_logger) && type().isDefined();
 }
 
-bool lang::Variable::validateSetValue(std::shared_ptr<lang::Value> const& value,
-                                      ValidationLogger&                   validation_logger,
-                                      lang::Location                      assignable_location,
-                                      lang::Location                      assigned_location) const
+bool lang::Variable::validateSetValue(lang::Value const& value,
+                                      ValidationLogger&  validation_logger,
+                                      lang::Location     assignable_location,
+                                      lang::Location     assigned_location) const
 {
     if (lang::validation::isNameUndefined(self(), assignable_location, validation_logger)) return false;
     // The following variable methods require that the variable is defined.
@@ -125,21 +131,21 @@ bool lang::Variable::validateSetValue(std::shared_ptr<lang::Value> const& value,
         return false;// Type mismatch is not relevant if assignment is not allowed no matter what.
     }
 
-    lang::ResolvingHandle<lang::Type> target_type = type();
+    std::reference_wrapper<lang::Type const> target_type = type();
 
-    if (type()->isReferenceType()) { target_type = type()->getElementType(); }
+    if (type().isReferenceType()) { target_type = type().getElementType(); }
 
-    return lang::Type::checkMismatch(target_type, value->type(), assigned_location, validation_logger);
+    return lang::Type::checkMismatch(target_type, value.type(), assigned_location, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::Variable::getValue(CompileContext& context)
+Shared<lang::Value> lang::Variable::getValue(CompileContext& context)
 {
-    return definition_->getValue(context);
+    return definition_.value()->getValue(context);
 }
 
-void lang::Variable::setValue(std::shared_ptr<Value> value, CompileContext& context)
+void lang::Variable::setValue(Shared<Value> value, CompileContext& context)
 {
-    definition_->setValue(value, context);
+    definition_.value()->setValue(value, context);
 }
 
 lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const
@@ -149,45 +155,45 @@ lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const
 
 void lang::Variable::expand()
 {
-    definition_->expand();
+    definition_.value()->expand();
 }
 
 void lang::Variable::determineFlow()
 {
-    definition_->determineFlow();
+    definition_.value()->determineFlow();
 }
 
 void lang::Variable::validateFlow(ValidationLogger& validation_logger) const
 {
-    definition_->validateFlow(validation_logger);
+    definition_.value()->validateFlow(validation_logger);
 }
 
 void lang::Variable::resolve()
 {
-    definition_->resolve();
+    definition_.value()->resolve();
 }
 
 void lang::Variable::postResolve()
 {
-    definition_->postResolve();
+    definition_.value()->postResolve();
 }
 
 void lang::Variable::createNativeBacking(CompileContext& context)
 {
-    definition_->createNativeBacking(context);
+    definition_.value()->createNativeBacking(context);
 }
 
 void lang::Variable::build(CompileContext& context)
 {
-    definition_->build(context);
+    definition_.value()->build(context);
 }
 
-std::set<lang::ResolvingHandle<lang::Variable>> lang::Variable::getVariableDependencies() const
+std::vector<lang::ResolvingHandle<lang::Variable>> lang::Variable::getVariableDependencies()
 {
-    return definition_->getVariableDependencies();
+    return definition_.value()->getVariableDependencies();
 }
 
-std::set<lang::ResolvingHandle<lang::Function>> lang::Variable::getFunctionDependencies() const
+std::vector<lang::ResolvingHandle<lang::Function>> lang::Variable::getFunctionDependencies()
 {
-    return definition_->getFunctionDependencies();
+    return definition_.value()->getFunctionDependencies();
 }

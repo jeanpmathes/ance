@@ -4,7 +4,7 @@
 
 data::StringElement::StringElement(std::string string) : string_(std::move(string)) {}
 
-std::optional<std::reference_wrapper<const std::string>> data::StringElement::asString() const
+Optional<std::reference_wrapper<const std::string>> data::StringElement::asString() const
 {
-    return string_;
+    return std::cref(string_);
 }

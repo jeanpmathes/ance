@@ -16,7 +16,7 @@ namespace lang
       public:
         [[nodiscard]] StateCount getStateCount() const override;
 
-        llvm::Constant* getDefaultContent(llvm::Module& m) override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) const override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         [[nodiscard]] bool isVoidType() const override;
@@ -31,7 +31,7 @@ namespace lang
 
       protected:
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) override;
+        llvm::DIType* createDebugType(CompileContext& context) const override;
 
       public:
         /**
@@ -39,6 +39,8 @@ namespace lang
          * @return The instance.
          */
         static lang::ResolvingHandle<lang::Type> get();
+
+        ResolvingHandle<lang::Type> clone() const override;
     };
 }
 #endif

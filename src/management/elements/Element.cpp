@@ -1,6 +1,6 @@
 #include "Element.h"
 
-std::optional<std::reference_wrapper<const data::Element>> data::Element::operator[](std::string const&) const
+Optional<std::reference_wrapper<const data::Element>> data::Element::operator[](std::string const&) const
 {
     return {};
 }
@@ -15,12 +15,12 @@ std::vector<std::reference_wrapper<const data::Element>>::const_iterator data::E
     return empty_vector_.cend();
 }
 
-std::optional<std::reference_wrapper<const std::string>> data::Element::asString() const
+Optional<std::reference_wrapper<const std::string>> data::Element::asString() const
 {
     return {};
 }
 
-std::optional<bool> data::Element::asBool() const
+Optional<bool> data::Element::asBool() const
 {
     return {};
 }

@@ -83,7 +83,12 @@ bool lang::TypeAlias::isReferenceType() const
     return actual_->isReferenceType();
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeAlias::getElementType() const
+lang::ResolvingHandle<lang::Type> lang::TypeAlias::getElementType()
+{
+    return actual_->getElementType();
+}
+
+lang::Type const& lang::TypeAlias::getElementType() const
 {
     return actual_->getElementType();
 }
@@ -148,17 +153,23 @@ lang::ArrayType* lang::TypeAlias::isArrayType()
     return actual_->isArrayType();
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeAlias::getActualType() const
+lang::ResolvingHandle<lang::Type> lang::TypeAlias::getActualType()
 {
-    if (!actually_actual_.has_value())
+    if (!actually_actual_.hasValue())
     {
         lang::ResolvingHandle<lang::Type> current = actual_;
 
         while (current != current->getActualType()) { current = current->getActualType(); }
 
-        actually_actual_.emplace(current);
+        actually_actual_ = current;
     }
 
+    return actually_actual_.value();
+}
+
+lang::Type const& lang::TypeAlias::getActualType() const
+{
+    const_cast<TypeAlias*>(this)->getActualType();
     return actually_actual_.value();
 }
 
@@ -167,7 +178,7 @@ void lang::TypeAlias::onScope()
     scope()->addType(actual_);
 }
 
-llvm::Constant* lang::TypeAlias::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::TypeAlias::getDefaultContent(llvm::Module& m) const
 {
     return actual_->getDefaultContent(m);
 }
@@ -179,7 +190,7 @@ llvm::Type* lang::TypeAlias::getContentType(llvm::LLVMContext& c) const
 
 bool lang::TypeAlias::validateDefinition(ValidationLogger& validation_logger) const
 {
-    if (is_valid_) return is_valid_.value();
+    if (is_valid_.hasValue()) return is_valid_.value();
 
     bool valid = true;
 
@@ -208,7 +219,7 @@ bool lang::TypeAlias::validate(ValidationLogger& validation_logger, lang::Locati
     return validateDefinition(validation_logger);
 }
 
-bool lang::TypeAlias::isSubscriptDefined()
+bool lang::TypeAlias::isSubscriptDefined() const
 {
     return actual_->isSubscriptDefined();
 }
@@ -218,41 +229,39 @@ lang::ResolvingHandle<lang::Type> lang::TypeAlias::getSubscriptReturnType()
     return actual_->getSubscriptReturnType();
 }
 
-bool lang::TypeAlias::validateSubscript(lang::Location                    indexed_location,
-                                        lang::ResolvingHandle<lang::Type> index_type,
-                                        lang::Location                    index_location,
-                                        ValidationLogger&                 validation_logger) const
+bool lang::TypeAlias::validateSubscript(lang::Location    indexed_location,
+                                        lang::Type const& index_type,
+                                        lang::Location    index_location,
+                                        ValidationLogger& validation_logger) const
 {
     return actual_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::TypeAlias::buildSubscript(std::shared_ptr<Value> indexed,
-                                                             std::shared_ptr<Value> index,
-                                                             CompileContext&        context)
+Shared<lang::Value> lang::TypeAlias::buildSubscript(Shared<Value> indexed, Shared<Value> index, CompileContext& context)
 {
     return actual_->buildSubscript(indexed, index, context);
 }
 
-bool lang::TypeAlias::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
+bool lang::TypeAlias::isImplicitlyConvertibleTo(lang::Type const& other) const
 {
     return actual_->isImplicitlyConvertibleTo(other);
 }
 
-bool lang::TypeAlias::validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                 lang::Location                    location,
-                                                 ValidationLogger&                 validation_logger) const
+bool lang::TypeAlias::validateImplicitConversion(lang::Type const& other,
+                                                 lang::Location    location,
+                                                 ValidationLogger& validation_logger) const
 {
     return actual_->validateImplicitConversion(other, location, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                      std::shared_ptr<Value>            value,
-                                                                      CompileContext&                   context)
+Shared<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                             Shared<Value>                     value,
+                                                             CompileContext&                   context)
 {
     return actual_->buildImplicitConversion(other, value, context);
 }
 
-bool lang::TypeAlias::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
+bool lang::TypeAlias::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
 {
     return actual_->isOperatorDefined(op, other);
 }
@@ -263,24 +272,24 @@ lang::ResolvingHandle<lang::Type> lang::TypeAlias::getOperatorResultType(lang::B
     return actual_->getOperatorResultType(op, other);
 }
 
-bool lang::TypeAlias::validateOperator(lang::BinaryOperator              op,
-                                       lang::ResolvingHandle<lang::Type> other,
-                                       lang::Location                    left_location,
-                                       lang::Location                    right_location,
-                                       ValidationLogger&                 validation_logger) const
+bool lang::TypeAlias::validateOperator(lang::BinaryOperator op,
+                                       lang::Type const&    other,
+                                       lang::Location       left_location,
+                                       lang::Location       right_location,
+                                       ValidationLogger&    validation_logger) const
 {
     return actual_->validateOperator(op, other, left_location, right_location, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::TypeAlias::buildOperator(lang::BinaryOperator   op,
-                                                            std::shared_ptr<Value> left,
-                                                            std::shared_ptr<Value> right,
-                                                            CompileContext&        context)
+Shared<lang::Value> lang::TypeAlias::buildOperator(lang::BinaryOperator op,
+                                                   Shared<Value>        left,
+                                                   Shared<Value>        right,
+                                                   CompileContext&      context)
 {
     return actual_->buildOperator(op, left, right, context);
 }
 
-bool lang::TypeAlias::hasMember(lang::Identifier const& name)
+bool lang::TypeAlias::hasMember(lang::Identifier const& name) const
 {
     return actual_->hasMember(name);
 }
@@ -295,14 +304,14 @@ bool lang::TypeAlias::validateMemberAccess(lang::Identifier const& name, Validat
     return actual_->validateMemberAccess(name, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::TypeAlias::buildMemberAccess(std::shared_ptr<Value>  value,
-                                                                lang::Identifier const& name,
-                                                                CompileContext&         context)
+Shared<lang::Value> lang::TypeAlias::buildMemberAccess(Shared<Value>           value,
+                                                       lang::Identifier const& name,
+                                                       CompileContext&         context)
 {
     return actual_->buildMemberAccess(value, name, context);
 }
 
-bool lang::TypeAlias::definesIndirection()
+bool lang::TypeAlias::definesIndirection() const
 {
     return actual_->definesIndirection();
 }
@@ -317,7 +326,7 @@ bool lang::TypeAlias::validateIndirection(lang::Location location, ValidationLog
     return actual_->validateIndirection(location, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::TypeAlias::buildIndirection(std::shared_ptr<Value> value, CompileContext& context)
+Shared<lang::Value> lang::TypeAlias::buildIndirection(Shared<Value> value, CompileContext& context)
 {
     return actual_->buildIndirection(value, context);
 }
@@ -357,10 +366,10 @@ void lang::TypeAlias::buildNativeDefinition(CompileContext& context)
 
 std::string lang::TypeAlias::createMangledName() const
 {
-    return getActualType()->getMangledName();
+    return getActualType().getMangledName();
 }
 
-llvm::DIType* lang::TypeAlias::createDebugType(CompileContext& context)
+llvm::DIType* lang::TypeAlias::createDebugType(CompileContext& context) const
 {
     return context.di()->createTypedef(actual_->getDebugType(context),
                                        name().text(),
@@ -368,11 +377,22 @@ llvm::DIType* lang::TypeAlias::createDebugType(CompileContext& context)
                                        static_cast<unsigned>(getDefinitionLocation().line()),
                                        scope()->getDebugScope(context));
 }
-
-std::vector<lang::TypeDefinition*> lang::TypeAlias::getDependencies() const
+std::vector<lang::TypeDefinition const*> lang::TypeAlias::getDependencies() const
 {
-    std::vector<lang::TypeDefinition*> dependencies;
+    std::vector<lang::TypeDefinition const*> dependencies;
     if (actual_->isDefined()) dependencies.push_back(actual_->getDefinition());
 
     return dependencies;
+}
+
+std::vector<std::reference_wrapper<const lang::Type>> lang::TypeAlias::getContained() const
+{
+    std::vector<std::reference_wrapper<const lang::Type>> contained;
+    contained.emplace_back(actual_);
+    return contained;
+}
+
+void lang::TypeAlias::expand()
+{
+    actual_ = actual_->createUndefinedClone();
 }

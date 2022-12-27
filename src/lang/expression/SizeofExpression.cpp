@@ -8,21 +8,21 @@
 #include "lang/type/Type.h"
 #include "lang/utility/Values.h"
 
-SizeofExpression::SizeofExpression(std::unique_ptr<Expression> expression, lang::Location location)
+SizeofExpression::SizeofExpression(Owned<Expression> expression, lang::Location location)
     : Expression(location)
     , expression_(std::move(expression))
 {
     addSubexpression(*expression_);
 }
 
-Expression& SizeofExpression::expression() const
+Expression const& SizeofExpression::expression() const
 {
     return *expression_;
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> SizeofExpression::tryGetType() const
+void SizeofExpression::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    return lang::SizeType::getSize();
+    type.reroute(lang::SizeType::getSize());
 }
 
 bool SizeofExpression::validate(ValidationLogger& validation_logger) const
@@ -32,7 +32,7 @@ bool SizeofExpression::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion SizeofExpression::expandWith(Expressions subexpressions) const
 {
-    return {Statements(), std::make_unique<SizeofExpression>(std::move(subexpressions[0]), location()), Statements()};
+    return {Statements(), makeOwned<SizeofExpression>(std::move(subexpressions[0]), location()), Statements()};
 }
 
 void SizeofExpression::doBuild(CompileContext& context)
@@ -41,6 +41,6 @@ void SizeofExpression::doBuild(CompileContext& context)
         lang::SizeType::buildContentValue(expression_->type()->getContentSize(context.module()), context);
     llvm::Value* native_value = lang::values::contentToNative(type(), content_value, context);
 
-    std::shared_ptr<lang::WrappedNativeValue> value = std::make_shared<lang::WrappedNativeValue>(type(), native_value);
+    Shared<lang::WrappedNativeValue> value = makeShared<lang::WrappedNativeValue>(type(), native_value);
     setValue(value);
 }

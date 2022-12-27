@@ -6,12 +6,17 @@
 #include "lang/type/Type.h"
 
 lang::RoughlyCastedValue::RoughlyCastedValue(lang::ResolvingHandle<lang::Type> target_type,
-                                             std::shared_ptr<lang::Value>      original)
-    : target_type_(target_type)
+                                             Shared<lang::Value>               original)
+    : target_type_(std::move(target_type))
     , original_(std::move(original))
 {}
 
-lang::ResolvingHandle<lang::Type> lang::RoughlyCastedValue::type() const
+lang::ResolvingHandle<lang::Type> lang::RoughlyCastedValue::type()
+{
+    return target_type_;
+}
+
+lang::Type const& lang::RoughlyCastedValue::type() const
 {
     return target_type_;
 }
@@ -25,7 +30,7 @@ void lang::RoughlyCastedValue::buildNativeValue(CompileContext& context)
     original_->buildNativeValue(context);
 }
 
-llvm::Value* lang::RoughlyCastedValue::getNativeValue()
+llvm::Value* lang::RoughlyCastedValue::getNativeValue() const
 {
     return original_->getNativeValue();
 }

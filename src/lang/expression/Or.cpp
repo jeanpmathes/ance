@@ -11,7 +11,7 @@
 #include "lang/statement/If.h"
 #include "lang/statement/LocalVariableDefinition.h"
 
-Or::Or(bool negate, std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, lang::Location location)
+Or::Or(bool negate, Owned<Expression> left, Owned<Expression> right, lang::Location location)
     : UnexpandedExpression(location)
     , negate_(negate)
     , left_(std::move(left))
@@ -26,19 +26,19 @@ bool Or::negate() const
     return negate_;
 }
 
-Expression& Or::left() const
+Expression const& Or::left() const
 {
     return *left_;
 }
 
-Expression& Or::right() const
+Expression const& Or::right() const
 {
     return *right_;
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> Or::tryGetType() const
+void Or::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    return lang::BooleanType::get();
+    type.reroute(lang::BooleanType::get());
 }
 
 bool Or::validate(ValidationLogger& validation_logger) const
@@ -55,38 +55,38 @@ bool Or::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion Or::expandWith(Expressions subexpressions) const
 {
-    auto temp_name          = lang::Identifier::from(scope()->getTemporaryName(), location());
+    auto temp_name          = lang::Identifier::like(scope()->getTemporaryName(), location());
     auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
     auto lhs                = std::move(subexpressions[0]);
     auto rhs                = std::move(subexpressions[1]);
 
     Statements before;
 
-    before.push_back(std::make_unique<LocalVariableDefinition>(temp_name,
-                                                               lang::BooleanType::get(),
-                                                               location(),
-                                                               lang::Assigner::COPY_ASSIGNMENT,
-                                                               std::move(lhs),
-                                                               location()));
+    before.emplace_back(makeOwned<LocalVariableDefinition>(temp_name,
+                                                           lang::BooleanType::get(),
+                                                           location(),
+                                                           lang::Assigner::COPY_ASSIGNMENT,
+                                                           std::move(lhs),
+                                                           location()));
 
-    before.push_back(std::make_unique<If>(
-        std::make_unique<UnaryOperation>(lang::UnaryOperator::NOT,
-                                         std::make_unique<VariableAccess>(make_temp_variable(), location()),
-                                         location()),
-        std::make_unique<Assignment>(std::make_unique<VariableAccess>(make_temp_variable(), location()),
-                                     lang::Assigner::COPY_ASSIGNMENT,
-                                     std::move(rhs),
-                                     location()),
-        nullptr,
-        location()));
+    before.emplace_back(
+        makeOwned<If>(makeOwned<UnaryOperation>(lang::UnaryOperator::NOT,
+                                                makeOwned<VariableAccess>(make_temp_variable(), location()),
+                                                location()),
+                      makeOwned<Assignment>(makeOwned<VariableAccess>(make_temp_variable(), location()),
+                                            lang::Assigner::COPY_ASSIGNMENT,
+                                            std::move(rhs),
+                                            location()),
+                      std::nullopt,
+                      location()));
 
-    std::unique_ptr<Expression> result = std::make_unique<VariableAccess>(make_temp_variable(), location());
+    Owned<Expression> result = makeOwned<VariableAccess>(make_temp_variable(), location());
 
-    if (negate_) { result = std::make_unique<UnaryOperation>(lang::UnaryOperator::NOT, std::move(result), location()); }
+    if (negate_) { result = makeOwned<UnaryOperation>(lang::UnaryOperator::NOT, std::move(result), location()); }
 
     Statements after;
 
-    after.push_back(std::make_unique<Drop>(make_temp_variable(), location()));
+    after.push_back(makeOwned<Drop>(make_temp_variable(), location()));
 
     return {std::move(before), std::move(result), std::move(after)};
 }

@@ -14,15 +14,15 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::CustomFunction::CustomFunction(Function&                                     function,
-                                     lang::AccessModifier                          access,
-                                     lang::ResolvingHandle<lang::Type>             return_type,
-                                     lang::Location                                return_type_location,
-                                     std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                                     std::unique_ptr<Statement>                    code,
-                                     Scope&                                        containing_scope,
-                                     lang::Location                                declaration_location,
-                                     lang::Location                                definition_location)
+lang::CustomFunction::CustomFunction(Function&                            function,
+                                     lang::AccessModifier                 access,
+                                     lang::ResolvingHandle<lang::Type>    return_type,
+                                     lang::Location                       return_type_location,
+                                     std::vector<Shared<lang::Parameter>> parameters,
+                                     Owned<Statement>                     code,
+                                     Scope&                               containing_scope,
+                                     lang::Location                       declaration_location,
+                                     lang::Location                       definition_location)
     : lang::StatementFunction(function,
                               access,
                               return_type,
@@ -43,11 +43,11 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger) const
 {
     if (lang::validation::isTypeUndefined(returnType(), returnTypeLocation(), validation_logger)) return;
 
-    returnType()->validate(validation_logger, returnTypeLocation());
+    returnType().validate(validation_logger, returnTypeLocation());
 
     for (auto const [parameter, argument] : llvm::zip(parameters(), arguments()))
     {
-        if (!argument)
+        if (not argument.hasValue())
         {
             validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
                                        parameter->name().location());
@@ -55,7 +55,7 @@ void lang::CustomFunction::validate(ValidationLogger& validation_logger) const
 
         if (lang::validation::isTypeUndefined(parameter->type(), parameter->typeLocation(), validation_logger)) return;
 
-        parameter->type()->validate(validation_logger, parameter->typeLocation());
+        parameter->type().validate(validation_logger, parameter->typeLocation());
 
         if (parameter->type() == lang::VoidType::get())
         {
@@ -76,28 +76,32 @@ bool lang::CustomFunction::validateFlow(ValidationLogger& validation_logger) con
 
 void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger) const
 {
-    std::list<lang::BasicBlock*> final_blocks = getInitialBlock().getLeaves();
+    std::list<lang::BasicBlock const*> const final_blocks = getInitialBlock().getLeaves();
 
-    std::optional<lang::Location> missing_return_location;
+    Optional<lang::Location> missing_return_location;
 
     for (auto* block : final_blocks)
     {
-        std::optional<std::pair<std::shared_ptr<lang::Value>, lang::Location>> return_value = block->getReturnValue();
+        Optional<std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>> return_value =
+            block->getReturnValue();
 
-        if (return_value)
+        if (return_value.hasValue())
         {
             auto& [value, location] = *return_value;
 
-            if (value)
+            if (value.hasValue())
             {
-                if (returnType()->isVoidType())
+                if (returnType().isVoidType())
                 {
                     validation_logger.logError("Cannot return value in void function '" + name() + "'",
                                                this->location());
                 }
-                else { lang::Type::checkMismatch(returnType(), value->type(), location, validation_logger); }
+                else
+                {
+                    lang::Type::checkMismatch(returnType(), value.value().get().type(), location, validation_logger);
+                }
             }
-            else if (!returnType()->isVoidType())
+            else if (!returnType().isVoidType())
             {
                 validation_logger.logError("Missing return value in function '" + name() + "'", location);
             }
@@ -108,7 +112,7 @@ void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger) c
         }
         else
         {
-            if (!returnType()->isVoidType())
+            if (!returnType().isVoidType())
             {
                 lang::Location end = block->getEndLocation();
                 if (end.isGlobal()) end = this->location();
@@ -117,7 +121,7 @@ void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger) c
         }
     }
 
-    if (missing_return_location)
+    if (missing_return_location.hasValue())
     {
         validation_logger.logError("Not all code paths of '" + name() + "' return a value", *missing_return_location);
     }
@@ -125,9 +129,9 @@ void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger) c
 
 void lang::CustomFunction::validateUnreachable(ValidationLogger& validation_logger) const
 {
-    std::optional<lang::Location> unreachable_code_location = findUnreachableCode();
+    Optional<lang::Location> unreachable_code_location = findUnreachableCode();
 
-    if (unreachable_code_location)
+    if (unreachable_code_location.hasValue())
     {
         validation_logger.logWarning("Unreachable code in function '" + name() + "'", *unreachable_code_location);
     }
@@ -144,8 +148,8 @@ void lang::CustomFunction::createNativeBacking(CompileContext& context)
 
     for (auto const pair : llvm::zip(parameters(), native_function->args()))
     {
-        auto const& [parameter, argument] = pair;
-        di_types.push_back(parameter->type()->getDebugType(context));
+        auto& [parameter, argument] = pair;
+        di_types.push_back(parameter->type().getDebugType(context));
     }
 
     llvm::DISubroutineType* debug_type =
@@ -164,13 +168,13 @@ void lang::CustomFunction::createNativeBacking(CompileContext& context)
     native_function->setSubprogram(subprogram);
 }
 
-llvm::DISubprogram* lang::CustomFunction::debugSubprogram()
+llvm::DISubprogram* lang::CustomFunction::debugSubprogram() const
 {
     auto [native_type, native_function] = getNativeRepresentation();
     return native_function->getSubprogram();
 }
 
-llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext&)
+llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext&) const
 {
     return debugSubprogram();
 }

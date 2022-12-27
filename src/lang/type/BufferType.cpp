@@ -12,7 +12,7 @@
 #include "validation/ValidationLogger.h"
 
 lang::BufferType::BufferType(lang::ResolvingHandle<lang::Type> element_type)
-    : TypeDefinition(lang::Identifier::from("[]" + element_type->name()))
+    : TypeDefinition(lang::Identifier::like("[]" + element_type->name()))
     , SequenceType(element_type, std::nullopt)
     , IndirectType(element_type)
 {}
@@ -27,11 +27,22 @@ bool lang::BufferType::isBufferType() const
     return true;
 }
 
-lang::ResolvingHandle<lang::Type> lang::BufferType::getActualType() const
+lang::ResolvingHandle<lang::Type> lang::BufferType::getActualType()
 {
-    lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
-    if (actual_element_type == element_type_) { return self(); }
-    else { return lang::BufferType::get(actual_element_type); }
+    if (!actual_type_.hasValue())
+    {
+        lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
+        if (actual_element_type == element_type_) { actual_type_ = self(); }
+        else { actual_type_ = lang::BufferType::get(actual_element_type); }
+    }
+
+    return actual_type_.value();
+}
+
+lang::Type const& lang::BufferType::getActualType() const
+{
+    const_cast<BufferType*>(this)->getActualType();
+    return actual_type_.value();
 }
 
 bool lang::BufferType::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -53,7 +64,7 @@ llvm::Type* lang::BufferType::getIndexedType(CompileContext& context) const
     return element_type_->getContentType(*context.llvmContext());
 }
 
-llvm::Value* lang::BufferType::getIndexingPointer(std::shared_ptr<Value> indexed, CompileContext& context)
+llvm::Value* lang::BufferType::getIndexingPointer(Shared<Value> indexed, CompileContext& context)
 {
     indexed->buildContentValue(context);
     return indexed->getContentValue();
@@ -84,18 +95,18 @@ std::string lang::BufferType::createMangledName() const
     return std::string("ptr_b") + "(" + element_type_->getMangledName() + ")";
 }
 
-llvm::DIType* lang::BufferType::createDebugType(CompileContext& context)
+llvm::DIType* lang::BufferType::createDebugType(CompileContext& context) const
 {
     llvm::DataLayout const& dl = context.module()->getDataLayout();
 
-    uint64_t size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
 
     llvm::DIType* di_type;
 
     if (element_type_->isVoidType())
     {
-        std::string name     = std::string(this->name().text());
-        auto        encoding = llvm::dwarf::DW_ATE_address;
+        std::string const name     = std::string(this->name().text());
+        auto              encoding = llvm::dwarf::DW_ATE_address;
 
         di_type = context.di()->createBasicType(name, size_in_bits, encoding);
     }
@@ -109,9 +120,14 @@ llvm::DIType* lang::BufferType::createDebugType(CompileContext& context)
     return di_type;
 }
 
-std::vector<lang::TypeDefinition*> lang::BufferType::getDependencies() const
+std::vector<lang::TypeDefinition const*> lang::BufferType::getDependencies() const
 {
     return {};// A pointer does not depend on the pointee type.
+}
+
+std::vector<std::reference_wrapper<const lang::Type>> lang::BufferType::getContained() const
+{
+    return {element_type_};
 }
 
 lang::TypeRegistry<>& lang::BufferType::getBufferTypes()
@@ -127,26 +143,35 @@ lang::TypeDefinitionRegistry* lang::BufferType::getRegistry()
 
 lang::ResolvingHandle<lang::Type> lang::BufferType::get(lang::ResolvingHandle<lang::Type> element_type)
 {
-    element_type = element_type->toSeparateUndefined();
+    element_type = element_type->getDetachedIfUndefined();
 
     std::vector<lang::ResolvingHandle<lang::Type>> used_types;
-    used_types.push_back(element_type);
+    used_types.emplace_back(element_type);
 
-    std::optional<lang::ResolvingHandle<lang::Type>> defined_type = getBufferTypes().get(used_types, lang::Empty());
+    Optional<lang::ResolvingHandle<lang::Type>> defined_type = getBufferTypes().get(used_types, lang::Empty());
 
-    if (defined_type.has_value()) { return defined_type.value(); }
+    if (defined_type.hasValue()) { return defined_type.value(); }
     else
     {
-        auto*                             buffer_type = new lang::BufferType(element_type);
-        lang::ResolvingHandle<lang::Type> type =
-            lang::makeHandled<lang::Type>(std::unique_ptr<lang::BufferType>(buffer_type));
+        auto&                             buffer_type = *(new lang::BufferType(element_type));
+        lang::ResolvingHandle<lang::Type> type = lang::makeHandled<lang::Type>(Owned<lang::BufferType>(buffer_type));
         getBufferTypes().add(std::move(used_types), lang::Empty(), type);
 
         return type;
     }
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> lang::BufferType::getPointeeType() const
+Optional<lang::ResolvingHandle<lang::Type>> lang::BufferType::getPointeeType()
 {
     return element_type_;
+}
+
+lang::Type const* lang::BufferType::getPointeeType() const
+{
+    return &*element_type_;
+}
+
+lang::ResolvingHandle<lang::Type> lang::BufferType::clone() const
+{
+    return lang::BufferType::get(const_cast<lang::BufferType*>(this)->element_type_->createUndefinedClone());
 }

@@ -61,9 +61,9 @@ void lang::BasicBlock::Definition::Simple::transferStatements(std::list<Statemen
     statements_.splice(statements_.begin(), statements);
 }
 
-std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Simple::getLeaves()
+std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Simple::getLeaves() const
 {
-    std::list<lang::BasicBlock*> leaves;
+    std::list<lang::BasicBlock const*> leaves;
 
     if (next_) { leaves.splice(leaves.end(), next_->getLeaves()); }
     else { leaves.push_back(self()); }
@@ -80,21 +80,21 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Simple::getSuccesso
     return successors;
 }
 
-lang::Location lang::BasicBlock::Definition::Simple::getStartLocation()
+lang::Location lang::BasicBlock::Definition::Simple::getStartLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.front()->location();
 }
 
-lang::Location lang::BasicBlock::Definition::Simple::getEndLocation()
+lang::Location lang::BasicBlock::Definition::Simple::getEndLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
-void lang::BasicBlock::Definition::Simple::reach()
+void lang::BasicBlock::Definition::Simple::reach() const
 {
     if (next_) { next_->reach(); }
 }

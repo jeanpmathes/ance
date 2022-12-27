@@ -15,7 +15,7 @@ class AnceLinker
      * Create a new linker.
      * @param link_config The linker configuration from the project file.
      */
-    explicit AnceLinker(std::optional<std::reference_wrapper<const data::Element>> link_config);
+    explicit AnceLinker(Optional<std::reference_wrapper<const data::Element>> link_config);
 
     /**
      * Link object files.

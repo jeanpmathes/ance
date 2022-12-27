@@ -20,19 +20,19 @@ class Assertion
      * @param condition The condition to assert.
      * @param location The location of the statement.
      */
-    Assertion(std::unique_ptr<Expression> condition, lang::Location location);
+    Assertion(Owned<Expression> condition, lang::Location location);
 
-    [[nodiscard]] Expression& condition() const;
+    [[nodiscard]] Expression const& condition() const;
 
     void validate(ValidationLogger& validation_logger) const override;
 
-    Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+    [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
     void doBuild(CompileContext& context) override;
 
   private:
-    std::unique_ptr<Expression> condition_;
+    Owned<Expression> condition_;
 };
 
 #endif

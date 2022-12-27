@@ -17,22 +17,23 @@ namespace lang
          * Create a new delayed value.
          * @param expression The backing expression.
          */
-        explicit DelayedValue(DelayableExpression& expression);
+        explicit DelayedValue(Passed<DelayableExpression> expression);
 
-        lang::ResolvingHandle<lang::Type> type() const override;
+        lang::ResolvingHandle<lang::Type> type() override;
+        [[nodiscard]] lang::Type const&   type() const override;
 
         /**
          * Set the value to use. This method should be called once or never by the delayable expression.
          * @param value The value.
          */
-        void setValue(std::shared_ptr<lang::Value> const& value);
+        void setValue(Shared<lang::Value> value);
 
-        void         buildNativeValue(CompileContext& context) override;
-        llvm::Value* getNativeValue() override;
+        void                       buildNativeValue(CompileContext& context) override;
+        [[nodiscard]] llvm::Value* getNativeValue() const override;
 
       private:
-        DelayableExpression&         expression_;
-        std::shared_ptr<lang::Value> value_ {};
+        Passed<DelayableExpression>   expression_;
+        Optional<Shared<lang::Value>> value_ {};
     };
 }
 

@@ -21,26 +21,28 @@ class MatchSelect
      * @param cases The cases to select from.
      * @param location The location of the match select.
      */
-    MatchSelect(std::unique_ptr<Expression>        condition,
-                std::vector<std::unique_ptr<Case>> cases,
-                lang::Location                     location);
+    MatchSelect(Owned<Expression> condition, std::vector<Owned<Case>> cases, lang::Location location);
 
-    [[nodiscard]] Expression&                               condition() const;
-    [[nodiscard]] std::vector<std::reference_wrapper<Case>> cases() const;
+    [[nodiscard]] Expression const&                               condition() const;
+    [[nodiscard]] std::vector<std::reference_wrapper<Case const>> cases() const;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
     bool validate(ValidationLogger& validation_logger) const override;
 
+    void walkDefinitions() override;
+    void postResolve() override;
+
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
+
+  protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
 
   public:
     ~MatchSelect() override;
 
   private:
-    std::unique_ptr<Expression>        condition_;
-    std::vector<std::unique_ptr<Case>> cases_;
+    Owned<Expression>        condition_;
+    std::vector<Owned<Case>> cases_;
 };
 
 #endif

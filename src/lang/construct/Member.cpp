@@ -11,7 +11,7 @@ lang::Member::Member(lang::AccessModifier                access,
                      lang::Identifier                    name,
                      lang::ResolvingHandle<lang::Type>   type,
                      lang::Assigner                      assigner,
-                     std::unique_ptr<ConstantExpression> constant_init,
+                     Optional<Owned<ConstantExpression>> constant_init,
                      lang::Location                      location,
                      lang::Location                      type_location)
     : access_(access)
@@ -33,7 +33,12 @@ lang::Identifier const& lang::Member::name() const
     return name_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::Member::type() const
+lang::ResolvingHandle<lang::Type> lang::Member::type()
+{
+    return type_;
+}
+
+lang::Type const& lang::Member::type() const
 {
     return type_;
 }
@@ -62,21 +67,22 @@ bool lang::Member::validate(ValidationLogger& validation_logger) const
 {
     if (!type_->validate(validation_logger, location())) return false;
 
-    if (constant_init_ && assigner_ != lang::Assigner::COPY_ASSIGNMENT)
+    if (constant_init_.hasValue() && assigner_ != lang::Assigner::COPY_ASSIGNMENT)
     {
         validation_logger.logError("Only copy assignment currently supported for member initializers", location());
         return false;
     }
 
-    if (constant_init_)
+    if (constant_init_.hasValue())
     {
-        if (!constant_init_->validate(validation_logger)) return false;
+        if (!constant_init_.value()->validate(validation_logger)) return false;
 
-        if (!lang::Type::areSame(type(), constant_init_->type()))
+        if (!lang::Type::areSame(type(), constant_init_.value()->type()))
         {
-            validation_logger.logError("Member initializer with type " + constant_init_->type()->getAnnotatedName()
-                                           + " must be of member type " + type()->getAnnotatedName(),
-                                       constant_init_->location());
+            validation_logger.logError("Member initializer with type "
+                                           + constant_init_.value()->type().getAnnotatedName()
+                                           + " must be of member type " + type().getAnnotatedName(),
+                                       constant_init_.value()->location());
             return false;
         }
     }
@@ -86,13 +92,13 @@ bool lang::Member::validate(ValidationLogger& validation_logger) const
 
 llvm::Constant* lang::Member::getConstantInitializer(llvm::Module& m) const
 {
-    if (constant_init_) { return getInitialValue(m); }
-    else { return type()->getDefaultContent(m); }
+    if (constant_init_.hasValue()) { return getInitialValue(m); }
+    else { return type().getDefaultContent(m); }
 }
 
 void lang::Member::buildInitialization(llvm::Value* ptr, CompileContext& context)
 {
-    if (constant_init_)
+    if (constant_init_.hasValue())
     {
         llvm::Value* content   = getInitialValue(*context.module());
         llvm::Value* value_ptr = lang::values::contentToNative(type(), content, context);
@@ -106,10 +112,16 @@ llvm::Constant* lang::Member::getInitialValue(llvm::Module& m) const
 {
     if (!initial_value_)
     {
-        std::shared_ptr<lang::Constant> constant = constant_init_->getConstantValue();
+        // The llvm constant does not allow to change the ance constant.
+        Shared<lang::Constant> constant = const_cast<Member*>(this)->constant_init_.value()->getConstantValue();
         constant->buildContentConstant(&m);
         initial_value_ = constant->getContentConstant();
     }
 
     return initial_value_;
+}
+
+void lang::Member::expand()
+{
+    type_ = type_->createUndefinedClone();
 }

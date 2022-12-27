@@ -24,7 +24,8 @@ class Drop
      */
     Drop(lang::ResolvingHandle<lang::Variable> variable, lang::Location location);
 
-    [[nodiscard]] lang::ResolvingHandle<lang::Variable> variable() const;
+    [[nodiscard]] lang::ResolvingHandle<lang::Variable> variable();
+    [[nodiscard]] lang::Variable const&                 variable() const;
 
     void walkDefinitions() override;
 

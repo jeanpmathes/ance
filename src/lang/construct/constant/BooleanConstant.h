@@ -21,22 +21,25 @@ namespace lang
       public:
         [[nodiscard]] std::string toString() const override;
 
-        lang::ResolvingHandle<lang::Type> type() const override;
+        lang::ResolvingHandle<lang::Type> type() override;
+        [[nodiscard]] lang::Type const&   type() const override;
 
-        llvm::Constant* buildContent(llvm::Module* m) override;
+        llvm::Constant* createContent(llvm::Module* m) override;
 
         bool equals(lang::Constant const* other) const override;
+
+        [[nodiscard]] Shared<Constant> clone() const override;
 
         /**
          * Create a boolean constant with the false value.
          * @return The new boolean constant.
          */
-        static std::shared_ptr<lang::BooleanConstant> createFalse();
+        static Shared<lang::BooleanConstant> createFalse();
         /**
          * Create a boolean constant with the true value.
          * @return The new boolean constant.
          */
-        static std::shared_ptr<lang::BooleanConstant> createTrue();
+        static Shared<lang::BooleanConstant> createTrue();
 
       private:
         lang::ResolvingHandle<lang::Type> type_;

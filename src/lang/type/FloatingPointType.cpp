@@ -17,13 +17,13 @@ std::string lang::FloatingPointType::createMangledName() const
     return std::string(name().text());
 }
 
-llvm::DIType* lang::FloatingPointType::createDebugType(CompileContext& context)
+llvm::DIType* lang::FloatingPointType::createDebugType(CompileContext& context) const
 {
     llvm::DataLayout const& dl = context.module()->getDataLayout();
 
-    std::string name         = std::string(this->name().text());
-    uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
-    auto        encoding     = llvm::dwarf::DW_ATE_float;
+    std::string const name         = std::string(this->name().text());
+    uint64_t const    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    auto              encoding     = llvm::dwarf::DW_ATE_float;
 
     return context.di()->createBasicType(name, size_in_bits, encoding);
 }
@@ -38,23 +38,21 @@ bool lang::FloatingPointType::isFloatingPointType(size_t precision) const
     return precision == getPrecision();
 }
 
-bool lang::FloatingPointType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
+bool lang::FloatingPointType::isImplicitlyConvertibleTo(lang::Type const& other) const
 {
-    if (auto other_float = other->isFloatingPointType()) { return getPrecision() < other_float->getPrecision(); }
+    if (auto other_float = other.isFloatingPointType()) { return getPrecision() < other_float->getPrecision(); }
 
     return false;
 }
 
-bool lang::FloatingPointType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
-                                                         lang::Location,
-                                                         ValidationLogger&) const
+bool lang::FloatingPointType::validateImplicitConversion(lang::Type const&, lang::Location, ValidationLogger&) const
 {
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                              std::shared_ptr<Value>            value,
-                                                                              CompileContext&                   context)
+Shared<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                                     Shared<Value>                     value,
+                                                                     CompileContext&                   context)
 {
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
@@ -64,10 +62,10 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildImplicitConversion(la
                                                               content_value->getName() + ".fcast");
     llvm::Value* native_content_value = lang::values::contentToNative(other, converted_value, context);
 
-    return std::make_shared<WrappedNativeValue>(other, native_content_value);
+    return makeShared<WrappedNativeValue>(other, native_content_value);
 }
 
-bool lang::FloatingPointType::isOperatorDefined(lang::UnaryOperator op)
+bool lang::FloatingPointType::isOperatorDefined(lang::UnaryOperator op) const
 {
     return op == lang::UnaryOperator::NEGATION;
 }
@@ -82,17 +80,17 @@ bool lang::FloatingPointType::validateOperator(lang::UnaryOperator, lang::Locati
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator    op,
-                                                                    std::shared_ptr<Value> value,
-                                                                    CompileContext&        context)
+Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator op,
+                                                           Shared<Value>       value,
+                                                           CompileContext&     context)
 {
     return buildOperator(op, value, getOperatorResultType(op), context);
 }
 
-std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator               op,
-                                                                    std::shared_ptr<Value>            value,
-                                                                    lang::ResolvingHandle<lang::Type> return_type,
-                                                                    CompileContext&                   context)
+Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator               op,
+                                                           Shared<Value>                     value,
+                                                           lang::ResolvingHandle<lang::Type> return_type,
+                                                           CompileContext&                   context)
 {
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
@@ -111,19 +109,16 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryO
     }
 
     llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
-    return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
+    return makeShared<lang::WrappedNativeValue>(return_type, native_result);
 }
-bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
+
+bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
 {
     if (!op.isArithmetic() && !op.isRelational() && !op.isEquality()) return false;
 
-    other = lang::Type::getReferencedType(other);
+    lang::Type const& real_other = lang::Type::getReferencedType(other);
 
-    if (other->isFloatingPointType())
-    {
-        auto* other_type = dynamic_cast<FloatingPointType*>(other->getActualType()->getDefinition());
-        return this == other_type;
-    }
+    if (real_other.isFloatingPointType()) { return this == real_other.isFloatingPointType(); }
 
     return false;
 }
@@ -138,7 +133,7 @@ lang::ResolvingHandle<lang::Type> lang::FloatingPointType::getOperatorResultType
 }
 
 bool lang::FloatingPointType::validateOperator(lang::BinaryOperator,
-                                               lang::ResolvingHandle<lang::Type>,
+                                               lang::Type const&,
                                                lang::Location,
                                                lang::Location,
                                                ValidationLogger&) const
@@ -146,19 +141,19 @@ bool lang::FloatingPointType::validateOperator(lang::BinaryOperator,
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::BinaryOperator   op,
-                                                                    std::shared_ptr<Value> left,
-                                                                    std::shared_ptr<Value> right,
-                                                                    CompileContext&        context)
+Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::BinaryOperator op,
+                                                           Shared<Value>        left,
+                                                           Shared<Value>        right,
+                                                           CompileContext&      context)
 {
     return buildOperator(op, left, right, getOperatorResultType(op, right->type()), context);
 }
 
-std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::BinaryOperator              op,
-                                                                    std::shared_ptr<Value>            left,
-                                                                    std::shared_ptr<Value>            right,
-                                                                    lang::ResolvingHandle<lang::Type> return_type,
-                                                                    CompileContext&                   context)
+Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::BinaryOperator              op,
+                                                           Shared<Value>                     left,
+                                                           Shared<Value>                     right,
+                                                           lang::ResolvingHandle<lang::Type> return_type,
+                                                           CompileContext&                   context)
 {
     right = lang::Type::getValueOrReferencedValue(right, context);
 
@@ -212,10 +207,10 @@ std::shared_ptr<lang::Value> lang::FloatingPointType::buildOperator(lang::Binary
     }
 
     llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
-    return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
+    return makeShared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
-bool lang::FloatingPointType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
+bool lang::FloatingPointType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
 {
     if (parameters.size() == 1)
     {
@@ -226,9 +221,9 @@ bool lang::FloatingPointType::acceptOverloadRequest(std::vector<lang::ResolvingH
     return false;
 }
 
-void lang::FloatingPointType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
-                                                     lang::PredefinedFunction&                             function,
-                                                     CompileContext&                                       context)
+void lang::FloatingPointType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                                     lang::PredefinedFunction&                      function,
+                                                     CompileContext&                                context)
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }

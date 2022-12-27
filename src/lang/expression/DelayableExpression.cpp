@@ -1,11 +1,16 @@
 #include "DelayableExpression.h"
 
-std::shared_ptr<lang::Value> DelayableExpression::getValue() const
+Shared<lang::Value> DelayableExpression::getValue()
 {
     return value_;
 }
 
-void DelayableExpression::setValue(std::shared_ptr<lang::Value> const& value)
+lang::Value const& DelayableExpression::getValue() const
 {
-    value_->setValue(value);
+    return *value_;
+}
+
+void DelayableExpression::setValue(Shared<lang::Value> value)
+{
+    delayed_value_->setValue(value);
 }

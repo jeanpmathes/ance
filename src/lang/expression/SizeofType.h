@@ -22,19 +22,18 @@ class SizeofType
      */
     explicit SizeofType(lang::ResolvingHandle<lang::Type> type, lang::Location type_location, lang::Location location);
 
-    [[nodiscard]] lang::ResolvingHandle<lang::Type> targetType() const;
+    [[nodiscard]] lang::Type const& targetType() const;
 
   protected:
     void walkDefinitions() override;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
     void doBuild(CompileContext& context) override;
 
   private:

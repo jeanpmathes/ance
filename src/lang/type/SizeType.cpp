@@ -6,7 +6,8 @@
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/type/BooleanType.h"
 
-lang::SizeType::SizeType(std::string name, Kind kind) : TypeDefinition(lang::Identifier::from(name)), kind_(kind) {}
+lang::SizeType::SizeType(std::string const& name, Kind kind) : TypeDefinition(lang::Identifier::like(name)), kind_(kind)
+{}
 
 bool lang::SizeType::isSizeType() const
 {
@@ -40,7 +41,7 @@ void lang::SizeType::init(llvm::LLVMContext&, Application& app)
 lang::ResolvingHandle<lang::Type> lang::SizeType::getSize()
 {
     static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new SizeType("size", SIZE_KIND)));
+        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new SizeType("size", SIZE_KIND))));
     return instance;
 }
 
@@ -52,7 +53,7 @@ unsigned int lang::SizeType::getSizeWidth()
 lang::ResolvingHandle<lang::Type> lang::SizeType::getDiff()
 {
     static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new SizeType("diff", DIFF_KIND)));
+        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new SizeType("diff", DIFF_KIND))));
     return instance;
 }
 
@@ -61,7 +62,7 @@ unsigned int lang::SizeType::getDiffWidth()
     return diff_width_;
 }
 
-std::optional<size_t> lang::SizeType::getBitSize() const
+Optional<size_t> lang::SizeType::getBitSize() const
 {
     return std::nullopt;
 }
@@ -96,4 +97,13 @@ std::string lang::SizeType::getSuffix() const
 
     assert(false);
     return "";
+}
+
+lang::ResolvingHandle<lang::Type> lang::SizeType::clone() const
+{
+    if (kind_ == SIZE_KIND) return getSize();
+    if (kind_ == DIFF_KIND) return getDiff();
+
+    assert(false);
+    throw std::logic_error("Invalid size type kind");
 }

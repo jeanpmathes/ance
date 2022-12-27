@@ -23,8 +23,7 @@ class Break
 
     void validate(ValidationLogger& validation_logger) const override;
 
-    std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
-                                                                     lang::Function&   function) override;
+    std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, lang::Function& function) override;
 
     [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 

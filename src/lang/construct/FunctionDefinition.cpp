@@ -9,15 +9,15 @@
 #include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
-lang::FunctionDefinition::FunctionDefinition(Function&                                     function,
-                                             Scope&                                        containing_scope,
-                                             lang::ResolvingHandle<lang::Type>             type,
-                                             lang::Location                                return_type_location,
-                                             std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                                             lang::Location                                location)
+lang::FunctionDefinition::FunctionDefinition(Function&                            function,
+                                             Scope&                               containing_scope,
+                                             lang::ResolvingHandle<lang::Type>    type,
+                                             lang::Location                       return_type_location,
+                                             std::vector<Shared<lang::Parameter>> parameters,
+                                             lang::Location                       location)
     : function_(function)
     , containing_scope_(containing_scope)
-    , return_type_(type)
+    , return_type_(std::move(type))
     , return_type_location_(return_type_location)
     , parameters_(std::move(parameters))
     , location_(location)
@@ -39,7 +39,12 @@ lang::Function& lang::FunctionDefinition::function() const
     return function_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::FunctionDefinition::returnType() const
+lang::ResolvingHandle<lang::Type> lang::FunctionDefinition::returnType()
+{
+    return return_type_;
+}
+
+lang::Type const& lang::FunctionDefinition::returnType() const
 {
     return return_type_;
 }
@@ -54,7 +59,12 @@ lang::Location lang::FunctionDefinition::returnTypeLocation() const
     return return_type_location_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::FunctionDefinition::parameterType(size_t index) const
+lang::ResolvingHandle<lang::Type> lang::FunctionDefinition::parameterType(size_t index)
+{
+    return parameters_[index]->type();
+}
+
+lang::Type const& lang::FunctionDefinition::parameterType(size_t index) const
 {
     return parameters_[index]->type();
 }
@@ -71,10 +81,21 @@ lang::Location lang::FunctionDefinition::location() const
 
 void lang::FunctionDefinition::postResolve() {}
 
+void lang::FunctionDefinition::expand()
+{
+    // This would be unnecessary with full expansion that creates a new function.
+
+    return_type_ = return_type_->createUndefinedClone();
+
+    for (auto& parameter : parameters_) { parameter->expand(); }
+
+    signature_ = lang::Signature::fromParameters(name(), parameters_);
+}
+
 bool lang::FunctionDefinition::validateCall(
-    std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
-    lang::Location                                                              location,
-    ValidationLogger&                                                           validation_logger)
+    std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
+    lang::Location                                                                           location,
+    ValidationLogger&                                                                        validation_logger) const
 {
     if (arguments.size() != parameters_.size())
     {
@@ -87,35 +108,34 @@ bool lang::FunctionDefinition::validateCall(
 
     for (auto const [param, arg] : llvm::zip(parameters_, arguments))
     {
-        auto [arg_value, arg_location] = arg;
-        valid &= lang::Type::checkMismatch(param->type(), arg_value->type(), arg_location, validation_logger);
+        auto const& [arg_value, arg_location] = arg;
+        valid &= lang::Type::checkMismatch(param->type(), arg_value.get().type(), arg_location, validation_logger);
     }
 
-    doCallValidation(arguments, location, validation_logger);
+    valid &= doCallValidation(arguments, location, validation_logger);
 
     return valid;
 }
 
 bool lang::FunctionDefinition::doCallValidation(
-    std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const&,
+    std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const&,
     lang::Location,
     ValidationLogger&) const
 {
-    return false;
+    return true;
 }
 
-std::shared_ptr<lang::Value> lang::FunctionDefinition::buildCall(
-    std::vector<std::shared_ptr<lang::Value>> const& arguments,
-    CompileContext&                                  context) const
+Optional<Shared<lang::Value>> lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Value>> arguments,
+                                                                  CompileContext&                  context)
 {
     auto [native_type, native_function] = getNativeRepresentation();
 
-    llvm::Value* content_value = buildCall(arguments, native_type, native_function, context);
+    llvm::Value* content_value = buildCall(std::move(arguments), native_type, native_function, context);
 
-    if (returnType()->isVoidType()) { return nullptr; }
+    if (returnType()->isVoidType()) { return {}; }
 
     llvm::Value* native_value = lang::values::contentToNative(returnType(), content_value, context);
-    return std::make_shared<lang::WrappedNativeValue>(returnType(), native_value);
+    return {makeShared<lang::WrappedNativeValue>(returnType(), native_value)};
 }
 
 std::string lang::FunctionDefinition::parameterSource() const
@@ -126,7 +146,7 @@ std::string lang::FunctionDefinition::parameterSource() const
     for (auto& parameter : parameters_)
     {
         if (!is_first) source += ", ";
-        source += parameter->name() + ": " + parameter->type()->name();
+        source += parameter->name() + ": " + parameter->type().name();
 
         is_first = false;
     }
@@ -134,7 +154,12 @@ std::string lang::FunctionDefinition::parameterSource() const
     return source + ")";
 }
 
-std::vector<std::shared_ptr<lang::Parameter>> const& lang::FunctionDefinition::parameters() const
+std::vector<Shared<lang::Parameter>> const& lang::FunctionDefinition::parameters() const
+{
+    return parameters_;
+}
+
+std::vector<Shared<lang::Parameter>> lang::FunctionDefinition::parameters()
 {
     return parameters_;
 }
@@ -157,17 +182,19 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::FunctionDefinition::create
     return {native_type, native_function};
 }
 
-llvm::CallInst* lang::FunctionDefinition::buildCall(std::vector<std::shared_ptr<lang::Value>> const& arguments,
-                                                    llvm::FunctionType*                              native_type,
-                                                    llvm::Function*                                  native_function,
-                                                    CompileContext&                                  context) const
+llvm::CallInst* lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Value>> arguments,
+                                                    llvm::FunctionType*              native_type,
+                                                    llvm::Function*                  native_function,
+                                                    CompileContext&                  context)
 {
     std::vector<llvm::Value*> args;
     args.reserve(arguments.size());
 
-    for (auto const [param, arg] : llvm::zip(parameters_, arguments))
+    assert(arguments.size() == parameters_.size());
+
+    for (auto [param, arg] : llvm::zip(parameters_, arguments))
     {
-        std::shared_ptr<lang::Value> matched_arg = lang::Type::makeMatching(param->type(), arg, context);
+        Shared<lang::Value> matched_arg = lang::Type::makeMatching(param->type(), arg, context);
 
         matched_arg->buildContentValue(context);
         args.push_back(matched_arg->getContentValue());

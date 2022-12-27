@@ -14,7 +14,7 @@ namespace data
     class DictionaryElement : public data::Element
     {
       public:
-        std::optional<std::reference_wrapper<const data::Element>> operator[](std::string const& key) const override;
+        Optional<std::reference_wrapper<const data::Element>> operator[](std::string const& key) const override;
 
         /**
          * Add an element to the dictionary.

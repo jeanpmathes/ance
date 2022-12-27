@@ -10,6 +10,7 @@
 #include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
 #include "lang/construct/Function.h"
+#include "lang/utility/Owners.h"
 
 class Application;
 
@@ -51,10 +52,10 @@ class AnceCompiler
     llvm::Module      module_;
     llvm::IRBuilder<> ir_;
     llvm::DIBuilder   di_;
+    Runtime           runtime_;
+    CompileContext    context_;
 
-    llvm::TargetMachine*            target_machine_ {nullptr};
-    std::unique_ptr<CompileContext> context_ {};
-    std::unique_ptr<Runtime>        runtime_ {};
+    llvm::TargetMachine* target_machine_ {nullptr};
 };
 
 #endif

@@ -3,7 +3,6 @@
 #include <utility>
 
 #include "lang/ApplicationVisitor.h"
-#include "lang/scope/LocalScope.h"
 #include "lang/scope/Scope.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
@@ -13,7 +12,12 @@ Drop::Drop(lang::ResolvingHandle<lang::Variable> variable, lang::Location locati
     , variable_(std::move(variable))
 {}
 
-lang::ResolvingHandle<lang::Variable> Drop::variable() const
+lang::ResolvingHandle<lang::Variable> Drop::variable()
+{
+    return variable_;
+}
+
+lang::Variable const& Drop::variable() const
 {
     return variable_;
 }
@@ -40,7 +44,7 @@ Statements Drop::expandWith(Expressions, Statements) const
 {
     Statements statements;
 
-    statements.push_back(std::make_unique<Drop>(variable_->toUndefined(), location()));
+    statements.emplace_back(makeOwned<Drop>(variable_->toUndefined(), location()));
 
     return statements;
 }

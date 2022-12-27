@@ -66,9 +66,9 @@ void lang::BasicBlock::Definition::Branching::transferStatements(std::list<State
     statements_.splice(statements_.begin(), statements);
 }
 
-std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Branching::getLeaves()
+std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Branching::getLeaves() const
 {
-    std::set<lang::BasicBlock*> leaves;
+    std::set<lang::BasicBlock const*> leaves;
 
     for (auto leaf : true_next_->getLeaves()) { leaves.insert(leaf); }
 
@@ -87,21 +87,21 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Branching::getSucce
     return successors;
 }
 
-lang::Location lang::BasicBlock::Definition::Branching::getStartLocation()
+lang::Location lang::BasicBlock::Definition::Branching::getStartLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
-lang::Location lang::BasicBlock::Definition::Branching::getEndLocation()
+lang::Location lang::BasicBlock::Definition::Branching::getEndLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
-void lang::BasicBlock::Definition::Branching::reach()
+void lang::BasicBlock::Definition::Branching::reach() const
 {
     true_next_->reach();
     false_next_->reach();
@@ -122,8 +122,8 @@ void lang::BasicBlock::Definition::Branching::doBuild(CompileContext& context)
 
     for (auto& statement : statements_) { statement->build(context); }
 
-    std::shared_ptr<lang::Value> truth         = condition_->getValue();
-    std::shared_ptr<lang::Value> boolean_truth = lang::Type::makeMatching(lang::BooleanType::get(), truth, context);
+    Shared<lang::Value> truth         = condition_->getValue();
+    Shared<lang::Value> boolean_truth = lang::Type::makeMatching(lang::BooleanType::get(), truth, context);
 
     boolean_truth->buildContentValue(context);
 

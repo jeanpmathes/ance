@@ -27,27 +27,26 @@ class VariableAccess
      */
     VariableAccess(lang::ResolvingHandle<lang::Variable> variable, lang::Location location);
 
-    [[nodiscard]] lang::ResolvingHandle<lang::Variable> variable() const;
+    [[nodiscard]] lang::Variable const& variable() const;
 
   protected:
     void walkDefinitions() override;
     void postResolve() override;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
-    [[nodiscard]] bool isNamed() override;
+    [[nodiscard]] bool isNamed() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
-    bool validateAssignment(std::shared_ptr<lang::Value> const& value,
-                            lang::Location                      value_location,
-                            ValidationLogger&                   validation_logger) override;
+    bool validateAssignment(lang::Value const& value,
+                            lang::Location     value_location,
+                            ValidationLogger&  validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
     void doBuild(CompileContext& context) override;
-    void doAssign(std::shared_ptr<lang::Value> value, CompileContext& context) override;
+    void doAssign(Shared<lang::Value> value, CompileContext& context) override;
 
   private:
     bool isVariableDropped(ValidationLogger& validation_logger) const;

@@ -30,10 +30,10 @@ namespace lang
 
         bool isUnsignedIntegerPointerType() const override;
 
-        bool acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters) override;
-        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
-                                    lang::PredefinedFunction&                             function,
-                                    CompileContext&                                       context) override;
+        bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
+        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                    lang::PredefinedFunction&                      function,
+                                    CompileContext&                                context) override;
         void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
                                     lang::ResolvingHandle<lang::Type> return_type,
                                     lang::PredefinedFunction&         function,
@@ -45,7 +45,7 @@ namespace lang
       protected:
         std::string createMangledName() const override;
 
-        std::optional<size_t> getBitSize() const override;
+        Optional<size_t>      getBitSize() const override;
         size_t                getNativeBitSize() const override;
         bool                  isSigned() const override;
         size_t                getMinimumBitSize() const override;
@@ -70,6 +70,8 @@ namespace lang
          * @return The instance.
          */
         static lang::ResolvingHandle<lang::Type> get();
+
+        ResolvingHandle<lang::Type> clone() const override;
     };
 }
 

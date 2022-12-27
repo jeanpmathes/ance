@@ -32,7 +32,7 @@ namespace lang
                       lang::Location                        type_location,
                       Scope&                                containing_scope,
                       bool                                  is_final,
-                      std::shared_ptr<lang::Value>          value,
+                      Optional<Shared<lang::Value>>         value,
                       unsigned                              parameter_no,
                       lang::Location                        location);
 
@@ -42,14 +42,14 @@ namespace lang
         void buildDefinition(CompileContext& context) override;
         void buildFinalization(CompileContext& context) override;
 
-        std::shared_ptr<lang::Value> getValue(CompileContext& context) override;
+        Shared<lang::Value> getValue(CompileContext& context) override;
 
       protected:
-        void storeValue(std::shared_ptr<lang::Value> value, CompileContext& context) override;
+        void storeValue(Shared<lang::Value> value, CompileContext& context) override;
 
       private:
-        std::shared_ptr<lang::Value> initial_value_;
-        unsigned                     parameter_no_;
+        Optional<Shared<lang::Value>> initial_value_;
+        unsigned                      parameter_no_;
 
         llvm::Value*           native_value_ {};
         llvm::DILocalVariable* local_debug_variable_ {nullptr};

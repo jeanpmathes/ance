@@ -60,14 +60,14 @@ namespace lang
          * @param is_constant Whether the variable is constant.
          * @param location The source location.
          */
-        void defineAsGlobal(std::optional<lang::ResolvingHandle<lang::Type>> type,
-                            lang::Location                                   type_location,
-                            GlobalScope&                                     containing_scope,
-                            lang::AccessModifier                             access,
-                            std::unique_ptr<Expression>                      init,
-                            bool                                             is_final,
-                            bool                                             is_constant,
-                            lang::Location                                   location);
+        void defineAsGlobal(Optional<lang::ResolvingHandle<lang::Type>> type,
+                            lang::Location                              type_location,
+                            GlobalScope&                                containing_scope,
+                            lang::AccessModifier                        access,
+                            Optional<Owned<Expression>>                 init,
+                            bool                                        is_final,
+                            bool                                        is_constant,
+                            lang::Location                              location);
 
         /**
          * Define this variable as a local variable.
@@ -79,13 +79,13 @@ namespace lang
          * @param parameter_no The parameter number. Use zero if this is not a parameter.
          * @param location The source location.
          */
-        void defineAsLocal(lang::ResolvingHandle<lang::Type>   type,
-                           lang::Location                      type_location,
-                           Scope&                              containing_scope,
-                           bool                                is_final,
-                           std::shared_ptr<lang::Value> const& value,
-                           unsigned                            parameter_no,
-                           lang::Location                      location);
+        void defineAsLocal(lang::ResolvingHandle<lang::Type> type,
+                           lang::Location                    type_location,
+                           Scope&                            containing_scope,
+                           bool                              is_final,
+                           Optional<Shared<lang::Value>>     value,
+                           unsigned                          parameter_no,
+                           lang::Location                    location);
 
         /**
          * Get the name.
@@ -101,7 +101,12 @@ namespace lang
          * Get the value type.
          * @return The type.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> type();
+        /**
+         * Get the value type.
+         * @return The type.
+         */
+        [[nodiscard]] lang::Type const& type() const;
         /**
          * Get whether this variable is final.
          * @return Whether it is final.
@@ -147,35 +152,35 @@ namespace lang
          * @param assignable_location The source location of the assignable.
          * @param assigned_location The source location of the value that is assigned to the assignable.
          */
-        bool validateSetValue(std::shared_ptr<lang::Value> const& value,
-                              ValidationLogger&                   validation_logger,
-                              lang::Location                      assignable_location,
-                              lang::Location                      assigned_location) const;
+        bool validateSetValue(lang::Value const& value,
+                              ValidationLogger&  validation_logger,
+                              lang::Location     assignable_location,
+                              lang::Location     assigned_location) const;
 
         /**
          * Get the current value of the variable.
          * @param context The current compile context.
          * @return The current value.
          */
-        std::shared_ptr<lang::Value> getValue(CompileContext& context);
+        Shared<lang::Value> getValue(CompileContext& context);
         /**
          * Set the current value of the variable.
          * @param value The new value.
          * @param context The current compile context.
          */
-        void setValue(std::shared_ptr<Value> value, CompileContext& context);
+        void setValue(Shared<Value> value, CompileContext& context);
 
         /**
          * Get the variable dependencies of this variable. Only variables in unordered scope have dependencies.
          * @return The dependencies.
          */
-        [[nodiscard]] std::set<lang::ResolvingHandle<lang::Variable>> getVariableDependencies() const;
+        std::vector<lang::ResolvingHandle<lang::Variable>> getVariableDependencies();
 
         /**
          * Get the function dependencies of this variable. Only variables in unordered scope have dependencies.
          * @return The dependencies.
          */
-        [[nodiscard]] std::set<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() const;
+        std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies();
 
         /**
          * Get an undefined variable with the same name.
@@ -193,7 +198,7 @@ namespace lang
 
       private:
         lang::Identifier                          name_;
-        std::unique_ptr<lang::VariableDefinition> definition_ {};
+        Optional<Owned<lang::VariableDefinition>> definition_ {};
     };
 }
 #endif

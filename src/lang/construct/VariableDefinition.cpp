@@ -27,7 +27,13 @@ lang::Scope* lang::VariableDefinition::scope() const
 {
     return &scope_;
 }
-lang::ResolvingHandle<lang::Type> lang::VariableDefinition::type() const
+
+lang::ResolvingHandle<lang::Type> lang::VariableDefinition::type()
+{
+    return type_;
+}
+
+lang::Type const& lang::VariableDefinition::type() const
 {
     return type_;
 }
@@ -55,21 +61,21 @@ void lang::VariableDefinition::postResolve() {}
 void lang::VariableDefinition::createNativeBacking(CompileContext&) {}
 void lang::VariableDefinition::build(CompileContext&) {}
 
-std::set<lang::ResolvingHandle<lang::Variable>> lang::VariableDefinition::getVariableDependencies() const
+std::vector<lang::ResolvingHandle<lang::Variable>> lang::VariableDefinition::getVariableDependencies()
 {
     return {};
 }
 
-std::set<lang::ResolvingHandle<lang::Function>> lang::VariableDefinition::getFunctionDependencies() const
+std::vector<lang::ResolvingHandle<lang::Function>> lang::VariableDefinition::getFunctionDependencies()
 {
     return {};
 }
 
-void lang::VariableDefinition::setValue(std::shared_ptr<lang::Value> value, CompileContext& context)
+void lang::VariableDefinition::setValue(Shared<lang::Value> value, CompileContext& context)
 {
     if (type()->isReferenceType())
     {
-        std::shared_ptr<lang::Value> reference = getValue(context);
+        Shared<lang::Value> reference = getValue(context);
 
         lang::ResolvingHandle<lang::Type> target_type = type()->getElementType();
         value                                         = lang::Type::makeMatching(target_type, value, context);
@@ -82,7 +88,12 @@ void lang::VariableDefinition::setValue(std::shared_ptr<lang::Value> value, Comp
     else { storeValue(value, context); }
 }
 
-lang::ResolvingHandle<lang::Variable> lang::VariableDefinition::self() const
+lang::ResolvingHandle<lang::Variable> lang::VariableDefinition::self()
+{
+    return self_;
+}
+
+lang::Variable const& lang::VariableDefinition::self() const
 {
     return self_;
 }

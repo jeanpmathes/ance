@@ -34,17 +34,17 @@ class LocalVariableDefinition
      * @param assigned The initially assigned value, or nullptr if a default value is used.
      * @param location The source location.
      */
-    LocalVariableDefinition(lang::Identifier                                 name,
-                            std::optional<lang::ResolvingHandle<lang::Type>> type,
-                            lang::Location                                   type_location,
-                            lang::Assigner                                   assigner,
-                            std::unique_ptr<Expression>                      assigned,
-                            lang::Location                                   location);
+    LocalVariableDefinition(lang::Identifier                            name,
+                            Optional<lang::ResolvingHandle<lang::Type>> type,
+                            lang::Location                              type_location,
+                            lang::Assigner                              assigner,
+                            Optional<Owned<Expression>>                 assigned,
+                            lang::Location                              location);
 
-    [[nodiscard]] lang::Identifier const&                          name() const;
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> type() const;
-    [[nodiscard]] lang::Assigner                                   assigner() const;
-    [[nodiscard]] Expression*                                      assigned() const;
+    [[nodiscard]] lang::Identifier const& name() const;
+    [[nodiscard]] lang::Type const*       type() const;
+    [[nodiscard]] lang::Assigner          assigner() const;
+    [[nodiscard]] Expression const*       assigned() const;
 
     void setScope(lang::Scope& scope) override;
     void walkDefinitions() override;
@@ -62,13 +62,13 @@ class LocalVariableDefinition
 
   private:
     lang::Identifier                                 name_;
-    std::optional<lang::ResolvingHandle<lang::Type>> type_opt_;
+    Optional<lang::ResolvingHandle<lang::Type>>      type_opt_;
     lang::ResolvingHandle<lang::Type>                type_;
     lang::Location                                   type_location_;
     lang::Assigner                                   assigner_;
-    std::unique_ptr<Expression>                      assigned_;
+    Optional<Owned<Expression>>                      assigned_;
 
-    std::optional<lang::ResolvingHandle<lang::Variable>> variable_ {};
+    Optional<lang::ResolvingHandle<lang::Variable>> variable_ {};
 };
 
 #endif

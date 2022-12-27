@@ -26,45 +26,46 @@ namespace lang
          * Make an initial block. This block is scoped.
          * @return The initial block.
          */
-        static std::unique_ptr<CodeBlock> makeInitial(lang::Location location);
+        static Owned<CodeBlock> makeInitial(lang::Location location);
 
         /**
          * Make a block wrapping a statement. The block is not scoped.
          * @param statement The statement to wrap.
          * @return The block.
          */
-        static CodeBlock* wrapStatement(std::unique_ptr<Statement> statement);
+        static Owned<CodeBlock> makeWithStatement(Owned<Statement> statement);
 
         /**
          * Create a code block wrapping multiple statements. The block is not scoped.
          * @param statements The statements to wrap.
          * @return The block.
          */
-        static std::unique_ptr<CodeBlock> wrapStatements(std::vector<std::unique_ptr<Statement>> statements);
+        static Owned<CodeBlock> wrapStatements(std::vector<Owned<Statement>> statements);
 
         /**
          * Make a scoped block.
          * @return The block.
          */
-        static CodeBlock* makeScoped(lang::Location location);
+        static Owned<CodeBlock> makeScoped(lang::Location location);
 
-        [[nodiscard]] std::vector<std::reference_wrapper<Statement>> statements() const;
+        [[nodiscard]] std::vector<std::reference_wrapper<Statement const>> statements() const;
 
         /**
          * Append a block to this block.
          * @param block The block to append.
          */
-        void append(std::unique_ptr<CodeBlock> block);
+        void append(Owned<CodeBlock> block);
 
         void setScope(Scope& scope) override;
 
         void walkDefinitions() override;
 
-        std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
-                                                                         Function&         function) override;
+        std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, Function& function) override;
 
-        lang::LocalScope* getBlockScope() const override;
-        bool              isCompound() const override;
+        lang::LocalScope*       getBlockScope() override;
+        lang::LocalScope const* getBlockScope() const override;
+
+        bool isCompound() const override;
 
         void validate(ValidationLogger& validation_logger) const override;
 
@@ -73,9 +74,9 @@ namespace lang
         void doBuild(CompileContext& context) override;
 
       private:
-        bool                                    scoped_;
-        std::vector<std::unique_ptr<Statement>> subs_ {};
-        std::unique_ptr<lang::LocalScope>       scope_ {};
+        bool                              scoped_;
+        std::vector<Owned<Statement>>     subs_ {};
+        Optional<Owned<lang::LocalScope>> scope_ {};
     };
 
 }

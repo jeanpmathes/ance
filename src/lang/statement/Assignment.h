@@ -24,25 +24,25 @@ class Assignment
      * @param assigned An expression producing the value that is assigned.
      * @param location The source location.
      */
-    Assignment(std::unique_ptr<Expression> assignable,
-               lang::Assigner              assigner,
-               std::unique_ptr<Expression> assigned,
-               lang::Location              location);
+    Assignment(Owned<Expression> assignable,
+               lang::Assigner    assigner,
+               Owned<Expression> assigned,
+               lang::Location    location);
 
-    [[nodiscard]] Expression&    assignable() const;
-    [[nodiscard]] lang::Assigner assigner() const;
-    [[nodiscard]] Expression&    assigned() const;
+    [[nodiscard]] Expression const& assignable() const;
+    [[nodiscard]] lang::Assigner    assigner() const;
+    [[nodiscard]] Expression const& assigned() const;
 
     void validate(ValidationLogger& validation_logger) const override;
 
-    Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+    [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
   protected:
     void doBuild(CompileContext& context) override;
 
   private:
-    std::unique_ptr<Expression> assignable_;
-    lang::Assigner              assigner_;
-    std::unique_ptr<Expression> assigned_;
+    Owned<Expression> assignable_;
+    lang::Assigner    assigner_;
+    Owned<Expression> assigned_;
 };
 #endif

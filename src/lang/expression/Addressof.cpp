@@ -6,27 +6,26 @@
 #include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
-Addressof::Addressof(std::unique_ptr<Expression> arg, lang::Location location)
-    : Expression(location)
-    , arg_(std::move(arg))
+Addressof::Addressof(Owned<Expression> arg, lang::Location location) : Expression(location), arg_(std::move(arg))
 {
     addSubexpression(*arg_);
 }
 
-Expression& Addressof::argument() const
+Expression const& Addressof::argument() const
 {
     return *arg_;
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> Addressof::tryGetType() const
+void Addressof::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    auto value_type_opt = arg_->tryGetType();
-    if (!value_type_opt) return std::nullopt;
-    auto value_type = *value_type_opt;
+    auto value_type = arg_->type();
 
-    if (value_type->isReferenceType()) { value_type = value_type->getElementType(); }
+    if (value_type->isDefined())
+    {
+        if (value_type->isReferenceType()) { value_type = value_type->getElementType(); }
 
-    return lang::PointerType::get(value_type);
+        type.reroute(lang::PointerType::get(value_type));
+    }
 }
 
 bool Addressof::validate(ValidationLogger& validation_logger) const
@@ -45,18 +44,18 @@ bool Addressof::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion Addressof::expandWith(Expressions subexpressions) const
 {
-    return {Statements(), std::make_unique<Addressof>(std::move(subexpressions[0]), location()), Statements()};
+    return {Statements(), makeOwned<Addressof>(std::move(subexpressions[0]), location()), Statements()};
 }
 
 void Addressof::doBuild(CompileContext& context)
 {
-    std::shared_ptr<lang::Value> value = arg_->getValue();
+    Shared<lang::Value> value = arg_->getValue();
     value->buildNativeValue(context);
 
     llvm::Value* address = value->getNativeValue();
     if (!arg_->type()->isReferenceType()) address = lang::values::contentToNative(type(), address, context);
 
-    setValue(std::make_shared<lang::WrappedNativeValue>(type(), address));
+    setValue(makeShared<lang::WrappedNativeValue>(type(), address));
 }
 
 Addressof::~Addressof() = default;

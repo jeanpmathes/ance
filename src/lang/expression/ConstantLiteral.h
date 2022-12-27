@@ -19,20 +19,25 @@ class ConstantLiteral
      * @param constant The constant to wrap.
      * @param location The source location.
      */
-    ConstantLiteral(std::shared_ptr<lang::Constant> constant, lang::Location location);
+    ConstantLiteral(Shared<lang::Constant> constant, lang::Location location);
 
-    [[nodiscard]] lang::Constant& constant() const;
-
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
+    [[nodiscard]] lang::Constant const& constant() const;
 
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
-    [[nodiscard]] std::shared_ptr<lang::Constant> getConstantValue() const override;
+    Shared<lang::Constant>              getConstantValue() override;
+    [[nodiscard]] lang::Constant const& getConstantValue() const override;
+
+  protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
+
+  public:
+    ~ConstantLiteral() override;
 
   private:
-    std::shared_ptr<lang::Constant> constant_;
+    Shared<lang::Constant> constant_;
 };
 
 #endif

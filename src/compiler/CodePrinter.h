@@ -15,51 +15,51 @@ class CodePrinter : public lang::ApplicationVisitor
 
     explicit CodePrinter(std::ostream& out);
 
-    std::any visit(lang::GlobalVariable& variable) override;
+    [[nodiscard]] std::any visit(lang::GlobalVariable const& variable) override;
 
-    std::any visit(lang::CustomFunction& function) override;
-    std::any visit(lang::ExternFunction& function) override;
+    [[nodiscard]] std::any visit(lang::CustomFunction const& function) override;
+    [[nodiscard]] std::any visit(lang::ExternFunction const& function) override;
 
-    std::any visit(Addressof& addressof) override;
-    std::any visit(Allocation& allocation) override;
-    std::any visit(And& an_and) override;
-    std::any visit(ArrayDefinition& array_definition) override;
-    std::any visit(BinaryOperation& binary_operation) override;
-    std::any visit(BindRef& bind_ref) override;
-    std::any visit(BindRefTo& bind_ref_to) override;
-    std::any visit(ConstantLiteral& constant_literal) override;
-    std::any visit(FunctionCall& function_call) override;
-    std::any visit(IfSelect& if_select) override;
-    std::any visit(Indirection& indirection) override;
-    std::any visit(MatchSelect& match_select) override;
-    std::any visit(MemberAccess& member_access) override;
-    std::any visit(Or& an_or) override;
-    std::any visit(Parenthesis& parenthesis) override;
-    std::any visit(SizeofExpression& sizeof_expression) override;
-    std::any visit(SizeofType& sizeof_type) override;
-    std::any visit(Subscript& subscript) override;
-    std::any visit(UnaryOperation& unary_operation) override;
-    std::any visit(VariableAccess& variable_access) override;
-    std::any visit(VectorDefinition& vector_definition) override;
+    [[nodiscard]] std::any visit(Addressof const& addressof) override;
+    [[nodiscard]] std::any visit(Allocation const& allocation) override;
+    [[nodiscard]] std::any visit(And const& an_and) override;
+    [[nodiscard]] std::any visit(ArrayDefinition const& array_definition) override;
+    [[nodiscard]] std::any visit(BinaryOperation const& binary_operation) override;
+    [[nodiscard]] std::any visit(BindRef const& bind_ref) override;
+    [[nodiscard]] std::any visit(BindRefTo const& bind_ref_to) override;
+    [[nodiscard]] std::any visit(ConstantLiteral const& constant_literal) override;
+    [[nodiscard]] std::any visit(FunctionCall const& function_call) override;
+    [[nodiscard]] std::any visit(IfSelect const& if_select) override;
+    [[nodiscard]] std::any visit(Indirection const& indirection) override;
+    [[nodiscard]] std::any visit(MatchSelect const& match_select) override;
+    [[nodiscard]] std::any visit(MemberAccess const& member_access) override;
+    [[nodiscard]] std::any visit(Or const& an_or) override;
+    [[nodiscard]] std::any visit(Parenthesis const& parenthesis) override;
+    [[nodiscard]] std::any visit(SizeofExpression const& sizeof_expression) override;
+    [[nodiscard]] std::any visit(SizeofType const& sizeof_type) override;
+    [[nodiscard]] std::any visit(Subscript const& subscript) override;
+    [[nodiscard]] std::any visit(UnaryOperation const& unary_operation) override;
+    [[nodiscard]] std::any visit(VariableAccess const& variable_access) override;
+    [[nodiscard]] std::any visit(VectorDefinition const& vector_definition) override;
 
-    std::any visit(lang::CodeBlock& code_block) override;
+    [[nodiscard]] std::any visit(lang::CodeBlock const& code_block) override;
 
-    std::any visit(Assertion& assertion) override;
-    std::any visit(Assignment& assignment_statement) override;
-    std::any visit(Break& break_statement) override;
-    std::any visit(Continue& continue_statement) override;
-    std::any visit(Delete& delete_statement) override;
-    std::any visit(Drop& drop_statement) override;
-    std::any visit(ExpressionStatement& expression_statement) override;
-    std::any visit(If& if_statement) override;
-    std::any visit(LocalReferenceVariableDefinition& local_reference_variable_definition) override;
-    std::any visit(LocalVariableDefinition& local_variable_definition) override;
-    std::any visit(Match& match_statement) override;
-    std::any visit(Return& return_statement) override;
-    std::any visit(While& while_statement) override;
+    [[nodiscard]] std::any visit(Assertion const& assertion) override;
+    [[nodiscard]] std::any visit(Assignment const& assignment_statement) override;
+    [[nodiscard]] std::any visit(Break const& break_statement) override;
+    [[nodiscard]] std::any visit(Continue const& continue_statement) override;
+    [[nodiscard]] std::any visit(Delete const& delete_statement) override;
+    [[nodiscard]] std::any visit(Drop const& drop_statement) override;
+    [[nodiscard]] std::any visit(ExpressionStatement const& expression_statement) override;
+    [[nodiscard]] std::any visit(If const& if_statement) override;
+    [[nodiscard]] std::any visit(LocalReferenceVariableDefinition const& local_reference_variable_definition) override;
+    [[nodiscard]] std::any visit(LocalVariableDefinition const& local_variable_definition) override;
+    [[nodiscard]] std::any visit(Match const& match_statement) override;
+    [[nodiscard]] std::any visit(Return const& return_statement) override;
+    [[nodiscard]] std::any visit(While const& while_statement) override;
 
   protected:
-    void postVisit(lang::Visitable<ANCE_CONSTRUCTS>&) override;
+    void postVisit(lang::Visitable<ANCE_CONSTRUCTS> const&) override;
 
   private:
     void indent();

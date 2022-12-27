@@ -8,29 +8,27 @@
 #include "lang/statement/Assignment.h"
 #include "validation/ValidationLogger.h"
 
-Case* Case::createDefault(std::unique_ptr<Statement> code)
+Case* Case::createDefault(Owned<Statement> code)
 {
-    return new Case(std::vector<std::unique_ptr<ConstantExpression>>(), std::move(code));
+    return new Case(std::vector<Owned<ConstantExpression>>(), std::move(code));
 }
 
-Case* Case::createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions, std::unique_ptr<Statement> code)
+Case* Case::createCase(std::vector<Owned<ConstantExpression>> conditions, Owned<Statement> code)
 {
     return new Case(std::move(conditions), std::move(code));
 }
 
-Case* Case::createDefault(std::unique_ptr<Expression> expression)
+Case* Case::createDefault(Owned<Expression> expression)
 {
-    return new Case(std::vector<std::unique_ptr<ConstantExpression>>(), std::move(expression));
+    return new Case(std::vector<Owned<ConstantExpression>>(), std::move(expression));
 }
 
-Case* Case::createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions,
-                       std::unique_ptr<Expression>                      expression)
+Case* Case::createCase(std::vector<Owned<ConstantExpression>> conditions, Owned<Expression> expression)
 {
     return new Case(std::move(conditions), std::move(expression));
 }
 
-Case::Case(std::vector<std::unique_ptr<ConstantExpression>>                      conditions,
-           std::variant<std::unique_ptr<Statement>, std::unique_ptr<Expression>> code)
+Case::Case(std::vector<Owned<ConstantExpression>> conditions, std::variant<Owned<Statement>, Owned<Expression>> code)
     : conditions_(std::move(conditions))
     , code_(std::move(code))
 {
@@ -41,26 +39,20 @@ Case::Case(std::vector<std::unique_ptr<ConstantExpression>>                     
     }
 }
 
-std::vector<std::reference_wrapper<ConstantExpression>> Case::conditions() const
+std::vector<std::reference_wrapper<ConstantExpression const>> Case::conditions() const
 {
-    std::vector<std::reference_wrapper<ConstantExpression>> result;
+    std::vector<std::reference_wrapper<ConstantExpression const>> result;
 
     for (auto& condition : conditions_) { result.emplace_back(*condition); }
 
     return result;
 }
 
-std::reference_wrapper<lang::Visitable<ANCE_CONSTRUCTS>> Case::code() const
+std::reference_wrapper<lang::Visitable<ANCE_CONSTRUCTS> const> Case::code() const
 {
-    if (std::holds_alternative<std::unique_ptr<Statement>>(code_))
-    {
-        return *std::get<std::unique_ptr<Statement>>(code_);
-    }
+    if (std::holds_alternative<Owned<Statement>>(code_)) { return *std::get<Owned<Statement>>(code_); }
 
-    if (std::holds_alternative<std::unique_ptr<Expression>>(code_))
-    {
-        return *std::get<std::unique_ptr<Expression>>(code_);
-    }
+    if (std::holds_alternative<Owned<Expression>>(code_)) { return *std::get<Owned<Expression>>(code_); }
 
     throw std::runtime_error("Case::code() called on invalid case");
 }
@@ -69,15 +61,15 @@ void Case::setContainingScope(lang::Scope& scope)
 {
     for (auto& condition : conditions_) { condition->setContainingScope(scope); }
 
-    if (std::holds_alternative<std::unique_ptr<Statement>>(code_))
+    if (std::holds_alternative<Owned<Statement>>(code_))
     {
-        Statement* code = std::get<std::unique_ptr<Statement>>(code_).get();
+        Statement* code = std::get<Owned<Statement>>(code_).get();
         code->setContainingScope(scope);
     }
 
-    if (std::holds_alternative<std::unique_ptr<Expression>>(code_))
+    if (std::holds_alternative<Owned<Expression>>(code_))
     {
-        Expression* code = std::get<std::unique_ptr<Expression>>(code_).get();
+        Expression* code = std::get<Owned<Expression>>(code_).get();
         code->setContainingScope(scope);
     }
 }
@@ -86,16 +78,33 @@ void Case::walkDefinitions()
 {
     for (auto& condition : conditions_) { condition->walkDefinitions(); }
 
-    if (std::holds_alternative<std::unique_ptr<Statement>>(code_))
+    if (std::holds_alternative<Owned<Statement>>(code_))
     {
-        Statement* code = std::get<std::unique_ptr<Statement>>(code_).get();
+        Statement* code = std::get<Owned<Statement>>(code_).get();
         code->walkDefinitions();
     }
 
-    if (std::holds_alternative<std::unique_ptr<Expression>>(code_))
+    if (std::holds_alternative<Owned<Expression>>(code_))
     {
-        Expression* code = std::get<std::unique_ptr<Expression>>(code_).get();
+        Expression* code = std::get<Owned<Expression>>(code_).get();
         code->walkDefinitions();
+    }
+}
+
+void Case::postResolve()
+{
+    for (auto& condition : conditions_) { condition->postResolve(); }
+
+    if (std::holds_alternative<Owned<Statement>>(code_))
+    {
+        Statement* code = std::get<Owned<Statement>>(code_).get();
+        code->postResolve();
+    }
+
+    if (std::holds_alternative<Owned<Expression>>(code_))
+    {
+        Expression* code = std::get<Owned<Expression>>(code_).get();
+        code->postResolve();
     }
 }
 
@@ -103,19 +112,19 @@ std::vector<std::pair<ConstantExpression*, Statement*>> Case::getConditions()
 {
     std::vector<std::pair<ConstantExpression*, Statement*>> conditions;
 
-    if (conditions_.empty()) { conditions.emplace_back(nullptr, std::get<std::unique_ptr<Statement>>(code_).get()); }
+    if (conditions_.empty()) { conditions.emplace_back(nullptr, std::get<Owned<Statement>>(code_).get()); }
     else
     {
         for (auto& condition : conditions_)
         {
-            conditions.emplace_back(condition.get(), std::get<std::unique_ptr<Statement>>(code_).get());
+            conditions.emplace_back(condition.get(), std::get<Owned<Statement>>(code_).get());
         }
     }
 
     return conditions;
 }
 
-bool Case::validateConflicts(Case& other, ValidationLogger& validation_logger)
+bool Case::validateConflicts(Case const& other, ValidationLogger& validation_logger) const
 {
     bool conflicts = false;
 
@@ -123,12 +132,12 @@ bool Case::validateConflicts(Case& other, ValidationLogger& validation_logger)
     {
         for (auto& other_condition : other.conditions_)
         {
-            std::shared_ptr<lang::Constant> condition_constant       = condition->getConstantValue();
-            std::shared_ptr<lang::Constant> other_condition_constant = other_condition->getConstantValue();
+            lang::Constant const& condition_constant       = condition->getConstantValue();
+            lang::Constant const& other_condition_constant = other_condition->getConstantValue();
 
-            if (condition_constant->equals(other_condition_constant.get()))
+            if (condition_constant.equals(&other_condition_constant))
             {
-                validation_logger.logError("Match case '" + condition_constant->toString() + "' already covered",
+                validation_logger.logError("Match case '" + condition_constant.toString() + "' already covered",
                                            condition->location());
 
                 conflicts = true;
@@ -139,50 +148,58 @@ bool Case::validateConflicts(Case& other, ValidationLogger& validation_logger)
     return !conflicts;
 }
 
-bool Case::validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger)
+bool Case::validate(lang::Type const& target_type, ssize_t* coverage_count, ValidationLogger& validation_logger) const
 {
+    assert(coverage_count != nullptr);
+
     bool valid = true;
 
     for (auto& condition : conditions_) { valid &= condition->validate(validation_logger); }
 
-    if (std::holds_alternative<std::unique_ptr<Statement>>(code_))
+    if (std::holds_alternative<Owned<Statement>>(code_))
     {
-        Statement* code = std::get<std::unique_ptr<Statement>>(code_).get();
+        Statement const* code = std::get<Owned<Statement>>(code_).get();
         code->validate(validation_logger);
     }
 
-    if (std::holds_alternative<std::unique_ptr<Expression>>(code_))
+    if (std::holds_alternative<Owned<Expression>>(code_))
     {
-        Expression* code = std::get<std::unique_ptr<Expression>>(code_).get();
+        Expression const* code = std::get<Owned<Expression>>(code_).get();
         valid &= code->validate(validation_logger);
     }
 
     if (!valid) return false;
 
-    coverage_count_ = static_cast<ssize_t>(conditions_.size());
+    if (conditions_.empty())
+    {
+        *coverage_count = -1;
+        return true;
+    }
 
-    std::vector<ConstantExpression*> local_conditions;
+    *coverage_count = static_cast<ssize_t>(conditions_.size());
+
+    std::vector<std::reference_wrapper<ConstantExpression const>> local_conditions;
     for (auto& condition : conditions_)
     {
         for (auto& local_condition : local_conditions)
         {
-            std::shared_ptr<lang::Constant> condition_constant       = condition->getConstantValue();
-            std::shared_ptr<lang::Constant> local_condition_constant = local_condition->getConstantValue();
+            lang::Constant const& condition_constant       = condition->getConstantValue();
+            lang::Constant const& local_condition_constant = local_condition.get().getConstantValue();
 
-            if (condition_constant->equals(local_condition_constant.get()))
+            if (condition_constant.equals(&local_condition_constant))
             {
-                validation_logger.logWarning("Match case '" + condition_constant->toString() + "' is duplicated",
+                validation_logger.logWarning("Match case '" + condition_constant.toString() + "' is duplicated",
                                              condition->location());
 
-                coverage_count_--;
+                (*coverage_count)--;
             }
         }
 
-        local_conditions.push_back(condition.get());
+        local_conditions.emplace_back(*condition);
 
         if (!lang::Type::areSame(condition->type(), target_type))
         {
-            validation_logger.logError("Cases must be of matched value type " + target_type->getAnnotatedName(),
+            validation_logger.logError("Cases must be of matched value type " + target_type.getAnnotatedName(),
                                        condition->location());
 
             valid = false;
@@ -192,38 +209,15 @@ bool Case::validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLog
     return valid;
 }
 
-std::vector<lang::ResolvingHandle<lang::Type>> Case::getCommonType(std::vector<std::unique_ptr<Case>> const& cases)
+bool Case::validateReturnTypes(lang::Location                  location,
+                               std::vector<Owned<Case>> const& cases,
+                               ValidationLogger&               validation_logger)
 {
-    std::vector<lang::ResolvingHandle<lang::Type>> types;
+    std::vector<std::reference_wrapper<lang::Type const>> types;
 
-    for (auto& case_instance : cases)
-    {
-        types.push_back(std::get<std::unique_ptr<Expression>>(case_instance->code_)->type());
-    }
+    for (auto& case_instance : cases) { types.emplace_back(std::get<Owned<Expression>>(case_instance->code_)->type()); }
 
-    return lang::Type::getCommonType(types);
-}
-
-std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> Case::tryGetCommonType(
-    std::vector<std::unique_ptr<Case>> const& cases)
-{
-    std::vector<lang::ResolvingHandle<lang::Type>> types;
-
-    for (auto& case_instance : cases)
-    {
-        auto type = std::get<std::unique_ptr<Expression>>(case_instance->code_)->tryGetType();
-        if (type.has_value()) { types.push_back(type.value()); }
-        else { return std::nullopt; }
-    }
-
-    return lang::Type::getCommonType(types);
-}
-
-bool Case::validateReturnTypes(lang::Location                            location,
-                               std::vector<std::unique_ptr<Case>> const& cases,
-                               ValidationLogger&                         validation_logger)
-{
-    std::vector<lang::ResolvingHandle<lang::Type>> common_types = getCommonType(cases);
+    std::vector<std::reference_wrapper<lang::Type const>> const common_types = lang::Type::getCommonType(types);
 
     if (common_types.empty() || common_types.size() > 1)
     {
@@ -234,11 +228,20 @@ bool Case::validateReturnTypes(lang::Location                            locatio
     return true;
 }
 
-std::unique_ptr<Case> Case::expand() const
+std::vector<lang::ResolvingHandle<lang::Type>> Case::getCommonType(std::vector<Owned<Case>>& cases)
 {
-    Statements expanded_statements = std::get<std::unique_ptr<Statement>>(code_)->expand();
+    std::vector<lang::ResolvingHandle<lang::Type>> types;
 
-    std::vector<std::unique_ptr<ConstantExpression>> expanded_conditions;
+    for (auto& case_instance : cases) { types.emplace_back(std::get<Owned<Expression>>(case_instance->code_)->type()); }
+
+    return lang::Type::getCommonType(types);
+}
+
+Owned<Case> Case::expand() const
+{
+    Statements expanded_statements = std::get<Owned<Statement>>(code_)->expand();
+
+    std::vector<Owned<ConstantExpression>> expanded_conditions;
 
     for (auto& condition : conditions_)
     {
@@ -247,36 +250,34 @@ std::unique_ptr<Case> Case::expand() const
         assert(before.empty());
         assert(after.empty());
 
-        expanded_conditions.push_back(
-            std::unique_ptr<ConstantExpression>(dynamic_cast<ConstantExpression*>(expanded_condition.release())));
+        expanded_conditions.emplace_back(*(dynamic_cast<ConstantExpression*>(unwrap(std::move(expanded_condition)))));
     }
 
-    std::unique_ptr<lang::CodeBlock> new_block = lang::CodeBlock::wrapStatements(std::move(expanded_statements));
-    return std::unique_ptr<Case>(new Case(std::move(expanded_conditions), std::move(new_block)));
+    Owned<lang::CodeBlock> new_block = lang::CodeBlock::wrapStatements(std::move(expanded_statements));
+    return Owned<Case>(*(new Case(std::move(expanded_conditions), std::move(new_block))));
 }
 
-std::unique_ptr<Case> Case::expand(lang::ResolvingHandle<lang::Variable> target) const
+Owned<Case> Case::expand(lang::ResolvingHandle<lang::Variable> target) const
 {
-    auto [before, value_provider, after] = std::get<std::unique_ptr<Expression>>(code_)->expand();
+    auto [before, value_provider, after] = std::get<Owned<Expression>>(code_)->expand();
 
-    lang::Location location = std::get<std::unique_ptr<Expression>>(code_)->location();
+    lang::Location const location = std::get<Owned<Expression>>(code_)->location();
 
     Statements expanded_statements;
     expanded_statements.insert(expanded_statements.end(),
                                std::make_move_iterator(before.begin()),
                                std::make_move_iterator(before.end()));
 
-    expanded_statements.push_back(
-        std::make_unique<Assignment>(std::make_unique<VariableAccess>(target->toUndefined(), location),
-                                     lang::Assigner::COPY_ASSIGNMENT,
-                                     std::move(value_provider),
-                                     location));
+    expanded_statements.emplace_back(makeOwned<Assignment>(makeOwned<VariableAccess>(target->toUndefined(), location),
+                                                           lang::Assigner::COPY_ASSIGNMENT,
+                                                           std::move(value_provider),
+                                                           location));
 
     expanded_statements.insert(expanded_statements.end(),
                                std::make_move_iterator(after.begin()),
                                std::make_move_iterator(after.end()));
 
-    std::vector<std::unique_ptr<ConstantExpression>> expanded_conditions;
+    std::vector<Owned<ConstantExpression>> expanded_conditions;
 
     for (auto& condition : conditions_)
     {
@@ -285,20 +286,14 @@ std::unique_ptr<Case> Case::expand(lang::ResolvingHandle<lang::Variable> target)
         assert(before_condition.empty());
         assert(after_condition.empty());
 
-        expanded_conditions.push_back(
-            std::unique_ptr<ConstantExpression>(dynamic_cast<ConstantExpression*>(expanded_condition.release())));
+        expanded_conditions.emplace_back(*(dynamic_cast<ConstantExpression*>(unwrap(std::move(expanded_condition)))));
     }
 
-    std::unique_ptr<lang::CodeBlock> new_block = lang::CodeBlock::wrapStatements(std::move(expanded_statements));
-    return std::unique_ptr<Case>(new Case(std::move(expanded_conditions), std::move(new_block)));
+    Owned<lang::CodeBlock> new_block = lang::CodeBlock::wrapStatements(std::move(expanded_statements));
+    return Owned<Case>(*(new Case(std::move(expanded_conditions), std::move(new_block))));
 }
 
-ssize_t Case::getCoverageCount()
-{
-    if (conditions_.empty()) { return -1; }
-    return coverage_count_;
-}
-Match::Match(std::vector<std::unique_ptr<Case>> cases, std::unique_ptr<Expression> expression, lang::Location location)
+Match::Match(std::vector<Owned<Case>> cases, Owned<Expression> expression, lang::Location location)
     : Statement(location)
     , expression_(std::move(expression))
     , cases_(std::move(cases))
@@ -308,22 +303,26 @@ Match::Match(std::vector<std::unique_ptr<Case>> cases, std::unique_ptr<Expressio
     for (auto& case_instance : cases_) { addChild(*case_instance); }
 }
 
-Expression& Match::expression() const
+Expression& Match::expression()
 {
     return *expression_;
 }
 
-std::vector<std::reference_wrapper<Case>> Match::cases() const
+Expression const& Match::expression() const
 {
-    std::vector<std::reference_wrapper<Case>> cases;
+    return *expression_;
+}
+
+std::vector<std::reference_wrapper<Case const>> Match::cases() const
+{
+    std::vector<std::reference_wrapper<Case const>> cases;
 
     for (auto& case_instance : cases_) { cases.emplace_back(*case_instance); }
 
     return cases;
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> Match::createBasicBlocks(lang::BasicBlock& entry,
-                                                                        lang::Function&   function)
+std::vector<Owned<lang::BasicBlock>> Match::createBasicBlocks(lang::BasicBlock& entry, lang::Function& function)
 {
     std::vector<std::pair<ConstantExpression*, Statement*>> conditions;
 
@@ -333,7 +332,7 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Match::createBasicBlocks(lang::Ba
         conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());
     }
 
-    auto blocks = lang::BasicBlock::createMatching(this, std::move(conditions), function);
+    auto blocks = lang::BasicBlock::createMatching(this, conditions, function);
     entry.link(*blocks.front());
 
     return blocks;
@@ -353,9 +352,16 @@ void Match::walkDefinitions()
     for (auto& case_ptr : cases_) { case_ptr->walkDefinitions(); }
 }
 
+void Match::postResolve()
+{
+    Statement::postResolve();
+
+    for (auto& case_ptr : cases_) { case_ptr->postResolve(); }
+}
+
 Statements Match::expandWith(Expressions subexpressions, Statements) const
 {
-    std::vector<std::unique_ptr<Case>> expanded_cases;
+    std::vector<Owned<Case>> expanded_cases;
     for (auto& case_ptr : cases_)
     {
         auto expanded_case = case_ptr->expand();
@@ -364,7 +370,7 @@ Statements Match::expandWith(Expressions subexpressions, Statements) const
 
     Statements statements;
 
-    statements.push_back(std::make_unique<Match>(std::move(expanded_cases), std::move(subexpressions[0]), location()));
+    statements.emplace_back(makeOwned<Match>(std::move(expanded_cases), std::move(subexpressions[0]), location()));
 
     return statements;
 }
@@ -384,14 +390,14 @@ void Match::validate(ValidationLogger& validation_logger) const
     validateCases(location(), *expression_, cases_, validation_logger);
 }
 
-bool Match::validateType(Expression& expression, ValidationLogger& validation_logger)
+bool Match::validateType(Expression const& expression, ValidationLogger& validation_logger)
 {
-    lang::ResolvingHandle<lang::Type> type = expression.type();
+    lang::Type const& type = expression.type();
 
-    if (!type->isFixedWidthIntegerType() && !type->isBooleanType() && !type->isSizeType() && !type->isDiffType()
-        && !type->isUnsignedIntegerPointerType())
+    if (!type.isFixedWidthIntegerType() && !type.isBooleanType() && !type.isSizeType() && !type.isDiffType()
+        && !type.isUnsignedIntegerPointerType())
     {
-        validation_logger.logError("Cannot match non-integer or boolean type " + type->getAnnotatedName(),
+        validation_logger.logError("Cannot match non-integer or boolean type " + type.getAnnotatedName(),
                                    expression.location());
 
         return false;
@@ -400,22 +406,22 @@ bool Match::validateType(Expression& expression, ValidationLogger& validation_lo
     return true;
 }
 
-bool Match::validateCases(lang::Location                            location,
-                          Expression&                               expression,
-                          std::vector<std::unique_ptr<Case>> const& cases,
-                          ValidationLogger&                         validation_logger)
+bool Match::validateCases(lang::Location                  location,
+                          Expression const&               expression,
+                          std::vector<Owned<Case>> const& cases,
+                          ValidationLogger&               validation_logger)
 {
     bool valid = true;
 
-    std::vector<std::reference_wrapper<Case>> checked_cases;
-    ssize_t                                   covered_cases = 0;
+    std::vector<std::reference_wrapper<Case const>> checked_cases;
+    ssize_t                                         covered_cases = 0;
 
     for (auto& case_instance : cases)
     {
-        valid &= case_instance->validate(expression.type(), validation_logger);
+        ssize_t additional_coverage = 0;
+        valid &= case_instance->validate(expression.type(), &additional_coverage, validation_logger);
 
-        ssize_t additional_coverage = case_instance->getCoverageCount();
-        bool    has_default_case    = additional_coverage == -1 || covered_cases == -1;
+        bool const has_default_case = additional_coverage == -1 || covered_cases == -1;
         covered_cases               = has_default_case ? -1 : covered_cases + additional_coverage;
 
         for (auto& checked_case : checked_cases)
@@ -426,7 +432,7 @@ bool Match::validateCases(lang::Location                            location,
         checked_cases.emplace_back(*case_instance);
     }
 
-    StateCount state_count = expression.type()->getStateCount();
+    StateCount state_count = expression.type().getStateCount();
 
     if (covered_cases != -1)
     {
@@ -441,7 +447,7 @@ bool Match::validateCases(lang::Location                            location,
         if (uncovered)
         {
             validation_logger.logError("Match does not cover all possible states of type "
-                                           + expression.type()->getAnnotatedName(),
+                                           + expression.type().getAnnotatedName(),
                                        location);
             valid = false;
         }
@@ -451,7 +457,7 @@ bool Match::validateCases(lang::Location                            location,
     {
         if (*count == SpecialCount::UNCOUNTABLE)
         {
-            validation_logger.logError("Cannot match uncountable type " + expression.type()->getAnnotatedName(),
+            validation_logger.logError("Cannot match uncountable type " + expression.type().getAnnotatedName(),
                                        location);
             valid = false;
         }

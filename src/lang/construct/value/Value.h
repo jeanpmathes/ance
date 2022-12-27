@@ -22,7 +22,13 @@ namespace lang
          * Get the type of the value.
          * @return The type.
          */
-        virtual lang::ResolvingHandle<lang::Type> type() const = 0;
+        virtual lang::ResolvingHandle<lang::Type> type() = 0;
+
+        /**
+         * Get the type of the value.
+         * @return The type.
+         */
+        [[nodiscard]] virtual lang::Type const& type() const = 0;
 
         /**
          * Build the native value. The native value is the value actually used in the IR.
@@ -39,12 +45,12 @@ namespace lang
          * Get the native value. It must be built before accessing it.
          * @return The native value.
          */
-        virtual llvm::Value* getNativeValue() = 0;
+        [[nodiscard]] virtual llvm::Value* getNativeValue() const = 0;
         /**
          * Get the content value. It must be built before accessing it.
          * @return The content value.
          */
-        virtual llvm::Value* getContentValue();
+        [[nodiscard]] virtual llvm::Value* getContentValue() const;
 
         virtual ~Value() = default;
 

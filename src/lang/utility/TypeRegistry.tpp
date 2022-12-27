@@ -1,8 +1,7 @@
 #include "TypeRegistry.h"
 
 template<typename OTHER_KEY>
-std::optional<TypeHandle> lang::TypeRegistry<OTHER_KEY>::get(UsedTypes const& type_keys,
-                                                             const OTHER_KEY& other_keys) const
+Optional<TypeHandle> lang::TypeRegistry<OTHER_KEY>::get(UsedTypes type_keys, OTHER_KEY other_keys)
 {
     for (auto& [current_key, current_type] : types_)
     {
@@ -76,6 +75,12 @@ void lang::TypeRegistry<OTHER_KEY>::resolve()
     }
 
     types_ = std::move(merged);
+}
+
+template<typename OTHER_KEY>
+void lang::TypeRegistry<OTHER_KEY>::clear()
+{
+    types_.clear();
 }
 
 template<typename OTHER_KEY>

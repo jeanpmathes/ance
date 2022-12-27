@@ -6,6 +6,7 @@
 #include "compiler/FileContext.h"
 #include "lang/utility/Identifier.h"
 #include "lang/utility/Location.h"
+#include "lang/utility/Optional.h"
 
 class Application;
 
@@ -156,6 +157,48 @@ class SourceVisitor : public anceBaseVisitor
   private:
     FileContext* file_context_;
     Application& application_;
+
+  private:
+    /**
+     * Dirty fix to allow passing value to any that has no non-const copy constructor.
+     * @tparam T The type of the value.
+     */
+    template<Copyable T>
+    struct Erased {
+        alignas(T) std::array<std::byte, sizeof(T)> mutable data;
+
+        explicit Erased(T value) : data() { new (data.data()) T(value); }
+        Erased(Erased const& other) : data() { new (data.data()) T(other.get()); }
+        Erased(Erased&& other) noexcept : data() { new (data.data()) T(other.get()); }
+        Erased& operator=(Erased const& other)
+        {
+            get() = other.get();
+            return *this;
+        }
+        Erased& operator=(Erased&& other) noexcept
+        {
+            get() = other.get();
+            return *this;
+        }
+
+        T& get() const { return *reinterpret_cast<T*>(data.data()); }
+
+        ~Erased() { std::destroy_at(std::launder(reinterpret_cast<T*>(data.data()))); }
+    };
+
+    template<Copyable T>
+    static T erasedCast(std::any any)
+    {
+        Erased<T> value = std::any_cast<Erased<T>>(any);
+        return value.get();
+    }
+
+    template<Copyable T>
+    static Erased<T> erase(T value)
+    {
+        Erased<T> any(value);
+        return any;
+    }
 };
 
 #endif

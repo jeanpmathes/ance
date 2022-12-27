@@ -72,10 +72,10 @@ class Runtime
      * @param context The current compile context.
      * @return A pointer to the allocated memory.
      */
-    std::shared_ptr<lang::Value> allocate(Allocator                           allocation,
-                                          lang::ResolvingHandle<lang::Type>   type,
-                                          std::shared_ptr<lang::Value> const& count,
-                                          CompileContext&                     context);
+    Shared<lang::Value> allocate(Allocator                         allocation,
+                                 lang::ResolvingHandle<lang::Type> type,
+                                 Optional<Shared<lang::Value>>     count,
+                                 CompileContext&                   context);
 
     /**
      * Free dynamically allocated memory.
@@ -83,14 +83,14 @@ class Runtime
      * @param delete_buffer Whether the memory is a single element or a buffer of multiple elements.
      * @param context The current compile context.
      */
-    void deleteDynamic(std::shared_ptr<lang::Value> const& value, bool delete_buffer, CompileContext& context);
+    void deleteDynamic(Shared<lang::Value> value, bool delete_buffer, CompileContext& context);
 
     /**
      * Build an assertion.
      * @param value The boolean value to assert.
      * @param context The current compile context.
      */
-    void buildAssert(std::shared_ptr<lang::Value> const& value, CompileContext& context);
+    void buildAssert(Shared<lang::Value> value, CompileContext& context);
 
   private:
     llvm::Value* allocateAutomatic(lang::ResolvingHandle<lang::Type> type,

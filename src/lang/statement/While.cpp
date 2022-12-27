@@ -6,7 +6,7 @@
 #include "lang/type/BooleanType.h"
 #include "validation/ValidationLogger.h"
 
-While::While(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> block, lang::Location location)
+While::While(Owned<Expression> condition, Owned<Statement> block, lang::Location location)
     : Statement(location)
     , condition_(std::move(condition))
     , block_(std::move(block))
@@ -15,18 +15,17 @@ While::While(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> b
     addSubstatement(*block_);
 }
 
-Expression& While::condition()
+Expression const& While::condition() const
 {
     return *condition_;
 }
 
-Statement& While::body()
+Statement const& While::body() const
 {
     return *block_;
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> While::createBasicBlocks(lang::BasicBlock& entry,
-                                                                        lang::Function&   function)
+std::vector<Owned<lang::BasicBlock>> While::createBasicBlocks(lang::BasicBlock& entry, lang::Function& function)
 {
     auto blocks = lang::BasicBlock::createLooping(condition_.get(), block_.get(), &loop_parts_, function);
 
@@ -48,8 +47,7 @@ Statements While::expandWith(Expressions subexpressions, Statements substatement
 {
     Statements statements;
 
-    statements.push_back(
-        std::make_unique<While>(std::move(subexpressions[0]), std::move(substatements[0]), location()));
+    statements.emplace_back(makeOwned<While>(std::move(subexpressions[0]), std::move(substatements[0]), location()));
 
     return statements;
 }

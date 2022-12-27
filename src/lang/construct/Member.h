@@ -30,16 +30,19 @@ namespace lang
                lang::Identifier                    name,
                lang::ResolvingHandle<lang::Type>   type,
                lang::Assigner                      assigner,
-               std::unique_ptr<ConstantExpression> constant_init,
+               Optional<Owned<ConstantExpression>> constant_init,
                lang::Location                      location,
                lang::Location                      type_location);
 
-        [[nodiscard]] lang::AccessModifier              access() const;
-        [[nodiscard]] lang::Identifier const&           name() const;
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
-        [[nodiscard]] lang::Assigner                    assigner() const;
-        [[nodiscard]] lang::Location                    location() const;
-        [[nodiscard]] lang::Location                    typeLocation() const;
+        [[nodiscard]] lang::AccessModifier    access() const;
+        [[nodiscard]] lang::Identifier const& name() const;
+
+        [[nodiscard]] lang::Type const&                 type() const;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> type();
+
+        [[nodiscard]] lang::Assigner assigner() const;
+        [[nodiscard]] lang::Location location() const;
+        [[nodiscard]] lang::Location typeLocation() const;
 
         /**
          * Set the scope that contains the member.
@@ -57,7 +60,7 @@ namespace lang
          * Gets the constant initializer of the member.
          * @return The constant initializer of the member.
          */
-        [[nodiscard]] llvm::Constant* getConstantInitializer(llvm::Module& m) const;
+        llvm::Constant* getConstantInitializer(llvm::Module& m) const;
 
         /**
          * Build the initialization of this member.
@@ -65,6 +68,8 @@ namespace lang
          * @param context The compile context.
          */
         void buildInitialization(llvm::Value* ptr, CompileContext& context);
+
+        void expand();
 
       private:
         llvm::Constant* getInitialValue(llvm::Module& m) const;
@@ -74,7 +79,7 @@ namespace lang
         lang::Identifier                    name_;
         lang::ResolvingHandle<lang::Type>   type_;
         lang::Assigner                      assigner_;
-        std::unique_ptr<ConstantExpression> constant_init_;
+        Optional<Owned<ConstantExpression>> constant_init_;
         lang::Location                      location_;
         lang::Location                      type_location_;
 

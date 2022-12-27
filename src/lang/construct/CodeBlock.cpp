@@ -5,29 +5,28 @@
 
 lang::CodeBlock::CodeBlock(bool scoped, lang::Location location) : Statement(location), scoped_(scoped) {}
 
-std::unique_ptr<lang::CodeBlock> lang::CodeBlock::makeInitial(lang::Location location)
+Owned<lang::CodeBlock> lang::CodeBlock::makeInitial(lang::Location location)
 {
-    return std::unique_ptr<lang::CodeBlock>(new CodeBlock(true, location));
+    return Owned<lang::CodeBlock>(*(new CodeBlock(true, location)));
 }
 
-lang::CodeBlock* lang::CodeBlock::wrapStatement(std::unique_ptr<Statement> statement)
+Owned<lang::CodeBlock> lang::CodeBlock::makeWithStatement(Owned<Statement> statement)
 {
-    auto* block = new CodeBlock(false, statement->location());
+    auto block = Owned<lang::CodeBlock>(*(new CodeBlock(false, statement->location())));
 
     block->addSubstatement(*statement);
-
     block->subs_.emplace_back(std::move(statement));
 
     return block;
 }
 
-std::unique_ptr<lang::CodeBlock> lang::CodeBlock::wrapStatements(std::vector<std::unique_ptr<Statement>> statements)
+Owned<lang::CodeBlock> lang::CodeBlock::wrapStatements(std::vector<Owned<Statement>> statements)
 {
     lang::Location location = Location::global();
 
     for (auto& statement : statements) { location.extend(statement->location()); }
 
-    auto* block = new CodeBlock(false, location);
+    auto block = Owned<lang::CodeBlock>(*(new CodeBlock(false, location)));
 
     for (auto& statement : statements)
     {
@@ -35,25 +34,25 @@ std::unique_ptr<lang::CodeBlock> lang::CodeBlock::wrapStatements(std::vector<std
         block->subs_.emplace_back(std::move(statement));
     }
 
-    return std::unique_ptr<lang::CodeBlock>(block);
+    return block;
 }
 
-lang::CodeBlock* lang::CodeBlock::makeScoped(lang::Location location)
+Owned<lang::CodeBlock> lang::CodeBlock::makeScoped(lang::Location location)
 {
-    return new CodeBlock(true, location);
+    return Owned<lang::CodeBlock>(*(new CodeBlock(true, location)));
 }
 
-std::vector<std::reference_wrapper<Statement>> lang::CodeBlock::statements() const
+std::vector<std::reference_wrapper<Statement const>> lang::CodeBlock::statements() const
 {
-    std::vector<std::reference_wrapper<Statement>> s;
+    std::vector<std::reference_wrapper<Statement const>> s;
     s.reserve(subs_.size());
 
-    for (auto& statement : subs_) { s.emplace_back(*statement); }
+    for (auto const& statement : subs_) { s.emplace_back(*statement); }
 
     return s;
 }
 
-void lang::CodeBlock::append(std::unique_ptr<CodeBlock> block)
+void lang::CodeBlock::append(Owned<CodeBlock> block)
 {
     if (block->scoped_)
     {
@@ -82,7 +81,7 @@ void lang::CodeBlock::setScope(Scope& scope)
     if (scoped_)
     {
         scope_  = scope.makeLocalScope();
-        created = scope_.get();
+        created = scope_.value().get();
     }
 
     lang::Scope* local_parent = created ? created : &scope;
@@ -95,14 +94,13 @@ void lang::CodeBlock::walkDefinitions()
     for (auto& sub : subs_) { sub->walkDefinitions(); }
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlocks(lang::BasicBlock& entry,
-                                                                                  Function&         function)
+std::vector<Owned<lang::BasicBlock>> lang::CodeBlock::createBasicBlocks(lang::BasicBlock& entry, Function& function)
 {
-    std::vector<std::unique_ptr<lang::BasicBlock>> blocks;
+    std::vector<Owned<lang::BasicBlock>> blocks;
 
     lang::BasicBlock* previous_block = &entry;
 
-    auto append_blocks = [&](std::vector<std::unique_ptr<BasicBlock>>&& new_blocks) {
+    auto append_blocks = [&](std::vector<Owned<BasicBlock>>&& new_blocks) {
         blocks.insert(blocks.end(),
                       std::make_move_iterator(new_blocks.begin()),
                       std::make_move_iterator(new_blocks.end()));
@@ -113,22 +111,27 @@ std::vector<std::unique_ptr<lang::BasicBlock>> lang::CodeBlock::createBasicBlock
 
     for (auto& sub : subs_)
     {
-        std::vector<std::unique_ptr<BasicBlock>> new_blocks = sub->createBasicBlocks(*previous_block, function);
+        std::vector<Owned<BasicBlock>> new_blocks = sub->createBasicBlocks(*previous_block, function);
         append_blocks(std::move(new_blocks));
     }
 
     if (scoped_)
     {
-        blocks.push_back(lang::BasicBlock::createFinalizing(scope_.get(), "block"));
+        blocks.push_back(lang::BasicBlock::createFinalizing(scope_->get(), "block"));
         previous_block->link(*blocks.back());
     }
 
     return blocks;
 }
 
-lang::LocalScope* lang::CodeBlock::getBlockScope() const
+lang::LocalScope* lang::CodeBlock::getBlockScope()
 {
-    return scope_.get();
+    return scope_->get();
+}
+
+lang::LocalScope const* lang::CodeBlock::getBlockScope() const
+{
+    return scope_->get();
 }
 
 bool lang::CodeBlock::isCompound() const
@@ -147,14 +150,13 @@ Statements lang::CodeBlock::expandWith(Expressions, Statements substatements) co
 {
     Statements statements;
 
-    auto* block = new CodeBlock(scoped_, location());
-    statements.push_back(std::unique_ptr<Statement>(block));
+    auto& block = *(new CodeBlock(scoped_, location()));
+    statements.emplace_back(block);
 
     for (auto& sub : substatements)
     {
-        block->addSubstatement(*sub);
-
-        block->subs_.push_back(std::move(sub));
+        block.addSubstatement(*sub);
+        block.subs_.push_back(std::move(sub));
     }
 
     return statements;

@@ -17,12 +17,10 @@ namespace lang
         DoubleType();
 
       public:
-        llvm::Constant* getDefaultContent(llvm::Module& m) override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) const override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
       private:
-        inline static Type* instance_ = nullptr;
-
         [[nodiscard]] size_t getPrecision() const override;
 
       public:
@@ -31,6 +29,8 @@ namespace lang
          * @return The double type instance.
          */
         static lang::ResolvingHandle<lang::Type> get();
+
+        ResolvingHandle<lang::Type> clone() const override;
     };
 }
 #endif

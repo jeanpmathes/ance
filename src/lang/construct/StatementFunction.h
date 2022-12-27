@@ -33,17 +33,17 @@ namespace lang
     class StatementFunction : public lang::FunctionDefinition
     {
       public:
-        StatementFunction(Function&                                     function,
-                          lang::AccessModifier                          access,
-                          lang::ResolvingHandle<lang::Type>             return_type,
-                          lang::Location                                return_type_location,
-                          std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                          std::unique_ptr<Statement>                    code,
-                          Scope&                                        containing_scope,
-                          lang::Location                                declaration_location);
+        StatementFunction(Function&                            function,
+                          lang::AccessModifier                 access,
+                          lang::ResolvingHandle<lang::Type>    return_type,
+                          lang::Location                       return_type_location,
+                          std::vector<Shared<lang::Parameter>> parameters,
+                          Owned<Statement>                     code,
+                          Scope&                               containing_scope,
+                          lang::Location                       declaration_location);
 
         [[nodiscard]] lang::AccessModifier access() const;
-        [[nodiscard]] Statement&           code() const;
+        [[nodiscard]] Statement const&     code() const;
 
         void postResolve() override;
         void validate(ValidationLogger& validation_logger) const override;
@@ -54,7 +54,7 @@ namespace lang
         void createNativeBacking(CompileContext& context) override;
         void build(CompileContext& context) override;
 
-        llvm::DIScope*    getDebugScope(CompileContext& context) override;
+        llvm::DIScope*    getDebugScope(CompileContext& context) const override;
         lang::LocalScope* getInsideScope() override;
 
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
@@ -64,25 +64,25 @@ namespace lang
 
         [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
 
-        [[nodiscard]] BasicBlock&                   getInitialBlock() const;
-        [[nodiscard]] std::optional<lang::Location> findUnreachableCode() const;
+        [[nodiscard]] BasicBlock const&        getInitialBlock() const;
+        [[nodiscard]] Optional<lang::Location> findUnreachableCode() const;
 
-        [[nodiscard]] std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>> const& arguments() const;
+        [[nodiscard]] std::vector<Optional<lang::ResolvingHandle<lang::Variable>>> const& arguments() const;
 
       private:
         void setupCode();
 
       private:
-        std::unique_ptr<Statement> code_;
-        lang::LocalScope*          inside_scope_ {nullptr};
+        Owned<Statement>  code_;
+        lang::LocalScope* inside_scope_ {nullptr};
 
         lang::AccessModifier access_;
 
-        std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>> arguments_ {};
+        std::vector<Optional<lang::ResolvingHandle<lang::Variable>>> arguments_ {};
 
-        std::unique_ptr<lang::BasicBlock>              initial_block_;
-        std::vector<std::unique_ptr<lang::BasicBlock>> blocks_ {};
-        std::vector<lang::BasicBlock*>                 used_blocks_ {};
+        Owned<lang::BasicBlock>              initial_block_;
+        std::vector<Owned<lang::BasicBlock>> blocks_ {};
+        std::vector<lang::BasicBlock*>       used_blocks_ {};
 
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};

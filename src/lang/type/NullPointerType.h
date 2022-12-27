@@ -18,25 +18,28 @@ namespace lang
 
         bool isNullValueType() const override;
 
-        bool                         isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other) override;
-        bool                         validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                lang::Location                    location,
-                                                                ValidationLogger&                 validation_logger) const override;
-        std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                             std::shared_ptr<Value>            value,
-                                                             CompileContext&                   context) override;
+        bool                isImplicitlyConvertibleTo(lang::Type const& other) const override;
+        bool                validateImplicitConversion(lang::Type const& other,
+                                                       lang::Location    location,
+                                                       ValidationLogger& validation_logger) const override;
+        Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                    Shared<Value>                     value,
+                                                    CompileContext&                   context) override;
 
       protected:
-        llvm::Constant* getDefaultContent(llvm::Module& m) override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) const override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) override;
+        llvm::DIType* createDebugType(CompileContext& context) const override;
 
-        std::optional<lang::ResolvingHandle<lang::Type>> getPointeeType() const override;
+        Optional<lang::ResolvingHandle<lang::Type>> getPointeeType() override;
+        Type const*                                 getPointeeType() const override;
 
       public:
         static lang::ResolvingHandle<lang::Type> get();
+
+        ResolvingHandle<lang::Type> clone() const override;
     };
 }
 

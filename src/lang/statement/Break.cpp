@@ -10,7 +10,7 @@ void Break::validate(ValidationLogger& validation_logger) const
     if (getLoopParent() == nullptr) { validation_logger.logError("No loop to break", location()); }
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> Break::createBasicBlocks(lang::BasicBlock& entry, lang::Function&)
+std::vector<Owned<lang::BasicBlock>> Break::createBasicBlocks(lang::BasicBlock& entry, lang::Function&)
 {
     Statement const* loop_parent = getLoopParent();
     assert(loop_parent != nullptr);
@@ -33,7 +33,7 @@ Statements Break::expandWith(Expressions, Statements) const
 {
     Statements statements;
 
-    statements.push_back(std::make_unique<Break>(location()));
+    statements.emplace_back(makeOwned<Break>(location()));
 
     return statements;
 }

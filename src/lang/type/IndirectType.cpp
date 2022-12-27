@@ -10,7 +10,7 @@ lang::IndirectType::IndirectType(lang::ResolvingHandle<lang::Type> element_type)
     , value_reference_(lang::ReferenceType::get(element_type))
 {}
 
-llvm::Constant* lang::IndirectType::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::IndirectType::getDefaultContent(llvm::Module& m) const
 {
     return llvm::ConstantPointerNull::get(getContentType(m.getContext()));
 }
@@ -21,7 +21,7 @@ llvm::PointerType* lang::IndirectType::getContentType(llvm::LLVMContext& c) cons
     return llvm::PointerType::get(native_type, 0);
 }
 
-bool lang::IndirectType::definesIndirection()
+bool lang::IndirectType::definesIndirection() const
 {
     return true;
 }
@@ -36,11 +36,11 @@ bool lang::IndirectType::validateIndirection(lang::Location, ValidationLogger&) 
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::IndirectType::buildIndirection(std::shared_ptr<Value> value, CompileContext& context)
+Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<Value> value, CompileContext& context)
 {
     value->buildContentValue(context);
     llvm::Value* ptr = value->getContentValue();
 
     llvm::Value* native_value = lang::values::contentToNative(value_reference_, ptr, context);
-    return std::make_shared<lang::WrappedNativeValue>(value_reference_, native_value);
+    return makeShared<lang::WrappedNativeValue>(value_reference_, native_value);
 }

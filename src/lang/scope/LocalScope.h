@@ -3,7 +3,6 @@
 
 #include "Scope.h"
 
-#include <optional>
 #include <set>
 
 #include "lang/Assigner.h"
@@ -12,6 +11,7 @@
 #include "lang/construct/Variable.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Location.h"
+#include "lang/utility/Optional.h"
 #include "lang/utility/OwningHandle.h"
 
 class Expression;
@@ -36,7 +36,7 @@ namespace lang
 
         lang::GlobalScope* getGlobalScope() override;
         lang::LocalScope*  asLocalScope() override;
-        llvm::DIScope*     getDebugScope(CompileContext& context) override;
+        llvm::DIScope*     getDebugScope(CompileContext& context) const override;
 
         [[nodiscard]] lang::Scope* scope() const;
 
@@ -57,12 +57,12 @@ namespace lang
          * @param location The source location.
          * @return The defined variable.
          */
-        lang::ResolvingHandle<lang::Variable> defineLocalVariable(Identifier                          name,
-                                                                  lang::ResolvingHandle<lang::Type>   type,
-                                                                  lang::Location                      type_location,
-                                                                  lang::Assigner                      assigner,
-                                                                  std::shared_ptr<lang::Value> const& value,
-                                                                  lang::Location                      location);
+        lang::ResolvingHandle<lang::Variable> defineLocalVariable(Identifier                        name,
+                                                                  lang::ResolvingHandle<lang::Type> type,
+                                                                  lang::Location                    type_location,
+                                                                  lang::Assigner                    assigner,
+                                                                  Optional<Shared<lang::Value>>     value,
+                                                                  lang::Location                    location);
 
         /**
          * Drop a variable. A variable must be defined in this scope to be dropped.
@@ -76,7 +76,7 @@ namespace lang
          * @param variable The variable to check.
          * @return True if the variable was dropped, false otherwise.
          */
-        bool wasVariableDropped(lang::ResolvingHandle<lang::Variable> variable) const;
+        [[nodiscard]] bool wasVariableDropped(lang::Variable const& variable) const;
 
         void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
         void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;

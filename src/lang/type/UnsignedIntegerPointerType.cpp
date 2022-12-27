@@ -3,25 +3,23 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 
-lang::UnsignedIntegerPointerType::UnsignedIntegerPointerType() : TypeDefinition(lang::Identifier::from("uiptr")) {}
+lang::UnsignedIntegerPointerType::UnsignedIntegerPointerType() : TypeDefinition(lang::Identifier::like("uiptr")) {}
 
 bool lang::UnsignedIntegerPointerType::isUnsignedIntegerPointerType() const
 {
     return true;
 }
 
-bool lang::UnsignedIntegerPointerType::acceptOverloadRequest(
-    std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
+bool lang::UnsignedIntegerPointerType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
 {
     if (parameters.size() == 1 && parameters[0]->isAddressType()) return true;
 
     return IntegerType::acceptOverloadRequest(parameters);
 }
 
-void lang::UnsignedIntegerPointerType::buildRequestedOverload(
-    std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
-    lang::PredefinedFunction&                             function,
-    CompileContext&                                       context)
+void lang::UnsignedIntegerPointerType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                                              lang::PredefinedFunction&                      function,
+                                                              CompileContext&                                context)
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }
@@ -75,11 +73,11 @@ unsigned int lang::UnsignedIntegerPointerType::sizeInBits()
 lang::ResolvingHandle<lang::Type> lang::UnsignedIntegerPointerType::get()
 {
     static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new UnsignedIntegerPointerType()));
+        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new UnsignedIntegerPointerType())));
     return instance;
 }
 
-std::optional<size_t> lang::UnsignedIntegerPointerType::getBitSize() const
+Optional<size_t> lang::UnsignedIntegerPointerType::getBitSize() const
 {
     return std::nullopt;
 }
@@ -102,4 +100,9 @@ size_t lang::UnsignedIntegerPointerType::getMinimumBitSize() const
 std::string lang::UnsignedIntegerPointerType::getSuffix() const
 {
     return "uiptr";
+}
+
+lang::ResolvingHandle<lang::Type> lang::UnsignedIntegerPointerType::clone() const
+{
+    return get();
 }

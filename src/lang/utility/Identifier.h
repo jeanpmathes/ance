@@ -19,12 +19,18 @@ namespace lang
         Identifier(std::string_view string, lang::Location location);
 
       public:
+        Identifier(Identifier const& other) = default;
+        Identifier(Identifier&& other)      = default;
+
+        Identifier& operator=(Identifier const& other) = default;
+        Identifier& operator=(Identifier&& other)      = default;
+
         /**
          * Create an identifier and intern the string.
          * @param string The text of the identifier.
          * @return The identifier.
          */
-        static Identifier from(std::string const& string, lang::Location location = lang::Location::global());
+        static Identifier like(std::string const& string, lang::Location location = lang::Location::global());
 
         [[nodiscard]] std::string_view text() const;
         [[nodiscard]] lang::Location   location() const;

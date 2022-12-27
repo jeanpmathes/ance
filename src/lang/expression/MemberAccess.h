@@ -26,27 +26,26 @@ class MemberAccess
      * @param member The identifier of the member.
      * @param location The location of the member access.
      */
-    MemberAccess(std::unique_ptr<Expression> value, lang::Identifier member, lang::Location location);
+    MemberAccess(Owned<Expression> value, lang::Identifier member, lang::Location location);
 
-    [[nodiscard]] Expression&             value() const;
+    [[nodiscard]] Expression const&       value() const;
     [[nodiscard]] lang::Identifier const& member() const;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
     void doBuild(CompileContext& context) override;
 
   public:
     ~MemberAccess() override;
 
   private:
-    std::unique_ptr<Expression> value_;
-    lang::Identifier            member_;
+    Owned<Expression> value_;
+    lang::Identifier  member_;
 };
 
 #endif

@@ -8,7 +8,7 @@ void lang::Value::buildContentValue(CompileContext& context)
     content_value_ = lang::values::nativeToContent(type(), getNativeValue(), context);
 }
 
-llvm::Value* lang::Value::getContentValue()
+llvm::Value* lang::Value::getContentValue() const
 {
     assert(content_value_ && "Content value must be built before accessing it.");
     return content_value_;

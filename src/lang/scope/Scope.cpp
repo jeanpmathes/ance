@@ -14,9 +14,9 @@ std::string lang::Scope::getTemporaryName()
     return "$temp" + std::to_string(temp_name_counter_++);
 }
 
-std::unique_ptr<lang::LocalScope> lang::Scope::makeLocalScope()
+Owned<lang::LocalScope> lang::Scope::makeLocalScope()
 {
-    auto local_scope = std::make_unique<lang::LocalScope>(this);
+    auto local_scope = makeOwned<lang::LocalScope>(this);
     addChild(*local_scope);
 
     onSubScope(local_scope.get());
@@ -37,7 +37,13 @@ void lang::Scope::addDependency(lang::ResolvingHandle<lang::Variable> variable)
 
     if (variable->scope() == this) return;
 
-    variable_dependencies_[variable]++;
+    if (!variable_to_dependency_index_.contains(variable))
+    {
+        variable_to_dependency_index_.emplace(variable, variable_dependencies_.size());
+        variable_dependencies_.emplace_back(variable);
+    }
+
+    variable_dependencies_[variable_to_dependency_index_.at(variable)].count++;
 
     scope()->addDependency(variable);
 }
@@ -48,17 +54,21 @@ void lang::Scope::addDependency(lang::ResolvingHandle<lang::Function> function)
 
     if (function->scope() == this) return;
 
-    function_dependencies_.insert(function);
+    if (!function_dependencies_set_.contains(function))
+    {
+        function_dependencies_set_.emplace(function);
+        function_dependencies_.emplace_back(function);
+    }
 
     scope()->addDependency(function);
 }
 
-std::map<lang::ResolvingHandle<lang::Variable>, size_t> lang::Scope::getVariableDependencies() const
+std::vector<lang::Scope::VariableDependency> lang::Scope::getVariableDependencies()
 {
     return variable_dependencies_;
 }
 
-std::set<lang::ResolvingHandle<lang::Function>> lang::Scope::getFunctionDependencies() const
+std::vector<lang::ResolvingHandle<lang::Function>> lang::Scope::getFunctionDependencies()
 {
     return function_dependencies_;
 }

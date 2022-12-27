@@ -19,26 +19,25 @@ class Subscript
      * @param index The index to use.
      * @param location The source location.
      */
-    Subscript(std::unique_ptr<Expression> indexed, std::unique_ptr<Expression> index, lang::Location location);
+    Subscript(Owned<Expression> indexed, Owned<Expression> index, lang::Location location);
 
-    [[nodiscard]] Expression& indexed() const;
-    [[nodiscard]] Expression& index() const;
-
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
+    [[nodiscard]] Expression const& indexed() const;
+    [[nodiscard]] Expression const& index() const;
 
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
     void doBuild(CompileContext& context) override;
 
   public:
     ~Subscript() override;
 
   private:
-    std::unique_ptr<Expression> indexed_;
-    std::unique_ptr<Expression> index_;
+    Owned<Expression> indexed_;
+    Owned<Expression> index_;
 };
 
 #endif

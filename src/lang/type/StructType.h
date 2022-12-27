@@ -16,15 +16,15 @@ namespace lang
     class StructType : public lang::TypeDefinition
     {
       public:
-        StructType(lang::AccessModifier                       access_modifier,
-                   lang::Identifier                           name,
-                   std::vector<std::unique_ptr<lang::Member>> members,
-                   lang::Location                             location);
+        StructType(lang::AccessModifier             access_modifier,
+                   lang::Identifier                 name,
+                   std::vector<Owned<lang::Member>> members,
+                   lang::Location                   location);
 
         [[nodiscard]] StateCount getStateCount() const override;
         bool                     isStructType() const override;
 
-        llvm::Constant*   getDefaultContent(llvm::Module& m) override;
+        llvm::Constant*   getDefaultContent(llvm::Module& m) const override;
         llvm::StructType* getContentType(llvm::LLVMContext& c) const override;
 
         [[nodiscard]] lang::AccessModifier getAccessModifier() const override;
@@ -33,12 +33,14 @@ namespace lang
 
         bool validateDefinition(ValidationLogger& validation_logger) const override;
 
-        bool                              hasMember(lang::Identifier const& name) override;
+        bool                              hasMember(lang::Identifier const& name) const override;
         lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name) override;
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
-        std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
-                                                       lang::Identifier const& name,
-                                                       CompileContext&         context) override;
+        Shared<lang::Value> buildMemberAccess(Shared<Value>           value,
+                                              lang::Identifier const& name,
+                                              CompileContext&         context) override;
+
+        void expand() override;
 
       protected:
         void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context) override;
@@ -48,9 +50,10 @@ namespace lang
         void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context) override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) override;
+        llvm::DIType* createDebugType(CompileContext& context) const override;
 
-        [[nodiscard]] std::vector<lang::TypeDefinition*> getDependencies() const override;
+      public:
+        std::vector<std::reference_wrapper<const lang::Type>> getContained() const override;
 
       private:
         llvm::Value* buildGetElementPointer(llvm::Value* struct_ptr, int32_t member_index, CompileContext& context);
@@ -58,7 +61,7 @@ namespace lang
       private:
         [[maybe_unused]] lang::AccessModifier access_;
 
-        std::vector<std::unique_ptr<lang::Member>>                       members_;
+        std::vector<Owned<lang::Member>>                                 members_;
         std::map<lang::Identifier, std::reference_wrapper<lang::Member>> member_map_ {};
         std::map<lang::Identifier, int32_t>                              member_indices_ {};
 

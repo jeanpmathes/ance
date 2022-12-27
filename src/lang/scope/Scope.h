@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <utility>
 
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
@@ -65,13 +66,13 @@ namespace lang
          * @param context The current compile context.
          * @return The debug scope.
          */
-        virtual llvm::DIScope* getDebugScope(CompileContext& context) = 0;
+        virtual llvm::DIScope* getDebugScope(CompileContext& context) const = 0;
 
         /**
          * Create a local scope in this scope.
          * @return The created local scope.
          */
-        std::unique_ptr<lang::LocalScope> makeLocalScope();
+        Owned<lang::LocalScope> makeLocalScope();
 
         /**
          * Register the usage of a variable in this scope. Only variables that are registered will be resolved.
@@ -158,17 +159,26 @@ namespace lang
          */
         void addDependency(lang::ResolvingHandle<lang::Function> function);
 
+        struct VariableDependency {
+            explicit VariableDependency(lang::ResolvingHandle<lang::Variable> var) : variable(std::move(var)) {}
+            VariableDependency(VariableDependency& other)  = default;
+            VariableDependency(VariableDependency&& other) = default;
+
+            lang::ResolvingHandle<lang::Variable> variable;
+            size_t                                count {0};
+        };
+
         /**
          * Get the variable dependencies and their count.
          * @return The variable dependencies.
          */
-        [[nodiscard]] std::map<lang::ResolvingHandle<lang::Variable>, size_t> getVariableDependencies() const;
+        std::vector<VariableDependency> getVariableDependencies();
 
         /**
          * Get the function dependencies.
          * @return The function dependencies.
          */
-        [[nodiscard]] std::set<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() const;
+        std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies();
 
         ~Scope() override = default;
 
@@ -178,8 +188,11 @@ namespace lang
       private:
         size_t temp_name_counter_ = 0;
 
-        std::map<lang::ResolvingHandle<lang::Variable>, size_t> variable_dependencies_;
-        std::set<lang::ResolvingHandle<lang::Function>>         function_dependencies_;
+        std::vector<VariableDependency>                         variable_dependencies_;
+        std::map<lang::ResolvingHandle<lang::Variable>, size_t> variable_to_dependency_index_;
+
+        std::vector<lang::ResolvingHandle<lang::Function>> function_dependencies_;
+        std::set<lang::ResolvingHandle<lang::Function>>    function_dependencies_set_;
     };
 }
 #endif

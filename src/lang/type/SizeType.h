@@ -22,7 +22,7 @@ namespace lang
             DIFF_KIND
         };
 
-        SizeType(std::string name, Kind kind);
+        SizeType(std::string const& name, Kind kind);
 
         Kind kind_;
 
@@ -55,7 +55,7 @@ namespace lang
       protected:
         std::string createMangledName() const override;
 
-        std::optional<size_t> getBitSize() const override;
+        Optional<size_t>      getBitSize() const override;
         size_t                getNativeBitSize() const override;
         bool                  isSigned() const override;
         size_t                getMinimumBitSize() const override;
@@ -90,6 +90,8 @@ namespace lang
          * Get the width of the diff type.
          */
         static unsigned int getDiffWidth();
+
+        ResolvingHandle<lang::Type> clone() const override;
     };
 }
 #endif

@@ -19,22 +19,23 @@ class BindRef
      * @param value The value to bind.
      * @param location The location of the bind reference.
      */
-    BindRef(std::unique_ptr<Expression> value, lang::Location location);
+    BindRef(Owned<Expression> value, lang::Location location);
 
   public:
-    [[nodiscard]] Expression& value() const;
-
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
+    [[nodiscard]] Expression const& value() const;
 
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
+  protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
+
   public:
     ~BindRef() override;
 
   private:
-    std::unique_ptr<Expression> value_;
+    Owned<Expression> value_;
 };
 
 #endif

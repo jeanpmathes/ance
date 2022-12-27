@@ -2,11 +2,13 @@
 
 #include "lang/utility/StringStorage.h"
 
+#include <iostream>
+
 lang::Identifier::Identifier(std::string_view string, lang::Location location) : string_(string), location_(location) {}
 
-lang::Identifier lang::Identifier::from(std::string const& string, lang::Location location)
+lang::Identifier lang::Identifier::like(std::string const& string, lang::Location location)
 {
-    std::string_view view = lang::StringStorage::shared().store(string);
+    std::string_view const view = lang::StringStorage::shared().store(string);
 
     return {view, location};
 }

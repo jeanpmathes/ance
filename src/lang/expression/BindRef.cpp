@@ -3,31 +3,31 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/expression/Addressof.h"
 #include "lang/expression/BindRefTo.h"
-#include "lang/type/PointerType.h"
 #include "lang/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
-BindRef::BindRef(std::unique_ptr<Expression> value, lang::Location location)
+BindRef::BindRef(Owned<Expression> value, lang::Location location)
     : UnexpandedExpression(location)
     , value_(std::move(value))
 {
     addSubexpression(*value_);
 }
 
-Expression& BindRef::value() const
+Expression const& BindRef::value() const
 {
     return *value_;
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> BindRef::tryGetType() const
+void BindRef::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    auto element_type_opt = value_->tryGetType();
-    if (!element_type_opt) return std::nullopt;
-    auto element_type = *element_type_opt;
+    auto element_type = value_->type();
 
-    if (element_type->isReferenceType()) { element_type = element_type->getElementType(); }
+    if (element_type->isDefined())
+    {
+        if (element_type->isReferenceType()) { element_type = element_type->getElementType(); }
 
-    return lang::ReferenceType::get(element_type);
+        type.reroute(lang::ReferenceType::get(element_type));
+    }
 }
 
 bool BindRef::validate(ValidationLogger& validation_logger) const
@@ -46,10 +46,9 @@ bool BindRef::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion BindRef::expandWith(Expressions subexpressions) const
 {
-    return {
-        Statements(),
-        std::make_unique<BindRefTo>(std::make_unique<Addressof>(std::move(subexpressions[0]), location()), location()),
-        Statements()};
+    return {Statements(),
+            makeOwned<BindRefTo>(makeOwned<Addressof>(std::move(subexpressions[0]), location()), location()),
+            Statements()};
 }
 
 BindRef::~BindRef() = default;

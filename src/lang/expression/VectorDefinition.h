@@ -22,34 +22,33 @@ class VectorDefinition
     , public lang::Element<VectorDefinition, ANCE_CONSTRUCTS>
 {
   public:
-    VectorDefinition(std::optional<lang::ResolvingHandle<lang::Type>> type,
-                     lang::Location                                   type_location,
-                     std::vector<std::unique_ptr<Expression>>         elements,
-                     lang::Location                                   location);
+    VectorDefinition(Optional<lang::ResolvingHandle<lang::Type>> type,
+                     lang::Location                              type_location,
+                     std::vector<Owned<Expression>>              elements,
+                     lang::Location                              location);
 
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> const& elementType() const;
-    [[nodiscard]] std::vector<std::reference_wrapper<Expression>>         values() const;
+    [[nodiscard]] lang::Type const*                                     elementType() const;
+    [[nodiscard]] std::vector<std::reference_wrapper<Expression const>> values() const;
 
   protected:
     void walkDefinitions() override;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
     void doBuild(CompileContext& context) override;
 
   public:
     ~VectorDefinition() override;
 
   private:
-    std::optional<lang::ResolvingHandle<lang::Type>> type_;
-    lang::Location                                   type_location_;
-    std::vector<std::unique_ptr<Expression>>         elements_;
+    Optional<lang::ResolvingHandle<lang::Type>> type_;
+    lang::Location                              type_location_;
+    std::vector<Owned<Expression>>              elements_;
 };
 
 #endif

@@ -27,12 +27,12 @@ namespace lang
     class FunctionDefinition : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     {
       public:
-        explicit FunctionDefinition(lang::Function&                               function,
-                                    lang::Scope&                                  containing_scope,
-                                    lang::ResolvingHandle<lang::Type>             type,
-                                    lang::Location                                return_type_location,
-                                    std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                                    lang::Location                                location);
+        explicit FunctionDefinition(lang::Function&                      function,
+                                    lang::Scope&                         containing_scope,
+                                    lang::ResolvingHandle<lang::Type>    type,
+                                    lang::Location                       return_type_location,
+                                    std::vector<Shared<lang::Parameter>> parameters,
+                                    lang::Location                       location);
 
         /**
          * Get the name of this function.
@@ -54,7 +54,13 @@ namespace lang
          * Get the return type of this function.
          * @return The return type.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> returnType() const;
+        lang::ResolvingHandle<lang::Type> returnType();
+
+        /**
+         * Get the return type of this function.
+         * @return The return type.
+         */
+        [[nodiscard]] lang::Type const& returnType() const;
 
         /**
          * Get the function signature.
@@ -73,7 +79,14 @@ namespace lang
          * @param index The index of the parameter. Must be smaller than the parameter count.
          * @return The type of the selected parameter.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> parameterType(size_t index) const;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> parameterType(size_t index);
+
+        /**
+         * Get the type of a parameter.
+         * @param index The index of the parameter. Must be smaller than the parameter count.
+         * @return The type of the selected parameter.
+         */
+        [[nodiscard]] lang::Type const& parameterType(size_t index) const;
 
         /**
          * Get the parameter count.
@@ -107,7 +120,7 @@ namespace lang
         /**
          * Expand the function content to remove syntactic sugar.
          */
-        virtual void expand() = 0;
+        virtual void expand();
 
         /**
          * Determine and create structures to represent control flow.
@@ -140,17 +153,18 @@ namespace lang
          * @param validation_logger A logger to log validation messages.
          * @return True if the call is valid.
          */
-        virtual bool validateCall(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
-                                  lang::Location                                                              location,
-                                  ValidationLogger& validation_logger);
+        virtual bool validateCall(
+            std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
+            lang::Location                                                                           location,
+            ValidationLogger& validation_logger) const;
 
         /**
          *This method is called in @see FunctionDefinition::validateCall.
          */
         virtual bool doCallValidation(
-            std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
-            lang::Location                                                              location,
-            ValidationLogger&                                                           validation_logger) const;
+            std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
+            lang::Location                                                                           location,
+            ValidationLogger& validation_logger) const;
 
         /**
          * Build a call to this function.
@@ -158,8 +172,7 @@ namespace lang
          * @param context The current compile context.
          * @return The return value. Will be null for return type void.
          */
-        std::shared_ptr<lang::Value> buildCall(std::vector<std::shared_ptr<lang::Value>> const& arguments,
-                                               CompileContext&                                  context) const;
+        Optional<Shared<lang::Value>> buildCall(std::vector<Shared<lang::Value>> arguments, CompileContext& context);
 
         /**
          * Get the parameter list as source, with parentheses.
@@ -171,7 +184,13 @@ namespace lang
          * Get the function parameters.
          * @return A vector containing the parameters.
          */
-        [[nodiscard]] std::vector<std::shared_ptr<lang::Parameter>> const& parameters() const;
+        [[nodiscard]] std::vector<Shared<lang::Parameter>> const& parameters() const;
+
+        /**
+         * Get the function parameters.
+         * @return A vector containing the parameters.
+         */
+        [[nodiscard]] std::vector<Shared<lang::Parameter>> parameters();
 
         /**
          * A helper to create a native function.
@@ -192,17 +211,17 @@ namespace lang
          * @param context The current compile context.
          * @return The return value.
          */
-        llvm::CallInst* buildCall(std::vector<std::shared_ptr<lang::Value>> const& arguments,
-                                  llvm::FunctionType*                              native_type,
-                                  llvm::Function*                                  native_function,
-                                  CompileContext&                                  context) const;
+        llvm::CallInst* buildCall(std::vector<Shared<lang::Value>> arguments,
+                                  llvm::FunctionType*              native_type,
+                                  llvm::Function*                  native_function,
+                                  CompileContext&                  context);
 
         [[nodiscard]] virtual std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const = 0;
 
       public:
         lang::GlobalScope*        getGlobalScope();
-        virtual llvm::DIScope*    getDebugScope(CompileContext& context) = 0;
-        virtual lang::LocalScope* getInsideScope()                       = 0;
+        virtual llvm::DIScope*    getDebugScope(CompileContext& context) const = 0;
+        virtual lang::LocalScope* getInsideScope()                             = 0;
 
         [[nodiscard]] virtual std::vector<lang::BasicBlock*> const& getBasicBlocks() const = 0;
 
@@ -214,7 +233,7 @@ namespace lang
 
         lang::ResolvingHandle<lang::Type>             return_type_;
         lang::Location                                return_type_location_;
-        std::vector<std::shared_ptr<lang::Parameter>> parameters_;
+        std::vector<Shared<lang::Parameter>>          parameters_;
         lang::Location                                location_;
 
       protected:

@@ -3,6 +3,8 @@
 
 #include "DelayableExpression.h"
 
+#include <optional>
+
 #include "compiler/Runtime.h"
 #include "lang/Element.h"
 
@@ -26,25 +28,24 @@ class Allocation
      */
     Allocation(Runtime::Allocator                allocation,
                lang::ResolvingHandle<lang::Type> type,
-               std::unique_ptr<Expression>       count,
+               Optional<Owned<Expression>>       count,
                lang::Location                    location,
                lang::Location                    allocated_type_location);
 
-    [[nodiscard]] Runtime::Allocator                allocator() const;
-    [[nodiscard]] lang::ResolvingHandle<lang::Type> allocatedType() const;
-    [[nodiscard]] Expression*                       count() const;
+    [[nodiscard]] Runtime::Allocator allocator() const;
+    [[nodiscard]] lang::Type const&  allocatedType() const;
+    [[nodiscard]] Expression const*  count() const;
 
   protected:
     void walkDefinitions() override;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
     void doBuild(CompileContext& context) override;
 
   public:
@@ -54,7 +55,7 @@ class Allocation
     Runtime::Allocator                allocation_;
     lang::ResolvingHandle<lang::Type> allocated_type_;
     lang::Location                    allocated_type_location_;
-    std::unique_ptr<Expression>       count_;
+    Optional<Owned<Expression>>       count_;
     lang::ResolvingHandle<lang::Type> return_type_;
 };
 

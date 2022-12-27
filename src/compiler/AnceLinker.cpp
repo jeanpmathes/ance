@@ -2,34 +2,34 @@
 
 #include <lld/Common/Driver.h>
 
-AnceLinker::AnceLinker(std::optional<std::reference_wrapper<const data::Element>> link_config)
+AnceLinker::AnceLinker(Optional<std::reference_wrapper<const data::Element>> link_config)
 {
-    if (link_config)
+    if (link_config.hasValue())
     {
         auto const& link_config_root = link_config->get();
 
         auto libpath_list = link_config_root["libpath"];
 
-        if (libpath_list)
+        if (libpath_list.hasValue())
         {
             for (auto libpath : libpath_list->get())
             {
                 auto libpath_str = libpath.get().asString();
-                if (!libpath_str) continue;
+                if (!libpath_str.hasValue()) continue;
 
-                std::filesystem::path path(libpath_str->get());
+                std::filesystem::path const path(libpath_str->get());
                 lib_paths_.push_back("/libpath:" + path.string());
             }
         }
 
         auto lib_list = link_config_root["lib"];
 
-        if (lib_list)
+        if (lib_list.hasValue())
         {
             for (auto lib : lib_list->get())
             {
                 auto lib_str = lib.get().asString();
-                if (!lib_str) continue;
+                if (!lib_str.hasValue()) continue;
 
                 libs_.push_back("/defaultlib:" + lib_str->get());
             }
@@ -49,14 +49,14 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
 
     args.push_back("/entry:start$lang");
 
-    std::string out = "/out:" + exe.string();
+    std::string const out = "/out:" + exe.string();
     args.push_back(out.c_str());
 
     for (auto const& libpath : lib_paths_) { args.push_back(libpath.c_str()); }
 
     for (auto const& lib : libs_) { args.push_back(lib.c_str()); }
 
-    std::string in = obj.string();
+    std::string const in = obj.string();
     args.push_back(in.c_str());
 
     return lld::mingw::link(args, llvm::outs(), llvm::errs(), false, false);

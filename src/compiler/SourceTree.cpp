@@ -12,57 +12,60 @@ size_t SourceTree::parse()
     std::filesystem::path              project_path = application_.getProject().getProjectDirectory();
     std::vector<std::filesystem::path> source_files = application_.getProject().getSourceFiles();
 
-    std::vector<std::future<SourceFileReadResult>> futures;
+    std::vector<std::future<void>> futures;
+    futures.reserve(source_files.size());
+
+    std::vector<SourceFileReadResult> results;
+    results.reserve(source_files.size());
 
     for (size_t index = 0; index < source_files.size(); index++)
     {
-        auto result = std::async(std::launch::async, readSourceFile, project_path, source_files[index], index);
-        futures.push_back(std::move(result));
+        auto result = std::ref(results.emplace_back());
+        auto future = std::async(std::launch::async, readSourceFile, project_path, source_files[index], index, result);
+        futures.push_back(std::move(future));
     }
 
-    for (auto& future : futures)
-    {
-        auto result = future.get();
-        source_files_.push_back(std::move(result));
-    }
+    for (auto& future : futures) { future.wait(); }
+
+    for (auto& result : results) { source_files_.push_back(std::move(result)); }
 
     return source_files_.size();
 }
 
-SourceTree::SourceFileReadResult SourceTree::readSourceFile(std::filesystem::path const& project_path,
-                                                            std::filesystem::path const& file_path,
-                                                            size_t                       index)
+void SourceTree::readSourceFile(std::filesystem::path const&                 project_path,
+                                std::filesystem::path const&                 file_path,
+                                size_t                                       index,
+                                std::reference_wrapper<SourceFileReadResult> result)
 {
-    std::unique_ptr<SourceFile> source_file = std::make_unique<SourceFile>(project_path, file_path);
+    Owned<SourceFile> source_file = makeOwned<SourceFile>(project_path, file_path);
 
-    std::unique_ptr<AnceSyntaxErrorHandler> syntax_error_listener =
-        std::make_unique<AnceSyntaxErrorHandler>(*source_file);
+    Owned<AnceSyntaxErrorHandler> syntax_error_listener = makeOwned<AnceSyntaxErrorHandler>(*source_file);
 
     std::fstream code;
     code.open(project_path / file_path);
 
-    std::unique_ptr<antlr4::ANTLRInputStream> input = std::make_unique<antlr4::ANTLRInputStream>(code);
-    std::unique_ptr<anceLexer>                lexer = std::make_unique<anceLexer>(input.get());
+    Owned<antlr4::ANTLRInputStream> input = makeOwned<antlr4::ANTLRInputStream>(code);
+    Owned<anceLexer>                lexer = makeOwned<anceLexer>(input.get());
     lexer->removeErrorListeners();
     lexer->addErrorListener(syntax_error_listener->lexerErrorListener());
 
-    std::unique_ptr<antlr4::CommonTokenStream> tokens = std::make_unique<antlr4::CommonTokenStream>(lexer.get());
-    std::unique_ptr<anceParser>                parser = std::make_unique<anceParser>(tokens.get());
+    Owned<antlr4::CommonTokenStream> tokens = makeOwned<antlr4::CommonTokenStream>(lexer.get());
+    Owned<anceParser>                parser = makeOwned<anceParser>(tokens.get());
     parser->removeErrorListeners();
     parser->addErrorListener(syntax_error_listener->parserErrorListener());
 
     antlr4::tree::ParseTree* tree = parser->file();
 
-    std::unique_ptr<FileContext> file_context = std::make_unique<FileContext>(index, *source_file);
+    Owned<FileContext> file_context = makeOwned<FileContext>(index, *source_file);
 
-    return {std::move(file_context),
-            std::move(syntax_error_listener),
-            std::move(source_file),
-            std::move(input),
-            std::move(lexer),
-            std::move(tokens),
-            std::move(parser),
-            tree};
+    result.get().file_context         = std::move(file_context);
+    result.get().syntax_error_handler = std::move(syntax_error_listener);
+    result.get().source_file          = std::move(source_file);
+    result.get().input                = std::move(input);
+    result.get().lexer                = std::move(lexer);
+    result.get().tokens               = std::move(tokens);
+    result.get().parser               = std::move(parser);
+    result.get().tree                 = tree;
 }
 
 size_t SourceTree::emitMessages()
@@ -71,8 +74,8 @@ size_t SourceTree::emitMessages()
 
     for (auto& source_file : source_files_)
     {
-        source_file.syntax_error_handler->emitMessages();
-        fatal_error_count += source_file.syntax_error_handler->fatalSyntaxErrorCount();
+        source_file.syntax_error_handler.value()->emitMessages();
+        fatal_error_count += source_file.syntax_error_handler.value()->fatalSyntaxErrorCount();
     }
 
     return fatal_error_count;
@@ -82,7 +85,7 @@ void SourceTree::accept(SourceVisitor& visitor)
 {
     for (auto& source_file : source_files_)
     {
-        visitor.setFileContext(*source_file.file_context);
+        visitor.setFileContext(*source_file.file_context.value());
         visitor.visit(source_file.tree);
     }
 }
@@ -91,7 +94,7 @@ std::vector<std::reference_wrapper<SourceFile>> SourceTree::getSourceFiles()
 {
     std::vector<std::reference_wrapper<SourceFile>> result;
 
-    for (auto& source_file : source_files_) { result.emplace_back(*source_file.source_file); }
+    for (auto& source_file : source_files_) { result.emplace_back(*source_file.source_file.value()); }
 
     return result;
 }

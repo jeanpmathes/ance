@@ -8,7 +8,7 @@
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
-Expression::Expression(lang::Location location) : location_(location) {}
+Expression::Expression(lang::Location location) : location_(location), type_(lang::Type::getUndefined()) {}
 
 lang::Location Expression::location() const
 {
@@ -20,15 +20,16 @@ lang::Scope* Expression::scope() const
     return containing_scope_;
 }
 
-lang::ResolvingHandle<lang::Type> Expression::type() const
+lang::ResolvingHandle<lang::Type> Expression::type()
 {
-    if (not type_.has_value())
-    {
-        type_ = tryGetType();
-        assert(type_.has_value());
-    }
+    if (not type_->isDefined()) defineType(type_);
 
-    return type_.value();
+    return type_;
+}
+
+lang::Type const& Expression::type() const
+{
+    return type_;
 }
 
 void Expression::setContainingScope(lang::Scope& scope)
@@ -45,6 +46,7 @@ void Expression::walkDefinitions()
 void Expression::postResolve()
 {
     for (auto& subexpression : subexpressions_) { subexpression.get().postResolve(); }
+    type();// Trigger rerouting / defining of type.
 }
 
 void Expression::setScope(lang::Scope& scope)
@@ -52,21 +54,21 @@ void Expression::setScope(lang::Scope& scope)
     for (auto& subexpression : subexpressions_) { subexpression.get().setContainingScope(scope); }
 }
 
-bool Expression::isNamed()
+bool Expression::isNamed() const
 {
-    return type()->isReferenceType();
+    return type().isReferenceType();
 }
 
-bool Expression::validateAssignment(std::shared_ptr<lang::Value> const& value,
-                                    lang::Location                      value_location,
-                                    ValidationLogger&                   validation_logger)
+bool Expression::validateAssignment(lang::Value const& value,
+                                    lang::Location     value_location,
+                                    ValidationLogger&  validation_logger) const
 {
     if (!validate(validation_logger)) return false;
 
-    if (type()->isReferenceType())
+    if (type().isReferenceType())
     {
-        lang::ResolvingHandle<lang::Type> target_type = type()->getElementType();
-        return lang::Type::checkMismatch(target_type, value->type(), value_location, validation_logger);
+        lang::Type const& target_type = type().getElementType();
+        return lang::Type::checkMismatch(target_type, value.type(), value_location, validation_logger);
     }
     else
     {
@@ -75,21 +77,21 @@ bool Expression::validateAssignment(std::shared_ptr<lang::Value> const& value,
     }
 }
 
-void Expression::assign(std::shared_ptr<lang::Value> value, CompileContext& context)
+void Expression::assign(Shared<lang::Value> value, CompileContext& context)
 {
     context.setDebugLocation(location(), containing_scope_);
     doAssign(std::move(value), context);
     context.resetDebugLocation();
 }
 
-void Expression::doAssign(std::shared_ptr<lang::Value> value, CompileContext& context)
+void Expression::doAssign(Shared<lang::Value> value, CompileContext& context)
 {
     assert(type()->isReferenceType());
 
     lang::ResolvingHandle<lang::Type> target_type = type()->getElementType();
     value                                         = lang::Type::makeMatching(target_type, value, context);
 
-    std::shared_ptr<lang::Value> expression_return = getValue();
+    Shared<lang::Value> expression_return = getValue();
 
     expression_return->buildContentValue(context);
     value->buildNativeValue(context);
@@ -103,7 +105,7 @@ void Expression::addSubexpression(Expression& subexpression)
     addChild(subexpression);
 }
 
-std::tuple<Statements, std::unique_ptr<Expression>, Statements> Expression::expand() const
+std::tuple<Statements, Owned<Expression>, Statements> Expression::expand() const
 {
     Statements before;
     Statements after;
@@ -137,29 +139,23 @@ std::tuple<Statements, std::unique_ptr<Expression>, Statements> Expression::expa
     return std::make_tuple(std::move(before), std::move(expanded_expression), std::move(after));
 }
 
-std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> Expression::tryGetTypes(
-    std::vector<std::unique_ptr<Expression>> const& expressions)
-{
-    std::vector<lang::ResolvingHandle<lang::Type>> types;
-    types.reserve(expressions.size());
-
-    for (auto& expression : expressions)
-    {
-        auto type = expression->tryGetType();
-        if (not type.has_value()) return std::nullopt;
-        types.push_back(type.value());
-    }
-
-    return types;
-}
-
-std::vector<lang::ResolvingHandle<lang::Type>> Expression::getTypes(
-    std::vector<std::unique_ptr<Expression>> const& expressions)
+std::vector<lang::ResolvingHandle<lang::Type>> Expression::getTypes(std::vector<Owned<Expression>>& expressions)
 {
     std::vector<lang::ResolvingHandle<lang::Type>> types;
     types.reserve(expressions.size());
 
     for (auto& expression : expressions) { types.push_back(expression->type()); }
+
+    return types;
+}
+
+std::vector<std::reference_wrapper<lang::Type const>> Expression::getTypes(
+    std::vector<Owned<Expression>> const& expressions)
+{
+    std::vector<std::reference_wrapper<lang::Type const>> types;
+    types.reserve(expressions.size());
+
+    for (auto& expression : expressions) { types.emplace_back(expression->type()); }
 
     return types;
 }

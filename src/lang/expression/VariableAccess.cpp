@@ -12,7 +12,7 @@ VariableAccess::VariableAccess(lang::ResolvingHandle<lang::Variable> variable, l
     , variable_(std::move(variable))
 {}
 
-lang::ResolvingHandle<lang::Variable> VariableAccess::variable() const
+lang::Variable const& VariableAccess::variable() const
 {
     return variable_;
 }
@@ -29,13 +29,12 @@ void VariableAccess::postResolve()
     if (variable_->isDefined()) { scope()->addDependency(variable_); }
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> VariableAccess::tryGetType() const
+void VariableAccess::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    if (variable_->isDefined() && variable_->type()->isDefined()) return variable_->type();
-    else return std::nullopt;
+    if (variable_->isDefined() && variable_->type()->isDefined()) { type.reroute(variable_->type()); }
 }
 
-bool VariableAccess::isNamed()
+bool VariableAccess::isNamed() const
 {
     return true;
 }
@@ -46,9 +45,9 @@ bool VariableAccess::validate(ValidationLogger& validation_logger) const
     return variable_->validateGetValue(validation_logger, location());
 }
 
-bool VariableAccess::validateAssignment(std::shared_ptr<lang::Value> const& value,
-                                        lang::Location                      value_location,
-                                        ValidationLogger&                   validation_logger)
+bool VariableAccess::validateAssignment(lang::Value const& value,
+                                        lang::Location     value_location,
+                                        ValidationLogger&  validation_logger) const
 {
     if (isVariableDropped(validation_logger)) return false;
 
@@ -68,16 +67,19 @@ bool VariableAccess::isVariableDropped(ValidationLogger& validation_logger) cons
 
 Expression::Expansion VariableAccess::expandWith(Expressions) const
 {
-    return {Statements(), std::make_unique<VariableAccess>(variable_->toUndefined(), location()), Statements()};
+    std::string test = std::string(variable_->name().text());
+    (void) test;
+
+    return {Statements(), makeOwned<VariableAccess>(variable_->toUndefined(), location()), Statements()};
 }
 
 void VariableAccess::doBuild(CompileContext& context)
 {
-    std::shared_ptr<lang::Value> value = variable_->getValue(context);
+    Shared<lang::Value> value = variable_->getValue(context);
     setValue(value);
 }
 
-void VariableAccess::doAssign(std::shared_ptr<lang::Value> value, CompileContext& context)
+void VariableAccess::doAssign(Shared<lang::Value> value, CompileContext& context)
 {
     variable_->setValue(value, context);
 }

@@ -10,11 +10,11 @@ std::string Project::getName() const
 {
     auto name = project_.root()["name"];
 
-    if (name)
+    if (name.hasValue())
     {
         auto str = name->get().asString();
 
-        if (str) { return str->get(); }
+        if (str.hasValue()) { return str->get(); }
     }
 
     return "unnamed";
@@ -31,9 +31,9 @@ std::filesystem::path Project::getProjectDirectory() const
 
 std::vector<std::filesystem::path> Project::getSourceFiles() const
 {
-    std::filesystem::path project_directory = getProjectDirectory();
-    std::filesystem::path src               = "src";
-    std::filesystem::path src_directory     = project_directory / src;
+    std::filesystem::path const project_directory = getProjectDirectory();
+    std::filesystem::path const src               = "src";
+    std::filesystem::path const src_directory     = project_directory / src;
 
     std::vector<std::filesystem::path> files;
 
@@ -41,7 +41,7 @@ std::vector<std::filesystem::path> Project::getSourceFiles() const
     {
         if (entry.is_regular_file() && entry.path().extension() == ".nc")
         {
-            std::filesystem::path relative_path = entry.path().lexically_relative(project_directory);
+            std::filesystem::path const relative_path = entry.path().lexically_relative(project_directory);
             files.push_back(relative_path);
         }
     }

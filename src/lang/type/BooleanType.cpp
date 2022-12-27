@@ -9,7 +9,7 @@
 #include "lang/type/Type.h"
 #include "lang/utility/Values.h"
 
-lang::BooleanType::BooleanType() : TypeDefinition(lang::Identifier::from("bool")) {}
+lang::BooleanType::BooleanType() : TypeDefinition(lang::Identifier::like("bool")) {}
 
 StateCount lang::BooleanType::getStateCount() const
 {
@@ -22,7 +22,7 @@ bool lang::BooleanType::isBooleanType() const
     return true;
 }
 
-llvm::Constant* lang::BooleanType::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::BooleanType::getDefaultContent(llvm::Module& m) const
 {
     return llvm::ConstantInt::get(getContentType(m.getContext()), 0, false);
 }
@@ -52,12 +52,12 @@ std::string lang::BooleanType::createMangledName() const
     return "b";
 }
 
-llvm::DIType* lang::BooleanType::createDebugType(CompileContext& context)
+llvm::DIType* lang::BooleanType::createDebugType(CompileContext& context) const
 {
     llvm::DataLayout const& dl = context.module()->getDataLayout();
 
-    std::string name         = std::string(this->name().text());
-    uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    std::string const name         = std::string(this->name().text());
+    uint64_t const    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
 
     return context.di()->createBasicType(name, size_in_bits, llvm::dwarf::DW_ATE_boolean);
 }
@@ -65,11 +65,11 @@ llvm::DIType* lang::BooleanType::createDebugType(CompileContext& context)
 lang::ResolvingHandle<lang::Type> lang::BooleanType::get()
 {
     static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new BooleanType()));
+        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new BooleanType())));
     return instance;
 }
 
-bool lang::BooleanType::isOperatorDefined(lang::UnaryOperator op)
+bool lang::BooleanType::isOperatorDefined(lang::UnaryOperator op) const
 {
     return op == lang::UnaryOperator::NOT || op == lang::UnaryOperator::BITWISE_NOT;
 }
@@ -84,9 +84,9 @@ bool lang::BooleanType::validateOperator(lang::UnaryOperator, lang::Location, Va
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator    op,
-                                                              std::shared_ptr<Value> value,
-                                                              CompileContext&        context)
+Shared<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator op,
+                                                     Shared<Value>       value,
+                                                     CompileContext&     context)
 {
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
@@ -107,15 +107,14 @@ std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperato
 
     lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op);
     llvm::Value*                      native_result = lang::values::contentToNative(result_type, result, context);
-    return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
+    return makeShared<lang::WrappedNativeValue>(result_type, native_result);
 }
 
-bool lang::BooleanType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
+bool lang::BooleanType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
 {
     if (!op.isEquality() && !op.isBitwise()) return false;
 
-    other = lang::Type::getReferencedType(other);
-    return other->isBooleanType();
+    return lang::Type::getReferencedType(other).isBooleanType();
 }
 
 lang::ResolvingHandle<lang::Type> lang::BooleanType::getOperatorResultType(lang::BinaryOperator op,
@@ -127,7 +126,7 @@ lang::ResolvingHandle<lang::Type> lang::BooleanType::getOperatorResultType(lang:
 }
 
 bool lang::BooleanType::validateOperator(lang::BinaryOperator,
-                                         lang::ResolvingHandle<lang::Type>,
+                                         lang::Type const&,
                                          lang::Location,
                                          lang::Location,
                                          ValidationLogger&) const
@@ -135,10 +134,10 @@ bool lang::BooleanType::validateOperator(lang::BinaryOperator,
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperator   op,
-                                                              std::shared_ptr<Value> left,
-                                                              std::shared_ptr<Value> right,
-                                                              CompileContext&        context)
+Shared<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperator op,
+                                                     Shared<Value>        left,
+                                                     Shared<Value>        right,
+                                                     CompileContext&      context)
 {
     right = lang::Type::getValueOrReferencedValue(right, context);
 
@@ -169,16 +168,16 @@ std::shared_ptr<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperat
             break;
 
         default:
-            return nullptr;
+            throw std::logic_error("Invalid operator for boolean type");
     }
 
     lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op, right->type());
     llvm::Value*                      native_result = lang::values::contentToNative(result_type, result, context);
 
-    return std::make_shared<lang::WrappedNativeValue>(result_type, native_result);
+    return makeShared<lang::WrappedNativeValue>(result_type, native_result);
 }
 
-bool lang::BooleanType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
+bool lang::BooleanType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
 {
     if (parameters.size() == 1)
     {
@@ -188,9 +187,9 @@ bool lang::BooleanType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<
     return false;
 }
 
-void lang::BooleanType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
-                                               lang::PredefinedFunction&                             function,
-                                               CompileContext&                                       context)
+void lang::BooleanType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                               lang::PredefinedFunction&                      function,
+                                               CompileContext&                                context)
 {
     llvm::Function* native_function;
     std::tie(std::ignore, native_function) = function.getNativeRepresentation();
@@ -219,4 +218,9 @@ void lang::BooleanType::buildRequestedOverload(std::vector<lang::ResolvingHandle
             }
         }
     }
+}
+
+lang::ResolvingHandle<lang::Type> lang::BooleanType::clone() const
+{
+    return get();
 }

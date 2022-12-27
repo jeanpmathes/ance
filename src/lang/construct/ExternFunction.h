@@ -20,12 +20,12 @@ namespace lang
         , public lang::Element<ExternFunction, ANCE_CONSTRUCTS>
     {
       public:
-        ExternFunction(Function&                                     function,
-                       Scope&                                        containing_scope,
-                       lang::ResolvingHandle<lang::Type>             return_type,
-                       lang::Location                                return_type_location,
-                       std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                       lang::Location                                location);
+        ExternFunction(Function&                            function,
+                       Scope&                               containing_scope,
+                       lang::ResolvingHandle<lang::Type>    return_type,
+                       lang::Location                       return_type_location,
+                       std::vector<Shared<lang::Parameter>> parameters,
+                       lang::Location                       location);
 
         [[nodiscard]] bool isMangled() const override;
 
@@ -37,7 +37,7 @@ namespace lang
         void createNativeBacking(CompileContext& context) override;
         void build(CompileContext& context) override;
 
-        llvm::DIScope*                                      getDebugScope(CompileContext& context) override;
+        llvm::DIScope*                                      getDebugScope(CompileContext& context) const override;
         lang::LocalScope*                                   getInsideScope() override;
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 

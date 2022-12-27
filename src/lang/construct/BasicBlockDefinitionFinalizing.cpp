@@ -48,9 +48,9 @@ void lang::BasicBlock::Definition::Finalizing::simplify()
     if (next_) next_->simplify();
 }
 
-std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Finalizing::getLeaves()
+std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Finalizing::getLeaves() const
 {
-    std::list<lang::BasicBlock*> leaves;
+    std::list<lang::BasicBlock const*> leaves;
 
     if (next_) { leaves.splice(leaves.end(), next_->getLeaves()); }
     else { leaves.push_back(self()); }
@@ -67,24 +67,24 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Finalizing::getSucc
     return successors;
 }
 
-lang::Location lang::BasicBlock::Definition::Finalizing::getStartLocation()
+lang::Location lang::BasicBlock::Definition::Finalizing::getStartLocation() const
 {
     return lang::Location::global();
 }
 
-lang::Location lang::BasicBlock::Definition::Finalizing::getEndLocation()
+lang::Location lang::BasicBlock::Definition::Finalizing::getEndLocation() const
 {
     return lang::Location::global();
 }
 
-void lang::BasicBlock::Definition::Finalizing::reach()
+void lang::BasicBlock::Definition::Finalizing::reach() const
 {
     if (next_) next_->reach();
 }
 
 void lang::BasicBlock::Definition::Finalizing::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
-    std::string name = "b" + std::to_string(index_);
+    std::string const name = "b" + std::to_string(index_);
     native_block_    = llvm::BasicBlock::Create(*context.llvmContext(), name, native_function);
 
     if (next_) next_->prepareBuild(context, native_function);

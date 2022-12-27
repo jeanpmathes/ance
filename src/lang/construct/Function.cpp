@@ -5,15 +5,13 @@
 #include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/CustomFunction.h"
 #include "lang/construct/ExternFunction.h"
-#include "lang/construct/InitializerFunction.h"
 #include "lang/construct/LocalVariable.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
 
-lang::Function::Function(Identifier function_name) : name_(std::move(function_name)) {}
+lang::Function::Function(Identifier function_name) : name_(function_name) {}
 
 lang::Identifier const& lang::Function::name() const
 {
@@ -22,172 +20,184 @@ lang::Identifier const& lang::Function::name() const
 
 bool lang::Function::isDefined() const
 {
-    return (definition_ != nullptr);
+    return definition_.hasValue();
 }
 
-void lang::Function::defineAsExtern(Scope&                                               containing_scope,
-                                    lang::ResolvingHandle<lang::Type>                    return_type,
-                                    lang::Location                                       return_type_location,
-                                    std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
-                                    lang::Location                                       location)
+void lang::Function::defineAsExtern(Scope&                                      containing_scope,
+                                    lang::ResolvingHandle<lang::Type>           return_type,
+                                    lang::Location                              return_type_location,
+                                    std::vector<Shared<lang::Parameter>> const& parameters,
+                                    lang::Location                              location)
 {
-    definition_ = std::make_unique<lang::ExternFunction>(*this,
-                                                         containing_scope,
-                                                         return_type,
-                                                         return_type_location,
-                                                         parameters,
-                                                         location);
+    definition_ = makeOwned<lang::ExternFunction>(*this,
+                                                  containing_scope,
+                                                  return_type,
+                                                  return_type_location,
+                                                  parameters,
+                                                  location);
 
-    addChild(*definition_);
+    addChild(*definition_.value());
 }
 
-void lang::Function::defineAsCustom(lang::AccessModifier                                 access,
-                                    lang::ResolvingHandle<lang::Type>                    return_type,
-                                    lang::Location                                       return_type_location,
-                                    std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
-                                    std::unique_ptr<lang::CodeBlock>                     block,
-                                    Scope&                                               containing_scope,
-                                    lang::Location                                       declaration_location,
-                                    lang::Location                                       definition_location)
+void lang::Function::defineAsCustom(lang::AccessModifier                        access,
+                                    lang::ResolvingHandle<lang::Type>           return_type,
+                                    lang::Location                              return_type_location,
+                                    std::vector<Shared<lang::Parameter>> const& parameters,
+                                    Owned<lang::CodeBlock>                      block,
+                                    Scope&                                      containing_scope,
+                                    lang::Location                              declaration_location,
+                                    lang::Location                              definition_location)
 {
-    definition_ = std::make_unique<lang::CustomFunction>(*this,
-                                                         access,
-                                                         return_type,
-                                                         return_type_location,
-                                                         parameters,
-                                                         std::move(block),
-                                                         containing_scope,
-                                                         declaration_location,
-                                                         definition_location);
+    definition_ = makeOwned<lang::CustomFunction>(*this,
+                                                  access,
+                                                  return_type,
+                                                  return_type_location,
+                                                  parameters,
+                                                  std::move(block),
+                                                  containing_scope,
+                                                  declaration_location,
+                                                  definition_location);
 
-    addChild(*definition_);
+    addChild(*definition_.value());
 }
 
-lang::PredefinedFunction& lang::Function::defineAsPredefined(
-    lang::ResolvingHandle<lang::Type>                    return_type,
-    std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
-    lang::Scope&                                         containing_scope,
-    lang::Location                                       location)
+lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHandle<lang::Type>           return_type,
+                                                             std::vector<Shared<lang::Parameter>> const& parameters,
+                                                             lang::Scope&   containing_scope,
+                                                             lang::Location location)
 {
 
-    auto definition =
-        std::make_unique<lang::PredefinedFunction>(*this, containing_scope, return_type, parameters, location);
+    auto definition = makeOwned<lang::PredefinedFunction>(*this, containing_scope, return_type, parameters, location);
 
     lang::PredefinedFunction& predefined_function = *definition;
 
     definition_ = std::move(definition);
-    addChild(*definition_);
+    addChild(*definition_.value());
 
     return predefined_function;
 }
 
 void lang::Function::defineAsInit(lang::ResolvingHandle<lang::Variable> variable,
                                   lang::Assigner                        assigner,
-                                  std::unique_ptr<Expression>           initializer,
+                                  Owned<Expression>                     initializer,
                                   lang::Scope&                          containing_scope)
 {
 
-    definition_ = std::make_unique<lang::InitializerFunction>(*this,
-                                                              variable,
-                                                              assigner,
-                                                              std::move(initializer),
-                                                              containing_scope);
-    addChild(*definition_);
+    definition_ =
+        makeOwned<lang::InitializerFunction>(*this, variable, assigner, std::move(initializer), containing_scope);
+    addChild(*definition_.value());
 }
 
-std::optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParameterVariable(
-    Identifier const&                   name,
-    lang::ResolvingHandle<lang::Type>   type,
-    lang::Location                      type_location,
-    std::shared_ptr<lang::Value> const& value,
-    unsigned int                        parameter_no,
-    lang::Location                      location)
+Optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParameterVariable(
+    Identifier const&                 name,
+    lang::ResolvingHandle<lang::Type> type,
+    lang::Location                    type_location,
+    Shared<lang::Value>               value,
+    unsigned int                      parameter_no,
+    lang::Location                    location)
 {
-    if (defined_parameters_.find(name) == defined_parameters_.end())
-    {
-        bool is_final = false;// Assigner has value UNSPECIFIED, so it's not final.
+    if (defined_parameters_.contains(name)) return {};
 
-        lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(name);
-        variable->defineAsLocal(type, type_location, *this, is_final, value, parameter_no, location);
+    bool const is_final = false;// Assigner has value UNSPECIFIED, so it's not final.
 
-        addChild(*variable);
-        defined_parameters_[name] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+    lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(name);
+    variable->defineAsLocal(type, type_location, *this, is_final, value, parameter_no, location);
 
-        return std::make_optional(variable);
-    }
-    else { return {}; }
+    addChild(*variable);
+    defined_parameters_.emplace(name, lang::OwningHandle<lang::Variable>::takeOwnership(variable));
+
+    return makeOptional(variable);
 }
 
-lang::ResolvingHandle<lang::Type> lang::Function::returnType() const
+lang::ResolvingHandle<lang::Type> lang::Function::returnType()
 {
     assert(isDefined());
-    return definition_->returnType();
+    return definition_.value()->returnType();
+}
+
+lang::Type const& lang::Function::returnType() const
+{
+    assert(isDefined());
+    return definition_.value()->returnType();
 }
 
 lang::Signature const& lang::Function::signature() const
 {
     assert(isDefined());
-    return definition_->signature();
+    return definition_.value()->signature();
 }
 
-lang::ResolvingHandle<lang::Type> lang::Function::parameterType(size_t index) const
+lang::ResolvingHandle<lang::Type> lang::Function::parameterType(size_t index)
 {
     assert(isDefined());
-    return definition_->parameterType(index);
+    return definition_.value()->parameterType(index);
+}
+
+lang::Type const& lang::Function::parameterType(size_t index) const
+{
+    assert(isDefined());
+    return definition_.value()->parameterType(index);
 }
 
 size_t lang::Function::parameterCount() const
 {
     assert(isDefined());
-    return definition_->parameterCount();
+    return definition_.value()->parameterCount();
 }
 
 lang::Location lang::Function::location() const
 {
     assert(isDefined());
-    return definition_->location();
+    return definition_.value()->location();
 }
 
 bool lang::Function::isMangled() const
 {
     assert(isDefined());
-    return definition_->isMangled();
+    return definition_.value()->isMangled();
 }
 
 void lang::Function::validate(ValidationLogger& validation_logger) const
 {
-    definition_->validate(validation_logger);
+    definition_.value()->validate(validation_logger);
 }
 
 void lang::Function::expand()
 {
     {// Quick fix to remove old scope from children, with full expansion this would be unnecessary.
         clearChildren();
-        addChild(*definition_);
-        for (auto& [name, parameter] : defined_parameters_) { addChild(*parameter); }
+        addChild(*definition_.value());
     }
 
-    definition_->expand();
+    definition_.value()->expand();
+}
+
+void lang::Function::clear()
+{
+    undefined_variables_.clear();
+    defined_parameters_.clear();
+    undefined_function_groups_.clear();
+    undefined_types_.clear();
 }
 
 void lang::Function::determineFlow()
 {
-    definition_->determineFlow();
+    definition_.value()->determineFlow();
 }
 
 void lang::Function::validateFlow(ValidationLogger& validation_logger) const
 {
-    definition_->validateFlow(validation_logger);
+    definition_.value()->validateFlow(validation_logger);
 }
 
 void lang::Function::createNativeBacking(CompileContext& context)
 {
-    definition_->createNativeBacking(context);
+    definition_.value()->createNativeBacking(context);
 }
 
 void lang::Function::build(CompileContext& context)
 {
-    definition_->build(context);
+    definition_.value()->build(context);
 }
 
 void lang::Function::buildDeclarations(CompileContext& context)
@@ -200,75 +210,76 @@ void lang::Function::buildFinalization(CompileContext& context)
     for (auto& [name, parameter] : defined_parameters_) { parameter->buildFinalization(context); }
 }
 
-bool lang::Function::validateCall(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
-                                  lang::Location                                                              location,
-                                  ValidationLogger& validation_logger)
+bool lang::Function::validateCall(
+    std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
+    lang::Location                                                                           location,
+    ValidationLogger&                                                                        validation_logger) const
 {
-    return definition_->validateCall(arguments, location, validation_logger);
+    return definition_.value()->validateCall(arguments, location, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::Function::buildCall(std::vector<std::shared_ptr<lang::Value>> const& arguments,
-                                                       CompileContext&                                  context) const
+Optional<Shared<lang::Value>> lang::Function::buildCall(std::vector<Shared<lang::Value>> const& arguments,
+                                                        CompileContext&                         context)
 {
-    return definition_->buildCall(arguments, context);
+    return definition_.value()->buildCall(arguments, context);
 }
 
 lang::Scope* lang::Function::scope()
 {
-    return &definition_->scope();
+    return &definition_.value()->scope();
 }
 
 lang::GlobalScope* lang::Function::getGlobalScope()
 {
-    return definition_->getGlobalScope();
+    return definition_.value()->getGlobalScope();
 }
 
-llvm::DIScope* lang::Function::getDebugScope(CompileContext& context)
+llvm::DIScope* lang::Function::getDebugScope(CompileContext& context) const
 {
-    return definition_->getDebugScope(context);
+    return definition_.value()->getDebugScope(context);
 }
 
 lang::LocalScope* lang::Function::getInsideScope()
 {
-    return definition_->getInsideScope();
+    return definition_.value()->getInsideScope();
 }
 
 std::vector<lang::BasicBlock*> const& lang::Function::getBasicBlocks() const
 {
-    return definition_->getBasicBlocks();
+    return definition_.value()->getBasicBlocks();
 }
 
 void lang::Function::registerUsage(lang::ResolvingHandle<lang::Variable> variable)
 {
     assert(!variable->isDefined());
 
-    if (undefined_variables_.find(variable->name()) != undefined_variables_.end())
+    if (undefined_variables_.contains(variable->name()))
     {
-        variable.reroute(undefined_variables_[variable->name()].handle());
+        variable.reroute(undefined_variables_.at(variable->name()).handle());
         return;
     }
 
-    if (defined_parameters_.find(variable->name()) != defined_parameters_.end())
+    if (defined_parameters_.contains(variable->name()))
     {
-        variable.reroute(defined_parameters_[variable->name()].handle());
+        variable.reroute(defined_parameters_.at(variable->name()).handle());
         return;
     }
 
-    undefined_variables_[variable->name()] = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+    undefined_variables_.emplace(variable->name(), lang::OwningHandle<lang::Variable>::takeOwnership(variable));
 }
 
 void lang::Function::registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
 {
     assert(!function_group->isDefined());
 
-    if (undefined_function_groups_.find(function_group->name()) != undefined_function_groups_.end())
+    if (undefined_function_groups_.contains(function_group->name()))
     {
-        function_group.reroute(undefined_function_groups_[function_group->name()].handle());
+        function_group.reroute(undefined_function_groups_.at(function_group->name()).handle());
         return;
     }
 
-    undefined_function_groups_[function_group->name()] =
-        lang::OwningHandle<lang::FunctionGroup>::takeOwnership(function_group);
+    undefined_function_groups_.emplace(function_group->name(),
+                                       lang::OwningHandle<lang::FunctionGroup>::takeOwnership(function_group));
 }
 
 void lang::Function::registerUsage(lang::ResolvingHandle<lang::Type> type)
@@ -277,11 +288,11 @@ void lang::Function::registerUsage(lang::ResolvingHandle<lang::Type> type)
 
     if (undefined_types_.find(type->name()) != undefined_types_.end())
     {
-        type.reroute(undefined_types_[type->name()].handle());
+        type.reroute(undefined_types_.at(type->name()).handle());
         return;
     }
 
-    undefined_types_[type->name()] = lang::OwningHandle<lang::Type>::takeOwnership(type);
+    undefined_types_.emplace(type->name(), lang::OwningHandle<lang::Type>::takeOwnership(type));
 }
 
 void lang::Function::registerDefinition(lang::ResolvingHandle<lang::Type> type)
@@ -327,14 +338,14 @@ void lang::Function::resolve()
 
 void lang::Function::postResolve()
 {
-    definition_->postResolve();
+    definition_.value()->postResolve();
 }
 
 bool lang::Function::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
 {
     if (defined_parameters_.contains(variable->name()))
     {
-        variable.reroute(defined_parameters_[variable->name()].handle());
+        variable.reroute(defined_parameters_.at(variable->name()).handle());
         return true;
     }
 

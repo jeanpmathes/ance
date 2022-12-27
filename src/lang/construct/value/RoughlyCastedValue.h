@@ -19,16 +19,17 @@ namespace lang
          * @param target_type The target type.
          * @param original The original value.
          */
-        RoughlyCastedValue(lang::ResolvingHandle<lang::Type> target_type, std::shared_ptr<lang::Value> original);
+        RoughlyCastedValue(lang::ResolvingHandle<lang::Type> target_type, Shared<lang::Value> original);
 
-        lang::ResolvingHandle<lang::Type> type() const override;
+        lang::ResolvingHandle<lang::Type> type() override;
+        [[nodiscard]] lang::Type const&   type() const override;
 
-        void         buildNativeValue(CompileContext& context) override;
-        llvm::Value* getNativeValue() override;
+        void                       buildNativeValue(CompileContext& context) override;
+        [[nodiscard]] llvm::Value* getNativeValue() const override;
 
       private:
         lang::ResolvingHandle<lang::Type> target_type_;
-        std::shared_ptr<lang::Value>      original_;
+        Shared<lang::Value>               original_;
     };
 }
 

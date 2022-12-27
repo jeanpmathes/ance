@@ -4,17 +4,24 @@
 
 #include "lang/type/NullPointerType.h"
 
+lang::NullConstant::NullConstant() : type_(lang::NullPointerType::get()) {}
+
 std::string lang::NullConstant::toString() const
 {
     return "null";
 }
 
-lang::ResolvingHandle<lang::Type> lang::NullConstant::type() const
+lang::ResolvingHandle<lang::Type> lang::NullConstant::type()
 {
-    return lang::NullPointerType::get();
+    return type_;
 }
 
-llvm::Constant* lang::NullConstant::buildContent(llvm::Module* m)
+lang::Type const& lang::NullConstant::type() const
+{
+    return type_;
+}
+
+llvm::Constant* lang::NullConstant::createContent(llvm::Module* m)
 {
     return lang::NullPointerType::get()->getDefaultContent(*m);
 }
@@ -25,7 +32,12 @@ bool lang::NullConstant::equals(lang::Constant const* other) const
     return other_null != nullptr;
 }
 
-std::shared_ptr<lang::NullConstant> lang::NullConstant::create()
+Shared<lang::Constant> lang::NullConstant::clone() const
 {
-    return std::make_shared<lang::NullConstant>();
+    return create();
+}
+
+Shared<lang::NullConstant> lang::NullConstant::create()
+{
+    return makeShared<lang::NullConstant>();
 }

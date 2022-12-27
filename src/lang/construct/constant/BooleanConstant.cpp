@@ -9,12 +9,17 @@ std::string lang::BooleanConstant::toString() const
     return boolean_ ? "true" : "false";
 }
 
-lang::ResolvingHandle<lang::Type> lang::BooleanConstant::type() const
+lang::ResolvingHandle<lang::Type> lang::BooleanConstant::type()
 {
     return type_;
 }
 
-llvm::Constant* lang::BooleanConstant::buildContent(llvm::Module* m)
+lang::Type const& lang::BooleanConstant::type() const
+{
+    return type_;
+}
+
+llvm::Constant* lang::BooleanConstant::createContent(llvm::Module* m)
 {
     return boolean_ ? llvm::ConstantInt::getTrue(type_->getContentType(m->getContext()))
                     : llvm::ConstantInt::getFalse(type_->getContentType(m->getContext()));
@@ -28,12 +33,17 @@ bool lang::BooleanConstant::equals(lang::Constant const* other) const
     return this->boolean_ == other_boolean->boolean_;
 }
 
-std::shared_ptr<lang::BooleanConstant> lang::BooleanConstant::createFalse()
+Shared<lang::Constant> lang::BooleanConstant::clone() const
 {
-    return std::shared_ptr<lang::BooleanConstant>(new BooleanConstant(false));
+    return Shared<BooleanConstant>(*(new BooleanConstant(boolean_)));
 }
 
-std::shared_ptr<lang::BooleanConstant> lang::BooleanConstant::createTrue()
+Shared<lang::BooleanConstant> lang::BooleanConstant::createFalse()
 {
-    return std::shared_ptr<lang::BooleanConstant>(new BooleanConstant(true));
+    return Shared<lang::BooleanConstant>(*(new BooleanConstant(false)));
+}
+
+Shared<lang::BooleanConstant> lang::BooleanConstant::createTrue()
+{
+    return Shared<lang::BooleanConstant>(*(new BooleanConstant(true)));
 }

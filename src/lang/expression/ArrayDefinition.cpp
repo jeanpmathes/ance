@@ -5,26 +5,26 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-ArrayDefinition::ArrayDefinition(std::optional<lang::ResolvingHandle<lang::Type>> type,
-                                 lang::Location                                   type_location,
-                                 std::vector<std::unique_ptr<Expression>>         elements,
-                                 lang::Location                                   location)
+ArrayDefinition::ArrayDefinition(Optional<lang::ResolvingHandle<lang::Type>> type,
+                                 lang::Location                              type_location,
+                                 std::vector<Owned<Expression>>              elements,
+                                 lang::Location                              location)
     : Expression(location)
-    , type_(std::move(type))
+    , declared_type_(std::move(type))
     , type_location_(type_location)
     , elements_(std::move(elements))
 {
     for (auto& element : elements_) { addSubexpression(*element); }
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> const& ArrayDefinition::elementType() const
+Optional<lang::ResolvingHandle<lang::Type>> const& ArrayDefinition::elementType() const
 {
-    return type_;
+    return declared_type_;
 }
 
-std::vector<std::reference_wrapper<Expression>> ArrayDefinition::values() const
+std::vector<std::reference_wrapper<Expression const>> ArrayDefinition::values() const
 {
-    std::vector<std::reference_wrapper<Expression>> values;
+    std::vector<std::reference_wrapper<Expression const>> values;
 
     values.reserve(elements_.size());
     for (auto const& element : elements_) { values.emplace_back(*element); }
@@ -36,20 +36,25 @@ void ArrayDefinition::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    if (type_.has_value()) scope()->addType(type_.value());
+    if (declared_type_.hasValue()) scope()->addType(declared_type_.value());
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> ArrayDefinition::tryGetType() const
+void ArrayDefinition::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    if (type_.has_value()) return lang::ArrayType::get(type_.value(), elements_.size());
+    if (declared_type_.hasValue())
+    {
+        type.reroute(lang::ArrayType::get(declared_type_.value(), elements_.size()));
+        return;
+    }
 
-    auto types = Expression::tryGetTypes(elements_);
-    if (not types.has_value()) return std::nullopt;
+    auto types        = Expression::getTypes(elements_);
+    auto common_types = lang::Type::getCommonType(types);
 
-    auto common_types = lang::Type::getCommonType(types.value());
-
-    if (common_types.size() == 1) { return lang::ArrayType::get(common_types.front(), elements_.size()); }
-    else { return std::nullopt; }
+    if (common_types.size() == 1)
+    {
+        type.reroute(lang::ArrayType::get(common_types.front(), elements_.size()));
+        return;
+    }
 }
 
 bool ArrayDefinition::validate(ValidationLogger& validation_logger) const
@@ -66,17 +71,17 @@ bool ArrayDefinition::validate(ValidationLogger& validation_logger) const
         return false;
     }
 
-    if (type_.has_value())
+    if (declared_type_.hasValue())
     {
-        lang::ResolvingHandle<lang::Type> type = type_.value();
+        lang::Type const& type = declared_type_.value();
 
         if (lang::validation::isTypeUndefined(type, type_location_, validation_logger)) return false;
 
-        assert(this->type()->getElementType() == type_.value());
+        assert(this->type().getElementType() == type);
     }
     else
     {
-        std::vector<lang::ResolvingHandle<lang::Type>> types = Expression::getTypes(elements_);
+        std::vector<std::reference_wrapper<lang::Type const>> const types = Expression::getTypes(elements_);
 
         auto common_types = lang::Type::getCommonType(types);
 
@@ -86,15 +91,13 @@ bool ArrayDefinition::validate(ValidationLogger& validation_logger) const
             return false;
         }
 
-        assert(type()->getElementType() == common_types.front());
+        assert(type().getElementType() == common_types.front());
     }
 
     for (auto& element : elements_)
     {
-        valid &= lang::Type::checkMismatch(type()->getElementType(),
-                                           element->type(),
-                                           element->location(),
-                                           validation_logger);
+        valid &=
+            lang::Type::checkMismatch(type().getElementType(), element->type(), element->location(), validation_logger);
     }
 
     return valid;
@@ -102,17 +105,17 @@ bool ArrayDefinition::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion ArrayDefinition::expandWith(Expressions subexpressions) const
 {
-    std::optional<lang::ResolvingHandle<lang::Type>> type;
-    if (type_.has_value()) type = type_.value()->toUndefined();
+    Optional<lang::ResolvingHandle<lang::Type>> type;
+    if (declared_type_.hasValue()) type = declared_type_.value()->createUndefinedClone();
 
     return {Statements(),
-            std::make_unique<ArrayDefinition>(type, type_location_, std::move(subexpressions), location()),
+            makeOwned<ArrayDefinition>(type, type_location_, std::move(subexpressions), location()),
             Statements()};
 }
 
 void ArrayDefinition::doBuild(CompileContext& context)
 {
-    std::vector<std::shared_ptr<lang::Value>> elements;
+    std::vector<Shared<lang::Value>> elements;
 
     for (auto& element : elements_)
     {

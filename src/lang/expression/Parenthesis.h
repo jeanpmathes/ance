@@ -16,29 +16,29 @@ class Parenthesis
      * @param expression The expression to wrap in parenthesis.
      * @param location The location of the parenthesis.
      */
-    Parenthesis(std::unique_ptr<Expression> expression, lang::Location location);
+    Parenthesis(Owned<Expression> expression, lang::Location location);
 
-    [[nodiscard]] Expression& contained() const;
+    [[nodiscard]] Expression const& contained() const;
 
   public:
-    bool isNamed() override;
+    [[nodiscard]] bool isNamed() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
-    bool validateAssignment(std::shared_ptr<lang::Value> const& value,
-                            lang::Location                      value_location,
-                            ValidationLogger&                   validation_logger) override;
+    bool validateAssignment(lang::Value const& value,
+                            lang::Location     value_location,
+                            ValidationLogger&  validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
-    [[nodiscard]] std::shared_ptr<lang::Value> getValue() const override;
+    Shared<lang::Value>              getValue() override;
+    [[nodiscard]] lang::Value const& getValue() const override;
 
   protected:
-    void doAssign(std::shared_ptr<lang::Value> value, CompileContext& context) override;
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
+    void doAssign(Shared<lang::Value> value, CompileContext& context) override;
 
   private:
-    std::unique_ptr<Expression> expression_;
+    Owned<Expression> expression_;
 };
 
 #endif

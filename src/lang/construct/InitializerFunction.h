@@ -36,7 +36,7 @@ namespace lang
         InitializerFunction(Function&                             function,
                             lang::ResolvingHandle<lang::Variable> variable,
                             lang::Assigner                        assigner,
-                            std::unique_ptr<Expression>           initializer,
+                            Owned<Expression>                     initializer,
                             Scope&                                containing_scope);
 
         [[nodiscard]] bool isMangled() const override;
@@ -44,9 +44,9 @@ namespace lang
         void createNativeBacking(CompileContext& context) override;
 
       private:
-        static std::unique_ptr<Statement> makeCode(lang::ResolvingHandle<lang::Variable> variable,
-                                                   lang::Assigner                        assigner,
-                                                   std::unique_ptr<Expression>           initializer);
+        static Owned<Statement> makeCode(lang::ResolvingHandle<lang::Variable> variable,
+                                         lang::Assigner                        assigner,
+                                         Owned<Expression>                     initializer);
     };
 }
 

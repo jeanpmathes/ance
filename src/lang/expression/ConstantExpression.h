@@ -21,9 +21,16 @@ class ConstantExpression : public virtual Expression
      * Get the constant value of this expression.
      * @return The constant value.
      */
-    [[nodiscard]] virtual std::shared_ptr<lang::Constant> getConstantValue() const = 0;
+    [[nodiscard]] virtual Shared<lang::Constant> getConstantValue() = 0;
 
-    [[nodiscard]] std::shared_ptr<lang::Value> getValue() const override;
+    /**
+     * Get the constant value of this expression.
+     * @return The constant value.
+     */
+    [[nodiscard]] virtual lang::Constant const& getConstantValue() const = 0;
+
+    Shared<lang::Value>              getValue() override;
+    [[nodiscard]] lang::Value const& getValue() const override;
 };
 
 #endif

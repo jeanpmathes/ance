@@ -42,9 +42,9 @@ void lang::BasicBlock::Definition::Empty::simplify()
     if (next_) next_->simplify();
 }
 
-std::list<lang::BasicBlock*> lang::BasicBlock::Definition::Empty::getLeaves()
+std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Empty::getLeaves() const
 {
-    std::list<lang::BasicBlock*> leaves;
+    std::list<lang::BasicBlock const*> leaves;
 
     if (next_) { leaves.splice(leaves.end(), next_->getLeaves()); }
     else { leaves.push_back(self()); }
@@ -61,17 +61,17 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Empty::getSuccessor
     return successors;
 }
 
-lang::Location lang::BasicBlock::Definition::Empty::getStartLocation()
+lang::Location lang::BasicBlock::Definition::Empty::getStartLocation() const
 {
     return lang::Location::global();
 }
 
-lang::Location lang::BasicBlock::Definition::Empty::getEndLocation()
+lang::Location lang::BasicBlock::Definition::Empty::getEndLocation() const
 {
     return lang::Location::global();
 }
 
-void lang::BasicBlock::Definition::Empty::reach()
+void lang::BasicBlock::Definition::Empty::reach() const
 {
     if (next_) next_->reach();
 }

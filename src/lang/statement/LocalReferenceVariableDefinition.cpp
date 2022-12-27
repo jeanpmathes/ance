@@ -14,11 +14,11 @@
 LocalReferenceVariableDefinition::LocalReferenceVariableDefinition(lang::Identifier                  name,
                                                                    lang::ResolvingHandle<lang::Type> type,
                                                                    lang::Location                    type_location,
-                                                                   std::unique_ptr<Expression>       reference,
+                                                                   Owned<Expression>                 reference,
                                                                    lang::Location                    location)
     : Statement(location)
-    , name_(std::move(name))
-    , type_(type)
+    , name_(name)
+    , type_(std::move(type))
     , type_location_(type_location)
     , reference_(std::move(reference))
 {
@@ -30,12 +30,12 @@ lang::Identifier const& LocalReferenceVariableDefinition::name() const
     return name_;
 }
 
-lang::ResolvingHandle<lang::Type> LocalReferenceVariableDefinition::type() const
+lang::Type const& LocalReferenceVariableDefinition::type() const
 {
     return type_;
 }
 
-Expression& LocalReferenceVariableDefinition::reference() const
+Expression const& LocalReferenceVariableDefinition::reference() const
 {
     return *reference_;
 }
@@ -63,7 +63,7 @@ void LocalReferenceVariableDefinition::walkDefinitions()
 
 void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger) const
 {
-    assert(variable_);
+    assert(variable_.hasValue());
 
     if (lang::validation::isTypeUndefined(type_, type_location_, validation_logger)) return;
 
@@ -77,18 +77,18 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
 
     if (!type_->validate(validation_logger, type_location_)) return;
 
-    bool reference_is_valid = reference_->validate(validation_logger);
+    bool const reference_is_valid = reference_->validate(validation_logger);
     if (!reference_is_valid) return;
 
-    lang::ResolvingHandle<lang::Type> reference_type = reference_->type();
+    lang::Type const& reference_type = reference_->type();
 
-    lang::ResolvingHandle<lang::Type> declared_referenced_type = type_->getElementType();
-    lang::ResolvingHandle<lang::Type> provided_referenced_type = reference_type->getElementType();
+    lang::Type const& declared_referenced_type = type_->getElementType();
+    lang::Type const& provided_referenced_type = reference_type.getElementType();
 
     if (!lang::Type::areSame(declared_referenced_type, provided_referenced_type))
     {
-        validation_logger.logError("Cannot bind " + declared_referenced_type->getAnnotatedName()
-                                       + " reference to value of type " + provided_referenced_type->getAnnotatedName(),
+        validation_logger.logError("Cannot bind " + declared_referenced_type.getAnnotatedName()
+                                       + " reference to value of type " + provided_referenced_type.getAnnotatedName(),
                                    reference_->location());
         return;
     }
@@ -98,11 +98,11 @@ Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressio
 {
     Statements statements;
 
-    statements.push_back(std::make_unique<LocalReferenceVariableDefinition>(name_,
-                                                                            type_->toUndefined(),
-                                                                            type_location_,
-                                                                            std::move(subexpressions[0]),
-                                                                            location()));
+    statements.emplace_back(makeOwned<LocalReferenceVariableDefinition>(name_,
+                                                                        type_->createUndefinedClone(),
+                                                                        type_location_,
+                                                                        std::move(subexpressions[0]),
+                                                                        location()));
 
     return statements;
 }

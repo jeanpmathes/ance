@@ -9,18 +9,23 @@ lang::Parameter::Parameter(lang::ResolvingHandle<lang::Type> type,
                            lang::Location                    type_location,
                            Identifier                        name,
                            lang::Location                    location)
-    : type_(type)
+    : type_(std::move(type))
     , type_location_(type_location)
-    , name_(std::move(name))
+    , name_(name)
     , location_(location)
 {}
 
-lang::ResolvingHandle<lang::Type> lang::Parameter::type() const
+lang::ResolvingHandle<lang::Type> lang::Parameter::type()
 {
     return type_;
 }
 
-lang::Identifier const& lang::Parameter::name()
+lang::Type const& lang::Parameter::type() const
+{
+    return type_;
+}
+
+lang::Identifier const& lang::Parameter::name() const
 {
     return name_;
 }
@@ -51,12 +56,17 @@ void lang::Parameter::buildContentValue(CompileContext& context)
     if (!content_value_) { content_value_ = lang::values::nativeToContent(type(), native_value_, context); }
 }
 
-llvm::Value* lang::Parameter::getNativeValue()
+llvm::Value* lang::Parameter::getNativeValue() const
 {
     return native_value_;
 }
 
-llvm::Value* lang::Parameter::getContentValue()
+llvm::Value* lang::Parameter::getContentValue() const
 {
     return content_value_;
+}
+
+void lang::Parameter::expand()
+{
+    type_ = type_->createUndefinedClone();
 }

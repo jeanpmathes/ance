@@ -22,29 +22,30 @@ class IfSelect
      * @param else_expression The expression to evaluate if the condition is false.
      * @param location The location of the expression.
      */
-    IfSelect(std::unique_ptr<Expression> condition,
-             std::unique_ptr<Expression> then_expression,
-             std::unique_ptr<Expression> else_expression,
-             lang::Location              location);
+    IfSelect(Owned<Expression> condition,
+             Owned<Expression> then_expression,
+             Owned<Expression> else_expression,
+             lang::Location    location);
 
-    [[nodiscard]] Expression& condition() const;
-    [[nodiscard]] Expression& thenExpression() const;
-    [[nodiscard]] Expression& elseExpression() const;
+    [[nodiscard]] Expression const& condition() const;
+    [[nodiscard]] Expression const& thenExpression() const;
+    [[nodiscard]] Expression const& elseExpression() const;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
+
+  protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
 
   public:
     ~IfSelect() override;
 
   private:
-    std::unique_ptr<Expression> condition_;
-    std::unique_ptr<Expression> then_expression_;
-    std::unique_ptr<Expression> else_expression_;
+    Owned<Expression> condition_;
+    Owned<Expression> then_expression_;
+    Owned<Expression> else_expression_;
 };
 
 #endif

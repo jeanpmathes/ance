@@ -9,21 +9,21 @@
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
-Assertion::Assertion(std::unique_ptr<Expression> condition, lang::Location location)
+Assertion::Assertion(Owned<Expression> condition, lang::Location location)
     : Statement(location)
     , condition_(std::move(condition))
 {
     addSubexpression(*condition_);
 }
 
-Expression& Assertion::condition() const
+Expression const& Assertion::condition() const
 {
     return *condition_;
 }
 
 void Assertion::validate(ValidationLogger& validation_logger) const
 {
-    bool is_valid = condition_->validate(validation_logger);
+    bool const is_valid = condition_->validate(validation_logger);
     if (!is_valid) return;
 
     lang::Type::checkMismatch(lang::BooleanType::get(), condition_->type(), condition_->location(), validation_logger);
@@ -33,7 +33,7 @@ Statements Assertion::expandWith(Expressions subexpressions, Statements) const
 {
     Statements statements;
 
-    statements.push_back(std::make_unique<Assertion>(std::move(subexpressions[0]), location()));
+    statements.emplace_back(makeOwned<Assertion>(std::move(subexpressions[0]), location()));
 
     return statements;
 }

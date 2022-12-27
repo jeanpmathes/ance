@@ -4,14 +4,14 @@
 #include "lang/construct/Function.h"
 #include "lang/expression/BuildableExpression.h"
 
-ExpressionStatement::ExpressionStatement(std::unique_ptr<BuildableExpression> expression, lang::Location location)
+ExpressionStatement::ExpressionStatement(Owned<BuildableExpression> expression, lang::Location location)
     : Statement(location)
     , expression_(std::move(expression))
 {
     addSubexpression(*expression_);
 }
 
-BuildableExpression& ExpressionStatement::expression() const
+BuildableExpression const& ExpressionStatement::expression() const
 {
     return *expression_;
 }
@@ -25,10 +25,9 @@ Statements ExpressionStatement::expandWith(Expressions subexpressions, Statement
 {
     Statements statements;
 
-    auto* expression = dynamic_cast<BuildableExpression*>(subexpressions[0].release());
-
-    statements.push_back(
-        std::make_unique<ExpressionStatement>(std::unique_ptr<BuildableExpression>(expression), location()));
+    auto* expression = dynamic_cast<BuildableExpression*>(unwrap(std::move(subexpressions[0])));
+    assert(expression != nullptr);
+    statements.emplace_back(makeOwned<ExpressionStatement>(Owned<BuildableExpression>(*expression), location()));
 
     return statements;
 }

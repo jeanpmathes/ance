@@ -1,6 +1,8 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCTS_H
 #define ANCE_SRC_LANG_CONSTRUCTS_H
 
+#include <vector>
+
 class Application;
 
 namespace lang
@@ -76,8 +78,11 @@ class While;
         VectorDefinition, ArrayDefinition
 #endif
 
+template<typename T>
+class Owned;
+
 class Statement;
-using Statements = std::vector<std::unique_ptr<Statement>>;
+using Statements = std::vector<Owned<Statement>>;
 
 class Expression;
-using Expressions = std::vector<std::unique_ptr<Expression>>;
+using Expressions = std::vector<Owned<Expression>>;

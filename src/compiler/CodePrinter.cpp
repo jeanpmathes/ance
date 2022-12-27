@@ -12,7 +12,7 @@ using namespace util;
 
 CodePrinter::CodePrinter(std::ostream& out) : out_(out) {}
 
-std::any CodePrinter::visit(lang::GlobalVariable& variable)
+std::any CodePrinter::visit(lang::GlobalVariable const& variable)
 {
     indent();
 
@@ -21,7 +21,7 @@ std::any CodePrinter::visit(lang::GlobalVariable& variable)
         out_ << "const"
              << " ";
     out_ << variable.name() << ": ";
-    out_ << variable.type()->name();
+    out_ << variable.type().name();
 
     if (variable.init())
     {
@@ -34,7 +34,7 @@ std::any CodePrinter::visit(lang::GlobalVariable& variable)
     return {};
 }
 
-std::any CodePrinter::visit(lang::CustomFunction& function)
+std::any CodePrinter::visit(lang::CustomFunction const& function)
 {
     indent();
 
@@ -42,7 +42,7 @@ std::any CodePrinter::visit(lang::CustomFunction& function)
     out_ << function.name() << " ";
     out_ << function.parameterSource();
 
-    if (function.returnType() != lang::VoidType::get()) { out_ << " : " << function.returnType()->name(); }
+    if (function.returnType() != lang::VoidType::get()) { out_ << " : " << function.returnType().name(); }
 
     out_ << std::endl;
 
@@ -51,7 +51,7 @@ std::any CodePrinter::visit(lang::CustomFunction& function)
     return {};
 }
 
-std::any CodePrinter::visit(lang::ExternFunction& function)
+std::any CodePrinter::visit(lang::ExternFunction const& function)
 {
     indent();
 
@@ -61,14 +61,14 @@ std::any CodePrinter::visit(lang::ExternFunction& function)
     return {};
 }
 
-std::any CodePrinter::visit(Addressof& addressof)
+std::any CodePrinter::visit(Addressof const& addressof)
 {
     out_ << "addressof " << visitTree(addressof.argument());
 
     return {};
 }
 
-std::any CodePrinter::visit(Allocation& allocation)
+std::any CodePrinter::visit(Allocation const& allocation)
 {
     out_ << "new";
     if (allocation.count()) out_ << "[" << visitTree(*allocation.count()) << "]";
@@ -85,25 +85,26 @@ std::any CodePrinter::visit(Allocation& allocation)
     }
 
     out_ << " " << allocator << " ";
-    out_ << allocation.allocatedType()->name();
+    out_ << allocation.allocatedType().name();
 
     return {};
 }
 
-std::any CodePrinter::visit(And& an_and)
+std::any CodePrinter::visit(And const& an_and)
 {
     visitTree(an_and.left());
+    if (an_and.negate()) out_ << " not";
     out_ << " and ";
     visitTree(an_and.right());
 
     return {};
 }
 
-std::any CodePrinter::visit(ArrayDefinition& array_definition)
+std::any CodePrinter::visit(ArrayDefinition const& array_definition)
 {
     out_ << "[";
 
-    if (array_definition.elementType().has_value()) { out_ << array_definition.elementType().value()->name() << " | "; }
+    if (array_definition.elementType().hasValue()) { out_ << array_definition.elementType().value()->name() << " | "; }
 
     bool is_first = true;
     for (auto& value : array_definition.values())
@@ -119,7 +120,7 @@ std::any CodePrinter::visit(ArrayDefinition& array_definition)
     return {};
 }
 
-std::any CodePrinter::visit(BinaryOperation& binary_operation)
+std::any CodePrinter::visit(BinaryOperation const& binary_operation)
 {
     out_ << visitTree(binary_operation.left()) << " ";
     out_ << binary_operation.op().toString() << " ";
@@ -128,21 +129,21 @@ std::any CodePrinter::visit(BinaryOperation& binary_operation)
     return {};
 }
 
-std::any CodePrinter::visit(BindRef& bind_ref)
+std::any CodePrinter::visit(BindRef const& bind_ref)
 {
     out_ << "ref " << visitTree(bind_ref.value());
 
     return {};
 }
 
-std::any CodePrinter::visit(BindRefTo& bind_ref_to)
+std::any CodePrinter::visit(BindRefTo const& bind_ref_to)
 {
     out_ << "ref to " << visitTree(bind_ref_to.address());
 
     return {};
 }
 
-std::any CodePrinter::visit(ConstantLiteral& constant_literals)
+std::any CodePrinter::visit(ConstantLiteral const& constant_literals)
 {
     if (constant_literals.constant().getBackingExpression())
     {
@@ -153,13 +154,13 @@ std::any CodePrinter::visit(ConstantLiteral& constant_literals)
     return {};
 }
 
-std::any CodePrinter::visit(FunctionCall& function_call)
+std::any CodePrinter::visit(FunctionCall const& function_call)
 {
     out_ << function_call.callable().name() << "(";
 
     bool first = true;
 
-    for (Expression& argument : function_call.arguments())
+    for (Expression const& argument : function_call.arguments())
     {
         if (!first) out_ << ", ";
         first = false;
@@ -172,7 +173,7 @@ std::any CodePrinter::visit(FunctionCall& function_call)
     return {};
 }
 
-std::any CodePrinter::visit(IfSelect& if_select)
+std::any CodePrinter::visit(IfSelect const& if_select)
 {
     out_ << "if " << visitTree(if_select.condition()) << " ";
     out_ << "then " << visitTree(if_select.thenExpression()) << " ";
@@ -181,7 +182,7 @@ std::any CodePrinter::visit(IfSelect& if_select)
     return {};
 }
 
-std::any CodePrinter::visit(MatchSelect& match_select)
+std::any CodePrinter::visit(MatchSelect const& match_select)
 {
     out_ << "match " << visitTree(match_select.condition()) << " with ";
     out_ << "{ ";
@@ -209,37 +210,38 @@ std::any CodePrinter::visit(MatchSelect& match_select)
     return {};
 }
 
-std::any CodePrinter::visit(Or& an_or)
+std::any CodePrinter::visit(Or const& an_or)
 {
     visitTree(an_or.left());
+    if (an_or.negate()) out_ << " not";
     out_ << " or ";
     visitTree(an_or.right());
 
     return {};
 }
 
-std::any CodePrinter::visit(Parenthesis& parenthesis)
+std::any CodePrinter::visit(Parenthesis const& parenthesis)
 {
     out_ << "(" << visitTree(parenthesis.contained()) << ")";
 
     return {};
 }
 
-std::any CodePrinter::visit(SizeofExpression& sizeof_expression)
+std::any CodePrinter::visit(SizeofExpression const& sizeof_expression)
 {
     out_ << "sizeof(" << visitTree(sizeof_expression.expression()) << ")";
 
     return {};
 }
 
-std::any CodePrinter::visit(SizeofType& sizeof_type)
+std::any CodePrinter::visit(SizeofType const& sizeof_type)
 {
-    out_ << "sizeof " << sizeof_type.targetType()->name();
+    out_ << "sizeof " << sizeof_type.targetType().name();
 
     return {};
 }
 
-std::any CodePrinter::visit(Subscript& subscript)
+std::any CodePrinter::visit(Subscript const& subscript)
 {
     out_ << visitTree(subscript.indexed());
     out_ << "[" << visitTree(subscript.index()) << "]";
@@ -247,7 +249,7 @@ std::any CodePrinter::visit(Subscript& subscript)
     return {};
 }
 
-std::any CodePrinter::visit(UnaryOperation& unary_operation)
+std::any CodePrinter::visit(UnaryOperation const& unary_operation)
 {
     out_ << unary_operation.op().toString() << " ";
     out_ << visitTree(unary_operation.operand());
@@ -255,21 +257,18 @@ std::any CodePrinter::visit(UnaryOperation& unary_operation)
     return {};
 }
 
-std::any CodePrinter::visit(VariableAccess& variable_access)
+std::any CodePrinter::visit(VariableAccess const& variable_access)
 {
-    out_ << variable_access.variable()->name();
+    out_ << variable_access.variable().name();
 
     return {};
 }
 
-std::any CodePrinter::visit(VectorDefinition& vector_definition)
+std::any CodePrinter::visit(VectorDefinition const& vector_definition)
 {
     out_ << "<";
 
-    if (vector_definition.elementType().has_value())
-    {
-        out_ << vector_definition.elementType().value()->name() << " | ";
-    }
+    if (vector_definition.elementType() != nullptr) { out_ << vector_definition.elementType()->name() << " | "; }
 
     bool is_first = true;
     for (auto& value : vector_definition.values())
@@ -285,7 +284,7 @@ std::any CodePrinter::visit(VectorDefinition& vector_definition)
     return {};
 }
 
-std::any CodePrinter::visit(MemberAccess& member_access)
+std::any CodePrinter::visit(MemberAccess const& member_access)
 {
     out_ << visitTree(member_access.value());
     emitWhitespace();
@@ -294,7 +293,7 @@ std::any CodePrinter::visit(MemberAccess& member_access)
     return {};
 }
 
-std::any CodePrinter::visit(Indirection& indirection)
+std::any CodePrinter::visit(Indirection const& indirection)
 {
     out_ << visitTree(indirection.value()) << ".";
     consumeWhitespace();
@@ -302,14 +301,14 @@ std::any CodePrinter::visit(Indirection& indirection)
     return {};
 }
 
-std::any CodePrinter::visit(lang::CodeBlock& code_block)
+std::any CodePrinter::visit(lang::CodeBlock const& code_block)
 {
     if (code_block.isCompound())
     {
         out_ << "{" << std::endl;
         indent_++;
 
-        for (auto& statement : code_block.statements())
+        for (auto const& statement : code_block.statements())
         {
             indent();
             visitTree(statement);
@@ -329,14 +328,14 @@ std::any CodePrinter::visit(lang::CodeBlock& code_block)
     return {};
 }
 
-std::any CodePrinter::visit(Assertion& assertion)
+std::any CodePrinter::visit(Assertion const& assertion)
 {
     out_ << "assert " << visitTree(assertion.condition()) << ";";
 
     return {};
 }
 
-std::any CodePrinter::visit(Assignment& assignment_statement)
+std::any CodePrinter::visit(Assignment const& assignment_statement)
 {
     out_ << visitTree(assignment_statement.assignable()) << " ";
     out_ << assignment_statement.assigner().getSymbol() << " ";
@@ -345,21 +344,21 @@ std::any CodePrinter::visit(Assignment& assignment_statement)
     return {};
 }
 
-std::any CodePrinter::visit(Break&)
+std::any CodePrinter::visit(Break const&)
 {
     out_ << "break;";
 
     return {};
 }
 
-std::any CodePrinter::visit(Continue&)
+std::any CodePrinter::visit(Continue const&)
 {
     out_ << "continue;";
 
     return {};
 }
 
-std::any CodePrinter::visit(Delete& delete_statement)
+std::any CodePrinter::visit(Delete const& delete_statement)
 {
     out_ << "delete";
     if (delete_statement.isBufferDelete()) out_ << "[]";
@@ -369,21 +368,21 @@ std::any CodePrinter::visit(Delete& delete_statement)
     return {};
 }
 
-std::any CodePrinter::visit(Drop& drop_statement)
+std::any CodePrinter::visit(Drop const& drop_statement)
 {
-    out_ << "drop " << drop_statement.variable()->name() << ";";
+    out_ << "drop " << drop_statement.variable().name() << ";";
 
     return {};
 }
 
-std::any CodePrinter::visit(ExpressionStatement& expression_statement)
+std::any CodePrinter::visit(ExpressionStatement const& expression_statement)
 {
     out_ << visitTree(expression_statement.expression()) << ";";
 
     return {};
 }
 
-std::any CodePrinter::visit(If& if_statement)
+std::any CodePrinter::visit(If const& if_statement)
 {
     out_ << "if " << visitTree(if_statement.condition()) << " then";
 
@@ -413,19 +412,19 @@ std::any CodePrinter::visit(If& if_statement)
     return {};
 }
 
-std::any CodePrinter::visit(LocalReferenceVariableDefinition& local_reference_variable_definition)
+std::any CodePrinter::visit(LocalReferenceVariableDefinition const& local_reference_variable_definition)
 {
     out_ << "let " << local_reference_variable_definition.name();
-    out_ << ": " << local_reference_variable_definition.type()->name() << " ";
+    out_ << ": " << local_reference_variable_definition.type().name() << " ";
     out_ << visitTree(local_reference_variable_definition.reference()) << ";";
 
     return {};
 }
 
-std::any CodePrinter::visit(LocalVariableDefinition& local_variable_definition)
+std::any CodePrinter::visit(LocalVariableDefinition const& local_variable_definition)
 {
     out_ << "let " << local_variable_definition.name();
-    if (local_variable_definition.type()) out_ << ": " << local_variable_definition.type().value()->name();
+    if (local_variable_definition.type() != nullptr) out_ << ": " << local_variable_definition.type()->name();
 
     if (local_variable_definition.assigned())
     {
@@ -438,7 +437,7 @@ std::any CodePrinter::visit(LocalVariableDefinition& local_variable_definition)
     return {};
 }
 
-std::any CodePrinter::visit(Match& match_statement)
+std::any CodePrinter::visit(Match const& match_statement)
 {
     out_ << "match " << visitTree(match_statement.expression()) << " with" << std::endl;
     indent();
@@ -470,7 +469,7 @@ std::any CodePrinter::visit(Match& match_statement)
     return {};
 }
 
-std::any CodePrinter::visit(Return& return_statement)
+std::any CodePrinter::visit(Return const& return_statement)
 {
     out_ << "return";
 
@@ -481,7 +480,7 @@ std::any CodePrinter::visit(Return& return_statement)
     return {};
 }
 
-std::any CodePrinter::visit(While& while_statement)
+std::any CodePrinter::visit(While const& while_statement)
 {
     out_ << "while " << visitTree(while_statement.condition()) << " do";
 
@@ -496,7 +495,7 @@ std::any CodePrinter::visit(While& while_statement)
     return {};
 }
 
-void CodePrinter::postVisit(lang::Visitable<ANCE_CONSTRUCTS>&)
+void CodePrinter::postVisit(lang::Visitable<ANCE_CONSTRUCTS> const&)
 {
     switch (consume_whitespace_)
     {

@@ -9,7 +9,7 @@
 StateCount lang::IntegerType::getStateCount() const
 {
     auto bit_size = getBitSize();
-    if (bit_size.has_value())
+    if (bit_size.hasValue())
     {
         size_t state_count = 1 << bit_size.value();
         return state_count;
@@ -18,7 +18,7 @@ StateCount lang::IntegerType::getStateCount() const
     return SpecialCount::PLATFORM_DEPENDENT;
 }
 
-llvm::Constant* lang::IntegerType::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::IntegerType::getDefaultContent(llvm::Module& m) const
 {
     return llvm::ConstantInt::get(getContentType(m.getContext()), 0, false);
 }
@@ -33,18 +33,18 @@ lang::IntegerType const* lang::IntegerType::isIntegerType() const
     return this;
 }
 
-bool lang::IntegerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
+bool lang::IntegerType::isImplicitlyConvertibleTo(lang::Type const& other) const
 {
-    auto other_integer = other->isIntegerType();
+    auto other_integer = other.isIntegerType();
     if (not other_integer) return false;
 
-    auto   this_bit_size  = getBitSize();
-    size_t other_bit_size = other_integer->getBitSize().value_or(other_integer->getMinimumBitSize());
+    auto         this_bit_size  = getBitSize();
+    size_t const other_bit_size = other_integer->getBitSize().valueOr(other_integer->getMinimumBitSize());
 
-    if (this_bit_size.has_value())
+    if (this_bit_size.hasValue())
     {
-        bool can_enlarge   = (this_bit_size.value() <= other_bit_size) && (isSigned() == other_integer->isSigned());
-        bool can_gain_sign = (this_bit_size.value() < other_bit_size) && !isSigned() && other_integer->isSigned();
+        bool const can_enlarge = (this_bit_size.value() <= other_bit_size) && (isSigned() == other_integer->isSigned());
+        bool const can_gain_sign = (this_bit_size.value() < other_bit_size) && !isSigned() && other_integer->isSigned();
 
         return can_enlarge || can_gain_sign;
     }
@@ -52,16 +52,14 @@ bool lang::IntegerType::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Ty
     return self()->isSizeType() && other_integer->isDiffType();
 }
 
-bool lang::IntegerType::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
-                                                   lang::Location,
-                                                   ValidationLogger&) const
+bool lang::IntegerType::validateImplicitConversion(lang::Type const&, lang::Location, ValidationLogger&) const
 {
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                        std::shared_ptr<Value>            value,
-                                                                        CompileContext&                   context)
+Shared<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                               Shared<Value>                     value,
+                                                               CompileContext&                   context)
 {
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
@@ -72,10 +70,10 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Re
                                                                content_value->getName() + ".icast");
     llvm::Value* native_converted_value = lang::values::contentToNative(other, converted_value, context);
 
-    return std::make_shared<WrappedNativeValue>(other, native_converted_value);
+    return makeShared<WrappedNativeValue>(other, native_converted_value);
 }
 
-bool lang::IntegerType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
+bool lang::IntegerType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
 {
     if (parameters.size() == 1)
     {
@@ -87,9 +85,9 @@ bool lang::IntegerType::acceptOverloadRequest(std::vector<lang::ResolvingHandle<
     return false;
 }
 
-void lang::IntegerType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
-                                               lang::PredefinedFunction&                             function,
-                                               CompileContext&                                       context)
+void lang::IntegerType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                               lang::PredefinedFunction&                      function,
+                                               CompileContext&                                context)
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }
@@ -143,7 +141,7 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
     }
 }
 
-bool lang::IntegerType::isOperatorDefined(lang::UnaryOperator op)
+bool lang::IntegerType::isOperatorDefined(lang::UnaryOperator op) const
 {
     return op == lang::UnaryOperator::BITWISE_NOT || op == lang::UnaryOperator::NEGATION;
 }
@@ -158,17 +156,17 @@ bool lang::IntegerType::validateOperator(lang::UnaryOperator, lang::Location, Va
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator    op,
-                                                              std::shared_ptr<Value> value,
-                                                              CompileContext&        context)
+Shared<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator op,
+                                                     Shared<Value>       value,
+                                                     CompileContext&     context)
 {
     return buildOperator(op, value, getOperatorResultType(op), context);
 }
 
-std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator               op,
-                                                              std::shared_ptr<Value>            value,
-                                                              lang::ResolvingHandle<lang::Type> return_type,
-                                                              CompileContext&                   context)
+Shared<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator               op,
+                                                     Shared<Value>                     value,
+                                                     lang::ResolvingHandle<lang::Type> return_type,
+                                                     CompileContext&                   context)
 {
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
@@ -191,16 +189,16 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperato
     }
 
     llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
-    return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
+    return makeShared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
-bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
+bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
 {
     if (!op.isArithmetic() && !op.isBitwise() && !op.isRelational() && !op.isEquality() && !op.isShift()) return false;
 
-    other = lang::Type::getReferencedType(other);
+    lang::Type const& real_other = lang::Type::getReferencedType(other);
 
-    if (auto other_integer = other->isIntegerType())
+    if (auto other_integer = real_other.isIntegerType())
     {
         if (op.isShift()) return !other_integer->isSigned();
 
@@ -209,7 +207,7 @@ bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator op, lang::Resolvi
         auto this_bit_size  = getBitSize();
         auto other_bit_size = other_integer->getBitSize();
 
-        if (this_bit_size.has_value() && other_bit_size.has_value())
+        if (this_bit_size.hasValue() && other_bit_size.hasValue())
         {
             return (this_bit_size.value() == other_bit_size.value()) && (isSigned() == other_integer->isSigned());
         }
@@ -228,7 +226,7 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang:
 }
 
 bool lang::IntegerType::validateOperator(lang::BinaryOperator,
-                                         lang::ResolvingHandle<lang::Type>,
+                                         lang::Type const&,
                                          lang::Location,
                                          lang::Location,
                                          ValidationLogger&) const
@@ -236,19 +234,19 @@ bool lang::IntegerType::validateOperator(lang::BinaryOperator,
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator   op,
-                                                              std::shared_ptr<Value> left,
-                                                              std::shared_ptr<Value> right,
-                                                              CompileContext&        context)
+Shared<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator op,
+                                                     Shared<Value>        left,
+                                                     Shared<Value>        right,
+                                                     CompileContext&      context)
 {
     return buildOperator(op, left, right, getOperatorResultType(op, right->type()), context);
 }
 
-std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator              op,
-                                                              std::shared_ptr<Value>            left,
-                                                              std::shared_ptr<Value>            right,
-                                                              lang::ResolvingHandle<lang::Type> return_type,
-                                                              CompileContext&                   context)
+Shared<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator              op,
+                                                     Shared<Value>                     left,
+                                                     Shared<Value>                     right,
+                                                     lang::ResolvingHandle<lang::Type> return_type,
+                                                     CompileContext&                   context)
 {
     right = lang::Type::getValueOrReferencedValue(right, context);
 
@@ -326,7 +324,7 @@ std::shared_ptr<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperat
     }
 
     llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
-    return std::make_shared<lang::WrappedNativeValue>(return_type, native_result);
+    return makeShared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
 bool lang::IntegerType::isTriviallyDefaultConstructible() const
@@ -344,13 +342,13 @@ bool lang::IntegerType::isTriviallyDestructible() const
     return true;
 }
 
-llvm::DIType* lang::IntegerType::createDebugType(CompileContext& context)
+llvm::DIType* lang::IntegerType::createDebugType(CompileContext& context) const
 {
     llvm::DataLayout const& dl = context.module()->getDataLayout();
 
-    std::string name         = std::string(this->name().text());
-    uint64_t    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
-    auto        encoding     = isSigned() ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned;
+    std::string const name         = std::string(this->name().text());
+    uint64_t const    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    auto              encoding     = isSigned() ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned;
 
     return context.di()->createBasicType(name, size_in_bits, encoding);
 }

@@ -5,24 +5,23 @@
 #include "lang/expression/Expression.h"
 #include "validation/ValidationLogger.h"
 
-Return::Return(std::unique_ptr<Expression> return_value, lang::Location location)
+Return::Return(Optional<Owned<Expression>> return_value, lang::Location location)
     : Statement(location)
     , return_value_(std::move(return_value))
 {
-    if (return_value_) addSubexpression(*return_value_);
+    if (return_value_.hasValue()) addSubexpression(*return_value_.value());
 }
 
-Expression* Return::expression()
+Expression const* Return::expression() const
 {
-    return return_value_.get();
+    return return_value_.value().get();
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> Return::createBasicBlocks(lang::BasicBlock& entry,
-                                                                         lang::Function&   function)
+std::vector<Owned<lang::BasicBlock>> Return::createBasicBlocks(lang::BasicBlock& entry, lang::Function& function)
 {
-    std::vector<std::unique_ptr<lang::BasicBlock>> blocks;
+    std::vector<Owned<lang::BasicBlock>> blocks;
     blocks.push_back(
-        lang::BasicBlock::createReturning(scope()->asLocalScope(), return_value_.get(), location(), function));
+        lang::BasicBlock::createReturning(scope()->asLocalScope(), return_value_.value().get(), location(), function));
 
     entry.link(*blocks.front());
 
@@ -31,15 +30,18 @@ std::vector<std::unique_ptr<lang::BasicBlock>> Return::createBasicBlocks(lang::B
 
 void Return::validate(ValidationLogger& validation_logger) const
 {
-    if (return_value_) return_value_->validate(validation_logger);
+    if (return_value_.hasValue()) return_value_.value()->validate(validation_logger);
 }
 
 Statements Return::expandWith(Expressions subexpressions, Statements) const
 {
     Statements statements;
 
-    if (return_value_) { statements.push_back(std::make_unique<Return>(std::move(subexpressions[0]), location())); }
-    else { statements.push_back(std::make_unique<Return>(nullptr, location())); }
+    if (return_value_.hasValue())
+    {
+        statements.emplace_back(makeOwned<Return>(std::move(subexpressions[0]), location()));
+    }
+    else { statements.emplace_back(makeOwned<Return>(std::nullopt, location())); }
 
     return statements;
 }

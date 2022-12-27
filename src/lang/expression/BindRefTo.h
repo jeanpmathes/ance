@@ -14,25 +14,24 @@ class BindRefTo
     , public lang::Element<BindRefTo, ANCE_CONSTRUCTS>
 {
   public:
-    BindRefTo(std::unique_ptr<Expression> address, lang::Location location);
+    BindRefTo(Owned<Expression> address, lang::Location location);
 
   public:
-    [[nodiscard]] Expression& address() const;
-
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
+    [[nodiscard]] Expression const& address() const;
 
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
     void doBuild(CompileContext& context) override;
 
   public:
     ~BindRefTo() override;
 
   private:
-    std::unique_ptr<Expression> address_;
+    Owned<Expression> address_;
 };
 
 #endif

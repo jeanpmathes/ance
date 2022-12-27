@@ -20,26 +20,27 @@ class And
      * @param right The right operand.
      * @param location The source location of the operation.
      */
-    And(bool negate, std::unique_ptr<Expression> left, std::unique_ptr<Expression> right, lang::Location location);
+    And(bool negate, Owned<Expression> left, Owned<Expression> right, lang::Location location);
 
-    [[nodiscard]] bool        negate() const;
-    [[nodiscard]] Expression& left() const;
-    [[nodiscard]] Expression& right() const;
+    [[nodiscard]] bool              negate() const;
+    [[nodiscard]] Expression const& left() const;
+    [[nodiscard]] Expression const& right() const;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
+
+  protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
 
   public:
     ~And() override;
 
   private:
-    bool                        negate_;
-    std::unique_ptr<Expression> left_;
-    std::unique_ptr<Expression> right_;
+    bool              negate_;
+    Owned<Expression> left_;
+    Owned<Expression> right_;
 };
 
 #endif

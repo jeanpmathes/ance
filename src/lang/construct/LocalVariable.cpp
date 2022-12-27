@@ -14,11 +14,11 @@ lang::LocalVariable::LocalVariable(lang::ResolvingHandle<lang::Variable> self,
                                    lang::Location                        type_location,
                                    Scope&                                containing_scope,
                                    bool                                  is_final,
-                                   std::shared_ptr<lang::Value>          value,
+                                   Optional<Shared<lang::Value>>         value,
                                    unsigned                              parameter_no,
                                    lang::Location                        location)
     : VariableDefinition(self, type, type_location, containing_scope, is_final, location)
-    , initial_value_(std::move(value))
+    , initial_value_(value)
     , parameter_no_(parameter_no)
 {
     // Type is already added in declaring statement.
@@ -64,9 +64,9 @@ void lang::LocalVariable::buildDefinition(CompileContext& context)
                                 location().getDebugLoc(context.llvmContext(), scope()->getDebugScope(context)),
                                 context.ir()->GetInsertBlock());
 
-    if (initial_value_)
+    if (initial_value_.hasValue())
     {
-        std::shared_ptr<lang::Value> value = lang::Type::makeMatching(type(), initial_value_, context);
+        Shared<lang::Value> value = lang::Type::makeMatching(type(), initial_value_.value(), context);
 
         if (type()->isReferenceType() || parameter_no_ != 0)
         {
@@ -91,12 +91,12 @@ void lang::LocalVariable::buildFinalization(CompileContext& context)
     if (!type()->isReferenceType()) { type()->buildFinalizer(native_value_, context); }
 }
 
-std::shared_ptr<lang::Value> lang::LocalVariable::getValue(CompileContext&)
+Shared<lang::Value> lang::LocalVariable::getValue(CompileContext&)
 {
-    return std::make_shared<lang::WrappedNativeValue>(type(), native_value_);
+    return makeShared<lang::WrappedNativeValue>(type(), native_value_);
 }
 
-void lang::LocalVariable::storeValue(std::shared_ptr<lang::Value> value, CompileContext& context)
+void lang::LocalVariable::storeValue(Shared<lang::Value> value, CompileContext& context)
 {
     value = lang::Type::makeMatching(type(), value, context);
 

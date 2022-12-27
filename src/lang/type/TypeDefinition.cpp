@@ -16,6 +16,36 @@
 lang::TypeDefinition::TypeDefinition(lang::Identifier name, lang::Location location) : name_(name), location_(location)
 {}
 
+bool lang::TypeDefinition::isFullyDefined() const
+{
+    std::stack<TypeDefinition const*> stack;
+    std::set<TypeDefinition const*>   visited;
+
+    stack.push(this);
+
+    while (!stack.empty())
+    {
+        auto const* current = stack.top();
+        stack.pop();
+
+        if (visited.count(current)) continue;
+        visited.insert(current);
+
+        std::vector<std::reference_wrapper<lang::Type const>> const contained = getContained();
+
+        for (auto const& type : contained)
+        {
+            auto const* definition = type.get().getDefinition();
+
+            if (definition == nullptr) return false;
+
+            stack.push(definition);
+        }
+    }
+
+    return true;
+}
+
 lang::Identifier const& lang::TypeDefinition::name() const
 {
     return name_;
@@ -36,6 +66,12 @@ lang::Location lang::TypeDefinition::getDefinitionLocation() const
 bool lang::TypeDefinition::isCustom() const
 {
     return !location_.isGlobal();
+}
+
+lang::ResolvingHandle<lang::Type> lang::TypeDefinition::clone() const
+{
+    assert(!isCustom() && "TypeDefinition::clone() called on custom type definition.");
+    throw std::runtime_error("Not implemented.");
 }
 
 lang::FixedWidthIntegerType const* lang::TypeDefinition::isFixedWidthIntegerType() const
@@ -163,9 +199,15 @@ lang::ArrayType* lang::TypeDefinition::isArrayType()
     return nullptr;
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getElementType() const
+lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getElementType()
 {
     return lang::Type::getUndefined();
+}
+
+lang::Type const& lang::TypeDefinition::getElementType() const
+{
+    static lang::ResolvingHandle<lang::Type> undefined = lang::Type::getUndefined();
+    return undefined;
 }
 
 void lang::TypeDefinition::setType(lang::Type* type)
@@ -174,12 +216,12 @@ void lang::TypeDefinition::setType(lang::Type* type)
     type_ = type;
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getActualType() const
+lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getActualType()
 {
     return self();
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getOriginalType() const
+lang::Type const& lang::TypeDefinition::getActualType() const
 {
     return self();
 }
@@ -191,9 +233,7 @@ lang::AccessModifier lang::TypeDefinition::getAccessModifier() const
 
 void lang::TypeDefinition::setContainingScope(lang::Scope* scope)
 {
-    if (containing_scope_) return;
     containing_scope_ = scope;
-
     onScope();
 }
 
@@ -211,7 +251,7 @@ bool lang::TypeDefinition::requestOverload(std::vector<lang::ResolvingHandle<lan
 
     if (acceptOverloadRequest(parameters))
     {
-        requested_constructors_.emplace_back(std::make_pair(parameters, &createConstructor(parameters)));
+        requested_constructors_.emplace_back(parameters, &createConstructor(parameters));
         return true;
     }
 
@@ -231,12 +271,18 @@ lang::Scope* lang::TypeDefinition::scope()
     return containing_scope_;
 }
 
+lang::Scope const* lang::TypeDefinition::scope() const
+{
+    assert(containing_scope_);
+    return containing_scope_;
+}
+
 llvm::Type* lang::TypeDefinition::getNativeType(llvm::LLVMContext& c) const
 {
     return llvm::PointerType::get(getContentType(c), 0);
 }
 
-llvm::DIType* lang::TypeDefinition::getDebugType(CompileContext& context)
+llvm::DIType* lang::TypeDefinition::getDebugType(CompileContext& context) const
 {
     if (!debug_type_) { debug_type_ = createDebugType(context); }
 
@@ -257,7 +303,7 @@ llvm::TypeSize lang::TypeDefinition::getContentSize(llvm::Module* m)
     return m->getDataLayout().getTypeAllocSize(getContentType(m->getContext()));
 }
 
-bool lang::TypeDefinition::isSubscriptDefined()
+bool lang::TypeDefinition::isSubscriptDefined() const
 {
     return false;
 }
@@ -267,12 +313,12 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getSubscriptReturnType()
     return lang::Type::getUndefined();
 }
 
-bool lang::TypeDefinition::isOperatorDefined(lang::BinaryOperator, lang::ResolvingHandle<lang::Type>)
+bool lang::TypeDefinition::isOperatorDefined(lang::BinaryOperator, lang::Type const&) const
 {
     return false;
 }
 
-bool lang::TypeDefinition::isOperatorDefined(lang::UnaryOperator)
+bool lang::TypeDefinition::isOperatorDefined(lang::UnaryOperator) const
 {
     return false;
 }
@@ -288,12 +334,12 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getOperatorResultType(la
     return lang::Type::getUndefined();
 }
 
-bool lang::TypeDefinition::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type>)
+bool lang::TypeDefinition::isImplicitlyConvertibleTo(lang::Type const&) const
 {
     return false;
 }
 
-bool lang::TypeDefinition::hasMember(lang::Identifier const&)
+bool lang::TypeDefinition::hasMember(lang::Identifier const&) const
 {
     return false;
 }
@@ -303,7 +349,7 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getMemberType(lang::Iden
     return lang::Type::getUndefined();
 }
 
-bool lang::TypeDefinition::definesIndirection()
+bool lang::TypeDefinition::definesIndirection() const
 {
     return false;
 }
@@ -323,16 +369,13 @@ bool lang::TypeDefinition::validate(ValidationLogger&, lang::Location) const
     return true;
 }
 
-bool lang::TypeDefinition::validateSubscript(lang::Location,
-                                             lang::ResolvingHandle<lang::Type>,
-                                             lang::Location,
-                                             ValidationLogger&) const
+bool lang::TypeDefinition::validateSubscript(lang::Location, lang::Type const&, lang::Location, ValidationLogger&) const
 {
     return false;
 }
 
 bool lang::TypeDefinition::validateOperator(lang::BinaryOperator,
-                                            lang::ResolvingHandle<lang::Type>,
+                                            lang::Type const&,
                                             lang::Location,
                                             lang::Location,
                                             ValidationLogger&) const
@@ -345,9 +388,7 @@ bool lang::TypeDefinition::validateOperator(lang::UnaryOperator, lang::Location,
     return false;
 }
 
-bool lang::TypeDefinition::validateImplicitConversion(lang::ResolvingHandle<lang::Type>,
-                                                      lang::Location,
-                                                      ValidationLogger&) const
+bool lang::TypeDefinition::validateImplicitConversion(lang::Type const&, lang::Location, ValidationLogger&) const
 {
     return false;
 }
@@ -362,51 +403,45 @@ bool lang::TypeDefinition::validateIndirection(lang::Location, ValidationLogger&
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::TypeDefinition::buildSubscript(std::shared_ptr<Value>,
-                                                                  std::shared_ptr<Value>,
+Shared<lang::Value> lang::TypeDefinition::buildSubscript(Shared<Value>, Shared<Value>, CompileContext&)
+{
+    throw std::logic_error("Subscript not defined");
+}
+
+Shared<lang::Value> lang::TypeDefinition::buildOperator(lang::BinaryOperator,
+                                                        Shared<Value>,
+                                                        Shared<Value>,
+                                                        CompileContext&)
+{
+    throw std::logic_error("Operator not defined");
+}
+
+Shared<lang::Value> lang::TypeDefinition::buildOperator(lang::UnaryOperator, Shared<Value>, CompileContext&)
+{
+    throw std::logic_error("Operator not defined");
+}
+
+Shared<lang::Value> lang::TypeDefinition::buildImplicitConversion(lang::ResolvingHandle<lang::Type>,
+                                                                  Shared<Value>,
                                                                   CompileContext&)
 {
-    return nullptr;
+    throw std::logic_error("Implicit conversion not defined");
 }
 
-std::shared_ptr<lang::Value> lang::TypeDefinition::buildOperator(lang::BinaryOperator,
-                                                                 std::shared_ptr<Value>,
-                                                                 std::shared_ptr<Value>,
-                                                                 CompileContext&)
+Shared<lang::Value> lang::TypeDefinition::buildMemberAccess(Shared<Value>, lang::Identifier const&, CompileContext&)
 {
-    return nullptr;
+    throw std::logic_error("Member access not defined");
 }
 
-std::shared_ptr<lang::Value> lang::TypeDefinition::buildOperator(lang::UnaryOperator,
-                                                                 std::shared_ptr<Value>,
-                                                                 CompileContext&)
+Shared<lang::Value> lang::TypeDefinition::buildIndirection(Shared<Value>, CompileContext&)
 {
-    return nullptr;
-}
-
-std::shared_ptr<lang::Value> lang::TypeDefinition::buildImplicitConversion(lang::ResolvingHandle<lang::Type>,
-                                                                           std::shared_ptr<Value>,
-                                                                           CompileContext&)
-{
-    return nullptr;
-}
-
-std::shared_ptr<lang::Value> lang::TypeDefinition::buildMemberAccess(std::shared_ptr<Value>,
-                                                                     lang::Identifier const&,
-                                                                     CompileContext&)
-{
-    return nullptr;
-}
-
-std::shared_ptr<lang::Value> lang::TypeDefinition::buildIndirection(std::shared_ptr<Value>, CompileContext&)
-{
-    return nullptr;
+    throw std::logic_error("Indirection not defined");
 }
 
 void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, CompileContext& context)
 {
-    llvm::APInt count_value = llvm::APInt(lang::SizeType::getSizeWidth(), 1);
-    llvm::Type* count_type  = lang::SizeType::getSize()->getContentType(*context.llvmContext());
+    llvm::APInt const count_value = llvm::APInt(lang::SizeType::getSizeWidth(), 1);
+    llvm::Type*       count_type  = lang::SizeType::getSize()->getContentType(*context.llvmContext());
 
     llvm::Value* count = llvm::ConstantInt::get(count_type, count_value);
 
@@ -646,7 +681,7 @@ bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger
 
 bool lang::TypeDefinition::hasCyclicDependency() const
 {
-    if (cyclic_dependency_.has_value()) { return cyclic_dependency_.value(); }
+    if (cyclic_dependency_.hasValue()) { return cyclic_dependency_.value(); }
 
     int const visited  = 1;
     int const finished = 2;
@@ -689,7 +724,21 @@ bool lang::TypeDefinition::hasCyclicDependency() const
     return false;
 }
 
-std::vector<lang::TypeDefinition*> lang::TypeDefinition::getDependencies() const
+std::vector<lang::TypeDefinition const*> lang::TypeDefinition::getDependencies() const
+{
+    std::vector<lang::TypeDefinition const*> dependencies;
+
+    for (auto contained : getContained())
+    {
+        auto* definition = contained.get().getDefinition();
+
+        if (definition != nullptr) dependencies.push_back(definition);
+    }
+
+    return dependencies;
+}
+
+std::vector<std::reference_wrapper<lang::Type const>> lang::TypeDefinition::getContained() const
 {
     return {};
 }
@@ -698,32 +747,32 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
     std::vector<lang::ResolvingHandle<lang::Type>> parameter_types)
 {
     lang::OwningHandle<lang::Function> function = lang::OwningHandle<lang::Function>::takeOwnership(
-        lang::makeHandled<lang::Function>(lang::Identifier::from(name() + "$constructor")));
+        lang::makeHandled<lang::Function>(lang::Identifier::like(name() + "$constructor")));
 
     size_t count = 1;
 
-    std::vector<std::shared_ptr<lang::Parameter>> parameters;
+    std::vector<Shared<lang::Parameter>> parameters;
     for (auto& parameter_type : parameter_types)
     {
         std::string parameter_name = "p" + std::to_string(count++);
-        parameters.push_back(std::make_shared<lang::Parameter>(parameter_type,
-                                                               lang::Location::global(),
-                                                               lang::Identifier::from(parameter_name),
-                                                               lang::Location::global()));
+        parameters.push_back(makeShared<lang::Parameter>(parameter_type,
+                                                         lang::Location::global(),
+                                                         lang::Identifier::like(parameter_name),
+                                                         lang::Location::global()));
     }
 
     lang::PredefinedFunction& predefined_function =
         function->defineAsPredefined(self(), parameters, *scope(), lang::Location::global());
 
     predefined_function.setCallValidator(
-        [this](std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
-               lang::Location                                                              location,
-               ValidationLogger&                                                           validation_logger) {
+        [this](std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
+               lang::Location                                                                           location,
+               ValidationLogger& validation_logger) {
             if (arguments.size() == 1)
             {
                 auto const& [argument, argument_location] = arguments[0];
 
-                if (argument->type()->isImplicitlyConvertibleTo(self()))
+                if (argument.get().type().isImplicitlyConvertibleTo(self()))
                 {
                     validation_logger.logWarning("Unnecessary conversion constructor, use implicit conversion",
                                                  location);
@@ -738,12 +787,12 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
     return predefined_function;
 }
 
-bool lang::TypeDefinition::acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const&)
+bool lang::TypeDefinition::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>>)
 {
     return false;
 }
 
-void lang::TypeDefinition::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const&,
+void lang::TypeDefinition::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>>,
                                                   lang::PredefinedFunction&,
                                                   CompileContext&)
 {}
@@ -792,3 +841,5 @@ void lang::TypeDefinition::buildPointerIteration(llvm::Function*                
         context.ir()->CreateRetVoid();
     }
 }
+
+void lang::TypeDefinition::expand() {}

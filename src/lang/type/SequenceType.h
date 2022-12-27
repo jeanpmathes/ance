@@ -18,35 +18,35 @@ namespace lang
          * @param element_type The type of the elements.
          * @param size An optional size.
          */
-        SequenceType(lang::ResolvingHandle<lang::Type> element_type, std::optional<size_t> size);
+        SequenceType(lang::ResolvingHandle<lang::Type> element_type, Optional<size_t> size);
         ~SequenceType() override = default;
 
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const final;
+        ResolvingHandle<lang::Type> getElementType() override;
+        lang::Type const&           getElementType() const override;
 
         [[nodiscard]] StateCount getStateCount() const override;
 
-        bool                              isSubscriptDefined() override;
+        bool                              isSubscriptDefined() const override;
         lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
-        bool                              validateSubscript(lang::Location                    indexed_location,
-                                                            lang::ResolvingHandle<lang::Type> index_type,
-                                                            lang::Location                    index_location,
-                                                            ValidationLogger&                 validation_logger) const override;
-        std::shared_ptr<lang::Value>      buildSubscript(std::shared_ptr<Value> indexed,
-                                                         std::shared_ptr<Value> index,
-                                                         CompileContext&        context) override;
+        bool                              validateSubscript(lang::Location    indexed_location,
+                                                            lang::Type const& index_type,
+                                                            lang::Location    index_location,
+                                                            ValidationLogger& validation_logger) const override;
+        Shared<lang::Value>               buildSubscript(Shared<Value>   indexed,
+                                                         Shared<Value>   index,
+                                                         CompileContext& context) override;
 
       protected:
-        llvm::Value* buildGetElementPointer(std::shared_ptr<lang::Value> const& indexed,
-                                            std::shared_ptr<lang::Value> const& index,
-                                            CompileContext&                     context);
+        llvm::Value* buildGetElementPointer(Shared<Value> indexed, Shared<Value> index, CompileContext& context);
 
         llvm::Value* buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context);
 
-        virtual llvm::Type*  getIndexedType(CompileContext& context) const;
-        virtual llvm::Value* getIndexingPointer(std::shared_ptr<Value> indexed, CompileContext& context);
+        virtual llvm::Type*                     getIndexedType(CompileContext& context) const;
+        virtual llvm::Value*                    getIndexingPointer(Shared<Value> indexed, CompileContext& context);
         virtual llvm::SmallVector<llvm::Value*> getNativeIndices(llvm::Value* zero, llvm::Value* index);
 
-        [[nodiscard]] std::vector<lang::TypeDefinition*> getDependencies() const override;
+      public:
+        std::vector<std::reference_wrapper<lang::Type const>> getContained() const override;
 
       public:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
@@ -59,21 +59,19 @@ namespace lang
                                                   CompileContext& context) override;
         void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context) override;
 
-      protected:
         /**
          * Create a value with the given elements. Only valid if the type is sized.
          * @param values The elements of the value. All values must be of the element type, and the count must match the size.
          * @param context The current compile context.
          * @return The value.
          */
-        std::shared_ptr<lang::Value> createValue(std::vector<std::shared_ptr<lang::Value>> values,
-                                                 CompileContext&                           context);
+        Shared<lang::Value> createValue(std::vector<Shared<lang::Value>> values, CompileContext& context);
 
       protected:
         lang::ResolvingHandle<lang::Type> element_type_;
         lang::ResolvingHandle<lang::Type> element_reference_;
 
-        std::optional<size_t> size_;
+        Optional<size_t> size_;
     };
 }
 

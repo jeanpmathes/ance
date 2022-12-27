@@ -11,24 +11,32 @@ class Application;
 namespace lang
 {
     /**
-     * A constant for boolean values.
+     * The constant null (pointer).
      */
     class NullConstant : public Constant
     {
       public:
+        NullConstant();
+
         [[nodiscard]] std::string toString() const override;
 
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const override;
+        lang::ResolvingHandle<lang::Type> type() override;
+        [[nodiscard]] lang::Type const&   type() const override;
 
-        llvm::Constant* buildContent(llvm::Module* m) override;
+        llvm::Constant* createContent(llvm::Module* m) override;
 
         bool equals(lang::Constant const* other) const override;
+
+        Shared<Constant> clone() const override;
 
         /**
          * Create a null constant.
          * @return The new null constant.
          */
-        static std::shared_ptr<lang::NullConstant> create();
+        static Shared<lang::NullConstant> create();
+
+      private:
+        lang::ResolvingHandle<lang::Type> type_;
     };
 }
 

@@ -5,7 +5,7 @@
 #include "lang/construct/Function.h"
 #include "lang/type/Type.h"
 
-lang::VoidType::VoidType() : TypeDefinition(lang::Identifier::from("void")) {}
+lang::VoidType::VoidType() : TypeDefinition(lang::Identifier::like("void")) {}
 
 StateCount lang::VoidType::getStateCount() const
 {
@@ -13,7 +13,7 @@ StateCount lang::VoidType::getStateCount() const
     return count;
 }
 
-llvm::Constant* lang::VoidType::getDefaultContent(llvm::Module&)
+llvm::Constant* lang::VoidType::getDefaultContent(llvm::Module&) const
 {
     throw std::logic_error("Void does not have a default value.");
 }
@@ -28,7 +28,7 @@ std::string lang::VoidType::createMangledName() const
     return std::string(name().text());
 }
 
-llvm::DIType* lang::VoidType::createDebugType(CompileContext& context)
+llvm::DIType* lang::VoidType::createDebugType(CompileContext& context) const
 {
     return context.di()->createUnspecifiedType(name().text());
 }
@@ -62,6 +62,11 @@ void lang::VoidType::buildNativeDefinition(CompileContext&) {}
 lang::ResolvingHandle<lang::Type> lang::VoidType::get()
 {
     static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new VoidType()));
+        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new VoidType())));
     return instance;
+}
+
+lang::ResolvingHandle<lang::Type> lang::VoidType::clone() const
+{
+    return get();
 }

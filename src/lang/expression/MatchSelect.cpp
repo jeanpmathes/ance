@@ -7,9 +7,7 @@
 #include "lang/statement/Match.h"
 #include "validation/ValidationLogger.h"
 
-MatchSelect::MatchSelect(std::unique_ptr<Expression>        condition,
-                         std::vector<std::unique_ptr<Case>> cases,
-                         lang::Location                     location)
+MatchSelect::MatchSelect(Owned<Expression> condition, std::vector<Owned<Case>> cases, lang::Location location)
     : UnexpandedExpression(location)
     , condition_(std::move(condition))
     , cases_(std::move(cases))
@@ -17,30 +15,37 @@ MatchSelect::MatchSelect(std::unique_ptr<Expression>        condition,
     addSubexpression(*condition_);
 }
 
-Expression& MatchSelect::condition() const
+Expression const& MatchSelect::condition() const
 {
     return *condition_;
 }
 
-std::vector<std::reference_wrapper<Case>> MatchSelect::cases() const
+std::vector<std::reference_wrapper<Case const>> MatchSelect::cases() const
 {
-    std::vector<std::reference_wrapper<Case>> cases;
+    std::vector<std::reference_wrapper<Case const>> cases;
 
     for (auto& c : cases_) { cases.emplace_back(*c); }
 
     return cases;
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> MatchSelect::tryGetType() const
+void MatchSelect::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    auto potential_common_types = Case::tryGetCommonType(cases_);
+    auto common_types = Case::getCommonType(cases_);
 
-    if (potential_common_types.has_value() && potential_common_types.value().size() == 1)
-    {
-        return potential_common_types.value().front();
-    }
+    if (common_types.size() == 1 && common_types.front()->isDefined()) { type.reroute(common_types.front()); }
+}
 
-    return std::nullopt;
+void MatchSelect::walkDefinitions()
+{
+    Expression::walkDefinitions();
+    for (auto& c : cases_) { c->walkDefinitions(); }
+}
+
+void MatchSelect::postResolve()
+{
+    Expression::postResolve();
+    for (auto& c : cases_) { c->postResolve(); }
 }
 
 bool MatchSelect::validate(ValidationLogger& validation_logger) const
@@ -63,26 +68,26 @@ bool MatchSelect::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion MatchSelect::expandWith(Expressions subexpressions) const
 {
-    auto temp_name = lang::Identifier::from(scope()->getTemporaryName(), location());
+    auto temp_name = lang::Identifier::like(scope()->getTemporaryName(), location());
     auto condition = std::move(subexpressions[0]);
 
     auto variable = lang::makeHandled<lang::Variable>(temp_name);
 
-    std::vector<std::unique_ptr<Case>> cases;
+    std::vector<Owned<Case>> cases;
     for (auto& original_case : cases_) { cases.push_back(original_case->expand(variable)); }
 
     Statements statements;
 
-    statements.push_back(std::make_unique<LocalVariableDefinition>(temp_name,
-                                                                   type()->toUndefined(),
-                                                                   location(),
-                                                                   lang::Assigner::COPY_ASSIGNMENT,
-                                                                   nullptr,
-                                                                   location()));
+    statements.emplace_back(makeOwned<LocalVariableDefinition>(temp_name,
+                                                               type().createUndefinedClone(),
+                                                               location(),
+                                                               lang::Assigner::COPY_ASSIGNMENT,
+                                                               std::nullopt,
+                                                               location()));
 
-    statements.push_back(std::make_unique<Match>(std::move(cases), std::move(condition), location()));
+    statements.emplace_back(makeOwned<Match>(std::move(cases), std::move(condition), location()));
 
-    auto result = std::make_unique<VariableAccess>(variable->toUndefined(), location());
+    auto result = makeOwned<VariableAccess>(variable->toUndefined(), location());
 
     return {std::move(statements), std::move(result), Statements()};
 }

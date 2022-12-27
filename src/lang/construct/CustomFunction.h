@@ -35,15 +35,15 @@ namespace lang
         , public lang::Element<CustomFunction, ANCE_CONSTRUCTS>
     {
       public:
-        CustomFunction(Function&                                     function,
-                       lang::AccessModifier                          access,
-                       lang::ResolvingHandle<lang::Type>             return_type,
-                       lang::Location                                return_type_location,
-                       std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                       std::unique_ptr<Statement>                    code,
-                       Scope&                                        containing_scope,
-                       lang::Location                                declaration_location,
-                       lang::Location                                definition_location);
+        CustomFunction(Function&                            function,
+                       lang::AccessModifier                 access,
+                       lang::ResolvingHandle<lang::Type>    return_type,
+                       lang::Location                       return_type_location,
+                       std::vector<Shared<lang::Parameter>> parameters,
+                       Owned<Statement>                     code,
+                       Scope&                               containing_scope,
+                       lang::Location                       declaration_location,
+                       lang::Location                       definition_location);
 
         [[nodiscard]] bool isMangled() const override;
 
@@ -56,9 +56,9 @@ namespace lang
          * Get the debug subprogram.
          * @return The debug subprogram.
          */
-        llvm::DISubprogram* debugSubprogram();
+        llvm::DISubprogram* debugSubprogram() const;
 
-        llvm::DIScope* getDebugScope(CompileContext& context) override;
+        llvm::DIScope* getDebugScope(CompileContext& context) const override;
 
       protected:
         using FunctionDefinition::buildCall;

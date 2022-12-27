@@ -19,16 +19,19 @@ namespace lang
         bool isOpaquePointerType() const override;
 
       protected:
-        llvm::Constant* getDefaultContent(llvm::Module& m) override;
+        llvm::Constant* getDefaultContent(llvm::Module& m) const override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) override;
+        llvm::DIType* createDebugType(CompileContext& context) const override;
 
-        std::optional<lang::ResolvingHandle<lang::Type>> getPointeeType() const override;
+        Optional<lang::ResolvingHandle<lang::Type>> getPointeeType() override;
+        Type const*                                 getPointeeType() const override;
 
       public:
         static lang::ResolvingHandle<lang::Type> get();
+
+        ResolvingHandle<lang::Type> clone() const override;
     };
 }
 

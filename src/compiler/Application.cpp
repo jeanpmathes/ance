@@ -29,7 +29,7 @@
 #include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/type/VoidType.h"
 
-Application::Application(Project& project) : Application(project, std::make_unique<lang::GlobalScope>())
+Application::Application(Project& project) : Application(project, makeOwned<lang::GlobalScope>())
 {
     // Register keyword types
 
@@ -57,7 +57,7 @@ Application::Application(Project& project) : Application(project, std::make_uniq
     global_scope_->addTypeRegistry(lang::ReferenceType::getRegistry());
 }
 
-Application::Application(Project& project, std::unique_ptr<lang::GlobalScope>&& scope)
+Application::Application(Project& project, Owned<lang::GlobalScope>&& scope)
     : project_(project)
     , global_scope_(std::move(scope))
 {
@@ -91,12 +91,12 @@ void Application::validate(ValidationLogger& validation_logger) const
 
     if (!global_scope_->hasEntry())
     {
-        validation_logger.logError("Entry point 'main() : ui32' could not be found", lang::Location::global());
+        validation_logger.logError("Entry point 'main() : u32' could not be found", lang::Location::global());
     }
 
     if (!global_scope_->hasExit())
     {
-        validation_logger.logError("Exit point 'exit(ui32)' could not be found", lang::Location::global());
+        validation_logger.logError("Exit point 'exit(u32)' could not be found", lang::Location::global());
     }
 }
 
@@ -108,7 +108,7 @@ void Application::preBuild()
     global_scope_->determineFlow();
 }
 
-void Application::emitAsSource(std::filesystem::path out)
+void Application::emitAsSource(std::filesystem::path const& out)
 {
     std::ofstream of;
     of.open(out);

@@ -16,7 +16,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
          * @param code The code to execute.
          * @return The created case.
          */
-    static Case* createDefault(std::unique_ptr<Statement> code);
+    static Case* createDefault(Owned<Statement> code);
 
     /**
          * Create a case.
@@ -24,15 +24,14 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
          * @param code The code to execute.
          * @return The created case.
          */
-    static Case* createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions,
-                            std::unique_ptr<Statement>                       code);
+    static Case* createCase(std::vector<Owned<ConstantExpression>> conditions, Owned<Statement> code);
 
     /**
      * Create a default case, using an expression.
      * @param expression The expression that provides the value.
      * @return The created case.
      */
-    static Case* createDefault(std::unique_ptr<Expression> expression);
+    static Case* createDefault(Owned<Expression> expression);
 
     /**
      * Create a case, using an expression.
@@ -40,40 +39,23 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
      * @param expression The expression that provides a value.
      * @return The created case.
      */
-    static Case* createCase(std::vector<std::unique_ptr<ConstantExpression>> conditions,
-                            std::unique_ptr<Expression>                      expression);
+    static Case* createCase(std::vector<Owned<ConstantExpression>> conditions, Owned<Expression> expression);
 
   private:
-    Case(std::vector<std::unique_ptr<ConstantExpression>>                      conditions,
-         std::variant<std::unique_ptr<Statement>, std::unique_ptr<Expression>> code);
+    Case(std::vector<Owned<ConstantExpression>> conditions, std::variant<Owned<Statement>, Owned<Expression>> code);
 
   public:
-    [[nodiscard]] std::vector<std::reference_wrapper<ConstantExpression>>  conditions() const;
-    [[nodiscard]] std::reference_wrapper<lang::Visitable<ANCE_CONSTRUCTS>> code() const;
+    [[nodiscard]] std::vector<std::reference_wrapper<ConstantExpression const>>  conditions() const;
+    [[nodiscard]] std::reference_wrapper<lang::Visitable<ANCE_CONSTRUCTS> const> code() const;
 
     void setContainingScope(lang::Scope& scope);
     void walkDefinitions();
+    void postResolve();
 
     std::vector<std::pair<ConstantExpression*, Statement*>> getConditions();
 
-    bool validateConflicts(Case& other, ValidationLogger& validation_logger);
-    bool validate(lang::ResolvingHandle<lang::Type> target_type, ValidationLogger& validation_logger);
-
-    /**
-     * Get the common type of the cases. The cases must be expression-based.
-     * @param cases The cases to get the common type from.
-     * @return The common type.
-     */
-    static std::vector<lang::ResolvingHandle<lang::Type>> getCommonType(
-        std::vector<std::unique_ptr<Case>> const& cases);
-
-    /**
-     * Try to get the common type of the cases. The cases must be expression-based.
-     * @param cases The cases to get the common type from.
-     * @return The common type, or none.
-     */
-    static std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> tryGetCommonType(
-        std::vector<std::unique_ptr<Case>> const& cases);
+    bool validateConflicts(Case const& other, ValidationLogger& validation_logger) const;
+    bool validate(lang::Type const& target_type, ssize_t* coverage_count, ValidationLogger& validation_logger) const;
 
     /**
      * Validate the return types of the case-expressions.
@@ -82,29 +64,28 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
      * @param validation_logger The validation logger to use.
      * @return True if the return types are valid, false otherwise.
      */
-    static bool validateReturnTypes(lang::Location                            location,
-                                    std::vector<std::unique_ptr<Case>> const& cases,
-                                    ValidationLogger&                         validation_logger);
+    static bool validateReturnTypes(lang::Location                  location,
+                                    std::vector<Owned<Case>> const& cases,
+                                    ValidationLogger&               validation_logger);
+
+    static std::vector<lang::ResolvingHandle<lang::Type>> getCommonType(std::vector<Owned<Case>>& cases);
 
     /**
      * Expand the contents of this case. This is only valid for statement-based cases.
      * @return The expanded case.
      */
-    [[nodiscard]] std::unique_ptr<Case> expand() const;
+    [[nodiscard]] Owned<Case> expand() const;
 
     /**
      * Expand the contents of this case. This is only valid for expression-based cases.
      * @param target The variable to assign the result of the expression to.
      * @return The expanded case.
      */
-    [[nodiscard]] std::unique_ptr<Case> expand(lang::ResolvingHandle<lang::Variable> target) const;
-
-    ssize_t getCoverageCount();
+    [[nodiscard]] Owned<Case> expand(lang::ResolvingHandle<lang::Variable> target) const;
 
   private:
-    std::vector<std::unique_ptr<ConstantExpression>>                      conditions_;
-    std::variant<std::unique_ptr<Statement>, std::unique_ptr<Expression>> code_;
-    ssize_t                                                               coverage_count_ {};
+    std::vector<Owned<ConstantExpression>>            conditions_;
+    std::variant<Owned<Statement>, Owned<Expression>> code_;
 };
 
 /**
@@ -121,16 +102,17 @@ class Match
      * @param expression The expression to match.
      * @param location The source location of the statement.
      */
-    Match(std::vector<std::unique_ptr<Case>> cases, std::unique_ptr<Expression> expression, lang::Location location);
+    Match(std::vector<Owned<Case>> cases, Owned<Expression> expression, lang::Location location);
 
-    [[nodiscard]] Expression&                               expression() const;
-    [[nodiscard]] std::vector<std::reference_wrapper<Case>> cases() const;
+    Expression&                                                   expression();
+    [[nodiscard]] Expression const&                               expression() const;
+    [[nodiscard]] std::vector<std::reference_wrapper<Case const>> cases() const;
 
-    std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
-                                                                     lang::Function&   function) override;
+    std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, lang::Function& function) override;
 
     void setScope(lang::Scope& scope) override;
     void walkDefinitions() override;
+    void postResolve() override;
 
     void validate(ValidationLogger& validation_logger) const override;
 
@@ -140,7 +122,7 @@ class Match
      * @param validation_logger The validation logger to use.
      * @return True if the type can be matched, false otherwise.
      */
-    static bool validateType(Expression& expression, ValidationLogger& validation_logger);
+    static bool validateType(Expression const& expression, ValidationLogger& validation_logger);
 
     /**
      * Validate the cases of the match statement.
@@ -150,10 +132,10 @@ class Match
      * @param validation_logger The validation logger to use.
      * @return True if the cases are valid, false otherwise.
      */
-    static bool validateCases(lang::Location                            location,
-                              Expression&                               expression,
-                              std::vector<std::unique_ptr<Case>> const& cases,
-                              ValidationLogger&                         validation_logger);
+    static bool validateCases(lang::Location                  location,
+                              Expression const&               expression,
+                              std::vector<Owned<Case>> const& cases,
+                              ValidationLogger&               validation_logger);
 
     [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
@@ -161,8 +143,8 @@ class Match
     void doBuild(CompileContext& context) override;
 
   private:
-    std::unique_ptr<Expression>        expression_;
-    std::vector<std::unique_ptr<Case>> cases_;
+    Owned<Expression>        expression_;
+    std::vector<Owned<Case>> cases_;
 };
 
 #endif

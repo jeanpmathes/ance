@@ -27,10 +27,12 @@ AnceCompiler::AnceCompiler(Application& app, SourceTree& tree)
     , module_(application_.getProject().getName(), llvm_context_)
     , ir_(llvm_context_)
     , di_(module_)
+    , runtime_()
+    , context_(application_, runtime_, llvm_context_, module_, ir_, di_, tree)
 {
     module_.setSourceFileName(application_.getProject().getProjectFile().filename().string());
 
-    llvm::Triple triple(llvm::sys::getDefaultTargetTriple());
+    llvm::Triple const triple(llvm::sys::getDefaultTargetTriple());
 
     std::string         err;
     llvm::Target const* t = llvm::TargetRegistry::lookupTarget(triple.str(), err);
@@ -41,7 +43,7 @@ AnceCompiler::AnceCompiler(Application& app, SourceTree& tree)
     llvm::Optional<llvm::CodeModel::Model> cm;
     cm = llvm::CodeModel::Large;
 
-    llvm::TargetOptions opt;
+    llvm::TargetOptions const opt;
 
     target_machine_ = t->createTargetMachine(triple.str(), "generic", "", opt, rm, cm, llvm::CodeGenOpt::None);
 
@@ -56,39 +58,24 @@ AnceCompiler::AnceCompiler(Application& app, SourceTree& tree)
 
     module_.addModuleFlag(llvm::Module::Warning, "Dwarf Version", llvm::dwarf::DWARF_VERSION);
     module_.addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
-
-    llvm::DIFile* project_file = di_.createFile(application_.getProject().getProjectFile().filename().generic_string(),
-                                                application_.getProject().getProjectDirectory().generic_string());
-
-    llvm::DICompileUnit* unit = di_.createCompileUnit(llvm::dwarf::DW_LANG_C, project_file, "ance-000", false, "", 0);
-
-    runtime_ = std::make_unique<Runtime>();
-    context_ = std::make_unique<CompileContext>(&application_,
-                                                runtime_.get(),
-                                                &llvm_context_,
-                                                &module_,
-                                                &ir_,
-                                                &di_,
-                                                unit,
-                                                tree);
 }
 
 void AnceCompiler::compile(std::filesystem::path const& out)
 {
-    context_->runtime()->init(*context_);
+    context_.runtime()->init(context_);
 
-    application_.globalScope().createNativeBacking(*context_);
-    context_->runtime()->setExit(application_.globalScope().getExit());
+    application_.globalScope().createNativeBacking(context_);
+    context_.runtime()->setExit(application_.globalScope().getExit());
 
-    application_.globalScope().buildFunctions(*context_);
+    application_.globalScope().buildFunctions(context_);
 
-    assert(context_->allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
+    assert(context_.allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
 
     // Print control flow graph.
 
-    std::filesystem::path   cfg_path = out.parent_path() / "cfg.gml";
-    std::ofstream           cfg_out(cfg_path);
-    ControlFlowGraphPrinter cfg_printer(cfg_out);
+    std::filesystem::path const cfg_path = out.parent_path() / "cfg.gml";
+    std::ofstream               cfg_out(cfg_path);
+    ControlFlowGraphPrinter     cfg_printer(cfg_out);
     cfg_printer.visit(application_);
 
     // Prepare entry and exit functions.
@@ -174,7 +161,7 @@ llvm::Function* AnceCompiler::buildInit()
 
     ir_.SetInsertPoint(start_block);
 
-    application_.globalScope().buildInitialization(*context_);
+    application_.globalScope().buildInitialization(context_);
 
     ir_.CreateRetVoid();
     return init;
@@ -184,7 +171,7 @@ llvm::Function* AnceCompiler::buildExit()
 {
     lang::ResolvingHandle<lang::Type> exitcode_type = lang::FixedWidthIntegerType::get(32, false);
 
-    llvm::Type*         exit_params[] = {exitcode_type->getContentType(llvm_context_)};
+    std::array<llvm::Type*, 1> const exit_params = {exitcode_type->getContentType(llvm_context_)};
     llvm::FunctionType* exit_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), exit_params, false);
     llvm::Function*     exit      = llvm::Function::Create(exit_type,
                                                   llvm::GlobalValue::LinkageTypes::PrivateLinkage,
@@ -199,12 +186,12 @@ llvm::Function* AnceCompiler::buildExit()
 
     lang::ResolvingHandle<lang::Function> user_exit = application_.globalScope().getExit();
 
-    std::vector<std::shared_ptr<lang::Value>> args;
-    args.push_back(
-        std::make_shared<lang::WrappedNativeValue>(exitcode_type,
-                                                   lang::values::contentToNative(exitcode_type, exitcode, *context_)));
+    std::vector<Shared<lang::Value>> args;
+    args.emplace_back(
+        makeShared<lang::WrappedNativeValue>(exitcode_type,
+                                             lang::values::contentToNative(exitcode_type, exitcode, context_)));
 
-    user_exit->buildCall(args, *context_);
+    user_exit->buildCall(args, context_);
 
     ir_.CreateRetVoid();
     return exit;
@@ -224,10 +211,11 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::
 
     ir_.CreateCall(init);
 
-    std::shared_ptr<lang::Value> exitcode = main->buildCall({}, *context_);
-    exitcode->buildContentValue(*context_);
+    Optional<Shared<lang::Value>> exitcode = main->buildCall({}, context_);
+    assert(exitcode.hasValue());
+    exitcode.value()->buildContentValue(context_);
 
-    ir_.CreateCall(exit, {exitcode->getContentValue()});
+    ir_.CreateCall(exit, {exitcode.value()->getContentValue()});
 
     ir_.CreateRetVoid();
 }

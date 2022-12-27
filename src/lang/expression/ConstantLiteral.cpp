@@ -6,19 +6,19 @@
 #include "lang/scope/Scope.h"
 #include "lang/statement/Statement.h"
 
-ConstantLiteral::ConstantLiteral(std::shared_ptr<lang::Constant> constant, lang::Location location)
+ConstantLiteral::ConstantLiteral(Shared<lang::Constant> constant, lang::Location location)
     : Expression(location)
     , constant_(std::move(constant))
 {}
 
-lang::Constant& ConstantLiteral::constant() const
+lang::Constant const& ConstantLiteral::constant() const
 {
     return *constant_;
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> ConstantLiteral::tryGetType() const
+void ConstantLiteral::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    return constant_->type();
+    type.reroute(constant_->type());
 }
 
 bool ConstantLiteral::validate(ValidationLogger& validation_logger) const
@@ -28,10 +28,17 @@ bool ConstantLiteral::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion ConstantLiteral::expandWith(Expressions) const
 {
-    return {Statements(), std::make_unique<ConstantLiteral>(constant_, location()), Statements()};
+    return {Statements(), makeOwned<ConstantLiteral>(constant_->clone(), location()), Statements()};
 }
 
-std::shared_ptr<lang::Constant> ConstantLiteral::getConstantValue() const
+Shared<lang::Constant> ConstantLiteral::getConstantValue()
 {
     return constant_;
 }
+
+lang::Constant const& ConstantLiteral::getConstantValue() const
+{
+    return *constant_;
+}
+
+ConstantLiteral::~ConstantLiteral() = default;

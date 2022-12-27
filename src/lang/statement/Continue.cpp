@@ -10,7 +10,7 @@ void Continue::validate(ValidationLogger& validation_logger) const
     if (getLoopParent() == nullptr) { validation_logger.logError("No loop to continue", location()); }
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> Continue::createBasicBlocks(lang::BasicBlock& entry, lang::Function&)
+std::vector<Owned<lang::BasicBlock>> Continue::createBasicBlocks(lang::BasicBlock& entry, lang::Function&)
 {
     Statement const* loop_parent = getLoopParent();
     assert(loop_parent != nullptr);
@@ -33,7 +33,7 @@ Statements Continue::expandWith(Expressions, Statements) const
 {
     Statements statements;
 
-    statements.push_back(std::make_unique<Continue>(location()));
+    statements.emplace_back(makeOwned<Continue>(location()));
 
     return statements;
 }

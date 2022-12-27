@@ -13,10 +13,10 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::StructType::StructType(lang::AccessModifier                       access_modifier,
-                             lang::Identifier                           name,
-                             std::vector<std::unique_ptr<lang::Member>> members,
-                             lang::Location                             location)
+lang::StructType::StructType(lang::AccessModifier             access_modifier,
+                             lang::Identifier                 name,
+                             std::vector<Owned<lang::Member>> members,
+                             lang::Location                   location)
     : TypeDefinition(name, location)
     , access_(access_modifier)
     , members_(std::move(members))
@@ -43,7 +43,7 @@ bool lang::StructType::isStructType() const
     return true;
 }
 
-llvm::Constant* lang::StructType::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::StructType::getDefaultContent(llvm::Module& m) const
 {
     std::vector<llvm::Constant*> values;
 
@@ -60,7 +60,7 @@ llvm::StructType* lang::StructType::getContentType(llvm::LLVMContext& c) const
 
         std::vector<llvm::Type*> member_types;
 
-        for (auto& member : members_) { member_types.push_back(member->type()->getContentType(c)); }
+        for (auto& member : members_) { member_types.push_back(member->type().getContentType(c)); }
 
         native_type_->setBody(member_types);
     }
@@ -84,9 +84,9 @@ bool lang::StructType::validateDefinition(ValidationLogger& validation_logger) c
 
     for (auto& member : members_)
     {
-        auto type = member->type();
+        auto const& type = member->type();
 
-        if (!type->isDefined())
+        if (!type.isDefined())
         {
             valid = not lang::validation::isTypeUndefined(type, member->location(), validation_logger);
             continue;
@@ -106,7 +106,7 @@ bool lang::StructType::validateDefinition(ValidationLogger& validation_logger) c
             continue;
         }
 
-        if (type->isReferenceType())
+        if (type.isReferenceType())
         {
             validation_logger.logError("Cannot declare member of reference type", member->location());
             valid = false;
@@ -141,16 +141,16 @@ std::string lang::StructType::createMangledName() const
     return "struct(" + name() + ")";
 }
 
-llvm::DIType* lang::StructType::createDebugType(CompileContext& context)
+llvm::DIType* lang::StructType::createDebugType(CompileContext& context) const
 {
     llvm::DataLayout const& dl         = context.module()->getDataLayout();
     llvm::Type*             array_type = getContentType(*context.llvmContext());
 
-    uint64_t size      = dl.getTypeSizeInBits(array_type);
-    auto     alignment = static_cast<uint32_t>(dl.getABITypeAlignment(array_type));
+    uint64_t const size      = dl.getTypeSizeInBits(array_type);
+    auto           alignment = static_cast<uint32_t>(dl.getABITypeAlignment(array_type));
 
     std::vector<llvm::Metadata*> member_types;
-    for (auto& member : members_) { member_types.push_back(member->type()->getDebugType(context)); }
+    for (auto& member : members_) { member_types.push_back(member->type().getDebugType(context)); }
 
     llvm::MDTuple* debug_type = llvm::MDNode::get(*context.llvmContext(), member_types);
 
@@ -165,18 +165,18 @@ llvm::DIType* lang::StructType::createDebugType(CompileContext& context)
                                           debug_type);
 }
 
-std::vector<lang::TypeDefinition*> lang::StructType::getDependencies() const
+std::vector<std::reference_wrapper<lang::Type const>> lang::StructType::getContained() const
 {
-    std::vector<lang::TypeDefinition*> dependencies;
-    std::set<lang::TypeDefinition*>    added;
+    std::vector<std::reference_wrapper<lang::Type const>> dependencies;
+    std::set<lang::TypeDefinition const*>                 added;
 
     for (auto& member : members_)
     {
-        auto* definition = member->type()->getDefinition();
+        auto const* definition = member->type().getDefinition();
 
         if (definition && !added.contains(definition))
         {
-            dependencies.push_back(definition);
+            dependencies.emplace_back(member->type());
             added.insert(definition);
         }
     }
@@ -184,7 +184,7 @@ std::vector<lang::TypeDefinition*> lang::StructType::getDependencies() const
     return dependencies;
 }
 
-bool lang::StructType::hasMember(lang::Identifier const& name)
+bool lang::StructType::hasMember(lang::Identifier const& name) const
 {
     return member_map_.contains(name);
 }
@@ -205,15 +205,12 @@ bool lang::StructType::validateMemberAccess(lang::Identifier const& name, Valida
     return true;
 }
 
-std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr<Value>  value,
-                                                                 lang::Identifier const& name,
-                                                                 CompileContext&         context)
+Shared<lang::Value> lang::StructType::buildMemberAccess(Shared<Value>           value,
+                                                        lang::Identifier const& name,
+                                                        CompileContext&         context)
 {
-    lang::ResolvingHandle<lang::Type> return_type = lang::ReferenceType::get(getMemberType(name));
-
-    auto&                             member       = member_map_.at(name);
-    int32_t                           member_index = member_indices_[name];
-    lang::ResolvingHandle<lang::Type> member_type  = member.get().type();
+    lang::ResolvingHandle<lang::Type> return_type  = lang::ReferenceType::get(getMemberType(name));
+    int32_t const                     member_index = member_indices_[name];
 
     llvm::Value* struct_ptr;
 
@@ -231,7 +228,7 @@ std::shared_ptr<lang::Value> lang::StructType::buildMemberAccess(std::shared_ptr
     llvm::Value* member_ptr   = buildGetElementPointer(struct_ptr, member_index, context);
     llvm::Value* native_value = lang::values::contentToNative(return_type, member_ptr, context);
 
-    return std::make_shared<lang::WrappedNativeValue>(return_type, native_value);
+    return makeShared<lang::WrappedNativeValue>(return_type, native_value);
 }
 
 void lang::StructType::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context)
@@ -272,4 +269,9 @@ llvm::Value* lang::StructType::buildGetElementPointer(llvm::Value*    struct_ptr
                                          struct_ptr,
                                          static_cast<unsigned>(member_index),
                                          struct_ptr->getName() + ".gep");
+}
+
+void lang::StructType::expand()
+{
+    for (auto& member : members_) { member->expand(); }
 }

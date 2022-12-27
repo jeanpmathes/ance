@@ -44,7 +44,7 @@ namespace lang
          * @param m The module.
          * @return The content constant.
          */
-        virtual llvm::Constant* buildContent(llvm::Module* m) = 0;
+        virtual llvm::Constant* createContent(llvm::Module* m) = 0;
 
       public:
         /**
@@ -63,8 +63,14 @@ namespace lang
         void buildNativeValue(CompileContext& context) final;
         void buildContentValue(CompileContext& context) final;
 
-        llvm::Value* getNativeValue() final;
-        llvm::Value* getContentValue() final;
+        [[nodiscard]] llvm::Value* getNativeValue() const final;
+        [[nodiscard]] llvm::Value* getContentValue() const final;
+
+        /**
+         * Clone this constant.
+         * @return The cloned constant.
+         */
+        [[nodiscard]] virtual Shared<Constant> clone() const = 0;
 
       protected:
         llvm::Value*    native_value_ {nullptr};

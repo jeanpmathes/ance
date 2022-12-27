@@ -14,25 +14,23 @@ lang::Type::Type(Identifier name) : name_(name)
     assert(not name_.text().empty());
 }
 
-lang::Type::Type(std::unique_ptr<lang::TypeDefinition> definition)
-    : name_(definition->name())
-    , definition_(std::move(definition))
+lang::Type::Type(Owned<lang::TypeDefinition> definition) : name_(definition->name()), definition_(std::move(definition))
 {
-    definition_->setType(this);
+    definition_.value()->setType(this);
 }
 
-lang::Type::Type() : name_(lang::Identifier::from("")) {}
+lang::Type::Type() : name_(lang::Identifier::like("")) {}
 
 lang::ResolvingHandle<lang::Type> lang::Type::getUndefined()
 {
-    return ResolvingHandle<Type>(std::unique_ptr<Type>(new Type()));
+    return ResolvingHandle<Type>(Owned<Type>(*(new Type())));
 }
 
 lang::Identifier const& lang::Type::name() const
 {
-    static const lang::Identifier undefined = lang::Identifier::from("$undefined");
+    static const lang::Identifier undefined = lang::Identifier::like("$undefined");
 
-    if (isDefined()) { return definition_->name(); }
+    if (isDefined()) { return definition_.value()->name(); }
     else { return name_.text().empty() ? undefined : name_; }
 }
 
@@ -42,7 +40,7 @@ std::string lang::Type::getAnnotatedName(bool is_safe) const
 
     is_safe &= isDefined();
 
-    if (is_safe && getActualType() != self()) { name += " (aka '" + getActualType()->name() + "')"; }
+    if (is_safe && getActualType() != self()) { name += " (aka '" + getActualType().name() + "')"; }
 
     return name;
 }
@@ -50,225 +48,242 @@ std::string lang::Type::getAnnotatedName(bool is_safe) const
 std::string const& lang::Type::getMangledName() const
 {
     assert(isDefined());
-    return definition_->getMangledName();
+    return definition_.value()->getMangledName();
 }
 
 bool lang::Type::isDefined() const
 {
-    return (definition_ != nullptr);
+    return definition_.hasValue() && definition_.value()->isFullyDefined();
 }
 
-void lang::Type::define(std::unique_ptr<lang::TypeDefinition> definition)
+void lang::Type::define(Owned<lang::TypeDefinition> definition)
 {
     assert(!isDefined());
     assert(!name_.text().empty() && "Cannot define the undefined type.");
 
     definition_ = std::move(definition);
-    definition_->setType(this);
+    definition_.value()->setType(this);
 }
 
 StateCount lang::Type::getStateCount() const
 {
     assert(isDefined());
-    return definition_->getStateCount();
+    return definition_.value()->getStateCount();
 }
 
 bool lang::Type::isCustom() const
 {
-    assert(isDefined());
-    return definition_->isCustom();
+    assert(definition_.hasValue());
+    return definition_.value()->isCustom();
 }
 
 lang::FixedWidthIntegerType const* lang::Type::isFixedWidthIntegerType() const
 {
     assert(isDefined());
-    return definition_->isFixedWidthIntegerType();
+    return definition_.value()->isFixedWidthIntegerType();
 }
 
 bool lang::Type::isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const
 {
     assert(isDefined());
-    return definition_->isFixedWidthIntegerType(bit_size, is_signed);
+    return definition_.value()->isFixedWidthIntegerType(bit_size, is_signed);
 }
 
 bool lang::Type::isSigned() const
 {
     assert(isDefined());
-    return definition_->isSigned();
+    return definition_.value()->isSigned();
 }
 
 lang::IntegerType const* lang::Type::isIntegerType() const
 {
     assert(isDefined());
-    return definition_->isIntegerType();
+    return definition_.value()->isIntegerType();
 }
 
 bool lang::Type::isBooleanType() const
 {
     assert(isDefined());
-    return definition_->isBooleanType();
+    return definition_.value()->isBooleanType();
 }
 
 bool lang::Type::isCharType() const
 {
     assert(isDefined());
-    return definition_->isCharType();
+    return definition_.value()->isCharType();
 }
 
 bool lang::Type::isUnsignedIntegerPointerType() const
 {
     assert(isDefined());
-    return definition_->isUnsignedIntegerPointerType();
+    return definition_.value()->isUnsignedIntegerPointerType();
 }
 
 lang::FloatingPointType const* lang::Type::isFloatingPointType() const
 {
     assert(isDefined());
-    return definition_->isFloatingPointType();
+    return definition_.value()->isFloatingPointType();
 }
 
 bool lang::Type::isFloatingPointType(size_t precision) const
 {
     assert(isDefined());
-    return definition_->isFloatingPointType(precision);
+    return definition_.value()->isFloatingPointType(precision);
 }
 
 bool lang::Type::isSizeType() const
 {
     assert(isDefined());
-    return definition_->isSizeType();
+    return definition_.value()->isSizeType();
 }
 
 bool lang::Type::isDiffType() const
 {
     assert(isDefined());
-    return definition_->isDiffType();
+    return definition_.value()->isDiffType();
 }
 
 bool lang::Type::isVoidType() const
 {
     assert(isDefined());
-    return definition_->isVoidType();
+    return definition_.value()->isVoidType();
 }
 
 bool lang::Type::isNullValueType() const
 {
     assert(isDefined());
-    return definition_->isNullValueType();
+    return definition_.value()->isNullValueType();
 }
 
 bool lang::Type::isPointerType() const
 {
     assert(isDefined());
-    return definition_->isPointerType();
+    return definition_.value()->isPointerType();
 }
 
 bool lang::Type::isAddressType() const
 {
     assert(isDefined());
-    return definition_->isAddressType();
+    return definition_.value()->isAddressType();
 }
 
 bool lang::Type::isBufferType() const
 {
     assert(isDefined());
-    return definition_->isBufferType();
+    return definition_.value()->isBufferType();
 }
 
 bool lang::Type::isOpaquePointerType() const
 {
     assert(isDefined());
-    return definition_->isOpaquePointerType();
+    return definition_.value()->isOpaquePointerType();
 }
 
 bool lang::Type::isReferenceType() const
 {
     assert(isDefined());
-    return definition_->isReferenceType();
+    return definition_.value()->isReferenceType();
 }
 
 bool lang::Type::isStructType() const
 {
     assert(isDefined());
-    return definition_->isStructType();
+    return definition_.value()->isStructType();
 }
 
 lang::VectorizableType const* lang::Type::isVectorizable() const
 {
     assert(isDefined());
-    return definition_->isVectorizable();
+    return definition_.value()->isVectorizable();
 }
 
 lang::VectorizableType* lang::Type::isVectorizable()
 {
     assert(isDefined());
-    return definition_->isVectorizable();
+    return definition_.value()->isVectorizable();
 }
 
 lang::VectorType const* lang::Type::isVectorType() const
 {
     assert(isDefined());
-    return definition_->isVectorType();
+    return definition_.value()->isVectorType();
 }
 
 lang::VectorType* lang::Type::isVectorType()
 {
     assert(isDefined());
-    return definition_->isVectorType();
+    return definition_.value()->isVectorType();
 }
 
 lang::ArrayType const* lang::Type::isArrayType() const
 {
     assert(isDefined());
-    return definition_->isArrayType();
+    return definition_.value()->isArrayType();
 }
 
 lang::ArrayType* lang::Type::isArrayType()
 {
     assert(isDefined());
-    return definition_->isArrayType();
+    return definition_.value()->isArrayType();
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::getElementType() const
+lang::ResolvingHandle<lang::Type> lang::Type::getElementType()
 {
     assert(isDefined());
-    return definition_->getElementType();
+    return definition_.value()->getElementType();
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::getActualType() const
+lang::Type const& lang::Type::getElementType() const
 {
     assert(isDefined());
-    return definition_->getActualType();
+    return definition_.value()->getElementType();
+}
+
+lang::ResolvingHandle<lang::Type> lang::Type::getActualType()
+{
+    assert(definition_.hasValue());
+    return definition_.value()->getActualType();
+}
+
+lang::Type const& lang::Type::getActualType() const
+{
+    assert(definition_.hasValue());
+    return definition_.value()->getActualType();
 }
 
 lang::AccessModifier lang::Type::getAccessModifier() const
 {
     assert(isDefined());
-    return definition_->getAccessModifier();
+    return definition_.value()->getAccessModifier();
 }
 
 void lang::Type::setContainingScope(lang::Scope* scope)
 {
-    assert(isDefined());
-    definition_->setContainingScope(scope);
+    if (definition_.hasValue()) { definition_.value()->setContainingScope(scope); }
 }
 
-lang::Scope* lang::Type::getContainingScope() const
+lang::Scope* lang::Type::getContainingScope()
+{
+    assert(definition_.hasValue());
+    return definition_.value()->scope();
+}
+
+lang::Scope const* lang::Type::getContainingScope() const
 {
     assert(isDefined());
-    return definition_->scope();
+    return definition_.value()->scope();
 }
 
 void lang::Type::postResolve()
 {
     assert(isDefined());
-    definition_->postResolve();
+    definition_.value()->postResolve();
 }
 
 bool lang::Type::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters)
 {
     assert(isDefined());
-    return definition_->requestOverload(std::move(parameters));
+    return definition_.value()->requestOverload(std::move(parameters));
 }
 
 bool lang::Type::enableImplicitConversionOnCall() const
@@ -276,139 +291,146 @@ bool lang::Type::enableImplicitConversionOnCall() const
     return false;
 }
 
-llvm::Constant* lang::Type::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::Type::getDefaultContent(llvm::Module& m) const
 {
     assert(isDefined());
-    return definition_->getDefaultContent(m);
+    return definition_.value()->getDefaultContent(m);
 }
 
 llvm::Type* lang::Type::getNativeType(llvm::LLVMContext& c) const
 {
     assert(isDefined());
-    return definition_->getNativeType(c);
+    return definition_.value()->getNativeType(c);
 }
 
 llvm::Type* lang::Type::getContentType(llvm::LLVMContext& c) const
 {
     assert(isDefined());
-    return definition_->getContentType(c);
+    return definition_.value()->getContentType(c);
 }
 
-llvm::DIType* lang::Type::getDebugType(CompileContext& context)
+llvm::DIType* lang::Type::getDebugType(CompileContext& context) const
 {
     assert(isDefined());
-    return definition_->getDebugType(context);
+    return definition_.value()->getDebugType(context);
 }
 
 llvm::TypeSize lang::Type::getNativeSize(llvm::Module* m)
 {
     assert(isDefined());
-    return definition_->getNativeSize(m);
+    return definition_.value()->getNativeSize(m);
 }
 
 llvm::TypeSize lang::Type::getContentSize(llvm::Module* m)
 {
     assert(isDefined());
-    return definition_->getContentSize(m);
+    return definition_.value()->getContentSize(m);
 }
 
-bool lang::Type::isSubscriptDefined()
+bool lang::Type::isSubscriptDefined() const
 {
     assert(isDefined());
-    return definition_->isSubscriptDefined();
+    return definition_.value()->isSubscriptDefined();
 }
 
 lang::ResolvingHandle<lang::Type> lang::Type::getSubscriptReturnType()
 {
     assert(isDefined());
-    return definition_->getSubscriptReturnType();
+    return definition_.value()->getSubscriptReturnType();
 }
 
-bool lang::Type::isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other)
+bool lang::Type::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
 {
     assert(isDefined());
-    return definition_->isOperatorDefined(op, other);
+    return definition_.value()->isOperatorDefined(op, other);
 }
 
-bool lang::Type::isOperatorDefined(lang::UnaryOperator op)
+bool lang::Type::isOperatorDefined(lang::UnaryOperator op) const
 {
     assert(isDefined());
-    return definition_->isOperatorDefined(op);
+    return definition_.value()->isOperatorDefined(op);
 }
 
 lang::ResolvingHandle<lang::Type> lang::Type::getOperatorResultType(lang::BinaryOperator              op,
                                                                     lang::ResolvingHandle<lang::Type> other)
 {
     assert(isDefined());
-    return definition_->getOperatorResultType(op, other);
+    return definition_.value()->getOperatorResultType(op, other);
 }
 
 lang::ResolvingHandle<lang::Type> lang::Type::getOperatorResultType(lang::UnaryOperator op)
 {
     assert(isDefined());
-    return definition_->getOperatorResultType(op);
+    return definition_.value()->getOperatorResultType(op);
 }
 
-bool lang::Type::isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other)
+bool lang::Type::isImplicitlyConvertibleTo(lang::Type const& other) const
 {
     assert(isDefined());
-    return definition_->isImplicitlyConvertibleTo(other);
+    return definition_.value()->isImplicitlyConvertibleTo(other);
 }
 
-bool lang::Type::hasMember(lang::Identifier const& name)
+bool lang::Type::hasMember(lang::Identifier const& name) const
 {
     assert(isDefined());
-    return definition_->hasMember(name);
+    return definition_.value()->hasMember(name);
 }
 
 lang::ResolvingHandle<lang::Type> lang::Type::getMemberType(lang::Identifier const& name)
 {
     assert(isDefined());
-    return definition_->getMemberType(name);
+    return definition_.value()->getMemberType(name);
 }
 
-bool lang::Type::definesIndirection()
+bool lang::Type::definesIndirection() const
 {
     assert(isDefined());
-    return definition_->definesIndirection();
+    return definition_.value()->definesIndirection();
 }
 
 lang::ResolvingHandle<lang::Type> lang::Type::getIndirectionType()
 {
     assert(isDefined());
-    return definition_->getIndirectionType();
+    return definition_.value()->getIndirectionType();
 }
 
 bool lang::Type::validateDefinition(ValidationLogger& validation_logger) const
 {
-    assert(isDefined());
-    if (definition_->isCustom()) return definition_->validateDefinition(validation_logger);
+    assert(definition_.hasValue());
+    if (definition_.value()->isCustom()) return definition_.value()->validateDefinition(validation_logger);
     else return true;
 }
 
 bool lang::Type::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
-    assert(isDefined());
-    return definition_->validate(validation_logger, location);
+    assert(definition_.hasValue());
+    return definition_.value()->validate(validation_logger, location);
 }
 
-bool lang::Type::validateSubscript(lang::Location                    indexed_location,
-                                   lang::ResolvingHandle<lang::Type> index_type,
-                                   lang::Location                    index_location,
-                                   ValidationLogger&                 validation_logger) const
+bool lang::Type::validateSubscript(lang::Location    indexed_location,
+                                   Type const&       index_type,
+                                   lang::Location    index_location,
+                                   ValidationLogger& validation_logger) const
 {
     assert(isDefined());
-    return definition_->validateSubscript(indexed_location, std::move(index_type), index_location, validation_logger);
+    return definition_.value()->validateSubscript(indexed_location,
+                                                  std::move(index_type),
+                                                  index_location,
+                                                  validation_logger);
 }
 
-bool lang::Type::validateOperator(lang::BinaryOperator              op,
-                                  lang::ResolvingHandle<lang::Type> other,
-                                  lang::Location                    left_location,
-                                  lang::Location                    right_location,
-                                  ValidationLogger&                 validation_logger) const
+bool lang::Type::validateOperator(lang::BinaryOperator op,
+                                  lang::Type const&    other,
+                                  lang::Location       left_location,
+                                  lang::Location       right_location,
+                                  ValidationLogger&    validation_logger) const
 {
     assert(isDefined());
-    return definition_->validateOperator(op, std::move(other), left_location, right_location, validation_logger);
+    return definition_.value()->validateOperator(op,
+                                                 std::move(other),
+                                                 left_location,
+                                                 right_location,
+                                                 validation_logger);
 }
 
 bool lang::Type::validateOperator(lang::UnaryOperator op,
@@ -416,166 +438,167 @@ bool lang::Type::validateOperator(lang::UnaryOperator op,
                                   ValidationLogger&   validation_logger) const
 {
     assert(isDefined());
-    return definition_->validateOperator(op, location, validation_logger);
+    return definition_.value()->validateOperator(op, location, validation_logger);
 }
 
-bool lang::Type::validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                            lang::Location                    location,
-                                            ValidationLogger&                 validation_logger) const
+bool lang::Type::validateImplicitConversion(lang::Type const& other,
+                                            lang::Location    location,
+                                            ValidationLogger& validation_logger) const
 {
     assert(isDefined());
-    return definition_->validateImplicitConversion(std::move(other), location, validation_logger);
+    return definition_.value()->validateImplicitConversion(std::move(other), location, validation_logger);
 }
 
 bool lang::Type::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const
 {
     assert(isDefined());
-    return definition_->validateMemberAccess(name, validation_logger);
+    return definition_.value()->validateMemberAccess(name, validation_logger);
 }
 
 bool lang::Type::validateIndirection(lang::Location location, ValidationLogger& validation_logger) const
 {
     assert(isDefined());
-    return definition_->validateIndirection(location, validation_logger);
+    return definition_.value()->validateIndirection(location, validation_logger);
 }
 
-std::shared_ptr<lang::Value> lang::Type::buildSubscript(std::shared_ptr<Value> indexed,
-                                                        std::shared_ptr<Value> index,
-                                                        CompileContext&        context)
+Shared<lang::Value> lang::Type::buildSubscript(Shared<Value> indexed, Shared<Value> index, CompileContext& context)
 {
     assert(isDefined());
-    return definition_->buildSubscript(std::move(indexed), std::move(index), context);
+    return definition_.value()->buildSubscript(std::move(indexed), std::move(index), context);
 }
 
-std::shared_ptr<lang::Value> lang::Type::buildOperator(lang::BinaryOperator   op,
-                                                       std::shared_ptr<Value> left,
-                                                       std::shared_ptr<Value> right,
-                                                       CompileContext&        context)
+Shared<lang::Value> lang::Type::buildOperator(lang::BinaryOperator op,
+                                              Shared<Value>        left,
+                                              Shared<Value>        right,
+                                              CompileContext&      context)
 {
     assert(isDefined());
-    return definition_->buildOperator(op, std::move(left), std::move(right), context);
+    return definition_.value()->buildOperator(op, std::move(left), std::move(right), context);
 }
 
-std::shared_ptr<lang::Value> lang::Type::buildOperator(lang::UnaryOperator    op,
-                                                       std::shared_ptr<Value> value,
-                                                       CompileContext&        context)
+Shared<lang::Value> lang::Type::buildOperator(lang::UnaryOperator op, Shared<Value> value, CompileContext& context)
 {
     assert(isDefined());
-    return definition_->buildOperator(op, std::move(value), context);
+    return definition_.value()->buildOperator(op, std::move(value), context);
 }
 
-std::shared_ptr<lang::Value> lang::Type::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                 std::shared_ptr<Value>            value,
-                                                                 CompileContext&                   context)
+Shared<lang::Value> lang::Type::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                        Shared<Value>                     value,
+                                                        CompileContext&                   context)
 {
     assert(isDefined());
-    return definition_->buildImplicitConversion(other, std::move(value), context);
+    return definition_.value()->buildImplicitConversion(other, std::move(value), context);
 }
 
-std::shared_ptr<lang::Value> lang::Type::buildMemberAccess(std::shared_ptr<Value>  value,
-                                                           lang::Identifier const& name,
-                                                           CompileContext&         context)
+Shared<lang::Value> lang::Type::buildMemberAccess(Shared<Value>           value,
+                                                  lang::Identifier const& name,
+                                                  CompileContext&         context)
 {
     assert(isDefined());
-    return definition_->buildMemberAccess(std::move(value), name, context);
+    return definition_.value()->buildMemberAccess(std::move(value), name, context);
 }
 
-std::shared_ptr<lang::Value> lang::Type::buildIndirection(std::shared_ptr<Value> value, CompileContext& context)
+Shared<lang::Value> lang::Type::buildIndirection(Shared<Value> value, CompileContext& context)
 {
     assert(isDefined());
-    return definition_->buildIndirection(std::move(value), context);
+    return definition_.value()->buildIndirection(std::move(value), context);
 }
 
 void lang::Type::buildDefaultInitializer(llvm::Value* ptr, CompileContext& context)
 {
     assert(isDefined());
-    definition_->buildDefaultInitializer(ptr, context);
+    definition_.value()->buildDefaultInitializer(ptr, context);
 }
 
 void lang::Type::buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context)
 {
     assert(isDefined());
-    definition_->buildCopyInitializer(ptr, original, context);
+    definition_.value()->buildCopyInitializer(ptr, original, context);
 }
 
 void lang::Type::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
 {
     assert(isDefined());
-    definition_->buildDefaultInitializer(ptr, count, context);
+    definition_.value()->buildDefaultInitializer(ptr, count, context);
 }
 
 void lang::Type::buildFinalizer(llvm::Value* ptr, CompileContext& context)
 {
     assert(isDefined());
-    definition_->buildFinalizer(ptr, context);
+    definition_.value()->buildFinalizer(ptr, context);
 }
 
 void lang::Type::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
 {
     assert(isDefined());
-    definition_->buildFinalizer(ptr, count, context);
+    definition_.value()->buildFinalizer(ptr, count, context);
 }
 
 void lang::Type::buildNativeDeclaration(CompileContext& context)
 {
     assert(isDefined());
-    definition_->buildNativeDeclaration(context);
+    definition_.value()->buildNativeDeclaration(context);
 }
 
 void lang::Type::buildNativeDefinition(CompileContext& context)
 {
     assert(isDefined());
-    definition_->buildNativeDefinition(context);
+    definition_.value()->buildNativeDefinition(context);
 }
 
-lang::TypeDefinition* lang::Type::getDefinition() const
+lang::TypeDefinition* lang::Type::getDefinition()
 {
-    return definition_.get();
+    return getPtr(definition_);
 }
 
-bool lang::Type::isMatching(lang::ResolvingHandle<lang::Type> expected, lang::ResolvingHandle<lang::Type> actual)
+lang::TypeDefinition const* lang::Type::getDefinition() const
+{
+    return getPtr(definition_);
+}
+
+bool lang::Type::isMatching(lang::Type const& expected, lang::Type const& actual)
 {
     if (areSame(expected, actual)) return true;
 
-    if (actual->isImplicitlyConvertibleTo(expected)) return true;
+    if (actual.isImplicitlyConvertibleTo(expected)) return true;
 
-    if (actual->isReferenceType())
+    if (actual.isReferenceType())
     {
-        lang::ResolvingHandle<lang::Type> referenced_type = actual->getElementType();
+        lang::Type const& referenced_type = actual.getElementType();
         if (isMatching(expected, referenced_type)) return true;
     }
 
     return false;
 }
 
-bool lang::Type::checkMismatch(lang::ResolvingHandle<lang::Type> expected,
-                               lang::ResolvingHandle<lang::Type> actual,
-                               lang::Location                    location,
-                               ValidationLogger&                 validation_logger)
+bool lang::Type::checkMismatch(lang::Type const& expected,
+                               lang::Type const& actual,
+                               lang::Location    location,
+                               ValidationLogger& validation_logger)
 {
     bool matching = isMatching(expected, actual);
 
     if (!matching)
     {
-        validation_logger.logError("Cannot implicitly convert " + actual->getAnnotatedName() + " to "
-                                       + expected->getAnnotatedName(),
+        validation_logger.logError("Cannot implicitly convert " + actual.getAnnotatedName() + " to "
+                                       + expected.getAnnotatedName(),
                                    location);
     }
 
-    lang::ResolvingHandle<lang::Type> start_type = actual;
-    if (actual->isReferenceType()) start_type = actual->getElementType();
+    std::reference_wrapper<lang::Type const> start_type = actual;
+    if (actual.isReferenceType()) start_type = actual.getElementType();
 
-    if (start_type->isImplicitlyConvertibleTo(expected))
+    if (start_type.get().isImplicitlyConvertibleTo(expected))
     {
-        matching &= start_type->validateImplicitConversion(expected, location, validation_logger);
+        matching &= start_type.get().validateImplicitConversion(expected, location, validation_logger);
     }
 
     return matching;
 }
 
-std::shared_ptr<lang::Value> lang::Type::makeMatching(lang::ResolvingHandle<lang::Type> expected,
-                                                      std::shared_ptr<lang::Value>      value,
-                                                      CompileContext&                   context)
+Shared<lang::Value> lang::Type::makeMatching(lang::ResolvingHandle<lang::Type> expected,
+                                             Shared<lang::Value>               value,
+                                             CompileContext&                   context)
 {
     if (areSame(expected, value->type())) return makeActual(value);
 
@@ -584,14 +607,14 @@ std::shared_ptr<lang::Value> lang::Type::makeMatching(lang::ResolvingHandle<lang
 
     if (value->type()->isReferenceType())
     {
-        auto* reference_type                    = dynamic_cast<lang::ReferenceType*>(value->type()->definition_.get());
-        std::shared_ptr<lang::Value> referenced = reference_type->getReferenced(value, context);
+        auto* reference_type           = dynamic_cast<lang::ReferenceType*>(value->type()->definition_.value().get());
+        Shared<lang::Value> referenced = reference_type->getReferenced(value, context);
 
         return makeMatching(expected, referenced, context);
     }
 
     assert(false && "Cannot make the value matching, was mismatch checked before?");
-    return nullptr;
+    throw std::logic_error("Cannot make the value matching, was mismatch checked before?");
 }
 
 lang::ResolvingHandle<lang::Type> lang::Type::getReferencedType(lang::ResolvingHandle<lang::Type> type)
@@ -600,81 +623,128 @@ lang::ResolvingHandle<lang::Type> lang::Type::getReferencedType(lang::ResolvingH
     return type;
 }
 
-std::shared_ptr<lang::Value> lang::Type::getValueOrReferencedValue(std::shared_ptr<lang::Value> value,
-                                                                   CompileContext&              context)
+lang::Type const& lang::Type::getReferencedType(lang::Type const& type)
+{
+    if (type.isReferenceType()) return type.getElementType();
+    return type;
+}
+
+Shared<lang::Value> lang::Type::getValueOrReferencedValue(Shared<lang::Value> value, CompileContext& context)
 {
     if (value->type()->isReferenceType())
     {
-        auto* reference_type = dynamic_cast<lang::ReferenceType*>(value->type()->definition_.get());
+        auto* reference_type = dynamic_cast<lang::ReferenceType*>(value->type()->definition_.value().get());
         return reference_type->getReferenced(value, context);
     }
 
     return value;
 }
 
-bool lang::Type::areSame(lang::ResolvingHandle<lang::Type> lhs, lang::ResolvingHandle<lang::Type> rhs)
+bool lang::Type::areSame(lang::Type const& lhs, lang::Type const& rhs)
 {
-    return lhs->getActualType() == rhs->getActualType();
+    return lhs.getActualType() == rhs.getActualType();
 }
 
-std::shared_ptr<lang::Value> lang::Type::makeActual(std::shared_ptr<lang::Value> value)
+Shared<lang::Value> lang::Type::makeActual(Shared<lang::Value> value)
 {
     lang::ResolvingHandle<lang::Type> actual_type = value->type()->getActualType();
     if (actual_type == value->type()) return value;
 
-    return std::make_shared<lang::RoughlyCastedValue>(actual_type, value);
+    return makeShared<lang::RoughlyCastedValue>(actual_type, value);
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::toUndefined() const
+lang::ResolvingHandle<lang::Type> lang::Type::createUndefinedClone() const
 {
-    if (isDefined() && !isCustom()) return self();
+    if (isDefined() && !isCustom()) return definition_.value()->clone();
 
     return lang::makeHandled<lang::Type>(name());
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::toSeparateUndefined() const
+lang::ResolvingHandle<lang::Type> lang::Type::getDetachedIfUndefined()
 {
-    return isDefined() ? self() : lang::makeHandled<lang::Type>(name());
+    return definition_.hasValue() ? self() : lang::makeHandled<lang::Type>(name());
 }
 
+template<typename IN, typename OUT>
+struct GetCommonType {
+    OUT operator()(IN types) const
+    {
+        OUT common_types;
+
+        {// Check if all types are defined.
+            for (auto& type : types)
+            {
+                if (!deref(type).isDefined()) { return common_types; }
+            }
+        }
+
+        {// Check if all types are the same, which means we have a trivial common type.
+            auto first = types.front();
+
+            bool all_same = true;
+
+            for (auto& current : types)
+            {
+                if (not lang::Type::areSame(first, current))
+                {
+                    all_same = false;
+                    break;
+                }
+            }
+
+            if (all_same)
+            {
+                common_types.emplace_back(first);
+                return common_types;
+            }
+        }
+
+        {// Check for each type if it is a type all other types are convertible to.
+            std::set<lang::TypeDefinition const*> confirmed_candidates;
+
+            for (auto& candidate : types)
+            {
+                for (auto& current : types)
+                {
+                    if (lang::Type::isMatching(candidate, current))
+                    {
+                        auto [iterator, is_new] = confirmed_candidates.emplace(deref(candidate).getDefinition());
+                        if (is_new) { common_types.emplace_back(candidate); }
+                    }
+                }
+            }
+        }
+
+        return common_types;
+    }
+};
+
 std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::getCommonType(
-    std::vector<lang::ResolvingHandle<lang::Type>> const& types)
+    std::vector<lang::ResolvingHandle<lang::Type>>& types)
 {
-    std::vector<lang::ResolvingHandle<lang::Type>> common_types;
+    return GetCommonType<std::vector<lang::ResolvingHandle<lang::Type>>,
+                         std::vector<lang::ResolvingHandle<lang::Type>>>()(types);
+}
 
-    {// Check if all types are the same, which means we have a trivial common type.
-        lang::ResolvingHandle<lang::Type> const& first = types.front();
+std::vector<std::reference_wrapper<lang::Type const>> lang::Type::getCommonType(
+    std::vector<std::reference_wrapper<lang::Type const>> const& types)
+{
+    return GetCommonType<std::vector<std::reference_wrapper<lang::Type const>>,
+                         std::vector<std::reference_wrapper<lang::Type const>>>()(types);
+}
 
-        bool all_same = true;
+bool lang::Type::operator==(lang::Type const& other) const
+{
+    return this->definition_.value().get() == other.definition_.value().get();
+}
 
-        for (auto& current : types)
-        {
-            if (not areSame(first, current))
-            {
-                all_same = false;
-                break;
-            }
-        }
+bool lang::Type::operator!=(lang::Type const& other) const
+{
+    return !(*this == other);
+}
 
-        if (all_same)
-        {
-            common_types.push_back(first);
-            return common_types;
-        }
-    }
-
-    {// Check for each type if it is a type all other types are convertible to.
-        for (auto& candidate : types)
-        {
-            if (std::ranges::all_of(
-                    types,
-                    [&](lang::ResolvingHandle<lang::Type> const& current) { return isMatching(candidate, current); })
-                && std::find(common_types.begin(), common_types.end(), candidate) == common_types.end())
-            {
-                common_types.push_back(candidate);
-            }
-        }
-    }
-
-    return common_types;
+void lang::Type::expand()
+{
+    assert(definition_.hasValue());
+    definition_.value()->expand();
 }

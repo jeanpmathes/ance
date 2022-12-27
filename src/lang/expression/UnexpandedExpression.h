@@ -12,10 +12,11 @@ class UnexpandedExpression : public Expression
   public:
     explicit UnexpandedExpression(lang::Location location);
 
-    std::shared_ptr<lang::Value> getValue() const override;
+    Shared<lang::Value>              getValue() override;
+    [[nodiscard]] lang::Value const& getValue() const override;
 
   private:
-    std::shared_ptr<lang::Value> value_;
+    Shared<lang::Value> value_;
 };
 
 #endif

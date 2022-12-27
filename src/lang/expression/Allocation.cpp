@@ -11,7 +11,7 @@
 
 Allocation::Allocation(Runtime::Allocator                allocation,
                        lang::ResolvingHandle<lang::Type> type,
-                       std::unique_ptr<Expression>       count,
+                       Optional<Owned<Expression>>       count,
                        lang::Location                    location,
                        lang::Location                    allocated_type_location)
     : Expression(location)
@@ -19,9 +19,9 @@ Allocation::Allocation(Runtime::Allocator                allocation,
     , allocated_type_(type)
     , allocated_type_location_(allocated_type_location)
     , count_(std::move(count))
-    , return_type_(count_ ? lang::BufferType::get(type) : lang::PointerType::get(type))
+    , return_type_(count_.hasValue() ? lang::BufferType::get(type) : lang::PointerType::get(type))
 {
-    if (count_) addSubexpression(*count_);
+    if (count_.hasValue()) addSubexpression(*count_.value());
 }
 
 Runtime::Allocator Allocation::allocator() const
@@ -29,14 +29,14 @@ Runtime::Allocator Allocation::allocator() const
     return allocation_;
 }
 
-lang::ResolvingHandle<lang::Type> Allocation::allocatedType() const
+lang::Type const& Allocation::allocatedType() const
 {
     return allocated_type_;
 }
 
-Expression* Allocation::count() const
+Expression const* Allocation::count() const
 {
-    return count_.get();
+    return getPtr(count_);
 }
 
 void Allocation::walkDefinitions()
@@ -46,9 +46,9 @@ void Allocation::walkDefinitions()
     scope()->addType(allocated_type_);
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> Allocation::tryGetType() const
+void Allocation::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    return return_type_;
+    type.reroute(return_type_);
 }
 
 bool Allocation::validate(ValidationLogger& validation_logger) const
@@ -58,12 +58,14 @@ bool Allocation::validate(ValidationLogger& validation_logger) const
     bool is_valid = allocated_type_->validate(validation_logger, location())
                  && return_type_->validate(validation_logger, location());
 
-    if (count_)
+    if (count_.hasValue())
     {
-        count_->validate(validation_logger);
+        count_.value()->validate(validation_logger);
 
-        is_valid &=
-            lang::Type::checkMismatch(lang::SizeType::getSize(), count_->type(), count_->location(), validation_logger);
+        is_valid &= lang::Type::checkMismatch(lang::SizeType::getSize(),
+                                              count_.value()->type(),
+                                              count_.value()->location(),
+                                              validation_logger);
     }
 
     return is_valid;
@@ -71,35 +73,38 @@ bool Allocation::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion Allocation::expandWith(Expressions subexpressions) const
 {
-    if (count_)
+    if (count_.hasValue())
     {
         return {Statements(),
-                std::make_unique<Allocation>(allocation_,
-                                             allocated_type_->toUndefined(),
-                                             std::move(subexpressions[0]),
-                                             location(),
-                                             allocated_type_location_),
+                makeOwned<Allocation>(allocation_,
+                                      allocated_type_->createUndefinedClone(),
+                                      std::move(subexpressions[0]),
+                                      location(),
+                                      allocated_type_location_),
                 Statements()};
     }
     else
     {
         return {Statements(),
-                std::make_unique<Allocation>(allocation_,
-                                             allocated_type_->toUndefined(),
-                                             nullptr,
-                                             location(),
-                                             allocated_type_location_),
+                makeOwned<Allocation>(allocation_,
+                                      allocated_type_->createUndefinedClone(),
+                                      std::nullopt,
+                                      location(),
+                                      allocated_type_location_),
                 Statements()};
     }
 }
 
 void Allocation::doBuild(CompileContext& context)
 {
-    std::shared_ptr<lang::Value> count = {};
+    Optional<Shared<lang::Value>> count = {};
 
-    if (count_) { count = lang::Type::makeMatching(lang::SizeType::getSize(), count_->getValue(), context); }
+    if (count_.hasValue())
+    {
+        count = lang::Type::makeMatching(lang::SizeType::getSize(), count_.value()->getValue(), context);
+    }
 
-    std::shared_ptr<lang::Value> ptr = context.runtime()->allocate(allocation_, allocated_type_, count, context);
+    Shared<lang::Value> ptr = context.runtime()->allocate(allocation_, allocated_type_, count, context);
     setValue(ptr);
 }
 

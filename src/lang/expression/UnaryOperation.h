@@ -19,27 +19,26 @@ class UnaryOperation
      * @param operand The operand of the operation.
      * @param location The location of the operation.
      */
-    UnaryOperation(lang::UnaryOperator op, std::unique_ptr<Expression> operand, lang::Location location);
+    UnaryOperation(lang::UnaryOperator op, Owned<Expression> operand, lang::Location location);
 
-    [[nodiscard]] Expression&         operand() const;
+    [[nodiscard]] Expression const&   operand() const;
     [[nodiscard]] lang::UnaryOperator op() const;
 
   public:
-    [[nodiscard]] std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const override;
-
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
 
   protected:
+    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
     void doBuild(CompileContext& context) override;
 
   public:
     ~UnaryOperation() override;
 
   private:
-    std::unique_ptr<Expression> operand_;
-    lang::UnaryOperator         op_;
+    Owned<Expression>   operand_;
+    lang::UnaryOperator op_;
 };
 
 #endif

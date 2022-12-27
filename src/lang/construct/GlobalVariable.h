@@ -33,15 +33,15 @@ namespace lang
         /**
          * Create a new global variable definition.
          */
-        GlobalVariable(lang::ResolvingHandle<lang::Variable>            self,
-                       std::optional<lang::ResolvingHandle<lang::Type>> type,
-                       lang::Location                                   type_location,
-                       GlobalScope&                                     containing_scope,
-                       lang::AccessModifier                             access,
-                       std::unique_ptr<Expression>                      init,
-                       bool                                             is_final,
-                       bool                                             is_constant,
-                       lang::Location                                   location);
+        GlobalVariable(lang::ResolvingHandle<lang::Variable>       self,
+                       Optional<lang::ResolvingHandle<lang::Type>> type,
+                       lang::Location                              type_location,
+                       GlobalScope&                                containing_scope,
+                       lang::AccessModifier                        access,
+                       Optional<Owned<Expression>>                 init,
+                       bool                                        is_final,
+                       bool                                        is_constant,
+                       lang::Location                              location);
 
         [[nodiscard]] lang::AccessModifier access() const;
         [[nodiscard]] bool                 isConstant() const;
@@ -58,15 +58,15 @@ namespace lang
         void createNativeBacking(CompileContext& context) override;
         void build(CompileContext& context) override;
 
-        [[nodiscard]] std::set<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() const override;
-        [[nodiscard]] std::set<lang::ResolvingHandle<lang::Variable>> getVariableDependencies() const override;
+        [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() override;
+        [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Variable>> getVariableDependencies() override;
 
         /**
          * Get all variable dependencies of a variable by traversing the function dependencies.
          * @param variable The variable to get the dependencies for.
          * @return The dependencies.
          */
-        static std::set<lang::ResolvingHandle<lang::Variable>> getAllVariableDependencies(
+        static std::vector<lang::ResolvingHandle<lang::Variable>> getAllVariableDependencies(
             lang::ResolvingHandle<lang::Variable> variable);
 
         /**
@@ -83,21 +83,21 @@ namespace lang
         void buildDefinition(CompileContext& context) override;
         void buildFinalization(CompileContext& context) override;
 
-        std::shared_ptr<lang::Value> getValue(CompileContext& context) override;
+        Shared<lang::Value> getValue(CompileContext& context) override;
 
       protected:
-        void storeValue(std::shared_ptr<lang::Value> value, CompileContext& context) override;
+        void storeValue(Shared<lang::Value> value, CompileContext& context) override;
 
       private:
         void rerouteIfNeeded();
 
-        std::optional<lang::ResolvingHandle<lang::Type>>  type_opt_;
-        lang::AccessModifier                              access_;
-        bool                                              is_constant_;
-        ConstantExpression*                               constant_init_;
-        Expression*                                       init_;
-        std::unique_ptr<Expression>                       init_owner_;
-        std::optional<lang::OwningHandle<lang::Function>> init_function_;
+        Optional<lang::ResolvingHandle<lang::Type>>  type_opt_;
+        lang::AccessModifier                         access_;
+        bool                                         is_constant_;
+        ConstantExpression*                          constant_init_;
+        Expression*                                  init_;
+        Optional<Owned<Expression>>                  init_owner_;
+        Optional<lang::OwningHandle<lang::Function>> init_function_;
 
         llvm::GlobalVariable* native_variable_ {nullptr};
         bool                  finalized_ {false};

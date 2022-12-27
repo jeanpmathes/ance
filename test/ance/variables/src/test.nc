@@ -13,7 +13,7 @@ private g4: u32 <: if true then 200:32 else 100:32;
 // The initial value is implicitly converted if necessary.
 private g5: u32 <: 100:16;
 
-// The type can be inferred from the initial value.
+// The type can be inferred like the initial value.
 private g6 <: 100:32;
 
 // If no initial value is given, the default value of the variable type is used.

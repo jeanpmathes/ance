@@ -6,6 +6,7 @@
 
 #include "lang/Element.h"
 #include "lang/utility/Location.h"
+#include "lang/utility/Owners.h"
 
 namespace lang
 {
@@ -36,8 +37,7 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @param function The function this statement is part of.
      * @return The basic blocks.
      */
-    virtual std::vector<std::unique_ptr<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry,
-                                                                             lang::Function&   function);
+    virtual std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, lang::Function& function);
 
     /**
      * Get the parent statement, if any.
@@ -74,7 +74,14 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * For compound statements the block scope is the scope that contains all the statements.
      * @return The block scope, or nullptr.
      */
-    [[nodiscard]] virtual lang::LocalScope* getBlockScope() const;
+    [[nodiscard]] virtual lang::LocalScope* getBlockScope();
+
+    /**
+     * Get the block scope of the statement, if any.
+     * For compound statements the block scope is the scope that contains all the statements.
+     * @return The block scope, or nullptr.
+     */
+    [[nodiscard]] virtual lang::LocalScope const* getBlockScope() const;
 
     /**
      * Get whether this statement is a compound statement.

@@ -10,12 +10,12 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::ExternFunction::ExternFunction(Function&                                     function,
-                                     Scope&                                        containing_scope,
-                                     lang::ResolvingHandle<lang::Type>             return_type,
-                                     lang::Location                                return_type_location,
-                                     std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                                     lang::Location                                location)
+lang::ExternFunction::ExternFunction(Function&                            function,
+                                     Scope&                               containing_scope,
+                                     lang::ResolvingHandle<lang::Type>    return_type,
+                                     lang::Location                       return_type_location,
+                                     std::vector<Shared<lang::Parameter>> parameters,
+                                     lang::Location                       location)
     : lang::FunctionDefinition(function,
                                containing_scope,
                                return_type,
@@ -25,7 +25,7 @@ lang::ExternFunction::ExternFunction(Function&                                  
 {
     containing_scope.addType(return_type);
 
-    for (auto const& parameter : this->parameters()) { containing_scope.addType(parameter->type()); }
+    for (auto& parameter : this->parameters()) { containing_scope.addType(parameter->type()); }
 }
 
 bool lang::ExternFunction::isMangled() const
@@ -37,7 +37,7 @@ void lang::ExternFunction::validate(ValidationLogger& validation_logger) const
 {
     if (lang::validation::isTypeUndefined(returnType(), returnTypeLocation(), validation_logger)) return;
 
-    returnType()->validate(validation_logger, returnTypeLocation());
+    returnType().validate(validation_logger, returnTypeLocation());
 
     std::set<lang::Identifier> names;
 
@@ -53,16 +53,25 @@ void lang::ExternFunction::validate(ValidationLogger& validation_logger) const
 
         if (lang::validation::isTypeUndefined(parameter->type(), parameter->typeLocation(), validation_logger)) return;
 
-        parameter->type()->validate(validation_logger, parameter->typeLocation());
+        parameter->type().validate(validation_logger, parameter->typeLocation());
 
-        if (parameter->type()->isVoidType())
+        if (parameter->type().isVoidType())
         {
             validation_logger.logError("Parameter cannot have 'void' type", parameter->location());
         }
     }
 }
 
-void lang::ExternFunction::expand() {}
+void lang::ExternFunction::expand()
+{
+    lang::FunctionDefinition::expand();
+
+    function().clear();// Dirty fix, required because no full expansion is done.
+
+    scope().addType(returnType());
+
+    for (auto& parameter : this->parameters()) { scope().addType(parameter->type()); }
+}
 
 void lang::ExternFunction::determineFlow() {}
 
@@ -77,12 +86,14 @@ void lang::ExternFunction::createNativeBacking(CompileContext& context)
                                                                     *context.llvmContext(),
                                                                     context.module());
 
-    for (auto pair : zip(parameters(), native_function_->args())) { std::get<0>(pair)->wrap(&std::get<1>(pair)); }
+    auto params = parameters();
+
+    for (unsigned int i = 0; i < params.size(); ++i) { params[i]->wrap(native_function_->getArg(i)); }
 }
 
 void lang::ExternFunction::build(CompileContext&) {}
 
-llvm::DIScope* lang::ExternFunction::getDebugScope(CompileContext&)
+llvm::DIScope* lang::ExternFunction::getDebugScope(CompileContext&) const
 {
     return native_function_->getSubprogram();
 }

@@ -5,10 +5,10 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-VectorDefinition::VectorDefinition(std::optional<lang::ResolvingHandle<lang::Type>> type,
-                                   lang::Location                                   type_location,
-                                   std::vector<std::unique_ptr<Expression>>         elements,
-                                   lang::Location                                   location)
+VectorDefinition::VectorDefinition(Optional<lang::ResolvingHandle<lang::Type>> type,
+                                   lang::Location                              type_location,
+                                   std::vector<Owned<Expression>>              elements,
+                                   lang::Location                              location)
     : Expression(location)
     , type_(std::move(type))
     , type_location_(type_location)
@@ -17,14 +17,16 @@ VectorDefinition::VectorDefinition(std::optional<lang::ResolvingHandle<lang::Typ
     for (auto& element : elements_) { addSubexpression(*element); }
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> const& VectorDefinition::elementType() const
+lang::Type const* VectorDefinition::elementType() const
 {
-    return type_;
+    if (type_.hasValue()) { return &*(type_.value()); }
+
+    return nullptr;
 }
 
-std::vector<std::reference_wrapper<Expression>> VectorDefinition::values() const
+std::vector<std::reference_wrapper<Expression const>> VectorDefinition::values() const
 {
-    std::vector<std::reference_wrapper<Expression>> values;
+    std::vector<std::reference_wrapper<Expression const>> values;
 
     values.reserve(elements_.size());
     for (auto const& element : elements_) { values.emplace_back(*element); }
@@ -36,20 +38,19 @@ void VectorDefinition::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    if (type_.has_value()) scope()->addType(type_.value());
+    if (type_.hasValue()) scope()->addType(type_.value());
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> VectorDefinition::tryGetType() const
+void VectorDefinition::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    if (type_.has_value()) return lang::VectorType::get(type_.value(), elements_.size());
+    if (type_.hasValue()) { type.reroute(lang::VectorType::get(type_.value(), elements_.size())); }
+    else
+    {
+        auto types        = Expression::getTypes(elements_);
+        auto common_types = lang::Type::getCommonType(types);
 
-    auto types = Expression::tryGetTypes(elements_);
-    if (not types.has_value()) return std::nullopt;
-
-    auto common_types = lang::Type::getCommonType(types.value());
-
-    if (common_types.size() == 1) { return lang::VectorType::get(common_types.front(), elements_.size()); }
-    else { return std::nullopt; }
+        if (common_types.size() == 1) { type.reroute(lang::VectorType::get(common_types.front(), elements_.size())); }
+    }
 }
 
 bool VectorDefinition::validate(ValidationLogger& validation_logger) const
@@ -66,17 +67,15 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
         return false;
     }
 
-    if (type_.has_value())
+    if (type_.hasValue())
     {
-        lang::ResolvingHandle<lang::Type> type = type_.value();
+        lang::Type const& type = type_.value();
 
         if (lang::validation::isTypeUndefined(type, type_location_, validation_logger)) return false;
-
-        assert(this->type()->getElementType() == type_.value());
     }
     else
     {
-        std::vector<lang::ResolvingHandle<lang::Type>> types = Expression::getTypes(elements_);
+        auto const types = Expression::getTypes(elements_);
 
         auto common_types = lang::Type::getCommonType(types);
 
@@ -85,16 +84,12 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
             validation_logger.logError("Vector definition has no common type", location());
             return false;
         }
-
-        assert(type()->getElementType() == common_types.front());
     }
 
     for (auto& element : elements_)
     {
-        valid &= lang::Type::checkMismatch(type()->getElementType(),
-                                           element->type(),
-                                           element->location(),
-                                           validation_logger);
+        valid &=
+            lang::Type::checkMismatch(type().getElementType(), element->type(), element->location(), validation_logger);
     }
 
     return valid;
@@ -102,17 +97,17 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion VectorDefinition::expandWith(Expressions subexpressions) const
 {
-    std::optional<lang::ResolvingHandle<lang::Type>> type;
-    if (type_.has_value()) type = type_.value()->toUndefined();
+    Optional<lang::ResolvingHandle<lang::Type>> type;
+    if (type_.hasValue()) type = type_.value()->createUndefinedClone();
 
     return {Statements(),
-            std::make_unique<VectorDefinition>(type, type_location_, std::move(subexpressions), location()),
+            makeOwned<VectorDefinition>(type, type_location_, std::move(subexpressions), location()),
             Statements()};
 }
 
 void VectorDefinition::doBuild(CompileContext& context)
 {
-    std::vector<std::shared_ptr<lang::Value>> elements;
+    std::vector<Shared<lang::Value>> elements;
 
     for (auto& element : elements_)
     {

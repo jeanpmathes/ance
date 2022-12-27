@@ -14,30 +14,31 @@ namespace lang
         bool       isAddressType() const override;
         StateCount getStateCount() const override;
 
-        bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other) override;
+        bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
                                                                 lang::ResolvingHandle<lang::Type> other) override;
-        bool                              validateOperator(lang::BinaryOperator              op,
-                                                           lang::ResolvingHandle<lang::Type> other,
-                                                           lang::Location                    left_location,
-                                                           lang::Location                    right_location,
-                                                           ValidationLogger&                 validation_logger) const override;
-        std::shared_ptr<lang::Value>      buildOperator(lang::BinaryOperator   op,
-                                                        std::shared_ptr<Value> left,
-                                                        std::shared_ptr<Value> right,
-                                                        CompileContext&        context) override;
+        bool                              validateOperator(lang::BinaryOperator op,
+                                                           lang::Type const&    other,
+                                                           lang::Location       left_location,
+                                                           lang::Location       right_location,
+                                                           ValidationLogger&    validation_logger) const override;
+        Shared<lang::Value>               buildOperator(lang::BinaryOperator op,
+                                                        Shared<Value>        left,
+                                                        Shared<Value>        right,
+                                                        CompileContext&      context) override;
 
-        bool        acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters) override;
-        void        buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
-                                           lang::PredefinedFunction&                             function,
-                                           CompileContext&                                       context) override;
+        bool        acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
+        void        buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                           lang::PredefinedFunction&                      function,
+                                           CompileContext&                                context) override;
         static void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
                                            lang::ResolvingHandle<lang::Type> return_type,
                                            lang::PredefinedFunction&         function,
                                            CompileContext&                   context);
 
       protected:
-        [[nodiscard]] virtual std::optional<lang::ResolvingHandle<lang::Type>> getPointeeType() const = 0;
+        [[nodiscard]] virtual Optional<lang::ResolvingHandle<lang::Type>> getPointeeType()       = 0;
+        [[nodiscard]] virtual lang::Type const*                           getPointeeType() const = 0;
     };
 }
 

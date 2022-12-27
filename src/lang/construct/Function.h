@@ -65,11 +65,11 @@ namespace lang
          * @param parameters The parameters.
          * @param location The location of the function declaration.
          */
-        void defineAsExtern(Scope&                                               containing_scope,
-                            lang::ResolvingHandle<lang::Type>                    return_type,
-                            lang::Location                                       return_type_location,
-                            std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
-                            lang::Location                                       location);
+        void defineAsExtern(Scope&                                      containing_scope,
+                            lang::ResolvingHandle<lang::Type>           return_type,
+                            lang::Location                              return_type_location,
+                            std::vector<Shared<lang::Parameter>> const& parameters,
+                            lang::Location                              location);
 
         /**
          * Define this function as a custom function.
@@ -82,14 +82,14 @@ namespace lang
          * @param declaration_location The location of the function declaration.
          * @param definition_location The location of the function definition, meaning its code.
          */
-        void defineAsCustom(lang::AccessModifier                                 access,
-                            lang::ResolvingHandle<lang::Type>                    return_type,
-                            lang::Location                                       return_type_location,
-                            std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
-                            std::unique_ptr<lang::CodeBlock>                     block,
-                            Scope&                                               containing_scope,
-                            lang::Location                                       declaration_location,
-                            lang::Location                                       definition_location);
+        void defineAsCustom(lang::AccessModifier                        access,
+                            lang::ResolvingHandle<lang::Type>           return_type,
+                            lang::Location                              return_type_location,
+                            std::vector<Shared<lang::Parameter>> const& parameters,
+                            Owned<lang::CodeBlock>                      block,
+                            Scope&                                      containing_scope,
+                            lang::Location                              declaration_location,
+                            lang::Location                              definition_location);
 
         /**
          * Define this function as a predefined function.
@@ -99,10 +99,10 @@ namespace lang
          * @param location The location of the function.
          * @return The predefined function.
          */
-        PredefinedFunction& defineAsPredefined(lang::ResolvingHandle<lang::Type>                    return_type,
-                                               std::vector<std::shared_ptr<lang::Parameter>> const& parameters,
-                                               Scope&                                               containing_scope,
-                                               lang::Location                                       location);
+        PredefinedFunction& defineAsPredefined(lang::ResolvingHandle<lang::Type>           return_type,
+                                               std::vector<Shared<lang::Parameter>> const& parameters,
+                                               Scope&                                      containing_scope,
+                                               lang::Location                              location);
 
         /**
          * Define this function as a variable initialization function.
@@ -113,7 +113,7 @@ namespace lang
          */
         void defineAsInit(lang::ResolvingHandle<lang::Variable> variable,
                           lang::Assigner                        assigner,
-                          std::unique_ptr<Expression>           initializer,
+                          Owned<Expression>                     initializer,
                           Scope&                                containing_scope);
 
         /**
@@ -126,19 +126,24 @@ namespace lang
          * @param location The source location.
          * @return The defined variable or nothing if defining is not possible.
          */
-        std::optional<lang::ResolvingHandle<lang::Variable>> defineParameterVariable(
-            Identifier const&                   name,
-            lang::ResolvingHandle<lang::Type>   type,
-            lang::Location                      type_location,
-            std::shared_ptr<lang::Value> const& value,
-            unsigned                            parameter_no,
-            lang::Location                      location);
+        Optional<lang::ResolvingHandle<lang::Variable>> defineParameterVariable(Identifier const&                 name,
+                                                                                lang::ResolvingHandle<lang::Type> type,
+                                                                                lang::Location      type_location,
+                                                                                Shared<lang::Value> value,
+                                                                                unsigned            parameter_no,
+                                                                                lang::Location      location);
 
         /**
          * Get the return type of this function.
          * @return The return type.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> returnType() const;
+        lang::ResolvingHandle<lang::Type> returnType();
+
+        /**
+         * Get the return type of this function.
+         * @return The return type.
+         */
+        [[nodiscard]] lang::Type const& returnType() const;
 
         /**
          * Get the signature of this function.
@@ -151,7 +156,14 @@ namespace lang
          * @param index The index of the parameter. Must be smaller than the parameter count.
          * @return The type of the selected parameter.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> parameterType(size_t index) const;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> parameterType(size_t index);
+
+        /**
+         * Get the type of a parameter.
+         * @param index The index of the parameter. Must be smaller than the parameter count.
+         * @return The type of the selected parameter.
+         */
+        [[nodiscard]] lang::Type const& parameterType(size_t index) const;
 
         /**
          * Get the parameter count.
@@ -177,6 +189,11 @@ namespace lang
          * Expand this function to remove syntactic sugar.
          */
         void expand();
+
+        /**
+         * Clear all known variables. Would not be required in full expansion.
+         */
+        void clear();
 
         /**
          * Determine the control flow in this function and build the CFG.
@@ -217,9 +234,10 @@ namespace lang
          * @param validation_logger A logger to log validation messages.
          * @return True if the call is valid.
          */
-        bool validateCall(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
-                          lang::Location                                                              location,
-                          ValidationLogger& validation_logger);
+        bool validateCall(
+            std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
+            lang::Location                                                                           location,
+            ValidationLogger& validation_logger) const;
 
         /**
          * Build a call to this function.
@@ -227,12 +245,12 @@ namespace lang
          * @param context The current compile context.
          * @return The return value. Will be null for return type void.
          */
-        std::shared_ptr<lang::Value> buildCall(std::vector<std::shared_ptr<lang::Value>> const& arguments,
-                                               CompileContext&                                  context) const;
+        Optional<Shared<lang::Value>> buildCall(std::vector<Shared<lang::Value>> const& arguments,
+                                                CompileContext&                         context);
 
         lang::Scope*       scope() override;
         lang::GlobalScope* getGlobalScope() override;
-        llvm::DIScope*     getDebugScope(CompileContext& context) override;
+        llvm::DIScope*     getDebugScope(CompileContext& context) const override;
 
         /**
          * Get the scope inside of this function, if there is any.
@@ -244,7 +262,7 @@ namespace lang
          * Get the basic blocks for this function.
          * @return A vector containing all basic blocks.
          */
-        std::vector<lang::BasicBlock*> const& getBasicBlocks() const;
+        [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const;
 
         void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
         void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
@@ -263,7 +281,7 @@ namespace lang
       private:
         lang::Identifier name_;
 
-        std::unique_ptr<lang::FunctionDefinition> definition_ {};
+        Optional<Owned<lang::FunctionDefinition>> definition_ {};
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> undefined_variables_ {};
         std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> defined_parameters_ {};

@@ -11,7 +11,7 @@
 #include "validation/ValidationLogger.h"
 
 lang::FixedWidthIntegerType::FixedWidthIntegerType(uint64_t bit_size, bool is_signed)
-    : TypeDefinition(lang::Identifier::from((is_signed ? "i" : "u") + std::to_string(bit_size)))
+    : TypeDefinition(lang::Identifier::like((is_signed ? "i" : "u") + std::to_string(bit_size)))
     , bit_size_(bit_size)
     , is_signed_(is_signed)
 {}
@@ -44,8 +44,7 @@ bool lang::FixedWidthIntegerType::validate(ValidationLogger& validation_logger, 
     return true;
 }
 
-bool lang::FixedWidthIntegerType::acceptOverloadRequest(
-    std::vector<lang::ResolvingHandle<lang::Type>> const& parameters)
+bool lang::FixedWidthIntegerType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
 {
     if (parameters.size() == 1 && parameters[0]->isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS
         && !is_signed_)
@@ -56,10 +55,9 @@ bool lang::FixedWidthIntegerType::acceptOverloadRequest(
     return IntegerType::acceptOverloadRequest(parameters);
 }
 
-void lang::FixedWidthIntegerType::buildRequestedOverload(
-    std::vector<lang::ResolvingHandle<lang::Type>> const& parameters,
-    lang::PredefinedFunction&                             function,
-    CompileContext&                                       context)
+void lang::FixedWidthIntegerType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                                         lang::PredefinedFunction&                      function,
+                                                         CompileContext&                                context)
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }
@@ -107,22 +105,22 @@ lang::ResolvingHandle<lang::Type> lang::FixedWidthIntegerType::get(uint64_t bit_
 {
     std::vector<lang::ResolvingHandle<lang::Type>> used_types;
 
-    std::optional<lang::ResolvingHandle<lang::Type>> defined_type =
+    Optional<lang::ResolvingHandle<lang::Type>> defined_type =
         getIntegerTypes().get(used_types, std::make_pair(bit_size, is_signed));
 
-    if (defined_type.has_value()) { return defined_type.value(); }
+    if (defined_type.hasValue()) { return defined_type.value(); }
     else
     {
-        auto*                             integer_type = new lang::FixedWidthIntegerType(bit_size, is_signed);
+        auto&                             integer_type = *(new lang::FixedWidthIntegerType(bit_size, is_signed));
         lang::ResolvingHandle<lang::Type> type =
-            lang::makeHandled<lang::Type>(std::unique_ptr<lang::FixedWidthIntegerType>(integer_type));
+            lang::makeHandled<lang::Type>(Owned<lang::FixedWidthIntegerType>(integer_type));
         getIntegerTypes().add(std::move(used_types), std::make_pair(bit_size, is_signed), type);
 
         return type;
     }
 }
 
-std::optional<size_t> lang::FixedWidthIntegerType::getBitSize() const
+Optional<size_t> lang::FixedWidthIntegerType::getBitSize() const
 {
     return bit_size_;
 }
@@ -145,4 +143,9 @@ size_t lang::FixedWidthIntegerType::getMinimumBitSize() const
 std::string lang::FixedWidthIntegerType::getSuffix() const
 {
     return std::to_string(bit_size_);
+}
+
+lang::ResolvingHandle<lang::Type> lang::FixedWidthIntegerType::clone() const
+{
+    return get(bit_size_, is_signed_);
 }

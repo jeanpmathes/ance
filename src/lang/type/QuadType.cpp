@@ -3,9 +3,9 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
 
-lang::QuadType::QuadType() : TypeDefinition(lang::Identifier::from("quad")) {}
+lang::QuadType::QuadType() : TypeDefinition(lang::Identifier::like("quad")) {}
 
-llvm::Constant* lang::QuadType::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::QuadType::getDefaultContent(llvm::Module& m) const
 {
     return llvm::ConstantFP::get(getContentType(m.getContext()), 0);
 }
@@ -23,6 +23,11 @@ size_t lang::QuadType::getPrecision() const
 lang::ResolvingHandle<lang::Type> lang::QuadType::get()
 {
     static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new QuadType()));
+        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new QuadType())));
     return instance;
+}
+
+lang::ResolvingHandle<lang::Type> lang::QuadType::clone() const
+{
+    return get();
 }

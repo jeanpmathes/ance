@@ -3,9 +3,9 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
 
-lang::DoubleType::DoubleType() : TypeDefinition(lang::Identifier::from("double")) {}
+lang::DoubleType::DoubleType() : TypeDefinition(lang::Identifier::like("double")) {}
 
-llvm::Constant* lang::DoubleType::getDefaultContent(llvm::Module& m)
+llvm::Constant* lang::DoubleType::getDefaultContent(llvm::Module& m) const
 {
     return llvm::ConstantFP::get(getContentType(m.getContext()), 0);
 }
@@ -23,6 +23,11 @@ size_t lang::DoubleType::getPrecision() const
 lang::ResolvingHandle<lang::Type> lang::DoubleType::get()
 {
     static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(std::unique_ptr<lang::TypeDefinition>(new DoubleType()));
+        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new DoubleType())));
     return instance;
+}
+
+lang::ResolvingHandle<lang::Type> lang::DoubleType::clone() const
+{
+    return get();
 }

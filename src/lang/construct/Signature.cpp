@@ -10,34 +10,33 @@ size_t lang::Signature::getParameterCount() const
     return types_.size();
 }
 
-lang::Signature lang::Signature::fromParameters(Identifier                                           name,
-                                                std::vector<std::shared_ptr<lang::Parameter>> const& parameters)
+lang::Signature lang::Signature::fromParameters(Identifier name, std::vector<Shared<lang::Parameter>> parameters)
 {
     std::vector<ResolvingHandle<Type>> types;
 
     types.reserve(parameters.size());
-    for (auto& parameter : parameters) { types.push_back(parameter->type()); }
+    for (auto& parameter : parameters) { types.emplace_back(parameter->type()); }
 
     return Signature(name, types);
 }
 
-bool lang::Signature::isSame(std::vector<lang::ResolvingHandle<lang::Type>> const& arguments) const
+bool lang::Signature::isSame(std::vector<std::reference_wrapper<lang::Type const>> const& arguments) const
 {
     if (types_.size() != arguments.size()) return false;
 
     auto types = llvm::zip(types_, arguments);
     return std::all_of(types.begin(), types.end(), [](auto const& pair) {
-        return lang::Type::areSame(std::get<0>(pair), std::get<1>(pair));
+        return lang::Type::areSame(*(std::get<0>(pair)), std::get<1>(pair));
     });
 }
 
-bool lang::Signature::isMatching(std::vector<lang::ResolvingHandle<lang::Type>> const& arguments) const
+bool lang::Signature::isMatching(std::vector<std::reference_wrapper<lang::Type const>> const& arguments) const
 {
     if (types_.size() != arguments.size()) return false;
 
     auto types = llvm::zip(types_, arguments);
     return std::all_of(types.begin(), types.end(), [](auto const& pair) {
-        return lang::Type::isMatching(std::get<0>(pair), std::get<1>(pair));
+        return lang::Type::isMatching(*(std::get<0>(pair)), std::get<1>(pair));
     });
 }
 
@@ -71,7 +70,7 @@ std::string lang::Signature::toString() const
         if (!is_first) { string += ", "; }
 
         is_first = false;
-        string += type->getActualType()->name().text();
+        string += type->getActualType().name().text();
     }
 
     string += ")";
@@ -91,5 +90,11 @@ bool lang::Signature::operator!=(lang::Signature const& other) const
 bool lang::Signature::areSame(lang::Signature const& a, lang::Signature const& b)
 {
     if (a.function_name_.text() != b.function_name_.text()) return false;
-    return a.isSame(b.types_);
+
+    std::vector<std::reference_wrapper<lang::Type const>> b_types;
+
+    b_types.reserve(b.types_.size());
+    for (auto& type : b.types_) { b_types.emplace_back(*type); }
+
+    return a.isSame(b_types);
 }

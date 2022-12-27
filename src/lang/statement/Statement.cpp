@@ -15,10 +15,9 @@ void Statement::setContainingScope(lang::Scope& scope)
     setScope(scope);
 }
 
-std::vector<std::unique_ptr<lang::BasicBlock>> Statement::createBasicBlocks(lang::BasicBlock& entry,
-                                                                            lang::Function&   function)
+std::vector<Owned<lang::BasicBlock>> Statement::createBasicBlocks(lang::BasicBlock& entry, lang::Function& function)
 {
-    std::vector<std::unique_ptr<lang::BasicBlock>> blocks;
+    std::vector<Owned<lang::BasicBlock>> blocks;
     blocks.push_back(lang::BasicBlock::createSimple(this));
 
     entry.link(*blocks.front());
@@ -54,7 +53,12 @@ lang::Scope* Statement::scope() const
     return containing_scope_;
 }
 
-lang::LocalScope* Statement::getBlockScope() const
+lang::LocalScope* Statement::getBlockScope()
+{
+    return nullptr;
+}
+
+lang::LocalScope const* Statement::getBlockScope() const
 {
     return nullptr;
 }
@@ -74,6 +78,8 @@ void Statement::postResolve()
 {
     for (auto& subexpression : subexpressions_) { subexpression.get().postResolve(); }
     for (auto& substatement : substatements_) { substatement.get().postResolve(); }
+
+    for (auto& subexpression : subexpressions_) { subexpression.get().type(); }
 }
 
 lang::Location Statement::location() const

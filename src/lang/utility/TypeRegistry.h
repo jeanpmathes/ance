@@ -43,6 +43,11 @@ namespace lang
          */
         virtual void buildNativeDefinitions(CompileContext& context) = 0;
 
+        /**
+         * Clear all types in this registry.
+         */
+        virtual void clear() = 0;
+
         virtual ~TypeDefinitionRegistry() = default;
     };
 
@@ -54,12 +59,12 @@ namespace lang
     class TypeRegistry : public TypeDefinitionRegistry
     {
       public:
-        typedef std::vector<TypeHandle>         UsedTypes;
-        typedef std::pair<UsedTypes, OTHER_KEY> Key;
-        typedef std::pair<Key, TypeHandle>      Entry;
+        using UsedTypes = std::vector<TypeHandle>;
+        using Key       = std::pair<UsedTypes, OTHER_KEY>;
+        using Entry     = std::pair<Key, TypeHandle>;
 
-        std::optional<TypeHandle> get(UsedTypes const& type_keys, const OTHER_KEY& other_keys) const;
-        void                      add(UsedTypes&& type_keys, OTHER_KEY other_key, TypeHandle type);
+        Optional<TypeHandle> get(UsedTypes type_keys, OTHER_KEY other_keys);
+        void                 add(UsedTypes&& type_keys, OTHER_KEY other_key, TypeHandle type);
 
         void setDefaultContainingScope(lang::Scope* scope) override;
         void resolve() override;
@@ -67,6 +72,8 @@ namespace lang
 
         void buildNativeDeclarations(CompileContext& context) override;
         void buildNativeDefinitions(CompileContext& context) override;
+
+        void clear() override;
 
       private:
         std::vector<Entry> types_;

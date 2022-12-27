@@ -24,12 +24,17 @@ std::string lang::StringConstant::toString() const
     return prefix_ + literal_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::StringConstant::type() const
+lang::ResolvingHandle<lang::Type> lang::StringConstant::type()
 {
     return type_;
 }
 
-llvm::Constant* lang::StringConstant::buildContent(llvm::Module* m)
+lang::Type const& lang::StringConstant::type() const
+{
+    return type_;
+}
+
+llvm::Constant* lang::StringConstant::createContent(llvm::Module* m)
 {
     switch (kind_)
     {
@@ -149,7 +154,7 @@ lang::ResolvingHandle<lang::Type> lang::StringConstant::resolveType(lang::String
         }
         case CHAR:
         {
-            size_t size = std::get<std::u32string>(data).size();
+            size_t const size = std::get<std::u32string>(data).size();
             return lang::ArrayType::get(lang::CharType::get(), size);
         }
         case C_STRING:
@@ -157,4 +162,9 @@ lang::ResolvingHandle<lang::Type> lang::StringConstant::resolveType(lang::String
             return lang::PointerType::get(lang::FixedWidthIntegerType::get(8, false));
         }
     }
+}
+
+Shared<lang::Constant> lang::StringConstant::clone() const
+{
+    return Shared<StringConstant>(*(new StringConstant(prefix_, literal_)));
 }

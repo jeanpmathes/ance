@@ -2,13 +2,9 @@
 #include "OwningHandle.h"
 
 template<typename T>
-lang::OwningHandle<T>::OwningHandle(std::unique_ptr<T> owner, ResolvingHandle<T> handle)
+lang::OwningHandle<T>::OwningHandle(Owned<T> owner, ResolvingHandle<T> handle)
     : owner_(std::move(owner))
     , handle_(handle)
-{}
-
-template<typename T>
-lang::OwningHandle<T>::OwningHandle() : handle_(std::unique_ptr<T>(nullptr))
 {}
 
 template<typename T>
@@ -18,7 +14,19 @@ lang::OwningHandle<T> lang::OwningHandle<T>::takeOwnership(ResolvingHandle<T> ha
 }
 
 template<typename T>
-lang::ResolvingHandle<T> lang::OwningHandle<T>::handle() const
+lang::ResolvingHandle<T> lang::OwningHandle<T>::handle()
+{
+    return handle_;
+}
+
+template<typename T>
+std::reference_wrapper<lang::ResolvingHandle<T> const> lang::OwningHandle<T>::handle() const
+{
+    return handle_;
+}
+
+template<typename T>
+T const& lang::OwningHandle<T>::get() const
 {
     return handle_;
 }

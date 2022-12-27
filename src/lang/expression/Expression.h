@@ -54,7 +54,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     /**
      * Get whether this expression is a named value source.
      */
-    [[nodiscard]] virtual bool isNamed();
+    [[nodiscard]] virtual bool isNamed() const;
 
     /**
      * Validate this expression.
@@ -63,7 +63,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      */
     virtual bool validate(ValidationLogger& validation_logger) const = 0;
 
-    using Expansion = std::tuple<Statements, std::unique_ptr<Expression>, Statements>;
+    using Expansion = std::tuple<Statements, Owned<Expression>, Statements>;
 
     /**
      * Expand this expression to remove syntactic sugar.
@@ -85,47 +85,58 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @param validation_logger The validation logger to use.
      * @return True if assigning is valid.
      */
-    virtual bool validateAssignment(std::shared_ptr<lang::Value> const& value,
-                                    lang::Location                      value_location,
-                                    ValidationLogger&                   validation_logger);
+    virtual bool validateAssignment(lang::Value const& value,
+                                    lang::Location     value_location,
+                                    ValidationLogger&  validation_logger) const;
 
     /**
      * Build an assignment to this expression. The value should not be retrieved if assignment took place.
      * @param value The value to assign.
      * @param context The current compile context.
      */
-    void assign(std::shared_ptr<lang::Value> value, CompileContext& context);
+    void assign(Shared<lang::Value> value, CompileContext& context);
 
     /**
      * Get the return type of this expression.
-     * This operation assumes that the expression is valid, and should only be called after validation.
-     * @return The type of the value of this expression.
+     * @return The type of the value of this expression. Might be undefined if the expression is not valid.
      */
-    [[nodiscard]] lang::ResolvingHandle<lang::Type> type() const;
+    lang::ResolvingHandle<lang::Type> type();
 
     /**
-     * Try to get the type of this expression. This operation is always safe, even before validation.
-     * If a type is valid, it has to succeed.
-     * @return The type of the value of this expression, or empty.
+     * Get the return type of this expression.
+     * @return The type of the value of this expression. Might be undefined if the expression is not valid.
      */
-    [[nodiscard]] virtual std::optional<lang::ResolvingHandle<lang::Type>> tryGetType() const = 0;
+    [[nodiscard]] lang::Type const& type() const;
 
     /**
      * Get the value returned by this expression.
      * @return The value. One expression always returns the value.
      */
-    [[nodiscard]] virtual std::shared_ptr<lang::Value> getValue() const = 0;
+    [[nodiscard]] virtual Shared<lang::Value> getValue() = 0;
+
+    /**
+     * Get the value returned by this expression.
+     * @return The value. One expression always returns the value.
+     */
+    [[nodiscard]] virtual lang::Value const& getValue() const = 0;
 
     ~Expression() override = default;
 
   protected:
+    /**
+     * Define the type of this expression.
+     * If this expression is valid, the type must be defined after a call to this method.
+     * @param type The type to define. Should be rerouted to the return type of this expression.
+     */
+    virtual void defineType(lang::ResolvingHandle<lang::Type>& type) = 0;
+
     /**
      * Override this method to receive the containing scope.
      * @param scope The containing scope.
      */
     virtual void setScope(lang::Scope& scope);
 
-    virtual void doAssign(std::shared_ptr<lang::Value> value, CompileContext& context);
+    virtual void doAssign(Shared<lang::Value> value, CompileContext& context);
 
     /**
      * Add a subexpression to this expression.
@@ -134,16 +145,15 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     void addSubexpression(Expression& subexpression);
 
     /**
-     * Try get all return types of the given expressions. If any expression does not have a type, the result is empty.
+     * Get all return types of the given expressions.
      */
-    static std::optional<std::vector<lang::ResolvingHandle<lang::Type>>> tryGetTypes(
-        std::vector<std::unique_ptr<Expression>> const& expressions);
+    static std::vector<lang::ResolvingHandle<lang::Type>> getTypes(std::vector<Owned<Expression>>& expressions);
 
     /**
-     * Get all return types of the given expressions. This operation assumes that all expressions are valid, and should only be called after validation.
+     * Get all return types of the given expressions.
      */
-    static std::vector<lang::ResolvingHandle<lang::Type>> getTypes(
-        std::vector<std::unique_ptr<Expression>> const& expressions);
+    static std::vector<std::reference_wrapper<lang::Type const>> getTypes(
+        std::vector<Owned<Expression>> const& expressions);
 
   private:
     lang::Location location_;
@@ -151,7 +161,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
 
     std::vector<std::reference_wrapper<Expression>> subexpressions_;
 
-    mutable std::optional<lang::ResolvingHandle<lang::Type>> type_ {};
+    lang::ResolvingHandle<lang::Type> type_;
 };
 
 #endif

@@ -54,7 +54,7 @@ namespace lang
          * Create a defined type.
          * @param definition The type definition.
          */
-        explicit Type(std::unique_ptr<lang::TypeDefinition> definition);
+        explicit Type(Owned<lang::TypeDefinition> definition);
 
       private:
         Type();
@@ -98,7 +98,7 @@ namespace lang
          * Define this type. Can only be used on undefined types.
          * @param definition The definition for this type.
          */
-        void define(std::unique_ptr<lang::TypeDefinition> definition);
+        void define(Owned<lang::TypeDefinition> definition);
 
         /**
          * Get the number of states for this type.
@@ -271,13 +271,25 @@ namespace lang
          * Get the element type of this type. A type can have only exactly one element type. Currently, only arrays, vectors, pointers and references have element types.
          * @return The element type, or undefined if this type has no element type.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType() const;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> getElementType();
+
+        /**
+         * Get the element type of this type. A type can have only exactly one element type. Currently, only arrays, vectors, pointers and references have element types.
+         * @return The element type, or undefined if this type has no element type.
+         */
+        [[nodiscard]] lang::Type const& getElementType() const;
 
         /**
          * Get the actual type.
          * @return The actual type, or the type itself if it already is an actual type.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType() const;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> getActualType();
+
+        /**
+         * Get the actual type.
+         * @return The actual type, or the type itself if it already is an actual type.
+         */
+        [[nodiscard]] lang::Type const& getActualType() const;
 
         /**
          * Get the access modifier for this type.
@@ -295,19 +307,25 @@ namespace lang
          * Get the scope that contains this type.
          * @return The scope that contains the type.
          */
-        [[nodiscard]] lang::Scope* getContainingScope() const;
+        [[nodiscard]] lang::Scope* getContainingScope();
+
+        /**
+         * Get the scope that contains this type.
+         * @return The scope that contains the type.
+         */
+        [[nodiscard]] lang::Scope const* getContainingScope() const;
 
         void postResolve();
 
-        bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
-        bool enableImplicitConversionOnCall() const override;
+        bool               requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
+        [[nodiscard]] bool enableImplicitConversionOnCall() const override;
 
         /**
          * Get the default content of a value of this type.
          * @param m The module.
          * @return The default content.
          */
-        llvm::Constant* getDefaultContent(llvm::Module& m);
+        llvm::Constant* getDefaultContent(llvm::Module& m) const;
 
         /**
          * Get the native type. Values of this type are passed around using this type.
@@ -327,7 +345,7 @@ namespace lang
          * @param context The current compile context.
          * @return The debug type.
          */
-        llvm::DIType* getDebugType(CompileContext& context);
+        llvm::DIType* getDebugType(CompileContext& context) const;
 
         /**
          * Get the size of the native type.
@@ -346,7 +364,7 @@ namespace lang
          * See if the subscript operation is defined for this type.
          * @return True if the subscript is defined.
          */
-        bool isSubscriptDefined();
+        [[nodiscard]] bool isSubscriptDefined() const;
 
         /**
          * Get the return type of the get indexer.
@@ -360,14 +378,14 @@ namespace lang
          * @param other The other type.
          * @return True if the operation is defined.
          */
-        bool isOperatorDefined(lang::BinaryOperator op, lang::ResolvingHandle<lang::Type> other);
+        [[nodiscard]] bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const;
 
         /**
          * Get whether a unary operation is defined for this type.
          * @param op The operation.
          * @return True if the operation is defined.
          */
-        bool isOperatorDefined(lang::UnaryOperator op);
+        [[nodiscard]] bool isOperatorDefined(lang::UnaryOperator op) const;
 
         /**
          * Get a binary operation result type.
@@ -390,14 +408,14 @@ namespace lang
          * @param other The other type.
          * @return True if implicit conversion is possible.
          */
-        bool isImplicitlyConvertibleTo(lang::ResolvingHandle<lang::Type> other);
+        [[nodiscard]] bool isImplicitlyConvertibleTo(lang::Type const& other) const;
 
         /**
          * Check if this type has a member with the given name.
          * @param name The name of the member.
          * @return True if the member exists.
          */
-        bool hasMember(lang::Identifier const& name);
+        [[nodiscard]] bool hasMember(lang::Identifier const& name) const;
 
         /**
          * Get the type of a member.
@@ -410,7 +428,7 @@ namespace lang
          * Get whether this type defines the indirection operator.
          * @return True if the type defines the indirection operator.
          */
-        bool definesIndirection();
+        [[nodiscard]] bool definesIndirection() const;
 
         /**
          * Get the type this type is an indirection to.
@@ -442,10 +460,10 @@ namespace lang
          * @param validation_logger A logger to log validation messages.
          * @return True if the get indexer is valid.
          */
-        bool validateSubscript(lang::Location                    indexed_location,
-                               lang::ResolvingHandle<lang::Type> index_type,
-                               lang::Location                    index_location,
-                               ValidationLogger&                 validation_logger) const;
+        bool validateSubscript(lang::Location    indexed_location,
+                               Type const&       index_type,
+                               lang::Location    index_location,
+                               ValidationLogger& validation_logger) const;
 
         /**
          * Validate a binary operation. May only be called if the operation is defined.
@@ -456,11 +474,11 @@ namespace lang
          * @param validation_logger The validation logger to use.
          * @return True if the operation is valid.
          */
-        bool validateOperator(lang::BinaryOperator              op,
-                              lang::ResolvingHandle<lang::Type> other,
-                              lang::Location                    left_location,
-                              lang::Location                    right_location,
-                              ValidationLogger&                 validation_logger) const;
+        bool validateOperator(lang::BinaryOperator op,
+                              lang::Type const&    other,
+                              lang::Location       left_location,
+                              lang::Location       right_location,
+                              ValidationLogger&    validation_logger) const;
 
         /**
          * Validate a unary operation. May only be called if the operation is defined.
@@ -480,9 +498,9 @@ namespace lang
          * @param validation_logger The validation logger to use.
          * @return True if the implicit conversion is valid.
          */
-        bool validateImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                        lang::Location                    location,
-                                        ValidationLogger&                 validation_logger) const;
+        bool validateImplicitConversion(lang::Type const& other,
+                                        lang::Location    location,
+                                        ValidationLogger& validation_logger) const;
 
         /**
          * Validate a member access.
@@ -507,9 +525,7 @@ namespace lang
          * @param context The current compile context.
          * @return The return value.
          */
-        std::shared_ptr<lang::Value> buildSubscript(std::shared_ptr<Value> indexed,
-                                                    std::shared_ptr<Value> index,
-                                                    CompileContext&        context);
+        Shared<lang::Value> buildSubscript(Shared<Value> indexed, Shared<Value> index, CompileContext& context);
 
         /**
          * Build a binary operation.
@@ -519,10 +535,10 @@ namespace lang
          * @param context The current compile context.
          * @return The result value.
          */
-        std::shared_ptr<lang::Value> buildOperator(lang::BinaryOperator   op,
-                                                   std::shared_ptr<Value> left,
-                                                   std::shared_ptr<Value> right,
-                                                   CompileContext&        context);
+        Shared<lang::Value> buildOperator(lang::BinaryOperator op,
+                                          Shared<Value>        left,
+                                          Shared<Value>        right,
+                                          CompileContext&      context);
 
         /**
          * Build a unary operation.
@@ -531,9 +547,7 @@ namespace lang
          * @param context The current compile context.
          * @return The result value.
          */
-        std::shared_ptr<lang::Value> buildOperator(lang::UnaryOperator    op,
-                                                   std::shared_ptr<Value> value,
-                                                   CompileContext&        context);
+        Shared<lang::Value> buildOperator(lang::UnaryOperator op, Shared<Value> value, CompileContext& context);
 
         /**
          * Build an implicit conversion.
@@ -542,9 +556,9 @@ namespace lang
          * @param context The current compile context.
          * @return The converted value.
          */
-        std::shared_ptr<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                             std::shared_ptr<Value>            value,
-                                                             CompileContext&                   context);
+        Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                    Shared<Value>                     value,
+                                                    CompileContext&                   context);
 
         /**
          * Build a member access.
@@ -553,9 +567,9 @@ namespace lang
          * @param context The current compile context.
          * @return The result value.
          */
-        std::shared_ptr<lang::Value> buildMemberAccess(std::shared_ptr<Value>  value,
-                                                       lang::Identifier const& name,
-                                                       CompileContext&         context);
+        Shared<lang::Value> buildMemberAccess(Shared<Value>           value,
+                                              lang::Identifier const& name,
+                                              CompileContext&         context);
 
         /**
          * Build indirection.
@@ -563,7 +577,7 @@ namespace lang
          * @param context The current compile context.
          * @return The result value, which is a reference of indirection return type.
          */
-        std::shared_ptr<lang::Value> buildIndirection(std::shared_ptr<Value> value, CompileContext& context);
+        Shared<lang::Value> buildIndirection(Shared<Value> value, CompileContext& context);
 
         /**
          * Build the default initializer for this type.
@@ -615,7 +629,8 @@ namespace lang
          */
         void buildNativeDefinition(CompileContext& context);
 
-        [[nodiscard]] lang::TypeDefinition* getDefinition() const;
+        [[nodiscard]] lang::TypeDefinition*       getDefinition();
+        [[nodiscard]] lang::TypeDefinition const* getDefinition() const;
 
         /**
          * Check if two types are matching, meaning the available type can be converted to the expected type.
@@ -623,7 +638,7 @@ namespace lang
          * @param actual The available type.
          * @return True if the types are matching.
          */
-        static bool isMatching(lang::ResolvingHandle<lang::Type> expected, lang::ResolvingHandle<lang::Type> actual);
+        static bool isMatching(lang::Type const& expected, lang::Type const& actual);
 
         /**
          * Validate that a type matches the expected type.
@@ -633,10 +648,10 @@ namespace lang
          * @param validation_logger The validation logger.
          * @return True if the types match.
          */
-        static bool checkMismatch(lang::ResolvingHandle<lang::Type> expected,
-                                  lang::ResolvingHandle<lang::Type> actual,
-                                  lang::Location                    location,
-                                  ValidationLogger&                 validation_logger);
+        static bool checkMismatch(lang::Type const& expected,
+                                  lang::Type const& actual,
+                                  lang::Location    location,
+                                  ValidationLogger& validation_logger);
 
         /**
          * Transform a value so it matches an expected type.
@@ -645,9 +660,9 @@ namespace lang
          * @param context The current compile context.
          * @return A value with the expected type. It can be the same value as passed in.
          */
-        static std::shared_ptr<lang::Value> makeMatching(lang::ResolvingHandle<lang::Type> expected,
-                                                         std::shared_ptr<lang::Value>      value,
-                                                         CompileContext&                   context);
+        static Shared<lang::Value> makeMatching(lang::ResolvingHandle<lang::Type> expected,
+                                                Shared<lang::Value>               value,
+                                                CompileContext&                   context);
 
         /**
          * Get the referenced type, meaning the type itself if it is not a reference type, or the element type.
@@ -657,13 +672,19 @@ namespace lang
         static lang::ResolvingHandle<lang::Type> getReferencedType(lang::ResolvingHandle<lang::Type> type);
 
         /**
+         * Get the referenced type, meaning the type itself if it is not a reference type, or the element type.
+         * @param type The type to get the referenced type of.
+         * @return The dereferenced type.
+         */
+        static lang::Type const& getReferencedType(lang::Type const& type);
+
+        /**
          * Get the value directly, or the referenced value if it is a reference type.
          * @param value The value to get the referenced value of.
          * @param context The current compile context.
          * @return The referenced value.
          */
-        static std::shared_ptr<lang::Value> getValueOrReferencedValue(std::shared_ptr<lang::Value> value,
-                                                                      CompileContext&              context);
+        static Shared<lang::Value> getValueOrReferencedValue(Shared<lang::Value> value, CompileContext& context);
 
         /**
          * Check if the actual types of two types are the same.
@@ -671,26 +692,26 @@ namespace lang
          * @param rhs The right hand side type.
          * @return True if the types are actually the same.
          */
-        static bool areSame(lang::ResolvingHandle<lang::Type> lhs, lang::ResolvingHandle<lang::Type> rhs);
+        static bool areSame(lang::Type const& lhs, lang::Type const& rhs);
 
         /**
          * Get the value as its actual type.
          * @param value The value to change the type of.
          * @return The value with the actual type.
          */
-        static std::shared_ptr<lang::Value> makeActual(std::shared_ptr<lang::Value> value);
+        static Shared<lang::Value> makeActual(Shared<lang::Value> value);
 
         /**
          * Get an undefined type with the same name. Types given by literals cannot be undefined.
          * Therefore, for these types the returned type will be the same as the type passed in.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> toUndefined() const;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> createUndefinedClone() const;
 
         /**
-         * Get a separate type handle if the type is undefined, otherwise return the same type.
-         * @return The type handle.
+         * Get a separate type get if the type is undefined, otherwise return the same type.
+         * @return The type get.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> toSeparateUndefined() const;
+        lang::ResolvingHandle<lang::Type> getDetachedIfUndefined();
 
         /**
          * Get the common types from a list of types.
@@ -698,11 +719,41 @@ namespace lang
          * @return A list of common types. It can be empty if there are no common types.
          */
         static std::vector<lang::ResolvingHandle<lang::Type>> getCommonType(
-            std::vector<lang::ResolvingHandle<lang::Type>> const& types);
+            std::vector<lang::ResolvingHandle<lang::Type>>& types);
+
+        /**
+         * Get the common types from a list of types.
+         * @param types The types to get the common types from.
+         * @return A list of common types. It can be empty if there are no common types.
+         */
+        static std::vector<std::reference_wrapper<lang::Type const>> getCommonType(
+            std::vector<std::reference_wrapper<lang::Type const>> const& types);
+
+        template<typename IN, typename OUT>
+        friend struct GetCommonType;
+
+        /**
+         * Check equality of types. This compares identity, meaning that same types (e.g. type and alias) are not equal.
+         * @param other The other type to compare to.
+         * @return True if the types are equal.
+         */
+        bool operator==(lang::Type const& other) const;
+
+        /**
+         * Check inequality of types. This is the inverse of the equality operator.
+         * @param other The other type to compare to.
+         * @return True if the types are not equal.
+         */
+        bool operator!=(lang::Type const& other) const;
+
+        /**
+         * Perform some expansion. Is not necessary with full expansion.
+         */
+        void expand();
 
       private:
         lang::Identifier                      name_;
-        std::unique_ptr<lang::TypeDefinition> definition_ {};
+        Optional<Owned<lang::TypeDefinition>> definition_ {};
     };
 }
 #endif

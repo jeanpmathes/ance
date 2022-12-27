@@ -13,14 +13,14 @@
 #include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
-lang::StatementFunction::StatementFunction(Function&                                     function,
-                                           lang::AccessModifier                          access,
-                                           lang::ResolvingHandle<lang::Type>             return_type,
-                                           lang::Location                                return_type_location,
-                                           std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                                           std::unique_ptr<Statement>                    code,
-                                           Scope&                                        containing_scope,
-                                           lang::Location                                declaration_location)
+lang::StatementFunction::StatementFunction(Function&                            function,
+                                           lang::AccessModifier                 access,
+                                           lang::ResolvingHandle<lang::Type>    return_type,
+                                           lang::Location                       return_type_location,
+                                           std::vector<Shared<lang::Parameter>> parameters,
+                                           Owned<Statement>                     code,
+                                           Scope&                               containing_scope,
+                                           lang::Location                       declaration_location)
     : lang::FunctionDefinition(function,
                                containing_scope,
                                return_type,
@@ -32,22 +32,6 @@ lang::StatementFunction::StatementFunction(Function&                            
     , initial_block_(lang::BasicBlock::createEmpty())
 {
     setupCode();
-
-    containing_scope.addType(return_type);
-
-    unsigned no = 1;
-    for (auto const& parameter : this->parameters())
-    {
-        containing_scope.addType(parameter->type());
-
-        auto arg = function.defineParameterVariable(parameter->name(),
-                                                    parameter->type(),
-                                                    parameter->typeLocation(),
-                                                    parameter,
-                                                    no++,
-                                                    parameter->location());
-        arguments_.push_back(arg);
-    }
 }
 
 std::pair<llvm::FunctionType*, llvm::Function*> lang::StatementFunction::getNativeRepresentation() const
@@ -64,6 +48,22 @@ void lang::StatementFunction::setupCode()
     assert(inside_scope_);
 
     code_->walkDefinitions();
+
+    scope().addType(returnType());
+
+    unsigned no = 1;
+    for (auto& parameter : this->parameters())
+    {
+        scope().addType(parameter->type());
+
+        auto arg = function().defineParameterVariable(parameter->name(),
+                                                      parameter->type(),
+                                                      parameter->typeLocation(),
+                                                      parameter,
+                                                      no++,
+                                                      parameter->location());
+        arguments_.emplace_back(arg);
+    }
 }
 
 lang::AccessModifier lang::StatementFunction::access() const
@@ -71,7 +71,7 @@ lang::AccessModifier lang::StatementFunction::access() const
     return access_;
 }
 
-Statement& lang::StatementFunction::code() const
+Statement const& lang::StatementFunction::code() const
 {
     return *code_;
 }
@@ -90,11 +90,15 @@ void lang::StatementFunction::validate(ValidationLogger& validation_logger) cons
 void lang::StatementFunction::expand()
 {
     clearChildren();
+    arguments_.clear();
 
     Statements expanded_statements = code_->expand();
     assert(expanded_statements.size() == 1);
-
     code_ = std::move(expanded_statements.front());
+
+    lang::FunctionDefinition::expand();
+
+    function().clear();// Dirty fix, required because no full expansion is done.
 
     setupCode();
 }
@@ -131,16 +135,16 @@ bool lang::StatementFunction::validateFlow(ValidationLogger&) const
     return true;
 }
 
-lang::BasicBlock& lang::StatementFunction::getInitialBlock() const
+lang::BasicBlock const& lang::StatementFunction::getInitialBlock() const
 {
     return *initial_block_;
 }
 
-std::optional<lang::Location> lang::StatementFunction::findUnreachableCode() const
+Optional<lang::Location> lang::StatementFunction::findUnreachableCode() const
 {
     initial_block_->reach();
 
-    std::optional<lang::Location> unreachable_code_location;
+    Optional<lang::Location> unreachable_code_location;
 
     for (auto& block : blocks_)
     {
@@ -155,11 +159,9 @@ void lang::StatementFunction::createNativeBacking(CompileContext& context)
     std::tie(native_type_, native_function_) =
         createNativeFunction(access_.linkage(), *context.llvmContext(), context.module());
 
-    for (auto const pair : llvm::zip(parameters(), native_function_->args()))
-    {
-        auto const& [parameter, argument] = pair;
-        parameter->wrap(&argument);
-    }
+    auto params = parameters();
+
+    for (unsigned int i = 0; i < params.size(); ++i) { params[i]->wrap(native_function_->getArg(i)); }
 }
 
 void lang::StatementFunction::build(CompileContext& context)
@@ -193,12 +195,12 @@ std::vector<lang::BasicBlock*> const& lang::StatementFunction::getBasicBlocks() 
     return used_blocks_;
 }
 
-llvm::DIScope* lang::StatementFunction::getDebugScope(CompileContext&)
+llvm::DIScope* lang::StatementFunction::getDebugScope(CompileContext&) const
 {
     return native_function_->getSubprogram();
 }
 
-std::vector<std::optional<lang::ResolvingHandle<lang::Variable>>> const& lang::StatementFunction::arguments() const
+std::vector<Optional<lang::ResolvingHandle<lang::Variable>>> const& lang::StatementFunction::arguments() const
 {
     return arguments_;
 }

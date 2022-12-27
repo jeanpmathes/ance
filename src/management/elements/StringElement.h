@@ -19,7 +19,7 @@ namespace data
          */
         explicit StringElement(std::string string);
 
-        [[nodiscard]] std::optional<std::reference_wrapper<const std::string>> asString() const override;
+        [[nodiscard]] Optional<std::reference_wrapper<const std::string>> asString() const override;
 
       private:
         std::string string_;

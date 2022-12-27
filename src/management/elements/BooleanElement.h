@@ -19,7 +19,7 @@ namespace data
          */
         explicit BooleanElement(bool b);
 
-        [[nodiscard]] std::optional<bool> asBool() const override;
+        [[nodiscard]] Optional<bool> asBool() const override;
 
       private:
         bool b_;

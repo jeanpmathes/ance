@@ -3,11 +3,11 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 
-lang::PredefinedFunction::PredefinedFunction(lang::Function&                               function,
-                                             lang::Scope&                                  containing_scope,
-                                             lang::ResolvingHandle<lang::Type>             return_type,
-                                             std::vector<std::shared_ptr<lang::Parameter>> parameters,
-                                             lang::Location                                location)
+lang::PredefinedFunction::PredefinedFunction(lang::Function&                      function,
+                                             lang::Scope&                         containing_scope,
+                                             lang::ResolvingHandle<lang::Type>    return_type,
+                                             std::vector<Shared<lang::Parameter>> parameters,
+                                             lang::Location                       location)
     : lang::FunctionDefinition(function,
                                containing_scope,
                                return_type,
@@ -36,12 +36,14 @@ void lang::PredefinedFunction::createNativeBacking(CompileContext& context)
                                                                     *context.llvmContext(),
                                                                     context.module());
 
-    for (auto pair : zip(parameters(), native_function_->args())) { std::get<0>(pair)->wrap(&std::get<1>(pair)); }
+    auto params = parameters();
+
+    for (unsigned int i = 0; i < params.size(); ++i) { params[i]->wrap(native_function_->getArg(i)); }
 }
 
 void lang::PredefinedFunction::build(CompileContext&) {}
 
-llvm::DIScope* lang::PredefinedFunction::getDebugScope(CompileContext&)
+llvm::DIScope* lang::PredefinedFunction::getDebugScope(CompileContext&) const
 {
     return native_function_->getSubprogram();
 }
@@ -63,7 +65,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::PredefinedFunction::getNat
 }
 
 void lang::PredefinedFunction::setCallValidator(
-    std::function<bool(std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const&,
+    std::function<bool(std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const&,
                        lang::Location,
                        ValidationLogger&)> validator)
 {
@@ -71,9 +73,9 @@ void lang::PredefinedFunction::setCallValidator(
 }
 
 bool lang::PredefinedFunction::doCallValidation(
-    std::vector<std::pair<std::shared_ptr<lang::Value>, lang::Location>> const& arguments,
-    lang::Location                                                              location,
-    ValidationLogger&                                                           validation_logger) const
+    std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
+    lang::Location                                                                           location,
+    ValidationLogger&                                                                        validation_logger) const
 {
     if (call_validator_) { return call_validator_(arguments, location, validation_logger); }
     return true;

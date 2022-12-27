@@ -12,9 +12,9 @@ void lang::Callable::addFunction(lang::OwningHandle<lang::Function> function)
     function_handles_.push_back(functions_.back().handle());
 }
 
-bool lang::Callable::validateResolution(std::vector<lang::ResolvingHandle<lang::Type>> const& types,
-                                        lang::Location                                        location,
-                                        ValidationLogger&                                     validation_logger) const
+bool lang::Callable::validateResolution(std::vector<std::reference_wrapper<lang::Type const>> const& types,
+                                        lang::Location                                               location,
+                                        ValidationLogger& validation_logger) const
 {
     size_t argument_count = types.size();
 
@@ -30,7 +30,7 @@ bool lang::Callable::validateResolution(std::vector<lang::ResolvingHandle<lang::
 }
 
 std::vector<lang::ResolvingHandle<lang::Function>> lang::Callable::resolveOverload(
-    std::vector<lang::ResolvingHandle<lang::Type>> const& arguments) const
+    std::vector<std::reference_wrapper<lang::Type const>> const& arguments)
 {
     std::vector<lang::ResolvingHandle<lang::Function>> same_signatures;
     std::vector<lang::ResolvingHandle<lang::Function>> matching_signatures;
@@ -39,7 +39,24 @@ std::vector<lang::ResolvingHandle<lang::Function>> lang::Callable::resolveOverlo
     {
         if (function->signature().isSame(arguments)) same_signatures.push_back(function.handle());
         else if (enableImplicitConversionOnCall() && function->signature().isMatching(arguments))
-            matching_signatures.push_back(function.handle());
+            matching_signatures.emplace_back(function.handle());
+    }
+
+    if (same_signatures.empty()) return matching_signatures;
+    else return same_signatures;
+}
+
+std::vector<std::reference_wrapper<lang::Function const>> lang::Callable::resolveOverload(
+    std::vector<std::reference_wrapper<lang::Type const>> const& arguments) const
+{
+    std::vector<std::reference_wrapper<lang::Function const>> same_signatures;
+    std::vector<std::reference_wrapper<lang::Function const>> matching_signatures;
+
+    for (auto& function : functions_)
+    {
+        if (function->signature().isSame(arguments)) same_signatures.emplace_back(*function);
+        else if (enableImplicitConversionOnCall() && function->signature().isMatching(arguments))
+            matching_signatures.emplace_back(*function);
     }
 
     if (same_signatures.empty()) return matching_signatures;

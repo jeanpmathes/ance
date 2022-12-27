@@ -5,7 +5,7 @@
 #include "lang/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
-Indirection::Indirection(std::unique_ptr<Expression> expression, lang::Location location)
+Indirection::Indirection(Owned<Expression> expression, lang::Location location)
     : Expression(location)
     , value_(std::move(expression))
 
@@ -13,42 +13,40 @@ Indirection::Indirection(std::unique_ptr<Expression> expression, lang::Location 
     addSubexpression(*value_);
 }
 
-Expression& Indirection::value() const
+Expression const& Indirection::value() const
 {
     return *value_;
 }
 
-std::optional<lang::ResolvingHandle<lang::Type>> Indirection::tryGetType() const
+void Indirection::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    auto type_opt = value_->tryGetType();
-    if (!type_opt) return std::nullopt;
-    auto type = type_opt.value();
+    auto value_type = value_->type();
 
-    return lang::ReferenceType::get(type->getIndirectionType());
+    if (value_type->isDefined()) { type.reroute(lang::ReferenceType::get(value_type->getIndirectionType())); }
 }
 
 bool Indirection::validate(ValidationLogger& validation_logger) const
 {
     if (!value_->validate(validation_logger)) return false;
 
-    if (!value_->type()->definesIndirection())
+    if (!value_->type().definesIndirection())
     {
-        validation_logger.logError("Type " + value_->type()->getAnnotatedName() + " does not define indirection",
+        validation_logger.logError("Type " + value_->type().getAnnotatedName() + " does not define indirection",
                                    location());
         return false;
     }
 
-    return value_->type()->validateIndirection(location(), validation_logger);
+    return value_->type().validateIndirection(location(), validation_logger);
 }
 
 Expression::Expansion Indirection::expandWith(Expressions subexpressions) const
 {
-    return {Statements(), std::make_unique<Indirection>(std::move(subexpressions[0]), location()), Statements()};
+    return {Statements(), makeOwned<Indirection>(std::move(subexpressions[0]), location()), Statements()};
 }
 
 void Indirection::doBuild(CompileContext& context)
 {
-    std::shared_ptr<lang::Value> ref = value_->type()->buildIndirection(value_->getValue(), context);
+    Shared<lang::Value> ref = value_->type()->buildIndirection(value_->getValue(), context);
     setValue(ref);
 }
 

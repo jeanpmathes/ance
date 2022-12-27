@@ -19,7 +19,7 @@ namespace lang::values
      * @param context The current compile context.
      * @return The content value.
      */
-    llvm::Value* nativeToContent(lang::ResolvingHandle<lang::Type> type, llvm::Value* native, CompileContext& context);
+    llvm::Value* nativeToContent(lang::Type const& type, llvm::Value* native, CompileContext& context);
     /**
      * Convert a content value to a native value.
      * @param type The type of the value.
@@ -27,14 +27,14 @@ namespace lang::values
      * @param context The current compile context.
      * @return The native value.
      */
-    llvm::Value* contentToNative(lang::ResolvingHandle<lang::Type> type, llvm::Value* content, CompileContext& context);
+    llvm::Value* contentToNative(lang::Type const& type, llvm::Value* content, CompileContext& context);
 
     /**
      * Get a clone of a value. Both values will then refer to the same native value.
      * @param value The value to clone. The native value must be built.
      * @return The new value.
      */
-    std::shared_ptr<lang::Value> clone(std::shared_ptr<lang::Value> const& value);
+    Shared<lang::Value> clone(Shared<lang::Value> value);
 }
 
 #endif
