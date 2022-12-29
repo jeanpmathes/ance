@@ -117,7 +117,7 @@ std::vector<Owned<lang::BasicBlock>> lang::CodeBlock::createBasicBlocks(lang::Ba
 
     if (scoped_)
     {
-        blocks.push_back(lang::BasicBlock::createFinalizing(scope_->get(), "block"));
+        blocks.push_back(lang::BasicBlock::createFinalizing(**scope_, "block"));
         previous_block->link(*blocks.back());
     }
 

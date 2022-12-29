@@ -6,9 +6,9 @@
 
 lang::BasicBlock::Definition::Simple::Simple() = default;
 
-lang::BasicBlock::Definition::Simple::Simple(Statement* statement)
+lang::BasicBlock::Definition::Simple::Simple(Statement& statement)
 {
-    statements_.push_back(statement);
+    statements_.push_back(&statement);
 }
 
 void lang::BasicBlock::Definition::Simple::complete(size_t& index)

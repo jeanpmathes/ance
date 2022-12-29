@@ -7,7 +7,7 @@
 #include "lang/expression/Expression.h"
 #include "lang/type/BooleanType.h"
 
-lang::BasicBlock::Definition::Branching::Branching(Expression* condition) : condition_(condition) {}
+lang::BasicBlock::Definition::Branching::Branching(Expression& condition) : condition_(condition) {}
 
 void lang::BasicBlock::Definition::Branching::complete(size_t& index)
 {
@@ -109,7 +109,7 @@ void lang::BasicBlock::Definition::Branching::reach() const
 
 void lang::BasicBlock::Definition::Branching::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
-    std::string name = "b" + std::to_string(index_);
+    std::string const name = "b" + std::to_string(index_);
     native_block_    = llvm::BasicBlock::Create(*context.llvmContext(), name, native_function);
 
     true_next_->prepareBuild(context, native_function);
@@ -122,7 +122,7 @@ void lang::BasicBlock::Definition::Branching::doBuild(CompileContext& context)
 
     for (auto& statement : statements_) { statement->build(context); }
 
-    Shared<lang::Value> truth         = condition_->getValue();
+    Shared<lang::Value> truth         = condition_.getValue();
     Shared<lang::Value> boolean_truth = lang::Type::makeMatching(lang::BooleanType::get(), truth, context);
 
     boolean_truth->buildContentValue(context);

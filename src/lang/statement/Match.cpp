@@ -332,7 +332,7 @@ std::vector<Owned<lang::BasicBlock>> Match::createBasicBlocks(lang::BasicBlock& 
         conditions.insert(conditions.end(), additional_conditions.begin(), additional_conditions.end());
     }
 
-    auto blocks = lang::BasicBlock::createMatching(this, conditions, function);
+    auto blocks = lang::BasicBlock::createMatching(*this, conditions, function);
     entry.link(*blocks.front());
 
     return blocks;

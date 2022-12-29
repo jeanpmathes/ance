@@ -39,7 +39,7 @@ Statement const* If::elseBlock() const
 
 std::vector<Owned<lang::BasicBlock>> If::createBasicBlocks(lang::BasicBlock& entry, lang::Function& function)
 {
-    auto blocks = lang::BasicBlock::createBranching(condition_.get(), getPtr(if_block_), getPtr(else_block_), function);
+    auto blocks = lang::BasicBlock::createBranching(*condition_, **if_block_, getPtr(else_block_), function);
 
     entry.link(*blocks.front());
 

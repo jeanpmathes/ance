@@ -27,7 +27,7 @@ Statement const& While::body() const
 
 std::vector<Owned<lang::BasicBlock>> While::createBasicBlocks(lang::BasicBlock& entry, lang::Function& function)
 {
-    auto blocks = lang::BasicBlock::createLooping(condition_.get(), block_.get(), &loop_parts_, function);
+    auto blocks = lang::BasicBlock::createLooping(*condition_, *block_, &loop_parts_, function);
 
     entry.link(*blocks.front());
 

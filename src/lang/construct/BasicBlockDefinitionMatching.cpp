@@ -6,7 +6,7 @@
 #include "lang/statement/Match.h"
 #include "validation/ValidationLogger.h"
 
-lang::BasicBlock::Definition::Matching::Matching(Match* match, std::vector<std::vector<ConstantExpression*>> cases)
+lang::BasicBlock::Definition::Matching::Matching(Match& match, std::vector<std::vector<ConstantExpression*>> cases)
     : match_(match)
     , cases_(std::move(cases))
 {}
@@ -96,7 +96,7 @@ void lang::BasicBlock::Definition::Matching::doBuild(CompileContext& context)
 
     for (auto& statement : statements_) { statement->build(context); }
 
-    Shared<lang::Value> value = match_->expression().getValue();
+    Shared<lang::Value> value = match_.expression().getValue();
     value->buildContentValue(context);
 
     llvm::BasicBlock* default_block = nullptr;

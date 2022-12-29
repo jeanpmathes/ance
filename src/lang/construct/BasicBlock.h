@@ -28,7 +28,7 @@ namespace lang
          * @param info Information about the scope.
          * @return The finalizing block.
          */
-        static Owned<BasicBlock> createFinalizing(lang::Scope* scope, std::string info);
+        static Owned<BasicBlock> createFinalizing(lang::Scope& scope, std::string info);
 
         /**
          * Create a simple basic block that contains a single or no statement, and no links.
@@ -45,7 +45,7 @@ namespace lang
          * @param function The function that contains the basic block.
          * @return The created basic block.
          */
-        static Owned<BasicBlock> createReturning(lang::LocalScope* scope,
+        static Owned<BasicBlock> createReturning(lang::LocalScope& scope,
                                                  Expression*       expression,
                                                  lang::Location    return_location,
                                                  Function&         function);
@@ -58,8 +58,8 @@ namespace lang
          * @param function The function containing the basic block.
          * @return The created basic blocks.
          */
-        static std::vector<Owned<BasicBlock>> createBranching(Expression* condition,
-                                                              Statement*  true_block,
+        static std::vector<Owned<BasicBlock>> createBranching(Expression& condition,
+                                                              Statement&  true_block,
                                                               Statement*  false_block,
                                                               Function&   function);
 
@@ -71,8 +71,8 @@ namespace lang
          * @param function The function containing the basic block.
          * @return The created basic blocks.
          */
-        static std::vector<Owned<BasicBlock>> createLooping(Expression*                                      new_block,
-                                                            Statement*                                       code_block,
+        static std::vector<Owned<BasicBlock>> createLooping(Expression&                                      new_block,
+                                                            Statement&                                       code_block,
                                                             std::pair<lang::BasicBlock*, lang::BasicBlock*>* loop_parts,
                                                             Function&                                        function);
 
@@ -84,7 +84,7 @@ namespace lang
          * @return The created basic blocks.
          */
         static std::vector<Owned<BasicBlock>> createMatching(
-            Match*                                                         match,
+            Match&                                                         match,
             std::vector<std::pair<ConstantExpression*, Statement*>> const& cases,
             Function&                                                      function);
 
@@ -231,8 +231,8 @@ namespace lang
 
               public:
                 void        setSelf(BasicBlock* self);
-                BasicBlock*       self();
-                BasicBlock const* self() const;
+                BasicBlock*                     self();
+                [[nodiscard]] BasicBlock const* self() const;
 
                 [[nodiscard]] virtual bool isMeta() const;
 
@@ -249,12 +249,13 @@ namespace lang
                 [[nodiscard]] size_t getIncomingLinkCount() const;
                 void                 updateIncomingLinks(BasicBlock* updated);
 
-                virtual std::list<lang::BasicBlock const*> getLeaves() const = 0;
-                virtual std::vector<lang::BasicBlock*>     getSuccessors()   = 0;
-                virtual Optional<std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>>
-                                       getReturnValue() const;
-                virtual lang::Location getStartLocation() const = 0;
-                virtual lang::Location getEndLocation() const   = 0;
+                [[nodiscard]] virtual std::list<lang::BasicBlock const*> getLeaves() const = 0;
+                virtual std::vector<lang::BasicBlock*>                   getSuccessors()   = 0;
+                [[nodiscard]] virtual Optional<
+                    std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>>
+                                                     getReturnValue() const;
+                [[nodiscard]] virtual lang::Location getStartLocation() const = 0;
+                [[nodiscard]] virtual lang::Location getEndLocation() const   = 0;
 
                 virtual void reach() const = 0;
 
@@ -290,10 +291,10 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>     getSuccessors() override;
-                lang::Location                     getStartLocation() const override;
-                lang::Location                     getEndLocation() const override;
+                [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
+                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                [[nodiscard]] lang::Location                     getStartLocation() const override;
+                [[nodiscard]] lang::Location                     getEndLocation() const override;
 
                 void reach() const override;
 
@@ -309,7 +310,7 @@ namespace lang
             class Finalizing : public Base
             {
               public:
-                Finalizing(lang::Scope* scope, std::string info);
+                Finalizing(lang::Scope& scope, std::string info);
                 ~Finalizing() override = default;
 
               public:
@@ -323,10 +324,10 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>     getSuccessors() override;
-                lang::Location                     getStartLocation() const override;
-                lang::Location                     getEndLocation() const override;
+                [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
+                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                [[nodiscard]] lang::Location                     getStartLocation() const override;
+                [[nodiscard]] lang::Location                     getEndLocation() const override;
 
                 void reach() const override;
 
@@ -337,7 +338,7 @@ namespace lang
 
               private:
                 lang::BasicBlock* next_ {nullptr};
-                lang::Scope*      scope_ {nullptr};
+                lang::Scope&      scope_;
                 std::string       info_ {};
             };
 
@@ -345,7 +346,7 @@ namespace lang
             {
               public:
                 Simple();
-                explicit Simple(Statement* statement);
+                explicit Simple(Statement& statement);
                 ~Simple() override = default;
 
               public:
@@ -357,10 +358,10 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>     getSuccessors() override;
-                lang::Location                     getStartLocation() const override;
-                lang::Location                     getEndLocation() const override;
+                [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
+                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                [[nodiscard]] lang::Location                     getStartLocation() const override;
+                [[nodiscard]] lang::Location                     getEndLocation() const override;
 
                 void reach() const override;
 
@@ -377,7 +378,7 @@ namespace lang
             class Returning : public Base
             {
               public:
-                explicit Returning(lang::LocalScope* scope, Expression* return_value, lang::Location return_location);
+                explicit Returning(lang::LocalScope& scope, Expression* return_value, lang::Location return_location);
                 ~Returning() override = default;
 
               public:
@@ -389,12 +390,12 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>     getSuccessors() override;
-                Optional<std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>>
-                               getReturnValue() const override;
-                lang::Location getStartLocation() const override;
-                lang::Location getEndLocation() const override;
+                [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
+                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                [[nodiscard]] Optional<std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>>
+                                             getReturnValue() const override;
+                [[nodiscard]] lang::Location getStartLocation() const override;
+                [[nodiscard]] lang::Location getEndLocation() const override;
 
                 void reach() const override;
 
@@ -407,14 +408,14 @@ namespace lang
                 std::list<Statement*> statements_ {};
                 lang::BasicBlock*     unreachable_next_ {nullptr};
                 Expression*           return_value_;
-                lang::LocalScope*     scope_;
+                lang::LocalScope&     scope_;
                 lang::Location        return_location_;
             };
 
             class Branching : public Base
             {
               public:
-                explicit Branching(Expression* condition);
+                explicit Branching(Expression& condition);
                 ~Branching() override = default;
 
               public:
@@ -426,10 +427,10 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>     getSuccessors() override;
-                lang::Location                     getStartLocation() const override;
-                lang::Location                     getEndLocation() const override;
+                [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
+                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                [[nodiscard]] lang::Location                     getStartLocation() const override;
+                [[nodiscard]] lang::Location                     getEndLocation() const override;
 
                 void reach() const override;
 
@@ -444,13 +445,13 @@ namespace lang
                 lang::BasicBlock* true_next_ {nullptr};
                 lang::BasicBlock* false_next_ {nullptr};
 
-                Expression* condition_;
+                Expression& condition_;
             };
 
             class Matching : public Base
             {
               public:
-                explicit Matching(Match* match, std::vector<std::vector<ConstantExpression*>> cases);
+                explicit Matching(Match& match, std::vector<std::vector<ConstantExpression*>> cases);
                 ~Matching() override = default;
 
               public:
@@ -462,10 +463,10 @@ namespace lang
 
                 void transferStatements(std::list<Statement*>& statements) override;
 
-                std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>     getSuccessors() override;
-                lang::Location                     getStartLocation() const override;
-                lang::Location                     getEndLocation() const override;
+                [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
+                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                [[nodiscard]] lang::Location                     getStartLocation() const override;
+                [[nodiscard]] lang::Location                     getEndLocation() const override;
 
                 void reach() const override;
 
@@ -479,7 +480,7 @@ namespace lang
 
                 std::vector<lang::BasicBlock*> branches_ {};
 
-                Match*                                        match_;
+                Match&                                        match_;
                 std::vector<std::vector<ConstantExpression*>> cases_;
             };
         };

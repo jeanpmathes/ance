@@ -9,7 +9,7 @@ Owned<lang::BasicBlock> lang::BasicBlock::createEmpty()
     return makeOwned<BasicBlock>(makeOwned<Definition::Empty>());
 }
 
-Owned<lang::BasicBlock> lang::BasicBlock::createFinalizing(lang::Scope* scope, std::string info)
+Owned<lang::BasicBlock> lang::BasicBlock::createFinalizing(lang::Scope& scope, std::string info)
 {
     return makeOwned<BasicBlock>(makeOwned<Definition::Finalizing>(scope, std::move(info)));
 }
@@ -17,10 +17,10 @@ Owned<lang::BasicBlock> lang::BasicBlock::createFinalizing(lang::Scope* scope, s
 Owned<lang::BasicBlock> lang::BasicBlock::createSimple(Statement* statement)
 {
     if (statement == nullptr) { return makeOwned<BasicBlock>(makeOwned<Definition::Simple>()); }
-    else { return makeOwned<BasicBlock>(makeOwned<Definition::Simple>(statement)); }
+    else { return makeOwned<BasicBlock>(makeOwned<Definition::Simple>(*statement)); }
 }
 
-Owned<lang::BasicBlock> lang::BasicBlock::createReturning(lang::LocalScope* scope,
+Owned<lang::BasicBlock> lang::BasicBlock::createReturning(lang::LocalScope& scope,
                                                           Expression*       expression,
                                                           lang::Location    return_location,
                                                           Function&         function)
@@ -33,8 +33,8 @@ Owned<lang::BasicBlock> lang::BasicBlock::createReturning(lang::LocalScope* scop
     return block;
 }
 
-std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createBranching(Expression* condition,
-                                                                       Statement*  true_block,
+std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createBranching(Expression& condition,
+                                                                       Statement&  true_block,
                                                                        Statement*  false_block,
                                                                        Function&   function)
 {
@@ -56,7 +56,7 @@ std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createBranching(Expressio
         blocks.back()->link(*end_block);
     };
 
-    append_code_block(true_block);
+    append_code_block(&true_block);
 
     if (false_block) append_code_block(false_block);
     else branch.link(*end_block);
@@ -69,8 +69,8 @@ std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createBranching(Expressio
 }
 
 std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createLooping(
-    Expression*                                      condition,
-    Statement*                                       code_block,
+    Expression&                                      condition,
+    Statement&                                       code_block,
     std::pair<lang::BasicBlock*, lang::BasicBlock*>* loop_parts,
     Function&                                        function)
 {
@@ -94,7 +94,7 @@ std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createLooping(
         blocks.back()->link(next);
     };
 
-    append_code_block(code_block, branch);
+    append_code_block(&code_block, branch);
     branch.link(*end_block);
 
     blocks.push_back(std::move(end_block));
@@ -113,7 +113,7 @@ std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createJump(lang::BasicBlo
 
     for (auto scope : scopes)
     {
-        blocks.push_back(createFinalizing(scope, "jump"));
+        blocks.push_back(createFinalizing(*scope, "jump"));
 
         current_block->link(*blocks.back());
         current_block = blocks.back().get();
@@ -128,7 +128,7 @@ std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createJump(lang::BasicBlo
 }
 
 std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createMatching(
-    Match*                                                         match,
+    Match&                                                         match,
     std::vector<std::pair<ConstantExpression*, Statement*>> const& cases,
     Function&                                                      function)
 {

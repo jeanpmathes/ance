@@ -3,7 +3,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/scope/Scope.h"
 
-lang::BasicBlock::Definition::Finalizing::Finalizing(lang::Scope* scope, std::string info)
+lang::BasicBlock::Definition::Finalizing::Finalizing(lang::Scope& scope, std::string info)
     : scope_(scope)
     , info_(std::move(info))
 {}
@@ -94,7 +94,7 @@ void lang::BasicBlock::Definition::Finalizing::doBuild(CompileContext& context)
 {
     context.ir()->SetInsertPoint(native_block_);
 
-    scope_->buildFinalization(context);
+    scope_.buildFinalization(context);
 
     if (next_ != nullptr)
     {

@@ -9,7 +9,7 @@
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
-lang::BasicBlock::Definition::Returning::Returning(lang::LocalScope* scope,
+lang::BasicBlock::Definition::Returning::Returning(lang::LocalScope& scope,
                                                    Expression*       return_value,
                                                    lang::Location    return_location)
     : return_value_(return_value)
@@ -97,7 +97,7 @@ void lang::BasicBlock::Definition::Returning::reach() const {}
 
 void lang::BasicBlock::Definition::Returning::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
-    std::string name = "b" + std::to_string(index_);
+    std::string const name = "b" + std::to_string(index_);
     native_block_    = llvm::BasicBlock::Create(*context.llvmContext(), name, native_function);
 }
 
@@ -109,7 +109,7 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext& context)
 
     if (return_value_) {}
 
-    scope_->buildReturnFinalization(context);
+    scope_.buildReturnFinalization(context);
 
     if (return_value_)
     {

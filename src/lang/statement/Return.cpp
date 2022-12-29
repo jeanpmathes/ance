@@ -21,7 +21,7 @@ std::vector<Owned<lang::BasicBlock>> Return::createBasicBlocks(lang::BasicBlock&
 {
     std::vector<Owned<lang::BasicBlock>> blocks;
     blocks.push_back(
-        lang::BasicBlock::createReturning(scope()->asLocalScope(), return_value_.value().get(), location(), function));
+        lang::BasicBlock::createReturning(*scope()->asLocalScope(), return_value_.value().get(), location(), function));
 
     entry.link(*blocks.front());
 
