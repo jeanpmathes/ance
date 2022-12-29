@@ -2,6 +2,7 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/construct/Variable.h"
+#include "lang/scope/Scope.h"
 #include "lang/type/ReferenceType.h"
 
 lang::VariableDefinition::VariableDefinition(lang::ResolvingHandle<lang::Variable> self,
@@ -54,6 +55,11 @@ bool lang::VariableDefinition::isFinal() const
 }
 
 void lang::VariableDefinition::expand() {}
+void lang::VariableDefinition::setType(lang::ResolvingHandle<lang::Type> type)
+{
+    type_ = type;
+    scope_.addType(type);
+}
 void lang::VariableDefinition::determineFlow() {}
 void lang::VariableDefinition::validateFlow(ValidationLogger&) const {}
 void lang::VariableDefinition::resolve() {}

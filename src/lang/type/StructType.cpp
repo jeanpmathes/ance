@@ -191,7 +191,9 @@ bool lang::StructType::hasMember(lang::Identifier const& name) const
 
 lang::ResolvingHandle<lang::Type> lang::StructType::getMemberType(lang::Identifier const& name)
 {
-    return member_map_.at(name).get().type();
+    if (member_map_.contains(name)) { return member_map_.at(name).get().type(); }
+
+    return lang::Type::getUndefined();
 }
 
 bool lang::StructType::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const

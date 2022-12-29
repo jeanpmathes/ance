@@ -49,8 +49,7 @@ Owned<T> lang::ResolvingHandle<T>::take()
 template<typename T>
 void lang::ResolvingHandle<T>::reroute(lang::ResolvingHandle<T> target)
 {
-    assert(getRootNavigator() != target.getRootNavigator());
-    navigator_->root()->target(target.getRootNavigator());
+    if (getRootNavigator() != target.getRootNavigator()) { navigator_->root()->target(target.getRootNavigator()); }
 }
 
 template<typename T>

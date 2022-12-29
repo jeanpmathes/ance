@@ -147,6 +147,12 @@ void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
 
 void lang::GlobalVariable::expand()
 {
+    if (type_opt_.hasValue())// Not necessary with full expansion.
+    {
+        type_opt_ = type_opt_.value()->createUndefinedClone();
+        setType(type_opt_.value());
+    }
+
     if (init_function_.hasValue())
     {
         clearChildren();
@@ -359,7 +365,7 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::determi
 
                 for (auto& dependency : getAllVariableDependencies(current_variable))
                 {
-                    if (state.at(dependency) == finished) continue;
+                    if (state.contains(dependency) && state.at(dependency) == finished) continue;
                     to_check.emplace(dependency, false);
                 }
             }

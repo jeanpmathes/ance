@@ -61,6 +61,7 @@ namespace lang
         [[nodiscard]] bool isFinal() const;
 
         virtual void expand();
+        void         setType(lang::ResolvingHandle<lang::Type> type);
         virtual void determineFlow();
         virtual void validateFlow(ValidationLogger& validation_logger) const;
         virtual void resolve();

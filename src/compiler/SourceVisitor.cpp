@@ -1056,7 +1056,7 @@ lang::Identifier SourceVisitor::ident(antlr4::tree::TerminalNode* i)
     size_t const start_column = file_context_->getUtf8Index(start_line, token->getCharPositionInLine()) + 1;
 
     size_t const end_line   = start_line;
-    size_t const end_column = start_column + text.size();
+    size_t const end_column = start_column + text.size() - 1;
 
     return createIdentifier(text, {start_line, start_column, end_line, end_column, file_context_->getFileIndex()});
 }

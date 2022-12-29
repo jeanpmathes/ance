@@ -61,6 +61,7 @@ lang::Location lang::Member::typeLocation() const
 void lang::Member::setScope(lang::Scope* scope)
 {
     scope->addType(type());
+    if (constant_init_.hasValue()) { constant_init_.value()->type(); }
 }
 
 bool lang::Member::validate(ValidationLogger& validation_logger) const

@@ -704,14 +704,14 @@ struct GetCommonType {
 
             for (auto& candidate : types)
             {
-                for (auto& current : types)
-                {
-                    if (lang::Type::isMatching(candidate, current))
-                    {
-                        auto [iterator, is_new] = confirmed_candidates.emplace(deref(candidate).getDefinition());
-                        if (is_new) { common_types.emplace_back(candidate); }
-                    }
-                }
+                bool is_confirmed = true;
+
+                for (auto& current : types) { is_confirmed &= lang::Type::isMatching(candidate, current); }
+
+                if (not is_confirmed) continue;
+
+                auto [iterator, is_new] = confirmed_candidates.emplace(deref(candidate).getDefinition());
+                if (is_new) { common_types.emplace_back(candidate); }
             }
         }
 

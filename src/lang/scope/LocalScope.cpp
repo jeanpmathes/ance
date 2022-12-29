@@ -132,7 +132,7 @@ void lang::LocalScope::registerUsage(lang::ResolvingHandle<lang::Type> type)
     if (blockers_.contains(type->name()))
     {
         if (blocked_types_.contains(type->name())) { type.reroute(blocked_types_.at(type->name()).handle()); }
-        else { blocked_types_.at(type->name()) = lang::OwningHandle<lang::Type>::takeOwnership(type); }
+        else { blocked_types_.emplace(type->name(), lang::OwningHandle<lang::Type>::takeOwnership(type)); }
 
         return;
     }
@@ -215,7 +215,10 @@ bool lang::LocalScope::searchUsageInLocalScopes(lang::ResolvingHandle<lang::Vari
         {
             variable.reroute(blocked_variables_.at(variable->name()).handle());
         }
-        else { blocked_variables_.at(variable->name()) = lang::OwningHandle<lang::Variable>::takeOwnership(variable); }
+        else
+        {
+            blocked_variables_.emplace(variable->name(), lang::OwningHandle<lang::Variable>::takeOwnership(variable));
+        }
 
         return true;
     }
