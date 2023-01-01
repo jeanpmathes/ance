@@ -34,16 +34,16 @@ void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::ResolvingHan
 
     if (parameter_element->isAddressType())
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
+        context.ir().SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
 
-            llvm::Value* converted = context.ir()->CreatePtrToInt(original,
-                                                                  return_type->getContentType(*context.llvmContext()),
-                                                                  original->getName() + ".ptrtoint");
+            llvm::Value* converted = context.ir().CreatePtrToInt(original,
+                                                                 return_type->getContentType(context.llvmContext()),
+                                                                 original->getName() + ".ptrtoint");
 
-            context.ir()->CreateRet(converted);
+            context.ir().CreateRet(converted);
         }
 
         return;

@@ -19,10 +19,10 @@ lang::Type const& lang::BooleanConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::BooleanConstant::createContent(llvm::Module* m)
+llvm::Constant* lang::BooleanConstant::createContent(llvm::Module& m)
 {
-    return boolean_ ? llvm::ConstantInt::getTrue(type_->getContentType(m->getContext()))
-                    : llvm::ConstantInt::getFalse(type_->getContentType(m->getContext()));
+    return boolean_ ? llvm::ConstantInt::getTrue(type_->getContentType(m.getContext()))
+                    : llvm::ConstantInt::getFalse(type_->getContentType(m.getContext()));
 }
 
 bool lang::BooleanConstant::equals(lang::Constant const* other) const

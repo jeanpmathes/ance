@@ -202,30 +202,30 @@ void lang::GlobalVariable::buildDeclaration(CompileContext& context)
     if (constant_init_)
     {
         Shared<lang::Constant> initial_value = constant_init_->getConstantValue();
-        initial_value->buildContentConstant(context.module());
+        initial_value->buildContentConstant(context.llvmModule());
         native_initializer = initial_value->getContentConstant();
     }
     else if (init_function_.hasValue())
     {
         // Will be initialized at startup.
-        native_initializer = llvm::Constant::getNullValue(type()->getContentType(*context.llvmContext()));
+        native_initializer = llvm::Constant::getNullValue(type()->getContentType(context.llvmContext()));
     }
-    else { native_initializer = type()->getDefaultContent(*context.module()); }
+    else { native_initializer = type()->getDefaultContent(context.llvmModule()); }
 
-    native_variable_ = new llvm::GlobalVariable(*context.module(),
-                                                type()->getContentType(context.module()->getContext()),
+    native_variable_ = new llvm::GlobalVariable(context.llvmModule(),
+                                                type()->getContentType(context.llvmModule().getContext()),
                                                 is_constant_,
                                                 access_.linkage(),
                                                 native_initializer,
                                                 name().text());
 
-    auto* debug_info = context.di()->createGlobalVariableExpression(context.unit(),
-                                                                    name().text(),
-                                                                    name().text(),
-                                                                    context.getSourceFile(location()),
-                                                                    static_cast<unsigned>(location().line()),
-                                                                    type()->getDebugType(context),
-                                                                    true);
+    auto* debug_info = context.di().createGlobalVariableExpression(&context.unit(),
+                                                                   name().text(),
+                                                                   name().text(),
+                                                                   context.getSourceFile(location()),
+                                                                   static_cast<unsigned>(location().line()),
+                                                                   type()->getDebugType(context),
+                                                                   true);
 
     native_variable_->addDebugInfo(debug_info);
 }

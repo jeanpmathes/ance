@@ -64,10 +64,10 @@ Shared<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHa
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
 
-    llvm::Value* converted_value        = context.ir()->CreateIntCast(content_value,
-                                                               other->getContentType(*context.llvmContext()),
-                                                               isSigned(),
-                                                               content_value->getName() + ".icast");
+    llvm::Value* converted_value        = context.ir().CreateIntCast(content_value,
+                                                              other->getContentType(context.llvmContext()),
+                                                              isSigned(),
+                                                              content_value->getName() + ".icast");
     llvm::Value* native_converted_value = lang::values::contentToNative(other, converted_value, context);
 
     return makeShared<WrappedNativeValue>(other, native_converted_value);
@@ -102,41 +102,41 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
 
     if (parameter_element->isIntegerType() || parameter_element->isBooleanType())
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
+        context.ir().SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
 
-            llvm::Value* converted = context.ir()->CreateIntCast(original,
-                                                                 return_type->getContentType(*context.llvmContext()),
-                                                                 parameter_element->isSigned(),
-                                                                 original->getName() + ".icast");
-            context.ir()->CreateRet(converted);
+            llvm::Value* converted = context.ir().CreateIntCast(original,
+                                                                return_type->getContentType(context.llvmContext()),
+                                                                parameter_element->isSigned(),
+                                                                original->getName() + ".icast");
+            context.ir().CreateRet(converted);
         }
     }
 
     if (parameter_element->isFloatingPointType())
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
+        context.ir().SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
             llvm::Value* converted;
 
             if (isSigned())
             {
-                converted = context.ir()->CreateFPToSI(original,
-                                                       return_type->getContentType(*context.llvmContext()),
-                                                       original->getName() + ".fptosi");
+                converted = context.ir().CreateFPToSI(original,
+                                                      return_type->getContentType(context.llvmContext()),
+                                                      original->getName() + ".fptosi");
             }
             else
             {
-                converted = context.ir()->CreateFPToUI(original,
-                                                       return_type->getContentType(*context.llvmContext()),
-                                                       original->getName() + ".fptoui");
+                converted = context.ir().CreateFPToUI(original,
+                                                      return_type->getContentType(context.llvmContext()),
+                                                      original->getName() + ".fptoui");
             }
 
-            context.ir()->CreateRet(converted);
+            context.ir().CreateRet(converted);
         }
     }
 }
@@ -176,11 +176,11 @@ Shared<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator        
     switch (op)
     {
         case lang::UnaryOperator::BITWISE_NOT:
-            result = context.ir()->CreateNot(content_value, content_value->getName() + ".not");
+            result = context.ir().CreateNot(content_value, content_value->getName() + ".not");
             break;
 
         case lang::UnaryOperator::NEGATION:
-            result = context.ir()->CreateNeg(content_value, content_value->getName() + ".neg");
+            result = context.ir().CreateNeg(content_value, content_value->getName() + ".neg");
             break;
 
         default:
@@ -261,65 +261,65 @@ Shared<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator       
     switch (op)
     {
         case lang::BinaryOperator::ADDITION:
-            result = context.ir()->CreateAdd(left_value, right_value, left_value->getName() + ".add");
+            result = context.ir().CreateAdd(left_value, right_value, left_value->getName() + ".add");
             break;
         case lang::BinaryOperator::SUBTRACTION:
-            result = context.ir()->CreateSub(left_value, right_value, left_value->getName() + ".sub");
+            result = context.ir().CreateSub(left_value, right_value, left_value->getName() + ".sub");
             break;
         case lang::BinaryOperator::MULTIPLICATION:
-            result = context.ir()->CreateMul(left_value, right_value, left_value->getName() + ".mul");
+            result = context.ir().CreateMul(left_value, right_value, left_value->getName() + ".mul");
             break;
         case lang::BinaryOperator::DIVISION:
-            if (isSigned()) result = context.ir()->CreateSDiv(left_value, right_value, left_value->getName() + ".sdiv");
-            else result = context.ir()->CreateUDiv(left_value, right_value, left_value->getName() + ".udiv");
+            if (isSigned()) result = context.ir().CreateSDiv(left_value, right_value, left_value->getName() + ".sdiv");
+            else result = context.ir().CreateUDiv(left_value, right_value, left_value->getName() + ".udiv");
             break;
         case lang::BinaryOperator::REMAINDER:
-            if (isSigned()) result = context.ir()->CreateSRem(left_value, right_value, left_value->getName() + ".srem");
-            else result = context.ir()->CreateURem(left_value, right_value, left_value->getName() + ".urem");
+            if (isSigned()) result = context.ir().CreateSRem(left_value, right_value, left_value->getName() + ".srem");
+            else result = context.ir().CreateURem(left_value, right_value, left_value->getName() + ".urem");
             break;
         case lang::BinaryOperator::LESS_THAN:
             if (isSigned())
-                result = context.ir()->CreateICmpSLT(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context.ir()->CreateICmpULT(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir().CreateICmpSLT(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir().CreateICmpULT(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::LESS_THAN_OR_EQUAL:
             if (isSigned())
-                result = context.ir()->CreateICmpSLE(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context.ir()->CreateICmpULE(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir().CreateICmpSLE(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir().CreateICmpULE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::GREATER_THAN:
             if (isSigned())
-                result = context.ir()->CreateICmpSGT(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context.ir()->CreateICmpUGT(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir().CreateICmpSGT(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir().CreateICmpUGT(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::GREATER_THAN_OR_EQUAL:
             if (isSigned())
-                result = context.ir()->CreateICmpSGE(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context.ir()->CreateICmpUGE(left_value, right_value, left_value->getName() + ".icmp");
+                result = context.ir().CreateICmpSGE(left_value, right_value, left_value->getName() + ".icmp");
+            else result = context.ir().CreateICmpUGE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::EQUAL:
-            result = context.ir()->CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir().CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::NOT_EQUAL:
-            result = context.ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir().CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::BITWISE_AND:
-            result = context.ir()->CreateAnd(left_value, right_value, left_value->getName() + ".and");
+            result = context.ir().CreateAnd(left_value, right_value, left_value->getName() + ".and");
             break;
         case lang::BinaryOperator::BITWISE_OR:
-            result = context.ir()->CreateOr(left_value, right_value, left_value->getName() + ".or");
+            result = context.ir().CreateOr(left_value, right_value, left_value->getName() + ".or");
             break;
         case lang::BinaryOperator::BITWISE_XOR:
-            result = context.ir()->CreateXor(left_value, right_value, left_value->getName() + ".xor");
+            result = context.ir().CreateXor(left_value, right_value, left_value->getName() + ".xor");
             break;
         case lang::BinaryOperator::SHIFT_LEFT:
-            right_value = context.ir()->CreateIntCast(right_value, left_value->getType(), false);
-            result      = context.ir()->CreateShl(left_value, right_value, left_value->getName() + ".shl");
+            right_value = context.ir().CreateIntCast(right_value, left_value->getType(), false);
+            result      = context.ir().CreateShl(left_value, right_value, left_value->getName() + ".shl");
             break;
         case lang::BinaryOperator::SHIFT_RIGHT:
-            right_value = context.ir()->CreateIntCast(right_value, left_value->getType(), false);
-            if (isSigned()) result = context.ir()->CreateAShr(left_value, right_value, left_value->getName() + ".ashr");
-            else result = context.ir()->CreateLShr(left_value, right_value, left_value->getName() + ".lshr");
+            right_value = context.ir().CreateIntCast(right_value, left_value->getType(), false);
+            if (isSigned()) result = context.ir().CreateAShr(left_value, right_value, left_value->getName() + ".ashr");
+            else result = context.ir().CreateLShr(left_value, right_value, left_value->getName() + ".lshr");
             break;
     }
 
@@ -344,11 +344,11 @@ bool lang::IntegerType::isTriviallyDestructible() const
 
 llvm::DIType* lang::IntegerType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
 
     std::string const name         = std::string(this->name().text());
-    uint64_t const    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    uint64_t const    size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
     auto              encoding     = isSigned() ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned;
 
-    return context.di()->createBasicType(name, size_in_bits, encoding);
+    return context.di().createBasicType(name, size_in_bits, encoding);
 }

@@ -371,11 +371,11 @@ std::string lang::TypeAlias::createMangledName() const
 
 llvm::DIType* lang::TypeAlias::createDebugType(CompileContext& context) const
 {
-    return context.di()->createTypedef(actual_->getDebugType(context),
-                                       name().text(),
-                                       context.getSourceFile(getDefinitionLocation()),
-                                       static_cast<unsigned>(getDefinitionLocation().line()),
-                                       scope()->getDebugScope(context));
+    return context.di().createTypedef(actual_->getDebugType(context),
+                                      name().text(),
+                                      context.getSourceFile(getDefinitionLocation()),
+                                      static_cast<unsigned>(getDefinitionLocation().line()),
+                                      scope()->getDebugScope(context));
 }
 std::vector<lang::TypeDefinition const*> lang::TypeAlias::getDependencies() const
 {

@@ -201,7 +201,7 @@ namespace lang
          */
         std::pair<llvm::FunctionType*, llvm::Function*> createNativeFunction(llvm::GlobalValue::LinkageTypes linkage,
                                                                              llvm::LLVMContext&              c,
-                                                                             llvm::Module*                   m);
+                                                                             llvm::Module&                   m);
 
         /**
          * A helper to build a call to a native function.

@@ -167,7 +167,7 @@ std::vector<Shared<lang::Parameter>> lang::FunctionDefinition::parameters()
 std::pair<llvm::FunctionType*, llvm::Function*> lang::FunctionDefinition::createNativeFunction(
     llvm::GlobalValue::LinkageTypes linkage,
     llvm::LLVMContext&              c,
-    llvm::Module*                   m)
+    llvm::Module&                   m)
 {
     std::string const& native_name = isMangled() ? signature_.getMangledName() : std::string(function_.name().text());
 
@@ -200,7 +200,7 @@ llvm::CallInst* lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Val
         args.push_back(matched_arg->getContentValue());
     }
 
-    auto* content_value = context.ir()->CreateCall(native_type, native_function, args);
+    auto* content_value = context.ir().CreateCall(native_type, native_function, args);
     if (!native_type->getReturnType()->isVoidTy()) content_value->setName(name() + ".call");
     return content_value;
 }

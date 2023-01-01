@@ -1,7 +1,5 @@
 #include "NullConstant.h"
 
-#include <memory>
-
 #include "lang/type/NullPointerType.h"
 
 lang::NullConstant::NullConstant() : type_(lang::NullPointerType::get()) {}
@@ -21,9 +19,9 @@ lang::Type const& lang::NullConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::NullConstant::createContent(llvm::Module* m)
+llvm::Constant* lang::NullConstant::createContent(llvm::Module& m)
 {
-    return lang::NullPointerType::get()->getDefaultContent(*m);
+    return lang::NullPointerType::get()->getDefaultContent(m);
 }
 
 bool lang::NullConstant::equals(lang::Constant const* other) const

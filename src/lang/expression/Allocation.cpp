@@ -104,7 +104,7 @@ void Allocation::doBuild(CompileContext& context)
         count = lang::Type::makeMatching(lang::SizeType::getSize(), count_.value()->getValue(), context);
     }
 
-    Shared<lang::Value> ptr = context.runtime()->allocate(allocation_, allocated_type_, count, context);
+    Shared<lang::Value> ptr = context.runtime().allocate(allocation_, allocated_type_, count, context);
     setValue(ptr);
 }
 

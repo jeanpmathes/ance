@@ -121,8 +121,8 @@ namespace lang
         virtual llvm::Type* getContentType(llvm::LLVMContext& c) const = 0;
         llvm::DIType*       getDebugType(CompileContext& context) const;
 
-        llvm::TypeSize getNativeSize(llvm::Module* m);
-        llvm::TypeSize getContentSize(llvm::Module* m);
+        llvm::TypeSize getNativeSize(llvm::Module& m);
+        llvm::TypeSize getContentSize(llvm::Module& m);
 
         virtual bool                              isSubscriptDefined() const;
         virtual lang::ResolvingHandle<lang::Type> getSubscriptReturnType();

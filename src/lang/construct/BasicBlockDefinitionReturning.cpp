@@ -98,12 +98,12 @@ void lang::BasicBlock::Definition::Returning::reach() const {}
 void lang::BasicBlock::Definition::Returning::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
     std::string const name = "b" + std::to_string(index_);
-    native_block_    = llvm::BasicBlock::Create(*context.llvmContext(), name, native_function);
+    native_block_          = llvm::BasicBlock::Create(context.llvmContext(), name, native_function);
 }
 
 void lang::BasicBlock::Definition::Returning::doBuild(CompileContext& context)
 {
-    context.ir()->SetInsertPoint(native_block_);
+    context.ir().SetInsertPoint(native_block_);
 
     for (auto& statement : statements_) { statement->build(context); }
 
@@ -118,9 +118,9 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext& context)
         return_value = lang::Type::makeMatching(self()->containing_function_->returnType(), return_value, context);
         return_value->buildContentValue(context);
 
-        context.ir()->CreateRet(return_value->getContentValue());
+        context.ir().CreateRet(return_value->getContentValue());
     }
-    else { context.ir()->CreateRetVoid(); }
+    else { context.ir().CreateRetVoid(); }
 }
 
 std::string lang::BasicBlock::Definition::Returning::getExitRepresentation()

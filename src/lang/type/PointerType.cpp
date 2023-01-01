@@ -67,7 +67,7 @@ bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Loca
 
 llvm::Type* lang::PointerType::getIndexedType(CompileContext& context) const
 {
-    return element_type_->getContentType(*context.llvmContext());
+    return element_type_->getContentType(context.llvmContext());
 }
 
 llvm::Value* lang::PointerType::getIndexingPointer(Shared<Value> indexed, CompileContext& context)
@@ -103,12 +103,12 @@ std::string lang::PointerType::createMangledName() const
 
 llvm::DIType* lang::PointerType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
 
-    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
 
     llvm::DIType* element_di_type = element_type_->getDebugType(context);
-    llvm::DIType* di_type         = context.di()->createPointerType(element_di_type, size_in_bits);
+    llvm::DIType* di_type         = context.di().createPointerType(element_di_type, size_in_bits);
 
     return di_type;
 }

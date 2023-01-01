@@ -232,14 +232,14 @@ std::string lang::ReferenceType::createMangledName() const
 
 llvm::DIType* lang::ReferenceType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
 
-    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
 
     llvm::DIType* di_type;
 
     llvm::DIType* element_di_type = element_type_->getDebugType(context);
-    di_type = context.di()->createReferenceType(llvm::dwarf::DW_TAG_reference_type, element_di_type, size_in_bits);
+    di_type = context.di().createReferenceType(llvm::dwarf::DW_TAG_reference_type, element_di_type, size_in_bits);
 
     return di_type;
 }
@@ -257,7 +257,7 @@ lang::TypeDefinitionRegistry* lang::ReferenceType::getRegistry()
 
 llvm::Value* lang::ReferenceType::getReferenced(llvm::Value* value, CompileContext& context) const
 {
-    return context.ir()->CreateLoad(getContentType(*context.llvmContext()), value, value->getName() + ".load");
+    return context.ir().CreateLoad(getContentType(context.llvmContext()), value, value->getName() + ".load");
 }
 
 Shared<lang::Value> lang::ReferenceType::getReferenced(Shared<lang::Value> value, CompileContext& context)

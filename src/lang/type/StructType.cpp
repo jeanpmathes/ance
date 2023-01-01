@@ -143,8 +143,8 @@ std::string lang::StructType::createMangledName() const
 
 llvm::DIType* lang::StructType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl         = context.module()->getDataLayout();
-    llvm::Type*             array_type = getContentType(*context.llvmContext());
+    llvm::DataLayout const& dl         = context.llvmModule().getDataLayout();
+    llvm::Type*             array_type = getContentType(context.llvmContext());
 
     uint64_t const size      = dl.getTypeSizeInBits(array_type);
     auto           alignment = static_cast<uint32_t>(dl.getABITypeAlignment(array_type));
@@ -152,17 +152,17 @@ llvm::DIType* lang::StructType::createDebugType(CompileContext& context) const
     std::vector<llvm::Metadata*> member_types;
     for (auto& member : members_) { member_types.push_back(member->type().getDebugType(context)); }
 
-    llvm::MDTuple* debug_type = llvm::MDNode::get(*context.llvmContext(), member_types);
+    llvm::MDTuple* debug_type = llvm::MDNode::get(context.llvmContext(), member_types);
 
-    return context.di()->createStructType(scope()->getDebugScope(context),
-                                          name().text(),
-                                          context.getSourceFile(getDefinitionLocation()),
-                                          static_cast<unsigned>(getDefinitionLocation().line()),
-                                          size,
-                                          alignment,
-                                          llvm::DINode::FlagZero,
-                                          nullptr,
-                                          debug_type);
+    return context.di().createStructType(scope()->getDebugScope(context),
+                                         name().text(),
+                                         context.getSourceFile(getDefinitionLocation()),
+                                         static_cast<unsigned>(getDefinitionLocation().line()),
+                                         size,
+                                         alignment,
+                                         llvm::DINode::FlagZero,
+                                         nullptr,
+                                         debug_type);
 }
 
 std::vector<std::reference_wrapper<lang::Type const>> lang::StructType::getContained() const
@@ -267,10 +267,10 @@ llvm::Value* lang::StructType::buildGetElementPointer(llvm::Value*    struct_ptr
                                                       int32_t         member_index,
                                                       CompileContext& context)
 {
-    return context.ir()->CreateStructGEP(getContentType(*context.llvmContext()),
-                                         struct_ptr,
-                                         static_cast<unsigned>(member_index),
-                                         struct_ptr->getName() + ".gep");
+    return context.ir().CreateStructGEP(getContentType(context.llvmContext()),
+                                        struct_ptr,
+                                        static_cast<unsigned>(member_index),
+                                        struct_ptr->getName() + ".gep");
 }
 
 void lang::StructType::expand()

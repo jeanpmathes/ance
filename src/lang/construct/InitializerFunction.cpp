@@ -51,17 +51,17 @@ void lang::InitializerFunction::createNativeBacking(CompileContext& context)
     auto [native_type, native_function] = getNativeRepresentation();
 
     llvm::DISubroutineType* debug_type =
-        context.di()->createSubroutineType(context.di()->getOrCreateTypeArray({returnType()->getDebugType(context)}));
+        context.di().createSubroutineType(context.di().getOrCreateTypeArray({returnType()->getDebugType(context)}));
     llvm::DISubprogram* subprogram =
-        context.di()->createFunction(scope().getDebugScope(context),
-                                     name().text(),
-                                     name().text(),
-                                     nullptr,
-                                     0,
-                                     debug_type,
-                                     0,
-                                     llvm::DINode::DIFlags::FlagPrototyped,
-                                     llvm::DISubprogram::toSPFlags(false, true, false, 0U, false));
+        context.di().createFunction(scope().getDebugScope(context),
+                                    name().text(),
+                                    name().text(),
+                                    nullptr,
+                                    0,
+                                    debug_type,
+                                    0,
+                                    llvm::DINode::DIFlags::FlagPrototyped,
+                                    llvm::DISubprogram::toSPFlags(false, true, false, 0U, false));
 
     native_function->setSubprogram(subprogram);
 }

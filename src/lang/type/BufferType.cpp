@@ -61,7 +61,7 @@ bool lang::BufferType::validate(ValidationLogger& validation_logger, lang::Locat
 
 llvm::Type* lang::BufferType::getIndexedType(CompileContext& context) const
 {
-    return element_type_->getContentType(*context.llvmContext());
+    return element_type_->getContentType(context.llvmContext());
 }
 
 llvm::Value* lang::BufferType::getIndexingPointer(Shared<Value> indexed, CompileContext& context)
@@ -97,9 +97,9 @@ std::string lang::BufferType::createMangledName() const
 
 llvm::DIType* lang::BufferType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
 
-    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
 
     llvm::DIType* di_type;
 
@@ -108,13 +108,13 @@ llvm::DIType* lang::BufferType::createDebugType(CompileContext& context) const
         std::string const name     = std::string(this->name().text());
         auto              encoding = llvm::dwarf::DW_ATE_address;
 
-        di_type = context.di()->createBasicType(name, size_in_bits, encoding);
+        di_type = context.di().createBasicType(name, size_in_bits, encoding);
     }
     else
     {
         llvm::DIType* element_di_type = element_type_->getDebugType(context);
 
-        di_type = context.di()->createPointerType(element_di_type, size_in_bits);
+        di_type = context.di().createPointerType(element_di_type, size_in_bits);
     }
 
     return di_type;

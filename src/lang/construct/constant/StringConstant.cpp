@@ -34,36 +34,36 @@ lang::Type const& lang::StringConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::StringConstant::createContent(llvm::Module* m)
+llvm::Constant* lang::StringConstant::createContent(llvm::Module& m)
 {
     switch (kind_)
     {
         case BYTE:
         {
             auto const& data = std::get<std::string>(data_);
-            return llvm::ConstantDataArray::getString(m->getContext(), data, false);
+            return llvm::ConstantDataArray::getString(m.getContext(), data, false);
         }
         case CHAR:
         {
             auto const& data = std::get<std::u32string>(data_);
             auto const* ptr  = reinterpret_cast<char const*>(data.data());
-            llvm::Type* type = lang::CharType::get()->getContentType(m->getContext());
+            llvm::Type* type = lang::CharType::get()->getContentType(m.getContext());
 
             return llvm::ConstantDataArray::getRaw(ptr, data.size(), type);
         }
         case C_STRING:
         {
             auto const&     data        = std::get<std::string>(data_);
-            llvm::Constant* content     = llvm::ConstantDataArray::getString(m->getContext(), data, true);
-            auto*           str_arr_ptr = new llvm::GlobalVariable(*m,
+            llvm::Constant* content     = llvm::ConstantDataArray::getString(m.getContext(), data, true);
+            auto*           str_arr_ptr = new llvm::GlobalVariable(m,
                                                          content->getType(),
                                                          true,
                                                          llvm::GlobalValue::PrivateLinkage,
                                                          content,
                                                          "data.str");
 
-            llvm::Constant* zero      = llvm::ConstantInt::get(llvm::Type::getInt64Ty(m->getContext()), 0);
-            llvm::Constant* indices[] = {zero, zero};
+            llvm::Constant* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(m.getContext()), 0);
+            std::array<llvm::Constant*, 2> const indices = {zero, zero};
 
             return llvm::ConstantExpr::getInBoundsGetElementPtr(str_arr_ptr->getValueType(), str_arr_ptr, indices);
         }
@@ -129,8 +129,8 @@ std::u32string lang::StringConstant::parse(std::u32string const& unparsed, bool*
 
 lang::StringConstant::Data lang::StringConstant::createData(std::string const& literal, Kind kind, bool* valid)
 {
-    std::u32string unparsed = boost::locale::conv::utf_to_utf<char32_t>(literal);
-    std::u32string parsed   = parse(unparsed, valid);
+    std::u32string const unparsed = boost::locale::conv::utf_to_utf<char32_t>(literal);
+    std::u32string       parsed   = parse(unparsed, valid);
 
     switch (kind)
     {
@@ -149,7 +149,7 @@ lang::ResolvingHandle<lang::Type> lang::StringConstant::resolveType(lang::String
     {
         case BYTE:
         {
-            size_t size = std::get<std::string>(data).size();
+            size_t const size = std::get<std::string>(data).size();
             return lang::ArrayType::get(lang::FixedWidthIntegerType::get(8, false), size);
         }
         case CHAR:

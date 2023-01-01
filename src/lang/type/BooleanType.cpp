@@ -54,12 +54,12 @@ std::string lang::BooleanType::createMangledName() const
 
 llvm::DIType* lang::BooleanType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
 
     std::string const name         = std::string(this->name().text());
-    uint64_t const    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    uint64_t const    size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
 
-    return context.di()->createBasicType(name, size_in_bits, llvm::dwarf::DW_ATE_boolean);
+    return context.di().createBasicType(name, size_in_bits, llvm::dwarf::DW_ATE_boolean);
 }
 
 lang::ResolvingHandle<lang::Type> lang::BooleanType::get()
@@ -97,7 +97,7 @@ Shared<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator op,
     {
         case lang::UnaryOperator::NOT:
         case lang::UnaryOperator::BITWISE_NOT:
-            result = context.ir()->CreateNot(content_value, content_value->getName() + ".not");
+            result = context.ir().CreateNot(content_value, content_value->getName() + ".not");
             break;
 
         default:
@@ -152,19 +152,19 @@ Shared<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperator op,
     switch (op)
     {
         case lang::BinaryOperator::EQUAL:
-            result = context.ir()->CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir().CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::NOT_EQUAL:
-            result = context.ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir().CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::BITWISE_AND:
-            result = context.ir()->CreateAnd(left_value, right_value, left_value->getName() + ".and");
+            result = context.ir().CreateAnd(left_value, right_value, left_value->getName() + ".and");
             break;
         case lang::BinaryOperator::BITWISE_OR:
-            result = context.ir()->CreateOr(left_value, right_value, left_value->getName() + ".or");
+            result = context.ir().CreateOr(left_value, right_value, left_value->getName() + ".or");
             break;
         case lang::BinaryOperator::BITWISE_XOR:
-            result = context.ir()->CreateXor(left_value, right_value, left_value->getName() + ".xor");
+            result = context.ir().CreateXor(left_value, right_value, left_value->getName() + ".xor");
             break;
 
         default:
@@ -198,23 +198,21 @@ void lang::BooleanType::buildRequestedOverload(std::vector<lang::ResolvingHandle
     {
         if (parameters[0]->isFixedWidthIntegerType() || parameters[0]->isSizeType() || parameters[0]->isDiffType())
         {
-            llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-            context.ir()->SetInsertPoint(block);
+            llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
+            context.ir().SetInsertPoint(block);
             {
                 llvm::Value* original = native_function->getArg(0);
 
                 llvm::Value* is_nonzero =
-                    context.ir()->CreateICmpNE(original,
-                                               llvm::ConstantInt::get(original->getType(), 0, false),
-                                               ".icmp");
+                    context.ir().CreateICmpNE(original, llvm::ConstantInt::get(original->getType(), 0, false), ".icmp");
 
                 llvm::Value* converted =
-                    context.ir()->CreateSelect(is_nonzero,
-                                               llvm::ConstantInt::getTrue(getContentType(*context.llvmContext())),
-                                               llvm::ConstantInt::getFalse(getContentType(*context.llvmContext())),
-                                               ".select");
+                    context.ir().CreateSelect(is_nonzero,
+                                              llvm::ConstantInt::getTrue(getContentType(context.llvmContext())),
+                                              llvm::ConstantInt::getFalse(getContentType(context.llvmContext())),
+                                              ".select");
 
-                context.ir()->CreateRet(converted);
+                context.ir().CreateRet(converted);
             }
         }
     }

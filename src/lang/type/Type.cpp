@@ -315,13 +315,13 @@ llvm::DIType* lang::Type::getDebugType(CompileContext& context) const
     return definition_.value()->getDebugType(context);
 }
 
-llvm::TypeSize lang::Type::getNativeSize(llvm::Module* m)
+llvm::TypeSize lang::Type::getNativeSize(llvm::Module& m)
 {
     assert(isDefined());
     return definition_.value()->getNativeSize(m);
 }
 
-llvm::TypeSize lang::Type::getContentSize(llvm::Module* m)
+llvm::TypeSize lang::Type::getContentSize(llvm::Module& m)
 {
     assert(isDefined());
     return definition_.value()->getContentSize(m);

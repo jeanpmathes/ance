@@ -108,10 +108,10 @@ lang::Type const& lang::IntegerConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::IntegerConstant::createContent(llvm::Module* m)
+llvm::Constant* lang::IntegerConstant::createContent(llvm::Module& m)
 {
     llvm::APInt const integer(static_cast<unsigned int>(integer_type_->getNativeBitSize()), text_, radix_);
-    return llvm::ConstantInt::get(type_->getContentType(m->getContext()), integer);
+    return llvm::ConstantInt::get(type_->getContentType(m.getContext()), integer);
 }
 
 bool lang::IntegerConstant::equals(lang::Constant const* other) const

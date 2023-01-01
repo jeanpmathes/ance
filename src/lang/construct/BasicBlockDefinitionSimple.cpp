@@ -43,7 +43,7 @@ void lang::BasicBlock::Definition::Simple::simplify()
     if (!next_) { return; }
 
     // This block is the only block entering the next (real) block, or this block is unnecessary.
-    bool can_simplify = (next_->getIncomingLinkCount() == 1 && !next_->isMeta()) || statements_.empty();
+    bool const can_simplify = (next_->getIncomingLinkCount() == 1 && !next_->isMeta()) || statements_.empty();
 
     if (can_simplify)
     {
@@ -101,24 +101,24 @@ void lang::BasicBlock::Definition::Simple::reach() const
 
 void lang::BasicBlock::Definition::Simple::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
-    std::string name = "b" + std::to_string(index_);
-    native_block_    = llvm::BasicBlock::Create(*context.llvmContext(), name, native_function);
+    std::string const name = "b" + std::to_string(index_);
+    native_block_          = llvm::BasicBlock::Create(context.llvmContext(), name, native_function);
 
     if (next_) next_->prepareBuild(context, native_function);
 }
 
 void lang::BasicBlock::Definition::Simple::doBuild(CompileContext& context)
 {
-    context.ir()->SetInsertPoint(native_block_);
+    context.ir().SetInsertPoint(native_block_);
 
     for (auto& statement : statements_) { statement->build(context); }
 
     if (next_ != nullptr)
     {
-        context.ir()->CreateBr(next_->definition_->getNativeBlock());
+        context.ir().CreateBr(next_->definition_->getNativeBlock());
         next_->doBuild(context);
     }
-    else { context.ir()->CreateRetVoid(); }
+    else { context.ir().CreateRetVoid(); }
 }
 
 std::string lang::BasicBlock::Definition::Simple::getExitRepresentation()

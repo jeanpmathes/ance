@@ -70,7 +70,7 @@ llvm::Value* lang::SequenceType::buildGetElementPointer(Shared<Value>   indexed,
 {
     index->buildContentValue(context);
 
-    llvm::Value* zero         = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context.llvmContext()), 0);
+    llvm::Value* zero         = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.llvmContext()), 0);
     llvm::Value* native_index = index->getContentValue();
 
     llvm::Value* sequence_ptr = getIndexingPointer(indexed, context);
@@ -78,36 +78,36 @@ llvm::Value* lang::SequenceType::buildGetElementPointer(Shared<Value>   indexed,
     if (size_.hasValue())// Check if index is in bounds.
     {
         llvm::Value* native_size =
-            llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(*context.llvmContext()), size_.value());
+            llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(context.llvmContext()), size_.value());
         llvm::Value* in_bounds =
-            context.ir()->CreateICmpULT(native_index, native_size, native_index->getName() + ".icmp");
+            context.ir().CreateICmpULT(native_index, native_size, native_index->getName() + ".icmp");
 
         in_bounds->setName("..inbounds");
 
         // todo: use in_bounds bool to throw exception
     }
 
-    llvm::Value* element_ptr = context.ir()->CreateGEP(getIndexedType(context),
-                                                       sequence_ptr,
-                                                       getNativeIndices(zero, native_index),
-                                                       sequence_ptr->getName() + ".gep");
+    llvm::Value* element_ptr = context.ir().CreateGEP(getIndexedType(context),
+                                                      sequence_ptr,
+                                                      getNativeIndices(zero, native_index),
+                                                      sequence_ptr->getName() + ".gep");
     return element_ptr;
 }
 
 llvm::Value* lang::SequenceType::buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context)
 {
-    llvm::Value* zero         = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context.llvmContext()), 0);
-    llvm::Value* native_index = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context.llvmContext()), index);
+    llvm::Value* zero         = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.llvmContext()), 0);
+    llvm::Value* native_index = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.llvmContext()), index);
 
-    return context.ir()->CreateGEP(getContentType(*context.llvmContext()),
-                                   indexed,
-                                   getNativeIndices(zero, native_index),
-                                   indexed->getName() + ".gep");
+    return context.ir().CreateGEP(getContentType(context.llvmContext()),
+                                  indexed,
+                                  getNativeIndices(zero, native_index),
+                                  indexed->getName() + ".gep");
 }
 
 llvm::Type* lang::SequenceType::getIndexedType(CompileContext& context) const
 {
-    return getContentType(*context.llvmContext());
+    return getContentType(context.llvmContext());
 }
 
 llvm::Value* lang::SequenceType::getIndexingPointer(Shared<Value> indexed, CompileContext& context)
@@ -186,14 +186,14 @@ Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Val
     assert(size_.hasValue());
     assert(values.size() == size_.value());
 
-    llvm::Value* sequence_ptr = context.ir()->CreateAlloca(getContentType(*context.llvmContext()), nullptr, "alloca");
+    llvm::Value* sequence_ptr = context.ir().CreateAlloca(getContentType(context.llvmContext()), nullptr, "alloca");
 
     for (uint64_t index = 0; index < size_.value(); index++)
     {
         values[index]->buildContentValue(context);
 
         llvm::Value* element_ptr = buildGetElementPointer(sequence_ptr, index, context);
-        context.ir()->CreateStore(values[index]->getContentValue(), element_ptr);
+        context.ir().CreateStore(values[index]->getContentValue(), element_ptr);
     }
 
     return makeShared<lang::WrappedNativeValue>(self(), sequence_ptr);

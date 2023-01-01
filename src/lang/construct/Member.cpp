@@ -101,7 +101,7 @@ void lang::Member::buildInitialization(llvm::Value* ptr, CompileContext& context
 {
     if (constant_init_.hasValue())
     {
-        llvm::Value* content   = getInitialValue(*context.module());
+        llvm::Value* content   = getInitialValue(context.llvmModule());
         llvm::Value* value_ptr = lang::values::contentToNative(type(), content, context);
 
         type()->buildCopyInitializer(ptr, value_ptr, context);
@@ -115,7 +115,7 @@ llvm::Constant* lang::Member::getInitialValue(llvm::Module& m) const
     {
         // The llvm constant does not allow to change the ance constant.
         Shared<lang::Constant> constant = const_cast<Member*>(this)->constant_init_.value()->getConstantValue();
-        constant->buildContentConstant(&m);
+        constant->buildContentConstant(m);
         initial_value_ = constant->getContentConstant();
     }
 

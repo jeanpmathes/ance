@@ -69,7 +69,7 @@ namespace lang
          * @param scope The containing debug scope.
          * @return The debug location.
          */
-        llvm::DebugLoc getDebugLoc(llvm::LLVMContext* llvm_context, llvm::DIScope* scope) const;
+        llvm::DebugLoc getDebugLoc(llvm::LLVMContext& llvm_context, llvm::DIScope* scope) const;
 
         /**
          * Extend this location to include another location.

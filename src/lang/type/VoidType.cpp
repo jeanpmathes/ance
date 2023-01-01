@@ -30,7 +30,7 @@ std::string lang::VoidType::createMangledName() const
 
 llvm::DIType* lang::VoidType::createDebugType(CompileContext& context) const
 {
-    return context.di()->createUnspecifiedType(name().text());
+    return context.di().createUnspecifiedType(name().text());
 }
 
 bool lang::VoidType::isVoidType() const

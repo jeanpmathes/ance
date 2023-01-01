@@ -49,8 +49,9 @@ Expression::Expansion SizeofType::expandWith(Expressions) const
 
 void SizeofType::doBuild(CompileContext& context)
 {
-    llvm::Value* content_value = lang::SizeType::buildContentValue(type_->getContentSize(context.module()), context);
-    llvm::Value* native_value  = lang::values::contentToNative(type(), content_value, context);
+    llvm::Value* content_value =
+        lang::SizeType::buildContentValue(type_->getContentSize(context.llvmModule()), context);
+    llvm::Value* native_value = lang::values::contentToNative(type(), content_value, context);
 
     Shared<lang::WrappedNativeValue> value = makeShared<lang::WrappedNativeValue>(type(), native_value);
     setValue(value);

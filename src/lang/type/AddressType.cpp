@@ -75,26 +75,26 @@ Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
     switch (op)
     {
         case lang::BinaryOperator::EQUAL:
-            result = context.ir()->CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir().CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::NOT_EQUAL:
-            result = context.ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir().CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::ADDITION:
-            result = context.ir()->CreateGEP(getPointeeType().value()->getContentType(*context.llvmContext()),
-                                             left_value,
-                                             right_value,
-                                             left_value->getName() + ".gep");
+            result = context.ir().CreateGEP(getPointeeType().value()->getContentType(context.llvmContext()),
+                                            left_value,
+                                            right_value,
+                                            left_value->getName() + ".gep");
             break;
         case lang::BinaryOperator::SUBTRACTION:
-            result = context.ir()->CreatePtrDiff(getPointeeType().value()->getContentType(*context.llvmContext()),
-                                                 left_value,
-                                                 right_value,
-                                                 left_value->getName() + ".ptrdiff");
-            result = context.ir()->CreateIntCast(result,
-                                                 lang::SizeType::getDiff()->getContentType(*context.llvmContext()),
-                                                 true,
-                                                 left_value->getName() + ".icast");
+            result = context.ir().CreatePtrDiff(getPointeeType().value()->getContentType(context.llvmContext()),
+                                                left_value,
+                                                right_value,
+                                                left_value->getName() + ".ptrdiff");
+            result = context.ir().CreateIntCast(result,
+                                                lang::SizeType::getDiff()->getContentType(context.llvmContext()),
+                                                true,
+                                                left_value->getName() + ".icast");
             break;
 
         default:
@@ -129,31 +129,31 @@ void lang::AddressType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
 
     if (parameter_element->isAddressType())
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
+        context.ir().SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
 
-            llvm::Value* converted = context.ir()->CreateBitCast(original,
-                                                                 return_type->getContentType(*context.llvmContext()),
-                                                                 original->getName() + ".bitcast");
+            llvm::Value* converted = context.ir().CreateBitCast(original,
+                                                                return_type->getContentType(context.llvmContext()),
+                                                                original->getName() + ".bitcast");
 
-            context.ir()->CreateRet(converted);
+            context.ir().CreateRet(converted);
         }
     }
 
     if (parameter_element->isUnsignedIntegerPointerType())
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
+        context.ir().SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
 
-            llvm::Value* converted = context.ir()->CreateIntToPtr(original,
-                                                                  return_type->getContentType(*context.llvmContext()),
-                                                                  original->getName() + ".inttoptr");
+            llvm::Value* converted = context.ir().CreateIntToPtr(original,
+                                                                 return_type->getContentType(context.llvmContext()),
+                                                                 original->getName() + ".inttoptr");
 
-            context.ir()->CreateRet(converted);
+            context.ir().CreateRet(converted);
         }
     }
 }

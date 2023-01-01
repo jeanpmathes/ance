@@ -36,7 +36,7 @@ namespace lang
          * Build the content constant of this constant.
          * @param m The module.
          */
-        void buildContentConstant(llvm::Module* m);
+        void buildContentConstant(llvm::Module& m);
 
       protected:
         /**
@@ -44,7 +44,7 @@ namespace lang
          * @param m The module.
          * @return The content constant.
          */
-        virtual llvm::Constant* createContent(llvm::Module* m) = 0;
+        virtual llvm::Constant* createContent(llvm::Module& m) = 0;
 
       public:
         /**

@@ -19,13 +19,13 @@ std::string lang::FloatingPointType::createMangledName() const
 
 llvm::DIType* lang::FloatingPointType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
 
     std::string const name         = std::string(this->name().text());
-    uint64_t const    size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    uint64_t const    size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
     auto              encoding     = llvm::dwarf::DW_ATE_float;
 
-    return context.di()->createBasicType(name, size_in_bits, encoding);
+    return context.di().createBasicType(name, size_in_bits, encoding);
 }
 
 lang::FloatingPointType const* lang::FloatingPointType::isFloatingPointType() const
@@ -57,9 +57,9 @@ Shared<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::Resol
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
 
-    llvm::Value* converted_value      = context.ir()->CreateFPCast(content_value,
-                                                              other->getContentType(*context.llvmContext()),
-                                                              content_value->getName() + ".fcast");
+    llvm::Value* converted_value      = context.ir().CreateFPCast(content_value,
+                                                             other->getContentType(context.llvmContext()),
+                                                             content_value->getName() + ".fcast");
     llvm::Value* native_content_value = lang::values::contentToNative(other, converted_value, context);
 
     return makeShared<WrappedNativeValue>(other, native_content_value);
@@ -100,7 +100,7 @@ Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator  
     switch (op)
     {
         case lang::UnaryOperator::NEGATION:
-            result = context.ir()->CreateFNeg(content_value, content_value->getName() + ".neg");
+            result = context.ir().CreateFNeg(content_value, content_value->getName() + ".neg");
             break;
 
         default:
@@ -168,37 +168,37 @@ Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::BinaryOperator 
     switch (op)
     {
         case lang::BinaryOperator::ADDITION:
-            result = context.ir()->CreateFAdd(left_value, right_value, left_value->getName() + ".fadd");
+            result = context.ir().CreateFAdd(left_value, right_value, left_value->getName() + ".fadd");
             break;
         case lang::BinaryOperator::SUBTRACTION:
-            result = context.ir()->CreateFSub(left_value, right_value, left_value->getName() + ".fsub");
+            result = context.ir().CreateFSub(left_value, right_value, left_value->getName() + ".fsub");
             break;
         case lang::BinaryOperator::MULTIPLICATION:
-            result = context.ir()->CreateFMul(left_value, right_value, left_value->getName() + ".fmul");
+            result = context.ir().CreateFMul(left_value, right_value, left_value->getName() + ".fmul");
             break;
         case lang::BinaryOperator::DIVISION:
-            result = context.ir()->CreateFDiv(left_value, right_value, left_value->getName() + ".fdiv");
+            result = context.ir().CreateFDiv(left_value, right_value, left_value->getName() + ".fdiv");
             break;
         case lang::BinaryOperator::REMAINDER:
-            result = context.ir()->CreateFRem(left_value, right_value, left_value->getName() + ".frem");
+            result = context.ir().CreateFRem(left_value, right_value, left_value->getName() + ".frem");
             break;
         case lang::BinaryOperator::LESS_THAN:
-            result = context.ir()->CreateFCmpOLT(left_value, right_value, left_value->getName() + ".fcmp");
+            result = context.ir().CreateFCmpOLT(left_value, right_value, left_value->getName() + ".fcmp");
             break;
         case lang::BinaryOperator::LESS_THAN_OR_EQUAL:
-            result = context.ir()->CreateFCmpOLE(left_value, right_value, left_value->getName() + ".fcmp");
+            result = context.ir().CreateFCmpOLE(left_value, right_value, left_value->getName() + ".fcmp");
             break;
         case lang::BinaryOperator::GREATER_THAN:
-            result = context.ir()->CreateFCmpOGT(left_value, right_value, left_value->getName() + ".fcmp");
+            result = context.ir().CreateFCmpOGT(left_value, right_value, left_value->getName() + ".fcmp");
             break;
         case lang::BinaryOperator::GREATER_THAN_OR_EQUAL:
-            result = context.ir()->CreateFCmpOGE(left_value, right_value, left_value->getName() + ".fcmp");
+            result = context.ir().CreateFCmpOGE(left_value, right_value, left_value->getName() + ".fcmp");
             break;
         case lang::BinaryOperator::EQUAL:
-            result = context.ir()->CreateFCmpOEQ(left_value, right_value, left_value->getName() + ".fcmp");
+            result = context.ir().CreateFCmpOEQ(left_value, right_value, left_value->getName() + ".fcmp");
             break;
         case lang::BinaryOperator::NOT_EQUAL:
-            result = context.ir()->CreateFCmpONE(left_value, right_value, left_value->getName() + ".fcmp");
+            result = context.ir().CreateFCmpONE(left_value, right_value, left_value->getName() + ".fcmp");
             break;
 
         default:
@@ -238,23 +238,23 @@ void lang::FloatingPointType::buildRequestedOverload(lang::ResolvingHandle<lang:
 
     if (parameter_element->isFloatingPointType())
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
+        context.ir().SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
 
-            llvm::Value* converted = context.ir()->CreateFPCast(original,
-                                                                return_type->getContentType(*context.llvmContext()),
-                                                                original->getName() + ".fcast");
+            llvm::Value* converted = context.ir().CreateFPCast(original,
+                                                               return_type->getContentType(context.llvmContext()),
+                                                               original->getName() + ".fcast");
 
-            context.ir()->CreateRet(converted);
+            context.ir().CreateRet(converted);
         }
     }
 
     if (parameter_element->isFixedWidthIntegerType())
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
+        context.ir().SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
 
@@ -262,18 +262,18 @@ void lang::FloatingPointType::buildRequestedOverload(lang::ResolvingHandle<lang:
 
             if (parameter_element->isSigned())
             {
-                converted = context.ir()->CreateSIToFP(original,
-                                                       return_type->getContentType(*context.llvmContext()),
-                                                       original->getName() + ".sitofp");
+                converted = context.ir().CreateSIToFP(original,
+                                                      return_type->getContentType(context.llvmContext()),
+                                                      original->getName() + ".sitofp");
             }
             else
             {
-                converted = context.ir()->CreateUIToFP(original,
-                                                       return_type->getContentType(*context.llvmContext()),
-                                                       original->getName() + ".uitofp");
+                converted = context.ir().CreateUIToFP(original,
+                                                      return_type->getContentType(context.llvmContext()),
+                                                      original->getName() + ".uitofp");
             }
 
-            context.ir()->CreateRet(converted);
+            context.ir().CreateRet(converted);
         }
     }
 }

@@ -38,7 +38,7 @@ Expression::Expansion SizeofExpression::expandWith(Expressions subexpressions) c
 void SizeofExpression::doBuild(CompileContext& context)
 {
     llvm::Value* content_value =
-        lang::SizeType::buildContentValue(expression_->type()->getContentSize(context.module()), context);
+        lang::SizeType::buildContentValue(expression_->type()->getContentSize(context.llvmModule()), context);
     llvm::Value* native_value = lang::values::contentToNative(type(), content_value, context);
 
     Shared<lang::WrappedNativeValue> value = makeShared<lang::WrappedNativeValue>(type(), native_value);

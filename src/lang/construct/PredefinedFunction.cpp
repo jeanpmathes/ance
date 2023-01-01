@@ -33,8 +33,8 @@ bool lang::PredefinedFunction::validateFlow(ValidationLogger&) const
 void lang::PredefinedFunction::createNativeBacking(CompileContext& context)
 {
     std::tie(native_type_, native_function_) = createNativeFunction(llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-                                                                    *context.llvmContext(),
-                                                                    context.module());
+                                                                    context.llvmContext(),
+                                                                    context.llvmModule());
 
     auto params = parameters();
 
@@ -55,7 +55,7 @@ lang::LocalScope* lang::PredefinedFunction::getInsideScope()
 
 std::vector<lang::BasicBlock*> const& lang::PredefinedFunction::getBasicBlocks() const
 {
-    static std::vector<lang::BasicBlock*> empty;
+    static std::vector<lang::BasicBlock*> const empty;
     return empty;
 }
 

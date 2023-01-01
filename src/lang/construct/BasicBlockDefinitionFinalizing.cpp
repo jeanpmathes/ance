@@ -85,23 +85,23 @@ void lang::BasicBlock::Definition::Finalizing::reach() const
 void lang::BasicBlock::Definition::Finalizing::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
     std::string const name = "b" + std::to_string(index_);
-    native_block_    = llvm::BasicBlock::Create(*context.llvmContext(), name, native_function);
+    native_block_          = llvm::BasicBlock::Create(context.llvmContext(), name, native_function);
 
     if (next_) next_->prepareBuild(context, native_function);
 }
 
 void lang::BasicBlock::Definition::Finalizing::doBuild(CompileContext& context)
 {
-    context.ir()->SetInsertPoint(native_block_);
+    context.ir().SetInsertPoint(native_block_);
 
     scope_.buildFinalization(context);
 
     if (next_ != nullptr)
     {
-        context.ir()->CreateBr(next_->definition_->getNativeBlock());
+        context.ir().CreateBr(next_->definition_->getNativeBlock());
         next_->doBuild(context);
     }
-    else { context.ir()->CreateRetVoid(); }
+    else { context.ir().CreateRetVoid(); }
 }
 
 std::string lang::BasicBlock::Definition::Finalizing::getExitRepresentation()

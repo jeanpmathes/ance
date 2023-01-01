@@ -42,9 +42,9 @@ lang::Type const& lang::CharConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::CharConstant::createContent(llvm::Module* m)
+llvm::Constant* lang::CharConstant::createContent(llvm::Module& m)
 {
-    return llvm::ConstantInt::get(type_->getContentType(m->getContext()), char_, false);
+    return llvm::ConstantInt::get(type_->getContentType(m.getContext()), char_, false);
 }
 
 bool lang::CharConstant::equals(lang::Constant const* other) const

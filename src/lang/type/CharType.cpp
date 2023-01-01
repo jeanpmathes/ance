@@ -49,11 +49,11 @@ void lang::CharType::buildRequestedOverload(std::vector<lang::ResolvingHandle<la
 
     if (parameters.size() == 1 && parameters[0]->isFixedWidthIntegerType(SIZE_IN_BITS, false))
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
+        context.ir().SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
-            context.ir()->CreateRet(original);
+            context.ir().CreateRet(original);
         }
 
         return;
@@ -102,10 +102,10 @@ Shared<lang::Value> lang::CharType::buildOperator(lang::BinaryOperator op,
     switch (op)
     {
         case lang::BinaryOperator::EQUAL:
-            result = context.ir()->CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir().CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::NOT_EQUAL:
-            result = context.ir()->CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
+            result = context.ir().CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
             break;
 
         default:
@@ -142,7 +142,7 @@ llvm::DIType* lang::CharType::createDebugType(CompileContext& context) const
 {
     std::string const name = std::string(this->name().text());
 
-    return context.di()->createBasicType(name, SIZE_IN_BITS, llvm::dwarf::DW_ATE_UCS);
+    return context.di().createBasicType(name, SIZE_IN_BITS, llvm::dwarf::DW_ATE_UCS);
 }
 
 lang::ResolvingHandle<lang::Type> lang::CharType::get()

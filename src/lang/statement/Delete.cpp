@@ -57,5 +57,5 @@ Statements Delete::expandWith(Expressions subexpressions, Statements) const
 
 void Delete::doBuild(CompileContext& context)
 {
-    context.runtime()->deleteDynamic(to_delete_->getValue(), delete_buffer_, context);
+    context.runtime().deleteDynamic(to_delete_->getValue(), delete_buffer_, context);
 }

@@ -78,23 +78,23 @@ void lang::BasicBlock::Definition::Empty::reach() const
 
 void lang::BasicBlock::Definition::Empty::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
-    std::string name = "b" + std::to_string(index_);
-    native_block_    = llvm::BasicBlock::Create(*context.llvmContext(), name, native_function);
+    std::string const name = "b" + std::to_string(index_);
+    native_block_          = llvm::BasicBlock::Create(context.llvmContext(), name, native_function);
 
     if (next_) next_->prepareBuild(context, native_function);
 }
 
 void lang::BasicBlock::Definition::Empty::doBuild(CompileContext& context)
 {
-    context.ir()->CreateBr(native_block_);// Branch from prelude in function to this block
-    context.ir()->SetInsertPoint(native_block_);
+    context.ir().CreateBr(native_block_);// Branch from prelude in function to this block
+    context.ir().SetInsertPoint(native_block_);
 
     if (next_ != nullptr)
     {
-        context.ir()->CreateBr(next_->definition_->getNativeBlock());
+        context.ir().CreateBr(next_->definition_->getNativeBlock());
         next_->doBuild(context);
     }
-    else { context.ir()->CreateRetVoid(); }
+    else { context.ir().CreateRetVoid(); }
 }
 
 std::string lang::BasicBlock::Definition::Empty::getExitRepresentation()

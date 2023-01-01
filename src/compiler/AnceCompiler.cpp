@@ -62,10 +62,10 @@ AnceCompiler::AnceCompiler(Application& app, SourceTree& tree)
 
 void AnceCompiler::compile(std::filesystem::path const& out)
 {
-    context_.runtime()->init(context_);
+    context_.runtime().init(context_);
 
     application_.globalScope().createNativeBacking(context_);
-    context_.runtime()->setExit(application_.globalScope().getExit());
+    context_.runtime().setExit(application_.globalScope().getExit());
 
     application_.globalScope().buildFunctions(context_);
 

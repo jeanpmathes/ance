@@ -15,7 +15,7 @@ bool lang::Constant::validate(ValidationLogger&, lang::Location) const
     return true;
 }
 
-void lang::Constant::buildContentConstant(llvm::Module* m)
+void lang::Constant::buildContentConstant(llvm::Module& m)
 {
     assert(!content_constant_ && "A constant may only be built once.");
     content_constant_ = createContent(m);
@@ -29,13 +29,13 @@ llvm::Constant* lang::Constant::getContentConstant()
 
 void lang::Constant::buildNativeValue(CompileContext& context)
 {
-    buildContentConstant(context.module());
+    buildContentConstant(context.llvmModule());
     native_value_ = lang::values::contentToNative(type(), content_constant_, context);
 }
 
 void lang::Constant::buildContentValue(CompileContext& context)
 {
-    buildContentConstant(context.module());
+    buildContentConstant(context.llvmModule());
 }
 
 llvm::Value* lang::Constant::getNativeValue() const

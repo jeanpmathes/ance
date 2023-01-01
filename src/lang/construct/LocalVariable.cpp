@@ -31,7 +31,7 @@ void lang::LocalVariable::validate(ValidationLogger&) const
 
 void lang::LocalVariable::buildDeclaration(CompileContext& context)
 {
-    native_value_ = context.ir()->CreateAlloca(type()->getContentType(*context.llvmContext()), nullptr, name().text());
+    native_value_ = context.ir().CreateAlloca(type()->getContentType(context.llvmContext()), nullptr, name().text());
 }
 
 void lang::LocalVariable::buildDefinition(CompileContext& context)
@@ -40,29 +40,29 @@ void lang::LocalVariable::buildDefinition(CompileContext& context)
 
     if (parameter_no_ == 0)
     {
-        local_debug_variable_ = context.di()->createAutoVariable(scope()->getDebugScope(context),
-                                                                 name().text(),
-                                                                 context.getSourceFile(location()),
-                                                                 static_cast<unsigned>(location().line()),
-                                                                 type()->getDebugType(context),
-                                                                 true);
+        local_debug_variable_ = context.di().createAutoVariable(scope()->getDebugScope(context),
+                                                                name().text(),
+                                                                context.getSourceFile(location()),
+                                                                static_cast<unsigned>(location().line()),
+                                                                type()->getDebugType(context),
+                                                                true);
     }
     else
     {
-        local_debug_variable_ = context.di()->createParameterVariable(scope()->getDebugScope(context),
-                                                                      name().text(),
-                                                                      parameter_no_,
-                                                                      context.getSourceFile(location()),
-                                                                      static_cast<unsigned>(location().line()),
-                                                                      type()->getDebugType(context),
-                                                                      true);
+        local_debug_variable_ = context.di().createParameterVariable(scope()->getDebugScope(context),
+                                                                     name().text(),
+                                                                     parameter_no_,
+                                                                     context.getSourceFile(location()),
+                                                                     static_cast<unsigned>(location().line()),
+                                                                     type()->getDebugType(context),
+                                                                     true);
     }
 
-    context.di()->insertDeclare(native_value_,
-                                local_debug_variable_,
-                                context.di()->createExpression(),
-                                location().getDebugLoc(context.llvmContext(), scope()->getDebugScope(context)),
-                                context.ir()->GetInsertBlock());
+    context.di().insertDeclare(native_value_,
+                               local_debug_variable_,
+                               context.di().createExpression(),
+                               location().getDebugLoc(context.llvmContext(), scope()->getDebugScope(context)),
+                               context.ir().GetInsertBlock());
 
     if (initial_value_.hasValue())
     {
@@ -73,7 +73,7 @@ void lang::LocalVariable::buildDefinition(CompileContext& context)
             value->buildContentValue(context);
             llvm::Value* stored = value->getContentValue();
 
-            context.ir()->CreateStore(stored, native_value_);
+            context.ir().CreateStore(stored, native_value_);
         }
         else
         {

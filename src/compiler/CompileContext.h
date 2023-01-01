@@ -45,43 +45,43 @@ class CompileContext
      * Get the application.
      * @return The application.
      */
-    Application* application();
+    Application& application();
 
     /**
      * Get the runtime.
      * @return The runtime.
      */
-    Runtime* runtime();
+    Runtime& runtime();
 
     /**
      * Get the llvmContext.
      * @return The llvmContext.
      */
-    llvm::LLVMContext* llvmContext();
+    llvm::LLVMContext& llvmContext();
 
     /**
      * Get the module.
      * @return The module.
      */
-    llvm::Module* module();
+    llvm::Module& llvmModule();
 
     /**
      * Get the ir builder.
      * @return The ir builder.
      */
-    llvm::IRBuilder<>* ir();
+    llvm::IRBuilder<>& ir();
 
     /**
      * Get the di builder.
      * @return The di builder.
      */
-    llvm::DIBuilder* di();
+    llvm::DIBuilder& di();
 
     /**
      * Get the compile unit.
      * @return The compile unit.
      */
-    llvm::DICompileUnit* unit();
+    llvm::DICompileUnit& unit();
 
     /**
      * Get the debug information for a source file that contains the given location.
@@ -95,7 +95,7 @@ class CompileContext
      * @param location The source location.
      * @param scope The current scope.
      */
-    void setDebugLocation(lang::Location location, lang::Scope* scope);
+    void setDebugLocation(lang::Location location, lang::Scope& scope);
 
     /**
      * Reset the previous debug location.

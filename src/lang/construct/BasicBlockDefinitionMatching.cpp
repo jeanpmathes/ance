@@ -85,14 +85,14 @@ void lang::BasicBlock::Definition::Matching::reach() const
 void lang::BasicBlock::Definition::Matching::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
     std::string const name = "b" + std::to_string(index_);
-    native_block_    = llvm::BasicBlock::Create(*context.llvmContext(), name, native_function);
+    native_block_          = llvm::BasicBlock::Create(context.llvmContext(), name, native_function);
 
     for (auto& branch : branches_) { branch->prepareBuild(context, native_function); }
 }
 
 void lang::BasicBlock::Definition::Matching::doBuild(CompileContext& context)
 {
-    context.ir()->SetInsertPoint(native_block_);
+    context.ir().SetInsertPoint(native_block_);
 
     for (auto& statement : statements_) { statement->build(context); }
 
@@ -113,7 +113,7 @@ void lang::BasicBlock::Definition::Matching::doBuild(CompileContext& context)
     if (!default_block) { default_block = branches_.front()->definition_->getNativeBlock(); }
 
     auto switch_instance =
-        context.ir()->CreateSwitch(value->getContentValue(), default_block, static_cast<unsigned>(cases_.size()));
+        context.ir().CreateSwitch(value->getContentValue(), default_block, static_cast<unsigned>(cases_.size()));
 
     for (auto const [case_value, branch_block] : llvm::zip(cases_, branches_))
     {
@@ -124,7 +124,7 @@ void lang::BasicBlock::Definition::Matching::doBuild(CompileContext& context)
         for (auto& case_value_expression : case_value)
         {
             Shared<lang::Constant> constant = case_value_expression->getConstantValue();
-            constant->buildContentConstant(context.module());
+            constant->buildContentConstant(context.llvmModule());
             llvm::Constant* native_constant = constant->getContentConstant();
 
             auto native_integer_constant = llvm::cast<llvm::ConstantInt>(native_constant);

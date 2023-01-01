@@ -72,11 +72,11 @@ void lang::FixedWidthIntegerType::buildRequestedOverload(lang::ResolvingHandle<l
 
     if (parameter_element->isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_)
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(*context.llvmContext(), "block", native_function);
-        context.ir()->SetInsertPoint(block);
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
+        context.ir().SetInsertPoint(block);
         {
             llvm::Value* original = native_function->getArg(0);
-            context.ir()->CreateRet(original);
+            context.ir().CreateRet(original);
         }
 
         return;

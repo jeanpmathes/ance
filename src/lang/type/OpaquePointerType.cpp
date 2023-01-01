@@ -29,14 +29,14 @@ std::string lang::OpaquePointerType::createMangledName() const
 
 llvm::DIType* lang::OpaquePointerType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
 
-    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
 
     std::string const name     = std::string(this->name().text());
     auto              encoding = llvm::dwarf::DW_ATE_address;
 
-    llvm::DIType* di_type = context.di()->createBasicType(name, size_in_bits, encoding);
+    llvm::DIType* di_type = context.di().createBasicType(name, size_in_bits, encoding);
 
     return di_type;
 }

@@ -33,39 +33,39 @@ CompileContext::CompileContext(Application&       app,
     }
 }
 
-Application* CompileContext::application()
+Application& CompileContext::application()
 {
-    return &application_;
+    return application_;
 }
 
-Runtime* CompileContext::runtime()
+Runtime& CompileContext::runtime()
 {
-    return &runtime_;
+    return runtime_;
 }
 
-llvm::LLVMContext* CompileContext::llvmContext()
+llvm::LLVMContext& CompileContext::llvmContext()
 {
-    return &context_;
+    return context_;
 }
 
-llvm::Module* CompileContext::module()
+llvm::Module& CompileContext::llvmModule()
 {
-    return &module_;
+    return module_;
 }
 
-llvm::IRBuilder<>* CompileContext::ir()
+llvm::IRBuilder<>& CompileContext::ir()
 {
-    return &ir_builder_;
+    return ir_builder_;
 }
 
-llvm::DIBuilder* CompileContext::di()
+llvm::DIBuilder& CompileContext::di()
 {
-    return &di_builder_;
+    return di_builder_;
 }
 
-llvm::DICompileUnit* CompileContext::unit()
+llvm::DICompileUnit& CompileContext::unit()
 {
-    return unit_;
+    return *unit_;
 }
 
 llvm::DIFile* CompileContext::getSourceFile(lang::Location location)
@@ -75,18 +75,18 @@ llvm::DIFile* CompileContext::getSourceFile(lang::Location location)
     return source_files_[location.file()];
 }
 
-void CompileContext::setDebugLocation(lang::Location location, lang::Scope* scope)
+void CompileContext::setDebugLocation(lang::Location location, lang::Scope& scope)
 {
-    llvm::DebugLoc previous_location = ir()->getCurrentDebugLocation();
-    ir()->SetCurrentDebugLocation(location.getDebugLoc(llvmContext(), scope->getDebugScope(*this)));
+    llvm::DebugLoc const previous_location = ir().getCurrentDebugLocation();
+    ir().SetCurrentDebugLocation(location.getDebugLoc(llvmContext(), scope.getDebugScope(*this)));
 
     debug_loc_stack_.push(previous_location);
 }
 
 void CompileContext::resetDebugLocation()
 {
-    llvm::DebugLoc previous_location = debug_loc_stack_.top();
-    ir()->SetCurrentDebugLocation(previous_location);
+    llvm::DebugLoc const previous_location = debug_loc_stack_.top();
+    ir().SetCurrentDebugLocation(previous_location);
 
     debug_loc_stack_.pop();
 }

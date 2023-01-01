@@ -79,7 +79,7 @@ bool Expression::validateAssignment(lang::Value const& value,
 
 void Expression::assign(Shared<lang::Value> value, CompileContext& context)
 {
-    context.setDebugLocation(location(), containing_scope_);
+    context.setDebugLocation(location(), *containing_scope_);
     doAssign(std::move(value), context);
     context.resetDebugLocation();
 }

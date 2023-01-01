@@ -152,18 +152,17 @@ void lang::CustomFunction::createNativeBacking(CompileContext& context)
         di_types.push_back(parameter->type().getDebugType(context));
     }
 
-    llvm::DISubroutineType* debug_type =
-        context.di()->createSubroutineType(context.di()->getOrCreateTypeArray(di_types));
-    llvm::DISubprogram* subprogram =
-        context.di()->createFunction(scope().getDebugScope(context),
-                                     name().text(),
-                                     isMangled() ? signature_.getMangledName() : name().text(),
-                                     context.getSourceFile(location()),
-                                     static_cast<unsigned>(location().line()),
-                                     debug_type,
-                                     static_cast<unsigned>(definition_location_.line()),
-                                     llvm::DINode::DIFlags::FlagPrototyped,
-                                     llvm::DISubprogram::toSPFlags(false, true, false, 0U, name().text() == "main"));
+    llvm::DISubroutineType* debug_type = context.di().createSubroutineType(context.di().getOrCreateTypeArray(di_types));
+    llvm::DISubprogram*     subprogram =
+        context.di().createFunction(scope().getDebugScope(context),
+                                    name().text(),
+                                    isMangled() ? signature_.getMangledName() : name().text(),
+                                    context.getSourceFile(location()),
+                                    static_cast<unsigned>(location().line()),
+                                    debug_type,
+                                    static_cast<unsigned>(definition_location_.line()),
+                                    llvm::DINode::DIFlags::FlagPrototyped,
+                                    llvm::DISubprogram::toSPFlags(false, true, false, 0U, name().text() == "main"));
 
     native_function->setSubprogram(subprogram);
 }

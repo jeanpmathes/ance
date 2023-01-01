@@ -157,7 +157,7 @@ Optional<lang::Location> lang::StatementFunction::findUnreachableCode() const
 void lang::StatementFunction::createNativeBacking(CompileContext& context)
 {
     std::tie(native_type_, native_function_) =
-        createNativeFunction(access_.linkage(), *context.llvmContext(), context.module());
+        createNativeFunction(access_.linkage(), context.llvmContext(), context.llvmModule());
 
     auto params = parameters();
 
@@ -166,23 +166,23 @@ void lang::StatementFunction::createNativeBacking(CompileContext& context)
 
 void lang::StatementFunction::build(CompileContext& context)
 {
-    llvm::BasicBlock* decl = llvm::BasicBlock::Create(*context.llvmContext(), "decl", native_function_);
+    llvm::BasicBlock* decl = llvm::BasicBlock::Create(context.llvmContext(), "decl", native_function_);
 
-    context.ir()->SetInsertPoint(decl);
+    context.ir().SetInsertPoint(decl);
     function().buildDeclarations(context);
     inside_scope_->buildDeclarations(context);
 
-    llvm::BasicBlock* defs = llvm::BasicBlock::Create(*context.llvmContext(), "defs", native_function_);
+    llvm::BasicBlock* defs = llvm::BasicBlock::Create(context.llvmContext(), "defs", native_function_);
 
-    context.ir()->CreateBr(defs);
-    context.ir()->SetInsertPoint(defs);
+    context.ir().CreateBr(defs);
+    context.ir().SetInsertPoint(defs);
     for (auto& arg : arguments_) { (*arg)->buildDefinition(context); }
 
     initial_block_->prepareBuild(context, native_function_);
     initial_block_->doBuild(context);
 
-    context.ir()->SetCurrentDebugLocation(llvm::DebugLoc());
-    context.di()->finalizeSubprogram(native_function_->getSubprogram());
+    context.ir().SetCurrentDebugLocation(llvm::DebugLoc());
+    context.di().finalizeSubprogram(native_function_->getSubprogram());
 }
 
 lang::LocalScope* lang::StatementFunction::getInsideScope()

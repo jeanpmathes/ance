@@ -4,7 +4,7 @@
 
 void BuildableExpression::build(CompileContext& context)
 {
-    context.setDebugLocation(location(), scope());
+    context.setDebugLocation(location(), *scope());
     doBuild(context);
     context.resetDebugLocation();
 }

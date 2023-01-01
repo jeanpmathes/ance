@@ -28,7 +28,7 @@ Shared<lang::Value> lang::NullPointerType::buildImplicitConversion(lang::Resolvi
                                                                    Shared<Value>,
                                                                    CompileContext& context)
 {
-    llvm::Type* other_type = other->getContentType(*context.llvmContext());
+    llvm::Type* other_type = other->getContentType(context.llvmContext());
     assert(other_type->isPointerTy());
 
     llvm::Value* null         = llvm::ConstantPointerNull::get(llvm::dyn_cast<llvm::PointerType>(other_type));
@@ -54,14 +54,14 @@ std::string lang::NullPointerType::createMangledName() const
 
 llvm::DIType* lang::NullPointerType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.module()->getDataLayout();
+    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
 
-    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(*context.llvmContext()));
+    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
 
     std::string const name     = std::string(this->name().text());
     auto              encoding = llvm::dwarf::DW_ATE_address;
 
-    llvm::DIType* di_type = context.di()->createBasicType(name, size_in_bits, encoding);
+    llvm::DIType* di_type = context.di().createBasicType(name, size_in_bits, encoding);
 
     return di_type;
 }

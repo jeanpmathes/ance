@@ -352,13 +352,13 @@ namespace lang
          * @param m The llvm module.
          * @return The native size.
          */
-        llvm::TypeSize getNativeSize(llvm::Module* m);
+        llvm::TypeSize getNativeSize(llvm::Module& m);
         /**
          * Get the size of the content type.
          * @param m The llvm module.
          * @return The content size.
          */
-        llvm::TypeSize getContentSize(llvm::Module* m);
+        llvm::TypeSize getContentSize(llvm::Module& m);
 
         /**
          * See if the subscript operation is defined for this type.

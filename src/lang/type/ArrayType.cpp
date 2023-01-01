@@ -82,17 +82,17 @@ std::string lang::ArrayType::createMangledName() const
 
 llvm::DIType* lang::ArrayType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl         = context.module()->getDataLayout();
-    llvm::Type*             array_type = getContentType(*context.llvmContext());
+    llvm::DataLayout const& dl         = context.llvmModule().getDataLayout();
+    llvm::Type*             array_type = getContentType(context.llvmContext());
 
     uint64_t const size            = dl.getTypeSizeInBits(array_type);
     auto           alignment       = static_cast<uint32_t>(dl.getABITypeAlignment(array_type));
     llvm::DIType*  element_di_type = element_type_->getDebugType(context);
 
     llvm::SmallVector<llvm::Metadata*, 1> subscripts;
-    subscripts.push_back(context.di()->getOrCreateSubrange(0, static_cast<int64_t>(size_.value())));
+    subscripts.push_back(context.di().getOrCreateSubrange(0, static_cast<int64_t>(size_.value())));
 
-    return context.di()->createArrayType(size, alignment, element_di_type, context.di()->getOrCreateArray(subscripts));
+    return context.di().createArrayType(size, alignment, element_di_type, context.di().getOrCreateArray(subscripts));
 }
 
 lang::TypeRegistry<uint64_t>& lang::ArrayType::getArrayTypes()
