@@ -115,6 +115,7 @@ class SourceVisitor : public anceBaseVisitor
 
     std::any visitPublic(anceParser::PublicContext* ctx) override;
     std::any visitPrivate(anceParser::PrivateContext* ctx) override;
+    std::any visitExtern(anceParser::ExternContext* ctx) override;
 
     std::any visitAutomatic(anceParser::AutomaticContext* ctx) override;
     std::any visitDynamic(anceParser::DynamicContext* ctx) override;

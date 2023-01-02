@@ -888,6 +888,12 @@ std::any SourceVisitor::visitPrivate(anceParser::PrivateContext*)
     return access_modifier;
 }
 
+std::any SourceVisitor::visitExtern(anceParser::ExternContext*)
+{
+    lang::AccessModifier access_modifier = lang::AccessModifier::EXTERN_ACCESS;
+    return access_modifier;
+}
+
 std::any SourceVisitor::visitAutomatic(anceParser::AutomaticContext*)
 {
     Runtime::Allocator const allocator = Runtime::Allocator::AUTOMATIC;

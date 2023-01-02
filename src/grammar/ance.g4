@@ -41,6 +41,7 @@ member
 accessModifier
 	: 'public' # Public
 	| 'private' # Private
+	| 'extern' # Extern
 	;
 
 code

@@ -36,7 +36,7 @@ lang::CustomFunction::CustomFunction(Function&                            functi
 
 bool lang::CustomFunction::isMangled() const
 {
-    return true;
+    return access() != lang::AccessModifier::EXTERN_ACCESS;
 }
 
 void lang::CustomFunction::validate(ValidationLogger& validation_logger) const

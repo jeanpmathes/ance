@@ -83,6 +83,11 @@ Expression* lang::GlobalVariable::init() const
 
 void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
 {
+    if (access_ == lang::AccessModifier::EXTERN_ACCESS)
+    {
+        validation_logger.logError("Global variables cannot be extern", location());
+    }
+
     if (type_opt_.hasValue())
     {
         if (lang::validation::isTypeUndefined(type(), typeLocation(), validation_logger)) return;

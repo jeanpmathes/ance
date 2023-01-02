@@ -346,6 +346,14 @@ public:
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
+  class  ExternContext : public AccessModifierContext {
+  public:
+    ExternContext(AccessModifierContext *ctx);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   AccessModifierContext* accessModifier();
 
   class  CodeContext : public antlr4::ParserRuleContext {

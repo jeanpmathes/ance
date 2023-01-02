@@ -14,6 +14,9 @@ std::string lang::AccessModifier::toString() const
 
         case AccessModifier::PUBLIC_ACCESS:
             return "public";
+
+        case AccessModifier::EXTERN_ACCESS:
+            return "extern";
     }
 }
 
@@ -26,6 +29,8 @@ llvm::GlobalValue::LinkageTypes lang::AccessModifier::linkage()
         case AccessModifier::PRIVATE_ACCESS:
             linkage = llvm::GlobalValue::LinkageTypes::PrivateLinkage;
             break;
+
+        case AccessModifier::EXTERN_ACCESS:
         case AccessModifier::PUBLIC_ACCESS:
             linkage = llvm::GlobalValue::LinkageTypes::ExternalLinkage;
             break;

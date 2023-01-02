@@ -14,7 +14,8 @@ namespace lang
         enum Value
         {
             PUBLIC_ACCESS,
-            PRIVATE_ACCESS
+            PRIVATE_ACCESS,
+            EXTERN_ACCESS
         };
 
         AccessModifier() = default;
@@ -27,7 +28,7 @@ namespace lang
      * Get this access modifier as string.
      * @return The string.
      */
-        std::string toString() const;
+        [[nodiscard]] std::string toString() const;
 
         /**
      * Get the corresponding native linkage type.

@@ -43,6 +43,8 @@ public:
 
     virtual std::any visitPrivate(anceParser::PrivateContext *context) = 0;
 
+    virtual std::any visitExtern(anceParser::ExternContext *context) = 0;
+
     virtual std::any visitCode(anceParser::CodeContext *context) = 0;
 
     virtual std::any visitBlock(anceParser::BlockContext *context) = 0;
