@@ -60,10 +60,10 @@ int main(int argc, char** argv)
 
         if (validation_logger.errorCount() == 0)
         {
-            std::filesystem::path const out_dir = project_file_path.parent_path() / "out";
+            std::filesystem::path const bld_dir = project_file_path.parent_path() / "bld";
 
-            std::filesystem::path const obj_dir = out_dir / "obj";
-            std::filesystem::path const bin_dir = out_dir / "bin";
+            std::filesystem::path const obj_dir = bld_dir / "obj";
+            std::filesystem::path const bin_dir = bld_dir / "bin";
 
             application.emitAsSource(obj_dir / "input.nc");
             application.preBuild();

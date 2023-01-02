@@ -72,7 +72,7 @@ def run_test(test: discovery.Test) -> TestRun:
         if compile_result != COMPILE_VALID:
             return TestRun(test, compile_result, compile_output, False, None)
 
-        output_path: str = os.path.join(temp_project_dir, 'out')
+        output_path: str = os.path.join(temp_project_dir, 'bld')
         run_result, run_output = ance.run_project(output_path, "test")
         return TestRun(test, compile_result, compile_output, run_result == 0, run_output)
 
