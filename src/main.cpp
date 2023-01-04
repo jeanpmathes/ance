@@ -82,19 +82,19 @@ int main(int argc, char** argv)
                 llvm::InitializeAllAsmPrinters();
 
                 AnceCompiler compiler(application, tree);
-                AnceLinker   linker(project_file.root()["link"]);
+                AnceLinker   linker(application, project_file.root()["link"]);
 
                 std::filesystem::create_directories(obj_dir);
                 std::filesystem::create_directories(bin_dir);
 
                 std::filesystem::path const ilr = obj_dir / (project.getName() + ".ll");
                 std::filesystem::path const obj = obj_dir / (project.getName() + ".o");
-                std::filesystem::path const exe = bin_dir / (project.getName() + ".exe");
+                std::filesystem::path const app = bin_dir / (project.getName() + application.getType().getExtension());
 
                 compiler.compile(ilr);
                 compiler.emitObject(obj);
 
-                bool const ok = linker.link(obj, exe);
+                bool const ok = linker.link(obj, app);
 
                 llvm::llvm_shutdown();
 

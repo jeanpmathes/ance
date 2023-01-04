@@ -5,6 +5,8 @@
 #include <memory>
 
 #include "lang/Element.h"
+
+#include "ApplicationType.h"
 #include "lang/scope/GlobalScope.h"
 
 namespace lang
@@ -71,6 +73,12 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
      * @return The source file paths, relative to the project directory.
      */
     [[nodiscard]] std::vector<std::filesystem::path> getSourceFiles() const;
+
+    /**
+     * Get the application type.
+     * @return The application type.
+     */
+    [[nodiscard]] ApplicationType getType() const;
 
     /**
      * Get the bitness of the application.

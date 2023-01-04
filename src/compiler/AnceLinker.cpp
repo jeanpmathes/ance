@@ -2,7 +2,11 @@
 
 #include <lld/Common/Driver.h>
 
-AnceLinker::AnceLinker(Optional<std::reference_wrapper<const data::Element>> link_config)
+#include "compiler/Application.h"
+#include "lang/ApplicationVisitor.h"
+
+AnceLinker::AnceLinker(Application& application, Optional<std::reference_wrapper<const data::Element>> link_config)
+    : application_(application)
 {
     if (link_config.hasValue())
     {
@@ -37,7 +41,7 @@ AnceLinker::AnceLinker(Optional<std::reference_wrapper<const data::Element>> lin
     }
 }
 
-bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path const& exe)
+bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path const& app)
 {
     std::vector<char const*> args;
     args.push_back("lld");
@@ -47,9 +51,9 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     args.push_back("/machine:x64");
     args.push_back("/subsystem:console");
 
-    args.push_back("/entry:start$lang");
+    application_.getType().addLinkerArguments(args);
 
-    std::string const out = "/out:" + exe.string();
+    std::string const out = "/out:" + app.string();
     args.push_back(out.c_str());
 
     for (auto const& libpath : lib_paths_) { args.push_back(libpath.c_str()); }

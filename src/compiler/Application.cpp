@@ -145,3 +145,8 @@ std::vector<std::filesystem::path> Application::getSourceFiles() const
 {
     return project_.getSourceFiles();
 }
+
+ApplicationType Application::getType() const
+{
+    return ApplicationType::EXECUTABLE;
+}
