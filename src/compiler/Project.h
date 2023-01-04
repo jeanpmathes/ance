@@ -19,6 +19,10 @@ class Application;
 class Project
 {
   public:
+    /**
+     * Create a project from a given file.
+     * @param project The project file.
+     */
     explicit Project(data::File& project);
 
     /**

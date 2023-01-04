@@ -9,8 +9,8 @@ SourceTree::SourceTree(Application& application) : application_(application) {}
 
 size_t SourceTree::parse()
 {
-    std::filesystem::path              project_path = application_.getProject().getProjectDirectory();
-    std::vector<std::filesystem::path> source_files = application_.getProject().getSourceFiles();
+    std::filesystem::path              project_path = application_.getProjectDirectory();
+    std::vector<std::filesystem::path> source_files = application_.getSourceFiles();
 
     std::vector<std::future<void>> futures;
     futures.reserve(source_files.size());

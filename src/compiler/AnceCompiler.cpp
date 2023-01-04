@@ -24,13 +24,13 @@
 
 AnceCompiler::AnceCompiler(Application& app, SourceTree& tree)
     : application_(app)
-    , module_(application_.getProject().getName(), llvm_context_)
+    , module_(application_.getName(), llvm_context_)
     , ir_(llvm_context_)
     , di_(module_)
     , runtime_()
     , context_(application_, runtime_, llvm_context_, module_, ir_, di_, tree)
 {
-    module_.setSourceFileName(application_.getProject().getProjectFile().filename().string());
+    module_.setSourceFileName(application_.getProjectFile().filename().string());
 
     llvm::Triple const triple(llvm::sys::getDefaultTargetTriple());
 

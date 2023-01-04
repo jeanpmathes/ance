@@ -19,8 +19,8 @@ CompileContext::CompileContext(Application&       app,
     , ir_builder_(ir)
     , di_builder_(di)
 {
-    llvm::DIFile* project_file = di.createFile(application_.getProject().getProjectFile().filename().generic_string(),
-                                               application_.getProject().getProjectDirectory().generic_string());
+    llvm::DIFile* project_file = di.createFile(application_.getProjectFile().filename().generic_string(),
+                                               application_.getProjectDirectory().generic_string());
 
     unit_ = di.createCompileUnit(llvm::dwarf::DW_LANG_C, project_file, "ance-000", false, "", 0);
 

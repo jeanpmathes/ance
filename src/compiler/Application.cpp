@@ -69,9 +69,11 @@ void Application::setPointerSize(unsigned size)
     pointer_size_ = size;
 }
 
-Project& Application::getProject() const
+std::string const& Application::getName() const
 {
-    return project_;
+    if (!name_.hasValue()) { name_ = project_.getName(); }
+
+    return name_.value();
 }
 
 unsigned Application::getBitness() const
@@ -127,4 +129,19 @@ void Application::validateFlow(ValidationLogger& validation_logger) const
 lang::GlobalScope& Application::globalScope()
 {
     return *global_scope_;
+}
+
+std::filesystem::path Application::getProjectFile() const
+{
+    return project_.getProjectFile();
+}
+
+std::filesystem::path Application::getProjectDirectory() const
+{
+    return project_.getProjectDirectory();
+}
+
+std::vector<std::filesystem::path> Application::getSourceFiles() const
+{
+    return project_.getSourceFiles();
 }

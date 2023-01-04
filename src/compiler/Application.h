@@ -49,10 +49,28 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
     void setPointerSize(unsigned size);
 
     /**
-     * Get the containing project.
-     * @return The project.
+     * Get the name of the application.
+     * @return The name.
      */
-    [[nodiscard]] Project& getProject() const;
+    std::string const& getName() const;
+
+    /**
+     * Get the path to the project file.
+     * @return The project file.
+     */
+    [[nodiscard]] std::filesystem::path getProjectFile() const;
+
+    /**
+     * Get the path to the project directory.
+     * @return The project directory.
+     */
+    [[nodiscard]] std::filesystem::path getProjectDirectory() const;
+
+    /**
+     * Get the paths to all source files.
+     * @return The source file paths, relative to the project directory.
+     */
+    [[nodiscard]] std::vector<std::filesystem::path> getSourceFiles() const;
 
     /**
      * Get the bitness of the application.
@@ -100,6 +118,8 @@ class Application : public lang::Element<Application, ANCE_CONSTRUCTS>
     Owned<lang::GlobalScope> global_scope_;
 
     unsigned pointer_size_ {0};
+
+    mutable Optional<std::string> name_;
 };
 
 #endif
