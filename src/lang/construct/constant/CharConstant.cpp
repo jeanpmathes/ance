@@ -82,7 +82,7 @@ char32_t lang::CharConstant::parseChar(std::u32string const& unparsed, bool& val
     Optional<char32_t> content;
     bool               escaped = false;
 
-    for (size_t index = 0; index < unparsed.size(); ++index)
+    for (size_t index = 0; index < unparsed.size();)
     {
         if (content.hasValue() && index != unparsed.size() - 1)
         {
@@ -90,15 +90,18 @@ char32_t lang::CharConstant::parseChar(std::u32string const& unparsed, bool& val
             return 0;
         }
 
-        char32_t const& c = unparsed[index];
-
         if (escaped)
         {
             content = readEscapedChar(unparsed, index, valid);
             escaped = false;
         }
-        else if (c == '\\') { escaped = true; }
-        else if (c != '\'') { content = static_cast<char32_t>(static_cast<unsigned char>(c)); }
+        else
+        {
+            char32_t const& c = unparsed[index++];
+
+            if (c == '\\') { escaped = true; }
+            else if (c != '\'') { content = static_cast<char32_t>(static_cast<unsigned char>(c)); }
+        }
     }
 
     if (!content.hasValue())
@@ -138,6 +141,9 @@ char32_t lang::CharConstant::readEscapedChar(std::u32string const& unparsed, siz
 
         case 'f':
             return '\f';
+
+        case '\\':
+            return '\\';
 
         case 'u':// Read a unicode code point in the format \u{XXXX}
         {
@@ -266,6 +272,9 @@ uint8_t lang::CharConstant::readEscapedByte(std::string const& unparsed, size_t&
 
         case 'f':
             return '\f';
+
+        case '\\':
+            return '\\';
 
         case 'x':// Read a hex 8-byte character with the format \xXX
         {

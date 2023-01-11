@@ -224,7 +224,7 @@ void lang::GlobalVariable::buildDeclaration(CompileContext& context)
                                                 native_initializer,
                                                 name().text());
 
-    auto* debug_info = context.di().createGlobalVariableExpression(&context.unit(),
+    auto* debug_info = context.di().createGlobalVariableExpression(&context.llvmUnit(),
                                                                    name().text(),
                                                                    name().text(),
                                                                    context.getSourceFile(location()),

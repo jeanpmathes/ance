@@ -9,7 +9,7 @@
 SourceFile::SourceFile(std::filesystem::path const& project_directory, std::filesystem::path const& file)
     : relative_path_(file)
 {
-    std::filesystem::path full_path = project_directory / file;
+    std::filesystem::path const full_path = project_directory / file;
 
     std::ifstream file_stream(full_path);
 
@@ -30,7 +30,7 @@ std::string_view SourceFile::getLineSlice(size_t line, unsigned int column_start
     column_start--;
     column_end--;
 
-    unsigned int length = column_end - column_start + 1;
+    unsigned int const length = column_end - column_start + 1;
     return getLine(line).substr(column_start, length);
 }
 
@@ -53,8 +53,8 @@ size_t SourceFile::getUtf8Index(size_t line, size_t utf_32_column) const
 {
     if (utf_32_column == 0) return 0;
 
-    std::string_view line_view    = getLine(line);
-    int              utf_8_column = 0;
+    std::string_view const line_view    = getLine(line);
+    int                    utf_8_column = 0;
 
     boost::u8_to_u32_iterator<std::string_view::const_iterator> utf_32_iterator(line_view.begin());
 

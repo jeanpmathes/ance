@@ -7,7 +7,6 @@
 
 lang::IndirectType::IndirectType(lang::ResolvingHandle<lang::Type> element_type)
     : value_type_(element_type)
-    , value_reference_(lang::ReferenceType::get(element_type))
 {}
 
 llvm::Constant* lang::IndirectType::getDefaultContent(llvm::Module& m) const
@@ -41,6 +40,8 @@ Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<Value> value, Co
     value->buildContentValue(context);
     llvm::Value* ptr = value->getContentValue();
 
-    llvm::Value* native_value = lang::values::contentToNative(value_reference_, ptr, context);
-    return makeShared<lang::WrappedNativeValue>(value_reference_, native_value);
+    auto value_reference = lang::ReferenceType::get(value_type_);
+
+    llvm::Value* native_value = lang::values::contentToNative(value_reference, ptr, context);
+    return makeShared<lang::WrappedNativeValue>(value_reference, native_value);
 }

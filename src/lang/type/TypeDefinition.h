@@ -63,7 +63,7 @@ namespace lang
         [[nodiscard]] Identifier const& name() const;
         std::string const&              getMangledName() const;
         [[nodiscard]] lang::Location    getDefinitionLocation() const;
-        [[nodiscard]] bool              isCustom() const;
+        [[nodiscard]] virtual bool      isCustom() const;
 
         [[nodiscard]] virtual StateCount getStateCount() const = 0;
 

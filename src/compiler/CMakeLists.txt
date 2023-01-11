@@ -9,4 +9,6 @@ target_sources(ance PRIVATE AnceCompiler.cpp
                ControlFlowGraphPrinter.cpp
                ApplicationType.cpp
                Project.cpp
+               Unit.cpp
+               ProjectDescription.cpp
                CodePrinter.cpp)

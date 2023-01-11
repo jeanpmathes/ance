@@ -65,7 +65,7 @@ lang::Location lang::TypeDefinition::getDefinitionLocation() const
 
 bool lang::TypeDefinition::isCustom() const
 {
-    return !location_.isGlobal();
+    return false;// Most types are built-in.
 }
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::clone() const

@@ -32,28 +32,28 @@ public:
   };
 
   enum {
-    RuleFile = 0, RuleVariableDeclaration = 1, RuleFunction = 2, RuleParameters = 3, 
-    RuleParameter = 4, RuleTypeDefinition = 5, RuleDefineAlias = 6, RuleStructDefinition = 7, 
-    RuleMember = 8, RuleAccessModifier = 9, RuleCode = 10, RuleBlock = 11, 
-    RuleStatement = 12, RuleExpressionStatement = 13, RuleLocalVariableDefinition = 14, 
-    RuleLocalReferenceDefinition = 15, RuleDropStatement = 16, RuleAssignment = 17, 
-    RuleAssigner = 18, RuleDeleteStatement = 19, RuleBreakStatement = 20, 
-    RuleContinueStatement = 21, RuleReturnStatement = 22, RuleAssertStatement = 23, 
-    RuleIfStatement = 24, RuleWhileStatement = 25, RuleMatchStatement = 26, 
-    RuleMatchCase = 27, RuleExpression = 28, RuleUnaryOperator = 29, RuleBinaryOperatorMultiplicative = 30, 
-    RuleBinaryOperatorAdditive = 31, RuleBinaryOperatorBitwise = 32, RuleBinaryOperatorShift = 33, 
-    RuleBinaryOperatorRelational = 34, RuleBinaryOperatorEquality = 35, 
-    RuleIndependentExpression = 36, RuleFunctionCall = 37, RuleArguments = 38, 
-    RuleVariableAccess = 39, RuleAllocation = 40, RuleAllocator = 41, RuleAddressof = 42, 
-    RuleBindRef = 43, RuleSizeofType = 44, RuleSizeofExpression = 45, RuleMatchExpression = 46, 
-    RuleMatchExpressionCase = 47, RuleLiteralExpression = 48, RuleStringLiteral = 49, 
-    RuleCharLiteral = 50, RuleIntegerLiteral = 51, RuleNormalInteger = 52, 
-    RuleSpecialInteger = 53, RuleFloatingPointLiteral = 54, RuleBooleanLiteral = 55, 
-    RuleNullLiteral = 56, RuleSizeLiteral = 57, RuleDiffLiteral = 58, RuleUiptrLiteral = 59, 
-    RuleType = 60, RuleIntegerType = 61, RuleArrayType = 62, RuleVectorType = 63, 
-    RuleKeywordType = 64, RuleFloatingPointType = 65, RuleTargetDependentType = 66, 
-    RuleBooleanType = 67, RuleCharType = 68, RuleNullPointerType = 69, RuleVoidType = 70, 
-    RuleCustomType = 71
+    RuleFile = 0, RuleProjectFile = 1, RuleVariableDeclaration = 2, RuleFunction = 3, 
+    RuleParameters = 4, RuleParameter = 5, RuleTypeDefinition = 6, RuleDefineAlias = 7, 
+    RuleStructDefinition = 8, RuleMember = 9, RuleAccessModifier = 10, RuleCode = 11, 
+    RuleBlock = 12, RuleStatement = 13, RuleExpressionStatement = 14, RuleLocalVariableDefinition = 15, 
+    RuleLocalReferenceDefinition = 16, RuleDropStatement = 17, RuleAssignment = 18, 
+    RuleAssigner = 19, RuleDeleteStatement = 20, RuleBreakStatement = 21, 
+    RuleContinueStatement = 22, RuleReturnStatement = 23, RuleAssertStatement = 24, 
+    RuleIfStatement = 25, RuleWhileStatement = 26, RuleMatchStatement = 27, 
+    RuleMatchCase = 28, RuleExpression = 29, RuleUnaryOperator = 30, RuleBinaryOperatorMultiplicative = 31, 
+    RuleBinaryOperatorAdditive = 32, RuleBinaryOperatorBitwise = 33, RuleBinaryOperatorShift = 34, 
+    RuleBinaryOperatorRelational = 35, RuleBinaryOperatorEquality = 36, 
+    RuleIndependentExpression = 37, RuleFunctionCall = 38, RuleArguments = 39, 
+    RuleVariableAccess = 40, RuleAllocation = 41, RuleAllocator = 42, RuleAddressof = 43, 
+    RuleBindRef = 44, RuleSizeofType = 45, RuleSizeofExpression = 46, RuleMatchExpression = 47, 
+    RuleMatchExpressionCase = 48, RuleLiteralExpression = 49, RuleStringLiteral = 50, 
+    RuleCharLiteral = 51, RuleIntegerLiteral = 52, RuleNormalInteger = 53, 
+    RuleSpecialInteger = 54, RuleFloatingPointLiteral = 55, RuleBooleanLiteral = 56, 
+    RuleNullLiteral = 57, RuleSizeLiteral = 58, RuleDiffLiteral = 59, RuleUiptrLiteral = 60, 
+    RuleType = 61, RuleIntegerType = 62, RuleArrayType = 63, RuleVectorType = 64, 
+    RuleKeywordType = 65, RuleFloatingPointType = 66, RuleTargetDependentType = 67, 
+    RuleBooleanType = 68, RuleCharType = 69, RuleNullPointerType = 70, RuleVoidType = 71, 
+    RuleCustomType = 72
   };
 
   explicit anceParser(antlr4::TokenStream *input);
@@ -74,6 +74,7 @@ public:
 
 
   class FileContext;
+  class ProjectFileContext;
   class VariableDeclarationContext;
   class FunctionContext;
   class ParametersContext;
@@ -164,6 +165,21 @@ public:
   };
 
   FileContext* file();
+
+  class  ProjectFileContext : public antlr4::ParserRuleContext {
+  public:
+    ProjectFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *EOF();
+    std::vector<CodeContext *> code();
+    CodeContext* code(size_t i);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  ProjectFileContext* projectFile();
 
   class  VariableDeclarationContext : public antlr4::ParserRuleContext {
   public:

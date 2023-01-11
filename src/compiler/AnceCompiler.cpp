@@ -12,9 +12,8 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
 
-#include "compiler/Application.h"
 #include "compiler/ControlFlowGraphPrinter.h"
-#include "compiler/Project.h"
+#include "compiler/Unit.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/FixedWidthIntegerType.h"
@@ -22,15 +21,15 @@
 #include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/utility/Values.h"
 
-AnceCompiler::AnceCompiler(Application& app, SourceTree& tree)
-    : application_(app)
-    , module_(application_.getName(), llvm_context_)
+AnceCompiler::AnceCompiler(Unit& unit, SourceTree& tree)
+    : unit_(unit)
+    , module_(unit.getName(), llvm_context_)
     , ir_(llvm_context_)
     , di_(module_)
     , runtime_()
-    , context_(application_, runtime_, llvm_context_, module_, ir_, di_, tree)
+    , context_(unit_, runtime_, llvm_context_, module_, ir_, di_, tree)
 {
-    module_.setSourceFileName(application_.getProjectFile().filename().string());
+    module_.setSourceFileName(unit.getProjectFile().filename().string());
 
     llvm::Triple const triple(llvm::sys::getDefaultTargetTriple());
 
@@ -48,9 +47,9 @@ AnceCompiler::AnceCompiler(Application& app, SourceTree& tree)
     target_machine_ = t->createTargetMachine(triple.str(), "generic", "", opt, rm, cm, llvm::CodeGenOpt::None);
 
     llvm::DataLayout dl = target_machine_->createDataLayout();
-    application_.setPointerSize(dl.getPointerSize());
+    unit_.setPointerSize(dl.getPointerSize());
 
-    lang::SizeType::init(llvm_context_, app);
+    lang::SizeType::init(llvm_context_, unit_);
     lang::UnsignedIntegerPointerType::init(llvm_context_, dl);
 
     module_.setDataLayout(dl);
@@ -64,10 +63,10 @@ void AnceCompiler::compile(std::filesystem::path const& out)
 {
     context_.runtime().init(context_);
 
-    application_.globalScope().createNativeBacking(context_);
-    context_.runtime().setExit(application_.globalScope().getExit());
+    unit_.globalScope().createNativeBacking(context_);
+    context_.runtime().setExit(unit_.globalScope().getExit());
 
-    application_.globalScope().buildFunctions(context_);
+    unit_.globalScope().buildFunctions(context_);
 
     assert(context_.allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
 
@@ -76,15 +75,28 @@ void AnceCompiler::compile(std::filesystem::path const& out)
     std::filesystem::path const cfg_path = out.parent_path() / "cfg.gml";
     std::ofstream               cfg_out(cfg_path);
     ControlFlowGraphPrinter     cfg_printer(cfg_out);
-    cfg_printer.visit(application_);
+    cfg_printer.visit(unit_);
 
     // Prepare entry and exit functions.
 
-    lang::ResolvingHandle<lang::Function> main = application_.globalScope().getEntry();
+    switch (unit_.getType())
+    {
+        case ApplicationType::EXECUTABLE:
+        {
+            lang::ResolvingHandle<lang::Function> main = unit_.globalScope().getEntry();
 
-    llvm::Function* init_function = buildInit();
-    llvm::Function* exit_function = buildExit();
-    buildStart(main, init_function, exit_function);
+            llvm::Function* init_function = buildInit();
+            llvm::Function* exit_function = buildExit();
+            buildStart(main, init_function, exit_function);
+
+            break;
+        }
+
+        case ApplicationType::LIBRARY:
+        {
+            break;
+        }
+    }
 
     llvm::verifyModule(module_, &llvm::errs());
 
@@ -161,7 +173,7 @@ llvm::Function* AnceCompiler::buildInit()
 
     ir_.SetInsertPoint(start_block);
 
-    application_.globalScope().buildInitialization(context_);
+    unit_.globalScope().buildInitialization(context_);
 
     ir_.CreateRetVoid();
     return init;
@@ -184,7 +196,7 @@ llvm::Function* AnceCompiler::buildExit()
     llvm::BasicBlock* exit_block = llvm::BasicBlock::Create(llvm_context_, "entry", exit);
     ir_.SetInsertPoint(exit_block);
 
-    lang::ResolvingHandle<lang::Function> user_exit = application_.globalScope().getExit();
+    lang::ResolvingHandle<lang::Function> user_exit = unit_.globalScope().getExit();
 
     std::vector<Shared<lang::Value>> args;
     args.emplace_back(

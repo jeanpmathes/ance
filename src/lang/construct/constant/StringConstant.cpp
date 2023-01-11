@@ -111,17 +111,20 @@ std::u32string lang::StringConstant::parse(std::u32string const& unparsed, bool*
 
     bool escaped = false;
 
-    for (size_t index = 0; index < unparsed.size(); ++index)
+    for (size_t index = 0; index < unparsed.size();)
     {
-        char32_t const& c = unparsed[index];
-
         if (escaped)
         {
             parsed += lang::CharConstant::readEscapedChar(unparsed, index, *valid);
             escaped = false;
         }
-        else if (c == '\\') { escaped = true; }
-        else if (c != '"') { parsed += c; }
+        else
+        {
+            char32_t const& c = unparsed[index++];
+
+            if (c == '\\') { escaped = true; }
+            else if (c != '"') { parsed += c; }
+        }
     }
 
     return parsed;

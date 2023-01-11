@@ -8,7 +8,7 @@
 #include "lang/utility/Location.h"
 #include "lang/utility/Optional.h"
 
-class Application;
+class Unit;
 
 /**
  * The ance syntax visitor creating the application. Base class is generated.
@@ -18,15 +18,17 @@ class SourceVisitor : public anceBaseVisitor
   public:
     /**
      * Create a new visitor.
-     * @param application The application to fill.
+     * @param unit The application to create.
      */
-    explicit SourceVisitor(Application& application);
+    explicit SourceVisitor(Unit& unit);
 
     /**
      * Set the current file context;
      * @param file_context The file context.
      */
     void setFileContext(FileContext& file_context);
+
+    std::any visitProjectFile(anceParser::ProjectFileContext* ctx) override;
 
     // Declarations
 
@@ -157,7 +159,7 @@ class SourceVisitor : public anceBaseVisitor
 
   private:
     FileContext* file_context_;
-    Application& application_;
+    Unit&        unit_;
 
   private:
     /**

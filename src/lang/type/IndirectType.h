@@ -28,7 +28,6 @@ namespace lang
 
       private:
         lang::ResolvingHandle<lang::Type> value_type_;
-        lang::ResolvingHandle<lang::Type> value_reference_;
     };
 }
 

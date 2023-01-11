@@ -5,12 +5,17 @@
 #include "compiler/Project.h"
 #include "lang/ApplicationVisitor.h"
 
-SourceTree::SourceTree(Application& application) : application_(application) {}
+SourceTree::SourceTree(Unit& unit) : unit_(unit) {}
+
+Unit& SourceTree::unit()
+{
+    return unit_;
+}
 
 size_t SourceTree::parse()
 {
-    std::filesystem::path              project_path = application_.getProjectDirectory();
-    std::vector<std::filesystem::path> source_files = application_.getSourceFiles();
+    std::filesystem::path              project_path = unit_.getProjectDirectory();
+    std::vector<std::filesystem::path> source_files = unit_.getSourceFiles();
 
     std::vector<std::future<void>> futures;
     futures.reserve(source_files.size());
@@ -21,7 +26,8 @@ size_t SourceTree::parse()
     for (size_t index = 0; index < source_files.size(); index++)
     {
         auto result = std::ref(results.emplace_back());
-        auto future = std::async(std::launch::async, readSourceFile, project_path, source_files[index], index, result);
+        auto future =
+            std::async(std::launch::async, readSourceFile, project_path, source_files[index], index, &unit_, result);
         futures.push_back(std::move(future));
     }
 
@@ -35,6 +41,7 @@ size_t SourceTree::parse()
 void SourceTree::readSourceFile(std::filesystem::path const&                 project_path,
                                 std::filesystem::path const&                 file_path,
                                 size_t                                       index,
+                                Unit*                                        unit,
                                 std::reference_wrapper<SourceFileReadResult> result)
 {
     Owned<SourceFile> source_file = makeOwned<SourceFile>(project_path, file_path);
@@ -54,7 +61,7 @@ void SourceTree::readSourceFile(std::filesystem::path const&                 pro
     parser->removeErrorListeners();
     parser->addErrorListener(syntax_error_listener->parserErrorListener());
 
-    antlr4::tree::ParseTree* tree = parser->file();
+    antlr4::tree::ParseTree* tree = unit->selectTree(*parser);
 
     Owned<FileContext> file_context = makeOwned<FileContext>(index, *source_file);
 
@@ -81,12 +88,11 @@ size_t SourceTree::emitMessages()
     return fatal_error_count;
 }
 
-void SourceTree::accept(SourceVisitor& visitor)
+void SourceTree::buildAbstractSyntaxTree()
 {
     for (auto& source_file : source_files_)
     {
-        visitor.setFileContext(*source_file.file_context.value());
-        visitor.visit(source_file.tree);
+        unit_.addToAbstractSyntaxTree(source_file.tree, **source_file.file_context);
     }
 }
 

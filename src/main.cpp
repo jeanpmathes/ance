@@ -10,11 +10,71 @@
 #include "compiler/AnceLinker.h"
 #include "compiler/Application.h"
 #include "compiler/Project.h"
+#include "compiler/ProjectDescription.h"
 #include "compiler/SourceTree.h"
-#include "compiler/SourceVisitor.h"
 #include "lang/ApplicationVisitor.h"
 #include "management/File.h"
 #include "validation/ValidationLogger.h"
+
+/**
+ * The first validation step. Operates on the AST. 
+ */
+static Optional<int> validateTree(SourceTree& tree, ValidationLogger& validation_logger)
+{
+    size_t const fatal_syntax_error_count = tree.emitMessages();
+
+    if (fatal_syntax_error_count != 0) return EXIT_FAILURE;
+
+    tree.buildAbstractSyntaxTree();
+
+    tree.unit().preValidate();
+
+    tree.unit().validate(validation_logger);
+
+    if (validation_logger.errorCount() != 0)
+    {
+        validation_logger.emitMessages(tree.getSourceFiles());
+        return EXIT_FAILURE;
+    }
+
+    return {};
+}
+
+/**
+ * The second validation steps. Operates on the CFG.
+ */
+static Optional<int> validateFlow(SourceTree& tree, ValidationLogger& validation_logger)
+{
+    tree.unit().validateFlow(validation_logger);
+
+    validation_logger.emitMessages(tree.getSourceFiles());
+
+    if (validation_logger.errorCount() != 0) return EXIT_FAILURE;
+
+    return {};
+}
+
+static Optional<int> build(SourceTree& tree, std::filesystem::path const& obj_dir, std::filesystem::path const& bin_dir)
+{
+    AnceCompiler compiler(tree.unit(), tree);
+    AnceLinker   linker(tree.unit());
+
+    std::filesystem::create_directories(obj_dir);
+    std::filesystem::create_directories(bin_dir);
+
+    std::filesystem::path const ilr = obj_dir / (tree.unit().getName() + ".ll");
+    std::filesystem::path const obj = obj_dir / (tree.unit().getName() + ".o");
+    std::filesystem::path const app = bin_dir / (tree.unit().getName() + tree.unit().getType().getExtension());
+
+    compiler.compile(ilr);
+    compiler.emitObject(obj);
+
+    bool const ok = linker.link(obj, app);
+
+    if (ok) return {};
+
+    return EXIT_FAILURE;
+}
 
 int main(int argc, char** argv)
 {
@@ -28,82 +88,72 @@ int main(int argc, char** argv)
     boost::locale::generator const gen;
     std::locale::global(gen(""));
 
+    llvm::InitializeAllTargetInfos();
+    llvm::InitializeAllTargets();
+    llvm::InitializeAllTargetMCs();
+    llvm::InitializeAllAsmParsers();
+    llvm::InitializeAllAsmPrinters();
+
     std::filesystem::path project_file_path(argv[1]);
     if (project_file_path.is_relative()) project_file_path = std::filesystem::absolute(project_file_path);
 
-    data::File project_file(project_file_path);
-    project_file.read();
+    std::filesystem::path const bld_dir = project_file_path.parent_path() / "bld";
 
-    Project project(project_file);
+    ProjectDescription project_description(project_file_path);
+    ValidationLogger   validation_logger;
 
-    Application& application = project.getApplication();
+    std::cout << "============ Build [ " << project_description.getName() << " ] ============" << std::endl;
 
-    std::cout << "============ Build [ " << project.getName() << " ] ============" << std::endl;
-
-    SourceTree   tree(application);
-    size_t const count = tree.parse();
-
-    std::cout << "ance: input: " << count << " source file(s) read" << std::endl;
-
-    size_t const fatal_syntax_error_count = tree.emitMessages();
-
-    if (fatal_syntax_error_count == 0)
     {
-        SourceVisitor source_visitor(application);
-        tree.accept(source_visitor);
+        SourceTree tree(project_description);
+        tree.parse();
 
-        application.preValidate();
+        std::cout << "ance: input: project file read" << std::endl;
 
-        ValidationLogger validation_logger;
+        auto error = validateTree(tree, validation_logger);
+        if (error.hasValue()) return error.value();
 
-        application.validate(validation_logger);
+        project_description.preBuild();
 
-        if (validation_logger.errorCount() == 0)
-        {
-            std::filesystem::path const bld_dir = project_file_path.parent_path() / "bld";
+        error = validateFlow(tree, validation_logger);
+        if (error.hasValue()) return error.value();
 
-            std::filesystem::path const obj_dir = bld_dir / "obj";
-            std::filesystem::path const bin_dir = bld_dir / "bin";
+        std::filesystem::path const  obj_dir = bld_dir / "prj";
+        std::filesystem::path const& bin_dir = bld_dir;
 
-            application.emitAsSource(obj_dir / "input.nc");
-            application.preBuild();
-            application.emitAsSource(obj_dir / "input_prebuild.nc");
-
-            application.validateFlow(validation_logger);
-
-            if (validation_logger.errorCount() == 0)
-            {
-                validation_logger.emitMessages(tree.getSourceFiles());
-
-                llvm::InitializeAllTargetInfos();
-                llvm::InitializeAllTargets();
-                llvm::InitializeAllTargetMCs();
-                llvm::InitializeAllAsmParsers();
-                llvm::InitializeAllAsmPrinters();
-
-                AnceCompiler compiler(application, tree);
-                AnceLinker   linker(application, project_file.root()["link"]);
-
-                std::filesystem::create_directories(obj_dir);
-                std::filesystem::create_directories(bin_dir);
-
-                std::filesystem::path const ilr = obj_dir / (project.getName() + ".ll");
-                std::filesystem::path const obj = obj_dir / (project.getName() + ".o");
-                std::filesystem::path const app = bin_dir / (project.getName() + application.getType().getExtension());
-
-                compiler.compile(ilr);
-                compiler.emitObject(obj);
-
-                bool const ok = linker.link(obj, app);
-
-                llvm::llvm_shutdown();
-
-                return ok ? EXIT_SUCCESS : EXIT_FAILURE;
-            }
-            else { validation_logger.emitMessages(tree.getSourceFiles()); }
-        }
-        else { validation_logger.emitMessages(tree.getSourceFiles()); }
+        error = build(tree, obj_dir, bin_dir);
+        if (error.hasValue()) return error.value();
     }
 
-    return EXIT_FAILURE;
+    {
+        data::File project_file(project_file_path);
+        project_file.read();
+
+        Project project(project_file);
+
+        Application& application = project.getApplication();
+
+        SourceTree   tree(application);
+        size_t const count = tree.parse();
+
+        std::cout << "ance: input: " << count << " source file(s) read" << std::endl;
+
+        auto error = validateTree(tree, validation_logger);
+        if (error.hasValue()) return error.value();
+
+        std::filesystem::path const obj_dir = bld_dir / "obj";
+        std::filesystem::path const bin_dir = bld_dir / "bin";
+
+        application.emitAsSource(obj_dir / "input.nc");
+        application.preBuild();
+        application.emitAsSource(obj_dir / "input_prebuild.nc");
+
+        error = validateFlow(tree, validation_logger);
+        if (error.hasValue()) return error.value();
+
+        error = build(tree, obj_dir, bin_dir);
+        if (error.hasValue()) return error.value();
+    }
+
+    llvm::llvm_shutdown();
 }

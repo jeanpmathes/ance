@@ -20,7 +20,7 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitor
 
     explicit ControlFlowGraphPrinter(std::ostream& out);
 
-    std::any visit(Application& app) override;
+    std::any visit(Unit& unit) override;
     std::any visit(lang::CustomFunction& function) override;
     std::any visit(lang::BasicBlock& block) override;
 

@@ -5,24 +5,24 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 
-CompileContext::CompileContext(Application&       app,
+CompileContext::CompileContext(Unit&              unit,
                                Runtime&           runtime,
                                llvm::LLVMContext& c,
                                llvm::Module&      m,
                                llvm::IRBuilder<>& ir,
                                llvm::DIBuilder&   di,
                                SourceTree&        source_tree)
-    : application_(app)
+    : unit_(unit)
     , runtime_(runtime)
     , context_(c)
     , module_(m)
     , ir_builder_(ir)
     , di_builder_(di)
 {
-    llvm::DIFile* project_file = di.createFile(application_.getProjectFile().filename().generic_string(),
-                                               application_.getProjectDirectory().generic_string());
+    llvm::DIFile* project_file =
+        di.createFile(unit_.getProjectFile().filename().generic_string(), unit_.getProjectDirectory().generic_string());
 
-    unit_ = di.createCompileUnit(llvm::dwarf::DW_LANG_C, project_file, "ance-000", false, "", 0);
+    di_unit_ = di.createCompileUnit(llvm::dwarf::DW_LANG_C, project_file, "ance-000", false, "", 0);
 
     for (auto& source_file : source_tree.getSourceFiles())
     {
@@ -33,9 +33,9 @@ CompileContext::CompileContext(Application&       app,
     }
 }
 
-Application& CompileContext::application()
+Unit& CompileContext::unit()
 {
-    return application_;
+    return unit_;
 }
 
 Runtime& CompileContext::runtime()
@@ -63,9 +63,9 @@ llvm::DIBuilder& CompileContext::di()
     return di_builder_;
 }
 
-llvm::DICompileUnit& CompileContext::unit()
+llvm::DICompileUnit& CompileContext::llvmUnit()
 {
-    return *unit_;
+    return *di_unit_;
 }
 
 llvm::DIFile* CompileContext::getSourceFile(lang::Location location)

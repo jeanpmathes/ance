@@ -63,6 +63,7 @@ void AnceSyntaxErrorHandler::ParserErrorListener::syntaxError(antlr4::Recognizer
     if (offending_symbol->getType() == anceLexer::ERROR_CHAR)
     {
         parent_.log("Unexpected character", line, char_position_in_line);
+        parent_.fatal_error_count_++;
         return;
     }
 

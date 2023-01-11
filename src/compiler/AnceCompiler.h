@@ -12,20 +12,20 @@
 #include "lang/construct/Function.h"
 #include "lang/utility/Owners.h"
 
-class Application;
+class Unit;
 
 /**
- * Represents the compile step, which transforms an application into a llvm module.
+ * Represents the compile step, which transforms a unit into a llvm module.
  */
 class AnceCompiler
 {
   public:
     /**
-     * Create a new compiler for an application.
-     * @param app The application.
+     * Create a new compiler for a unit.
+     * @param unit The unit to compile.
      * @param tree The source tree.
      */
-    AnceCompiler(Application& app, SourceTree& tree);
+    AnceCompiler(Unit& unit, SourceTree& tree);
 
     /**
      * Compile the application.
@@ -47,7 +47,7 @@ class AnceCompiler
   private:
     static constexpr char const* INTERNAL_FUNCTION_SUFFIX = "$lang";
 
-    Application&      application_;
+    Unit&             unit_;
     llvm::LLVMContext llvm_context_;
     llvm::Module      module_;
     llvm::IRBuilder<> ir_;

@@ -19,6 +19,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitProjectFile(anceParser::ProjectFileContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitVariableDeclaration(anceParser::VariableDeclarationContext *ctx) override {
     return visitChildren(ctx);
   }

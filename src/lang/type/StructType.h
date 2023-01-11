@@ -22,6 +22,7 @@ namespace lang
                    lang::Location                   location);
 
         [[nodiscard]] StateCount getStateCount() const override;
+        [[nodiscard]] bool       isCustom() const override;
         bool                     isStructType() const override;
 
         llvm::Constant*   getDefaultContent(llvm::Module& m) const override;

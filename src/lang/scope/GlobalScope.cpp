@@ -23,7 +23,7 @@ lang::GlobalScope* lang::GlobalScope::getGlobalScope()
 
 llvm::DIScope* lang::GlobalScope::getDebugScope(CompileContext& context) const
 {
-    return &context.unit();
+    return &context.llvmUnit();
 }
 
 void lang::GlobalScope::validate(ValidationLogger& validation_logger) const

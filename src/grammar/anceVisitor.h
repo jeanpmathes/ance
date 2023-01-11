@@ -21,6 +21,8 @@ public:
    */
     virtual std::any visitFile(anceParser::FileContext *context) = 0;
 
+    virtual std::any visitProjectFile(anceParser::ProjectFileContext *context) = 0;
+
     virtual std::any visitVariableDeclaration(anceParser::VariableDeclarationContext *context) = 0;
 
     virtual std::any visitFunctionDefinition(anceParser::FunctionDefinitionContext *context) = 0;

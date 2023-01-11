@@ -5,8 +5,8 @@
 #include "grammar/anceParser.h"
 #include <antlr4-runtime.h>
 
-#include "compiler/Application.h"
 #include "compiler/SourceVisitor.h"
+#include "compiler/Unit.h"
 #include "validation/AnceSyntaxErrorHandler.h"
 #include "validation/SourceFile.h"
 
@@ -16,7 +16,13 @@
 class SourceTree
 {
   public:
-    explicit SourceTree(Application& application);
+    explicit SourceTree(Unit& unit);
+
+    /**
+     * Get the unit this source tree belongs to.
+     * @return The unit.
+     */
+    Unit& unit();
 
     /**
      * Read in and parse all source files.
@@ -31,10 +37,9 @@ class SourceTree
     size_t emitMessages();
 
     /**
-     * Visit all source files with the given visitor.
-     * @param visitor The visitor.
+     * Build the abstract syntax tree.
      */
-    void accept(SourceVisitor& visitor);
+    void buildAbstractSyntaxTree();
 
     /**
      * Get all source files.
@@ -57,10 +62,11 @@ class SourceTree
     static void readSourceFile(std::filesystem::path const&                 project_path,
                                std::filesystem::path const&                 file_path,
                                size_t                                       file_index,
+                               Unit*                                        unit,
                                std::reference_wrapper<SourceFileReadResult> result);
 
   private:
-    Application&                      application_;
+    Unit&                             unit_;
     std::vector<SourceFileReadResult> source_files_;
 };
 

@@ -14,7 +14,7 @@ namespace lang
 }
 
 class SourceTree;
-class Application;
+class Unit;
 class Runtime;
 
 /**
@@ -25,7 +25,7 @@ class CompileContext
   public:
     /**
      * Create a new compile context.
-     * @param app The application.
+     * @param unit The unit to compile.
      * @param runtime The runtime.
      * @param c The llvm context.
      * @param m The llvm module.
@@ -33,7 +33,7 @@ class CompileContext
      * @param di The DI builder.
      * @param source_tree The source tree.
      */
-    CompileContext(Application&       app,
+    CompileContext(Unit&              unit,
                    Runtime&           runtime,
                    llvm::LLVMContext& c,
                    llvm::Module&      m,
@@ -42,10 +42,10 @@ class CompileContext
                    SourceTree&        source_tree);
 
     /**
-     * Get the application.
-     * @return The application.
+     * Get the unit.
+     * @return The unit.
      */
-    Application& application();
+    Unit& unit();
 
     /**
      * Get the runtime.
@@ -78,10 +78,10 @@ class CompileContext
     llvm::DIBuilder& di();
 
     /**
-     * Get the compile unit.
-     * @return The compile unit.
+     * Get the llvm compile unit.
+     * @return The llvm compile unit.
      */
-    llvm::DICompileUnit& unit();
+    llvm::DICompileUnit& llvmUnit();
 
     /**
      * Get the debug information for a source file that contains the given location.
@@ -109,13 +109,13 @@ class CompileContext
     bool allDebugLocationsPopped();
 
   private:
-    Application&         application_;
+    Unit&                unit_;
     Runtime&             runtime_;
     llvm::LLVMContext&   context_;
     llvm::Module&        module_;
     llvm::IRBuilder<>&   ir_builder_;
     llvm::DIBuilder&     di_builder_;
-    llvm::DICompileUnit* unit_ {nullptr};
+    llvm::DICompileUnit* di_unit_ {nullptr};
 
     std::vector<llvm::DIFile*> source_files_ {};
 

@@ -2,13 +2,13 @@
 
 ControlFlowGraphPrinter::ControlFlowGraphPrinter(std::ostream& out) : out_(out) {}
 
-std::any ControlFlowGraphPrinter::visit(Application& app)
+std::any ControlFlowGraphPrinter::visit(Unit& unit)
 {
     out_ << "graph [" << std::endl;
     out_ << "\tlabel \"\"" << std::endl;
     out_ << "\tdirected 1" << std::endl;
 
-    visitChildren(app);
+    visitChildren(unit);
 
     out_ << "]" << std::endl << std::endl;
     return {};

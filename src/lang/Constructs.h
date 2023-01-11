@@ -3,7 +3,7 @@
 
 #include <vector>
 
-class Application;
+class Unit;
 
 namespace lang
 {
@@ -68,14 +68,13 @@ class Return;
 class While;
 
 #define ANCE_CONSTRUCTS                                                                                                \
-    Application, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction,                      \
-        lang::PredefinedFunction, lang::InitializerFunction, lang::BasicBlock, lang::CodeBlock, lang::Variable,        \
-        lang::GlobalVariable, lang::LocalVariable, Addressof, Allocation, BinaryOperation, UnaryOperation, BindRef,    \
-        BindRefTo, ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType, Subscript,                \
-        VariableAccess, MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope,                  \
-        lang::LocalScope, Assertion, Assignment, Break, Continue, Delete, ExpressionStatement,                         \
-        LocalReferenceVariableDefinition, LocalVariableDefinition, Drop, Return, If, While, Match, Case,               \
-        VectorDefinition, ArrayDefinition
+    Unit, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::PredefinedFunction,   \
+        lang::InitializerFunction, lang::BasicBlock, lang::CodeBlock, lang::Variable, lang::GlobalVariable,            \
+        lang::LocalVariable, Addressof, Allocation, BinaryOperation, UnaryOperation, BindRef, BindRefTo,               \
+        ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType, Subscript, VariableAccess,           \
+        MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope, lang::LocalScope, Assertion,     \
+        Assignment, Break, Continue, Delete, ExpressionStatement, LocalReferenceVariableDefinition,                    \
+        LocalVariableDefinition, Drop, Return, If, While, Match, Case, VectorDefinition, ArrayDefinition
 #endif
 
 template<typename T>

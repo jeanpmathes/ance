@@ -5,20 +5,19 @@
 
 #include "management/elements/Element.h"
 
-class Application;
+class Unit;
 
 /**
- * Represents the linking step which transforms object files into a finished executable.
+ * Represents the linking step which transforms object files into a finished binary.
  */
 class AnceLinker
 {
   public:
     /**
      * Create a new linker.
-     * @param application The application to link.
-     * @param link_config The linker configuration from the project file.
+     * @param unit The unit to link.
      */
-    explicit AnceLinker(Application& application, Optional<std::reference_wrapper<const data::Element>> link_config);
+    explicit AnceLinker(Unit& unit);
 
     /**
      * Link object files.
@@ -29,10 +28,7 @@ class AnceLinker
     bool link(std::filesystem::path const& obj, std::filesystem::path const& app);
 
   private:
-    std::vector<std::string> lib_paths_;
-    std::vector<std::string> libs_;
-
-    Application& application_;
+    Unit& unit_;
 };
 
 #endif

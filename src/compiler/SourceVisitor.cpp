@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-#include "compiler/Application.h"
+#include "compiler/Unit.h"
 #include "lang/ApplicationVisitor.h"
 
 #include "lang/type/ArrayType.h"
@@ -33,11 +33,107 @@
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
 
-SourceVisitor::SourceVisitor(Application& application) : file_context_(nullptr), application_(application) {}
+SourceVisitor::SourceVisitor(Unit& unit) : file_context_(nullptr), unit_(unit) {}
 
 void SourceVisitor::setFileContext(FileContext& file_context)
 {
     file_context_ = &file_context;
+}
+
+std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
+{
+    {// Project Description Function
+        auto                              access      = lang::AccessModifier::EXTERN_ACCESS;
+        lang::Identifier const            identifier  = lang::Identifier::like("define_project");
+        lang::ResolvingHandle<lang::Type> return_type = lang::VoidType::get();
+
+        lang::Location const declaration_location = lang::Location::global();
+        lang::Location const definition_location  = lang::Location::global();
+
+        std::vector<Shared<lang::Parameter>> parameters;
+        parameters.emplace_back(makeShared<lang::Parameter>(
+            lang::PointerType::get(lang::makeHandled<lang::Type>(lang::Identifier::like("Project"))),
+            lang::Location::global(),
+            lang::Identifier::like("project"),
+            lang::Location::global()));
+
+        lang::Location const return_type_location = lang::Location::global();
+
+        auto function_block = lang::CodeBlock::makeInitial(location(ctx));
+
+        for (auto code_context : ctx->code())
+        {
+            lang::CodeBlock& block     = *std::any_cast<lang::CodeBlock*>(visit(code_context));
+            auto             block_ptr = Owned<lang::CodeBlock>(block);
+
+            function_block->append(std::move(block_ptr));
+        }
+
+        unit_.globalScope().defineCustomFunction(identifier,
+                                                 access,
+                                                 return_type,
+                                                 return_type_location,
+                                                 parameters,
+                                                 std::move(function_block),
+                                                 declaration_location,
+                                                 definition_location);
+    }
+
+    {// Project Description Struct
+        std::vector<Owned<lang::Member>> members;
+
+        auto push_member = [&members](lang::Identifier member_identifier, lang::ResolvingHandle<lang::Type> type) {
+            members.emplace_back(makeOwned<lang::Member>(lang::AccessModifier::PUBLIC_ACCESS,
+                                                         member_identifier,
+                                                         type,
+                                                         lang::Assigner::UNSPECIFIED,
+                                                         std::nullopt,
+                                                         lang::Location::global(),
+                                                         lang::Location::global()));
+        };
+
+        auto string_type      = lang::PointerType::get(lang::FixedWidthIntegerType::get(8, false));
+        auto string_list_type = lang::BufferType::get(string_type);
+
+        push_member(lang::Identifier::like("name"), string_type);
+        push_member(lang::Identifier::like("libs"), string_list_type);
+        push_member(lang::Identifier::like("libpaths"), string_list_type);
+
+        unit_.globalScope().defineStruct(lang::AccessModifier::PUBLIC_ACCESS,
+                                         lang::Identifier::like("Project"),
+                                         std::move(members),
+                                         lang::Location::global());
+    }
+
+    {// Exit Function
+        auto                              access      = lang::AccessModifier::PUBLIC_ACCESS;
+        lang::Identifier const            identifier  = lang::Identifier::like("exit");
+        lang::ResolvingHandle<lang::Type> return_type = lang::VoidType::get();
+
+        lang::Location const declaration_location = lang::Location::global();
+        lang::Location const definition_location  = lang::Location::global();
+
+        std::vector<Shared<lang::Parameter>> parameters;
+        parameters.emplace_back(makeShared<lang::Parameter>(lang::FixedWidthIntegerType::get(32, false),
+                                                            lang::Location::global(),
+                                                            lang::Identifier::like("exitcode"),
+                                                            lang::Location::global()));
+
+        lang::Location const return_type_location = lang::Location::global();
+
+        auto function_block = lang::CodeBlock::makeInitial(location(ctx));
+
+        unit_.globalScope().defineCustomFunction(identifier,
+                                                 access,
+                                                 return_type,
+                                                 return_type_location,
+                                                 parameters,
+                                                 std::move(function_block),
+                                                 declaration_location,
+                                                 definition_location);
+    }
+
+    return {};
 }
 
 std::any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx)
@@ -66,14 +162,14 @@ std::any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclaration
     }
     else { initial_value = nullptr; }
 
-    application_.globalScope().defineGlobalVariable(access,
-                                                    is_constant,
-                                                    identifier,
-                                                    type,
-                                                    type_location,
-                                                    assigner,
-                                                    wrap(initial_value),
-                                                    location(ctx));
+    unit_.globalScope().defineGlobalVariable(access,
+                                             is_constant,
+                                             identifier,
+                                             type,
+                                             type_location,
+                                             assigner,
+                                             wrap(initial_value),
+                                             location(ctx));
 
     return {};
 }
@@ -87,7 +183,7 @@ std::any SourceVisitor::visitStructDefinition(anceParser::StructDefinitionContex
 
     for (auto member : ctx->member()) { members.emplace_back(*std::any_cast<lang::Member*>(visit(member))); }
 
-    application_.globalScope().defineStruct(access, identifier, std::move(members), location(ctx));
+    unit_.globalScope().defineStruct(access, identifier, std::move(members), location(ctx));
 
     return {};
 }
@@ -140,14 +236,14 @@ std::any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionCo
         function_block->append(std::move(block_ptr));
     }
 
-    application_.globalScope().defineCustomFunction(identifier,
-                                                    access,
-                                                    return_type,
-                                                    return_type_location,
-                                                    shared_parameters,
-                                                    std::move(function_block),
-                                                    declaration_location,
-                                                    definition_location);
+    unit_.globalScope().defineCustomFunction(identifier,
+                                             access,
+                                             return_type,
+                                             return_type_location,
+                                             shared_parameters,
+                                             std::move(function_block),
+                                             declaration_location,
+                                             definition_location);
 
     return {};
 }
@@ -165,11 +261,11 @@ std::any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFunctio
 
     lang::Location const return_type_location = ctx->type() ? location(ctx->type()) : lang::Location::global();
 
-    application_.globalScope().defineExternFunction(identifier,
-                                                    return_type,
-                                                    return_type_location,
-                                                    shared_parameters,
-                                                    location(ctx));
+    unit_.globalScope().defineExternFunction(identifier,
+                                             return_type,
+                                             return_type_location,
+                                             shared_parameters,
+                                             location(ctx));
 
     return {};
 }
@@ -196,7 +292,7 @@ std::any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ctx)
     auto                   other      = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
     lang::Identifier const identifier = ident(ctx->IDENTIFIER());
 
-    application_.globalScope().defineTypeAliasOther(identifier, other, location(ctx), location(ctx->type()));
+    unit_.globalScope().defineTypeAliasOther(identifier, other, location(ctx), location(ctx->type()));
 
     return {};
 }
@@ -844,7 +940,7 @@ std::any SourceVisitor::visitVectorType(anceParser::VectorTypeContext* ctx)
 
 std::any SourceVisitor::visitKeywordType(anceParser::KeywordTypeContext* ctx)
 {
-    return erase(application_.globalScope().getType(createIdentifier(ctx->getText(), location(ctx))).value());
+    return erase(unit_.globalScope().getType(createIdentifier(ctx->getText(), location(ctx))).value());
 }
 
 std::any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)

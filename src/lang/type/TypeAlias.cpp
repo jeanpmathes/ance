@@ -23,6 +23,11 @@ StateCount lang::TypeAlias::getStateCount() const
     return actual_->getStateCount();
 }
 
+bool lang::TypeAlias::isCustom() const
+{
+    return true;
+}
+
 lang::FixedWidthIntegerType const* lang::TypeAlias::isFixedWidthIntegerType() const
 {
     return actual_->isFixedWidthIntegerType();

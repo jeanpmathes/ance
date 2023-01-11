@@ -22,7 +22,8 @@ namespace lang
                   lang::Location                    definition_location,
                   lang::Location                    actual_type_location);
 
-        StateCount getStateCount() const override;
+        StateCount         getStateCount() const override;
+        [[nodiscard]] bool isCustom() const override;
 
         [[nodiscard]] FixedWidthIntegerType const* isFixedWidthIntegerType() const override;
         [[nodiscard]] bool               isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;

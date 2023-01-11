@@ -4,6 +4,10 @@ file
 	: ( variableDeclaration | function | typeDefinition )* EOF
 	;
 
+projectFile
+    : ( code )* EOF
+    ;
+
 variableDeclaration
 	: accessModifier ( CONST )? IDENTIFIER ( ':' type )? ( assigner expression )? ';'
 	;

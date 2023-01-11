@@ -1,7 +1,7 @@
 #include "SizeType.h"
 
-#include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "compiler/Unit.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/type/BooleanType.h"
@@ -29,7 +29,7 @@ std::string lang::SizeType::createMangledName() const
     return std::string(name().text());
 }
 
-void lang::SizeType::init(llvm::LLVMContext&, Application& app)
+void lang::SizeType::init(llvm::LLVMContext&, Unit& app)
 {
     assert(size_width_ == 0);
     assert(diff_width_ == 0);

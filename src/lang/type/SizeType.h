@@ -6,7 +6,7 @@
 #include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
 
-class Application;
+class Unit;
 
 namespace lang
 {
@@ -65,9 +65,9 @@ namespace lang
         /**
          * Initialize the size type.
          * @param c The llvm context.
-         * @param app The current application.
+         * @param unit The current unit.
          */
-        static void init(llvm::LLVMContext& c, Application& app);
+        static void init(llvm::LLVMContext& c, Unit& unit);
 
         /**
          * Get the size type instance.

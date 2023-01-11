@@ -1,30 +1,18 @@
-#ifndef ANCE_SRC_COMPILER_APPLICATION_H_
-#define ANCE_SRC_COMPILER_APPLICATION_H_
+#ifndef ANCE_SRC_COMPILER_PROJECTDESCRIPTION_H_
+#define ANCE_SRC_COMPILER_PROJECTDESCRIPTION_H_
 
 #include "Unit.h"
 
-/**
- * The application that is described by the source and will be compiled.
- */
-class Application : public Unit
+class ProjectDescription : public Unit
 {
   public:
-    /**
-     * Create a new application from a given project.
-     * @param project The project.
-     */
-    explicit Application(Project& project);
+    explicit ProjectDescription(std::filesystem::path project_file);
 
-  public:
-    Application(Application const&) = delete;
-    Application(Application&&)      = delete;
-
-  public:
     /**
      * Get the name of the application.
      * @return The name.
      */
-    std::string const& getName() const override;
+    [[nodiscard]] std::string const& getName() const override;
 
     /**
      * Get the path to the project file.
@@ -60,9 +48,8 @@ class Application : public Unit
     void                     addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileContext& context) override;
 
   private:
-    Project& project_;
-
-    mutable Optional<std::string> name_;
+    std::filesystem::path project_file_;
+    std::string           name_;
 };
 
 #endif
