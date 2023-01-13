@@ -1,18 +1,16 @@
-{
-    name: "test",
-    link: {
-        lib: [
-            "kernel32",
-            "ucrt",
-            "libucrt",
-            "msvcrt",
-            "libcmt",
-            "libvcruntime"
-        ],
-        libpath: [
-            "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.19041.0\\um\\x64",
-            "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.19041.0\\ucrt\\x64",
-            "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.30.30705\\lib\\x64"
-        ]
-    }
-}
+project.name <: c"test";
+
+project.libs <: new[7] dynamic *u8;
+project.libs[0] <: c"kernel32";
+project.libs[1] <: c"ucrt";
+project.libs[2] <: c"libucrt";
+project.libs[3] <: c"msvcrt";
+project.libs[4] <: c"libcmt";
+project.libs[5] <: c"libvcruntime";
+project.libs[6] <: null;
+
+project.libpaths <: new[4] dynamic *u8;
+project.libpaths[0] <: c"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.19041.0\\um\\x64";
+project.libpaths[1] <: c"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.19041.0\\ucrt\\x64";
+project.libpaths[2] <: c"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.30.30705\\lib\\x64";
+project.libpaths[3] <: null;

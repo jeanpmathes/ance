@@ -202,11 +202,11 @@ void lang::ResolvingHandle<T>::invalidate(T const* element)
 
     HandleNavigator* root = navigator_->root();
 
-    assert(!root->owned_element_.hasValue());
-
     T const* actual_element = root->get();
 
     if (actual_element != element) return;
+
+    assert(!root->owned_element_.hasValue());
 
     root->element_       = nullptr;
     root->owned_element_ = {};
