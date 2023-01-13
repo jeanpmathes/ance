@@ -8,48 +8,48 @@ class ProjectDescription : public Unit
   public:
     explicit ProjectDescription(std::filesystem::path project_file);
 
-    /**
-     * Get the name of the application.
-     * @return The name.
-     */
-    [[nodiscard]] std::string const& getName() const override;
-
-    /**
-     * Get the path to the project file.
-     * @return The project file.
-     */
-    [[nodiscard]] std::filesystem::path getProjectFile() const override;
-
-    /**
-     * Get the path to the project directory.
-     * @return The project directory.
-     */
-    [[nodiscard]] std::filesystem::path getProjectDirectory() const override;
-
-    /**
-     * Get the paths to all source files.
-     * @return The source file paths, relative to the project directory.
-     */
+    [[nodiscard]] std::string const&                 getName() const override;
+    [[nodiscard]] std::filesystem::path              getProjectFile() const override;
+    [[nodiscard]] std::filesystem::path              getProjectDirectory() const override;
     [[nodiscard]] std::vector<std::filesystem::path> getSourceFiles() const override;
-
-    /**
-     * Get the application type.
-     * @return The application type.
-     */
-    [[nodiscard]] ApplicationType getType() const override;
-
-    /**
-     * Validate the application before compilation.
-     * @param validation_logger A logger to log validation messages.
-     */
-    void validate(ValidationLogger& validation_logger) const override;
+    [[nodiscard]] UnitResult                         getType() const override;
+    void                                             validate(ValidationLogger& validation_logger) const override;
 
     antlr4::tree::ParseTree* selectTree(anceParser& parser) override;
     void                     addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileContext& context) override;
 
+    [[nodiscard]] std::vector<std::string> getLibraries() const override;
+    [[nodiscard]] std::vector<std::string> getLibraryPaths() const override;
+
+    void setResultPath(std::filesystem::path result) override;
+
+  public:
+    static constexpr char const* ANCE_PROJECT_DEFINITION_FUNCTION = "define_project";
+
+    struct Description {
+        std::string              name;
+        std::filesystem::path    project_file;
+        std::vector<std::string> linkage_libraries;
+        std::vector<std::string> linkage_library_paths;
+    };
+
+    /**
+     * Load all data from the project definition library.
+     */
+    bool loadDescription();
+
+    /**
+     * Get the description of the project.
+     * @return The description.
+     */
+    [[nodiscard]] Description const& description() const;
+
   private:
     std::filesystem::path project_file_;
     std::string           name_;
+
+    Optional<Description>           description_;
+    Optional<std::filesystem::path> result_path_;
 };
 
 #endif

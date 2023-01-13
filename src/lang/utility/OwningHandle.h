@@ -14,6 +14,9 @@ namespace lang
         OwningHandle(Owned<T> owner, lang::ResolvingHandle<T> handle);
 
       public:
+        OwningHandle(OwningHandle&& other) noexcept            = default;
+        OwningHandle& operator=(OwningHandle&& other) noexcept = default;
+
         static lang::OwningHandle<T> takeOwnership(lang::ResolvingHandle<T> handle);
 
         lang::ResolvingHandle<T>                               handle();
@@ -26,6 +29,8 @@ namespace lang
 
         T const* operator->() const noexcept;
         T const& operator*() const noexcept;
+
+        ~OwningHandle();
 
       private:
         Owned<T>                 owner_ {};

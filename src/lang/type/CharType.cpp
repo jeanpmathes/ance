@@ -147,9 +147,14 @@ llvm::DIType* lang::CharType::createDebugType(CompileContext& context) const
 
 lang::ResolvingHandle<lang::Type> lang::CharType::get()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new CharType())));
+#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new CharType())))
+
+    static lang::ResolvingHandle<lang::Type> instance = MAKE;
+
+    if (!instance.valid()) instance = MAKE;
+
     return instance;
+#undef MAKE
 }
 
 lang::ResolvingHandle<lang::Type> lang::CharType::clone() const

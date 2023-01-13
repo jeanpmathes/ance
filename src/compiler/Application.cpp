@@ -2,8 +2,6 @@
 
 #include "compiler/CodePrinter.h"
 #include "compiler/Project.h"
-#include "management/File.h"
-#include "management/elements/Element.h"
 #include "validation/ValidationLogger.h"
 
 #include "lang/type/HalfType.h"
@@ -51,9 +49,9 @@ std::vector<std::filesystem::path> Application::getSourceFiles() const
     return project_.getSourceFiles();
 }
 
-ApplicationType Application::getType() const
+UnitResult Application::getType() const
 {
-    return ApplicationType::EXECUTABLE;
+    return UnitResult::EXECUTABLE;
 }
 
 antlr4::tree::ParseTree* Application::selectTree(anceParser& parser)
@@ -65,4 +63,14 @@ void Application::addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileCon
 {
     source_visitor_.setFileContext(context);
     source_visitor_.visit(tree);
+}
+
+std::vector<std::string> Application::getLibraries() const
+{
+    return project_.description().linkage_libraries;
+}
+
+std::vector<std::string> Application::getLibraryPaths() const
+{
+    return project_.description().linkage_library_paths;
 }

@@ -72,9 +72,19 @@ unsigned int lang::UnsignedIntegerPointerType::sizeInBits()
 
 lang::ResolvingHandle<lang::Type> lang::UnsignedIntegerPointerType::get()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new UnsignedIntegerPointerType())));
+#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new UnsignedIntegerPointerType())))
+
+    static lang::ResolvingHandle<lang::Type> instance = MAKE;
+
+    if (!instance.valid())
+    {
+        instance = MAKE;
+        size_    = 0;
+    }
+
     return instance;
+
+#undef MAKE
 }
 
 Optional<size_t> lang::UnsignedIntegerPointerType::getBitSize() const

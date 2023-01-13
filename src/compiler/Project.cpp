@@ -1,32 +1,22 @@
 #include "Project.h"
 
 #include "lang/ApplicationVisitor.h"
-#include "management/File.h"
-#include "management/elements/Element.h"
 
-Project::Project(data::File& project) : project_(project), application_(*this) {}
+Project::Project(ProjectDescription::Description&& description) : description_(description), application_(*this) {}
 
 std::string Project::getName() const
 {
-    auto name = project_.root()["name"];
-
-    if (name.hasValue())
-    {
-        auto str = name->get().asString();
-
-        if (str.hasValue()) { return str->get(); }
-    }
-
-    return "unnamed";
+    return description_.name;
 }
+
 std::filesystem::path Project::getProjectFile() const
 {
-    return project_.path();
+    return description_.project_file;
 }
 
 std::filesystem::path Project::getProjectDirectory() const
 {
-    return project_.path().parent_path();
+    return description_.project_file.parent_path();
 }
 
 std::vector<std::filesystem::path> Project::getSourceFiles() const
@@ -52,4 +42,9 @@ std::vector<std::filesystem::path> Project::getSourceFiles() const
 Application& Project::getApplication()
 {
     return application_;
+}
+
+ProjectDescription::Description const& Project::description() const
+{
+    return description_;
 }

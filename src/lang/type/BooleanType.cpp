@@ -64,9 +64,14 @@ llvm::DIType* lang::BooleanType::createDebugType(CompileContext& context) const
 
 lang::ResolvingHandle<lang::Type> lang::BooleanType::get()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new BooleanType())));
+#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new BooleanType())))
+
+    static lang::ResolvingHandle<lang::Type> instance = MAKE;
+
+    if (!instance.valid()) instance = MAKE;
+
     return instance;
+#undef MAKE
 }
 
 bool lang::BooleanType::isOperatorDefined(lang::UnaryOperator op) const

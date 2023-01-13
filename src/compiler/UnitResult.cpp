@@ -1,12 +1,11 @@
+#include "UnitResult.h"
 
-#include "ApplicationType.h"
-
-ApplicationType::operator Value() const
+UnitResult::operator Value() const
 {
     return value_;
 }
 
-void ApplicationType::addLinkerArguments(std::vector<char const*>& args)
+void UnitResult::addLinkerArguments(std::vector<char const*>& args)
 {
     switch (value_)
     {
@@ -26,7 +25,7 @@ void ApplicationType::addLinkerArguments(std::vector<char const*>& args)
     }
 }
 
-std::string ApplicationType::getExtension() const
+std::string UnitResult::getExtension() const
 {
     switch (value_)
     {

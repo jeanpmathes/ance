@@ -3,7 +3,6 @@ add_executable(ance main.cpp)
 add_subdirectory(lang)
 add_subdirectory(compiler)
 add_subdirectory(grammar)
-add_subdirectory(management)
 add_subdirectory(validation)
 
 include_directories(.)

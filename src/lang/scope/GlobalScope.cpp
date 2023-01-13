@@ -231,6 +231,7 @@ Optional<lang::ResolvingHandle<lang::Type>> lang::GlobalScope::getType(Identifie
 void lang::GlobalScope::addTypeRegistry(lang::TypeDefinitionRegistry* registry)
 {
     type_registries_.push_back(registry);
+    registry->clear();
 }
 
 void lang::GlobalScope::registerUsage(lang::ResolvingHandle<lang::Variable> variable)

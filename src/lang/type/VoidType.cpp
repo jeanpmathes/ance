@@ -61,9 +61,14 @@ void lang::VoidType::buildNativeDefinition(CompileContext&) {}
 
 lang::ResolvingHandle<lang::Type> lang::VoidType::get()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new VoidType())));
+#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new VoidType())))
+
+    static lang::ResolvingHandle<lang::Type> instance = MAKE;
+
+    if (!instance.valid()) instance = MAKE;
+
     return instance;
+#undef MAKE
 }
 
 lang::ResolvingHandle<lang::Type> lang::VoidType::clone() const

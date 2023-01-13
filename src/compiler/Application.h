@@ -20,44 +20,18 @@ class Application : public Unit
     Application(Application&&)      = delete;
 
   public:
-    /**
-     * Get the name of the application.
-     * @return The name.
-     */
-    std::string const& getName() const override;
-
-    /**
-     * Get the path to the project file.
-     * @return The project file.
-     */
-    [[nodiscard]] std::filesystem::path getProjectFile() const override;
-
-    /**
-     * Get the path to the project directory.
-     * @return The project directory.
-     */
-    [[nodiscard]] std::filesystem::path getProjectDirectory() const override;
-
-    /**
-     * Get the paths to all source files.
-     * @return The source file paths, relative to the project directory.
-     */
+    std::string const&                               getName() const override;
+    [[nodiscard]] std::filesystem::path              getProjectFile() const override;
+    [[nodiscard]] std::filesystem::path              getProjectDirectory() const override;
     [[nodiscard]] std::vector<std::filesystem::path> getSourceFiles() const override;
-
-    /**
-     * Get the application type.
-     * @return The application type.
-     */
-    [[nodiscard]] ApplicationType getType() const override;
-
-    /**
-     * Validate the application before compilation.
-     * @param validation_logger A logger to log validation messages.
-     */
-    void validate(ValidationLogger& validation_logger) const override;
+    [[nodiscard]] UnitResult                         getType() const override;
+    void                                             validate(ValidationLogger& validation_logger) const override;
 
     antlr4::tree::ParseTree* selectTree(anceParser& parser) override;
     void                     addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileContext& context) override;
+
+    std::vector<std::string> getLibraries() const override;
+    std::vector<std::string> getLibraryPaths() const override;
 
   private:
     Project& project_;

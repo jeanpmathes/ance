@@ -8,6 +8,9 @@
 
 namespace lang
 {
+    template<typename T>
+    class OwningHandle;
+
     /**
      * A get that helps resolving entities that can be used before defining them.
      * For that purpose the get supports some rerouting operations.
@@ -84,6 +87,24 @@ namespace lang
         bool operator!=(ResolvingHandle<T> const& other) const;
 
         bool operator<(ResolvingHandle<T> const& other) const;
+
+        /**
+         * Check whether this handle is valid, i.e. whether it points to an object.
+         * Handles should be assumed to be valid and used in a way that does not invalidate them.
+         * @return True if this handle is valid.
+         */
+        [[nodiscard]] bool valid() const;
+
+      private:
+        friend class OwningHandle<T>;
+
+        /**
+         * Invalidate this handle. This is called by the owning handle when it is destroyed.
+         * It is possible that handles are routed away from the owning handle, which the owning handle does not know.
+         * To prevent invalidation in that case, the owning handle passes a pointer to the element it owns.
+         * @param element The element owned by the owning handle. No invalidation is performed if this is not the handled element.
+         */
+        void invalidate(T const* element);
 
       private:
         Shared<HandleNavigator> getRootNavigator();

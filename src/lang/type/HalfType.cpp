@@ -24,9 +24,14 @@ size_t lang::HalfType::getPrecision() const
 
 lang::ResolvingHandle<lang::Type> lang::HalfType::get()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new HalfType())));
+#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new HalfType())))
+
+    static lang::ResolvingHandle<lang::Type> instance = MAKE;
+
+    if (not instance.valid()) instance = MAKE;
+
     return instance;
+#undef MAKE
 }
 
 lang::ResolvingHandle<lang::Type> lang::HalfType::clone() const

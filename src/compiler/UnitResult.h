@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_COMPILER_APPLICATIONTYPE_H_
-#define ANCE_SRC_COMPILER_APPLICATIONTYPE_H_
+#ifndef ANCE_SRC_COMPILER_UNITRESULT_H_
+#define ANCE_SRC_COMPILER_UNITRESULT_H_
 
 #include <string>
 #include <vector>
@@ -7,7 +7,7 @@
 /**
  * The resulting build artifact type of a project.
  */
-class ApplicationType
+class UnitResult
 {
   public:
     enum Value
@@ -23,8 +23,8 @@ class ApplicationType
         EXECUTABLE
     };
 
-    ApplicationType() = default;
-    constexpr ApplicationType(Value val) : value_(val) {}// NOLINT(google-explicit-constructor)
+    UnitResult() = default;
+    constexpr UnitResult(Value val) : value_(val) {}// NOLINT(google-explicit-constructor)
 
              operator Value() const;// NOLINT(google-explicit-constructor)
     explicit operator bool() = delete;

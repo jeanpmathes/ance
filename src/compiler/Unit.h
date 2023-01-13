@@ -8,9 +8,9 @@
 
 #include "lang/Element.h"
 
-#include "compiler/ApplicationType.h"
 #include "compiler/FileContext.h"
 #include "compiler/SourceVisitor.h"
+#include "compiler/UnitResult.h"
 #include "lang/scope/GlobalScope.h"
 
 namespace lang
@@ -74,7 +74,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      * Get the application type.
      * @return The application type.
      */
-    [[nodiscard]] virtual ApplicationType getType() const = 0;
+    [[nodiscard]] virtual UnitResult getType() const = 0;
 
     /**
      * Get the bitness of the application.
@@ -140,13 +140,21 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      * Libraries that should be linked.
      * @return The libraries to link.
      */
-    [[nodiscard]] virtual std::vector<std::string> getLibraries() const;
+    [[nodiscard]] virtual std::vector<std::string> getLibraries() const = 0;
 
     /**
      * Paths to the directories containing the libraries.
      * @return The paths.
      */
-    [[nodiscard]] virtual std::vector<std::string> getLibraryPaths() const;
+    [[nodiscard]] virtual std::vector<std::string> getLibraryPaths() const = 0;
+
+    /**
+     * Called after linking.
+     * @param result The path to the result.
+     */
+    virtual void setResultPath(std::filesystem::path result);
+
+    ~Unit() override = default;
 
   private:
     Owned<lang::GlobalScope> global_scope_;

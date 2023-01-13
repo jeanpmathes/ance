@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 
+#include "compiler/ProjectDescription.h"
 #include "compiler/Unit.h"
 #include "lang/ApplicationVisitor.h"
 
@@ -43,8 +44,9 @@ void SourceVisitor::setFileContext(FileContext& file_context)
 std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 {
     {// Project Description Function
-        auto                              access      = lang::AccessModifier::EXTERN_ACCESS;
-        lang::Identifier const            identifier  = lang::Identifier::like("define_project");
+        auto                   access = lang::AccessModifier::EXTERN_ACCESS;
+        lang::Identifier const identifier =
+            lang::Identifier::like(ProjectDescription::ANCE_PROJECT_DEFINITION_FUNCTION);
         lang::ResolvingHandle<lang::Type> return_type = lang::VoidType::get();
 
         lang::Location const declaration_location = lang::Location::global();

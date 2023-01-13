@@ -13,7 +13,6 @@
 #include "compiler/ProjectDescription.h"
 #include "compiler/SourceTree.h"
 #include "lang/ApplicationVisitor.h"
-#include "management/File.h"
 #include "validation/ValidationLogger.h"
 
 /**
@@ -64,16 +63,18 @@ static Optional<int> build(SourceTree& tree, std::filesystem::path const& obj_di
 
     std::filesystem::path const ilr = obj_dir / (tree.unit().getName() + ".ll");
     std::filesystem::path const obj = obj_dir / (tree.unit().getName() + ".o");
-    std::filesystem::path const app = bin_dir / (tree.unit().getName() + tree.unit().getType().getExtension());
+    std::filesystem::path const res = bin_dir / (tree.unit().getName() + tree.unit().getType().getExtension());
 
     compiler.compile(ilr);
     compiler.emitObject(obj);
 
-    bool const ok = linker.link(obj, app);
+    bool const ok = linker.link(obj, res);
 
-    if (ok) return {};
+    if (!ok) return EXIT_FAILURE;
 
-    return EXIT_FAILURE;
+    tree.unit().setResultPath(res);
+
+    return {};
 }
 
 int main(int argc, char** argv)
@@ -99,12 +100,14 @@ int main(int argc, char** argv)
 
     std::filesystem::path const bld_dir = project_file_path.parent_path() / "bld";
 
-    ProjectDescription project_description(project_file_path);
-    ValidationLogger   validation_logger;
-
-    std::cout << "============ Build [ " << project_description.getName() << " ] ============" << std::endl;
+    ProjectDescription::Description description;
+    ValidationLogger                validation_logger;
 
     {
+        ProjectDescription project_description(project_file_path);
+
+        std::cout << "============ Build [ " << project_description.getName() << " ] ============" << std::endl;
+
         SourceTree tree(project_description);
         tree.parse();
 
@@ -123,13 +126,19 @@ int main(int argc, char** argv)
 
         error = build(tree, obj_dir, bin_dir);
         if (error.hasValue()) return error.value();
+
+        bool const ok = project_description.loadDescription();
+        if (!ok)
+        {
+            std::cout << "ance: input: project description invalid" << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        description = project_description.description();
     }
 
     {
-        data::File project_file(project_file_path);
-        project_file.read();
-
-        Project project(project_file);
+        Project project(std::move(description));
 
         Application& application = project.getApplication();
 

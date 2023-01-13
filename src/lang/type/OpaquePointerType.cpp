@@ -43,9 +43,14 @@ llvm::DIType* lang::OpaquePointerType::createDebugType(CompileContext& context) 
 
 lang::ResolvingHandle<lang::Type> lang::OpaquePointerType::get()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new OpaquePointerType())));
+#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new OpaquePointerType())))
+
+    static lang::ResolvingHandle<lang::Type> instance = MAKE;
+
+    if (!instance.valid()) instance = MAKE;
+
     return instance;
+#undef MAKE
 }
 
 Optional<lang::ResolvingHandle<lang::Type>> lang::OpaquePointerType::getPointeeType()

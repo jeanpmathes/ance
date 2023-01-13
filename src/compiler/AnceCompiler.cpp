@@ -81,7 +81,7 @@ void AnceCompiler::compile(std::filesystem::path const& out)
 
     switch (unit_.getType())
     {
-        case ApplicationType::EXECUTABLE:
+        case UnitResult::EXECUTABLE:
         {
             lang::ResolvingHandle<lang::Function> main = unit_.globalScope().getEntry();
 
@@ -92,7 +92,7 @@ void AnceCompiler::compile(std::filesystem::path const& out)
             break;
         }
 
-        case ApplicationType::LIBRARY:
+        case UnitResult::LIBRARY:
         {
             break;
         }

@@ -40,9 +40,18 @@ void lang::SizeType::init(llvm::LLVMContext&, Unit& app)
 
 lang::ResolvingHandle<lang::Type> lang::SizeType::getSize()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new SizeType("size", SIZE_KIND))));
+#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new SizeType("size", SIZE_KIND))))
+
+    static lang::ResolvingHandle<lang::Type> instance = MAKE;
+
+    if (!instance.valid())
+    {
+        instance    = MAKE;
+        size_width_ = 0;
+    }
+
     return instance;
+#undef MAKE
 }
 
 unsigned int lang::SizeType::getSizeWidth()
@@ -52,9 +61,18 @@ unsigned int lang::SizeType::getSizeWidth()
 
 lang::ResolvingHandle<lang::Type> lang::SizeType::getDiff()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new SizeType("diff", DIFF_KIND))));
+#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new SizeType("diff", DIFF_KIND))))
+
+    static lang::ResolvingHandle<lang::Type> instance = MAKE;
+
+    if (!instance.valid())
+    {
+        instance    = MAKE;
+        diff_width_ = 0;
+    }
+
     return instance;
+#undef MAKE
 }
 
 unsigned int lang::SizeType::getDiffWidth()

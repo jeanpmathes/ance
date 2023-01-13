@@ -4,8 +4,6 @@
 
 #include "compiler/CodePrinter.h"
 #include "compiler/Project.h"
-#include "management/File.h"
-#include "management/elements/Element.h"
 #include "validation/ValidationLogger.h"
 
 #include "lang/type/DoubleType.h"
@@ -50,7 +48,6 @@ Unit::Unit() : Unit(makeOwned<lang::GlobalScope>())
     global_scope_->registerDefinition(lang::UnsignedIntegerPointerType::get());
     global_scope_->registerDefinition(lang::OpaquePointerType::get());
     global_scope_->registerDefinition(lang::NullPointerType::get());
-
     // Add type registries
 
     global_scope_->addTypeRegistry(lang::FixedWidthIntegerType::getRegistry());
@@ -111,14 +108,4 @@ lang::GlobalScope const& Unit::globalScope() const
     return *global_scope_;
 }
 
-std::vector<std::string> Unit::getLibraries() const
-{
-    return {"kernel32", "ucrt", "msvcrt", "libcmt", "libvcruntime"};
-}
-
-std::vector<std::string> Unit::getLibraryPaths() const
-{
-    return {R"(C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64)",
-            R"(C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64)",
-            R"(C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.30.30705\lib\x64)"};
-}
+void Unit::setResultPath(std::filesystem::path) {}

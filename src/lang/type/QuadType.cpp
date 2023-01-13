@@ -22,9 +22,14 @@ size_t lang::QuadType::getPrecision() const
 
 lang::ResolvingHandle<lang::Type> lang::QuadType::get()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new QuadType())));
+#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new QuadType())))
+
+    static lang::ResolvingHandle<lang::Type> instance = MAKE;
+
+    if (!instance.valid()) instance = MAKE;
+
     return instance;
+#undef MAKE
 }
 
 lang::ResolvingHandle<lang::Type> lang::QuadType::clone() const

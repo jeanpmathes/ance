@@ -5,11 +5,7 @@
 #include <memory>
 
 #include "compiler/Application.h"
-
-namespace data
-{
-    class File;
-}
+#include "compiler/ProjectDescription.h"
 
 class Application;
 
@@ -20,10 +16,10 @@ class Project
 {
   public:
     /**
-     * Create a project from a given file.
-     * @param project The project file.
+     * Create a project from a given description.
+     * @param description The project description.
      */
-    explicit Project(data::File& project);
+    explicit Project(ProjectDescription::Description&& description);
 
     /**
      * Get the name of the application.
@@ -55,9 +51,11 @@ class Project
      */
     Application& getApplication();
 
+    [[nodiscard]] ProjectDescription::Description const& description() const;
+
   private:
-    data::File& project_;
-    Application application_;
+    ProjectDescription::Description description_;
+    Application                     application_;
 };
 
 #endif

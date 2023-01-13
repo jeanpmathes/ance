@@ -22,9 +22,14 @@ size_t lang::DoubleType::getPrecision() const
 
 lang::ResolvingHandle<lang::Type> lang::DoubleType::get()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new DoubleType())));
+#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new DoubleType())))
+
+    static lang::ResolvingHandle<lang::Type> instance = MAKE;
+
+    if (!instance.valid()) instance = MAKE;
+
     return instance;
+#undef MAKE
 }
 
 lang::ResolvingHandle<lang::Type> lang::DoubleType::clone() const

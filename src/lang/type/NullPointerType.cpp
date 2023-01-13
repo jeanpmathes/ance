@@ -68,9 +68,14 @@ llvm::DIType* lang::NullPointerType::createDebugType(CompileContext& context) co
 
 lang::ResolvingHandle<lang::Type> lang::NullPointerType::get()
 {
-    static lang::ResolvingHandle<lang::Type> instance =
-        lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new NullPointerType())));
+#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new NullPointerType())))
+
+    static lang::ResolvingHandle<lang::Type> instance = MAKE;
+
+    if (!instance.valid()) instance = MAKE;
+
     return instance;
+#undef MAKE
 }
 
 Optional<lang::ResolvingHandle<lang::Type>> lang::NullPointerType::getPointeeType()
