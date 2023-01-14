@@ -83,7 +83,8 @@ tests: list = discovery.create_tests(projects)
 test_runs = []
 passing_count: int = 0
 
-for test_case in tests:
+for idx, test_case in enumerate(tests):
+    print(f"Running test {test_case.test_name}... ({idx + 1}/{len(tests)})")
     run: TestRun = run_test(test_case)
     test_runs.append(run)
 
