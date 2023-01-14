@@ -55,10 +55,9 @@ namespace lang
             explicit HandleNavigator(Shared<HandleNavigator> next);
             explicit HandleNavigator(Owned<T> element);
 
-            Optional<Shared<HandleNavigator>> sRoot();
-
-            HandleNavigator*       root();
-            HandleNavigator const* root() const;
+            Optional<Shared<HandleNavigator>> root();
+            HandleNavigator*                  navigator();
+            HandleNavigator const*            root() const;
 
             T*       get();
             T const* get() const;

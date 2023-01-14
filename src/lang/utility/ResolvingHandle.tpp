@@ -49,7 +49,7 @@ Owned<T> lang::ResolvingHandle<T>::take()
 template<typename T>
 void lang::ResolvingHandle<T>::reroute(lang::ResolvingHandle<T> target)
 {
-    if (getRootNavigator() != target.getRootNavigator()) { navigator_->root()->target(target.getRootNavigator()); }
+    if (getRootNavigator() != target.getRootNavigator()) { navigator_->navigator()->target(target.getRootNavigator()); }
 }
 
 template<typename T>
@@ -91,10 +91,9 @@ lang::ResolvingHandle<T>::operator T const&() const noexcept
 template<typename T>
 Shared<typename lang::ResolvingHandle<T>::HandleNavigator> lang::ResolvingHandle<T>::getRootNavigator()
 {
-    Optional<Shared<HandleNavigator>> nav_root = navigator_->sRoot();
-    if (!nav_root.hasValue()) nav_root = navigator_;
-
-    return nav_root.value();
+    Optional<Shared<HandleNavigator>> nav_root = navigator_->root();
+    if (nav_root.hasValue()) navigator_ = nav_root.value();// Shorten the chain.
+    return navigator_;
 }
 
 template<typename T>
@@ -129,27 +128,34 @@ lang::ResolvingHandle<T>::HandleNavigator::HandleNavigator(Shared<HandleNavigato
 {}
 
 template<typename T>
-lang::ResolvingHandle<T>::HandleNavigator::HandleNavigator(Owned<T> element) : owned_element_(std::move(element))
+lang::ResolvingHandle<T>::HandleNavigator::HandleNavigator(Owned<T> element)
+    : owned_element_(std::move(element))
+    , element_(owned_element_.value().get())
 {}
 
 template<typename T>
-Optional<Shared<typename lang::ResolvingHandle<T>::HandleNavigator>> lang::ResolvingHandle<T>::HandleNavigator::sRoot()
+Optional<Shared<typename lang::ResolvingHandle<T>::HandleNavigator>> lang::ResolvingHandle<T>::HandleNavigator::root()
 {
-    if (next_.hasValue())
+    auto root = next_;
+
+    if (root.hasValue())
     {
-        Optional<Shared<HandleNavigator>> potential_root = next_.value()->sRoot();
-
-        if (potential_root.hasValue()) { next_ = potential_root; }
-
-        return next_;
+        auto next_root = root.value()->root();
+        if (next_root.hasValue()) root = next_root;
     }
-    else { return {}; }
+
+    return root;
 }
 
 template<typename T>
-typename lang::ResolvingHandle<T>::HandleNavigator* lang::ResolvingHandle<T>::HandleNavigator::root()
+typename lang::ResolvingHandle<T>::HandleNavigator* lang::ResolvingHandle<T>::HandleNavigator::navigator()
 {
-    return next_.hasValue() ? next_.value()->root() : this;
+    HandleNavigator* nav = this;
+
+    auto potential_nav = this->root();
+    if (potential_nav.hasValue()) nav = potential_nav.value().get();
+
+    return nav;
 }
 
 template<typename T>
@@ -161,27 +167,24 @@ typename lang::ResolvingHandle<T>::HandleNavigator const* lang::ResolvingHandle<
 template<typename T>
 T* lang::ResolvingHandle<T>::HandleNavigator::get()
 {
-    HandleNavigator* root = this->root();
-    return root->element_ ? root->element_ : root->owned_element_->get();
+    return navigator()->element_;
 }
 
 template<typename T>
 T const* lang::ResolvingHandle<T>::HandleNavigator::get() const
 {
     HandleNavigator const* root = this->root();
-    return root->element_ ? root->element_ : root->owned_element_->get();
+    return root->element_;
 }
 
 template<typename T>
 Owned<T> lang::ResolvingHandle<T>::HandleNavigator::take()
 {
-    auto root = this->root();
+    HandleNavigator* root = navigator();
     assert(root->owned_element_.hasValue());
 
     Owned<T> taken = std::move(root->owned_element_.value());
-
     root->owned_element_ = {};
-    root->element_       = taken.get();
 
     return taken;
 }
@@ -200,7 +203,7 @@ void lang::ResolvingHandle<T>::invalidate(T const* element)
 {
     assert(valid());
 
-    HandleNavigator* root = navigator_->root();
+    HandleNavigator* root = navigator_->navigator();
 
     T const* actual_element = root->get();
 
