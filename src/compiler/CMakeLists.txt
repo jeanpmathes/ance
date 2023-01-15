@@ -11,4 +11,5 @@ target_sources(ance PRIVATE AnceCompiler.cpp
                Project.cpp
                Unit.cpp
                ProjectDescription.cpp
+               OptLevel.cpp
                CodePrinter.cpp)

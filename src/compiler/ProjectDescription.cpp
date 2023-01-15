@@ -37,6 +37,11 @@ UnitResult ProjectDescription::getType() const
     return UnitResult::LIBRARY;
 }
 
+OptLevel ProjectDescription::getOptimizationLevel() const
+{
+    return OptLevel::O_3;
+}
+
 void ProjectDescription::validate(ValidationLogger& validation_logger) const
 {
     this->globalScope().validate(validation_logger);
@@ -66,9 +71,10 @@ std::vector<std::string> ProjectDescription::getLibraryPaths() const
 }
 
 struct Project_ {
-    uint8_t const*  name;
-    uint8_t const** libraries;
-    uint8_t const** library_paths;
+    uint8_t const*  name = nullptr;
+    uint8_t const** libraries = nullptr;
+    uint8_t const** library_paths = nullptr;
+    uint32_t opt_level = 0;
 };
 
 struct test {
@@ -133,10 +139,30 @@ bool ProjectDescription::loadDescription()
         return result;
     };
 
+    OptLevel opt_level;
+    switch (project.opt_level)
+    {
+        case 0:
+            opt_level = OptLevel::O_0;
+            break;
+        case 1:
+            opt_level = OptLevel::O_1;
+            break;
+        case 2:
+            opt_level = OptLevel::O_2;
+            break;
+        case 3:
+            opt_level = OptLevel::O_3;
+            break;
+        default:
+            return false;
+    }
+
     description_ = {.name                  = read_string(project.name),
                     .project_file          = project_file_,
                     .linkage_libraries     = read_vector(project.libraries),
-                    .linkage_library_paths = read_vector(project.library_paths)};
+                    .linkage_library_paths = read_vector(project.library_paths),
+                    .opt_level             = opt_level};
 
 #if defined(ANCE_TARGET_WINDOWS)
     FreeLibrary(handle);

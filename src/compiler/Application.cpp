@@ -54,6 +54,11 @@ UnitResult Application::getType() const
     return UnitResult::EXECUTABLE;
 }
 
+OptLevel Application::getOptimizationLevel() const
+{
+    return project_.description().opt_level;
+}
+
 antlr4::tree::ParseTree* Application::selectTree(anceParser& parser)
 {
     return parser.file();

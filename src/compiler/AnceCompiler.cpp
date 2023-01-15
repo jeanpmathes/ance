@@ -44,7 +44,13 @@ AnceCompiler::AnceCompiler(Unit& unit, SourceTree& tree)
 
     llvm::TargetOptions const opt;
 
-    target_machine_ = t->createTargetMachine(triple.str(), "generic", "", opt, rm, cm, llvm::CodeGenOpt::None);
+    target_machine_ = t->createTargetMachine(triple.str(),
+                                             "generic",
+                                             "",
+                                             opt,
+                                             rm,
+                                             cm,
+                                             unit_.getOptimizationLevel().getCodeGenerationOptimizationLevel());
 
     llvm::DataLayout dl = target_machine_->createDataLayout();
     unit_.setPointerSize(dl.getPointerSize());
@@ -118,7 +124,7 @@ void AnceCompiler::compile(std::filesystem::path const& out)
                                       cgscc_analysis_manager,
                                       module_analysis_manager);
 
-    auto opt_level = llvm::OptimizationLevel::O1;
+    auto opt_level = unit_.getOptimizationLevel().getOptimizationLevel();
 
     if (opt_level != llvm::OptimizationLevel::O0)
     {

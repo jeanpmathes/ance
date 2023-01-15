@@ -9,6 +9,7 @@
 #include "lang/Element.h"
 
 #include "compiler/FileContext.h"
+#include "compiler/OptLevel.h"
 #include "compiler/SourceVisitor.h"
 #include "compiler/UnitResult.h"
 #include "lang/scope/GlobalScope.h"
@@ -16,11 +17,6 @@
 namespace lang
 {
     class Function;
-}
-
-namespace data
-{
-    class File;
 }
 
 class Statement;
@@ -75,6 +71,12 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      * @return The application type.
      */
     [[nodiscard]] virtual UnitResult getType() const = 0;
+
+    /**
+     * Get the optimization level.
+     * @return The optimization level.
+     */
+    [[nodiscard]] virtual OptLevel getOptimizationLevel() const = 0;
 
     /**
      * Get the bitness of the application.

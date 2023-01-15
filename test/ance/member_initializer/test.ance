@@ -1,4 +1,5 @@
 project.name <: c"test";
+project.opt_level <: 3;
 
 project.libs <: new[7] dynamic *u8;
 project.libs[0] <: c"kernel32";
