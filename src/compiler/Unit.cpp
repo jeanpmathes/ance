@@ -107,5 +107,3 @@ lang::GlobalScope const& Unit::globalScope() const
 {
     return *global_scope_;
 }
-
-void Unit::setResultPath(std::filesystem::path) {}

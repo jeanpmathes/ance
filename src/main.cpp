@@ -53,6 +53,11 @@ static Optional<int> validateFlow(SourceTree& tree, ValidationLogger& validation
     return {};
 }
 
+static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir, Unit& unit)
+{
+    return bin_dir / (unit.getName() + unit.getType().getExtension());
+}
+
 static Optional<int> build(SourceTree& tree, std::filesystem::path const& obj_dir, std::filesystem::path const& bin_dir)
 {
     AnceCompiler compiler(tree.unit(), tree);
@@ -63,18 +68,16 @@ static Optional<int> build(SourceTree& tree, std::filesystem::path const& obj_di
 
     std::filesystem::path const ilr = obj_dir / (tree.unit().getName() + ".ll");
     std::filesystem::path const obj = obj_dir / (tree.unit().getName() + ".o");
-    std::filesystem::path const res = bin_dir / (tree.unit().getName() + tree.unit().getType().getExtension());
+    std::filesystem::path const res = getResultPath(bin_dir, tree.unit());
 
     compiler.compile(ilr);
     compiler.emitObject(obj);
 
     bool const ok = linker.link(obj, res);
 
-    if (!ok) return EXIT_FAILURE;
+    if (ok) return {};
 
-    tree.unit().setResultPath(res);
-
-    return {};
+    return EXIT_FAILURE;
 }
 
 int main(int argc, char** argv)
@@ -105,27 +108,31 @@ int main(int argc, char** argv)
 
     {
         ProjectDescription project_description(project_file_path);
+        project_description.setBinaryDescriptionPath(getResultPath(bld_dir, project_description));
 
         std::cout << "============ Build [ " << project_description.getName() << " ] ============" << std::endl;
 
-        SourceTree tree(project_description);
-        tree.parse();
+        if (project_description.isRefreshRequired())
+        {
+            SourceTree tree(project_description);
+            tree.parse();
 
-        std::cout << "ance: input: project file read" << std::endl;
+            std::cout << "ance: input: project file read" << std::endl;
 
-        auto error = validateTree(tree, validation_logger);
-        if (error.hasValue()) return error.value();
+            auto error = validateTree(tree, validation_logger);
+            if (error.hasValue()) return error.value();
 
-        project_description.preBuild();
+            project_description.preBuild();
 
-        error = validateFlow(tree, validation_logger);
-        if (error.hasValue()) return error.value();
+            error = validateFlow(tree, validation_logger);
+            if (error.hasValue()) return error.value();
 
-        std::filesystem::path const  obj_dir = bld_dir / "prj";
-        std::filesystem::path const& bin_dir = bld_dir;
+            std::filesystem::path const  obj_dir = bld_dir / "prj";
+            std::filesystem::path const& bin_dir = bld_dir;
 
-        error = build(tree, obj_dir, bin_dir);
-        if (error.hasValue()) return error.value();
+            error = build(tree, obj_dir, bin_dir);
+            if (error.hasValue()) return error.value();
+        }
 
         bool const ok = project_description.loadDescription();
         if (!ok)

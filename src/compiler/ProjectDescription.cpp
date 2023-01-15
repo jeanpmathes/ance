@@ -7,6 +7,11 @@ ProjectDescription::ProjectDescription(std::filesystem::path project_file)
     , name_(project_file_.stem().generic_string())
 {}
 
+void ProjectDescription::setBinaryDescriptionPath(std::filesystem::path path)
+{
+    binary_description_path_ = std::move(path);
+}
+
 std::string const& ProjectDescription::getName() const
 {
     return name_;
@@ -60,11 +65,6 @@ std::vector<std::string> ProjectDescription::getLibraryPaths() const
             R"(C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.30.30705\lib\x64)"};
 }
 
-void ProjectDescription::setResultPath(std::filesystem::path result)
-{
-    result_path_ = std::move(result);
-}
-
 struct Project_ {
     uint8_t const*  name;
     uint8_t const** libraries;
@@ -92,7 +92,7 @@ bool ProjectDescription::loadDescription()
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #define ANCE_TARGET_WINDOWS
 
-    HMODULE handle = LoadLibraryA(result_path_->string().c_str());
+    HMODULE handle = LoadLibraryA(binary_description_path_->string().c_str());
     if (!handle) return false;
 
     auto function =
@@ -103,7 +103,7 @@ bool ProjectDescription::loadDescription()
 #elif defined(_POSIX_VERSION)
 #define ANCE_TARGET_POSIX
 
-    void* handle = dlopen(result_path_->string().c_str(), RTLD_NOW);
+    void* handle = dlopen(binary_description_path_->string().c_str(), RTLD_NOW);
     if (!handle) return false;
 
     auto function = reinterpret_cast<ProjectDescriptionFunction>(dlsym(handle, ANCE_PROJECT_DEFINITION_FUNCTION));
@@ -143,6 +143,19 @@ bool ProjectDescription::loadDescription()
 #elif defined(ANCE_TARGET_POSIX)
     dlclose(handle);
 #endif
+
+    return true;
+}
+
+bool ProjectDescription::isRefreshRequired()
+{
+    if (std::filesystem::exists(binary_description_path_.value()))
+    {
+        auto binary_description_time = std::filesystem::last_write_time(binary_description_path_.value());
+        auto project_file_time       = std::filesystem::last_write_time(project_file_);
+
+        return binary_description_time < project_file_time;
+    }
 
     return true;
 }

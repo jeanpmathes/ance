@@ -8,6 +8,12 @@ class ProjectDescription : public Unit
   public:
     explicit ProjectDescription(std::filesystem::path project_file);
 
+    /**
+     * Set the path where the binary form of the project description will be stored.
+     * @param path The path.
+     */
+    void setBinaryDescriptionPath(std::filesystem::path path);
+
     [[nodiscard]] std::string const&                 getName() const override;
     [[nodiscard]] std::filesystem::path              getProjectFile() const override;
     [[nodiscard]] std::filesystem::path              getProjectDirectory() const override;
@@ -21,7 +27,11 @@ class ProjectDescription : public Unit
     [[nodiscard]] std::vector<std::string> getLibraries() const override;
     [[nodiscard]] std::vector<std::string> getLibraryPaths() const override;
 
-    void setResultPath(std::filesystem::path result) override;
+    /*
+     * Get whether a refresh build is required.
+     * @return True if a refresh build is required, false if the binary description is up to date.
+     */
+    bool isRefreshRequired();
 
   public:
     static constexpr char const* ANCE_PROJECT_DEFINITION_FUNCTION = "define_project";
@@ -48,8 +58,8 @@ class ProjectDescription : public Unit
     std::filesystem::path project_file_;
     std::string           name_;
 
+    Optional<std::filesystem::path> binary_description_path_;
     Optional<Description>           description_;
-    Optional<std::filesystem::path> result_path_;
 };
 
 #endif

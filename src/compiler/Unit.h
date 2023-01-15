@@ -148,12 +148,6 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      */
     [[nodiscard]] virtual std::vector<std::string> getLibraryPaths() const = 0;
 
-    /**
-     * Called after linking.
-     * @param result The path to the result.
-     */
-    virtual void setResultPath(std::filesystem::path result);
-
     ~Unit() override = default;
 
   private:
