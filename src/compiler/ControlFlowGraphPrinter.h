@@ -5,7 +5,7 @@
 
 #include "compiler/CodePrinter.h"
 
-class ControlFlowGraphPrinter : public lang::ApplicationVisitor
+class ControlFlowGraphPrinter : public lang::ApplicationVisitorNonConst
 {
   private:
     enum class BlockStyle
@@ -16,7 +16,7 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitor
     };
 
   public:
-    using lang::ApplicationVisitor::visit;
+    using lang::ApplicationVisitorNonConst::visit;
 
     explicit ControlFlowGraphPrinter(std::ostream& out);
 

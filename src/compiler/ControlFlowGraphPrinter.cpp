@@ -47,7 +47,8 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
             std::stringstream code_stream;
             CodePrinter       code_printer(code_stream);
 
-            code_printer.visitTree(statement);
+            Statement const& stmt = statement;
+            code_printer.visitTree(stmt);
 
             label += escape(code_stream.str());
             label += '\n';
@@ -58,7 +59,7 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
     }
     else
     {
-        bool inside = id > 0;
+        bool const inside = id > 0;
 
         label = inside ? block.getExitRepresentation() : current_function_->name().text();
         style = BlockStyle::META;
@@ -66,7 +67,7 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
 
     printBlock(label, id, style);
 
-    std::vector<lang::BasicBlock*> successors = block.getSuccessors();
+    std::vector<lang::BasicBlock*> const successors = block.getSuccessors();
 
     if (successors.empty()) { printLink(id, NODE_EXIT); }
     else

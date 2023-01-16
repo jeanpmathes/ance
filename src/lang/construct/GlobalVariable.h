@@ -46,7 +46,7 @@ namespace lang
         [[nodiscard]] lang::AccessModifier access() const;
         [[nodiscard]] bool                 isConstant() const;
         [[nodiscard]] lang::Assigner       assigner() const;
-        [[nodiscard]] Expression*          init() const;
+        [[nodiscard]] Expression const*    init() const;
 
         void validate(ValidationLogger& validation_logger) const override;
 

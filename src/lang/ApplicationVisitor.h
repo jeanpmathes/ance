@@ -5,7 +5,22 @@
 
 namespace lang
 {
-    using ApplicationVisitor = lang::VisitorBase<ANCE_CONSTRUCTS>;
+    template<bool is_const>
+    class ApplicationVisitor : public lang::VisitorBase<ANCE_CONSTRUCTS>
+    {
+      public:
+        using VisitorBase<ANCE_CONSTRUCTS>::visit;
+
+        std::any defaultVisit(VisitableBase* ptr) override
+        {
+            assert(!is_const && "Non-const visitable passed to const visitor.");
+
+            return lang::VisitorBase<ANCE_CONSTRUCTS>::defaultVisit(ptr);
+        }
+    };
+
+    using ApplicationVisitorConst    = ApplicationVisitor<true>;
+    using ApplicationVisitorNonConst = ApplicationVisitor<false>;
 }
 
 #include "compiler/Application.h"

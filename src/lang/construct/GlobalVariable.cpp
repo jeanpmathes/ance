@@ -76,7 +76,7 @@ lang::Assigner lang::GlobalVariable::assigner() const
     else { return lang::Assigner::COPY_ASSIGNMENT; }
 }
 
-Expression* lang::GlobalVariable::init() const
+Expression const* lang::GlobalVariable::init() const
 {
     return init_;
 }

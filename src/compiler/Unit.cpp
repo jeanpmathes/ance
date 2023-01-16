@@ -90,7 +90,9 @@ void Unit::emitAsSource(std::filesystem::path const& out)
     std::ostream o(of.rdbuf());
 
     CodePrinter printer(o);
-    printer.visit(*this);
+
+    Unit const& self = *this;
+    printer.visit(self);
 }
 
 void Unit::validateFlow(ValidationLogger& validation_logger)

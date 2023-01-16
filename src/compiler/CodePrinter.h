@@ -8,10 +8,10 @@ namespace util
     std::ostream& operator<<(std::ostream& os, std::any const& any);
 }
 
-class CodePrinter : public lang::ApplicationVisitor
+class CodePrinter : public lang::ApplicationVisitorConst
 {
   public:
-    using lang::ApplicationVisitor::visit;
+    using lang::ApplicationVisitorConst::visit;
 
     explicit CodePrinter(std::ostream& out);
 
