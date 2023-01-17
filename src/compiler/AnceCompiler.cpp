@@ -126,10 +126,14 @@ void AnceCompiler::compile(std::filesystem::path const& out)
 
     auto opt_level = unit_.getOptimizationLevel().getOptimizationLevel();
 
-    if (opt_level != llvm::OptimizationLevel::O0)
+    if (opt_level == llvm::OptimizationLevel::O0)
     {
-        llvm::ModulePassManager pass_manager =
-            pass_builder.buildModuleSimplificationPipeline(opt_level, llvm::ThinOrFullLTOPhase::None);
+        llvm::ModulePassManager pass_manager = pass_builder.buildO0DefaultPipeline(opt_level);
+        pass_manager.run(module_, module_analysis_manager);
+    }
+    else
+    {
+        llvm::ModulePassManager pass_manager = pass_builder.buildPerModuleDefaultPipeline(opt_level);
         pass_manager.run(module_, module_analysis_manager);
     }
 
