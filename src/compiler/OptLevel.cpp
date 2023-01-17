@@ -40,3 +40,22 @@ llvm::OptimizationLevel OptLevel::getOptimizationLevel() const
             return llvm::OptimizationLevel::O3;
     }
 }
+
+bool OptLevel::isOptimized() const
+{
+    return value_ != O_0;
+}
+
+llvm::DICompileUnit::DebugEmissionKind OptLevel::getDebugEmissionKind() const
+{
+    switch (value_)
+    {
+        case O_0:
+            return llvm::DICompileUnit::DebugEmissionKind::FullDebug;
+
+        case O_1:
+        case O_2:
+        case O_3:
+            return llvm::DICompileUnit::DebugEmissionKind::NoDebug;
+    }
+}

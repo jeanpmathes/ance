@@ -22,7 +22,11 @@ CompileContext::CompileContext(Unit&              unit,
     llvm::DIFile* project_file =
         di.createFile(unit_.getProjectFile().filename().generic_string(), unit_.getProjectDirectory().generic_string());
 
-    di_unit_ = di.createCompileUnit(llvm::dwarf::DW_LANG_C, project_file, "ance-000", false, "", 0);
+    bool const is_optimized = unit_.getOptimizationLevel().isOptimized();
+    auto const debug_kind   = unit_.getOptimizationLevel().getDebugEmissionKind();
+
+    di_unit_ =
+        di.createCompileUnit(llvm::dwarf::DW_LANG_C, project_file, "ance-000", is_optimized, "", 0, "", debug_kind);
 
     for (auto& source_file : source_tree.getSourceFiles())
     {

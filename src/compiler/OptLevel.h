@@ -1,6 +1,7 @@
 #ifndef ANCE_SRC_COMPILER_OPTLEVEL_H_
 #define ANCE_SRC_COMPILER_OPTLEVEL_H_
 
+#include <llvm/IR/DebugInfoMetadata.h>
 #include <llvm/Passes/OptimizationLevel.h>
 #include <llvm/Support/CodeGen.h>
 
@@ -24,8 +25,10 @@ class OptLevel
              operator Value() const;// NOLINT(google-explicit-constructor)
     explicit operator bool() = delete;
 
-    [[nodiscard]] llvm::CodeGenOpt::Level getCodeGenerationOptimizationLevel() const;
-    [[nodiscard]] llvm::OptimizationLevel getOptimizationLevel() const;
+    [[nodiscard]] llvm::CodeGenOpt::Level                getCodeGenerationOptimizationLevel() const;
+    [[nodiscard]] llvm::OptimizationLevel                getOptimizationLevel() const;
+    [[nodiscard]] bool                                   isOptimized() const;
+    [[nodiscard]] llvm::DICompileUnit::DebugEmissionKind getDebugEmissionKind() const;
 
   private:
     Value value_;
