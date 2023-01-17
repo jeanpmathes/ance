@@ -79,6 +79,12 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     [[nodiscard]] virtual OptLevel getOptimizationLevel() const = 0;
 
     /**
+     * Whether extras like a CFG should be emitted.
+     * @return True if extras should be emitted.
+     */
+    [[nodiscard]] virtual bool emitExtras() const = 0;
+
+    /**
      * Get the bitness of the application.
      * @return The bitness.
      */

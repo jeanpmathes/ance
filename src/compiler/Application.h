@@ -26,6 +26,7 @@ class Application : public Unit
     [[nodiscard]] std::vector<std::filesystem::path> getSourceFiles() const override;
     [[nodiscard]] UnitResult                         getType() const override;
     OptLevel                                         getOptimizationLevel() const override;
+    bool                                             emitExtras() const override;
     void                                             validate(ValidationLogger& validation_logger) const override;
 
     antlr4::tree::ParseTree* selectTree(anceParser& parser) override;

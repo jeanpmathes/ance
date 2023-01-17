@@ -59,6 +59,11 @@ OptLevel Application::getOptimizationLevel() const
     return project_.description().opt_level;
 }
 
+bool Application::emitExtras() const
+{
+    return project_.description().emit_extras;
+}
+
 antlr4::tree::ParseTree* Application::selectTree(anceParser& parser)
 {
     return parser.file();

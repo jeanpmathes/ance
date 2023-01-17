@@ -42,6 +42,11 @@ OptLevel ProjectDescription::getOptimizationLevel() const
     return OptLevel::O_3;
 }
 
+bool ProjectDescription::emitExtras() const
+{
+    return false;
+}
+
 void ProjectDescription::validate(ValidationLogger& validation_logger) const
 {
     this->globalScope().validate(validation_logger);
@@ -74,7 +79,8 @@ struct Project_ {
     uint8_t const*  name = nullptr;
     uint8_t const** libraries = nullptr;
     uint8_t const** library_paths = nullptr;
-    uint32_t opt_level = 0;
+    uint32_t        opt_level     = 0;
+    bool            emit_extras   = false;
 };
 
 struct test {
@@ -162,7 +168,8 @@ bool ProjectDescription::loadDescription()
                     .project_file          = project_file_,
                     .linkage_libraries     = read_vector(project.libraries),
                     .linkage_library_paths = read_vector(project.library_paths),
-                    .opt_level             = opt_level};
+                    .opt_level             = opt_level,
+                    .emit_extras           = project.emit_extras};
 
 #if defined(ANCE_TARGET_WINDOWS)
     FreeLibrary(handle);

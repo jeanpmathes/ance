@@ -160,9 +160,11 @@ int main(int argc, char** argv)
         std::filesystem::path const obj_dir = bld_dir / "obj";
         std::filesystem::path const bin_dir = bld_dir / "bin";
 
-        application.emitAsSource(obj_dir / "input.nc");
+        if (application.emitExtras()) application.emitAsSource(obj_dir / "input.nc");
+
         application.preBuild();
-        application.emitAsSource(obj_dir / "input_prebuild.nc");
+
+        if (application.emitExtras()) application.emitAsSource(obj_dir / "input_prebuild.nc");
 
         error = validateFlow(tree, validation_logger);
         if (error.hasValue()) return error.value();

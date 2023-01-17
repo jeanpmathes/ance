@@ -76,12 +76,13 @@ void AnceCompiler::compile(std::filesystem::path const& out)
 
     assert(context_.allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
 
-    // Print control flow graph.
-
-    std::filesystem::path const cfg_path = out.parent_path() / "cfg.gml";
-    std::ofstream               cfg_out(cfg_path);
-    ControlFlowGraphPrinter     cfg_printer(cfg_out);
-    cfg_printer.visit(unit_);
+    if (unit_.emitExtras())// Print control flow graph.
+    {
+        std::filesystem::path const cfg_path = out.parent_path() / "cfg.gml";
+        std::ofstream               cfg_out(cfg_path);
+        ControlFlowGraphPrinter     cfg_printer(cfg_out);
+        cfg_printer.visit(unit_);
+    }
 
     // Prepare entry and exit functions.
 

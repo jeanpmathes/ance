@@ -20,6 +20,7 @@ class ProjectDescription : public Unit
     [[nodiscard]] std::vector<std::filesystem::path> getSourceFiles() const override;
     [[nodiscard]] UnitResult                         getType() const override;
     OptLevel                                         getOptimizationLevel() const override;
+    bool                                             emitExtras() const override;
     void                                             validate(ValidationLogger& validation_logger) const override;
 
     antlr4::tree::ParseTree* selectTree(anceParser& parser) override;
@@ -43,6 +44,7 @@ class ProjectDescription : public Unit
         std::vector<std::string> linkage_libraries;
         std::vector<std::string> linkage_library_paths;
         OptLevel                 opt_level;
+        bool                     emit_extras;
     };
 
     /**
