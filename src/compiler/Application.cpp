@@ -59,9 +59,14 @@ OptLevel Application::getOptimizationLevel() const
     return project_.description().opt_level;
 }
 
+bool Application::enableAssertions() const
+{
+    return not project_.description().is_assert_ignored;
+}
+
 bool Application::emitExtras() const
 {
-    return project_.description().emit_extras;
+    return project_.description().is_extra_emission_enabled;
 }
 
 antlr4::tree::ParseTree* Application::selectTree(anceParser& parser)

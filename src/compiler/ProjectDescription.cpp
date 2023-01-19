@@ -42,6 +42,11 @@ OptLevel ProjectDescription::getOptimizationLevel() const
     return OptLevel::O_3;
 }
 
+bool ProjectDescription::enableAssertions() const
+{
+    return false;
+}
+
 bool ProjectDescription::emitExtras() const
 {
     return false;
@@ -76,11 +81,12 @@ std::vector<std::string> ProjectDescription::getLibraryPaths() const
 }
 
 struct Project_ {
-    uint8_t const*  name = nullptr;
-    uint8_t const** libraries = nullptr;
-    uint8_t const** library_paths = nullptr;
-    uint32_t        opt_level     = 0;
-    bool            emit_extras   = false;
+    uint8_t const*  name                      = nullptr;
+    uint8_t const** libraries                 = nullptr;
+    uint8_t const** library_paths             = nullptr;
+    uint32_t        opt_level                 = 0;
+    bool            is_assert_ignored         = false;
+    bool            is_extra_emission_enabled = false;
 };
 
 struct test {
@@ -164,12 +170,13 @@ bool ProjectDescription::loadDescription()
             return false;
     }
 
-    description_ = {.name                  = read_string(project.name),
-                    .project_file          = project_file_,
-                    .linkage_libraries     = read_vector(project.libraries),
-                    .linkage_library_paths = read_vector(project.library_paths),
-                    .opt_level             = opt_level,
-                    .emit_extras           = project.emit_extras};
+    description_ = {.name                      = read_string(project.name),
+                    .project_file              = project_file_,
+                    .linkage_libraries         = read_vector(project.libraries),
+                    .linkage_library_paths     = read_vector(project.library_paths),
+                    .opt_level                 = opt_level,
+                    .is_assert_ignored         = project.is_assert_ignored,
+                    .is_extra_emission_enabled = project.is_extra_emission_enabled};
 
 #if defined(ANCE_TARGET_WINDOWS)
     FreeLibrary(handle);

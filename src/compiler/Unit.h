@@ -79,6 +79,12 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     [[nodiscard]] virtual OptLevel getOptimizationLevel() const = 0;
 
     /**
+     * Get whether assertions are enabled.
+     * @return True if assertions are enabled.
+     */
+    [[nodiscard]] virtual bool enableAssertions() const = 0;
+
+    /**
      * Whether extras like a CFG should be emitted.
      * @return True if extras should be emitted.
      */

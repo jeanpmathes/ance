@@ -165,10 +165,13 @@ void Runtime::buildAssert(Shared<lang::Value> value, CompileContext& context)
 {
     assert(value->type()->isBooleanType());
 
-    value->buildContentValue(context);
-    llvm::Value* truth_value = value->getContentValue();
+    if (context_->unit().enableAssertions())
+    {
+        value->buildContentValue(context);
+        llvm::Value* truth_value = value->getContentValue();
 
-    context_->ir().CreateCall(assertion_, truth_value);
+        context_->ir().CreateCall(assertion_, truth_value);
+    }
 }
 
 llvm::Value* Runtime::allocateAutomatic(lang::ResolvingHandle<lang::Type> type,

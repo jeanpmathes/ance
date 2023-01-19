@@ -3,7 +3,6 @@
 #include <fstream>
 
 #include "compiler/CodePrinter.h"
-#include "compiler/Project.h"
 #include "validation/ValidationLogger.h"
 
 #include "lang/type/DoubleType.h"
