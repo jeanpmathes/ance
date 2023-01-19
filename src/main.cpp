@@ -15,6 +15,27 @@
 #include "lang/ApplicationVisitor.h"
 #include "validation/ValidationLogger.h"
 
+static Optional<int> emit(SourceTree& tree, ValidationLogger& validation_logger, std::string const& step_name)
+{
+    validation_logger.emitMessages(tree.getSourceFiles(), step_name);
+
+    if (validation_logger.errorCount() != 0
+        || (tree.unit().useWarningsAsErrors() && validation_logger.warningCount() != 0))
+    {
+        bool const failed_by_warning = validation_logger.errorCount() == 0;
+
+        std::cout << "ance: validation: failed";
+        if (failed_by_warning) std::cout << " (by warning)";
+        std::cout << std::endl;
+
+        return EXIT_FAILURE;
+    }
+
+    validation_logger.clear();
+
+    return {};
+}
+
 /**
  * The first validation step. Operates on the AST. 
  */
@@ -30,13 +51,7 @@ static Optional<int> validateTree(SourceTree& tree, ValidationLogger& validation
 
     tree.unit().validate(validation_logger);
 
-    if (validation_logger.errorCount() != 0)
-    {
-        validation_logger.emitMessages(tree.getSourceFiles());
-        return EXIT_FAILURE;
-    }
-
-    return {};
+    return emit(tree, validation_logger, "tree");
 }
 
 /**
@@ -46,11 +61,7 @@ static Optional<int> validateFlow(SourceTree& tree, ValidationLogger& validation
 {
     tree.unit().validateFlow(validation_logger);
 
-    validation_logger.emitMessages(tree.getSourceFiles());
-
-    if (validation_logger.errorCount() != 0) return EXIT_FAILURE;
-
-    return {};
+    return emit(tree, validation_logger, "flow");
 }
 
 static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir, Unit& unit)
@@ -171,6 +182,8 @@ int main(int argc, char** argv)
 
         error = build(tree, obj_dir, bin_dir);
         if (error.hasValue()) return error.value();
+
+        std::cout << "ance: build: success" << std::endl;
     }
 
     llvm::llvm_shutdown();

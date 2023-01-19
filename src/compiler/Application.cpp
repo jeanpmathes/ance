@@ -59,6 +59,11 @@ OptLevel Application::getOptimizationLevel() const
     return project_.description().opt_level;
 }
 
+bool Application::useWarningsAsErrors() const
+{
+    return project_.description().is_warning_as_error_enabled;
+}
+
 bool Application::enableAssertions() const
 {
     return not project_.description().is_assert_ignored;

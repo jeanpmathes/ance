@@ -101,6 +101,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
         push_member(lang::Identifier::like("libs"), string_list_type);
         push_member(lang::Identifier::like("libpaths"), string_list_type);
         push_member(lang::Identifier::like("opt_level"), lang::FixedWidthIntegerType::get(32, false));
+        push_member(lang::Identifier::like("is_warning_as_error_enabled"), lang::BooleanType::get());
         push_member(lang::Identifier::like("is_assert_ignored"), lang::BooleanType::get());
         push_member(lang::Identifier::like("is_extra_emission_enabled"), lang::BooleanType::get());
 

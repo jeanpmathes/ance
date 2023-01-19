@@ -35,9 +35,11 @@ void ValidationLogger::log(ValidationLogger::LogLevel level, std::string const& 
     entries_.emplace_back(level, message, location);
 }
 
-void ValidationLogger::emitMessages(std::vector<std::reference_wrapper<SourceFile>> const& source_files)
+void ValidationLogger::emitMessages(std::vector<std::reference_wrapper<SourceFile>> const& source_files,
+                                    std::string const&                                     step_name)
 {
-    std::cout << "ance: validation: " << warningCount() << " warnings, " << errorCount() << " errors" << std::endl;
+    std::cout << "ance: validation: (" << step_name << ") " << warningCount() << " warnings, " << errorCount()
+              << " errors" << std::endl;
 
     for (auto& entry : entries_)
     {
@@ -62,30 +64,36 @@ void ValidationLogger::emitMessages(std::vector<std::reference_wrapper<SourceFil
             continue;
         }
 
-        SourceFile& source_file = source_files[entry.location_.file()].get();
+        SourceFile const& source_file = source_files[entry.location_.file()].get();
 
         std::cout << source_file.getRelativePath().generic_string() << " ";
         std::cout << entry.location_ << " " << entry.message_ << std::endl;
         std::cout << std::endl;
 
-        std::string_view line_view = trim(source_file.getLine(entry.location_.line()), start);
+        std::string_view const line_view = trim(source_file.getLine(entry.location_.line()), start);
         std::cout << '\t' << line_view << std::endl;
 
         if (entry.location_.isSingleLine())
         {
-            size_t length_to_mark = entry.location_.column() - start;
-            size_t length_of_mark = entry.location_.columnEnd() - entry.location_.column() + 1;
+            size_t const length_to_mark = entry.location_.column() - start;
+            size_t const length_of_mark = entry.location_.columnEnd() - entry.location_.column() + 1;
 
-            std::string_view text_to_mark   = line_view.substr(0, length_to_mark);
-            std::string_view text_with_mark = line_view.substr(length_to_mark, length_of_mark);
+            std::string_view const text_to_mark   = line_view.substr(0, length_to_mark);
+            std::string_view const text_with_mark = line_view.substr(length_to_mark, length_of_mark);
 
-            size_t marker_start  = estimateWidth(text_to_mark);
-            size_t marker_length = estimateWidth(text_with_mark);
+            size_t const marker_start  = estimateWidth(text_to_mark);
+            size_t const marker_length = estimateWidth(text_with_mark);
 
             std::cout << '\t' << std::string(marker_start - 1, ' ') << std::string(marker_length, '~') << std::endl;
             std::cout << std::endl;
         }
     }
+}
 
+void ValidationLogger::clear()
+{
     entries_.clear();
+
+    warning_count_ = 0;
+    error_count_   = 0;
 }

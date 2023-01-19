@@ -79,6 +79,12 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     [[nodiscard]] virtual OptLevel getOptimizationLevel() const = 0;
 
     /**
+     * Whether to treat warnings as errors.
+     * @return True if warnings should be treated as errors.
+     */
+    [[nodiscard]] virtual bool useWarningsAsErrors() const = 0;
+
+    /**
      * Get whether assertions are enabled.
      * @return True if assertions are enabled.
      */

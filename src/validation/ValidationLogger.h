@@ -71,8 +71,15 @@ class ValidationLogger
     /**
      * Emit all logged messages.
      * @param source_files The source file containing the code that was validated with this logger.
+     * @param step_name The name of the validation step.
      */
-    void emitMessages(std::vector<std::reference_wrapper<SourceFile>> const& source_files);
+    void emitMessages(std::vector<std::reference_wrapper<SourceFile>> const& source_files,
+                      std::string const&                                     step_name);
+
+    /**
+     * Clear all logged messages and counters.
+     */
+    void clear();
 
   private:
     std::vector<LogEntry> entries_;

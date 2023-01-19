@@ -42,6 +42,11 @@ OptLevel ProjectDescription::getOptimizationLevel() const
     return OptLevel::O_3;
 }
 
+bool ProjectDescription::useWarningsAsErrors() const
+{
+    return true;
+}
+
 bool ProjectDescription::enableAssertions() const
 {
     return false;
@@ -84,8 +89,9 @@ struct Project_ {
     uint8_t const*  name                      = nullptr;
     uint8_t const** libraries                 = nullptr;
     uint8_t const** library_paths             = nullptr;
-    uint32_t        opt_level                 = 0;
-    bool            is_assert_ignored         = false;
+    uint32_t        opt_level                   = 0;
+    bool            is_warning_as_error_enabled = false;
+    bool            is_assert_ignored           = false;
     bool            is_extra_emission_enabled = false;
 };
 
@@ -170,13 +176,14 @@ bool ProjectDescription::loadDescription()
             return false;
     }
 
-    description_ = {.name                      = read_string(project.name),
-                    .project_file              = project_file_,
-                    .linkage_libraries         = read_vector(project.libraries),
-                    .linkage_library_paths     = read_vector(project.library_paths),
-                    .opt_level                 = opt_level,
-                    .is_assert_ignored         = project.is_assert_ignored,
-                    .is_extra_emission_enabled = project.is_extra_emission_enabled};
+    description_ = {.name                        = read_string(project.name),
+                    .project_file                = project_file_,
+                    .linkage_libraries           = read_vector(project.libraries),
+                    .linkage_library_paths       = read_vector(project.library_paths),
+                    .opt_level                   = opt_level,
+                    .is_warning_as_error_enabled = project.is_warning_as_error_enabled,
+                    .is_assert_ignored           = project.is_assert_ignored,
+                    .is_extra_emission_enabled   = project.is_extra_emission_enabled};
 
 #if defined(ANCE_TARGET_WINDOWS)
     FreeLibrary(handle);
