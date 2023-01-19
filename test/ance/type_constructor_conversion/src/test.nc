@@ -6,7 +6,7 @@ public main () : u32
 {
     let i: size <: 12;
     let j: u32 <: u32(i);
-    let k: uiptr <: uiptr(j);
+    let k: uiptr <: j; // The constructor uiptr(j) would be unnecessary.
     let l: u64 <: u64(k);
 
     let f1: single <: 12.0s;
