@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 
+#include <llvm/Support/Host.h>
 #include <llvm/Support/ManagedStatic.h>
 #include <llvm/Support/TargetSelect.h>
 
@@ -69,9 +70,12 @@ static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir,
     return bin_dir / (unit.getName() + unit.getType().getExtension());
 }
 
-static Optional<int> build(SourceTree& tree, std::filesystem::path const& obj_dir, std::filesystem::path const& bin_dir)
+static Optional<int> build(SourceTree&                  tree,
+                           llvm::Triple const&          triple,
+                           std::filesystem::path const& obj_dir,
+                           std::filesystem::path const& bin_dir)
 {
-    AnceCompiler compiler(tree.unit(), tree);
+    AnceCompiler compiler(tree, triple);
     AnceLinker   linker(tree.unit());
 
     std::filesystem::create_directories(obj_dir);
@@ -114,6 +118,8 @@ int main(int argc, char** argv)
 
     std::filesystem::path const bld_dir = project_file_path.parent_path() / "bld";
 
+    llvm::Triple const triple(llvm::sys::getDefaultTargetTriple());
+
     ProjectDescription::Description description;
     ValidationLogger                validation_logger;
 
@@ -141,7 +147,7 @@ int main(int argc, char** argv)
             std::filesystem::path const  obj_dir = bld_dir / "prj";
             std::filesystem::path const& bin_dir = bld_dir;
 
-            error = build(tree, obj_dir, bin_dir);
+            error = build(tree, triple, obj_dir, bin_dir);
             if (error.hasValue()) return error.value();
         }
 
@@ -180,7 +186,7 @@ int main(int argc, char** argv)
         error = validateFlow(tree, validation_logger);
         if (error.hasValue()) return error.value();
 
-        error = build(tree, obj_dir, bin_dir);
+        error = build(tree, triple, obj_dir, bin_dir);
         if (error.hasValue()) return error.value();
 
         std::cout << "ance: build: success" << std::endl;

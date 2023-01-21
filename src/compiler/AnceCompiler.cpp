@@ -10,9 +10,9 @@
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/Support/FileSystem.h>
-#include <llvm/Support/Host.h>
 
 #include "compiler/ControlFlowGraphPrinter.h"
+#include "compiler/SourceTree.h"
 #include "compiler/Unit.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
@@ -21,17 +21,16 @@
 #include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/utility/Values.h"
 
-AnceCompiler::AnceCompiler(Unit& unit, SourceTree& tree)
-    : unit_(unit)
-    , module_(unit.getName(), llvm_context_)
+AnceCompiler::AnceCompiler(SourceTree& tree, llvm::Triple const& triple)
+    : unit_(tree.unit())
+    , triple_(triple)
+    , module_(tree.unit().getName(), llvm_context_)
     , ir_(llvm_context_)
     , di_(module_)
     , runtime_()
     , context_(unit_, runtime_, llvm_context_, module_, ir_, di_, tree)
 {
-    module_.setSourceFileName(unit.getProjectFile().filename().string());
-
-    llvm::Triple const triple(llvm::sys::getDefaultTargetTriple());
+    module_.setSourceFileName(tree.unit().getProjectFile().filename().string());
 
     std::string         err;
     llvm::Target const* t = llvm::TargetRegistry::lookupTarget(triple.str(), err);
@@ -52,11 +51,8 @@ AnceCompiler::AnceCompiler(Unit& unit, SourceTree& tree)
                                              cm,
                                              unit_.getOptimizationLevel().getCodeGenerationOptimizationLevel());
 
-    llvm::DataLayout dl = target_machine_->createDataLayout();
-    unit_.setPointerSize(dl.getPointerSize());
-
-    lang::SizeType::init(llvm_context_, unit_);
-    lang::UnsignedIntegerPointerType::init(llvm_context_, dl);
+    llvm::DataLayout const dl = target_machine_->createDataLayout();
+    unit_.setTargetInfo(triple, dl);
 
     module_.setDataLayout(dl);
     module_.setTargetTriple(triple.str());
@@ -76,7 +72,9 @@ void AnceCompiler::compile(std::filesystem::path const& out)
 
     assert(context_.allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
 
-    if (unit_.emitExtras())// Print control flow graph.
+    // Print control flow graph.
+
+    if (unit_.emitExtras())
     {
         std::filesystem::path const cfg_path = out.parent_path() / "cfg.gml";
         std::ofstream               cfg_out(cfg_path);

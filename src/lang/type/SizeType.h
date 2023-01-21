@@ -64,10 +64,9 @@ namespace lang
       public:
         /**
          * Initialize the size type.
-         * @param c The llvm context.
          * @param unit The current unit.
          */
-        static void init(llvm::LLVMContext& c, Unit& unit);
+        static void init(Unit& unit);
 
         /**
          * Get the size type instance.

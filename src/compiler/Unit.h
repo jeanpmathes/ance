@@ -37,10 +37,9 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
 
   public:
     /**
-     * Set the pointer size to use.
-     * @param size The pointer size.
+     * Set information about the compile target machine.
      */
-    void setPointerSize(unsigned size);
+    void setTargetInfo(llvm::Triple const& triple, llvm::DataLayout const& data_layout);
 
     /**
      * Get the name of the unit.
@@ -101,6 +100,12 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      * @return The bitness.
      */
     [[nodiscard]] unsigned getBitness() const;
+
+    /**
+     * Get the target triple.
+     * @return The target triple.
+     */
+    [[nodiscard]] llvm::Triple const& getTargetTriple() const;
 
     /**
      * Prepare everything for the first validation step.
@@ -175,6 +180,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
 
   protected:
     unsigned      pointer_size_ {0};
+    llvm::Triple  target_triple_;
     SourceVisitor source_visitor_ {*this};
 };
 

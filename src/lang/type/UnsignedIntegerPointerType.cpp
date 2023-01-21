@@ -57,7 +57,7 @@ std::string lang::UnsignedIntegerPointerType::createMangledName() const
     return std::string(name().text());
 }
 
-void lang::UnsignedIntegerPointerType::init(llvm::LLVMContext&, llvm::DataLayout& data_layout)
+void lang::UnsignedIntegerPointerType::init(llvm::DataLayout const& data_layout)
 {
     assert(size_ == 0);
 

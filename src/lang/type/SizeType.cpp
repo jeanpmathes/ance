@@ -29,7 +29,7 @@ std::string lang::SizeType::createMangledName() const
     return std::string(name().text());
 }
 
-void lang::SizeType::init(llvm::LLVMContext&, Unit& app)
+void lang::SizeType::init(Unit& app)
 {
     assert(size_width_ == 0);
     assert(diff_width_ == 0);

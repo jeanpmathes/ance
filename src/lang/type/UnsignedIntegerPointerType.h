@@ -54,10 +54,9 @@ namespace lang
       public:
         /**
          * Initialize the type.
-         * @param llvm_context The llvm context.
          * @param data_layout The data layout of the current build target.
          */
-        static void init(llvm::LLVMContext& llvm_context, llvm::DataLayout& data_layout);
+        static void init(llvm::DataLayout const& data_layout);
 
         /**
          * Get the bit size of the type.

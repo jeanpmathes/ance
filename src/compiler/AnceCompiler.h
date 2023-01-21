@@ -22,10 +22,10 @@ class AnceCompiler
   public:
     /**
      * Create a new compiler for a unit.
-     * @param unit The unit to compile.
      * @param tree The source tree.
+     * @param triple The target triple.
      */
-    AnceCompiler(Unit& unit, SourceTree& tree);
+    AnceCompiler(SourceTree& tree, llvm::Triple const& triple);
 
     /**
      * Compile the application.
@@ -48,6 +48,7 @@ class AnceCompiler
     static constexpr char const* INTERNAL_FUNCTION_SUFFIX = "$lang";
 
     Unit&             unit_;
+    llvm::Triple      triple_;
     llvm::LLVMContext llvm_context_;
     llvm::Module      module_;
     llvm::IRBuilder<> ir_;

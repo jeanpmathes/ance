@@ -12,10 +12,14 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     std::vector<char const*> args;
     args.push_back("lld");
 
-    args.push_back("/debug:FULL");
+    if (unit_.getOptimizationLevel().getDebugEmissionKind() == llvm::DICompileUnit::DebugEmissionKind::FullDebug)
+    {
+        args.push_back("/debug:FULL");
+    }
 
-    args.push_back("/machine:x64");
-    args.push_back("/subsystem:console");
+    if (unit_.getTargetTriple().isArch64Bit()) { args.push_back("/machine:x64"); }
+
+    if (unit_.getTargetTriple().isOSWindows()) { args.push_back("/subsystem:console"); }
 
     unit_.getType().addLinkerArguments(args);
 
