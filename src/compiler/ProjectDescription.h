@@ -42,6 +42,7 @@ class ProjectDescription : public Unit
 
     struct Description {
         std::string              name;
+        UnitResult               kind;
         std::filesystem::path    project_file;
         std::vector<std::string> linkage_libraries;
         std::vector<std::string> linkage_library_paths;

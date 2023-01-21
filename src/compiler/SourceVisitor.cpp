@@ -81,6 +81,25 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
                                                  definition_location);
     }
 
+    {// Global Constants
+        auto declare_constant = [this](std::string const& name, std::string const& value) {
+            unit_.globalScope().defineGlobalVariable(
+                lang::AccessModifier::PRIVATE_ACCESS,
+                true,
+                lang::Identifier::like(name),
+                lang::FixedWidthIntegerType::get(32, false),
+                lang::Location::global(),
+                lang::Assigner::FINAL_COPY_ASSIGNMENT,
+                makeOptional<Owned<Expression>>(makeOwned<ConstantLiteral>(
+                    makeShared<lang::IntegerConstant>(value, 10, lang::FixedWidthIntegerType::get(32, false)),
+                    lang::Location::global())),
+                lang::Location::global());
+        };
+
+        declare_constant("Executable", "1");
+        declare_constant("Library", "2");
+    }
+
     {// Project Description Struct
         std::vector<Owned<lang::Member>> members;
 
@@ -98,6 +117,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
         auto string_list_type = lang::BufferType::get(string_type);
 
         push_member(lang::Identifier::like("name"), string_type);
+        push_member(lang::Identifier::like("kind"), lang::FixedWidthIntegerType::get(32, false));
         push_member(lang::Identifier::like("libs"), string_list_type);
         push_member(lang::Identifier::like("libpaths"), string_list_type);
         push_member(lang::Identifier::like("opt_level"), lang::FixedWidthIntegerType::get(32, false));

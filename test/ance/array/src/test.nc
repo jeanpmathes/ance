@@ -16,12 +16,12 @@ private arr8: [u8; 3] <: 8"abc";
 
 public main () : u32
 {
-    // Arrays provide indexers.
+    // Arrays provide subscript operators.
 
     let e: i32 <: arr1[0];
     arr1[0] <: e;
 
-    // The return types of indexers are references to the element type.
+    // The return types of subscript operators are references to the element type.
 
     // For all array types, array definition expressions can be used to define a value.
     // The element type can be specified or inferred.

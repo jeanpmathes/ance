@@ -86,8 +86,9 @@ std::vector<std::string> ProjectDescription::getLibraryPaths() const
 }
 
 struct Project_ {
-    uint8_t const*  name                      = nullptr;
-    uint8_t const** libraries                 = nullptr;
+    uint8_t const*  name                        = nullptr;
+    uint32_t        kind                        = 0;
+    uint8_t const** libraries                   = nullptr;
     uint8_t const** library_paths             = nullptr;
     uint32_t        opt_level                   = 0;
     bool            is_warning_as_error_enabled = false;
@@ -157,6 +158,19 @@ bool ProjectDescription::loadDescription()
         return result;
     };
 
+    UnitResult kind;
+    switch (project.kind)
+    {
+        case 1:
+            kind = UnitResult::EXECUTABLE;
+            break;
+        case 2:
+            kind = UnitResult::LIBRARY;
+            break;
+        default:
+            return false;
+    }
+
     OptLevel opt_level;
     switch (project.opt_level)
     {
@@ -177,6 +191,7 @@ bool ProjectDescription::loadDescription()
     }
 
     description_ = {.name                        = read_string(project.name),
+                    .kind                        = kind,
                     .project_file                = project_file_,
                     .linkage_libraries           = read_vector(project.libraries),
                     .linkage_library_paths       = read_vector(project.library_paths),

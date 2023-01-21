@@ -51,7 +51,7 @@ std::vector<std::filesystem::path> Application::getSourceFiles() const
 
 UnitResult Application::getType() const
 {
-    return UnitResult::EXECUTABLE;
+    return project_.description().kind;
 }
 
 OptLevel Application::getOptimizationLevel() const
