@@ -51,6 +51,11 @@ namespace lang
         [[nodiscard]] lang::Function& function() const;
 
         /**
+         * Get the access level.
+         */
+        [[nodiscard]] virtual lang::AccessModifier access() const;
+
+        /**
          * Get the return type of this function.
          * @return The return type.
          */
@@ -105,6 +110,12 @@ namespace lang
          * @return True if the name is mangled.
          */
         [[nodiscard]] virtual bool isMangled() const = 0;
+
+        /**
+         * Get whether this function is imported.
+         * @return True if the function is imported.
+         */
+        [[nodiscard]] virtual bool isImported() const;
 
         /**
          * Called after the resolve step.

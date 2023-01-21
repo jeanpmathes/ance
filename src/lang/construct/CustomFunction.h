@@ -56,7 +56,7 @@ namespace lang
          * Get the debug subprogram.
          * @return The debug subprogram.
          */
-        llvm::DISubprogram* debugSubprogram() const;
+        [[nodiscard]] llvm::DISubprogram* debugSubprogram() const;
 
         llvm::DIScope* getDebugScope(CompileContext& context) const override;
 

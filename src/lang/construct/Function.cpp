@@ -109,6 +109,12 @@ Optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParameterV
     return makeOptional(variable);
 }
 
+lang::AccessModifier lang::Function::access() const
+{
+    assert(isDefined());
+    return definition_.value()->access();
+}
+
 lang::ResolvingHandle<lang::Type> lang::Function::returnType()
 {
     assert(isDefined());
@@ -155,6 +161,12 @@ bool lang::Function::isMangled() const
 {
     assert(isDefined());
     return definition_.value()->isMangled();
+}
+
+bool lang::Function::isImported() const
+{
+    assert(isDefined());
+    return definition_.value()->isImported();
 }
 
 void lang::Function::validate(ValidationLogger& validation_logger) const

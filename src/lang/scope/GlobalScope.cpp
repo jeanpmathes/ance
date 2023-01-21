@@ -433,6 +433,19 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::getExit()
     return potential_function.value();
 }
 
+std::vector<std::string> lang::GlobalScope::getExportFunctions() const
+{
+    std::vector<std::string> exports;
+
+    for (auto& [name, group] : defined_function_groups_)
+    {
+        std::vector<std::string> group_exports = group->getExportFunctions();
+        exports.insert(exports.end(), group_exports.begin(), group_exports.end());
+    }
+
+    return exports;
+}
+
 void lang::GlobalScope::createNativeBacking(CompileContext& context)
 {
     for (auto& [key, val] : defined_function_groups_) { val->createNativeBacking(context); }

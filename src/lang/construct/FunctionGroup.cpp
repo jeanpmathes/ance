@@ -17,6 +17,20 @@ lang::Identifier const& lang::FunctionGroup::name() const
     return name_;
 }
 
+std::vector<std::string> lang::FunctionGroup::getExportFunctions() const
+{
+    std::vector<std::string> exports;
+
+    for (auto& function : functions())
+    {
+        if (function->isImported()) continue;
+
+        if (function->access() == AccessModifier::EXTERN_ACCESS) { exports.emplace_back(function->name().text()); }
+    }
+
+    return exports;
+}
+
 bool lang::FunctionGroup::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>>)
 {
     return false;

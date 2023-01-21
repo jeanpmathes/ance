@@ -134,6 +134,12 @@ namespace lang
                                                                                 lang::Location      location);
 
         /**
+         * Get the access level of this function.
+         * @return The access level.
+         */
+        lang::AccessModifier access() const;
+
+        /**
          * Get the return type of this function.
          * @return The return type.
          */
@@ -182,6 +188,12 @@ namespace lang
          * @return True if this function is mangled, false otherwise.
          */
         [[nodiscard]] bool isMangled() const;
+
+        /**
+         * Whether this function is imported, meaning the definition is not part of this module.
+         * @return True if this function is imported, false otherwise.
+         */
+        [[nodiscard]] bool isImported() const;
 
         void validate(ValidationLogger& validation_logger) const override;
 

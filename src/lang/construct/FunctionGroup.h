@@ -26,6 +26,8 @@ namespace lang
         [[nodiscard]] bool              isDefined() const override;
         [[nodiscard]] Identifier const& name() const override;
 
+        [[nodiscard]] std::vector<std::string> getExportFunctions() const;
+
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
 
         void resolve();

@@ -39,6 +39,11 @@ lang::Function& lang::FunctionDefinition::function() const
     return function_;
 }
 
+lang::AccessModifier lang::FunctionDefinition::access() const
+{
+    return lang::AccessModifier::PRIVATE_ACCESS;
+}
+
 lang::ResolvingHandle<lang::Type> lang::FunctionDefinition::returnType()
 {
     return return_type_;
@@ -77,6 +82,11 @@ size_t lang::FunctionDefinition::parameterCount() const
 lang::Location lang::FunctionDefinition::location() const
 {
     return location_;
+}
+
+bool lang::FunctionDefinition::isImported() const
+{
+    return false;
 }
 
 void lang::FunctionDefinition::postResolve() {}

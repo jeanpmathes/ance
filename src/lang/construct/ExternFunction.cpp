@@ -33,6 +33,11 @@ bool lang::ExternFunction::isMangled() const
     return false;
 }
 
+bool lang::ExternFunction::isImported() const
+{
+    return true;
+}
+
 void lang::ExternFunction::validate(ValidationLogger& validation_logger) const
 {
     if (lang::validation::isTypeUndefined(returnType(), returnTypeLocation(), validation_logger)) return;

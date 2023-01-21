@@ -42,7 +42,7 @@ namespace lang
                           Scope&                               containing_scope,
                           lang::Location                       declaration_location);
 
-        [[nodiscard]] lang::AccessModifier access() const;
+        [[nodiscard]] lang::AccessModifier access() const override;
         [[nodiscard]] Statement const&     code() const;
 
         void postResolve() override;

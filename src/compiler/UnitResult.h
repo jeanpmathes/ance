@@ -33,7 +33,7 @@ class UnitResult
      * Add the required linker arguments for this application type to the given vector.
      * @param args The vector to add the arguments to.
      */
-    void addLinkerArguments(std::vector<char const*>& args);
+    void addLinkerArguments(std::vector<char const*>& args, std::string const& os);
 
     /**
      * Get the file extension for this application type.

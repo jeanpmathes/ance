@@ -28,6 +28,7 @@ namespace lang
                        lang::Location                       location);
 
         [[nodiscard]] bool isMangled() const override;
+        [[nodiscard]] bool isImported() const override;
 
         void validate(ValidationLogger& validation_logger) const override;
         void expand() override;

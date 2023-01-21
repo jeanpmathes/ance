@@ -5,7 +5,7 @@ UnitResult::operator Value() const
     return value_;
 }
 
-void UnitResult::addLinkerArguments(std::vector<char const*>& args)
+void UnitResult::addLinkerArguments(std::vector<char const*>& args, std::string const& os)
 {
     switch (value_)
     {
@@ -20,6 +20,8 @@ void UnitResult::addLinkerArguments(std::vector<char const*>& args)
 
             // Executable is the default.
             args.push_back("/entry:start$lang");
+
+            if (os == "windows") { args.push_back("/subsystem:console"); }
 
             break;
     }

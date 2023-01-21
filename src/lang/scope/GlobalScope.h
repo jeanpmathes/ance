@@ -193,6 +193,12 @@ namespace lang
         void buildInitialization(CompileContext& context);
         void buildFinalization(CompileContext& context) override;
 
+        /**
+         * Get all functions that should be exported.
+         * @return The exported functions.
+         */
+        std::vector<std::string> getExportFunctions() const;
+
       private:
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);
         lang::OwningHandle<lang::Type>             retrieveUndefinedType(Identifier name);
