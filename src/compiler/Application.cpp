@@ -23,14 +23,17 @@ void Application::validate(ValidationLogger& validation_logger) const
 {
     this->globalScope().validate(validation_logger);
 
-    if (!this->globalScope().hasEntry())
+    if (getType() == UnitResult::EXECUTABLE)
     {
-        validation_logger.logError("Entry point 'main() : u32' could not be found", lang::Location::global());
-    }
+        if (!this->globalScope().hasEntry())
+        {
+            validation_logger.logError("Entry point 'main() : u32' could not be found", lang::Location::global());
+        }
 
-    if (!this->globalScope().hasExit())
-    {
-        validation_logger.logError("Exit point 'exit(u32)' could not be found", lang::Location::global());
+        if (!this->globalScope().hasExit())
+        {
+            validation_logger.logError("Exit point 'exit(u32)' could not be found", lang::Location::global());
+        }
     }
 }
 

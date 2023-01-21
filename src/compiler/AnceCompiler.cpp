@@ -18,7 +18,6 @@
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/SizeType.h"
-#include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/utility/Values.h"
 
 AnceCompiler::AnceCompiler(SourceTree& tree, llvm::Triple const& triple)
@@ -66,7 +65,7 @@ void AnceCompiler::compile(std::filesystem::path const& out)
     context_.runtime().init(context_);
 
     unit_.globalScope().createNativeBacking(context_);
-    context_.runtime().setExit(unit_.globalScope().getExit());
+    if (unit_.getType() == UnitResult::EXECUTABLE) { context_.runtime().setExit(unit_.globalScope().getExit()); }
 
     unit_.globalScope().buildFunctions(context_);
 
@@ -99,6 +98,9 @@ void AnceCompiler::compile(std::filesystem::path const& out)
 
         case UnitResult::LIBRARY:
         {
+            llvm::Function* init_function = buildInit();
+            buildLibStart(init_function);
+
             break;
         }
     }
@@ -238,6 +240,22 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::
 
     ir_.CreateCall(exit, {exitcode.value()->getContentValue()});
 
+    ir_.CreateRetVoid();
+}
+
+void AnceCompiler::buildLibStart(llvm::Function* init)
+{
+    llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
+    llvm::Function*     start      = llvm::Function::Create(start_type,
+                                                   llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+                                                   getInternalFunctionName("lib_start"),
+                                                   module_);
+
+    llvm::BasicBlock* start_block = llvm::BasicBlock::Create(llvm_context_, "entry", start);
+
+    ir_.SetInsertPoint(start_block);
+
+    ir_.CreateCall(init);
     ir_.CreateRetVoid();
 }
 

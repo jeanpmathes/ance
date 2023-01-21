@@ -42,6 +42,7 @@ class AnceCompiler
     llvm::Function* buildInit();
     llvm::Function* buildExit();
     void            buildStart(lang::ResolvingHandle<lang::Function> main, llvm::Function* init, llvm::Function* exit);
+    void            buildLibStart(llvm::Function* init);
     static std::string getInternalFunctionName(std::string const& name);
 
   private:

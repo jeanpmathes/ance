@@ -12,7 +12,7 @@ void UnitResult::addLinkerArguments(std::vector<char const*>& args)
         case LIBRARY:
 
             args.emplace_back("/dll");
-            // No entry point needed for now.
+            args.push_back("/entry:lib_start$lang");
 
             break;
 
