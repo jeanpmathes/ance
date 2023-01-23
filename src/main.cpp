@@ -115,6 +115,11 @@ int main(int argc, char** argv)
 
     std::filesystem::path project_file_path(argv[1]);
     if (project_file_path.is_relative()) project_file_path = std::filesystem::absolute(project_file_path);
+    if (!std::filesystem::exists(project_file_path))
+    {
+        std::cout << "ance: input: project file does not exist." << std::endl;
+        return EXIT_FAILURE;
+    }
 
     std::filesystem::path const bld_dir = project_file_path.parent_path() / "bld";
 
