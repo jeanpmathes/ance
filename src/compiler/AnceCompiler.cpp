@@ -65,8 +65,6 @@ void AnceCompiler::compile(std::filesystem::path const& out)
     context_.runtime().init(context_);
 
     unit_.globalScope().createNativeBacking(context_);
-    if (unit_.getType() == UnitResult::EXECUTABLE) { context_.runtime().setExit(unit_.globalScope().getExit()); }
-
     unit_.globalScope().buildFunctions(context_);
 
     assert(context_.allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
@@ -207,14 +205,11 @@ llvm::Function* AnceCompiler::buildExit()
     llvm::BasicBlock* exit_block = llvm::BasicBlock::Create(llvm_context_, "entry", exit);
     ir_.SetInsertPoint(exit_block);
 
-    lang::ResolvingHandle<lang::Function> user_exit = unit_.globalScope().getExit();
-
-    std::vector<Shared<lang::Value>> args;
-    args.emplace_back(
+    auto exitcode_value =
         makeShared<lang::WrappedNativeValue>(exitcode_type,
-                                             lang::values::contentToNative(exitcode_type, exitcode, context_)));
+                                             lang::values::contentToNative(exitcode_type, exitcode, context_));
 
-    user_exit->buildCall(args, context_);
+    context_.runtime().buildExit(exitcode_value, context_);
 
     ir_.CreateRetVoid();
     return exit;

@@ -145,7 +145,6 @@ namespace lang
 
       private:
         [[nodiscard]] Optional<lang::ResolvingHandle<lang::Function>> findEntry();
-        [[nodiscard]] Optional<lang::ResolvingHandle<lang::Function>> findExit();
 
       public:
         /**
@@ -156,23 +155,10 @@ namespace lang
         [[nodiscard]] bool hasEntry() const;
 
         /**
-         * Check if this global scope has an exit point
-         * The default exit point is an exit method taking a ui32.
-         * @return True if there is an exit point.
-         */
-        [[nodiscard]] bool hasExit() const;
-
-        /**
          * Get the entry point. Fails if there is no entry point.
          * @return The entry point.
          */
         lang::ResolvingHandle<lang::Function> getEntry();
-
-        /**
-         * Get the exit point. Fails if there is no exit point.
-         * @return The exit point.
-         */
-        lang::ResolvingHandle<lang::Function> getExit();
 
         /**
          * Create the native content backing methods and functions. It is required for the actual build.

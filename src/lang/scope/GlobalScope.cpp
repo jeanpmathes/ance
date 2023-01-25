@@ -386,49 +386,15 @@ Optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntry()
     else return {};
 }
 
-Optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findExit()
-{
-    auto c = defined_function_groups_.find(lang::Identifier::like("exit"));
-    if (c == defined_function_groups_.end()) return {};
-
-    auto& [name, group] = *c;
-
-    auto input_arg_type = lang::FixedWidthIntegerType::get(32, false);
-
-    std::vector<std::reference_wrapper<lang::Type const>> arg_types;
-    arg_types.emplace_back(input_arg_type);
-
-    auto potential_function = group->resolveOverload(arg_types);
-    if (potential_function.size() != 1) return {};
-
-    lang::Function const& function = *potential_function.front();
-
-    if (function.returnType().isVoidType()) return potential_function.front();
-    else return {};
-}
-
 bool lang::GlobalScope::hasEntry() const
 {
     // The findEntry function is non-const because it returns a non-const handle, but it doesn't modify this object.
     return const_cast<GlobalScope*>(this)->findEntry().hasValue();
 }
 
-bool lang::GlobalScope::hasExit() const
-{
-    // The findExit function is non-const because it returns a non-const handle, but it doesn't modify this object.
-    return const_cast<GlobalScope*>(this)->findExit().hasValue();
-}
-
 lang::ResolvingHandle<lang::Function> lang::GlobalScope::getEntry()
 {
     Optional<lang::ResolvingHandle<lang::Function>> potential_function = findEntry();
-    assert(potential_function.hasValue());
-    return potential_function.value();
-}
-
-lang::ResolvingHandle<lang::Function> lang::GlobalScope::getExit()
-{
-    Optional<lang::ResolvingHandle<lang::Function>> potential_function = findExit();
     assert(potential_function.hasValue());
     return potential_function.value();
 }

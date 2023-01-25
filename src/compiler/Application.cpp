@@ -29,11 +29,6 @@ void Application::validate(ValidationLogger& validation_logger) const
         {
             validation_logger.logError("Entry point 'main() : u32' could not be found", lang::Location::global());
         }
-
-        if (!this->globalScope().hasExit())
-        {
-            validation_logger.logError("Exit point 'exit(u32)' could not be found", lang::Location::global());
-        }
     }
 }
 

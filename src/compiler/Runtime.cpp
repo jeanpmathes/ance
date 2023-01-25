@@ -6,11 +6,14 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/type/BooleanType.h"
 #include "lang/type/BufferType.h"
 #include "lang/type/FixedWidthIntegerType.h"
+#include "lang/type/OpaquePointerType.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
+#include "lang/type/VoidType.h"
 #include "lang/utility/Values.h"
 
 void Runtime::init(CompileContext& context)
@@ -20,65 +23,40 @@ void Runtime::init(CompileContext& context)
     llvm::LLVMContext& llvm_context = context.llvmContext();
     llvm::Module&      module       = context.llvmModule();
 
-    // Setup dynamic memory allocation call.
-    std::array<llvm::Type*, 2> const allocate_dynamic_params = {
-        llvm::Type::getInt32Ty(llvm_context),
-        lang::SizeType::getSize()->getContentType(llvm_context)};
-    allocate_dynamic_type_ =
-        llvm::FunctionType::get(llvm::Type::getInt8PtrTy(llvm_context), allocate_dynamic_params, false);
-    allocate_dynamic_ = llvm::Function::Create(allocate_dynamic_type_,
-                                               llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-                                               "GlobalAlloc",
-                                               module);
+    auto create_function = [&](char const*                                    name,
+                               lang::ResolvingHandle<lang::Type>              return_type,
+                               std::vector<lang::ResolvingHandle<lang::Type>> parameters) -> llvm::Function* {
+        std::vector<llvm::Type*> llvm_parameters;
+        llvm_parameters.reserve(parameters.size());
+        for (lang::ResolvingHandle<lang::Type> const& parameter : parameters)
+        {
+            llvm_parameters.push_back(parameter->getContentType(llvm_context));
+        }
 
-    // Setup dynamic memory delete call.
-    std::array<llvm::Type*, 1> const delete_dynamic_params = {llvm::Type::getInt8PtrTy(llvm_context)};
-    delete_dynamic_type_ =
-        llvm::FunctionType::get(llvm::Type::getInt8PtrTy(llvm_context), delete_dynamic_params, false);
-    delete_dynamic_ = llvm::Function::Create(delete_dynamic_type_,
-                                             llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-                                             "GlobalFree",
-                                             module);
-}
+        llvm::FunctionType* function_type =
+            llvm::FunctionType::get(return_type->getContentType(llvm_context), llvm_parameters, false);
+        return llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, name, &module);
+    };
 
-void Runtime::setExit(lang::ResolvingHandle<lang::Function> exit)
-{
-    llvm::LLVMContext& llvm_context = context_->llvmContext();
-    llvm::Module&      module       = context_->llvmModule();
+    std::vector<lang::ResolvingHandle<lang::Type>> allocate_dynamic_parameters;
+    allocate_dynamic_parameters.emplace_back(lang::SizeType::getSize());
+    allocate_dynamic_ =
+        create_function(ALLOCATE_DYNAMIC_NAME, lang::OpaquePointerType::get(), allocate_dynamic_parameters);
 
-    std::array<llvm::Type*, 1> const assertion_params = {llvm::Type::getInt1Ty(llvm_context)};
+    std::vector<lang::ResolvingHandle<lang::Type>> delete_dynamic_parameters;
+    delete_dynamic_parameters.emplace_back(lang::OpaquePointerType::get());
+    delete_dynamic_ = create_function(DELETE_DYNAMIC_NAME, lang::VoidType::get(), delete_dynamic_parameters);
 
-    assertion_type_ = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context), assertion_params, false);
-    assertion_ =
-        llvm::Function::Create(assertion_type_, llvm::GlobalValue::LinkageTypes::PrivateLinkage, "rt$assert", module);
+    std::vector<lang::ResolvingHandle<lang::Type>> assertion_parameters;
+    assertion_parameters.emplace_back(lang::BooleanType::get());
+    assertion_ = create_function(ASSERTION_NAME, lang::VoidType::get(), assertion_parameters);
 
-    llvm::BasicBlock* entry_block = llvm::BasicBlock::Create(llvm_context, "entry", assertion_);
-    llvm::BasicBlock* abort_block = llvm::BasicBlock::Create(llvm_context, "abort", assertion_);
-    llvm::BasicBlock* exit_block  = llvm::BasicBlock::Create(llvm_context, "exit", assertion_);
+    std::vector<lang::ResolvingHandle<lang::Type>> exit_parameters;
+    exit_parameters.emplace_back(lang::FixedWidthIntegerType::get(32, false));
+    exit_ = create_function(EXIT_NAME, lang::VoidType::get(), exit_parameters);
 
-    context_->ir().SetInsertPoint(entry_block);
-    {
-        llvm::Value* truth_value = assertion_->getArg(0);
-        context_->ir().CreateCondBr(truth_value, exit_block, abort_block);
-    }
-
-    context_->ir().SetInsertPoint(abort_block);
-    {
-        lang::ResolvingHandle<lang::Type> exit_value_type = lang::FixedWidthIntegerType::get(32, false);
-        llvm::Value* exit_value_content = llvm::ConstantInt::get(exit_value_type->getContentType(llvm_context), 3);
-        llvm::Value* exit_value_native  = lang::values::contentToNative(exit_value_type, exit_value_content, *context_);
-        Shared<lang::Value> exit_value  = makeShared<lang::WrappedNativeValue>(exit_value_type, exit_value_native);
-
-        std::vector<Shared<lang::Value>> args;
-        args.emplace_back(exit_value);
-        exit->buildCall(args, *context_);
-        context_->ir().CreateBr(exit_block);
-    }
-
-    context_->ir().SetInsertPoint(exit_block);
-    {
-        context_->ir().CreateRetVoid();
-    }
+    std::vector<lang::ResolvingHandle<lang::Type>> const abort_parameters;
+    abort_ = create_function(ABORT_NAME, lang::VoidType::get(), abort_parameters);
 }
 
 Shared<lang::Value> Runtime::allocate(Allocator                         allocation,
@@ -156,9 +134,7 @@ void Runtime::deleteDynamic(Shared<lang::Value> value, bool delete_buffer, Compi
         context.ir().CreateBitCast(ptr, llvm::Type::getInt8PtrTy(context.llvmContext()), ptr->getName() + ".bitcast");
 
     std::array<llvm::Value*, 1> const args = {opaque_ptr};
-
-    llvm::Value* success = context.ir().CreateCall(delete_dynamic_type_, delete_dynamic_, args);
-    success->setName(delete_dynamic_->getName() + ".call");
+    context.ir().CreateCall(delete_dynamic_, args);
 }
 
 void Runtime::buildAssert(Shared<lang::Value> value, CompileContext& context)
@@ -174,6 +150,16 @@ void Runtime::buildAssert(Shared<lang::Value> value, CompileContext& context)
     }
 }
 
+void Runtime::buildExit(Shared<lang::Value> value, CompileContext& context)
+{
+    assert(value->type()->isFixedWidthIntegerType(32, false));
+
+    value->buildContentValue(context);
+    llvm::Value* exit_code = value->getContentValue();
+
+    context_->ir().CreateCall(exit_, exit_code);
+}
+
 llvm::Value* Runtime::allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
                                         llvm::Value*                      count_value,
                                         CompileContext&                   context)
@@ -186,9 +172,6 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
                                       CompileContext&                   context)
 {
     llvm::Type* size_content_type = lang::SizeType::getSize()->getContentType(context.llvmContext());
-
-    // Set the zero init flag.
-    llvm::Value* flags = llvm::ConstantInt::get(llvm::Type::getInt32Ty(context.llvmContext()), 0x0040, false);
 
     // Calculate the size to allocate.
     llvm::Value* size;
@@ -216,12 +199,7 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
                                       false);
     }
 
-    std::array<llvm::Value*, 2> const args = {flags, size};
-
-    llvm::Value* opaque_ptr = context.ir().CreateCall(allocate_dynamic_type_,
-                                                      allocate_dynamic_,
-                                                      args,
-                                                      allocate_dynamic_->getName() + ".call");
+    llvm::Value* opaque_ptr = context.ir().CreateCall(allocate_dynamic_, size, allocate_dynamic_->getName() + ".call");
 
     llvm::Value* result_ptr;
 

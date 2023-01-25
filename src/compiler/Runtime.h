@@ -30,23 +30,23 @@ class Runtime
      */
     void init(CompileContext& context);
 
-    /**
-     * Set the exit point.
-     * @param exit The exit function, defined for the current application.
-     */
-    void setExit(lang::ResolvingHandle<lang::Function> exit);
-
   private:
     CompileContext* context_ {nullptr};
 
-    llvm::FunctionType* allocate_dynamic_type_ {nullptr};
-    llvm::Function*     allocate_dynamic_ {nullptr};
+    llvm::Function*              allocate_dynamic_ {nullptr};
+    const static constexpr char* ALLOCATE_DYNAMIC_NAME = "__allocate__";
 
-    llvm::FunctionType* delete_dynamic_type_ {nullptr};
-    llvm::Function*     delete_dynamic_ {nullptr};
+    llvm::Function*              delete_dynamic_ {nullptr};
+    const static constexpr char* DELETE_DYNAMIC_NAME = "__free__";
 
-    llvm::FunctionType* assertion_type_ {nullptr};
-    llvm::Function*     assertion_ {nullptr};
+    llvm::Function*              assertion_ {nullptr};
+    const static constexpr char* ASSERTION_NAME = "__assert__";
+
+    llvm::Function*              exit_ {nullptr};
+    const static constexpr char* EXIT_NAME = "__exit__";
+
+    llvm::Function*              abort_ {nullptr};
+    const static constexpr char* ABORT_NAME = "__abort__";
 
   public:
     /**
@@ -91,6 +91,13 @@ class Runtime
      * @param context The current compile context.
      */
     void buildAssert(Shared<lang::Value> value, CompileContext& context);
+
+    /**
+     * Build an exit.
+     * @param value The exit code.
+     * @param context The current compile context.
+     */
+    void buildExit(Shared<lang::Value> value, CompileContext& context);
 
   private:
     llvm::Value* allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
