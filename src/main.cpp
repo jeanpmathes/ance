@@ -123,6 +123,9 @@ int main(int argc, char** argv)
 
     std::filesystem::path const bld_dir = project_file_path.parent_path() / "bld";
 
+    std::filesystem::path const project_definition_bin = bld_dir / "def" / "bin";
+    std::filesystem::path const project_definition_obj = bld_dir / "def" / "obj";
+
     llvm::Triple const triple(llvm::sys::getDefaultTargetTriple());
 
     ProjectDescription::Description description;
@@ -130,9 +133,10 @@ int main(int argc, char** argv)
 
     {
         ProjectDescription project_description(project_file_path);
-        project_description.setBinaryDescriptionPath(getResultPath(bld_dir, project_description));
+        project_description.setBinaryDescriptionPath(getResultPath(project_definition_bin, project_description));
 
-        std::cout << "============ Build [ " << project_description.getName() << " ] ============" << std::endl;
+        std::cout << "======================== Build [ " << project_description.getName()
+                  << " ] ========================" << std::endl;
 
         if (project_description.isRefreshRequired())
         {
@@ -149,10 +153,7 @@ int main(int argc, char** argv)
             error = validateFlow(tree, validation_logger);
             if (error.hasValue()) return error.value();
 
-            std::filesystem::path const  obj_dir = bld_dir / "prj";
-            std::filesystem::path const& bin_dir = bld_dir;
-
-            error = build(tree, triple, obj_dir, bin_dir);
+            error = build(tree, triple, project_definition_obj, project_definition_bin);
             if (error.hasValue()) return error.value();
         }
 
@@ -179,8 +180,8 @@ int main(int argc, char** argv)
         auto error = validateTree(tree, validation_logger);
         if (error.hasValue()) return error.value();
 
-        std::filesystem::path const obj_dir = bld_dir / "obj";
-        std::filesystem::path const bin_dir = bld_dir / "bin";
+        std::filesystem::path const obj_dir = bld_dir / triple.getTriple() / "obj";
+        std::filesystem::path const bin_dir = bld_dir / triple.getTriple() / "bin";
 
         if (application.emitExtras()) application.emitAsSource(obj_dir / "input.nc");
 

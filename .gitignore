@@ -5,8 +5,7 @@
 cmake-build-debug/
 
 # test files
-ance_output/
-ance_proj/
+first/
 
 # antlr
 antlr/
