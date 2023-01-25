@@ -7,6 +7,9 @@ cmake-build-debug/
 # test files
 first/
 
+# (binary) resource files
+resources/
+
 # antlr
 antlr/
 *.interp
