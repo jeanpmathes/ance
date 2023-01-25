@@ -1,6 +1,7 @@
 import tempfile
 import shutil
 import os
+import sys
 from typing import Optional
 
 import ance
@@ -59,6 +60,13 @@ class TestRun:
             print(self.compile_output)
 
 
+if len(sys.argv) != 2:
+    print("Expected target triple as argument")
+    exit(1)
+
+target_triple = sys.argv[1]
+
+
 def run_test(test: discovery.Test) -> TestRun:
     with tempfile.TemporaryDirectory() as temp:
         temp_project_dir: str = os.path.join(temp, test.test_name)
@@ -72,8 +80,7 @@ def run_test(test: discovery.Test) -> TestRun:
         if compile_result != COMPILE_VALID:
             return TestRun(test, compile_result, compile_output, False, None)
 
-        output_path: str = os.path.join(temp_project_dir, 'bld')
-        run_result, run_output = ance.run_project(output_path, "test")
+        run_result, run_output = ance.run_project(temp_project_dir, target_triple, "test")
         return TestRun(test, compile_result, compile_output, run_result == 0, run_output)
 
 
