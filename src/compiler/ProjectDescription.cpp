@@ -42,19 +42,24 @@ OptLevel ProjectDescription::getOptimizationLevel() const
     return OptLevel::O_3;
 }
 
-bool ProjectDescription::useWarningsAsErrors() const
+bool ProjectDescription::isWarningsAsErrors() const
 {
     return true;
 }
 
-bool ProjectDescription::enableAssertions() const
+bool ProjectDescription::isAssertionsEnabled() const
 {
     return false;
 }
 
-bool ProjectDescription::emitExtras() const
+bool ProjectDescription::isEmittingExtras() const
 {
     return false;
+}
+
+bool ProjectDescription::isUsingRuntime() const
+{
+    return true;
 }
 
 void ProjectDescription::validate(ValidationLogger& validation_logger) const
@@ -93,7 +98,8 @@ struct Project_ {
     uint32_t        opt_level                   = 0;
     bool            is_warning_as_error_enabled = false;
     bool            is_assert_ignored           = false;
-    bool            is_extra_emission_enabled = false;
+    bool            is_extra_emission_enabled   = false;
+    bool            is_runtime_excluded         = false;
 };
 
 struct test {
@@ -198,7 +204,8 @@ bool ProjectDescription::loadDescription()
                     .opt_level                   = opt_level,
                     .is_warning_as_error_enabled = project.is_warning_as_error_enabled,
                     .is_assert_ignored           = project.is_assert_ignored,
-                    .is_extra_emission_enabled   = project.is_extra_emission_enabled};
+                    .is_extra_emission_enabled   = project.is_extra_emission_enabled,
+                    .is_runtime_excluded         = project.is_runtime_excluded};
 
 #if defined(ANCE_TARGET_WINDOWS)
     FreeLibrary(handle);

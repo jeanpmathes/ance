@@ -81,19 +81,25 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      * Whether to treat warnings as errors.
      * @return True if warnings should be treated as errors.
      */
-    [[nodiscard]] virtual bool useWarningsAsErrors() const = 0;
+    [[nodiscard]] virtual bool isWarningsAsErrors() const = 0;
 
     /**
      * Get whether assertions are enabled.
      * @return True if assertions are enabled.
      */
-    [[nodiscard]] virtual bool enableAssertions() const = 0;
+    [[nodiscard]] virtual bool isAssertionsEnabled() const = 0;
 
     /**
      * Whether extras like a CFG should be emitted.
      * @return True if extras should be emitted.
      */
-    [[nodiscard]] virtual bool emitExtras() const = 0;
+    [[nodiscard]] virtual bool isEmittingExtras() const = 0;
+
+    /**
+     * Whether the runtime is used.
+     * @return True if the runtime is used.
+     */
+    [[nodiscard]] virtual bool isUsingRuntime() const = 0;
 
     /**
      * Get the bitness of the application.

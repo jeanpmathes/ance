@@ -124,6 +124,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
         push_member(lang::Identifier::like("is_warning_as_error_enabled"), lang::BooleanType::get());
         push_member(lang::Identifier::like("is_assert_ignored"), lang::BooleanType::get());
         push_member(lang::Identifier::like("is_extra_emission_enabled"), lang::BooleanType::get());
+        push_member(lang::Identifier::like("is_runtime_excluded"), lang::BooleanType::get());
 
         unit_.globalScope().defineStruct(lang::AccessModifier::PUBLIC_ACCESS,
                                          lang::Identifier::like("Project"),

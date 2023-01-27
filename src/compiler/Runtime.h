@@ -100,6 +100,8 @@ class Runtime
     void buildExit(Shared<lang::Value> value, CompileContext& context);
 
   private:
+    bool is_initialized_ {false};
+
     llvm::Value* allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
                                    llvm::Value*                      count_value,
                                    CompileContext&                   context);

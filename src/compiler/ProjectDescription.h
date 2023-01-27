@@ -20,9 +20,10 @@ class ProjectDescription : public Unit
     [[nodiscard]] std::vector<std::filesystem::path> getSourceFiles() const override;
     [[nodiscard]] UnitResult                         getType() const override;
     [[nodiscard]] OptLevel                           getOptimizationLevel() const override;
-    [[nodiscard]] bool                               useWarningsAsErrors() const override;
-    [[nodiscard]] bool                               enableAssertions() const override;
-    [[nodiscard]] bool                               emitExtras() const override;
+    [[nodiscard]] bool                               isWarningsAsErrors() const override;
+    [[nodiscard]] bool                               isAssertionsEnabled() const override;
+    [[nodiscard]] bool                               isEmittingExtras() const override;
+    [[nodiscard]] bool                               isUsingRuntime() const override;
     void                                             validate(ValidationLogger& validation_logger) const override;
 
     antlr4::tree::ParseTree* selectTree(anceParser& parser) override;
@@ -50,6 +51,7 @@ class ProjectDescription : public Unit
         bool                     is_warning_as_error_enabled;
         bool                     is_assert_ignored;
         bool                     is_extra_emission_enabled;
+        bool                     is_runtime_excluded;
     };
 
     /**

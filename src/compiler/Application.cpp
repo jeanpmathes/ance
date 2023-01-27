@@ -57,19 +57,24 @@ OptLevel Application::getOptimizationLevel() const
     return project_.description().opt_level;
 }
 
-bool Application::useWarningsAsErrors() const
+bool Application::isWarningsAsErrors() const
 {
     return project_.description().is_warning_as_error_enabled;
 }
 
-bool Application::enableAssertions() const
+bool Application::isAssertionsEnabled() const
 {
     return not project_.description().is_assert_ignored;
 }
 
-bool Application::emitExtras() const
+bool Application::isEmittingExtras() const
 {
     return project_.description().is_extra_emission_enabled;
+}
+
+bool Application::isUsingRuntime() const
+{
+    return not project_.description().is_runtime_excluded;
 }
 
 antlr4::tree::ParseTree* Application::selectTree(anceParser& parser)

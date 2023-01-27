@@ -57,6 +57,8 @@ void Runtime::init(CompileContext& context)
 
     std::vector<lang::ResolvingHandle<lang::Type>> const abort_parameters;
     abort_ = create_function(ABORT_NAME, lang::VoidType::get(), abort_parameters);
+
+    is_initialized_ = true;
 }
 
 Shared<lang::Value> Runtime::allocate(Allocator                         allocation,
@@ -64,6 +66,8 @@ Shared<lang::Value> Runtime::allocate(Allocator                         allocati
                                       Optional<Shared<lang::Value>>     count,
                                       CompileContext&                   context)
 {
+    assert(is_initialized_);
+
     llvm::Value* count_value = nullptr;
 
     if (count.hasValue())
@@ -99,6 +103,8 @@ Shared<lang::Value> Runtime::allocate(Allocator                         allocati
 
 void Runtime::deleteDynamic(Shared<lang::Value> value, bool delete_buffer, CompileContext& context)
 {
+    assert(is_initialized_);
+
     assert(delete_buffer || value->type()->isPointerType());// Not deleting a buffer implies a pointer type.
     assert(!delete_buffer || value->type()->isBufferType());// Deleting a buffer implies a buffer type.
 
@@ -139,9 +145,11 @@ void Runtime::deleteDynamic(Shared<lang::Value> value, bool delete_buffer, Compi
 
 void Runtime::buildAssert(Shared<lang::Value> value, CompileContext& context)
 {
+    assert(is_initialized_);
+
     assert(value->type()->isBooleanType());
 
-    if (context_->unit().enableAssertions())
+    if (context_->unit().isAssertionsEnabled())
     {
         value->buildContentValue(context);
         llvm::Value* truth_value = value->getContentValue();
@@ -152,6 +160,8 @@ void Runtime::buildAssert(Shared<lang::Value> value, CompileContext& context)
 
 void Runtime::buildExit(Shared<lang::Value> value, CompileContext& context)
 {
+    assert(is_initialized_);
+
     assert(value->type()->isFixedWidthIntegerType(32, false));
 
     value->buildContentValue(context);

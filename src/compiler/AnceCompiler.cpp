@@ -62,7 +62,7 @@ AnceCompiler::AnceCompiler(SourceTree& tree, llvm::Triple const& triple)
 
 void AnceCompiler::compile(std::filesystem::path const& out)
 {
-    context_.runtime().init(context_);
+    if (unit_.isUsingRuntime()) context_.runtime().init(context_);
 
     unit_.globalScope().createNativeBacking(context_);
     unit_.globalScope().buildFunctions(context_);
@@ -71,7 +71,7 @@ void AnceCompiler::compile(std::filesystem::path const& out)
 
     // Print control flow graph.
 
-    if (unit_.emitExtras())
+    if (unit_.isEmittingExtras())
     {
         std::filesystem::path const cfg_path = out.parent_path() / "cfg.gml";
         std::ofstream               cfg_out(cfg_path);
@@ -209,7 +209,7 @@ llvm::Function* AnceCompiler::buildExit()
         makeShared<lang::WrappedNativeValue>(exitcode_type,
                                              lang::values::contentToNative(exitcode_type, exitcode, context_));
 
-    context_.runtime().buildExit(exitcode_value, context_);
+    if (unit_.isUsingRuntime()) { context_.runtime().buildExit(exitcode_value, context_); }
 
     ir_.CreateRetVoid();
     return exit;

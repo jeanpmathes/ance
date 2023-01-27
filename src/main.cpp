@@ -21,7 +21,7 @@ static Optional<int> emit(SourceTree& tree, ValidationLogger& validation_logger,
     validation_logger.emitMessages(tree.getSourceFiles(), step_name);
 
     if (validation_logger.errorCount() != 0
-        || (tree.unit().useWarningsAsErrors() && validation_logger.warningCount() != 0))
+        || (tree.unit().isWarningsAsErrors() && validation_logger.warningCount() != 0))
     {
         bool const failed_by_warning = validation_logger.errorCount() == 0;
 
@@ -183,11 +183,11 @@ int main(int argc, char** argv)
         std::filesystem::path const obj_dir = bld_dir / triple.getTriple() / "obj";
         std::filesystem::path const bin_dir = bld_dir / triple.getTriple() / "bin";
 
-        if (application.emitExtras()) application.emitAsSource(obj_dir / "input.nc");
+        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input.nc");
 
         application.preBuild();
 
-        if (application.emitExtras()) application.emitAsSource(obj_dir / "input_prebuild.nc");
+        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input_prebuild.nc");
 
         error = validateFlow(tree, validation_logger);
         if (error.hasValue()) return error.value();

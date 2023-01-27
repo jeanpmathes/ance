@@ -38,7 +38,8 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     std::filesystem::path const target_data_directory =
         std::filesystem::current_path() / "resources" / "targets" / unit_.getTargetTriple().getTriple();
 
-    if (!(std::filesystem::exists(target_data_directory) && std::filesystem::is_directory(target_data_directory)))
+    if (unit_.isUsingRuntime()
+        && !(std::filesystem::exists(target_data_directory) && std::filesystem::is_directory(target_data_directory)))
     {
         std::cout << "ance: build: no target resources found [ " << unit_.getTargetTriple().getTriple() << " ]"
                   << std::endl;
@@ -47,14 +48,14 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
 
     std::vector<std::string> lib_paths;
 
-    lib_paths.push_back("/libpath:" + target_data_directory.string());
+    if (unit_.isUsingRuntime()) { lib_paths.push_back("/libpath:" + target_data_directory.string()); }
 
     for (auto const& libpath : unit_.getLibraryPaths()) { lib_paths.push_back("/libpath:" + libpath); }
     for (auto const& libpath : lib_paths) { args.push_back(libpath.c_str()); }
 
     std::vector<std::string> libs;
 
-    libs.emplace_back("/defaultlib:runtime");
+    if (unit_.isUsingRuntime()) { libs.emplace_back("/defaultlib:runtime"); }
 
     for (auto const& lib : unit_.getLibraries()) { libs.push_back("/defaultlib:" + lib); }
     for (auto const& lib : libs) { args.push_back(lib.c_str()); }
