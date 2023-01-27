@@ -1,12 +1,13 @@
 import os.path
 import subprocess
 
-compiler_path: str = '../../cmake-build-debug/src/ance.exe'
+working_directory: str = os.path.abspath('../..')
+compiler_path: str = os.path.abspath('../../cmake-build-debug/src/ance.exe')
 
 
 def compile_project(project_dir_path: str) -> (int, str):
     project_path = os.path.join(project_dir_path, 'test.ance')
-    ance_c = subprocess.run([compiler_path, project_path], capture_output=True, encoding='utf-8')
+    ance_c = subprocess.run([compiler_path, project_path], capture_output=True, encoding='utf-8', cwd=working_directory)
     return ance_c.returncode, ance_c.stdout
 
 
