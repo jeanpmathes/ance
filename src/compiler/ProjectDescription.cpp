@@ -4,7 +4,7 @@
 
 ProjectDescription::ProjectDescription(std::filesystem::path project_file)
     : project_file_(std::move(project_file))
-    , name_(project_file_.stem().generic_string())
+    , name_("__definition__")
 {}
 
 void ProjectDescription::setBinaryDescriptionPath(std::filesystem::path path)

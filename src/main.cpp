@@ -136,7 +136,7 @@ int main(int argc, char** argv)
         project_description.setBinaryDescriptionPath(
             getResultPath(project_definition_bin, project_description, triple));
 
-        std::cout << "======================== Build [ " << project_description.getName()
+        std::cout << "======================== Build [ " << project_file_path.stem().string()
                   << " ] ========================" << std::endl;
 
         if (project_description.isRefreshRequired())
