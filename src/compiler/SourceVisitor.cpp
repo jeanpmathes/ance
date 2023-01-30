@@ -118,8 +118,8 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 
         push_member(lang::Identifier::like("name"), string_type);
         push_member(lang::Identifier::like("kind"), lang::FixedWidthIntegerType::get(32, false));
-        push_member(lang::Identifier::like("libs"), string_list_type);
-        push_member(lang::Identifier::like("libpaths"), string_list_type);
+        push_member(lang::Identifier::like("libraries"), string_list_type);
+        push_member(lang::Identifier::like("library_paths"), string_list_type);
         push_member(lang::Identifier::like("binary_dependencies"), string_list_type);
         push_member(lang::Identifier::like("opt_level"), lang::FixedWidthIntegerType::get(32, false));
         push_member(lang::Identifier::like("is_warning_as_error_enabled"), lang::BooleanType::get());

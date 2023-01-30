@@ -67,7 +67,7 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
         std::filesystem::path const from = binary_dependency;
         std::filesystem::path const to   = app.parent_path() / from.filename();
 
-        std::filesystem::copy_file(from, to);
+        std::filesystem::copy_file(from, to, std::filesystem::copy_options::update_existing);
     }
 
     std::vector<std::string> lib_paths;
