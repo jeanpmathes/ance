@@ -102,10 +102,6 @@ struct Project_ {
     bool            is_runtime_excluded         = false;
 };
 
-struct test {
-    char x;
-};
-
 using ProjectDescriptionFunction = void(__cdecl*)(Project_*);
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
@@ -122,6 +118,8 @@ bool ProjectDescription::loadDescription()
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #define ANCE_TARGET_WINDOWS
+
+    SetDllDirectoryA(binary_description_path_->parent_path().string().c_str());
 
     HMODULE handle = LoadLibraryA(binary_description_path_->string().c_str());
     if (!handle) return false;
