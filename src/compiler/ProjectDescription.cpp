@@ -90,11 +90,17 @@ std::vector<std::string> ProjectDescription::getLibraryPaths() const
             R"(C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.30.30705\lib\x64)"};
 }
 
+std::vector<std::string> ProjectDescription::getBinaryDependencyPaths() const
+{
+    return {};
+}
+
 struct Project_ {
     uint8_t const*  name                        = nullptr;
     uint32_t        kind                        = 0;
     uint8_t const** libraries                   = nullptr;
-    uint8_t const** library_paths             = nullptr;
+    uint8_t const** library_paths               = nullptr;
+    uint8_t const** binary_dependencies         = nullptr;
     uint32_t        opt_level                   = 0;
     bool            is_warning_as_error_enabled = false;
     bool            is_assert_ignored           = false;
@@ -142,6 +148,8 @@ bool ProjectDescription::loadDescription()
 #endif
 
     auto read_string = [](uint8_t const* str) -> std::string {
+        if (str == nullptr) return {};
+
         std::stringstream ss;
         while (*str != '\0')
         {
@@ -153,6 +161,8 @@ bool ProjectDescription::loadDescription()
     };
 
     auto read_vector = [&](uint8_t const** array) -> std::vector<std::string> {
+        if (array == nullptr) return {};
+
         std::vector<std::string> result;
         while (*array)
         {
@@ -199,6 +209,7 @@ bool ProjectDescription::loadDescription()
                     .project_file                = project_file_,
                     .linkage_libraries           = read_vector(project.libraries),
                     .linkage_library_paths       = read_vector(project.library_paths),
+                    .binary_dependencies         = read_vector(project.binary_dependencies),
                     .opt_level                   = opt_level,
                     .is_warning_as_error_enabled = project.is_warning_as_error_enabled,
                     .is_assert_ignored           = project.is_assert_ignored,

@@ -46,6 +46,30 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
         return false;
     }
 
+    std::vector<std::string> binary_dependencies = unit_.getBinaryDependencyPaths();
+
+    if (unit_.isUsingRuntime())
+    {
+        UnitResult const            runtime_type = UnitResult::LIBRARY;
+        std::string const           runtime_file = "runtime" + runtime_type.getExtension(unit_.getTargetTriple());
+        std::filesystem::path const runtime_path = target_data_directory / runtime_file;
+        binary_dependencies.push_back(runtime_path.string());
+    }
+
+    for (auto const& binary_dependency : binary_dependencies)
+    {
+        if (!std::filesystem::exists(binary_dependency))
+        {
+            std::cout << "ance: build: cannot find binary dependency: " << binary_dependency << std::endl;
+            return false;
+        }
+
+        std::filesystem::path const from = binary_dependency;
+        std::filesystem::path const to   = app.parent_path() / from.filename();
+
+        std::filesystem::copy_file(from, to);
+    }
+
     std::vector<std::string> lib_paths;
 
     if (unit_.isUsingRuntime()) { lib_paths.push_back("/libpath:" + target_data_directory.string()); }

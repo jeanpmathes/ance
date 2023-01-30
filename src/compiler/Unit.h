@@ -185,6 +185,12 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      */
     [[nodiscard]] virtual std::vector<std::string> getLibraryPaths() const = 0;
 
+    /**
+     * Paths to binary dependencies hat must be copied to the binary output directory.
+     * @return The paths.
+     */
+    [[nodiscard]] virtual std::vector<std::string> getBinaryDependencyPaths() const = 0;
+
     ~Unit() override = default;
 
   private:

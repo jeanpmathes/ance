@@ -1,5 +1,7 @@
 #include "UnitResult.h"
 
+#include <stdexcept>
+
 UnitResult::operator Value() const
 {
     return value_;
@@ -27,13 +29,22 @@ void UnitResult::addLinkerArguments(std::vector<char const*>& args, std::string 
     }
 }
 
-std::string UnitResult::getExtension() const
+std::string UnitResult::getExtension(llvm::Triple const& triple) const
 {
-    switch (value_)
+    switch (triple.getOS())
     {
-        case LIBRARY:
-            return ".dll";
-        case EXECUTABLE:
-            return ".exe";
+        case llvm::Triple::Win32:
+        {
+            switch (value_)
+            {
+                case LIBRARY:
+                    return ".dll";
+                case EXECUTABLE:
+                    return ".exe";
+            }
+        }
+
+        default:
+            throw std::logic_error("Not supported.");
     }
 }

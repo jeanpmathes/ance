@@ -37,6 +37,7 @@ class Application : public Unit
 
     std::vector<std::string> getLibraries() const override;
     std::vector<std::string> getLibraryPaths() const override;
+    std::vector<std::string> getBinaryDependencyPaths() const override;
 
   private:
     Project& project_;

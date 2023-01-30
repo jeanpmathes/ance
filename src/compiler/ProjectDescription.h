@@ -31,6 +31,7 @@ class ProjectDescription : public Unit
 
     [[nodiscard]] std::vector<std::string> getLibraries() const override;
     [[nodiscard]] std::vector<std::string> getLibraryPaths() const override;
+    [[nodiscard]] std::vector<std::string> getBinaryDependencyPaths() const override;
 
     /*
      * Get whether a refresh build is required.
@@ -47,6 +48,7 @@ class ProjectDescription : public Unit
         std::filesystem::path    project_file;
         std::vector<std::string> linkage_libraries;
         std::vector<std::string> linkage_library_paths;
+        std::vector<std::string> binary_dependencies;
         OptLevel                 opt_level;
         bool                     is_warning_as_error_enabled;
         bool                     is_assert_ignored;

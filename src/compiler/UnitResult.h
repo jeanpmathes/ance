@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include <llvm/ADT/Triple.h>
+
 /**
  * The resulting build artifact type of a project.
  */
@@ -39,7 +41,7 @@ class UnitResult
      * Get the file extension for this application type.
      * @return The file extension.
      */
-    [[nodiscard]] std::string getExtension() const;
+    [[nodiscard]] std::string getExtension(llvm::Triple const& triple) const;
 
   private:
     Value value_;

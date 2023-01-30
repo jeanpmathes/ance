@@ -65,9 +65,9 @@ static Optional<int> validateFlow(SourceTree& tree, ValidationLogger& validation
     return emit(tree, validation_logger, "flow");
 }
 
-static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir, Unit& unit)
+static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir, Unit& unit, llvm::Triple const& triple)
 {
-    return bin_dir / (unit.getName() + unit.getType().getExtension());
+    return bin_dir / (unit.getName() + unit.getType().getExtension(triple));
 }
 
 static Optional<int> build(SourceTree&                  tree,
@@ -83,7 +83,7 @@ static Optional<int> build(SourceTree&                  tree,
 
     std::filesystem::path const ilr = obj_dir / (tree.unit().getName() + ".ll");
     std::filesystem::path const obj = obj_dir / (tree.unit().getName() + ".o");
-    std::filesystem::path const res = getResultPath(bin_dir, tree.unit());
+    std::filesystem::path const res = getResultPath(bin_dir, tree.unit(), tree.unit().getTargetTriple());
 
     compiler.compile(ilr);
     compiler.emitObject(obj);
@@ -133,7 +133,8 @@ int main(int argc, char** argv)
 
     {
         ProjectDescription project_description(project_file_path);
-        project_description.setBinaryDescriptionPath(getResultPath(project_definition_bin, project_description));
+        project_description.setBinaryDescriptionPath(
+            getResultPath(project_definition_bin, project_description, triple));
 
         std::cout << "======================== Build [ " << project_description.getName()
                   << " ] ========================" << std::endl;

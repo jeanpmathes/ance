@@ -97,3 +97,8 @@ std::vector<std::string> Application::getLibraryPaths() const
 {
     return project_.description().linkage_library_paths;
 }
+
+std::vector<std::string> Application::getBinaryDependencyPaths() const
+{
+    return project_.description().binary_dependencies;
+}
