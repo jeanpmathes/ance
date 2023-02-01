@@ -10,7 +10,7 @@
 #include "lang/type/VectorType.h"
 #include "lang/type/SizeType.h"
 
-Application::Application(Project& project) : project_(project) {}
+Application::Application(Project& project) : Unit(!project.description().is_runtime_excluded), project_(project) {}
 
 std::string const& Application::getName() const
 {

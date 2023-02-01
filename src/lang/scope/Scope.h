@@ -50,6 +50,12 @@ namespace lang
         virtual lang::GlobalScope* getGlobalScope() = 0;
 
         /**
+         * Get the global scope.
+         * @return The global scope.
+         */
+        virtual lang::GlobalScope const* getGlobalScope() const = 0;
+
+        /**
          * Get this scope as a local scope, if it is one.
          * @return The local scope, or nullptr if this scope is not a local scope.
          */

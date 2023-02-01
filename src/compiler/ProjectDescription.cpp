@@ -3,7 +3,8 @@
 #include "lang/ApplicationVisitor.h"
 
 ProjectDescription::ProjectDescription(std::filesystem::path project_file)
-    : project_file_(std::move(project_file))
+    : Unit(true)
+    , project_file_(std::move(project_file))
     , name_("__definition__")
 {}
 

@@ -30,7 +30,7 @@ Unit::Unit(Owned<lang::GlobalScope> global_scope) : global_scope_(std::move(glob
     addChild(*global_scope_);
 }
 
-Unit::Unit() : Unit(makeOwned<lang::GlobalScope>())
+Unit::Unit(bool is_containing_runtime) : Unit(makeOwned<lang::GlobalScope>(is_containing_runtime))
 {
     // Register keyword types
 

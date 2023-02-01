@@ -30,6 +30,14 @@ class Runtime
      */
     void init(CompileContext& context);
 
+    /**
+     * Check whether a name is reserved by the runtime.
+     * A reserved name cannot be used by a function that is not mangled, except if the runtime is excluded.
+     * @param name The name to check.
+     * @return True if the name is reserved.
+     */
+    [[nodiscard]] static bool isNameReserved(lang::Identifier const& name);
+
   private:
     CompileContext* context_ {nullptr};
 
@@ -47,6 +55,12 @@ class Runtime
 
     llvm::Function*              abort_ {nullptr};
     const static constexpr char* ABORT_NAME = "__abort__";
+
+    inline static std::vector<std::string> reserved_names_ {ALLOCATE_DYNAMIC_NAME,
+                                                            DELETE_DYNAMIC_NAME,
+                                                            ASSERTION_NAME,
+                                                            EXIT_NAME,
+                                                            ABORT_NAME};
 
   public:
     /**

@@ -61,6 +61,11 @@ void Runtime::init(CompileContext& context)
     is_initialized_ = true;
 }
 
+bool Runtime::isNameReserved(lang::Identifier const& name)
+{
+    return std::find(reserved_names_.begin(), reserved_names_.end(), name.text()) != reserved_names_.end();
+}
+
 Shared<lang::Value> Runtime::allocate(Allocator                         allocation,
                                       lang::ResolvingHandle<lang::Type> type,
                                       Optional<Shared<lang::Value>>     count,

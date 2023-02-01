@@ -261,8 +261,9 @@ namespace lang
                                                 CompileContext&                         context);
 
         lang::Scope*       scope() override;
-        lang::GlobalScope* getGlobalScope() override;
-        llvm::DIScope*     getDebugScope(CompileContext& context) const override;
+        lang::GlobalScope*       getGlobalScope() override;
+        lang::GlobalScope const* getGlobalScope() const override;
+        llvm::DIScope*           getDebugScope(CompileContext& context) const override;
 
         /**
          * Get the scope inside of this function, if there is any.

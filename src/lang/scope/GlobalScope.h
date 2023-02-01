@@ -31,10 +31,24 @@ namespace lang
         , public lang::Element<GlobalScope, ANCE_CONSTRUCTS>
     {
       public:
+        explicit GlobalScope(bool is_containing_runtime);
+
+      private:
+        bool is_containing_runtime_ {false};
+
+      public:
+        /**
+         * Check whether this scope contains the runtime.
+         * @return True if the runtime is contained.
+         */
+        [[nodiscard]] bool isContainingRuntime() const;
+
+      public:
         lang::Scope* scope() override;
 
-        lang::GlobalScope* getGlobalScope() override;
-        llvm::DIScope*     getDebugScope(CompileContext& context) const override;
+        lang::GlobalScope*       getGlobalScope() override;
+        lang::GlobalScope const* getGlobalScope() const override;
+        llvm::DIScope*           getDebugScope(CompileContext& context) const override;
 
         void validate(ValidationLogger& validation_logger) const override;
 

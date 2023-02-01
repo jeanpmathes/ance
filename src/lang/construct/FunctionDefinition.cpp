@@ -219,3 +219,8 @@ lang::GlobalScope* lang::FunctionDefinition::getGlobalScope()
 {
     return containing_scope_.getGlobalScope();
 }
+
+lang::GlobalScope const* lang::FunctionDefinition::getGlobalScope() const
+{
+    return containing_scope_.getGlobalScope();
+}

@@ -11,12 +11,24 @@
 #include "lang/type/TypeAlias.h"
 #include "validation/ValidationLogger.h"
 
+lang::GlobalScope::GlobalScope(bool is_containing_runtime) : is_containing_runtime_(is_containing_runtime) {}
+
+bool lang::GlobalScope::isContainingRuntime() const
+{
+    return is_containing_runtime_;
+}
+
 lang::Scope* lang::GlobalScope::scope()
 {
     return this;
 }
 
 lang::GlobalScope* lang::GlobalScope::getGlobalScope()
+{
+    return this;
+}
+
+lang::GlobalScope const* lang::GlobalScope::getGlobalScope() const
 {
     return this;
 }

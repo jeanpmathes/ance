@@ -246,6 +246,11 @@ lang::GlobalScope* lang::Function::getGlobalScope()
     return definition_.value()->getGlobalScope();
 }
 
+lang::GlobalScope const* lang::Function::getGlobalScope() const
+{
+    return definition_.value()->getGlobalScope();
+}
+
 llvm::DIScope* lang::Function::getDebugScope(CompileContext& context) const
 {
     return definition_.value()->getDebugScope(context);

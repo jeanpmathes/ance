@@ -16,6 +16,11 @@ lang::GlobalScope* lang::LocalScope::getGlobalScope()
     return parent_->getGlobalScope();
 }
 
+lang::GlobalScope const* lang::LocalScope::getGlobalScope() const
+{
+    return parent_->getGlobalScope();
+}
+
 lang::LocalScope* lang::LocalScope::asLocalScope()
 {
     return this;

@@ -231,6 +231,7 @@ namespace lang
 
       public:
         lang::GlobalScope*        getGlobalScope();
+        lang::GlobalScope const*  getGlobalScope() const;
         virtual llvm::DIScope*    getDebugScope(CompileContext& context) const = 0;
         virtual lang::LocalScope* getInsideScope()                             = 0;
 

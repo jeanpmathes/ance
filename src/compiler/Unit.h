@@ -33,7 +33,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     explicit Unit(Owned<lang::GlobalScope> global_scope);
 
   protected:
-    Unit();
+    Unit(bool is_containing_runtime);
 
   public:
     /**
