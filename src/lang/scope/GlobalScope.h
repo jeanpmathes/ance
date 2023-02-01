@@ -58,6 +58,14 @@ namespace lang
         void validateFlow(ValidationLogger& validation_logger) const;
 
         /**
+         * Use this for elements that depend on the runtime.
+         * @param location The location of the element.
+         * @param validation_logger The logger to use for validation.
+         * @return True if the runtime is available.
+         */
+        bool validateRuntimeDependency(lang::Location location, ValidationLogger& validation_logger) const;
+
+        /**
          * Define a global variable.
          * @param access The access level.
          * @param is_constant Whether the variable is a constant.

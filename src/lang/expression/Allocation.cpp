@@ -68,6 +68,8 @@ bool Allocation::validate(ValidationLogger& validation_logger) const
                                               validation_logger);
     }
 
+    is_valid &= scope()->getGlobalScope()->validateRuntimeDependency(location(), validation_logger);
+
     return is_valid;
 }
 

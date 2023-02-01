@@ -88,6 +88,15 @@ void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger) const
     for (auto& [name, variable] : global_defined_variables_) { variable->validateFlow(validation_logger); }
 }
 
+bool lang::GlobalScope::validateRuntimeDependency(lang::Location location, ValidationLogger& validation_logger) const
+{
+    if (isContainingRuntime()) return true;
+
+    validation_logger.logError("Not allowed in runtime-excluded project", location);
+
+    return false;
+}
+
 void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                        access,
                                              bool                                        is_constant,
                                              lang::Identifier                            name,

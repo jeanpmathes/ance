@@ -27,6 +27,8 @@ void Assertion::validate(ValidationLogger& validation_logger) const
     if (!is_valid) return;
 
     lang::Type::checkMismatch(lang::BooleanType::get(), condition_->type(), condition_->location(), validation_logger);
+
+    scope()->getGlobalScope()->validateRuntimeDependency(location(), validation_logger);
 }
 
 Statements Assertion::expandWith(Expressions subexpressions, Statements) const
