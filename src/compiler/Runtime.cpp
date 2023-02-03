@@ -123,26 +123,28 @@ void Runtime::deleteDynamic(Shared<lang::Value> value, bool delete_buffer, Compi
     llvm::Type* size_ptr_content_type =
         lang::PointerType::get(lang::SizeType::getSize())->getContentType(context.llvmContext());
 
+    llvm::Value* memory_ptr = ptr;
+
     if (delete_buffer)
     {
         llvm::Value* content_ptr = context.ir().CreateBitCast(ptr, size_ptr_content_type, ptr->getName() + ".bitcast");
 
-        llvm::Value* header_ptr =
-            context.ir().CreateGEP(size_content_type,
-                                   content_ptr,
-                                   llvm::ConstantInt::get(llvm::IntegerType::getInt64Ty(context.llvmContext()),
-                                                          static_cast<uint64_t>(-1),
-                                                          true),
-                                   content_ptr->getName() + ".gep");
+        memory_ptr = context.ir().CreateGEP(size_content_type,
+                                            content_ptr,
+                                            llvm::ConstantInt::get(llvm::IntegerType::getInt64Ty(context.llvmContext()),
+                                                                   static_cast<uint64_t>(-1),
+                                                                   true),
+                                            content_ptr->getName() + ".gep");
 
-        llvm::Value* count = context.ir().CreateLoad(size_content_type, header_ptr, header_ptr->getName() + ".load");
+        llvm::Value* count = context.ir().CreateLoad(size_content_type, memory_ptr, memory_ptr->getName() + ".load");
 
         value->type()->getElementType()->buildFinalizer(ptr, count, context);
     }
     else { value->type()->getElementType()->buildFinalizer(ptr, context); }
 
-    llvm::Value* opaque_ptr =
-        context.ir().CreateBitCast(ptr, llvm::Type::getInt8PtrTy(context.llvmContext()), ptr->getName() + ".bitcast");
+    llvm::Value* opaque_ptr = context.ir().CreateBitCast(memory_ptr,
+                                                         llvm::Type::getInt8PtrTy(context.llvmContext()),
+                                                         ptr->getName() + ".bitcast");
 
     std::array<llvm::Value*, 1> const args = {opaque_ptr};
     context.ir().CreateCall(delete_dynamic_, args);
