@@ -265,18 +265,33 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main,
 
 void AnceCompiler::buildLibStart(llvm::Function* init, llvm::Function*)
 {
-    llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
-    llvm::Function*     start      = llvm::Function::Create(start_type,
-                                                   llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-                                                   getInternalFunctionName("lib_start"),
-                                                   module_);
+    switch (target_machine_->getTargetTriple().getOS())
+    {
+        case llvm::Triple::OSType::Win32:
+        {
+            llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(llvm_context_),
+                                                                     {llvm::Type::getInt8PtrTy(llvm_context_),
+                                                                      llvm::Type::getInt32Ty(llvm_context_),
+                                                                      llvm::Type::getInt8PtrTy(llvm_context_)},
+                                                                     false);
+            llvm::Function*     start      = llvm::Function::Create(start_type,
+                                                           llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+                                                           getInternalFunctionName("lib_start"),
+                                                           module_);
 
-    llvm::BasicBlock* start_block = llvm::BasicBlock::Create(llvm_context_, "entry", start);
+            llvm::BasicBlock* start_block = llvm::BasicBlock::Create(llvm_context_, "entry", start);
 
-    ir_.SetInsertPoint(start_block);
+            ir_.SetInsertPoint(start_block);
+            ir_.CreateCall(init);
 
-    ir_.CreateCall(init);
-    ir_.CreateRetVoid();
+            ir_.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(llvm_context_), 1));
+
+            break;
+        }
+
+        default:
+            throw std::runtime_error("Unsupported OS for library start function.");
+    }
 }
 
 std::string AnceCompiler::getInternalFunctionName(std::string const& name)
