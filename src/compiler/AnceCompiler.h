@@ -39,10 +39,14 @@ class AnceCompiler
     void emitObject(std::filesystem::path const& out);
 
   private:
-    llvm::Function* buildInit();
-    llvm::Function* buildExit();
-    void            buildStart(lang::ResolvingHandle<lang::Function> main, llvm::Function* init, llvm::Function* exit);
-    void            buildLibStart(llvm::Function* init);
+    llvm::Function*    buildInit();
+    llvm::Function*    buildFinit();
+    llvm::Function*    buildExit();
+    void               buildStart(lang::ResolvingHandle<lang::Function> main,
+                                  llvm::Function*                       init,
+                                  llvm::Function*                       finit,
+                                  llvm::Function*                       exit);
+    void               buildLibStart(llvm::Function* init, llvm::Function* finit);
     static std::string getInternalFunctionName(std::string const& name);
 
   private:

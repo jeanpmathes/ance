@@ -87,17 +87,19 @@ void AnceCompiler::compile(std::filesystem::path const& out)
         {
             lang::ResolvingHandle<lang::Function> main = unit_.globalScope().getEntry();
 
-            llvm::Function* init_function = buildInit();
-            llvm::Function* exit_function = buildExit();
-            buildStart(main, init_function, exit_function);
+            llvm::Function* init_function  = buildInit();
+            llvm::Function* finit_function = buildFinit();
+            llvm::Function* exit_function  = buildExit();
+            buildStart(main, init_function, finit_function, exit_function);
 
             break;
         }
 
         case UnitResult::LIBRARY:
         {
-            llvm::Function* init_function = buildInit();
-            buildLibStart(init_function);
+            llvm::Function* init_function  = buildInit();
+            llvm::Function* finit_function = buildFinit();
+            buildLibStart(init_function, finit_function);
 
             break;
         }
@@ -188,6 +190,24 @@ llvm::Function* AnceCompiler::buildInit()
     return init;
 }
 
+llvm::Function* AnceCompiler::buildFinit()
+{
+    llvm::FunctionType* finit_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
+    llvm::Function*     finit      = llvm::Function::Create(finit_type,
+                                                   llvm::GlobalValue::LinkageTypes::PrivateLinkage,
+                                                   getInternalFunctionName("finit"),
+                                                   module_);
+
+    llvm::BasicBlock* start_block = llvm::BasicBlock::Create(llvm_context_, "entry", finit);
+
+    ir_.SetInsertPoint(start_block);
+
+    unit_.globalScope().buildFinalization(context_);
+
+    ir_.CreateRetVoid();
+    return finit;
+}
+
 llvm::Function* AnceCompiler::buildExit()
 {
     lang::ResolvingHandle<lang::Type> exitcode_type = lang::FixedWidthIntegerType::get(32, false);
@@ -215,7 +235,10 @@ llvm::Function* AnceCompiler::buildExit()
     return exit;
 }
 
-void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::Function* init, llvm::Function* exit)
+void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main,
+                              llvm::Function*                       init,
+                              llvm::Function*                       finit,
+                              llvm::Function*                       exit)
 {
     llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
     llvm::Function*     start      = llvm::Function::Create(start_type,
@@ -231,14 +254,16 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::
 
     Optional<Shared<lang::Value>> exitcode = main->buildCall({}, context_);
     assert(exitcode.hasValue());
-    exitcode.value()->buildContentValue(context_);
 
+    ir_.CreateCall(finit);
+
+    exitcode.value()->buildContentValue(context_);
     ir_.CreateCall(exit, {exitcode.value()->getContentValue()});
 
     ir_.CreateRetVoid();
 }
 
-void AnceCompiler::buildLibStart(llvm::Function* init)
+void AnceCompiler::buildLibStart(llvm::Function* init, llvm::Function*)
 {
     llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
     llvm::Function*     start      = llvm::Function::Create(start_type,
