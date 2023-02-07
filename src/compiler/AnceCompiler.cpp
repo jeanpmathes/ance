@@ -263,7 +263,7 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main,
     ir_.CreateRetVoid();
 }
 
-void AnceCompiler::buildLibStart(llvm::Function* init, llvm::Function*)
+void AnceCompiler::buildLibStart(llvm::Function* init, llvm::Function* finit)
 {
     switch (target_machine_->getTargetTriple().getOS())
     {
@@ -279,11 +279,27 @@ void AnceCompiler::buildLibStart(llvm::Function* init, llvm::Function*)
                                                            getInternalFunctionName("lib_start"),
                                                            module_);
 
-            llvm::BasicBlock* start_block = llvm::BasicBlock::Create(llvm_context_, "entry", start);
+            llvm::BasicBlock* begin_block = llvm::BasicBlock::Create(llvm_context_, "entry", start);
+            llvm::BasicBlock* init_block  = llvm::BasicBlock::Create(llvm_context_, "init", start);
+            llvm::BasicBlock* finit_block = llvm::BasicBlock::Create(llvm_context_, "finit", start);
+            llvm::BasicBlock* done_block  = llvm::BasicBlock::Create(llvm_context_, "exit", start);
 
-            ir_.SetInsertPoint(start_block);
+            ir_.SetInsertPoint(begin_block);
+            auto reason_switch = ir_.CreateSwitch(start->getArg(1), done_block, 2);
+            reason_switch->addCase(llvm::ConstantInt::get(llvm::Type::getInt32Ty(llvm_context_), 1),
+                                   init_block);// DLL_PROCESS_ATTACH
+            reason_switch->addCase(llvm::ConstantInt::get(llvm::Type::getInt32Ty(llvm_context_), 0),
+                                   finit_block);// DLL_PROCESS_DETACH
+
+            ir_.SetInsertPoint(init_block);
             ir_.CreateCall(init);
+            ir_.CreateBr(done_block);
 
+            ir_.SetInsertPoint(finit_block);
+            ir_.CreateCall(finit);
+            ir_.CreateBr(done_block);
+
+            ir_.SetInsertPoint(done_block);
             ir_.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(llvm_context_), 1));
 
             break;
