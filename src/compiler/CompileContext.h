@@ -1,6 +1,7 @@
 #ifndef ANCE_SRC_COMPILER_COMPILECONTEXT_H_
 #define ANCE_SRC_COMPILER_COMPILECONTEXT_H_
 
+#include <filesystem>
 #include <stack>
 
 #include <llvm/IR/DIBuilder.h>
@@ -91,6 +92,13 @@ class CompileContext
     llvm::DIFile* getSourceFile(lang::Location location);
 
     /**
+     * Get the path to the source file that contains the given location.
+     * @param location The location.
+     * @return The path to the source file.
+     */
+    std::filesystem::path getSourceFilePath(lang::Location location);
+
+    /**
      * Set the current debug location.
      * @param location The source location.
      * @param scope The current scope.
@@ -117,7 +125,12 @@ class CompileContext
     llvm::DIBuilder&     di_builder_;
     llvm::DICompileUnit* di_unit_ {nullptr};
 
-    std::vector<llvm::DIFile*> source_files_ {};
+    struct SourceFile {
+        std::filesystem::path path;
+        llvm::DIFile*         debug_info;
+    };
+
+    std::vector<SourceFile> source_files_ {};
 
     std::stack<llvm::DebugLoc, std::vector<llvm::DebugLoc>> debug_loc_stack_;
 };

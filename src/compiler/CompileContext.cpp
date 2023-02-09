@@ -33,7 +33,8 @@ CompileContext::CompileContext(Unit&              unit,
         llvm::DIFile* di_source_file = di.createFile(source_file.get().getFilename().generic_string(),
                                                      source_file.get().getDirectory().generic_string());
 
-        source_files_.emplace_back(di_source_file);
+        SourceFile description = {.path = source_file.get().getRelativePath(), .debug_info = di_source_file};
+        source_files_.emplace_back(std::move(description));
     }
 }
 
@@ -76,7 +77,14 @@ llvm::DIFile* CompileContext::getSourceFile(lang::Location location)
 {
     if (location.isGlobal()) return nullptr;
 
-    return source_files_[location.file()];
+    return source_files_[location.file()].debug_info;
+}
+
+std::filesystem::path CompileContext::getSourceFilePath(lang::Location location)
+{
+    if (location.isGlobal()) return {};
+
+    return source_files_[location.file()].path;
 }
 
 void CompileContext::setDebugLocation(lang::Location location, lang::Scope& scope)

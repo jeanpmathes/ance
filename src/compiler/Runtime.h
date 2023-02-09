@@ -39,8 +39,6 @@ class Runtime
     [[nodiscard]] static bool isNameReserved(lang::Identifier const& name);
 
   private:
-    CompileContext* context_ {nullptr};
-
     llvm::Function*              allocate_dynamic_ {nullptr};
     const static constexpr char* ALLOCATE_DYNAMIC_NAME = "__allocate__";
 
@@ -100,11 +98,19 @@ class Runtime
     void deleteDynamic(Shared<lang::Value> value, bool delete_buffer, CompileContext& context);
 
     /**
-     * Build an assertion.
+     * Build an assertion. Only performed when assertions are enabled.
      * @param value The boolean value to assert.
+     * @param description The description of the assertion.
      * @param context The current compile context.
      */
-    void buildAssert(Shared<lang::Value> value, CompileContext& context);
+    void buildAssert(Shared<lang::Value> value, std::string const& description, CompileContext& context);
+
+    /**
+     * Build an abort, used on program failures. Is only performed when assertions are enabled.
+     * @param reason The description of the abort.
+     * @param context The current compile context.
+     */
+    void buildFailure(std::string const& reason, CompileContext& context);
 
     /**
      * Build an exit.

@@ -18,8 +18,6 @@
 
 void Runtime::init(CompileContext& context)
 {
-    context_ = &context;
-
     llvm::LLVMContext& llvm_context = context.llvmContext();
     llvm::Module&      module       = context.llvmModule();
 
@@ -49,13 +47,15 @@ void Runtime::init(CompileContext& context)
 
     std::vector<lang::ResolvingHandle<lang::Type>> assertion_parameters;
     assertion_parameters.emplace_back(lang::BooleanType::get());
+    assertion_parameters.emplace_back(lang::PointerType::get(lang::FixedWidthIntegerType::get(8, false)));
     assertion_ = create_function(ASSERTION_NAME, lang::VoidType::get(), assertion_parameters);
 
     std::vector<lang::ResolvingHandle<lang::Type>> exit_parameters;
     exit_parameters.emplace_back(lang::FixedWidthIntegerType::get(32, false));
     exit_ = create_function(EXIT_NAME, lang::VoidType::get(), exit_parameters);
 
-    std::vector<lang::ResolvingHandle<lang::Type>> const abort_parameters;
+    std::vector<lang::ResolvingHandle<lang::Type>> abort_parameters;
+    abort_parameters.emplace_back(lang::PointerType::get(lang::FixedWidthIntegerType::get(8, false)));
     abort_ = create_function(ABORT_NAME, lang::VoidType::get(), abort_parameters);
 
     is_initialized_ = true;
@@ -150,18 +150,31 @@ void Runtime::deleteDynamic(Shared<lang::Value> value, bool delete_buffer, Compi
     context.ir().CreateCall(delete_dynamic_, args);
 }
 
-void Runtime::buildAssert(Shared<lang::Value> value, CompileContext& context)
+void Runtime::buildAssert(Shared<lang::Value> value, std::string const& description, CompileContext& context)
 {
     assert(is_initialized_);
 
     assert(value->type()->isBooleanType());
 
-    if (context_->unit().isAssertionsEnabled())
+    if (context.unit().isAssertionsEnabled())
     {
+        llvm::Value* description_ptr = context.ir().CreateGlobalStringPtr(description);
+
         value->buildContentValue(context);
         llvm::Value* truth_value = value->getContentValue();
 
-        context_->ir().CreateCall(assertion_, truth_value);
+        context.ir().CreateCall(assertion_, {truth_value, description_ptr});
+    }
+}
+
+void Runtime::buildFailure(std::string const& reason, CompileContext& context)
+{
+    assert(is_initialized_);
+
+    if (context.unit().isAssertionsEnabled())
+    {
+        llvm::Value* reason_ptr = context.ir().CreateGlobalStringPtr(reason);
+        context.ir().CreateCall(abort_, reason_ptr);
     }
 }
 
@@ -174,7 +187,7 @@ void Runtime::buildExit(Shared<lang::Value> value, CompileContext& context)
     value->buildContentValue(context);
     llvm::Value* exit_code = value->getContentValue();
 
-    context_->ir().CreateCall(exit_, exit_code);
+    context.ir().CreateCall(exit_, exit_code);
 }
 
 llvm::Value* Runtime::allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
