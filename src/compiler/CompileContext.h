@@ -116,6 +116,12 @@ class CompileContext
      */
     bool allDebugLocationsPopped();
 
+    /**
+     * Get a string describing the current location in the source code.
+     * @return The location string.
+     */
+    std::string getLocationString();
+
   private:
     Unit&                unit_;
     Runtime&             runtime_;
@@ -132,7 +138,14 @@ class CompileContext
 
     std::vector<SourceFile> source_files_ {};
 
-    std::stack<llvm::DebugLoc, std::vector<llvm::DebugLoc>> debug_loc_stack_;
+    struct DebugLocation {
+        llvm::DebugLoc di_location;
+        lang::Location location;
+    };
+
+    DebugLocation current_debug_location_ {.location = lang::Location::global()};
+
+    std::stack<DebugLocation, std::vector<DebugLocation>> debug_loc_stack_;
 };
 
 #endif

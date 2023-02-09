@@ -167,15 +167,12 @@ void Runtime::buildAssert(Shared<lang::Value> value, std::string const& descript
     }
 }
 
-void Runtime::buildFailure(std::string const& reason, CompileContext& context)
+void Runtime::buildAbort(std::string const& reason, CompileContext& context)
 {
     assert(is_initialized_);
 
-    if (context.unit().isAssertionsEnabled())
-    {
-        llvm::Value* reason_ptr = context.ir().CreateGlobalStringPtr(reason);
-        context.ir().CreateCall(abort_, reason_ptr);
-    }
+    llvm::Value* reason_ptr = context.ir().CreateGlobalStringPtr(reason);
+    context.ir().CreateCall(abort_, reason_ptr);
 }
 
 void Runtime::buildExit(Shared<lang::Value> value, CompileContext& context)

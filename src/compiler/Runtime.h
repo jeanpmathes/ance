@@ -106,11 +106,11 @@ class Runtime
     void buildAssert(Shared<lang::Value> value, std::string const& description, CompileContext& context);
 
     /**
-     * Build an abort, used on program failures. Is only performed when assertions are enabled.
+     * Build an abort.
      * @param reason The description of the abort.
      * @param context The current compile context.
      */
-    void buildFailure(std::string const& reason, CompileContext& context);
+    void buildAbort(std::string const& reason, CompileContext& context);
 
     /**
      * Build an exit.

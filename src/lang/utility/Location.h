@@ -3,6 +3,8 @@
 
 #include <llvm/IR/DebugLoc.h>
 
+class CompileContext;
+
 namespace lang
 {
     /**
@@ -76,6 +78,11 @@ namespace lang
          * @param location The location to extend to.
          */
         void extend(lang::Location location);
+
+        /*
+         * Format this location as a string, in the format "file:line:column".
+         */
+        std::string toString(CompileContext& context);
 
         friend std::ostream& operator<<(std::ostream& os, lang::Location const& location);
 

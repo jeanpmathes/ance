@@ -4,6 +4,8 @@
 
 #include <llvm/IR/DIBuilder.h>
 
+#include "compiler/CompileContext.h"
+
 lang::Location::Location(size_t start_line, size_t start_column, size_t end_line, size_t end_column, size_t file_index)
     : start_line_(start_line)
     , start_column_(start_column)
@@ -64,6 +66,14 @@ void lang::Location::extend(lang::Location location)
 
     end_line_   = std::max(end_line_, location.end_line_);
     end_column_ = std::max(end_column_, location.end_column_);
+}
+
+std::string lang::Location::toString(CompileContext& context)
+{
+    if (isGlobal()) return "<internal>";
+
+    return context.getSourceFilePath(*this).generic_string() + ":" + std::to_string(line()) + ":"
+         + std::to_string(column());
 }
 
 std::ostream& lang::operator<<(std::ostream& os, lang::Location const& location)

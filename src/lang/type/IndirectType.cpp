@@ -1,13 +1,16 @@
 #include "IndirectType.h"
 
+#include "compiler/CompileContext.h"
+#include "compiler/Runtime.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/scope/GlobalScope.h"
+#include "lang/type/BooleanType.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/utility/Values.h"
 
-lang::IndirectType::IndirectType(lang::ResolvingHandle<lang::Type> element_type)
-    : value_type_(element_type)
-{}
+lang::IndirectType::IndirectType(lang::ResolvingHandle<lang::Type> element_type) : value_type_(element_type) {}
 
 llvm::Constant* lang::IndirectType::getDefaultContent(llvm::Module& m) const
 {
@@ -39,6 +42,17 @@ Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<Value> value, Co
 {
     value->buildContentValue(context);
     llvm::Value* ptr = value->getContentValue();
+
+    if (scope()->getGlobalScope()->isContainingRuntime())
+    {
+        llvm::Value* is_null     = context.ir().CreateIsNull(ptr, ptr->getName() + "is_null");
+        llvm::Value* is_not_null = context.ir().CreateNot(is_null, ptr->getName() + "is_not_null");
+
+        llvm::Value* is_not_null_ptr = lang::values::contentToNative(lang::BooleanType::get(), is_not_null, context);
+        Shared<lang::Value> truth    = makeShared<lang::WrappedNativeValue>(lang::BooleanType::get(), is_not_null_ptr);
+
+        context.runtime().buildAssert(truth, "Null pointer dereference at " + context.getLocationString(), context);
+    }
 
     auto value_reference = lang::ReferenceType::get(value_type_);
 

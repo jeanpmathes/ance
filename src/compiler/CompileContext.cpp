@@ -89,21 +89,28 @@ std::filesystem::path CompileContext::getSourceFilePath(lang::Location location)
 
 void CompileContext::setDebugLocation(lang::Location location, lang::Scope& scope)
 {
-    llvm::DebugLoc const previous_location = ir().getCurrentDebugLocation();
+    debug_loc_stack_.push(current_debug_location_);
+
     ir().SetCurrentDebugLocation(location.getDebugLoc(llvmContext(), scope.getDebugScope(*this)));
 
-    debug_loc_stack_.push(previous_location);
+    current_debug_location_.location    = location;
+    current_debug_location_.di_location = ir().getCurrentDebugLocation();
 }
 
 void CompileContext::resetDebugLocation()
 {
-    llvm::DebugLoc const previous_location = debug_loc_stack_.top();
-    ir().SetCurrentDebugLocation(previous_location);
-
+    current_debug_location_ = debug_loc_stack_.top();
     debug_loc_stack_.pop();
+
+    ir().SetCurrentDebugLocation(current_debug_location_.di_location);
 }
 
 bool CompileContext::allDebugLocationsPopped()
 {
     return debug_loc_stack_.empty();
+}
+
+std::string CompileContext::getLocationString()
+{
+    return current_debug_location_.location.toString(*this);
 }

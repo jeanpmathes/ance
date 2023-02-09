@@ -42,8 +42,7 @@ Statements Assertion::expandWith(Expressions subexpressions, Statements) const
 
 void Assertion::doBuild(CompileContext& context)
 {
-    std::stringstream message;
-    message << "Assertion failed at " << location() << " in " << context.getSourceFilePath(location());
-
-    context.runtime().buildAssert(condition_->getValue(), message.str(), context);
+    context.runtime().buildAssert(condition_->getValue(),
+                                  "Assertion failed at " + context.getLocationString(),
+                                  context);
 }

@@ -1,8 +1,12 @@
 #include "SequenceType.h"
 
 #include "compiler/CompileContext.h"
+#include "compiler/Runtime.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/scope/GlobalScope.h"
+#include "lang/type/BooleanType.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
 #include "lang/utility/Values.h"
@@ -75,16 +79,17 @@ llvm::Value* lang::SequenceType::buildGetElementPointer(Shared<Value>   indexed,
 
     llvm::Value* sequence_ptr = getIndexingPointer(indexed, context);
 
-    if (size_.hasValue())// Check if index is in bounds.
+    if (size_.hasValue() && scope()->getGlobalScope()->isContainingRuntime())// Check if index is in bounds.
     {
         llvm::Value* native_size =
             llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(context.llvmContext()), size_.value());
         llvm::Value* in_bounds =
             context.ir().CreateICmpULT(native_index, native_size, native_index->getName() + ".icmp");
 
-        in_bounds->setName("..inbounds");
+        llvm::Value*        in_bounds_ptr = lang::values::contentToNative(lang::BooleanType::get(), in_bounds, context);
+        Shared<lang::Value> truth = makeShared<lang::WrappedNativeValue>(lang::BooleanType::get(), in_bounds_ptr);
 
-        // todo: use in_bounds bool to throw exception
+        context.runtime().buildAssert(truth, "Index out of bounds at " + context.getLocationString(), context);
     }
 
     llvm::Value* element_ptr = context.ir().CreateGEP(getIndexedType(context),
