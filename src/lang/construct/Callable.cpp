@@ -35,6 +35,13 @@ std::vector<lang::ResolvingHandle<lang::Function>> lang::Callable::resolveOverlo
     std::vector<lang::ResolvingHandle<lang::Function>> same_signatures;
     std::vector<lang::ResolvingHandle<lang::Function>> matching_signatures;
 
+    if (functions_.size() == 1)
+    {
+        std::vector<lang::ResolvingHandle<lang::Function>> result;
+        result.push_back(functions_.front().handle());
+        return result;
+    }
+
     for (auto& function : functions_)
     {
         if (function->signature().isSame(arguments)) same_signatures.push_back(function.handle());
@@ -51,6 +58,13 @@ std::vector<std::reference_wrapper<lang::Function const>> lang::Callable::resolv
 {
     std::vector<std::reference_wrapper<lang::Function const>> same_signatures;
     std::vector<std::reference_wrapper<lang::Function const>> matching_signatures;
+
+    if (functions_.size() == 1)
+    {
+        std::vector<std::reference_wrapper<lang::Function const>> result;
+        result.emplace_back(*functions_.front());
+        return result;
+    }
 
     for (auto& function : functions_)
     {
