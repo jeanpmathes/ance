@@ -35,14 +35,28 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
         args.push_back(export_functions.back().c_str());
     }
 
+    std::string const resource_data_directory_name       = "ANCE_RESOURCE_DATA_DIRECTORY";
+    char const*       resource_data_directory_path_value = std::getenv(resource_data_directory_name.c_str());
+
+    if (resource_data_directory_path_value == nullptr)
+    {
+        std::cout << "ance: build: no resource data directory set"
+                  << " (" << resource_data_directory_name << ")" << std::endl;
+
+        return false;
+    }
+
+    std::filesystem::path const resource_data_directory = resource_data_directory_path_value;
+
     std::filesystem::path const target_data_directory =
-        std::filesystem::current_path() / "resources" / "targets" / unit_.getTargetTriple().getTriple();
+        resource_data_directory / "targets" / unit_.getTargetTriple().getTriple();
 
     if (unit_.isUsingRuntime()
         && !(std::filesystem::exists(target_data_directory) && std::filesystem::is_directory(target_data_directory)))
     {
         std::cout << "ance: build: no target resources found [ " << unit_.getTargetTriple().getTriple() << " ]"
                   << std::endl;
+
         return false;
     }
 
