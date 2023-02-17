@@ -14,9 +14,3 @@ public main () : u32
     return x;
 }
 
-public exit (exitcode: u32)
-{
-    ExitProcess(exitcode);
-}
-
-extern ExitProcess (uExitCode: u32);

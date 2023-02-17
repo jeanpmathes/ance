@@ -44,9 +44,3 @@ private get_quad() : quad
     return 1.0h;
 }
 
-public exit (exitcode: u32)
-{
-    ExitProcess(exitcode);
-}
-
-extern ExitProcess (uExitCode: u32);

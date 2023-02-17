@@ -75,9 +75,3 @@ private test_uiptr_math ()
     assert x1 + x2 == 0x00000003:uiptr;
 }
 
-public exit (exitcode: u32)
-{
-    ExitProcess(exitcode);
-}
-
-extern ExitProcess (uExitCode: u32);

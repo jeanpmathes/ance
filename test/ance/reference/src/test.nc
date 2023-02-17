@@ -32,9 +32,3 @@ private modify_num (num: &size)
     num <: 0;
 }
 
-public exit (exitcode: u32)
-{
-    ExitProcess(exitcode);
-}
-
-extern ExitProcess (uExitCode: u32);

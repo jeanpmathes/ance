@@ -28,11 +28,5 @@ private write (str: *u8, len: u32) : void
     WriteFile(std_out, str, len, written, null);
 }
 
-public exit (exitcode: u32)
-{
-    ExitProcess(exitcode);
-}
-
 extern WriteFile (hFile: Handle, lpBuffer: *u8, nNumberOfBytesToWrite: u32, lpNumberOfBytesWritten: *u32, lpOverlapped: ptr);
 extern GetStdHandle (nStdHandle: u32) : Handle;
-extern ExitProcess (uExitCode: u32);
