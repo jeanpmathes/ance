@@ -23,6 +23,11 @@ class ConstantExpression;
 
 namespace lang
 {
+    class Description;
+}
+
+namespace lang
+{
     /**
      * The top level scope.
      */
@@ -85,38 +90,6 @@ namespace lang
                                   lang::Location                              location);
 
         /**
-         * Define an extern function in this scope.
-         * @param name The name of the function.
-         * @param return_type The return type.
-         * @param parameters The parameters.
-         * @param location The location of the function declaration.
-         */
-        void defineExternFunction(Identifier                                  name,
-                                  lang::ResolvingHandle<lang::Type>           return_type,
-                                  lang::Location                              return_type_location,
-                                  std::vector<Shared<lang::Parameter>> const& parameters,
-                                  lang::Location                              location);
-
-        /**
-         * Define a custom function in this scope.
-         * @param name The name of the function.
-         * @param access The access level.
-         * @param return_type The return type of the function.
-         * @param parameters The parameters for this function.
-         * @param code The code of the function.
-         * @param declaration_location The location of the function declaration.
-         * @param definition_location The location of the function definition, meaning its code.
-         */
-        void defineCustomFunction(Identifier                                  name,
-                                  lang::AccessModifier                        access,
-                                  lang::ResolvingHandle<lang::Type>           return_type,
-                                  lang::Location                              return_type_location,
-                                  std::vector<Shared<lang::Parameter>> const& parameters,
-                                  Owned<lang::CodeBlock>                      code,
-                                  lang::Location                              declaration_location,
-                                  lang::Location                              definition_location);
-
-        /**
          * Define a type that is an alias for another type.
          * @param name The name of the alias.
          * @param actual The other type.
@@ -137,6 +110,18 @@ namespace lang
                           Identifier                       name,
                           std::vector<Owned<lang::Member>> members,
                           lang::Location                   definition_location);
+
+        /**
+         * Add an description element to this scope.
+         * @param description The description to add.
+         */
+        void addDescription(Owned<lang::Description> description);
+
+        /**
+         * Add a function to this scope.
+         * @param function The function to add.
+         */
+        void addFunction(lang::OwningHandle<lang::Function> function);
 
         /**
          * Get a type defined in this scope by it's name.
@@ -211,6 +196,10 @@ namespace lang
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);
         lang::OwningHandle<lang::Type>             retrieveUndefinedType(Identifier name);
 
+        std::map<lang::Identifier, std::vector<Owned<lang::Description>>> compatible_descriptions_;
+        std::set<lang::Identifier>                                        conflicting_description_names_;
+        std::vector<Owned<lang::Description>>                             conflicting_descriptions_;
+
         std::vector<lang::TypeDefinitionRegistry*> type_registries_;
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
@@ -218,12 +207,13 @@ namespace lang
 
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> defined_function_groups_;
+        std::vector<lang::OwningHandle<lang::Function>>                     invalid_functions_;
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> defined_types_;
 
-        std::set<lang::Identifier>                                defined_names_;
-        std::vector<std::tuple<lang::Identifier, lang::Location>> duplicated_names_;
+        std::set<lang::Identifier>    defined_names_;
+        std::vector<lang::Identifier> duplicated_names_;
 
         mutable std::vector<lang::ResolvingHandle<lang::Variable>> global_variables_;
 

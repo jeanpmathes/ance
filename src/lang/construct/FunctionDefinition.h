@@ -129,11 +129,6 @@ namespace lang
         virtual void validate(ValidationLogger& validation_logger) const = 0;
 
         /**
-         * Expand the function content to remove syntactic sugar.
-         */
-        virtual void expand();
-
-        /**
          * Determine and create structures to represent control flow.
          */
         virtual void determineFlow() = 0;
@@ -230,9 +225,9 @@ namespace lang
         [[nodiscard]] virtual std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const = 0;
 
       public:
-        lang::GlobalScope*        getGlobalScope();
-        lang::GlobalScope const*  getGlobalScope() const;
-        virtual llvm::DIScope*    getDebugScope(CompileContext& context) const = 0;
+        lang::GlobalScope*                     getGlobalScope();
+        [[nodiscard]] lang::GlobalScope const* getGlobalScope() const;
+        virtual llvm::DIScope*                 getDebugScope(CompileContext& context) const = 0;
         virtual lang::LocalScope* getInsideScope()                             = 0;
 
         [[nodiscard]] virtual std::vector<lang::BasicBlock*> const& getBasicBlocks() const = 0;

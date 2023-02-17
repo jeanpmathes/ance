@@ -43,7 +43,7 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
                                     lang::ResolvingHandle<lang::Type>           return_type,
                                     lang::Location                              return_type_location,
                                     std::vector<Shared<lang::Parameter>> const& parameters,
-                                    Owned<lang::CodeBlock>                      block,
+                                    Statement&                                  block,
                                     Scope&                                      containing_scope,
                                     lang::Location                              declaration_location,
                                     lang::Location                              definition_location)
@@ -53,7 +53,7 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
                                                   return_type,
                                                   return_type_location,
                                                   parameters,
-                                                  std::move(block),
+                                                  block,
                                                   containing_scope,
                                                   declaration_location,
                                                   definition_location);
@@ -77,14 +77,10 @@ lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHand
     return predefined_function;
 }
 
-void lang::Function::defineAsInit(lang::ResolvingHandle<lang::Variable> variable,
-                                  lang::Assigner                        assigner,
-                                  Owned<Expression>                     initializer,
-                                  lang::Scope&                          containing_scope)
+void lang::Function::defineAsInit(Statement& code, lang::Scope& containing_scope)
 {
 
-    definition_ =
-        makeOwned<lang::InitializerFunction>(*this, variable, assigner, std::move(initializer), containing_scope);
+    definition_ = makeOwned<lang::InitializerFunction>(*this, code, containing_scope);
     addChild(*definition_.value());
 }
 
@@ -172,24 +168,6 @@ bool lang::Function::isImported() const
 void lang::Function::validate(ValidationLogger& validation_logger) const
 {
     definition_.value()->validate(validation_logger);
-}
-
-void lang::Function::expand()
-{
-    {// Quick fix to remove old scope from children, with full expansion this would be unnecessary.
-        clearChildren();
-        addChild(*definition_.value());
-    }
-
-    definition_.value()->expand();
-}
-
-void lang::Function::clear()
-{
-    undefined_variables_.clear();
-    defined_parameters_.clear();
-    undefined_function_groups_.clear();
-    undefined_types_.clear();
 }
 
 void lang::Function::determineFlow()

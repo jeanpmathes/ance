@@ -45,7 +45,7 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 
     for (auto& [name, type] : defined_types_) { valid &= type->validateDefinition(validation_logger); }
 
-    for (auto const& [name, location] : duplicated_names_)
+    for (auto const& name : duplicated_names_)
     {
         validation_logger.logError("Name '" + name + "' already defined in the current context", name.location());
     }
@@ -66,11 +66,36 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 
 void lang::GlobalScope::expand()
 {
+    // this is only required because no full expansion is done on the global scope:
+    auto undefined_function_groups = std::move(undefined_function_groups_);
+    auto defined_function_groups   = std::move(defined_function_groups_);
+    auto invalid_functions         = std::move(invalid_functions_);
+
+    clearChildren();
+
+    // this is actually required:
+
     for (auto& registry : type_registries_) { registry->clear(); }
+
+    std::map<lang::Identifier, std::vector<Owned<lang::Description>>> expanded_descriptions;
+
+    for (auto& [name, descriptions] : compatible_descriptions_)
+    {
+        for (auto& description : descriptions)
+        {
+            std::vector<Owned<lang::Description>> new_descriptions = description->expand();
+
+            for (auto& new_description : new_descriptions)
+            {
+                expanded_descriptions[name].push_back(std::move(new_description));
+            }
+        }
+    }
+
+    compatible_descriptions_ = std::move(expanded_descriptions);
 
     for (auto& [name, type] : defined_types_) { type->expand(); }
 
-    for (auto& [name, function] : defined_function_groups_) { function->expand(); }
     for (auto& [name, variable] : global_defined_variables_) { variable->expand(); }
 
     expanded_ = true;
@@ -108,7 +133,7 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
 {
     if (defined_names_.contains(name))
     {
-        duplicated_names_.emplace_back(name, location);
+        duplicated_names_.emplace_back(name);
         return;
     }
 
@@ -133,64 +158,6 @@ void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier               
     global_defined_variables_.emplace(name, std::move(defined));
 }
 
-void lang::GlobalScope::defineExternFunction(Identifier                                  name,
-                                             lang::ResolvingHandle<lang::Type>           return_type,
-                                             lang::Location                              return_type_location,
-                                             std::vector<Shared<lang::Parameter>> const& parameters,
-                                             lang::Location                              location)
-{
-    if (defined_names_.contains(name) && !defined_function_groups_.contains(name))
-    {
-        duplicated_names_.emplace_back(name, location);
-        return;
-    }
-
-    defined_names_.emplace(name);
-
-    lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(name);
-
-    lang::OwningHandle<lang::Function> undefined =
-        lang::OwningHandle<lang::Function>::takeOwnership(lang::makeHandled<lang::Function>(name));
-    undefined->defineAsExtern(*this, return_type, return_type_location, parameters, location);
-    lang::OwningHandle<lang::Function> defined = std::move(undefined);
-
-    group->addFunction(std::move(defined));
-}
-
-void lang::GlobalScope::defineCustomFunction(Identifier                                  name,
-                                             lang::AccessModifier                        access,
-                                             lang::ResolvingHandle<lang::Type>           return_type,
-                                             lang::Location                              return_type_location,
-                                             std::vector<Shared<lang::Parameter>> const& parameters,
-                                             Owned<lang::CodeBlock>                      code,
-                                             lang::Location                              declaration_location,
-                                             lang::Location                              definition_location)
-{
-    if (defined_names_.contains(name) && !defined_function_groups_.contains(name))
-    {
-        duplicated_names_.emplace_back(name, definition_location);
-        return;
-    }
-
-    defined_names_.emplace(name);
-
-    lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(name);
-
-    lang::OwningHandle<lang::Function> undefined =
-        lang::OwningHandle<lang::Function>::takeOwnership(lang::makeHandled<lang::Function>(name));
-    undefined->defineAsCustom(access,
-                              return_type,
-                              return_type_location,
-                              parameters,
-                              std::move(code),
-                              *this,
-                              declaration_location,
-                              definition_location);
-    lang::OwningHandle<lang::Function> defined = std::move(undefined);
-
-    group->addFunction(std::move(defined));
-}
-
 void lang::GlobalScope::defineTypeAliasOther(Identifier                        name,
                                              lang::ResolvingHandle<lang::Type> actual,
                                              lang::Location                    definition_location,
@@ -198,7 +165,7 @@ void lang::GlobalScope::defineTypeAliasOther(Identifier                        n
 {
     if (defined_names_.contains(name))
     {
-        duplicated_names_.emplace_back(name, definition_location);
+        duplicated_names_.emplace_back(name);
         return;
     }
 
@@ -221,7 +188,7 @@ void lang::GlobalScope::defineStruct(lang::AccessModifier             access,
 {
     if (defined_names_.contains(name))
     {
-        duplicated_names_.emplace_back(name, definition_location);
+        duplicated_names_.emplace_back(name);
         return;
     }
 
@@ -235,6 +202,61 @@ void lang::GlobalScope::defineStruct(lang::AccessModifier             access,
     lang::OwningHandle<lang::Type> defined = std::move(undefined);
 
     defined_types_.emplace(name, std::move(defined));
+}
+
+void lang::GlobalScope::addDescription(Owned<lang::Description> description)
+{
+    addChild(*description);
+
+    if (conflicting_description_names_.contains(description->name()))
+    {
+        conflicting_descriptions_.push_back(std::move(description));
+        return;
+    }
+
+    auto conflict = compatible_descriptions_.find(description->name());
+
+    if (conflict != compatible_descriptions_.end())
+    {
+        auto& [name, conflicting_description] = *conflict;
+
+        assert(not conflicting_description.empty());
+
+        bool const is_overload_allowed =
+            description->isOverloadAllowed() && conflicting_description.front()->isOverloadAllowed();
+
+        if (not is_overload_allowed)
+        {
+            conflicting_description_names_.emplace(description->name());
+
+            std::move(conflicting_description.begin(),
+                      conflicting_description.end(),
+                      std::back_inserter(conflicting_descriptions_));
+            conflicting_descriptions_.push_back(std::move(description));
+
+            compatible_descriptions_.erase(conflict);
+
+            return;
+        }
+    }
+
+    compatible_descriptions_[description->name()].push_back(std::move(description));
+}
+
+void lang::GlobalScope::addFunction(lang::OwningHandle<lang::Function> function)
+{
+    if (!expanded_ && defined_names_.contains(function->name()) && !defined_function_groups_.contains(function->name()))
+    {
+        duplicated_names_.emplace_back(function->name());
+        invalid_functions_.push_back(std::move(function));
+    }
+    else
+    {
+        defined_names_.emplace(function->name());
+
+        lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(function->name());
+        group->addFunction(std::move(function));
+    }
 }
 
 Optional<lang::ResolvingHandle<lang::Type>> lang::GlobalScope::getType(Identifier string)
@@ -332,9 +354,13 @@ void lang::GlobalScope::registerDefinition(lang::ResolvingHandle<lang::Type> typ
 
 void lang::GlobalScope::resolve()
 {
+    for (auto& [name, descriptions] : compatible_descriptions_)
+    {
+        for (auto& description : descriptions) { description->initialize(*this); }
+    }
+
     for (auto& [key, group] : defined_function_groups_) { group->resolve(); }
     for (auto& [key, variable] : global_defined_variables_) { variable->resolve(); }
-
     for (auto& [key, type] : defined_types_) { type->setContainingScope(this); }
 
     // Type registries are currently incorrect, as they resolve type dependencies in an incorrect scope.
@@ -485,7 +511,6 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunc
 
     lang::ResolvingHandle<lang::FunctionGroup> defined = undefined->handle();
     defined_function_groups_.emplace(name, std::move(undefined.value()));
-    addChild(*defined);
 
     return defined;
 }

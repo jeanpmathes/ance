@@ -30,7 +30,6 @@ namespace lang
         [[nodiscard]] bool isMangled() const override;
 
         void validate(ValidationLogger& validation_logger) const override;
-        void expand() override;
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 

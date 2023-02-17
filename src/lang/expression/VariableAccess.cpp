@@ -67,9 +67,6 @@ bool VariableAccess::isVariableDropped(ValidationLogger& validation_logger) cons
 
 Expression::Expansion VariableAccess::expandWith(Expressions) const
 {
-    std::string test = std::string(variable_->name().text());
-    (void) test;
-
     return {Statements(), makeOwned<VariableAccess>(variable_->toUndefined(), location()), Statements()};
 }
 

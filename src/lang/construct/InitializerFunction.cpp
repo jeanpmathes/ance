@@ -7,24 +7,22 @@
 #include "lang/statement/Assignment.h"
 #include "lang/type/VoidType.h"
 
-lang::InitializerFunction::InitializerFunction(lang::Function&                       function,
-                                               lang::ResolvingHandle<lang::Variable> variable,
-                                               lang::Assigner                        assigner,
-                                               Owned<Expression>                     initializer,
-                                               lang::Scope&                          containing_scope)
+lang::InitializerFunction::InitializerFunction(lang::Function& function,
+                                               Statement&      initializer,
+                                               lang::Scope&    containing_scope)
     : lang::StatementFunction(function,
                               lang::AccessModifier::PRIVATE_ACCESS,
                               lang::VoidType::get(),
                               lang::Location::global(),
                               {},
-                              makeCode(std::move(variable), assigner, std::move(initializer)),
+                              initializer,
                               containing_scope,
                               lang::Location::global())
 {}
 
-Owned<Statement> lang::InitializerFunction::makeCode(lang::ResolvingHandle<lang::Variable> variable,
-                                                     lang::Assigner                        assigner,
-                                                     Owned<Expression>                     initializer)
+Owned<Statement> lang::InitializerFunction::makeInitializerBlock(lang::ResolvingHandle<lang::Variable> variable,
+                                                                 lang::Assigner                        assigner,
+                                                                 Owned<Expression>                     initializer)
 {
     Owned<lang::CodeBlock> code = lang::CodeBlock::makeScoped(lang::Location::global());
 

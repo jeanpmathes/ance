@@ -23,7 +23,6 @@ bool lang::PredefinedFunction::isMangled() const
 
 void lang::PredefinedFunction::validate(ValidationLogger&) const {}
 
-void lang::PredefinedFunction::expand() {}
 void lang::PredefinedFunction::determineFlow() {}
 bool lang::PredefinedFunction::validateFlow(ValidationLogger&) const
 {

@@ -32,28 +32,29 @@ public:
   };
 
   enum {
-    RuleFile = 0, RuleProjectFile = 1, RuleVariableDeclaration = 2, RuleFunction = 3, 
-    RuleParameters = 4, RuleParameter = 5, RuleTypeDefinition = 6, RuleDefineAlias = 7, 
-    RuleStructDefinition = 8, RuleMember = 9, RuleAccessModifier = 10, RuleCode = 11, 
-    RuleBlock = 12, RuleStatement = 13, RuleExpressionStatement = 14, RuleLocalVariableDefinition = 15, 
-    RuleLocalReferenceDefinition = 16, RuleDropStatement = 17, RuleAssignment = 18, 
-    RuleAssigner = 19, RuleDeleteStatement = 20, RuleBreakStatement = 21, 
-    RuleContinueStatement = 22, RuleReturnStatement = 23, RuleAssertStatement = 24, 
-    RuleIfStatement = 25, RuleWhileStatement = 26, RuleMatchStatement = 27, 
-    RuleMatchCase = 28, RuleExpression = 29, RuleUnaryOperator = 30, RuleBinaryOperatorMultiplicative = 31, 
-    RuleBinaryOperatorAdditive = 32, RuleBinaryOperatorBitwise = 33, RuleBinaryOperatorShift = 34, 
-    RuleBinaryOperatorRelational = 35, RuleBinaryOperatorEquality = 36, 
-    RuleIndependentExpression = 37, RuleFunctionCall = 38, RuleArguments = 39, 
-    RuleVariableAccess = 40, RuleAllocation = 41, RuleAllocator = 42, RuleAddressof = 43, 
-    RuleBindRef = 44, RuleSizeofType = 45, RuleSizeofExpression = 46, RuleMatchExpression = 47, 
-    RuleMatchExpressionCase = 48, RuleLiteralExpression = 49, RuleStringLiteral = 50, 
-    RuleCharLiteral = 51, RuleIntegerLiteral = 52, RuleNormalInteger = 53, 
-    RuleSpecialInteger = 54, RuleFloatingPointLiteral = 55, RuleBooleanLiteral = 56, 
-    RuleNullLiteral = 57, RuleSizeLiteral = 58, RuleDiffLiteral = 59, RuleUiptrLiteral = 60, 
-    RuleType = 61, RuleIntegerType = 62, RuleArrayType = 63, RuleVectorType = 64, 
-    RuleKeywordType = 65, RuleFloatingPointType = 66, RuleTargetDependentType = 67, 
-    RuleBooleanType = 68, RuleCharType = 69, RuleNullPointerType = 70, RuleVoidType = 71, 
-    RuleCustomType = 72
+    RuleFile = 0, RuleProjectFile = 1, RuleGlobal = 2, RuleDescription = 3, 
+    RuleVariableDescription = 4, RuleFunctionDescription = 5, RuleFunctionBlock = 6, 
+    RuleParameters = 7, RuleParameter = 8, RuleTypeDescription = 9, RuleAliasDescription = 10, 
+    RuleStructDescription = 11, RuleMember = 12, RuleAccessModifier = 13, 
+    RuleCode = 14, RuleBlock = 15, RuleStatement = 16, RuleExpressionStatement = 17, 
+    RuleLocalVariableDefinition = 18, RuleLocalReferenceDefinition = 19, 
+    RuleDropStatement = 20, RuleAssignment = 21, RuleAssigner = 22, RuleDeleteStatement = 23, 
+    RuleBreakStatement = 24, RuleContinueStatement = 25, RuleReturnStatement = 26, 
+    RuleAssertStatement = 27, RuleIfStatement = 28, RuleWhileStatement = 29, 
+    RuleMatchStatement = 30, RuleMatchCase = 31, RuleExpression = 32, RuleUnaryOperator = 33, 
+    RuleBinaryOperatorMultiplicative = 34, RuleBinaryOperatorAdditive = 35, 
+    RuleBinaryOperatorBitwise = 36, RuleBinaryOperatorShift = 37, RuleBinaryOperatorRelational = 38, 
+    RuleBinaryOperatorEquality = 39, RuleIndependentExpression = 40, RuleFunctionCall = 41, 
+    RuleArguments = 42, RuleVariableAccess = 43, RuleAllocation = 44, RuleAllocator = 45, 
+    RuleAddressof = 46, RuleBindRef = 47, RuleSizeofType = 48, RuleSizeofExpression = 49, 
+    RuleMatchExpression = 50, RuleMatchExpressionCase = 51, RuleLiteralExpression = 52, 
+    RuleStringLiteral = 53, RuleCharLiteral = 54, RuleIntegerLiteral = 55, 
+    RuleNormalInteger = 56, RuleSpecialInteger = 57, RuleFloatingPointLiteral = 58, 
+    RuleBooleanLiteral = 59, RuleNullLiteral = 60, RuleSizeLiteral = 61, 
+    RuleDiffLiteral = 62, RuleUiptrLiteral = 63, RuleType = 64, RuleIntegerType = 65, 
+    RuleArrayType = 66, RuleVectorType = 67, RuleKeywordType = 68, RuleFloatingPointType = 69, 
+    RuleTargetDependentType = 70, RuleBooleanType = 71, RuleCharType = 72, 
+    RuleNullPointerType = 73, RuleVoidType = 74, RuleCustomType = 75
   };
 
   explicit anceParser(antlr4::TokenStream *input);
@@ -75,13 +76,16 @@ public:
 
   class FileContext;
   class ProjectFileContext;
-  class VariableDeclarationContext;
-  class FunctionContext;
+  class GlobalContext;
+  class DescriptionContext;
+  class VariableDescriptionContext;
+  class FunctionDescriptionContext;
+  class FunctionBlockContext;
   class ParametersContext;
   class ParameterContext;
-  class TypeDefinitionContext;
-  class DefineAliasContext;
-  class StructDefinitionContext;
+  class TypeDescriptionContext;
+  class AliasDescriptionContext;
+  class StructDescriptionContext;
   class MemberContext;
   class AccessModifierContext;
   class CodeContext;
@@ -151,13 +155,8 @@ public:
   public:
     FileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
+    GlobalContext *global();
     antlr4::tree::TerminalNode *EOF();
-    std::vector<VariableDeclarationContext *> variableDeclaration();
-    VariableDeclarationContext* variableDeclaration(size_t i);
-    std::vector<FunctionContext *> function();
-    FunctionContext* function(size_t i);
-    std::vector<TypeDefinitionContext *> typeDefinition();
-    TypeDefinitionContext* typeDefinition(size_t i);
 
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -181,9 +180,38 @@ public:
 
   ProjectFileContext* projectFile();
 
-  class  VariableDeclarationContext : public antlr4::ParserRuleContext {
+  class  GlobalContext : public antlr4::ParserRuleContext {
   public:
-    VariableDeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    GlobalContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    std::vector<DescriptionContext *> description();
+    DescriptionContext* description(size_t i);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  GlobalContext* global();
+
+  class  DescriptionContext : public antlr4::ParserRuleContext {
+  public:
+    DescriptionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    VariableDescriptionContext *variableDescription();
+    FunctionDescriptionContext *functionDescription();
+    TypeDescriptionContext *typeDescription();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  DescriptionContext* description();
+
+  class  VariableDescriptionContext : public antlr4::ParserRuleContext {
+  public:
+    VariableDescriptionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     AccessModifierContext *accessModifier();
     antlr4::tree::TerminalNode *IDENTIFIER();
@@ -198,48 +226,39 @@ public:
    
   };
 
-  VariableDeclarationContext* variableDeclaration();
+  VariableDescriptionContext* variableDescription();
 
-  class  FunctionContext : public antlr4::ParserRuleContext {
+  class  FunctionDescriptionContext : public antlr4::ParserRuleContext {
   public:
-    FunctionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-   
-    FunctionContext() = default;
-    void copyFrom(FunctionContext *context);
-    using antlr4::ParserRuleContext::copyFrom;
-
+    FunctionDescriptionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-
-   
-  };
-
-  class  ExternFunctionDeclarationContext : public FunctionContext {
-  public:
-    ExternFunctionDeclarationContext(FunctionContext *ctx);
-
-    antlr4::tree::TerminalNode *IDENTIFIER();
-    ParametersContext *parameters();
-    antlr4::tree::TerminalNode *SEMICOLON();
-    TypeContext *type();
-
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  FunctionDefinitionContext : public FunctionContext {
-  public:
-    FunctionDefinitionContext(FunctionContext *ctx);
-
     AccessModifierContext *accessModifier();
     antlr4::tree::TerminalNode *IDENTIFIER();
     ParametersContext *parameters();
+    FunctionBlockContext *functionBlock();
+    antlr4::tree::TerminalNode *SEMICOLON();
     TypeContext *type();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  FunctionDescriptionContext* functionDescription();
+
+  class  FunctionBlockContext : public antlr4::ParserRuleContext {
+  public:
+    FunctionBlockContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
     std::vector<CodeContext *> code();
     CodeContext* code(size_t i);
 
+
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
   };
 
-  FunctionContext* function();
+  FunctionBlockContext* functionBlock();
 
   class  ParametersContext : public antlr4::ParserRuleContext {
   public:
@@ -269,23 +288,23 @@ public:
 
   ParameterContext* parameter();
 
-  class  TypeDefinitionContext : public antlr4::ParserRuleContext {
+  class  TypeDescriptionContext : public antlr4::ParserRuleContext {
   public:
-    TypeDefinitionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    TypeDescriptionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    DefineAliasContext *defineAlias();
-    StructDefinitionContext *structDefinition();
+    AliasDescriptionContext *aliasDescription();
+    StructDescriptionContext *structDescription();
 
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
    
   };
 
-  TypeDefinitionContext* typeDefinition();
+  TypeDescriptionContext* typeDescription();
 
-  class  DefineAliasContext : public antlr4::ParserRuleContext {
+  class  AliasDescriptionContext : public antlr4::ParserRuleContext {
   public:
-    DefineAliasContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    AliasDescriptionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     AccessModifierContext *accessModifier();
     antlr4::tree::TerminalNode *IDENTIFIER();
@@ -297,11 +316,11 @@ public:
    
   };
 
-  DefineAliasContext* defineAlias();
+  AliasDescriptionContext* aliasDescription();
 
-  class  StructDefinitionContext : public antlr4::ParserRuleContext {
+  class  StructDescriptionContext : public antlr4::ParserRuleContext {
   public:
-    StructDefinitionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    StructDescriptionContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     AccessModifierContext *accessModifier();
     antlr4::tree::TerminalNode *IDENTIFIER();
@@ -313,7 +332,7 @@ public:
    
   };
 
-  StructDefinitionContext* structDefinition();
+  StructDescriptionContext* structDescription();
 
   class  MemberContext : public antlr4::ParserRuleContext {
   public:

@@ -58,7 +58,7 @@ namespace lang
          */
         void wrap(llvm::Argument* argument);
 
-        void expand();
+        Shared<lang::Parameter> expand() const;
 
         void buildNativeValue(CompileContext& context) override;
         void buildContentValue(CompileContext& context) override;

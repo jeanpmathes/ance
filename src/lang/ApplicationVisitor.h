@@ -38,6 +38,8 @@ namespace lang
 #include "lang/construct/LocalVariable.h"
 #include "lang/construct/Variable.h"
 
+#include "lang/construct/descriptions/FunctionDescription.h"
+
 #include "lang/expression/Addressof.h"
 #include "lang/expression/Allocation.h"
 #include "lang/expression/And.h"

@@ -98,6 +98,7 @@ namespace lang
         Expression*                                  init_;
         Optional<Owned<Expression>>                  init_owner_;
         Optional<lang::OwningHandle<lang::Function>> init_function_;
+        Optional<Owned<Statement>>                   init_block_;
 
         llvm::GlobalVariable* native_variable_ {nullptr};
         bool                  finalized_ {false};

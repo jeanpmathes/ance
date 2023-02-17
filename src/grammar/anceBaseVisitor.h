@@ -23,15 +23,23 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual std::any visitVariableDeclaration(anceParser::VariableDeclarationContext *ctx) override {
+  virtual std::any visitGlobal(anceParser::GlobalContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual std::any visitFunctionDefinition(anceParser::FunctionDefinitionContext *ctx) override {
+  virtual std::any visitDescription(anceParser::DescriptionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual std::any visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext *ctx) override {
+  virtual std::any visitVariableDescription(anceParser::VariableDescriptionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitFunctionDescription(anceParser::FunctionDescriptionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitFunctionBlock(anceParser::FunctionBlockContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -43,15 +51,15 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual std::any visitTypeDefinition(anceParser::TypeDefinitionContext *ctx) override {
+  virtual std::any visitTypeDescription(anceParser::TypeDescriptionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual std::any visitDefineAlias(anceParser::DefineAliasContext *ctx) override {
+  virtual std::any visitAliasDescription(anceParser::AliasDescriptionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual std::any visitStructDefinition(anceParser::StructDefinitionContext *ctx) override {
+  virtual std::any visitStructDescription(anceParser::StructDescriptionContext *ctx) override {
     return visitChildren(ctx);
   }
 

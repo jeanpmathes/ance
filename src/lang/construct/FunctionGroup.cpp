@@ -99,11 +99,6 @@ void lang::FunctionGroup::validate(ValidationLogger& validation_logger) const
     }
 }
 
-void lang::FunctionGroup::expand()
-{
-    for (auto& function : functions()) function->expand();
-}
-
 void lang::FunctionGroup::determineFlow()
 {
     for (auto& function : functions()) function->determineFlow();

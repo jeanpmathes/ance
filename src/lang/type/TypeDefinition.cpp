@@ -754,7 +754,7 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
     std::vector<Shared<lang::Parameter>> parameters;
     for (auto& parameter_type : parameter_types)
     {
-        std::string parameter_name = "p" + std::to_string(count++);
+        std::string const parameter_name = "p" + std::to_string(count++);
         parameters.push_back(makeShared<lang::Parameter>(parameter_type,
                                                          lang::Location::global(),
                                                          lang::Identifier::like(parameter_name),

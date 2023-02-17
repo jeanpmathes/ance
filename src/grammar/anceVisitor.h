@@ -23,21 +23,25 @@ public:
 
     virtual std::any visitProjectFile(anceParser::ProjectFileContext *context) = 0;
 
-    virtual std::any visitVariableDeclaration(anceParser::VariableDeclarationContext *context) = 0;
+    virtual std::any visitGlobal(anceParser::GlobalContext *context) = 0;
 
-    virtual std::any visitFunctionDefinition(anceParser::FunctionDefinitionContext *context) = 0;
+    virtual std::any visitDescription(anceParser::DescriptionContext *context) = 0;
 
-    virtual std::any visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext *context) = 0;
+    virtual std::any visitVariableDescription(anceParser::VariableDescriptionContext *context) = 0;
+
+    virtual std::any visitFunctionDescription(anceParser::FunctionDescriptionContext *context) = 0;
+
+    virtual std::any visitFunctionBlock(anceParser::FunctionBlockContext *context) = 0;
 
     virtual std::any visitParameters(anceParser::ParametersContext *context) = 0;
 
     virtual std::any visitParameter(anceParser::ParameterContext *context) = 0;
 
-    virtual std::any visitTypeDefinition(anceParser::TypeDefinitionContext *context) = 0;
+    virtual std::any visitTypeDescription(anceParser::TypeDescriptionContext *context) = 0;
 
-    virtual std::any visitDefineAlias(anceParser::DefineAliasContext *context) = 0;
+    virtual std::any visitAliasDescription(anceParser::AliasDescriptionContext *context) = 0;
 
-    virtual std::any visitStructDefinition(anceParser::StructDefinitionContext *context) = 0;
+    virtual std::any visitStructDescription(anceParser::StructDescriptionContext *context) = 0;
 
     virtual std::any visitMember(anceParser::MemberContext *context) = 0;
 

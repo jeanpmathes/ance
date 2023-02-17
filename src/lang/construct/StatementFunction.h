@@ -38,7 +38,7 @@ namespace lang
                           lang::ResolvingHandle<lang::Type>    return_type,
                           lang::Location                       return_type_location,
                           std::vector<Shared<lang::Parameter>> parameters,
-                          Owned<Statement>                     code,
+                          Statement&                           code,
                           Scope&                               containing_scope,
                           lang::Location                       declaration_location);
 
@@ -47,7 +47,6 @@ namespace lang
 
         void postResolve() override;
         void validate(ValidationLogger& validation_logger) const override;
-        void expand() override;
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
@@ -73,7 +72,7 @@ namespace lang
         void setupCode();
 
       private:
-        Owned<Statement>  code_;
+        Statement&        code_;
         lang::LocalScope* inside_scope_ {nullptr};
 
         lang::AccessModifier access_;

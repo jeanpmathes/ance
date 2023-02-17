@@ -48,10 +48,11 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable>      
         if (constant_init_) { constant_init_->setContainingScope(containing_scope); }
         else
         {
-            init_function_.value()->defineAsInit(self->toUndefined(),
-                                                 assigner(),
-                                                 std::move(init_owner_.value()),
-                                                 containing_scope);
+            init_block_ = lang::InitializerFunction::makeInitializerBlock(self->toUndefined(),
+                                                                          assigner(),
+                                                                          std::move(init_owner_.value()));
+
+            init_function_.value()->defineAsInit(**init_block_, containing_scope);
 
             init_owner_ = {};
         }
@@ -164,7 +165,12 @@ void lang::GlobalVariable::expand()
         init_       = nullptr;
         init_owner_ = {};
 
-        init_function_.value()->expand();
+        Statements expanded_statements = (**init_block_).expand();
+        assert(expanded_statements.size() == 1);
+
+        init_block_ = std::move(expanded_statements.front());
+
+        init_function_.value()->defineAsInit(**init_block_, *scope());
     }
 }
 

@@ -47,6 +47,7 @@ Unit::Unit(bool is_containing_runtime) : Unit(makeOwned<lang::GlobalScope>(is_co
     global_scope_->registerDefinition(lang::UnsignedIntegerPointerType::get());
     global_scope_->registerDefinition(lang::OpaquePointerType::get());
     global_scope_->registerDefinition(lang::NullPointerType::get());
+
     // Add type registries
 
     global_scope_->addTypeRegistry(lang::FixedWidthIntegerType::getRegistry());

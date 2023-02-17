@@ -6,7 +6,6 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
-#include "lang/type/VoidType.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
@@ -38,45 +37,7 @@ bool lang::ExternFunction::isImported() const
     return true;
 }
 
-void lang::ExternFunction::validate(ValidationLogger& validation_logger) const
-{
-    if (lang::validation::isTypeUndefined(returnType(), returnTypeLocation(), validation_logger)) return;
-
-    returnType().validate(validation_logger, returnTypeLocation());
-
-    std::set<lang::Identifier> names;
-
-    for (auto const& parameter : parameters())
-    {
-        auto [it, inserted] = names.insert(parameter->name());
-
-        if (!inserted)
-        {
-            validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
-                                       parameter->name().location());
-        }
-
-        if (lang::validation::isTypeUndefined(parameter->type(), parameter->typeLocation(), validation_logger)) return;
-
-        parameter->type().validate(validation_logger, parameter->typeLocation());
-
-        if (parameter->type().isVoidType())
-        {
-            validation_logger.logError("Parameter cannot have 'void' type", parameter->location());
-        }
-    }
-}
-
-void lang::ExternFunction::expand()
-{
-    lang::FunctionDefinition::expand();
-
-    function().clear();// Dirty fix, required because no full expansion is done.
-
-    scope().addType(returnType());
-
-    for (auto& parameter : this->parameters()) { scope().addType(parameter->type()); }
-}
+void lang::ExternFunction::validate(ValidationLogger&) const {}
 
 void lang::ExternFunction::determineFlow() {}
 

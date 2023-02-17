@@ -40,14 +40,13 @@ namespace lang
                        lang::ResolvingHandle<lang::Type>    return_type,
                        lang::Location                       return_type_location,
                        std::vector<Shared<lang::Parameter>> parameters,
-                       Owned<Statement>                     code,
+                       Statement&                           code,
                        Scope&                               containing_scope,
                        lang::Location                       declaration_location,
                        lang::Location                       definition_location);
 
         [[nodiscard]] bool isMangled() const override;
 
-        void validate(ValidationLogger& validation_logger) const override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
         void createNativeBacking(CompileContext& context) override;

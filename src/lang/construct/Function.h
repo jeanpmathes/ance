@@ -86,7 +86,7 @@ namespace lang
                             lang::ResolvingHandle<lang::Type>           return_type,
                             lang::Location                              return_type_location,
                             std::vector<Shared<lang::Parameter>> const& parameters,
-                            Owned<lang::CodeBlock>                      block,
+                            Statement&                                  block,
                             Scope&                                      containing_scope,
                             lang::Location                              declaration_location,
                             lang::Location                              definition_location);
@@ -106,15 +106,10 @@ namespace lang
 
         /**
          * Define this function as a variable initialization function.
-         * @param variable The variable to initialize.
-         * @param assigner The assigner.
-         * @param initializer The initializer.
+         * @param code The initializer.
          * @param containing_scope The scope containing the function.
          */
-        void defineAsInit(lang::ResolvingHandle<lang::Variable> variable,
-                          lang::Assigner                        assigner,
-                          Owned<Expression>                     initializer,
-                          Scope&                                containing_scope);
+        void defineAsInit(Statement& code, Scope& containing_scope);
 
         /**
          * Define a local variable that is a parameter.
@@ -137,7 +132,7 @@ namespace lang
          * Get the access level of this function.
          * @return The access level.
          */
-        lang::AccessModifier access() const;
+        [[nodiscard]] lang::AccessModifier access() const;
 
         /**
          * Get the return type of this function.
@@ -196,16 +191,6 @@ namespace lang
         [[nodiscard]] bool isImported() const;
 
         void validate(ValidationLogger& validation_logger) const override;
-
-        /**
-         * Expand this function to remove syntactic sugar.
-         */
-        void expand();
-
-        /**
-         * Clear all known variables. Would not be required in full expansion.
-         */
-        void clear();
 
         /**
          * Determine the control flow in this function and build the CFG.

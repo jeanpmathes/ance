@@ -33,20 +33,15 @@ namespace lang
         , public lang::Element<InitializerFunction, ANCE_CONSTRUCTS>
     {
       public:
-        InitializerFunction(Function&                             function,
-                            lang::ResolvingHandle<lang::Variable> variable,
-                            lang::Assigner                        assigner,
-                            Owned<Expression>                     initializer,
-                            Scope&                                containing_scope);
+        InitializerFunction(Function& function, Statement& initializer, Scope& containing_scope);
 
         [[nodiscard]] bool isMangled() const override;
 
         void createNativeBacking(CompileContext& context) override;
 
-      private:
-        static Owned<Statement> makeCode(lang::ResolvingHandle<lang::Variable> variable,
-                                         lang::Assigner                        assigner,
-                                         Owned<Expression>                     initializer);
+        static Owned<Statement> makeInitializerBlock(lang::ResolvingHandle<lang::Variable> variable,
+                                                     lang::Assigner                        assigner,
+                                                     Owned<Expression>                     initializer);
     };
 }
 

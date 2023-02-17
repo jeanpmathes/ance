@@ -1,5 +1,6 @@
 add_subdirectory(constant)
 add_subdirectory(value)
+add_subdirectory(descriptions)
 
 target_sources(ance PRIVATE
                BasicBlock.cpp

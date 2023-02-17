@@ -11,7 +11,6 @@
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/Type.h"
 #include "lang/type/VoidType.h"
-#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::CustomFunction::CustomFunction(Function&                            function,
@@ -19,7 +18,7 @@ lang::CustomFunction::CustomFunction(Function&                            functi
                                      lang::ResolvingHandle<lang::Type>    return_type,
                                      lang::Location                       return_type_location,
                                      std::vector<Shared<lang::Parameter>> parameters,
-                                     Owned<Statement>                     code,
+                                     Statement&                           code,
                                      Scope&                               containing_scope,
                                      lang::Location                       declaration_location,
                                      lang::Location                       definition_location)
@@ -28,7 +27,7 @@ lang::CustomFunction::CustomFunction(Function&                            functi
                               return_type,
                               return_type_location,
                               std::move(parameters),
-                              std::move(code),
+                              code,
                               containing_scope,
                               declaration_location)
     , definition_location_(definition_location)
@@ -37,33 +36,6 @@ lang::CustomFunction::CustomFunction(Function&                            functi
 bool lang::CustomFunction::isMangled() const
 {
     return access() != lang::AccessModifier::EXTERN_ACCESS;
-}
-
-void lang::CustomFunction::validate(ValidationLogger& validation_logger) const
-{
-    if (lang::validation::isTypeUndefined(returnType(), returnTypeLocation(), validation_logger)) return;
-
-    returnType().validate(validation_logger, returnTypeLocation());
-
-    for (auto const [parameter, argument] : llvm::zip(parameters(), arguments()))
-    {
-        if (not argument.hasValue())
-        {
-            validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
-                                       parameter->name().location());
-        }
-
-        if (lang::validation::isTypeUndefined(parameter->type(), parameter->typeLocation(), validation_logger)) return;
-
-        parameter->type().validate(validation_logger, parameter->typeLocation());
-
-        if (parameter->type() == lang::VoidType::get())
-        {
-            validation_logger.logError("Parameter cannot have 'void' type", parameter->location());
-        }
-    }
-
-    StatementFunction::validate(validation_logger);
 }
 
 bool lang::CustomFunction::validateFlow(ValidationLogger& validation_logger) const

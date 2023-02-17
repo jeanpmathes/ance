@@ -91,17 +91,6 @@ bool lang::FunctionDefinition::isImported() const
 
 void lang::FunctionDefinition::postResolve() {}
 
-void lang::FunctionDefinition::expand()
-{
-    // This would be unnecessary with full expansion that creates a new function.
-
-    return_type_ = return_type_->createUndefinedClone();
-
-    for (auto& parameter : parameters_) { parameter->expand(); }
-
-    signature_ = lang::Signature::fromParameters(name(), parameters_);
-}
-
 bool lang::FunctionDefinition::validateCall(
     std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
     lang::Location                                                                           location,

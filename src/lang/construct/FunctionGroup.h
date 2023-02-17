@@ -33,7 +33,6 @@ namespace lang
         void resolve();
         void postResolve();
         void validate(ValidationLogger& validation_logger) const;
-        void expand();
         void determineFlow();
         void validateFlow(ValidationLogger& validation_logger) const;
         void createNativeBacking(CompileContext& compile_context);

@@ -18,7 +18,7 @@ lang::StatementFunction::StatementFunction(Function&                            
                                            lang::ResolvingHandle<lang::Type>    return_type,
                                            lang::Location                       return_type_location,
                                            std::vector<Shared<lang::Parameter>> parameters,
-                                           Owned<Statement>                     code,
+                                           Statement&                           code,
                                            Scope&                               containing_scope,
                                            lang::Location                       declaration_location)
     : lang::FunctionDefinition(function,
@@ -27,7 +27,7 @@ lang::StatementFunction::StatementFunction(Function&                            
                                return_type_location,
                                std::move(parameters),
                                declaration_location)
-    , code_(std::move(code))
+    , code_(code)
     , access_(access)
     , initial_block_(lang::BasicBlock::createEmpty())
 {
@@ -41,13 +41,13 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::StatementFunction::getNati
 
 void lang::StatementFunction::setupCode()
 {
-    addChild(*code_);
+    addChild(code_);
 
-    code_->setContainingScope(this->function());
-    inside_scope_ = code_->getBlockScope();
+    code_.setContainingScope(this->function());
+    inside_scope_ = code_.getBlockScope();
     assert(inside_scope_);
 
-    code_->walkDefinitions();
+    code_.walkDefinitions();
 
     scope().addType(returnType());
 
@@ -73,39 +73,23 @@ lang::AccessModifier lang::StatementFunction::access() const
 
 Statement const& lang::StatementFunction::code() const
 {
-    return *code_;
+    return code_;
 }
 
 void lang::StatementFunction::postResolve()
 {
-    code_->postResolve();
+    code_.postResolve();
 }
 
 void lang::StatementFunction::validate(ValidationLogger& validation_logger) const
 {
     inside_scope_->validate(validation_logger);
-    code_->validate(validation_logger);
-}
-
-void lang::StatementFunction::expand()
-{
-    clearChildren();
-    arguments_.clear();
-
-    Statements expanded_statements = code_->expand();
-    assert(expanded_statements.size() == 1);
-    code_ = std::move(expanded_statements.front());
-
-    lang::FunctionDefinition::expand();
-
-    function().clear();// Dirty fix, required because no full expansion is done.
-
-    setupCode();
+    code_.validate(validation_logger);
 }
 
 void lang::StatementFunction::determineFlow()
 {
-    blocks_ = code_->createBasicBlocks(*initial_block_, function());
+    blocks_ = code_.createBasicBlocks(*initial_block_, function());
 
     lang::BasicBlock* last = blocks_.empty() ? initial_block_.get() : blocks_.back().get();
     blocks_.push_back(lang::BasicBlock::createFinalizing(function(), "function"));

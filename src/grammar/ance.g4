@@ -1,21 +1,34 @@
 grammar ance;
 
 file
-	: ( variableDeclaration | function | typeDefinition )* EOF
+	: global EOF
 	;
 
 projectFile
     : ( code )* EOF
     ;
 
-variableDeclaration
+global
+    : ( description )*
+    ;
+
+description
+    : variableDescription
+    | functionDescription
+    | typeDescription
+    ;
+
+variableDescription
 	: accessModifier ( CONST )? IDENTIFIER ( ':' type )? ( assigner expression )? ';'
 	;
 
-function
-	: accessModifier IDENTIFIER '(' parameters ')' (':' type)? '{' ( code )* '}' # FunctionDefinition
-	| 'extern' IDENTIFIER '(' parameters ')' (':' type)? ';' # ExternFunctionDeclaration
+functionDescription
+	: accessModifier IDENTIFIER '(' parameters ')' (':' type)? ( functionBlock | ';' )
 	;
+
+functionBlock
+    : '{' ( code )* '}'
+    ;
 
 parameters
 	: (parameter (',' parameter)* )?
@@ -25,16 +38,16 @@ parameter
 	: IDENTIFIER ':' type
 	;
 
-typeDefinition
-    : defineAlias
-    | structDefinition
+typeDescription
+    : aliasDescription
+    | structDescription
     ;
 
-defineAlias
+aliasDescription
     : accessModifier 'define' IDENTIFIER 'alias' type ';'
     ;
 
-structDefinition
+structDescription
     : accessModifier 'struct' IDENTIFIER '{' ( member )* '}'
     ;
 

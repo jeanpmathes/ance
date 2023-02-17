@@ -71,14 +71,18 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
             function_block->append(std::move(block_ptr));
         }
 
-        unit_.globalScope().defineCustomFunction(identifier,
-                                                 access,
-                                                 return_type,
-                                                 return_type_location,
-                                                 parameters,
-                                                 std::move(function_block),
-                                                 declaration_location,
-                                                 definition_location);
+        Owned<Statement> block_statement = std::move(function_block);
+
+        Owned<lang::FunctionDescription> description = makeOwned<lang::FunctionDescription>(access,
+                                                                                            identifier,
+                                                                                            return_type,
+                                                                                            return_type_location,
+                                                                                            parameters,
+                                                                                            std::move(block_statement),
+                                                                                            declaration_location,
+                                                                                            definition_location);
+
+        unit_.globalScope().addDescription(std::move(description));
     }
 
     {// Global Constants
@@ -149,22 +153,40 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 
         lang::Location const return_type_location = lang::Location::global();
 
-        auto function_block = lang::CodeBlock::makeInitial(location(ctx));
+        auto             function_block  = lang::CodeBlock::makeInitial(location(ctx));
+        Owned<Statement> block_statement = std::move(function_block);
 
-        unit_.globalScope().defineCustomFunction(identifier,
-                                                 access,
-                                                 return_type,
-                                                 return_type_location,
-                                                 parameters,
-                                                 std::move(function_block),
-                                                 declaration_location,
-                                                 definition_location);
+        Owned<lang::FunctionDescription> description = makeOwned<lang::FunctionDescription>(access,
+                                                                                            identifier,
+                                                                                            return_type,
+                                                                                            return_type_location,
+                                                                                            parameters,
+                                                                                            std::move(block_statement),
+                                                                                            declaration_location,
+                                                                                            definition_location);
+
+        unit_.globalScope().addDescription(std::move(description));
     }
 
     return {};
 }
 
-std::any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx)
+std::any SourceVisitor::visitGlobal(anceParser::GlobalContext* ctx)
+{
+    for (auto description_context : ctx->description())
+    {
+        std::any potential_description = visit(description_context);
+        if (potential_description.has_value() && std::any_cast<lang::Description*>(&potential_description))
+        {
+            lang::Description& description = *std::any_cast<lang::Description*>(potential_description);
+            unit_.globalScope().addDescription(Owned<lang::Description>(description));
+        }
+    }
+
+    return {};
+}
+
+std::any SourceVisitor::visitVariableDescription(anceParser::VariableDescriptionContext* ctx)
 {
     auto       access      = std::any_cast<lang::AccessModifier>(visit(ctx->accessModifier()));
     bool const is_constant = ctx->CONST();
@@ -202,7 +224,7 @@ std::any SourceVisitor::visitVariableDeclaration(anceParser::VariableDeclaration
     return {};
 }
 
-std::any SourceVisitor::visitStructDefinition(anceParser::StructDefinitionContext* ctx)
+std::any SourceVisitor::visitStructDescription(anceParser::StructDescriptionContext* ctx)
 {
     auto                   access     = std::any_cast<lang::AccessModifier>(visit(ctx->accessModifier()));
     lang::Identifier const identifier = ident(ctx->IDENTIFIER());
@@ -236,7 +258,7 @@ std::any SourceVisitor::visitMember(anceParser::MemberContext* ctx)
     return new lang::Member(access, identifier, type, assigner, wrap(const_expr), location(ctx), location(ctx->type()));
 }
 
-std::any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx)
+std::any SourceVisitor::visitFunctionDescription(anceParser::FunctionDescriptionContext* ctx)
 {
     auto                              access     = std::any_cast<lang::AccessModifier>(visit(ctx->accessModifier()));
     lang::Identifier const            identifier = ident(ctx->IDENTIFIER());
@@ -244,7 +266,8 @@ std::any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionCo
         ctx->type() ? erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type())) : lang::VoidType::get();
 
     lang::Location const declaration_location = location(ctx);
-    lang::Location const definition_location  = ctx->code().empty() ? declaration_location : location(ctx->code()[0]);
+    lang::Location const definition_location =
+        ctx->functionBlock() == nullptr ? declaration_location : location(ctx->functionBlock());
 
     auto parameters = std::any_cast<std::vector<lang::Parameter*>>(visit(ctx->parameters()));
 
@@ -254,48 +277,31 @@ std::any SourceVisitor::visitFunctionDefinition(anceParser::FunctionDefinitionCo
 
     lang::Location const return_type_location = ctx->type() ? location(ctx->type()) : lang::Location::global();
 
-    auto function_block = lang::CodeBlock::makeInitial(location(ctx));
+    Optional<Owned<Statement>> code;
 
-    for (auto code_context : ctx->code())
+    if (ctx->functionBlock() != nullptr)
     {
-        lang::CodeBlock& block     = *std::any_cast<lang::CodeBlock*>(visit(code_context));
-        auto             block_ptr = Owned<lang::CodeBlock>(block);
+        Owned<lang::CodeBlock> function_block = lang::CodeBlock::makeInitial(location(ctx));
 
-        function_block->append(std::move(block_ptr));
+        for (auto code_context : ctx->functionBlock()->code())
+        {
+            lang::CodeBlock& block     = *std::any_cast<lang::CodeBlock*>(visit(code_context));
+            auto             block_ptr = Owned<lang::CodeBlock>(block);
+
+            function_block->append(std::move(block_ptr));
+        }
+
+        code = std::move(function_block);
     }
 
-    unit_.globalScope().defineCustomFunction(identifier,
-                                             access,
-                                             return_type,
-                                             return_type_location,
-                                             shared_parameters,
-                                             std::move(function_block),
-                                             declaration_location,
-                                             definition_location);
-
-    return {};
-}
-
-std::any SourceVisitor::visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx)
-{
-    lang::Identifier const            identifier = ident(ctx->IDENTIFIER());
-    lang::ResolvingHandle<lang::Type> return_type =
-        ctx->type() ? erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type())) : lang::VoidType::get();
-    auto parameters = std::any_cast<std::vector<lang::Parameter*>>(visit(ctx->parameters()));
-
-    std::vector<Shared<lang::Parameter>> shared_parameters;
-    shared_parameters.reserve(parameters.size());
-    for (lang::Parameter* parameter_ptr : parameters) { shared_parameters.emplace_back(*parameter_ptr); }
-
-    lang::Location const return_type_location = ctx->type() ? location(ctx->type()) : lang::Location::global();
-
-    unit_.globalScope().defineExternFunction(identifier,
-                                             return_type,
-                                             return_type_location,
-                                             shared_parameters,
-                                             location(ctx));
-
-    return {};
+    return static_cast<lang::Description*>(new lang::FunctionDescription(access,
+                                                                         identifier,
+                                                                         return_type,
+                                                                         return_type_location,
+                                                                         shared_parameters,
+                                                                         std::move(code),
+                                                                         declaration_location,
+                                                                         definition_location));
 }
 
 std::any SourceVisitor::visitParameters(anceParser::ParametersContext* ctx)
@@ -315,7 +321,7 @@ std::any SourceVisitor::visitParameter(anceParser::ParameterContext* ctx)
     return new lang::Parameter(type, location(ctx->type()), identifier, location(ctx));
 }
 
-std::any SourceVisitor::visitDefineAlias(anceParser::DefineAliasContext* ctx)
+std::any SourceVisitor::visitAliasDescription(anceParser::AliasDescriptionContext* ctx)
 {
     auto                   other      = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
     lang::Identifier const identifier = ident(ctx->IDENTIFIER());

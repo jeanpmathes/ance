@@ -29,20 +29,17 @@ class SourceVisitor : public anceBaseVisitor
     void setFileContext(FileContext& file_context);
 
     std::any visitProjectFile(anceParser::ProjectFileContext* ctx) override;
+    std::any visitGlobal(anceParser::GlobalContext* ctx) override;
 
-    // Declarations
+    // Descriptions
 
-    std::any visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx) override;
-    std::any visitStructDefinition(anceParser::StructDefinitionContext* ctx) override;
+    std::any visitVariableDescription(anceParser::VariableDescriptionContext* ctx) override;
+    std::any visitStructDescription(anceParser::StructDescriptionContext* ctx) override;
     std::any visitMember(anceParser::MemberContext* ctx) override;
-
-    // Functions
-
-    std::any visitFunctionDefinition(anceParser::FunctionDefinitionContext* ctx) override;
-    std::any visitExternFunctionDeclaration(anceParser::ExternFunctionDeclarationContext* ctx) override;
+    std::any visitFunctionDescription(anceParser::FunctionDescriptionContext* ctx) override;
     std::any visitParameters(anceParser::ParametersContext* ctx) override;
     std::any visitParameter(anceParser::ParameterContext* ctx) override;
-    std::any visitDefineAlias(anceParser::DefineAliasContext* ctx) override;
+    std::any visitAliasDescription(anceParser::AliasDescriptionContext* ctx) override;
 
     // Statements
 
