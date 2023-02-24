@@ -1,5 +1,7 @@
 #include "GlobalVariable.h"
 
+#include <utility>
+
 #include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
@@ -16,48 +18,29 @@ namespace llvm
     class Constant;
 }
 
-lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable>       self,
-                                     Optional<lang::ResolvingHandle<lang::Type>> type,
-                                     lang::Location                              type_location,
-                                     GlobalScope&                                containing_scope,
-                                     lang::AccessModifier                        access,
-                                     Optional<Owned<Expression>>                 init,
-                                     bool                                        is_final,
-                                     bool                                        is_constant,
-                                     lang::Location                              location)
-    : VariableDefinition(self,
-                         type.valueOr(lang::Type::getUndefined()),
-                         type_location,
-                         containing_scope,
-                         is_final,
-                         location)
-    , type_opt_(type)
+lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
+                                     lang::ResolvingHandle<lang::Type>     type,
+                                     lang::Location                        type_location,
+                                     GlobalScope&                          containing_scope,
+                                     lang::AccessModifier                  access,
+                                     Initializer                           init,
+                                     lang::Scope*                          init_scope,
+                                     Assigner                              assigner,
+                                     bool                                  is_constant,
+                                     lang::Location                        location)
+    : VariableDefinition(self, type, type_location, containing_scope, assigner.isFinal(), location)
     , access_(access)
     , is_constant_(is_constant)
-    , constant_init_(is_constant_ ? dynamic_cast<ConstantExpression*>(getPtr(init)) : nullptr)
-    , init_(getPtr(init))
-    , init_owner_(std::move(init))
-    , init_function_(init_ && not constant_init_ ? lang::OwningHandle<lang::Function>::takeOwnership(
-                         lang::makeHandled<lang::Function>(lang::Identifier::like(self->name() + "$init")))
-                                                 : Optional<lang::OwningHandle<lang::Function>>())
+    , init_(std::move(init))
+    , init_scope_(init_scope)
+    , assigner_(assigner)
 {
-    if (type.hasValue()) containing_scope.addType(type.value());
-
-    if (init_owner_.hasValue())
+    if (init_.hasValue())
     {
-        if (constant_init_) { constant_init_->setContainingScope(containing_scope); }
-        else
+        if (auto* constant_init = std::get_if<std::reference_wrapper<ConstantExpression>>(&init_.value()))
         {
-            init_block_ = lang::InitializerFunction::makeInitializerBlock(self->toUndefined(),
-                                                                          assigner(),
-                                                                          std::move(init_owner_.value()));
-
-            init_function_.value()->defineAsInit(**init_block_, containing_scope);
-
-            init_owner_ = {};
+            constant_init->get().setContainingScope(containing_scope);
         }
-
-        addChild(*init_);
     }
 }
 
@@ -73,153 +56,27 @@ bool lang::GlobalVariable::isConstant() const
 
 lang::Assigner lang::GlobalVariable::assigner() const
 {
-    if (isFinal()) { return lang::Assigner::FINAL_COPY_ASSIGNMENT; }
-    else { return lang::Assigner::COPY_ASSIGNMENT; }
-}
-
-Expression const* lang::GlobalVariable::init() const
-{
-    return init_;
-}
-
-void lang::GlobalVariable::validate(ValidationLogger& validation_logger) const
-{
-    if (access_ == lang::AccessModifier::EXTERN_ACCESS)
-    {
-        validation_logger.logError("Global variables cannot be extern", location());
-    }
-
-    if (type_opt_.hasValue())
-    {
-        if (lang::validation::isTypeUndefined(type(), typeLocation(), validation_logger)) return;
-
-        if (!type().validate(validation_logger, typeLocation())) return;
-
-        if (type().isVoidType())
-        {
-            validation_logger.logError("Global variable cannot have 'void' type", typeLocation());
-            return;
-        }
-
-        if (type().isReferenceType())
-        {
-            validation_logger.logError("Global variable cannot have reference type", typeLocation());
-            return;
-        }
-    }
-
-    if (!init_ && is_constant_)
-    {
-        validation_logger.logError("Constants require an explicit constant initializer", location());
-        return;
-    }
-
-    if (!constant_init_ && is_constant_)
-    {
-        validation_logger.logError("Initializer for constant variable must be constant", location());
-        return;
-    }
-
-    if (is_constant_ && !isFinal())
-    {
-        validation_logger.logError("Assignment to constants must be final", location());
-        return;
-    }
-
-    if (init_)
-    {
-        if (!init_->validate(validation_logger)) return;
-
-        if (constant_init_)
-        {
-            if (!lang::Type::areSame(type(), constant_init_->type()))
-            {
-                validation_logger.logError("Constant initializer must be of variable type " + type().getAnnotatedName(),
-                                           constant_init_->location());
-                return;
-            }
-        }
-        else
-        {
-            if (!lang::Type::checkMismatch(type(), init_->type(), init_->location(), validation_logger)) return;
-        }
-    }
-    else if (!type_opt_.hasValue())
-    {
-        validation_logger.logError("Default-initialized global variable must have explicit type", location());
-        return;
-    }
-}
-
-void lang::GlobalVariable::expand()
-{
-    if (type_opt_.hasValue())// Not necessary with full expansion.
-    {
-        type_opt_ = type_opt_.value()->createUndefinedClone();
-        setType(type_opt_.value());
-    }
-
-    if (init_function_.hasValue())
-    {
-        clearChildren();
-        init_       = nullptr;
-        init_owner_ = {};
-
-        Statements expanded_statements = (**init_block_).expand();
-        assert(expanded_statements.size() == 1);
-
-        init_block_ = std::move(expanded_statements.front());
-
-        init_function_.value()->defineAsInit(**init_block_, *scope());
-    }
-}
-
-void lang::GlobalVariable::determineFlow()
-{
-    if (init_function_.hasValue()) { init_function_.value()->determineFlow(); }
-}
-
-void lang::GlobalVariable::validateFlow(ValidationLogger& validation_logger) const
-{
-    if (init_function_.hasValue()) { init_function_.value()->validateFlow(validation_logger); }
-}
-
-void lang::GlobalVariable::resolve()
-{
-    if (init_function_.hasValue()) { init_function_.value()->resolve(); }
-}
-
-void lang::GlobalVariable::postResolve()
-{
-    rerouteIfNeeded();
-
-    if (init_function_.hasValue()) { init_function_.value()->postResolve(); }
-}
-
-void lang::GlobalVariable::createNativeBacking(CompileContext& context)
-{
-    if (init_function_.hasValue()) { init_function_.value()->createNativeBacking(context); }
-}
-
-void lang::GlobalVariable::build(CompileContext& context)
-{
-    if (init_function_.hasValue()) { init_function_.value()->build(context); }
+    return assigner_;
 }
 
 void lang::GlobalVariable::buildDeclaration(CompileContext& context)
 {
     llvm::Constant* native_initializer;
 
-    if (constant_init_)
+    if (init_.hasValue())
     {
-        Shared<lang::Constant> initial_value = constant_init_->getConstantValue();
-        initial_value->buildContentConstant(context.llvmModule());
-        native_initializer = initial_value->getContentConstant();
-    }
-    else if (init_function_.hasValue())
-    {
-        // Will be initialized at startup.
-        native_initializer = llvm::Constant::getNullValue(type()->getContentType(context.llvmContext()));
+        if (auto* constant_init = std::get_if<std::reference_wrapper<ConstantExpression>>(&init_.value()))
+        {
+            Shared<lang::Constant> initial_value = constant_init->get().getConstantValue();
+            initial_value->buildContentConstant(context.llvmModule());
+            native_initializer = initial_value->getContentConstant();
+        }
+        else
+        {
+            // Will be initialized at startup.
+            assert(std::holds_alternative<std::reference_wrapper<lang::Function>>(init_.value()));
+            native_initializer = llvm::Constant::getNullValue(type()->getContentType(context.llvmContext()));
+        }
     }
     else { native_initializer = type()->getDefaultContent(context.llvmModule()); }
 
@@ -243,9 +100,13 @@ void lang::GlobalVariable::buildDeclaration(CompileContext& context)
 
 void lang::GlobalVariable::buildDefinition(CompileContext& context)
 {
-    if (constant_init_) return;// Definition done in declaration.
-
-    if (init_function_.hasValue()) { init_function_.value()->buildCall({}, context); }
+    if (init_.hasValue())
+    {
+        if (auto* function_init = std::get_if<std::reference_wrapper<lang::Function>>(&init_.value()))
+        {
+            function_init->get().buildCall({}, context);
+        }
+    }
 }
 
 void lang::GlobalVariable::buildFinalization(CompileContext& context)
@@ -259,15 +120,16 @@ void lang::GlobalVariable::buildFinalization(CompileContext& context)
 
 std::vector<lang::ResolvingHandle<lang::Function>> lang::GlobalVariable::getFunctionDependencies()
 {
-    if (init_function_.hasValue()) return init_function_.value()->getFunctionDependencies();
-    else return {};
+    if (init_scope_ != nullptr) { return init_scope_->getFunctionDependencies(); }
+
+    return {};
 }
 
 std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::getVariableDependencies()
 {
-    if (init_function_.hasValue())
+    if (init_scope_ != nullptr)
     {
-        auto dependencies = init_function_.value()->getVariableDependencies();
+        auto dependencies = init_scope_->getVariableDependencies();
 
         std::vector<lang::ResolvingHandle<lang::Variable>> result;
 
@@ -278,7 +140,8 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::getVari
 
         return result;
     }
-    else return {};
+
+    return {};
 }
 
 Shared<lang::Value> lang::GlobalVariable::getValue(CompileContext&)
@@ -331,7 +194,7 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::getAllV
 
 std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::determineOrder(
     std::vector<lang::ResolvingHandle<lang::Variable>> variables,
-    ValidationLogger&                                  validation_logger)
+    ValidationLogger*                                  validation_logger)
 {
     int const unvisited = 0;
     int const visited   = 1;
@@ -366,9 +229,13 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::determi
 
                 if (state.at(current_variable) == visited)
                 {
-                    validation_logger.logError("Variable '" + current_variable->name()
-                                                   + "' part of circular dependency",
-                                               current_variable->name().location());
+                    if (validation_logger)
+                    {
+                        validation_logger->logError("Variable '" + current_variable->name()
+                                                        + "' part of circular dependency",
+                                                    current_variable->name().location());
+                    }
+
                     return {};
                 }
 
@@ -385,13 +252,4 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::determi
 
     assert(variables.size() == ordered_variables.size());
     return ordered_variables;
-}
-
-void lang::GlobalVariable::rerouteIfNeeded()
-{
-    if (init_ && not type_opt_.hasValue())
-    {
-        auto assigned_type = init_->type();
-        if (assigned_type->isDefined() && assigned_type != type()) { type().reroute(assigned_type); }
-    }
 }

@@ -33,6 +33,16 @@ namespace lang
         void initialize(lang::Scope& scope);
 
         /**
+         * Call resolve on owned entities.
+         */
+        virtual void resolve();
+
+        /**
+         * Called after all entities have been resolved.
+         */
+        virtual void postResolve();
+
+        /**
          * Validate the description.
          * @param validation_logger The logger to log validation errors to.
          */

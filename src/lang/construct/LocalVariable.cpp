@@ -24,11 +24,6 @@ lang::LocalVariable::LocalVariable(lang::ResolvingHandle<lang::Variable> self,
     // Type is already added in declaring statement.
 }
 
-void lang::LocalVariable::validate(ValidationLogger&) const
-{
-    // Validation of variable declaring statement.
-}
-
 void lang::LocalVariable::buildDeclaration(CompileContext& context)
 {
     native_value_ = context.ir().CreateAlloca(type()->getContentType(context.llvmContext()), nullptr, name().text());

@@ -123,12 +123,6 @@ namespace lang
         virtual void postResolve();
 
         /**
-         * Validate this function.
-         * @param validation_logger A logger to log validation messages.
-         */
-        virtual void validate(ValidationLogger& validation_logger) const = 0;
-
-        /**
          * Determine and create structures to represent control flow.
          */
         virtual void determineFlow() = 0;

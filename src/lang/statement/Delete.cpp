@@ -5,7 +5,6 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
-#include "lang/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
 
 Delete::Delete(Owned<Expression> to_delete, bool delete_buffer, lang::Location location)

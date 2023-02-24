@@ -62,14 +62,14 @@ namespace lang
 
         std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, Function& function) override;
 
-        lang::LocalScope*       getBlockScope() override;
-        lang::LocalScope const* getBlockScope() const override;
+        lang::LocalScope*                     getBlockScope() override;
+        [[nodiscard]] lang::LocalScope const* getBlockScope() const override;
 
-        bool isCompound() const override;
+        [[nodiscard]] bool isCompound() const override;
 
         void validate(ValidationLogger& validation_logger) const override;
 
-        Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+        [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
 
         void doBuild(CompileContext& context) override;
 

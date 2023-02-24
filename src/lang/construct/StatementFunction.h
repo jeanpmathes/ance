@@ -46,7 +46,6 @@ namespace lang
         [[nodiscard]] Statement const&     code() const;
 
         void postResolve() override;
-        void validate(ValidationLogger& validation_logger) const override;
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 

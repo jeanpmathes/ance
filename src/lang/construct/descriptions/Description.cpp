@@ -12,6 +12,9 @@ void lang::Description::initialize(lang::Scope& scope)
     performInitialization();
 }
 
+void lang::Description::resolve() {}
+void lang::Description::postResolve() {}
+
 lang::Scope& lang::Description::scope()
 {
     assert(scope_ != nullptr);

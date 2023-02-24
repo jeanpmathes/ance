@@ -81,12 +81,6 @@ void lang::StatementFunction::postResolve()
     code_.postResolve();
 }
 
-void lang::StatementFunction::validate(ValidationLogger& validation_logger) const
-{
-    inside_scope_->validate(validation_logger);
-    code_.validate(validation_logger);
-}
-
 void lang::StatementFunction::determineFlow()
 {
     blocks_ = code_.createBasicBlocks(*initial_block_, function());

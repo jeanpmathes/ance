@@ -21,14 +21,15 @@ bool lang::Variable::isDefined() const
     return definition_.hasValue();
 }
 
-void lang::Variable::defineAsGlobal(Optional<lang::ResolvingHandle<lang::Type>> type,
-                                    lang::Location                              type_location,
-                                    GlobalScope&                                containing_scope,
-                                    lang::AccessModifier                        access,
-                                    Optional<Owned<Expression>>                 init,
-                                    bool                                        is_final,
-                                    bool                                        is_constant,
-                                    lang::Location                              location)
+void lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
+                                    lang::Location                    type_location,
+                                    GlobalScope&                      containing_scope,
+                                    lang::AccessModifier              access,
+                                    lang::GlobalVariable::Initializer init,
+                                    lang::Scope*                      init_scope,
+                                    lang::Assigner                    assigner,
+                                    bool                              is_constant,
+                                    lang::Location                    location)
 {
     definition_ = makeOwned<lang::GlobalVariable>(self(),
                                                   type,
@@ -36,7 +37,8 @@ void lang::Variable::defineAsGlobal(Optional<lang::ResolvingHandle<lang::Type>> 
                                                   containing_scope,
                                                   access,
                                                   std::move(init),
-                                                  is_final,
+                                                  init_scope,
+                                                  assigner,
                                                   is_constant,
                                                   location);
 
@@ -90,11 +92,6 @@ bool lang::Variable::isFinal() const
 {
     assert(definition_.hasValue());
     return definition_.value()->isFinal();
-}
-
-void lang::Variable::validate(ValidationLogger& validation_logger) const
-{
-    definition_.value()->validate(validation_logger);
 }
 
 void lang::Variable::buildDeclaration(CompileContext& context)
@@ -151,41 +148,6 @@ void lang::Variable::setValue(Shared<Value> value, CompileContext& context)
 lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const
 {
     return lang::makeHandled<lang::Variable>(name());
-}
-
-void lang::Variable::expand()
-{
-    definition_.value()->expand();
-}
-
-void lang::Variable::determineFlow()
-{
-    definition_.value()->determineFlow();
-}
-
-void lang::Variable::validateFlow(ValidationLogger& validation_logger) const
-{
-    definition_.value()->validateFlow(validation_logger);
-}
-
-void lang::Variable::resolve()
-{
-    definition_.value()->resolve();
-}
-
-void lang::Variable::postResolve()
-{
-    definition_.value()->postResolve();
-}
-
-void lang::Variable::createNativeBacking(CompileContext& context)
-{
-    definition_.value()->createNativeBacking(context);
-}
-
-void lang::Variable::build(CompileContext& context)
-{
-    definition_.value()->build(context);
 }
 
 std::vector<lang::ResolvingHandle<lang::Variable>> lang::Variable::getVariableDependencies()

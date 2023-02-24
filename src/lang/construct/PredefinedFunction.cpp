@@ -21,8 +21,6 @@ bool lang::PredefinedFunction::isMangled() const
     return true;
 }
 
-void lang::PredefinedFunction::validate(ValidationLogger&) const {}
-
 void lang::PredefinedFunction::determineFlow() {}
 bool lang::PredefinedFunction::validateFlow(ValidationLogger&) const
 {

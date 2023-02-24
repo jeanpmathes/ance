@@ -37,8 +37,6 @@ bool lang::ExternFunction::isImported() const
     return true;
 }
 
-void lang::ExternFunction::validate(ValidationLogger&) const {}
-
 void lang::ExternFunction::determineFlow() {}
 
 bool lang::ExternFunction::validateFlow(ValidationLogger&) const

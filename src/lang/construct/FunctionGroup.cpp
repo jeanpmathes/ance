@@ -93,10 +93,6 @@ void lang::FunctionGroup::validate(ValidationLogger& validation_logger) const
             }
         }
     }
-
-    {// Validate every function
-        for (auto& function : functions()) { function->validate(validation_logger); }
-    }
 }
 
 void lang::FunctionGroup::determineFlow()

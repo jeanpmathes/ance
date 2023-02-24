@@ -8,7 +8,9 @@
 #include <llvm/IR/Value.h>
 
 #include "lang/AccessModifier.h"
+#include "lang/Assigner.h"
 #include "lang/Element.h"
+#include "lang/construct/GlobalVariable.h"
 #include "lang/construct/VariableDefinition.h"
 #include "lang/utility/Identifier.h"
 #include "lang/utility/Location.h"
@@ -55,19 +57,21 @@ namespace lang
          * @param type_location The location of the type.
          * @param containing_scope The containing scope.
          * @param access The access modifier.
-         * @param init The expression used for initialization.
-         * @param is_final Whether the variable is final.
+         * @param init The expression or function used for initialization.
+         * @param init_scope The scope in which initialization is performed.
+         * @param assigner The assigner used for initialization.
          * @param is_constant Whether the variable is constant.
          * @param location The source location.
          */
-        void defineAsGlobal(Optional<lang::ResolvingHandle<lang::Type>> type,
-                            lang::Location                              type_location,
-                            GlobalScope&                                containing_scope,
-                            lang::AccessModifier                        access,
-                            Optional<Owned<Expression>>                 init,
-                            bool                                        is_final,
-                            bool                                        is_constant,
-                            lang::Location                              location);
+        void defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
+                            lang::Location                    type_location,
+                            GlobalScope&                      containing_scope,
+                            lang::AccessModifier              access,
+                            lang::GlobalVariable::Initializer init,
+                            lang::Scope*                      init_scope,
+                            lang::Assigner                    assigner,
+                            bool                              is_constant,
+                            lang::Location                    location);
 
         /**
          * Define this variable as a local variable.
@@ -112,12 +116,6 @@ namespace lang
          * @return Whether it is final.
          */
         [[nodiscard]] bool isFinal() const;
-
-        /**
-         * Validate this variable.
-         * @param validation_logger A logger to log validation messages.
-         */
-        void validate(ValidationLogger& validation_logger) const;
 
         /**
          * Build the variable declaration which prepares the storage.
@@ -186,15 +184,6 @@ namespace lang
          * Get an undefined variable with the same name.
          */
         [[nodiscard]] lang::ResolvingHandle<lang::Variable> toUndefined() const;
-
-        // These methods are required by global variables for their initialization function.
-        void expand();
-        void determineFlow();
-        void validateFlow(ValidationLogger& validation_logger) const;
-        void resolve();
-        void postResolve();
-        void createNativeBacking(CompileContext& context);
-        void build(CompileContext& context);
 
       private:
         lang::Identifier                          name_;

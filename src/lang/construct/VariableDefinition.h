@@ -60,23 +60,8 @@ namespace lang
          */
         [[nodiscard]] bool isFinal() const;
 
-        virtual void expand();
-        void         setType(lang::ResolvingHandle<lang::Type> type);
-        virtual void determineFlow();
-        virtual void validateFlow(ValidationLogger& validation_logger) const;
-        virtual void resolve();
-        virtual void postResolve();
-        virtual void createNativeBacking(CompileContext& context);
-        virtual void build(CompileContext& context);
-
         [[nodiscard]] virtual std::vector<lang::ResolvingHandle<lang::Variable>> getVariableDependencies();
         [[nodiscard]] virtual std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies();
-
-        /**
-         * Validate this variable declaration.
-         * @param validation_logger The logger to use for validation.
-         */
-        virtual void validate(ValidationLogger& validation_logger) const = 0;
 
         virtual void buildDeclaration(CompileContext& context)  = 0;
         virtual void buildDefinition(CompileContext& context)   = 0;

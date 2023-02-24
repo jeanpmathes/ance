@@ -87,17 +87,19 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 
     {// Global Constants
         auto declare_constant = [this](std::string const& name, std::string const& value) {
-            unit_.globalScope().defineGlobalVariable(
-                lang::AccessModifier::PRIVATE_ACCESS,
-                true,
+            Owned<lang::VariableDescription> description = makeOwned<lang::VariableDescription>(
                 lang::Identifier::like(name),
                 lang::FixedWidthIntegerType::get(32, false),
                 lang::Location::global(),
-                lang::Assigner::FINAL_COPY_ASSIGNMENT,
+                lang::AccessModifier::PRIVATE_ACCESS,
                 makeOptional<Owned<Expression>>(makeOwned<ConstantLiteral>(
                     makeShared<lang::IntegerConstant>(value, 10, lang::FixedWidthIntegerType::get(32, false)),
                     lang::Location::global())),
+                lang::Assigner::FINAL_COPY_ASSIGNMENT,
+                true,
                 lang::Location::global());
+
+            unit_.globalScope().addDescription(std::move(description));
         };
 
         declare_constant("Executable", "1");
@@ -202,26 +204,25 @@ std::any SourceVisitor::visitVariableDescription(anceParser::VariableDescription
 
     lang::Identifier const identifier = ident(ctx->IDENTIFIER());
 
-    Expression*    initial_value;
-    lang::Assigner assigner = lang::Assigner::UNSPECIFIED;
+    Expression*    initial_value = nullptr;
+    lang::Assigner assigner      = lang::Assigner::UNSPECIFIED;
 
     if (ctx->expression())
     {
         assigner      = std::any_cast<lang::Assigner>(visit(ctx->assigner()));
         initial_value = std::any_cast<Expression*>(visit(ctx->expression()));
     }
-    else { initial_value = nullptr; }
 
-    unit_.globalScope().defineGlobalVariable(access,
-                                             is_constant,
-                                             identifier,
-                                             type,
-                                             type_location,
-                                             assigner,
-                                             wrap(initial_value),
-                                             location(ctx));
+    return static_cast<lang::Description*>(new lang::VariableDescription(identifier,
+                                                                         type,
+                                                                         type_location,
+                                                                         access,
+                                                                         wrap(initial_value),
 
-    return {};
+                                                                         assigner,
+                                                                         is_constant,
+
+                                                                         location(ctx)));
 }
 
 std::any SourceVisitor::visitStructDescription(anceParser::StructDescriptionContext* ctx)

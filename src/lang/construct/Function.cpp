@@ -79,7 +79,6 @@ lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHand
 
 void lang::Function::defineAsInit(Statement& code, lang::Scope& containing_scope)
 {
-
     definition_ = makeOwned<lang::InitializerFunction>(*this, code, containing_scope);
     addChild(*definition_.value());
 }
@@ -163,11 +162,6 @@ bool lang::Function::isImported() const
 {
     assert(isDefined());
     return definition_.value()->isImported();
-}
-
-void lang::Function::validate(ValidationLogger& validation_logger) const
-{
-    definition_.value()->validate(validation_logger);
 }
 
 void lang::Function::determineFlow()

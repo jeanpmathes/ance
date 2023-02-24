@@ -53,7 +53,7 @@ namespace lang
          * Get the global scope.
          * @return The global scope.
          */
-        virtual lang::GlobalScope const* getGlobalScope() const = 0;
+        [[nodiscard]] virtual lang::GlobalScope const* getGlobalScope() const = 0;
 
         /**
          * Get this scope as a local scope, if it is one.
@@ -140,12 +140,6 @@ namespace lang
          * @return True if a definition was found.
          */
         virtual bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) = 0;
-
-        /**
-         * Validate this scope.
-         * @param validation_logger A logger to log validation messages to.
-         */
-        virtual void validate(ValidationLogger& validation_logger) const = 0;
 
         /**
          * Build the finalization for all entities in this scope.

@@ -34,10 +34,10 @@ namespace lang
 
         lang::Scope* scope() override;
 
-        lang::GlobalScope*       getGlobalScope() override;
-        lang::GlobalScope const* getGlobalScope() const override;
-        lang::LocalScope*        asLocalScope() override;
-        llvm::DIScope*     getDebugScope(CompileContext& context) const override;
+        lang::GlobalScope*                     getGlobalScope() override;
+        [[nodiscard]] lang::GlobalScope const* getGlobalScope() const override;
+        lang::LocalScope*                      asLocalScope() override;
+        llvm::DIScope*                         getDebugScope(CompileContext& context) const override;
 
         [[nodiscard]] lang::Scope* scope() const;
 
@@ -98,8 +98,6 @@ namespace lang
         void onSubScope(lang::LocalScope* sub_scope) override;
 
       public:
-        void validate(ValidationLogger& validation_logger) const override;
-
         /**
          * Build all variable declarations.
          * @param context The current compile context.

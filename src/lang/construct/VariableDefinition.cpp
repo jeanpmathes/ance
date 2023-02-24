@@ -54,19 +54,6 @@ bool lang::VariableDefinition::isFinal() const
     return is_final_;
 }
 
-void lang::VariableDefinition::expand() {}
-void lang::VariableDefinition::setType(lang::ResolvingHandle<lang::Type> type)
-{
-    type_ = type;
-    scope_.addType(type);
-}
-void lang::VariableDefinition::determineFlow() {}
-void lang::VariableDefinition::validateFlow(ValidationLogger&) const {}
-void lang::VariableDefinition::resolve() {}
-void lang::VariableDefinition::postResolve() {}
-void lang::VariableDefinition::createNativeBacking(CompileContext&) {}
-void lang::VariableDefinition::build(CompileContext&) {}
-
 std::vector<lang::ResolvingHandle<lang::Variable>> lang::VariableDefinition::getVariableDependencies()
 {
     return {};

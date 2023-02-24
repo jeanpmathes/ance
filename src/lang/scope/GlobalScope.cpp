@@ -5,7 +5,6 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/Assigner.h"
 #include "lang/construct/GlobalVariable.h"
-#include "lang/expression/ConstantExpression.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/StructType.h"
 #include "lang/type/TypeAlias.h"
@@ -52,8 +51,12 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 
     if (!valid) return;
 
+    for (auto& [name, descriptions] : compatible_descriptions_)
+    {
+        for (auto& description : descriptions) { description->validate(validation_logger); }
+    }
+
     for (auto& [key, function] : defined_function_groups_) { function->validate(validation_logger); }
-    for (auto& [name, variable] : global_defined_variables_) { variable->validate(validation_logger); }
 
     std::vector<lang::ResolvingHandle<lang::Variable>> global_variables;
     for (auto& [name, variable] : const_cast<GlobalScope*>(this)->global_defined_variables_)
@@ -61,7 +64,7 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
         global_variables.emplace_back(variable.handle());
     }
 
-    global_variables_ = lang::GlobalVariable::determineOrder(global_variables, validation_logger);
+    lang::GlobalVariable::determineOrder(global_variables, &validation_logger);
 }
 
 void lang::GlobalScope::expand()
@@ -70,6 +73,10 @@ void lang::GlobalScope::expand()
     auto undefined_function_groups = std::move(undefined_function_groups_);
     auto defined_function_groups   = std::move(defined_function_groups_);
     auto invalid_functions         = std::move(invalid_functions_);
+
+    auto undefined_variables = std::move(global_defined_variables_);
+    auto defined_variables   = std::move(global_defined_variables_);
+    auto invalid_variables   = std::move(invalid_variables_);
 
     clearChildren();
 
@@ -96,21 +103,17 @@ void lang::GlobalScope::expand()
 
     for (auto& [name, type] : defined_types_) { type->expand(); }
 
-    for (auto& [name, variable] : global_defined_variables_) { variable->expand(); }
-
     expanded_ = true;
 }
 
 void lang::GlobalScope::determineFlow()
 {
     for (auto& [key, function] : defined_function_groups_) { function->determineFlow(); }
-    for (auto& [name, variable] : global_defined_variables_) { variable->determineFlow(); }
 }
 
 void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger) const
 {
     for (auto& [key, function] : defined_function_groups_) { function->validateFlow(validation_logger); }
-    for (auto& [name, variable] : global_defined_variables_) { variable->validateFlow(validation_logger); }
 }
 
 bool lang::GlobalScope::validateRuntimeDependency(lang::Location location, ValidationLogger& validation_logger) const
@@ -120,42 +123,6 @@ bool lang::GlobalScope::validateRuntimeDependency(lang::Location location, Valid
     validation_logger.logError("Not allowed in runtime-excluded project", location);
 
     return false;
-}
-
-void lang::GlobalScope::defineGlobalVariable(lang::AccessModifier                        access,
-                                             bool                                        is_constant,
-                                             lang::Identifier                            name,
-                                             Optional<lang::ResolvingHandle<lang::Type>> type,
-                                             lang::Location                              type_location,
-                                             lang::Assigner                              assigner,
-                                             Optional<Owned<Expression>>                 initializer,
-                                             lang::Location                              location)
-{
-    if (defined_names_.contains(name))
-    {
-        duplicated_names_.emplace_back(name);
-        return;
-    }
-
-    defined_names_.emplace(name);
-
-    bool const is_final = assigner.isFinal();
-
-    Optional<lang::OwningHandle<lang::Variable>> undefined;
-
-    if (global_undefined_variables_.contains(name))
-    {
-        undefined = std::move(global_undefined_variables_.at(name));
-        global_undefined_variables_.erase(name);
-    }
-    else { undefined = lang::OwningHandle<lang::Variable>::takeOwnership(lang::makeHandled<lang::Variable>(name)); }
-
-    undefined.value()
-        ->defineAsGlobal(type, type_location, *this, access, std::move(initializer), is_final, is_constant, location);
-    lang::OwningHandle<lang::Variable> defined = std::move(undefined.value());
-
-    addChild(*defined);
-    global_defined_variables_.emplace(name, std::move(defined));
 }
 
 void lang::GlobalScope::defineTypeAliasOther(Identifier                        name,
@@ -256,6 +223,29 @@ void lang::GlobalScope::addFunction(lang::OwningHandle<lang::Function> function)
 
         lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(function->name());
         group->addFunction(std::move(function));
+    }
+}
+
+void lang::GlobalScope::addVariable(lang::OwningHandle<lang::Variable> variable)
+{
+    if (!expanded_ && defined_names_.contains(variable->name())
+        && !global_undefined_variables_.contains(variable->name()))
+    {
+        duplicated_names_.emplace_back(variable->name());
+        invalid_variables_.push_back(std::move(variable));
+    }
+    else
+    {
+        defined_names_.emplace(variable->name());
+
+        if (global_undefined_variables_.contains(variable->name()))
+        {
+            global_undefined_variables_.at(variable->name()).handle().reroute(variable.handle());
+            global_undefined_variables_.erase(variable->name());
+        }
+
+        addChild(*variable);
+        global_defined_variables_.emplace(variable->name(), std::move(variable));
     }
 }
 
@@ -360,7 +350,12 @@ void lang::GlobalScope::resolve()
     }
 
     for (auto& [key, group] : defined_function_groups_) { group->resolve(); }
-    for (auto& [key, variable] : global_defined_variables_) { variable->resolve(); }
+
+    for (auto& [name, descriptions] : compatible_descriptions_)
+    {
+        for (auto& description : descriptions) { description->resolve(); }
+    }
+
     for (auto& [key, type] : defined_types_) { type->setContainingScope(this); }
 
     // Type registries are currently incorrect, as they resolve type dependencies in an incorrect scope.
@@ -381,7 +376,11 @@ void lang::GlobalScope::postResolve()
 
     for (auto& registry : type_registries_) { registry->postResolve(); }
     for (auto& [key, group] : defined_function_groups_) { group->postResolve(); }
-    for (auto& [key, variable] : global_defined_variables_) { variable->postResolve(); }
+
+    for (auto& [name, descriptions] : compatible_descriptions_)
+    {
+        for (auto& description : descriptions) { description->postResolve(); }
+    }
 }
 
 bool lang::GlobalScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
@@ -462,7 +461,6 @@ std::vector<std::string> lang::GlobalScope::getExportFunctions() const
 void lang::GlobalScope::createNativeBacking(CompileContext& context)
 {
     for (auto& [key, val] : defined_function_groups_) { val->createNativeBacking(context); }
-    for (auto& [key, val] : global_defined_variables_) { val->createNativeBacking(context); }
 
     for (auto& [name, variable] : global_defined_variables_) { variable->buildDeclaration(context); }
 
@@ -476,12 +474,16 @@ void lang::GlobalScope::createNativeBacking(CompileContext& context)
 void lang::GlobalScope::buildFunctions(CompileContext& context)
 {
     for (auto& [key, group] : defined_function_groups_) { group->build(context); }
-    for (auto& [key, variable] : global_defined_variables_) { variable->build(context); }
 }
 
 void lang::GlobalScope::buildInitialization(CompileContext& context)
 {
-    for (auto& variable : global_variables_) { variable->buildDefinition(context); }
+    std::vector<lang::ResolvingHandle<lang::Variable>> global_variables;
+    for (auto& [name, variable] : global_defined_variables_) { global_variables.emplace_back(variable.handle()); }
+
+    global_variables = GlobalVariable::determineOrder(global_variables, nullptr);
+
+    for (auto& variable : global_variables) { variable->buildDefinition(context); }
 }
 
 void lang::GlobalScope::buildFinalization(CompileContext& context)

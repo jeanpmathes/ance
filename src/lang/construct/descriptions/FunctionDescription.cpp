@@ -80,6 +80,12 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
             validation_logger.logError("Parameter cannot have 'void' type", parameter->location());
         }
     }
+
+    if (code_.hasValue()) { (**code_).validate(validation_logger); }
+    else if (access_ != lang::AccessModifier::EXTERN_ACCESS)
+    {
+        validation_logger.logError("Functions without a body must be declared as 'extern'", declaration_location_);
+    }
 }
 
 lang::Description::Descriptions lang::FunctionDescription::expand() const

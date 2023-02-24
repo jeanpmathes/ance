@@ -55,7 +55,7 @@ namespace lang
         lang::GlobalScope const* getGlobalScope() const override;
         llvm::DIScope*           getDebugScope(CompileContext& context) const override;
 
-        void validate(ValidationLogger& validation_logger) const override;
+        void validate(ValidationLogger& validation_logger) const;
 
         void expand();
         void determineFlow();
@@ -69,25 +69,6 @@ namespace lang
          * @return True if the runtime is available.
          */
         bool validateRuntimeDependency(lang::Location location, ValidationLogger& validation_logger) const;
-
-        /**
-         * Define a global variable.
-         * @param access The access level.
-         * @param is_constant Whether the variable is a constant.
-         * @param name The name of the variable.
-         * @param type The type of the variable.
-         * @param assigner The assigner to use for the initial assignment.
-         * @param initializer The initializer.
-         * @param location The source location.
-         */
-        void defineGlobalVariable(lang::AccessModifier                        access,
-                                  bool                                        is_constant,
-                                  lang::Identifier                            name,
-                                  Optional<lang::ResolvingHandle<lang::Type>> type,
-                                  lang::Location                              type_location,
-                                  lang::Assigner                              assigner,
-                                  Optional<Owned<Expression>>                 initializer,
-                                  lang::Location                              location);
 
         /**
          * Define a type that is an alias for another type.
@@ -122,6 +103,12 @@ namespace lang
          * @param function The function to add.
          */
         void addFunction(lang::OwningHandle<lang::Function> function);
+
+        /**
+         * Add a variable to this scope.
+         * @param variable The variable to add.
+         */
+        void addVariable(lang::OwningHandle<lang::Variable> variable);
 
         /**
          * Get a type defined in this scope by it's name.
@@ -202,20 +189,19 @@ namespace lang
 
         std::vector<lang::TypeDefinitionRegistry*> type_registries_;
 
-        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
-        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_defined_variables_;
-
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> defined_function_groups_;
         std::vector<lang::OwningHandle<lang::Function>>                     invalid_functions_;
+
+        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
+        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_defined_variables_;
+        std::vector<lang::OwningHandle<lang::Variable>>                invalid_variables_;
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> defined_types_;
 
         std::set<lang::Identifier>    defined_names_;
         std::vector<lang::Identifier> duplicated_names_;
-
-        mutable std::vector<lang::ResolvingHandle<lang::Variable>> global_variables_;
 
         bool expanded_ = false;
     };

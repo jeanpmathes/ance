@@ -12,9 +12,9 @@ using namespace util;
 
 CodePrinter::CodePrinter(std::ostream& out) : out_(out) {}
 
-std::any CodePrinter::visit(lang::GlobalVariable const& variable)
+std::any CodePrinter::visit(lang::GlobalVariable const&)
 {
-    indent();
+    indent(); /*
 
     out_ << variable.access().toString() << " ";
     if (variable.isConstant())
@@ -29,7 +29,7 @@ std::any CodePrinter::visit(lang::GlobalVariable const& variable)
         visitTree(*variable.init());
     }
 
-    out_ << ";" << std::endl;
+    out_ << ";" << std::endl; */
 
     return {};
 }

@@ -36,8 +36,6 @@ namespace lang
                       unsigned                              parameter_no,
                       lang::Location                        location);
 
-        void validate(ValidationLogger& validation_logger) const override;
-
         void buildDeclaration(CompileContext& context) override;
         void buildDefinition(CompileContext& context) override;
         void buildFinalization(CompileContext& context) override;

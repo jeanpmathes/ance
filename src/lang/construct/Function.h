@@ -190,8 +190,6 @@ namespace lang
          */
         [[nodiscard]] bool isImported() const;
 
-        void validate(ValidationLogger& validation_logger) const override;
-
         /**
          * Determine the control flow in this function and build the CFG.
          * This step is necessary to build.
@@ -245,10 +243,10 @@ namespace lang
         Optional<Shared<lang::Value>> buildCall(std::vector<Shared<lang::Value>> const& arguments,
                                                 CompileContext&                         context);
 
-        lang::Scope*       scope() override;
-        lang::GlobalScope*       getGlobalScope() override;
-        lang::GlobalScope const* getGlobalScope() const override;
-        llvm::DIScope*           getDebugScope(CompileContext& context) const override;
+        lang::Scope*                           scope() override;
+        lang::GlobalScope*                     getGlobalScope() override;
+        [[nodiscard]] lang::GlobalScope const* getGlobalScope() const override;
+        llvm::DIScope*                         getDebugScope(CompileContext& context) const override;
 
         /**
          * Get the scope inside of this function, if there is any.
