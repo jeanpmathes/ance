@@ -19,6 +19,9 @@ class ConstantExpression;
 
 namespace lang
 {
+    /**
+     * A description of a (global) variable.
+     */
     class VariableDescription
         : public virtual Description
         , public Element<VariableDescription, ANCE_CONSTRUCTS>

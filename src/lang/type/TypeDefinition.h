@@ -137,7 +137,6 @@ namespace lang
         virtual bool                              definesIndirection() const;
         virtual lang::ResolvingHandle<lang::Type> getIndirectionType();
 
-        virtual bool validateDefinition(ValidationLogger& validation_logger) const;
         virtual bool validate(ValidationLogger& validation_logger, lang::Location location) const;
         virtual bool validateSubscript(lang::Location    indexed_location,
                                        lang::Type const& index_type,
@@ -266,8 +265,6 @@ namespace lang
         virtual void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
                                             lang::PredefinedFunction&                      function,
                                             CompileContext&                                context);
-
-        virtual void expand();
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self() const;
 

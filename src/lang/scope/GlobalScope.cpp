@@ -39,17 +39,10 @@ llvm::DIScope* lang::GlobalScope::getDebugScope(CompileContext& context) const
 
 void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 {
-    // Validate types before everything else as they are used and checked by everything.
-    bool valid = true;
-
-    for (auto& [name, type] : defined_types_) { valid &= type->validateDefinition(validation_logger); }
-
     for (auto const& name : duplicated_names_)
     {
         validation_logger.logError("Name '" + name + "' already defined in the current context", name.location());
     }
-
-    if (!valid) return;
 
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
@@ -78,6 +71,20 @@ void lang::GlobalScope::expand()
     auto defined_variables   = std::move(global_defined_variables_);
     auto invalid_variables   = std::move(invalid_variables_);
 
+    auto undefined_types = std::move(undefined_types_);
+    auto defined_types   = std::move(defined_types_);
+    auto invalid_types   = std::move(invalid_types_);
+
+    for (auto& name : registered_types_)
+    {
+        auto it = defined_types.find(name);
+        assert(it != defined_types.end());
+
+        auto& [_, type] = *it;
+        defined_types_.emplace(name, std::move(type));
+        defined_types.erase(it);
+    }
+
     clearChildren();
 
     // this is actually required:
@@ -101,8 +108,6 @@ void lang::GlobalScope::expand()
 
     compatible_descriptions_ = std::move(expanded_descriptions);
 
-    for (auto& [name, type] : defined_types_) { type->expand(); }
-
     expanded_ = true;
 }
 
@@ -123,52 +128,6 @@ bool lang::GlobalScope::validateRuntimeDependency(lang::Location location, Valid
     validation_logger.logError("Not allowed in runtime-excluded project", location);
 
     return false;
-}
-
-void lang::GlobalScope::defineTypeAliasOther(Identifier                        name,
-                                             lang::ResolvingHandle<lang::Type> actual,
-                                             lang::Location                    definition_location,
-                                             lang::Location                    actual_type_location)
-{
-    if (defined_names_.contains(name))
-    {
-        duplicated_names_.emplace_back(name);
-        return;
-    }
-
-    defined_names_.emplace(name);
-
-    lang::OwningHandle<lang::Type> undefined = retrieveUndefinedType(name);
-    Owned<lang::TypeDefinition>    alias_definition =
-        makeOwned<lang::TypeAlias>(name, actual, definition_location, actual_type_location);
-
-    undefined->define(std::move(alias_definition));
-    lang::OwningHandle<lang::Type> defined = std::move(undefined);
-
-    defined_types_.emplace(name, std::move(defined));
-}
-
-void lang::GlobalScope::defineStruct(lang::AccessModifier             access,
-                                     lang::Identifier                 name,
-                                     std::vector<Owned<lang::Member>> members,
-                                     lang::Location                   definition_location)
-{
-    if (defined_names_.contains(name))
-    {
-        duplicated_names_.emplace_back(name);
-        return;
-    }
-
-    defined_names_.emplace(name);
-
-    lang::OwningHandle<lang::Type> undefined = retrieveUndefinedType(name);
-    Owned<lang::TypeDefinition>    struct_definition =
-        makeOwned<lang::StructType>(access, name, std::move(members), definition_location);
-
-    undefined->define(std::move(struct_definition));
-    lang::OwningHandle<lang::Type> defined = std::move(undefined);
-
-    defined_types_.emplace(name, std::move(defined));
 }
 
 void lang::GlobalScope::addDescription(Owned<lang::Description> description)
@@ -246,6 +205,28 @@ void lang::GlobalScope::addVariable(lang::OwningHandle<lang::Variable> variable)
 
         addChild(*variable);
         global_defined_variables_.emplace(variable->name(), std::move(variable));
+    }
+}
+
+void lang::GlobalScope::addType(lang::OwningHandle<lang::Type> type)
+{
+    if (!expanded_ && defined_names_.contains(type->name()) && !undefined_types_.contains(type->name()))
+    {
+        duplicated_names_.emplace_back(type->name());
+        invalid_types_.push_back(std::move(type));
+    }
+    else
+    {
+        defined_names_.emplace(type->name());
+
+        if (undefined_types_.contains(type->name()))
+        {
+            undefined_types_.at(type->name()).handle().reroute(type.handle());
+            undefined_types_.erase(type->name());
+        }
+
+        type->setContainingScope(this);
+        defined_types_.emplace(type->name(), std::move(type));
     }
 }
 
@@ -333,6 +314,8 @@ void lang::GlobalScope::registerDefinition(lang::ResolvingHandle<lang::Type> typ
     defined_types_.emplace(type->name(), lang::OwningHandle<lang::Type>::takeOwnership(type));
     type->setContainingScope(this);
 
+    registered_types_.emplace(type->name());
+
     if (undefined_types_.contains(type->name()))
     {
         lang::OwningHandle<lang::Type> undefined = std::move(undefined_types_.at(type->name()));
@@ -356,8 +339,6 @@ void lang::GlobalScope::resolve()
         for (auto& description : descriptions) { description->resolve(); }
     }
 
-    for (auto& [key, type] : defined_types_) { type->setContainingScope(this); }
-
     // Type registries are currently incorrect, as they resolve type dependencies in an incorrect scope.
 
     for (auto& registry : type_registries_)
@@ -369,10 +350,7 @@ void lang::GlobalScope::resolve()
 
 void lang::GlobalScope::postResolve()
 {
-    if (!expanded_)
-    {// Ugly, not necessary with full expansion.
-        for (auto& [name, type] : defined_types_) { type->postResolve(); }
-    }
+    for (auto& [name, type] : defined_types_) { type->postResolve(); }
 
     for (auto& registry : type_registries_) { registry->postResolve(); }
     for (auto& [key, group] : defined_function_groups_) { group->postResolve(); }
@@ -515,18 +493,4 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunc
     defined_function_groups_.emplace(name, std::move(undefined.value()));
 
     return defined;
-}
-
-lang::OwningHandle<lang::Type> lang::GlobalScope::retrieveUndefinedType(Identifier name)
-{
-    Optional<lang::OwningHandle<lang::Type>> undefined;
-
-    if (undefined_types_.find(name) != undefined_types_.end())
-    {
-        undefined = std::move(undefined_types_.at(name));
-        undefined_types_.erase(name);
-    }
-    else { undefined = lang::OwningHandle<lang::Type>::takeOwnership(lang::makeHandled<lang::Type>(name)); }
-
-    return std::move(undefined.value());
 }

@@ -71,28 +71,6 @@ namespace lang
         bool validateRuntimeDependency(lang::Location location, ValidationLogger& validation_logger) const;
 
         /**
-         * Define a type that is an alias for another type.
-         * @param name The name of the alias.
-         * @param actual The other type.
-         */
-        void defineTypeAliasOther(Identifier                        name,
-                                  lang::ResolvingHandle<lang::Type> actual,
-                                  lang::Location                    definition_location,
-                                  lang::Location                    actual_type_location);
-
-        /**
-         * Define a struct.
-         * @param access The access level.
-         * @param name The name of the struct.
-         * @param members The members of the struct.
-         * @param definition_location The location of the struct definition.
-         */
-        void defineStruct(lang::AccessModifier             access,
-                          Identifier                       name,
-                          std::vector<Owned<lang::Member>> members,
-                          lang::Location                   definition_location);
-
-        /**
          * Add an description element to this scope.
          * @param description The description to add.
          */
@@ -109,6 +87,12 @@ namespace lang
          * @param variable The variable to add.
          */
         void addVariable(lang::OwningHandle<lang::Variable> variable);
+
+        /**
+         * Add a type to this scope.
+         * @param type The type to add.
+         */
+        void addType(lang::OwningHandle<lang::Type> type);
 
         /**
          * Get a type defined in this scope by it's name.
@@ -181,7 +165,6 @@ namespace lang
 
       private:
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);
-        lang::OwningHandle<lang::Type>             retrieveUndefinedType(Identifier name);
 
         std::map<lang::Identifier, std::vector<Owned<lang::Description>>> compatible_descriptions_;
         std::set<lang::Identifier>                                        conflicting_description_names_;
@@ -199,6 +182,8 @@ namespace lang
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> defined_types_;
+        std::vector<lang::OwningHandle<lang::Type>>                invalid_types_;
+        std::set<lang::Identifier>                                 registered_types_;
 
         std::set<lang::Identifier>    defined_names_;
         std::vector<lang::Identifier> duplicated_names_;

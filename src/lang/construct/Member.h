@@ -69,7 +69,7 @@ namespace lang
          */
         void buildInitialization(llvm::Value* ptr, CompileContext& context);
 
-        void expand();
+        Owned<Member> expand() const;
 
       private:
         llvm::Constant* getInitialValue(llvm::Module& m) const;

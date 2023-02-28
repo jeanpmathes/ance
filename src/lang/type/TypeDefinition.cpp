@@ -359,11 +359,6 @@ lang::ResolvingHandle<lang::Type> lang::TypeDefinition::getIndirectionType()
     return lang::Type::getUndefined();
 }
 
-bool lang::TypeDefinition::validateDefinition(ValidationLogger&) const
-{
-    return true;
-}
-
 bool lang::TypeDefinition::validate(ValidationLogger&, lang::Location) const
 {
     return true;
@@ -841,5 +836,3 @@ void lang::TypeDefinition::buildPointerIteration(llvm::Function*                
         context.ir().CreateRetVoid();
     }
 }
-
-void lang::TypeDefinition::expand() {}

@@ -193,35 +193,9 @@ llvm::Type* lang::TypeAlias::getContentType(llvm::LLVMContext& c) const
     return actual_->getContentType(c);
 }
 
-bool lang::TypeAlias::validateDefinition(ValidationLogger& validation_logger) const
+bool lang::TypeAlias::validate(ValidationLogger&, lang::Location) const
 {
-    if (is_valid_.hasValue()) return is_valid_.value();
-
-    bool valid = true;
-
-    if (actual_->getDefinition() == this)
-    {
-        validation_logger.logError("Cannot alias self", actual_type_location_);
-        valid = false;
-    }
-
-    if (lang::validation::isTypeUndefined(actual_, actual_type_location_, validation_logger)) { valid = false; }
-
-    if (actual_ == lang::VoidType::get())// Prevent infinite recursion.
-    {
-        validation_logger.logError("Cannot create alias for 'void' type", getDefinitionLocation());
-        valid = false;
-    }
-
-    valid = valid && checkDependencies(validation_logger);
-
-    is_valid_ = valid && actual_->validate(validation_logger, actual_type_location_);
-    return is_valid_.value();
-}
-
-bool lang::TypeAlias::validate(ValidationLogger& validation_logger, lang::Location) const
-{
-    return validateDefinition(validation_logger);
+    return true;
 }
 
 bool lang::TypeAlias::isSubscriptDefined() const
@@ -395,9 +369,4 @@ std::vector<std::reference_wrapper<const lang::Type>> lang::TypeAlias::getContai
     std::vector<std::reference_wrapper<const lang::Type>> contained;
     contained.emplace_back(actual_);
     return contained;
-}
-
-void lang::TypeAlias::expand()
-{
-    actual_ = actual_->createUndefinedClone();
 }

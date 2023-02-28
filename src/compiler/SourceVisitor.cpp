@@ -133,10 +133,13 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
         push_member(lang::Identifier::like("is_extra_emission_enabled"), lang::BooleanType::get());
         push_member(lang::Identifier::like("is_runtime_excluded"), lang::BooleanType::get());
 
-        unit_.globalScope().defineStruct(lang::AccessModifier::PUBLIC_ACCESS,
-                                         lang::Identifier::like("Project"),
-                                         std::move(members),
-                                         lang::Location::global());
+        Owned<lang::StructDescription> description =
+            makeOwned<lang::StructDescription>(lang::AccessModifier::PUBLIC_ACCESS,
+                                               lang::Identifier::like("Project"),
+                                               std::move(members),
+                                               lang::Location::global());
+
+        unit_.globalScope().addDescription(std::move(description));
     }
 
     {// Exit Function
@@ -177,12 +180,8 @@ std::any SourceVisitor::visitGlobal(anceParser::GlobalContext* ctx)
 {
     for (auto description_context : ctx->description())
     {
-        std::any potential_description = visit(description_context);
-        if (potential_description.has_value() && std::any_cast<lang::Description*>(&potential_description))
-        {
-            lang::Description& description = *std::any_cast<lang::Description*>(potential_description);
-            unit_.globalScope().addDescription(Owned<lang::Description>(description));
-        }
+        lang::Description& description = *std::any_cast<lang::Description*>(visit(description_context));
+        unit_.globalScope().addDescription(Owned<lang::Description>(description));
     }
 
     return {};
@@ -234,9 +233,8 @@ std::any SourceVisitor::visitStructDescription(anceParser::StructDescriptionCont
 
     for (auto member : ctx->member()) { members.emplace_back(*std::any_cast<lang::Member*>(visit(member))); }
 
-    unit_.globalScope().defineStruct(access, identifier, std::move(members), location(ctx));
-
-    return {};
+    return static_cast<lang::Description*>(
+        new lang::StructDescription(access, identifier, std::move(members), location(ctx)));
 }
 
 std::any SourceVisitor::visitMember(anceParser::MemberContext* ctx)
@@ -324,12 +322,12 @@ std::any SourceVisitor::visitParameter(anceParser::ParameterContext* ctx)
 
 std::any SourceVisitor::visitAliasDescription(anceParser::AliasDescriptionContext* ctx)
 {
+    auto                   access     = std::any_cast<lang::AccessModifier>(visit(ctx->accessModifier()));
     auto                   other      = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
     lang::Identifier const identifier = ident(ctx->IDENTIFIER());
 
-    unit_.globalScope().defineTypeAliasOther(identifier, other, location(ctx), location(ctx->type()));
-
-    return {};
+    return static_cast<lang::Description*>(
+        new lang::AliasDescription(access, identifier, other, location(ctx), location(ctx->type())));
 }
 
 std::any SourceVisitor::visitBlock(anceParser::BlockContext* ctx)

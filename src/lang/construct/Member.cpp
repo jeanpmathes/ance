@@ -4,6 +4,7 @@
 #include "lang/construct/constant/Constant.h"
 #include "lang/construct/value/Value.h"
 #include "lang/scope/Scope.h"
+#include "lang/statement/Statement.h"
 #include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
@@ -122,7 +123,29 @@ llvm::Constant* lang::Member::getInitialValue(llvm::Module& m) const
     return initial_value_;
 }
 
-void lang::Member::expand()
+Owned<lang::Member> lang::Member::expand() const
 {
-    type_ = type_->createUndefinedClone();
+    lang::ResolvingHandle<lang::Type> type = type_->createUndefinedClone();
+
+    Optional<Owned<ConstantExpression>> expanded_init_expression;
+
+    if (constant_init_.hasValue())
+    {
+        auto [leading_statements, new_expression, following_statements] = constant_init_.value()->expand();
+
+        assert(leading_statements.empty());
+        assert(following_statements.empty());
+
+        Expression* expanded_init_expression_ptr = unwrap(std::move(new_expression));
+        expanded_init_expression =
+            Owned<ConstantExpression>(*dynamic_cast<ConstantExpression*>(expanded_init_expression_ptr));
+    }
+
+    return makeOwned<Member>(access_,
+                             name_,
+                             type,
+                             assigner_,
+                             std::move(expanded_init_expression),
+                             location_,
+                             type_location_);
 }

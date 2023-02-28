@@ -16,6 +16,9 @@ namespace lang
 
 namespace lang
 {
+    /**
+     * A function description.
+     */
     class FunctionDescription
         : public virtual Description
         , public Element<FunctionDescription, ANCE_CONSTRUCTS>

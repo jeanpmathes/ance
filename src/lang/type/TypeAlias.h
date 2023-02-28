@@ -62,7 +62,6 @@ namespace lang
 
         llvm::Type* getContentType(llvm::LLVMContext& c) const override;
 
-        bool validateDefinition(ValidationLogger& validation_logger) const override;
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
         bool                              isSubscriptDefined() const override;
@@ -115,8 +114,6 @@ namespace lang
         void createConstructors() override;
         void buildNativeDeclaration(CompileContext& context) override;
         void buildNativeDefinition(CompileContext& context) override;
-
-        void expand() override;
 
       protected:
         std::string   createMangledName() const override;

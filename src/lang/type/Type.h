@@ -438,13 +438,6 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getIndirectionType();
 
         /**
-         * Validate the definition of this type, if there is any.
-         * @param validation_logger The validation logger to use.
-         * @return True if the type has a valid definition.
-         */
-        bool validateDefinition(ValidationLogger& validation_logger) const;
-
-        /**
          * Validate if this type is well-formed.
          * @param validation_logger The validation logger to use.
          * @param location The source location of the type declaration.
@@ -745,11 +738,6 @@ namespace lang
          * @return True if the types are not equal.
          */
         bool operator!=(lang::Type const& other) const;
-
-        /**
-         * Perform some expansion. Is not necessary with full expansion.
-         */
-        void expand();
 
       private:
         lang::Identifier                      name_;

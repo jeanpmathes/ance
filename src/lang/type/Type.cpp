@@ -394,13 +394,6 @@ lang::ResolvingHandle<lang::Type> lang::Type::getIndirectionType()
     return definition_.value()->getIndirectionType();
 }
 
-bool lang::Type::validateDefinition(ValidationLogger& validation_logger) const
-{
-    assert(definition_.hasValue());
-    if (definition_.value()->isCustom()) return definition_.value()->validateDefinition(validation_logger);
-    else return true;
-}
-
 bool lang::Type::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     assert(definition_.hasValue());
@@ -741,10 +734,4 @@ bool lang::Type::operator==(lang::Type const& other) const
 bool lang::Type::operator!=(lang::Type const& other) const
 {
     return !(*this == other);
-}
-
-void lang::Type::expand()
-{
-    assert(definition_.hasValue());
-    definition_.value()->expand();
 }

@@ -26,7 +26,8 @@ LocalVariableDefinition::LocalVariableDefinition(lang::Identifier               
 {
     if (assigned_.hasValue()) { addSubexpression(*assigned_.value()); }
 
-    if (type_opt_.hasValue()) { type_ = type_opt_.value(); }
+    if (type_opt_.hasValue()) { type_.reroute(type_opt_.value()); }
+    else if (assigned_.hasValue()) { type_.reroute(assigned_.value()->type()); }
 }
 
 lang::Identifier const& LocalVariableDefinition::name() const
@@ -66,8 +67,6 @@ void LocalVariableDefinition::walkDefinitions()
 {
     Statement::walkDefinitions();
 
-    rerouteIfNeeded();
-
     Optional<Shared<lang::Value>> assigned_value;
     if (assigned_.hasValue()) { assigned_value = assigned_.value()->getValue(); }
 
@@ -84,8 +83,6 @@ void LocalVariableDefinition::walkDefinitions()
 void LocalVariableDefinition::postResolve()
 {
     Statement::postResolve();
-
-    rerouteIfNeeded();
 }
 
 void LocalVariableDefinition::validate(ValidationLogger& validation_logger) const
@@ -150,13 +147,4 @@ Statements LocalVariableDefinition::expandWith(Expressions subexpressions, State
 void LocalVariableDefinition::doBuild(CompileContext& context)
 {
     (*variable_)->buildDefinition(context);
-}
-
-void LocalVariableDefinition::rerouteIfNeeded()
-{
-    if (assigned_.hasValue() && not type_opt_.hasValue())
-    {
-        auto assigned_type = assigned_.value()->type();
-        if (assigned_type->isDefined() && assigned_type != type_) { type_.reroute(assigned_type); }
-    }
 }

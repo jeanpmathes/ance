@@ -58,9 +58,6 @@ class LocalVariableDefinition
     void doBuild(CompileContext& context) override;
 
   private:
-    void rerouteIfNeeded();
-
-  private:
     lang::Identifier                                 name_;
     Optional<lang::ResolvingHandle<lang::Type>>      type_opt_;
     lang::ResolvingHandle<lang::Type>                type_;

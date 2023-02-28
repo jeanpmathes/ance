@@ -38,7 +38,9 @@ namespace lang
 #include "lang/construct/LocalVariable.h"
 #include "lang/construct/Variable.h"
 
+#include "lang/construct/descriptions/AliasDescription.h"
 #include "lang/construct/descriptions/FunctionDescription.h"
+#include "lang/construct/descriptions/StructDescription.h"
 #include "lang/construct/descriptions/VariableDescription.h"
 
 #include "lang/expression/Addressof.h"
