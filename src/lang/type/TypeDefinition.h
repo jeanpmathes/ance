@@ -29,6 +29,7 @@ namespace lang
     class VectorType;
     class ArrayType;
     class IntegerType;
+    class Context;
 }
 
 class CompileContext;
@@ -103,12 +104,11 @@ namespace lang
          * Get a non-const handle to this type. This is only possible for non-custom types.
          * @return The handle to this type. The actual type is not cloned.
          */
-        [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> clone() const;
+        [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const;
 
         [[nodiscard]] virtual lang::AccessModifier getAccessModifier() const;
 
         void         setContainingScope(Scope* scope);
-        virtual void onScope();
         Scope*       scope();
         Scope const* scope() const;
 

@@ -33,7 +33,7 @@ lang::ResolvingHandle<lang::Type> lang::PointerType::getActualType()
     {
         lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
         if (actual_element_type == element_type_) { actual_type_ = self(); }
-        else { actual_type_ = lang::PointerType::get(actual_element_type); }
+        else { actual_type_ = scope()->context().getPointerType(actual_element_type); }
     }
 
     return actual_type_.value();
@@ -123,37 +123,6 @@ std::vector<std::reference_wrapper<const lang::Type>> lang::PointerType::getCont
     return {element_type_};
 }
 
-lang::TypeRegistry<>& lang::PointerType::getPointerTypes()
-{
-    static TypeRegistry<> pointer_types;
-    return pointer_types;
-}
-
-lang::TypeDefinitionRegistry* lang::PointerType::getRegistry()
-{
-    return &getPointerTypes();
-}
-
-lang::ResolvingHandle<lang::Type> lang::PointerType::get(lang::ResolvingHandle<lang::Type> element_type)
-{
-    element_type = element_type->getDetachedIfUndefined();
-
-    std::vector<lang::ResolvingHandle<lang::Type>> used_types;
-    used_types.emplace_back(element_type);
-
-    Optional<lang::ResolvingHandle<lang::Type>> defined_type = getPointerTypes().get(used_types, lang::Empty());
-
-    if (defined_type.hasValue()) { return defined_type.value(); }
-    else
-    {
-        auto&                             pointer_type = *(new lang::PointerType(element_type));
-        lang::ResolvingHandle<lang::Type> type = lang::makeHandled<lang::Type>(Owned<lang::PointerType>(pointer_type));
-        getPointerTypes().add(std::move(used_types), lang::Empty(), type);
-
-        return type;
-    }
-}
-
 Optional<lang::ResolvingHandle<lang::Type>> lang::PointerType::getPointeeType()
 {
     return element_type_;
@@ -164,7 +133,7 @@ lang::Type const* lang::PointerType::getPointeeType() const
     return &*element_type_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::PointerType::clone() const
+lang::ResolvingHandle<lang::Type> lang::PointerType::clone(lang::Context& new_context) const
 {
-    return get(const_cast<lang::PointerType*>(this)->element_type_->createUndefinedClone());
+    return new_context.getPointerType(element_type_->createUndefinedClone(new_context));
 }

@@ -3,8 +3,8 @@
 #include <utility>
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
-#include "lang/statement/Statement.h"
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
@@ -105,7 +105,7 @@ void Expression::addSubexpression(Expression& subexpression)
     addChild(subexpression);
 }
 
-std::tuple<Statements, Owned<Expression>, Statements> Expression::expand() const
+Expression::Expansion Expression::expand(lang::Context& new_context) const
 {
     Statements before;
     Statements after;
@@ -115,7 +115,7 @@ std::tuple<Statements, Owned<Expression>, Statements> Expression::expand() const
 
     for (auto& subexpression : subexpressions_)
     {
-        auto [statements_before, expanded_expression, statements_after] = subexpression.get().expand();
+        auto [statements_before, expanded_expression, statements_after] = subexpression.get().expand(new_context);
 
         before.insert(before.end(),
                       std::make_move_iterator(statements_before.begin()),
@@ -127,7 +127,8 @@ std::tuple<Statements, Owned<Expression>, Statements> Expression::expand() const
         subexpressions.push_back(std::move(expanded_expression));
     }
 
-    auto [statements_before, expanded_expression, statements_after] = this->expandWith(std::move(subexpressions));
+    auto [statements_before, expanded_expression, statements_after] =
+        this->expandWith(std::move(subexpressions), new_context);
 
     before.insert(before.end(),
                   std::make_move_iterator(statements_before.begin()),

@@ -13,10 +13,9 @@ namespace lang
      */
     class DoubleType : public FloatingPointType
     {
-      private:
+      public:
         DoubleType();
 
-      public:
         llvm::Constant* getDefaultContent(llvm::Module& m) const override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
@@ -24,13 +23,7 @@ namespace lang
         [[nodiscard]] size_t getPrecision() const override;
 
       public:
-        /**
-         * Get the double type instance.
-         * @return The double type instance.
-         */
-        static lang::ResolvingHandle<lang::Type> get();
-
-        ResolvingHandle<lang::Type> clone() const override;
+        lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }
 #endif

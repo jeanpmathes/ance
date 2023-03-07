@@ -33,7 +33,7 @@ void Return::validate(ValidationLogger& validation_logger) const
     if (return_value_.hasValue()) return_value_.value()->validate(validation_logger);
 }
 
-Statements Return::expandWith(Expressions subexpressions, Statements) const
+Statements Return::expandWith(Expressions subexpressions, Statements, lang::Context&) const
 {
     Statements statements;
 

@@ -1,5 +1,6 @@
 #include "ConstantExpression.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/constant/Constant.h"
 
 Shared<lang::Value> ConstantExpression::getValue()

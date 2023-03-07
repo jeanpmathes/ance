@@ -21,7 +21,9 @@ bool lang::SizeType::isDiffType() const
 
 llvm::Value* lang::SizeType::buildContentValue(llvm::TypeSize size, CompileContext& contex)
 {
-    return llvm::ConstantInt::get(getSize()->getContentType(contex.llvmContext()), size.getFixedSize(), false);
+    return llvm::ConstantInt::get(contex.types().getSizeType()->getContentType(contex.llvmContext()),
+                                  size.getFixedSize(),
+                                  false);
 }
 
 std::string lang::SizeType::createMangledName() const
@@ -38,41 +40,9 @@ void lang::SizeType::init(Unit& app)
     diff_width_ = size_width_ * 2;
 }
 
-lang::ResolvingHandle<lang::Type> lang::SizeType::getSize()
-{
-#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new SizeType("size", SIZE_KIND))))
-
-    static lang::ResolvingHandle<lang::Type> instance = MAKE;
-
-    if (!instance.valid())
-    {
-        instance    = MAKE;
-        size_width_ = 0;
-    }
-
-    return instance;
-#undef MAKE
-}
-
 unsigned int lang::SizeType::getSizeWidth()
 {
     return size_width_;
-}
-
-lang::ResolvingHandle<lang::Type> lang::SizeType::getDiff()
-{
-#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new SizeType("diff", DIFF_KIND))))
-
-    static lang::ResolvingHandle<lang::Type> instance = MAKE;
-
-    if (!instance.valid())
-    {
-        instance    = MAKE;
-        diff_width_ = 0;
-    }
-
-    return instance;
-#undef MAKE
 }
 
 unsigned int lang::SizeType::getDiffWidth()
@@ -117,10 +87,10 @@ std::string lang::SizeType::getSuffix() const
     return "";
 }
 
-lang::ResolvingHandle<lang::Type> lang::SizeType::clone() const
+lang::ResolvingHandle<lang::Type> lang::SizeType::clone(lang::Context& new_context) const
 {
-    if (kind_ == SIZE_KIND) return getSize();
-    if (kind_ == DIFF_KIND) return getDiff();
+    if (kind_ == SIZE_KIND) return new_context.getSizeType();
+    if (kind_ == DIFF_KIND) return new_context.getDiffType();
 
     assert(false);
     throw std::logic_error("Invalid size type kind");

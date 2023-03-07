@@ -1,8 +1,10 @@
 #include "NullConstant.h"
 
+#include "lang/ApplicationVisitor.h"
+#include "lang/Context.h"
 #include "lang/type/NullPointerType.h"
 
-lang::NullConstant::NullConstant() : type_(lang::NullPointerType::get()) {}
+lang::NullConstant::NullConstant(lang::Context& new_context) : type_(new_context.getNullPointerType()) {}
 
 std::string lang::NullConstant::toString() const
 {
@@ -21,7 +23,7 @@ lang::Type const& lang::NullConstant::type() const
 
 llvm::Constant* lang::NullConstant::createContent(llvm::Module& m)
 {
-    return lang::NullPointerType::get()->getDefaultContent(m);
+    return type_->getDefaultContent(m);
 }
 
 bool lang::NullConstant::equals(lang::Constant const* other) const
@@ -30,12 +32,12 @@ bool lang::NullConstant::equals(lang::Constant const* other) const
     return other_null != nullptr;
 }
 
-Shared<lang::Constant> lang::NullConstant::clone() const
+Shared<lang::Constant> lang::NullConstant::clone(lang::Context& new_context) const
 {
-    return create();
+    return create(new_context);
 }
 
-Shared<lang::NullConstant> lang::NullConstant::create()
+Shared<lang::NullConstant> lang::NullConstant::create(lang::Context& new_context)
 {
-    return makeShared<lang::NullConstant>();
+    return makeShared<lang::NullConstant>(new_context);
 }

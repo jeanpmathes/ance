@@ -10,10 +10,9 @@ namespace lang
      */
     class VoidType : public lang::TypeDefinition
     {
-      private:
+      public:
         VoidType();
 
-      public:
         [[nodiscard]] StateCount getStateCount() const override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) const override;
@@ -34,13 +33,7 @@ namespace lang
         llvm::DIType* createDebugType(CompileContext& context) const override;
 
       public:
-        /**
-         * Get the void type instance.
-         * @return The instance.
-         */
-        static lang::ResolvingHandle<lang::Type> get();
-
-        ResolvingHandle<lang::Type> clone() const override;
+        lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }
 #endif

@@ -28,7 +28,7 @@ class Parenthesis
                             lang::Location     value_location,
                             ValidationLogger&  validation_logger) const override;
 
-    [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
+    [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;
 
     Shared<lang::Value>              getValue() override;
     [[nodiscard]] lang::Value const& getValue() const override;

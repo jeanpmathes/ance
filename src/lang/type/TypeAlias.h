@@ -17,10 +17,7 @@ namespace lang
     class TypeAlias : public lang::TypeDefinition
     {
       public:
-        TypeAlias(lang::Identifier                  name,
-                  lang::ResolvingHandle<lang::Type> actual,
-                  lang::Location                    definition_location,
-                  lang::Location                    actual_type_location);
+        TypeAlias(lang::Identifier name, lang::ResolvingHandle<lang::Type> actual, lang::Location definition_location);
 
         StateCount         getStateCount() const override;
         [[nodiscard]] bool isCustom() const override;
@@ -55,8 +52,6 @@ namespace lang
 
         lang::ResolvingHandle<lang::Type> getActualType() override;
         [[nodiscard]] lang::Type const&   getActualType() const override;
-
-        void onScope() override;
 
         llvm::Constant* getDefaultContent(llvm::Module& m) const override;
 
@@ -125,7 +120,6 @@ namespace lang
 
       private:
         lang::ResolvingHandle<lang::Type> actual_;
-        lang::Location                    actual_type_location_;
 
         mutable Optional<lang::ResolvingHandle<lang::Type>> actually_actual_ {};
         mutable Optional<bool>                              is_valid_ {};

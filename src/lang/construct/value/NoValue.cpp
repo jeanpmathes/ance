@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "lang/ApplicationVisitor.h"
+
 lang::NoValue::NoValue(Passed<UnexpandedExpression> unexpanded_expression)
     : unexpanded_expression_(std::move(unexpanded_expression))
 {}

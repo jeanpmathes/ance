@@ -1,6 +1,7 @@
 #include "Member.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/constant/Constant.h"
 #include "lang/construct/value/Value.h"
 #include "lang/scope/Scope.h"
@@ -123,15 +124,15 @@ llvm::Constant* lang::Member::getInitialValue(llvm::Module& m) const
     return initial_value_;
 }
 
-Owned<lang::Member> lang::Member::expand() const
+Owned<lang::Member> lang::Member::expand(lang::Context& new_context) const
 {
-    lang::ResolvingHandle<lang::Type> type = type_->createUndefinedClone();
+    lang::ResolvingHandle<lang::Type> type = type_->createUndefinedClone(new_context);
 
     Optional<Owned<ConstantExpression>> expanded_init_expression;
 
     if (constant_init_.hasValue())
     {
-        auto [leading_statements, new_expression, following_statements] = constant_init_.value()->expand();
+        auto [leading_statements, new_expression, following_statements] = constant_init_.value()->expand(new_context);
 
         assert(leading_statements.empty());
         assert(following_statements.empty());

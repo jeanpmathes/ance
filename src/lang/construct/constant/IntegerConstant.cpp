@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "lang/ApplicationVisitor.h"
+#include "lang/Context.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/IntegerType.h"
 #include "lang/type/Type.h"
@@ -16,8 +18,10 @@ lang::IntegerConstant::IntegerConstant(std::string integer, uint8_t radix, lang:
     text_.erase(0, std::min(text_.find_first_not_of('0'), text_.size() - 1));
 }
 
-lang::IntegerConstant::IntegerConstant(std::string const& integer, bool is_signed)
-    : IntegerConstant(integer, 10, lang::FixedWidthIntegerType::get(llvm::APInt::getBitsNeeded(integer, 10), is_signed))
+lang::IntegerConstant::IntegerConstant(std::string const& integer, bool is_signed, lang::Context& new_context)
+    : IntegerConstant(integer,
+                      10,
+                      new_context.getFixedWidthIntegerType(llvm::APInt::getBitsNeeded(integer, 10), is_signed))
 {}
 
 std::string lang::IntegerConstant::toString() const
@@ -135,7 +139,7 @@ bool lang::IntegerConstant::equals(lang::Constant const* other) const
     return this_value == other_value;
 }
 
-Shared<lang::Constant> lang::IntegerConstant::clone() const
+Shared<lang::Constant> lang::IntegerConstant::clone(lang::Context& new_context) const
 {
-    return Shared<Constant>(*(new IntegerConstant(text_, radix_, type_->createUndefinedClone())));
+    return Shared<Constant>(*(new IntegerConstant(text_, radix_, type_->createUndefinedClone(new_context))));
 }

@@ -48,13 +48,15 @@ Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<Value> value, Co
         llvm::Value* is_null     = context.ir().CreateIsNull(ptr, ptr->getName() + "is_null");
         llvm::Value* is_not_null = context.ir().CreateNot(is_null, ptr->getName() + "is_not_null");
 
-        llvm::Value* is_not_null_ptr = lang::values::contentToNative(lang::BooleanType::get(), is_not_null, context);
-        Shared<lang::Value> truth    = makeShared<lang::WrappedNativeValue>(lang::BooleanType::get(), is_not_null_ptr);
+        llvm::Value* is_not_null_ptr =
+            lang::values::contentToNative(context.types().getBooleanType(), is_not_null, context);
+        Shared<lang::Value> truth =
+            makeShared<lang::WrappedNativeValue>(context.types().getBooleanType(), is_not_null_ptr);
 
         context.runtime().buildAssert(truth, "Null pointer dereference at " + context.getLocationString(), context);
     }
 
-    auto value_reference = lang::ReferenceType::get(value_type_);
+    auto value_reference = context.types().getReferenceType(value_type_);
 
     llvm::Value* native_value = lang::values::contentToNative(value_reference, ptr, context);
     return makeShared<lang::WrappedNativeValue>(value_reference, native_value);

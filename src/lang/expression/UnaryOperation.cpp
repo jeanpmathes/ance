@@ -44,7 +44,7 @@ bool UnaryOperation::validate(ValidationLogger& validation_logger) const
     return operand_->type().validateOperator(op_, operand_->location(), validation_logger);
 }
 
-Expression::Expansion UnaryOperation::expandWith(Expressions subexpressions) const
+Expression::Expansion UnaryOperation::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(), makeOwned<UnaryOperation>(op_, std::move(subexpressions[0]), location()), Statements()};
 }

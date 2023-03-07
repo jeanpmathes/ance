@@ -4,6 +4,7 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
+#include "lang/Context.h"
 #include "lang/Element.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/Owners.h"
@@ -123,9 +124,10 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
 
     /**
      * Expand this statement into new statements that do not use syntactic sugar.
+     * @param new_context The context in which the new statements will be used.
      * @return The expanded statements.
      */
-    [[nodiscard]] virtual Statements expand() const;
+    [[nodiscard]] virtual Statements expand(lang::Context& new_context) const;
 
     /**
      * Expand this statement into new statements with the given sub-elements.
@@ -133,7 +135,9 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @param substatements The substatements to use.
      * @return The expanded statements.
      */
-    [[nodiscard]] virtual Statements expandWith(Expressions subexpressions, Statements substatements) const = 0;
+    [[nodiscard]] virtual Statements expandWith(Expressions    subexpressions,
+                                                Statements     substatements,
+                                                lang::Context& new_context) const = 0;
 
     /**
      * Build this statement.

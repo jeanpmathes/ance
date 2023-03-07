@@ -29,7 +29,7 @@ std::vector<Owned<lang::BasicBlock>> Continue::createBasicBlocks(lang::BasicBloc
     return lang::BasicBlock::createJump(entry, *start, scopes);
 }
 
-Statements Continue::expandWith(Expressions, Statements) const
+Statements Continue::expandWith(Expressions, Statements, lang::Context&) const
 {
     Statements statements;
 

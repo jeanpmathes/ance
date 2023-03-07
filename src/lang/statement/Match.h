@@ -74,14 +74,14 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
      * Expand the contents of this case. This is only valid for statement-based cases.
      * @return The expanded case.
      */
-    [[nodiscard]] Owned<Case> expand() const;
+    [[nodiscard]] Owned<Case> expand(lang::Context& new_context) const;
 
     /**
      * Expand the contents of this case. This is only valid for expression-based cases.
      * @param target The variable to assign the result of the expression to.
      * @return The expanded case.
      */
-    [[nodiscard]] Owned<Case> expand(lang::ResolvingHandle<lang::Variable> target) const;
+    [[nodiscard]] Owned<Case> expand(lang::ResolvingHandle<lang::Variable> target, lang::Context& new_context) const;
 
   private:
     std::vector<Owned<ConstantExpression>>            conditions_;
@@ -137,7 +137,9 @@ class Match
                               std::vector<Owned<Case>> const& cases,
                               ValidationLogger&               validation_logger);
 
-    [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+    [[nodiscard]] Statements expandWith(Expressions    subexpressions,
+                                        Statements     substatements,
+                                        lang::Context& new_context) const override;
 
   protected:
     void doBuild(CompileContext& context) override;

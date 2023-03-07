@@ -25,7 +25,7 @@ class ConstantLiteral
 
     bool validate(ValidationLogger& validation_logger) const override;
 
-    [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
+    [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;
 
     Shared<lang::Constant>              getConstantValue() override;
     [[nodiscard]] lang::Constant const& getConstantValue() const override;

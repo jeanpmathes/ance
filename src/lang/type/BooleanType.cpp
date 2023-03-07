@@ -62,18 +62,6 @@ llvm::DIType* lang::BooleanType::createDebugType(CompileContext& context) const
     return context.di().createBasicType(name, size_in_bits, llvm::dwarf::DW_ATE_boolean);
 }
 
-lang::ResolvingHandle<lang::Type> lang::BooleanType::get()
-{
-#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new BooleanType())))
-
-    static lang::ResolvingHandle<lang::Type> instance = MAKE;
-
-    if (!instance.valid()) instance = MAKE;
-
-    return instance;
-#undef MAKE
-}
-
 bool lang::BooleanType::isOperatorDefined(lang::UnaryOperator op) const
 {
     return op == lang::UnaryOperator::NOT || op == lang::UnaryOperator::BITWISE_NOT;
@@ -223,7 +211,7 @@ void lang::BooleanType::buildRequestedOverload(std::vector<lang::ResolvingHandle
     }
 }
 
-lang::ResolvingHandle<lang::Type> lang::BooleanType::clone() const
+lang::ResolvingHandle<lang::Type> lang::BooleanType::clone(lang::Context& new_context) const
 {
-    return get();
+    return new_context.getBooleanType();
 }

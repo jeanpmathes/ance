@@ -47,7 +47,8 @@ bool lang::FloatConstant::equals(lang::Constant const* other) const
     return this->float_ == other_float->float_;
 }
 
-Shared<lang::Constant> lang::FloatConstant::clone() const
+Shared<lang::Constant> lang::FloatConstant::clone(lang::Context& new_context) const
 {
-    return Shared<lang::Constant>(*(new FloatConstant(text_, float_.getSemantics(), type_->createUndefinedClone())));
+    return Shared<lang::Constant>(
+        *(new FloatConstant(text_, float_.getSemantics(), type_->createUndefinedClone(new_context))));
 }

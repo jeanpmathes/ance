@@ -42,7 +42,7 @@ std::any CodePrinter::visit(lang::CustomFunction const& function)
     out_ << function.name() << " ";
     out_ << function.parameterSource();
 
-    if (function.returnType() != lang::VoidType::get()) { out_ << " : " << function.returnType().name(); }
+    if (!function.returnType().isVoidType()) { out_ << " : " << function.returnType().name(); }
 
     out_ << std::endl;
 

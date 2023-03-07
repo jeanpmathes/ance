@@ -42,6 +42,8 @@ void lang::StructDescription::performInitialization()
     self_ = type.handle();
 
     scope().getGlobalScope()->addType(std::move(type));
+
+    for (auto& member : members_) { member->setScope(&scope()); }
 }
 
 void lang::StructDescription::validate(ValidationLogger& validation_logger) const
@@ -73,7 +75,7 @@ void lang::StructDescription::validate(ValidationLogger& validation_logger) cons
             continue;
         }
 
-        if (type == lang::VoidType::get())
+        if (type == scope().context().getVoidType())
         {
             validation_logger.logError("Cannot declare member of 'void' type", member->location());
             valid = false;
@@ -108,13 +110,13 @@ void lang::StructDescription::validate(ValidationLogger& validation_logger) cons
     }
 }
 
-lang::Description::Descriptions lang::StructDescription::expand() const
+lang::Description::Descriptions lang::StructDescription::expand(lang::Context& new_context) const
 {
     Descriptions result;
 
     std::vector<Owned<lang::Member>> members;
     members.reserve(members_.size());
-    for (auto& member : members_) { members.emplace_back(member->expand()); }
+    for (auto& member : members_) { members.emplace_back(member->expand(new_context)); }
 
     result.emplace_back(makeOwned<StructDescription>(access_, name_, std::move(members), definition_location_));
 

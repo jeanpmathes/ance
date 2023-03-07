@@ -21,7 +21,7 @@ void ExpressionStatement::validate(ValidationLogger& validation_logger) const
     expression_->validate(validation_logger);
 }
 
-Statements ExpressionStatement::expandWith(Expressions subexpressions, Statements) const
+Statements ExpressionStatement::expandWith(Expressions subexpressions, Statements, lang::Context&) const
 {
     Statements statements;
 

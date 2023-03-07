@@ -30,7 +30,7 @@ void SizeofType::walkDefinitions()
 
 void SizeofType::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    type.reroute(lang::SizeType::getSize());
+    type.reroute(scope()->context().getSizeType());
 }
 
 bool SizeofType::validate(ValidationLogger& validation_logger) const
@@ -40,10 +40,10 @@ bool SizeofType::validate(ValidationLogger& validation_logger) const
     return type_->validate(validation_logger, type_location_);
 }
 
-Expression::Expansion SizeofType::expandWith(Expressions) const
+Expression::Expansion SizeofType::expandWith(Expressions, lang::Context& new_context) const
 {
     return {Statements(),
-            makeOwned<SizeofType>(type_->createUndefinedClone(), type_location_, location()),
+            makeOwned<SizeofType>(type_->createUndefinedClone(new_context), type_location_, location()),
             Statements()};
 }
 

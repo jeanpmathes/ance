@@ -4,6 +4,7 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
+#include "lang/Context.h"
 #include "lang/Element.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Location.h"
@@ -67,16 +68,17 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
 
     /**
      * Expand this expression to remove syntactic sugar.
+     * @param new_context The context in which the expanded expression will be used.
      * @return The statements to use before and after the current containing statement, as well as a new expression.
      */
-    [[nodiscard]] virtual Expansion expand() const;
+    [[nodiscard]] virtual Expansion expand(lang::Context& new_context) const;
 
     /**
      * Expand this expression with the given subexpressions.
      * @param subexpressions The subexpressions to use.
      * @return The statements to use before and after the current containing statement, as well as a new expression.
      */
-    [[nodiscard]] virtual Expansion expandWith(Expressions subexpressions) const = 0;
+    [[nodiscard]] virtual Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const = 0;
 
     /**
      * Validate an assignment to this expression.

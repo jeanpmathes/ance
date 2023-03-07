@@ -66,7 +66,7 @@ bool MatchSelect::validate(ValidationLogger& validation_logger) const
     return valid;
 }
 
-Expression::Expansion MatchSelect::expandWith(Expressions subexpressions) const
+Expression::Expansion MatchSelect::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
     auto temp_name = lang::Identifier::like(scope()->getTemporaryName(), location());
     auto condition = std::move(subexpressions[0]);
@@ -74,12 +74,12 @@ Expression::Expansion MatchSelect::expandWith(Expressions subexpressions) const
     auto variable = lang::makeHandled<lang::Variable>(temp_name);
 
     std::vector<Owned<Case>> cases;
-    for (auto& original_case : cases_) { cases.push_back(original_case->expand(variable)); }
+    for (auto& original_case : cases_) { cases.push_back(original_case->expand(variable, new_context)); }
 
     Statements statements;
 
     statements.emplace_back(makeOwned<LocalVariableDefinition>(temp_name,
-                                                               type().createUndefinedClone(),
+                                                               type().createUndefinedClone(new_context),
                                                                location(),
                                                                lang::Assigner::COPY_ASSIGNMENT,
                                                                std::nullopt,

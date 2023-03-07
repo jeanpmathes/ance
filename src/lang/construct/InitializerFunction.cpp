@@ -12,7 +12,7 @@ lang::InitializerFunction::InitializerFunction(lang::Function& function,
                                                lang::Scope&    containing_scope)
     : lang::StatementFunction(function,
                               lang::AccessModifier::PRIVATE_ACCESS,
-                              lang::VoidType::get(),
+                              containing_scope.context().getVoidType(),
                               lang::Location::global(),
                               {},
                               initializer,

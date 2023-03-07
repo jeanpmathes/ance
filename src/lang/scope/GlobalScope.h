@@ -8,6 +8,7 @@
 
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
+#include "lang/Context.h"
 #include "lang/Element.h"
 #include "lang/construct/CodeBlock.h"
 #include "lang/construct/Function.h"
@@ -51,9 +52,18 @@ namespace lang
       public:
         lang::Scope* scope() override;
 
-        lang::GlobalScope*       getGlobalScope() override;
-        lang::GlobalScope const* getGlobalScope() const override;
-        llvm::DIScope*           getDebugScope(CompileContext& context) const override;
+        /**
+         * Get the context, in which all basic systems like the typesystem are defined.
+         */
+        lang::Context& context();
+        /**
+         * Get the context, in which all basic systems like the typesystem are defined.
+         */
+        [[nodiscard]] lang::Context const& context() const;
+
+        lang::GlobalScope*                     getGlobalScope() override;
+        [[nodiscard]] lang::GlobalScope const* getGlobalScope() const override;
+        llvm::DIScope*                         getDebugScope(CompileContext& context) const override;
 
         void validate(ValidationLogger& validation_logger) const;
 
@@ -100,12 +110,6 @@ namespace lang
          * @return The type, or nothing if no such type is defined.
          */
         Optional<lang::ResolvingHandle<lang::Type>> getType(Identifier string);
-
-        /**
-         * Add a type registry so it will get the chance to resolve types.
-         * @param registry The registry to add. Only add a registry once.
-         */
-        void addTypeRegistry(lang::TypeDefinitionRegistry* registry);
 
         void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
         void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
@@ -170,8 +174,6 @@ namespace lang
         std::set<lang::Identifier>                                        conflicting_description_names_;
         std::vector<Owned<lang::Description>>                             conflicting_descriptions_;
 
-        std::vector<lang::TypeDefinitionRegistry*> type_registries_;
-
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> defined_function_groups_;
         std::vector<lang::OwningHandle<lang::Function>>                     invalid_functions_;
@@ -183,10 +185,11 @@ namespace lang
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> defined_types_;
         std::vector<lang::OwningHandle<lang::Type>>                invalid_types_;
-        std::set<lang::Identifier>                                 registered_types_;
 
         std::set<lang::Identifier>    defined_names_;
         std::vector<lang::Identifier> duplicated_names_;
+
+        Optional<Owned<lang::Context>> context_;
 
         bool expanded_ = false;
     };

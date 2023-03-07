@@ -32,30 +32,6 @@ Unit::Unit(Owned<lang::GlobalScope> global_scope) : global_scope_(std::move(glob
 
 Unit::Unit(bool is_containing_runtime) : Unit(makeOwned<lang::GlobalScope>(is_containing_runtime))
 {
-    // Register keyword types
-
-    global_scope_->registerDefinition(lang::HalfType::get());
-    global_scope_->registerDefinition(lang::SingleType::get());
-    global_scope_->registerDefinition(lang::DoubleType::get());
-    global_scope_->registerDefinition(lang::QuadType::get());
-
-    global_scope_->registerDefinition(lang::VoidType::get());
-    global_scope_->registerDefinition(lang::BooleanType::get());
-    global_scope_->registerDefinition(lang::CharType::get());
-    global_scope_->registerDefinition(lang::SizeType::getSize());
-    global_scope_->registerDefinition(lang::SizeType::getDiff());
-    global_scope_->registerDefinition(lang::UnsignedIntegerPointerType::get());
-    global_scope_->registerDefinition(lang::OpaquePointerType::get());
-    global_scope_->registerDefinition(lang::NullPointerType::get());
-
-    // Add type registries
-
-    global_scope_->addTypeRegistry(lang::FixedWidthIntegerType::getRegistry());
-    global_scope_->addTypeRegistry(lang::ArrayType::getRegistry());
-    global_scope_->addTypeRegistry(lang::VectorType::getRegistry());
-    global_scope_->addTypeRegistry(lang::PointerType::getRegistry());
-    global_scope_->addTypeRegistry(lang::BufferType::getRegistry());
-    global_scope_->addTypeRegistry(lang::ReferenceType::getRegistry());
 }
 
 void Unit::setTargetInfo(llvm::Triple const& triple, llvm::DataLayout const& data_layout)

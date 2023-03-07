@@ -16,7 +16,7 @@ namespace lang
     class NullConstant : public Constant
     {
       public:
-        NullConstant();
+        explicit NullConstant(lang::Context& new_context);
 
         [[nodiscard]] std::string toString() const override;
 
@@ -27,13 +27,13 @@ namespace lang
 
         bool equals(lang::Constant const* other) const override;
 
-        Shared<Constant> clone() const override;
+        Shared<Constant> clone(lang::Context& new_context) const override;
 
         /**
          * Create a null constant.
          * @return The new null constant.
          */
-        static Shared<lang::NullConstant> create();
+        static Shared<lang::NullConstant> create(lang::Context& new_context);
 
       private:
         lang::ResolvingHandle<lang::Type> type_;

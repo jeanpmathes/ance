@@ -23,10 +23,9 @@ namespace lang
      */
     class VectorType : public lang::SequenceType
     {
-      private:
+      public:
         VectorType(lang::ResolvingHandle<lang::Type> element_type, uint64_t size);
 
-      public:
         static const uint64_t MAX_VECTOR_TYPE_SIZE = 1ll << 32;
 
         VectorType const* isVectorType() const override;
@@ -85,22 +84,10 @@ namespace lang
         llvm::DIType* createDebugType(CompileContext& context) const override;
 
       private:
-        static lang::TypeRegistry<uint64_t>& getVectorTypes();
-
         Optional<lang::ResolvingHandle<lang::Type>> actual_type_ {};
 
       public:
-        static lang::TypeDefinitionRegistry* getRegistry();
-
-        /**
-         * Get an vector type instance.
-         * @param element_type The element type of the vector.
-         * @param size The size of the vector. Must be greater than zero.
-         * @return The vector type instance.
-         */
-        static lang::ResolvingHandle<lang::Type> get(lang::ResolvingHandle<lang::Type> element_type, uint64_t size);
-
-        ResolvingHandle<lang::Type> clone() const override;
+        lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }
 

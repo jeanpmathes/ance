@@ -27,7 +27,7 @@ void BindRefTo::defineType(lang::ResolvingHandle<lang::Type>& type)
     if (argument_type->isDefined() && (argument_type->isPointerType() || argument_type->isBufferType()))
     {
         auto element_type = argument_type->getElementType();
-        type.reroute(lang::ReferenceType::get(element_type));
+        type.reroute(scope()->context().getReferenceType(element_type));
     }
 }
 
@@ -49,7 +49,7 @@ bool BindRefTo::validate(ValidationLogger& validation_logger) const
     return true;
 }
 
-Expression::Expansion BindRefTo::expandWith(Expressions subexpressions) const
+Expression::Expansion BindRefTo::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(), makeOwned<BindRefTo>(std::move(subexpressions[0]), location()), Statements()};
 }

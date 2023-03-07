@@ -33,13 +33,14 @@ void lang::AliasDescription::performInitialization()
     lang::OwningHandle<lang::Type> type =
         lang::OwningHandle<lang::Type>::takeOwnership(lang::makeHandled<lang::Type>(name_));
 
-    Owned<lang::TypeDefinition> alias_definition =
-        makeOwned<lang::TypeAlias>(name_, actual_, definition_location_, actual_type_location_);
+    Owned<lang::TypeDefinition> alias_definition = makeOwned<lang::TypeAlias>(name_, actual_, definition_location_);
     type->define(std::move(alias_definition));
 
     self_ = type.handle();
 
     scope().getGlobalScope()->addType(std::move(type));
+
+    scope().addType(actual_);
 }
 
 void lang::AliasDescription::validate(ValidationLogger& validation_logger) const
@@ -59,7 +60,7 @@ void lang::AliasDescription::validate(ValidationLogger& validation_logger) const
 
     lang::validation::isTypeUndefined(actual_, actual_type_location_, validation_logger);
 
-    if (actual_ == lang::VoidType::get())// Prevent infinite recursion.
+    if (actual_ == scope().context().getVoidType())// Prevent infinite recursion.
     {
         validation_logger.logError("Cannot create alias for 'void' type", definition_location_);
     }
@@ -69,13 +70,13 @@ void lang::AliasDescription::validate(ValidationLogger& validation_logger) const
     actual_->validate(validation_logger, actual_type_location_);
 }
 
-lang::Description::Descriptions lang::AliasDescription::expand() const
+lang::Description::Descriptions lang::AliasDescription::expand(lang::Context& new_context) const
 {
     Descriptions result;
 
     result.emplace_back(makeOwned<AliasDescription>(access_,
                                                     name_,
-                                                    actual_->createUndefinedClone(),
+                                                    actual_->createUndefinedClone(new_context),
                                                     definition_location_,
                                                     actual_type_location_));
 

@@ -646,9 +646,9 @@ Shared<lang::Value> lang::Type::makeActual(Shared<lang::Value> value)
     return makeShared<lang::RoughlyCastedValue>(actual_type, value);
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::createUndefinedClone() const
+lang::ResolvingHandle<lang::Type> lang::Type::createUndefinedClone(lang::Context& new_context) const
 {
-    if (isDefined() && !isCustom()) return definition_.value()->clone();
+    if (isDefined() && !isCustom()) return definition_.value()->clone(new_context);
 
     return lang::makeHandled<lang::Type>(name());
 }

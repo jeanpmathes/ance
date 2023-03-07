@@ -10,10 +10,8 @@ namespace lang
      */
     class OpaquePointerType : public lang::AddressType
     {
-      private:
-        OpaquePointerType();
-
       public:
+        OpaquePointerType();
         ~OpaquePointerType() override = default;
 
         bool isOpaquePointerType() const override;
@@ -29,9 +27,7 @@ namespace lang
         Type const*                                 getPointeeType() const override;
 
       public:
-        static lang::ResolvingHandle<lang::Type> get();
-
-        ResolvingHandle<lang::Type> clone() const override;
+        lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }
 

@@ -57,7 +57,7 @@ bool Subscript::validate(ValidationLogger& validation_logger) const
     }
 }
 
-Expression::Expansion Subscript::expandWith(Expressions subexpressions) const
+Expression::Expansion Subscript::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(),
             makeOwned<Subscript>(std::move(subexpressions[0]), std::move(subexpressions[1]), location()),

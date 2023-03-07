@@ -6,7 +6,6 @@
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/type/BooleanType.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Values.h"
 
@@ -70,7 +69,7 @@ bool lang::CharType::isOperatorDefined(lang::BinaryOperator op, lang::Type const
 lang::ResolvingHandle<lang::Type> lang::CharType::getOperatorResultType(lang::BinaryOperator op,
                                                                         lang::ResolvingHandle<lang::Type>)
 {
-    if (op.isEquality()) return lang::BooleanType::get();
+    if (op.isEquality()) return scope()->context().getBooleanType();
 
     return lang::Type::getUndefined();
 }
@@ -145,19 +144,7 @@ llvm::DIType* lang::CharType::createDebugType(CompileContext& context) const
     return context.di().createBasicType(name, SIZE_IN_BITS, llvm::dwarf::DW_ATE_UCS);
 }
 
-lang::ResolvingHandle<lang::Type> lang::CharType::get()
+lang::ResolvingHandle<lang::Type> lang::CharType::clone(lang::Context& new_context) const
 {
-#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new CharType())))
-
-    static lang::ResolvingHandle<lang::Type> instance = MAKE;
-
-    if (!instance.valid()) instance = MAKE;
-
-    return instance;
-#undef MAKE
-}
-
-lang::ResolvingHandle<lang::Type> lang::CharType::clone() const
-{
-    return get();
+    return new_context.getCharType();
 }

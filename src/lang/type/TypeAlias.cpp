@@ -11,11 +11,9 @@
 
 lang::TypeAlias::TypeAlias(lang::Identifier                  name,
                            lang::ResolvingHandle<lang::Type> actual,
-                           lang::Location                    definition_location,
-                           lang::Location                    actual_type_location)
+                           lang::Location                    definition_location)
     : lang::TypeDefinition(name, definition_location)
     , actual_(actual)
-    , actual_type_location_(actual_type_location)
 {}
 
 StateCount lang::TypeAlias::getStateCount() const
@@ -176,11 +174,6 @@ lang::Type const& lang::TypeAlias::getActualType() const
 {
     const_cast<TypeAlias*>(this)->getActualType();
     return actually_actual_.value();
-}
-
-void lang::TypeAlias::onScope()
-{
-    scope()->addType(actual_);
 }
 
 llvm::Constant* lang::TypeAlias::getDefaultContent(llvm::Module& m) const
@@ -356,6 +349,7 @@ llvm::DIType* lang::TypeAlias::createDebugType(CompileContext& context) const
                                       static_cast<unsigned>(getDefinitionLocation().line()),
                                       scope()->getDebugScope(context));
 }
+
 std::vector<lang::TypeDefinition const*> lang::TypeAlias::getDependencies() const
 {
     std::vector<lang::TypeDefinition const*> dependencies;

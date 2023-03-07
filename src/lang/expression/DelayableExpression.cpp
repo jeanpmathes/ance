@@ -1,5 +1,7 @@
 #include "DelayableExpression.h"
 
+#include "lang/ApplicationVisitor.h"
+
 Shared<lang::Value> DelayableExpression::getValue()
 {
     return value_;

@@ -26,9 +26,9 @@ bool ConstantLiteral::validate(ValidationLogger& validation_logger) const
     return constant_->validate(validation_logger, location());
 }
 
-Expression::Expansion ConstantLiteral::expandWith(Expressions) const
+Expression::Expansion ConstantLiteral::expandWith(Expressions, lang::Context& new_context) const
 {
-    return {Statements(), makeOwned<ConstantLiteral>(constant_->clone(), location()), Statements()};
+    return {Statements(), makeOwned<ConstantLiteral>(constant_->clone(new_context), location()), Statements()};
 }
 
 Shared<lang::Constant> ConstantLiteral::getConstantValue()

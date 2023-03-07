@@ -78,7 +78,7 @@ bool BinaryOperation::validate(ValidationLogger& validation_logger) const
     return left_type.validateOperator(op_, right_type, left_->location(), right_->location(), validation_logger);
 }
 
-Expression::Expansion BinaryOperation::expandWith(Expressions subexpressions) const
+Expression::Expansion BinaryOperation::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(),
             makeOwned<BinaryOperation>(std::move(subexpressions[0]), op_, std::move(subexpressions[1]), location()),

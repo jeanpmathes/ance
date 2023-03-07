@@ -148,13 +148,13 @@ bool FunctionCall::validate(ValidationLogger& validation_logger) const
     return actual_function.get().validateCall(arguments, location(), validation_logger);
 }
 
-Expression::Expansion FunctionCall::expandWith(Expressions subexpressions) const
+Expression::Expansion FunctionCall::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
     Optional<lang::ResolvingHandle<lang::FunctionGroup>> fng;
 
     return {Statements(),
             makeOwned<FunctionCall>(function_group_.hasValue() ? function_group_.value()->toUndefined() : fng,
-                                    type_function_group_->createUndefinedClone(),
+                                    type_function_group_->createUndefinedClone(new_context),
                                     std::move(subexpressions),
                                     location()),
             Statements()};

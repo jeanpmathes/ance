@@ -38,7 +38,7 @@ Expression const& Or::right() const
 
 void Or::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    type.reroute(lang::BooleanType::get());
+    type.reroute(scope()->context().getBooleanType());
 }
 
 bool Or::validate(ValidationLogger& validation_logger) const
@@ -47,13 +47,19 @@ bool Or::validate(ValidationLogger& validation_logger) const
 
     if (!valid) return false;
 
-    valid &= lang::Type::checkMismatch(lang::BooleanType::get(), left_->type(), left_->location(), validation_logger);
-    valid &= lang::Type::checkMismatch(lang::BooleanType::get(), right_->type(), right_->location(), validation_logger);
+    valid &= lang::Type::checkMismatch(scope()->context().getBooleanType(),
+                                       left_->type(),
+                                       left_->location(),
+                                       validation_logger);
+    valid &= lang::Type::checkMismatch(scope()->context().getBooleanType(),
+                                       right_->type(),
+                                       right_->location(),
+                                       validation_logger);
 
     return valid;
 }
 
-Expression::Expansion Or::expandWith(Expressions subexpressions) const
+Expression::Expansion Or::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
     auto temp_name          = lang::Identifier::like(scope()->getTemporaryName(), location());
     auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
@@ -63,7 +69,7 @@ Expression::Expansion Or::expandWith(Expressions subexpressions) const
     Statements before;
 
     before.emplace_back(makeOwned<LocalVariableDefinition>(temp_name,
-                                                           lang::BooleanType::get(),
+                                                           new_context.getBooleanType(),
                                                            location(),
                                                            lang::Assigner::COPY_ASSIGNMENT,
                                                            std::move(lhs),
@@ -86,7 +92,7 @@ Expression::Expansion Or::expandWith(Expressions subexpressions) const
 
     Statements after;
 
-    after.push_back(makeOwned<Drop>(make_temp_variable(), location()));
+    after.emplace_back(makeOwned<Drop>(make_temp_variable(), location()));
 
     return {std::move(before), std::move(result), std::move(after)};
 }

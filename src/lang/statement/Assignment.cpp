@@ -50,7 +50,7 @@ void Assignment::validate(ValidationLogger& validation_logger) const
     }
 }
 
-Statements Assignment::expandWith(Expressions subexpressions, Statements) const
+Statements Assignment::expandWith(Expressions subexpressions, Statements, lang::Context&) const
 {
     Statements statements;
 

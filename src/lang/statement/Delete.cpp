@@ -46,7 +46,7 @@ void Delete::validate(ValidationLogger& validation_logger) const
     scope()->getGlobalScope()->validateRuntimeDependency(location(), validation_logger);
 }
 
-Statements Delete::expandWith(Expressions subexpressions, Statements) const
+Statements Delete::expandWith(Expressions subexpressions, Statements, lang::Context&) const
 {
     Statements statements;
 

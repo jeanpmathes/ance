@@ -1,6 +1,7 @@
 #include "BasicBlock.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/constant/Constant.h"
 #include "lang/construct/value/Value.h"
 #include "lang/statement/Match.h"

@@ -16,10 +16,9 @@ namespace lang
      */
     class ReferenceType : public lang::TypeDefinition
     {
-      private:
+      public:
         explicit ReferenceType(lang::ResolvingHandle<lang::Type> element_type);
 
-      public:
         [[nodiscard]] StateCount getStateCount() const override;
 
         [[nodiscard]] bool isReferenceType() const override;
@@ -102,12 +101,7 @@ namespace lang
         std::string   createMangledName() const override;
         llvm::DIType* createDebugType(CompileContext& context) const override;
 
-      private:
-        static lang::TypeRegistry<>& getReferenceTypes();
-
       public:
-        static lang::TypeDefinitionRegistry* getRegistry();
-
         /**
          * Get the referenced backing value.
          * @param value A native value for a reference-type variable.
@@ -124,14 +118,7 @@ namespace lang
          */
         Shared<lang::Value> getReferenced(Shared<lang::Value> value, CompileContext& context);
 
-        /**
-         * Get a reference type instance.
-         * @param element_type The element type.
-         * @return The instance.
-         */
-        static lang::ResolvingHandle<lang::Type> get(lang::ResolvingHandle<lang::Type> element_type);
-
-        ResolvingHandle<lang::Type> clone() const override;
+        lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }
 

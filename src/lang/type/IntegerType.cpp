@@ -1,9 +1,11 @@
 #include "IntegerType.h"
 
-#include "BooleanType.h"
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/scope/Scope.h"
+#include "lang/type/BooleanType.h"
 #include "lang/utility/Values.h"
 
 StateCount lang::IntegerType::getStateCount() const
@@ -220,7 +222,7 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang:
                                                                            lang::ResolvingHandle<lang::Type>)
 {
     if (op.isArithmetic() || op.isBitwise() || op.isShift()) return self()->getActualType();
-    if (op.isRelational() || op.isEquality()) return lang::BooleanType::get();
+    if (op.isRelational() || op.isEquality()) return scope()->context().getBooleanType();
 
     return lang::Type::getUndefined();
 }

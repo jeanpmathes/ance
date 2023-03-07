@@ -65,7 +65,7 @@ bool VariableAccess::isVariableDropped(ValidationLogger& validation_logger) cons
     return false;
 }
 
-Expression::Expansion VariableAccess::expandWith(Expressions) const
+Expression::Expansion VariableAccess::expandWith(Expressions, lang::Context&) const
 {
     return {Statements(), makeOwned<VariableAccess>(variable_->toUndefined(), location()), Statements()};
 }

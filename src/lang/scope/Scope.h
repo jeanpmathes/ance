@@ -23,6 +23,7 @@ namespace lang
     class LocalScope;
     class Variable;
     class Type;
+    class Context;
 }
 
 class Statement;
@@ -48,6 +49,16 @@ namespace lang
          * @return The global scope.
          */
         virtual lang::GlobalScope* getGlobalScope() = 0;
+
+        /**
+         * Get the context the global scope is in.
+         */
+        lang::Context& context();
+
+        /**
+         * Get the context the global scope is in.
+         */
+        lang::Context const& context() const;
 
         /**
          * Get the global scope.

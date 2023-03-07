@@ -30,8 +30,6 @@ namespace lang
 
         [[nodiscard]] lang::AccessModifier getAccessModifier() const override;
 
-        void onScope() override;
-
         bool                              hasMember(lang::Identifier const& name) const override;
         lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name) override;
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;

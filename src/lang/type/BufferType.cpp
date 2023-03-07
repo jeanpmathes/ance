@@ -33,7 +33,7 @@ lang::ResolvingHandle<lang::Type> lang::BufferType::getActualType()
     {
         lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
         if (actual_element_type == element_type_) { actual_type_ = self(); }
-        else { actual_type_ = lang::BufferType::get(actual_element_type); }
+        else { actual_type_ = scope()->context().getBufferType(actual_element_type); }
     }
 
     return actual_type_.value();
@@ -130,37 +130,6 @@ std::vector<std::reference_wrapper<const lang::Type>> lang::BufferType::getConta
     return {element_type_};
 }
 
-lang::TypeRegistry<>& lang::BufferType::getBufferTypes()
-{
-    static TypeRegistry<> buffer_types;
-    return buffer_types;
-}
-
-lang::TypeDefinitionRegistry* lang::BufferType::getRegistry()
-{
-    return &getBufferTypes();
-}
-
-lang::ResolvingHandle<lang::Type> lang::BufferType::get(lang::ResolvingHandle<lang::Type> element_type)
-{
-    element_type = element_type->getDetachedIfUndefined();
-
-    std::vector<lang::ResolvingHandle<lang::Type>> used_types;
-    used_types.emplace_back(element_type);
-
-    Optional<lang::ResolvingHandle<lang::Type>> defined_type = getBufferTypes().get(used_types, lang::Empty());
-
-    if (defined_type.hasValue()) { return defined_type.value(); }
-    else
-    {
-        auto&                             buffer_type = *(new lang::BufferType(element_type));
-        lang::ResolvingHandle<lang::Type> type = lang::makeHandled<lang::Type>(Owned<lang::BufferType>(buffer_type));
-        getBufferTypes().add(std::move(used_types), lang::Empty(), type);
-
-        return type;
-    }
-}
-
 Optional<lang::ResolvingHandle<lang::Type>> lang::BufferType::getPointeeType()
 {
     return element_type_;
@@ -171,7 +140,7 @@ lang::Type const* lang::BufferType::getPointeeType() const
     return &*element_type_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::BufferType::clone() const
+lang::ResolvingHandle<lang::Type> lang::BufferType::clone(lang::Context& new_context) const
 {
-    return lang::BufferType::get(const_cast<lang::BufferType*>(this)->element_type_->createUndefinedClone());
+    return new_context.getBufferType(element_type_->createUndefinedClone(new_context));
 }

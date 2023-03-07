@@ -56,7 +56,7 @@ namespace lang
         void postResolve() override;
         void validate(ValidationLogger& validation_logger) const override;
 
-        [[nodiscard]] Descriptions expand() const override;
+        [[nodiscard]] Descriptions expand(lang::Context& new_context) const override;
 
       protected:
         void performInitialization() override;

@@ -78,11 +78,6 @@ lang::AccessModifier lang::StructType::getAccessModifier() const
     return access_;
 }
 
-void lang::StructType::onScope()
-{
-    for (auto& member : members_) { member.get().setScope(scope()); }
-}
-
 std::string lang::StructType::createMangledName() const
 {
     return "struct(" + name() + ")";
@@ -158,7 +153,7 @@ Shared<lang::Value> lang::StructType::buildMemberAccess(Shared<Value>           
                                                         lang::Identifier const& name,
                                                         CompileContext&         context)
 {
-    lang::ResolvingHandle<lang::Type> return_type  = lang::ReferenceType::get(getMemberType(name));
+    lang::ResolvingHandle<lang::Type> return_type  = context.types().getReferenceType(getMemberType(name));
     int32_t const                     member_index = member_indices_[name];
 
     llvm::Value* struct_ptr;

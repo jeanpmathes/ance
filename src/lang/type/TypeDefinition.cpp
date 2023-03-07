@@ -68,7 +68,7 @@ bool lang::TypeDefinition::isCustom() const
     return false;// Most types are built-in.
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeDefinition::clone() const
+lang::ResolvingHandle<lang::Type> lang::TypeDefinition::clone(lang::Context&) const
 {
     assert(!isCustom() && "TypeDefinition::clone() called on custom type definition.");
     throw std::runtime_error("Not implemented.");
@@ -234,7 +234,18 @@ lang::AccessModifier lang::TypeDefinition::getAccessModifier() const
 void lang::TypeDefinition::setContainingScope(lang::Scope* scope)
 {
     containing_scope_ = scope;
-    onScope();
+}
+
+lang::Scope* lang::TypeDefinition::scope()
+{
+    assert(containing_scope_);
+    return containing_scope_;
+}
+
+lang::Scope const* lang::TypeDefinition::scope() const
+{
+    assert(containing_scope_);
+    return containing_scope_;
 }
 
 void lang::TypeDefinition::postResolve()
@@ -263,20 +274,6 @@ void lang::TypeDefinition::createConstructors()
     default_constructor_ = &createConstructor({});
 }
 
-void lang::TypeDefinition::onScope() {}
-
-lang::Scope* lang::TypeDefinition::scope()
-{
-    assert(containing_scope_);
-    return containing_scope_;
-}
-
-lang::Scope const* lang::TypeDefinition::scope() const
-{
-    assert(containing_scope_);
-    return containing_scope_;
-}
-
 llvm::Type* lang::TypeDefinition::getNativeType(llvm::LLVMContext& c) const
 {
     return llvm::PointerType::get(getContentType(c), 0);
@@ -291,14 +288,14 @@ llvm::DIType* lang::TypeDefinition::getDebugType(CompileContext& context) const
 
 llvm::TypeSize lang::TypeDefinition::getNativeSize(llvm::Module& m)
 {
-    if (self() == lang::VoidType::get()) return llvm::TypeSize::getNull();
+    if (self() == scope()->context().getVoidType()) return llvm::TypeSize::getNull();
 
     return m.getDataLayout().getTypeAllocSize(getNativeType(m.getContext()));
 }
 
 llvm::TypeSize lang::TypeDefinition::getContentSize(llvm::Module& m)
 {
-    if (self() == lang::VoidType::get()) return llvm::TypeSize::getNull();
+    if (self() == scope()->context().getVoidType()) return llvm::TypeSize::getNull();
 
     return m.getDataLayout().getTypeAllocSize(getContentType(m.getContext()));
 }
@@ -436,7 +433,7 @@ Shared<lang::Value> lang::TypeDefinition::buildIndirection(Shared<Value>, Compil
 void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, CompileContext& context)
 {
     llvm::APInt const count_value = llvm::APInt(lang::SizeType::getSizeWidth(), 1);
-    llvm::Type*       count_type  = lang::SizeType::getSize()->getContentType(context.llvmContext());
+    llvm::Type*       count_type  = context.types().getSizeType()->getContentType(context.llvmContext());
 
     llvm::Value* count = llvm::ConstantInt::get(count_type, count_value);
 
@@ -448,7 +445,7 @@ void lang::TypeDefinition::buildDefaultInitializer(llvm::Value* ptr, llvm::Value
     if (isTriviallyDefaultConstructible())
     {
         llvm::Value* element_size =
-            llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(context.llvmContext()),
+            llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()),
                                    getContentSize(context.llvmModule()).getFixedSize(),
                                    false);
 
@@ -486,8 +483,8 @@ void lang::TypeDefinition::buildCopyInitializer(llvm::Value* ptr, llvm::Value* o
 
 void lang::TypeDefinition::buildFinalizer(llvm::Value* ptr, CompileContext& context)
 {
-    llvm::APInt count_value = llvm::APInt(lang::SizeType::getSizeWidth(), 1);
-    llvm::Type* count_type  = lang::SizeType::getSize()->getContentType(context.llvmContext());
+    llvm::APInt const count_value = llvm::APInt(lang::SizeType::getSizeWidth(), 1);
+    llvm::Type*       count_type  = context.types().getSizeType()->getContentType(context.llvmContext());
 
     llvm::Value* count = llvm::ConstantInt::get(count_type, count_value);
 
@@ -505,10 +502,10 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
 {
     if (!isTriviallyDefaultConstructible())
     {
-        llvm::FunctionType* default_initializer_type = llvm::FunctionType::get(
-            llvm::Type::getVoidTy(context.llvmContext()),
-            {getNativeType(context.llvmContext()), lang::SizeType::getSize()->getContentType(context.llvmContext())},
-            false);
+        llvm::FunctionType* default_initializer_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context.llvmContext()),
+                                    {getNativeType(context.llvmContext()),
+                                     context.types().getSizeType()->getContentType(context.llvmContext())},
+                                    false);
 
         default_initializer_ = llvm::Function::Create(default_initializer_type,
                                                       getAccessModifier().linkage(),
@@ -531,10 +528,10 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
 
     if (!isTriviallyDestructible())
     {
-        llvm::FunctionType* default_finalizer_type = llvm::FunctionType::get(
-            llvm::Type::getVoidTy(context.llvmContext()),
-            {getNativeType(context.llvmContext()), lang::SizeType::getSize()->getContentType(context.llvmContext())},
-            false);
+        llvm::FunctionType* default_finalizer_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context.llvmContext()),
+                                    {getNativeType(context.llvmContext()),
+                                     scope()->context().getSizeType()->getContentType(context.llvmContext())},
+                                    false);
 
         default_finalizer_ = llvm::Function::Create(default_finalizer_type,
                                                     getAccessModifier().linkage(),
@@ -804,7 +801,7 @@ void lang::TypeDefinition::buildPointerIteration(llvm::Function*                
                                                  std::function<void(llvm::Value*, CompileContext&)> operation,
                                                  CompileContext&                                    context)
 {
-    llvm::Type* size_type = SizeType::getSize()->getContentType(context.llvmContext());
+    llvm::Type* size_type = context.types().getSizeType()->getContentType(context.llvmContext());
 
     llvm::BasicBlock* init = llvm::BasicBlock::Create(context.llvmContext(), "init", function);
     llvm::BasicBlock* body = llvm::BasicBlock::Create(context.llvmContext(), "body", function);

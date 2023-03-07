@@ -20,19 +20,7 @@ size_t lang::DoubleType::getPrecision() const
     return 64;
 }
 
-lang::ResolvingHandle<lang::Type> lang::DoubleType::get()
+lang::ResolvingHandle<lang::Type> lang::DoubleType::clone(lang::Context& new_context) const
 {
-#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new DoubleType())))
-
-    static lang::ResolvingHandle<lang::Type> instance = MAKE;
-
-    if (!instance.valid()) instance = MAKE;
-
-    return instance;
-#undef MAKE
-}
-
-lang::ResolvingHandle<lang::Type> lang::DoubleType::clone() const
-{
-    return get();
+    return new_context.getDoubleType();
 }

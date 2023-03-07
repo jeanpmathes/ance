@@ -40,10 +40,13 @@ void While::validate(ValidationLogger& validation_logger) const
 
     block_->validate(validation_logger);
 
-    lang::Type::checkMismatch(lang::BooleanType::get(), condition_->type(), condition_->location(), validation_logger);
+    lang::Type::checkMismatch(scope()->context().getBooleanType(),
+                              condition_->type(),
+                              condition_->location(),
+                              validation_logger);
 }
 
-Statements While::expandWith(Expressions subexpressions, Statements substatements) const
+Statements While::expandWith(Expressions subexpressions, Statements substatements, lang::Context&) const
 {
     Statements statements;
 

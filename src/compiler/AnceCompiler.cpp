@@ -210,7 +210,7 @@ llvm::Function* AnceCompiler::buildFinit()
 
 llvm::Function* AnceCompiler::buildExit()
 {
-    lang::ResolvingHandle<lang::Type> exitcode_type = lang::FixedWidthIntegerType::get(32, false);
+    lang::ResolvingHandle<lang::Type> exitcode_type = context_.types().getFixedWidthIntegerType(32, false);
 
     std::array<llvm::Type*, 1> const exit_params = {exitcode_type->getContentType(llvm_context_)};
     llvm::FunctionType* exit_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), exit_params, false);

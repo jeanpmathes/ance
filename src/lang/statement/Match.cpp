@@ -237,15 +237,15 @@ std::vector<lang::ResolvingHandle<lang::Type>> Case::getCommonType(std::vector<O
     return lang::Type::getCommonType(types);
 }
 
-Owned<Case> Case::expand() const
+Owned<Case> Case::expand(lang::Context& new_context) const
 {
-    Statements expanded_statements = std::get<Owned<Statement>>(code_)->expand();
+    Statements expanded_statements = std::get<Owned<Statement>>(code_)->expand(new_context);
 
     std::vector<Owned<ConstantExpression>> expanded_conditions;
 
     for (auto& condition : conditions_)
     {
-        auto [before, expanded_condition, after] = condition->expand();
+        auto [before, expanded_condition, after] = condition->expand(new_context);
 
         assert(before.empty());
         assert(after.empty());
@@ -257,9 +257,9 @@ Owned<Case> Case::expand() const
     return Owned<Case>(*(new Case(std::move(expanded_conditions), std::move(new_block))));
 }
 
-Owned<Case> Case::expand(lang::ResolvingHandle<lang::Variable> target) const
+Owned<Case> Case::expand(lang::ResolvingHandle<lang::Variable> target, lang::Context& new_context) const
 {
-    auto [before, value_provider, after] = std::get<Owned<Expression>>(code_)->expand();
+    auto [before, value_provider, after] = std::get<Owned<Expression>>(code_)->expand(new_context);
 
     lang::Location const location = std::get<Owned<Expression>>(code_)->location();
 
@@ -281,7 +281,7 @@ Owned<Case> Case::expand(lang::ResolvingHandle<lang::Variable> target) const
 
     for (auto& condition : conditions_)
     {
-        auto [before_condition, expanded_condition, after_condition] = condition->expand();
+        auto [before_condition, expanded_condition, after_condition] = condition->expand(new_context);
 
         assert(before_condition.empty());
         assert(after_condition.empty());
@@ -359,12 +359,12 @@ void Match::postResolve()
     for (auto& case_ptr : cases_) { case_ptr->postResolve(); }
 }
 
-Statements Match::expandWith(Expressions subexpressions, Statements) const
+Statements Match::expandWith(Expressions subexpressions, Statements, lang::Context& new_context) const
 {
     std::vector<Owned<Case>> expanded_cases;
     for (auto& case_ptr : cases_)
     {
-        auto expanded_case = case_ptr->expand();
+        auto expanded_case = case_ptr->expand(new_context);
         expanded_cases.push_back(std::move(expanded_case));
     }
 

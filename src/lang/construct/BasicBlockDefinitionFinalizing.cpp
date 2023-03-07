@@ -1,6 +1,7 @@
 #include "BasicBlock.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 
 lang::BasicBlock::Definition::Finalizing::Finalizing(lang::Scope& scope, std::string info)

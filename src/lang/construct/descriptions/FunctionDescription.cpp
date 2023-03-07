@@ -88,13 +88,13 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
     }
 }
 
-lang::Description::Descriptions lang::FunctionDescription::expand() const
+lang::Description::Descriptions lang::FunctionDescription::expand(lang::Context& new_context) const
 {
     Optional<Owned<Statement>> code;
 
     if (code_.hasValue())
     {
-        Statements expanded_statements = (**code_).expand();
+        Statements expanded_statements = (**code_).expand(new_context);
         assert(expanded_statements.size() == 1);
 
         code = std::move(expanded_statements.front());
@@ -102,11 +102,11 @@ lang::Description::Descriptions lang::FunctionDescription::expand() const
 
     std::vector<Shared<lang::Parameter>> expanded_parameters;
 
-    for (auto& parameter : parameters_) { expanded_parameters.emplace_back(parameter->expand()); }
+    for (auto& parameter : parameters_) { expanded_parameters.emplace_back(parameter->expand(new_context)); }
 
     auto expanded = makeOwned<lang::FunctionDescription>(access_,
                                                          name_,
-                                                         return_type_->createUndefinedClone(),
+                                                         return_type_->createUndefinedClone(new_context),
                                                          return_type_location_,
                                                          expanded_parameters,
                                                          std::move(code),

@@ -19,10 +19,9 @@ namespace lang
      */
     class UnsignedIntegerPointerType : public IntegerType
     {
-      private:
+      public:
         UnsignedIntegerPointerType();
 
-      public:
         /**
          * The minimum bit size of uiptr value.
          */
@@ -64,13 +63,7 @@ namespace lang
          */
         static unsigned int sizeInBits();
 
-        /**
-         * Get the uiptr type instance.
-         * @return The instance.
-         */
-        static lang::ResolvingHandle<lang::Type> get();
-
-        ResolvingHandle<lang::Type> clone() const override;
+        lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }
 

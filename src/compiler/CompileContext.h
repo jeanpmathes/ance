@@ -12,6 +12,7 @@
 namespace lang
 {
     class Scope;
+    class Context;
 }
 
 class SourceTree;
@@ -53,6 +54,13 @@ class CompileContext
      * @return The runtime.
      */
     Runtime& runtime();
+
+    /**
+     * Get the language context in which the AST is built.
+     * It contains all builtin types.
+     * @return The language context.
+     */
+    lang::Context& types();
 
     /**
      * Get the llvmContext.

@@ -1,6 +1,7 @@
 #include "BasicBlock.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 
 bool lang::BasicBlock::Definition::Empty::isMeta() const
 {

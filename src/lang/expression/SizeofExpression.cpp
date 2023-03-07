@@ -22,7 +22,7 @@ Expression const& SizeofExpression::expression() const
 
 void SizeofExpression::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    type.reroute(lang::SizeType::getSize());
+    type.reroute(scope()->context().getSizeType());
 }
 
 bool SizeofExpression::validate(ValidationLogger& validation_logger) const
@@ -30,7 +30,7 @@ bool SizeofExpression::validate(ValidationLogger& validation_logger) const
     return expression_->validate(validation_logger);
 }
 
-Expression::Expansion SizeofExpression::expandWith(Expressions subexpressions) const
+Expression::Expansion SizeofExpression::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(), makeOwned<SizeofExpression>(std::move(subexpressions[0]), location()), Statements()};
 }

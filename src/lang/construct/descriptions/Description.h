@@ -7,6 +7,7 @@ namespace lang
 {
     class Scope;
     class Identifier;
+    class Context;
 }
 
 class ValidationLogger;
@@ -52,9 +53,10 @@ namespace lang
 
         /**
          * Expand the description into one or more descriptions without syntactic sugar.
+         * @param new_context The context to use for the expanded descriptions.
          * @return The expanded descriptions.
          */
-        [[nodiscard]] virtual Descriptions expand() const = 0;
+        [[nodiscard]] virtual Descriptions expand(lang::Context& new_context) const = 0;
 
       protected:
         /**

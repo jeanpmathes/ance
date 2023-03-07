@@ -69,7 +69,6 @@ namespace lang
 
       protected:
         lang::ResolvingHandle<lang::Type> element_type_;
-        lang::ResolvingHandle<lang::Type> element_reference_;
 
         Optional<size_t> size_;
     };

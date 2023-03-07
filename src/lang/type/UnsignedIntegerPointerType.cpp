@@ -70,23 +70,6 @@ unsigned int lang::UnsignedIntegerPointerType::sizeInBits()
     return size_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::UnsignedIntegerPointerType::get()
-{
-#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new UnsignedIntegerPointerType())))
-
-    static lang::ResolvingHandle<lang::Type> instance = MAKE;
-
-    if (!instance.valid())
-    {
-        instance = MAKE;
-        size_    = 0;
-    }
-
-    return instance;
-
-#undef MAKE
-}
-
 Optional<size_t> lang::UnsignedIntegerPointerType::getBitSize() const
 {
     return std::nullopt;
@@ -112,7 +95,7 @@ std::string lang::UnsignedIntegerPointerType::getSuffix() const
     return "uiptr";
 }
 
-lang::ResolvingHandle<lang::Type> lang::UnsignedIntegerPointerType::clone() const
+lang::ResolvingHandle<lang::Type> lang::UnsignedIntegerPointerType::clone(lang::Context& new_context) const
 {
-    return get();
+    return new_context.getUnsignedIntegerPointerType();
 }

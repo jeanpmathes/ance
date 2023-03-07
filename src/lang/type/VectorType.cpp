@@ -42,7 +42,7 @@ lang::ResolvingHandle<lang::Type> lang::VectorType::getActualType()
     {
         lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
         if (actual_element_type == element_type_) { actual_type_ = self(); }
-        else { actual_type_ = lang::VectorType::get(actual_element_type, size_.value()); }
+        else { actual_type_ = scope()->context().getVectorType(actual_element_type, size_.value()); }
     }
 
     return actual_type_.value();
@@ -140,12 +140,12 @@ Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::ResolvingHan
         for (uint64_t index = 0; index < size_.value(); index++)
         {
             llvm::Constant* index_content =
-                llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(context.llvmContext()), index);
+                llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), index);
 
             auto index_value = [&]() {
                 llvm::Value* index_native =
-                    lang::values::contentToNative(lang::SizeType::getSize(), index_content, context);
-                return makeShared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
+                    lang::values::contentToNative(context.types().getSizeType(), index_content, context);
+                return makeShared<lang::WrappedNativeValue>(context.types().getSizeType(), index_native);
             };
 
             auto current_element = lang::Type::getValueOrReferencedValue(
@@ -171,7 +171,7 @@ bool lang::VectorType::isOperatorDefined(lang::UnaryOperator op) const
 
 lang::ResolvingHandle<lang::Type> lang::VectorType::getOperatorResultType(lang::UnaryOperator op)
 {
-    return get(element_type_->getOperatorResultType(op), size_.value());
+    return scope()->context().getVectorType(element_type_->getOperatorResultType(op), size_.value());
 }
 
 bool lang::VectorType::validateOperator(lang::UnaryOperator op,
@@ -203,12 +203,12 @@ Shared<lang::Value> lang::VectorType::buildOperator(lang::UnaryOperator op,
         for (uint64_t index = 0; index < size_.value(); index++)
         {
             llvm::Constant* index_content =
-                llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(context.llvmContext()), index);
+                llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), index);
 
             auto index_value = [&]() {
                 llvm::Value* index_native =
-                    lang::values::contentToNative(lang::SizeType::getSize(), index_content, context);
-                return makeShared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
+                    lang::values::contentToNative(context.types().getSizeType(), index_content, context);
+                return makeShared<lang::WrappedNativeValue>(context.types().getSizeType(), index_native);
             };
 
             auto element = lang::Type::getValueOrReferencedValue(
@@ -241,7 +241,7 @@ bool lang::VectorType::isOperatorDefined(lang::BinaryOperator op, lang::Type con
 lang::ResolvingHandle<lang::Type> lang::VectorType::getOperatorResultType(lang::BinaryOperator              op,
                                                                           lang::ResolvingHandle<lang::Type> other)
 {
-    return get(element_type_->getOperatorResultType(op, other), size_.value());
+    return scope()->context().getVectorType(element_type_->getOperatorResultType(op, other), size_.value());
 }
 
 bool lang::VectorType::validateOperator(lang::BinaryOperator op,
@@ -277,12 +277,12 @@ Shared<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperator op,
         for (uint64_t index = 0; index < size_.value(); index++)
         {
             llvm::Constant* index_content =
-                llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(context.llvmContext()), index);
+                llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), index);
 
             auto index_value = [&]() {
                 llvm::Value* index_native =
-                    lang::values::contentToNative(lang::SizeType::getSize(), index_content, context);
-                return makeShared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
+                    lang::values::contentToNative(context.types().getSizeType(), index_content, context);
+                return makeShared<lang::WrappedNativeValue>(context.types().getSizeType(), index_native);
             };
 
             auto left_element = lang::Type::getValueOrReferencedValue(
@@ -357,12 +357,12 @@ void lang::VectorType::buildRequestedOverload(std::vector<ResolvingHandle<lang::
             for (uint64_t index = 0; index < size_.value(); index++)
             {
                 llvm::Constant* index_content =
-                    llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(context.llvmContext()), index);
+                    llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), index);
 
                 auto index_value = [&]() {
                     llvm::Value* index_native =
-                        lang::values::contentToNative(lang::SizeType::getSize(), index_content, context);
-                    return makeShared<lang::WrappedNativeValue>(lang::SizeType::getSize(), index_native);
+                        lang::values::contentToNative(context.types().getSizeType(), index_content, context);
+                    return makeShared<lang::WrappedNativeValue>(context.types().getSizeType(), index_native);
                 };
 
                 auto element_ref      = other_type->buildSubscript(original_value, index_value(), context);
@@ -407,38 +407,7 @@ llvm::DIType* lang::VectorType::createDebugType(CompileContext& context) const
     return context.di().createVectorType(size, alignment, element_di_type, context.di().getOrCreateArray(subscripts));
 }
 
-lang::TypeRegistry<uint64_t>& lang::VectorType::getVectorTypes()
+lang::ResolvingHandle<lang::Type> lang::VectorType::clone(lang::Context& new_context) const
 {
-    static lang::TypeRegistry<uint64_t> vector_types;
-    return vector_types;
-}
-
-lang::TypeDefinitionRegistry* lang::VectorType::getRegistry()
-{
-    return &getVectorTypes();
-}
-
-lang::ResolvingHandle<lang::Type> lang::VectorType::get(lang::ResolvingHandle<lang::Type> element_type, uint64_t size)
-{
-    element_type = element_type->getDetachedIfUndefined();
-
-    std::vector<lang::ResolvingHandle<lang::Type>> used_types;
-    used_types.emplace_back(element_type);
-
-    Optional<lang::ResolvingHandle<lang::Type>> defined_type = getVectorTypes().get(used_types, size);
-
-    if (defined_type.hasValue()) { return defined_type.value(); }
-    else
-    {
-        auto&                             vector_type = *(new lang::VectorType(element_type, size));
-        lang::ResolvingHandle<lang::Type> type = lang::makeHandled<lang::Type>(Owned<lang::VectorType>(vector_type));
-        getVectorTypes().add(std::move(used_types), size, type);
-
-        return type;
-    }
-}
-
-lang::ResolvingHandle<lang::Type> lang::VectorType::clone() const
-{
-    return get(const_cast<lang::VectorType*>(this)->element_type_->createUndefinedClone(), size_.value());
+    return new_context.getVectorType(element_type_->createUndefinedClone(new_context), size_.value());
 }

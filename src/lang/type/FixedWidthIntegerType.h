@@ -16,10 +16,9 @@ namespace lang
      */
     class FixedWidthIntegerType : public IntegerType
     {
-      private:
+      public:
         FixedWidthIntegerType(uint64_t bit_size, bool is_signed);
 
-      public:
         static const int64_t MAX_INTEGER_SIZE = 1ll << 16;
 
         [[nodiscard]] FixedWidthIntegerType const* isFixedWidthIntegerType() const override;
@@ -49,21 +48,8 @@ namespace lang
         size_t                getMinimumBitSize() const override;
         std::string           getSuffix() const override;
 
-      private:
-        static lang::TypeRegistry<std::pair<uint64_t, bool>>& getIntegerTypes();
-
       public:
-        static lang::TypeDefinitionRegistry* getRegistry();
-
-        /**
-         * Get an integer type instance.
-         * @param bit_size The size of the integer.
-         * @param is_signed Whether the integer should be signed.
-         * @return The instance.
-         */
-        static lang::ResolvingHandle<lang::Type> get(uint64_t bit_size, bool is_signed);
-
-        ResolvingHandle<lang::Type> clone() const override;
+        lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }
 

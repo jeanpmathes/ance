@@ -26,7 +26,7 @@ void BindRef::defineType(lang::ResolvingHandle<lang::Type>& type)
     {
         if (element_type->isReferenceType()) { element_type = element_type->getElementType(); }
 
-        type.reroute(lang::ReferenceType::get(element_type));
+        type.reroute(scope()->context().getReferenceType(element_type));
     }
 }
 
@@ -44,7 +44,7 @@ bool BindRef::validate(ValidationLogger& validation_logger) const
     return true;
 }
 
-Expression::Expansion BindRef::expandWith(Expressions subexpressions) const
+Expression::Expansion BindRef::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(),
             makeOwned<BindRefTo>(makeOwned<Addressof>(std::move(subexpressions[0]), location()), location()),

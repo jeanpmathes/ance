@@ -1,8 +1,13 @@
 #include "BooleanConstant.h"
 
+#include "lang/ApplicationVisitor.h"
+#include "lang/Context.h"
 #include "lang/type/BooleanType.h"
 
-lang::BooleanConstant::BooleanConstant(bool boolean) : type_(lang::BooleanType::get()), boolean_(boolean) {}
+lang::BooleanConstant::BooleanConstant(bool boolean, lang::Context& context)
+    : type_(context.getBooleanType())
+    , boolean_(boolean)
+{}
 
 std::string lang::BooleanConstant::toString() const
 {
@@ -33,17 +38,17 @@ bool lang::BooleanConstant::equals(lang::Constant const* other) const
     return this->boolean_ == other_boolean->boolean_;
 }
 
-Shared<lang::Constant> lang::BooleanConstant::clone() const
+Shared<lang::Constant> lang::BooleanConstant::clone(lang::Context& new_context) const
 {
-    return Shared<BooleanConstant>(*(new BooleanConstant(boolean_)));
+    return Shared<BooleanConstant>(*(new BooleanConstant(boolean_, new_context)));
 }
 
-Shared<lang::BooleanConstant> lang::BooleanConstant::createFalse()
+Shared<lang::BooleanConstant> lang::BooleanConstant::createFalse(lang::Context& new_context)
 {
-    return Shared<lang::BooleanConstant>(*(new BooleanConstant(false)));
+    return Shared<lang::BooleanConstant>(*(new BooleanConstant(false, new_context)));
 }
 
-Shared<lang::BooleanConstant> lang::BooleanConstant::createTrue()
+Shared<lang::BooleanConstant> lang::BooleanConstant::createTrue(lang::Context& new_context)
 {
-    return Shared<lang::BooleanConstant>(*(new BooleanConstant(true)));
+    return Shared<lang::BooleanConstant>(*(new BooleanConstant(true, new_context)));
 }

@@ -37,26 +37,27 @@ void Runtime::init(CompileContext& context)
     };
 
     std::vector<lang::ResolvingHandle<lang::Type>> allocate_dynamic_parameters;
-    allocate_dynamic_parameters.emplace_back(lang::SizeType::getSize());
+    allocate_dynamic_parameters.emplace_back(context.types().getSizeType());
     allocate_dynamic_ =
-        create_function(ALLOCATE_DYNAMIC_NAME, lang::OpaquePointerType::get(), allocate_dynamic_parameters);
+        create_function(ALLOCATE_DYNAMIC_NAME, context.types().getOpaquePointerType(), allocate_dynamic_parameters);
 
     std::vector<lang::ResolvingHandle<lang::Type>> delete_dynamic_parameters;
-    delete_dynamic_parameters.emplace_back(lang::OpaquePointerType::get());
-    delete_dynamic_ = create_function(DELETE_DYNAMIC_NAME, lang::VoidType::get(), delete_dynamic_parameters);
+    delete_dynamic_parameters.emplace_back(context.types().getOpaquePointerType());
+    delete_dynamic_ = create_function(DELETE_DYNAMIC_NAME, context.types().getVoidType(), delete_dynamic_parameters);
 
     std::vector<lang::ResolvingHandle<lang::Type>> assertion_parameters;
-    assertion_parameters.emplace_back(lang::BooleanType::get());
-    assertion_parameters.emplace_back(lang::PointerType::get(lang::FixedWidthIntegerType::get(8, false)));
-    assertion_ = create_function(ASSERTION_NAME, lang::VoidType::get(), assertion_parameters);
+    assertion_parameters.emplace_back(context.types().getBooleanType());
+    assertion_parameters.emplace_back(
+        context.types().getPointerType(context.types().getFixedWidthIntegerType(8, false)));
+    assertion_ = create_function(ASSERTION_NAME, context.types().getVoidType(), assertion_parameters);
 
     std::vector<lang::ResolvingHandle<lang::Type>> exit_parameters;
-    exit_parameters.emplace_back(lang::FixedWidthIntegerType::get(32, false));
-    exit_ = create_function(EXIT_NAME, lang::VoidType::get(), exit_parameters);
+    exit_parameters.emplace_back(context.types().getFixedWidthIntegerType(32, false));
+    exit_ = create_function(EXIT_NAME, context.types().getVoidType(), exit_parameters);
 
     std::vector<lang::ResolvingHandle<lang::Type>> abort_parameters;
-    abort_parameters.emplace_back(lang::PointerType::get(lang::FixedWidthIntegerType::get(8, false)));
-    abort_ = create_function(ABORT_NAME, lang::VoidType::get(), abort_parameters);
+    abort_parameters.emplace_back(context.types().getPointerType(context.types().getFixedWidthIntegerType(8, false)));
+    abort_ = create_function(ABORT_NAME, context.types().getVoidType(), abort_parameters);
 
     is_initialized_ = true;
 }
@@ -77,7 +78,7 @@ Shared<lang::Value> Runtime::allocate(Allocator                         allocati
 
     if (count.hasValue())
     {
-        assert(lang::Type::areSame(count.value()->type(), lang::SizeType::getSize()));
+        assert(lang::Type::areSame(count.value()->type(), context.types().getSizeType()));
 
         count.value()->buildContentValue(context);
         count_value = count.value()->getContentValue();
@@ -97,7 +98,7 @@ Shared<lang::Value> Runtime::allocate(Allocator                         allocati
     }
 
     lang::ResolvingHandle<lang::Type> ptr_type =
-        count.hasValue() ? lang::BufferType::get(type) : lang::PointerType::get(type);
+        count.hasValue() ? context.types().getBufferType(type) : context.types().getPointerType(type);
     llvm::Value* native_ptr = lang::values::contentToNative(ptr_type, ptr_to_allocated, context);
 
     if (count_value) { type->buildDefaultInitializer(ptr_to_allocated, count_value, context); }
@@ -119,9 +120,9 @@ void Runtime::deleteDynamic(Shared<lang::Value> value, bool delete_buffer, Compi
         value
             ->getContentValue();// While native value is a pointer too, it is not the pointer we need (points to stack).
 
-    llvm::Type* size_content_type = lang::SizeType::getSize()->getContentType(context.llvmContext());
+    llvm::Type* size_content_type = context.types().getSizeType()->getContentType(context.llvmContext());
     llvm::Type* size_ptr_content_type =
-        lang::PointerType::get(lang::SizeType::getSize())->getContentType(context.llvmContext());
+        context.types().getPointerType(context.types().getSizeType())->getContentType(context.llvmContext());
 
     llvm::Value* memory_ptr = ptr;
 
@@ -198,7 +199,7 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
                                       llvm::Value*                      count_value,
                                       CompileContext&                   context)
 {
-    llvm::Type* size_content_type = lang::SizeType::getSize()->getContentType(context.llvmContext());
+    llvm::Type* size_content_type = context.types().getSizeType()->getContentType(context.llvmContext());
 
     // Calculate the size to allocate.
     llvm::Value* size;
@@ -221,7 +222,7 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
     }
     else
     {
-        size = llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(context.llvmContext()),
+        size = llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()),
                                       type->getContentSize(context.llvmModule()).getFixedSize(),
                                       false);
     }
@@ -230,9 +231,9 @@ llvm::Value* Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
 
     llvm::Value* result_ptr;
 
-    llvm::Type* result_content_type = lang::PointerType::get(type)->getContentType(context.llvmContext());
+    llvm::Type* result_content_type = context.types().getPointerType(type)->getContentType(context.llvmContext());
     llvm::Type* size_ptr_content_type =
-        lang::PointerType::get(lang::SizeType::getSize())->getContentType(context.llvmContext());
+        context.types().getPointerType(context.types().getSizeType())->getContentType(context.llvmContext());
 
     if (count_value)
     {

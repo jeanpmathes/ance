@@ -128,12 +128,12 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
     }
 }
 
-Statements LocalVariableDefinition::expandWith(Expressions subexpressions, Statements) const
+Statements LocalVariableDefinition::expandWith(Expressions subexpressions, Statements, lang::Context& new_context) const
 {
     Statements statements;
 
     Optional<lang::ResolvingHandle<lang::Type>> type;
-    if (type_opt_.hasValue()) type = type_opt_.value()->createUndefinedClone();
+    if (type_opt_.hasValue()) type = type_opt_.value()->createUndefinedClone(new_context);
 
     Optional<Owned<Expression>> assigned;
     if (subexpressions.size() == 1) assigned = std::move(subexpressions[0]);

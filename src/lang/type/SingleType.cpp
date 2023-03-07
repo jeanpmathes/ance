@@ -20,19 +20,7 @@ size_t lang::SingleType::getPrecision() const
     return 32;
 }
 
-lang::ResolvingHandle<lang::Type> lang::SingleType::get()
+lang::ResolvingHandle<lang::Type> lang::SingleType::clone(lang::Context& new_context) const
 {
-#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new SingleType())))
-
-    static lang::ResolvingHandle<lang::Type> instance = MAKE;
-
-    if (!instance.valid()) instance = MAKE;
-
-    return instance;
-#undef MAKE
-}
-
-lang::ResolvingHandle<lang::Type> lang::SingleType::clone() const
-{
-    return get();
+    return new_context.getSingleType();
 }

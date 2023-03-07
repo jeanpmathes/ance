@@ -3,6 +3,7 @@
 #include <set>
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/expression/Expression.h"
 #include "lang/type/BooleanType.h"
@@ -123,7 +124,7 @@ void lang::BasicBlock::Definition::Branching::doBuild(CompileContext& context)
     for (auto& statement : statements_) { statement->build(context); }
 
     Shared<lang::Value> truth         = condition_.getValue();
-    Shared<lang::Value> boolean_truth = lang::Type::makeMatching(lang::BooleanType::get(), truth, context);
+    Shared<lang::Value> boolean_truth = lang::Type::makeMatching(context.types().getBooleanType(), truth, context);
 
     boolean_truth->buildContentValue(context);
 

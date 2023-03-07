@@ -1,10 +1,11 @@
 #include "AddressType.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/type/BooleanType.h"
+#include "lang/scope/Scope.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Values.h"
@@ -30,7 +31,7 @@ bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::Type co
 
     if (op == lang::BinaryOperator::ADDITION && getPointeeType() != nullptr)
     {
-        return lang::Type::areSame(real_other, lang::SizeType::getDiff());
+        return lang::Type::areSame(real_other, scope()->context().getDiffType());
     }
 
     return false;
@@ -39,11 +40,11 @@ bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::Type co
 lang::ResolvingHandle<lang::Type> lang::AddressType::getOperatorResultType(lang::BinaryOperator op,
                                                                            lang::ResolvingHandle<lang::Type>)
 {
-    if (op.isEquality()) return lang::BooleanType::get();
+    if (op.isEquality()) return scope()->context().getBooleanType();
 
     if (op == lang::BinaryOperator::ADDITION) return self();
 
-    if (op == lang::BinaryOperator::SUBTRACTION) return lang::SizeType::getDiff();
+    if (op == lang::BinaryOperator::SUBTRACTION) return scope()->context().getDiffType();
 
     return lang::Type::getUndefined();
 }
@@ -92,7 +93,7 @@ Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
                                                 right_value,
                                                 left_value->getName() + ".ptrdiff");
             result = context.ir().CreateIntCast(result,
-                                                lang::SizeType::getDiff()->getContentType(context.llvmContext()),
+                                                context.types().getDiffType()->getContentType(context.llvmContext()),
                                                 true,
                                                 left_value->getName() + ".icast");
             break;

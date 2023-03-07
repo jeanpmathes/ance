@@ -23,8 +23,9 @@ namespace lang
          * Create a new char constant.
          * @param prefix The prefix of the constant.
          * @param content The content of the constant.
+         * @param new_context The context to create the constant in.
          */
-        explicit CharConstant(std::string const& prefix, std::string const& content);
+        explicit CharConstant(std::string const& prefix, std::string const& content, lang::Context& new_context);
 
         [[nodiscard]] std::string toString() const override;
 
@@ -36,7 +37,7 @@ namespace lang
         bool equals(lang::Constant const* other) const override;
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
-        Shared<Constant> clone() const override;
+        Shared<Constant> clone(lang::Context& new_context) const override;
 
         /**
          * Parse a character from a string.

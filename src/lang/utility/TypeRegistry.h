@@ -15,11 +15,18 @@ namespace lang
     class TypeDefinitionRegistry
     {
       public:
+        TypeDefinitionRegistry()                                             = default;
+        TypeDefinitionRegistry(TypeDefinitionRegistry&&) noexcept            = default;
+        TypeDefinitionRegistry& operator=(TypeDefinitionRegistry&&) noexcept = default;
+
+        TypeDefinitionRegistry(TypeDefinitionRegistry&)            = default;
+        TypeDefinitionRegistry& operator=(TypeDefinitionRegistry&) = default;
+
         /**
          * Set the scope that will contain the non-custom types. Call this method once.
          * @param scope The default containing scope.
          */
-        virtual void setDefaultContainingScope(lang::Scope* scope) = 0;
+        virtual void setDefaultContainingScope(lang::Scope& scope) = 0;
 
         /**
          * Resolve the used types.
@@ -63,10 +70,17 @@ namespace lang
         using Key       = std::pair<UsedTypes, OTHER_KEY>;
         using Entry     = std::pair<Key, TypeHandle>;
 
+        TypeRegistry()                                   = default;
+        TypeRegistry(TypeRegistry&&) noexcept            = default;
+        TypeRegistry& operator=(TypeRegistry&&) noexcept = default;
+
+        TypeRegistry(TypeRegistry&)            = default;
+        TypeRegistry& operator=(TypeRegistry&) = default;
+
         Optional<TypeHandle> get(UsedTypes type_keys, OTHER_KEY other_keys);
         void                 add(UsedTypes&& type_keys, OTHER_KEY other_key, TypeHandle type);
 
-        void setDefaultContainingScope(lang::Scope* scope) override;
+        void setDefaultContainingScope(lang::Scope& scope) override;
         void resolve() override;
         void postResolve() override;
 
@@ -74,6 +88,8 @@ namespace lang
         void buildNativeDefinitions(CompileContext& context) override;
 
         void clear() override;
+
+        ~TypeRegistry() override = default;
 
       private:
         std::vector<Entry> types_;

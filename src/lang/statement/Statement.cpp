@@ -87,7 +87,7 @@ lang::Location Statement::location() const
     return location_;
 }
 
-Statements Statement::expand() const
+Statements Statement::expand(lang::Context& new_context) const
 {
     Statements before;
     Statements after;
@@ -97,7 +97,7 @@ Statements Statement::expand() const
 
     for (auto& subexpression : subexpressions_)
     {
-        auto [statements_before, expanded_expression, statements_after] = subexpression.get().expand();
+        auto [statements_before, expanded_expression, statements_after] = subexpression.get().expand(new_context);
 
         before.insert(before.end(),
                       std::make_move_iterator(statements_before.begin()),
@@ -114,13 +114,13 @@ Statements Statement::expand() const
 
     for (auto& substatement : substatements_)
     {
-        Statements expanded_substatement = substatement.get().expand();
+        Statements expanded_substatement = substatement.get().expand(new_context);
         substatements.insert(substatements.end(),
                              std::make_move_iterator(expanded_substatement.begin()),
                              std::make_move_iterator(expanded_substatement.end()));
     }
 
-    auto expanded_statements = this->expandWith(std::move(subexpressions), std::move(substatements));
+    auto expanded_statements = this->expandWith(std::move(subexpressions), std::move(substatements), new_context);
 
     Statements final;
 

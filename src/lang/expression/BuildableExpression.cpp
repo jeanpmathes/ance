@@ -1,6 +1,7 @@
 #include "BuildableExpression.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 
 void BuildableExpression::build(CompileContext& context)
 {

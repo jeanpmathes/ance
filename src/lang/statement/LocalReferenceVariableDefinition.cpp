@@ -94,12 +94,14 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
     }
 }
 
-Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressions, Statements) const
+Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressions,
+                                                        Statements,
+                                                        lang::Context& new_context) const
 {
     Statements statements;
 
     statements.emplace_back(makeOwned<LocalReferenceVariableDefinition>(name_,
-                                                                        type_->createUndefinedClone(),
+                                                                        type_->createUndefinedClone(new_context),
                                                                         type_location_,
                                                                         std::move(subexpressions[0]),
                                                                         location()));

@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/expression/DelayableExpression.h"
 
 lang::DelayedValue::DelayedValue(Passed<DelayableExpression> expression) : expression_(std::move(expression)) {}

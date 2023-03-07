@@ -41,7 +41,7 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::getActualType()
     {
         lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
         if (actual_element_type == element_type_) { actual_type_ = self(); }
-        else { actual_type_ = lang::ReferenceType::get(actual_element_type); }
+        else { actual_type_ = scope()->context().getReferenceType(actual_element_type); }
     }
 
     return actual_type_.value();
@@ -71,7 +71,8 @@ bool lang::ReferenceType::validate(ValidationLogger& validation_logger, lang::Lo
 
     if (element_type_->isVoidType())
     {
-        validation_logger.logError("Cannot declare reference to " + lang::VoidType::get()->getAnnotatedName(),
+        validation_logger.logError("Cannot declare reference to "
+                                       + scope()->context().getVoidType()->getAnnotatedName(),
                                    location);
         return false;
     }
@@ -244,17 +245,6 @@ llvm::DIType* lang::ReferenceType::createDebugType(CompileContext& context) cons
     return di_type;
 }
 
-lang::TypeRegistry<>& lang::ReferenceType::getReferenceTypes()
-{
-    static lang::TypeRegistry<> reference_types;
-    return reference_types;
-}
-
-lang::TypeDefinitionRegistry* lang::ReferenceType::getRegistry()
-{
-    return &getReferenceTypes();
-}
-
 llvm::Value* lang::ReferenceType::getReferenced(llvm::Value* value, CompileContext& context) const
 {
     return context.ir().CreateLoad(getContentType(context.llvmContext()), value, value->getName() + ".load");
@@ -270,27 +260,6 @@ Shared<lang::Value> lang::ReferenceType::getReferenced(Shared<lang::Value> value
     return makeShared<lang::WrappedNativeValue>(element_type_, native_referred);
 }
 
-lang::ResolvingHandle<lang::Type> lang::ReferenceType::get(lang::ResolvingHandle<lang::Type> element_type)
-{
-    element_type = element_type->getDetachedIfUndefined();
-
-    std::vector<lang::ResolvingHandle<lang::Type>> used_types;
-    used_types.emplace_back(element_type);
-
-    Optional<lang::ResolvingHandle<lang::Type>> defined_type = getReferenceTypes().get(used_types, lang::Empty());
-
-    if (defined_type.hasValue()) { return defined_type.value(); }
-    else
-    {
-        auto&                             reference_type = *(new lang::ReferenceType(element_type));
-        lang::ResolvingHandle<lang::Type> type =
-            lang::makeHandled<lang::Type>(Owned<lang::ReferenceType>(reference_type));
-        getReferenceTypes().add(std::move(used_types), lang::Empty(), type);
-
-        return type;
-    }
-}
-
 std::vector<lang::TypeDefinition const*> lang::ReferenceType::getDependencies() const
 {
     return {};
@@ -301,7 +270,7 @@ std::vector<std::reference_wrapper<const lang::Type>> lang::ReferenceType::getCo
     return {element_type_};
 }
 
-lang::ResolvingHandle<lang::Type> lang::ReferenceType::clone() const
+lang::ResolvingHandle<lang::Type> lang::ReferenceType::clone(lang::Context& new_context) const
 {
-    return get(const_cast<lang::ReferenceType*>(this)->element_type_->createUndefinedClone());
+    return new_context.getReferenceType(element_type_->createUndefinedClone(new_context));
 }

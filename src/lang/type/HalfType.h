@@ -10,20 +10,13 @@ namespace lang
      */
     class HalfType : public FloatingPointType
     {
-      private:
+      public:
         HalfType();
 
-      public:
         llvm::Constant* getDefaultContent(llvm::Module& m) const override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
-        /**
-         * Get the half type instance.
-         * @return The instance.
-         */
-        static lang::ResolvingHandle<lang::Type> get();
-
-        ResolvingHandle<lang::Type> clone() const override;
+        lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
 
       private:
         [[nodiscard]] size_t getPrecision() const override;

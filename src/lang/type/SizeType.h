@@ -15,7 +15,7 @@ namespace lang
      */
     class SizeType : public IntegerType
     {
-      private:
+      public:
         enum Kind
         {
             SIZE_KIND,
@@ -24,6 +24,7 @@ namespace lang
 
         SizeType(std::string const& name, Kind kind);
 
+      private:
         Kind kind_;
 
       public:
@@ -69,28 +70,16 @@ namespace lang
         static void init(Unit& unit);
 
         /**
-         * Get the size type instance.
-         * @return The instance.
-         */
-        static lang::ResolvingHandle<lang::Type> getSize();
-
-        /**
          * Get the width of the size type.
          */
         static unsigned int getSizeWidth();
-
-        /**
-         * Get the diff type instance.
-         * @return The instance.
-         */
-        static lang::ResolvingHandle<lang::Type> getDiff();
 
         /**
          * Get the width of the diff type.
          */
         static unsigned int getDiffWidth();
 
-        ResolvingHandle<lang::Type> clone() const override;
+        lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }
 #endif

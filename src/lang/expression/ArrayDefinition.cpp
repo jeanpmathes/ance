@@ -43,7 +43,7 @@ void ArrayDefinition::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
     if (declared_type_.hasValue())
     {
-        type.reroute(lang::ArrayType::get(declared_type_.value(), elements_.size()));
+        type.reroute(scope()->context().getArrayType(declared_type_.value(), elements_.size()));
         return;
     }
 
@@ -52,7 +52,7 @@ void ArrayDefinition::defineType(lang::ResolvingHandle<lang::Type>& type)
 
     if (common_types.size() == 1)
     {
-        type.reroute(lang::ArrayType::get(common_types.front(), elements_.size()));
+        type.reroute(scope()->context().getArrayType(common_types.front(), elements_.size()));
         return;
     }
 }
@@ -103,10 +103,10 @@ bool ArrayDefinition::validate(ValidationLogger& validation_logger) const
     return valid;
 }
 
-Expression::Expansion ArrayDefinition::expandWith(Expressions subexpressions) const
+Expression::Expansion ArrayDefinition::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
     Optional<lang::ResolvingHandle<lang::Type>> type;
-    if (declared_type_.hasValue()) type = declared_type_.value()->createUndefinedClone();
+    if (declared_type_.hasValue()) type = declared_type_.value()->createUndefinedClone(new_context);
 
     return {Statements(),
             makeOwned<ArrayDefinition>(type, type_location_, std::move(subexpressions), location()),

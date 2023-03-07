@@ -27,7 +27,7 @@ class UnaryOperation
   public:
     bool validate(ValidationLogger& validation_logger) const override;
 
-    [[nodiscard]] Expansion expandWith(Expressions subexpressions) const override;
+    [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type>& type) override;

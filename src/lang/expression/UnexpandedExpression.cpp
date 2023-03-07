@@ -1,5 +1,6 @@
 #include "UnexpandedExpression.h"
 
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/NoValue.h"
 
 UnexpandedExpression::UnexpandedExpression(lang::Location location)

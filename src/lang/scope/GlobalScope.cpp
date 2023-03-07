@@ -10,7 +10,10 @@
 #include "lang/type/TypeAlias.h"
 #include "validation/ValidationLogger.h"
 
-lang::GlobalScope::GlobalScope(bool is_containing_runtime) : is_containing_runtime_(is_containing_runtime) {}
+lang::GlobalScope::GlobalScope(bool is_containing_runtime) : is_containing_runtime_(is_containing_runtime)
+{
+    context_ = makeOwned<lang::Context>(*this);
+}
 
 bool lang::GlobalScope::isContainingRuntime() const
 {
@@ -20,6 +23,16 @@ bool lang::GlobalScope::isContainingRuntime() const
 lang::Scope* lang::GlobalScope::scope()
 {
     return this;
+}
+
+lang::Context& lang::GlobalScope::context()
+{
+    return **context_;
+}
+
+lang::Context const& lang::GlobalScope::context() const
+{
+    return **context_;
 }
 
 lang::GlobalScope* lang::GlobalScope::getGlobalScope()
@@ -75,21 +88,11 @@ void lang::GlobalScope::expand()
     auto defined_types   = std::move(defined_types_);
     auto invalid_types   = std::move(invalid_types_);
 
-    for (auto& name : registered_types_)
-    {
-        auto it = defined_types.find(name);
-        assert(it != defined_types.end());
-
-        auto& [_, type] = *it;
-        defined_types_.emplace(name, std::move(type));
-        defined_types.erase(it);
-    }
-
     clearChildren();
 
     // this is actually required:
 
-    for (auto& registry : type_registries_) { registry->clear(); }
+    context_ = makeOwned<lang::Context>(*this);
 
     std::map<lang::Identifier, std::vector<Owned<lang::Description>>> expanded_descriptions;
 
@@ -97,7 +100,7 @@ void lang::GlobalScope::expand()
     {
         for (auto& description : descriptions)
         {
-            std::vector<Owned<lang::Description>> new_descriptions = description->expand();
+            std::vector<Owned<lang::Description>> new_descriptions = description->expand(**context_);
 
             for (auto& new_description : new_descriptions)
             {
@@ -242,12 +245,6 @@ Optional<lang::ResolvingHandle<lang::Type>> lang::GlobalScope::getType(Identifie
     else { return {}; }
 }
 
-void lang::GlobalScope::addTypeRegistry(lang::TypeDefinitionRegistry* registry)
-{
-    type_registries_.push_back(registry);
-    registry->clear();
-}
-
 void lang::GlobalScope::registerUsage(lang::ResolvingHandle<lang::Variable> variable)
 {
     assert(!variable->isDefined());
@@ -314,8 +311,6 @@ void lang::GlobalScope::registerDefinition(lang::ResolvingHandle<lang::Type> typ
     defined_types_.emplace(type->name(), lang::OwningHandle<lang::Type>::takeOwnership(type));
     type->setContainingScope(this);
 
-    registered_types_.emplace(type->name());
-
     if (undefined_types_.contains(type->name()))
     {
         lang::OwningHandle<lang::Type> undefined = std::move(undefined_types_.at(type->name()));
@@ -341,18 +336,15 @@ void lang::GlobalScope::resolve()
 
     // Type registries are currently incorrect, as they resolve type dependencies in an incorrect scope.
 
-    for (auto& registry : type_registries_)
-    {
-        registry->setDefaultContainingScope(this);
-        registry->resolve();
-    }
+    (**context_).resolve();
 }
 
 void lang::GlobalScope::postResolve()
 {
     for (auto& [name, type] : defined_types_) { type->postResolve(); }
 
-    for (auto& registry : type_registries_) { registry->postResolve(); }
+    (**context_).postResolve();
+
     for (auto& [key, group] : defined_function_groups_) { group->postResolve(); }
 
     for (auto& [name, descriptions] : compatible_descriptions_)
@@ -443,10 +435,10 @@ void lang::GlobalScope::createNativeBacking(CompileContext& context)
     for (auto& [name, variable] : global_defined_variables_) { variable->buildDeclaration(context); }
 
     for (auto& [name, type] : defined_types_) { type->buildNativeDeclaration(context); }
-    for (auto& registry : type_registries_) { registry->buildNativeDeclarations(context); }
+    (**context_).buildNativeDeclarations(context);
 
     for (auto& [name, type] : defined_types_) { type->buildNativeDefinition(context); }
-    for (auto& registry : type_registries_) { registry->buildNativeDefinitions(context); }
+    (**context_).buildNativeDefinitions(context);
 }
 
 void lang::GlobalScope::buildFunctions(CompileContext& context)

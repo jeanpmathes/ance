@@ -2,7 +2,6 @@
 
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/type/PointerType.h"
 #include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
@@ -24,13 +23,13 @@ void Addressof::defineType(lang::ResolvingHandle<lang::Type>& type)
     {
         if (value_type->isReferenceType()) { value_type = value_type->getElementType(); }
 
-        type.reroute(lang::PointerType::get(value_type));
+        type.reroute(scope()->context().getPointerType(value_type));
     }
 }
 
 bool Addressof::validate(ValidationLogger& validation_logger) const
 {
-    bool is_arg_valid = arg_->validate(validation_logger);
+    bool const is_arg_valid = arg_->validate(validation_logger);
     if (!is_arg_valid) return false;
 
     if (!arg_->isNamed())
@@ -42,7 +41,7 @@ bool Addressof::validate(ValidationLogger& validation_logger) const
     return true;
 }
 
-Expression::Expansion Addressof::expandWith(Expressions subexpressions) const
+Expression::Expansion Addressof::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(), makeOwned<Addressof>(std::move(subexpressions[0]), location()), Statements()};
 }

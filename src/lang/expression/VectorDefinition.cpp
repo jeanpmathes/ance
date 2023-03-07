@@ -43,13 +43,16 @@ void VectorDefinition::walkDefinitions()
 
 void VectorDefinition::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
-    if (type_.hasValue()) { type.reroute(lang::VectorType::get(type_.value(), elements_.size())); }
+    if (type_.hasValue()) { type.reroute(scope()->context().getVectorType(type_.value(), elements_.size())); }
     else
     {
         auto types        = Expression::getTypes(elements_);
         auto common_types = lang::Type::getCommonType(types);
 
-        if (common_types.size() == 1) { type.reroute(lang::VectorType::get(common_types.front(), elements_.size())); }
+        if (common_types.size() == 1)
+        {
+            type.reroute(scope()->context().getVectorType(common_types.front(), elements_.size()));
+        }
     }
 }
 
@@ -95,10 +98,10 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
     return valid;
 }
 
-Expression::Expansion VectorDefinition::expandWith(Expressions subexpressions) const
+Expression::Expansion VectorDefinition::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
     Optional<lang::ResolvingHandle<lang::Type>> type;
-    if (type_.hasValue()) type = type_.value()->createUndefinedClone();
+    if (type_.hasValue()) type = type_.value()->createUndefinedClone(new_context);
 
     return {Statements(),
             makeOwned<VectorDefinition>(type, type_location_, std::move(subexpressions), location()),

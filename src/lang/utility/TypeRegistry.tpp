@@ -22,14 +22,14 @@ void lang::TypeRegistry<OTHER_KEY>::add(UsedTypes&& type_keys, OTHER_KEY other_k
 }
 
 template<typename OTHER_KEY>
-void lang::TypeRegistry<OTHER_KEY>::setDefaultContainingScope(lang::Scope* scope)
+void lang::TypeRegistry<OTHER_KEY>::setDefaultContainingScope(lang::Scope& scope)
 {
-    scope_ = scope;
+    scope_ = &scope;
 
     for (auto& [key, type] : types_)
     {
         if (type->isCustom()) continue;
-        type->setContainingScope(scope);
+        type->setContainingScope(&scope);
     }
 }
 

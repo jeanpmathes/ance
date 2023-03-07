@@ -4,7 +4,6 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
-#include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
@@ -30,7 +29,7 @@ lang::ResolvingHandle<lang::Type> lang::ArrayType::getActualType()
     {
         lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
         if (actual_element_type == element_type_) { actual_type_ = self(); }
-        else { actual_type_ = lang::ArrayType::get(actual_element_type, size_.value()); }
+        else { actual_type_ = scope()->context().getArrayType(actual_element_type, size_.value()); }
     }
 
     return actual_type_.value();
@@ -95,39 +94,7 @@ llvm::DIType* lang::ArrayType::createDebugType(CompileContext& context) const
     return context.di().createArrayType(size, alignment, element_di_type, context.di().getOrCreateArray(subscripts));
 }
 
-lang::TypeRegistry<uint64_t>& lang::ArrayType::getArrayTypes()
+lang::ResolvingHandle<lang::Type> lang::ArrayType::clone(lang::Context& new_context) const
 {
-    static lang::TypeRegistry<uint64_t> array_types;
-    return array_types;
-}
-
-lang::TypeDefinitionRegistry* lang::ArrayType::getRegistry()
-{
-    return &getArrayTypes();
-}
-
-lang::ResolvingHandle<lang::Type> lang::ArrayType::get(lang::ResolvingHandle<lang::Type> element_type, uint64_t size)
-{
-    element_type = element_type->getDetachedIfUndefined();
-
-    std::vector<lang::ResolvingHandle<lang::Type>> used_types;
-    used_types.emplace_back(element_type);
-
-    Optional<lang::ResolvingHandle<lang::Type>> defined_type = getArrayTypes().get(used_types, size);
-
-    if (defined_type.hasValue()) { return defined_type.value(); }
-    else
-    {
-        auto&                             array_type = *(new lang::ArrayType(element_type, size));
-        lang::ResolvingHandle<lang::Type> type = lang::makeHandled<lang::Type>(Owned<lang::ArrayType>(array_type));
-        getArrayTypes().add(std::move(used_types), size, type);
-
-        return type;
-    }
-}
-
-lang::ResolvingHandle<lang::Type> lang::ArrayType::clone() const
-{
-    return lang::ArrayType::get(const_cast<lang::ArrayType*>(this)->element_type_->createUndefinedClone(),
-                                size_.value());
+    return new_context.getArrayType(element_type_->createUndefinedClone(new_context), size_.value());
 }

@@ -4,19 +4,20 @@
 
 #include <boost/locale/encoding_utf.hpp>
 
+#include "lang/ApplicationVisitor.h"
+#include "lang/Context.h"
 #include "lang/construct/constant/CharConstant.h"
 #include "lang/type/ArrayType.h"
 #include "lang/type/CharType.h"
 #include "lang/type/FixedWidthIntegerType.h"
-#include "lang/type/PointerType.h"
 #include "validation/ValidationLogger.h"
 
-lang::StringConstant::StringConstant(std::string prefix, std::string string)
+lang::StringConstant::StringConstant(std::string prefix, std::string string, lang::Context& new_context)
     : prefix_(std::move(prefix))
     , literal_(std::move(string))
     , kind_(resolveKind(prefix_, &is_prefix_valid_))
     , data_(createData(literal_, kind_, &is_literal_valid_))
-    , type_(resolveType(kind_, data_))
+    , type_(resolveType(kind_, data_, new_context))
 {}
 
 std::string lang::StringConstant::toString() const
@@ -47,7 +48,7 @@ llvm::Constant* lang::StringConstant::createContent(llvm::Module& m)
         {
             auto const& data = std::get<std::u32string>(data_);
             auto const* ptr  = reinterpret_cast<char const*>(data.data());
-            llvm::Type* type = lang::CharType::get()->getContentType(m.getContext());
+            llvm::Type* type = type_->getElementType()->getContentType(m.getContext());
 
             return llvm::ConstantDataArray::getRaw(ptr, data.size(), type);
         }
@@ -146,28 +147,30 @@ lang::StringConstant::Data lang::StringConstant::createData(std::string const& l
     }
 }
 
-lang::ResolvingHandle<lang::Type> lang::StringConstant::resolveType(lang::StringConstant::Kind kind, Data const& data)
+lang::ResolvingHandle<lang::Type> lang::StringConstant::resolveType(lang::StringConstant::Kind kind,
+                                                                    Data const&                data,
+                                                                    lang::Context&             new_context)
 {
     switch (kind)
     {
         case BYTE:
         {
             size_t const size = std::get<std::string>(data).size();
-            return lang::ArrayType::get(lang::FixedWidthIntegerType::get(8, false), size);
+            return new_context.getArrayType(new_context.getFixedWidthIntegerType(8, false), size);
         }
         case CHAR:
         {
             size_t const size = std::get<std::u32string>(data).size();
-            return lang::ArrayType::get(lang::CharType::get(), size);
+            return new_context.getArrayType(new_context.getCharType(), size);
         }
         case C_STRING:
         {
-            return lang::PointerType::get(lang::FixedWidthIntegerType::get(8, false));
+            return new_context.getPointerType(new_context.getFixedWidthIntegerType(8, false));
         }
     }
 }
 
-Shared<lang::Constant> lang::StringConstant::clone() const
+Shared<lang::Constant> lang::StringConstant::clone(lang::Context& new_context) const
 {
-    return Shared<StringConstant>(*(new StringConstant(prefix_, literal_)));
+    return Shared<StringConstant>(*(new StringConstant(prefix_, literal_, new_context)));
 }

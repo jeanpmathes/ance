@@ -33,8 +33,9 @@ namespace lang
          * Create a new fixed-width integer constant that selects it's size to be large enough to hold the given value.
          * @param integer The integer value to use, encoded as a string. Radix is assumed to be 10.
          * @param is_signed Whether the integer value is signed or unsigned.
+         * @param new_context The context to use for the new constant.
          */
-        IntegerConstant(std::string const& integer, bool is_signed);
+        IntegerConstant(std::string const& integer, bool is_signed, lang::Context& new_context);
 
         [[nodiscard]] std::string toString() const override;
 
@@ -47,7 +48,7 @@ namespace lang
 
         bool equals(lang::Constant const* other) const override;
 
-        Shared<Constant> clone() const override;
+        Shared<Constant> clone(lang::Context& new_context) const override;
 
       private:
         std::string                       text_;

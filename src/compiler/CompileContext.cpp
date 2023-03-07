@@ -48,6 +48,11 @@ Runtime& CompileContext::runtime()
     return runtime_;
 }
 
+lang::Context& CompileContext::types()
+{
+    return unit_.globalScope().context();
+}
+
 llvm::LLVMContext& CompileContext::llvmContext()
 {
     return context_;

@@ -27,7 +27,10 @@ void MemberAccess::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
     auto value_type = value_->type();
 
-    if (value_type->isDefined()) { type.reroute(lang::ReferenceType::get(value_type->getMemberType(member_))); }
+    if (value_type->isDefined())
+    {
+        type.reroute(scope()->context().getReferenceType(value_type->getMemberType(member_)));
+    }
 }
 
 bool MemberAccess::validate(ValidationLogger& validation_logger) const
@@ -44,7 +47,7 @@ bool MemberAccess::validate(ValidationLogger& validation_logger) const
     return value_->type().validateMemberAccess(member_, validation_logger);
 }
 
-Expression::Expansion MemberAccess::expandWith(Expressions subexpressions) const
+Expression::Expansion MemberAccess::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(), makeOwned<MemberAccess>(std::move(subexpressions[0]), member_, location()), Statements()};
 }

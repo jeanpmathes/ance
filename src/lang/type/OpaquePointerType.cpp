@@ -41,18 +41,6 @@ llvm::DIType* lang::OpaquePointerType::createDebugType(CompileContext& context) 
     return di_type;
 }
 
-lang::ResolvingHandle<lang::Type> lang::OpaquePointerType::get()
-{
-#define MAKE lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new OpaquePointerType())))
-
-    static lang::ResolvingHandle<lang::Type> instance = MAKE;
-
-    if (!instance.valid()) instance = MAKE;
-
-    return instance;
-#undef MAKE
-}
-
 Optional<lang::ResolvingHandle<lang::Type>> lang::OpaquePointerType::getPointeeType()
 {
     return std::nullopt;
@@ -63,7 +51,7 @@ lang::Type const* lang::OpaquePointerType::getPointeeType() const
     return nullptr;
 }
 
-lang::ResolvingHandle<lang::Type> lang::OpaquePointerType::clone() const
+lang::ResolvingHandle<lang::Type> lang::OpaquePointerType::clone(lang::Context& new_context) const
 {
-    return get();
+    return new_context.getOpaquePointerType();
 }

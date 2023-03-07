@@ -35,7 +35,9 @@ class Assignment
 
     void validate(ValidationLogger& validation_logger) const override;
 
-    [[nodiscard]] Statements expandWith(Expressions subexpressions, Statements substatements) const override;
+    [[nodiscard]] Statements expandWith(Expressions    subexpressions,
+                                        Statements     substatements,
+                                        lang::Context& new_context) const override;
 
   protected:
     void doBuild(CompileContext& context) override;

@@ -66,7 +66,7 @@ llvm::Value* lang::Parameter::getContentValue() const
     return content_value_;
 }
 
-Shared<lang::Parameter> lang::Parameter::expand() const
+Shared<lang::Parameter> lang::Parameter::expand(lang::Context& new_context) const
 {
-    return makeShared<lang::Parameter>(type_->createUndefinedClone(), type_location_, name_, location_);
+    return makeShared<lang::Parameter>(type_->createUndefinedClone(new_context), type_location_, name_, location_);
 }

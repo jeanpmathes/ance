@@ -4,6 +4,16 @@
 #include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
 
+lang::Context& lang::Scope::context()
+{
+    return getGlobalScope()->context();
+}
+
+lang::Context const& lang::Scope::context() const
+{
+    return getGlobalScope()->context();
+}
+
 lang::LocalScope* lang::Scope::asLocalScope()
 {
     return nullptr;

@@ -20,8 +20,9 @@ namespace lang
          * Create a new string constant.
          * @param prefix The prefix determining the type.
          * @param string The string content, used directly without any parsing.
+         * @param new_context The context to create the constant in.
          */
-        StringConstant(std::string prefix, std::string string);
+        StringConstant(std::string prefix, std::string string, lang::Context& new_context);
 
         [[nodiscard]] std::string toString() const override;
 
@@ -34,7 +35,7 @@ namespace lang
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
-        Shared<Constant> clone() const override;
+        Shared<Constant> clone(lang::Context& new_context) const override;
 
       private:
         enum Kind
@@ -50,7 +51,7 @@ namespace lang
         static Kind                              resolveKind(std::string const& prefix, bool* valid);
         static std::u32string                    parse(std::u32string const& unparsed, bool* valid);
         static Data                              createData(std::string const& literal, Kind kind, bool* valid);
-        static lang::ResolvingHandle<lang::Type> resolveType(Kind kind, Data const& data);
+        static lang::ResolvingHandle<lang::Type> resolveType(Kind kind, Data const& data, lang::Context& new_context);
 
       private:
         bool is_prefix_valid_  = true;

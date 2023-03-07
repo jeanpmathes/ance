@@ -8,20 +8,20 @@
 #include "lang/type/FixedWidthIntegerType.h"
 #include "validation/ValidationLogger.h"
 
-lang::CharConstant::CharConstant(std::string const& prefix, std::string const& content)
-    : type_(lang::CharType::get())
+lang::CharConstant::CharConstant(std::string const& prefix, std::string const& content, lang::Context& new_context)
+    : type_(new_context.getCharType())
     , prefix_(prefix)
     , content_(content)
     , char_(0)
 {
     if (prefix.empty())
     {
-        type_ = lang::CharType::get();
+        type_ = new_context.getCharType();
         char_ = parseChar(boost::locale::conv::utf_to_utf<char32_t>(content), is_literal_valid_);
     }
     else if (prefix == "8")
     {
-        type_ = lang::FixedWidthIntegerType::get(8, false);
+        type_ = new_context.getFixedWidthIntegerType(8, false);
         char_ = parseByte(content, is_literal_valid_);
     }
     else { is_prefix_valid_ = false; }
@@ -72,9 +72,9 @@ bool lang::CharConstant::validate(ValidationLogger& validation_logger, lang::Loc
     return true;
 }
 
-Shared<lang::Constant> lang::CharConstant::clone() const
+Shared<lang::Constant> lang::CharConstant::clone(lang::Context& new_context) const
 {
-    return Shared<CharConstant>(*(new CharConstant(prefix_, content_)));
+    return Shared<CharConstant>(*(new CharConstant(prefix_, content_, new_context)));
 }
 
 char32_t lang::CharConstant::parseChar(std::u32string const& unparsed, bool& valid)

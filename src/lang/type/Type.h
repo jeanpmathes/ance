@@ -696,9 +696,9 @@ namespace lang
 
         /**
          * Get an undefined type with the same name. Types given by literals cannot be undefined.
-         * Therefore, for these types the returned type will be the same as the type passed in.
+         * Therefore, for these types the returned type will already defined - but in the new context.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> createUndefinedClone() const;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> createUndefinedClone(lang::Context& new_context) const;
 
         /**
          * Get a separate type get if the type is undefined, otherwise return the same type.

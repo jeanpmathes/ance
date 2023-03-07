@@ -53,10 +53,13 @@ void If::validate(ValidationLogger& validation_logger) const
     if (if_block_.hasValue()) if_block_.value()->validate(validation_logger);
     if (else_block_.hasValue()) else_block_.value()->validate(validation_logger);
 
-    lang::Type::checkMismatch(lang::BooleanType::get(), condition_->type(), condition_->location(), validation_logger);
+    lang::Type::checkMismatch(scope()->context().getBooleanType(),
+                              condition_->type(),
+                              condition_->location(),
+                              validation_logger);
 }
 
-Statements If::expandWith(Expressions subexpressions, Statements substatements) const
+Statements If::expandWith(Expressions subexpressions, Statements substatements, lang::Context&) const
 {
     Statements statements;
 

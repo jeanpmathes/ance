@@ -198,7 +198,7 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
     }
 }
 
-lang::Description::Descriptions lang::VariableDescription::expand() const
+lang::Description::Descriptions lang::VariableDescription::expand(lang::Context& new_context) const
 {
     Expression* expanded_init_expression_ptr = nullptr;
 
@@ -206,7 +206,7 @@ lang::Description::Descriptions lang::VariableDescription::expand() const
 
     if (init_block_.hasValue())
     {
-        Statements expanded = init_block_.value()->expand();
+        Statements expanded = init_block_.value()->expand(new_context);
         assert(expanded.size() == 1);
 
         expanded_init_block = std::move(expanded[0]);
@@ -216,7 +216,7 @@ lang::Description::Descriptions lang::VariableDescription::expand() const
 
     if (init_expression_.hasValue())
     {
-        auto [leading_statements, new_expression, following_statements] = init_expression_.value()->expand();
+        auto [leading_statements, new_expression, following_statements] = init_expression_.value()->expand(new_context);
 
         assert(leading_statements.empty());
         assert(following_statements.empty());
@@ -228,7 +228,7 @@ lang::Description::Descriptions lang::VariableDescription::expand() const
     }
 
     auto expanded = makeOwned<lang::VariableDescription>(name_,
-                                                         type_handle_->createUndefinedClone(),
+                                                         type_handle_->createUndefinedClone(new_context),
                                                          type_location_,
                                                          access_,
                                                          std::move(expanded_init_block),

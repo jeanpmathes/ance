@@ -56,13 +56,7 @@ namespace lang
         llvm::DIType* createDebugType(CompileContext& context) const override;
 
       public:
-        /**
-         * Get the boolean type.
-         * @return The boolean type.
-         */
-        static lang::ResolvingHandle<lang::Type> get();
-
-        ResolvingHandle<lang::Type> clone() const override;
+        lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }
 

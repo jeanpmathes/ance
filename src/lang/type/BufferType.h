@@ -21,10 +21,9 @@ namespace lang
         , public lang::IndirectType
         , public lang::AddressType
     {
-      private:
+      public:
         explicit BufferType(lang::ResolvingHandle<lang::Type> element_type);
 
-      public:
         StateCount getStateCount() const override;
 
         bool isBufferType() const override;
@@ -60,21 +59,10 @@ namespace lang
         Type const*                                 getPointeeType() const override;
 
       private:
-        static lang::TypeRegistry<>& getBufferTypes();
-
         Optional<lang::ResolvingHandle<lang::Type>> actual_type_ {};
 
       public:
-        static lang::TypeDefinitionRegistry* getRegistry();
-
-        /**
-         * Get a buffer type instance.
-         * @param element_type The element type.
-         * @return The instance.
-         */
-        static lang::ResolvingHandle<lang::Type> get(lang::ResolvingHandle<lang::Type> element_type);
-
-        ResolvingHandle<lang::Type> clone() const override;
+        lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }
 

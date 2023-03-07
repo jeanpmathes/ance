@@ -40,7 +40,7 @@ void Drop::validate(ValidationLogger& validation_logger) const
     }
 }
 
-Statements Drop::expandWith(Expressions, Statements) const
+Statements Drop::expandWith(Expressions, Statements, lang::Context&) const
 {
     Statements statements;
 

@@ -16,7 +16,7 @@ namespace lang
     class BooleanConstant : public Constant
     {
       private:
-        explicit BooleanConstant(bool boolean);
+        explicit BooleanConstant(bool boolean, lang::Context& context);
 
       public:
         [[nodiscard]] std::string toString() const override;
@@ -28,18 +28,18 @@ namespace lang
 
         bool equals(lang::Constant const* other) const override;
 
-        [[nodiscard]] Shared<Constant> clone() const override;
+        [[nodiscard]] Shared<Constant> clone(lang::Context& new_context) const override;
 
         /**
          * Create a boolean constant with the false value.
          * @return The new boolean constant.
          */
-        static Shared<lang::BooleanConstant> createFalse();
+        static Shared<lang::BooleanConstant> createFalse(lang::Context& context);
         /**
          * Create a boolean constant with the true value.
          * @return The new boolean constant.
          */
-        static Shared<lang::BooleanConstant> createTrue();
+        static Shared<lang::BooleanConstant> createTrue(lang::Context& context);
 
       private:
         lang::ResolvingHandle<lang::Type> type_;

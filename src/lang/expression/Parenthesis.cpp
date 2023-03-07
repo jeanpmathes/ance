@@ -47,7 +47,7 @@ bool Parenthesis::validateAssignment(lang::Value const& value,
     return expression_->validateAssignment(value, value_location, validation_logger);
 }
 
-Expression::Expansion Parenthesis::expandWith(Expressions subexpressions) const
+Expression::Expansion Parenthesis::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(), makeOwned<Parenthesis>(std::move(subexpressions[0]), location()), Statements()};
 }

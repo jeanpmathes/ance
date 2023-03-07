@@ -146,7 +146,7 @@ void lang::CodeBlock::validate(ValidationLogger& validation_logger) const
     for (auto& sub : subs_) { sub->validate(validation_logger); }
 }
 
-Statements lang::CodeBlock::expandWith(Expressions, Statements substatements) const
+Statements lang::CodeBlock::expandWith(Expressions, Statements substatements, lang::Context&) const
 {
     Statements statements;
 

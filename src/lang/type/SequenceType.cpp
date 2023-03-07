@@ -1,20 +1,20 @@
 #include "SequenceType.h"
 
+#include <utility>
+
 #include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
-#include "lang/type/BooleanType.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
 #include "lang/utility/Values.h"
 
 lang::SequenceType::SequenceType(lang::ResolvingHandle<lang::Type> element_type, Optional<size_t> size)
     : element_type_(std::move(element_type))
-    , element_reference_(lang::ReferenceType::get(element_type_))
-    , size_(size)
+    , size_(std::move(size))
 {}
 
 lang::ResolvingHandle<lang::Type> lang::SequenceType::getElementType()
@@ -45,7 +45,7 @@ bool lang::SequenceType::isSubscriptDefined() const
 
 lang::ResolvingHandle<lang::Type> lang::SequenceType::getSubscriptReturnType()
 {
-    return element_reference_;
+    return scope()->context().getReferenceType(element_type_);
 }
 
 bool lang::SequenceType::validateSubscript(lang::Location,
@@ -53,17 +53,18 @@ bool lang::SequenceType::validateSubscript(lang::Location,
                                            lang::Location    index_location,
                                            ValidationLogger& validation_logger) const
 {
-    return lang::Type::checkMismatch(lang::SizeType::getSize(), index_type, index_location, validation_logger);
+    return lang::Type::checkMismatch(scope()->context().getSizeType(), index_type, index_location, validation_logger);
 }
 
 Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<Value>   indexed,
                                                        Shared<Value>   index,
                                                        CompileContext& context)
 {
-    index = lang::Type::makeMatching(lang::SizeType::getSize(), index, context);
+    index = lang::Type::makeMatching(scope()->context().getSizeType(), index, context);
 
-    llvm::Value* element_ptr  = buildGetElementPointer(indexed, index, context);
-    llvm::Value* native_value = lang::values::contentToNative(element_reference_, element_ptr, context);
+    llvm::Value* element_ptr = buildGetElementPointer(indexed, index, context);
+    llvm::Value* native_value =
+        lang::values::contentToNative(context.types().getReferenceType(element_type_), element_ptr, context);
 
     return makeShared<lang::WrappedNativeValue>(getSubscriptReturnType(), native_value);
 }
@@ -82,12 +83,14 @@ llvm::Value* lang::SequenceType::buildGetElementPointer(Shared<Value>   indexed,
     if (size_.hasValue() && scope()->getGlobalScope()->isContainingRuntime())// Check if index is in bounds.
     {
         llvm::Value* native_size =
-            llvm::ConstantInt::get(lang::SizeType::getSize()->getContentType(context.llvmContext()), size_.value());
+            llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), size_.value());
         llvm::Value* in_bounds =
             context.ir().CreateICmpULT(native_index, native_size, native_index->getName() + ".icmp");
 
-        llvm::Value*        in_bounds_ptr = lang::values::contentToNative(lang::BooleanType::get(), in_bounds, context);
-        Shared<lang::Value> truth = makeShared<lang::WrappedNativeValue>(lang::BooleanType::get(), in_bounds_ptr);
+        llvm::Value* in_bounds_ptr =
+            lang::values::contentToNative(context.types().getBooleanType(), in_bounds, context);
+        Shared<lang::Value> truth =
+            makeShared<lang::WrappedNativeValue>(context.types().getBooleanType(), in_bounds_ptr);
 
         context.runtime().buildAssert(truth, "Index out of bounds at " + context.getLocationString(), context);
     }

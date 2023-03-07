@@ -90,36 +90,6 @@ std::string lang::FixedWidthIntegerType::createMangledName() const
     return std::string(name().text());
 }
 
-lang::TypeRegistry<std::pair<uint64_t, bool>>& lang::FixedWidthIntegerType::getIntegerTypes()
-{
-    static TypeRegistry<std::pair<uint64_t, bool>> integer_types;
-    return integer_types;
-}
-
-lang::TypeDefinitionRegistry* lang::FixedWidthIntegerType::getRegistry()
-{
-    return &getIntegerTypes();
-}
-
-lang::ResolvingHandle<lang::Type> lang::FixedWidthIntegerType::get(uint64_t bit_size, bool is_signed)
-{
-    std::vector<lang::ResolvingHandle<lang::Type>> used_types;
-
-    Optional<lang::ResolvingHandle<lang::Type>> defined_type =
-        getIntegerTypes().get(used_types, std::make_pair(bit_size, is_signed));
-
-    if (defined_type.hasValue()) { return defined_type.value(); }
-    else
-    {
-        auto&                             integer_type = *(new lang::FixedWidthIntegerType(bit_size, is_signed));
-        lang::ResolvingHandle<lang::Type> type =
-            lang::makeHandled<lang::Type>(Owned<lang::FixedWidthIntegerType>(integer_type));
-        getIntegerTypes().add(std::move(used_types), std::make_pair(bit_size, is_signed), type);
-
-        return type;
-    }
-}
-
 Optional<size_t> lang::FixedWidthIntegerType::getBitSize() const
 {
     return bit_size_;
@@ -145,7 +115,7 @@ std::string lang::FixedWidthIntegerType::getSuffix() const
     return std::to_string(bit_size_);
 }
 
-lang::ResolvingHandle<lang::Type> lang::FixedWidthIntegerType::clone() const
+lang::ResolvingHandle<lang::Type> lang::FixedWidthIntegerType::clone(lang::Context& new_context) const
 {
-    return get(bit_size_, is_signed_);
+    return new_context.getFixedWidthIntegerType(bit_size_, is_signed_);
 }
