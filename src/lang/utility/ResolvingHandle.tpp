@@ -201,9 +201,10 @@ void lang::ResolvingHandle<T>::HandleNavigator::target(Shared<lang::ResolvingHan
 template<typename T>
 void lang::ResolvingHandle<T>::invalidate(T const* element)
 {
-    assert(valid());
-
     HandleNavigator* root = navigator_->navigator();
+
+    bool valid = root->owned_element_.hasValue() or root->element_ != nullptr;
+    assert(valid);
 
     T const* actual_element = root->get();
 
@@ -213,13 +214,6 @@ void lang::ResolvingHandle<T>::invalidate(T const* element)
 
     root->element_       = nullptr;
     root->owned_element_ = {};
-}
-
-template<typename T>
-bool lang::ResolvingHandle<T>::valid() const
-{
-    HandleNavigator const* root = navigator_->root();
-    return root->owned_element_.hasValue() or root->element_ != nullptr;
 }
 
 template<typename T, class... ARGS>

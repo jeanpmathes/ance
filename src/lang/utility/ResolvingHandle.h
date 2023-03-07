@@ -87,13 +87,6 @@ namespace lang
 
         bool operator<(ResolvingHandle<T> const& other) const;
 
-        /**
-         * Check whether this handle is valid, i.e. whether it points to an object.
-         * Handles should be assumed to be valid and used in a way that does not invalidate them.
-         * @return True if this handle is valid.
-         */
-        [[nodiscard]] bool valid() const;
-
       private:
         friend class OwningHandle<T>;
 
