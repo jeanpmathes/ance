@@ -80,7 +80,7 @@ llvm::Value* lang::SequenceType::buildGetElementPointer(Shared<Value>   indexed,
 
     llvm::Value* sequence_ptr = getIndexingPointer(indexed, context);
 
-    if (size_.hasValue() && scope()->getGlobalScope()->isContainingRuntime())// Check if index is in bounds.
+    if (size_.hasValue() && scope()->context().isContainingRuntime())// Check if index is in bounds.
     {
         llvm::Value* native_size =
             llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), size_.value());

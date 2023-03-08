@@ -97,16 +97,16 @@ std::vector<std::string> ProjectDescription::getBinaryDependencyPaths() const
 }
 
 struct Project_ {
-    uint8_t const*  name                        = nullptr;
-    uint32_t        kind                        = 0;
-    uint8_t const** libraries                   = nullptr;
-    uint8_t const** library_paths               = nullptr;
-    uint8_t const** binary_dependencies         = nullptr;
-    uint32_t        opt_level                   = 0;
-    bool            is_warning_as_error_enabled = false;
-    bool            is_assert_ignored           = false;
-    bool            is_extra_emission_enabled   = false;
-    bool            is_runtime_excluded         = false;
+    uint8_t const*  name                     = nullptr;
+    uint32_t        kind                     = 0;
+    uint8_t const** libraries                = nullptr;
+    uint8_t const** library_paths            = nullptr;
+    uint8_t const** binary_dependencies      = nullptr;
+    uint32_t        opt_level                = 0;
+    bool            warning_as_error_enabled = false;
+    bool            ignoring_assert          = false;
+    bool            extra_emission_enabled   = false;
+    bool            exclude_runtime          = false;
 };
 
 using ProjectDescriptionFunction = void(__cdecl*)(Project_*);
@@ -205,17 +205,17 @@ bool ProjectDescription::loadDescription()
             return false;
     }
 
-    description_ = {.name                        = read_string(project.name),
-                    .kind                        = kind,
-                    .project_file                = project_file_,
-                    .linkage_libraries           = read_vector(project.libraries),
-                    .linkage_library_paths       = read_vector(project.library_paths),
-                    .binary_dependencies         = read_vector(project.binary_dependencies),
-                    .opt_level                   = opt_level,
-                    .is_warning_as_error_enabled = project.is_warning_as_error_enabled,
-                    .is_assert_ignored           = project.is_assert_ignored,
-                    .is_extra_emission_enabled   = project.is_extra_emission_enabled,
-                    .is_runtime_excluded         = project.is_runtime_excluded};
+    description_ = {.name                     = read_string(project.name),
+                    .kind                     = kind,
+                    .project_file             = project_file_,
+                    .linkage_libraries        = read_vector(project.libraries),
+                    .linkage_library_paths    = read_vector(project.library_paths),
+                    .binary_dependencies      = read_vector(project.binary_dependencies),
+                    .opt_level                = opt_level,
+                    .warning_as_error_enabled = project.warning_as_error_enabled,
+                    .ignoring_assert          = project.ignoring_assert,
+                    .extra_emission_enabled   = project.extra_emission_enabled,
+                    .exclude_runtime          = project.exclude_runtime};
 
 #if defined(ANCE_TARGET_WINDOWS)
     FreeLibrary(handle);

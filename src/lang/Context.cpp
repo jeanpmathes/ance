@@ -18,8 +18,11 @@
 #include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/type/VectorType.h"
 #include "lang/type/VoidType.h"
+#include "validation/ValidationLogger.h"
 
-lang::Context::Context(lang::GlobalScope& global_scope) : global_scope_(global_scope)
+lang::Context::Context(lang::GlobalScope& global_scope, bool contains_runtime)
+    : global_scope_(global_scope)
+    , contains_runtime_(contains_runtime)
 {
     type_registries_.push_back(&array_types_);
     type_registries_.push_back(&buffer_types_);
@@ -286,4 +289,18 @@ lang::ResolvingHandle<lang::Type> lang::Context::getVoidType() const
         void_type_ = lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new VoidType())));
 
     return void_type_.value();
+}
+
+bool lang::Context::isContainingRuntime() const
+{
+    return contains_runtime_;
+}
+
+bool lang::Context::validateRuntimeDependency(lang::Location location, ValidationLogger& validation_logger) const
+{
+    if (isContainingRuntime()) return true;
+
+    validation_logger.logError("Not allowed in runtime-excluded project", location);
+
+    return false;
 }

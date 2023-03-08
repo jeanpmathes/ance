@@ -31,7 +31,7 @@ void Assertion::validate(ValidationLogger& validation_logger) const
                               condition_->location(),
                               validation_logger);
 
-    scope()->getGlobalScope()->validateRuntimeDependency(location(), validation_logger);
+    scope()->context().validateRuntimeDependency(location(), validation_logger);
 }
 
 Statements Assertion::expandWith(Expressions subexpressions, Statements, lang::Context&) const

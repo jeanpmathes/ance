@@ -8,7 +8,7 @@ public main () : u32
     assert not not true;
 
     // The not operator can be applied directly to the operators 'and' and 'or'.
-    // This will negate the result of the operation, short-circuiting if possible.
+    // This will negate the result of the operation. It is equivalent to negating the parenthesized expression.
 
     let a1 <: not (true or false);
     let b1 <: true not or false;

@@ -50,10 +50,10 @@ class ProjectDescription : public Unit
         std::vector<std::string> linkage_library_paths;
         std::vector<std::string> binary_dependencies;
         OptLevel                 opt_level;
-        bool                     is_warning_as_error_enabled;
-        bool                     is_assert_ignored;
-        bool                     is_extra_emission_enabled;
-        bool                     is_runtime_excluded;
+        bool                     warning_as_error_enabled;
+        bool                     ignoring_assert;
+        bool                     extra_emission_enabled;
+        bool                     exclude_runtime;
     };
 
     /**

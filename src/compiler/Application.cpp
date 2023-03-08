@@ -10,7 +10,7 @@
 #include "lang/type/VectorType.h"
 #include "lang/type/SizeType.h"
 
-Application::Application(Project& project) : Unit(!project.description().is_runtime_excluded), project_(project) {}
+Application::Application(Project& project) : Unit(!project.description().exclude_runtime), project_(project) {}
 
 std::string const& Application::getName() const
 {
@@ -59,22 +59,22 @@ OptLevel Application::getOptimizationLevel() const
 
 bool Application::isWarningsAsErrors() const
 {
-    return project_.description().is_warning_as_error_enabled;
+    return project_.description().warning_as_error_enabled;
 }
 
 bool Application::isAssertionsEnabled() const
 {
-    return not project_.description().is_assert_ignored;
+    return not project_.description().ignoring_assert;
 }
 
 bool Application::isEmittingExtras() const
 {
-    return project_.description().is_extra_emission_enabled;
+    return project_.description().extra_emission_enabled;
 }
 
 bool Application::isUsingRuntime() const
 {
-    return not project_.description().is_runtime_excluded;
+    return not project_.description().exclude_runtime;
 }
 
 antlr4::tree::ParseTree* Application::selectTree(anceParser& parser)

@@ -1,6 +1,6 @@
 project.name <: c"test";
 project.kind <: Executable;
-project.is_warning_as_error_enabled <: true;
+project.warning_as_error_enabled <: true;
 project.opt_level <: 3;
 
 project.libraries <: new[7] dynamic *u8;

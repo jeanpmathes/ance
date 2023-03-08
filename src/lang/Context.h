@@ -17,7 +17,7 @@ namespace lang
     class Context
     {
       public:
-        explicit Context(GlobalScope& global_scope);
+        explicit Context(GlobalScope& global_scope, bool contains_runtime);
 
         /**
          * Perform resolving on all types that require it.
@@ -151,9 +151,23 @@ namespace lang
          */
         lang::ResolvingHandle<lang::Type> getVoidType() const;
 
+        /**
+         * Whether the application is being compiled with the runtime.
+         */
+        bool isContainingRuntime() const;
+
+        /**
+         * Use this for elements that depend on the runtime.
+         * @param location The location of the element.
+         * @param validation_logger The logger to use for validation.
+         * @return True if the runtime is available.
+         */
+        bool validateRuntimeDependency(lang::Location location, ValidationLogger& validation_logger) const;
+
       private:
         GlobalScope&                               global_scope_;
         std::vector<lang::TypeDefinitionRegistry*> type_registries_ {};
+        bool                                       contains_runtime_;
 
         mutable lang::TypeRegistry<uint64_t>                  array_types_;
         mutable lang::TypeRegistry<>                          buffer_types_;

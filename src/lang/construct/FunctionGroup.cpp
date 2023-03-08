@@ -84,7 +84,7 @@ void lang::FunctionGroup::validate(ValidationLogger& validation_logger) const
     {// Validate that no not-mangled function collides with a reserved runtime function.
         for (auto& function : functions())
         {
-            if (function->getGlobalScope()->isContainingRuntime() && !function->isMangled()
+            if (function->context().isContainingRuntime() && !function->isMangled()
                 && Runtime::isNameReserved(function->name()))
             {
                 validation_logger.logError("Function '" + function->name()

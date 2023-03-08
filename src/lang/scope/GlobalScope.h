@@ -39,17 +39,6 @@ namespace lang
       public:
         explicit GlobalScope(bool is_containing_runtime);
 
-      private:
-        bool is_containing_runtime_ {false};
-
-      public:
-        /**
-         * Check whether this scope contains the runtime.
-         * @return True if the runtime is contained.
-         */
-        [[nodiscard]] bool isContainingRuntime() const;
-
-      public:
         lang::Scope* scope() override;
 
         /**
@@ -71,14 +60,6 @@ namespace lang
         void determineFlow();
 
         void validateFlow(ValidationLogger& validation_logger) const;
-
-        /**
-         * Use this for elements that depend on the runtime.
-         * @param location The location of the element.
-         * @param validation_logger The logger to use for validation.
-         * @return True if the runtime is available.
-         */
-        bool validateRuntimeDependency(lang::Location location, ValidationLogger& validation_logger) const;
 
         /**
          * Add an description element to this scope.

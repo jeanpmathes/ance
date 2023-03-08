@@ -10,14 +10,9 @@
 #include "lang/type/TypeAlias.h"
 #include "validation/ValidationLogger.h"
 
-lang::GlobalScope::GlobalScope(bool is_containing_runtime) : is_containing_runtime_(is_containing_runtime)
+lang::GlobalScope::GlobalScope(bool is_containing_runtime)
 {
-    context_ = makeOwned<lang::Context>(*this);
-}
-
-bool lang::GlobalScope::isContainingRuntime() const
-{
-    return is_containing_runtime_;
+    context_ = makeOwned<lang::Context>(*this, is_containing_runtime);
 }
 
 lang::Scope* lang::GlobalScope::scope()
@@ -92,7 +87,7 @@ void lang::GlobalScope::expand()
 
     // this is actually required:
 
-    context_ = makeOwned<lang::Context>(*this);
+    context_ = makeOwned<lang::Context>(*this, (**context_).isContainingRuntime());
 
     std::map<lang::Identifier, std::vector<Owned<lang::Description>>> expanded_descriptions;
 
@@ -122,15 +117,6 @@ void lang::GlobalScope::determineFlow()
 void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger) const
 {
     for (auto& [key, function] : defined_function_groups_) { function->validateFlow(validation_logger); }
-}
-
-bool lang::GlobalScope::validateRuntimeDependency(lang::Location location, ValidationLogger& validation_logger) const
-{
-    if (isContainingRuntime()) return true;
-
-    validation_logger.logError("Not allowed in runtime-excluded project", location);
-
-    return false;
 }
 
 void lang::GlobalScope::addDescription(Owned<lang::Description> description)

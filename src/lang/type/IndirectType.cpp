@@ -43,7 +43,7 @@ Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<Value> value, Co
     value->buildContentValue(context);
     llvm::Value* ptr = value->getContentValue();
 
-    if (scope()->getGlobalScope()->isContainingRuntime())
+    if (scope()->context().isContainingRuntime())
     {
         llvm::Value* is_null     = context.ir().CreateIsNull(ptr, ptr->getName() + "is_null");
         llvm::Value* is_not_null = context.ir().CreateNot(is_null, ptr->getName() + "is_not_null");
