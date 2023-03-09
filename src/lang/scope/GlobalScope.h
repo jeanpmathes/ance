@@ -44,11 +44,11 @@ namespace lang
         /**
          * Get the context, in which all basic systems like the typesystem are defined.
          */
-        lang::Context& context();
+        lang::Context& context() override;
         /**
          * Get the context, in which all basic systems like the typesystem are defined.
          */
-        [[nodiscard]] lang::Context const& context() const;
+        [[nodiscard]] lang::Context const& context() const override;
 
         lang::GlobalScope*                     getGlobalScope() override;
         [[nodiscard]] lang::GlobalScope const* getGlobalScope() const override;
@@ -56,8 +56,8 @@ namespace lang
 
         void validate(ValidationLogger& validation_logger) const;
 
-        void expand();
-        void determineFlow();
+        [[nodiscard]] Owned<lang::GlobalScope> expand() const;
+        void                                   determineFlow();
 
         void validateFlow(ValidationLogger& validation_logger) const;
 
@@ -146,7 +146,7 @@ namespace lang
          * Get all functions that should be exported.
          * @return The exported functions.
          */
-        std::vector<std::string> getExportFunctions() const;
+        [[nodiscard]] std::vector<std::string> getExportFunctions() const;
 
       private:
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);
@@ -157,22 +157,16 @@ namespace lang
 
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> defined_function_groups_;
-        std::vector<lang::OwningHandle<lang::Function>>                     invalid_functions_;
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_defined_variables_;
-        std::vector<lang::OwningHandle<lang::Variable>>                invalid_variables_;
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Type>> defined_types_;
-        std::vector<lang::OwningHandle<lang::Type>>                invalid_types_;
 
         std::set<lang::Identifier>    defined_names_;
-        std::vector<lang::Identifier> duplicated_names_;
 
         Optional<Owned<lang::Context>> context_;
-
-        bool expanded_ = false;
     };
 }
 #endif

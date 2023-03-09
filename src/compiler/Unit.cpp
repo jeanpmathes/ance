@@ -5,25 +5,8 @@
 #include "compiler/CodePrinter.h"
 #include "validation/ValidationLogger.h"
 
-#include "lang/type/DoubleType.h"
-#include "lang/type/HalfType.h"
-#include "lang/type/QuadType.h"
-#include "lang/type/SingleType.h"
-
-#include "lang/type/ArrayType.h"
-#include "lang/type/BufferType.h"
-#include "lang/type/FixedWidthIntegerType.h"
-#include "lang/type/PointerType.h"
-#include "lang/type/ReferenceType.h"
-#include "lang/type/VectorType.h"
-
-#include "lang/type/BooleanType.h"
-#include "lang/type/CharType.h"
-#include "lang/type/NullPointerType.h"
-#include "lang/type/OpaquePointerType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/UnsignedIntegerPointerType.h"
-#include "lang/type/VoidType.h"
 
 Unit::Unit(Owned<lang::GlobalScope> global_scope) : global_scope_(std::move(global_scope))
 {
@@ -61,7 +44,10 @@ void Unit::preValidate()
 
 void Unit::preBuild()
 {
-    global_scope_->expand();
+    clearChildren();
+    global_scope_ = global_scope_->expand();
+    addChild(*global_scope_);
+
     global_scope_->resolve();
     global_scope_->postResolve();
     global_scope_->determineFlow();

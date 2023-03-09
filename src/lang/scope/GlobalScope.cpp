@@ -47,9 +47,10 @@ llvm::DIScope* lang::GlobalScope::getDebugScope(CompileContext& context) const
 
 void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 {
-    for (auto const& name : duplicated_names_)
+    for (auto const& description : conflicting_descriptions_)
     {
-        validation_logger.logError("Name '" + name + "' already defined in the current context", name.location());
+        validation_logger.logError("Name '" + description->name() + "' already defined in the current context",
+                                   description->name().location());
     }
 
     for (auto& [name, descriptions] : compatible_descriptions_)
@@ -68,45 +69,24 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
     lang::GlobalVariable::determineOrder(global_variables, &validation_logger);
 }
 
-void lang::GlobalScope::expand()
+Owned<lang::GlobalScope> lang::GlobalScope::expand() const
 {
-    // this is only required because no full expansion is done on the global scope:
-    auto undefined_function_groups = std::move(undefined_function_groups_);
-    auto defined_function_groups   = std::move(defined_function_groups_);
-    auto invalid_functions         = std::move(invalid_functions_);
-
-    auto undefined_variables = std::move(global_defined_variables_);
-    auto defined_variables   = std::move(global_defined_variables_);
-    auto invalid_variables   = std::move(invalid_variables_);
-
-    auto undefined_types = std::move(undefined_types_);
-    auto defined_types   = std::move(defined_types_);
-    auto invalid_types   = std::move(invalid_types_);
-
-    clearChildren();
-
-    // this is actually required:
-
-    context_ = makeOwned<lang::Context>(*this, (**context_).isContainingRuntime());
-
-    std::map<lang::Identifier, std::vector<Owned<lang::Description>>> expanded_descriptions;
+    Owned<lang::GlobalScope> expanded_scope = makeOwned<lang::GlobalScope>((**context_).isContainingRuntime());
 
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
         for (auto& description : descriptions)
         {
-            std::vector<Owned<lang::Description>> new_descriptions = description->expand(**context_);
+            std::vector<Owned<lang::Description>> new_descriptions = description->expand(expanded_scope->context());
 
             for (auto& new_description : new_descriptions)
             {
-                expanded_descriptions[name].push_back(std::move(new_description));
+                expanded_scope->addDescription(std::move(new_description));
             }
         }
     }
 
-    compatible_descriptions_ = std::move(expanded_descriptions);
-
-    expanded_ = true;
+    return expanded_scope;
 }
 
 void lang::GlobalScope::determineFlow()
@@ -160,63 +140,44 @@ void lang::GlobalScope::addDescription(Owned<lang::Description> description)
 
 void lang::GlobalScope::addFunction(lang::OwningHandle<lang::Function> function)
 {
-    if (!expanded_ && defined_names_.contains(function->name()) && !defined_function_groups_.contains(function->name()))
-    {
-        duplicated_names_.emplace_back(function->name());
-        invalid_functions_.push_back(std::move(function));
-    }
-    else
-    {
-        defined_names_.emplace(function->name());
+    assert(!defined_names_.contains(function->name()) || defined_function_groups_.contains(function->name()));
 
-        lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(function->name());
-        group->addFunction(std::move(function));
-    }
+    defined_names_.emplace(function->name());
+
+    lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(function->name());
+    group->addFunction(std::move(function));
 }
 
 void lang::GlobalScope::addVariable(lang::OwningHandle<lang::Variable> variable)
 {
-    if (!expanded_ && defined_names_.contains(variable->name())
-        && !global_undefined_variables_.contains(variable->name()))
-    {
-        duplicated_names_.emplace_back(variable->name());
-        invalid_variables_.push_back(std::move(variable));
-    }
-    else
-    {
-        defined_names_.emplace(variable->name());
+    assert(!defined_names_.contains(variable->name()) || global_undefined_variables_.contains(variable->name()));
 
-        if (global_undefined_variables_.contains(variable->name()))
-        {
-            global_undefined_variables_.at(variable->name()).handle().reroute(variable.handle());
-            global_undefined_variables_.erase(variable->name());
-        }
+    defined_names_.emplace(variable->name());
 
-        addChild(*variable);
-        global_defined_variables_.emplace(variable->name(), std::move(variable));
+    if (global_undefined_variables_.contains(variable->name()))
+    {
+        global_undefined_variables_.at(variable->name()).handle().reroute(variable.handle());
+        global_undefined_variables_.erase(variable->name());
     }
+
+    addChild(*variable);
+    global_defined_variables_.emplace(variable->name(), std::move(variable));
 }
 
 void lang::GlobalScope::addType(lang::OwningHandle<lang::Type> type)
 {
-    if (!expanded_ && defined_names_.contains(type->name()) && !undefined_types_.contains(type->name()))
-    {
-        duplicated_names_.emplace_back(type->name());
-        invalid_types_.push_back(std::move(type));
-    }
-    else
-    {
-        defined_names_.emplace(type->name());
+    assert(!defined_names_.contains(type->name()) || undefined_types_.contains(type->name()));
 
-        if (undefined_types_.contains(type->name()))
-        {
-            undefined_types_.at(type->name()).handle().reroute(type.handle());
-            undefined_types_.erase(type->name());
-        }
+    defined_names_.emplace(type->name());
 
-        type->setContainingScope(this);
-        defined_types_.emplace(type->name(), std::move(type));
+    if (undefined_types_.contains(type->name()))
+    {
+        undefined_types_.at(type->name()).handle().reroute(type.handle());
+        undefined_types_.erase(type->name());
     }
+
+    type->setContainingScope(this);
+    defined_types_.emplace(type->name(), std::move(type));
 }
 
 Optional<lang::ResolvingHandle<lang::Type>> lang::GlobalScope::getType(Identifier string)

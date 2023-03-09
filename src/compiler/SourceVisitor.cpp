@@ -1067,7 +1067,6 @@ std::any SourceVisitor::visitCopyAssignment(anceParser::CopyAssignmentContext*)
 std::any SourceVisitor::visitMoveAssignment(anceParser::MoveAssignmentContext*)
 {
     assert(false && "Move assignment currently not supported.");
-    // todo: move assignment
 
     lang::Assigner assigner = lang::Assigner::MOVE_ASSIGNMENT;
     return assigner;
