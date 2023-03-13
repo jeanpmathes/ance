@@ -5,7 +5,6 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/RoughlyCastedValue.h"
 #include "lang/statement/Statement.h"
-#include "lang/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
 BindRefTo::BindRefTo(Owned<Expression> address, lang::Location location)
@@ -22,6 +21,8 @@ Expression const& BindRefTo::address() const
 
 void BindRefTo::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
+    if (scope() == nullptr) return;
+
     auto argument_type = address_->type();
 
     if (argument_type->isDefined() && (argument_type->isPointerType() || argument_type->isBufferType()))

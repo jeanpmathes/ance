@@ -38,6 +38,8 @@ Expression const& Or::right() const
 
 void Or::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
+    if (scope() == nullptr) return;
+
     type.reroute(scope()->context().getBooleanType());
 }
 

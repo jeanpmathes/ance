@@ -145,12 +145,15 @@ void AnceCompiler::compile(std::filesystem::path const& out)
 
     // Emit llvm IR to file.
 
-    std::error_code      ec;
-    llvm::raw_fd_ostream out_stream(out.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
+    if (unit_.isEmittingExtras())
+    {
+        std::error_code      ec;
+        llvm::raw_fd_ostream out_stream(out.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
 
-    if (ec) { std::cerr << "IO error while creating IR file stream: " << ec.message() << std::endl; }
+        if (ec) { std::cerr << "IO error while creating IR file stream: " << ec.message() << std::endl; }
 
-    module_.print(out_stream, nullptr);
+        module_.print(out_stream, nullptr);
+    }
 }
 
 void AnceCompiler::emitObject(std::filesystem::path const& out)

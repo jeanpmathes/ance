@@ -59,8 +59,6 @@ std::string lang::UnsignedIntegerPointerType::createMangledName() const
 
 void lang::UnsignedIntegerPointerType::init(llvm::DataLayout const& data_layout)
 {
-    assert(size_ == 0);
-
     size_ = std::max(static_cast<unsigned int>(MINIMUM_BIT_SIZE), data_layout.getPointerSizeInBits());
 }
 

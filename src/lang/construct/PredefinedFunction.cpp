@@ -29,7 +29,7 @@ bool lang::PredefinedFunction::validateFlow(ValidationLogger&) const
 
 void lang::PredefinedFunction::createNativeBacking(CompileContext& context)
 {
-    std::tie(native_type_, native_function_) = createNativeFunction(llvm::GlobalValue::LinkageTypes::ExternalLinkage,
+    std::tie(native_type_, native_function_) = createNativeFunction(llvm::GlobalValue::LinkageTypes::PrivateLinkage,
                                                                     context.llvmContext(),
                                                                     context.llvmModule());
 

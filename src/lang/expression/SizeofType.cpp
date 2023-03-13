@@ -30,6 +30,8 @@ void SizeofType::walkDefinitions()
 
 void SizeofType::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
+    if (scope() == nullptr) return;
+
     type.reroute(scope()->context().getSizeType());
 }
 

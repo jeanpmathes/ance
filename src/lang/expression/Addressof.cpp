@@ -17,6 +17,8 @@ Expression const& Addressof::argument() const
 
 void Addressof::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
+    if (scope() == nullptr) return;
+
     auto value_type = arg_->type();
 
     if (value_type->isDefined())

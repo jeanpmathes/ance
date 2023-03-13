@@ -22,6 +22,8 @@ Expression const& SizeofExpression::expression() const
 
 void SizeofExpression::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
+    if (scope() == nullptr) return;
+
     type.reroute(scope()->context().getSizeType());
 }
 

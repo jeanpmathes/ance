@@ -41,6 +41,8 @@ void ArrayDefinition::walkDefinitions()
 
 void ArrayDefinition::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
+    if (scope() == nullptr) return;
+
     if (declared_type_.hasValue())
     {
         type.reroute(scope()->context().getArrayType(declared_type_.value(), elements_.size()));

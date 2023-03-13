@@ -20,6 +20,8 @@ Expression const& BindRef::value() const
 
 void BindRef::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
+    if (scope() == nullptr) return;
+
     auto element_type = value_->type();
 
     if (element_type->isDefined())

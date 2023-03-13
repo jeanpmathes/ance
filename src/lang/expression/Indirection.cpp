@@ -20,6 +20,8 @@ Expression const& Indirection::value() const
 
 void Indirection::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
+    if (scope() == nullptr) return;
+
     auto value_type = value_->type();
 
     if (value_type->isDefined())

@@ -38,6 +38,7 @@ Expression const& And::right() const
 
 void And::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
+    if (scope() == nullptr) return;
     type.reroute(scope()->context().getBooleanType());
 }
 

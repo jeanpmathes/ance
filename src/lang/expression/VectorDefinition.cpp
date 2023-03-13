@@ -43,6 +43,8 @@ void VectorDefinition::walkDefinitions()
 
 void VectorDefinition::defineType(lang::ResolvingHandle<lang::Type>& type)
 {
+    if (scope() == nullptr) return;
+
     if (type_.hasValue()) { type.reroute(scope()->context().getVectorType(type_.value(), elements_.size())); }
     else
     {
