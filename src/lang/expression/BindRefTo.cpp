@@ -19,7 +19,7 @@ Expression const& BindRefTo::address() const
     return *address_;
 }
 
-void BindRefTo::defineType(lang::ResolvingHandle<lang::Type>& type)
+void BindRefTo::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (scope() == nullptr) return;
 

@@ -24,7 +24,7 @@ Expression const& Subscript::index() const
     return *index_;
 }
 
-void Subscript::defineType(lang::ResolvingHandle<lang::Type>& type)
+void Subscript::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     auto indexed_type = indexed_->type();
     if (indexed_type->isDefined()) { type.reroute(indexed_type->getSubscriptReturnType()); }

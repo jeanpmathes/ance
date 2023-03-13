@@ -22,7 +22,7 @@ lang::UnaryOperator UnaryOperation::op() const
     return op_;
 }
 
-void UnaryOperation::defineType(lang::ResolvingHandle<lang::Type>& type)
+void UnaryOperation::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     auto operand_type = operand_->type();
     if (operand_type->isDefined()) { type.reroute(operand_type->getOperatorResultType(op_)); }

@@ -20,7 +20,7 @@ Expression const& SizeofExpression::expression() const
     return *expression_;
 }
 
-void SizeofExpression::defineType(lang::ResolvingHandle<lang::Type>& type)
+void SizeofExpression::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (scope() == nullptr) return;
 

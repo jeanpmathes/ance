@@ -29,7 +29,7 @@ void VariableAccess::postResolve()
     if (variable_->isDefined()) { scope()->addDependency(variable_); }
 }
 
-void VariableAccess::defineType(lang::ResolvingHandle<lang::Type>& type)
+void VariableAccess::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (variable_->isDefined() && variable_->type()->isDefined()) { type.reroute(variable_->type()); }
 }

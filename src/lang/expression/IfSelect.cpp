@@ -40,7 +40,7 @@ Expression const& IfSelect::elseExpression() const
     return *else_expression_;
 }
 
-void IfSelect::defineType(lang::ResolvingHandle<lang::Type>& type)
+void IfSelect::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     auto then_type = then_expression_->type();
     auto else_type = else_expression_->type();

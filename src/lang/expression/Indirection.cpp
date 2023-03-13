@@ -18,7 +18,7 @@ Expression const& Indirection::value() const
     return *value_;
 }
 
-void Indirection::defineType(lang::ResolvingHandle<lang::Type>& type)
+void Indirection::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (scope() == nullptr) return;
 

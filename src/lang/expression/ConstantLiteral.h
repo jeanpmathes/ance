@@ -31,7 +31,7 @@ class ConstantLiteral
     [[nodiscard]] lang::Constant const& getConstantValue() const override;
 
   protected:
-    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
+    void defineType(lang::ResolvingHandle<lang::Type> type) override;
 
   public:
     ~ConstantLiteral() override;

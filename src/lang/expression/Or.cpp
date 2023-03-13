@@ -36,7 +36,7 @@ Expression const& Or::right() const
     return *right_;
 }
 
-void Or::defineType(lang::ResolvingHandle<lang::Type>& type)
+void Or::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (scope() == nullptr) return;
 

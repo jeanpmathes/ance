@@ -28,7 +28,7 @@ void SizeofType::walkDefinitions()
     scope()->addType(type_);
 }
 
-void SizeofType::defineType(lang::ResolvingHandle<lang::Type>& type)
+void SizeofType::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (scope() == nullptr) return;
 

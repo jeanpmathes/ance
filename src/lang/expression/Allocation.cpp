@@ -45,7 +45,7 @@ void Allocation::walkDefinitions()
     scope()->addType(allocated_type_);
 }
 
-void Allocation::defineType(lang::ResolvingHandle<lang::Type>& type)
+void Allocation::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     type.reroute(return_type_);
 }

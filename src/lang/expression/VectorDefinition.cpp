@@ -41,7 +41,7 @@ void VectorDefinition::walkDefinitions()
     if (type_.hasValue()) scope()->addType(type_.value());
 }
 
-void VectorDefinition::defineType(lang::ResolvingHandle<lang::Type>& type)
+void VectorDefinition::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (scope() == nullptr) return;
 

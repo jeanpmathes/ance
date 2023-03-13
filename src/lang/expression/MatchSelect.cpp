@@ -29,7 +29,7 @@ std::vector<std::reference_wrapper<Case const>> MatchSelect::cases() const
     return cases;
 }
 
-void MatchSelect::defineType(lang::ResolvingHandle<lang::Type>& type)
+void MatchSelect::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     auto common_types = Case::getCommonType(cases_);
 

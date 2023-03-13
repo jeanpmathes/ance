@@ -20,7 +20,7 @@ bool Parenthesis::isNamed() const
     return expression_->isNamed();
 }
 
-void Parenthesis::defineType(lang::ResolvingHandle<lang::Type>& type)
+void Parenthesis::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     type.reroute(expression_->type());
 }

@@ -34,7 +34,7 @@ class Parenthesis
     [[nodiscard]] lang::Value const& getValue() const override;
 
   protected:
-    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
+    void defineType(lang::ResolvingHandle<lang::Type> type) override;
     void doAssign(Shared<lang::Value> value, CompileContext& context) override;
 
   private:

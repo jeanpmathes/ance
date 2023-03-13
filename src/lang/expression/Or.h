@@ -32,7 +32,7 @@ class Or
     [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;
 
   protected:
-    void defineType(lang::ResolvingHandle<lang::Type>& type) override;
+    void defineType(lang::ResolvingHandle<lang::Type> type) override;
 
   public:
     ~Or() override;

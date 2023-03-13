@@ -15,7 +15,7 @@ Expression const& Addressof::argument() const
     return *arg_;
 }
 
-void Addressof::defineType(lang::ResolvingHandle<lang::Type>& type)
+void Addressof::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (scope() == nullptr) return;
 

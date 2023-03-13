@@ -18,7 +18,7 @@ Expression const& BindRef::value() const
     return *value_;
 }
 
-void BindRef::defineType(lang::ResolvingHandle<lang::Type>& type)
+void BindRef::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (scope() == nullptr) return;
 

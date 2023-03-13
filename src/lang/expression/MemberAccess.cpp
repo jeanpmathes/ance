@@ -23,7 +23,7 @@ lang::Identifier const& MemberAccess::member() const
     return member_;
 }
 
-void MemberAccess::defineType(lang::ResolvingHandle<lang::Type>& type)
+void MemberAccess::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (scope() == nullptr) return;
 

@@ -32,7 +32,7 @@ lang::BinaryOperator BinaryOperation::op() const
     return op_;
 }
 
-void BinaryOperation::defineType(lang::ResolvingHandle<lang::Type>& type)
+void BinaryOperation::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     auto left_type  = left_->type();
     auto right_type = right_->type();

@@ -130,7 +130,7 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * If this expression is valid, the type must be defined after a call to this method.
      * @param type The type to define. Should be rerouted to the return type of this expression.
      */
-    virtual void defineType(lang::ResolvingHandle<lang::Type>& type) = 0;
+    virtual void defineType(lang::ResolvingHandle<lang::Type> type) = 0;
 
     /**
      * Override this method to receive the containing scope.

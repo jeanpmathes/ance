@@ -16,7 +16,7 @@ lang::Constant const& ConstantLiteral::constant() const
     return *constant_;
 }
 
-void ConstantLiteral::defineType(lang::ResolvingHandle<lang::Type>& type)
+void ConstantLiteral::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     type.reroute(constant_->type());
 }

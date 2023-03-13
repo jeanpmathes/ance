@@ -39,7 +39,7 @@ void ArrayDefinition::walkDefinitions()
     if (declared_type_.hasValue()) scope()->addType(declared_type_.value());
 }
 
-void ArrayDefinition::defineType(lang::ResolvingHandle<lang::Type>& type)
+void ArrayDefinition::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (scope() == nullptr) return;
 

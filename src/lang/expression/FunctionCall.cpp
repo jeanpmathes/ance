@@ -90,7 +90,7 @@ void FunctionCall::postResolve()
     type();
 }
 
-void FunctionCall::defineType(lang::ResolvingHandle<lang::Type>& type)
+void FunctionCall::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (!used_callable_) return;
 
