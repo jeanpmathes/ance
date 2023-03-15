@@ -160,7 +160,6 @@ void lang::GlobalScope::addVariable(lang::OwningHandle<lang::Variable> variable)
         global_undefined_variables_.erase(variable->name());
     }
 
-    addChild(*variable);
     global_defined_variables_.emplace(variable->name(), std::move(variable));
 }
 

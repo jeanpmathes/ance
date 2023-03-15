@@ -24,7 +24,7 @@ class ValidationLogger;
 
 namespace lang
 {
-    class FunctionDefinition : public virtual lang::Visitable<ANCE_CONSTRUCTS>
+    class FunctionDefinition
     {
       public:
         explicit FunctionDefinition(lang::Function&                      function,
@@ -74,6 +74,12 @@ namespace lang
         [[nodiscard]] lang::Signature const& signature() const;
 
         /**
+         * Get the code of this function, if any.
+         * @return The code.
+         */
+        [[nodiscard]] virtual Statement const* code() const;
+
+        /**
          * Get the location of the return type.
          * @return The location.
          */
@@ -92,6 +98,13 @@ namespace lang
          * @return The type of the selected parameter.
          */
         [[nodiscard]] lang::Type const& parameterType(size_t index) const;
+
+        /**
+         * Get the name of a parameter.
+         * @param index The index of the parameter. Must be smaller than the parameter count.
+         * @return The name of the selected parameter.
+         */
+        [[nodiscard]] lang::Identifier const& parameterName(size_t index) const;
 
         /**
          * Get the parameter count.
@@ -174,11 +187,6 @@ namespace lang
          */
         Optional<Shared<lang::Value>> buildCall(std::vector<Shared<lang::Value>> arguments, CompileContext& context);
 
-        /**
-         * Get the parameter list as source, with parentheses.
-         */
-        [[nodiscard]] std::string parameterSource() const;
-
       protected:
         /**
          * Get the function parameters.
@@ -226,7 +234,7 @@ namespace lang
 
         [[nodiscard]] virtual std::vector<lang::BasicBlock*> const& getBasicBlocks() const = 0;
 
-        ~FunctionDefinition() override = default;
+        virtual ~FunctionDefinition() = default;
 
       private:
         lang::Function& function_;

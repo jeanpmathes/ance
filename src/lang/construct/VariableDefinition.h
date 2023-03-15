@@ -9,6 +9,7 @@ namespace lang
 {
     class Scope;
     class Type;
+    class Variable;
 }
 
 class ValidationLogger;
@@ -19,7 +20,7 @@ namespace lang
     /**
      * Defines the behaviour of a variable.
      */
-    class VariableDefinition : public virtual lang::Visitable<ANCE_CONSTRUCTS>
+    class VariableDefinition
     {
       public:
         VariableDefinition(lang::ResolvingHandle<lang::Variable> self,
@@ -70,7 +71,7 @@ namespace lang
         virtual Shared<lang::Value> getValue(CompileContext& context) = 0;
         virtual void                setValue(Shared<lang::Value> value, CompileContext& context);
 
-        ~VariableDefinition() override = default;
+        virtual ~VariableDefinition() = default;
 
       protected:
         virtual void                          storeValue(Shared<lang::Value> value, CompileContext& context) = 0;

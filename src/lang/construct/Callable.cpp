@@ -6,8 +6,6 @@
 
 void lang::Callable::addFunction(lang::OwningHandle<lang::Function> function)
 {
-    onAddFunction(*function);
-
     functions_.push_back(std::move(function));
     function_handles_.push_back(functions_.back().handle());
 }
@@ -76,8 +74,6 @@ std::vector<std::reference_wrapper<lang::Function const>> lang::Callable::resolv
     if (same_signatures.empty()) return matching_signatures;
     else return same_signatures;
 }
-
-void lang::Callable::onAddFunction(lang::Function&) {}
 
 std::vector<lang::ResolvingHandle<lang::Function>>& lang::Callable::functions()
 {

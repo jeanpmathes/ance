@@ -15,9 +15,7 @@ namespace lang
     /**
      * A function that is just declared, the actual definition is provided externally when linking.
      */
-    class ExternFunction
-        : public lang::FunctionDefinition
-        , public lang::Element<ExternFunction, ANCE_CONSTRUCTS>
+    class ExternFunction : public lang::FunctionDefinition
     {
       public:
         ExternFunction(Function&                            function,

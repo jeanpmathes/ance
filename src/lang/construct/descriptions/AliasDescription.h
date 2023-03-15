@@ -32,8 +32,10 @@ namespace lang
 
         ~AliasDescription() override = default;
 
-        [[nodiscard]] Identifier const& name() const override;
-        [[nodiscard]] bool              isOverloadAllowed() const override;
+        [[nodiscard]] Identifier const&    name() const override;
+        [[nodiscard]] lang::AccessModifier access() const;
+        [[nodiscard]] lang::Type const&    actual() const;
+        [[nodiscard]] bool                 isOverloadAllowed() const override;
 
         void validate(ValidationLogger& validation_logger) const override;
 

@@ -14,14 +14,15 @@ std::any ControlFlowGraphPrinter::visit(Unit& unit)
     return {};
 }
 
-std::any ControlFlowGraphPrinter::visit(lang::CustomFunction& function)
+std::any ControlFlowGraphPrinter::visit(lang::FunctionDescription& function_description)
 {
-    current_function_ = &function;
+    current_function_ = function_description.function();
+    assert(current_function_);
 
-    for (auto& bb : function.getBasicBlocks()) { visit(*bb); }
+    for (auto& bb : current_function_->getBasicBlocks()) { visit(*bb); }
 
     printBlock("exit", NODE_EXIT, BlockStyle::META);
-    printGroup(function.signature().toString());
+    printGroup(current_function_->signature().toString());
 
     out_ << nodes_.rdbuf();
     out_ << edges_.rdbuf();

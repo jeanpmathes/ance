@@ -55,11 +55,6 @@ lang::Location lang::Member::location() const
     return location_;
 }
 
-lang::Location lang::Member::typeLocation() const
-{
-    return type_location_;
-}
-
 void lang::Member::setScope(lang::Scope* scope)
 {
     scope->addType(type());
@@ -68,7 +63,7 @@ void lang::Member::setScope(lang::Scope* scope)
 
 bool lang::Member::validate(ValidationLogger& validation_logger) const
 {
-    if (!type_->validate(validation_logger, location())) return false;
+    if (!type_->validate(validation_logger, type_location_)) return false;
 
     if (constant_init_.hasValue() && assigner_ != lang::Assigner::COPY_ASSIGNMENT)
     {

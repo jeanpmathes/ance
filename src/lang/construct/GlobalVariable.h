@@ -16,6 +16,7 @@ namespace lang
     class Constant;
     class Type;
     class GlobalScope;
+    class Variable;
 }
 
 class ConstantExpression;
@@ -27,7 +28,6 @@ namespace lang
      */
     class GlobalVariable
         : public VariableDefinition
-        , public lang::Element<GlobalVariable, ANCE_CONSTRUCTS>
     {
       public:
         using Initializer =

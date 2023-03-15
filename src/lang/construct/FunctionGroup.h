@@ -18,7 +18,6 @@ namespace lang
     class FunctionGroup
         : public HandleTarget<FunctionGroup>
         , public Callable
-        , public Element<FunctionGroup, ANCE_CONSTRUCTS>
     {
       public:
         explicit FunctionGroup(Identifier name);
@@ -42,9 +41,6 @@ namespace lang
          * Get an undefined function group with the same name.
          */
         [[nodiscard]] lang::ResolvingHandle<lang::FunctionGroup> toUndefined() const;
-
-      protected:
-        void onAddFunction(lang::Function& function) override;
 
       private:
         lang::Identifier name_;

@@ -50,17 +50,15 @@ namespace lang
          */
         virtual lang::GlobalScope* getGlobalScope() = 0;
 
-        virtual /**
+        /**
          * Get the context the global scope is in.
          */
-            lang::Context&
-            context();
+        virtual lang::Context& context();
 
-        virtual /**
+        /**
          * Get the context the global scope is in.
          */
-            lang::Context const&
-            context() const;
+        virtual lang::Context const& context() const;
 
         /**
          * Get the global scope.

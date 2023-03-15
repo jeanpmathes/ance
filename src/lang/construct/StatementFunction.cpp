@@ -41,7 +41,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::StatementFunction::getNati
 
 void lang::StatementFunction::setupCode()
 {
-    addChild(code_);
+    function().addChild(code_);
 
     code_.setContainingScope(this->function());
     inside_scope_ = code_.getBlockScope();
@@ -71,9 +71,9 @@ lang::AccessModifier lang::StatementFunction::access() const
     return access_;
 }
 
-Statement const& lang::StatementFunction::code() const
+Statement const* lang::StatementFunction::code() const
 {
-    return code_;
+    return &code_;
 }
 
 void lang::StatementFunction::postResolve()

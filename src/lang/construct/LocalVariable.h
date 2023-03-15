@@ -19,9 +19,7 @@ namespace lang
     /**
      * A local variable or function parameter definition.
      */
-    class LocalVariable
-        : public lang::VariableDefinition
-        , public lang::Element<LocalVariable, ANCE_CONSTRUCTS>
+    class LocalVariable : public lang::VariableDefinition
     {
       public:
         /**

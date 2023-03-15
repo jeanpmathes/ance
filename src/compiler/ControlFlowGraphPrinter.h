@@ -21,7 +21,7 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitorNonConst
     explicit ControlFlowGraphPrinter(std::ostream& out);
 
     std::any visit(Unit& unit) override;
-    std::any visit(lang::CustomFunction& function) override;
+    std::any visit(lang::FunctionDescription& function) override;
     std::any visit(lang::BasicBlock& block) override;
 
   private:
@@ -46,9 +46,9 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitorNonConst
     std::stringstream nodes_ {};
     std::stringstream edges_ {};
 
-    std::map<std::pair<lang::CustomFunction*, int32_t>, uint32_t> id_map_ {};
+    std::map<std::pair<lang::Function const*, int32_t>, uint32_t> id_map_ {};
     uint32_t                                                      node_counter_ {0};
-    lang::CustomFunction*                                         current_function_ {nullptr};
+    lang::Function const*                                         current_function_ {nullptr};
 };
 
 #endif

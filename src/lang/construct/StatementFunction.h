@@ -43,7 +43,7 @@ namespace lang
                           lang::Location                       declaration_location);
 
         [[nodiscard]] lang::AccessModifier access() const override;
-        [[nodiscard]] Statement const&     code() const;
+        [[nodiscard]] Statement const*     code() const override;
 
         void postResolve() override;
         void determineFlow() override;

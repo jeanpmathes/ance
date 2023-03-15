@@ -13,7 +13,7 @@ namespace lang
     /**
      * A member of a class or struct.
      */
-    class Member
+    class Member : public Element<Member, ANCE_CONSTRUCTS>
     {
       public:
         /**
@@ -42,7 +42,6 @@ namespace lang
 
         [[nodiscard]] lang::Assigner assigner() const;
         [[nodiscard]] lang::Location location() const;
-        [[nodiscard]] lang::Location typeLocation() const;
 
         /**
          * Set the scope that contains the member.

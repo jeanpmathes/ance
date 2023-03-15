@@ -16,9 +16,7 @@ namespace lang
      * A function that is defined by the language itself using native representation, not by source code.
      * Therefore a predefined function does not require some steps like resolving.
      */
-    class PredefinedFunction
-        : public lang::FunctionDefinition
-        , public lang::Element<PredefinedFunction, ANCE_CONSTRUCTS>
+    class PredefinedFunction : public lang::FunctionDefinition
     {
       public:
         PredefinedFunction(Function&                            function,

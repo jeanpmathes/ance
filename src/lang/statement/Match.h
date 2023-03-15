@@ -6,6 +6,11 @@
 #include "lang/Element.h"
 #include "lang/expression/ConstantExpression.h"
 
+namespace lang
+{
+    class Variable;
+}
+
 class Expression;
 
 class Case : public lang::Element<Case, ANCE_CONSTRUCTS>

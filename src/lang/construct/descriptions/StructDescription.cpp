@@ -21,6 +21,19 @@ lang::Identifier const& lang::StructDescription::name() const
     return name_;
 }
 
+lang::AccessModifier lang::StructDescription::access() const
+{
+    return access_;
+}
+
+std::vector<std::reference_wrapper<const lang::Member>> lang::StructDescription::members() const
+{
+    std::vector<std::reference_wrapper<const lang::Member>> members;
+    members.reserve(members_.size());
+    for (auto& member : members_) { members.emplace_back(*member); }
+    return members;
+}
+
 bool lang::StructDescription::isOverloadAllowed() const
 {
     return false;

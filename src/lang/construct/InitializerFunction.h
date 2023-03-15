@@ -28,9 +28,7 @@ namespace lang
     /**
      * A function that initializes a (global) variable.
      */
-    class InitializerFunction
-        : public lang::StatementFunction
-        , public lang::Element<InitializerFunction, ANCE_CONSTRUCTS>
+    class InitializerFunction : public lang::StatementFunction
     {
       public:
         InitializerFunction(Function& function, Statement& initializer, Scope& containing_scope);

@@ -36,7 +36,6 @@ namespace lang
      */
     class Variable
         : public HandleTarget<lang::Variable>
-        , public lang::Element<Variable, ANCE_CONSTRUCTS>
     {
       public:
         /**
@@ -62,16 +61,17 @@ namespace lang
          * @param assigner The assigner used for initialization.
          * @param is_constant Whether the variable is constant.
          * @param location The source location.
+         * @return The global variable.
          */
-        void defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
-                            lang::Location                    type_location,
-                            GlobalScope&                      containing_scope,
-                            lang::AccessModifier              access,
-                            lang::GlobalVariable::Initializer init,
-                            lang::Scope*                      init_scope,
-                            lang::Assigner                    assigner,
-                            bool                              is_constant,
-                            lang::Location                    location);
+        lang::GlobalVariable* defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
+                                             lang::Location                    type_location,
+                                             GlobalScope&                      containing_scope,
+                                             lang::AccessModifier              access,
+                                             lang::GlobalVariable::Initializer init,
+                                             lang::Scope*                      init_scope,
+                                             lang::Assigner                    assigner,
+                                             bool                              is_constant,
+                                             lang::Location                    location);
 
         /**
          * Define this variable as a local variable.

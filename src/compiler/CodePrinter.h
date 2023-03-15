@@ -15,10 +15,12 @@ class CodePrinter : public lang::ApplicationVisitorConst
 
     explicit CodePrinter(std::ostream& out);
 
-    [[nodiscard]] std::any visit(lang::GlobalVariable const& variable) override;
+    [[nodiscard]] std::any visit(lang::VariableDescription const& variable_description) override;
+    [[nodiscard]] std::any visit(lang::FunctionDescription const& function_description) override;
+    [[nodiscard]] std::any visit(lang::StructDescription const& struct_description) override;
+    [[nodiscard]] std::any visit(lang::AliasDescription const& alias_description) override;
 
-    [[nodiscard]] std::any visit(lang::CustomFunction const& function) override;
-    [[nodiscard]] std::any visit(lang::ExternFunction const& function) override;
+    [[nodiscard]] std::any visit(lang::Member const& member) override;
 
     [[nodiscard]] std::any visit(Addressof const& addressof) override;
     [[nodiscard]] std::any visit(Allocation const& allocation) override;
@@ -66,6 +68,8 @@ class CodePrinter : public lang::ApplicationVisitorConst
 
     void consumeWhitespace();
     void emitWhitespace();
+
+    void emitFunction(lang::Function const& function);
 
     enum ConsumeWhitespace
     {

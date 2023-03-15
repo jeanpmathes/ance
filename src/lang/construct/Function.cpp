@@ -35,8 +35,6 @@ void lang::Function::defineAsExtern(Scope&                                      
                                                   return_type_location,
                                                   parameters,
                                                   location);
-
-    addChild(*definition_.value());
 }
 
 void lang::Function::defineAsCustom(lang::AccessModifier                        access,
@@ -57,8 +55,6 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
                                                   containing_scope,
                                                   declaration_location,
                                                   definition_location);
-
-    addChild(*definition_.value());
 }
 
 lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHandle<lang::Type>           return_type,
@@ -72,15 +68,19 @@ lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHand
     lang::PredefinedFunction& predefined_function = *definition;
 
     definition_ = std::move(definition);
-    addChild(*definition_.value());
 
     return predefined_function;
 }
 
-void lang::Function::defineAsInit(Statement& code, lang::Scope& containing_scope)
+lang::InitializerFunction& lang::Function::defineAsInit(Statement& code, lang::Scope& containing_scope)
 {
-    definition_ = makeOwned<lang::InitializerFunction>(*this, code, containing_scope);
-    addChild(*definition_.value());
+    auto definition = makeOwned<lang::InitializerFunction>(*this, code, containing_scope);
+
+    lang::InitializerFunction& initializer_function = *definition;
+
+    definition_ = std::move(definition);
+
+    return initializer_function;
 }
 
 Optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParameterVariable(
@@ -98,7 +98,6 @@ Optional<lang::ResolvingHandle<lang::Variable>> lang::Function::defineParameterV
     lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(name);
     variable->defineAsLocal(type, type_location, *this, is_final, value, parameter_no, location);
 
-    addChild(*variable);
     defined_parameters_.emplace(name, lang::OwningHandle<lang::Variable>::takeOwnership(variable));
 
     return makeOptional(variable);
@@ -128,6 +127,12 @@ lang::Signature const& lang::Function::signature() const
     return definition_.value()->signature();
 }
 
+Statement const* lang::Function::code() const
+{
+    assert(isDefined());
+    return definition_.value()->code();
+}
+
 lang::ResolvingHandle<lang::Type> lang::Function::parameterType(size_t index)
 {
     assert(isDefined());
@@ -138,6 +143,12 @@ lang::Type const& lang::Function::parameterType(size_t index) const
 {
     assert(isDefined());
     return definition_.value()->parameterType(index);
+}
+
+lang::Identifier const& lang::Function::parameterName(size_t index) const
+{
+    assert(isDefined());
+    return definition_.value()->parameterName(index);
 }
 
 size_t lang::Function::parameterCount() const

@@ -12,9 +12,12 @@ using namespace util;
 
 CodePrinter::CodePrinter(std::ostream& out) : out_(out) {}
 
-std::any CodePrinter::visit(lang::GlobalVariable const&)
+std::any CodePrinter::visit(lang::VariableDescription const& variable_description)
 {
-    indent(); /*
+    indent();
+
+    assert(variable_description.variable());
+    lang::GlobalVariable const& variable = *variable_description.variable();
 
     out_ << variable.access().toString() << " ";
     if (variable.isConstant())
@@ -23,40 +26,76 @@ std::any CodePrinter::visit(lang::GlobalVariable const&)
     out_ << variable.name() << ": ";
     out_ << variable.type().name();
 
-    if (variable.init())
+    if (variable_description.initializer())
     {
         out_ << " " << variable.assigner().getSymbol() << " ";
-        visitTree(*variable.init());
+        visitTree(*variable_description.initializer());
     }
 
-    out_ << ";" << std::endl; */
+    out_ << ";" << std::endl;
+
+    if (variable_description.initializerFunction())
+    {
+        indent();
+        emitFunction(variable_description.initializerFunction()->function());
+    }
 
     return {};
 }
 
-std::any CodePrinter::visit(lang::CustomFunction const& function)
+std::any CodePrinter::visit(lang::FunctionDescription const& function_description)
 {
     indent();
 
-    out_ << function.access().toString() << " ";
-    out_ << function.name() << " ";
-    out_ << function.parameterSource();
+    assert(function_description.function());
+    lang::Function const& function = *function_description.function();
 
-    if (!function.returnType().isVoidType()) { out_ << " : " << function.returnType().name(); }
-
-    out_ << std::endl;
-
-    out_ << visitTree(function.code()) << std::endl;
+    emitFunction(function);
 
     return {};
 }
 
-std::any CodePrinter::visit(lang::ExternFunction const& function)
+std::any CodePrinter::visit(lang::StructDescription const& struct_description)
 {
     indent();
 
-    out_ << "extern " << function.name() << " ";
-    out_ << function.parameterSource() << ";" << std::endl;
+    out_ << struct_description.access().toString() << " ";
+    out_ << "struct " << struct_description.name() << std::endl;
+
+    indent();
+    indent_++;
+    out_ << "{" << std::endl;
+
+    for (auto& member : struct_description.members())
+    {
+        indent();
+        visitTree(member);
+        out_ << std::endl;
+    }
+
+    indent_--;
+    indent();
+    out_ << "}" << std::endl;
+
+    return {};
+}
+
+std::any CodePrinter::visit(lang::AliasDescription const& alias_description)
+{
+    indent();
+
+    out_ << alias_description.access().toString() << " ";
+    out_ << "define " << alias_description.name() << " ";
+    out_ << "alias " << alias_description.actual().name() << ";" << std::endl;
+
+    return {};
+}
+
+std::any CodePrinter::visit(lang::Member const& member)
+{
+    out_ << member.access().toString() << " ";
+    out_ << member.name() << ": ";
+    out_ << member.type().name() << ";";
 
     return {};
 }
@@ -521,4 +560,34 @@ void CodePrinter::consumeWhitespace()
 void CodePrinter::emitWhitespace()
 {
     if (consume_whitespace_ != CONSUME_WS_ACTIVE) { out_ << " "; }
+}
+
+void CodePrinter::emitFunction(lang::Function const& function)
+{
+    out_ << function.access().toString() << " ";
+    out_ << function.name() << " ";
+
+    {
+        out_ << "(";
+        bool is_first = true;
+
+        for (size_t index = 0; index < function.parameterCount(); index++)
+        {
+            if (!is_first) out_ << ", ";
+            out_ << function.parameterName(index) + ": " + function.parameterType(index).name();
+
+            is_first = false;
+        }
+
+        out_ << ")";
+    }
+
+    if (!function.returnType().isVoidType()) { out_ << " : " << function.returnType().name(); }
+
+    if (function.code())
+    {
+        out_ << std::endl;
+        out_ << visitTree(*function.code()) << std::endl;
+    }
+    else { out_ << ";" << std::endl; }
 }

@@ -59,6 +59,11 @@ lang::Signature const& lang::FunctionDefinition::signature() const
     return signature_;
 }
 
+Statement const* lang::FunctionDefinition::code() const
+{
+    return nullptr;
+}
+
 lang::Location lang::FunctionDefinition::returnTypeLocation() const
 {
     return return_type_location_;
@@ -72,6 +77,11 @@ lang::ResolvingHandle<lang::Type> lang::FunctionDefinition::parameterType(size_t
 lang::Type const& lang::FunctionDefinition::parameterType(size_t index) const
 {
     return parameters_[index]->type();
+}
+
+lang::Identifier const& lang::FunctionDefinition::parameterName(size_t index) const
+{
+    return parameters_[index]->name();
 }
 
 size_t lang::FunctionDefinition::parameterCount() const
@@ -135,22 +145,6 @@ Optional<Shared<lang::Value>> lang::FunctionDefinition::buildCall(std::vector<Sh
 
     llvm::Value* native_value = lang::values::contentToNative(returnType(), content_value, context);
     return {makeShared<lang::WrappedNativeValue>(returnType(), native_value)};
-}
-
-std::string lang::FunctionDefinition::parameterSource() const
-{
-    std::string source   = "(";
-    bool        is_first = true;
-
-    for (auto& parameter : parameters_)
-    {
-        if (!is_first) source += ", ";
-        source += parameter->name() + ": " + parameter->type().name();
-
-        is_first = false;
-    }
-
-    return source + ")";
 }
 
 std::vector<Shared<lang::Parameter>> const& lang::FunctionDefinition::parameters() const

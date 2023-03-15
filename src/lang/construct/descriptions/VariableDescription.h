@@ -13,6 +13,8 @@ namespace lang
 {
     class Type;
     class Parameter;
+    class GlobalVariable;
+    class InitializerFunction;
 }
 
 class ConstantExpression;
@@ -49,8 +51,11 @@ namespace lang
 
         ~VariableDescription() override = default;
 
-        [[nodiscard]] Identifier const& name() const override;
-        [[nodiscard]] bool              isOverloadAllowed() const override;
+        [[nodiscard]] Identifier const&           name() const override;
+        [[nodiscard]] bool                        isOverloadAllowed() const override;
+        [[nodiscard]] lang::GlobalVariable const* variable() const;
+        [[nodiscard]] Expression const*           initializer() const;
+        [[nodiscard]] InitializerFunction const*  initializerFunction() const;
 
         void resolve() override;
         void postResolve() override;
@@ -76,6 +81,9 @@ namespace lang
 
         Optional<Owned<Expression>> init_expression_;
         Optional<Owned<Statement>>  init_block_;
+
+        lang::GlobalVariable*      global_variable_ {nullptr};
+        lang::InitializerFunction* init_function_ {nullptr};
     };
 }
 

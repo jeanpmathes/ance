@@ -61,6 +61,21 @@ bool lang::VariableDescription::isOverloadAllowed() const
     return false;
 }
 
+lang::GlobalVariable const* lang::VariableDescription::variable() const
+{
+    return global_variable_;
+}
+
+Expression const* lang::VariableDescription::initializer() const
+{
+    return init_expression_ptr_;
+}
+
+lang::InitializerFunction const* lang::VariableDescription::initializerFunction() const
+{
+    return init_function_;
+}
+
 void lang::VariableDescription::performInitialization()
 {
     lang::OwningHandle<lang::Variable> variable =
@@ -81,7 +96,7 @@ void lang::VariableDescription::performInitialization()
             auto init_function = lang::OwningHandle<lang::Function>::takeOwnership(
                 lang::makeHandled<lang::Function>(lang::Identifier::like(name_ + "$init")));
 
-            init_function->defineAsInit(**init_block_, scope());
+            init_function_ = &init_function->defineAsInit(**init_block_, scope());
 
             variable_init = std::ref(*init_function);
             init_scope    = &*init_function;
@@ -103,15 +118,15 @@ void lang::VariableDescription::performInitialization()
         }
     }
 
-    variable->defineAsGlobal(type_handle_,
-                             type_location_,
-                             *scope().getGlobalScope(),
-                             access_,
-                             variable_init,
-                             init_scope,
-                             assigner_,
-                             is_constant_,
-                             location_);
+    global_variable_ = variable->defineAsGlobal(type_handle_,
+                                                type_location_,
+                                                *scope().getGlobalScope(),
+                                                access_,
+                                                variable_init,
+                                                init_scope,
+                                                assigner_,
+                                                is_constant_,
+                                                location_);
 
     scope().getGlobalScope()->addVariable(std::move(variable));
 }

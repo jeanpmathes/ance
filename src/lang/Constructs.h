@@ -7,25 +7,17 @@ class Unit;
 
 namespace lang
 {
-    class FunctionGroup;
-
-    class Function;
-    class CustomFunction;
-    class ExternFunction;
-    class PredefinedFunction;
-    class InitializerFunction;
-
     class BasicBlock;
     class CodeBlock;
 
-    class Variable;
-    class GlobalVariable;
-    class LocalVariable;
+    class Function;
 
     class FunctionDescription;
     class VariableDescription;
     class StructDescription;
     class AliasDescription;
+
+    class Member;
 }
 
 class Addressof;
@@ -73,14 +65,13 @@ class Return;
 class While;
 
 #define ANCE_CONSTRUCTS                                                                                                \
-    Unit, lang::FunctionGroup, lang::Function, lang::CustomFunction, lang::ExternFunction, lang::PredefinedFunction,   \
-        lang::InitializerFunction, lang::BasicBlock, lang::CodeBlock, lang::Variable, lang::GlobalVariable,            \
-        lang::LocalVariable, lang::FunctionDescription, lang::VariableDescription, lang::StructDescription,            \
-        lang::AliasDescription, Addressof, Allocation, BinaryOperation, UnaryOperation, BindRef, BindRefTo,            \
-        ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType, Subscript, VariableAccess,           \
-        MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope, lang::LocalScope, Assertion,     \
-        Assignment, Break, Continue, Delete, ExpressionStatement, LocalReferenceVariableDefinition,                    \
-        LocalVariableDefinition, Drop, Return, If, While, Match, Case, VectorDefinition, ArrayDefinition
+    Unit, lang::BasicBlock, lang::CodeBlock, lang::Function, lang::FunctionDescription, lang::VariableDescription,     \
+        lang::StructDescription, lang::AliasDescription, lang::Member, Addressof, Allocation, BinaryOperation,         \
+        UnaryOperation, BindRef, BindRefTo, ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType,  \
+        Subscript, VariableAccess, MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope,       \
+        lang::LocalScope, Assertion, Assignment, Break, Continue, Delete, ExpressionStatement,                         \
+        LocalReferenceVariableDefinition, LocalVariableDefinition, Drop, Return, If, While, Match, Case,               \
+        VectorDefinition, ArrayDefinition
 #endif
 
 template<typename T>

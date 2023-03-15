@@ -23,6 +23,16 @@ lang::Identifier const& lang::AliasDescription::name() const
     return name_;
 }
 
+lang::AccessModifier lang::AliasDescription::access() const
+{
+    return access_;
+}
+
+lang::Type const& lang::AliasDescription::actual() const
+{
+    return actual_;
+}
+
 bool lang::AliasDescription::isOverloadAllowed() const
 {
     return false;

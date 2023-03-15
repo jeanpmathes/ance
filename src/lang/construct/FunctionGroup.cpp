@@ -119,8 +119,3 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::FunctionGroup::toUndefined() co
 {
     return lang::makeHandled<lang::FunctionGroup>(name());
 }
-
-void lang::FunctionGroup::onAddFunction(lang::Function& function)
-{
-    addChild(function);
-}

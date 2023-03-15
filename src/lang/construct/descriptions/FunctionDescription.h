@@ -49,6 +49,9 @@ namespace lang
         [[nodiscard]] Identifier const& name() const override;
         [[nodiscard]] bool              isOverloadAllowed() const override;
 
+        [[nodiscard]] lang::Function const* function() const;
+        [[nodiscard]] Statement const*      code() const;
+
         void validate(ValidationLogger& validation_logger) const override;
 
         [[nodiscard]] Descriptions expand(lang::Context& new_context) const override;
@@ -65,6 +68,8 @@ namespace lang
         Optional<Owned<Statement>>           code_;
         lang::Location                       declaration_location_;
         lang::Location                       definition_location_;
+
+        lang::Function* function_ {nullptr};
     };
 }
 

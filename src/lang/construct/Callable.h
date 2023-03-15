@@ -72,7 +72,6 @@ namespace lang
             std::vector<std::reference_wrapper<lang::Type const>> const& arguments) const;
 
       protected:
-        virtual void                                                            onAddFunction(lang::Function& function);
         std::vector<lang::ResolvingHandle<lang::Function>>&                     functions();
         [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Function>> const& functions() const;
 

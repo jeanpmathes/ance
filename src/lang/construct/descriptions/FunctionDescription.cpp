@@ -50,7 +50,19 @@ void lang::FunctionDescription::performInitialization()
     }
     else { function->defineAsExtern(scope(), return_type_, return_type_location_, parameters_, declaration_location_); }
 
+    function_ = &*function;
+
     scope().getGlobalScope()->addFunction(std::move(function));
+}
+
+lang::Function const* lang::FunctionDescription::function() const
+{
+    return function_;
+}
+
+Statement const* lang::FunctionDescription::code() const
+{
+    return getPtr(code_);
 }
 
 void lang::FunctionDescription::validate(ValidationLogger& validation_logger) const

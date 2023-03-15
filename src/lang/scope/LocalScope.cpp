@@ -55,7 +55,6 @@ lang::ResolvingHandle<lang::Variable> lang::LocalScope::defineLocalVariable(Iden
     lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(name);
     variable->defineAsLocal(type, type_location, *this, is_final, value, 0, location);
 
-    addChild(*variable);
     defined_local_variables_[name].push_back(lang::OwningHandle<lang::Variable>::takeOwnership(variable));
 
     active_variables_.insert_or_assign(name, variable);

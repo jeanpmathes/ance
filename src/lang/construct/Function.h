@@ -24,6 +24,7 @@ namespace lang
     class Type;
     class CodeBlock;
     class PredefinedFunction;
+    class InitializerFunction;
 }
 
 class CompileContext;
@@ -109,7 +110,7 @@ namespace lang
          * @param code The initializer.
          * @param containing_scope The scope containing the function.
          */
-        void defineAsInit(Statement& code, Scope& containing_scope);
+        InitializerFunction& defineAsInit(Statement& code, Scope& containing_scope);
 
         /**
          * Define a local variable that is a parameter.
@@ -153,6 +154,12 @@ namespace lang
         [[nodiscard]] lang::Signature const& signature() const;
 
         /**
+         * Get the code block of this function, if there is one.
+         * @return The code block.
+         */
+        [[nodiscard]] Statement const* code() const;
+
+        /**
          * Get the type of a parameter.
          * @param index The index of the parameter. Must be smaller than the parameter count.
          * @return The type of the selected parameter.
@@ -165,6 +172,13 @@ namespace lang
          * @return The type of the selected parameter.
          */
         [[nodiscard]] lang::Type const& parameterType(size_t index) const;
+
+        /**
+         * Get the name of a parameter.
+         * @param index The index of the parameter. Must be smaller than the parameter count.
+         * @return The name of the selected parameter.
+         */
+        [[nodiscard]] lang::Identifier const& parameterName(size_t index) const;
 
         /**
          * Get the parameter count.

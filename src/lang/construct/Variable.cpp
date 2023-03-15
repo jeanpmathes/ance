@@ -21,28 +21,31 @@ bool lang::Variable::isDefined() const
     return definition_.hasValue();
 }
 
-void lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
-                                    lang::Location                    type_location,
-                                    GlobalScope&                      containing_scope,
-                                    lang::AccessModifier              access,
-                                    lang::GlobalVariable::Initializer init,
-                                    lang::Scope*                      init_scope,
-                                    lang::Assigner                    assigner,
-                                    bool                              is_constant,
-                                    lang::Location                    location)
+lang::GlobalVariable* lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
+                                                     lang::Location                    type_location,
+                                                     GlobalScope&                      containing_scope,
+                                                     lang::AccessModifier              access,
+                                                     lang::GlobalVariable::Initializer init,
+                                                     lang::Scope*                      init_scope,
+                                                     lang::Assigner                    assigner,
+                                                     bool                              is_constant,
+                                                     lang::Location                    location)
 {
-    definition_ = makeOwned<lang::GlobalVariable>(self(),
-                                                  type,
-                                                  type_location,
-                                                  containing_scope,
-                                                  access,
-                                                  std::move(init),
-                                                  init_scope,
-                                                  assigner,
-                                                  is_constant,
-                                                  location);
+    Owned<lang::GlobalVariable> global_variable     = makeOwned<lang::GlobalVariable>(self(),
+                                                                                  type,
+                                                                                  type_location,
+                                                                                  containing_scope,
+                                                                                  access,
+                                                                                  std::move(init),
+                                                                                  init_scope,
+                                                                                  assigner,
+                                                                                  is_constant,
+                                                                                  location);
+    auto*                       global_variable_ptr = &*global_variable;
 
-    addChild(**definition_);
+    definition_ = std::move(global_variable);
+
+    return global_variable_ptr;
 }
 
 void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type> type,
@@ -61,8 +64,6 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type> type,
                                                  value,
                                                  parameter_no,
                                                  location);
-
-    addChild(**definition_);
 }
 
 lang::Identifier const& lang::Variable::name() const
