@@ -24,11 +24,11 @@ std::any ControlFlowGraphPrinter::visit(lang::FunctionDescription& function_desc
     printBlock("exit", NODE_EXIT, BlockStyle::META);
     printGroup(current_function_->signature().toString());
 
-    out_ << nodes_.rdbuf();
-    out_ << edges_.rdbuf();
+    out_ << nodes_.str();
+    out_ << edges_.str();
 
-    nodes_.clear();
-    edges_.clear();
+    std::stringstream().swap(nodes_);
+    std::stringstream().swap(edges_);
 
     current_function_ = nullptr;
     return {};
