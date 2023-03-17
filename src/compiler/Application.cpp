@@ -10,7 +10,7 @@
 #include "lang/type/VectorType.h"
 #include "lang/type/SizeType.h"
 
-Application::Application(Project& project) : Unit(!project.description().exclude_runtime), project_(project) {}
+Application::Application(Project& project) : Unit(!project.description().runtime_excluded), project_(project) {}
 
 std::string const& Application::getName() const
 {
@@ -74,7 +74,7 @@ bool Application::isEmittingExtras() const
 
 bool Application::isUsingRuntime() const
 {
-    return not project_.description().exclude_runtime;
+    return not project_.description().runtime_excluded;
 }
 
 antlr4::tree::ParseTree* Application::selectTree(anceParser& parser)

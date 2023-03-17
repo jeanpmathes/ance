@@ -53,7 +53,7 @@ class ProjectDescription : public Unit
         bool                     warning_as_error_enabled;
         bool                     ignoring_assert;
         bool                     extra_emission_enabled;
-        bool                     exclude_runtime;
+        bool                     runtime_excluded;
     };
 
     /**

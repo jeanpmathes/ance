@@ -136,7 +136,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
         push_member(lang::Identifier::like("warning_as_error_enabled"), unit_.globalScope().context().getBooleanType());
         push_member(lang::Identifier::like("ignoring_assert"), unit_.globalScope().context().getBooleanType());
         push_member(lang::Identifier::like("extra_emission_enabled"), unit_.globalScope().context().getBooleanType());
-        push_member(lang::Identifier::like("exclude_runtime"), unit_.globalScope().context().getBooleanType());
+        push_member(lang::Identifier::like("runtime_excluded"), unit_.globalScope().context().getBooleanType());
 
         Owned<lang::StructDescription> description =
             makeOwned<lang::StructDescription>(lang::AccessModifier::PUBLIC_ACCESS,
