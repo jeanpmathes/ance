@@ -102,6 +102,12 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     [[nodiscard]] virtual bool isUsingRuntime() const = 0;
 
     /**
+     * Whether to include archives (static libraries) as whole.
+     * @return True if archives should be included as whole.
+     */
+    [[nodiscard]] virtual bool isIncludingWholeArchive() const = 0;
+
+    /**
      * Get the bitness of the application.
      * @return The bitness.
      */

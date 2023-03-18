@@ -24,6 +24,7 @@ class ProjectDescription : public Unit
     [[nodiscard]] bool                               isAssertionsEnabled() const override;
     [[nodiscard]] bool                               isEmittingExtras() const override;
     [[nodiscard]] bool                               isUsingRuntime() const override;
+    [[nodiscard]] bool                               isIncludingWholeArchive() const override;
     void                                             validate(ValidationLogger& validation_logger) const override;
 
     antlr4::tree::ParseTree* selectTree(anceParser& parser) override;
@@ -54,6 +55,7 @@ class ProjectDescription : public Unit
         bool                     ignoring_assert;
         bool                     extra_emission_enabled;
         bool                     runtime_excluded;
+        bool                     including_whole_archives;
     };
 
     /**

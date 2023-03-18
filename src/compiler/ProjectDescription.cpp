@@ -63,6 +63,11 @@ bool ProjectDescription::isUsingRuntime() const
     return true;
 }
 
+bool ProjectDescription::isIncludingWholeArchive() const
+{
+    return false;
+}
+
 void ProjectDescription::validate(ValidationLogger& validation_logger) const
 {
     this->globalScope().validate(validation_logger);
@@ -107,6 +112,7 @@ struct Project_ {
     bool            ignoring_assert          = false;
     bool            extra_emission_enabled   = false;
     bool            runtime_excluded         = false;
+    bool            including_whole_archives = false;
 };
 
 using ProjectDescriptionFunction = void(__cdecl*)(Project_*);
@@ -215,7 +221,8 @@ bool ProjectDescription::loadDescription()
                     .warning_as_error_enabled = project.warning_as_error_enabled,
                     .ignoring_assert          = project.ignoring_assert,
                     .extra_emission_enabled   = project.extra_emission_enabled,
-                    .runtime_excluded         = project.runtime_excluded};
+                    .runtime_excluded         = project.runtime_excluded,
+                    .including_whole_archives = project.including_whole_archives};
 
 #if defined(ANCE_TARGET_WINDOWS)
     FreeLibrary(handle);

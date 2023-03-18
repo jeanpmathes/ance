@@ -77,6 +77,11 @@ bool Application::isUsingRuntime() const
     return not project_.description().runtime_excluded;
 }
 
+bool Application::isIncludingWholeArchive() const
+{
+    return project_.description().including_whole_archives;
+}
+
 antlr4::tree::ParseTree* Application::selectTree(anceParser& parser)
 {
     return parser.file();

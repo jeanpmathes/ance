@@ -98,6 +98,8 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     for (auto const& lib : unit_.getLibraries()) { libs.push_back("/defaultlib:" + lib); }
     for (auto const& lib : libs) { args.push_back(lib.c_str()); }
 
+    if (unit_.isIncludingWholeArchive()) { args.push_back("/wholearchive"); }
+
     std::string const in = obj.string();
     args.push_back(in.c_str());
 
