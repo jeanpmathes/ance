@@ -30,13 +30,13 @@ class Application : public Unit
     [[nodiscard]] bool                               isAssertionsEnabled() const override;
     [[nodiscard]] bool                               isEmittingExtras() const override;
     [[nodiscard]] bool                               isUsingRuntime() const override;
-    [[nodiscard]] bool                               isIncludingWholeArchive() const override;
     void                                             validate(ValidationLogger& validation_logger) const override;
 
     antlr4::tree::ParseTree* selectTree(anceParser& parser) override;
     void                     addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileContext& context) override;
 
     std::vector<std::string> getLibraries() const override;
+    std::vector<std::string> getArchives() const override;
     std::vector<std::string> getLibraryPaths() const override;
     std::vector<std::string> getBinaryDependencyPaths() const override;
 

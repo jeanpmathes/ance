@@ -63,11 +63,6 @@ bool ProjectDescription::isUsingRuntime() const
     return true;
 }
 
-bool ProjectDescription::isIncludingWholeArchive() const
-{
-    return false;
-}
-
 void ProjectDescription::validate(ValidationLogger& validation_logger) const
 {
     this->globalScope().validate(validation_logger);
@@ -89,6 +84,11 @@ std::vector<std::string> ProjectDescription::getLibraries() const
     return {"kernel32", "ucrt", "msvcrt", "libcmt", "libvcruntime"};
 }
 
+std::vector<std::string> ProjectDescription::getArchives() const
+{
+    return {};
+}
+
 std::vector<std::string> ProjectDescription::getLibraryPaths() const
 {
     return {R"(C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64)",
@@ -105,6 +105,7 @@ struct Project_ {
     uint8_t const*  name                     = nullptr;
     uint32_t        kind                     = 0;
     uint8_t const** libraries                = nullptr;
+    uint8_t const** archives                 = nullptr;
     uint8_t const** library_paths            = nullptr;
     uint8_t const** binary_dependencies      = nullptr;
     uint32_t        opt_level                = 0;
@@ -112,7 +113,6 @@ struct Project_ {
     bool            ignoring_assert          = false;
     bool            extra_emission_enabled   = false;
     bool            runtime_excluded         = false;
-    bool            including_whole_archives = false;
 };
 
 using ProjectDescriptionFunction = void(__cdecl*)(Project_*);
@@ -215,14 +215,14 @@ bool ProjectDescription::loadDescription()
                     .kind                     = kind,
                     .project_file             = project_file_,
                     .linkage_libraries        = read_vector(project.libraries),
+                    .linkage_archives         = read_vector(project.archives),
                     .linkage_library_paths    = read_vector(project.library_paths),
                     .binary_dependencies      = read_vector(project.binary_dependencies),
                     .opt_level                = opt_level,
                     .warning_as_error_enabled = project.warning_as_error_enabled,
                     .ignoring_assert          = project.ignoring_assert,
                     .extra_emission_enabled   = project.extra_emission_enabled,
-                    .runtime_excluded         = project.runtime_excluded,
-                    .including_whole_archives = project.including_whole_archives};
+                    .runtime_excluded         = project.runtime_excluded};
 
 #if defined(ANCE_TARGET_WINDOWS)
     FreeLibrary(handle);

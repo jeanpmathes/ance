@@ -24,13 +24,13 @@ class ProjectDescription : public Unit
     [[nodiscard]] bool                               isAssertionsEnabled() const override;
     [[nodiscard]] bool                               isEmittingExtras() const override;
     [[nodiscard]] bool                               isUsingRuntime() const override;
-    [[nodiscard]] bool                               isIncludingWholeArchive() const override;
     void                                             validate(ValidationLogger& validation_logger) const override;
 
     antlr4::tree::ParseTree* selectTree(anceParser& parser) override;
     void                     addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileContext& context) override;
 
     [[nodiscard]] std::vector<std::string> getLibraries() const override;
+    [[nodiscard]] std::vector<std::string> getArchives() const override;
     [[nodiscard]] std::vector<std::string> getLibraryPaths() const override;
     [[nodiscard]] std::vector<std::string> getBinaryDependencyPaths() const override;
 
@@ -48,6 +48,7 @@ class ProjectDescription : public Unit
         UnitResult               kind;
         std::filesystem::path    project_file;
         std::vector<std::string> linkage_libraries;
+        std::vector<std::string> linkage_archives;
         std::vector<std::string> linkage_library_paths;
         std::vector<std::string> binary_dependencies;
         OptLevel                 opt_level;
@@ -55,7 +56,6 @@ class ProjectDescription : public Unit
         bool                     ignoring_assert;
         bool                     extra_emission_enabled;
         bool                     runtime_excluded;
-        bool                     including_whole_archives;
     };
 
     /**

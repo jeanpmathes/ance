@@ -77,11 +77,6 @@ bool Application::isUsingRuntime() const
     return not project_.description().runtime_excluded;
 }
 
-bool Application::isIncludingWholeArchive() const
-{
-    return project_.description().including_whole_archives;
-}
-
 antlr4::tree::ParseTree* Application::selectTree(anceParser& parser)
 {
     return parser.file();
@@ -96,6 +91,11 @@ void Application::addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileCon
 std::vector<std::string> Application::getLibraries() const
 {
     return project_.description().linkage_libraries;
+}
+
+std::vector<std::string> Application::getArchives() const
+{
+    return project_.description().linkage_archives;
 }
 
 std::vector<std::string> Application::getLibraryPaths() const

@@ -17,6 +17,9 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
         args.push_back("/debug:FULL");
     }
 
+    args.push_back("/nologo");
+    args.push_back("/errorlimit:0");
+
     if (unit_.getTargetTriple().isArch64Bit()) { args.push_back("/machine:x64"); }
 
     std::string const os = std::string(unit_.getTargetTriple().getOSName());
@@ -98,7 +101,9 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     for (auto const& lib : unit_.getLibraries()) { libs.push_back("/defaultlib:" + lib); }
     for (auto const& lib : libs) { args.push_back(lib.c_str()); }
 
-    if (unit_.isIncludingWholeArchive()) { args.push_back("/wholearchive"); }
+    std::vector<std::string> archives;
+    for (auto const& archive : unit_.getArchives()) { archives.push_back("/wholearchive:" + archive); }
+    for (auto const& archive : archives) { args.push_back(archive.c_str()); }
 
     std::string const in = obj.string();
     args.push_back(in.c_str());

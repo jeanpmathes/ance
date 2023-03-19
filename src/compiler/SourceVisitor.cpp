@@ -129,6 +129,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
         push_member(lang::Identifier::like("name"), string_type);
         push_member(lang::Identifier::like("kind"), unit_.globalScope().context().getFixedWidthIntegerType(32, false));
         push_member(lang::Identifier::like("libraries"), string_list_type);
+        push_member(lang::Identifier::like("archives"), string_list_type);
         push_member(lang::Identifier::like("library_paths"), string_list_type);
         push_member(lang::Identifier::like("binary_dependencies"), string_list_type);
         push_member(lang::Identifier::like("opt_level"),
@@ -137,7 +138,6 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
         push_member(lang::Identifier::like("ignoring_assert"), unit_.globalScope().context().getBooleanType());
         push_member(lang::Identifier::like("extra_emission_enabled"), unit_.globalScope().context().getBooleanType());
         push_member(lang::Identifier::like("runtime_excluded"), unit_.globalScope().context().getBooleanType());
-        push_member(lang::Identifier::like("including_whole_archives"), unit_.globalScope().context().getBooleanType());
 
         Owned<lang::StructDescription> description =
             makeOwned<lang::StructDescription>(lang::AccessModifier::PUBLIC_ACCESS,
