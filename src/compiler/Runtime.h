@@ -48,16 +48,12 @@ class Runtime
     llvm::Function*              assertion_ {nullptr};
     const static constexpr char* ASSERTION_NAME = "__assert__";
 
-    llvm::Function*              exit_ {nullptr};
-    const static constexpr char* EXIT_NAME = "__exit__";
-
     llvm::Function*              abort_ {nullptr};
     const static constexpr char* ABORT_NAME = "__abort__";
 
     inline static std::vector<std::string> reserved_names_ {ALLOCATE_DYNAMIC_NAME,
                                                             DELETE_DYNAMIC_NAME,
                                                             ASSERTION_NAME,
-                                                            EXIT_NAME,
                                                             ABORT_NAME};
 
   public:
@@ -111,13 +107,6 @@ class Runtime
      * @param context The current compile context.
      */
     void buildAbort(std::string const& reason, CompileContext& context);
-
-    /**
-     * Build an exit.
-     * @param value The exit code.
-     * @param context The current compile context.
-     */
-    void buildExit(Shared<lang::Value> value, CompileContext& context);
 
   private:
     bool is_initialized_ {false};

@@ -9,24 +9,26 @@ UnitResult::operator Value() const
 
 void UnitResult::addLinkerArguments(std::vector<char const*>& args, std::string const& os)
 {
-    switch (value_)
+    if (os == "windows")
     {
-        case LIBRARY:
+        switch (value_)
+        {
+            case LIBRARY:
 
-            args.emplace_back("/dll");
-            args.push_back("/entry:lib_start$lang");
+                args.emplace_back("/dll");
+                // The subsystem is only relevant for executables.
 
-            break;
+                break;
 
-        case EXECUTABLE:
+            case EXECUTABLE:
 
-            // Executable is the default.
-            args.push_back("/entry:start$lang");
+                // Executable is the default.
+                args.push_back("/subsystem:console");
 
-            if (os == "windows") { args.push_back("/subsystem:console"); }
-
-            break;
+                break;
+        }
     }
+    else { throw std::logic_error("Not supported."); }
 }
 
 std::string UnitResult::getExtension(llvm::Triple const& triple) const

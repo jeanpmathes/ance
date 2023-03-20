@@ -51,10 +51,6 @@ void Runtime::init(CompileContext& context)
         context.types().getPointerType(context.types().getFixedWidthIntegerType(8, false)));
     assertion_ = create_function(ASSERTION_NAME, context.types().getVoidType(), assertion_parameters);
 
-    std::vector<lang::ResolvingHandle<lang::Type>> exit_parameters;
-    exit_parameters.emplace_back(context.types().getFixedWidthIntegerType(32, false));
-    exit_ = create_function(EXIT_NAME, context.types().getVoidType(), exit_parameters);
-
     std::vector<lang::ResolvingHandle<lang::Type>> abort_parameters;
     abort_parameters.emplace_back(context.types().getPointerType(context.types().getFixedWidthIntegerType(8, false)));
     abort_ = create_function(ABORT_NAME, context.types().getVoidType(), abort_parameters);
@@ -174,18 +170,6 @@ void Runtime::buildAbort(std::string const& reason, CompileContext& context)
 
     llvm::Value* reason_ptr = context.ir().CreateGlobalStringPtr(reason);
     context.ir().CreateCall(abort_, reason_ptr);
-}
-
-void Runtime::buildExit(Shared<lang::Value> value, CompileContext& context)
-{
-    assert(is_initialized_);
-
-    assert(value->type()->isFixedWidthIntegerType(32, false));
-
-    value->buildContentValue(context);
-    llvm::Value* exit_code = value->getContentValue();
-
-    context.ir().CreateCall(exit_, exit_code);
 }
 
 llvm::Value* Runtime::allocateAutomatic(lang::ResolvingHandle<lang::Type> type,

@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "compiler/AnceCompiler.h"
 #include "lang/ApplicationVisitor.h"
 #include "validation/ValidationLogger.h"
 
@@ -81,15 +82,26 @@ void lang::FunctionGroup::validate(ValidationLogger& validation_logger) const
         }
     }
 
-    {// Validate that no not-mangled function collides with a reserved runtime function.
+    {// Validate that no not-mangled function collides with a reserved function.
         for (auto& function : functions())
         {
-            if (function->context().isContainingRuntime() && !function->isMangled()
-                && Runtime::isNameReserved(function->name()))
+            if (function->isMangled()) continue;
+
+            if (function->context().isContainingRuntime() && Runtime::isNameReserved(function->name()))
             {
                 validation_logger.logError("Function '" + function->name()
                                                + "' collides with a reserved runtime function",
                                            function->location());
+            }
+
+            for (auto& builtin : AnceCompiler::BUILTIN_NAMES)
+            {
+                if (function->name().text() == builtin)
+                {
+                    validation_logger.logError("Function '" + function->name()
+                                                   + "' collides with a reserved builtin function",
+                                               function->location());
+                }
             }
         }
     }
