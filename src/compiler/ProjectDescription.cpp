@@ -81,7 +81,7 @@ void ProjectDescription::addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, 
 
 std::vector<std::string> ProjectDescription::getLibraries() const
 {
-    return {"kernel32", "ucrt", "msvcrt", "libcmt", "libvcruntime"};
+    return {};
 }
 
 std::vector<std::string> ProjectDescription::getArchives() const
@@ -91,9 +91,7 @@ std::vector<std::string> ProjectDescription::getArchives() const
 
 std::vector<std::string> ProjectDescription::getLibraryPaths() const
 {
-    return {R"(C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x64)",
-            R"(C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64)",
-            R"(C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.30.30705\lib\x64)"};
+    return {};
 }
 
 std::vector<std::string> ProjectDescription::getBinaryDependencyPaths() const

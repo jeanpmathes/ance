@@ -88,15 +88,16 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     }
 
     std::vector<std::string> lib_paths;
+    std::vector<std::string> libs;
+
+    bool const ok = getTargetRequirements(libs, lib_paths);
+    if (!ok) return false;
 
     if (unit_.isUsingRuntime()) { lib_paths.push_back("/libpath:" + target_data_directory.string()); }
+    if (unit_.isUsingRuntime()) { libs.emplace_back("/defaultlib:runtime"); }
 
     for (auto const& libpath : unit_.getLibraryPaths()) { lib_paths.push_back("/libpath:" + libpath); }
     for (auto const& libpath : lib_paths) { args.push_back(libpath.c_str()); }
-
-    std::vector<std::string> libs;
-
-    if (unit_.isUsingRuntime()) { libs.emplace_back("/defaultlib:runtime"); }
 
     for (auto const& lib : unit_.getLibraries()) { libs.push_back("/defaultlib:" + lib); }
     for (auto const& lib : libs) { args.push_back(lib.c_str()); }
@@ -109,4 +110,49 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     args.push_back(in.c_str());
 
     return lld::mingw::link(args, llvm::outs(), llvm::errs(), false, false);
+}
+
+bool AnceLinker::getTargetRequirements(std::vector<std::string>& libs, std::vector<std::string>& lib_paths)
+{
+    std::string const system_sdk_directory = "ANCE_SYSTEM_SDK_DIRECTORY";
+    char const*       system_sdk_path      = std::getenv(system_sdk_directory.c_str());
+
+    std::string const system_runtime_directory = "ANCE_SYSTEM_RUNTIME_DIRECTORY";
+    char const*       system_runtime_path      = std::getenv(system_runtime_directory.c_str());
+
+    if (unit_.getTargetTriple().getOS() == llvm::Triple::Win32)
+    {
+        std::string const arch_suffix = unit_.getTargetTriple().isArch64Bit() ? "x64" : "x86";
+
+        if (system_sdk_path == nullptr)
+        {
+            std::cout << R"(ance: build: no system sdk directory set (e.g. ..\Windows Kits\10\Lib\<version>))"
+                      << " (" << system_sdk_directory << ")" << std::endl;
+
+            return false;
+        }
+        else
+        {
+            std::string const path = system_sdk_path;
+            lib_paths.push_back("/libpath:" + path + "\\um\\" + arch_suffix);
+            lib_paths.push_back("/libpath:" + path + "\\ucrt\\" + arch_suffix);
+        }
+
+        if (system_runtime_path == nullptr)
+        {
+            std::cout << R"(ance: build: no system runtime directory set (e.g. ..VC\Tools\MSVC\<version>))"
+                      << " (" << system_runtime_directory << ")" << std::endl;
+
+            return false;
+        }
+        else
+        {
+            std::string const path = system_runtime_path;
+            lib_paths.push_back("/libpath:" + path + "\\lib\\" + arch_suffix);
+        }
+
+        libs.emplace_back("/defaultlib:msvcrt.lib");
+    }
+
+    return true;
 }

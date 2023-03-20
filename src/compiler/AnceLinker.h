@@ -26,6 +26,8 @@ class AnceLinker
     bool link(std::filesystem::path const& obj, std::filesystem::path const& app);
 
   private:
+    bool getTargetRequirements(std::vector<std::string>& libs, std::vector<std::string>& lib_paths);
+
     Unit& unit_;
 };
 
