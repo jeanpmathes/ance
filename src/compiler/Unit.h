@@ -23,6 +23,7 @@ class Statement;
 class CompileContext;
 class ValidationLogger;
 class Project;
+class Packages;
 
 /**
  * A unit of source that is compiled as a whole.
@@ -33,7 +34,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     explicit Unit(Owned<lang::GlobalScope> global_scope);
 
   protected:
-    Unit(bool is_containing_runtime);
+    explicit Unit(bool is_containing_runtime);
 
   public:
     /**
@@ -114,6 +115,11 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     [[nodiscard]] llvm::Triple const& getTargetTriple() const;
 
     /**
+     * Prepare all package dependencies.
+     */
+    bool preparePackageDependencies(Packages const& packages);
+
+    /**
      * Prepare everything for the first validation step.
      */
     void preValidate();
@@ -172,6 +178,12 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      * @return The names of the exported functions.
      */
     [[nodiscard]] virtual std::vector<std::string> getExportedFunctions() const;
+
+    /**
+     * Get the name of all required packages.
+     * @return The names of the required packages.
+     */
+    [[nodiscard]] virtual std::vector<std::string> getDependencies() const = 0;
 
     /**
      * Libraries that should be linked.

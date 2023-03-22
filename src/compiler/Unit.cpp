@@ -3,10 +3,10 @@
 #include <fstream>
 
 #include "compiler/CodePrinter.h"
-#include "validation/ValidationLogger.h"
-
+#include "compiler/Packages.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/UnsignedIntegerPointerType.h"
+#include "validation/ValidationLogger.h"
 
 Unit::Unit(Owned<lang::GlobalScope> global_scope) : global_scope_(std::move(global_scope))
 {
@@ -34,6 +34,24 @@ unsigned Unit::getBitness() const
 llvm::Triple const& Unit::getTargetTriple() const
 {
     return target_triple_;
+}
+
+bool Unit::preparePackageDependencies(Packages const& packages)
+{
+    auto dependencies = getDependencies();
+    bool valid        = true;
+
+    for (auto const& dependency : dependencies)
+    {
+        auto package = packages.getPackage(dependency);
+        if (!package.hasValue())
+        {
+            std::cout << "ance: packages: Could not find package '" << dependency << "'" << std::endl;
+            valid = false;
+        }
+    }
+
+    return valid;
 }
 
 void Unit::preValidate()

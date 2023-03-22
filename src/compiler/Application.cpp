@@ -88,6 +88,11 @@ void Application::addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileCon
     source_visitor_.visit(tree);
 }
 
+std::vector<std::string> Application::getDependencies() const
+{
+    return project_.description().dependencies;
+}
+
 std::vector<std::string> Application::getLibraries() const
 {
     return project_.description().linkage_libraries;

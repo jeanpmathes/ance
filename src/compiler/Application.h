@@ -35,6 +35,7 @@ class Application : public Unit
     antlr4::tree::ParseTree* selectTree(anceParser& parser) override;
     void                     addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileContext& context) override;
 
+    std::vector<std::string> getDependencies() const override;
     std::vector<std::string> getLibraries() const override;
     std::vector<std::string> getArchives() const override;
     std::vector<std::string> getLibraryPaths() const override;

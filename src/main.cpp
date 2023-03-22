@@ -10,6 +10,7 @@
 #include "compiler/AnceCompiler.h"
 #include "compiler/AnceLinker.h"
 #include "compiler/Application.h"
+#include "compiler/Packages.h"
 #include "compiler/Project.h"
 #include "compiler/ProjectDescription.h"
 #include "compiler/SourceTree.h"
@@ -107,6 +108,15 @@ int main(int argc, char** argv)
     boost::locale::generator const gen;
     std::locale::global(gen(""));
 
+    char const* package_directory = std::getenv("ANCE_PACKAGE_DIRECTORY");
+    if (package_directory == nullptr)
+    {
+        std::cout << "ance: packages: ANCE_PACKAGE_DIRECTORY is not set" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    Packages const packages(package_directory);
+
     llvm::InitializeAllTargetInfos();
     llvm::InitializeAllTargets();
     llvm::InitializeAllTargetMCs();
@@ -144,6 +154,9 @@ int main(int argc, char** argv)
             SourceTree tree(project_description);
             tree.parse();
 
+            auto ok = tree.unit().preparePackageDependencies(packages);
+            if (!ok) return EXIT_FAILURE;
+
             std::cout << "ance: input: project file read" << std::endl;
 
             auto error = validateTree(tree, validation_logger);
@@ -172,6 +185,8 @@ int main(int argc, char** argv)
         Project project(std::move(description));
 
         Application& application = project.getApplication();
+        auto         ok          = application.preparePackageDependencies(packages);
+        if (!ok) return EXIT_FAILURE;
 
         SourceTree   tree(application);
         size_t const count = tree.parse();

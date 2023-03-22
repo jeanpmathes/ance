@@ -4,6 +4,7 @@ target_sources(ance PRIVATE AnceCompiler.cpp
                SourceTree.cpp
                FileContext.cpp
                CompileContext.cpp
+               Packages.cpp
                Runtime.cpp
                SourceVisitor.cpp
                ControlFlowGraphPrinter.cpp

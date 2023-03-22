@@ -79,6 +79,11 @@ void ProjectDescription::addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, 
     source_visitor_.visit(tree);
 }
 
+std::vector<std::string> ProjectDescription::getDependencies() const
+{
+    return {};
+}
+
 std::vector<std::string> ProjectDescription::getLibraries() const
 {
     return {};
