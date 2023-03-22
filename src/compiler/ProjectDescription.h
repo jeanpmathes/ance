@@ -47,6 +47,7 @@ class ProjectDescription : public Unit
         std::string              name;
         UnitResult               kind;
         std::filesystem::path    project_file;
+        std::vector<std::string> dependencies;
         std::vector<std::string> linkage_libraries;
         std::vector<std::string> linkage_archives;
         std::vector<std::string> linkage_library_paths;

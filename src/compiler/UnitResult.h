@@ -15,13 +15,18 @@ class UnitResult
     enum Value
     {
         /**
-     * A shared library.
-     */
+         * A shared library.
+         */
         LIBRARY,
 
         /**
-     * An executable.
-     */
+         * A package, i.e. a static library.
+         */
+        PACKAGE,
+
+        /**
+         * An executable.
+         */
         EXECUTABLE
     };
 

@@ -100,6 +100,13 @@ void AnceCompiler::compile(std::filesystem::path const& out)
 
             break;
         }
+
+        case UnitResult::PACKAGE:
+        {
+            buildLibStart(init_function, finit_function);
+
+            break;
+        }
     }
 
     llvm::verifyModule(module_, &llvm::errs());

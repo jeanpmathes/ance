@@ -102,6 +102,7 @@ std::vector<std::string> ProjectDescription::getBinaryDependencyPaths() const
 struct Project_ {
     uint8_t const*  name                     = nullptr;
     uint32_t        kind                     = 0;
+    uint8_t const** dependencies             = nullptr;
     uint8_t const** libraries                = nullptr;
     uint8_t const** archives                 = nullptr;
     uint8_t const** library_paths            = nullptr;
@@ -184,6 +185,9 @@ bool ProjectDescription::loadDescription()
             kind = UnitResult::EXECUTABLE;
             break;
         case 2:
+            kind = UnitResult::PACKAGE;
+            break;
+        case 3:
             kind = UnitResult::LIBRARY;
             break;
         default:
@@ -212,6 +216,7 @@ bool ProjectDescription::loadDescription()
     description_ = {.name                     = read_string(project.name),
                     .kind                     = kind,
                     .project_file             = project_file_,
+                    .dependencies             = read_vector(project.dependencies),
                     .linkage_libraries        = read_vector(project.libraries),
                     .linkage_archives         = read_vector(project.archives),
                     .linkage_library_paths    = read_vector(project.library_paths),

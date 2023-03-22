@@ -106,7 +106,8 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
         };
 
         declare_constant("Executable", "1");
-        declare_constant("Library", "2");
+        declare_constant("Package", "2");
+        declare_constant("Library", "3");
     }
 
     {// Project Description Struct
@@ -128,6 +129,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 
         push_member(lang::Identifier::like("name"), string_type);
         push_member(lang::Identifier::like("kind"), unit_.globalScope().context().getFixedWidthIntegerType(32, false));
+        push_member(lang::Identifier::like("dependencies"), string_list_type);
         push_member(lang::Identifier::like("libraries"), string_list_type);
         push_member(lang::Identifier::like("archives"), string_list_type);
         push_member(lang::Identifier::like("library_paths"), string_list_type);

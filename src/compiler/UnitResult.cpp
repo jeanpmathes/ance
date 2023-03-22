@@ -26,6 +26,13 @@ void UnitResult::addLinkerArguments(std::vector<char const*>& args, std::string 
                 args.push_back("/subsystem:console");
 
                 break;
+
+            case PACKAGE:
+
+                args.emplace_back("/dll");
+                // The subsystem is only relevant for executables.
+
+                break;
         }
     }
     else { throw std::logic_error("Not supported."); }
@@ -43,6 +50,8 @@ std::string UnitResult::getExtension(llvm::Triple const& triple) const
                     return ".dll";
                 case EXECUTABLE:
                     return ".exe";
+                case PACKAGE:
+                    return ".apkg";
             }
         }
 
