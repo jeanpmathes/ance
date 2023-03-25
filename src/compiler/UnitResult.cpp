@@ -46,12 +46,11 @@ std::string UnitResult::getExtension(llvm::Triple const& triple) const
         {
             switch (value_)
             {
-                case LIBRARY:
-                    return ".dll";
                 case EXECUTABLE:
                     return ".exe";
                 case PACKAGE:
-                    return ".apkg";
+                case LIBRARY:
+                    return ".dll";
             }
         }
 

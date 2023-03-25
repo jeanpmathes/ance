@@ -114,10 +114,18 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      */
     [[nodiscard]] llvm::Triple const& getTargetTriple() const;
 
+    using BuildFunction = Optional<int>(std::ostream&,
+                                        std::filesystem::path const&,
+                                        Optional<std::filesystem::path> const&,
+                                        Packages const&);
+
     /**
      * Prepare all package dependencies.
      */
-    bool preparePackageDependencies(Packages const& packages, std::ostream& out);
+    bool preparePackageDependencies(Packages const&                     packages,
+                                    std::function<BuildFunction> const& build,
+                                    std::filesystem::path const&        bld_dir,
+                                    std::ostream&                       out);
 
     /**
      * Prepare everything for the first validation step.

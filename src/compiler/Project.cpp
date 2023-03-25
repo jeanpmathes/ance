@@ -27,6 +27,8 @@ std::vector<std::filesystem::path> Project::getSourceFiles() const
 
     std::vector<std::filesystem::path> files;
 
+    if (!std::filesystem::exists(src_directory)) return files;
+
     for (auto& entry : std::filesystem::recursive_directory_iterator(src_directory))
     {
         if (entry.is_regular_file() && entry.path().extension() == ".nc")

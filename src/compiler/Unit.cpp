@@ -36,10 +36,15 @@ llvm::Triple const& Unit::getTargetTriple() const
     return target_triple_;
 }
 
-bool Unit::preparePackageDependencies(Packages const& packages, std::ostream& out)
+bool Unit::preparePackageDependencies(Packages const&                     packages,
+                                      std::function<BuildFunction> const& build,
+                                      std::filesystem::path const&        bld_dir,
+                                      std::ostream&                       out)
 {
     auto dependencies = getDependencies();
     bool valid        = true;
+
+    std::vector<Packages::Package> packages_to_build;
 
     for (auto const& dependency : dependencies)
     {
@@ -48,6 +53,24 @@ bool Unit::preparePackageDependencies(Packages const& packages, std::ostream& ou
         {
             out << "ance: packages: Could not find package '" << dependency << "'" << std::endl;
             valid = false;
+        }
+        else { packages_to_build.push_back(package.value()); }
+    }
+
+    if (valid)
+    {
+        for (auto const& package : packages_to_build)
+        {
+            std::stringstream                     ss;
+            Optional<std::filesystem::path> const destination = bld_dir / package.name;
+            std::filesystem::create_directories(destination.value());
+
+            bool const is_ok = not build(ss, package.path, destination, packages).hasValue();
+            valid &= is_ok;
+
+            out << "ance: packages: Building package '" << package.name << "'";
+            if (is_ok) { out << " succeeded" << std::endl; }
+            else { out << " failed" << std::endl; }
         }
     }
 

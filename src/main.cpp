@@ -29,7 +29,7 @@ static Optional<int> emit(SourceTree&        tree,
     {
         bool const failed_by_warning = validation_logger.errorCount() == 0;
 
-        out << "ance: validation: failed";
+        out << "ance: validation: Failed";
         if (failed_by_warning) out << " (by warning)";
         out << std::endl;
 
@@ -100,12 +100,19 @@ static Optional<int> build(SourceTree&                  tree,
     return EXIT_FAILURE;
 }
 
-static Optional<int> run(std::ostream& out, std::filesystem::path const& project_file_path, Packages const& packages)
+static Optional<int> run(std::ostream&                          out,
+                         std::filesystem::path const&           project_file_path,
+                         Optional<std::filesystem::path> const& override_bld_dir,
+                         Packages const&                        packages)
 {
-    std::filesystem::path const bld_dir = project_file_path.parent_path() / "bld";
+    std::filesystem::path bld_dir = project_file_path.parent_path() / "bld";
+    if (override_bld_dir.hasValue()) bld_dir = *override_bld_dir;
 
     std::filesystem::path const project_definition_bin = bld_dir / "def" / "bin";
     std::filesystem::path const project_definition_obj = bld_dir / "def" / "obj";
+
+    std::filesystem::path const dependency_build_dir            = bld_dir / "dep";
+    std::filesystem::path const definition_dependency_build_dir = bld_dir / "dep" / "def";
 
     llvm::Triple const triple(llvm::sys::getDefaultTargetTriple());
 
@@ -125,10 +132,10 @@ static Optional<int> run(std::ostream& out, std::filesystem::path const& project
             SourceTree tree(project_description);
             tree.parse();
 
-            auto ok = tree.unit().preparePackageDependencies(packages, out);
+            auto ok = tree.unit().preparePackageDependencies(packages, run, definition_dependency_build_dir, out);
             if (!ok) return EXIT_FAILURE;
 
-            out << "ance: input: project file read" << std::endl;
+            out << "ance: input: Project file read" << std::endl;
 
             auto error = validateTree(tree, validation_logger, out);
             if (error.hasValue()) return error.value();
@@ -145,7 +152,7 @@ static Optional<int> run(std::ostream& out, std::filesystem::path const& project
         bool const ok = project_description.loadDescription();
         if (!ok)
         {
-            out << "ance: input: project description invalid" << std::endl;
+            out << "ance: input: Project description invalid" << std::endl;
             return EXIT_FAILURE;
         }
 
@@ -156,7 +163,7 @@ static Optional<int> run(std::ostream& out, std::filesystem::path const& project
         Project project(std::move(description));
 
         Application& application = project.getApplication();
-        auto         ok          = application.preparePackageDependencies(packages, out);
+        auto         ok          = application.preparePackageDependencies(packages, run, dependency_build_dir, out);
         if (!ok) return EXIT_FAILURE;
 
         SourceTree   tree(application);
@@ -182,7 +189,7 @@ static Optional<int> run(std::ostream& out, std::filesystem::path const& project
         error = build(tree, triple, obj_dir, bin_dir, out);
         if (error.hasValue()) return error.value();
 
-        out << "ance: build: success" << std::endl;
+        out << "ance: build: Success" << std::endl;
     }
 
     return {};
@@ -219,11 +226,11 @@ int main(int argc, char** argv)
     if (project_file_path.is_relative()) project_file_path = std::filesystem::absolute(project_file_path);
     if (!std::filesystem::exists(project_file_path))
     {
-        std::cout << "ance: input: project file does not exist." << std::endl;
+        std::cout << "ance: input: Project file does not exist." << std::endl;
         return EXIT_FAILURE;
     }
 
-    auto result = run(std::cout, project_file_path, packages);
+    auto result = run(std::cout, project_file_path, std::nullopt, packages);
 
     llvm::llvm_shutdown();
 
