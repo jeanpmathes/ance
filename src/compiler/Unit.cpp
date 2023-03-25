@@ -36,7 +36,7 @@ llvm::Triple const& Unit::getTargetTriple() const
     return target_triple_;
 }
 
-bool Unit::preparePackageDependencies(Packages const& packages)
+bool Unit::preparePackageDependencies(Packages const& packages, std::ostream& out)
 {
     auto dependencies = getDependencies();
     bool valid        = true;
@@ -46,7 +46,7 @@ bool Unit::preparePackageDependencies(Packages const& packages)
         auto package = packages.getPackage(dependency);
         if (!package.hasValue())
         {
-            std::cout << "ance: packages: Could not find package '" << dependency << "'" << std::endl;
+            out << "ance: packages: Could not find package '" << dependency << "'" << std::endl;
             valid = false;
         }
     }

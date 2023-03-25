@@ -36,42 +36,42 @@ void ValidationLogger::log(ValidationLogger::LogLevel level, std::string const& 
 }
 
 void ValidationLogger::emitMessages(std::vector<std::reference_wrapper<SourceFile>> const& source_files,
+                                    std::ostream&                                          stream,
                                     std::string const&                                     step_name)
 {
-    std::cout << "ance: validation: (" << step_name << ") " << warningCount() << " warnings, " << errorCount()
-              << " errors" << std::endl;
+    stream << "ance: validation: (" << step_name << ") " << warningCount() << " warnings, " << errorCount() << " errors" << std::endl;
 
     for (auto& entry : entries_)
     {
         size_t start = 0;
 
-        std::cout << "ance: ";
+        stream << "ance: ";
 
         switch (entry.level_)
         {
             case LogLevel::ERROR:
-                std::cout << ansi::ColorRed << "error" << ansi::ColorReset << ": ";
+                stream << ansi::ColorRed << "error" << ansi::ColorReset << ": ";
                 break;
             case LogLevel::WARNING:
-                std::cout << ansi::ColorYellow << "warning" << ansi::ColorReset << ": ";
+                stream << ansi::ColorYellow << "warning" << ansi::ColorReset << ": ";
                 break;
         }
 
         if (entry.location_.isGlobal())
         {
-            std::cout << entry.message_ << std::endl;
-            std::cout << std::endl;
+            stream << entry.message_ << std::endl;
+            stream << std::endl;
             continue;
         }
 
         SourceFile const& source_file = source_files[entry.location_.file()].get();
 
-        std::cout << source_file.getRelativePath().generic_string() << " ";
-        std::cout << entry.location_ << " " << entry.message_ << std::endl;
-        std::cout << std::endl;
+        stream << source_file.getRelativePath().generic_string() << " ";
+        stream << entry.location_ << " " << entry.message_ << std::endl;
+        stream << std::endl;
 
         std::string_view const line_view = trim(source_file.getLine(entry.location_.line()), start);
-        std::cout << '\t' << line_view << std::endl;
+        stream << '\t' << line_view << std::endl;
 
         if (entry.location_.isSingleLine())
         {
@@ -84,8 +84,8 @@ void ValidationLogger::emitMessages(std::vector<std::reference_wrapper<SourceFil
             size_t const marker_start  = estimateWidth(text_to_mark);
             size_t const marker_length = estimateWidth(text_with_mark);
 
-            std::cout << '\t' << std::string(marker_start - 1, ' ') << std::string(marker_length, '~') << std::endl;
-            std::cout << std::endl;
+            stream << '\t' << std::string(marker_start - 1, ' ') << std::string(marker_length, '~') << std::endl;
+            stream << std::endl;
         }
     }
 }

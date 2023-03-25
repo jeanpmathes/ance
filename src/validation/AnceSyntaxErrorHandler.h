@@ -58,7 +58,7 @@ class AnceSyntaxErrorHandler
     /**
      * Emit all messages describing found syntax errors.
      */
-    void emitMessages();
+    void emitMessages(std::ostream& stream);
 
     /**
      * Get the number of fatal syntax errors. Visiting the parse tree is not safe if fatal syntax errors occured.

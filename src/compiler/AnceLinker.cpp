@@ -7,7 +7,7 @@
 
 AnceLinker::AnceLinker(Unit& unit) : unit_(unit) {}
 
-bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path const& app)
+bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path const& app, std::ostream& stream)
 {
     std::vector<char const*> args;
     args.push_back("lld");
@@ -43,8 +43,8 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
 
     if (resource_data_directory_path_value == nullptr)
     {
-        std::cout << "ance: build: no resource data directory set"
-                  << " (" << resource_data_directory_name << ")" << std::endl;
+        stream << "ance: build: no resource data directory set"
+               << " (" << resource_data_directory_name << ")" << std::endl;
 
         return false;
     }
@@ -57,8 +57,8 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     if (unit_.isUsingRuntime()
         && !(std::filesystem::exists(target_data_directory) && std::filesystem::is_directory(target_data_directory)))
     {
-        std::cout << "ance: build: no target resources found [ " << unit_.getTargetTriple().getTriple() << " ]"
-                  << std::endl;
+        stream << "ance: build: no target resources found [ " << unit_.getTargetTriple().getTriple() << " ]"
+               << std::endl;
 
         return false;
     }
@@ -77,7 +77,7 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     {
         if (!std::filesystem::exists(binary_dependency))
         {
-            std::cout << "ance: build: cannot find binary dependency: " << binary_dependency << std::endl;
+            stream << "ance: build: cannot find binary dependency: " << binary_dependency << std::endl;
             return false;
         }
 
@@ -90,7 +90,7 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     std::vector<std::string> lib_paths;
     std::vector<std::string> libs;
 
-    bool const ok = getTargetRequirements(libs, lib_paths);
+    bool const ok = getTargetRequirements(libs, lib_paths, stream);
     if (!ok) return false;
 
     if (unit_.isUsingRuntime()) { lib_paths.push_back("/libpath:" + target_data_directory.string()); }
@@ -112,7 +112,9 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     return lld::mingw::link(args, llvm::outs(), llvm::errs(), false, false);
 }
 
-bool AnceLinker::getTargetRequirements(std::vector<std::string>& libs, std::vector<std::string>& lib_paths)
+bool AnceLinker::getTargetRequirements(std::vector<std::string>& libs,
+                                       std::vector<std::string>& lib_paths,
+                                       std::ostream&             stream)
 {
     std::string const system_sdk_directory = "ANCE_SYSTEM_SDK_DIRECTORY";
     char const*       system_sdk_path      = std::getenv(system_sdk_directory.c_str());
@@ -126,8 +128,8 @@ bool AnceLinker::getTargetRequirements(std::vector<std::string>& libs, std::vect
 
         if (system_sdk_path == nullptr)
         {
-            std::cout << R"(ance: build: no system sdk directory set (e.g. ..\Windows Kits\10\Lib\<version>))"
-                      << " (" << system_sdk_directory << ")" << std::endl;
+            stream << R"(ance: build: no system sdk directory set (e.g. ..\Windows Kits\10\Lib\<version>))"
+                   << " (" << system_sdk_directory << ")" << std::endl;
 
             return false;
         }
@@ -140,8 +142,8 @@ bool AnceLinker::getTargetRequirements(std::vector<std::string>& libs, std::vect
 
         if (system_runtime_path == nullptr)
         {
-            std::cout << R"(ance: build: no system runtime directory set (e.g. ..VC\Tools\MSVC\<version>))"
-                      << " (" << system_runtime_directory << ")" << std::endl;
+            stream << R"(ance: build: no system runtime directory set (e.g. ..VC\Tools\MSVC\<version>))"
+                   << " (" << system_runtime_directory << ")" << std::endl;
 
             return false;
         }

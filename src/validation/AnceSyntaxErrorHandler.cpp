@@ -94,31 +94,31 @@ void AnceSyntaxErrorHandler::log(std::string const& message, size_t line, size_t
     syntax_errors_.emplace_back(message, std::make_pair(line, char_position));
 }
 
-void AnceSyntaxErrorHandler::emitMessages()
+void AnceSyntaxErrorHandler::emitMessages(std::ostream& stream)
 {
     for (auto& [message, location] : syntax_errors_)
     {
         auto& [line, char_position] = location;
-        size_t column               = char_position + 1;
+        size_t const column         = char_position + 1;
 
         size_t start;
 
-        std::cout << "ance: " << ansi::ColorRed << "syntax" << ansi::ColorReset;
-        std::cout << ": " << source_file_.getRelativePath().generic_string() << " ";
-        std::cout << "(" << line << ", " << column << ") ";
-        std::cout << message << std::endl;
+        stream << "ance: " << ansi::ColorRed << "syntax" << ansi::ColorReset;
+        stream << ": " << source_file_.getRelativePath().generic_string() << " ";
+        stream << "(" << line << ", " << column << ") ";
+        stream << message << std::endl;
 
-        std::cout << std::endl;
+        stream << std::endl;
 
-        std::string_view line_view = trim(source_file_.getLine(line), start);
+        std::string_view const line_view = trim(source_file_.getLine(line), start);
 
-        std::cout << '\t' << line_view << std::endl;
+        stream << '\t' << line_view << std::endl;
 
-        std::string_view text_to_mark    = line_view.substr(0, column - start - 1);
-        size_t           marker_position = estimateWidth(text_to_mark);
+        std::string_view const text_to_mark    = line_view.substr(0, column - start - 1);
+        size_t const           marker_position = estimateWidth(text_to_mark);
 
-        std::cout << '\t' << std::string(marker_position, ' ') << '^' << std::endl;
-        std::cout << std::endl;
+        stream << '\t' << std::string(marker_position, ' ') << '^' << std::endl;
+        stream << std::endl;
     }
 }
 

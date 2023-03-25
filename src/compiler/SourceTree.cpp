@@ -75,13 +75,13 @@ void SourceTree::readSourceFile(std::filesystem::path const&                 pro
     result.get().tree                 = tree;
 }
 
-size_t SourceTree::emitMessages()
+size_t SourceTree::emitMessages(std::ostream& stream)
 {
     size_t fatal_error_count = 0;
 
     for (auto& source_file : source_files_)
     {
-        source_file.syntax_error_handler.value()->emitMessages();
+        source_file.syntax_error_handler.value()->emitMessages(stream);
         fatal_error_count += source_file.syntax_error_handler.value()->fatalSyntaxErrorCount();
     }
 

@@ -117,7 +117,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     /**
      * Prepare all package dependencies.
      */
-    bool preparePackageDependencies(Packages const& packages);
+    bool preparePackageDependencies(Packages const& packages, std::ostream& out);
 
     /**
      * Prepare everything for the first validation step.

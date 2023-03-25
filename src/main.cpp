@@ -17,18 +17,21 @@
 #include "lang/ApplicationVisitor.h"
 #include "validation/ValidationLogger.h"
 
-static Optional<int> emit(SourceTree& tree, ValidationLogger& validation_logger, std::string const& step_name)
+static Optional<int> emit(SourceTree&        tree,
+                          ValidationLogger&  validation_logger,
+                          std::ostream&      out,
+                          std::string const& step_name)
 {
-    validation_logger.emitMessages(tree.getSourceFiles(), step_name);
+    validation_logger.emitMessages(tree.getSourceFiles(), out, step_name);
 
     if (validation_logger.errorCount() != 0
         || (tree.unit().isWarningsAsErrors() && validation_logger.warningCount() != 0))
     {
         bool const failed_by_warning = validation_logger.errorCount() == 0;
 
-        std::cout << "ance: validation: failed";
-        if (failed_by_warning) std::cout << " (by warning)";
-        std::cout << std::endl;
+        out << "ance: validation: failed";
+        if (failed_by_warning) out << " (by warning)";
+        out << std::endl;
 
         return EXIT_FAILURE;
     }
@@ -41,9 +44,9 @@ static Optional<int> emit(SourceTree& tree, ValidationLogger& validation_logger,
 /**
  * The first validation step. Operates on the AST. 
  */
-static Optional<int> validateTree(SourceTree& tree, ValidationLogger& validation_logger)
+static Optional<int> validateTree(SourceTree& tree, ValidationLogger& validation_logger, std::ostream& out)
 {
-    size_t const fatal_syntax_error_count = tree.emitMessages();
+    size_t const fatal_syntax_error_count = tree.emitMessages(out);
 
     if (fatal_syntax_error_count != 0) return EXIT_FAILURE;
 
@@ -53,17 +56,17 @@ static Optional<int> validateTree(SourceTree& tree, ValidationLogger& validation
 
     tree.unit().validate(validation_logger);
 
-    return emit(tree, validation_logger, "tree");
+    return emit(tree, validation_logger, out, "tree");
 }
 
 /**
  * The second validation steps. Operates on the CFG.
  */
-static Optional<int> validateFlow(SourceTree& tree, ValidationLogger& validation_logger)
+static Optional<int> validateFlow(SourceTree& tree, ValidationLogger& validation_logger, std::ostream& out)
 {
     tree.unit().validateFlow(validation_logger);
 
-    return emit(tree, validation_logger, "flow");
+    return emit(tree, validation_logger, out, "flow");
 }
 
 static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir, Unit& unit, llvm::Triple const& triple)
@@ -74,7 +77,8 @@ static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir,
 static Optional<int> build(SourceTree&                  tree,
                            llvm::Triple const&          triple,
                            std::filesystem::path const& obj_dir,
-                           std::filesystem::path const& bin_dir)
+                           std::filesystem::path const& bin_dir,
+                           std::ostream&                out)
 {
     AnceCompiler compiler(tree, triple);
     AnceLinker   linker(tree.unit());
@@ -89,11 +93,99 @@ static Optional<int> build(SourceTree&                  tree,
     compiler.compile(ilr);
     compiler.emitObject(obj);
 
-    bool const ok = linker.link(obj, res);
+    bool const ok = linker.link(obj, res, out);
 
     if (ok) return {};
 
     return EXIT_FAILURE;
+}
+
+static Optional<int> run(std::ostream& out, std::filesystem::path const& project_file_path, Packages const& packages)
+{
+    std::filesystem::path const bld_dir = project_file_path.parent_path() / "bld";
+
+    std::filesystem::path const project_definition_bin = bld_dir / "def" / "bin";
+    std::filesystem::path const project_definition_obj = bld_dir / "def" / "obj";
+
+    llvm::Triple const triple(llvm::sys::getDefaultTargetTriple());
+
+    ProjectDescription::Description description;
+    ValidationLogger                validation_logger;
+
+    {
+        ProjectDescription project_description(project_file_path);
+        project_description.setBinaryDescriptionPath(
+            getResultPath(project_definition_bin, project_description, triple));
+
+        out << "======================== Build [ " << project_file_path.stem().string()
+            << " ] ========================" << std::endl;
+
+        if (project_description.isRefreshRequired())
+        {
+            SourceTree tree(project_description);
+            tree.parse();
+
+            auto ok = tree.unit().preparePackageDependencies(packages, out);
+            if (!ok) return EXIT_FAILURE;
+
+            out << "ance: input: project file read" << std::endl;
+
+            auto error = validateTree(tree, validation_logger, out);
+            if (error.hasValue()) return error.value();
+
+            project_description.preBuild();
+
+            error = validateFlow(tree, validation_logger, out);
+            if (error.hasValue()) return error.value();
+
+            error = build(tree, triple, project_definition_obj, project_definition_bin, out);
+            if (error.hasValue()) return error.value();
+        }
+
+        bool const ok = project_description.loadDescription();
+        if (!ok)
+        {
+            out << "ance: input: project description invalid" << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        description = project_description.description();
+    }
+
+    {
+        Project project(std::move(description));
+
+        Application& application = project.getApplication();
+        auto         ok          = application.preparePackageDependencies(packages, out);
+        if (!ok) return EXIT_FAILURE;
+
+        SourceTree   tree(application);
+        size_t const count = tree.parse();
+
+        out << "ance: input: " << count << " source file(s) read" << std::endl;
+
+        auto error = validateTree(tree, validation_logger, out);
+        if (error.hasValue()) return error.value();
+
+        std::filesystem::path const obj_dir = bld_dir / triple.getTriple() / "obj";
+        std::filesystem::path const bin_dir = bld_dir / triple.getTriple() / "bin";
+
+        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input.nc");
+
+        application.preBuild();
+
+        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input_prebuild.nc");
+
+        error = validateFlow(tree, validation_logger, out);
+        if (error.hasValue()) return error.value();
+
+        error = build(tree, triple, obj_dir, bin_dir, out);
+        if (error.hasValue()) return error.value();
+
+        out << "ance: build: success" << std::endl;
+    }
+
+    return {};
 }
 
 int main(int argc, char** argv)
@@ -131,88 +223,9 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    std::filesystem::path const bld_dir = project_file_path.parent_path() / "bld";
-
-    std::filesystem::path const project_definition_bin = bld_dir / "def" / "bin";
-    std::filesystem::path const project_definition_obj = bld_dir / "def" / "obj";
-
-    llvm::Triple const triple(llvm::sys::getDefaultTargetTriple());
-
-    ProjectDescription::Description description;
-    ValidationLogger                validation_logger;
-
-    {
-        ProjectDescription project_description(project_file_path);
-        project_description.setBinaryDescriptionPath(
-            getResultPath(project_definition_bin, project_description, triple));
-
-        std::cout << "======================== Build [ " << project_file_path.stem().string()
-                  << " ] ========================" << std::endl;
-
-        if (project_description.isRefreshRequired())
-        {
-            SourceTree tree(project_description);
-            tree.parse();
-
-            auto ok = tree.unit().preparePackageDependencies(packages);
-            if (!ok) return EXIT_FAILURE;
-
-            std::cout << "ance: input: project file read" << std::endl;
-
-            auto error = validateTree(tree, validation_logger);
-            if (error.hasValue()) return error.value();
-
-            project_description.preBuild();
-
-            error = validateFlow(tree, validation_logger);
-            if (error.hasValue()) return error.value();
-
-            error = build(tree, triple, project_definition_obj, project_definition_bin);
-            if (error.hasValue()) return error.value();
-        }
-
-        bool const ok = project_description.loadDescription();
-        if (!ok)
-        {
-            std::cout << "ance: input: project description invalid" << std::endl;
-            return EXIT_FAILURE;
-        }
-
-        description = project_description.description();
-    }
-
-    {
-        Project project(std::move(description));
-
-        Application& application = project.getApplication();
-        auto         ok          = application.preparePackageDependencies(packages);
-        if (!ok) return EXIT_FAILURE;
-
-        SourceTree   tree(application);
-        size_t const count = tree.parse();
-
-        std::cout << "ance: input: " << count << " source file(s) read" << std::endl;
-
-        auto error = validateTree(tree, validation_logger);
-        if (error.hasValue()) return error.value();
-
-        std::filesystem::path const obj_dir = bld_dir / triple.getTriple() / "obj";
-        std::filesystem::path const bin_dir = bld_dir / triple.getTriple() / "bin";
-
-        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input.nc");
-
-        application.preBuild();
-
-        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input_prebuild.nc");
-
-        error = validateFlow(tree, validation_logger);
-        if (error.hasValue()) return error.value();
-
-        error = build(tree, triple, obj_dir, bin_dir);
-        if (error.hasValue()) return error.value();
-
-        std::cout << "ance: build: success" << std::endl;
-    }
+    auto result = run(std::cout, project_file_path, packages);
 
     llvm::llvm_shutdown();
+
+    return result.valueOr(EXIT_SUCCESS);
 }

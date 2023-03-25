@@ -34,7 +34,7 @@ class SourceTree
      * Emit error and other messages.
      * @return The number of fatal errors.
      */
-    size_t emitMessages();
+    size_t emitMessages(std::ostream& stream);
 
     /**
      * Build the abstract syntax tree.
