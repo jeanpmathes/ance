@@ -121,11 +121,15 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
 
     /**
      * Prepare all package dependencies.
+     * @param packages The packages object.
+     * @param build A function that builds a package into a given directory.
+     * @param dir The directory to output build files and logs to. Subdirectories will be created.
+     * @param out The output stream to log general information to, related to the overall build process.
      */
     bool preparePackageDependencies(Packages const&                     packages,
                                     std::function<BuildFunction> const& build,
-                                    std::filesystem::path const&        bld_dir,
-                                    std::ostream&                       out);
+                                    std::filesystem::path const&        dir,
+                                    std::ostream&                       out) const;
 
     /**
      * Prepare everything for the first validation step.

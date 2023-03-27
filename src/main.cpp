@@ -102,17 +102,15 @@ static Optional<int> build(SourceTree&                  tree,
 
 static Optional<int> run(std::ostream&                          out,
                          std::filesystem::path const&           project_file_path,
-                         Optional<std::filesystem::path> const& override_bld_dir,
+                         Optional<std::filesystem::path> const& override_build_dir,
                          Packages const&                        packages)
 {
-    std::filesystem::path bld_dir = project_file_path.parent_path() / "bld";
-    if (override_bld_dir.hasValue()) bld_dir = *override_bld_dir;
+    std::filesystem::path build_dir = project_file_path.parent_path() / "bld";
+    if (override_build_dir.hasValue()) build_dir = *override_build_dir;
 
-    std::filesystem::path const project_definition_bin = bld_dir / "def" / "bin";
-    std::filesystem::path const project_definition_obj = bld_dir / "def" / "obj";
-
-    std::filesystem::path const dependency_build_dir            = bld_dir / "dep";
-    std::filesystem::path const definition_dependency_build_dir = bld_dir / "dep" / "def";
+    std::filesystem::path const project_definition_root = build_dir / "def";
+    std::filesystem::path const project_definition_bin  = project_definition_root / "bin";
+    std::filesystem::path const project_definition_obj  = project_definition_root / "obj";
 
     llvm::Triple const triple(llvm::sys::getDefaultTargetTriple());
 
@@ -132,7 +130,7 @@ static Optional<int> run(std::ostream&                          out,
             SourceTree tree(project_description);
             tree.parse();
 
-            auto ok = tree.unit().preparePackageDependencies(packages, run, definition_dependency_build_dir, out);
+            auto ok = tree.unit().preparePackageDependencies(packages, run, project_definition_root, out);
             if (!ok) return EXIT_FAILURE;
 
             out << "ance: input: Project file read" << std::endl;
@@ -163,7 +161,7 @@ static Optional<int> run(std::ostream&                          out,
         Project project(std::move(description));
 
         Application& application = project.getApplication();
-        auto         ok          = application.preparePackageDependencies(packages, run, dependency_build_dir, out);
+        auto         ok          = application.preparePackageDependencies(packages, run, build_dir, out);
         if (!ok) return EXIT_FAILURE;
 
         SourceTree   tree(application);
@@ -174,8 +172,8 @@ static Optional<int> run(std::ostream&                          out,
         auto error = validateTree(tree, validation_logger, out);
         if (error.hasValue()) return error.value();
 
-        std::filesystem::path const obj_dir = bld_dir / triple.getTriple() / "obj";
-        std::filesystem::path const bin_dir = bld_dir / triple.getTriple() / "bin";
+        std::filesystem::path const obj_dir = build_dir / triple.getTriple() / "obj";
+        std::filesystem::path const bin_dir = build_dir / triple.getTriple() / "bin";
 
         if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input.nc");
 

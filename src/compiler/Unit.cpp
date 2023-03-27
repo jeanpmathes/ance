@@ -38,16 +38,28 @@ llvm::Triple const& Unit::getTargetTriple() const
 
 bool Unit::preparePackageDependencies(Packages const&                     packages,
                                       std::function<BuildFunction> const& build,
-                                      std::filesystem::path const&        bld_dir,
-                                      std::ostream&                       out)
+                                      std::filesystem::path const&        dir,
+                                      std::ostream&                       out) const
 {
     auto dependencies = getDependencies();
     bool valid        = true;
 
     std::vector<Packages::Package> packages_to_build;
+    std::set<std::string>          package_names;
+
+    std::filesystem::path const bld_dir = dir / "dep";
+    std::filesystem::create_directories(bld_dir);
 
     for (auto const& dependency : dependencies)
     {
+        if (package_names.contains(dependency))
+        {
+            out << "ance: packages: Package '" << dependency << "' is already a dependency, skipping" << std::endl;
+            continue;
+        }
+
+        package_names.insert(dependency);
+
         auto package = packages.getPackage(dependency);
         if (!package.hasValue())
         {
@@ -61,11 +73,14 @@ bool Unit::preparePackageDependencies(Packages const&                     packag
     {
         for (auto const& package : packages_to_build)
         {
-            std::stringstream                     ss;
+            std::string const           log_file = package.name + ".txt";
+            std::filesystem::path const log_path = bld_dir / log_file;
+            std::ofstream               log(log_path);
+
             Optional<std::filesystem::path> const destination = bld_dir / package.name;
             std::filesystem::create_directories(destination.value());
 
-            bool const is_ok = not build(ss, package.path, destination, packages).hasValue();
+            bool const is_ok = not build(log, package.path, destination, packages).hasValue();
             valid &= is_ok;
 
             out << "ance: packages: Building package '" << package.name << "'";
