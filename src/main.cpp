@@ -112,7 +112,9 @@ static Optional<int> run(std::ostream&                          out,
     std::filesystem::path const project_definition_bin  = project_definition_root / "bin";
     std::filesystem::path const project_definition_obj  = project_definition_root / "obj";
 
-    llvm::Triple const triple(llvm::sys::getDefaultTargetTriple());
+    llvm::Triple const          triple(llvm::sys::getDefaultTargetTriple());
+    std::filesystem::path const triple_dir = triple.getTriple();
+    std::filesystem::path       bin_suffix = triple_dir / "bin";
 
     ProjectDescription::Description description;
     ValidationLogger                validation_logger;
@@ -130,7 +132,12 @@ static Optional<int> run(std::ostream&                          out,
             SourceTree tree(project_description);
             tree.parse();
 
-            auto ok = tree.unit().preparePackageDependencies(packages, run, project_definition_root, out);
+            auto ok = tree.unit().preparePackageDependencies(packages,
+                                                             run,
+                                                             project_definition_root,
+                                                             project_definition_bin,
+                                                             bin_suffix,
+                                                             out);
             if (!ok) return EXIT_FAILURE;
 
             out << "ance: input: Project file read" << std::endl;
@@ -160,8 +167,11 @@ static Optional<int> run(std::ostream&                          out,
     {
         Project project(std::move(description));
 
+        std::filesystem::path const obj_dir = build_dir / triple_dir / "obj";
+        std::filesystem::path const bin_dir = build_dir / bin_suffix;
+
         Application& application = project.getApplication();
-        auto         ok          = application.preparePackageDependencies(packages, run, build_dir, out);
+        auto         ok = application.preparePackageDependencies(packages, run, build_dir, bin_dir, bin_suffix, out);
         if (!ok) return EXIT_FAILURE;
 
         SourceTree   tree(application);
@@ -171,9 +181,6 @@ static Optional<int> run(std::ostream&                          out,
 
         auto error = validateTree(tree, validation_logger, out);
         if (error.hasValue()) return error.value();
-
-        std::filesystem::path const obj_dir = build_dir / triple.getTriple() / "obj";
-        std::filesystem::path const bin_dir = build_dir / triple.getTriple() / "bin";
 
         if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input.nc");
 

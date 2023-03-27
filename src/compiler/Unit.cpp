@@ -39,6 +39,8 @@ llvm::Triple const& Unit::getTargetTriple() const
 bool Unit::preparePackageDependencies(Packages const&                     packages,
                                       std::function<BuildFunction> const& build,
                                       std::filesystem::path const&        dir,
+                                      std::filesystem::path const&        bin_base,
+                                      std::filesystem::path const&        bin_suffix,
                                       std::ostream&                       out) const
 {
     auto dependencies = getDependencies();
@@ -86,6 +88,15 @@ bool Unit::preparePackageDependencies(Packages const&                     packag
             out << "ance: packages: Building package '" << package.name << "'";
             if (is_ok) { out << " succeeded" << std::endl; }
             else { out << " failed" << std::endl; }
+
+            if (is_ok)
+            {
+                std::filesystem::path const results = destination.value() / bin_suffix;
+                std::filesystem::copy(results,
+                                      bin_base,
+                                      std::filesystem::copy_options::overwrite_existing
+                                          | std::filesystem::copy_options::recursive);
+            }
         }
     }
 

@@ -124,11 +124,15 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      * @param packages The packages object.
      * @param build A function that builds a package into a given directory.
      * @param dir The directory to output build files and logs to. Subdirectories will be created.
+     * @param bin_base Path to the binary directory, all package binaries will be copied to this directory.
+     * @param bin_suffix Suffix that leads from the build directory of a package to the binary directory of the package.
      * @param out The output stream to log general information to, related to the overall build process.
      */
     bool preparePackageDependencies(Packages const&                     packages,
                                     std::function<BuildFunction> const& build,
                                     std::filesystem::path const&        dir,
+                                    std::filesystem::path const&        bin_base,
+                                    std::filesystem::path const&        bin_suffix,
                                     std::ostream&                       out) const;
 
     /**
