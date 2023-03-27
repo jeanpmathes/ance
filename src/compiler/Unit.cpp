@@ -1,6 +1,7 @@
 #include "Unit.h"
 
 #include <fstream>
+#include <future>
 
 #include "compiler/CodePrinter.h"
 #include "compiler/Packages.h"
@@ -73,30 +74,44 @@ bool Unit::preparePackageDependencies(Packages const&                     packag
 
     if (valid)
     {
+        std::vector<std::future<bool>> futures;
+        futures.reserve(packages_to_build.size());
+
         for (auto const& package : packages_to_build)
         {
-            std::string const           log_file = package.name + ".txt";
-            std::filesystem::path const log_path = bld_dir / log_file;
-            std::ofstream               log(log_path);
+            futures.emplace_back(
+                std::async(std::launch::async,
+                           [&packages, &package, &build, &bld_dir, &bin_base, &bin_suffix]() -> bool {
+                               std::string const           log_file = package.name + ".txt";
+                               std::filesystem::path const log_path = bld_dir / log_file;
+                               std::ofstream               log(log_path);
 
-            Optional<std::filesystem::path> const destination = bld_dir / package.name;
-            std::filesystem::create_directories(destination.value());
+                               Optional<std::filesystem::path> const destination = bld_dir / package.name;
+                               std::filesystem::create_directories(destination.value());
 
-            bool const is_ok = not build(log, package.path, destination, packages).hasValue();
+                               bool const is_ok = not build(log, package.path, destination, packages).hasValue();
+
+                               if (is_ok)
+                               {
+                                   std::filesystem::path const results = destination.value() / bin_suffix;
+                                   std::filesystem::copy(results,
+                                                         bin_base,
+                                                         std::filesystem::copy_options::overwrite_existing
+                                                             | std::filesystem::copy_options::recursive);
+                               }
+
+                               return is_ok;
+                           }));
+        }
+
+        for (auto [future, package] : llvm::zip(futures, packages_to_build))
+        {
+            bool const is_ok = future.get();
             valid &= is_ok;
 
             out << "ance: packages: Building package '" << package.name << "'";
             if (is_ok) { out << " succeeded" << std::endl; }
             else { out << " failed" << std::endl; }
-
-            if (is_ok)
-            {
-                std::filesystem::path const results = destination.value() / bin_suffix;
-                std::filesystem::copy(results,
-                                      bin_base,
-                                      std::filesystem::copy_options::overwrite_existing
-                                          | std::filesystem::copy_options::recursive);
-            }
         }
     }
 

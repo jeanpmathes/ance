@@ -114,12 +114,15 @@ static Optional<int> run(std::ostream&                          out,
 
     llvm::Triple const          triple(llvm::sys::getDefaultTargetTriple());
     std::filesystem::path const triple_dir = triple.getTriple();
-    std::filesystem::path       bin_suffix = triple_dir / "bin";
+    std::filesystem::path const bin_suffix = triple_dir / "bin";
 
     ProjectDescription::Description description;
     ValidationLogger                validation_logger;
 
     {
+        std::filesystem::create_directories(project_definition_bin);
+        std::filesystem::create_directories(project_definition_obj);
+
         ProjectDescription project_description(project_file_path);
         project_description.setBinaryDescriptionPath(
             getResultPath(project_definition_bin, project_description, triple));
@@ -169,6 +172,9 @@ static Optional<int> run(std::ostream&                          out,
 
         std::filesystem::path const obj_dir = build_dir / triple_dir / "obj";
         std::filesystem::path const bin_dir = build_dir / bin_suffix;
+
+        std::filesystem::create_directories(obj_dir);
+        std::filesystem::create_directories(bin_dir);
 
         Application& application = project.getApplication();
         auto         ok = application.preparePackageDependencies(packages, run, build_dir, bin_dir, bin_suffix, out);
