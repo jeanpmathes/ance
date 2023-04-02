@@ -34,6 +34,7 @@ namespace lang
          * @param code The code.
          * @param declaration_location The location of the declaration.
          * @param definition_location The location of the definition. Use the declaration location if there is no definition.
+         * @param is_imported Whether the function is imported.
          */
         FunctionDescription(lang::AccessModifier                 access,
                             lang::Identifier                     name,
@@ -42,12 +43,20 @@ namespace lang
                             std::vector<Shared<lang::Parameter>> parameters,
                             Optional<Owned<Statement>>           code,
                             lang::Location                       declaration_location,
-                            lang::Location                       definition_location);
+                            lang::Location                       definition_location,
+                            bool                                 is_imported = false);
+
+        /**
+         * The import constructor.
+         */
+        FunctionDescription();
 
         ~FunctionDescription() override = default;
 
         [[nodiscard]] Identifier const& name() const override;
         [[nodiscard]] bool              isOverloadAllowed() const override;
+        [[nodiscard]] AccessModifier    access() const override;
+        [[nodiscard]] bool              isImported() const override;
 
         [[nodiscard]] lang::Function const* function() const;
         [[nodiscard]] Statement const*      code() const;
@@ -58,8 +67,10 @@ namespace lang
 
       protected:
         void performInitialization() override;
+        void sync(Storage& storage) override;
 
       private:
+        bool                                 is_imported_;
         lang::AccessModifier                 access_;
         lang::Identifier                     name_;
         lang::ResolvingHandle<lang::Type>    return_type_;

@@ -10,11 +10,22 @@ class Storage;
  * A type that can be stored in a storage and retrieved from it.
  */
 template<typename T>
-concept Storable = requires(T t, Storage& s) {
+concept Storable = requires(T* t, Storage& s) {
                        {
-                           T::synchronize(&t, s)
+                           T::synchronize(t, s)
                        } -> std::same_as<void>;
                    };
+
+/**
+ * A storable type with relaxed requirements, used for polymorphic types or types that perform their own indirection.
+ * If a type K does not perform indirection, an indirection-type like T = K* should be used as PolymorphicStorable.
+ */
+template<typename T>
+concept PolymorphicStorable = requires(T t, Storage& s) {
+                                  {
+                                      synchronize(t, s)
+                                  } -> std::same_as<void>;
+                              };
 
 /**
  * Used to read from and write to.
@@ -23,6 +34,9 @@ class Storage
 {
   public:
     virtual ~Storage() = default;
+
+    [[nodiscard]] virtual bool isReading() const { return false; }
+    [[nodiscard]] virtual bool isWriting() const { return false; }
 
     virtual void sync(int8_t& value)   = 0;
     virtual void sync(uint8_t& value)  = 0;
@@ -45,6 +59,12 @@ class Storage
     {
         T::synchronize(&value, *this);
     }
+
+    template<PolymorphicStorable T>
+    void sync(T& value)
+    {
+        synchronize(value, *this);
+    }
 };
 
 /**
@@ -57,6 +77,7 @@ class Reader : public Storage
     ~Reader() override = default;
 
     explicit Reader(std::istream& stream) : stream_(stream) {}
+    [[nodiscard]] bool isReading() const override { return true; }
 
     void sync(int8_t& value) override;
     void sync(uint8_t& value) override;
@@ -85,6 +106,7 @@ class Writer : public Storage
     ~Writer() override = default;
 
     explicit Writer(std::ostream& stream) : stream_(stream) {}
+    [[nodiscard]] bool isWriting() const override { return true; }
 
     void sync(int8_t& value) override;
     void sync(uint8_t& value) override;

@@ -1,8 +1,9 @@
 #include "Identifier.h"
 
-#include "lang/utility/StringStorage.h"
-
 #include <iostream>
+
+#include "lang/utility/Storage.h"
+#include "lang/utility/StringStorage.h"
 
 lang::Identifier::Identifier(std::string_view string, lang::Location location) : string_(string), location_(location) {}
 
@@ -13,6 +14,11 @@ lang::Identifier lang::Identifier::like(std::string const& string, lang::Locatio
     return {view, location};
 }
 
+lang::Identifier lang::Identifier::empty()
+{
+    return {std::string_view(), lang::Location::global()};
+}
+
 std::string_view lang::Identifier::text() const
 {
     return string_;
@@ -21,6 +27,17 @@ std::string_view lang::Identifier::text() const
 lang::Location lang::Identifier::location() const
 {
     return location_;
+}
+
+void lang::Identifier::synchronize(lang::Identifier* identifier, Storage& storage)
+{
+    std::string content;
+
+    if (storage.isWriting()) { content = std::string(identifier->string_); }
+
+    storage.sync(content);
+
+    if (storage.isReading()) { *identifier = like(content, identifier->location_); }
 }
 
 std::ostream& operator<<(std::ostream& os, lang::Identifier const& identifier)

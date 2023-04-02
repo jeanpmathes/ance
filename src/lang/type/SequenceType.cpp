@@ -12,7 +12,7 @@
 #include "lang/type/SizeType.h"
 #include "lang/utility/Values.h"
 
-lang::SequenceType::SequenceType(lang::ResolvingHandle<lang::Type> element_type, Optional<size_t> size)
+lang::SequenceType::SequenceType(lang::ResolvingHandle<lang::Type> element_type, Optional<uint64_t> size)
     : element_type_(std::move(element_type))
     , size_(std::move(size))
 {}
@@ -36,6 +36,11 @@ StateCount lang::SequenceType::getStateCount() const
     if (auto* size = std::get_if<size_t>(&state_count)) { *size *= size_.value(); }
 
     return state_count;
+}
+
+Optional<uint64_t> lang::SequenceType::getSize()
+{
+    return size_;
 }
 
 bool lang::SequenceType::isSubscriptDefined() const

@@ -70,6 +70,11 @@ namespace lang
 
         Owned<Member> expand(lang::Context& new_context) const;
 
+        /**
+         * Perform storage synchronization.
+         */
+        static void synchronize(lang::Member* member, Storage& storage);
+
       private:
         llvm::Constant* getInitialValue(llvm::Module& m) const;
 

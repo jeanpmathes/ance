@@ -59,18 +59,20 @@ namespace lang
         [[nodiscard]] bool isDefined() const;
 
         /**
-         * Define this function as extern.
+         * Define this function as imported.
          * @param containing_scope The function containing scope.
+         * @param access The access level.
          * @param return_type The return type.
          * @param return_type_location The location of the return type.
          * @param parameters The parameters.
          * @param location The location of the function declaration.
          */
-        void defineAsExtern(Scope&                                      containing_scope,
-                            lang::ResolvingHandle<lang::Type>           return_type,
-                            lang::Location                              return_type_location,
-                            std::vector<Shared<lang::Parameter>> const& parameters,
-                            lang::Location                              location);
+        void defineAsImported(Scope&                                      containing_scope,
+                              lang::AccessModifier                        access,
+                              lang::ResolvingHandle<lang::Type>           return_type,
+                              lang::Location                              return_type_location,
+                              std::vector<Shared<lang::Parameter>> const& parameters,
+                              lang::Location                              location);
 
         /**
          * Define this function as a custom function.

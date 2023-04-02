@@ -6,6 +6,7 @@
 #include "lang/construct/value/Value.h"
 #include "lang/scope/Scope.h"
 #include "lang/statement/Statement.h"
+#include "lang/utility/Storage.h"
 #include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
@@ -144,4 +145,11 @@ Owned<lang::Member> lang::Member::expand(lang::Context& new_context) const
                              std::move(expanded_init_expression),
                              location_,
                              type_location_);
+}
+
+void lang::Member::synchronize(lang::Member* member, Storage& storage)
+{
+    storage.sync(member->name_);
+    storage.sync(member->access_);
+    storage.sync(member->type_);
 }

@@ -5,7 +5,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/ExternFunction.h"
+#include "lang/construct/ImportedFunction.h"
 #include "lang/construct/LocalVariable.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/scope/LocalScope.h"
@@ -23,18 +23,20 @@ bool lang::Function::isDefined() const
     return definition_.hasValue();
 }
 
-void lang::Function::defineAsExtern(Scope&                                      containing_scope,
-                                    lang::ResolvingHandle<lang::Type>           return_type,
-                                    lang::Location                              return_type_location,
-                                    std::vector<Shared<lang::Parameter>> const& parameters,
-                                    lang::Location                              location)
+void lang::Function::defineAsImported(Scope&                                      containing_scope,
+                                      lang::AccessModifier                        access,
+                                      lang::ResolvingHandle<lang::Type>           return_type,
+                                      lang::Location                              return_type_location,
+                                      std::vector<Shared<lang::Parameter>> const& parameters,
+                                      lang::Location                              location)
 {
-    definition_ = makeOwned<lang::ExternFunction>(*this,
-                                                  containing_scope,
-                                                  return_type,
-                                                  return_type_location,
-                                                  parameters,
-                                                  location);
+    definition_ = makeOwned<lang::ImportedFunction>(*this,
+                                                    containing_scope,
+                                                    access,
+                                                    return_type,
+                                                    return_type_location,
+                                                    parameters,
+                                                    location);
 }
 
 void lang::Function::defineAsCustom(lang::AccessModifier                        access,

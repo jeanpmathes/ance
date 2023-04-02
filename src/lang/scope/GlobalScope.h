@@ -21,6 +21,7 @@
 #include "lang/utility/TypeRegistry.h"
 
 class ConstantExpression;
+class Storage;
 
 namespace lang
 {
@@ -101,6 +102,13 @@ namespace lang
         void resolve() override;
         void postResolve() override;
 
+        /**
+         * Synchronize all (public) descriptions with the given storage.
+         * @param scope The scope to sync.
+         * @param storage The storage to sync with.
+         */
+        static void synchronize(lang::GlobalScope* scope, Storage& storage);
+
       protected:
         bool resolveDefinition(lang::ResolvingHandle<lang::Variable> variable) override;
         bool resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
@@ -169,4 +177,5 @@ namespace lang
         Optional<Owned<lang::Context>> context_;
     };
 }
+
 #endif

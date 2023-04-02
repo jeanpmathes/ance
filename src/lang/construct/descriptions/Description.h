@@ -3,6 +3,8 @@
 
 #include "lang/Element.h"
 
+#include "lang/AccessModifier.h"
+
 namespace lang
 {
     class Scope;
@@ -11,6 +13,7 @@ namespace lang
 }
 
 class ValidationLogger;
+class Storage;
 
 namespace lang
 {
@@ -26,6 +29,7 @@ namespace lang
       public:
         [[nodiscard]] virtual lang::Identifier const& name() const              = 0;
         [[nodiscard]] virtual bool                    isOverloadAllowed() const = 0;
+        [[nodiscard]] virtual lang::AccessModifier    access() const            = 0;
 
         /**
          * Initialize the description, which will add the described entity to the passed scope.
@@ -58,6 +62,12 @@ namespace lang
          */
         [[nodiscard]] virtual Descriptions expand(lang::Context& new_context) const = 0;
 
+        /**
+         * Check if the description is imported.
+         * @return True if the description is imported.
+         */
+        [[nodiscard]] virtual bool isImported() const = 0;
+
       protected:
         /**
          * Set the containing scope. Must be called exactly once, before the description is used.
@@ -70,9 +80,14 @@ namespace lang
         Scope&                     scope();
         [[nodiscard]] Scope const& scope() const;
 
+      public:
+        virtual void sync(Storage& storage) = 0;
+
       private:
         Scope* scope_ {nullptr};
     };
+
+    void synchronize(Description** description, Storage& storage);
 }
 
 #endif

@@ -8,6 +8,7 @@ target_sources(ance PRIVATE
                QuadType.cpp
                SingleType.cpp
                SizeType.cpp
+               CustomType.cpp
                UnsignedIntegerPointerType.cpp
                Type.cpp
                VoidType.cpp

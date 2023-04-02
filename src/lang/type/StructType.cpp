@@ -38,11 +38,6 @@ StateCount lang::StructType::getStateCount() const
     return SpecialCount::ABSTRACT;
 }
 
-bool lang::StructType::isCustom() const
-{
-    return true;
-}
-
 bool lang::StructType::isStructType() const
 {
     return true;

@@ -8,6 +8,7 @@
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/StructType.h"
 #include "lang/type/TypeAlias.h"
+#include "lang/utility/Storage.h"
 #include "validation/ValidationLogger.h"
 
 lang::GlobalScope::GlobalScope(bool is_containing_runtime)
@@ -431,4 +432,37 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunc
     defined_function_groups_.emplace(name, std::move(undefined.value()));
 
     return defined;
+}
+void lang::GlobalScope::synchronize(lang::GlobalScope* scope, Storage& storage)
+{
+    std::vector<lang::Description*> export_descriptions;
+
+    if (storage.isWriting())
+    {
+        for (auto& [name, descriptions] : scope->compatible_descriptions_)
+        {
+            for (auto& description : descriptions)
+            {
+                if (description->access() != lang::AccessModifier::PUBLIC_ACCESS) continue;
+                if (description->isImported()) continue;
+
+                export_descriptions.emplace_back(&*description);
+            }
+        }
+    }
+
+    uint64_t export_count = export_descriptions.size();
+    storage.sync(export_count);
+    if (storage.isReading()) export_descriptions = std::vector<lang::Description*>(export_count);
+
+    for (uint64_t i = 0; i < export_count; i++)
+    {
+        lang::Description** description = &export_descriptions[i];
+        storage.sync(description);
+    }
+
+    if (storage.isReading())
+    {
+        for (auto& description : export_descriptions) { scope->addDescription(Owned<lang::Description>(*description)); }
+    }
 }

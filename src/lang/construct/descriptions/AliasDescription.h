@@ -28,12 +28,16 @@ namespace lang
                          Identifier                        name,
                          lang::ResolvingHandle<lang::Type> actual,
                          lang::Location                    definition_location,
-                         lang::Location                    actual_type_location);
+                         lang::Location                    actual_type_location,
+                         bool                              is_imported = false);
+
+        AliasDescription();
 
         ~AliasDescription() override = default;
 
         [[nodiscard]] Identifier const&    name() const override;
-        [[nodiscard]] lang::AccessModifier access() const;
+        [[nodiscard]] lang::AccessModifier access() const override;
+        [[nodiscard]] bool                 isImported() const override;
         [[nodiscard]] lang::Type const&    actual() const;
         [[nodiscard]] bool                 isOverloadAllowed() const override;
 
@@ -43,9 +47,11 @@ namespace lang
 
       protected:
         void performInitialization() override;
+        void sync(Storage& storage) override;
 
       private:
         lang::AccessModifier              access_;
+        bool                              is_imported_;
         Identifier                        name_;
         lang::ResolvingHandle<lang::Type> actual_;
         lang::Location                    definition_location_;

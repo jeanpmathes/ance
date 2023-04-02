@@ -28,12 +28,16 @@ namespace lang
         StructDescription(lang::AccessModifier             access,
                           Identifier                       name,
                           std::vector<Owned<lang::Member>> members,
-                          lang::Location                   definition_location);
+                          lang::Location                   definition_location,
+                          bool                             is_imported = false);
+
+        StructDescription();
 
         ~StructDescription() override = default;
 
         [[nodiscard]] Identifier const&                                       name() const override;
-        [[nodiscard]] lang::AccessModifier                                    access() const;
+        [[nodiscard]] lang::AccessModifier                                    access() const override;
+        [[nodiscard]] bool                                                    isImported() const override;
         [[nodiscard]] std::vector<std::reference_wrapper<const lang::Member>> members() const;
         [[nodiscard]] bool                                                    isOverloadAllowed() const override;
 
@@ -43,9 +47,11 @@ namespace lang
 
       protected:
         void performInitialization() override;
+        void sync(Storage& storage) override;
 
       private:
         lang::AccessModifier             access_;
+        bool                             is_imported_;
         Identifier                       name_;
         std::vector<Owned<lang::Member>> members_;
         lang::Location                   definition_location_;

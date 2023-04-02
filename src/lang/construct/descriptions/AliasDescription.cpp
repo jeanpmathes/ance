@@ -3,6 +3,7 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/TypeAlias.h"
 #include "lang/type/VoidType.h"
+#include "lang/utility/Storage.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
@@ -10,12 +11,23 @@ lang::AliasDescription::AliasDescription(lang::AccessModifier              acces
                                          lang::Identifier                  name,
                                          lang::ResolvingHandle<lang::Type> actual,
                                          lang::Location                    definition_location,
-                                         lang::Location                    actual_type_location)
+                                         lang::Location                    actual_type_location,
+                                         bool                              is_imported)
     : access_(access)
+    , is_imported_(is_imported)
     , name_(name)
     , actual_(std::move(actual))
     , definition_location_(definition_location)
     , actual_type_location_(actual_type_location)
+{}
+
+lang::AliasDescription::AliasDescription()
+    : access_(lang::AccessModifier::PUBLIC_ACCESS)
+    , is_imported_(true)
+    , name_(lang::Identifier::empty())
+    , actual_(lang::Type::getUndefined())
+    , definition_location_(lang::Location::global())
+    , actual_type_location_(lang::Location::global())
 {}
 
 lang::Identifier const& lang::AliasDescription::name() const
@@ -26,6 +38,11 @@ lang::Identifier const& lang::AliasDescription::name() const
 lang::AccessModifier lang::AliasDescription::access() const
 {
     return access_;
+}
+
+bool lang::AliasDescription::isImported() const
+{
+    return is_imported_;
 }
 
 lang::Type const& lang::AliasDescription::actual() const
@@ -88,7 +105,14 @@ lang::Description::Descriptions lang::AliasDescription::expand(lang::Context& ne
                                                     name_,
                                                     actual_->createUndefinedClone(new_context),
                                                     definition_location_,
-                                                    actual_type_location_));
+                                                    actual_type_location_,
+                                                    is_imported_));
 
     return result;
+}
+
+void lang::AliasDescription::sync(Storage& storage)
+{
+    storage.sync(name_);
+    storage.sync(actual_);
 }

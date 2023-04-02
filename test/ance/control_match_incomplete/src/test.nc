@@ -14,7 +14,7 @@ public main () : u32
 
     match value with
     {
-        0:size => write(c"A", 1:32); // Only once case covered.
+        0:size => write(c"A", 1:32); // Only one case covered.
     }
 
     return 0:32;

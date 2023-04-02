@@ -12,7 +12,7 @@ target_sources(ance PRIVATE
                BasicBlockDefinitionMatching.cpp
                Function.cpp
                CustomFunction.cpp
-               ExternFunction.cpp
+               ImportedFunction.cpp
                PredefinedFunction.cpp
                StatementFunction.cpp
                InitializerFunction.cpp

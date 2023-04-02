@@ -18,13 +18,14 @@ namespace lang
          * @param element_type The type of the elements.
          * @param size An optional size.
          */
-        SequenceType(lang::ResolvingHandle<lang::Type> element_type, Optional<size_t> size);
+        SequenceType(lang::ResolvingHandle<lang::Type> element_type, Optional<uint64_t> size);
         ~SequenceType() override = default;
 
         ResolvingHandle<lang::Type> getElementType() override;
         lang::Type const&           getElementType() const override;
 
-        [[nodiscard]] StateCount getStateCount() const override;
+        [[nodiscard]] StateCount         getStateCount() const override;
+        [[nodiscard]] Optional<uint64_t> getSize();
 
         bool                              isSubscriptDefined() const override;
         lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
@@ -70,7 +71,7 @@ namespace lang
       protected:
         lang::ResolvingHandle<lang::Type> element_type_;
 
-        Optional<size_t> size_;
+        Optional<uint64_t> size_;
     };
 }
 

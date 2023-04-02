@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_TYPE_STRUCTTYPE_H_
 #define ANCE_SRC_LANG_TYPE_STRUCTTYPE_H_
 
-#include "TypeDefinition.h"
+#include "CustomType.h"
 
 #include <map>
 
@@ -13,7 +13,7 @@ namespace lang
     /**
  * The type of a struct.
  */
-    class StructType : public lang::TypeDefinition
+    class StructType : public lang::CustomType
     {
       public:
         StructType(lang::AccessModifier                              access_modifier,
@@ -22,7 +22,6 @@ namespace lang
                    lang::Location                                    location);
 
         [[nodiscard]] StateCount getStateCount() const override;
-        [[nodiscard]] bool       isCustom() const override;
         bool                     isStructType() const override;
 
         llvm::Constant*   getDefaultContent(llvm::Module& m) const override;

@@ -1,6 +1,7 @@
 #include "VariableDescription.h"
 
 #include "lang/ApplicationVisitor.h"
+#include "lang/utility/Storage.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
@@ -16,6 +17,7 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
     , type_(std::move(type))
     , type_location_(type_location)
     , access_(access)
+    , is_import_(false)
     , assigner_(assigner)
     , is_constant_(is_constant)
     , location_(location)
@@ -30,6 +32,7 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
                                                Optional<lang::ResolvingHandle<lang::Type>> type,
                                                lang::Location                              type_location,
                                                lang::AccessModifier                        access,
+                                               bool                                        is_import,
                                                Optional<Owned<Statement>>                  init_block,
                                                Optional<Owned<Expression>>                 init_expression,
                                                Expression*                                 init_expression_ptr,
@@ -40,6 +43,7 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
     , type_(std::move(type))
     , type_location_(type_location)
     , access_(access)
+    , is_import_(is_import)
     , assigner_(assigner)
     , is_constant_(is_constant)
     , location_(location)
@@ -51,6 +55,22 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
     , init_block_(std::move(init_block))
 {}
 
+lang::VariableDescription::VariableDescription()
+    : name_(lang::Identifier::empty())
+    , type_(lang::Type::getUndefined())
+    , type_location_(lang::Location::global())
+    , access_(lang::AccessModifier::PUBLIC_ACCESS)
+    , is_import_(true)
+    , assigner_(Assigner::UNSPECIFIED)
+    , is_constant_(false)
+    , location_(lang::Location::global())
+    , type_handle_(type_.value())
+    , constant_init_(nullptr)
+    , init_expression_ptr_(nullptr)
+    , init_expression_(std::nullopt)
+    , init_block_(std::nullopt)
+{}
+
 lang::Identifier const& lang::VariableDescription::name() const
 {
     return name_;
@@ -59,6 +79,16 @@ lang::Identifier const& lang::VariableDescription::name() const
 bool lang::VariableDescription::isOverloadAllowed() const
 {
     return false;
+}
+
+lang::AccessModifier lang::VariableDescription::access() const
+{
+    return access_;
+}
+
+bool lang::VariableDescription::isImported() const
+{
+    return is_import_;
 }
 
 lang::GlobalVariable const* lang::VariableDescription::variable() const
@@ -122,6 +152,7 @@ void lang::VariableDescription::performInitialization()
                                                 type_location_,
                                                 *scope().getGlobalScope(),
                                                 access_,
+                                                is_import_,
                                                 variable_init,
                                                 init_scope,
                                                 assigner_,
@@ -246,6 +277,7 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
                                                          type_handle_->createUndefinedClone(new_context),
                                                          type_location_,
                                                          access_,
+                                                         is_import_,
                                                          std::move(expanded_init_block),
                                                          std::move(expanded_init_expression),
                                                          expanded_init_expression_ptr,
@@ -257,4 +289,11 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
     descriptions.emplace_back(std::move(expanded));
 
     return descriptions;
+}
+
+void lang::VariableDescription::sync(Storage& storage)
+{
+    storage.sync(name_);
+    storage.sync(type_handle_);
+    storage.sync(is_constant_);
 }

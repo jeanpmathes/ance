@@ -23,6 +23,7 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
                                      lang::Location                        type_location,
                                      GlobalScope&                          containing_scope,
                                      lang::AccessModifier                  access,
+                                     bool                                  is_import,
                                      Initializer                           init,
                                      lang::Scope*                          init_scope,
                                      Assigner                              assigner,
@@ -30,6 +31,7 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
                                      lang::Location                        location)
     : VariableDefinition(self, type, type_location, containing_scope, assigner.isFinal(), location)
     , access_(access)
+    , is_import_(is_import)
     , is_constant_(is_constant)
     , init_(std::move(init))
     , init_scope_(init_scope)
@@ -61,7 +63,7 @@ lang::Assigner lang::GlobalVariable::assigner() const
 
 void lang::GlobalVariable::buildDeclaration(CompileContext& context)
 {
-    llvm::Constant* native_initializer;
+    llvm::Constant* native_initializer = nullptr;
 
     if (init_.hasValue())
     {
@@ -78,7 +80,7 @@ void lang::GlobalVariable::buildDeclaration(CompileContext& context)
             native_initializer = llvm::Constant::getNullValue(type()->getContentType(context.llvmContext()));
         }
     }
-    else { native_initializer = type()->getDefaultContent(context.llvmModule()); }
+    else if (!is_import_) { native_initializer = type()->getDefaultContent(context.llvmModule()); }
 
     native_variable_ = new llvm::GlobalVariable(context.llvmModule(),
                                                 type()->getContentType(context.llvmModule().getContext()),

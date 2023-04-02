@@ -7,6 +7,7 @@
 #include "compiler/Packages.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/UnsignedIntegerPointerType.h"
+#include "lang/utility/Storage.h"
 #include "validation/ValidationLogger.h"
 
 Unit::Unit(Owned<lang::GlobalScope> global_scope) : global_scope_(std::move(global_scope))
@@ -116,6 +117,19 @@ bool Unit::preparePackageDependencies(Packages const&                     packag
     }
 
     return valid;
+}
+
+void Unit::exportPackage(std::filesystem::path const& dir)
+{
+    std::filesystem::create_directories(dir);
+
+    std::filesystem::path const out = dir / (getName() + Packages::PACKAGE_EXTENSION);
+
+    std::ofstream of(out);
+    Writer        writer(of);
+
+    Storage& storage = writer;
+    storage.sync(*global_scope_);
 }
 
 void Unit::preValidate()

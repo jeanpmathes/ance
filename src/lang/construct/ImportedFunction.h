@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_LANG_CONSTRUCT_EXTERNFUNCTION_H_
-#define ANCE_SRC_LANG_CONSTRUCT_EXTERNFUNCTION_H_
+#ifndef ANCE_SRC_LANG_CONSTRUCT_IMPORTEDFUNCTION_H_
+#define ANCE_SRC_LANG_CONSTRUCT_IMPORTEDFUNCTION_H_
 
 #include "FunctionDefinition.h"
 
@@ -15,15 +15,16 @@ namespace lang
     /**
      * A function that is just declared, the actual definition is provided externally when linking.
      */
-    class ExternFunction : public lang::FunctionDefinition
+    class ImportedFunction : public lang::FunctionDefinition
     {
       public:
-        ExternFunction(Function&                            function,
-                       Scope&                               containing_scope,
-                       lang::ResolvingHandle<lang::Type>    return_type,
-                       lang::Location                       return_type_location,
-                       std::vector<Shared<lang::Parameter>> parameters,
-                       lang::Location                       location);
+        ImportedFunction(Function&                            function,
+                         Scope&                               containing_scope,
+                         lang::AccessModifier                 access,
+                         lang::ResolvingHandle<lang::Type>    return_type,
+                         lang::Location                       return_type_location,
+                         std::vector<Shared<lang::Parameter>> parameters,
+                         lang::Location                       location);
 
         [[nodiscard]] bool isMangled() const override;
         [[nodiscard]] bool isImported() const override;
@@ -42,6 +43,8 @@ namespace lang
         [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
 
       private:
+        lang::AccessModifier access_;
+
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};
     };

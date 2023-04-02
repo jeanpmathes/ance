@@ -33,6 +33,7 @@ namespace lang
 
 class CompileContext;
 class ValidationLogger;
+class Storage;
 
 namespace lang
 {
@@ -739,9 +740,14 @@ namespace lang
          */
         bool operator!=(lang::Type const& other) const;
 
+        inline static lang::Context* sync_context_ = nullptr;
+
       private:
         lang::Identifier                      name_;
         Optional<Owned<lang::TypeDefinition>> definition_ {};
     };
 }
+
+void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage);
+
 #endif

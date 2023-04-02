@@ -11,6 +11,8 @@ namespace lang
     class Type;
 }
 
+class Storage;
+
 namespace lang
 {
     /**
@@ -65,6 +67,11 @@ namespace lang
 
         [[nodiscard]] llvm::Value* getNativeValue() const override;
         [[nodiscard]] llvm::Value* getContentValue() const override;
+
+        /**
+         * Perform storage synchronization.
+         */
+        static void synchronize(lang::Parameter* parameter, Storage& storage);
 
       private:
         lang::ResolvingHandle<lang::Type> type_;

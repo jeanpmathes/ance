@@ -26,8 +26,8 @@ namespace lang
 #include "compiler/Application.h"
 
 #include "lang/construct/CustomFunction.h"
-#include "lang/construct/ExternFunction.h"
 #include "lang/construct/Function.h"
+#include "lang/construct/ImportedFunction.h"
 #include "lang/construct/InitializerFunction.h"
 #include "lang/construct/PredefinedFunction.h"
 

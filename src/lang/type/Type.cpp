@@ -5,8 +5,12 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/value/RoughlyCastedValue.h"
+#include "lang/type/ArrayType.h"
+#include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/ReferenceType.h"
+#include "lang/type/VectorType.h"
 #include "lang/utility/Identifier.h"
+#include "lang/utility/Storage.h"
 #include "validation/ValidationLogger.h"
 
 lang::Type::Type(Identifier name) : name_(name)
@@ -734,4 +738,214 @@ bool lang::Type::operator==(lang::Type const& other) const
 bool lang::Type::operator!=(lang::Type const& other) const
 {
     return !(*this == other);
+}
+
+enum TypeClass : uint8_t
+{
+    CUSTOM,
+    ARRAY,
+    BOOLEAN,
+    BUFFER,
+    CHAR,
+    DOUBLE,
+    FIXED_WIDTH_INTEGER,
+    HALF,
+    NULL_POINTER,
+    OPAQUE_POINTER,
+    POINTER,
+    QUAD,
+    REFERENCE,
+    SINGLE,
+    UNSIGNED_INTEGER_POINTER,
+    VECTOR,
+    VOID
+};
+
+static TypeClass getTypeClass(lang::Type* type)
+{
+    if (!type->isDefined()) return TypeClass::CUSTOM;
+
+    if (type->isCustom()) return TypeClass::CUSTOM;
+    if (type->isArrayType()) return TypeClass::ARRAY;
+    if (type->isBooleanType()) return TypeClass::BOOLEAN;
+    if (type->isBufferType()) return TypeClass::BUFFER;
+    if (type->isCharType()) return TypeClass::CHAR;
+    if (type->isFloatingPointType(64)) return TypeClass::DOUBLE;
+    if (type->isFixedWidthIntegerType()) return TypeClass::FIXED_WIDTH_INTEGER;
+    if (type->isFloatingPointType(16)) return TypeClass::HALF;
+    if (type->isNullValueType()) return TypeClass::NULL_POINTER;
+    if (type->isOpaquePointerType()) return TypeClass::OPAQUE_POINTER;
+    if (type->isPointerType()) return TypeClass::POINTER;
+    if (type->isFloatingPointType(128)) return TypeClass::QUAD;
+    if (type->isReferenceType()) return TypeClass::REFERENCE;
+    if (type->isFloatingPointType(32)) return TypeClass::SINGLE;
+    if (type->isUnsignedIntegerPointerType()) return TypeClass::UNSIGNED_INTEGER_POINTER;
+    if (type->isVectorType()) return TypeClass::VECTOR;
+    if (type->isVoidType()) return TypeClass::VOID;
+
+    assert(false);
+    return TypeClass::VOID;
+}
+
+void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
+{
+    if (storage.isWriting()) assert(type->isDefined());
+    if (storage.isReading()) assert(lang::Type::sync_context_ != nullptr);
+
+    uint8_t type_class = getTypeClass(&*type);
+    storage.sync(type_class);
+
+    switch (type_class)
+    {
+        case TypeClass::CUSTOM:
+        {
+            lang::Identifier identifier = type->name();
+            storage.sync(identifier);
+            if (storage.isReading()) type.reroute(lang::makeHandled<lang::Type>(identifier));
+            break;
+        }
+        case TypeClass::ARRAY:
+        {
+            uint64_t                          size         = 0;
+            lang::ResolvingHandle<lang::Type> element_type = lang::Type::getUndefined();
+
+            if (storage.isWriting())
+            {
+                size         = type->isArrayType()->getSize().value();
+                element_type = type->getElementType();
+            }
+
+            storage.sync(size);
+            storage.sync(element_type);
+
+            if (storage.isReading()) { type.reroute(lang::Type::sync_context_->getArrayType(element_type, size)); }
+            break;
+        }
+        case TypeClass::BOOLEAN:
+        {
+            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getBooleanType());
+            break;
+        }
+        case TypeClass::BUFFER:
+        {
+            lang::ResolvingHandle<lang::Type> element_type = lang::Type::getUndefined();
+
+            if (storage.isWriting()) { element_type = type->getElementType(); }
+
+            storage.sync(element_type);
+
+            if (storage.isReading()) { type.reroute(lang::Type::sync_context_->getBufferType(element_type)); }
+            break;
+        }
+        case TypeClass::CHAR:
+        {
+            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getCharType());
+            break;
+        }
+        case TypeClass::DOUBLE:
+        {
+            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getDoubleType());
+            break;
+        }
+        case TypeClass::FIXED_WIDTH_INTEGER:
+        {
+            uint64_t bits      = 0;
+            bool     is_signed = false;
+
+            if (storage.isWriting())
+            {
+                bits      = type->isFixedWidthIntegerType()->getBitSize().value();
+                is_signed = type->isSigned();
+            }
+
+            storage.sync(bits);
+            storage.sync(is_signed);
+
+            if (storage.isReading())
+            {
+                type.reroute(lang::Type::sync_context_->getFixedWidthIntegerType(bits, is_signed));
+            }
+
+            break;
+        }
+        case TypeClass::HALF:
+        {
+            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getHalfType());
+            break;
+        }
+        case TypeClass::NULL_POINTER:
+        {
+            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getNullPointerType());
+            break;
+        }
+        case TypeClass::OPAQUE_POINTER:
+        {
+            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getOpaquePointerType());
+            break;
+        }
+        case TypeClass::POINTER:
+        {
+            lang::ResolvingHandle<lang::Type> element_type = lang::Type::getUndefined();
+
+            if (storage.isWriting()) { element_type = type->getElementType(); }
+
+            storage.sync(element_type);
+
+            if (storage.isReading()) { type.reroute(lang::Type::sync_context_->getPointerType(element_type)); }
+            break;
+        }
+        case TypeClass::QUAD:
+        {
+            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getQuadType());
+            break;
+        }
+        case TypeClass::REFERENCE:
+        {
+            lang::ResolvingHandle<lang::Type> element_type = lang::Type::getUndefined();
+
+            if (storage.isWriting()) { element_type = type->getElementType(); }
+
+            storage.sync(element_type);
+
+            if (storage.isReading()) { type.reroute(lang::Type::sync_context_->getReferenceType(element_type)); }
+            break;
+        }
+        case TypeClass::SINGLE:
+        {
+            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getSingleType());
+            break;
+        }
+        case TypeClass::UNSIGNED_INTEGER_POINTER:
+        {
+            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getUnsignedIntegerPointerType());
+            break;
+        }
+        case TypeClass::VECTOR:
+        {
+            uint64_t                          size         = 0;
+            lang::ResolvingHandle<lang::Type> element_type = lang::Type::getUndefined();
+
+            if (storage.isWriting())
+            {
+                size         = type->isVectorType()->getSize().value();
+                element_type = type->getElementType();
+            }
+
+            storage.sync(size);
+            storage.sync(element_type);
+
+            if (storage.isReading()) { type.reroute(lang::Type::sync_context_->getVectorType(element_type, size)); }
+            break;
+        }
+        case TypeClass::VOID:
+        {
+            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getVoidType());
+            break;
+        }
+        default:
+        {
+            assert(false);
+            break;
+        }
+    }
 }

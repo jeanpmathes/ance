@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "lang/type/Type.h"
+#include "lang/utility/Storage.h"
 #include "lang/utility/Values.h"
 
 lang::Parameter::Parameter(lang::ResolvingHandle<lang::Type> type,
@@ -69,4 +70,10 @@ llvm::Value* lang::Parameter::getContentValue() const
 Shared<lang::Parameter> lang::Parameter::expand(lang::Context& new_context) const
 {
     return makeShared<lang::Parameter>(type_->createUndefinedClone(new_context), type_location_, name_, location_);
+}
+
+void lang::Parameter::synchronize(lang::Parameter* parameter, Storage& storage)
+{
+    storage.sync(parameter->name_);
+    storage.sync(parameter->type_);
 }

@@ -19,6 +19,12 @@ namespace lang
       public:
         FixedWidthIntegerType(uint64_t bit_size, bool is_signed);
 
+        Optional<size_t> getBitSize() const override;
+        size_t           getNativeBitSize() const override;
+        bool             isSigned() const override;
+        size_t           getMinimumBitSize() const override;
+        std::string      getSuffix() const override;
+
         static const int64_t MAX_INTEGER_SIZE = 1ll << 16;
 
         [[nodiscard]] FixedWidthIntegerType const* isFixedWidthIntegerType() const override;
@@ -41,12 +47,6 @@ namespace lang
 
       protected:
         std::string createMangledName() const override;
-
-        Optional<size_t>      getBitSize() const override;
-        size_t                getNativeBitSize() const override;
-        bool                  isSigned() const override;
-        size_t                getMinimumBitSize() const override;
-        std::string           getSuffix() const override;
 
       public:
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;

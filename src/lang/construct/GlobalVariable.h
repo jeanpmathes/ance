@@ -41,6 +41,7 @@ namespace lang
                        lang::Location                        type_location,
                        GlobalScope&                          containing_scope,
                        lang::AccessModifier                  access,
+                       bool                                  is_import,
                        Initializer                           init,
                        lang::Scope*                          init_scope,
                        Assigner                              assigner,
@@ -83,6 +84,7 @@ namespace lang
 
       private:
         lang::AccessModifier access_;
+        bool                 is_import_;
         bool                 is_constant_;
         Initializer          init_;
         lang::Scope*         init_scope_;

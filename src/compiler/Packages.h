@@ -25,6 +25,8 @@ class Packages
      */
     [[nodiscard]] Optional<Package> getPackage(std::string const& name) const;
 
+    constexpr static char const* PACKAGE_EXTENSION = ".apkg";
+
   private:
     std::filesystem::path base_;
 };

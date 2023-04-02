@@ -136,6 +136,12 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
                                     std::ostream&                       out) const;
 
     /**
+     * Export this unit as a package.
+     * @param dir The directory to export to.
+     */
+    void exportPackage(std::filesystem::path const& dir);
+
+    /**
      * Prepare everything for the first validation step.
      */
     void preValidate();

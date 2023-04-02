@@ -7,6 +7,8 @@
 
 #include "lang/utility/Location.h"
 
+class Storage;
+
 namespace lang
 {
     /**
@@ -32,8 +34,19 @@ namespace lang
          */
         static Identifier like(std::string const& string, lang::Location location = lang::Location::global());
 
+        /**
+         * Create an empty identifier.
+         * @return The empty identifier.
+         */
+        static Identifier empty();
+
         [[nodiscard]] std::string_view text() const;
         [[nodiscard]] lang::Location   location() const;
+
+        /**
+         * Perform storage synchronization.
+         */
+        static void synchronize(lang::Identifier* identifier, Storage& storage);
 
       private:
         std::string_view string_;

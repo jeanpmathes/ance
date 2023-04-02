@@ -93,6 +93,8 @@ static Optional<int> build(SourceTree&                  tree,
     compiler.compile(ilr);
     compiler.emitObject(obj);
 
+    tree.unit().exportPackage(bin_dir);
+
     bool const ok = linker.link(obj, res, out);
 
     if (ok) return {};

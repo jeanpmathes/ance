@@ -1,6 +1,7 @@
 #include "FunctionDescription.h"
 
 #include "lang/ApplicationVisitor.h"
+#include "lang/utility/Storage.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
@@ -11,8 +12,10 @@ lang::FunctionDescription::FunctionDescription(lang::AccessModifier             
                                                std::vector<Shared<lang::Parameter>> parameters,
                                                Optional<Owned<Statement>>           code,
                                                lang::Location                       declaration_location,
-                                               lang::Location                       definition_location)
-    : access_(access)
+                                               lang::Location                       definition_location,
+                                               bool                                 is_imported)
+    : is_imported_(is_imported)
+    , access_(access)
     , name_(name)
     , return_type_(return_type)
     , return_type_location_(return_type_location)
@@ -20,6 +23,18 @@ lang::FunctionDescription::FunctionDescription(lang::AccessModifier             
     , code_(std::move(code))
     , declaration_location_(declaration_location)
     , definition_location_(definition_location)
+{}
+
+lang::FunctionDescription::FunctionDescription()
+    : is_imported_(true)
+    , access_(lang::AccessModifier::PUBLIC_ACCESS)
+    , name_(lang::Identifier::empty())
+    , return_type_(lang::Type::getUndefined())
+    , return_type_location_(lang::Location::global())
+    , parameters_()
+    , code_(std::nullopt)
+    , declaration_location_(lang::Location::global())
+    , definition_location_(lang::Location::global())
 {}
 
 lang::Identifier const& lang::FunctionDescription::name() const
@@ -30,6 +45,16 @@ lang::Identifier const& lang::FunctionDescription::name() const
 bool lang::FunctionDescription::isOverloadAllowed() const
 {
     return true;
+}
+
+lang::AccessModifier lang::FunctionDescription::access() const
+{
+    return access_;
+}
+
+bool lang::FunctionDescription::isImported() const
+{
+    return is_imported_;
 }
 
 void lang::FunctionDescription::performInitialization()
@@ -48,7 +73,15 @@ void lang::FunctionDescription::performInitialization()
                                  declaration_location_,
                                  definition_location_);
     }
-    else { function->defineAsExtern(scope(), return_type_, return_type_location_, parameters_, declaration_location_); }
+    else
+    {
+        function->defineAsImported(scope(),
+                                   access_,
+                                   return_type_,
+                                   return_type_location_,
+                                   parameters_,
+                                   declaration_location_);
+    }
 
     function_ = &*function;
 
@@ -94,7 +127,7 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
     }
 
     if (code_.hasValue()) { (**code_).validate(validation_logger); }
-    else if (access_ != lang::AccessModifier::EXTERN_ACCESS)
+    else if (access_ != lang::AccessModifier::EXTERN_ACCESS && !is_imported_)
     {
         validation_logger.logError("Functions without a body must be declared as 'extern'", declaration_location_);
     }
@@ -123,10 +156,38 @@ lang::Description::Descriptions lang::FunctionDescription::expand(lang::Context&
                                                          expanded_parameters,
                                                          std::move(code),
                                                          declaration_location_,
-                                                         definition_location_);
+                                                         definition_location_,
+                                                         is_imported_);
 
     Descriptions descriptions;
     descriptions.emplace_back(std::move(expanded));
 
     return descriptions;
+}
+
+void lang::FunctionDescription::sync(Storage& storage)
+{
+    storage.sync(name_);
+    storage.sync(return_type_);
+
+    std::vector<Shared<lang::Parameter>> parameters = parameters_;
+    parameters_.clear();
+
+    uint64_t size = parameters.size();
+    storage.sync(size);
+
+    for (uint64_t i = 0; i < size; ++i)
+    {
+        if (storage.isReading())
+        {
+            parameters_.emplace_back(makeShared<lang::Parameter>(lang::Type::getUndefined(),
+                                                                 lang::Location::global(),
+                                                                 lang::Identifier::empty(),
+                                                                 lang::Location::global()));
+        }
+
+        if (storage.isWriting()) { parameters_.emplace_back(parameters[i]); }
+
+        storage.sync(*parameters_.back());
+    }
 }

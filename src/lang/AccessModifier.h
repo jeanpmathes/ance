@@ -3,6 +3,8 @@
 
 #include <llvm/IR/GlobalValue.h>
 
+class Storage;
+
 namespace lang
 {
     /**
@@ -11,7 +13,7 @@ namespace lang
     class AccessModifier
     {
       public:
-        enum Value
+        enum Value : uint8_t
         {
             PUBLIC_ACCESS,
             PRIVATE_ACCESS,
@@ -25,16 +27,21 @@ namespace lang
         explicit operator bool() = delete;
 
         /**
-     * Get this access modifier as string.
-     * @return The string.
-     */
+         * Get this access modifier as string.
+         * @return The string.
+         */
         [[nodiscard]] std::string toString() const;
 
         /**
-     * Get the corresponding native linkage type.
-     * @return The linkage type.
-     */
+         * Get the corresponding native linkage type.
+         * @return The linkage type.
+         */
         llvm::GlobalValue::LinkageTypes linkage();
+
+        /**
+         * Perform storage synchronization.
+         */
+        static void synchronize(lang::AccessModifier* access_modifier, Storage& storage);
 
       private:
         Value value_;

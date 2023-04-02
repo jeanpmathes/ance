@@ -56,6 +56,7 @@ namespace lang
          * @param type_location The location of the type.
          * @param containing_scope The containing scope.
          * @param access The access modifier.
+         * @param is_import Whether the variable is imported.
          * @param init The expression or function used for initialization.
          * @param init_scope The scope in which initialization is performed.
          * @param assigner The assigner used for initialization.
@@ -67,6 +68,7 @@ namespace lang
                                              lang::Location                    type_location,
                                              GlobalScope&                      containing_scope,
                                              lang::AccessModifier              access,
+                                             bool                              is_import,
                                              lang::GlobalVariable::Initializer init,
                                              lang::Scope*                      init_scope,
                                              lang::Assigner                    assigner,

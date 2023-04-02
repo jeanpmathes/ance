@@ -42,6 +42,7 @@ namespace lang
                             Optional<lang::ResolvingHandle<lang::Type>> type,
                             lang::Location                              type_location,
                             lang::AccessModifier                        access,
+                            bool                                        is_import,
                             Optional<Owned<Statement>>                  init_block,
                             Optional<Owned<Expression>>                 init_expression,
                             Expression*                                 init_expression_ptr,
@@ -49,10 +50,14 @@ namespace lang
                             bool                                        is_constant,
                             lang::Location                              location);
 
+        VariableDescription();
+
         ~VariableDescription() override = default;
 
         [[nodiscard]] Identifier const&           name() const override;
         [[nodiscard]] bool                        isOverloadAllowed() const override;
+        [[nodiscard]] AccessModifier              access() const override;
+        bool                                      isImported() const override;
         [[nodiscard]] lang::GlobalVariable const* variable() const;
         [[nodiscard]] Expression const*           initializer() const;
         [[nodiscard]] InitializerFunction const*  initializerFunction() const;
@@ -65,12 +70,14 @@ namespace lang
 
       protected:
         void performInitialization() override;
+        void sync(Storage& storage) override;
 
       private:
         lang::Identifier                            name_;
         Optional<lang::ResolvingHandle<lang::Type>> type_;
         lang::Location                              type_location_;
         lang::AccessModifier                        access_;
+        bool                                        is_import_;
         Assigner                                    assigner_;
         bool                                        is_constant_;
         lang::Location                              location_;

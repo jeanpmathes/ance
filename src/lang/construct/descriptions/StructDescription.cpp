@@ -3,17 +3,28 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/StructType.h"
 #include "lang/type/VoidType.h"
+#include "lang/utility/Storage.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::StructDescription::StructDescription(lang::AccessModifier             access,
                                            lang::Identifier                 name,
                                            std::vector<Owned<lang::Member>> members,
-                                           lang::Location                   definition_location)
+                                           lang::Location                   definition_location,
+                                           bool                             is_imported)
     : access_(access)
+    , is_imported_(is_imported)
     , name_(name)
     , members_(std::move(members))
     , definition_location_(definition_location)
+{}
+
+lang::StructDescription::StructDescription()
+    : access_(lang::AccessModifier::PUBLIC_ACCESS)
+    , is_imported_(true)
+    , name_(lang::Identifier::empty())
+    , members_()
+    , definition_location_(lang::Location::global())
 {}
 
 lang::Identifier const& lang::StructDescription::name() const
@@ -24,6 +35,11 @@ lang::Identifier const& lang::StructDescription::name() const
 lang::AccessModifier lang::StructDescription::access() const
 {
     return access_;
+}
+
+bool lang::StructDescription::isImported() const
+{
+    return is_imported_;
 }
 
 std::vector<std::reference_wrapper<const lang::Member>> lang::StructDescription::members() const
@@ -131,7 +147,37 @@ lang::Description::Descriptions lang::StructDescription::expand(lang::Context& n
     members.reserve(members_.size());
     for (auto& member : members_) { members.emplace_back(member->expand(new_context)); }
 
-    result.emplace_back(makeOwned<StructDescription>(access_, name_, std::move(members), definition_location_));
+    result.emplace_back(
+        makeOwned<StructDescription>(access_, name_, std::move(members), definition_location_, is_imported_));
 
     return result;
+}
+
+void lang::StructDescription::sync(Storage& storage)
+{
+    storage.sync(name_);
+
+    std::vector<Owned<lang::Member>> members = std::move(members_);
+    members_.clear();
+
+    uint64_t size = members.size();
+    storage.sync(size);
+
+    for (uint64_t i = 0; i < size; ++i)
+    {
+        if (storage.isReading())
+        {
+            members_.emplace_back(makeOwned<lang::Member>(lang::AccessModifier::PUBLIC_ACCESS,
+                                                          lang::Identifier::empty(),
+                                                          lang::Type::getUndefined(),
+                                                          lang::Assigner::UNSPECIFIED,
+                                                          std::nullopt,
+                                                          lang::Location::global(),
+                                                          lang::Location::global()));
+        }
+
+        if (storage.isWriting()) { members_.emplace_back(std::move(members[i])); }
+
+        storage.sync(*members_.back());
+    }
 }

@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_TYPE_TYPEALIAS_H_
 #define ANCE_SRC_LANG_TYPE_TYPEALIAS_H_
 
-#include "TypeDefinition.h"
+#include "CustomType.h"
 
 #include <optional>
 
@@ -14,18 +14,17 @@ namespace lang
     /**
      * Defines a type that can be used as an alias for the actual type.
      */
-    class TypeAlias : public lang::TypeDefinition
+    class TypeAlias : public lang::CustomType
     {
       public:
         TypeAlias(lang::Identifier name, lang::ResolvingHandle<lang::Type> actual, lang::Location definition_location);
 
-        StateCount         getStateCount() const override;
-        [[nodiscard]] bool isCustom() const override;
+        StateCount getStateCount() const override;
 
         [[nodiscard]] FixedWidthIntegerType const* isFixedWidthIntegerType() const override;
         [[nodiscard]] bool               isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
-        [[nodiscard]] bool                         isSigned() const override;
-        [[nodiscard]] IntegerType const*           isIntegerType() const override;
+        [[nodiscard]] bool               isSigned() const override;
+        [[nodiscard]] IntegerType const* isIntegerType() const override;
         [[nodiscard]] bool                         isBooleanType() const override;
         [[nodiscard]] bool                         isUnsignedIntegerPointerType() const override;
         [[nodiscard]] FloatingPointType const*     isFloatingPointType() const override;
