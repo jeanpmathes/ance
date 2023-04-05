@@ -543,7 +543,7 @@ void lang::Type::buildNativeDefinition(CompileContext& context)
     definition_.value()->buildNativeDefinition(context);
 }
 
-std::vector<std::string> lang::Type::getExportFunctions() const
+std::vector<std::string> lang::Type::getExportSymbols() const
 {
     assert(isDefined());
     return definition_.value()->getExportFunctions();

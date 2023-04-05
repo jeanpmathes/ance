@@ -191,7 +191,7 @@ lang::GlobalScope const& Unit::globalScope() const
     return *global_scope_;
 }
 
-std::vector<std::string> Unit::getExportedFunctions() const
+std::vector<std::string> Unit::getExportedSymbols() const
 {
-    return global_scope_->getExportFunctions();
+    return global_scope_->getExportSymbols();
 }

@@ -31,11 +31,11 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     std::string const out_lib = "/implib:" + (app.parent_path() / (app.stem().string() + ".lib")).string();
     args.push_back(out_lib.c_str());
 
-    std::vector<std::string> export_functions;
-    for (auto const& export_function : unit_.getExportedFunctions())
+    std::vector<std::string> export_symbols;
+    for (auto const& export_function : unit_.getExportedSymbols())
     {
-        export_functions.push_back("/export:" + export_function);
-        args.push_back(export_functions.back().c_str());
+        export_symbols.push_back("/export:" + export_function);
+        args.push_back(export_symbols.back().c_str());
     }
 
     std::string const resource_data_directory_name       = "ANCE_RESOURCE_DATA_DIRECTORY";

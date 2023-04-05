@@ -366,20 +366,26 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::getEntry()
     return potential_function.value();
 }
 
-std::vector<std::string> lang::GlobalScope::getExportFunctions() const
+std::vector<std::string> lang::GlobalScope::getExportSymbols() const
 {
     std::vector<std::string> exports;
 
     for (auto& [name, group] : defined_function_groups_)
     {
-        std::vector<std::string> group_exports = group->getExportFunctions();
+        std::vector<std::string> group_exports = group->getExportSymbols();
         exports.insert(exports.end(), group_exports.begin(), group_exports.end());
     }
 
     for (auto& [name, type] : defined_types_)
     {
-        std::vector<std::string> type_exports = type->getExportFunctions();
+        std::vector<std::string> type_exports = type->getExportSymbols();
         exports.insert(exports.end(), type_exports.begin(), type_exports.end());
+    }
+
+    for (auto& [name, variable] : global_defined_variables_)
+    {
+        std::vector<std::string> variable_exports = variable->getExportSymbols();
+        exports.insert(exports.end(), variable_exports.begin(), variable_exports.end());
     }
 
     return exports;

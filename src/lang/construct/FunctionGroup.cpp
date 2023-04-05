@@ -18,7 +18,7 @@ lang::Identifier const& lang::FunctionGroup::name() const
     return name_;
 }
 
-std::vector<std::string> lang::FunctionGroup::getExportFunctions() const
+std::vector<std::string> lang::FunctionGroup::getExportSymbols() const
 {
     std::vector<std::string> exports;
 

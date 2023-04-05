@@ -146,6 +146,14 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::getVari
     return {};
 }
 
+std::vector<std::string> lang::GlobalVariable::getExportSymbols() const
+{
+    if (is_import_) return {};
+    if (access_ != AccessModifier::PUBLIC_ACCESS) return {};
+
+    return {std::string(name().text())};
+}
+
 Shared<lang::Value> lang::GlobalVariable::getValue(CompileContext&)
 {
     assert(native_variable_);

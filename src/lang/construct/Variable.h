@@ -187,6 +187,11 @@ namespace lang
          */
         [[nodiscard]] lang::ResolvingHandle<lang::Variable> toUndefined() const;
 
+        /**
+         * Symbols that should be exported for this variable.
+         */
+        [[nodiscard]] std::vector<std::string> getExportSymbols() const;
+
       private:
         lang::Identifier                          name_;
         Optional<Owned<lang::VariableDefinition>> definition_ {};

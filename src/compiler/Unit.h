@@ -203,10 +203,10 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     virtual void addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileContext& context) = 0;
 
     /**
-     * Get the names of the functions that should be exported.
-     * @return The names of the exported functions.
+     * Get the names of the symbols that should be exported.
+     * @return The names of the exported symbols.
      */
-    [[nodiscard]] virtual std::vector<std::string> getExportedFunctions() const;
+    [[nodiscard]] virtual std::vector<std::string> getExportedSymbols() const;
 
     /**
      * Get the name of all required packages.

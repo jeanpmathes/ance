@@ -627,7 +627,7 @@ namespace lang
          * Get the names of the functions that are exported by this type.
          * @return The names of the exported functions.
          */
-        [[nodiscard]] std::vector<std::string> getExportFunctions() const;
+        [[nodiscard]] std::vector<std::string> getExportSymbols() const;
 
         [[nodiscard]] lang::TypeDefinition*       getDefinition();
         [[nodiscard]] lang::TypeDefinition const* getDefinition() const;

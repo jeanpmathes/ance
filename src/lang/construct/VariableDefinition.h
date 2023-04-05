@@ -63,6 +63,7 @@ namespace lang
 
         [[nodiscard]] virtual std::vector<lang::ResolvingHandle<lang::Variable>> getVariableDependencies();
         [[nodiscard]] virtual std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies();
+        [[nodiscard]] virtual std::vector<std::string>                           getExportSymbols() const;
 
         virtual void buildDeclaration(CompileContext& context)  = 0;
         virtual void buildDefinition(CompileContext& context)   = 0;

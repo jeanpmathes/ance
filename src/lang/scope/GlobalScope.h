@@ -151,10 +151,10 @@ namespace lang
         void buildFinalization(CompileContext& context) override;
 
         /**
-         * Get all functions that should be exported.
-         * @return The exported functions.
+         * Get all symbols that should be exported.
+         * @return The exported symbols.
          */
-        [[nodiscard]] std::vector<std::string> getExportFunctions() const;
+        [[nodiscard]] std::vector<std::string> getExportSymbols() const;
 
       private:
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);
