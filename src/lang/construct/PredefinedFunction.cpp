@@ -5,6 +5,8 @@
 
 lang::PredefinedFunction::PredefinedFunction(lang::Function&                      function,
                                              lang::Scope&                         containing_scope,
+                                             lang::AccessModifier                 access_modifier,
+                                             bool                                 is_imported,
                                              lang::ResolvingHandle<lang::Type>    return_type,
                                              std::vector<Shared<lang::Parameter>> parameters,
                                              lang::Location                       location)
@@ -14,11 +16,18 @@ lang::PredefinedFunction::PredefinedFunction(lang::Function&                    
                                lang::Location::global(),
                                std::move(parameters),
                                location)
+    , access_modifier_(access_modifier)
+    , is_imported_(is_imported)
 {}
 
 bool lang::PredefinedFunction::isMangled() const
 {
     return true;
+}
+
+bool lang::PredefinedFunction::isImported() const
+{
+    return is_imported_;
 }
 
 void lang::PredefinedFunction::determineFlow() {}
@@ -29,9 +38,11 @@ bool lang::PredefinedFunction::validateFlow(ValidationLogger&) const
 
 void lang::PredefinedFunction::createNativeBacking(CompileContext& context)
 {
-    std::tie(native_type_, native_function_) = createNativeFunction(llvm::GlobalValue::LinkageTypes::PrivateLinkage,
-                                                                    context.llvmContext(),
-                                                                    context.llvmModule());
+    llvm::GlobalValue::LinkageTypes const linkage = access_modifier_.linkage();
+    if (is_imported_) { assert(linkage == llvm::GlobalValue::LinkageTypes::ExternalLinkage); }
+
+    std::tie(native_type_, native_function_) =
+        createNativeFunction(linkage, context.llvmContext(), context.llvmModule());
 
     auto params = parameters();
 

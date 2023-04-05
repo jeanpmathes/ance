@@ -1,8 +1,8 @@
 #ifndef ANCE_SRC_COMPILER_SOURCETREE_H_
 #define ANCE_SRC_COMPILER_SOURCETREE_H_
 
-#include "grammar/anceLexer.h"
-#include "grammar/anceParser.h"
+#include "anceLexer.h"
+#include "anceParser.h"
 #include <antlr4-runtime.h>
 
 #include "compiler/SourceVisitor.h"

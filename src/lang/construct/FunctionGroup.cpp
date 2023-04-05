@@ -26,7 +26,12 @@ std::vector<std::string> lang::FunctionGroup::getExportFunctions() const
     {
         if (function->isImported()) continue;
 
-        if (function->access() == AccessModifier::EXTERN_ACCESS) { exports.emplace_back(function->name().text()); }
+        auto access = function->access();
+
+        if (access == AccessModifier::EXTERN_ACCESS || access == AccessModifier::PUBLIC_ACCESS)
+        {
+            exports.emplace_back(function->getLinkageName());
+        }
     }
 
     return exports;

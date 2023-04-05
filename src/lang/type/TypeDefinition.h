@@ -65,6 +65,7 @@ namespace lang
         std::string const&              getMangledName() const;
         [[nodiscard]] lang::Location    getDefinitionLocation() const;
         [[nodiscard]] virtual bool      isCustom() const;
+        [[nodiscard]] virtual bool      isImported() const;
 
         [[nodiscard]] virtual StateCount getStateCount() const = 0;
 
@@ -180,6 +181,8 @@ namespace lang
         virtual void buildNativeDefinition(CompileContext& context);
 
         virtual void createConstructors();
+
+        [[nodiscard]] virtual std::vector<std::string> getExportFunctions() const;
 
         /**
          * Whether this type can be default-constructed by zeroing memory.

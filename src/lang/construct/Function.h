@@ -54,6 +54,12 @@ namespace lang
         [[nodiscard]] Identifier const& name() const;
 
         /**
+         * Get the linkage name of this function.
+         * @return The linkage name.
+         */
+        [[nodiscard]] std::string getLinkageName() const;
+
+        /**
          * Get whether this function is defined.
          */
         [[nodiscard]] bool isDefined() const;
@@ -98,12 +104,16 @@ namespace lang
          * Define this function as a predefined function.
          * @param return_type The return type of the function.
          * @param parameters The parameters for this function.
+         * @param access_modifier The access level of the function.
+         * @param is_imported Whether this function is imported.
          * @param containing_scope The scope containing the function.
          * @param location The location of the function.
          * @return The predefined function.
          */
         PredefinedFunction& defineAsPredefined(lang::ResolvingHandle<lang::Type>           return_type,
                                                std::vector<Shared<lang::Parameter>> const& parameters,
+                                               lang::AccessModifier                        access_modifier,
+                                               bool                                        is_imported,
                                                Scope&                                      containing_scope,
                                                lang::Location                              location);
 

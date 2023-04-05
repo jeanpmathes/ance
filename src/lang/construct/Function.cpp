@@ -18,6 +18,11 @@ lang::Identifier const& lang::Function::name() const
     return name_;
 }
 
+std::string lang::Function::getLinkageName() const
+{
+    return isMangled() ? signature().getMangledName() : std::string(name().text());
+}
+
 bool lang::Function::isDefined() const
 {
     return definition_.hasValue();
@@ -61,11 +66,19 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
 
 lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHandle<lang::Type>           return_type,
                                                              std::vector<Shared<lang::Parameter>> const& parameters,
-                                                             lang::Scope&   containing_scope,
-                                                             lang::Location location)
+                                                             lang::AccessModifier access_modifier,
+                                                             bool                 is_imported,
+                                                             lang::Scope&         containing_scope,
+                                                             lang::Location       location)
 {
 
-    auto definition = makeOwned<lang::PredefinedFunction>(*this, containing_scope, return_type, parameters, location);
+    auto definition = makeOwned<lang::PredefinedFunction>(*this,
+                                                          containing_scope,
+                                                          access_modifier,
+                                                          is_imported,
+                                                          return_type,
+                                                          parameters,
+                                                          location);
 
     lang::PredefinedFunction& predefined_function = *definition;
 

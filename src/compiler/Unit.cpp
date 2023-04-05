@@ -43,7 +43,7 @@ bool Unit::preparePackageDependencies(Packages const&                     packag
                                       std::filesystem::path const&        dir,
                                       std::filesystem::path const&        bin_base,
                                       std::filesystem::path const&        bin_suffix,
-                                      std::ostream&                       out) const
+                                      std::ostream&                       out)
 {
     auto dependencies = getDependencies();
     bool valid        = true;
@@ -113,6 +113,8 @@ bool Unit::preparePackageDependencies(Packages const&                     packag
             out << "ance: packages: Building package '" << package.name << "'";
             if (is_ok) { out << " succeeded" << std::endl; }
             else { out << " failed" << std::endl; }
+
+            importPackage(bin_base, package.name);
         }
     }
 
@@ -129,6 +131,18 @@ void Unit::exportPackage(std::filesystem::path const& dir)
     Writer        writer(of);
 
     Storage& storage = writer;
+    storage.sync(*global_scope_);
+}
+
+void Unit::importPackage(std::filesystem::path const& path, std::string const& name)
+{
+    std::filesystem::path const out = path / (name + Packages::PACKAGE_EXTENSION);
+
+    std::ifstream in(out);
+    Reader        reader(in);
+
+    Storage& storage = reader;
+    storage.data_    = &global_scope_->context();
     storage.sync(*global_scope_);
 }
 

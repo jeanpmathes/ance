@@ -141,9 +141,12 @@ bool ProjectDescription::loadDescription()
     HMODULE handle = LoadLibraryA(binary_description_path_->string().c_str());
     if (!handle) return false;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-function-type"
     auto function =
         reinterpret_cast<ProjectDescriptionFunction>(GetProcAddress(handle, ANCE_PROJECT_DEFINITION_FUNCTION));
     if (!function) return false;
+#pragma clang diagnostic pop
 
     function(&project);
 #elif defined(_POSIX_VERSION)

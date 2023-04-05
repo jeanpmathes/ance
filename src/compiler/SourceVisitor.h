@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_COMPILER_SOURCEVISITOR_H_
 #define ANCE_SRC_COMPILER_SOURCEVISITOR_H_
 
-#include "grammar/anceBaseVisitor.h"
+#include "anceBaseVisitor.h"
 
 #include "compiler/FileContext.h"
 #include "lang/utility/Identifier.h"

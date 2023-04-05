@@ -162,7 +162,7 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::FunctionDefinition::create
     llvm::LLVMContext&              c,
     llvm::Module&                   m)
 {
-    std::string const& native_name = isMangled() ? signature_.getMangledName() : std::string(function_.name().text());
+    std::string const native_name = function_.getLinkageName();
 
     std::vector<llvm::Type*> param_types;
     param_types.reserve(parameters_.size());

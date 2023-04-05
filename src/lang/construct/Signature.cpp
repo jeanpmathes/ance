@@ -40,7 +40,7 @@ bool lang::Signature::isMatching(std::vector<std::reference_wrapper<lang::Type c
     });
 }
 
-std::string const& lang::Signature::getMangledName()
+std::string const& lang::Signature::getMangledName() const
 {
     if (!mangled_name_.empty()) return mangled_name_;
 

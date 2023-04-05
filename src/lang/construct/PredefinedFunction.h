@@ -21,11 +21,14 @@ namespace lang
       public:
         PredefinedFunction(Function&                            function,
                            Scope&                               containing_scope,
+                           lang::AccessModifier                 access_modifier,
+                           bool                                 is_imported,
                            lang::ResolvingHandle<lang::Type>    return_type,
                            std::vector<Shared<lang::Parameter>> parameters,
                            lang::Location                       location);
 
         [[nodiscard]] bool isMangled() const override;
+        [[nodiscard]] bool isImported() const override;
 
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
@@ -50,6 +53,9 @@ namespace lang
             ValidationLogger& validation_logger) const override;
 
       private:
+        lang::AccessModifier access_modifier_;
+        bool                 is_imported_;
+
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};
 

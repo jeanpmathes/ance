@@ -60,7 +60,8 @@ void lang::AliasDescription::performInitialization()
     lang::OwningHandle<lang::Type> type =
         lang::OwningHandle<lang::Type>::takeOwnership(lang::makeHandled<lang::Type>(name_));
 
-    Owned<lang::TypeDefinition> alias_definition = makeOwned<lang::TypeAlias>(name_, actual_, definition_location_);
+    Owned<lang::TypeDefinition> alias_definition =
+        makeOwned<lang::TypeAlias>(access_, name_, actual_, is_imported_, definition_location_);
     type->define(std::move(alias_definition));
 
     self_ = type.handle();

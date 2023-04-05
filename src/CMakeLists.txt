@@ -5,7 +5,8 @@ add_subdirectory(compiler)
 add_subdirectory(grammar)
 add_subdirectory(validation)
 
-include_directories(.)
+target_include_directories(ance PUBLIC .)
+target_include_directories(ance SYSTEM PRIVATE grammar)
 
 set(LLD_AVAILABLE_LIBS lldCommon;lldCOFF;lldELF;lldMachO;lldMinGW;lldWasm)
 
@@ -21,8 +22,7 @@ set(ERROR_OPTIONS
     -Wno-c++98-c++11-compat-pedantic
     -Wno-exit-time-destructors
     -Wno-global-constructors
-    -Wno-switch-enum
-    -Wno-return-std-move-in-c++11)
+    -Wno-switch-enum)
 
 target_compile_options(ance PRIVATE /EHa -MDd ${ERROR_OPTIONS})
 
@@ -30,10 +30,5 @@ set_source_files_properties(grammar/anceBaseVisitor.cpp
                             grammar/anceLexer.cpp
                             grammar/anceParser.cpp
                             grammar/anceVisitor.cpp
-                            PROPERTIES COMPILE_FLAGS -Wno-everything)
-
-set_source_files_properties(management/grammar/dataBaseVisitor.cpp
-                            management/grammar/dataLexer.cpp
-                            management/grammar/dataParser.cpp
-                            management/grammar/dataVisitor.cpp
-                            PROPERTIES COMPILE_FLAGS -Wno-everything)
+                            PROPERTIES
+                            COMPILE_FLAGS -Wno-everything)

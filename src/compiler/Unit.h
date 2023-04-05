@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <memory>
 
-#include "grammar/anceParser.h"
+#include "anceParser.h"
 
 #include "lang/Element.h"
 
@@ -133,13 +133,20 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
                                     std::filesystem::path const&        dir,
                                     std::filesystem::path const&        bin_base,
                                     std::filesystem::path const&        bin_suffix,
-                                    std::ostream&                       out) const;
+                                    std::ostream&                       out);
 
     /**
      * Export this unit as a package.
      * @param dir The directory to export to.
      */
     void exportPackage(std::filesystem::path const& dir);
+
+    /**
+     * Import a package into this unit.
+     * @param dir The directory in which the package is located.
+     * @name The name of the package.
+     */
+    void importPackage(std::filesystem::path const& dir, std::string const& name);
 
     /**
      * Prepare everything for the first validation step.

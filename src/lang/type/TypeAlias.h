@@ -17,16 +17,22 @@ namespace lang
     class TypeAlias : public lang::CustomType
     {
       public:
-        TypeAlias(lang::Identifier name, lang::ResolvingHandle<lang::Type> actual, lang::Location definition_location);
+        TypeAlias(lang::AccessModifier              access,
+                  lang::Identifier                  name,
+                  lang::ResolvingHandle<lang::Type> actual,
+                  bool                              is_imported,
+                  lang::Location                    definition_location);
 
-        StateCount getStateCount() const override;
+        StateCount     getStateCount() const override;
+        AccessModifier getAccessModifier() const override;
 
         [[nodiscard]] FixedWidthIntegerType const* isFixedWidthIntegerType() const override;
         [[nodiscard]] bool               isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
         [[nodiscard]] bool               isSigned() const override;
         [[nodiscard]] IntegerType const* isIntegerType() const override;
-        [[nodiscard]] bool                         isBooleanType() const override;
-        [[nodiscard]] bool                         isUnsignedIntegerPointerType() const override;
+        [[nodiscard]] bool               isBooleanType() const override;
+        [[nodiscard]] bool               isCharType() const override;
+        [[nodiscard]] bool               isUnsignedIntegerPointerType() const override;
         [[nodiscard]] FloatingPointType const*     isFloatingPointType() const override;
         [[nodiscard]] bool                         isFloatingPointType(size_t precision) const override;
         [[nodiscard]] bool                     isSizeType() const override;
@@ -76,6 +82,15 @@ namespace lang
                                                     Shared<Value>                     value,
                                                     CompileContext&                   context) override;
 
+        bool                        isOperatorDefined(lang::UnaryOperator op) const override;
+        ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
+        bool                        validateOperator(lang::UnaryOperator op,
+                                                     lang::Location      location,
+                                                     ValidationLogger&   validation_logger) const override;
+        Shared<lang::Value>         buildOperator(lang::UnaryOperator op,
+                                                  Shared<Value>       value,
+                                                  CompileContext&     context) override;
+
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
                                                                 lang::ResolvingHandle<lang::Type> other) override;
@@ -105,7 +120,15 @@ namespace lang
         void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context) override;
         void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context) override;
 
+        bool isTriviallyDefaultConstructible() const override;
+        bool isTriviallyCopyConstructible() const override;
+        bool isTriviallyDestructible() const override;
+
         void createConstructors() override;
+        bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
+        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+                                    lang::PredefinedFunction&                      function,
+                                    CompileContext&                                context) override;
         void buildNativeDeclaration(CompileContext& context) override;
         void buildNativeDefinition(CompileContext& context) override;
 
@@ -119,6 +142,7 @@ namespace lang
 
       private:
         lang::ResolvingHandle<lang::Type> actual_;
+        lang::AccessModifier              access_modifier_;
 
         mutable Optional<lang::ResolvingHandle<lang::Type>> actually_actual_ {};
         mutable Optional<bool>                              is_valid_ {};

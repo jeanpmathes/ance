@@ -68,6 +68,11 @@ bool lang::TypeDefinition::isCustom() const
     return false;// Most types are built-in.
 }
 
+bool lang::TypeDefinition::isImported() const
+{
+    return false;// Only custom types can be imported.
+}
+
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::clone(lang::Context&) const
 {
     assert(!isCustom() && "TypeDefinition::clone() called on custom type definition.");
@@ -272,6 +277,27 @@ bool lang::TypeDefinition::requestOverload(std::vector<lang::ResolvingHandle<lan
 void lang::TypeDefinition::createConstructors()
 {
     default_constructor_ = &createConstructor({});
+}
+
+std::vector<std::string> lang::TypeDefinition::getExportFunctions() const
+{
+    if (getAccessModifier() != lang::AccessModifier::PUBLIC_ACCESS || isImported()) return {};
+
+    std::vector<std::string> functions;
+
+    functions.reserve(requested_constructors_.size() + 4);
+    for (auto const& [parameters, function] : requested_constructors_)
+    {
+        functions.push_back(function->function().getLinkageName());
+    }
+
+    if (default_constructor_) functions.push_back(default_constructor_->function().getLinkageName());
+
+    if (default_initializer_) functions.emplace_back(default_initializer_->getName());
+    if (copy_initializer_) functions.emplace_back(copy_initializer_->getName());
+    if (default_finalizer_) functions.emplace_back(default_finalizer_->getName());
+
+    return functions;
 }
 
 llvm::Type* lang::TypeDefinition::getNativeType(llvm::LLVMContext& c) const
@@ -500,9 +526,12 @@ void lang::TypeDefinition::buildFinalizer(llvm::Value* ptr, llvm::Value* count, 
 
 void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
 {
+    if (isImported()) assert(getAccessModifier().linkage() == llvm::GlobalValue::ExternalLinkage);
+
     if (!isTriviallyDefaultConstructible())
     {
-        llvm::FunctionType* default_initializer_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context.llvmContext()),
+        llvm::FunctionType* default_initializer_type =
+            llvm::FunctionType::get(llvm::Type::getVoidTy(context.llvmContext()),
                                     {getNativeType(context.llvmContext()),
                                      context.types().getSizeType()->getContentType(context.llvmContext())},
                                     false);
@@ -544,6 +573,8 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
 
 void lang::TypeDefinition::buildNativeDefinition(CompileContext& context)
 {
+    if (isImported()) return;
+
     if (!isTriviallyDefaultConstructible()) defineDefaultInitializer(context);
     if (!isTriviallyCopyConstructible()) defineCopyInitializer(context);
     if (!isTriviallyDestructible()) defineDefaultFinalizer(context);
@@ -753,8 +784,12 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
                                                          lang::Location::global()));
     }
 
-    lang::PredefinedFunction& predefined_function =
-        function->defineAsPredefined(self(), parameters, *scope(), lang::Location::global());
+    lang::PredefinedFunction& predefined_function = function->defineAsPredefined(self(),
+                                                                                 parameters,
+                                                                                 getAccessModifier(),
+                                                                                 isImported(),
+                                                                                 *scope(),
+                                                                                 lang::Location::global());
 
     predefined_function.setCallValidator(
         [this](std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,

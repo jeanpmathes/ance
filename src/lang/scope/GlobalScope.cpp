@@ -56,7 +56,11 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
-        for (auto& description : descriptions) { description->validate(validation_logger); }
+        for (auto& description : descriptions)
+        {
+            if (description->isImported()) continue;
+            description->validate(validation_logger);
+        }
     }
 
     for (auto& [key, function] : defined_function_groups_) { function->validate(validation_logger); }
@@ -372,6 +376,12 @@ std::vector<std::string> lang::GlobalScope::getExportFunctions() const
         exports.insert(exports.end(), group_exports.begin(), group_exports.end());
     }
 
+    for (auto& [name, type] : defined_types_)
+    {
+        std::vector<std::string> type_exports = type->getExportFunctions();
+        exports.insert(exports.end(), type_exports.begin(), type_exports.end());
+    }
+
     return exports;
 }
 
@@ -433,6 +443,7 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::GlobalScope::prepareDefinedFunc
 
     return defined;
 }
+
 void lang::GlobalScope::synchronize(lang::GlobalScope* scope, Storage& storage)
 {
     std::vector<lang::Description*> export_descriptions;

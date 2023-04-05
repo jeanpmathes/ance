@@ -65,7 +65,7 @@ void lang::StructDescription::performInitialization()
     for (auto& member : members_) { members.emplace_back(*member); }
 
     Owned<lang::TypeDefinition> struct_definition =
-        makeOwned<lang::StructType>(access_, name_, members, definition_location_);
+        makeOwned<lang::StructType>(access_, name_, members, is_imported_, definition_location_);
     type->define(std::move(struct_definition));
 
     self_ = type.handle();

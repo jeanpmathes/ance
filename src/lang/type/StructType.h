@@ -19,6 +19,7 @@ namespace lang
         StructType(lang::AccessModifier                              access_modifier,
                    lang::Identifier                                  name,
                    std::vector<std::reference_wrapper<lang::Member>> members,
+                   bool                                              is_imported,
                    lang::Location                                    location);
 
         [[nodiscard]] StateCount getStateCount() const override;

@@ -623,6 +623,12 @@ namespace lang
          */
         void buildNativeDefinition(CompileContext& context);
 
+        /**
+         * Get the names of the functions that are exported by this type.
+         * @return The names of the exported functions.
+         */
+        [[nodiscard]] std::vector<std::string> getExportFunctions() const;
+
         [[nodiscard]] lang::TypeDefinition*       getDefinition();
         [[nodiscard]] lang::TypeDefinition const* getDefinition() const;
 
@@ -739,8 +745,6 @@ namespace lang
          * @return True if the types are not equal.
          */
         bool operator!=(lang::Type const& other) const;
-
-        inline static lang::Context* sync_context_ = nullptr;
 
       private:
         lang::Identifier                      name_;

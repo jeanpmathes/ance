@@ -96,10 +96,13 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     if (unit_.isUsingRuntime()) { lib_paths.push_back("/libpath:" + target_data_directory.string()); }
     if (unit_.isUsingRuntime()) { libs.emplace_back("/defaultlib:runtime"); }
 
+    lib_paths.push_back("/libpath:" + app.parent_path().string());
+
     for (auto const& libpath : unit_.getLibraryPaths()) { lib_paths.push_back("/libpath:" + libpath); }
     for (auto const& libpath : lib_paths) { args.push_back(libpath.c_str()); }
 
     for (auto const& lib : unit_.getLibraries()) { libs.push_back("/defaultlib:" + lib); }
+    for (auto const& lib : unit_.getDependencies()) { libs.push_back("/defaultlib:" + lib); }
     for (auto const& lib : libs) { args.push_back(lib.c_str()); }
 
     std::vector<std::string> archives;

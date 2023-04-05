@@ -9,16 +9,25 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::TypeAlias::TypeAlias(lang::Identifier                  name,
+lang::TypeAlias::TypeAlias(lang::AccessModifier              access,
+                           lang::Identifier                  name,
                            lang::ResolvingHandle<lang::Type> actual,
+                           bool                              is_imported,
                            lang::Location                    definition_location)
     : lang::TypeDefinition(name, definition_location)
+    , lang::CustomType(is_imported)
     , actual_(actual)
+    , access_modifier_(access)
 {}
 
 StateCount lang::TypeAlias::getStateCount() const
 {
     return actual_->getStateCount();
+}
+
+lang::AccessModifier lang::TypeAlias::getAccessModifier() const
+{
+    return access_modifier_;
 }
 
 lang::FixedWidthIntegerType const* lang::TypeAlias::isFixedWidthIntegerType() const
@@ -39,6 +48,11 @@ bool lang::TypeAlias::isFixedWidthIntegerType(uint64_t bit_size, bool is_signed)
 bool lang::TypeAlias::isBooleanType() const
 {
     return actual_->isBooleanType();
+}
+
+bool lang::TypeAlias::isCharType() const
+{
+    return actual_->isCharType();
 }
 
 lang::IntegerType const* lang::TypeAlias::isIntegerType() const
@@ -228,6 +242,28 @@ Shared<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::ResolvingHand
     return actual_->buildImplicitConversion(other, value, context);
 }
 
+bool lang::TypeAlias::isOperatorDefined(lang::UnaryOperator op) const
+{
+    return actual_->isOperatorDefined(op);
+}
+
+lang::ResolvingHandle<lang::Type> lang::TypeAlias::getOperatorResultType(lang::UnaryOperator op)
+{
+    return actual_->getOperatorResultType(op);
+}
+
+bool lang::TypeAlias::validateOperator(lang::UnaryOperator op,
+                                       lang::Location      location,
+                                       ValidationLogger&   validation_logger) const
+{
+    return actual_->validateOperator(op, location, validation_logger);
+}
+
+Shared<lang::Value> lang::TypeAlias::buildOperator(lang::UnaryOperator op, Shared<Value> value, CompileContext& context)
+{
+    return actual_->buildOperator(op, value, context);
+}
+
 bool lang::TypeAlias::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
 {
     return actual_->isOperatorDefined(op, other);
@@ -313,23 +349,38 @@ void lang::TypeAlias::buildFinalizer(llvm::Value* ptr, llvm::Value* count, Compi
     actual_->buildFinalizer(ptr, count, context);
 }
 
-void lang::TypeAlias::createConstructors()
+bool lang::TypeAlias::isTriviallyDefaultConstructible() const
 {
-    if (hasCyclicDependency()) return;
-    if (isVoidType() || isReferenceType()) return;
-
-    TypeDefinition::createConstructors();
+    return actual_->getDefinition()->isTriviallyDefaultConstructible();
 }
 
-void lang::TypeAlias::buildNativeDeclaration(CompileContext& context)
+bool lang::TypeAlias::isTriviallyCopyConstructible() const
 {
-    defineConstructors(context);
+    return actual_->getDefinition()->isTriviallyCopyConstructible();
 }
 
-void lang::TypeAlias::buildNativeDefinition(CompileContext& context)
+bool lang::TypeAlias::isTriviallyDestructible() const
 {
-    buildConstructors(context);
+    return actual_->getDefinition()->isTriviallyDestructible();
 }
+
+void lang::TypeAlias::createConstructors() {}
+
+bool lang::TypeAlias::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
+{
+    return actual_->requestOverload(parameters);
+}
+
+void lang::TypeAlias::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>>,
+                                             lang::PredefinedFunction&,
+                                             CompileContext&)
+{
+    assert(false);
+}
+
+void lang::TypeAlias::buildNativeDeclaration(CompileContext&) {}
+
+void lang::TypeAlias::buildNativeDefinition(CompileContext&) {}
 
 std::string lang::TypeAlias::createMangledName() const
 {

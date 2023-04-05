@@ -543,6 +543,12 @@ void lang::Type::buildNativeDefinition(CompileContext& context)
     definition_.value()->buildNativeDefinition(context);
 }
 
+std::vector<std::string> lang::Type::getExportFunctions() const
+{
+    assert(isDefined());
+    return definition_.value()->getExportFunctions();
+}
+
 lang::TypeDefinition* lang::Type::getDefinition()
 {
     return getPtr(definition_);
@@ -790,10 +796,15 @@ static TypeClass getTypeClass(lang::Type* type)
 void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
 {
     if (storage.isWriting()) assert(type->isDefined());
-    if (storage.isReading()) assert(lang::Type::sync_context_ != nullptr);
+    if (storage.isReading()) assert(storage.data_.has_value());
 
     uint8_t type_class = getTypeClass(&*type);
     storage.sync(type_class);
+
+    auto context = [&]() {
+        assert(storage.isReading());
+        return std::any_cast<lang::Context*>(storage.data_);
+    };
 
     switch (type_class)
     {
@@ -818,12 +829,12 @@ void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
             storage.sync(size);
             storage.sync(element_type);
 
-            if (storage.isReading()) { type.reroute(lang::Type::sync_context_->getArrayType(element_type, size)); }
+            if (storage.isReading()) { type.reroute(context()->getArrayType(element_type, size)); }
             break;
         }
         case TypeClass::BOOLEAN:
         {
-            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getBooleanType());
+            if (storage.isReading()) type.reroute(context()->getBooleanType());
             break;
         }
         case TypeClass::BUFFER:
@@ -834,17 +845,17 @@ void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
 
             storage.sync(element_type);
 
-            if (storage.isReading()) { type.reroute(lang::Type::sync_context_->getBufferType(element_type)); }
+            if (storage.isReading()) { type.reroute(context()->getBufferType(element_type)); }
             break;
         }
         case TypeClass::CHAR:
         {
-            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getCharType());
+            if (storage.isReading()) type.reroute(context()->getCharType());
             break;
         }
         case TypeClass::DOUBLE:
         {
-            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getDoubleType());
+            if (storage.isReading()) type.reroute(context()->getDoubleType());
             break;
         }
         case TypeClass::FIXED_WIDTH_INTEGER:
@@ -862,25 +873,23 @@ void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
             storage.sync(is_signed);
 
             if (storage.isReading())
-            {
-                type.reroute(lang::Type::sync_context_->getFixedWidthIntegerType(bits, is_signed));
-            }
+            { type.reroute(context()->getFixedWidthIntegerType(bits, is_signed)); }
 
             break;
         }
         case TypeClass::HALF:
         {
-            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getHalfType());
+            if (storage.isReading()) type.reroute(context()->getHalfType());
             break;
         }
         case TypeClass::NULL_POINTER:
         {
-            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getNullPointerType());
+            if (storage.isReading()) type.reroute(context()->getNullPointerType());
             break;
         }
         case TypeClass::OPAQUE_POINTER:
         {
-            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getOpaquePointerType());
+            if (storage.isReading()) type.reroute(context()->getOpaquePointerType());
             break;
         }
         case TypeClass::POINTER:
@@ -891,12 +900,12 @@ void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
 
             storage.sync(element_type);
 
-            if (storage.isReading()) { type.reroute(lang::Type::sync_context_->getPointerType(element_type)); }
+            if (storage.isReading()) { type.reroute(context()->getPointerType(element_type)); }
             break;
         }
         case TypeClass::QUAD:
         {
-            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getQuadType());
+            if (storage.isReading()) type.reroute(context()->getQuadType());
             break;
         }
         case TypeClass::REFERENCE:
@@ -907,17 +916,17 @@ void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
 
             storage.sync(element_type);
 
-            if (storage.isReading()) { type.reroute(lang::Type::sync_context_->getReferenceType(element_type)); }
+            if (storage.isReading()) { type.reroute(context()->getReferenceType(element_type)); }
             break;
         }
         case TypeClass::SINGLE:
         {
-            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getSingleType());
+            if (storage.isReading()) type.reroute(context()->getSingleType());
             break;
         }
         case TypeClass::UNSIGNED_INTEGER_POINTER:
         {
-            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getUnsignedIntegerPointerType());
+            if (storage.isReading()) type.reroute(context()->getUnsignedIntegerPointerType());
             break;
         }
         case TypeClass::VECTOR:
@@ -934,12 +943,12 @@ void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
             storage.sync(size);
             storage.sync(element_type);
 
-            if (storage.isReading()) { type.reroute(lang::Type::sync_context_->getVectorType(element_type, size)); }
+            if (storage.isReading()) { type.reroute(context()->getVectorType(element_type, size)); }
             break;
         }
         case TypeClass::VOID:
         {
-            if (storage.isReading()) type.reroute(lang::Type::sync_context_->getVoidType());
+            if (storage.isReading()) type.reroute(context()->getVoidType());
             break;
         }
         default:

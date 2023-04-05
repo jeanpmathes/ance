@@ -1,7 +1,7 @@
 #include "AnceSyntaxErrorHandler.h"
 
-#include "grammar/anceLexer.h"
-#include "grammar/anceParser.h"
+#include "anceLexer.h"
+#include "anceParser.h"
 #include "validation/ANSI.h"
 #include "validation/SourceFile.h"
 #include "validation/Strings.h"

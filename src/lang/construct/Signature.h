@@ -44,7 +44,7 @@ namespace lang
          * Get the mangled name. Will create the mangled name if it has not been created yet.
          * @return The mangled name.
          */
-        [[nodiscard]] std::string const& getMangledName();
+        [[nodiscard]] std::string const& getMangledName() const;
 
         /**
          * Get a string representation of the signature.
@@ -67,7 +67,7 @@ namespace lang
       private:
         lang::Identifier                               function_name_;
         std::vector<lang::ResolvingHandle<lang::Type>> types_;
-        std::string                                    mangled_name_ {};
+        mutable std::string                            mangled_name_ {};
     };
 }
 

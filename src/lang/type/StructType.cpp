@@ -7,7 +7,6 @@
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/Scope.h"
-#include "lang/type/ReferenceType.h"
 #include "lang/type/VoidType.h"
 #include "lang/utility/Values.h"
 #include "validation/Utilities.h"
@@ -16,8 +15,10 @@
 lang::StructType::StructType(lang::AccessModifier                              access_modifier,
                              lang::Identifier                                  name,
                              std::vector<std::reference_wrapper<lang::Member>> members,
+                             bool                                              is_imported,
                              lang::Location                                    location)
     : TypeDefinition(name, location)
+    , CustomType(is_imported)
     , access_(access_modifier)
     , members_(std::move(members))
 {

@@ -1,6 +1,7 @@
 #ifndef ANCE_SRC_LANG_UTILITY_STORAGE_H_
 #define ANCE_SRC_LANG_UTILITY_STORAGE_H_
 
+#include <any>
 #include <concepts>
 #include <string>
 
@@ -34,6 +35,7 @@ class Storage
 {
   public:
     virtual ~Storage() = default;
+    std::any data_;
 
     [[nodiscard]] virtual bool isReading() const { return false; }
     [[nodiscard]] virtual bool isWriting() const { return false; }

@@ -11,7 +11,13 @@ namespace lang
     class CustomType : public virtual lang::TypeDefinition
     {
       public:
+        explicit CustomType(bool is_imported);
+
         bool isCustom() const final;
+        bool isImported() const final;
+
+      private:
+        bool is_imported_ {false};
     };
 }
 
