@@ -762,6 +762,8 @@ enum TypeClass : uint8_t
     QUAD,
     REFERENCE,
     SINGLE,
+    SIZE,
+    DIFF,
     UNSIGNED_INTEGER_POINTER,
     VECTOR,
     VOID
@@ -785,6 +787,8 @@ static TypeClass getTypeClass(lang::Type* type)
     if (type->isFloatingPointType(128)) return TypeClass::QUAD;
     if (type->isReferenceType()) return TypeClass::REFERENCE;
     if (type->isFloatingPointType(32)) return TypeClass::SINGLE;
+    if (type->isSizeType()) return TypeClass::SIZE;
+    if (type->isDiffType()) return TypeClass::DIFF;
     if (type->isUnsignedIntegerPointerType()) return TypeClass::UNSIGNED_INTEGER_POINTER;
     if (type->isVectorType()) return TypeClass::VECTOR;
     if (type->isVoidType()) return TypeClass::VOID;
@@ -922,6 +926,16 @@ void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
         case TypeClass::SINGLE:
         {
             if (storage.isReading()) type.reroute(context()->getSingleType());
+            break;
+        }
+        case TypeClass::SIZE:
+        {
+            if (storage.isReading()) type.reroute(context()->getSizeType());
+            break;
+        }
+        case TypeClass::DIFF:
+        {
+            if (storage.isReading()) type.reroute(context()->getDiffType());
             break;
         }
         case TypeClass::UNSIGNED_INTEGER_POINTER:
