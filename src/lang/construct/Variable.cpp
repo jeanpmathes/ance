@@ -153,11 +153,6 @@ lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const
     return lang::makeHandled<lang::Variable>(name());
 }
 
-std::vector<std::string> lang::Variable::getExportSymbols() const
-{
-    return definition_.value()->getExportSymbols();
-}
-
 std::vector<lang::ResolvingHandle<lang::Variable>> lang::Variable::getVariableDependencies()
 {
     return definition_.value()->getVariableDependencies();

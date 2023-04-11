@@ -279,27 +279,6 @@ void lang::TypeDefinition::createConstructors()
     default_constructor_ = &createConstructor({});
 }
 
-std::vector<std::string> lang::TypeDefinition::getExportFunctions() const
-{
-    if (getAccessModifier() != lang::AccessModifier::PUBLIC_ACCESS || isImported()) return {};
-
-    std::vector<std::string> functions;
-
-    functions.reserve(requested_constructors_.size() + 4);
-    for (auto const& [parameters, function] : requested_constructors_)
-    {
-        functions.push_back(function->function().getLinkageName());
-    }
-
-    if (default_constructor_) functions.push_back(default_constructor_->function().getLinkageName());
-
-    if (default_initializer_) functions.emplace_back(default_initializer_->getName());
-    if (copy_initializer_) functions.emplace_back(copy_initializer_->getName());
-    if (default_finalizer_) functions.emplace_back(default_finalizer_->getName());
-
-    return functions;
-}
-
 llvm::Type* lang::TypeDefinition::getNativeType(llvm::LLVMContext& c) const
 {
     return llvm::PointerType::get(getContentType(c), 0);
@@ -540,6 +519,8 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
                                                       getAccessModifier().linkage(),
                                                       "ctor_default$" + getMangledName(),
                                                       context.llvmModule());
+
+        lang::Function::setImportExportAttributes(default_initializer_, getAccessModifier(), isImported(), context);
     }
 
     if (!isTriviallyCopyConstructible())
@@ -553,11 +534,14 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
                                                    getAccessModifier().linkage(),
                                                    "ctor_copy$" + getMangledName(),
                                                    context.llvmModule());
+
+        lang::Function::setImportExportAttributes(copy_initializer_, getAccessModifier(), isImported(), context);
     }
 
     if (!isTriviallyDestructible())
     {
-        llvm::FunctionType* default_finalizer_type = llvm::FunctionType::get(llvm::Type::getVoidTy(context.llvmContext()),
+        llvm::FunctionType* default_finalizer_type =
+            llvm::FunctionType::get(llvm::Type::getVoidTy(context.llvmContext()),
                                     {getNativeType(context.llvmContext()),
                                      scope()->context().getSizeType()->getContentType(context.llvmContext())},
                                     false);
@@ -566,6 +550,8 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
                                                     getAccessModifier().linkage(),
                                                     "dtor_default$" + getMangledName(),
                                                     context.llvmModule());
+
+        lang::Function::setImportExportAttributes(default_finalizer_, getAccessModifier(), isImported(), context);
     }
 
     defineConstructors(context);

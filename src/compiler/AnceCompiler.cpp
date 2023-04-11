@@ -162,6 +162,7 @@ void AnceCompiler::compile(std::filesystem::path const& out)
 
 void AnceCompiler::emitObject(std::filesystem::path const& out)
 {
+
     std::error_code      ec;
     llvm::raw_fd_ostream s(out.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
 
@@ -225,6 +226,9 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::
                                                    llvm::GlobalValue::LinkageTypes::ExternalLinkage,
                                                    WIN_EXE_MAIN_NAME,
                                                    module_);
+
+    start->addFnAttr(llvm::Attribute::AttrKind::UWTable);
+    start->setDSOLocal(true);
 
     llvm::BasicBlock* start_block = llvm::BasicBlock::Create(llvm_context_, "entry", start);
 

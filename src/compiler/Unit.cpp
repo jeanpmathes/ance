@@ -190,8 +190,3 @@ lang::GlobalScope const& Unit::globalScope() const
 {
     return *global_scope_;
 }
-
-std::vector<std::string> Unit::getExportedSymbols() const
-{
-    return global_scope_->getExportSymbols();
-}

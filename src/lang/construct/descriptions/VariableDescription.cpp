@@ -183,6 +183,11 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
         validation_logger.logError("Global variables cannot be extern", location_);
     }
 
+    if (access_ == lang::AccessModifier::PUBLIC_ACCESS)
+    {
+        validation_logger.logError("Public global variables are currently not supported", location_);
+    }
+
     if (type_.hasValue())
     {
         if (lang::validation::isTypeUndefined(type_handle_, type_location_, validation_logger)) return;
@@ -204,13 +209,13 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
 
     if (!constant_init_ && is_constant_)
     {
-        validation_logger.logError("Constants require an explicit constant initializer", type_location_);
+        validation_logger.logError("Constants require an explicit constant initializer", location_);
         return;
     }
 
     if (is_constant_ && !assigner_.isFinal())
     {
-        validation_logger.logError("Assignment to constants must be final", type_location_);
+        validation_logger.logError("Assignment to constants must be final", location_);
         return;
     }
 

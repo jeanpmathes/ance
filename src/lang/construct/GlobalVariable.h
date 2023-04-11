@@ -54,7 +54,6 @@ namespace lang
 
         [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() override;
         [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Variable>> getVariableDependencies() override;
-        [[nodiscard]] std::vector<std::string>                           getExportSymbols() const override;
 
         /**
          * Get all variable dependencies of a variable by traversing the function dependencies.

@@ -18,25 +18,6 @@ lang::Identifier const& lang::FunctionGroup::name() const
     return name_;
 }
 
-std::vector<std::string> lang::FunctionGroup::getExportSymbols() const
-{
-    std::vector<std::string> exports;
-
-    for (auto& function : functions())
-    {
-        if (function->isImported()) continue;
-
-        auto access = function->access();
-
-        if (access == AccessModifier::EXTERN_ACCESS || access == AccessModifier::PUBLIC_ACCESS)
-        {
-            exports.emplace_back(function->getLinkageName());
-        }
-    }
-
-    return exports;
-}
-
 bool lang::FunctionGroup::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>>)
 {
     return false;

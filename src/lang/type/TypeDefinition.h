@@ -182,8 +182,6 @@ namespace lang
 
         virtual void createConstructors();
 
-        [[nodiscard]] virtual std::vector<std::string> getExportFunctions() const;
-
         /**
          * Whether this type can be default-constructed by zeroing memory.
          */

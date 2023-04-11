@@ -1,20 +1,66 @@
 #include "AnceLinker.h"
 
 #include <lld/Common/Driver.h>
+#include <llvm/Support/CrashRecoveryContext.h>
 
 #include "compiler/Unit.h"
 #include "lang/ApplicationVisitor.h"
+
+/**
+ * Based on lld/tools/lld/lld.cpp (lld::lldMain)
+ */
+static bool lldRun(llvm::Triple::OSType os_type, std::vector<char const*>& args, std::ostream& stream)
+{
+    std::string              output;
+    llvm::raw_string_ostream llvm_stream(output);
+
+    switch (os_type)
+    {
+        case llvm::Triple::OSType::Win32:
+        {
+            bool const ok = lld::coff::link(args, llvm_stream, llvm_stream, false, false);
+            stream << output;// Newline added by lld.
+            return ok;
+        }
+        default:
+            stream << "ance: build: unsupported target OS" << std::endl;
+            return false;
+    }
+}
+
+/**
+ * Based on lld/tools/lld/lld.cpp (lld::safeLldMain)
+ */
+static bool lldRunSafely(llvm::Triple::OSType os_type, std::vector<char const*>& args, std::ostream& stream)
+{
+    bool ok = true;
+
+    {
+        llvm::CrashRecoveryContext crc;
+        if (!crc.RunSafely([&]() { ok = lldRun(os_type, args, stream); })) { lld::exitLld(crc.RetCode); }
+    }
+
+    llvm::CrashRecoveryContext crc;
+    if (!crc.RunSafely([&]() { lld::CommonLinkerContext::destroy(); }))
+    {
+        lld::exitLld(ok ? crc.RetCode : EXIT_FAILURE);
+    }
+
+    return ok;
+}
 
 AnceLinker::AnceLinker(Unit& unit) : unit_(unit) {}
 
 bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path const& app, std::ostream& stream)
 {
     std::vector<char const*> args;
+
     args.push_back("lld");
 
     if (unit_.getOptimizationLevel().getDebugEmissionKind() == llvm::DICompileUnit::DebugEmissionKind::FullDebug)
     {
         args.push_back("/debug:FULL");
+        args.push_back("/debug:dwarf");
     }
 
     args.push_back("/nologo");
@@ -30,13 +76,6 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
 
     std::string const out_lib = "/implib:" + (app.parent_path() / (app.stem().string() + ".lib")).string();
     args.push_back(out_lib.c_str());
-
-    std::vector<std::string> export_symbols;
-    for (auto const& export_function : unit_.getExportedSymbols())
-    {
-        export_symbols.push_back("/export:" + export_function);
-        args.push_back(export_symbols.back().c_str());
-    }
 
     std::string const resource_data_directory_name       = "ANCE_RESOURCE_DATA_DIRECTORY";
     char const*       resource_data_directory_path_value = std::getenv(resource_data_directory_name.c_str());
@@ -112,7 +151,7 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     std::string const in = obj.string();
     args.push_back(in.c_str());
 
-    return lld::mingw::link(args, llvm::outs(), llvm::errs(), false, false);
+    return lldRunSafely(unit_.getTargetTriple().getOS(), args, stream);
 }
 
 bool AnceLinker::getTargetRequirements(std::vector<std::string>& libs,

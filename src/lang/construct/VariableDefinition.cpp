@@ -64,11 +64,6 @@ std::vector<lang::ResolvingHandle<lang::Function>> lang::VariableDefinition::get
     return {};
 }
 
-std::vector<std::string> lang::VariableDefinition::getExportSymbols() const
-{
-    return {};
-}
-
 void lang::VariableDefinition::setValue(Shared<lang::Value> value, CompileContext& context)
 {
     if (type()->isReferenceType())

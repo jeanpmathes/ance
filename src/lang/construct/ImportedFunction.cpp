@@ -53,6 +53,8 @@ void lang::ImportedFunction::createNativeBacking(CompileContext& context)
                                                                     context.llvmContext(),
                                                                     context.llvmModule());
 
+    lang::Function::setImportExportAttributes(native_function_, access_, true, context);
+
     auto params = parameters();
 
     for (unsigned int i = 0; i < params.size(); ++i) { params[i]->wrap(native_function_->getArg(i)); }

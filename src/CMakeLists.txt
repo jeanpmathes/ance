@@ -8,7 +8,7 @@ add_subdirectory(validation)
 target_include_directories(ance PUBLIC .)
 target_include_directories(ance SYSTEM PRIVATE grammar)
 
-set(LLD_AVAILABLE_LIBS lldCommon;lldCOFF;lldELF;lldMachO;lldMinGW;lldWasm)
+set(LLD_AVAILABLE_LIBS lldCommon lldCOFF lldELF lldMachO lldMinGW lldWasm)
 
 target_link_libraries(ance PRIVATE ${ANTLR4_LIB})
 target_link_libraries(ance PRIVATE ${LLVM_AVAILABLE_LIBS} ${LLD_AVAILABLE_LIBS})

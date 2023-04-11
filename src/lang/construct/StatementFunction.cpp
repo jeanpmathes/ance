@@ -137,6 +137,8 @@ void lang::StatementFunction::createNativeBacking(CompileContext& context)
     std::tie(native_type_, native_function_) =
         createNativeFunction(access_.linkage(), context.llvmContext(), context.llvmModule());
 
+    lang::Function::setImportExportAttributes(native_function_, access_, false, context);
+
     auto params = parameters();
 
     for (unsigned int i = 0; i < params.size(); ++i) { params[i]->wrap(native_function_->getArg(i)); }

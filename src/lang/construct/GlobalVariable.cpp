@@ -82,12 +82,31 @@ void lang::GlobalVariable::buildDeclaration(CompileContext& context)
     }
     else if (!is_import_) { native_initializer = type()->getDefaultContent(context.llvmModule()); }
 
+    llvm::Type*       native_type  = type()->getContentType(context.llvmModule().getContext());
+    std::string const linkage_name = std::string(name().text());
+
     native_variable_ = new llvm::GlobalVariable(context.llvmModule(),
-                                                type()->getContentType(context.llvmModule().getContext()),
+                                                native_type,
                                                 is_constant_,
                                                 access_.linkage(),
                                                 native_initializer,
-                                                name().text());
+                                                linkage_name,
+                                                nullptr,
+                                                llvm::GlobalValue::NotThreadLocal,
+                                                llvm::None,
+                                                is_import_);
+
+    llvm::GlobalValue::DLLStorageClassTypes dll_storage_class = llvm::GlobalValue::DefaultStorageClass;
+    if (access_ == AccessModifier::PUBLIC_ACCESS)
+    {
+        dll_storage_class =
+            is_import_ ? llvm::GlobalValue::DLLImportStorageClass : llvm::GlobalValue::DLLExportStorageClass;
+    }
+    native_variable_->setDLLStorageClass(dll_storage_class);
+    native_variable_->setDSOLocal(!is_import_);
+
+    llvm::MaybeAlign const alignment = context.llvmModule().getDataLayout().getABITypeAlign(native_type);
+    native_variable_->setAlignment(alignment);
 
     auto* debug_info = context.di().createGlobalVariableExpression(&context.llvmUnit(),
                                                                    name().text(),
@@ -144,14 +163,6 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::getVari
     }
 
     return {};
-}
-
-std::vector<std::string> lang::GlobalVariable::getExportSymbols() const
-{
-    if (is_import_) return {};
-    if (access_ != AccessModifier::PUBLIC_ACCESS) return {};
-
-    return {std::string(name().text())};
 }
 
 Shared<lang::Value> lang::GlobalVariable::getValue(CompileContext&)

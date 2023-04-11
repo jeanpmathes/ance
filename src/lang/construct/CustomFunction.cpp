@@ -128,7 +128,7 @@ void lang::CustomFunction::createNativeBacking(CompileContext& context)
     llvm::DISubprogram*     subprogram =
         context.di().createFunction(scope().getDebugScope(context),
                                     name().text(),
-                                    isMangled() ? signature_.getMangledName() : name().text(),
+                                    native_function->getName(),
                                     context.getSourceFile(location()),
                                     static_cast<unsigned>(location().line()),
                                     debug_type,

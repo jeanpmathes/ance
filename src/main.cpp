@@ -29,6 +29,7 @@ static Optional<int> emit(SourceTree&        tree,
     {
         bool const failed_by_warning = validation_logger.errorCount() == 0;
 
+        out << std::endl;
         out << "ance: validation: Failed";
         if (failed_by_warning) out << " (by warning)";
         out << std::endl;
@@ -87,7 +88,7 @@ static Optional<int> build(SourceTree&                  tree,
     std::filesystem::create_directories(bin_dir);
 
     std::filesystem::path const ilr = obj_dir / (tree.unit().getName() + ".ll");
-    std::filesystem::path const obj = obj_dir / (tree.unit().getName() + ".o");
+    std::filesystem::path const obj = obj_dir / (tree.unit().getName() + ".obj");
     std::filesystem::path const res = getResultPath(bin_dir, tree.unit(), tree.unit().getTargetTriple());
 
     compiler.compile(ilr);

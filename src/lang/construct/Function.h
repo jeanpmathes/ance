@@ -295,6 +295,18 @@ namespace lang
         void resolve() override;
         void postResolve() override;
 
+        /**
+         * Set the import/export attributes of a function.
+         * @param function The function to set the attributes for.
+         * @param access_modifier The access modifier of the function.
+         * @param is_imported True if the function is imported, false otherwise.
+         * @param context The current compile context.
+         */
+        static void setImportExportAttributes(llvm::Function*      function,
+                                              lang::AccessModifier access_modifier,
+                                              bool                 is_imported,
+                                              CompileContext&      context);
+
       protected:
         bool resolveDefinition(lang::ResolvingHandle<lang::Variable> variable) override;
         bool resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;

@@ -376,3 +376,14 @@ bool lang::Function::resolveDefinition(lang::ResolvingHandle<lang::Type> type)
 {
     return scope()->resolveDefinition(type);
 }
+
+void lang::Function::setImportExportAttributes(llvm::Function*      function,
+                                               lang::AccessModifier access_modifier,
+                                               bool                 is_imported,
+                                               CompileContext&)
+{
+    if (access_modifier.linkage() != llvm::GlobalValue::LinkageTypes::ExternalLinkage) return;
+
+    if (is_imported) { function->setDLLStorageClass(llvm::GlobalValue::DLLStorageClassTypes::DLLImportStorageClass); }
+    else { function->setDLLStorageClass(llvm::GlobalValue::DLLStorageClassTypes::DLLExportStorageClass); }
+}
