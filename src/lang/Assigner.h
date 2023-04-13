@@ -3,6 +3,8 @@
 
 #include <string>
 
+class Storage;
+
 namespace lang
 {
     /**
@@ -11,7 +13,7 @@ namespace lang
     class Assigner
     {
       public:
-        enum Value
+        enum Value : uint8_t
         {
             /**
              * A simple copy assignment.
@@ -45,19 +47,24 @@ namespace lang
          * Get whether this assignment is final.
          * @return True if this assignment is final.
          */
-        bool isFinal() const;
+        [[nodiscard]] bool isFinal() const;
 
         /**
          * Get whether this assignment is represented by a symbol.
          * @return True if a symbol exists for this assignment.
          */
-        bool hasSymbol() const;
+        [[nodiscard]] bool hasSymbol() const;
 
         /**
          * Get the symbol for this assignment.
          * @return The symbol for this assignment.
          */
-        std::string getSymbol() const;
+        [[nodiscard]] std::string getSymbol() const;
+
+        /**
+         * Perform storage synchronization.
+         */
+        static void synchronize(lang::Assigner* assigner, Storage& storage);
 
       private:
         Value value_;

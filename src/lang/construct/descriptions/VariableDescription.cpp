@@ -183,11 +183,6 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
         validation_logger.logError("Global variables cannot be extern", location_);
     }
 
-    if (access_ == lang::AccessModifier::PUBLIC_ACCESS)
-    {
-        validation_logger.logError("Public global variables are currently not supported", location_);
-    }
-
     if (type_.hasValue())
     {
         if (lang::validation::isTypeUndefined(type_handle_, type_location_, validation_logger)) return;
@@ -301,4 +296,5 @@ void lang::VariableDescription::sync(Storage& storage)
     storage.sync(name_);
     storage.sync(type_handle_);
     storage.sync(is_constant_);
+    storage.sync(assigner_);
 }

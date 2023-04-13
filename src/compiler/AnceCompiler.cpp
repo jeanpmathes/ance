@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 
+#include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/MC/TargetRegistry.h>
@@ -164,20 +165,13 @@ void AnceCompiler::emitObject(std::filesystem::path const& out)
 {
 
     std::error_code      ec;
-    llvm::raw_fd_ostream s(out.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
+    llvm::raw_fd_ostream file(out.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
 
     if (ec) { std::cerr << "IO error while creating object file stream: " << ec.message() << std::endl; }
 
-    llvm::legacy::PassManager pass;
-    auto                      type = llvm::CGFT_ObjectFile;
+    llvm::WriteBitcodeToFile(module_, file);
 
-    if (target_machine_->addPassesToEmitFile(pass, s, nullptr, type))
-    {
-        std::cerr << "Cannot emit object files for current target." << std::endl;
-    }
-
-    pass.run(module_);
-    s.flush();
+    file.flush();
 }
 
 llvm::Function* AnceCompiler::buildInit()

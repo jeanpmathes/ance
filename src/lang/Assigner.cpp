@@ -1,6 +1,7 @@
 #include <cassert>
 
 #include "lang/Assigner.h"
+#include "lang/utility/Storage.h"
 
 lang::Assigner::operator Value() const
 {
@@ -33,4 +34,11 @@ std::string lang::Assigner::getSymbol() const
         default:
             return "";
     }
+}
+
+void lang::Assigner::synchronize(lang::Assigner* assigner, Storage& storage)
+{
+    uint8_t value = assigner->value_;
+    storage.sync(value);
+    assigner->value_ = static_cast<Value>(value);
 }
