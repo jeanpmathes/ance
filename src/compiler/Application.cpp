@@ -21,6 +21,17 @@ std::string const& Application::getName() const
 
 void Application::validate(ValidationLogger& validation_logger) const
 {
+    std::string const name_according_to_file = project_.getProjectFile().stem().generic_string();
+    std::string const name_according_to_path = project_.getProjectDirectory().stem().generic_string();
+
+    bool const names_match = name_according_to_file == name_according_to_path && name_according_to_file == getName();
+
+    if (!names_match)
+    {
+        validation_logger.logError("Project name does not match project file name or project directory name",
+                                   lang::Location::global());
+    }
+
     this->globalScope().validate(validation_logger);
 
     if (getType() == UnitResult::EXECUTABLE)
