@@ -78,7 +78,7 @@ std::string lang::Location::toString(CompileContext& context)
 
 std::ostream& lang::operator<<(std::ostream& os, lang::Location const& location)
 {
-    if (!location.isGlobal()) { os << "(" << location.start_line_ << ", " << location.start_column_ << ")"; }
+    if (!location.isGlobal()) { os << "(" << location.start_line_ << ":" << location.start_column_ << ")"; }
     else { os << "()"; }
 
     return os;

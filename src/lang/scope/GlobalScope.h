@@ -63,6 +63,13 @@ namespace lang
         void validateFlow(ValidationLogger& validation_logger) const;
 
         /**
+         * Set the source (package) that is currently used.
+         * All descriptions added after this call will be associated with this source.
+         * @param source The source to set, or nullopt to set the current project as source.
+         */
+        void setCurrentDescriptionSource(std::optional<std::string> source);
+
+        /**
          * Add an description element to this scope.
          * @param description The description to add.
          */
@@ -153,9 +160,20 @@ namespace lang
       private:
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);
 
-        std::map<lang::Identifier, std::vector<Owned<lang::Description>>> compatible_descriptions_;
-        std::set<lang::Identifier>                                        conflicting_description_names_;
-        std::vector<Owned<lang::Description>>                             conflicting_descriptions_;
+        std::optional<std::string> current_description_source_;
+
+        struct AssociatedDescription {
+            std::optional<std::string> source;
+            Owned<lang::Description>   description;
+
+            AssociatedDescription(std::optional<std::string> new_source, Owned<lang::Description> new_description)
+                : source(std::move(new_source))
+                , description(std::move(new_description))
+            {}
+        };
+
+        std::map<lang::Identifier, std::vector<AssociatedDescription>> compatible_descriptions_;
+        std::map<lang::Identifier, std::vector<AssociatedDescription>> incompatible_descriptions_;
 
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
         std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> defined_function_groups_;

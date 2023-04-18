@@ -86,7 +86,10 @@ void lang::TypeRegistry<OTHER_KEY>::clear()
 template<typename OTHER_KEY>
 void lang::TypeRegistry<OTHER_KEY>::postResolve()
 {
-    for (auto& [key, type] : types_) { type->postResolve(); }
+    for (auto& [key, type] : types_)
+    {
+        if (type->isDefined()) type->postResolve();
+    }
 }
 
 template<typename OTHER_KEY>

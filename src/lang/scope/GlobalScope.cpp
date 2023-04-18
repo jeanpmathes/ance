@@ -48,28 +48,73 @@ llvm::DIScope* lang::GlobalScope::getDebugScope(CompileContext& context) const
 
 void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 {
-    for (auto const& description : conflicting_descriptions_)
+    for (auto const& [name, associated_descriptions] : incompatible_descriptions_)
     {
-        validation_logger.logError("Name '" + description->name() + "' already defined in the current context",
-                                   description->name().location());
+        bool              first_source = true;
+        std::stringstream source_list;
+        size_t            conflicting_imports = 0;
+
+        std::vector<lang::Identifier> internal_conflicts;
+
+        for (auto const& [source, description] : associated_descriptions)
+        {
+            if (source.has_value())
+            {
+                if (first_source) first_source = false;
+                else source_list << ", ";
+
+                source_list << "'";
+                source_list << source.value();
+                source_list << "'";
+
+                conflicting_imports++;
+            }
+            else { internal_conflicts.emplace_back(description->name()); }
+        }
+
+        assert(conflicting_imports + internal_conflicts.size() > 1);
+
+        if (conflicting_imports > 1)
+        {
+            validation_logger.logError("Multiple definitions with the name '" + name
+                                           + "' are imported from: " + source_list.str(),
+                                       lang::Location::global());
+        }
+
+        for (auto const& internal_conflict : internal_conflicts)
+        {
+            if (conflicting_imports == 0)
+            {
+                validation_logger.logError("Multiple definitions with the name '" + name
+                                               + "' are defined in the same scope",
+                                           internal_conflict.location());
+            }
+            else
+            {
+                validation_logger.logError("Multiple definitions with the name '" + name
+                                               + "' are defined in the same scope and imported from: "
+                                               + source_list.str(),
+                                           internal_conflict.location());
+            }
+        }
     }
 
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
         for (auto& description : descriptions)
         {
-            if (description->isImported()) continue;
-            description->validate(validation_logger);
+            if (description.description->isImported()) continue;
+            description.description->validate(validation_logger);
         }
     }
 
     for (auto& [key, function] : defined_function_groups_) { function->validate(validation_logger); }
 
+    auto& global_defined_variables = const_cast<GlobalScope*>(this)->global_defined_variables_;
+
     std::vector<lang::ResolvingHandle<lang::Variable>> global_variables;
-    for (auto& [name, variable] : const_cast<GlobalScope*>(this)->global_defined_variables_)
-    {
-        global_variables.emplace_back(variable.handle());
-    }
+    global_variables.reserve(global_defined_variables.size());
+    for (auto& [name, variable] : global_defined_variables) { global_variables.emplace_back(variable.handle()); }
 
     lang::GlobalVariable::determineOrder(global_variables, &validation_logger);
 }
@@ -82,7 +127,8 @@ Owned<lang::GlobalScope> lang::GlobalScope::expand() const
     {
         for (auto& description : descriptions)
         {
-            std::vector<Owned<lang::Description>> new_descriptions = description->expand(expanded_scope->context());
+            std::vector<Owned<lang::Description>> new_descriptions =
+                description.description->expand(expanded_scope->context());
 
             for (auto& new_description : new_descriptions)
             {
@@ -104,13 +150,19 @@ void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger) const
     for (auto& [key, function] : defined_function_groups_) { function->validateFlow(validation_logger); }
 }
 
+void lang::GlobalScope::setCurrentDescriptionSource(std::optional<std::string> source)
+{
+    current_description_source_ = std::move(source);
+}
+
 void lang::GlobalScope::addDescription(Owned<lang::Description> description)
 {
     addChild(*description);
 
-    if (conflicting_description_names_.contains(description->name()))
+    if (incompatible_descriptions_.contains(description->name()))
     {
-        conflicting_descriptions_.push_back(std::move(description));
+        incompatible_descriptions_[description->name()].emplace_back(current_description_source_,
+                                                                     std::move(description));
         return;
     }
 
@@ -123,16 +175,15 @@ void lang::GlobalScope::addDescription(Owned<lang::Description> description)
         assert(not conflicting_description.empty());
 
         bool const is_overload_allowed =
-            description->isOverloadAllowed() && conflicting_description.front()->isOverloadAllowed();
+            description->isOverloadAllowed() && conflicting_description.front().description->isOverloadAllowed();
 
         if (not is_overload_allowed)
         {
-            conflicting_description_names_.emplace(description->name());
-
             std::move(conflicting_description.begin(),
                       conflicting_description.end(),
-                      std::back_inserter(conflicting_descriptions_));
-            conflicting_descriptions_.push_back(std::move(description));
+                      std::back_inserter(incompatible_descriptions_[description->name()]));
+            incompatible_descriptions_[description->name()].emplace_back(current_description_source_,
+                                                                         std::move(description));
 
             compatible_descriptions_.erase(conflict);
 
@@ -140,7 +191,7 @@ void lang::GlobalScope::addDescription(Owned<lang::Description> description)
         }
     }
 
-    compatible_descriptions_[description->name()].push_back(std::move(description));
+    compatible_descriptions_[description->name()].emplace_back(current_description_source_, std::move(description));
 }
 
 void lang::GlobalScope::addFunction(lang::OwningHandle<lang::Function> function)
@@ -275,14 +326,14 @@ void lang::GlobalScope::resolve()
 {
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
-        for (auto& description : descriptions) { description->initialize(*this); }
+        for (auto& description : descriptions) { description.description->initialize(*this); }
     }
 
     for (auto& [key, group] : defined_function_groups_) { group->resolve(); }
 
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
-        for (auto& description : descriptions) { description->resolve(); }
+        for (auto& description : descriptions) { description.description->resolve(); }
     }
 
     // Type registries are currently incorrect, as they resolve type dependencies in an incorrect scope.
@@ -300,7 +351,7 @@ void lang::GlobalScope::postResolve()
 
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
-        for (auto& description : descriptions) { description->postResolve(); }
+        for (auto& description : descriptions) { description.description->postResolve(); }
     }
 }
 
@@ -387,6 +438,7 @@ void lang::GlobalScope::buildFunctions(CompileContext& context)
 void lang::GlobalScope::buildInitialization(CompileContext& context)
 {
     std::vector<lang::ResolvingHandle<lang::Variable>> global_variables;
+    global_variables.reserve(global_defined_variables_.size());
     for (auto& [name, variable] : global_defined_variables_) { global_variables.emplace_back(variable.handle()); }
 
     global_variables = GlobalVariable::determineOrder(global_variables, nullptr);
@@ -435,10 +487,10 @@ void lang::GlobalScope::synchronize(lang::GlobalScope* scope, Storage& storage)
         {
             for (auto& description : descriptions)
             {
-                if (description->access() != lang::AccessModifier::PUBLIC_ACCESS) continue;
-                if (description->isImported()) continue;
+                if (description.description->access() != lang::AccessModifier::PUBLIC_ACCESS) continue;
+                if (description.description->isImported()) continue;
 
-                export_descriptions.emplace_back(&*description);
+                export_descriptions.emplace_back(&*description.description);
             }
         }
     }
