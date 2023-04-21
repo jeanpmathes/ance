@@ -122,7 +122,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
 
     using PrepareFunction = std::function<PrepareFunctionType>;
 
-    using BuildFunctionType = bool(Project& project, Packages const& packages);
+    using BuildFunctionType = bool(Project& project, Packages const& packages, std::set<std::string>, std::ostream&);
 
     using BuildFunction = std::function<BuildFunctionType>;
 
@@ -131,7 +131,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      * @param packages The packages object.
      * @param prepare The function to prepare a package.
      * @param dir The directory to output build files and logs to. Subdirectories will be created.
-     * @param out The output stream to log general information to, related to the overall build process.
+     * @param out The output stream to log general information to, related to current build process.
      */
     bool preparePackageDependencies(Packages const&              packages,
                                     PrepareFunction const&       prepare,
@@ -145,14 +145,18 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      * @param dir The directory to output build files and logs to. Subdirectories will be created.
      * @param bin_base Path to the binary directory, all package binaries will be copied to this directory.
      * @param bin_suffix Suffix that leads from the build directory of a package to the binary directory of the package.
-     * @param out The output stream to log general information to, related to the overall build process.
+     * @param out The output stream to log general information to, related to the current build process.
+     * @param included_packages Packages that are already included in a higher level package.
+     * @param root_out The output stream to log general information to, related to the uppermost build process.
      */
     bool buildPackageDependencies(Packages const&              packages,
                                   BuildFunction const&         build,
                                   std::filesystem::path const& dir,
                                   std::filesystem::path const& bin_base,
                                   std::filesystem::path const& bin_suffix,
-                                  std::ostream&                out);
+                                  std::ostream&                out,
+                                  std::set<std::string>        included_packages,
+                                  std::ostream&                root_out);
 
     /**
      * Export this unit as a package.

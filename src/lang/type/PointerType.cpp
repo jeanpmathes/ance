@@ -5,7 +5,6 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/scope/GlobalScope.h"
-#include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/VoidType.h"
 #include "validation/Utilities.h"

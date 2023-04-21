@@ -6,6 +6,7 @@
 #include <llvm/Support/TargetSelect.h>
 
 #include <boost/locale.hpp>
+#include <utility>
 
 #include "compiler/AnceCompiler.h"
 #include "compiler/AnceLinker.h"
@@ -96,7 +97,10 @@ static bool build(SourceTree&                  tree,
     return linker.link(obj, res, out);
 }
 
-static bool buildProject(Project& project, Packages const& packages);
+static bool buildProject(Project&              project,
+                         Packages const&       packages,
+                         std::set<std::string> included_packages,
+                         std::ostream&         root_out);
 
 static Optional<Owned<Project>> prepareProject(std::filesystem::path const&           project_file_path,
                                                Optional<std::filesystem::path> const& override_build_dir,
@@ -136,6 +140,8 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
                                                   project_definition_root,
                                                   project_definition_bin,
                                                   bin_suffix,
+                                                  out,
+                                                  {},
                                                   out);
 
         if (!ok) return std::nullopt;
@@ -173,7 +179,10 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
                               });
 }
 
-static bool buildProject(Project& project, Packages const& packages)
+static bool buildProject(Project&              project,
+                         Packages const&       packages,
+                         std::set<std::string> included_packages,
+                         std::ostream&         root_out)
 {
     Application&            application = project.getApplication();
     Application::BuildInfo& info        = application.getBuildInfo();
@@ -187,8 +196,14 @@ static bool buildProject(Project& project, Packages const& packages)
     auto ok = application.preparePackageDependencies(packages, prepareProject, info.build_dir, info.out);
     if (!ok) return false;
 
-    ok = application
-             .buildPackageDependencies(packages, buildProject, info.build_dir, bin_dir, info.bin_suffix, info.out);
+    ok = application.buildPackageDependencies(packages,
+                                              buildProject,
+                                              info.build_dir,
+                                              bin_dir,
+                                              info.bin_suffix,
+                                              info.out,
+                                              std::move(included_packages),
+                                              root_out);
     if (!ok) return false;
 
     SourceTree   tree(application);
@@ -225,7 +240,7 @@ static bool run(std::ostream&                          out,
 
     auto project = prepareProject(project_file_path, override_build_dir, out, packages);
 
-    if (project.hasValue()) { return buildProject(**project, packages); }
+    if (project.hasValue()) { return buildProject(**project, packages, {(**project).getName()}, out); }
 
     return false;
 }

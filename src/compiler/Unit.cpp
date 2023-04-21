@@ -55,6 +55,13 @@ bool Unit::preparePackageDependencies(Packages const&              packages,
 
     for (auto const& dependency : dependencies)
     {
+        if (dependency == getName())
+        {
+            out << "ance: packages: Package '" << dependency << "' depends on itself" << std::endl;
+            valid = false;
+            continue;
+        }
+
         if (package_names.contains(dependency))
         {
             out << "ance: packages: Package '" << dependency << "' is already a dependency, skipping" << std::endl;
@@ -120,7 +127,9 @@ bool Unit::buildPackageDependencies(Packages const&              packages,
                                     std::filesystem::path const& dir,
                                     std::filesystem::path const& bin_base,
                                     std::filesystem::path const& bin_suffix,
-                                    std::ostream&                out)
+                                    std::ostream&                out,
+                                    std::set<std::string> const  included_packages,
+                                    std::ostream&                root_out)
 {
     bool              valid = true;
     std::vector<bool> status_codes;
@@ -130,10 +139,21 @@ bool Unit::buildPackageDependencies(Packages const&              packages,
 
     for (auto& [project, package] : dependencies_)
     {
+        if (included_packages.contains(package.name))
+        {
+            root_out << "ance: packages: Package '" << package.name << "', required by '" << getName()
+                     << "', is part of a circular dependency" << std::endl;
+            valid = false;
+            continue;
+        }
+
+        std::set<std::string> new_included_packages = included_packages;
+        new_included_packages.insert(package.name);
+
         Optional<std::filesystem::path> const destination = bld_dir / package.name;
         std::filesystem::create_directories(destination.value());
 
-        bool const is_ok = build(**project, packages);
+        bool const is_ok = build(**project, packages, new_included_packages, root_out);
 
         if (is_ok)
         {
