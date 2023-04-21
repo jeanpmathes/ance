@@ -17,10 +17,7 @@
 #include "lang/ApplicationVisitor.h"
 #include "validation/ValidationLogger.h"
 
-static Optional<int> emit(SourceTree&        tree,
-                          ValidationLogger&  validation_logger,
-                          std::ostream&      out,
-                          std::string const& step_name)
+static bool emit(SourceTree& tree, ValidationLogger& validation_logger, std::ostream& out, std::string const& step_name)
 {
     validation_logger.emitMessages(tree.getSourceFiles(), out, step_name);
 
@@ -34,22 +31,22 @@ static Optional<int> emit(SourceTree&        tree,
         if (failed_by_warning) out << " (by warning)";
         out << std::endl;
 
-        return EXIT_FAILURE;
+        return false;
     }
 
     validation_logger.clear();
 
-    return {};
+    return true;
 }
 
 /**
  * The first validation step. Operates on the AST. 
  */
-static Optional<int> validateTree(SourceTree& tree, ValidationLogger& validation_logger, std::ostream& out)
+static bool validateTree(SourceTree& tree, ValidationLogger& validation_logger, std::ostream& out)
 {
     size_t const fatal_syntax_error_count = tree.emitMessages(out);
 
-    if (fatal_syntax_error_count != 0) return EXIT_FAILURE;
+    if (fatal_syntax_error_count != 0) return false;
 
     tree.buildAbstractSyntaxTree();
 
@@ -63,7 +60,7 @@ static Optional<int> validateTree(SourceTree& tree, ValidationLogger& validation
 /**
  * The second validation steps. Operates on the CFG.
  */
-static Optional<int> validateFlow(SourceTree& tree, ValidationLogger& validation_logger, std::ostream& out)
+static bool validateFlow(SourceTree& tree, ValidationLogger& validation_logger, std::ostream& out)
 {
     tree.unit().validateFlow(validation_logger);
 
@@ -75,11 +72,11 @@ static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir,
     return bin_dir / (unit.getName() + unit.getType().getExtension(triple));
 }
 
-static Optional<int> build(SourceTree&                  tree,
-                           llvm::Triple const&          triple,
-                           std::filesystem::path const& obj_dir,
-                           std::filesystem::path const& bin_dir,
-                           std::ostream&                out)
+static bool build(SourceTree&                  tree,
+                  llvm::Triple const&          triple,
+                  std::filesystem::path const& obj_dir,
+                  std::filesystem::path const& bin_dir,
+                  std::ostream&                out)
 {
     AnceCompiler compiler(tree, triple);
     AnceLinker   linker(tree.unit());
@@ -96,17 +93,15 @@ static Optional<int> build(SourceTree&                  tree,
 
     tree.unit().exportPackage(bin_dir);
 
-    bool const ok = linker.link(obj, res, out);
-
-    if (ok) return {};
-
-    return EXIT_FAILURE;
+    return linker.link(obj, res, out);
 }
 
-static Optional<int> run(std::ostream&                          out,
-                         std::filesystem::path const&           project_file_path,
-                         Optional<std::filesystem::path> const& override_build_dir,
-                         Packages const&                        packages)
+static bool buildProject(Project& project, Packages const& packages);
+
+static Optional<Owned<Project>> prepareProject(std::filesystem::path const&           project_file_path,
+                                               Optional<std::filesystem::path> const& override_build_dir,
+                                               std::ostream&                          out,
+                                               Packages const&                        packages)
 {
     std::filesystem::path build_dir = project_file_path.parent_path() / "bld";
     if (override_build_dir.hasValue()) build_dir = *override_build_dir;
@@ -122,91 +117,117 @@ static Optional<int> run(std::ostream&                          out,
     ProjectDescription::Description description;
     ValidationLogger                validation_logger;
 
+    std::filesystem::create_directories(project_definition_bin);
+    std::filesystem::create_directories(project_definition_obj);
+
+    ProjectDescription project_description(project_file_path);
+    project_description.setBinaryDescriptionPath(getResultPath(project_definition_bin, project_description, triple));
+
+    if (project_description.isRefreshRequired())
     {
-        std::filesystem::create_directories(project_definition_bin);
-        std::filesystem::create_directories(project_definition_obj);
+        SourceTree tree(project_description);
+        tree.parse();
 
-        ProjectDescription project_description(project_file_path);
-        project_description.setBinaryDescriptionPath(
-            getResultPath(project_definition_bin, project_description, triple));
+        auto ok = tree.unit().preparePackageDependencies(packages, prepareProject, project_definition_root, out);
+        if (!ok) return std::nullopt;
 
-        out << "======================== Build [ " << project_file_path.stem().string()
-            << " ] ========================" << std::endl;
+        ok = tree.unit().buildPackageDependencies(packages,
+                                                  buildProject,
+                                                  project_definition_root,
+                                                  project_definition_bin,
+                                                  bin_suffix,
+                                                  out);
 
-        if (project_description.isRefreshRequired())
-        {
-            SourceTree tree(project_description);
-            tree.parse();
+        if (!ok) return std::nullopt;
 
-            auto ok = tree.unit().preparePackageDependencies(packages,
-                                                             run,
-                                                             project_definition_root,
-                                                             project_definition_bin,
-                                                             bin_suffix,
-                                                             out);
-            if (!ok) return EXIT_FAILURE;
+        out << "ance: input: Project file read" << std::endl;
 
-            out << "ance: input: Project file read" << std::endl;
+        ok = validateTree(tree, validation_logger, out);
+        if (!ok) return std::nullopt;
 
-            auto error = validateTree(tree, validation_logger, out);
-            if (error.hasValue()) return error.value();
+        project_description.preBuild();
 
-            project_description.preBuild();
+        ok = validateFlow(tree, validation_logger, out);
+        if (!ok) return std::nullopt;
 
-            error = validateFlow(tree, validation_logger, out);
-            if (error.hasValue()) return error.value();
-
-            error = build(tree, triple, project_definition_obj, project_definition_bin, out);
-            if (error.hasValue()) return error.value();
-        }
-
-        bool const ok = project_description.loadDescription();
-        if (!ok)
-        {
-            out << "ance: input: Project description invalid" << std::endl;
-            return EXIT_FAILURE;
-        }
-
-        description = project_description.description();
+        ok = build(tree, triple, project_definition_obj, project_definition_bin, out);
+        if (!ok) return std::nullopt;
     }
 
+    bool const ok = project_description.loadDescription();
+    if (!ok)
     {
-        Project project(std::move(description));
-
-        std::filesystem::path const obj_dir = build_dir / triple_dir / "obj";
-        std::filesystem::path const bin_dir = build_dir / bin_suffix;
-
-        std::filesystem::create_directories(obj_dir);
-        std::filesystem::create_directories(bin_dir);
-
-        Application& application = project.getApplication();
-        auto         ok = application.preparePackageDependencies(packages, run, build_dir, bin_dir, bin_suffix, out);
-        if (!ok) return EXIT_FAILURE;
-
-        SourceTree   tree(application);
-        size_t const count = tree.parse();
-
-        out << "ance: input: " << count << " source file(s) read" << std::endl;
-
-        auto error = validateTree(tree, validation_logger, out);
-        if (error.hasValue()) return error.value();
-
-        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input.nc");
-
-        application.preBuild();
-
-        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input_prebuild.nc");
-
-        error = validateFlow(tree, validation_logger, out);
-        if (error.hasValue()) return error.value();
-
-        error = build(tree, triple, obj_dir, bin_dir, out);
-        if (error.hasValue()) return error.value();
-
-        out << "ance: build: Success" << std::endl;
+        out << "ance: input: Project description invalid" << std::endl;
+        return std::nullopt;
     }
 
-    return {};
+    description = project_description.description();
+    return makeOwned<Project>(std::move(description),
+                              Application::BuildInfo {
+                                  .triple            = triple,
+                                  .build_dir         = build_dir,
+                                  .triple_dir        = triple_dir,
+                                  .bin_suffix        = bin_suffix,
+                                  .validation_logger = validation_logger,
+                                  .out               = out,
+                              });
+}
+
+static bool buildProject(Project& project, Packages const& packages)
+{
+    Application&            application = project.getApplication();
+    Application::BuildInfo& info        = application.getBuildInfo();
+
+    std::filesystem::path const obj_dir = info.build_dir / info.triple_dir / "obj";
+    std::filesystem::path const bin_dir = info.build_dir / info.bin_suffix;
+
+    std::filesystem::create_directories(obj_dir);
+    std::filesystem::create_directories(bin_dir);
+
+    auto ok = application.preparePackageDependencies(packages, prepareProject, info.build_dir, info.out);
+    if (!ok) return false;
+
+    ok = application
+             .buildPackageDependencies(packages, buildProject, info.build_dir, bin_dir, info.bin_suffix, info.out);
+    if (!ok) return false;
+
+    SourceTree   tree(application);
+    size_t const count = tree.parse();
+
+    info.out << "ance: input: " << count << " source file(s) read" << std::endl;
+
+    ok = validateTree(tree, info.validation_logger, info.out);
+    if (!ok) return false;
+
+    if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input.nc");
+
+    application.preBuild();
+
+    if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input_prebuild.nc");
+
+    ok = validateFlow(tree, info.validation_logger, info.out);
+    if (!ok) return false;
+
+    ok = build(tree, info.triple, obj_dir, bin_dir, info.out);
+    if (!ok) return false;
+
+    info.out << "ance: build: Success" << std::endl;
+    return true;
+}
+
+static bool run(std::ostream&                          out,
+                std::filesystem::path const&           project_file_path,
+                Optional<std::filesystem::path> const& override_build_dir,
+                Packages const&                        packages)
+{
+    out << "======================== Build [ " << project_file_path.stem().string()
+        << " ] ========================" << std::endl;
+
+    auto project = prepareProject(project_file_path, override_build_dir, out, packages);
+
+    if (project.hasValue()) { return buildProject(**project, packages); }
+
+    return false;
 }
 
 int main(int argc, char** argv)
@@ -244,9 +265,9 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    auto result = run(std::cout, project_file_path, std::nullopt, packages);
+    auto ok = run(std::cout, project_file_path, std::nullopt, packages);
 
     llvm::llvm_shutdown();
 
-    return result.valueOr(EXIT_SUCCESS);
+    return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }

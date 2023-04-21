@@ -3,17 +3,31 @@
 
 #include "Unit.h"
 
+#include "validation/ValidationLogger.h"
+
 /**
  * The application that is described by the source and will be compiled.
  */
 class Application : public Unit
 {
   public:
+    struct BuildInfo {
+        llvm::Triple triple;
+
+        std::filesystem::path build_dir;
+        std::filesystem::path triple_dir;
+        std::filesystem::path bin_suffix;
+
+        ValidationLogger validation_logger;
+        std::ostream&    out;
+    };
+
     /**
      * Create a new application from a given project.
      * @param project The project.
+     * @param info The build information.
      */
-    explicit Application(Project& project);
+    explicit Application(Project& project, BuildInfo info);
 
   public:
     Application(Application const&) = delete;
@@ -41,8 +55,11 @@ class Application : public Unit
     std::vector<std::string> getLibraryPaths() const override;
     std::vector<std::string> getBinaryDependencyPaths() const override;
 
+    BuildInfo& getBuildInfo();
+
   private:
-    Project& project_;
+    Project&  project_;
+    BuildInfo info_;
 
     mutable Optional<std::string> name_;
 };

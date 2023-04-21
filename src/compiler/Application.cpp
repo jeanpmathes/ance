@@ -10,7 +10,11 @@
 #include "lang/type/VectorType.h"
 #include "lang/type/SizeType.h"
 
-Application::Application(Project& project) : Unit(!project.description().runtime_excluded), project_(project) {}
+Application::Application(Project& project, BuildInfo build_info)
+    : Unit(!project.description().runtime_excluded)
+    , project_(project)
+    , info_(std::move(build_info))
+{}
 
 std::string const& Application::getName() const
 {
@@ -122,4 +126,9 @@ std::vector<std::string> Application::getLibraryPaths() const
 std::vector<std::string> Application::getBinaryDependencyPaths() const
 {
     return project_.description().binary_dependencies;
+}
+
+Application::BuildInfo& Application::getBuildInfo()
+{
+    return info_;
 }

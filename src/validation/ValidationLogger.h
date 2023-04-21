@@ -16,9 +16,6 @@ class ValidationLogger
   public:
     ValidationLogger();
 
-    ValidationLogger(ValidationLogger&& validation_logger)      = delete;
-    ValidationLogger(ValidationLogger const& validation_logger) = delete;
-
   private:
     enum class LogLevel
     {

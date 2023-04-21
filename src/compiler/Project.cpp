@@ -2,7 +2,10 @@
 
 #include "lang/ApplicationVisitor.h"
 
-Project::Project(ProjectDescription::Description&& description) : description_(description), application_(*this) {}
+Project::Project(ProjectDescription::Description&& description, Application::BuildInfo info)
+    : description_(description)
+    , application_(*this, std::move(info))
+{}
 
 std::string Project::getName() const
 {

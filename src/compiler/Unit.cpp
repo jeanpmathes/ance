@@ -1,10 +1,9 @@
 #include "Unit.h"
 
 #include <fstream>
-#include <future>
 
 #include "compiler/CodePrinter.h"
-#include "compiler/Packages.h"
+#include "compiler/Project.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/utility/Storage.h"
@@ -38,18 +37,18 @@ llvm::Triple const& Unit::getTargetTriple() const
     return target_triple_;
 }
 
-bool Unit::preparePackageDependencies(Packages const&                     packages,
-                                      std::function<BuildFunction> const& build,
-                                      std::filesystem::path const&        dir,
-                                      std::filesystem::path const&        bin_base,
-                                      std::filesystem::path const&        bin_suffix,
-                                      std::ostream&                       out)
+bool Unit::preparePackageDependencies(Packages const&              packages,
+                                      PrepareFunction const&       prepare,
+                                      std::filesystem::path const& dir,
+                                      std::ostream&                out)
 {
+    assert(dependencies_.empty());
+
     auto dependencies = getDependencies();
     bool valid        = true;
 
-    std::vector<Packages::Package> packages_to_build;
     std::set<std::string>          package_names;
+    std::vector<Packages::Package> packages_to_build;
 
     std::filesystem::path const bld_dir = dir / "dep";
     std::filesystem::create_directories(bld_dir);
@@ -75,8 +74,6 @@ bool Unit::preparePackageDependencies(Packages const&                     packag
 
     if (valid)
     {
-        std::vector<bool> status_codes;
-
         for (auto const& package : packages_to_build)
         {
             std::string const           log_file = package.name + ".txt";
@@ -86,31 +83,83 @@ bool Unit::preparePackageDependencies(Packages const&                     packag
             Optional<std::filesystem::path> const destination = bld_dir / package.name;
             std::filesystem::create_directories(destination.value());
 
-            bool const is_ok = not build(log, package.path, destination, packages).hasValue();
+            open_logs_.emplace_back(std::move(log));
+            std::ofstream& log_ref = open_logs_.back();
 
-            if (is_ok)
+            auto potential_description = prepare(package.path, destination, log_ref, packages);
+
+            if (potential_description.hasValue())
             {
-                std::filesystem::path const results = destination.value() / bin_suffix;
-                std::filesystem::copy(results,
-                                      bin_base,
-                                      std::filesystem::copy_options::overwrite_existing
-                                          | std::filesystem::copy_options::recursive);
+                auto& application = (**potential_description).getApplication();
+                if (application.getType() != UnitResult::PACKAGE)
+                {
+                    out << "ance: packages: Package '" << package.name << "' is not a package" << std::endl;
+                    potential_description = std::nullopt;
+                }
             }
 
-            status_codes.push_back(is_ok);
+            dependencies_.emplace_back(std::move(potential_description), package);
         }
 
-        for (auto [is_ok, package] : llvm::zip(status_codes, packages_to_build))
+        for (auto& [project, package] : dependencies_)
         {
+            bool const is_ok = project.hasValue();
             valid &= is_ok;
 
-            out << "ance: packages: Building package '" << package.name << "'";
+            out << "ance: packages: Preparing package '" << package.name << "'";
             if (is_ok) { out << " succeeded" << std::endl; }
             else { out << " failed" << std::endl; }
-
-            importPackage(bin_base, package.name);
         }
     }
+
+    return valid;
+}
+
+bool Unit::buildPackageDependencies(Packages const&              packages,
+                                    BuildFunction const&         build,
+                                    std::filesystem::path const& dir,
+                                    std::filesystem::path const& bin_base,
+                                    std::filesystem::path const& bin_suffix,
+                                    std::ostream&                out)
+{
+    bool              valid = true;
+    std::vector<bool> status_codes;
+
+    std::filesystem::path const bld_dir = dir / "dep";
+    std::filesystem::create_directories(bld_dir);
+
+    for (auto& [project, package] : dependencies_)
+    {
+        Optional<std::filesystem::path> const destination = bld_dir / package.name;
+        std::filesystem::create_directories(destination.value());
+
+        bool const is_ok = build(**project, packages);
+
+        if (is_ok)
+        {
+            std::filesystem::path const results = destination.value() / bin_suffix;
+            std::filesystem::copy(results,
+                                  bin_base,
+                                  std::filesystem::copy_options::overwrite_existing
+                                      | std::filesystem::copy_options::recursive);
+        }
+
+        status_codes.push_back(is_ok);
+    }
+
+    for (auto [is_ok, dependency] : llvm::zip(status_codes, dependencies_))
+    {
+        auto const& [project, package] = dependency;
+        valid &= is_ok;
+
+        out << "ance: packages: Building package '" << package.name << "'";
+        if (is_ok) { out << " succeeded" << std::endl; }
+        else { out << " failed" << std::endl; }
+
+        importPackage(bin_base, package.name);
+    }
+
+    open_logs_.clear();
 
     return valid;
 }
@@ -188,3 +237,5 @@ lang::GlobalScope const& Unit::globalScope() const
 {
     return *global_scope_;
 }
+
+Unit::~Unit() = default;

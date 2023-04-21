@@ -18,8 +18,9 @@ class Project
     /**
      * Create a project from a given description.
      * @param description The project description.
+     * @param info The build information.
      */
-    explicit Project(ProjectDescription::Description&& description);
+    explicit Project(ProjectDescription::Description&& description, Application::BuildInfo info);
 
     /**
      * Get the name of the application.

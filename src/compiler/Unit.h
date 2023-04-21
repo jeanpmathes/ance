@@ -10,6 +10,7 @@
 
 #include "compiler/FileContext.h"
 #include "compiler/OptLevel.h"
+#include "compiler/Packages.h"
 #include "compiler/SourceVisitor.h"
 #include "compiler/UnitResult.h"
 #include "lang/scope/GlobalScope.h"
@@ -23,7 +24,7 @@ class Statement;
 class CompileContext;
 class ValidationLogger;
 class Project;
-class Packages;
+class ProjectDescription;
 
 /**
  * A unit of source that is compiled as a whole.
@@ -114,26 +115,44 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      */
     [[nodiscard]] llvm::Triple const& getTargetTriple() const;
 
-    using BuildFunction = Optional<int>(std::ostream&,
-                                        std::filesystem::path const&,
-                                        Optional<std::filesystem::path> const&,
-                                        Packages const&);
+    using PrepareFunctionType = Optional<Owned<Project>>(std::filesystem::path const&,
+                                                         Optional<std::filesystem::path> const&,
+                                                         std::ostream&,
+                                                         Packages const&);
+
+    using PrepareFunction = std::function<PrepareFunctionType>;
+
+    using BuildFunctionType = bool(Project& project, Packages const& packages);
+
+    using BuildFunction = std::function<BuildFunctionType>;
 
     /**
      * Prepare all package dependencies.
      * @param packages The packages object.
-     * @param build A function that builds a package into a given directory.
+     * @param prepare The function to prepare a package.
+     * @param dir The directory to output build files and logs to. Subdirectories will be created.
+     * @param out The output stream to log general information to, related to the overall build process.
+     */
+    bool preparePackageDependencies(Packages const&              packages,
+                                    PrepareFunction const&       prepare,
+                                    std::filesystem::path const& dir,
+                                    std::ostream&                out);
+
+    /**
+     * Prepare all package dependencies.
+     * @param packages The packages object.
+     * @param build The function to build a package.
      * @param dir The directory to output build files and logs to. Subdirectories will be created.
      * @param bin_base Path to the binary directory, all package binaries will be copied to this directory.
      * @param bin_suffix Suffix that leads from the build directory of a package to the binary directory of the package.
      * @param out The output stream to log general information to, related to the overall build process.
      */
-    bool preparePackageDependencies(Packages const&                     packages,
-                                    std::function<BuildFunction> const& build,
-                                    std::filesystem::path const&        dir,
-                                    std::filesystem::path const&        bin_base,
-                                    std::filesystem::path const&        bin_suffix,
-                                    std::ostream&                       out);
+    bool buildPackageDependencies(Packages const&              packages,
+                                  BuildFunction const&         build,
+                                  std::filesystem::path const& dir,
+                                  std::filesystem::path const& bin_base,
+                                  std::filesystem::path const& bin_suffix,
+                                  std::ostream&                out);
 
     /**
      * Export this unit as a package.
@@ -232,7 +251,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      */
     [[nodiscard]] virtual std::vector<std::string> getBinaryDependencyPaths() const = 0;
 
-    ~Unit() override = default;
+    ~Unit() override;
 
   private:
     Owned<lang::GlobalScope> global_scope_;
@@ -241,6 +260,9 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     unsigned      pointer_size_ {0};
     llvm::Triple  target_triple_;
     SourceVisitor source_visitor_ {*this};
+
+    std::vector<std::tuple<Optional<Owned<Project>>, Packages::Package>> dependencies_ {};
+    std::list<std::ofstream>                                             open_logs_ {};
 };
 
 #endif
