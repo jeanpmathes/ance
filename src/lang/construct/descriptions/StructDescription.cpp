@@ -117,6 +117,11 @@ void lang::StructDescription::validate(ValidationLogger& validation_logger) cons
             valid = false;
             continue;
         }
+
+        if (access_ == lang::AccessModifier::PUBLIC_ACCESS && member->access() == lang::AccessModifier::PUBLIC_ACCESS)
+        {
+            lang::validation::isTypeExportable(type, member->location(), validation_logger);
+        }
     }
 
     valid = valid && self.getDefinition()->checkDependencies(validation_logger);

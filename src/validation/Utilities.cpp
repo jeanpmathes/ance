@@ -34,3 +34,15 @@ bool lang::validation::isNameUndefined(lang::Variable const& variable,
 
     return true;
 }
+
+bool lang::validation::isTypeExportable(lang::Type const& type,
+                                        lang::Location    location,
+                                        ValidationLogger& validation_logger)
+{
+    if (type.getAccessModifier() == lang::AccessModifier::PUBLIC_ACCESS) return true;
+    if (!type.isCustom()) return true;
+
+    validation_logger.logError("Public definitions cannot expose non-public types", location);
+
+    return false;
+}

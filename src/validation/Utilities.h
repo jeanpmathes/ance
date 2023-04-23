@@ -25,6 +25,11 @@ namespace lang::validation
      * Check whether a (variable) name is undefined. If so, a message is logged.
      */
     bool isNameUndefined(lang::Variable const& variable, lang::Location location, ValidationLogger& validation_logger);
+
+    /**
+     * Check whether the access level is sufficient to export as part of a public interface.
+     */
+    bool isTypeExportable(lang::Type const& type, lang::Location location, ValidationLogger& validation_logger);
 }
 
 #endif

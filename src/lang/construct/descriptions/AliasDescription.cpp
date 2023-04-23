@@ -86,7 +86,12 @@ void lang::AliasDescription::validate(ValidationLogger& validation_logger) const
         validation_logger.logError("Cannot alias self", actual_type_location_);
     }
 
-    lang::validation::isTypeUndefined(actual_, actual_type_location_, validation_logger);
+    if (lang::validation::isTypeUndefined(actual_, actual_type_location_, validation_logger)) return;
+
+    if (access_ == lang::AccessModifier::PUBLIC_ACCESS)
+    {
+        lang::validation::isTypeExportable(actual_, actual_type_location_, validation_logger);
+    }
 
     if (actual_ == scope().context().getVoidType())// Prevent infinite recursion.
     {

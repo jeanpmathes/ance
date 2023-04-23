@@ -104,6 +104,11 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
 
     return_type_->validate(validation_logger, return_type_location_);
 
+    if (access_ == lang::AccessModifier::PUBLIC_ACCESS)
+    {
+        lang::validation::isTypeExportable(return_type_, return_type_location_, validation_logger);
+    }
+
     std::set<lang::Identifier> names;
 
     for (auto const& parameter : parameters_)
@@ -117,6 +122,11 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
         }
 
         if (lang::validation::isTypeUndefined(parameter->type(), parameter->typeLocation(), validation_logger)) return;
+
+        if (access_ == lang::AccessModifier::PUBLIC_ACCESS)
+        {
+            lang::validation::isTypeExportable(parameter->type(), parameter->typeLocation(), validation_logger);
+        }
 
         parameter->type().validate(validation_logger, parameter->typeLocation());
 

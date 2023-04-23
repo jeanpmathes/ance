@@ -189,6 +189,11 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
 
         if (!type_handle_->validate(validation_logger, type_location_)) return;
 
+        if (access_ == lang::AccessModifier::PUBLIC_ACCESS)
+        {
+            lang::validation::isTypeExportable(type_handle_, type_location_, validation_logger);
+        }
+
         if (type_handle_->isVoidType())
         {
             validation_logger.logError("Global variable cannot have 'void' type", type_location_);
