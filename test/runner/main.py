@@ -69,7 +69,7 @@ target_triple = sys.argv[1]
 
 def run_test(test: discovery.Test) -> TestRun:
     with tempfile.TemporaryDirectory() as temp:
-        temp_project_dir: str = os.path.join(temp, test.test_name)
+        temp_project_dir: str = os.path.join(temp, "test")
         shutil.copytree(test.project_dir_path, temp_project_dir)
 
         compile_result, compile_output = ance.compile_project(temp_project_dir)

@@ -31,9 +31,15 @@ def discover_projects(root_path: str):
 
 
 def create_project(directory: os.DirEntry) -> Optional[Project]:
-    for entry in os.scandir(directory.path):
+    nested_project_path: str = os.path.join(directory.path, "test")
+    if not os.path.isdir(nested_project_path):
+        return None
+
+    for entry in os.scandir(nested_project_path):
         if entry.is_file() and os.path.splitext(entry.path)[1] == ".ance":
-            return Project(directory.name, directory.path, entry.path)
+            return Project(directory.name, nested_project_path, entry.path)
+
+    return None
 
 
 def create_tests(projects: list) -> list:
