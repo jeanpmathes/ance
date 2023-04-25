@@ -34,6 +34,34 @@ std::string const& Application::getName() const
     return name_.value();
 }
 
+static bool isNameValid(std::string const& name)
+{
+    static std::set<char> const alpha = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                                         'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                                         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                                         'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+
+    static std::set<char> const num = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
+    bool is_first = true;
+
+    for (char const c : name)
+    {
+        if (is_first)
+        {
+            if (!alpha.contains(c)) { return false; }
+        }
+        else
+        {
+            if (!alpha.contains(c) && !num.contains(c) && c != '_') { return false; }
+        }
+
+        is_first = false;
+    }
+
+    return true;
+}
+
 void Application::validate(ValidationLogger& validation_logger) const
 {
     std::string const name_according_to_file = project_.getProjectFile().stem().generic_string();
@@ -45,6 +73,11 @@ void Application::validate(ValidationLogger& validation_logger) const
     {
         validation_logger.logError("Project name does not match project file name or project directory name",
                                    lang::Location::global());
+    }
+
+    if (!isNameValid(getName()))
+    {
+        validation_logger.logError("Project name is not a valid identifier", lang::Location::global());
     }
 
     this->globalScope().validate(validation_logger);
