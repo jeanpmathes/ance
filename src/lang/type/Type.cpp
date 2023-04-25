@@ -255,10 +255,10 @@ lang::Type const& lang::Type::getActualType() const
     return definition_.value()->getActualType();
 }
 
-lang::AccessModifier lang::Type::getAccessModifier() const
+lang::Accessibility const& lang::Type::getAccessibility() const
 {
     assert(isDefined());
-    return definition_.value()->getAccessModifier();
+    return definition_.value()->getAccessibility();
 }
 
 void lang::Type::setContainingScope(lang::Scope* scope)

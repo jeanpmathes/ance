@@ -73,14 +73,15 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 
         Owned<Statement> block_statement = std::move(function_block);
 
-        Owned<lang::FunctionDescription> description = makeOwned<lang::FunctionDescription>(access,
-                                                                                            identifier,
-                                                                                            return_type,
-                                                                                            return_type_location,
-                                                                                            parameters,
-                                                                                            std::move(block_statement),
-                                                                                            declaration_location,
-                                                                                            definition_location);
+        Owned<lang::FunctionDescription> description =
+            makeOwned<lang::FunctionDescription>(lang::Accessibility::local(access),
+                                                 identifier,
+                                                 return_type,
+                                                 return_type_location,
+                                                 parameters,
+                                                 std::move(block_statement),
+                                                 declaration_location,
+                                                 definition_location);
 
         unit_.globalScope().addDescription(std::move(description));
     }
@@ -91,7 +92,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
                 lang::Identifier::like(name),
                 unit_.globalScope().context().getFixedWidthIntegerType(32, false),
                 lang::Location::global(),
-                lang::AccessModifier::PRIVATE_ACCESS,
+                lang::Accessibility::local(lang::AccessModifier::PRIVATE_ACCESS),
                 makeOptional<Owned<Expression>>(
                     makeOwned<ConstantLiteral>(makeShared<lang::IntegerConstant>(
                                                    value,
@@ -129,7 +130,8 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 
         push_member(lang::Identifier::like("name"), string_type);
         push_member(lang::Identifier::like("kind"), unit_.globalScope().context().getFixedWidthIntegerType(32, false));
-        push_member(lang::Identifier::like("dependencies"), string_list_type);
+        push_member(lang::Identifier::like("public_dependencies"), string_list_type);
+        push_member(lang::Identifier::like("private_dependencies"), string_list_type);
         push_member(lang::Identifier::like("libraries"), string_list_type);
         push_member(lang::Identifier::like("archives"), string_list_type);
         push_member(lang::Identifier::like("library_paths"), string_list_type);
@@ -142,7 +144,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
         push_member(lang::Identifier::like("runtime_excluded"), unit_.globalScope().context().getBooleanType());
 
         Owned<lang::StructDescription> description =
-            makeOwned<lang::StructDescription>(lang::AccessModifier::PUBLIC_ACCESS,
+            makeOwned<lang::StructDescription>(lang::Accessibility::local(lang::AccessModifier::PUBLIC_ACCESS),
                                                lang::Identifier::like("Project"),
                                                std::move(members),
                                                lang::Location::global());
@@ -170,14 +172,15 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
         auto             function_block  = lang::CodeBlock::makeInitial(location(ctx));
         Owned<Statement> block_statement = std::move(function_block);
 
-        Owned<lang::FunctionDescription> description = makeOwned<lang::FunctionDescription>(access,
-                                                                                            identifier,
-                                                                                            return_type,
-                                                                                            return_type_location,
-                                                                                            parameters,
-                                                                                            std::move(block_statement),
-                                                                                            declaration_location,
-                                                                                            definition_location);
+        Owned<lang::FunctionDescription> description =
+            makeOwned<lang::FunctionDescription>(lang::Accessibility::local(access),
+                                                 identifier,
+                                                 return_type,
+                                                 return_type_location,
+                                                 parameters,
+                                                 std::move(block_statement),
+                                                 declaration_location,
+                                                 definition_location);
 
         unit_.globalScope().addDescription(std::move(description));
     }
@@ -224,12 +227,10 @@ std::any SourceVisitor::visitVariableDescription(anceParser::VariableDescription
     return static_cast<lang::Description*>(new lang::VariableDescription(identifier,
                                                                          type,
                                                                          type_location,
-                                                                         access,
+                                                                         lang::Accessibility::local(access),
                                                                          wrap(initial_value),
-
                                                                          assigner,
                                                                          is_constant,
-
                                                                          location(ctx)));
 }
 
@@ -243,7 +244,7 @@ std::any SourceVisitor::visitStructDescription(anceParser::StructDescriptionCont
     for (auto member : ctx->member()) { members.emplace_back(*std::any_cast<lang::Member*>(visit(member))); }
 
     return static_cast<lang::Description*>(
-        new lang::StructDescription(access, identifier, std::move(members), location(ctx)));
+        new lang::StructDescription(lang::Accessibility::local(access), identifier, std::move(members), location(ctx)));
 }
 
 std::any SourceVisitor::visitMember(anceParser::MemberContext* ctx)
@@ -303,7 +304,7 @@ std::any SourceVisitor::visitFunctionDescription(anceParser::FunctionDescription
         code = std::move(function_block);
     }
 
-    return static_cast<lang::Description*>(new lang::FunctionDescription(access,
+    return static_cast<lang::Description*>(new lang::FunctionDescription(lang::Accessibility::local(access),
                                                                          identifier,
                                                                          return_type,
                                                                          return_type_location,
@@ -336,8 +337,11 @@ std::any SourceVisitor::visitAliasDescription(anceParser::AliasDescriptionContex
     auto                   other      = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
     lang::Identifier const identifier = ident(ctx->IDENTIFIER());
 
-    return static_cast<lang::Description*>(
-        new lang::AliasDescription(access, identifier, other, location(ctx), location(ctx->type())));
+    return static_cast<lang::Description*>(new lang::AliasDescription(lang::Accessibility::local(access),
+                                                                      identifier,
+                                                                      other,
+                                                                      location(ctx),
+                                                                      location(ctx->type())));
 }
 
 std::any SourceVisitor::visitBlock(anceParser::BlockContext* ctx)

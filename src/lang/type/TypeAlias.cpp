@@ -9,25 +9,18 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::TypeAlias::TypeAlias(lang::AccessModifier              access,
+lang::TypeAlias::TypeAlias(lang::Accessibility               accessibility,
                            lang::Identifier                  name,
                            lang::ResolvingHandle<lang::Type> actual,
-                           bool                              is_imported,
                            lang::Location                    definition_location)
     : lang::TypeDefinition(name, definition_location)
-    , lang::CustomType(is_imported)
+    , lang::CustomType(accessibility)
     , actual_(actual)
-    , access_modifier_(access)
 {}
 
 StateCount lang::TypeAlias::getStateCount() const
 {
     return actual_->getStateCount();
-}
-
-lang::AccessModifier lang::TypeAlias::getAccessModifier() const
-{
-    return access_modifier_;
 }
 
 lang::FixedWidthIntegerType const* lang::TypeAlias::isFixedWidthIntegerType() const

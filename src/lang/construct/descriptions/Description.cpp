@@ -8,6 +8,13 @@
 #include "lang/construct/descriptions/StructDescription.h"
 #include "lang/construct/descriptions/VariableDescription.h"
 
+lang::Description::Description(lang::Accessibility accessibility) : accessibility_(accessibility) {}
+
+lang::Accessibility lang::Description::access() const
+{
+    return accessibility_;
+}
+
 void lang::Description::setScope(lang::Scope& scope)
 {
     assert(scope_ == nullptr);
@@ -35,6 +42,11 @@ lang::Scope const& lang::Description::scope() const
     return *scope_;
 }
 
+bool lang::Description::isImported() const
+{
+    return accessibility_.isImported();
+}
+
 enum DescriptionType : uint8_t
 {
     INVALID,
@@ -58,23 +70,23 @@ static DescriptionType getType(lang::Description* description)
     return type;
 }
 
-static lang::Description* createDescription(DescriptionType type)
+static lang::Description* createDescription(DescriptionType type, lang::Context& context)
 {
     lang::Description* description = nullptr;
 
     switch (type)
     {
         case FUNCTION:
-            description = new lang::FunctionDescription();
+            description = new lang::FunctionDescription(context.isCurrentDescriptionSourcePublic());
             break;
         case GLOBAL_VARIABLE:
-            description = new lang::VariableDescription();
+            description = new lang::VariableDescription(context.isCurrentDescriptionSourcePublic());
             break;
         case ALIAS:
-            description = new lang::AliasDescription();
+            description = new lang::AliasDescription(context.isCurrentDescriptionSourcePublic());
             break;
         case STRUCT:
-            description = new lang::StructDescription();
+            description = new lang::StructDescription(context.isCurrentDescriptionSourcePublic());
             break;
         default:
             assert(false);
@@ -91,7 +103,11 @@ void lang::synchronize(lang::Description** description, Storage& storage)
 
     storage.sync(type);
 
-    if (storage.isReading()) { *description = createDescription(static_cast<DescriptionType>(type)); }
+    if (storage.isReading())
+    {
+        lang::Context* context = std::any_cast<lang::Context*>(storage.data_);
+        *description           = createDescription(static_cast<DescriptionType>(type), *context);
+    }
 
     (*description)->sync(storage);
 }

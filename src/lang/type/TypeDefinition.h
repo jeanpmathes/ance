@@ -8,7 +8,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 
-#include "lang/AccessModifier.h"
+#include "lang/Accessibility.h"
 #include "lang/BinaryOperator.h"
 #include "lang/UnaryOperator.h"
 #include "lang/type/StateCount.h"
@@ -107,7 +107,7 @@ namespace lang
          */
         [[nodiscard]] virtual lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const;
 
-        [[nodiscard]] virtual lang::AccessModifier getAccessModifier() const;
+        [[nodiscard]] virtual lang::Accessibility const& getAccessibility() const;
 
         void         setContainingScope(Scope* scope);
         Scope*       scope();

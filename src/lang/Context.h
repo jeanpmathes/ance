@@ -164,10 +164,26 @@ namespace lang
          */
         bool validateRuntimeDependency(lang::Location location, ValidationLogger& validation_logger) const;
 
+        struct DescriptionSource {
+            std::string name;
+            bool        is_public;
+        };
+
+        /**
+         * Set the source (package) that is currently used.
+         * All descriptions added after this call will be associated with this source.
+         * @param source The source to set, or nullopt to set the current project as source.
+         */
+        void setCurrentDescriptionSource(Optional<DescriptionSource> source);
+
+        Optional<std::string> getCurrentDescriptionSourceName() const;
+        bool                  isCurrentDescriptionSourcePublic() const;
+
       private:
         GlobalScope&                               global_scope_;
         std::vector<lang::TypeDefinitionRegistry*> type_registries_ {};
         bool                                       contains_runtime_;
+        Optional<DescriptionSource>                current_description_source_;
 
         mutable lang::TypeRegistry<uint64_t>                  array_types_;
         mutable lang::TypeRegistry<>                          buffer_types_;

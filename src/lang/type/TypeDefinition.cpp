@@ -231,9 +231,13 @@ lang::Type const& lang::TypeDefinition::getActualType() const
     return self();
 }
 
-lang::AccessModifier lang::TypeDefinition::getAccessModifier() const
+lang::Accessibility const& lang::TypeDefinition::getAccessibility() const
 {
-    return lang::AccessModifier::PRIVATE_ACCESS;
+    static lang::Accessibility const default_accessibility =
+        lang::Accessibility(lang::AccessModifier::PRIVATE_ACCESS, lang::SourceAccessibility::BUILT_IN);
+
+    assert(!isCustom());
+    return default_accessibility;
 }
 
 void lang::TypeDefinition::setContainingScope(lang::Scope* scope)
@@ -505,7 +509,7 @@ void lang::TypeDefinition::buildFinalizer(llvm::Value* ptr, llvm::Value* count, 
 
 void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
 {
-    if (isImported()) assert(getAccessModifier().linkage() == llvm::GlobalValue::ExternalLinkage);
+    if (isImported()) assert(getAccessibility().modifier().linkage() == llvm::GlobalValue::ExternalLinkage);
 
     if (!isTriviallyDefaultConstructible())
     {
@@ -516,11 +520,14 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
                                     false);
 
         default_initializer_ = llvm::Function::Create(default_initializer_type,
-                                                      getAccessModifier().linkage(),
+                                                      getAccessibility().modifier().linkage(),
                                                       "ctor_default$" + getMangledName(),
                                                       context.llvmModule());
 
-        lang::Function::setImportExportAttributes(default_initializer_, getAccessModifier(), isImported(), context);
+        lang::Function::setImportExportAttributes(default_initializer_,
+                                                  getAccessibility().modifier(),
+                                                  isImported(),
+                                                  context);
     }
 
     if (!isTriviallyCopyConstructible())
@@ -531,11 +538,14 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
                                     false);
 
         copy_initializer_ = llvm::Function::Create(copy_initializer_type,
-                                                   getAccessModifier().linkage(),
+                                                   getAccessibility().modifier().linkage(),
                                                    "ctor_copy$" + getMangledName(),
                                                    context.llvmModule());
 
-        lang::Function::setImportExportAttributes(copy_initializer_, getAccessModifier(), isImported(), context);
+        lang::Function::setImportExportAttributes(copy_initializer_,
+                                                  getAccessibility().modifier(),
+                                                  isImported(),
+                                                  context);
     }
 
     if (!isTriviallyDestructible())
@@ -547,11 +557,14 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
                                     false);
 
         default_finalizer_ = llvm::Function::Create(default_finalizer_type,
-                                                    getAccessModifier().linkage(),
+                                                    getAccessibility().modifier().linkage(),
                                                     "dtor_default$" + getMangledName(),
                                                     context.llvmModule());
 
-        lang::Function::setImportExportAttributes(default_finalizer_, getAccessModifier(), isImported(), context);
+        lang::Function::setImportExportAttributes(default_finalizer_,
+                                                  getAccessibility().modifier(),
+                                                  isImported(),
+                                                  context);
     }
 
     defineConstructors(context);
@@ -772,7 +785,7 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
 
     lang::PredefinedFunction& predefined_function = function->defineAsPredefined(self(),
                                                                                  parameters,
-                                                                                 getAccessModifier(),
+                                                                                 getAccessibility().modifier(),
                                                                                  isImported(),
                                                                                  *scope(),
                                                                                  lang::Location::global());

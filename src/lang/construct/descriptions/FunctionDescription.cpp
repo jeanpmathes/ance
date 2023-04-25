@@ -5,17 +5,15 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::FunctionDescription::FunctionDescription(lang::AccessModifier                 access,
+lang::FunctionDescription::FunctionDescription(lang::Accessibility                  accessibility,
                                                lang::Identifier                     name,
                                                lang::ResolvingHandle<lang::Type>    return_type,
                                                lang::Location                       return_type_location,
                                                std::vector<Shared<lang::Parameter>> parameters,
                                                Optional<Owned<Statement>>           code,
                                                lang::Location                       declaration_location,
-                                               lang::Location                       definition_location,
-                                               bool                                 is_imported)
-    : is_imported_(is_imported)
-    , access_(access)
+                                               lang::Location                       definition_location)
+    : Description(accessibility)
     , name_(name)
     , return_type_(return_type)
     , return_type_location_(return_type_location)
@@ -25,9 +23,8 @@ lang::FunctionDescription::FunctionDescription(lang::AccessModifier             
     , definition_location_(definition_location)
 {}
 
-lang::FunctionDescription::FunctionDescription()
-    : is_imported_(true)
-    , access_(lang::AccessModifier::PUBLIC_ACCESS)
+lang::FunctionDescription::FunctionDescription(bool from_public_import)
+    : Description(lang::Accessibility::imported(from_public_import))
     , name_(lang::Identifier::empty())
     , return_type_(lang::Type::getUndefined())
     , return_type_location_(lang::Location::global())
@@ -47,16 +44,6 @@ bool lang::FunctionDescription::isOverloadAllowed() const
     return true;
 }
 
-lang::AccessModifier lang::FunctionDescription::access() const
-{
-    return access_;
-}
-
-bool lang::FunctionDescription::isImported() const
-{
-    return is_imported_;
-}
-
 void lang::FunctionDescription::performInitialization()
 {
     lang::OwningHandle<lang::Function> function =
@@ -64,7 +51,7 @@ void lang::FunctionDescription::performInitialization()
 
     if (code_.hasValue())
     {
-        function->defineAsCustom(access_,
+        function->defineAsCustom(access().modifier(),
                                  return_type_,
                                  return_type_location_,
                                  parameters_,
@@ -76,7 +63,7 @@ void lang::FunctionDescription::performInitialization()
     else
     {
         function->defineAsImported(scope(),
-                                   access_,
+                                   access().modifier(),
                                    return_type_,
                                    return_type_location_,
                                    parameters_,
@@ -104,7 +91,7 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
 
     return_type_->validate(validation_logger, return_type_location_);
 
-    if (access_ == lang::AccessModifier::PUBLIC_ACCESS)
+    if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS)
     {
         lang::validation::isTypeExportable(return_type_, return_type_location_, validation_logger);
     }
@@ -123,7 +110,7 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
 
         if (lang::validation::isTypeUndefined(parameter->type(), parameter->typeLocation(), validation_logger)) return;
 
-        if (access_ == lang::AccessModifier::PUBLIC_ACCESS)
+        if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS)
         {
             lang::validation::isTypeExportable(parameter->type(), parameter->typeLocation(), validation_logger);
         }
@@ -137,7 +124,7 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
     }
 
     if (code_.hasValue()) { (**code_).validate(validation_logger); }
-    else if (access_ != lang::AccessModifier::EXTERN_ACCESS && !is_imported_)
+    else if (access().modifier() != lang::AccessModifier::EXTERN_ACCESS && !isImported())
     {
         validation_logger.logError("Functions without a body must be declared as 'extern'", declaration_location_);
     }
@@ -159,15 +146,14 @@ lang::Description::Descriptions lang::FunctionDescription::expand(lang::Context&
 
     for (auto& parameter : parameters_) { expanded_parameters.emplace_back(parameter->expand(new_context)); }
 
-    auto expanded = makeOwned<lang::FunctionDescription>(access_,
+    auto expanded = makeOwned<lang::FunctionDescription>(access(),
                                                          name_,
                                                          return_type_->createUndefinedClone(new_context),
                                                          return_type_location_,
                                                          expanded_parameters,
                                                          std::move(code),
                                                          declaration_location_,
-                                                         definition_location_,
-                                                         is_imported_);
+                                                         definition_location_);
 
     Descriptions descriptions;
     descriptions.emplace_back(std::move(expanded));

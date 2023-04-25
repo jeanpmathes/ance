@@ -26,7 +26,7 @@ namespace lang
       public:
         /**
          * Create a new function description.
-         * @param access The access modifier.
+         * @param accessibility The access modifier.
          * @param name The name.
          * @param return_type The return type.
          * @param return_type_location The location of the return type.
@@ -34,29 +34,25 @@ namespace lang
          * @param code The code.
          * @param declaration_location The location of the declaration.
          * @param definition_location The location of the definition. Use the declaration location if there is no definition.
-         * @param is_imported Whether the function is imported.
          */
-        FunctionDescription(lang::AccessModifier                 access,
+        FunctionDescription(lang::Accessibility                  accessibility,
                             lang::Identifier                     name,
                             lang::ResolvingHandle<lang::Type>    return_type,
                             lang::Location                       return_type_location,
                             std::vector<Shared<lang::Parameter>> parameters,
                             Optional<Owned<Statement>>           code,
                             lang::Location                       declaration_location,
-                            lang::Location                       definition_location,
-                            bool                                 is_imported = false);
+                            lang::Location                       definition_location);
 
         /**
          * The import constructor.
          */
-        FunctionDescription();
+        explicit FunctionDescription(bool from_public_import);
 
         ~FunctionDescription() override = default;
 
         [[nodiscard]] Identifier const& name() const override;
         [[nodiscard]] bool              isOverloadAllowed() const override;
-        [[nodiscard]] AccessModifier    access() const override;
-        [[nodiscard]] bool              isImported() const override;
 
         [[nodiscard]] lang::Function const* function() const;
         [[nodiscard]] Statement const*      code() const;
@@ -70,8 +66,6 @@ namespace lang
         void sync(Storage& storage) override;
 
       private:
-        bool                                 is_imported_;
-        lang::AccessModifier                 access_;
         lang::Identifier                     name_;
         lang::ResolvingHandle<lang::Type>    return_type_;
         lang::Location                       return_type_location_;

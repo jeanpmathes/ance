@@ -14,7 +14,18 @@ Application::Application(Project& project, BuildInfo build_info)
     : Unit(!project.description().runtime_excluded)
     , project_(project)
     , info_(std::move(build_info))
-{}
+    , declared_dependencies_()
+{
+    for (auto const& dependency : project_.description().public_dependencies)
+    {
+        declared_dependencies_.emplace_back(dependency, true);
+    }
+
+    for (auto const& dependency : project_.description().private_dependencies)
+    {
+        declared_dependencies_.emplace_back(dependency, false);
+    }
+}
 
 std::string const& Application::getName() const
 {
@@ -103,9 +114,9 @@ void Application::addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileCon
     source_visitor_.visit(tree);
 }
 
-std::vector<std::string> Application::getDependencies() const
+std::vector<std::pair<std::string, bool>> Application::getDependencies() const
 {
-    return project_.description().dependencies;
+    return declared_dependencies_;
 }
 
 std::vector<std::string> Application::getLibraries() const
@@ -131,4 +142,9 @@ std::vector<std::string> Application::getBinaryDependencyPaths() const
 Application::BuildInfo& Application::getBuildInfo()
 {
     return info_;
+}
+
+std::vector<std::string> Application::getPublicDependencies() const
+{
+    return project_.description().public_dependencies;
 }

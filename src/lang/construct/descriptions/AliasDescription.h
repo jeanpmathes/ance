@@ -24,20 +24,17 @@ namespace lang
         , public Element<AliasDescription, ANCE_CONSTRUCTS>
     {
       public:
-        AliasDescription(lang::AccessModifier              access,
+        AliasDescription(lang::Accessibility               accessibility,
                          Identifier                        name,
                          lang::ResolvingHandle<lang::Type> actual,
                          lang::Location                    definition_location,
-                         lang::Location                    actual_type_location,
-                         bool                              is_imported = false);
+                         lang::Location                    actual_type_location);
 
-        AliasDescription();
+        explicit AliasDescription(bool from_public_import);
 
         ~AliasDescription() override = default;
 
         [[nodiscard]] Identifier const&    name() const override;
-        [[nodiscard]] lang::AccessModifier access() const override;
-        [[nodiscard]] bool                 isImported() const override;
         [[nodiscard]] lang::Type const&    actual() const;
         [[nodiscard]] bool                 isOverloadAllowed() const override;
 
@@ -50,8 +47,6 @@ namespace lang
         void sync(Storage& storage) override;
 
       private:
-        lang::AccessModifier              access_;
-        bool                              is_imported_;
         Identifier                        name_;
         lang::ResolvingHandle<lang::Type> actual_;
         lang::Location                    definition_location_;

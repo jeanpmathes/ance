@@ -1,6 +1,6 @@
 #include "CustomType.h"
 
-lang::CustomType::CustomType(bool is_imported) : is_imported_(is_imported) {}
+lang::CustomType::CustomType(lang::Accessibility accessibility) : accessibility_(accessibility) {}
 
 bool lang::CustomType::isCustom() const
 {
@@ -9,5 +9,10 @@ bool lang::CustomType::isCustom() const
 
 bool lang::CustomType::isImported() const
 {
-    return is_imported_;
+    return accessibility_.isImported();
+}
+
+lang::Accessibility const& lang::CustomType::getAccessibility() const
+{
+    return accessibility_;
 }

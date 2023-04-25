@@ -17,14 +17,12 @@ namespace lang
     class TypeAlias : public lang::CustomType
     {
       public:
-        TypeAlias(lang::AccessModifier              access,
+        TypeAlias(lang::Accessibility               accessibility,
                   lang::Identifier                  name,
                   lang::ResolvingHandle<lang::Type> actual,
-                  bool                              is_imported,
                   lang::Location                    definition_location);
 
         StateCount     getStateCount() const override;
-        AccessModifier getAccessModifier() const override;
 
         [[nodiscard]] FixedWidthIntegerType const* isFixedWidthIntegerType() const override;
         [[nodiscard]] bool               isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
@@ -142,7 +140,6 @@ namespace lang
 
       private:
         lang::ResolvingHandle<lang::Type> actual_;
-        lang::AccessModifier              access_modifier_;
 
         mutable Optional<lang::ResolvingHandle<lang::Type>> actually_actual_ {};
         mutable Optional<bool>                              is_valid_ {};

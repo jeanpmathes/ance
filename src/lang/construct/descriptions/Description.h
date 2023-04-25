@@ -3,7 +3,7 @@
 
 #include "lang/Element.h"
 
-#include "lang/AccessModifier.h"
+#include "lang/Accessibility.h"
 
 namespace lang
 {
@@ -24,12 +24,13 @@ namespace lang
     class Description : public virtual Visitable<ANCE_CONSTRUCTS>
     {
       public:
+        explicit Description(lang::Accessibility accessibility);
         ~Description() override = default;
 
       public:
         [[nodiscard]] virtual lang::Identifier const& name() const              = 0;
         [[nodiscard]] virtual bool                    isOverloadAllowed() const = 0;
-        [[nodiscard]] virtual lang::AccessModifier    access() const            = 0;
+        [[nodiscard]] lang::Accessibility             access() const;
 
         /**
          * Initialize the description, which will add the described entity to the passed scope.
@@ -66,7 +67,7 @@ namespace lang
          * Check if the description is imported.
          * @return True if the description is imported.
          */
-        [[nodiscard]] virtual bool isImported() const = 0;
+        [[nodiscard]] bool isImported() const;
 
       protected:
         /**
@@ -84,7 +85,8 @@ namespace lang
         virtual void sync(Storage& storage) = 0;
 
       private:
-        Scope* scope_ {nullptr};
+        lang::Accessibility accessibility_;
+        Scope*              scope_ {nullptr};
     };
 
     void synchronize(Description** description, Storage& storage);

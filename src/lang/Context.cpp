@@ -304,3 +304,20 @@ bool lang::Context::validateRuntimeDependency(lang::Location location, Validatio
 
     return false;
 }
+
+void lang::Context::setCurrentDescriptionSource(Optional<DescriptionSource> source)
+{
+    current_description_source_ = source;
+}
+
+Optional<std::string> lang::Context::getCurrentDescriptionSourceName() const
+{
+    if (current_description_source_.hasValue()) return current_description_source_.value().name;
+    else return std::nullopt;
+}
+
+bool lang::Context::isCurrentDescriptionSourcePublic() const
+{
+    assert(current_description_source_.hasValue());
+    return current_description_source_.value().is_public;
+}

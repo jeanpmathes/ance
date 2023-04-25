@@ -8,16 +8,15 @@
 lang::VariableDescription::VariableDescription(lang::Identifier                            name,
                                                Optional<lang::ResolvingHandle<lang::Type>> type,
                                                lang::Location                              type_location,
-                                               lang::AccessModifier                        access,
+                                               lang::Accessibility                         accessibility,
                                                Optional<Owned<Expression>>                 init,
                                                Assigner                                    assigner,
                                                bool                                        is_constant,
                                                lang::Location                              location)
-    : name_(name)
+    : Description(accessibility)
+    , name_(name)
     , type_(std::move(type))
     , type_location_(type_location)
-    , access_(access)
-    , is_import_(false)
     , assigner_(assigner)
     , is_constant_(is_constant)
     , location_(location)
@@ -31,19 +30,17 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
 lang::VariableDescription::VariableDescription(lang::Identifier                            name,
                                                Optional<lang::ResolvingHandle<lang::Type>> type,
                                                lang::Location                              type_location,
-                                               lang::AccessModifier                        access,
-                                               bool                                        is_import,
+                                               lang::Accessibility                         accessibility,
                                                Optional<Owned<Statement>>                  init_block,
                                                Optional<Owned<Expression>>                 init_expression,
                                                Expression*                                 init_expression_ptr,
                                                Assigner                                    assigner,
                                                bool                                        is_constant,
                                                lang::Location                              location)
-    : name_(name)
+    : Description(accessibility)
+    , name_(name)
     , type_(std::move(type))
     , type_location_(type_location)
-    , access_(access)
-    , is_import_(is_import)
     , assigner_(assigner)
     , is_constant_(is_constant)
     , location_(location)
@@ -55,12 +52,11 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
     , init_block_(std::move(init_block))
 {}
 
-lang::VariableDescription::VariableDescription()
-    : name_(lang::Identifier::empty())
+lang::VariableDescription::VariableDescription(bool from_public_import)
+    : Description(lang::Accessibility::imported(from_public_import))
+    , name_(lang::Identifier::empty())
     , type_(lang::Type::getUndefined())
     , type_location_(lang::Location::global())
-    , access_(lang::AccessModifier::PUBLIC_ACCESS)
-    , is_import_(true)
     , assigner_(Assigner::UNSPECIFIED)
     , is_constant_(false)
     , location_(lang::Location::global())
@@ -79,16 +75,6 @@ lang::Identifier const& lang::VariableDescription::name() const
 bool lang::VariableDescription::isOverloadAllowed() const
 {
     return false;
-}
-
-lang::AccessModifier lang::VariableDescription::access() const
-{
-    return access_;
-}
-
-bool lang::VariableDescription::isImported() const
-{
-    return is_import_;
 }
 
 lang::GlobalVariable const* lang::VariableDescription::variable() const
@@ -151,8 +137,8 @@ void lang::VariableDescription::performInitialization()
     global_variable_ = variable->defineAsGlobal(type_handle_,
                                                 type_location_,
                                                 *scope().getGlobalScope(),
-                                                access_,
-                                                is_import_,
+                                                access().modifier(),
+                                                access().isImported(),
                                                 variable_init,
                                                 init_scope,
                                                 assigner_,
@@ -178,7 +164,7 @@ void lang::VariableDescription::postResolve()
 
 void lang::VariableDescription::validate(ValidationLogger& validation_logger) const
 {
-    if (access_ == lang::AccessModifier::EXTERN_ACCESS)
+    if (access().modifier() == lang::AccessModifier::EXTERN_ACCESS)
     {
         validation_logger.logError("Global variables cannot be extern", location_);
     }
@@ -189,7 +175,7 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
 
         if (!type_handle_->validate(validation_logger, type_location_)) return;
 
-        if (access_ == lang::AccessModifier::PUBLIC_ACCESS)
+        if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS)
         {
             lang::validation::isTypeExportable(type_handle_, type_location_, validation_logger);
         }
@@ -281,8 +267,7 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
     auto expanded = makeOwned<lang::VariableDescription>(name_,
                                                          type_handle_->createUndefinedClone(new_context),
                                                          type_location_,
-                                                         access_,
-                                                         is_import_,
+                                                         access(),
                                                          std::move(expanded_init_block),
                                                          std::move(expanded_init_expression),
                                                          expanded_init_expression_ptr,

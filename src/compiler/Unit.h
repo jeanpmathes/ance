@@ -167,9 +167,10 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     /**
      * Import a package into this unit.
      * @param dir The directory in which the package is located.
-     * @name The name of the package.
+     * @param name The name of the package.
+     * @param is_public Whether the package is public.
      */
-    void importPackage(std::filesystem::path const& dir, std::string const& name);
+    void importPackage(std::filesystem::path const& dir, std::string const& name, bool is_public);
 
     /**
      * Prepare everything for the first validation step.
@@ -229,7 +230,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      * Get the name of all required packages.
      * @return The names of the required packages.
      */
-    [[nodiscard]] virtual std::vector<std::string> getDependencies() const = 0;
+    [[nodiscard]] virtual std::vector<std::pair<std::string, bool>> getDependencies() const = 0;
 
     /**
      * Libraries that should be linked.
@@ -255,6 +256,11 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      */
     [[nodiscard]] virtual std::vector<std::string> getBinaryDependencyPaths() const = 0;
 
+    /**
+     * Get the name of dependencies that must be linked.
+     */
+    [[nodiscard]] std::vector<std::string> const& getLinkDependencies() const;
+
     ~Unit() override;
 
   private:
@@ -265,8 +271,10 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     llvm::Triple  target_triple_;
     SourceVisitor source_visitor_ {*this};
 
-    std::vector<std::tuple<Optional<Owned<Project>>, Packages::Package>> dependencies_ {};
-    std::list<std::ofstream>                                             open_logs_ {};
+  private:
+    std::vector<std::tuple<Optional<Owned<Project>>, Packages::Package, bool>> dependencies_ {};
+    std::vector<std::string>                                                   dependencies_to_link_ {};
+    std::list<std::ofstream>                                                   open_logs_ {};
 };
 
 #endif

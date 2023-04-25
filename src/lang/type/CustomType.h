@@ -3,6 +3,8 @@
 
 #include "TypeDefinition.h"
 
+#include "lang/Accessibility.h"
+
 namespace lang
 {
     /**
@@ -11,13 +13,14 @@ namespace lang
     class CustomType : public virtual lang::TypeDefinition
     {
       public:
-        explicit CustomType(bool is_imported);
+        explicit CustomType(lang::Accessibility accessibility);
 
         bool isCustom() const final;
-        bool isImported() const final;
+        bool                       isImported() const final;
+        lang::Accessibility const& getAccessibility() const final;
 
       private:
-        bool is_imported_ {false};
+        lang::Accessibility accessibility_;
     };
 }
 

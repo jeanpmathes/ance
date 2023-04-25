@@ -29,8 +29,8 @@ class ProjectDescription : public Unit
     antlr4::tree::ParseTree* selectTree(anceParser& parser) override;
     void                     addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileContext& context) override;
 
-    [[nodiscard]] std::vector<std::string> getDependencies() const override;
-    [[nodiscard]] std::vector<std::string> getLibraries() const override;
+    [[nodiscard]] std::vector<std::pair<std::string, bool>> getDependencies() const override;
+    [[nodiscard]] std::vector<std::string>                  getLibraries() const override;
     [[nodiscard]] std::vector<std::string> getArchives() const override;
     [[nodiscard]] std::vector<std::string> getLibraryPaths() const override;
     [[nodiscard]] std::vector<std::string> getBinaryDependencyPaths() const override;
@@ -48,7 +48,8 @@ class ProjectDescription : public Unit
         std::string              name;
         UnitResult               kind;
         std::filesystem::path    project_file;
-        std::vector<std::string> dependencies;
+        std::vector<std::string> public_dependencies;
+        std::vector<std::string> private_dependencies;
         std::vector<std::string> linkage_libraries;
         std::vector<std::string> linkage_archives;
         std::vector<std::string> linkage_library_paths;

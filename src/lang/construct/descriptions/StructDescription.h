@@ -25,19 +25,16 @@ namespace lang
         , public Element<StructDescription, ANCE_CONSTRUCTS>
     {
       public:
-        StructDescription(lang::AccessModifier             access,
+        StructDescription(lang::Accessibility              accessibility,
                           Identifier                       name,
                           std::vector<Owned<lang::Member>> members,
-                          lang::Location                   definition_location,
-                          bool                             is_imported = false);
+                          lang::Location                   definition_location);
 
-        StructDescription();
+        explicit StructDescription(bool from_public_import);
 
         ~StructDescription() override = default;
 
         [[nodiscard]] Identifier const&                                       name() const override;
-        [[nodiscard]] lang::AccessModifier                                    access() const override;
-        [[nodiscard]] bool                                                    isImported() const override;
         [[nodiscard]] std::vector<std::reference_wrapper<const lang::Member>> members() const;
         [[nodiscard]] bool                                                    isOverloadAllowed() const override;
 
@@ -50,8 +47,6 @@ namespace lang
         void sync(Storage& storage) override;
 
       private:
-        lang::AccessModifier             access_;
-        bool                             is_imported_;
         Identifier                       name_;
         std::vector<Owned<lang::Member>> members_;
         lang::Location                   definition_location_;

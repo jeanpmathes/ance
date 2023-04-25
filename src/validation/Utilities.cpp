@@ -39,10 +39,13 @@ bool lang::validation::isTypeExportable(lang::Type const& type,
                                         lang::Location    location,
                                         ValidationLogger& validation_logger)
 {
-    if (type.getAccessModifier() == lang::AccessModifier::PUBLIC_ACCESS) return true;
-    if (!type.isCustom()) return true;
+    if (type.getAccessibility().isExposable()) return true;
 
-    validation_logger.logError("Public definitions cannot expose non-public types", location);
+    if (type.getAccessibility().isImported())
+    {
+        validation_logger.logError("Public definitions cannot expose types from private dependencies", location);
+    }
+    else { validation_logger.logError("Public definitions cannot expose non-public types", location); }
 
     return false;
 }

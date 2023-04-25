@@ -47,13 +47,13 @@ bool Unit::preparePackageDependencies(Packages const&              packages,
     auto dependencies = getDependencies();
     bool valid        = true;
 
-    std::set<std::string>          package_names;
-    std::vector<Packages::Package> packages_to_build;
+    std::set<std::string>                          package_names;
+    std::stack<std::pair<Packages::Package, bool>> packages_to_build;
 
     std::filesystem::path const bld_dir = dir / "dep";
     std::filesystem::create_directories(bld_dir);
 
-    for (auto const& dependency : dependencies)
+    for (auto const& [dependency, is_public] : dependencies)
     {
         if (dependency == getName())
         {
@@ -76,13 +76,21 @@ bool Unit::preparePackageDependencies(Packages const&              packages,
             out << "ance: packages: Could not find package '" << dependency << "'" << std::endl;
             valid = false;
         }
-        else { packages_to_build.push_back(package.value()); }
+        else { packages_to_build.emplace(package.value(), is_public); }
     }
+
+    std::set<std::string> prepared_packages;
 
     if (valid)
     {
-        for (auto const& package : packages_to_build)
+        while (!packages_to_build.empty())
         {
+            auto [package, is_public] = packages_to_build.top();
+            packages_to_build.pop();
+
+            if (prepared_packages.contains(package.name)) continue;
+            prepared_packages.insert(package.name);
+
             std::string const           log_file = package.name + ".txt";
             std::filesystem::path const log_path = bld_dir / log_file;
             std::ofstream               log(log_path);
@@ -103,12 +111,28 @@ bool Unit::preparePackageDependencies(Packages const&              packages,
                     out << "ance: packages: Package '" << package.name << "' is not a package" << std::endl;
                     potential_description = std::nullopt;
                 }
+                else
+                {
+                    for (auto& public_dependency : application.getPublicDependencies())
+                    {
+                        package_names.insert(public_dependency);
+
+                        auto public_package = packages.getPackage(public_dependency);
+                        if (!public_package.hasValue())
+                        {
+                            out << "ance: packages: Could not find package '" << public_dependency << "'" << std::endl;
+                            valid = false;
+                        }
+                        else { packages_to_build.emplace(public_package.value(), true); }
+                    }
+                }
             }
 
-            dependencies_.emplace_back(std::move(potential_description), package);
+            dependencies_.emplace_back(std::move(potential_description), package, is_public);
+            dependencies_to_link_.emplace_back(package.name);
         }
 
-        for (auto& [project, package] : dependencies_)
+        for (auto& [project, package, is_public] : dependencies_)
         {
             bool const is_ok = project.hasValue();
             valid &= is_ok;
@@ -137,7 +161,7 @@ bool Unit::buildPackageDependencies(Packages const&              packages,
     std::filesystem::path const bld_dir = dir / "dep";
     std::filesystem::create_directories(bld_dir);
 
-    for (auto& [project, package] : dependencies_)
+    for (auto& [project, package, is_public] : dependencies_)
     {
         if (included_packages.contains(package.name))
         {
@@ -169,14 +193,14 @@ bool Unit::buildPackageDependencies(Packages const&              packages,
 
     for (auto [is_ok, dependency] : llvm::zip(status_codes, dependencies_))
     {
-        auto const& [project, package] = dependency;
+        auto const& [project, package, is_public] = dependency;
         valid &= is_ok;
 
         out << "ance: packages: Building package '" << package.name << "'";
         if (is_ok) { out << " succeeded" << std::endl; }
         else { out << " failed" << std::endl; }
 
-        importPackage(bin_base, package.name);
+        importPackage(bin_base, package.name, is_public);
     }
 
     open_logs_.clear();
@@ -197,20 +221,21 @@ void Unit::exportPackage(std::filesystem::path const& dir)
     storage.sync(*global_scope_);
 }
 
-void Unit::importPackage(std::filesystem::path const& path, std::string const& name)
+void Unit::importPackage(std::filesystem::path const& path, std::string const& name, bool is_public)
 {
     std::filesystem::path const out = path / (name + Packages::PACKAGE_EXTENSION);
 
     std::ifstream in(out);
     Reader        reader(in);
 
-    global_scope_->setCurrentDescriptionSource(name);
+    global_scope_->context().setCurrentDescriptionSource(
+        lang::Context::DescriptionSource {.name = name, .is_public = is_public});
 
     Storage& storage = reader;
     storage.data_    = &global_scope_->context();
     storage.sync(*global_scope_);
 
-    global_scope_->setCurrentDescriptionSource(std::nullopt);
+    global_scope_->context().setCurrentDescriptionSource(std::nullopt);
 }
 
 void Unit::preValidate()
@@ -256,6 +281,11 @@ lang::GlobalScope& Unit::globalScope()
 lang::GlobalScope const& Unit::globalScope() const
 {
     return *global_scope_;
+}
+
+std::vector<std::string> const& Unit::getLinkDependencies() const
+{
+    return dependencies_to_link_;
 }
 
 Unit::~Unit() = default;

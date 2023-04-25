@@ -8,7 +8,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 
-#include "lang/AccessModifier.h"
+#include "lang/Accessibility.h"
 #include "lang/BinaryOperator.h"
 #include "lang/UnaryOperator.h"
 #include "lang/construct/Callable.h"
@@ -293,10 +293,10 @@ namespace lang
         [[nodiscard]] lang::Type const& getActualType() const;
 
         /**
-         * Get the access modifier for this type.
-         * @return The access modifier.
+         * Get the accessibility for this type.
+         * @return The accessibility.
          */
-        [[nodiscard]] lang::AccessModifier getAccessModifier() const;
+        [[nodiscard]] lang::Accessibility const& getAccessibility() const;
 
         /**
          * Set the scope that contains this type. The type must be already defined.

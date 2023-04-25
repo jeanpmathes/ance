@@ -59,7 +59,7 @@ std::any CodePrinter::visit(lang::StructDescription const& struct_description)
 {
     indent();
 
-    out_ << struct_description.access().toString() << " ";
+    out_ << struct_description.access().modifier().toString() << " ";
     out_ << "struct " << struct_description.name() << std::endl;
 
     indent();
@@ -84,7 +84,7 @@ std::any CodePrinter::visit(lang::AliasDescription const& alias_description)
 {
     indent();
 
-    out_ << alias_description.access().toString() << " ";
+    out_ << alias_description.access().modifier().toString() << " ";
     out_ << "define " << alias_description.name() << " ";
     out_ << "alias " << alias_description.actual().name() << ";" << std::endl;
 

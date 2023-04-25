@@ -58,7 +58,7 @@ void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 
         for (auto const& [source, description] : associated_descriptions)
         {
-            if (source.has_value())
+            if (source.hasValue())
             {
                 if (first_source) first_source = false;
                 else source_list << ", ";
@@ -150,18 +150,13 @@ void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger) const
     for (auto& [key, function] : defined_function_groups_) { function->validateFlow(validation_logger); }
 }
 
-void lang::GlobalScope::setCurrentDescriptionSource(std::optional<std::string> source)
-{
-    current_description_source_ = std::move(source);
-}
-
 void lang::GlobalScope::addDescription(Owned<lang::Description> description)
 {
     addChild(*description);
 
     if (incompatible_descriptions_.contains(description->name()))
     {
-        incompatible_descriptions_[description->name()].emplace_back(current_description_source_,
+        incompatible_descriptions_[description->name()].emplace_back(context().getCurrentDescriptionSourceName(),
                                                                      std::move(description));
         return;
     }
@@ -182,7 +177,7 @@ void lang::GlobalScope::addDescription(Owned<lang::Description> description)
             std::move(conflicting_description.begin(),
                       conflicting_description.end(),
                       std::back_inserter(incompatible_descriptions_[description->name()]));
-            incompatible_descriptions_[description->name()].emplace_back(current_description_source_,
+            incompatible_descriptions_[description->name()].emplace_back(context().getCurrentDescriptionSourceName(),
                                                                          std::move(description));
 
             compatible_descriptions_.erase(conflict);
@@ -191,7 +186,8 @@ void lang::GlobalScope::addDescription(Owned<lang::Description> description)
         }
     }
 
-    compatible_descriptions_[description->name()].emplace_back(current_description_source_, std::move(description));
+    compatible_descriptions_[description->name()].emplace_back(context().getCurrentDescriptionSourceName(),
+                                                               std::move(description));
 }
 
 void lang::GlobalScope::addFunction(lang::OwningHandle<lang::Function> function)
@@ -487,8 +483,7 @@ void lang::GlobalScope::synchronize(lang::GlobalScope* scope, Storage& storage)
         {
             for (auto& description : descriptions)
             {
-                if (description.description->access() != lang::AccessModifier::PUBLIC_ACCESS) continue;
-                if (description.description->isImported()) continue;
+                if (!description.description->access().isExported()) continue;
 
                 export_descriptions.emplace_back(&*description.description);
             }

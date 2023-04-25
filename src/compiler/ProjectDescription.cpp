@@ -79,7 +79,7 @@ void ProjectDescription::addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, 
     source_visitor_.visit(tree);
 }
 
-std::vector<std::string> ProjectDescription::getDependencies() const
+std::vector<std::pair<std::string, bool>> ProjectDescription::getDependencies() const
 {
     return {};
 }
@@ -107,7 +107,8 @@ std::vector<std::string> ProjectDescription::getBinaryDependencyPaths() const
 struct Project_ {
     uint8_t const*  name                     = nullptr;
     uint32_t        kind                     = 0;
-    uint8_t const** dependencies             = nullptr;
+    uint8_t const** public_dependencies      = nullptr;
+    uint8_t const** private_dependencies     = nullptr;
     uint8_t const** libraries                = nullptr;
     uint8_t const** archives                 = nullptr;
     uint8_t const** library_paths            = nullptr;
@@ -224,7 +225,8 @@ bool ProjectDescription::loadDescription()
     description_ = {.name                     = read_string(project.name),
                     .kind                     = kind,
                     .project_file             = project_file_,
-                    .dependencies             = read_vector(project.dependencies),
+                    .public_dependencies      = read_vector(project.public_dependencies),
+                    .private_dependencies     = read_vector(project.private_dependencies),
                     .linkage_libraries        = read_vector(project.libraries),
                     .linkage_archives         = read_vector(project.archives),
                     .linkage_library_paths    = read_vector(project.library_paths),

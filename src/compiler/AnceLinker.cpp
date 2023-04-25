@@ -141,7 +141,7 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     for (auto const& libpath : lib_paths) { args.push_back(libpath.c_str()); }
 
     for (auto const& lib : unit_.getLibraries()) { libs.push_back("/defaultlib:" + lib); }
-    for (auto const& lib : unit_.getDependencies()) { libs.push_back("/defaultlib:" + lib); }
+    for (auto const& lib : unit_.getLinkDependencies()) { libs.push_back("/defaultlib:" + lib); }
     for (auto const& lib : libs) { args.push_back(lib.c_str()); }
 
     std::vector<std::string> archives;

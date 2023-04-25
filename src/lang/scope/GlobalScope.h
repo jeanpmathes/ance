@@ -63,13 +63,6 @@ namespace lang
         void validateFlow(ValidationLogger& validation_logger) const;
 
         /**
-         * Set the source (package) that is currently used.
-         * All descriptions added after this call will be associated with this source.
-         * @param source The source to set, or nullopt to set the current project as source.
-         */
-        void setCurrentDescriptionSource(std::optional<std::string> source);
-
-        /**
          * Add an description element to this scope.
          * @param description The description to add.
          */
@@ -160,13 +153,11 @@ namespace lang
       private:
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);
 
-        std::optional<std::string> current_description_source_;
-
         struct AssociatedDescription {
-            std::optional<std::string> source;
-            Owned<lang::Description>   description;
+            Optional<std::string>    source;
+            Owned<lang::Description> description;
 
-            AssociatedDescription(std::optional<std::string> new_source, Owned<lang::Description> new_description)
+            AssociatedDescription(Optional<std::string> new_source, Owned<lang::Description> new_description)
                 : source(std::move(new_source))
                 , description(std::move(new_description))
             {}

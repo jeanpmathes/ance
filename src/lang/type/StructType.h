@@ -16,10 +16,9 @@ namespace lang
     class StructType : public lang::CustomType
     {
       public:
-        StructType(lang::AccessModifier                              access_modifier,
+        StructType(lang::Accessibility                               accessibility,
                    lang::Identifier                                  name,
                    std::vector<std::reference_wrapper<lang::Member>> members,
-                   bool                                              is_imported,
                    lang::Location                                    location);
 
         [[nodiscard]] StateCount getStateCount() const override;
@@ -27,8 +26,6 @@ namespace lang
 
         llvm::Constant*   getDefaultContent(llvm::Module& m) const override;
         llvm::StructType* getContentType(llvm::LLVMContext& c) const override;
-
-        [[nodiscard]] lang::AccessModifier getAccessModifier() const override;
 
         bool                              hasMember(lang::Identifier const& name) const override;
         lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name) override;
@@ -54,8 +51,6 @@ namespace lang
         llvm::Value* buildGetElementPointer(llvm::Value* struct_ptr, int32_t member_index, CompileContext& context);
 
       private:
-        [[maybe_unused]] lang::AccessModifier access_;
-
         std::vector<std::reference_wrapper<lang::Member>>                members_;
         std::map<lang::Identifier, std::reference_wrapper<lang::Member>> member_map_ {};
         std::map<lang::Identifier, int32_t>                              member_indices_ {};

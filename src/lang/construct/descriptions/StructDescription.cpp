@@ -7,21 +7,18 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::StructDescription::StructDescription(lang::AccessModifier             access,
+lang::StructDescription::StructDescription(lang::Accessibility              accessibility,
                                            lang::Identifier                 name,
                                            std::vector<Owned<lang::Member>> members,
-                                           lang::Location                   definition_location,
-                                           bool                             is_imported)
-    : access_(access)
-    , is_imported_(is_imported)
+                                           lang::Location                   definition_location)
+    : Description(accessibility)
     , name_(name)
     , members_(std::move(members))
     , definition_location_(definition_location)
 {}
 
-lang::StructDescription::StructDescription()
-    : access_(lang::AccessModifier::PUBLIC_ACCESS)
-    , is_imported_(true)
+lang::StructDescription::StructDescription(bool from_public_import)
+    : Description(lang::Accessibility::imported(from_public_import))
     , name_(lang::Identifier::empty())
     , members_()
     , definition_location_(lang::Location::global())
@@ -30,16 +27,6 @@ lang::StructDescription::StructDescription()
 lang::Identifier const& lang::StructDescription::name() const
 {
     return name_;
-}
-
-lang::AccessModifier lang::StructDescription::access() const
-{
-    return access_;
-}
-
-bool lang::StructDescription::isImported() const
-{
-    return is_imported_;
 }
 
 std::vector<std::reference_wrapper<const lang::Member>> lang::StructDescription::members() const
@@ -65,7 +52,7 @@ void lang::StructDescription::performInitialization()
     for (auto& member : members_) { members.emplace_back(*member); }
 
     Owned<lang::TypeDefinition> struct_definition =
-        makeOwned<lang::StructType>(access_, name_, members, is_imported_, definition_location_);
+        makeOwned<lang::StructType>(access(), name_, members, definition_location_);
     type->define(std::move(struct_definition));
 
     self_ = type.handle();
@@ -80,7 +67,7 @@ void lang::StructDescription::validate(ValidationLogger& validation_logger) cons
     assert(self_.hasValue());
     lang::Type const& self = self_.value();
 
-    if (access_ == lang::AccessModifier::EXTERN_ACCESS)
+    if (access().modifier() == lang::AccessModifier::EXTERN_ACCESS)
     {
         validation_logger.logError("Structs cannot be extern", definition_location_);
     }
@@ -118,7 +105,8 @@ void lang::StructDescription::validate(ValidationLogger& validation_logger) cons
             continue;
         }
 
-        if (access_ == lang::AccessModifier::PUBLIC_ACCESS && member->access() == lang::AccessModifier::PUBLIC_ACCESS)
+        if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS
+            && member->access() == lang::AccessModifier::PUBLIC_ACCESS)
         {
             lang::validation::isTypeExportable(type, member->location(), validation_logger);
         }
@@ -152,8 +140,7 @@ lang::Description::Descriptions lang::StructDescription::expand(lang::Context& n
     members.reserve(members_.size());
     for (auto& member : members_) { members.emplace_back(member->expand(new_context)); }
 
-    result.emplace_back(
-        makeOwned<StructDescription>(access_, name_, std::move(members), definition_location_, is_imported_));
+    result.emplace_back(makeOwned<StructDescription>(access(), name_, std::move(members), definition_location_));
 
     return result;
 }

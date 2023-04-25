@@ -12,14 +12,12 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::StructType::StructType(lang::AccessModifier                              access_modifier,
+lang::StructType::StructType(lang::Accessibility                               accessibility,
                              lang::Identifier                                  name,
                              std::vector<std::reference_wrapper<lang::Member>> members,
-                             bool                                              is_imported,
                              lang::Location                                    location)
     : TypeDefinition(name, location)
-    , CustomType(is_imported)
-    , access_(access_modifier)
+    , CustomType(accessibility)
     , members_(std::move(members))
 {
     int32_t index = 0;
@@ -67,11 +65,6 @@ llvm::StructType* lang::StructType::getContentType(llvm::LLVMContext& c) const
     }
 
     return native_type_;
-}
-
-lang::AccessModifier lang::StructType::getAccessModifier() const
-{
-    return access_;
 }
 
 std::string lang::StructType::createMangledName() const

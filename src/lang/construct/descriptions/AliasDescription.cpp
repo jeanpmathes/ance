@@ -7,23 +7,20 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::AliasDescription::AliasDescription(lang::AccessModifier              access,
+lang::AliasDescription::AliasDescription(lang::Accessibility               accessibility,
                                          lang::Identifier                  name,
                                          lang::ResolvingHandle<lang::Type> actual,
                                          lang::Location                    definition_location,
-                                         lang::Location                    actual_type_location,
-                                         bool                              is_imported)
-    : access_(access)
-    , is_imported_(is_imported)
+                                         lang::Location                    actual_type_location)
+    : Description(accessibility)
     , name_(name)
     , actual_(std::move(actual))
     , definition_location_(definition_location)
     , actual_type_location_(actual_type_location)
 {}
 
-lang::AliasDescription::AliasDescription()
-    : access_(lang::AccessModifier::PUBLIC_ACCESS)
-    , is_imported_(true)
+lang::AliasDescription::AliasDescription(bool from_public_import)
+    : Description(lang::Accessibility::imported(from_public_import))
     , name_(lang::Identifier::empty())
     , actual_(lang::Type::getUndefined())
     , definition_location_(lang::Location::global())
@@ -33,16 +30,6 @@ lang::AliasDescription::AliasDescription()
 lang::Identifier const& lang::AliasDescription::name() const
 {
     return name_;
-}
-
-lang::AccessModifier lang::AliasDescription::access() const
-{
-    return access_;
-}
-
-bool lang::AliasDescription::isImported() const
-{
-    return is_imported_;
 }
 
 lang::Type const& lang::AliasDescription::actual() const
@@ -61,7 +48,7 @@ void lang::AliasDescription::performInitialization()
         lang::OwningHandle<lang::Type>::takeOwnership(lang::makeHandled<lang::Type>(name_));
 
     Owned<lang::TypeDefinition> alias_definition =
-        makeOwned<lang::TypeAlias>(access_, name_, actual_, is_imported_, definition_location_);
+        makeOwned<lang::TypeAlias>(access(), name_, actual_, definition_location_);
     type->define(std::move(alias_definition));
 
     self_ = type.handle();
@@ -76,7 +63,7 @@ void lang::AliasDescription::validate(ValidationLogger& validation_logger) const
     assert(self_.hasValue());
     lang::Type const& self = self_.value();
 
-    if (access_ == lang::AccessModifier::EXTERN_ACCESS)
+    if (access().modifier() == lang::AccessModifier::EXTERN_ACCESS)
     {
         validation_logger.logError("Aliases cannot be extern", definition_location_);
     }
@@ -88,7 +75,7 @@ void lang::AliasDescription::validate(ValidationLogger& validation_logger) const
 
     if (lang::validation::isTypeUndefined(actual_, actual_type_location_, validation_logger)) return;
 
-    if (access_ == lang::AccessModifier::PUBLIC_ACCESS)
+    if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS)
     {
         lang::validation::isTypeExportable(actual_, actual_type_location_, validation_logger);
     }
@@ -107,12 +94,11 @@ lang::Description::Descriptions lang::AliasDescription::expand(lang::Context& ne
 {
     Descriptions result;
 
-    result.emplace_back(makeOwned<AliasDescription>(access_,
+    result.emplace_back(makeOwned<AliasDescription>(access(),
                                                     name_,
                                                     actual_->createUndefinedClone(new_context),
                                                     definition_location_,
-                                                    actual_type_location_,
-                                                    is_imported_));
+                                                    actual_type_location_));
 
     return result;
 }
