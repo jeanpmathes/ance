@@ -19,6 +19,13 @@ class SourceTree
     explicit SourceTree(Unit& unit);
 
     /**
+     * Check if this source tree is younger than the given file.
+     * @param file The file to compare to.
+     * @return True if this source tree is younger than the given file.
+     */
+    [[nodiscard]] bool isYoungerThan(std::filesystem::path const& file) const;
+
+    /**
      * Get the unit this source tree belongs to.
      * @return The unit.
      */

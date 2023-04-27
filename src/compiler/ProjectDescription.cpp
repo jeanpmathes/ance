@@ -246,19 +246,6 @@ bool ProjectDescription::loadDescription()
     return true;
 }
 
-bool ProjectDescription::isRefreshRequired()
-{
-    if (std::filesystem::exists(binary_description_path_.value()))
-    {
-        auto binary_description_time = std::filesystem::last_write_time(binary_description_path_.value());
-        auto project_file_time       = std::filesystem::last_write_time(project_file_);
-
-        return binary_description_time < project_file_time;
-    }
-
-    return true;
-}
-
 ProjectDescription::Description const& ProjectDescription::description() const
 {
     assert(description_.hasValue());

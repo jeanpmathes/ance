@@ -35,12 +35,6 @@ class ProjectDescription : public Unit
     [[nodiscard]] std::vector<std::string> getLibraryPaths() const override;
     [[nodiscard]] std::vector<std::string> getBinaryDependencyPaths() const override;
 
-    /*
-     * Get whether a refresh build is required.
-     * @return True if a refresh build is required, false if the binary description is up-to-date.
-     */
-    bool isRefreshRequired();
-
   public:
     static constexpr char const* ANCE_PROJECT_DEFINITION_FUNCTION = "define_project";
 

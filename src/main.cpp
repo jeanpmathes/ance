@@ -125,11 +125,15 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
     std::filesystem::create_directories(project_definition_obj);
 
     ProjectDescription project_description(project_file_path);
-    project_description.setBinaryDescriptionPath(getResultPath(project_definition_bin, project_description, triple));
 
-    if (project_description.isRefreshRequired())
+    std::filesystem::path const result = getResultPath(project_definition_bin, project_description, triple);
+    project_description.setBinaryDescriptionPath(result);
+
+    SourceTree tree(project_description);
+
+    if (tree.isYoungerThan(result))
     {
-        SourceTree tree(project_description);
+
         tree.parse();
 
         auto ok = tree.unit().preparePackageDependencies(packages, prepareProject, project_definition_root, out);
@@ -206,25 +210,29 @@ static bool buildProject(Project&              project,
                                               root_out);
     if (!ok) return false;
 
-    SourceTree   tree(application);
-    size_t const count = tree.parse();
+    SourceTree tree(application);
 
-    info.out << "ance: input: " << count << " source file(s) read" << std::endl;
+    if (tree.isYoungerThan(getResultPath(bin_dir, application, info.triple)))
+    {
+        size_t const count = tree.parse();
 
-    ok = validateTree(tree, info.validation_logger, info.out);
-    if (!ok) return false;
+        info.out << "ance: input: " << count << " source file(s) read" << std::endl;
 
-    if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input.nc");
+        ok = validateTree(tree, info.validation_logger, info.out);
+        if (!ok) return false;
 
-    application.preBuild();
+        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input.nc");
 
-    if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input_prebuild.nc");
+        application.preBuild();
 
-    ok = validateFlow(tree, info.validation_logger, info.out);
-    if (!ok) return false;
+        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input_prebuild.nc");
 
-    ok = build(tree, info.triple, obj_dir, bin_dir, info.out);
-    if (!ok) return false;
+        ok = validateFlow(tree, info.validation_logger, info.out);
+        if (!ok) return false;
+
+        ok = build(tree, info.triple, obj_dir, bin_dir, info.out);
+        if (!ok) return false;
+    }
 
     info.out << "ance: build: Success" << std::endl;
     return true;

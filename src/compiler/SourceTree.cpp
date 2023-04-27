@@ -7,6 +7,18 @@
 
 SourceTree::SourceTree(Unit& unit) : unit_(unit) {}
 
+bool SourceTree::isYoungerThan(std::filesystem::path const& file) const
+{
+    if (!std::filesystem::exists(file)) return true;
+
+    std::filesystem::file_time_type const file_time = std::filesystem::last_write_time(file);
+
+    return std::ranges::any_of(unit_.getSourceFiles(), [&](auto& source_file_path) {
+        std::filesystem::path const full_path = unit_.getProjectDirectory() / source_file_path;
+        return std::filesystem::last_write_time(full_path) > file_time;
+    });
+}
+
 Unit& SourceTree::unit()
 {
     return unit_;
