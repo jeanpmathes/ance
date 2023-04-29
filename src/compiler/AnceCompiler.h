@@ -48,9 +48,8 @@ class AnceCompiler
   public:
     static constexpr char const* WIN_EXE_MAIN_NAME =
         "main";// As the console subsystem is used, WinMain would be incorrect.
-    static constexpr char const* WIN_DLL_MAIN_NAME = "DllMain";
 
-    static constexpr std::array<char const*, 2> BUILTIN_NAMES = {WIN_EXE_MAIN_NAME, WIN_DLL_MAIN_NAME};
+    static constexpr std::array<char const*, 1> BUILTIN_NAMES = {WIN_EXE_MAIN_NAME};
 
   private:
     static constexpr char const* INTERNAL_FUNCTION_SUFFIX = "$lang";

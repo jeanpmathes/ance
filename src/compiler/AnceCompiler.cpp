@@ -19,7 +19,6 @@
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/SizeType.h"
-#include "lang/utility/Values.h"
 
 AnceCompiler::AnceCompiler(SourceTree& tree, llvm::Triple const& triple)
     : unit_(tree.unit())
@@ -241,48 +240,50 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::
 
 void AnceCompiler::buildLibStart(llvm::Function* init, llvm::Function* finit)
 {
-    switch (target_machine_->getTargetTriple().getOS())
+    auto* fn_type = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm_context_), false);
+    assert(fn_type == init->getFunctionType());
+    assert(fn_type == finit->getFunctionType());
+
+    auto* byte_ptr_type = llvm::Type::getInt8PtrTy(llvm_context_);
+    auto* entry_type =
+        llvm::StructType::get(llvm_context_,
+                              {llvm::Type::getInt32Ty(llvm_context_), fn_type->getPointerTo(), byte_ptr_type});
+    auto* array_type = llvm::ArrayType::get(entry_type, 1);
+
     {
-        case llvm::Triple::OSType::Win32:
-        {
-            llvm::FunctionType* start_type = llvm::FunctionType::get(llvm::Type::getInt32Ty(llvm_context_),
-                                                                     {llvm::Type::getInt8PtrTy(llvm_context_),
-                                                                      llvm::Type::getInt32Ty(llvm_context_),
-                                                                      llvm::Type::getInt8PtrTy(llvm_context_)},
-                                                                     false);
-            llvm::Function*     start      = llvm::Function::Create(start_type,
-                                                           llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-                                                           WIN_DLL_MAIN_NAME,
-                                                           module_);
+        auto* global_constructors = new llvm::GlobalVariable(module_,
+                                                             array_type,
+                                                             true,
+                                                             llvm::GlobalValue::LinkageTypes::AppendingLinkage,
+                                                             nullptr,
+                                                             "llvm.global_ctors");
 
-            llvm::BasicBlock* begin_block = llvm::BasicBlock::Create(llvm_context_, "entry", start);
-            llvm::BasicBlock* init_block  = llvm::BasicBlock::Create(llvm_context_, "init", start);
-            llvm::BasicBlock* finit_block = llvm::BasicBlock::Create(llvm_context_, "finit", start);
-            llvm::BasicBlock* done_block  = llvm::BasicBlock::Create(llvm_context_, "exit", start);
+        auto* data = llvm::ConstantArray::get(
+            array_type,
+            {llvm::ConstantStruct::get(entry_type,
+                                       {llvm::ConstantInt::get(llvm::Type::getInt32Ty(llvm_context_), 65535),
+                                        init,
+                                        llvm::ConstantPointerNull::get(byte_ptr_type)})});
 
-            ir_.SetInsertPoint(begin_block);
-            auto reason_switch = ir_.CreateSwitch(start->getArg(1), done_block, 2);
-            reason_switch->addCase(llvm::ConstantInt::get(llvm::Type::getInt32Ty(llvm_context_), 1),
-                                   init_block);// DLL_PROCESS_ATTACH
-            reason_switch->addCase(llvm::ConstantInt::get(llvm::Type::getInt32Ty(llvm_context_), 0),
-                                   finit_block);// DLL_PROCESS_DETACH
+        global_constructors->setInitializer(data);
+    }
 
-            ir_.SetInsertPoint(init_block);
-            ir_.CreateCall(init);
-            ir_.CreateBr(done_block);
+    {
+        auto* global_destructors = new llvm::GlobalVariable(module_,
+                                                            array_type,
+                                                            true,
+                                                            llvm::GlobalValue::LinkageTypes::AppendingLinkage,
+                                                            nullptr,
+                                                            "llvm.global_dtors");
 
-            ir_.SetInsertPoint(finit_block);
-            ir_.CreateCall(finit);
-            ir_.CreateBr(done_block);
+        auto* data = llvm::ConstantArray::get(
+            array_type,
+            {llvm::ConstantStruct::get(entry_type,
+                                       {llvm::ConstantInt::get(llvm::Type::getInt32Ty(llvm_context_), 65535),
+                                        finit,
+                                        llvm::ConstantPointerNull::get(byte_ptr_type)})});
 
-            ir_.SetInsertPoint(done_block);
-            ir_.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(llvm_context_), 1));
-
-            break;
-        }
-
-        default:
-            throw std::runtime_error("Unsupported OS for library start function.");
+        global_destructors->setInitializer(data);
     }
 }
 
