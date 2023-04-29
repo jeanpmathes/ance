@@ -16,6 +16,8 @@ Application::Application(Project& project, BuildInfo build_info)
     , info_(std::move(build_info))
     , declared_dependencies_()
 {
+    if (!project_.description().std_excluded) { declared_dependencies_.emplace_back("std", true); }
+
     for (auto const& dependency : project_.description().public_dependencies)
     {
         declared_dependencies_.emplace_back(dependency, true);
@@ -78,6 +80,12 @@ void Application::validate(ValidationLogger& validation_logger) const
     if (!isNameValid(getName()))
     {
         validation_logger.logError("Project name is not a valid identifier", lang::Location::global());
+    }
+
+    if (project_.description().runtime_excluded && !project_.description().std_excluded)
+    {
+        validation_logger.logError("Project cannot exclude the runtime while including the standard library",
+                                   lang::Location::global());
     }
 
     this->globalScope().validate(validation_logger);

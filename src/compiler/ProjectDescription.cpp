@@ -118,6 +118,7 @@ struct Project_ {
     bool            ignoring_assert          = false;
     bool            extra_emission_enabled   = false;
     bool            runtime_excluded         = false;
+    bool            std_excluded             = false;
 };
 
 using ProjectDescriptionFunction = void(__cdecl*)(Project_*);
@@ -235,7 +236,8 @@ bool ProjectDescription::loadDescription()
                     .warning_as_error_enabled = project.warning_as_error_enabled,
                     .ignoring_assert          = project.ignoring_assert,
                     .extra_emission_enabled   = project.extra_emission_enabled,
-                    .runtime_excluded         = project.runtime_excluded};
+                    .runtime_excluded         = project.runtime_excluded,
+                    .std_excluded             = project.std_excluded};
 
 #if defined(ANCE_TARGET_WINDOWS)
     FreeLibrary(handle);
