@@ -146,17 +146,17 @@ bool Unit::preparePackageDependencies(Packages const&              packages,
     return valid;
 }
 
-bool Unit::buildPackageDependencies(Packages const&              packages,
-                                    BuildFunction const&         build,
-                                    std::filesystem::path const& dir,
-                                    std::filesystem::path const& bin_base,
-                                    std::filesystem::path const& bin_suffix,
-                                    std::ostream&                out,
-                                    std::set<std::string> const  included_packages,
-                                    std::ostream&                root_out)
+std::pair<bool, size_t> Unit::buildPackageDependencies(Packages const&              packages,
+                                                       BuildFunction const&         build,
+                                                       std::filesystem::path const& dir,
+                                                       std::filesystem::path const& bin_base,
+                                                       std::filesystem::path const& bin_suffix,
+                                                       std::ostream&                out,
+                                                       std::set<std::string> const  included_packages,
+                                                       std::ostream&                root_out)
 {
-    bool              valid = true;
-    std::vector<bool> status_codes;
+    bool                        valid = true;
+    std::vector<Optional<bool>> status_codes;
 
     std::filesystem::path const bld_dir = dir / "dep";
     std::filesystem::create_directories(bld_dir);
@@ -177,9 +177,9 @@ bool Unit::buildPackageDependencies(Packages const&              packages,
         Optional<std::filesystem::path> const destination = bld_dir / package.name;
         std::filesystem::create_directories(destination.value());
 
-        bool const is_ok = build(**project, packages, new_included_packages, root_out);
+        Optional<bool> is_ok = build(**project, packages, new_included_packages, root_out);
 
-        if (is_ok)
+        if (is_ok.hasValue() && is_ok.value())
         {
             std::filesystem::path const results = destination.value() / bin_suffix;
             std::filesystem::copy(results,
@@ -188,16 +188,22 @@ bool Unit::buildPackageDependencies(Packages const&              packages,
                                       | std::filesystem::copy_options::recursive);
         }
 
-        status_codes.push_back(is_ok);
+        status_codes.emplace_back(is_ok);
     }
+
+    size_t built_count = 0;
 
     for (auto [is_ok, dependency] : llvm::zip(status_codes, dependencies_))
     {
+        if (!is_ok.hasValue()) continue;
+
+        valid &= is_ok.value();
+        built_count += 1;
+
         auto const& [project, package, is_public] = dependency;
-        valid &= is_ok;
 
         out << "ance: packages: Building package '" << package.name << "'";
-        if (is_ok) { out << " succeeded" << std::endl; }
+        if (is_ok.value()) { out << " succeeded" << std::endl; }
         else { out << " failed" << std::endl; }
 
         importPackage(bin_base, package.name, is_public);
@@ -205,7 +211,7 @@ bool Unit::buildPackageDependencies(Packages const&              packages,
 
     open_logs_.clear();
 
-    return valid;
+    return {valid, built_count};
 }
 
 void Unit::exportPackage(std::filesystem::path const& dir)

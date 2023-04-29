@@ -97,10 +97,10 @@ static bool build(SourceTree&                  tree,
     return linker.link(obj, res, out);
 }
 
-static bool buildProject(Project&              project,
-                         Packages const&       packages,
-                         std::set<std::string> included_packages,
-                         std::ostream&         root_out);
+static Optional<bool> buildProject(Project&              project,
+                                   Packages const&       packages,
+                                   std::set<std::string> included_packages,
+                                   std::ostream&         root_out);
 
 static Optional<Owned<Project>> prepareProject(std::filesystem::path const&           project_file_path,
                                                Optional<std::filesystem::path> const& override_build_dir,
@@ -131,24 +131,23 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
 
     SourceTree tree(project_description);
 
+    auto ok = tree.unit().preparePackageDependencies(packages, prepareProject, project_definition_root, out);
+    if (!ok) return std::nullopt;
+
+    std::tie(ok, std::ignore) = tree.unit().buildPackageDependencies(packages,
+                                                                     buildProject,
+                                                                     project_definition_root,
+                                                                     project_definition_bin,
+                                                                     bin_suffix,
+                                                                     out,
+                                                                     {},
+                                                                     out);
+
+    if (!ok) return std::nullopt;
+
     if (tree.isYoungerThan(result))
     {
-
         tree.parse();
-
-        auto ok = tree.unit().preparePackageDependencies(packages, prepareProject, project_definition_root, out);
-        if (!ok) return std::nullopt;
-
-        ok = tree.unit().buildPackageDependencies(packages,
-                                                  buildProject,
-                                                  project_definition_root,
-                                                  project_definition_bin,
-                                                  bin_suffix,
-                                                  out,
-                                                  {},
-                                                  out);
-
-        if (!ok) return std::nullopt;
 
         out << "ance: input: Project file read" << std::endl;
 
@@ -164,7 +163,7 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
         if (!ok) return std::nullopt;
     }
 
-    bool const ok = project_description.loadDescription();
+    ok = project_description.loadDescription();
     if (!ok)
     {
         out << "ance: input: Project description invalid" << std::endl;
@@ -183,10 +182,10 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
                               });
 }
 
-static bool buildProject(Project&              project,
-                         Packages const&       packages,
-                         std::set<std::string> included_packages,
-                         std::ostream&         root_out)
+static Optional<bool> buildProject(Project&              project,
+                                   Packages const&       packages,
+                                   std::set<std::string> included_packages,
+                                   std::ostream&         root_out)
 {
     Application&            application = project.getApplication();
     Application::BuildInfo& info        = application.getBuildInfo();
@@ -200,19 +199,21 @@ static bool buildProject(Project&              project,
     auto ok = application.preparePackageDependencies(packages, prepareProject, info.build_dir, info.out);
     if (!ok) return false;
 
-    ok = application.buildPackageDependencies(packages,
-                                              buildProject,
-                                              info.build_dir,
-                                              bin_dir,
-                                              info.bin_suffix,
-                                              info.out,
-                                              std::move(included_packages),
-                                              root_out);
+    size_t built_count = 0;
+
+    std::tie(ok, built_count) = application.buildPackageDependencies(packages,
+                                                                     buildProject,
+                                                                     info.build_dir,
+                                                                     bin_dir,
+                                                                     info.bin_suffix,
+                                                                     info.out,
+                                                                     std::move(included_packages),
+                                                                     root_out);
     if (!ok) return false;
 
     SourceTree tree(application);
 
-    if (tree.isYoungerThan(getResultPath(bin_dir, application, info.triple)))
+    if (tree.isYoungerThan(getResultPath(bin_dir, application, info.triple)) || built_count > 0)
     {
         size_t const count = tree.parse();
 
@@ -232,10 +233,15 @@ static bool buildProject(Project&              project,
 
         ok = build(tree, info.triple, obj_dir, bin_dir, info.out);
         if (!ok) return false;
-    }
 
-    info.out << "ance: build: Success" << std::endl;
-    return true;
+        info.out << "ance: build: Success" << std::endl;
+        return true;
+    }
+    else
+    {
+        info.out << "ance: build: Skipped" << std::endl;
+        return std::nullopt;
+    }
 }
 
 static bool run(std::ostream&                          out,
@@ -248,7 +254,7 @@ static bool run(std::ostream&                          out,
 
     auto project = prepareProject(project_file_path, override_build_dir, out, packages);
 
-    if (project.hasValue()) { return buildProject(**project, packages, {(**project).getName()}, out); }
+    if (project.hasValue()) { return buildProject(**project, packages, {(**project).getName()}, out).valueOr(true); }
 
     return false;
 }
