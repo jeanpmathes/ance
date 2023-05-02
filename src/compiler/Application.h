@@ -20,6 +20,8 @@ class Application : public Unit
 
         ValidationLogger validation_logger;
         std::ostream&    out;
+
+        bool project_description_dirty;
     };
 
     /**

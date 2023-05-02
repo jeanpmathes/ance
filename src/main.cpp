@@ -145,7 +145,9 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
 
     if (!ok) return std::nullopt;
 
-    if (tree.isYoungerThan(result))
+    bool const project_description_dirty = tree.isYoungerThan(result);
+
+    if (project_description_dirty)
     {
         tree.parse();
 
@@ -179,7 +181,7 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
                                   .bin_suffix        = bin_suffix,
                                   .validation_logger = validation_logger,
                                   .out               = out,
-                              });
+                                                      .project_description_dirty = project_description_dirty});
 }
 
 static Optional<bool> buildProject(Project&              project,
@@ -213,7 +215,8 @@ static Optional<bool> buildProject(Project&              project,
 
     SourceTree tree(application);
 
-    if (tree.isYoungerThan(getResultPath(bin_dir, application, info.triple)) || built_count > 0)
+    if (tree.isYoungerThan(getResultPath(bin_dir, application, info.triple)) || built_count > 0
+        || info.project_description_dirty)
     {
         size_t const count = tree.parse();
 
