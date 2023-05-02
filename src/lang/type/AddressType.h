@@ -11,7 +11,7 @@ namespace lang
     class AddressType : public virtual TypeDefinition
     {
       public:
-        bool       isAddressType() const override;
+        bool       isAddressType() const final;
         StateCount getStateCount() const override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;

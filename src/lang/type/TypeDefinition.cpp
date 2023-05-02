@@ -264,6 +264,9 @@ void lang::TypeDefinition::postResolve()
 
 bool lang::TypeDefinition::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters)
 {
+    lang::TypeDefinition* definition = getActualType()->getDefinition();
+    if (definition != this) return definition->requestOverload(parameters);
+
     for (auto const& [constructor_parameters, function] : requested_constructors_)
     {
         if (constructor_parameters == parameters) return true;

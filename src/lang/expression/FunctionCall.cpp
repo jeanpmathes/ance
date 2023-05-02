@@ -131,13 +131,14 @@ bool FunctionCall::validate(ValidationLogger& validation_logger) const
 
     if (functions.empty())
     {
-        validation_logger.logError("Cannot resolve '" + callable().name() + "' function overload", location());
+        validation_logger.logError("Cannot resolve " + callable().getAnnotatedName(true) + " function overload",
+                                   location());
         return false;
     }
 
     if (functions.size() > 1)
     {
-        validation_logger.logError("Ambiguous function call to '" + callable().name() + "'", location());
+        validation_logger.logError("Ambiguous function call to " + callable().getAnnotatedName(true), location());
         return false;
     }
 

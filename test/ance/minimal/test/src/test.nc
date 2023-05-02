@@ -1,6 +1,6 @@
 // valid
 
-// A minimal ance program. Both the main and exit functions must be defined.
+// A minimal ance program. For executables, a main function is required.
 
 public main () : u32
 {

@@ -26,6 +26,13 @@ public main () : u32
     let a11 <: ptr(a8);
     let a12 <: uiptr(a7);
 
+    // Pointers can also directly be converted to each other.
+    let a13 <: *i32(a1);
+    let a14 <: *u32(a13);
+
+    // Buffer-pointers work just like pointers in respect to the above.
+    let a15 <: []u32(a1);
+    let a16 <: *u32(a15);
+
     return 0:32;
 }
-

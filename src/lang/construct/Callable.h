@@ -27,9 +27,15 @@ namespace lang
          * Get the name of this callable.
          * @return The name.
          */
-        [[nodiscard]] virtual Identifier const& name() const = 0;
+        [[nodiscard]] virtual Identifier const& name() const      = 0;
+        [[nodiscard]] virtual bool              isDefined() const = 0;
 
-        [[nodiscard]] virtual bool isDefined() const = 0;
+        /**
+         * Get the name of this callable with helpful annotations. Useful for validation messages.
+         * @param is_safe Whether the callable is currently safe to use. Set to false when endless loops could occur.
+         * @return The annotated name.
+         */
+        [[nodiscard]] virtual std::string getAnnotatedName(bool is_safe) const;
 
         /**
          * Request a function overload from this callable. The callable can than offer this overload in later phases.
@@ -80,6 +86,9 @@ namespace lang
          * If not, the passed arguments must match the function signature exactly.
          */
         [[nodiscard]] virtual bool enableImplicitConversionOnCall() const;
+
+        virtual lang::Callable&       getFunctionSource();
+        virtual lang::Callable const& getFunctionSource() const;
 
       private:
         std::vector<lang::OwningHandle<lang::Function>>    functions_;

@@ -38,6 +38,11 @@ lang::Identifier const& lang::Type::name() const
     else { return name_.text().empty() ? undefined : name_; }
 }
 
+std::string lang::Type::getAnnotatedName() const
+{
+    return getAnnotatedName(true);
+}
+
 std::string lang::Type::getAnnotatedName(bool is_safe) const
 {
     std::string name = "'" + this->name() + "'";
@@ -738,6 +743,16 @@ bool lang::Type::operator==(lang::Type const& other) const
 bool lang::Type::operator!=(lang::Type const& other) const
 {
     return !(*this == other);
+}
+
+lang::Callable& lang::Type::getFunctionSource()
+{
+    return getActualType();
+}
+
+lang::Callable const& lang::Type::getFunctionSource() const
+{
+    return getActualType();
 }
 
 enum TypeClass : uint8_t

@@ -4,6 +4,11 @@
 #include "lang/construct/Function.h"
 #include "validation/ValidationLogger.h"
 
+std::string lang::Callable::getAnnotatedName(bool) const
+{
+    return std::string(name().text());
+}
+
 void lang::Callable::addFunction(lang::OwningHandle<lang::Function> function)
 {
     functions_.push_back(std::move(function));
@@ -14,14 +19,15 @@ bool lang::Callable::validateResolution(std::vector<std::reference_wrapper<lang:
                                         lang::Location                                               location,
                                         ValidationLogger& validation_logger) const
 {
-    size_t argument_count = types.size();
+    size_t const argument_count = types.size();
 
-    for (auto& function : functions_)
+    for (auto& function : getFunctionSource().functions_)
     {
         if (function->signature().getParameterCount() == argument_count) return true;
     }
 
-    validation_logger.logError("No overload of '" + name() + "' takes " + std::to_string(argument_count) + " arguments",
+    validation_logger.logError("No overload of " + getAnnotatedName(true) + " takes " + std::to_string(argument_count)
+                                   + " argument(s)",
                                location);
 
     return false;
@@ -33,14 +39,14 @@ std::vector<lang::ResolvingHandle<lang::Function>> lang::Callable::resolveOverlo
     std::vector<lang::ResolvingHandle<lang::Function>> same_signatures;
     std::vector<lang::ResolvingHandle<lang::Function>> matching_signatures;
 
-    if (functions_.size() == 1)
+    if (getFunctionSource().functions_.size() == 1)
     {
         std::vector<lang::ResolvingHandle<lang::Function>> result;
-        result.push_back(functions_.front().handle());
+        result.push_back(getFunctionSource().functions_.front().handle());
         return result;
     }
 
-    for (auto& function : functions_)
+    for (auto& function : getFunctionSource().functions_)
     {
         if (function->signature().isSame(arguments)) same_signatures.push_back(function.handle());
         else if (enableImplicitConversionOnCall() && function->signature().isMatching(arguments))
@@ -57,14 +63,14 @@ std::vector<std::reference_wrapper<lang::Function const>> lang::Callable::resolv
     std::vector<std::reference_wrapper<lang::Function const>> same_signatures;
     std::vector<std::reference_wrapper<lang::Function const>> matching_signatures;
 
-    if (functions_.size() == 1)
+    if (getFunctionSource().functions_.size() == 1)
     {
         std::vector<std::reference_wrapper<lang::Function const>> result;
-        result.emplace_back(*functions_.front());
+        result.emplace_back(*getFunctionSource().functions_.front());
         return result;
     }
 
-    for (auto& function : functions_)
+    for (auto& function : getFunctionSource().functions_)
     {
         if (function->signature().isSame(arguments)) same_signatures.emplace_back(*function);
         else if (enableImplicitConversionOnCall() && function->signature().isMatching(arguments))
@@ -77,15 +83,25 @@ std::vector<std::reference_wrapper<lang::Function const>> lang::Callable::resolv
 
 std::vector<lang::ResolvingHandle<lang::Function>>& lang::Callable::functions()
 {
-    return function_handles_;
+    return getFunctionSource().function_handles_;
 }
 
 std::vector<lang::ResolvingHandle<lang::Function>> const& lang::Callable::functions() const
 {
-    return function_handles_;
+    return getFunctionSource().function_handles_;
 }
 
 bool lang::Callable::enableImplicitConversionOnCall() const
 {
     return true;
+}
+
+lang::Callable& lang::Callable::getFunctionSource()
+{
+    return *this;
+}
+
+lang::Callable const& lang::Callable::getFunctionSource() const
+{
+    return *this;
 }

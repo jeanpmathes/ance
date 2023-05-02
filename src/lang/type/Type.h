@@ -79,10 +79,11 @@ namespace lang
 
         /**
          * Get the name of this type with helpful annotations. Useful for validation messages.
-         * @param is_safe Whether the type is currently safe to use. Set to false when endless loops could occur.
+         * Use this only when the type is safe to use. Otherwise use the other overload.
          * @return The annotated name.
          */
-        [[nodiscard]] std::string getAnnotatedName(bool is_safe = true) const;
+        [[nodiscard]] std::string getAnnotatedName() const;
+        [[nodiscard]] std::string getAnnotatedName(bool is_safe) const override;
 
         /**
          * Get the mangled name of this type. The mangled name can only be used after all type dependencies have been resolved.
@@ -739,6 +740,10 @@ namespace lang
          * @return True if the types are not equal.
          */
         bool operator!=(lang::Type const& other) const;
+
+      protected:
+        lang::Callable&       getFunctionSource() override;
+        lang::Callable const& getFunctionSource() const override;
 
       private:
         lang::Identifier                      name_;

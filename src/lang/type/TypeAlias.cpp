@@ -359,16 +359,16 @@ bool lang::TypeAlias::isTriviallyDestructible() const
 
 void lang::TypeAlias::createConstructors() {}
 
-bool lang::TypeAlias::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
+bool lang::TypeAlias::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>>)
 {
-    return actual_->requestOverload(parameters);
+    return false;// Overloads are rerouted to the actual type by base class.
 }
 
 void lang::TypeAlias::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>>,
                                              lang::PredefinedFunction&,
                                              CompileContext&)
 {
-    assert(false);
+    assert(false);// Overloads are rerouted to the actual type by base class.
 }
 
 void lang::TypeAlias::buildNativeDeclaration(CompileContext&) {}
