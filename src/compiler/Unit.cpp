@@ -195,18 +195,17 @@ std::pair<bool, size_t> Unit::buildPackageDependencies(Packages const&          
 
     for (auto [is_ok, dependency] : llvm::zip(status_codes, dependencies_))
     {
+        auto const& [project, package, is_public] = dependency;
+
+        if (is_ok.valueOr(true)) importPackage(bin_base, package.name, is_public);
         if (!is_ok.hasValue()) continue;
 
         valid &= is_ok.value();
         built_count += 1;
 
-        auto const& [project, package, is_public] = dependency;
-
         out << "ance: packages: Building package '" << package.name << "'";
         if (is_ok.value()) { out << " succeeded" << std::endl; }
         else { out << " failed" << std::endl; }
-
-        importPackage(bin_base, package.name, is_public);
     }
 
     open_logs_.clear();

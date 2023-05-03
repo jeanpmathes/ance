@@ -8,7 +8,7 @@
 #include "lang/utility/Empty.h"
 #include "lang/utility/ResolvingHandle.h"
 
-typedef lang::ResolvingHandle<lang::Type> TypeHandle;
+using TypeHandle = lang::ResolvingHandle<lang::Type>;
 
 namespace lang
 {

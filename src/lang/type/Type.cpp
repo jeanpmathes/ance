@@ -747,12 +747,12 @@ bool lang::Type::operator!=(lang::Type const& other) const
 
 lang::Callable& lang::Type::getFunctionSource()
 {
-    return getActualType();
+    return isDefined() ? getActualType() : *this;
 }
 
 lang::Callable const& lang::Type::getFunctionSource() const
 {
-    return getActualType();
+    return isDefined() ? getActualType() : *this;
 }
 
 enum TypeClass : uint8_t
