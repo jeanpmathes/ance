@@ -219,8 +219,9 @@ void Unit::exportPackage(std::filesystem::path const& dir)
 
     std::filesystem::path const out = dir / (getName() + Packages::PACKAGE_EXTENSION);
 
-    std::ofstream of(out);
-    Writer        writer(of);
+    std::ofstream of_stream(out, std::ios::binary | std::ios::out);
+    assert(of_stream.good());
+    Writer writer(of_stream);
 
     Storage& storage = writer;
     storage.sync(*global_scope_);
@@ -228,10 +229,11 @@ void Unit::exportPackage(std::filesystem::path const& dir)
 
 void Unit::importPackage(std::filesystem::path const& path, std::string const& name, bool is_public)
 {
-    std::filesystem::path const out = path / (name + Packages::PACKAGE_EXTENSION);
+    std::filesystem::path const in = path / (name + Packages::PACKAGE_EXTENSION);
 
-    std::ifstream in(out);
-    Reader        reader(in);
+    std::ifstream if_stream(in, std::ios::binary | std::ios::in);
+    assert(if_stream.good());
+    Reader reader(if_stream);
 
     global_scope_->context().setCurrentDescriptionSource(
         lang::Context::DescriptionSource {.name = name, .is_public = is_public});
