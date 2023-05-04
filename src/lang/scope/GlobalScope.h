@@ -55,6 +55,8 @@ namespace lang
         [[nodiscard]] lang::GlobalScope const* getGlobalScope() const override;
         llvm::DIScope*                         getDebugScope(CompileContext& context) const override;
 
+        bool isNameConflicted(lang::Identifier const& name) const override;
+
         void validate(ValidationLogger& validation_logger) const;
 
         [[nodiscard]] Owned<lang::GlobalScope> expand() const;

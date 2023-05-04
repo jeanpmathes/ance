@@ -76,7 +76,7 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
     {
         lang::Type const& type = type_.value();
 
-        if (lang::validation::isTypeUndefined(type, type_location_, validation_logger)) return false;
+        if (lang::validation::isTypeUndefined(type, scope(), type_location_, validation_logger)) return false;
     }
     else
     {

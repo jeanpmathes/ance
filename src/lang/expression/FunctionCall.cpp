@@ -144,7 +144,7 @@ bool FunctionCall::validate(ValidationLogger& validation_logger) const
 
     std::reference_wrapper<lang::Function const> const actual_function = functions.front();
 
-    if (lang::validation::isFunctionUndefined(actual_function, location(), validation_logger)) return false;
+    if (lang::validation::isFunctionUndefined(actual_function, scope(), location(), validation_logger)) return false;
 
     return actual_function.get().validateCall(arguments, location(), validation_logger);
 }

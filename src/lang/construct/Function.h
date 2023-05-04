@@ -216,6 +216,8 @@ namespace lang
          */
         [[nodiscard]] bool isImported() const;
 
+        bool isNameConflicted(lang::Identifier const& name) const override;
+
         /**
          * Determine the control flow in this function and build the CFG.
          * This step is necessary to build.
@@ -270,6 +272,7 @@ namespace lang
                                                 CompileContext&                         context);
 
         lang::Scope*                           scope() override;
+        lang::Scope const*                     scope() const;
         lang::GlobalScope*                     getGlobalScope() override;
         [[nodiscard]] lang::GlobalScope const* getGlobalScope() const override;
         llvm::DIScope*                         getDebugScope(CompileContext& context) const override;

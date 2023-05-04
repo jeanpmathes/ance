@@ -41,6 +41,8 @@ namespace lang
 
         [[nodiscard]] lang::Scope* scope() const;
 
+        bool isNameConflicted(lang::Identifier const& name) const override;
+
         /**
          * Prepare the definition of a new variable. This will block resolution above this scope.
          * @param name The name of the variable.

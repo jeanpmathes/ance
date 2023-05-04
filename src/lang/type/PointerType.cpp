@@ -46,7 +46,7 @@ lang::Type const& lang::PointerType::getActualType() const
 
 bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
-    if (lang::validation::isTypeUndefined(element_type_, element_type_->name().location(), validation_logger))
+    if (lang::validation::isTypeUndefined(element_type_, scope(), element_type_->name().location(), validation_logger))
         return false;
 
     if (element_type_->isReferenceType())

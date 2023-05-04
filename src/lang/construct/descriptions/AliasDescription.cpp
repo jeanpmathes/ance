@@ -73,7 +73,7 @@ void lang::AliasDescription::validate(ValidationLogger& validation_logger) const
         validation_logger.logError("Cannot alias self", actual_type_location_);
     }
 
-    if (lang::validation::isTypeUndefined(actual_, actual_type_location_, validation_logger)) return;
+    if (lang::validation::isTypeUndefined(actual_, &scope(), actual_type_location_, validation_logger)) return;
 
     if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS)
     {

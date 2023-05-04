@@ -24,6 +24,7 @@ namespace lang
     class Variable;
     class Type;
     class Context;
+    class Identifier;
 }
 
 class Statement;
@@ -90,6 +91,13 @@ namespace lang
          * @return The created local scope.
          */
         Owned<lang::LocalScope> makeLocalScope();
+
+        /**
+         * Whether a name is conflicted in this scope, meaning there are multiple elements with the same name.
+         * @param name The name to check.
+         * @return True if the name is conflicted, false otherwise.
+         */
+        [[nodiscard]] virtual bool isNameConflicted(lang::Identifier const& name) const = 0;
 
         /**
          * Register the usage of a variable in this scope. Only variables that are registered will be resolved.

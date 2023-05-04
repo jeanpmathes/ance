@@ -190,6 +190,17 @@ bool lang::Function::isImported() const
     return definition_.value()->isImported();
 }
 
+bool lang::Function::isNameConflicted(lang::Identifier const& name) const
+{
+    size_t count = 0;
+    for (auto& [parameter_name, parameter] : defined_parameters_)
+    {
+        if (parameter_name.text() == name.text()) count += 1;
+    }
+
+    return count > 1 || scope()->isNameConflicted(name);
+}
+
 void lang::Function::determineFlow()
 {
     definition_.value()->determineFlow();
@@ -235,6 +246,11 @@ Optional<Shared<lang::Value>> lang::Function::buildCall(std::vector<Shared<lang:
 }
 
 lang::Scope* lang::Function::scope()
+{
+    return &definition_.value()->scope();
+}
+
+lang::Scope const* lang::Function::scope() const
 {
     return &definition_.value()->scope();
 }

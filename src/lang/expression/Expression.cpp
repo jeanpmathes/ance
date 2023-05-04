@@ -64,6 +64,8 @@ bool Expression::validateAssignment(lang::Value const& value,
                                     ValidationLogger&  validation_logger) const
 {
     if (!validate(validation_logger)) return false;
+    if (!type().isDefined()) return false;
+    if (!value.type().isDefined()) return false;
 
     if (type().isReferenceType())
     {

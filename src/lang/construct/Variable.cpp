@@ -75,8 +75,7 @@ lang::Identifier const& lang::Variable::name() const
 
 lang::Scope* lang::Variable::scope() const
 {
-    assert(definition_.hasValue());
-    return definition_.value()->scope();
+    return definition_.hasValue() ? definition_.value()->scope() : nullptr;
 }
 
 lang::ResolvingHandle<lang::Type> lang::Variable::type()
@@ -114,7 +113,10 @@ void lang::Variable::buildFinalization(CompileContext& context)
 
 bool lang::Variable::validateGetValue(ValidationLogger& validation_logger, lang::Location location) const
 {
-    return not lang::validation::isNameUndefined(self(), location, validation_logger) && type().isDefined();
+    // If the type is undefined, this is not an error with the variable itself, but with the type.
+    // It still blocks any further validation, so we return false.
+
+    return not lang::validation::isNameUndefined(self(), scope(), location, validation_logger) && type().isDefined();
 }
 
 bool lang::Variable::validateSetValue(lang::Value const& value,
@@ -122,8 +124,10 @@ bool lang::Variable::validateSetValue(lang::Value const& value,
                                       lang::Location     assignable_location,
                                       lang::Location     assigned_location) const
 {
-    if (lang::validation::isNameUndefined(self(), assignable_location, validation_logger)) return false;
-    // The following variable methods require that the variable is defined.
+    if (lang::validation::isNameUndefined(self(), scope(), assignable_location, validation_logger)) return false;
+    if (not type().isDefined()) return false;
+    if (not value.type().isDefined()) return false;
+    // The following variable methods require that the variable and type is defined.
 
     if (isFinal())
     {

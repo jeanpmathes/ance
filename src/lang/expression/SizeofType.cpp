@@ -37,7 +37,7 @@ void SizeofType::defineType(lang::ResolvingHandle<lang::Type> type)
 
 bool SizeofType::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isTypeUndefined(type_, type_location_, validation_logger)) return false;
+    if (lang::validation::isTypeUndefined(type_, scope(), type_location_, validation_logger)) return false;
 
     return type_->validate(validation_logger, type_location_);
 }

@@ -103,7 +103,7 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
         return;
     }
 
-    if (lang::validation::isTypeUndefined(type_, type_location_, validation_logger)) return;
+    if (lang::validation::isTypeUndefined(type_, scope(), type_location_, validation_logger)) return;
 
     if (!type_->validate(validation_logger, type_location_)) return;
 

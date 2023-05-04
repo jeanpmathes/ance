@@ -171,7 +171,7 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
 
     if (type_.hasValue())
     {
-        if (lang::validation::isTypeUndefined(type_handle_, type_location_, validation_logger)) return;
+        if (lang::validation::isTypeUndefined(type_handle_, &scope(), type_location_, validation_logger)) return;
 
         if (!type_handle_->validate(validation_logger, type_location_)) return;
 

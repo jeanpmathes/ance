@@ -46,6 +46,11 @@ llvm::DIScope* lang::GlobalScope::getDebugScope(CompileContext& context) const
     return &context.llvmUnit();
 }
 
+bool lang::GlobalScope::isNameConflicted(lang::Identifier const& name) const
+{
+    return incompatible_descriptions_.contains(name);
+}
+
 void lang::GlobalScope::validate(ValidationLogger& validation_logger) const
 {
     for (auto const& [name, associated_descriptions] : incompatible_descriptions_)

@@ -87,7 +87,7 @@ Statement const* lang::FunctionDescription::code() const
 
 void lang::FunctionDescription::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isTypeUndefined(return_type_, return_type_location_, validation_logger)) return;
+    if (lang::validation::isTypeUndefined(return_type_, &scope(), return_type_location_, validation_logger)) return;
 
     return_type_->validate(validation_logger, return_type_location_);
 
@@ -108,7 +108,11 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
                                        parameter->name().location());
         }
 
-        if (lang::validation::isTypeUndefined(parameter->type(), parameter->typeLocation(), validation_logger)) return;
+        if (lang::validation::isTypeUndefined(parameter->type(),
+                                              &scope(),
+                                              parameter->typeLocation(),
+                                              validation_logger))
+            return;
 
         if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS)
         {

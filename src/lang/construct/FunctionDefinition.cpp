@@ -118,8 +118,12 @@ bool lang::FunctionDefinition::validateCall(
     for (auto const [param, arg] : llvm::zip(parameters_, arguments))
     {
         auto const& [arg_value, arg_location] = arg;
-        valid &= lang::Type::checkMismatch(param->type(), arg_value.get().type(), arg_location, validation_logger);
+        bool const types_defined              = param->type().isDefined() && arg_value.get().type().isDefined();
+        valid &= types_defined
+              && lang::Type::checkMismatch(param->type(), arg_value.get().type(), arg_location, validation_logger);
     }
+
+    if (!valid) return false;
 
     valid &= doCallValidation(arguments, location, validation_logger);
 

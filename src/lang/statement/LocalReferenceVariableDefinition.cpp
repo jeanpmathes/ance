@@ -65,7 +65,7 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
 {
     assert(variable_.hasValue());
 
-    if (lang::validation::isTypeUndefined(type_, type_location_, validation_logger)) return;
+    if (lang::validation::isTypeUndefined(type_, scope(), type_location_, validation_logger)) return;
 
     if (!type_->isReferenceType())
     {

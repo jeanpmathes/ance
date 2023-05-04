@@ -36,6 +36,11 @@ lang::Scope* lang::LocalScope::scope() const
     return parent_;
 }
 
+bool lang::LocalScope::isNameConflicted(lang::Identifier const& name) const
+{
+    return scope()->isNameConflicted(name);// Redefinition allowed, so no conflict.
+}
+
 void lang::LocalScope::prepareDefinition(Identifier name)
 {
     blockers_.emplace(name);
