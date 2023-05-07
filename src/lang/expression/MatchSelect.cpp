@@ -24,6 +24,7 @@ std::vector<std::reference_wrapper<Case const>> MatchSelect::cases() const
 {
     std::vector<std::reference_wrapper<Case const>> cases;
 
+    cases.reserve(cases_.size());
     for (auto& c : cases_) { cases.emplace_back(*c); }
 
     return cases;
@@ -74,6 +75,7 @@ Expression::Expansion MatchSelect::expandWith(Expressions subexpressions, lang::
     auto variable = lang::makeHandled<lang::Variable>(temp_name);
 
     std::vector<Owned<Case>> cases;
+    cases.reserve(cases_.size());
     for (auto& original_case : cases_) { cases.push_back(original_case->expand(variable, new_context)); }
 
     Statements statements;
@@ -90,6 +92,13 @@ Expression::Expansion MatchSelect::expandWith(Expressions subexpressions, lang::
     auto result = makeOwned<VariableAccess>(variable->toUndefined(), location());
 
     return {std::move(statements), std::move(result), Statements()};
+}
+
+void MatchSelect::setScope(lang::Scope& scope)
+{
+    Expression::setScope(scope);
+
+    for (auto& case_ptr : cases_) { case_ptr->setContainingScope(scope); }
 }
 
 MatchSelect::~MatchSelect() = default;

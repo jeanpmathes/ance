@@ -36,6 +36,7 @@ class MatchSelect
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
+    void setScope(lang::Scope& scope) override;
 
   public:
     ~MatchSelect() override;
