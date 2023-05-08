@@ -1,8 +1,8 @@
 grammar ance;
 
 file
-	: global EOF
-	;
+    : global EOF
+    ;
 
 projectFile
     : ( code )* EOF
@@ -19,24 +19,24 @@ description
     ;
 
 variableDescription
-	: accessModifier ( CONST )? IDENTIFIER ( ':' type )? ( assigner expression )? ';'
-	;
+    : accessModifier ( CONST )? IDENTIFIER ( ':' type )? ( assigner expression )? ';'
+    ;
 
 functionDescription
-	: accessModifier IDENTIFIER '(' parameters ')' (':' type)? ( functionBlock | ';' )
-	;
+    : accessModifier IDENTIFIER '(' parameters ')' (':' type)? ( functionBlock | ';' )
+    ;
 
 functionBlock
     : '{' ( code )* '}'
     ;
 
 parameters
-	: (parameter (',' parameter)* )?
-	;
+    : (parameter (',' parameter)* )?
+    ;
 
 parameter
-	: IDENTIFIER ':' type
-	;
+    : IDENTIFIER ':' type
+    ;
 
 typeDescription
     : aliasDescription
@@ -56,10 +56,10 @@ member
     ;
 
 accessModifier
-	: 'public' # Public
-	| 'private' # Private
-	| 'extern' # Extern
-	;
+    : 'public' # Public
+    | 'private' # Private
+    | 'extern' # Extern
+    ;
 
 code
     : statement
@@ -71,28 +71,28 @@ block
     ;
 
 statement
-	: expressionStatement
-	| localVariableDefinition
-	| localReferenceDefinition
-	| dropStatement
-	| assignment
-	| deleteStatement
-	| breakStatement
-	| continueStatement
-	| returnStatement
-	| assertStatement
-	| ifStatement
+    : expressionStatement
+    | localVariableDefinition
+    | localReferenceDefinition
+    | dropStatement
+    | assignment
+    | deleteStatement
+    | breakStatement
+    | continueStatement
+    | returnStatement
+    | assertStatement
+    | ifStatement
     | whileStatement
     | matchStatement
-	;
+    ;
 
 expressionStatement
-	: independentExpression ';'
-	;
+    : independentExpression ';'
+    ;
 
 localVariableDefinition
-	: 'let' IDENTIFIER (':' type )? ( assigner expression )? ';'
-	;
+    : 'let' IDENTIFIER (':' type )? ( assigner expression )? ';'
+    ;
 
 localReferenceDefinition
     : 'let' IDENTIFIER ':' type bindRef ';'
@@ -103,8 +103,8 @@ dropStatement
     ;
 
 assignment
-	: assignable=expression assigner assigned=expression ';'
-	;
+    : assignable=expression assigner assigned=expression ';'
+    ;
 
 assigner
     : '<:' # CopyAssignment
@@ -125,8 +125,8 @@ continueStatement
     ;
 
 returnStatement
-	: 'return' ( expression )? ';'
-	;
+    : 'return' ( expression )? ';'
+    ;
 
 assertStatement
     : 'assert' expression ';'
@@ -150,32 +150,32 @@ matchCase
     ;
 
 expression
-	: variableAccess # Variable
-	| allocation # Alloc
-	| literalExpression # Literal
-	| value=expression '.' # Indirection
-	| indexed=expression '[' index=expression ']' # Subscript
-	| accessed=expression IDENTIFIER # MemberAccess
-	| addressof # AddressOf
+    : variableAccess # Variable
+    | allocation # Alloc
+    | literalExpression # Literal
+    | value=expression '.' # Indirection
+    | indexed=expression '[' index=expression ']' # Subscript
+    | accessed=expression IDENTIFIER # MemberAccess
+    | addressof # AddressOf
     | bindRef # Ref
     | sizeofType # SizeOf
     | sizeofExpression # SizeOf
-	| independentExpression # Independent
-	| '(' expression ')' # Parenthesis
+    | independentExpression # Independent
+    | '(' expression ')' # Parenthesis
     | unaryOperator expression # UnaryOperation
-	| left=expression binaryOperatorMultiplicative right=expression # BinaryOperation
-	| left=expression binaryOperatorAdditive right=expression # BinaryOperation
-	| left=expression binaryOperatorBitwise right=expression # BinaryOperation
-	| left=expression binaryOperatorShift right=expression # BinaryOperation
-	| left=expression binaryOperatorRelational right=expression # BinaryOperation
-	| left=expression binaryOperatorEquality right=expression # BinaryOperation
-	| left=expression ( NOT )? 'and' right=expression # LogicalAnd
+    | left=expression binaryOperatorMultiplicative right=expression # BinaryOperation
+    | left=expression binaryOperatorAdditive right=expression # BinaryOperation
+    | left=expression binaryOperatorBitwise right=expression # BinaryOperation
+    | left=expression binaryOperatorShift right=expression # BinaryOperation
+    | left=expression binaryOperatorRelational right=expression # BinaryOperation
+    | left=expression binaryOperatorEquality right=expression # BinaryOperation
+    | left=expression ( NOT )? 'and' right=expression # LogicalAnd
     | left=expression ( NOT )? 'or' right=expression # LogicalOr
     | 'if' condition=expression 'then' thenBlock=expression 'else' elseBlock=expression # IfExpression
     | matchExpression # Match
     | '<' ( type '|' )? expression ( ',' expression )* '>' # VectorDefinition
     | '[' ( type '|' )? expression ( ',' expression )* ']' # ArrayDefinition
-	;
+    ;
 
 unaryOperator
     : 'not' # Not
@@ -218,21 +218,21 @@ binaryOperatorEquality
     ;
 
 independentExpression
-	: functionCall
-	;
+    : functionCall
+    ;
 
 functionCall
-	: IDENTIFIER '(' arguments ')'
-	| type '(' arguments ')'
-	;
+    : IDENTIFIER '(' arguments ')'
+    | type '(' arguments ')'
+    ;
 
 arguments
-	: (expression (',' expression)* )?
-	;
+    : (expression (',' expression)* )?
+    ;
 
 variableAccess
-	: IDENTIFIER
-	;
+    : IDENTIFIER
+    ;
 
 allocation
     : 'new' ( '[' expression ']' )? allocator type
@@ -253,12 +253,12 @@ bindRef
     ;
 
 sizeofType
-	: 'sizeof' type
-	;
+    : 'sizeof' type
+    ;
 
 sizeofExpression
-	: 'sizeof' '(' expression ')'
-	;
+    : 'sizeof' '(' expression ')'
+    ;
 
 matchExpression
     : 'match' condition=expression 'with' '{' ( matchExpressionCase ( ',' matchExpressionCase )* )? '}'
@@ -270,46 +270,46 @@ matchExpressionCase
     ;
 
 literalExpression
-	: stringLiteral
-	| charLiteral
-	| integerLiteral
-	| floatingPointLiteral
-	| booleanLiteral
-	| nullLiteral
-	| sizeLiteral
-	| diffLiteral
-	| uiptrLiteral
-	;
+    : stringLiteral
+    | charLiteral
+    | integerLiteral
+    | floatingPointLiteral
+    | booleanLiteral
+    | nullLiteral
+    | sizeLiteral
+    | diffLiteral
+    | uiptrLiteral
+    ;
 
 stringLiteral
-	: ( prefix=(IDENTIFIER | INTEGER) )? STRING
-	;
+    : ( prefix=(IDENTIFIER | INTEGER) )? STRING
+    ;
 
 charLiteral
     : ( prefix=(IDENTIFIER | INTEGER) )? CHAR
     ;
 
 integerLiteral
-	: normalInteger
-	| specialInteger
-	;
+    : normalInteger
+    | specialInteger
+    ;
 
 normalInteger
-	: ( uvalue=INTEGER | svalue=SIGNED_INTEGER) ( ':' width=INTEGER )?
-	;
+    : ( uvalue=INTEGER | svalue=SIGNED_INTEGER) ( ':' width=INTEGER )?
+    ;
 
 specialInteger
-	: HEX_INTEGER ':' width=INTEGER
-	| BIN_INTEGER ':' width=INTEGER
-	| OCT_INTEGER ':' width=INTEGER
-	;
+    : HEX_INTEGER ':' width=INTEGER
+    | BIN_INTEGER ':' width=INTEGER
+    | OCT_INTEGER ':' width=INTEGER
+    ;
 
 floatingPointLiteral
-	: HALF
-	| SINGLE
-	| DOUBLE
-	| QUAD
-	;
+    : HALF
+    | SINGLE
+    | DOUBLE
+    | QUAD
+    ;
 
 booleanLiteral
     : 'true' # True
@@ -333,23 +333,23 @@ uiptrLiteral
     ;
 
 type
-	: integerType # Integer
-	| arrayType # Array
-	| vectorType # Vector
-	| keywordType # Keyword
-	| '*' type # Pointer
-	| '[]' type # Buffer
-	| '&' type # Reference
-	| customType # Custom
-	;
+    : integerType # Integer
+    | arrayType # Array
+    | vectorType # Vector
+    | keywordType # Keyword
+    | '*' type # Pointer
+    | '[]' type # Buffer
+    | '&' type # Reference
+    | customType # Custom
+    ;
 
 integerType
-	: NATIVE_INTEGER_TYPE
-	;
+    : NATIVE_INTEGER_TYPE
+    ;
 
 arrayType
-	: '[' type ';' INTEGER ']'
-	;
+    : '[' type ';' INTEGER ']'
+    ;
 
 vectorType
     : '<' type ';' INTEGER '>'
@@ -365,11 +365,11 @@ keywordType
     ;
 
 floatingPointType
-	: 'half'
-	| 'single'
-	| 'double'
-	| 'quad'
-	;
+    : 'half'
+    | 'single'
+    | 'double'
+    | 'quad'
+    ;
 
 targetDependentType
     : 'size'
@@ -379,8 +379,8 @@ targetDependentType
     ;
 
 booleanType
-	: 'bool'
-	;
+    : 'bool'
+    ;
 
 charType
     : 'char'
@@ -391,8 +391,8 @@ nullPointerType
     ;
 
 voidType
-	: 'void'
-	;
+    : 'void'
+    ;
 
 customType
     : IDENTIFIER
