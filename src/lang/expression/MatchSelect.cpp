@@ -72,11 +72,11 @@ Expression::Expansion MatchSelect::expandWith(Expressions subexpressions, lang::
     auto temp_name = lang::Identifier::like(scope()->getTemporaryName(), location());
     auto condition = std::move(subexpressions[0]);
 
-    auto variable = lang::makeHandled<lang::Variable>(temp_name);
+    auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
 
     std::vector<Owned<Case>> cases;
     cases.reserve(cases_.size());
-    for (auto& original_case : cases_) { cases.push_back(original_case->expand(variable, new_context)); }
+    for (auto& original_case : cases_) { cases.push_back(original_case->expand(make_temp_variable(), new_context)); }
 
     Statements statements;
 
@@ -89,9 +89,13 @@ Expression::Expansion MatchSelect::expandWith(Expressions subexpressions, lang::
 
     statements.emplace_back(makeOwned<Match>(std::move(cases), std::move(condition), location()));
 
-    auto result = makeOwned<VariableAccess>(variable->toUndefined(), location());
+    auto result = makeOwned<VariableAccess>(make_temp_variable(), location());
 
-    return {std::move(statements), std::move(result), Statements()};
+    Statements after;
+
+    after.emplace_back(makeOwned<Drop>(make_temp_variable(), location()));
+
+    return {std::move(statements), std::move(result), std::move(after)};
 }
 
 void MatchSelect::setScope(lang::Scope& scope)

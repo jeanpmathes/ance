@@ -40,6 +40,7 @@ bool Subscript::validate(ValidationLogger& validation_logger) const
     if (!valid) return false;
 
     lang::Type const& indexed_type = indexed_->type();
+    if (!indexed_type.isDefined()) return false;
 
     if (indexed_type.isSubscriptDefined())
     {

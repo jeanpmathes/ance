@@ -122,12 +122,18 @@ Statements Statement::expand(lang::Context& new_context) const
 
     auto expanded_statements = this->expandWith(std::move(subexpressions), std::move(substatements), new_context);
 
+    return arrangeExpandedStatements(std::move(before), std::move(expanded_statements), std::move(after), new_context);
+}
+
+Statements Statement::arrangeExpandedStatements(Statements before,
+                                                Statements expanded,
+                                                Statements after,
+                                                lang::Context&) const
+{
     Statements final;
 
     final.insert(final.end(), std::make_move_iterator(before.begin()), std::make_move_iterator(before.end()));
-    final.insert(final.end(),
-                 std::make_move_iterator(expanded_statements.begin()),
-                 std::make_move_iterator(expanded_statements.end()));
+    final.insert(final.end(), std::make_move_iterator(expanded.begin()), std::make_move_iterator(expanded.end()));
     final.insert(final.end(), std::make_move_iterator(after.begin()), std::make_move_iterator(after.end()));
 
     return final;

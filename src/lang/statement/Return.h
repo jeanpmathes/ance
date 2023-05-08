@@ -30,11 +30,16 @@ class Return
 
     void validate(ValidationLogger& validation_logger) const override;
 
+  protected:
     [[nodiscard]] Statements expandWith(Expressions    subexpressions,
                                         Statements     substatements,
                                         lang::Context& new_context) const override;
 
-  protected:
+    [[nodiscard]] Statements arrangeExpandedStatements(Statements     before,
+                                                       Statements     expanded,
+                                                       Statements     after,
+                                                       lang::Context& new_context) const override;
+
     void doBuild(CompileContext& context) override;
 
   private:
