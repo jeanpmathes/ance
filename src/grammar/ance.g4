@@ -410,7 +410,7 @@ SINGLE : DECIMAL 's' ;
 DOUBLE : DECIMAL 'd' ;
 QUAD : DECIMAL 'q' ;
 
-DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ;
+DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ( [eE] ( '+' | '-' )? [0-9]+ )? ;
 
 STRING : '"' ('\\'~[\r\n] | ~[\r\n])*? '"' ;
 CHAR : '\'' ( '\\' ~[\r\n] | ~[\r\n] )*? '\'' ;
