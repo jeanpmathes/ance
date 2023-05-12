@@ -71,10 +71,7 @@ Statements While::expandWith(Expressions subexpressions, Statements substatement
     return statements;
 }
 
-Statements While::arrangeExpandedStatements(Statements before,
-                                            Statements expanded,
-                                            Statements after,
-                                            lang::Context&) const
+Statements While::arrangeExpandedStatements(Statements before, Statements expanded, Statements after) const
 {
     auto condition_variable = std::move(expanded[0]);
     auto loop_break         = std::move(expanded[1]);

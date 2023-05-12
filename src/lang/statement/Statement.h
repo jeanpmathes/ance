@@ -146,13 +146,11 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @param before The statements before the expansion, created by the expressions of this statement.
      * @param expanded The expanded statements, created by this statement.
      * @param after The statements after the expansion, created by the expressions of this statement.
-     * @param new_context The context in which the new statements will be used.
      * @return The arranged statements.
      */
-    [[nodiscard]] virtual Statements arrangeExpandedStatements(Statements     before,
-                                                               Statements     expanded,
-                                                               Statements     after,
-                                                               lang::Context& new_context) const;
+    [[nodiscard]] virtual Statements arrangeExpandedStatements(Statements before,
+                                                               Statements expanded,
+                                                               Statements after) const;
 
   public:
     /**

@@ -229,7 +229,7 @@ static Optional<bool> buildProject(Project&              project,
 
         application.preBuild();
 
-        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input_prebuild.nc");
+        if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input_expanded.nc");
 
         ok = validateFlow(tree, info.validation_logger, info.out);
         if (!ok) return false;

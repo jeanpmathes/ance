@@ -141,15 +141,11 @@ Statements Statement::expand(lang::Context& new_context) const
     assert(subexpressions.size() == subexpressions_.size());
     assert(substatements.size() == substatements_.size() || isCompound());
 
-    auto expanded_statements = this->expandWith(std::move(subexpressions), std::move(substatements), new_context);
-
-    return arrangeExpandedStatements(std::move(before), std::move(expanded_statements), std::move(after), new_context);
+    auto expanded_statements = expandWith(std::move(subexpressions), std::move(substatements), new_context);
+    return arrangeExpandedStatements(std::move(before), std::move(expanded_statements), std::move(after));
 }
 
-Statements Statement::arrangeExpandedStatements(Statements before,
-                                                Statements expanded,
-                                                Statements after,
-                                                lang::Context&) const
+Statements Statement::arrangeExpandedStatements(Statements before, Statements expanded, Statements after) const
 {
     Statements final;
 

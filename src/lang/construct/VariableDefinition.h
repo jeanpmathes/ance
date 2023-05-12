@@ -81,7 +81,6 @@ namespace lang
       private:
         lang::ResolvingHandle<lang::Variable> self_;
 
-        lang::ResolvingHandle<lang::Type> type_;
         lang::Location                    type_location_;
         lang::Scope&                      scope_;
         bool                              is_final_;

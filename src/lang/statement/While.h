@@ -37,10 +37,7 @@ class While
                                         lang::Context& new_context) const override;
 
   protected:
-    Statements arrangeExpandedStatements(Statements     before,
-                                         Statements     expanded,
-                                         Statements     after,
-                                         lang::Context& new_context) const override;
+    Statements arrangeExpandedStatements(Statements before, Statements expanded, Statements after) const override;
 
     void doBuild(CompileContext& context) override;
 

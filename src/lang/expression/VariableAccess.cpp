@@ -31,7 +31,7 @@ void VariableAccess::postResolve()
 
 void VariableAccess::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (variable_->isDefined() && variable_->type()->isDefined()) { type.reroute(variable_->type()); }
+    type.reroute(variable_->type());
 }
 
 bool VariableAccess::isNamed() const

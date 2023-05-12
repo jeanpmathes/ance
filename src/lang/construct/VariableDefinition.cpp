@@ -1,6 +1,7 @@
 #include "VariableDefinition.h"
 
 #include "compiler/CompileContext.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/construct/Variable.h"
 #include "lang/scope/Scope.h"
 #include "lang/type/ReferenceType.h"
@@ -12,12 +13,13 @@ lang::VariableDefinition::VariableDefinition(lang::ResolvingHandle<lang::Variabl
                                              bool                                  is_final,
                                              lang::Location                        location)
     : self_(self)
-    , type_(type)
     , type_location_(type_location)
     , scope_(containing_scope)
     , is_final_(is_final)
     , location_(location)
-{}
+{
+    self_->type().reroute(type);
+}
 
 lang::Identifier const& lang::VariableDefinition::name() const
 {
@@ -31,12 +33,12 @@ lang::Scope* lang::VariableDefinition::scope() const
 
 lang::ResolvingHandle<lang::Type> lang::VariableDefinition::type()
 {
-    return type_;
+    return self_->type();
 }
 
 lang::Type const& lang::VariableDefinition::type() const
 {
-    return type_;
+    return self_->type();
 }
 
 lang::Location lang::VariableDefinition::location() const

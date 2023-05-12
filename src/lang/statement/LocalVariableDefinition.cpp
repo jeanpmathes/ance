@@ -90,6 +90,9 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
     assert(variable_.hasValue());
     auto const& variable = *variable_;
 
+    auto tn = type_->name();
+    (void) tn;
+
     assert(variable->type() == type_);
 
     if (assigned_.hasValue())
@@ -121,6 +124,8 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
 
     if (assigned_.hasValue())
     {
+        if (!assigned_.value()->type().isDefined()) return;
+
         lang::Type::checkMismatch(variable->type(),
                                   assigned_.value()->type(),
                                   assigned_.value()->location(),

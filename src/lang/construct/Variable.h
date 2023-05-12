@@ -189,6 +189,7 @@ namespace lang
 
       private:
         lang::Identifier                          name_;
+        lang::ResolvingHandle<lang::Type>         type_;
         Optional<Owned<lang::VariableDefinition>> definition_ {};
     };
 }

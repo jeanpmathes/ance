@@ -70,7 +70,11 @@ void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger) c
                 }
                 else
                 {
-                    lang::Type::checkMismatch(returnType(), value.value().get().type(), location, validation_logger);
+                    if (value.value().get().type().isDefined())
+                        lang::Type::checkMismatch(returnType(),
+                                                  value.value().get().type(),
+                                                  location,
+                                                  validation_logger);
                 }
             }
             else if (!returnType().isVoidType())

@@ -14,7 +14,7 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::Variable::Variable(lang::Identifier name) : name_(name) {}
+lang::Variable::Variable(lang::Identifier name) : name_(name), type_(lang::Type::getUndefined()) {}
 
 bool lang::Variable::isDefined() const
 {
@@ -80,14 +80,12 @@ lang::Scope* lang::Variable::scope() const
 
 lang::ResolvingHandle<lang::Type> lang::Variable::type()
 {
-    assert(definition_.hasValue());
-    return definition_.value()->type();
+    return type_;
 }
 
 lang::Type const& lang::Variable::type() const
 {
-    assert(definition_.hasValue());
-    return definition_.value()->type();
+    return type_;
 }
 
 bool lang::Variable::isFinal() const
