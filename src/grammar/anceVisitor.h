@@ -87,6 +87,8 @@ public:
 
     virtual std::any visitWhileStatement(anceParser::WhileStatementContext *context) = 0;
 
+    virtual std::any visitLoopStatement(anceParser::LoopStatementContext *context) = 0;
+
     virtual std::any visitMatchStatement(anceParser::MatchStatementContext *context) = 0;
 
     virtual std::any visitLiteralCase(anceParser::LiteralCaseContext *context) = 0;

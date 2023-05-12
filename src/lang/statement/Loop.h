@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_LANG_STATEMENT_WHILE_H_
-#define ANCE_SRC_LANG_STATEMENT_WHILE_H_
+#ifndef ANCE_SRC_LANG_STATEMENT_LOOP_H_
+#define ANCE_SRC_LANG_STATEMENT_LOOP_H_
 
 #include "Statement.h"
 
@@ -10,23 +10,21 @@
 class Expression;
 
 /**
- * A while control flow statement.
+ * A loop control flow statement.
  */
-class While
+class Loop
     : public Statement
-    , public lang::Element<While, ANCE_CONSTRUCTS>
+    , public lang::Element<Loop, ANCE_CONSTRUCTS>
 {
   public:
     /**
-     * Create a new while-statement.
-     * @param condition The condition to check.
+     * Create a new loop-statement.
      * @param block The block to execute if the condition is true.
      * @param location The source location of the statement.
      */
-    While(Owned<Expression> condition, Owned<Statement> block, lang::Location location);
+    Loop(Owned<Statement> block, lang::Location location);
 
-    [[nodiscard]] Expression const& condition() const;
-    [[nodiscard]] Statement const&  body() const;
+    [[nodiscard]] Statement const& body() const;
 
     std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, lang::Function& function) override;
 
@@ -37,11 +35,6 @@ class While
                                         lang::Context& new_context) const override;
 
   protected:
-    Statements arrangeExpandedStatements(Statements     before,
-                                         Statements     expanded,
-                                         Statements     after,
-                                         lang::Context& new_context) const override;
-
     void doBuild(CompileContext& context) override;
 
     [[nodiscard]] bool                                            isLoop() const override;
@@ -50,8 +43,6 @@ class While
   private:
     std::pair<lang::BasicBlock*, lang::BasicBlock*> loop_parts_ {nullptr, nullptr};
 
-    Owned<Expression> condition_;
-    Owned<Statement>  block_;
+    Owned<Statement> block_;
 };
-
 #endif

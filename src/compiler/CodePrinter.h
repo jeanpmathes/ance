@@ -59,6 +59,7 @@ class CodePrinter : public lang::ApplicationVisitorConst
     [[nodiscard]] std::any visit(Match const& match_statement) override;
     [[nodiscard]] std::any visit(Return const& return_statement) override;
     [[nodiscard]] std::any visit(While const& while_statement) override;
+    [[nodiscard]] std::any visit(Loop const& loop_statement) override;
 
   protected:
     void postVisit(lang::Visitable<ANCE_CONSTRUCTS> const&) override;

@@ -129,6 +129,8 @@ Expression::Expansion Expression::expand(lang::Context& new_context) const
         subexpressions.push_back(std::move(expanded_expression));
     }
 
+    assert(subexpressions.size() == subexpressions_.size());
+
     auto [statements_before, expanded_expression, statements_after] =
         this->expandWith(std::move(subexpressions), new_context);
 

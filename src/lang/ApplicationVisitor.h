@@ -78,6 +78,7 @@ namespace lang
 #include "lang/statement/If.h"
 #include "lang/statement/LocalReferenceVariableDefinition.h"
 #include "lang/statement/LocalVariableDefinition.h"
+#include "lang/statement/Loop.h"
 #include "lang/statement/Match.h"
 #include "lang/statement/Return.h"
 #include "lang/statement/While.h"

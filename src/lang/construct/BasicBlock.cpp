@@ -69,22 +69,21 @@ std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createBranching(Expressio
 }
 
 std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createLooping(
-    Expression&                                      condition,
     Statement&                                       code_block,
     std::pair<lang::BasicBlock*, lang::BasicBlock*>* loop_parts,
     Function&                                        function)
 {
     std::vector<Owned<BasicBlock>> blocks;
 
-    blocks.push_back(makeOwned<BasicBlock>(makeOwned<Definition::Branching>(condition)));
-    auto& branch = *blocks.back();
+    blocks.push_back(lang::BasicBlock::createSimple());
+    auto& first_block = *blocks.back();
 
     Owned<lang::BasicBlock> end_block = lang::BasicBlock::createSimple();
 
-    *loop_parts = std::make_pair(&branch, end_block.get());
+    *loop_parts = std::make_pair(&first_block, end_block.get());
 
     auto append_code_block = [&](Statement* new_block, lang::BasicBlock& next) {
-        auto new_basic_blocks = new_block->createBasicBlocks(branch, function);
+        auto new_basic_blocks = new_block->createBasicBlocks(first_block, function);
         assert(!new_basic_blocks.empty());
 
         blocks.insert(blocks.end(),
@@ -94,9 +93,7 @@ std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createLooping(
         blocks.back()->link(next);
     };
 
-    append_code_block(&code_block, branch);
-    branch.link(*end_block);
-
+    append_code_block(&code_block, first_block);
     blocks.push_back(std::move(end_block));
 
     for (auto& new_block : blocks) new_block->setContainingFunction(function);

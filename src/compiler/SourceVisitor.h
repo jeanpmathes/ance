@@ -57,6 +57,7 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitAssertStatement(anceParser::AssertStatementContext* ctx) override;
     std::any visitIfStatement(anceParser::IfStatementContext* ctx) override;
     std::any visitWhileStatement(anceParser::WhileStatementContext* ctx) override;
+    std::any visitLoopStatement(anceParser::LoopStatementContext* ctx) override;
     std::any visitMatchStatement(anceParser::MatchStatementContext* ctx) override;
     std::any visitLiteralCase(anceParser::LiteralCaseContext* ctx) override;
     std::any visitDefaultCase(anceParser::DefaultCaseContext* ctx) override;

@@ -484,7 +484,7 @@ std::any SourceVisitor::visitIfStatement(anceParser::IfStatementContext* ctx)
     Expression& condition = *std::any_cast<Expression*>(visit(ctx->expression()));
     bool const  has_else  = ctx->elseBlock != nullptr;
 
-    auto if_block = Owned<lang::CodeBlock>(*std::any_cast<lang::CodeBlock*>(visit(ctx->ifBlock)));
+    auto if_block = Owned<Statement>(*std::any_cast<lang::CodeBlock*>(visit(ctx->ifBlock)));
 
     Optional<Owned<Statement>> else_block;
 
@@ -499,9 +499,17 @@ std::any SourceVisitor::visitWhileStatement(anceParser::WhileStatementContext* c
 {
     Expression& condition = *std::any_cast<Expression*>(visit(ctx->expression()));
 
-    auto block = (Owned<lang::CodeBlock>(*std::any_cast<lang::CodeBlock*>(visit(ctx->code()))));
+    auto block = (Owned<Statement>(*std::any_cast<lang::CodeBlock*>(visit(ctx->code()))));
 
     auto statement = makeOwned<While>(Owned<Expression>(condition), std::move(block), location(ctx));
+    return unwrap(lang::CodeBlock::makeWithStatement(std::move(statement)));
+}
+
+std::any SourceVisitor::visitLoopStatement(anceParser::LoopStatementContext* ctx)
+{
+    auto block = (Owned<Statement>(*std::any_cast<lang::CodeBlock*>(visit(ctx->code()))));
+
+    auto statement = makeOwned<Loop>(std::move(block), location(ctx));
     return unwrap(lang::CodeBlock::makeWithStatement(std::move(statement)));
 }
 

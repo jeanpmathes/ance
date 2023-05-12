@@ -151,6 +151,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitLoopStatement(anceParser::LoopStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitMatchStatement(anceParser::MatchStatementContext *ctx) override {
     return visitChildren(ctx);
   }

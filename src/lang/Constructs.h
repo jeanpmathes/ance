@@ -63,6 +63,7 @@ class LocalVariableDefinition;
 class Match;
 class Return;
 class While;
+class Loop;
 
 #define ANCE_CONSTRUCTS                                                                                                \
     Unit, lang::BasicBlock, lang::CodeBlock, lang::Function, lang::FunctionDescription, lang::VariableDescription,     \
@@ -70,7 +71,7 @@ class While;
         UnaryOperation, BindRef, BindRefTo, ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType,  \
         Subscript, VariableAccess, MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope,       \
         lang::LocalScope, Assertion, Assignment, Break, Continue, Delete, ExpressionStatement,                         \
-        LocalReferenceVariableDefinition, LocalVariableDefinition, Drop, Return, If, While, Match, Case,               \
+        LocalReferenceVariableDefinition, LocalVariableDefinition, Drop, Return, If, While, Loop, Match, Case,         \
         VectorDefinition, ArrayDefinition
 #endif
 

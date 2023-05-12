@@ -64,15 +64,13 @@ namespace lang
                                                               Function&   function);
 
         /**
-         * Create a basic block that loops as long as the condition is true.
-         * @param new_block The expression providing the condition.
+         * Create a basic block that loops forever.
          * @param code_block The block to execute as long as the condition is true.
          * @param loop_parts The loop parts to set that are used by loop control statements.
          * @param function The function containing the basic block.
          * @return The created basic blocks.
          */
-        static std::vector<Owned<BasicBlock>> createLooping(Expression&                                      new_block,
-                                                            Statement&                                       code_block,
+        static std::vector<Owned<BasicBlock>> createLooping(Statement&                                       code_block,
                                                             std::pair<lang::BasicBlock*, lang::BasicBlock*>* loop_parts,
                                                             Function&                                        function);
 

@@ -62,13 +62,6 @@ AnceCompiler::AnceCompiler(SourceTree& tree, llvm::Triple const& triple)
 
 void AnceCompiler::compile(std::filesystem::path const& out)
 {
-    if (unit_.isUsingRuntime()) context_.runtime().init(context_);
-
-    unit_.globalScope().createNativeBacking(context_);
-    unit_.globalScope().buildFunctions(context_);
-
-    assert(context_.allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
-
     // Print control flow graph.
 
     if (unit_.isEmittingExtras())
@@ -78,6 +71,15 @@ void AnceCompiler::compile(std::filesystem::path const& out)
         ControlFlowGraphPrinter     cfg_printer(cfg_out);
         cfg_printer.visit(unit_);
     }
+
+    // Begin actual compilation.
+
+    if (unit_.isUsingRuntime()) context_.runtime().init(context_);
+
+    unit_.globalScope().createNativeBacking(context_);
+    unit_.globalScope().buildFunctions(context_);
+
+    assert(context_.allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
 
     // Prepare entry and exit functions.
 

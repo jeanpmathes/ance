@@ -10,5 +10,6 @@ target_sources(ance PRIVATE Assignment.cpp
                Assertion.cpp
                If.cpp
                While.cpp
+               Loop.cpp
                Match.cpp
                Statement.cpp)

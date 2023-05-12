@@ -534,6 +534,21 @@ std::any CodePrinter::visit(While const& while_statement)
     return {};
 }
 
+std::any CodePrinter::visit(Loop const& loop_statement)
+{
+    out_ << "loop";
+
+    if (loop_statement.body().isCompound())
+    {
+        out_ << std::endl;
+        indent();
+        visitTree(loop_statement.body());
+    }
+    else { out_ << " " << visitTree(loop_statement.body()); }
+
+    return {};
+}
+
 void CodePrinter::postVisit(lang::Visitable<ANCE_CONSTRUCTS> const&)
 {
     switch (consume_whitespace_)

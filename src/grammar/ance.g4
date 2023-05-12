@@ -83,6 +83,7 @@ statement
     | assertStatement
     | ifStatement
     | whileStatement
+    | loopStatement
     | matchStatement
     ;
 
@@ -138,6 +139,10 @@ ifStatement
 
 whileStatement
     : 'while' expression 'do' code
+    ;
+
+loopStatement
+    : 'loop' code
     ;
 
 matchStatement

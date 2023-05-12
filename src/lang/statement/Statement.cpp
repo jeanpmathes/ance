@@ -114,11 +114,32 @@ Statements Statement::expand(lang::Context& new_context) const
 
     for (auto& substatement : substatements_)
     {
-        Statements expanded_substatement = substatement.get().expand(new_context);
-        substatements.insert(substatements.end(),
-                             std::make_move_iterator(expanded_substatement.begin()),
-                             std::make_move_iterator(expanded_substatement.end()));
+        Statements expanded_substatements = substatement.get().expand(new_context);
+
+        if (isCompound())
+        {
+            substatements.insert(substatements.end(),
+                                 std::make_move_iterator(expanded_substatements.begin()),
+                                 std::make_move_iterator(expanded_substatements.end()));
+        }
+        else if (expanded_substatements.size() == 1)
+        {
+            substatements.push_back(std::move(expanded_substatements.front()));
+        }
+        else
+        {
+            auto code_block = lang::CodeBlock::makeScoped(location());
+            code_block->append(lang::CodeBlock::wrapStatements(std::move(expanded_substatements)));
+
+            substatements.emplace_back(std::move(code_block));
+        }
     }
+
+    // All statements expect the same amount of subexpressions and substatements they previously registered.
+    // The only exception is compound statements, which can handle any amount of substatements.
+
+    assert(subexpressions.size() == subexpressions_.size());
+    assert(substatements.size() == substatements_.size() || isCompound());
 
     auto expanded_statements = this->expandWith(std::move(subexpressions), std::move(substatements), new_context);
 
