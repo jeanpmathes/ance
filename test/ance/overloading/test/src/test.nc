@@ -3,14 +3,8 @@
 
 // The language supports function overloading.
 
-private std_out: Handle;
-
-public define Handle alias ptr;
-
 public main () : u32
 {
-    std_out <: GetStdHandle(4294967285:32);
-
     overloaded();
     overloaded(0:32);
     overloaded(0:64);
@@ -24,36 +18,27 @@ public main () : u32
 
 // The void return type can be omitted.
 
-private write (str: *u8, len: u32) : void
-{
-    let written: *u32 <: new automatic u32;
-    WriteFile(std_out, str, len, written, null);
-}
-
 public overloaded ()
 {
-    write(c"A", 1:32);
+    print(console, c"A");
 }
 
 private overloaded (x: u32)
 {
-    write(c"B", 1:32);
+    print(console, c"B");
 }
 
 private overloaded (x: u64)
 {
-    write(c"C", 1:32);
+    print(console, c"C");
 }
 
 private overloaded (x: u32, y: u32)
 {
-    write(c"D", 1:32);
+    print(console, c"D");
 }
 
 private overloaded (x: single)
 {
-    write(c"E", 1:32);
+    print(console, c"E");
 }
-
-extern WriteFile (hFile: Handle, lpBuffer: *u8, nNumberOfBytesToWrite: u32, lpNumberOfBytesWritten: *u32, lpOverlapped: ptr);
-extern GetStdHandle (nStdHandle: u32) : Handle;

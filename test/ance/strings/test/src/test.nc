@@ -1,5 +1,5 @@
 // valid
-// o: "ABC\0"
+// o: "ABC"
 
 // There are multiple types of string literals.
 
@@ -27,24 +27,9 @@ private str10: [char; 1] <: "\u{0}";
 private str11: [char; 2] <: "AB";
 private str12: [char; 3] <: "ABC";
 
-private std_out: Handle;
-
-public define Handle alias ptr;
-
 public main () : u32
 {
-    std_out <: GetStdHandle(4294967285:32);
-
-    write(str8, 4:32);
+    print(console, str8);
 
     return 0:32;
 }
-
-private write (str: *u8, len: u32)
-{
-    let written: *u32 <: new automatic u32;
-    WriteFile(std_out, str, len, written, null);
-}
-
-extern WriteFile (hFile: Handle, lpBuffer: *u8, nNumberOfBytesToWrite: u32, lpNumberOfBytesWritten: *u32, lpOverlapped: ptr);
-extern GetStdHandle (nStdHandle: u32) : Handle;

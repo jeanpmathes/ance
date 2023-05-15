@@ -4,5 +4,5 @@
 
 public main () : u32
 {
-    return 0:32;
+    return foo();
 }
