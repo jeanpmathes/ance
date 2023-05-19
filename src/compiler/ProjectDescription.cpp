@@ -70,7 +70,13 @@ void ProjectDescription::validate(ValidationLogger& validation_logger) const
 
 antlr4::tree::ParseTree* ProjectDescription::selectTree(anceParser& parser)
 {
-    return parser.projectFile();
+    std::string const name = project_file_.stem().generic_string();
+    if (name == "std" || name == "project")
+    {
+        // The 'std' and 'project' packages cannot use the project file stub as it depends on them.
+        return parser.file();
+    }
+    else { return parser.projectFile(); }
 }
 
 void ProjectDescription::addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, FileContext& context)
@@ -81,7 +87,17 @@ void ProjectDescription::addToAbstractSyntaxTree(antlr4::tree::ParseTree* tree, 
 
 std::vector<std::pair<std::string, bool>> ProjectDescription::getDependencies() const
 {
-    return {};
+    std::vector<std::pair<std::string, bool>> dependencies;
+
+    std::string const name = getProjectFile().stem().generic_string();
+
+    if (name != "std" && name != "project")
+    {
+        dependencies.emplace_back("std", true);
+        dependencies.emplace_back("project", true);
+    }
+
+    return dependencies;
 }
 
 std::vector<std::string> ProjectDescription::getLibraries() const

@@ -31,7 +31,8 @@ bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::Type co
 
     if (op == lang::BinaryOperator::ADDITION && getPointeeType() != nullptr)
     {
-        return lang::Type::areSame(real_other, scope()->context().getDiffType());
+        // The size is only required because implicit operator argument casting does not work yet.
+        return real_other.isDiffType() || real_other.isSizeType();
     }
 
     return false;

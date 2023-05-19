@@ -62,6 +62,7 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
         args.push_back("/debug:FULL");
         args.push_back("/debug:dwarf");
     }
+    else { args.push_back("/ltcg"); }
 
     args.push_back("/nologo");
     args.push_back("/errorlimit:0");

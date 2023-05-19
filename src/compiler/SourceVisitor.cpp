@@ -8,18 +8,9 @@
 
 #include "lang/type/ArrayType.h"
 #include "lang/type/BooleanType.h"
-#include "lang/type/BufferType.h"
 #include "lang/type/DoubleType.h"
 #include "lang/type/FixedWidthIntegerType.h"
-#include "lang/type/HalfType.h"
-#include "lang/type/PointerType.h"
-#include "lang/type/QuadType.h"
-#include "lang/type/ReferenceType.h"
-#include "lang/type/SingleType.h"
-#include "lang/type/SizeType.h"
-#include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/type/VectorType.h"
-#include "lang/type/VoidType.h"
 
 #include "lang/construct/constant/BooleanConstant.h"
 #include "lang/construct/constant/CharConstant.h"
@@ -43,148 +34,46 @@ void SourceVisitor::setFileContext(FileContext& file_context)
 
 std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 {
-    {// Project Description Function
-        auto                   access = lang::AccessModifier::EXTERN_ACCESS;
-        lang::Identifier const identifier =
-            lang::Identifier::like(ProjectDescription::ANCE_PROJECT_DEFINITION_FUNCTION);
-        lang::ResolvingHandle<lang::Type> return_type = unit_.globalScope().context().getVoidType();
+    auto                   access     = lang::AccessModifier::EXTERN_ACCESS;
+    lang::Identifier const identifier = lang::Identifier::like(ProjectDescription::ANCE_PROJECT_DEFINITION_FUNCTION);
+    lang::ResolvingHandle<lang::Type> return_type = unit_.globalScope().context().getVoidType();
 
-        lang::Location const declaration_location = lang::Location::global();
-        lang::Location const definition_location  = lang::Location::global();
+    lang::Location const declaration_location = lang::Location::global();
+    lang::Location const definition_location  = lang::Location::global();
 
-        std::vector<Shared<lang::Parameter>> parameters;
-        parameters.emplace_back(makeShared<lang::Parameter>(unit_.globalScope().context().getPointerType(
-                                            lang::makeHandled<lang::Type>(lang::Identifier::like("Project"))),
-                                        lang::Location::global(),
-                                        lang::Identifier::like("project"),
-                                        lang::Location::global()));
+    std::vector<Shared<lang::Parameter>> parameters;
 
-        lang::Location const return_type_location = lang::Location::global();
+    parameters.emplace_back(makeShared<lang::Parameter>(
+        unit_.globalScope().context().getPointerType(lang::makeHandled<lang::Type>(lang::Identifier::like("Project"))),
+        lang::Location::global(),
+        lang::Identifier::like("project"),
+        lang::Location::global()));
 
-        auto function_block = lang::CodeBlock::makeInitial(location(ctx));
+    lang::Location const return_type_location = lang::Location::global();
 
-        for (auto code_context : ctx->code())
-        {
-            lang::CodeBlock& block     = *std::any_cast<lang::CodeBlock*>(visit(code_context));
-            auto             block_ptr = Owned<lang::CodeBlock>(block);
+    auto function_block = lang::CodeBlock::makeInitial(location(ctx));
 
-            function_block->append(std::move(block_ptr));
-        }
+    for (auto code_context : ctx->code())
+    {
+        lang::CodeBlock& block     = *std::any_cast<lang::CodeBlock*>(visit(code_context));
+        auto             block_ptr = Owned<lang::CodeBlock>(block);
 
-        Owned<Statement> block_statement = std::move(function_block);
-
-        Owned<lang::FunctionDescription> description =
-            makeOwned<lang::FunctionDescription>(lang::Accessibility::local(access),
-                                                 identifier,
-                                                 return_type,
-                                                 return_type_location,
-                                                 parameters,
-                                                 std::move(block_statement),
-                                                 declaration_location,
-                                                 definition_location);
-
-        unit_.globalScope().addDescription(std::move(description));
+        function_block->append(std::move(block_ptr));
     }
 
-    {// Global Constants
-        auto declare_constant = [this](std::string const& name, std::string const& value) {
-            Owned<lang::VariableDescription> description = makeOwned<lang::VariableDescription>(
-                lang::Identifier::like(name),
-                unit_.globalScope().context().getFixedWidthIntegerType(32, false),
-                lang::Location::global(),
-                lang::Accessibility::local(lang::AccessModifier::PRIVATE_ACCESS),
-                makeOptional<Owned<Expression>>(
-                    makeOwned<ConstantLiteral>(makeShared<lang::IntegerConstant>(
-                                                   value,
-                                                   10,
-                                                   unit_.globalScope().context().getFixedWidthIntegerType(32, false)),
-                                               lang::Location::global())),
-                lang::Assigner::FINAL_COPY_ASSIGNMENT,
-                true,
-                lang::Location::global());
+    Owned<Statement> block_statement = std::move(function_block);
 
-            unit_.globalScope().addDescription(std::move(description));
-        };
+    Owned<lang::FunctionDescription> description =
+        makeOwned<lang::FunctionDescription>(lang::Accessibility::local(access),
+                                             identifier,
+                                             return_type,
+                                             return_type_location,
+                                             parameters,
+                                             std::move(block_statement),
+                                             declaration_location,
+                                             definition_location);
 
-        declare_constant("Executable", "1");
-        declare_constant("Package", "2");
-        declare_constant("Library", "3");
-    }
-
-    {// Project Description Struct
-        std::vector<Owned<lang::Member>> members;
-
-        auto push_member = [&members](lang::Identifier member_identifier, lang::ResolvingHandle<lang::Type> type) {
-            members.emplace_back(makeOwned<lang::Member>(lang::AccessModifier::PUBLIC_ACCESS,
-                                                         member_identifier,
-                                                         type,
-                                                         lang::Assigner::UNSPECIFIED,
-                                                         std::nullopt,
-                                                         lang::Location::global(),
-                                                         lang::Location::global()));
-        };
-
-        auto string_type = unit_.globalScope().context().getPointerType(
-            unit_.globalScope().context().getFixedWidthIntegerType(8, false));
-        auto string_list_type = unit_.globalScope().context().getBufferType(string_type);
-
-        push_member(lang::Identifier::like("name"), string_type);
-        push_member(lang::Identifier::like("kind"), unit_.globalScope().context().getFixedWidthIntegerType(32, false));
-        push_member(lang::Identifier::like("public_dependencies"), string_list_type);
-        push_member(lang::Identifier::like("private_dependencies"), string_list_type);
-        push_member(lang::Identifier::like("libraries"), string_list_type);
-        push_member(lang::Identifier::like("archives"), string_list_type);
-        push_member(lang::Identifier::like("library_paths"), string_list_type);
-        push_member(lang::Identifier::like("binary_dependencies"), string_list_type);
-        push_member(lang::Identifier::like("opt_level"),
-                    unit_.globalScope().context().getFixedWidthIntegerType(32, false));
-        push_member(lang::Identifier::like("warning_as_error_enabled"), unit_.globalScope().context().getBooleanType());
-        push_member(lang::Identifier::like("ignoring_assert"), unit_.globalScope().context().getBooleanType());
-        push_member(lang::Identifier::like("extra_emission_enabled"), unit_.globalScope().context().getBooleanType());
-        push_member(lang::Identifier::like("runtime_excluded"), unit_.globalScope().context().getBooleanType());
-        push_member(lang::Identifier::like("std_excluded"), unit_.globalScope().context().getBooleanType());
-
-        Owned<lang::StructDescription> description =
-            makeOwned<lang::StructDescription>(lang::Accessibility::local(lang::AccessModifier::PUBLIC_ACCESS),
-                                               lang::Identifier::like("Project"),
-                                               std::move(members),
-                                               lang::Location::global());
-
-        unit_.globalScope().addDescription(std::move(description));
-    }
-
-    {// Exit Function
-        auto                              access      = lang::AccessModifier::PUBLIC_ACCESS;
-        lang::Identifier const            identifier  = lang::Identifier::like("exit");
-        lang::ResolvingHandle<lang::Type> return_type = unit_.globalScope().context().getVoidType();
-
-        lang::Location const declaration_location = lang::Location::global();
-        lang::Location const definition_location  = lang::Location::global();
-
-        std::vector<Shared<lang::Parameter>> parameters;
-        parameters.emplace_back(
-            makeShared<lang::Parameter>(unit_.globalScope().context().getFixedWidthIntegerType(32, false),
-                                        lang::Location::global(),
-                                        lang::Identifier::like("exitcode"),
-                                        lang::Location::global()));
-
-        lang::Location const return_type_location = lang::Location::global();
-
-        auto             function_block  = lang::CodeBlock::makeInitial(location(ctx));
-        Owned<Statement> block_statement = std::move(function_block);
-
-        Owned<lang::FunctionDescription> description =
-            makeOwned<lang::FunctionDescription>(lang::Accessibility::local(access),
-                                                 identifier,
-                                                 return_type,
-                                                 return_type_location,
-                                                 parameters,
-                                                 std::move(block_statement),
-                                                 declaration_location,
-                                                 definition_location);
-
-        unit_.globalScope().addDescription(std::move(description));
-    }
+    unit_.globalScope().addDescription(std::move(description));
 
     return {};
 }
