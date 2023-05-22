@@ -16,14 +16,12 @@ public main () : u32
     return 0:32;
 }
 
-// The void return type can be omitted.
-
-public overloaded ()
+public overloaded () : ()
 {
     print(console, c"A");
 }
 
-private overloaded (x: u32)
+private overloaded (x: u32) // The unit return type can be omitted.
 {
     print(console, c"B");
 }

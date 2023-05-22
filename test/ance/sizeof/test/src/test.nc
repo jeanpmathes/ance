@@ -17,8 +17,8 @@ public main () : u32
     let s2: size <: sizeof(x);
     assert s2 == 4;
 
-    // The size of void is zero.
-    assert sizeof void == 0;
+    // The size of unit is zero.
+    assert sizeof () == 0;
 
     return 0:32;
 }
