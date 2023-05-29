@@ -36,9 +36,11 @@ private foo () : () // This does not have to be specified explicitly, see below.
     a x <: ();
     a y <: ();
     a z <: ();
+
+    bar(());
 }
 
-private bar ()
+private bar (u: ())
 {
 
 }
