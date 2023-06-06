@@ -37,6 +37,12 @@ private foo () : () // This does not have to be specified explicitly, see below.
     a y <: ();
     a z <: ();
 
+    let a := new ();
+    delete a;
+
+    let a := new[3] ();
+    delete[] a;
+
     bar(());
 }
 
