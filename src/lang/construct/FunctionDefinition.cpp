@@ -5,6 +5,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
+#include "lang/construct/constant/UnitConstant.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
@@ -138,14 +139,14 @@ bool lang::FunctionDefinition::doCallValidation(
     return true;
 }
 
-Optional<Shared<lang::Value>> lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Value>> arguments,
-                                                                  CompileContext&                  context)
+Shared<lang::Value> lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Value>> arguments,
+                                                        CompileContext&                  context)
 {
     auto [native_type, native_function] = getNativeRepresentation();
 
     llvm::Value* content_value = buildCall(std::move(arguments), native_type, native_function, context);
 
-    if (returnType()->isVoidType()) { return {}; }
+    if (returnType()->isUnitType()) { return lang::UnitConstant::create(scope().context()); }
 
     llvm::Value* native_value = lang::values::contentToNative(returnType(), content_value, context);
     return {makeShared<lang::WrappedNativeValue>(returnType(), native_value)};
@@ -164,7 +165,8 @@ std::vector<Shared<lang::Parameter>> lang::FunctionDefinition::parameters()
 std::pair<llvm::FunctionType*, llvm::Function*> lang::FunctionDefinition::createNativeFunction(
     llvm::GlobalValue::LinkageTypes linkage,
     llvm::LLVMContext&              c,
-    llvm::Module&                   m)
+    llvm::Module&                   m,
+    bool                            preserve_unit_return)
 {
     std::string const native_name = function_.getLinkageName();
 
@@ -173,7 +175,10 @@ std::pair<llvm::FunctionType*, llvm::Function*> lang::FunctionDefinition::create
 
     for (auto& param : parameters_) { param_types.push_back(param->type()->getContentType(c)); }
 
-    llvm::FunctionType* native_type     = llvm::FunctionType::get(returnType()->getContentType(c), param_types, false);
+    llvm::Type* return_type = returnType()->getContentType(c);
+    if (returnType()->isUnitType() && not preserve_unit_return) { return_type = llvm::Type::getVoidTy(c); }
+
+    llvm::FunctionType* native_type     = llvm::FunctionType::get(return_type, param_types, false);
     llvm::Function*     native_function = llvm::Function::Create(native_type, linkage, native_name, m);
 
     return {native_type, native_function};

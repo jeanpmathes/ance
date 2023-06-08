@@ -146,10 +146,10 @@ namespace lang
                                                         uint64_t                          size) const;
 
         /**
-         * Get the void type.
-         * @return The void type.
+         * Get the unit type.
+         * @return The unit type.
          */
-        lang::ResolvingHandle<lang::Type> getVoidType() const;
+        lang::ResolvingHandle<lang::Type> getUnitType() const;
 
         /**
          * Whether the application is being compiled with the runtime.
@@ -203,7 +203,7 @@ namespace lang
         mutable Optional<lang::ResolvingHandle<lang::Type>> size_type_;
         mutable Optional<lang::ResolvingHandle<lang::Type>> diff_type_;
         mutable Optional<lang::ResolvingHandle<lang::Type>> unsigned_integer_pointer_type_;
-        mutable Optional<lang::ResolvingHandle<lang::Type>> void_type_;
+        mutable Optional<lang::ResolvingHandle<lang::Type>> unit_type_;
     };
 }
 

@@ -31,11 +31,7 @@ StateCount lang::SequenceType::getStateCount() const
 {
     assert(size_.hasValue() && "State count cannot be determined for sequence types without a size.");
 
-    StateCount state_count = element_type_->getStateCount();
-
-    if (auto* size = std::get_if<size_t>(&state_count)) { *size *= size_.value(); }
-
-    return state_count;
+    return element_type_->getStateCount() * size_.value();
 }
 
 Optional<uint64_t> lang::SequenceType::getSize()
@@ -65,6 +61,9 @@ Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<Value>   indexed,
                                                        Shared<Value>   index,
                                                        CompileContext& context)
 {
+    if (getSubscriptReturnType()->getStateCount().isUnit())
+        return lang::WrappedNativeValue::makeDefault(getSubscriptReturnType(), context);
+
     index = lang::Type::makeMatching(scope()->context().getSizeType(), index, context);
 
     llvm::Value* element_ptr = buildGetElementPointer(indexed, index, context);
@@ -78,6 +77,9 @@ llvm::Value* lang::SequenceType::buildGetElementPointer(Shared<Value>   indexed,
                                                         Shared<Value>   index,
                                                         CompileContext& context)
 {
+    if (getElementType()->getStateCount().isUnit())
+        return llvm::Constant::getNullValue(llvm::PointerType::get(getIndexedType(context), 0));
+
     index->buildContentValue(context);
 
     llvm::Value* zero         = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.llvmContext()), 0);
@@ -109,6 +111,9 @@ llvm::Value* lang::SequenceType::buildGetElementPointer(Shared<Value>   indexed,
 
 llvm::Value* lang::SequenceType::buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context)
 {
+    if (getElementType()->getStateCount().isUnit())
+        return llvm::Constant::getNullValue(llvm::PointerType::get(getContentType(context.llvmContext()), 0));
+
     llvm::Value* zero         = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.llvmContext()), 0);
     llvm::Value* native_index = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.llvmContext()), index);
 
@@ -184,6 +189,7 @@ void lang::SequenceType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr,
         for (uint64_t index = 0; index < size_.value(); index++)
         {
             llvm::Value* element_ptr = buildGetElementPointer(ptr, index, context);
+
             element_type_->buildFinalizer(element_ptr, context);
         }
     }
@@ -206,6 +212,7 @@ Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Val
         values[index]->buildContentValue(context);
 
         llvm::Value* element_ptr = buildGetElementPointer(sequence_ptr, index, context);
+
         context.ir().CreateStore(values[index]->getContentValue(), element_ptr);
     }
 

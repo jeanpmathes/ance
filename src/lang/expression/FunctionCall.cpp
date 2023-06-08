@@ -165,11 +165,11 @@ void FunctionCall::doBuild(CompileContext& context)
 {
     std::vector<Shared<lang::Value>> arg_values;
 
+    arg_values.reserve(arguments_.size());
     for (auto& arg : arguments_) { arg_values.push_back(arg->getValue()); }
 
-    Optional<Shared<lang::Value>> return_value = function().front()->buildCall(arg_values, context);
-
-    if (return_value.hasValue()) { setValue(return_value.value()); }
+    Shared<lang::Value> return_value = function().front()->buildCall(arg_values, context);
+    setValue(return_value);
 }
 
 std::vector<lang::ResolvingHandle<lang::Function>> FunctionCall::function()

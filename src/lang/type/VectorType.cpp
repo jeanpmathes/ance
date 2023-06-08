@@ -373,10 +373,10 @@ void lang::VectorType::buildRequestedOverload(std::vector<ResolvingHandle<lang::
 
                 auto converted_element = element_ctor->buildCall(ctor_parameters, context);
 
-                converted_element.value()->buildContentValue(context);
+                converted_element->buildContentValue(context);
 
                 llvm::Value* result_dst_ptr = buildGetElementPointer(result_ptr, index, context);
-                context.ir().CreateStore(converted_element.value()->getContentValue(), result_dst_ptr);
+                context.ir().CreateStore(converted_element->getContentValue(), result_dst_ptr);
             }
 
             llvm::Value* converted = lang::values::nativeToContent(self(), result_ptr, context);

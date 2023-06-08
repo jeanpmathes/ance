@@ -13,7 +13,7 @@ lang::BooleanType::BooleanType() : TypeDefinition(lang::Identifier::like("bool")
 
 StateCount lang::BooleanType::getStateCount() const
 {
-    size_t count = 2;
+    size_t const count = 2;
     return count;
 }
 

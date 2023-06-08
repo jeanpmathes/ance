@@ -13,8 +13,8 @@ StateCount lang::IntegerType::getStateCount() const
     auto bit_size = getBitSize();
     if (bit_size.hasValue())
     {
-        size_t state_count = 1 << bit_size.value();
-        return state_count;
+        size_t const state_count = 1LL << bit_size.value();
+        return state_count > 1 ? state_count : std::numeric_limits<size_t>::max();
     }
 
     return SpecialCount::PLATFORM_DEPENDENT;

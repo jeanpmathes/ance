@@ -6,7 +6,6 @@
 #include "lang/construct/value/Value.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/SizeType.h"
-#include "lang/type/VoidType.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
@@ -52,12 +51,6 @@ bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Loca
     if (element_type_->isReferenceType())
     {
         validation_logger.logError("Cannot declare pointers to reference types", location);
-        return false;
-    }
-
-    if (element_type_->isVoidType())
-    {
-        validation_logger.logError("Cannot declare pointers to void type", location);
         return false;
     }
 

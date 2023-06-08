@@ -2,7 +2,6 @@
 
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/TypeAlias.h"
-#include "lang/type/VoidType.h"
 #include "lang/utility/Storage.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
@@ -78,11 +77,6 @@ void lang::AliasDescription::validate(ValidationLogger& validation_logger) const
     if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS)
     {
         lang::validation::isTypeExportable(actual_, actual_type_location_, validation_logger);
-    }
-
-    if (actual_ == scope().context().getVoidType())// Prevent infinite recursion.
-    {
-        validation_logger.logError("Cannot create alias for 'void' type", definition_location_);
     }
 
     self.getDefinition()->checkDependencies(validation_logger);

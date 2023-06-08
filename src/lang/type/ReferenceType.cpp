@@ -6,7 +6,6 @@
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
-#include "lang/type/VoidType.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
@@ -53,10 +52,14 @@ lang::Type const& lang::ReferenceType::getActualType() const
     return actual_type_.value();
 }
 
-llvm::Constant* lang::ReferenceType::getDefaultContent(llvm::Module&) const
+llvm::Constant* lang::ReferenceType::getDefaultContent(llvm::Module& m) const
 {
-    assert(false && "References cannot be default-initialized.");
-    return nullptr;
+    // A default value for a reference does not make sense, except for zero-sized types.
+    // They are not stored anywhere, so we can just return a null pointer.
+
+    assert(element_type_->getStateCount().isUnit());
+
+    return llvm::ConstantPointerNull::get(llvm::PointerType::get(element_type_->getContentType(m.getContext()), 0));
 }
 
 llvm::PointerType* lang::ReferenceType::getContentType(llvm::LLVMContext& c) const
@@ -68,14 +71,6 @@ bool lang::ReferenceType::validate(ValidationLogger& validation_logger, lang::Lo
 {
     if (lang::validation::isTypeUndefined(element_type_, scope(), element_type_->name().location(), validation_logger))
         return false;
-
-    if (element_type_->isVoidType())
-    {
-        validation_logger.logError("Cannot declare reference to "
-                                       + scope()->context().getVoidType()->getAnnotatedName(),
-                                   location);
-        return false;
-    }
 
     if (element_type_->isReferenceType())
     {

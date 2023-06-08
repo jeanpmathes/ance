@@ -24,6 +24,7 @@ namespace lang
                            lang::AccessModifier                 access_modifier,
                            bool                                 is_imported,
                            lang::ResolvingHandle<lang::Type>    return_type,
+                           bool                                 preserve_unit_return,
                            std::vector<Shared<lang::Parameter>> parameters,
                            lang::Location                       location);
 
@@ -55,6 +56,7 @@ namespace lang
       private:
         lang::AccessModifier access_modifier_;
         bool                 is_imported_;
+        bool                 preserve_unit_return_;
 
         llvm::FunctionType* native_type_ {nullptr};
         llvm::Function*     native_function_ {nullptr};

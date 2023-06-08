@@ -22,7 +22,7 @@ public main () : u32
     let r1 <: x + y;
     let r2 <: <not> x;
 
-    // Elements can be accessed using the index operator.
+    // Elements can be accessed using the subscript operator.
 
     r1[0] <: 0;
 

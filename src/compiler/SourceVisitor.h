@@ -101,6 +101,7 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitUiptrLiteral(anceParser::UiptrLiteralContext* ctx) override;
     std::any visitNormalInteger(anceParser::NormalIntegerContext* ctx) override;
     std::any visitSpecialInteger(anceParser::SpecialIntegerContext* ctx) override;
+    std::any visitUnitLiteral(anceParser::UnitLiteralContext* ctx) override;
     std::any visitIntegerType(anceParser::IntegerTypeContext* ctx) override;
     std::any visitBooleanType(anceParser::BooleanTypeContext* ctx) override;
     std::any visitArrayType(anceParser::ArrayTypeContext* ctx) override;

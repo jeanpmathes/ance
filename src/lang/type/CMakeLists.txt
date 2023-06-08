@@ -11,7 +11,8 @@ target_sources(ance PRIVATE
                CustomType.cpp
                UnsignedIntegerPointerType.cpp
                Type.cpp
-               VoidType.cpp
+               UnitType.cpp
+               StateCount.cpp
                PointerType.cpp
                OpaquePointerType.cpp
                AddressType.cpp

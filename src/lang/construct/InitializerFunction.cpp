@@ -5,14 +5,13 @@
 #include "lang/construct/CodeBlock.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/statement/Assignment.h"
-#include "lang/type/VoidType.h"
 
 lang::InitializerFunction::InitializerFunction(lang::Function& function,
                                                Statement&      initializer,
                                                lang::Scope&    containing_scope)
     : lang::StatementFunction(function,
                               lang::AccessModifier::PRIVATE_ACCESS,
-                              containing_scope.context().getVoidType(),
+                              containing_scope.context().getUnitType(),
                               lang::Location::global(),
                               {},
                               initializer,

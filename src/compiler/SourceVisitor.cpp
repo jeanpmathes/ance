@@ -18,6 +18,7 @@
 #include "lang/construct/constant/IntegerConstant.h"
 #include "lang/construct/constant/NullConstant.h"
 #include "lang/construct/constant/StringConstant.h"
+#include "lang/construct/constant/UnitConstant.h"
 
 #include "lang/construct/CodeBlock.h"
 #include "lang/construct/Member.h"
@@ -36,7 +37,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 {
     auto                   access     = lang::AccessModifier::EXTERN_ACCESS;
     lang::Identifier const identifier = lang::Identifier::like(ProjectDescription::ANCE_PROJECT_DEFINITION_FUNCTION);
-    lang::ResolvingHandle<lang::Type> return_type = unit_.globalScope().context().getVoidType();
+    lang::ResolvingHandle<lang::Type> return_type = unit_.globalScope().context().getUnitType();
 
     lang::Location const declaration_location = lang::Location::global();
     lang::Location const definition_location  = lang::Location::global();
@@ -163,7 +164,7 @@ std::any SourceVisitor::visitFunctionDescription(anceParser::FunctionDescription
     lang::Identifier const            identifier = ident(ctx->IDENTIFIER());
     lang::ResolvingHandle<lang::Type> return_type =
         ctx->type() ? erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()))
-                    : unit_.globalScope().context().getVoidType();
+                    : unit_.globalScope().context().getUnitType();
 
     lang::Location const declaration_location = location(ctx);
     lang::Location const definition_location =
@@ -863,6 +864,12 @@ std::any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerContext* c
                                           radix,
                                           unit_.globalScope().context().getFixedWidthIntegerType(size, false));
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
+}
+
+std::any SourceVisitor::visitUnitLiteral(anceParser::UnitLiteralContext* ctx)
+{
+    Shared<lang::Constant> constant = lang::UnitConstant::create(unit_.globalScope().context());
+    return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ctx)

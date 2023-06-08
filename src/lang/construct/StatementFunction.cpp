@@ -10,7 +10,6 @@
 #include "lang/construct/Function.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
-#include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
 lang::StatementFunction::StatementFunction(Function&                            function,

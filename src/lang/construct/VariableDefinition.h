@@ -52,11 +52,6 @@ namespace lang
         [[nodiscard]] lang::Location location() const;
 
         /**
-         * Get the source location of the type of this variable.
-         */
-        [[nodiscard]] lang::Location typeLocation() const;
-
-        /**
          * Get whether this variable is defined as final.
          */
         [[nodiscard]] bool isFinal() const;

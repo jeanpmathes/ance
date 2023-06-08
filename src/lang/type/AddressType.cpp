@@ -83,20 +83,29 @@ Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
             result = context.ir().CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
             break;
         case lang::BinaryOperator::ADDITION:
-            result = context.ir().CreateGEP(getPointeeType().value()->getContentType(context.llvmContext()),
-                                            left_value,
-                                            right_value,
-                                            left_value->getName() + ".gep");
-            break;
-        case lang::BinaryOperator::SUBTRACTION:
-            result = context.ir().CreatePtrDiff(getPointeeType().value()->getContentType(context.llvmContext()),
+            if (getPointeeType().value()->getStateCount().isUnit())
+                result = getOperatorResultType(op, right->type())->getDefaultContent(context.llvmModule());
+            else
+                result = context.ir().CreateGEP(getPointeeType().value()->getContentType(context.llvmContext()),
                                                 left_value,
                                                 right_value,
-                                                left_value->getName() + ".ptrdiff");
-            result = context.ir().CreateIntCast(result,
-                                                context.types().getDiffType()->getContentType(context.llvmContext()),
-                                                true,
-                                                left_value->getName() + ".icast");
+                                                left_value->getName() + ".gep");
+            break;
+        case lang::BinaryOperator::SUBTRACTION:
+            if (getPointeeType().value()->getStateCount().isUnit())
+                result = getOperatorResultType(op, right->type())->getDefaultContent(context.llvmModule());
+            else
+            {
+                result = context.ir().CreatePtrDiff(getPointeeType().value()->getContentType(context.llvmContext()),
+                                                    left_value,
+                                                    right_value,
+                                                    left_value->getName() + ".ptrdiff");
+                result =
+                    context.ir().CreateIntCast(result,
+                                               context.types().getDiffType()->getContentType(context.llvmContext()),
+                                               true,
+                                               left_value->getName() + ".icast");
+            }
             break;
 
         default:

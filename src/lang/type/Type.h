@@ -184,10 +184,10 @@ namespace lang
         [[nodiscard]] bool isDiffType() const;
 
         /**
-         * Get whether this type is the void type.
-         * @return True if this type is the void type.
+         * Get whether this type is the unit type.
+         * @return True if this type is the unit type.
          */
-        [[nodiscard]] bool isVoidType() const;
+        [[nodiscard]] bool isUnitType() const;
 
         /**
          * Get whether this type is the null value type used by the null literal.

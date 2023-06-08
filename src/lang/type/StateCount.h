@@ -3,8 +3,15 @@
 
 #include <variant>
 
+#include "lang/utility/Optional.h"
+
 enum class SpecialCount
 {
+    /**
+     * For types where the exact state count is platform-dependent, but countable.
+     */
+    PLATFORM_DEPENDENT,
+
     /**
      * For types where states are not exact, and therefore hard to count.
      * One example are floating-point types.
@@ -12,17 +19,43 @@ enum class SpecialCount
     UNCOUNTABLE,
 
     /**
-     * For types where the exact state count is platform-dependent.
-     */
-    PLATFORM_DEPENDENT,
-
-    /**
-     * For types that represent something abstract.
+     * For types that represent something abstract, which means counting does not make sense.
      * One example are pointers.
      */
     ABSTRACT
 };
 
-using StateCount = std::variant<SpecialCount, size_t>;
+class StateCount
+{
+  public:
+    StateCount(size_t count);      // NOLINT(google-explicit-constructor)
+    StateCount(SpecialCount count);// NOLINT(google-explicit-constructor)
+
+    constexpr StateCount() = default;
+
+    [[nodiscard]] Optional<size_t>       count() const;
+    [[nodiscard]] Optional<SpecialCount> special() const;
+
+    [[nodiscard]] bool isUnit() const;
+
+    /**
+     * Whether this state count is countable. Matching of these is simple.
+     * Note that uncountable types that are not abstract are still matchable.
+     */
+    [[nodiscard]] bool isCountable() const;
+
+    /**
+     * Whether this state count is abstract. Matching of these is not possible.
+     */
+    [[nodiscard]] bool isAbstract() const;
+
+    StateCount operator+(StateCount const& other) const;
+    StateCount operator*(StateCount const& other) const;
+
+    static StateCount unit();
+
+  private:
+    std::variant<SpecialCount, size_t> count_;
+};
 
 #endif

@@ -86,7 +86,7 @@ namespace lang
                                                            lang::Location       left_location,
                                                            lang::Location       right_location,
                                                            ValidationLogger&    validation_logger) const override;
-        Shared<lang::Value>               buildOperator(lang::BinaryOperator op,
+        Shared<Value>                     buildOperator(lang::BinaryOperator op,
                                                         Shared<Value>        left,
                                                         Shared<Value>        right,
                                                         CompileContext&      context) override;

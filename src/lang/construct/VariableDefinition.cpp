@@ -46,11 +46,6 @@ lang::Location lang::VariableDefinition::location() const
     return location_;
 }
 
-lang::Location lang::VariableDefinition::typeLocation() const
-{
-    return type_location_;
-}
-
 bool lang::VariableDefinition::isFinal() const
 {
     return is_final_;
@@ -68,6 +63,8 @@ std::vector<lang::ResolvingHandle<lang::Function>> lang::VariableDefinition::get
 
 void lang::VariableDefinition::setValue(Shared<lang::Value> value, CompileContext& context)
 {
+    if (type()->getStateCount().isUnit()) return;
+
     if (type()->isReferenceType())
     {
         Shared<lang::Value> reference = getValue(context);

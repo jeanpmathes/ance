@@ -24,12 +24,11 @@ public:
     T__56 = 57, T__57 = 58, T__58 = 59, T__59 = 60, T__60 = 61, T__61 = 62, 
     T__62 = 63, T__63 = 64, T__64 = 65, T__65 = 66, T__66 = 67, T__67 = 68, 
     T__68 = 69, T__69 = 70, T__70 = 71, T__71 = 72, T__72 = 73, T__73 = 74, 
-    T__74 = 75, T__75 = 76, T__76 = 77, T__77 = 78, NATIVE_INTEGER_TYPE = 79, 
-    SIGNED_INTEGER = 80, HEX_INTEGER = 81, BIN_INTEGER = 82, OCT_INTEGER = 83, 
-    HALF = 84, SINGLE = 85, DOUBLE = 86, QUAD = 87, DECIMAL = 88, STRING = 89, 
-    CHAR = 90, INTEGER = 91, BUFFER = 92, CONST = 93, NOT = 94, IDENTIFIER = 95, 
-    SEMICOLON = 96, WHITESPACE = 97, BLOCK_COMMENT = 98, LINE_COMMENT = 99, 
-    ERROR_CHAR = 100
+    T__74 = 75, T__75 = 76, T__76 = 77, NATIVE_INTEGER_TYPE = 78, SIGNED_INTEGER = 79, 
+    HEX_INTEGER = 80, BIN_INTEGER = 81, OCT_INTEGER = 82, HALF = 83, SINGLE = 84, 
+    DOUBLE = 85, QUAD = 86, DECIMAL = 87, STRING = 88, CHAR = 89, INTEGER = 90, 
+    BUFFER = 91, CONST = 92, NOT = 93, IDENTIFIER = 94, SEMICOLON = 95, 
+    WHITESPACE = 96, BLOCK_COMMENT = 97, LINE_COMMENT = 98, ERROR_CHAR = 99
   };
 
   enum {
@@ -53,10 +52,10 @@ public:
     RuleCharLiteral = 55, RuleIntegerLiteral = 56, RuleNormalInteger = 57, 
     RuleSpecialInteger = 58, RuleFloatingPointLiteral = 59, RuleBooleanLiteral = 60, 
     RuleNullLiteral = 61, RuleSizeLiteral = 62, RuleDiffLiteral = 63, RuleUiptrLiteral = 64, 
-    RuleType = 65, RuleIntegerType = 66, RuleArrayType = 67, RuleVectorType = 68, 
-    RuleKeywordType = 69, RuleFloatingPointType = 70, RuleTargetDependentType = 71, 
-    RuleBooleanType = 72, RuleCharType = 73, RuleNullPointerType = 74, RuleVoidType = 75, 
-    RuleCustomType = 76
+    RuleUnitLiteral = 65, RuleType = 66, RuleIntegerType = 67, RuleArrayType = 68, 
+    RuleVectorType = 69, RuleKeywordType = 70, RuleFloatingPointType = 71, 
+    RuleTargetDependentType = 72, RuleBooleanType = 73, RuleCharType = 74, 
+    RuleNullPointerType = 75, RuleUnitType = 76, RuleCustomType = 77
   };
 
   explicit anceParser(antlr4::TokenStream *input);
@@ -141,6 +140,7 @@ public:
   class SizeLiteralContext;
   class DiffLiteralContext;
   class UiptrLiteralContext;
+  class UnitLiteralContext;
   class TypeContext;
   class IntegerTypeContext;
   class ArrayTypeContext;
@@ -151,7 +151,7 @@ public:
   class BooleanTypeContext;
   class CharTypeContext;
   class NullPointerTypeContext;
-  class VoidTypeContext;
+  class UnitTypeContext;
   class CustomTypeContext; 
 
   class  FileContext : public antlr4::ParserRuleContext {
@@ -1443,6 +1443,7 @@ public:
     SizeLiteralContext *sizeLiteral();
     DiffLiteralContext *diffLiteral();
     UiptrLiteralContext *uiptrLiteral();
+    UnitLiteralContext *unitLiteral();
 
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -1641,6 +1642,18 @@ public:
 
   UiptrLiteralContext* uiptrLiteral();
 
+  class  UnitLiteralContext : public antlr4::ParserRuleContext {
+  public:
+    UnitLiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  UnitLiteralContext* unitLiteral();
+
   class  TypeContext : public antlr4::ParserRuleContext {
   public:
     TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -1781,7 +1794,7 @@ public:
     BooleanTypeContext *booleanType();
     CharTypeContext *charType();
     NullPointerTypeContext *nullPointerType();
-    VoidTypeContext *voidType();
+    UnitTypeContext *unitType();
 
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -1850,9 +1863,9 @@ public:
 
   NullPointerTypeContext* nullPointerType();
 
-  class  VoidTypeContext : public antlr4::ParserRuleContext {
+  class  UnitTypeContext : public antlr4::ParserRuleContext {
   public:
-    VoidTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    UnitTypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
 
 
@@ -1860,7 +1873,7 @@ public:
    
   };
 
-  VoidTypeContext* voidType();
+  UnitTypeContext* unitType();
 
   class  CustomTypeContext : public antlr4::ParserRuleContext {
   public:

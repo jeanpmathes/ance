@@ -7,7 +7,6 @@
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/Scope.h"
-#include "lang/type/VoidType.h"
 #include "lang/utility/Values.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
@@ -31,10 +30,11 @@ lang::StructType::StructType(lang::Accessibility                               a
 
 StateCount lang::StructType::getStateCount() const
 {
-    // While some structs actually have a state count, they cannot currently be matched anyway.
-    // Also, struct matching would work on a per-member basis which makes state count of structs irrelevant for now.
+    StateCount state_count = StateCount::unit();
 
-    return SpecialCount::ABSTRACT;
+    for (auto& member : members_) { state_count = state_count * member.get().type()->getStateCount(); }
+
+    return state_count;
 }
 
 bool lang::StructType::isStructType() const
@@ -46,6 +46,7 @@ llvm::Constant* lang::StructType::getDefaultContent(llvm::Module& m) const
 {
     std::vector<llvm::Constant*> values;
 
+    values.reserve(members_.size());
     for (auto& member : members_) { values.push_back(member.get().getConstantInitializer(m)); }
 
     return llvm::ConstantStruct::get(getContentType(m.getContext()), values);
@@ -59,6 +60,7 @@ llvm::StructType* lang::StructType::getContentType(llvm::LLVMContext& c) const
 
         std::vector<llvm::Type*> member_types;
 
+        member_types.reserve(members_.size());
         for (auto& member : members_) { member_types.push_back(member.get().type()->getContentType(c)); }
 
         native_type_->setBody(member_types);
@@ -81,6 +83,7 @@ llvm::DIType* lang::StructType::createDebugType(CompileContext& context) const
     auto           alignment = static_cast<uint32_t>(dl.getABITypeAlignment(array_type));
 
     std::vector<llvm::Metadata*> member_types;
+    member_types.reserve(members_.size());
     for (auto& member : members_) { member_types.push_back(member.get().type()->getDebugType(context)); }
 
     llvm::MDTuple* debug_type = llvm::MDNode::get(context.llvmContext(), member_types);

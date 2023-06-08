@@ -8,6 +8,7 @@ lang::PredefinedFunction::PredefinedFunction(lang::Function&                    
                                              lang::AccessModifier                 access_modifier,
                                              bool                                 is_imported,
                                              lang::ResolvingHandle<lang::Type>    return_type,
+                                             bool                                 preserve_unit_return,
                                              std::vector<Shared<lang::Parameter>> parameters,
                                              lang::Location                       location)
     : lang::FunctionDefinition(function,
@@ -18,6 +19,7 @@ lang::PredefinedFunction::PredefinedFunction(lang::Function&                    
                                location)
     , access_modifier_(access_modifier)
     , is_imported_(is_imported)
+    , preserve_unit_return_(preserve_unit_return)
 {}
 
 bool lang::PredefinedFunction::isMangled() const
@@ -42,7 +44,7 @@ void lang::PredefinedFunction::createNativeBacking(CompileContext& context)
     if (is_imported_) { assert(linkage == llvm::GlobalValue::LinkageTypes::ExternalLinkage); }
 
     std::tie(native_type_, native_function_) =
-        createNativeFunction(linkage, context.llvmContext(), context.llvmModule());
+        createNativeFunction(linkage, context.llvmContext(), context.llvmModule(), preserve_unit_return_);
 
     lang::Function::setImportExportAttributes(native_function_, access_modifier_, is_imported_, context);
 

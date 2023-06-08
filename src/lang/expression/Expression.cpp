@@ -91,8 +91,9 @@ void Expression::doAssign(Shared<lang::Value> value, CompileContext& context)
     assert(type()->isReferenceType());
 
     lang::ResolvingHandle<lang::Type> target_type = type()->getElementType();
-    value                                         = lang::Type::makeMatching(target_type, value, context);
+    if (target_type->getStateCount().isUnit()) return;
 
+    value                                 = lang::Type::makeMatching(target_type, value, context);
     Shared<lang::Value> expression_return = getValue();
 
     expression_return->buildContentValue(context);

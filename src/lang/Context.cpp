@@ -15,9 +15,9 @@
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SingleType.h"
 #include "lang/type/SizeType.h"
+#include "lang/type/UnitType.h"
 #include "lang/type/UnsignedIntegerPointerType.h"
 #include "lang/type/VectorType.h"
-#include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
 lang::Context::Context(lang::GlobalScope& global_scope, bool contains_runtime)
@@ -40,7 +40,7 @@ lang::Context::Context(lang::GlobalScope& global_scope, bool contains_runtime)
     global_scope_.registerDefinition(getDoubleType());
     global_scope_.registerDefinition(getQuadType());
 
-    global_scope_.registerDefinition(getVoidType());
+    global_scope_.registerDefinition(getUnitType());
     global_scope_.registerDefinition(getBooleanType());
     global_scope_.registerDefinition(getCharType());
     global_scope_.registerDefinition(getSizeType());
@@ -283,12 +283,12 @@ lang::ResolvingHandle<lang::Type> lang::Context::getVectorType(lang::ResolvingHa
     }
 }
 
-lang::ResolvingHandle<lang::Type> lang::Context::getVoidType() const
+lang::ResolvingHandle<lang::Type> lang::Context::getUnitType() const
 {
-    if (!void_type_.hasValue())
-        void_type_ = lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new VoidType())));
+    if (!unit_type_.hasValue())
+        unit_type_ = lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new UnitType())));
 
-    return void_type_.value();
+    return unit_type_.value();
 }
 
 bool lang::Context::isContainingRuntime() const

@@ -13,7 +13,7 @@ lang::CharType::CharType() : TypeDefinition(lang::Identifier::like("char")) {}
 
 StateCount lang::CharType::getStateCount() const
 {
-    size_t state_count = 1ULL << SIZE_IN_BITS;
+    size_t const state_count = 1ULL << SIZE_IN_BITS;
     return state_count;
 }
 

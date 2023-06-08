@@ -120,11 +120,6 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
         }
 
         parameter->type().validate(validation_logger, parameter->typeLocation());
-
-        if (parameter->type().isVoidType())
-        {
-            validation_logger.logError("Parameter cannot have 'void' type", parameter->location());
-        }
     }
 
     if (code_.hasValue()) { (**code_).validate(validation_logger); }

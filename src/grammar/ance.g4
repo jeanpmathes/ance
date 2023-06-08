@@ -284,6 +284,7 @@ literalExpression
     | sizeLiteral
     | diffLiteral
     | uiptrLiteral
+    | unitLiteral
     ;
 
 stringLiteral
@@ -337,6 +338,10 @@ uiptrLiteral
     : HEX_INTEGER ':' 'uiptr'
     ;
 
+unitLiteral
+    : '(' ')'
+    ;
+
 type
     : integerType # Integer
     | arrayType # Array
@@ -366,7 +371,7 @@ keywordType
     | booleanType
     | charType
     | nullPointerType
-    | voidType
+    | unitType
     ;
 
 floatingPointType
@@ -395,8 +400,8 @@ nullPointerType
     : 'nullptr'
     ;
 
-voidType
-    : 'void'
+unitType
+    : '(' ')'
     ;
 
 customType

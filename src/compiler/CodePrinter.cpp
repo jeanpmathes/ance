@@ -1,7 +1,6 @@
 #include "CodePrinter.h"
 
 #include "lang/construct/Callable.h"
-#include "lang/type/VoidType.h"
 
 std::ostream& util::operator<<(std::ostream& os, std::any const&)
 {
@@ -597,7 +596,7 @@ void CodePrinter::emitFunction(lang::Function const& function)
         out_ << ")";
     }
 
-    if (!function.returnType().isVoidType()) { out_ << " : " << function.returnType().name(); }
+    if (!function.returnType().isUnitType()) { out_ << " : " << function.returnType().name(); }
 
     if (function.code())
     {

@@ -6,12 +6,14 @@ private struct X
 {
     private x: ();
     private y: ();
-    private z: ();
+    private z: Y;
 }
+
+private struct Y { }
 
 public unit: ();
 
-private foo () : () // This does not have to be specified explicitly, see below.
+public foo () : () // This does not have to be specified explicitly, see below.
 {
     let x: () <: (); // The unit literal can be used to get a unit type value.
 
@@ -23,6 +25,7 @@ private foo () : () // This does not have to be specified explicitly, see below.
 
     assert sizeof () == 0:size;
     assert sizeof X == 0:size;
+    assert sizeof Y == 0:size;
 
     let p: *() <: addressof x;
     let q: () <: p.;
@@ -35,7 +38,6 @@ private foo () : () // This does not have to be specified explicitly, see below.
     let a: X;
     a x <: ();
     a y <: ();
-    a z <: ();
 
     let a := new ();
     delete a;
@@ -53,6 +55,7 @@ private bar (u: ())
 
 public main () : u32
 {
+    foo();
     return 0:32;
 }
 

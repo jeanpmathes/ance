@@ -152,10 +152,10 @@ bool lang::Type::isDiffType() const
     return definition_.value()->isDiffType();
 }
 
-bool lang::Type::isVoidType() const
+bool lang::Type::isUnitType() const
 {
     assert(isDefined());
-    return definition_.value()->isVoidType();
+    return definition_.value()->isUnitType();
 }
 
 bool lang::Type::isNullValueType() const
@@ -775,7 +775,7 @@ enum TypeClass : uint8_t
     DIFF,
     UNSIGNED_INTEGER_POINTER,
     VECTOR,
-    VOID
+    UNIT
 };
 
 static TypeClass getTypeClass(lang::Type* type)
@@ -800,10 +800,10 @@ static TypeClass getTypeClass(lang::Type* type)
     if (type->isDiffType()) return TypeClass::DIFF;
     if (type->isUnsignedIntegerPointerType()) return TypeClass::UNSIGNED_INTEGER_POINTER;
     if (type->isVectorType()) return TypeClass::VECTOR;
-    if (type->isVoidType()) return TypeClass::VOID;
+    if (type->isUnitType()) return TypeClass::UNIT;
 
     assert(false);
-    return TypeClass::VOID;
+    return TypeClass::UNIT;
 }
 
 void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
@@ -969,9 +969,9 @@ void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
             if (storage.isReading()) { type.reroute(context()->getVectorType(element_type, size)); }
             break;
         }
-        case TypeClass::VOID:
+        case TypeClass::UNIT:
         {
-            if (storage.isReading()) type.reroute(context()->getVoidType());
+            if (storage.isReading()) type.reroute(context()->getUnitType());
             break;
         }
         default:

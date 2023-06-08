@@ -183,9 +183,9 @@ namespace lang
          * Build a call to this function.
          * @param arguments The arguments to pass to the function.
          * @param context The current compile context.
-         * @return The return value. Will be null for return type void.
+         * @return The return value.
          */
-        Optional<Shared<lang::Value>> buildCall(std::vector<Shared<lang::Value>> arguments, CompileContext& context);
+        Shared<lang::Value> buildCall(std::vector<Shared<lang::Value>> arguments, CompileContext& context);
 
       protected:
         /**
@@ -205,11 +205,13 @@ namespace lang
          * @param linkage The linkage type.
          * @param c The llvm context.
          * @param m The llvm module.
+         * @param preserve_unit_return Whether to preserve the unit return type or replace it with void.
          * @return The native function type and the native function.
          */
         std::pair<llvm::FunctionType*, llvm::Function*> createNativeFunction(llvm::GlobalValue::LinkageTypes linkage,
                                                                              llvm::LLVMContext&              c,
-                                                                             llvm::Module&                   m);
+                                                                             llvm::Module&                   m,
+                                                                             bool preserve_unit_return = false);
 
         /**
          * A helper to build a call to a native function.

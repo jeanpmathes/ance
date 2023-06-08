@@ -103,6 +103,7 @@ namespace lang
         /**
          * Define this function as a predefined function.
          * @param return_type The return type of the function.
+         * @param preserve_unit_return Whether to preserve the unit return type.
          * @param parameters The parameters for this function.
          * @param access_modifier The access level of the function.
          * @param is_imported Whether this function is imported.
@@ -111,6 +112,7 @@ namespace lang
          * @return The predefined function.
          */
         PredefinedFunction& defineAsPredefined(lang::ResolvingHandle<lang::Type>           return_type,
+                                               bool                                        preserve_unit_return,
                                                std::vector<Shared<lang::Parameter>> const& parameters,
                                                lang::AccessModifier                        access_modifier,
                                                bool                                        is_imported,
@@ -266,10 +268,9 @@ namespace lang
          * Build a call to this function.
          * @param arguments The arguments to pass to the function.
          * @param context The current compile context.
-         * @return The return value. Will be null for return type void.
+         * @return The return value.
          */
-        Optional<Shared<lang::Value>> buildCall(std::vector<Shared<lang::Value>> const& arguments,
-                                                CompileContext&                         context);
+        Shared<lang::Value> buildCall(std::vector<Shared<lang::Value>> const& arguments, CompileContext& context);
 
         lang::Scope*                           scope() override;
         lang::Scope const*                     scope() const;

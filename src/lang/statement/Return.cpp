@@ -2,6 +2,7 @@
 
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
+#include "lang/construct/constant/UnitConstant.h"
 #include "lang/expression/Expression.h"
 #include "validation/ValidationLogger.h"
 
@@ -19,9 +20,11 @@ Expression const* Return::expression() const
 
 std::vector<Owned<lang::BasicBlock>> Return::createBasicBlocks(lang::BasicBlock& entry, lang::Function& function)
 {
+    // Return statement without value is syntactic sugar and not allowed at later stages (like the current stage).
+    assert(return_value_.hasValue());
+
     std::vector<Owned<lang::BasicBlock>> blocks;
-    blocks.push_back(
-        lang::BasicBlock::createReturning(*scope()->asLocalScope(), return_value_.value().get(), location(), function));
+    blocks.push_back(lang::BasicBlock::createReturning(*scope()->asLocalScope(), **return_value_, function));
 
     entry.link(*blocks.front());
 
@@ -54,6 +57,7 @@ Statements Return::expandWith(Expressions subexpressions, Statements, lang::Cont
 
         return_value_access = makeOwned<VariableAccess>(make_temp_variable(), location());
     }
+    else { return_value_access = makeOwned<ConstantLiteral>(makeShared<lang::UnitConstant>(new_context), location()); }
 
     statements.emplace_back(makeOwned<Return>(std::move(return_value_access), location()));
 

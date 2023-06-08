@@ -9,12 +9,9 @@
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
-lang::BasicBlock::Definition::Returning::Returning(lang::LocalScope& scope,
-                                                   Expression*       return_value,
-                                                   lang::Location    return_location)
+lang::BasicBlock::Definition::Returning::Returning(lang::LocalScope& scope, Expression& return_value)
     : return_value_(return_value)
     , scope_(scope)
-    , return_location_(return_location)
 {}
 
 void lang::BasicBlock::Definition::Returning::complete(size_t& index)
@@ -68,15 +65,16 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Returning::getSucce
     return {};
 }
 
-Optional<std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>> lang::BasicBlock::Definition::
-    Returning::getReturnValue() const
+Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> lang::BasicBlock::Definition::Returning::
+    getReturnValue() const
 {
-    lang::Location const location = return_value_ ? return_value_->location() : return_location_;
-    Optional<std::reference_wrapper<lang::Value const>> value =
-        return_value_ ? makeOptional(std::cref(const_cast<Expression const*>(return_value_)->getValue()))
-                      : std::nullopt;
+    std::reference_wrapper<lang::Value const> const return_value =
+        const_cast<Expression const*>(&return_value_)->getValue();
+    lang::Location const location = return_value_.location();
 
-    return std::make_pair(value, location);
+    std::pair<std::reference_wrapper<lang::Value const>, lang::Location> return_value_pair = {return_value, location};
+
+    return return_value_pair;
 }
 
 lang::Location lang::BasicBlock::Definition::Returning::getStartLocation() const
@@ -107,20 +105,18 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext& context)
 
     for (auto& statement : statements_) { statement->build(context); }
 
-    if (return_value_) {}
-
     scope_.buildReturnFinalization(context);
 
-    if (return_value_)
+    if (self()->containing_function_->returnType()->isUnitType()) { context.ir().CreateRetVoid(); }
+    else
     {
-        Shared<lang::Value> return_value = return_value_->getValue();
+        Shared<lang::Value> return_value = return_value_.getValue();
 
         return_value = lang::Type::makeMatching(self()->containing_function_->returnType(), return_value, context);
         return_value->buildContentValue(context);
 
         context.ir().CreateRet(return_value->getContentValue());
     }
-    else { context.ir().CreateRetVoid(); }
 }
 
 std::string lang::BasicBlock::Definition::Returning::getExitRepresentation()

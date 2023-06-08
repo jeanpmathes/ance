@@ -40,15 +40,11 @@ namespace lang
         /**
          * Create a basic block that returns from the function.
          * @param scope The scope to return from.
-         * @param expression The expression providing the return value, or nullptr if no value is returned.
-         * @param return_location The location of the return statement.
+         * @param expression The expression providing the return value.
          * @param function The function that contains the basic block.
          * @return The created basic block.
          */
-        static Owned<BasicBlock> createReturning(lang::LocalScope& scope,
-                                                 Expression*       expression,
-                                                 lang::Location    return_location,
-                                                 Function&         function);
+        static Owned<BasicBlock> createReturning(lang::LocalScope& scope, Expression& expression, Function& function);
 
         /**
          * Create a basic block that branches depending on the value of an expression.
@@ -152,7 +148,7 @@ namespace lang
          * If this is a return block, but no value is returned, the optional contains a nullptr.
          * @return The return value of this basic block.
          */
-        Optional<std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>> getReturnValue() const;
+        Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> getReturnValue() const;
 
         /**
          * Get the location of the first statement in this basic block.
@@ -249,8 +245,7 @@ namespace lang
 
                 [[nodiscard]] virtual std::list<lang::BasicBlock const*> getLeaves() const = 0;
                 virtual std::vector<lang::BasicBlock*>                   getSuccessors()   = 0;
-                [[nodiscard]] virtual Optional<
-                    std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>>
+                [[nodiscard]] virtual Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>>
                                                      getReturnValue() const;
                 [[nodiscard]] virtual lang::Location getStartLocation() const = 0;
                 [[nodiscard]] virtual lang::Location getEndLocation() const   = 0;
@@ -376,7 +371,7 @@ namespace lang
             class Returning : public Base
             {
               public:
-                explicit Returning(lang::LocalScope& scope, Expression* return_value, lang::Location return_location);
+                explicit Returning(lang::LocalScope& scope, Expression& return_value);
                 ~Returning() override = default;
 
               public:
@@ -390,7 +385,7 @@ namespace lang
 
                 [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
                 std::vector<lang::BasicBlock*>                   getSuccessors() override;
-                [[nodiscard]] Optional<std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>>
+                [[nodiscard]] Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>>
                                              getReturnValue() const override;
                 [[nodiscard]] lang::Location getStartLocation() const override;
                 [[nodiscard]] lang::Location getEndLocation() const override;
@@ -405,9 +400,8 @@ namespace lang
               private:
                 std::list<Statement*> statements_ {};
                 lang::BasicBlock*     unreachable_next_ {nullptr};
-                Expression*           return_value_;
+                Expression&           return_value_;
                 lang::LocalScope&     scope_;
-                lang::Location        return_location_;
             };
 
             class Branching : public Base

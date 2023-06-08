@@ -40,6 +40,9 @@ bool lang::IndirectType::validateIndirection(lang::Location, ValidationLogger&) 
 
 Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<Value> value, CompileContext& context)
 {
+    if (getIndirectionType()->getStateCount().isUnit())
+        return lang::WrappedNativeValue::makeDefault(getIndirectionType(), context);
+
     value->buildContentValue(context);
     llvm::Value* ptr = value->getContentValue();
 

@@ -80,18 +80,18 @@ namespace lang
         [[nodiscard]] virtual bool                     isFloatingPointType(size_t precision) const;
         [[nodiscard]] virtual bool                     isSizeType() const;
         [[nodiscard]] virtual bool                     isDiffType() const;
-        [[nodiscard]] virtual bool                     isVoidType() const;
+        [[nodiscard]] virtual bool                     isUnitType() const;
         [[nodiscard]] virtual bool                     isNullValueType() const;
         [[nodiscard]] virtual bool                     isPointerType() const;
         [[nodiscard]] virtual bool                     isAddressType() const;
         [[nodiscard]] virtual bool                     isBufferType() const;
-        [[nodiscard]] virtual bool                         isOpaquePointerType() const;
-        [[nodiscard]] virtual bool                         isReferenceType() const;
-        [[nodiscard]] virtual bool                         isStructType() const;
-        [[nodiscard]] virtual VectorizableType const*      isVectorizable() const;
-        [[nodiscard]] virtual VectorizableType*            isVectorizable();
-        [[nodiscard]] virtual VectorType const*            isVectorType() const;
-        [[nodiscard]] virtual VectorType*                  isVectorType();
+        [[nodiscard]] virtual bool                     isOpaquePointerType() const;
+        [[nodiscard]] virtual bool                     isReferenceType() const;
+        [[nodiscard]] virtual bool                     isStructType() const;
+        [[nodiscard]] virtual VectorizableType const*  isVectorizable() const;
+        [[nodiscard]] virtual VectorizableType*        isVectorizable();
+        [[nodiscard]] virtual VectorType const*        isVectorType() const;
+        [[nodiscard]] virtual VectorType*              isVectorType();
         [[nodiscard]] virtual ArrayType const*             isArrayType() const;
         [[nodiscard]] virtual ArrayType*                   isArrayType();
 
@@ -279,7 +279,7 @@ namespace lang
                                    llvm::Value*                                       ptr,
                                    llvm::Value*                                       count,
                                    std::function<void(llvm::Value*, CompileContext&)> operation,
-                                   CompileContext&                                    context);
+                                   CompileContext&                                    context) const;
 
       private:
         lang::Identifier    name_;

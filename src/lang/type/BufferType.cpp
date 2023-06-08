@@ -7,7 +7,6 @@
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
-#include "lang/type/VoidType.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
@@ -101,21 +100,8 @@ llvm::DIType* lang::BufferType::createDebugType(CompileContext& context) const
 
     uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
 
-    llvm::DIType* di_type;
-
-    if (element_type_->isVoidType())
-    {
-        std::string const name     = std::string(this->name().text());
-        auto              encoding = llvm::dwarf::DW_ATE_address;
-
-        di_type = context.di().createBasicType(name, size_in_bits, encoding);
-    }
-    else
-    {
-        llvm::DIType* element_di_type = element_type_->getDebugType(context);
-
-        di_type = context.di().createPointerType(element_di_type, size_in_bits);
-    }
+    llvm::DIType* element_di_type = element_type_->getDebugType(context);
+    llvm::DIType* di_type         = context.di().createPointerType(element_di_type, size_in_bits);
 
     return di_type;
 }

@@ -13,7 +13,6 @@
 #include "lang/type/PointerType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
-#include "lang/type/VoidType.h"
 #include "lang/utility/Values.h"
 
 void Runtime::init(CompileContext& context)
@@ -43,17 +42,17 @@ void Runtime::init(CompileContext& context)
 
     std::vector<lang::ResolvingHandle<lang::Type>> delete_dynamic_parameters;
     delete_dynamic_parameters.emplace_back(context.types().getOpaquePointerType());
-    delete_dynamic_ = create_function(DELETE_DYNAMIC_NAME, context.types().getVoidType(), delete_dynamic_parameters);
+    delete_dynamic_ = create_function(DELETE_DYNAMIC_NAME, context.types().getUnitType(), delete_dynamic_parameters);
 
     std::vector<lang::ResolvingHandle<lang::Type>> assertion_parameters;
     assertion_parameters.emplace_back(context.types().getBooleanType());
     assertion_parameters.emplace_back(
         context.types().getPointerType(context.types().getFixedWidthIntegerType(8, false)));
-    assertion_ = create_function(ASSERTION_NAME, context.types().getVoidType(), assertion_parameters);
+    assertion_ = create_function(ASSERTION_NAME, context.types().getUnitType(), assertion_parameters);
 
     std::vector<lang::ResolvingHandle<lang::Type>> abort_parameters;
     abort_parameters.emplace_back(context.types().getPointerType(context.types().getFixedWidthIntegerType(8, false)));
-    abort_ = create_function(ABORT_NAME, context.types().getVoidType(), abort_parameters);
+    abort_ = create_function(ABORT_NAME, context.types().getUnitType(), abort_parameters);
 
     is_initialized_ = true;
 }
@@ -69,6 +68,11 @@ Shared<lang::Value> Runtime::allocate(Allocator                         allocati
                                       CompileContext&                   context)
 {
     assert(is_initialized_);
+
+    lang::ResolvingHandle<lang::Type> ptr_type =
+        count.hasValue() ? context.types().getBufferType(type) : context.types().getPointerType(type);
+
+    if (type->getStateCount().isUnit()) return lang::WrappedNativeValue::makeDefault(ptr_type, context);
 
     llvm::Value* count_value = nullptr;
 
@@ -93,8 +97,6 @@ Shared<lang::Value> Runtime::allocate(Allocator                         allocati
             break;
     }
 
-    lang::ResolvingHandle<lang::Type> ptr_type =
-        count.hasValue() ? context.types().getBufferType(type) : context.types().getPointerType(type);
     llvm::Value* native_ptr = lang::values::contentToNative(ptr_type, ptr_to_allocated, context);
 
     if (count_value) { type->buildDefaultInitializer(ptr_to_allocated, count_value, context); }
@@ -109,6 +111,8 @@ void Runtime::deleteDynamic(Shared<lang::Value> value, bool delete_buffer, Compi
 
     assert(delete_buffer || value->type()->isPointerType());// Not deleting a buffer implies a pointer type.
     assert(!delete_buffer || value->type()->isBufferType());// Deleting a buffer implies a buffer type.
+
+    if (value->type()->getElementType()->getStateCount().isUnit()) return;
 
     value->buildContentValue(context);
 

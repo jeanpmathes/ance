@@ -64,7 +64,8 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
                                                   definition_location);
 }
 
-lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHandle<lang::Type>           return_type,
+lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHandle<lang::Type> return_type,
+                                                             bool                              preserve_unit_return,
                                                              std::vector<Shared<lang::Parameter>> const& parameters,
                                                              lang::AccessModifier access_modifier,
                                                              bool                 is_imported,
@@ -77,6 +78,7 @@ lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHand
                                                           access_modifier,
                                                           is_imported,
                                                           return_type,
+                                                          preserve_unit_return,
                                                           parameters,
                                                           location);
 
@@ -239,8 +241,8 @@ bool lang::Function::validateCall(
     return definition_.value()->validateCall(arguments, location, validation_logger);
 }
 
-Optional<Shared<lang::Value>> lang::Function::buildCall(std::vector<Shared<lang::Value>> const& arguments,
-                                                        CompileContext&                         context)
+Shared<lang::Value> lang::Function::buildCall(std::vector<Shared<lang::Value>> const& arguments,
+                                              CompileContext&                         context)
 {
     return definition_.value()->buildCall(arguments, context);
 }

@@ -432,13 +432,13 @@ bool Match::validateCases(lang::Location                  location,
         checked_cases.emplace_back(*case_instance);
     }
 
-    StateCount state_count = expression.type().getStateCount();
+    StateCount const state_count = expression.type().getStateCount();
 
     if (covered_cases != -1)
     {
         bool uncovered;
 
-        if (auto* count = std::get_if<size_t>(&state_count))
+        if (auto count = state_count.count(); count.hasValue())
         {
             uncovered = static_cast<ssize_t>(*count) != covered_cases;
         }
@@ -453,14 +453,16 @@ bool Match::validateCases(lang::Location                  location,
         }
     }
 
-    if (auto* count = std::get_if<SpecialCount>(&state_count))
+    if (state_count.isAbstract())
     {
-        if (*count == SpecialCount::UNCOUNTABLE)
-        {
-            validation_logger.logError("Cannot match uncountable type " + expression.type().getAnnotatedName(),
-                                       location);
-            valid = false;
-        }
+        validation_logger.logError("Cannot match abstract type " + expression.type().getAnnotatedName(), location);
+        valid = false;
+    }
+    else if (!state_count.isCountable())
+    {
+        validation_logger.logError("Cannot (yet) match uncountable type " + expression.type().getAnnotatedName(),
+                                   location);
+        valid = false;
     }
 
     return valid;

@@ -4,7 +4,6 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 #include "lang/type/Type.h"
-#include "lang/type/VoidType.h"
 #include "lang/utility/Identifier.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
@@ -73,9 +72,9 @@ bool lang::TypeAlias::isDiffType() const
     return actual_->isDiffType();
 }
 
-bool lang::TypeAlias::isVoidType() const
+bool lang::TypeAlias::isUnitType() const
 {
-    return actual_->isVoidType();
+    return actual_->isUnitType();
 }
 
 bool lang::TypeAlias::isPointerType() const

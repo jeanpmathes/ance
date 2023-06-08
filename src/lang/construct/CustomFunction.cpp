@@ -10,7 +10,6 @@
 #include "lang/construct/Function.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/Type.h"
-#include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
 lang::CustomFunction::CustomFunction(Function&                            function,
@@ -54,41 +53,19 @@ void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger) c
 
     for (auto* block : final_blocks)
     {
-        Optional<std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>> return_value =
+        Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> return_value =
             block->getReturnValue();
 
         if (return_value.hasValue())
         {
             auto& [value, location] = *return_value;
 
-            if (value.hasValue())
-            {
-                if (returnType().isVoidType())
-                {
-                    validation_logger.logError("Cannot return value in void function '" + name() + "'",
-                                               this->location());
-                }
-                else
-                {
-                    if (value.value().get().type().isDefined())
-                        lang::Type::checkMismatch(returnType(),
-                                                  value.value().get().type(),
-                                                  location,
-                                                  validation_logger);
-                }
-            }
-            else if (!returnType().isVoidType())
-            {
-                validation_logger.logError("Missing return value in function '" + name() + "'", location);
-            }
-            else
-            {
-                // No value, but void return type -> OK
-            }
+            if (value.get().type().isDefined())
+                lang::Type::checkMismatch(returnType(), value.get().type(), location, validation_logger);
         }
         else
         {
-            if (!returnType().isVoidType())
+            if (!returnType().isUnitType())// Missing return statement implies a 'return ();' statement.
             {
                 lang::Location end = block->getEndLocation();
                 if (end.isGlobal()) end = this->location();

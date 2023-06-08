@@ -22,6 +22,14 @@ namespace lang
         explicit WrappedNativeValue(lang::ResolvingHandle<lang::Type> type, llvm::Value* value = nullptr);
 
         /**
+         * Create a new wrapped native value with a default value for the given type.
+         * @param type The type of the value.
+         * @param context The compile context.
+         * @return The new wrapped native value.
+         */
+        static Shared<lang::Value> makeDefault(lang::ResolvingHandle<lang::Type> type, CompileContext& context);
+
+        /**
          * Set the wraped value if it is not already set.
          * @param value The native value to wrap.
          */

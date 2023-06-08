@@ -2,7 +2,6 @@
 
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/StructType.h"
-#include "lang/type/VoidType.h"
 #include "lang/utility/Storage.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
@@ -87,13 +86,6 @@ void lang::StructDescription::validate(ValidationLogger& validation_logger) cons
         if (type == self)
         {
             validation_logger.logError("Cannot declare recursive member", member->location());
-            valid = false;
-            continue;
-        }
-
-        if (type == scope().context().getVoidType())
-        {
-            validation_logger.logError("Cannot declare member of 'void' type", member->location());
             valid = false;
             continue;
         }

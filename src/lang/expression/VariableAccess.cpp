@@ -2,7 +2,9 @@
 
 #include <utility>
 
+#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
+#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/LocalScope.h"
 #include "lang/scope/Scope.h"
 #include "validation/ValidationLogger.h"
@@ -72,7 +74,10 @@ Expression::Expansion VariableAccess::expandWith(Expressions, lang::Context&) co
 
 void VariableAccess::doBuild(CompileContext& context)
 {
-    Shared<lang::Value> value = variable_->getValue(context);
+    Shared<lang::Value> value = type()->getStateCount().isUnit()
+                                  ? lang::WrappedNativeValue::makeDefault(type(), context)
+                                  : variable_->getValue(context);
+
     setValue(value);
 }
 

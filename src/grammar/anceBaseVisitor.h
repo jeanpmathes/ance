@@ -431,6 +431,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitUnitLiteral(anceParser::UnitLiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitInteger(anceParser::IntegerContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -499,7 +503,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual std::any visitVoidType(anceParser::VoidTypeContext *ctx) override {
+  virtual std::any visitUnitType(anceParser::UnitTypeContext *ctx) override {
     return visitChildren(ctx);
   }
 

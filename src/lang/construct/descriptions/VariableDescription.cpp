@@ -180,12 +180,6 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
             lang::validation::isTypeExportable(type_handle_, type_location_, validation_logger);
         }
 
-        if (type_handle_->isVoidType())
-        {
-            validation_logger.logError("Global variable cannot have 'void' type", type_location_);
-            return;
-        }
-
         if (type_handle_->isReferenceType())
         {
             validation_logger.logError("Global variable cannot have reference type", type_location_);

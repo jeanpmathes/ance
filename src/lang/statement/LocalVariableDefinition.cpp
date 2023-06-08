@@ -110,12 +110,6 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
 
     if (!type_->validate(validation_logger, type_location_)) return;
 
-    if (type_->isVoidType())
-    {
-        validation_logger.logError("Local variable cannot have 'void' type", type_location_);
-        return;
-    }
-
     if (type_->isReferenceType())
     {
         validation_logger.logError("Cannot declare variable of reference type without binding to a value", location());

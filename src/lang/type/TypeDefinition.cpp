@@ -10,7 +10,6 @@
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
-#include "lang/type/VoidType.h"
 #include "validation/ValidationLogger.h"
 
 lang::TypeDefinition::TypeDefinition(lang::Identifier name, lang::Location location) : name_(name), location_(location)
@@ -134,7 +133,7 @@ bool lang::TypeDefinition::isDiffType() const
     return false;
 }
 
-bool lang::TypeDefinition::isVoidType() const
+bool lang::TypeDefinition::isUnitType() const
 {
     return false;
 }
@@ -300,15 +299,11 @@ llvm::DIType* lang::TypeDefinition::getDebugType(CompileContext& context) const
 
 llvm::TypeSize lang::TypeDefinition::getNativeSize(llvm::Module& m)
 {
-    if (self() == scope()->context().getVoidType()) return llvm::TypeSize::getNull();
-
     return m.getDataLayout().getTypeAllocSize(getNativeType(m.getContext()));
 }
 
 llvm::TypeSize lang::TypeDefinition::getContentSize(llvm::Module& m)
 {
-    if (self() == scope()->context().getVoidType()) return llvm::TypeSize::getNull();
-
     return m.getDataLayout().getTypeAllocSize(getContentType(m.getContext()));
 }
 
@@ -607,6 +602,10 @@ void lang::TypeDefinition::buildConstructors(CompileContext& context)
 
     llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_fn);
     context.ir().SetInsertPoint(block);
+
+    if (getStateCount().isUnit())
+        context.ir().CreateRet(llvm::Constant::getNullValue(getContentType(context.llvmContext())));
+    else
     {
         llvm::Value* ptr = context.ir().CreateAlloca(getContentType(context.llvmContext()), nullptr, "alloca");
         buildDefaultInitializer(ptr, context);
@@ -675,6 +674,8 @@ void lang::TypeDefinition::defineDefaultFinalizer(CompileContext& context)
 
 void lang::TypeDefinition::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context)
 {
+    if (getStateCount().isUnit()) return;
+
     llvm::Value* content = getDefaultContent(context.llvmModule());
     context.ir().CreateStore(content, ptr);
 }
@@ -683,6 +684,8 @@ void lang::TypeDefinition::buildSingleCopyInitializerDefinition(llvm::Value*    
                                                                 llvm::Value*    src_ptr,
                                                                 CompileContext& context)
 {
+    if (getStateCount().isUnit()) return;
+
     llvm::Type* content_type = getContentType(context.llvmContext());
 
     llvm::Value* src_content = context.ir().CreateLoad(content_type, src_ptr);
@@ -787,6 +790,7 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
     }
 
     lang::PredefinedFunction& predefined_function = function->defineAsPredefined(self(),
+                                                                                 true,// Preserve unit return type.
                                                                                  parameters,
                                                                                  getAccessibility().modifier(),
                                                                                  isImported(),
@@ -836,7 +840,7 @@ void lang::TypeDefinition::buildPointerIteration(llvm::Function*                
                                                  llvm::Value*                                       ptr,
                                                  llvm::Value*                                       count,
                                                  std::function<void(llvm::Value*, CompileContext&)> operation,
-                                                 CompileContext&                                    context)
+                                                 CompileContext&                                    context) const
 {
     llvm::Type* size_type = context.types().getSizeType()->getContentType(context.llvmContext());
 
@@ -851,17 +855,21 @@ void lang::TypeDefinition::buildPointerIteration(llvm::Function*                
 
     context.ir().SetInsertPoint(body);
     {
-        llvm::PHINode* current = context.ir().CreatePHI(size_type, 2, "i");
-        current->addIncoming(llvm::ConstantInt::get(size_type, 0), init);
+        llvm::PHINode* current_index = context.ir().CreatePHI(size_type, 2, "i");
+        current_index->addIncoming(llvm::ConstantInt::get(size_type, 0), init);
 
-        llvm::Value* element_ptr =
-            context.ir().CreateInBoundsGEP(getContentType(context.llvmContext()), ptr, current, "element_ptr");
+        llvm::Value* element_ptr = getStateCount().isUnit()
+                                     ? ptr
+                                     : context.ir().CreateInBoundsGEP(getContentType(context.llvmContext()),
+                                                                      ptr,
+                                                                      current_index,
+                                                                      "element_ptr");
         operation(element_ptr, context);
 
-        llvm::Value* next = context.ir().CreateAdd(current, llvm::ConstantInt::get(size_type, 1), "next");
-        current->addIncoming(next, body);
+        llvm::Value* next_index = context.ir().CreateAdd(current_index, llvm::ConstantInt::get(size_type, 1), "next");
+        current_index->addIncoming(next_index, body);
 
-        llvm::Value* condition = context.ir().CreateICmpULT(next, count, "condition");
+        llvm::Value* condition = context.ir().CreateICmpULT(next_index, count, "condition");
         context.ir().CreateCondBr(condition, body, end);
     }
 

@@ -9,7 +9,6 @@
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/expression/ConstantExpression.h"
 #include "lang/scope/GlobalScope.h"
-#include "lang/type/VoidType.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 

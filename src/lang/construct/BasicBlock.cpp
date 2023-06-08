@@ -21,12 +21,11 @@ Owned<lang::BasicBlock> lang::BasicBlock::createSimple(Statement* statement)
 }
 
 Owned<lang::BasicBlock> lang::BasicBlock::createReturning(lang::LocalScope& scope,
-                                                          Expression*       expression,
-                                                          lang::Location    return_location,
+                                                          Expression&       expression,
                                                           Function&         function)
 {
 
-    auto block = makeOwned<BasicBlock>(makeOwned<Definition::Returning>(scope, expression, return_location));
+    auto block = makeOwned<BasicBlock>(makeOwned<Definition::Returning>(scope, expression));
 
     block->setContainingFunction(function);
 
@@ -235,8 +234,7 @@ std::vector<lang::BasicBlock*> lang::BasicBlock::getSuccessors()
     return definition_->getSuccessors();
 }
 
-Optional<std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>> lang::BasicBlock::
-    getReturnValue() const
+Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> lang::BasicBlock::getReturnValue() const
 {
     assert(finalized_);
     return definition_->getReturnValue();
@@ -380,8 +378,8 @@ void lang::BasicBlock::Definition::Base::updateIncomingLinks(lang::BasicBlock* u
     incoming_links_.clear();
 }
 
-Optional<std::pair<Optional<std::reference_wrapper<lang::Value const>>, lang::Location>> lang::BasicBlock::Definition::
-    Base::getReturnValue() const
+Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> lang::BasicBlock::Definition::Base::
+    getReturnValue() const
 {
     return std::nullopt;
 }

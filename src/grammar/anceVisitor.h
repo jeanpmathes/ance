@@ -227,6 +227,8 @@ public:
 
     virtual std::any visitUiptrLiteral(anceParser::UiptrLiteralContext *context) = 0;
 
+    virtual std::any visitUnitLiteral(anceParser::UnitLiteralContext *context) = 0;
+
     virtual std::any visitInteger(anceParser::IntegerContext *context) = 0;
 
     virtual std::any visitArray(anceParser::ArrayContext *context) = 0;
@@ -261,7 +263,7 @@ public:
 
     virtual std::any visitNullPointerType(anceParser::NullPointerTypeContext *context) = 0;
 
-    virtual std::any visitVoidType(anceParser::VoidTypeContext *context) = 0;
+    virtual std::any visitUnitType(anceParser::UnitTypeContext *context) = 0;
 
     virtual std::any visitCustomType(anceParser::CustomTypeContext *context) = 0;
 
