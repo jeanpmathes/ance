@@ -40,8 +40,10 @@ bool lang::IndirectType::validateIndirection(lang::Location, ValidationLogger&) 
 
 Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<Value> value, CompileContext& context)
 {
+    auto value_reference = context.types().getReferenceType(value_type_);
+
     if (getIndirectionType()->getStateCount().isUnit())
-        return lang::WrappedNativeValue::makeDefault(getIndirectionType(), context);
+        return lang::WrappedNativeValue::makeDefault(value_reference, context);
 
     value->buildContentValue(context);
     llvm::Value* ptr = value->getContentValue();
@@ -58,8 +60,6 @@ Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<Value> value, Co
 
         context.runtime().buildAssert(truth, "Null pointer dereference at " + context.getLocationString(), context);
     }
-
-    auto value_reference = context.types().getReferenceType(value_type_);
 
     llvm::Value* native_value = lang::values::contentToNative(value_reference, ptr, context);
     return makeShared<lang::WrappedNativeValue>(value_reference, native_value);

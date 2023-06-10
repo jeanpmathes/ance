@@ -4,9 +4,9 @@
 
 private struct X
 {
-    private x: ();
-    private y: ();
-    private z: Y;
+    public x: ();
+    public y: ();
+    public z: Y;
 }
 
 private struct Y { }
@@ -31,7 +31,7 @@ public foo () : () // This does not have to be specified explicitly, see below.
     let q: () <: p.;
     p. <: ();
 
-    let p2: *() <: p + 1;
+    let p2: *() <: p + 1:size;
     let q2: () <: p2.;
     p2. <: ();
 
@@ -39,10 +39,10 @@ public foo () : () // This does not have to be specified explicitly, see below.
     a x <: ();
     a y <: ();
 
-    let a := new ();
+    let a := new automatic ();
     delete a;
 
-    let a := new[3] ();
+    let a := new[3] automatic ();
     delete[] a;
 
     bar(());

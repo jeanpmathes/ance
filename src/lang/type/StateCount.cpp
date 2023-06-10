@@ -62,16 +62,13 @@ StateCount StateCount::operator*(StateCount const& other) const
 
     if (common_special.hasValue()) return common_special.value();
 
-    return count().value() * other.count().value();
-}
+    // This is a dirty fix - types with more than 2^64 states should still be countable.
+    size_t     result;
+    bool const overflow = __builtin_mul_overflow(count().value(), other.count().value(), &result);
 
-StateCount StateCount::operator+(StateCount const& other) const
-{
-    auto common_special = getCommonSpecial(*this, other);
+    if (overflow) return SpecialCount::ABSTRACT;
 
-    if (common_special.hasValue()) return common_special.value();
-
-    return count().value() + other.count().value();
+    return result;
 }
 
 StateCount StateCount::unit()

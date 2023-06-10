@@ -49,7 +49,6 @@ class StateCount
      */
     [[nodiscard]] bool isAbstract() const;
 
-    StateCount operator+(StateCount const& other) const;
     StateCount operator*(StateCount const& other) const;
 
     static StateCount unit();

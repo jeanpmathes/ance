@@ -31,6 +31,9 @@ StateCount lang::SequenceType::getStateCount() const
 {
     assert(size_.hasValue() && "State count cannot be determined for sequence types without a size.");
 
+    if (size_.value() == 0)// To prevent state count zero.
+        return StateCount::unit();
+
     return element_type_->getStateCount() * size_.value();
 }
 

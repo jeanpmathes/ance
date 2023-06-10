@@ -19,6 +19,11 @@ lang::Type const& lang::DelayedValue::type() const
 
 void lang::DelayedValue::setValue(Shared<lang::Value> value)
 {
+    std::string a = std::string(type()->name().text());
+    std::string b = std::string(value->type()->name().text());
+    (void) a;
+    (void) b;
+
     assert(not value_.hasValue());
     assert(lang::Type::areSame(value->type(), type()) && "Type has to match.");
 

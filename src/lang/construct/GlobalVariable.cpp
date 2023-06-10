@@ -113,7 +113,7 @@ void lang::GlobalVariable::buildDeclaration(CompileContext& context)
                                                                    context.getSourceFile(location()),
                                                                    static_cast<unsigned>(location().line()),
                                                                    type()->getDebugType(context),
-                                                                   true);
+                                                                   access_ == AccessModifier::PRIVATE_ACCESS);
 
     native_variable_->addDebugInfo(debug_info);
 }
