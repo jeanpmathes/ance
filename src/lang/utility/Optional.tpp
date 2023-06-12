@@ -135,12 +135,14 @@ T Optional<T>::valueOr(T default_value)
 
 template<Moveable T>
 T& Optional<T>::valueOr(T& default_value)
+    requires(!Copyable<T>)
 {
     return hasValue() ? value() : default_value;
 }
 
 template<Moveable T>
 T const& Optional<T>::valueOr(T const& default_value) const
+    requires(!Copyable<T>)
 {
     return hasValue() ? value() : default_value;
 }

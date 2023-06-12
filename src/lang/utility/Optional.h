@@ -56,8 +56,10 @@ class Optional
 
     [[nodiscard]] T valueOr(T default_value)
         requires Copyable<T>;
-    [[nodiscard]] T&       valueOr(T& default_value);
-    [[nodiscard]] T const& valueOr(T const& default_value) const;
+    [[nodiscard]] T& valueOr(T& default_value)
+        requires(!Copyable<T>);
+    [[nodiscard]] T const& valueOr(T const& default_value) const
+        requires(!Copyable<T>);
 
   private:
     alignas(T) std::array<std::byte, sizeof(T)> storage_ {};

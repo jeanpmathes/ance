@@ -151,6 +151,7 @@ std::pair<bool, size_t> Unit::buildPackageDependencies(Packages const&          
                                                        std::filesystem::path const& dir,
                                                        std::filesystem::path const& bin_base,
                                                        std::filesystem::path const& bin_suffix,
+                                                       bool                         is_binary_dir_fresh,
                                                        std::ostream&                out,
                                                        std::set<std::string> const  included_packages,
                                                        std::ostream&                root_out)
@@ -179,7 +180,7 @@ std::pair<bool, size_t> Unit::buildPackageDependencies(Packages const&          
 
         Optional<bool> is_ok = build(**project, packages, new_included_packages, root_out);
 
-        if (is_ok.hasValue() && is_ok.value())
+        if (is_ok.valueOr(is_binary_dir_fresh))
         {
             std::filesystem::path const results = destination.value() / bin_suffix;
             std::filesystem::copy(results,

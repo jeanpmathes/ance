@@ -121,6 +121,9 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
     ProjectDescription::Description description;
     ValidationLogger                validation_logger;
 
+    bool const directory_fresh =
+        !std::filesystem::exists(project_definition_bin) || !std::filesystem::exists(project_definition_obj);
+
     std::filesystem::create_directories(project_definition_bin);
     std::filesystem::create_directories(project_definition_obj);
 
@@ -139,6 +142,7 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
                                                                      project_definition_root,
                                                                      project_definition_bin,
                                                                      bin_suffix,
+                                                                     directory_fresh,
                                                                      out,
                                                                      {},
                                                                      out);
@@ -195,6 +199,8 @@ static Optional<bool> buildProject(Project&              project,
     std::filesystem::path const obj_dir = info.build_dir / info.triple_dir / "obj";
     std::filesystem::path const bin_dir = info.build_dir / info.bin_suffix;
 
+    bool const directory_fresh = !std::filesystem::exists(obj_dir) || !std::filesystem::exists(bin_dir);
+
     std::filesystem::create_directories(obj_dir);
     std::filesystem::create_directories(bin_dir);
 
@@ -208,6 +214,7 @@ static Optional<bool> buildProject(Project&              project,
                                                                      info.build_dir,
                                                                      bin_dir,
                                                                      info.bin_suffix,
+                                                                     directory_fresh,
                                                                      info.out,
                                                                      std::move(included_packages),
                                                                      root_out);

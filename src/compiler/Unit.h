@@ -148,6 +148,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      * @param dir The directory to output build files and logs to. Subdirectories will be created.
      * @param bin_base Path to the binary directory, all package binaries will be copied to this directory.
      * @param bin_suffix Suffix that leads from the build directory of a package to the binary directory of the package.
+     * @param is_binary_dir_fresh Whether the binary directory is fresh, which means that all packages must be copied.
      * @param out The output stream to log general information to, related to the current build process.
      * @param included_packages Packages that are already included in a higher level package.
      * @param root_out The output stream to log general information to, related to the uppermost build process.
@@ -158,6 +159,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
                                                      std::filesystem::path const& dir,
                                                      std::filesystem::path const& bin_base,
                                                      std::filesystem::path const& bin_suffix,
+                                                     bool                         is_binary_dir_fresh,
                                                      std::ostream&                out,
                                                      std::set<std::string>        included_packages,
                                                      std::ostream&                root_out);
