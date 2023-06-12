@@ -45,6 +45,9 @@ public foo () : () // This does not have to be specified explicitly, see below.
     let a := new[3] automatic ();
     delete[] a;
 
+    // Call the constructor of the unit type. Useless, because the '()' literal could be used instead.
+    let useless: () <: ()();
+
     bar(());
 }
 
