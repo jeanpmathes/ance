@@ -141,7 +141,7 @@ namespace lang
          * Get the blocks that directly follow this block.
          * @return The blocks that directly follow this block.
          */
-        std::vector<lang::BasicBlock*> getSuccessors();
+        std::vector<lang::BasicBlock const*> getSuccessors() const;
 
         /**
          * Get the return value of this basic block. If this is not a return block, an empty optional is returned.
@@ -243,8 +243,8 @@ namespace lang
                 [[nodiscard]] size_t getIncomingLinkCount() const;
                 void                 updateIncomingLinks(BasicBlock* updated);
 
-                [[nodiscard]] virtual std::list<lang::BasicBlock const*> getLeaves() const = 0;
-                virtual std::vector<lang::BasicBlock*>                   getSuccessors()   = 0;
+                [[nodiscard]] virtual std::list<lang::BasicBlock const*> getLeaves() const     = 0;
+                virtual std::vector<lang::BasicBlock const*>             getSuccessors() const = 0;
                 [[nodiscard]] virtual Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>>
                                                      getReturnValue() const;
                 [[nodiscard]] virtual lang::Location getStartLocation() const = 0;
@@ -285,7 +285,7 @@ namespace lang
                 void transferStatements(std::list<Statement*>& statements) override;
 
                 [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                std::vector<lang::BasicBlock const*>             getSuccessors() const override;
                 [[nodiscard]] lang::Location                     getStartLocation() const override;
                 [[nodiscard]] lang::Location                     getEndLocation() const override;
 
@@ -318,7 +318,7 @@ namespace lang
                 void transferStatements(std::list<Statement*>& statements) override;
 
                 [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                std::vector<lang::BasicBlock const*>             getSuccessors() const override;
                 [[nodiscard]] lang::Location                     getStartLocation() const override;
                 [[nodiscard]] lang::Location                     getEndLocation() const override;
 
@@ -352,7 +352,7 @@ namespace lang
                 void transferStatements(std::list<Statement*>& statements) override;
 
                 [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                std::vector<lang::BasicBlock const*>             getSuccessors() const override;
                 [[nodiscard]] lang::Location                     getStartLocation() const override;
                 [[nodiscard]] lang::Location                     getEndLocation() const override;
 
@@ -384,7 +384,7 @@ namespace lang
                 void transferStatements(std::list<Statement*>& statements) override;
 
                 [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                std::vector<lang::BasicBlock const*>             getSuccessors() const override;
                 [[nodiscard]] Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>>
                                              getReturnValue() const override;
                 [[nodiscard]] lang::Location getStartLocation() const override;
@@ -420,7 +420,7 @@ namespace lang
                 void transferStatements(std::list<Statement*>& statements) override;
 
                 [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                std::vector<lang::BasicBlock const*>             getSuccessors() const override;
                 [[nodiscard]] lang::Location                     getStartLocation() const override;
                 [[nodiscard]] lang::Location                     getEndLocation() const override;
 
@@ -456,7 +456,7 @@ namespace lang
                 void transferStatements(std::list<Statement*>& statements) override;
 
                 [[nodiscard]] std::list<lang::BasicBlock const*> getLeaves() const override;
-                std::vector<lang::BasicBlock*>                   getSuccessors() override;
+                std::vector<lang::BasicBlock const*>             getSuccessors() const override;
                 [[nodiscard]] lang::Location                     getStartLocation() const override;
                 [[nodiscard]] lang::Location                     getEndLocation() const override;
 

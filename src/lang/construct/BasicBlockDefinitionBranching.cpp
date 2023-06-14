@@ -78,21 +78,16 @@ std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Branching::getL
     return {leaves.begin(), leaves.end()};
 }
 
-std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Branching::getSuccessors()
+std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Branching::getSuccessors() const
 {
-    std::vector<lang::BasicBlock*> successors;
-
-    successors.push_back(true_next_);
-    successors.push_back(false_next_);
-
-    return successors;
+    return {true_next_, false_next_};
 }
 
 lang::Location lang::BasicBlock::Definition::Branching::getStartLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
-    return statements_.back()->location();
+    return statements_.front()->location();
 }
 
 lang::Location lang::BasicBlock::Definition::Branching::getEndLocation() const

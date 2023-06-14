@@ -53,9 +53,9 @@ std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Empty::getLeave
     return leaves;
 }
 
-std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Empty::getSuccessors()
+std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Empty::getSuccessors() const
 {
-    std::vector<lang::BasicBlock*> successors;
+    std::vector<lang::BasicBlock const*> successors;
 
     if (next_) { successors.push_back(next_); }
 

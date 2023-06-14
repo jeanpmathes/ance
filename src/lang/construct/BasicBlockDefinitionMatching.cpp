@@ -59,16 +59,21 @@ std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Matching::getLe
 
     return leaves;
 }
-std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Matching::getSuccessors()
+std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Matching::getSuccessors() const
 {
-    return branches_;
+    std::vector<lang::BasicBlock const*> successors;
+
+    successors.reserve(branches_.size());
+    for (auto& branch : branches_) { successors.push_back(branch); }
+
+    return successors;
 }
 
 lang::Location lang::BasicBlock::Definition::Matching::getStartLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
-    return statements_.back()->location();
+    return statements_.front()->location();
 }
 
 lang::Location lang::BasicBlock::Definition::Matching::getEndLocation() const

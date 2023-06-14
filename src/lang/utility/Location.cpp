@@ -72,6 +72,17 @@ void lang::Location::extend(lang::Location location)
     end_column_ = std::max(end_column_, location.end_column_);
 }
 
+lang::Location lang::Location::getFirst(lang::Location a, lang::Location b)
+{
+    if (b.isGlobal()) return a;
+    if (a.isGlobal()) return b;
+
+    if (a.file() != b.file()) return a;
+
+    if (a.line() == b.line()) return a.column() < b.column() ? a : b;
+    return a.line() < b.line() ? a : b;
+}
+
 std::string lang::Location::toString(CompileContext& context)
 {
     if (isGlobal()) return "<internal>";

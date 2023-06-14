@@ -79,6 +79,14 @@ namespace lang
          */
         void extend(lang::Location location);
 
+        /**
+         * Get the first location of two locations.
+         * If any of the locations is global, the other location is returned.
+         * If the locations are in different files, the location a is returned.
+         * @return The first location.
+         */
+        static lang::Location getFirst(lang::Location a, lang::Location b);
+
         /*
          * Format this location as a string, in the format "file:line:column".
          */

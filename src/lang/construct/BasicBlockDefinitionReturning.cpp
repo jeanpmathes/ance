@@ -60,7 +60,7 @@ std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Returning::getL
     return leaves;
 }
 
-std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Returning::getSuccessors()
+std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Returning::getSuccessors() const
 {
     return {};
 }
@@ -81,7 +81,7 @@ lang::Location lang::BasicBlock::Definition::Returning::getStartLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
-    return statements_.back()->location();
+    return statements_.front()->location();
 }
 
 lang::Location lang::BasicBlock::Definition::Returning::getEndLocation() const

@@ -71,9 +71,9 @@ std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Simple::getLeav
     return leaves;
 }
 
-std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Simple::getSuccessors()
+std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Simple::getSuccessors() const
 {
-    std::vector<lang::BasicBlock*> successors;
+    std::vector<lang::BasicBlock const*> successors;
 
     if (next_) { successors.push_back(next_); }
 

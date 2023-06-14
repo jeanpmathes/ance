@@ -68,12 +68,15 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
 
     printBlock(label, id, style);
 
-    std::vector<lang::BasicBlock*> const successors = block.getSuccessors();
+    std::vector<lang::BasicBlock const*> const successors = block.getSuccessors();
 
     if (successors.empty()) { printLink(id, NODE_EXIT); }
     else
     {
-        for (lang::BasicBlock* successor : successors) { printLink(id, static_cast<int32_t>(successor->getId())); }
+        for (lang::BasicBlock const* successor : successors)
+        {
+            printLink(id, static_cast<int32_t>(successor->getId()));
+        }
     }
 
     return {};

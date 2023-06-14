@@ -121,14 +121,19 @@ Optional<lang::Location> lang::StatementFunction::findUnreachableCode() const
 {
     initial_block_->reach();
 
-    Optional<lang::Location> unreachable_code_location;
+    Optional<lang::Location> unreachable;
 
     for (auto& block : blocks_)
     {
-        if (block->isUnreached()) { unreachable_code_location = block->getStartLocation(); }
+        if (block->isUnreached())
+        {
+            unreachable =
+                lang::Location::getFirst(unreachable.valueOr(lang::Location::global()), block->getStartLocation());
+            std::cout << "Comparing " << unreachable.value() << " and " << block->getStartLocation() << std::endl;
+        }
     }
 
-    return unreachable_code_location;
+    return unreachable;
 }
 
 void lang::StatementFunction::createNativeBacking(CompileContext& context)

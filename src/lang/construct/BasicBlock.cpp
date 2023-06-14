@@ -219,14 +219,14 @@ std::list<lang::BasicBlock const*> lang::BasicBlock::getLeaves() const
     if (!leaves_.hasValue())
     {
         leaves_ = makeOptional<std::list<lang::BasicBlock const*>>(
-            std::list<lang::BasicBlock const*>());// Prevent infinite recursion.
+            std::list<lang::BasicBlock const*>());// Prevent infinite recursion, as getLeaves() calls this function.
         leaves_ = definition_->getLeaves();
     }
 
     return leaves_.value();
 }
 
-std::vector<lang::BasicBlock*> lang::BasicBlock::getSuccessors()
+std::vector<lang::BasicBlock const*> lang::BasicBlock::getSuccessors() const
 {
     assert(finalized_);
     assert(simplified_);
