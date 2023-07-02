@@ -9,7 +9,7 @@
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
-lang::BasicBlock::Definition::Returning::Returning(lang::LocalScope& scope, Expression& return_value)
+lang::BasicBlock::Definition::Returning::Returning(lang::Scope& scope, Expression& return_value)
     : return_value_(return_value)
     , scope_(scope)
 {}
@@ -105,7 +105,12 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext& context)
 
     for (auto& statement : statements_) { statement->build(context); }
 
-    scope_.buildReturnFinalization(context);
+    Scope* current = &scope_;
+    while (current->isPartOfFunction())
+    {
+        current->buildFinalization(context);
+        current = current->scope();
+    }
 
     if (self()->containing_function_->returnType()->isUnitType()) { context.ir().CreateRetVoid(); }
     else

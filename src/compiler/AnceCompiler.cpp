@@ -90,7 +90,7 @@ void AnceCompiler::compile(std::filesystem::path const& out)
     {
         case UnitResult::EXECUTABLE:
         {
-            lang::ResolvingHandle<lang::Function> main = unit_.globalScope().getEntry();
+            lang::ResolvingHandle<lang::Function> main = unit_.globalScope().getEntryPoint();
             buildStart(main, init_function, finit_function);
 
             break;

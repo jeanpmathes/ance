@@ -25,7 +25,7 @@ lang::Type const& SizeofType::targetType() const
 
 void SizeofType::walkDefinitions()
 {
-    scope()->addType(type_);
+    scope()->registerUsageIfUndefined(type_);
 }
 
 void SizeofType::defineType(lang::ResolvingHandle<lang::Type> type)

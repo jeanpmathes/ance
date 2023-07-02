@@ -10,7 +10,6 @@
 #include "validation/ValidationLogger.h"
 
 lang::ImportedFunction::ImportedFunction(Function& function,
-
                                          Scope&                               containing_scope,
                                          lang::AccessModifier                 access,
                                          lang::ResolvingHandle<lang::Type>    return_type,
@@ -24,10 +23,13 @@ lang::ImportedFunction::ImportedFunction(Function& function,
                                std::move(parameters),
                                location)
     , access_(access)
-{
-    containing_scope.addType(return_type);
+{}
 
-    for (auto& parameter : this->parameters()) { containing_scope.addType(parameter->type()); }
+void lang::ImportedFunction::setup()
+{
+    scope().registerUsageIfUndefined(returnType());
+
+    for (auto& parameter : this->parameters()) { scope().registerUsageIfUndefined(parameter->type()); }
 }
 
 bool lang::ImportedFunction::isMangled() const
@@ -65,11 +67,6 @@ void lang::ImportedFunction::build(CompileContext&) {}
 llvm::DIScope* lang::ImportedFunction::getDebugScope(CompileContext&) const
 {
     return native_function_->getSubprogram();
-}
-
-lang::LocalScope* lang::ImportedFunction::getInsideScope()
-{
-    return nullptr;
 }
 
 std::vector<lang::BasicBlock*> const& lang::ImportedFunction::getBasicBlocks() const

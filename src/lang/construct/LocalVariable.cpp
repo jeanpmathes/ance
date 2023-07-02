@@ -24,6 +24,38 @@ lang::LocalVariable::LocalVariable(lang::ResolvingHandle<lang::Variable> self,
     // Type is already added in declaring statement.
 }
 
+lang::OwningHandle<lang::Variable> lang::LocalVariable::makeLocalVariable(lang::Identifier const&           name,
+                                                                          lang::ResolvingHandle<lang::Type> type,
+                                                                          lang::Location                type_location,
+                                                                          lang::Assigner                assigner,
+                                                                          Optional<Shared<lang::Value>> value,
+                                                                          lang::Scope&   containing_scope,
+                                                                          lang::Location location)
+{
+    bool const is_final = assigner.isFinal();
+
+    lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(name);
+    variable->defineAsLocal(type, type_location, containing_scope, is_final, value, 0, location);
+
+    return lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+}
+
+lang::OwningHandle<lang::Variable> lang::LocalVariable::makeParameterVariable(lang::Identifier const&           name,
+                                                                              lang::ResolvingHandle<lang::Type> type,
+                                                                              lang::Location      type_location,
+                                                                              Shared<lang::Value> value,
+                                                                              unsigned int        parameter_no,
+                                                                              lang::Scope&        containing_scope,
+                                                                              lang::Location      location)
+{
+    bool const is_final = false;// Assigner has value UNSPECIFIED, so it's not final.
+
+    lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(name);
+    variable->defineAsLocal(type, type_location, containing_scope, is_final, value, parameter_no, location);
+
+    return lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+}
+
 void lang::LocalVariable::buildDeclaration(CompileContext& context)
 {
     native_value_ = context.ir().CreateAlloca(type()->getContentType(context.llvmContext()), nullptr, name().text());

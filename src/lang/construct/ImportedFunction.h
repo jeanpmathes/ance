@@ -26,6 +26,8 @@ namespace lang
                          std::vector<Shared<lang::Parameter>> parameters,
                          lang::Location                       location);
 
+        void setup() override;
+
         [[nodiscard]] bool isMangled() const override;
         [[nodiscard]] bool isImported() const override;
 
@@ -36,7 +38,6 @@ namespace lang
         void build(CompileContext& context) override;
 
         llvm::DIScope*                                      getDebugScope(CompileContext& context) const override;
-        lang::LocalScope*                                   getInsideScope() override;
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 
       protected:

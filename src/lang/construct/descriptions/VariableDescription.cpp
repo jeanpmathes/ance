@@ -101,7 +101,7 @@ void lang::VariableDescription::performInitialization()
 
     lang::Scope* init_scope = nullptr;
 
-    if (type_.hasValue()) { scope().addType(type_.value()); }
+    if (type_.hasValue()) { scope().registerUsageIfUndefined(type_.value()); }
     else if (init_expression_ptr_ != nullptr) { type_handle_.reroute(init_expression_ptr_->type()); }
 
     if (constant_init_ != nullptr) { variable_init = std::ref(*constant_init_); }
@@ -117,7 +117,7 @@ void lang::VariableDescription::performInitialization()
             variable_init = std::ref(*init_function);
             init_scope    = &*init_function;
 
-            scope().getGlobalScope()->addFunction(std::move(init_function));
+            scope().addFunction(std::move(init_function));
         }
         else if (init_expression_.hasValue())
         {
@@ -136,7 +136,7 @@ void lang::VariableDescription::performInitialization()
 
     global_variable_ = variable->defineAsGlobal(type_handle_,
                                                 type_location_,
-                                                *scope().getGlobalScope(),
+                                                scope(),
                                                 access().modifier(),
                                                 access().isImported(),
                                                 variable_init,
@@ -145,7 +145,7 @@ void lang::VariableDescription::performInitialization()
                                                 is_constant_,
                                                 location_);
 
-    scope().getGlobalScope()->addVariable(std::move(variable));
+    scope().addVariable(std::move(variable));
 }
 
 void lang::VariableDescription::resolve()

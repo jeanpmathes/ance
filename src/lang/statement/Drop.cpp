@@ -25,7 +25,7 @@ lang::Variable const& Drop::variable() const
 void Drop::walkDefinitions()
 {
     scope()->registerUsage(variable_);
-    dropped_ = scope()->asLocalScope()->drop(variable_);
+    dropped_ = scope()->asOrderedScope()->drop(variable_);
 }
 
 void Drop::validate(ValidationLogger& validation_logger) const

@@ -76,7 +76,7 @@ void lang::CodeBlock::append(Owned<CodeBlock> block)
 
 void lang::CodeBlock::setScope(Scope& scope)
 {
-    lang::LocalScope* created = nullptr;
+    lang::Scope* created = nullptr;
 
     if (scoped_)
     {
@@ -124,12 +124,12 @@ std::vector<Owned<lang::BasicBlock>> lang::CodeBlock::createBasicBlocks(lang::Ba
     return blocks;
 }
 
-lang::LocalScope* lang::CodeBlock::getBlockScope()
+lang::Scope* lang::CodeBlock::getBlockScope()
 {
     return scope_->get();
 }
 
-lang::LocalScope const* lang::CodeBlock::getBlockScope() const
+lang::Scope const* lang::CodeBlock::getBlockScope() const
 {
     return scope_->get();
 }

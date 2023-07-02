@@ -1,10 +1,7 @@
 #ifndef ANCE_SRC_LANG_SCOPE_GLOBALSCOPE_H_
 #define ANCE_SRC_LANG_SCOPE_GLOBALSCOPE_H_
 
-#include "Scope.h"
-
-#include <optional>
-#include <vector>
+#include "UnorderedScope.h"
 
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
@@ -34,13 +31,14 @@ namespace lang
      * The top level scope.
      */
     class GlobalScope
-        : public Scope
+        : public UnorderedScope
         , public lang::Element<GlobalScope, ANCE_CONSTRUCTS>
     {
       public:
         explicit GlobalScope(bool is_containing_runtime);
 
-        lang::Scope* scope() override;
+        Scope*                     scope() override;
+        [[nodiscard]] Scope const* scope() const override;
 
         /**
          * Get the context, in which all basic systems like the typesystem are defined.
@@ -51,58 +49,16 @@ namespace lang
          */
         [[nodiscard]] lang::Context const& context() const override;
 
+        bool isPartOfFunction() const override;
+
         lang::GlobalScope*                     getGlobalScope() override;
         [[nodiscard]] lang::GlobalScope const* getGlobalScope() const override;
         llvm::DIScope*                         getDebugScope(CompileContext& context) const override;
-
-        bool isNameConflicted(lang::Identifier const& name) const override;
-
-        void validate(ValidationLogger& validation_logger) const;
 
         [[nodiscard]] Owned<lang::GlobalScope> expand() const;
         void                                   determineFlow();
 
         void validateFlow(ValidationLogger& validation_logger) const;
-
-        /**
-         * Add an description element to this scope.
-         * @param description The description to add.
-         */
-        void addDescription(Owned<lang::Description> description);
-
-        /**
-         * Add a function to this scope.
-         * @param function The function to add.
-         */
-        void addFunction(lang::OwningHandle<lang::Function> function);
-
-        /**
-         * Add a variable to this scope.
-         * @param variable The variable to add.
-         */
-        void addVariable(lang::OwningHandle<lang::Variable> variable);
-
-        /**
-         * Add a type to this scope.
-         * @param type The type to add.
-         */
-        void addType(lang::OwningHandle<lang::Type> type);
-
-        /**
-         * Get a type defined in this scope by it's name.
-         * @param string The name of the type.
-         * @return The type, or nothing if no such type is defined.
-         */
-        Optional<lang::ResolvingHandle<lang::Type>> getType(Identifier string);
-
-        void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
-        void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
-        void registerUsage(lang::ResolvingHandle<lang::Type> type) override;
-
-        void registerDefinition(lang::ResolvingHandle<lang::Type> type) override;
-
-        void resolve() override;
-        void postResolve() override;
 
         /**
          * Synchronize all (public) descriptions with the given storage.
@@ -111,27 +67,19 @@ namespace lang
          */
         static void synchronize(lang::GlobalScope* scope, Storage& storage);
 
-      protected:
-        bool resolveDefinition(lang::ResolvingHandle<lang::Variable> variable) override;
-        bool resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
-        bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) override;
-
-      private:
-        [[nodiscard]] Optional<lang::ResolvingHandle<lang::Function>> findEntry();
-
       public:
         /**
          * Check if this global scope has an entry point.
          * The default entry point is a main method returning ui32.
          * @return True if there is an entry point.
          */
-        [[nodiscard]] bool hasEntry() const;
+        [[nodiscard]] bool hasEntryPoint() const;
 
         /**
          * Get the entry point. Fails if there is no entry point.
          * @return The entry point.
          */
-        lang::ResolvingHandle<lang::Function> getEntry();
+        lang::ResolvingHandle<lang::Function> getEntryPoint();
 
         /**
          * Create the native content backing methods and functions. It is required for the actual build.
@@ -145,40 +93,14 @@ namespace lang
          */
         void buildFunctions(CompileContext& context);
 
-        /**
-         * Build all initialization required by global entities.
-         * @param context The current compile context.
-         */
-        void buildInitialization(CompileContext& context);
-        void buildFinalization(CompileContext& context) override;
+      protected:
+        void onResolve() override;
+        void onPostResolve() override;
 
       private:
-        lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);
+        [[nodiscard]] Optional<lang::ResolvingHandle<lang::Function>> findEntryPoint();
 
-        struct AssociatedDescription {
-            Optional<std::string>    source;
-            Owned<lang::Description> description;
-
-            AssociatedDescription(Optional<std::string> new_source, Owned<lang::Description> new_description)
-                : source(std::move(new_source))
-                , description(std::move(new_description))
-            {}
-        };
-
-        std::map<lang::Identifier, std::vector<AssociatedDescription>> compatible_descriptions_;
-        std::map<lang::Identifier, std::vector<AssociatedDescription>> incompatible_descriptions_;
-
-        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
-        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> defined_function_groups_;
-
-        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
-        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_defined_variables_;
-
-        std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_;
-        std::map<lang::Identifier, lang::OwningHandle<lang::Type>> defined_types_;
-
-        std::set<lang::Identifier>    defined_names_;
-
+      private:
         Optional<Owned<lang::Context>> context_;
     };
 }

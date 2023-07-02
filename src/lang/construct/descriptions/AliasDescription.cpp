@@ -52,9 +52,8 @@ void lang::AliasDescription::performInitialization()
 
     self_ = type.handle();
 
-    scope().getGlobalScope()->addType(std::move(type));
-
-    scope().addType(actual_);
+    scope().addType(std::move(type));
+    scope().registerUsageIfUndefined(actual_);
 }
 
 void lang::AliasDescription::validate(ValidationLogger& validation_logger) const

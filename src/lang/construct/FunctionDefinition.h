@@ -34,6 +34,8 @@ namespace lang
                                     std::vector<Shared<lang::Parameter>> parameters,
                                     lang::Location                       location);
 
+        virtual void setup();
+
         /**
          * Get the name of this function.
          * @return The name.
@@ -172,7 +174,7 @@ namespace lang
             ValidationLogger& validation_logger) const;
 
         /**
-         *This method is called in @see FunctionDefinition::validateCall.
+         *This method is called in FunctionDefinition::validateCall.
          */
         virtual bool doCallValidation(
             std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
@@ -229,10 +231,7 @@ namespace lang
         [[nodiscard]] virtual std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const = 0;
 
       public:
-        lang::GlobalScope*                     getGlobalScope();
-        [[nodiscard]] lang::GlobalScope const* getGlobalScope() const;
         virtual llvm::DIScope*                 getDebugScope(CompileContext& context) const = 0;
-        virtual lang::LocalScope* getInsideScope()                             = 0;
 
         [[nodiscard]] virtual std::vector<lang::BasicBlock*> const& getBasicBlocks() const = 0;
 

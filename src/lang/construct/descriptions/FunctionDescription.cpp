@@ -72,7 +72,7 @@ void lang::FunctionDescription::performInitialization()
 
     function_ = &*function;
 
-    scope().getGlobalScope()->addFunction(std::move(function));
+    scope().addFunction(std::move(function));
 }
 
 lang::Function const* lang::FunctionDescription::function() const
@@ -104,8 +104,8 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
 
         if (!inserted)
         {
-            validation_logger.logError("Name '" + parameter->name() + "' already defined in the current context",
-                                       parameter->name().location());
+            validation_logger.logWarning("Name '" + parameter->name() + "' already used for a parameter",
+                                         parameter->name().location());
         }
 
         if (lang::validation::isTypeUndefined(parameter->type(),

@@ -24,7 +24,7 @@ std::vector<Owned<lang::BasicBlock>> Return::createBasicBlocks(lang::BasicBlock&
     assert(return_value_.hasValue());
 
     std::vector<Owned<lang::BasicBlock>> blocks;
-    blocks.push_back(lang::BasicBlock::createReturning(*scope()->asLocalScope(), **return_value_, function));
+    blocks.push_back(lang::BasicBlock::createReturning(*scope(), **return_value_, function));
 
     entry.link(*blocks.front());
 

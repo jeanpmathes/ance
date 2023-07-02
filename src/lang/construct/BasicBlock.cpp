@@ -20,9 +20,9 @@ Owned<lang::BasicBlock> lang::BasicBlock::createSimple(Statement* statement)
     else { return makeOwned<BasicBlock>(makeOwned<Definition::Simple>(*statement)); }
 }
 
-Owned<lang::BasicBlock> lang::BasicBlock::createReturning(lang::LocalScope& scope,
-                                                          Expression&       expression,
-                                                          Function&         function)
+Owned<lang::BasicBlock> lang::BasicBlock::createReturning(lang::Scope& scope,
+                                                          Expression&  expression,
+                                                          Function&    function)
 {
 
     auto block = makeOwned<BasicBlock>(makeOwned<Definition::Returning>(scope, expression));

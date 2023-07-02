@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_FUNCTION_H_
 #define ANCE_SRC_LANG_CONSTRUCT_FUNCTION_H_
 
-#include "lang/scope/Scope.h"
+#include "lang/scope/OrderedScope.h"
 
 #include <string>
 
@@ -36,7 +36,7 @@ namespace lang
      * A function.
      */
     class Function
-        : public lang::Scope
+        : public lang::OrderedScope
         , public HandleTarget<lang::Function>
         , public lang::Element<Function, ANCE_CONSTRUCTS>
     {
@@ -127,23 +127,6 @@ namespace lang
         InitializerFunction& defineAsInit(Statement& code, Scope& containing_scope);
 
         /**
-         * Define a local variable that is a parameter.
-         * @param name The name.
-         * @param type The type.
-         * @param type_location The source location of the type.
-         * @param value The initial value.
-         * @param parameter_no The number of the parameter. Counting starts with one.
-         * @param location The source location.
-         * @return The defined variable or nothing if defining is not possible.
-         */
-        Optional<lang::ResolvingHandle<lang::Variable>> defineParameterVariable(Identifier const&                 name,
-                                                                                lang::ResolvingHandle<lang::Type> type,
-                                                                                lang::Location      type_location,
-                                                                                Shared<lang::Value> value,
-                                                                                unsigned            parameter_no,
-                                                                                lang::Location      location);
-
-        /**
          * Get the access level of this function.
          * @return The access level.
          */
@@ -218,8 +201,6 @@ namespace lang
          */
         [[nodiscard]] bool isImported() const;
 
-        bool isNameConflicted(lang::Identifier const& name) const override;
-
         /**
          * Determine the control flow in this function and build the CFG.
          * This step is necessary to build.
@@ -245,14 +226,6 @@ namespace lang
         void build(CompileContext& context);
 
         /**
-         * Build all parameter declarations.
-         * @param context The current compile context.
-         */
-        void buildDeclarations(CompileContext& context);
-
-        void buildFinalization(CompileContext& context) override;
-
-        /**
          * Validate a call to this function.
          * @param arguments The arguments that will be passed to the function and their source location.
          * @param location The source location of the function call.
@@ -272,17 +245,12 @@ namespace lang
          */
         Shared<lang::Value> buildCall(std::vector<Shared<lang::Value>> const& arguments, CompileContext& context);
 
-        lang::Scope*                           scope() override;
-        lang::Scope const*                     scope() const;
-        lang::GlobalScope*                     getGlobalScope() override;
-        [[nodiscard]] lang::GlobalScope const* getGlobalScope() const override;
-        llvm::DIScope*                         getDebugScope(CompileContext& context) const override;
+        lang::Scope*                     scope() override;
+        [[nodiscard]] lang::Scope const* scope() const override;
 
-        /**
-         * Get the scope inside of this function, if there is any.
-         * @return A scope or null.
-         */
-        lang::LocalScope* getInsideScope();
+        llvm::DIScope* getDebugScope(CompileContext& context) const override;
+
+        bool isPartOfFunction() const override;
 
         /**
          * Get the basic blocks for this function.
@@ -290,13 +258,6 @@ namespace lang
          */
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const;
 
-        void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
-        void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
-        void registerUsage(lang::ResolvingHandle<lang::Type> type) override;
-
-        void registerDefinition(lang::ResolvingHandle<lang::Type> type) override;
-
-        void resolve() override;
         void postResolve() override;
 
         /**
@@ -311,22 +272,9 @@ namespace lang
                                               bool                 is_imported,
                                               CompileContext&      context);
 
-      protected:
-        bool resolveDefinition(lang::ResolvingHandle<lang::Variable> variable) override;
-        bool resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
-        bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) override;
-
       private:
         lang::Identifier name_;
-
         Optional<Owned<lang::FunctionDefinition>> definition_ {};
-
-        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> undefined_variables_ {};
-        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> defined_parameters_ {};
-
-        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_ {};
-
-        std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_ {};
     };
 }
 

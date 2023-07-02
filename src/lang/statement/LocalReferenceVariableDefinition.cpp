@@ -44,21 +44,25 @@ void LocalReferenceVariableDefinition::setScope(lang::Scope& scope)
 {
     Statement::setScope(scope);
 
-    scope.asLocalScope()->prepareDefinition(name_);
+    scope.asOrderedScope()->prepareDefinition(name_);
 }
 
 void LocalReferenceVariableDefinition::walkDefinitions()
 {
     Statement::walkDefinitions();
 
-    variable_ = scope()->asLocalScope()->defineLocalVariable(name_,
-                                                             type_,
-                                                             type_location_,
-                                                             lang::Assigner::REFERENCE_BINDING,
-                                                             reference_->getValue(),
-                                                             location());
+    lang::OwningHandle<lang::Variable> variable =
+        lang::LocalVariable::makeLocalVariable(name_,
+                                               type_,
+                                               type_location_,
+                                               lang::Assigner::REFERENCE_BINDING,
+                                               reference_->getValue(),
+                                               *scope(),
+                                               location());
+    variable_ = variable.handle();
 
-    scope()->addType(type_);
+    scope()->addVariable(std::move(variable));
+    scope()->registerUsageIfUndefined(type_);
 }
 
 void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger) const

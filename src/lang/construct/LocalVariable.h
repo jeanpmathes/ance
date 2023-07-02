@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 
+#include "lang/Assigner.h"
 #include "lang/Element.h"
 
 namespace lang
@@ -33,6 +34,22 @@ namespace lang
                       Optional<Shared<lang::Value>>         value,
                       unsigned                              parameter_no,
                       lang::Location                        location);
+
+        static lang::OwningHandle<lang::Variable> makeLocalVariable(Identifier const&                 name,
+                                                                    lang::ResolvingHandle<lang::Type> type,
+                                                                    lang::Location                    type_location,
+                                                                    lang::Assigner                    assigner,
+                                                                    Optional<Shared<lang::Value>>     value,
+                                                                    lang::Scope&                      containing_scope,
+                                                                    lang::Location                    location);
+
+        static lang::OwningHandle<lang::Variable> makeParameterVariable(Identifier const&                 name,
+                                                                        lang::ResolvingHandle<lang::Type> type,
+                                                                        lang::Location                    type_location,
+                                                                        Shared<lang::Value>               value,
+                                                                        unsigned                          parameter_no,
+                                                                        lang::Scope&   containing_scope,
+                                                                        lang::Location location);
 
         void buildDeclaration(CompileContext& context) override;
         void buildDefinition(CompileContext& context) override;

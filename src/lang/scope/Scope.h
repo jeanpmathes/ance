@@ -11,6 +11,7 @@
 #include "lang/AccessModifier.h"
 #include "lang/Element.h"
 #include "lang/utility/Location.h"
+#include "lang/utility/OwningHandle.h"
 #include "lang/utility/ResolvingHandle.h"
 
 namespace lang
@@ -20,11 +21,13 @@ namespace lang
     class FunctionGroup;
     class Value;
     class GlobalScope;
+    class OrderedScope;
     class LocalScope;
     class Variable;
     class Type;
     class Context;
     class Identifier;
+    class Description;
 }
 
 class Statement;
@@ -38,18 +41,49 @@ namespace lang
      */
     class Scope : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     {
+      protected:
+        /**
+         * Creates a new scope without a parent scope.
+         * If this is used, the getters must be overridden.
+         */
+        explicit Scope();
+
+        /**
+         * Creates a new scope with a parent scope.
+         * @param containing_scope The parent scope.
+         */
+        explicit Scope(lang::Scope* containing_scope);
+
       public:
         /**
          * Get the containing scope or the global scope if there is no containing scope.
          * @return The containing scope.
          */
-        virtual lang::Scope* scope() = 0;
+        virtual lang::Scope* scope();
+
+        /**
+         * Get the containing scope or the global scope if there is no containing scope.
+         * @return The containing scope.
+         */
+        [[nodiscard]] virtual lang::Scope const* scope() const;
 
         /**
          * Get the global scope.
          * @return The global scope.
          */
-        virtual lang::GlobalScope* getGlobalScope() = 0;
+        virtual lang::GlobalScope* getGlobalScope();
+
+        /**
+         * Get the global scope.
+         * @return The global scope.
+         */
+        [[nodiscard]] virtual lang::GlobalScope const* getGlobalScope() const;
+
+        /**
+         * Get this scope as an ordered scope.
+         * @return An ordered scope, or nullptr if this scope is not an ordered scope.
+         */
+        virtual lang::OrderedScope* asOrderedScope();
 
         /**
          * Get the context the global scope is in.
@@ -59,19 +93,12 @@ namespace lang
         /**
          * Get the context the global scope is in.
          */
-        virtual lang::Context const& context() const;
+        [[nodiscard]] virtual lang::Context const& context() const;
 
         /**
-         * Get the global scope.
-         * @return The global scope.
+         * Whether this scope is part of a function.
          */
-        [[nodiscard]] virtual lang::GlobalScope const* getGlobalScope() const = 0;
-
-        /**
-         * Get this scope as a local scope, if it is one.
-         * @return The local scope, or nullptr if this scope is not a local scope.
-         */
-        virtual lang::LocalScope* asLocalScope();
+        [[nodiscard]] virtual bool isPartOfFunction() const = 0;
 
         /**
          * Get the name for a temporary element like a variable or function.
@@ -90,7 +117,7 @@ namespace lang
          * Create a local scope in this scope.
          * @return The created local scope.
          */
-        Owned<lang::LocalScope> makeLocalScope();
+        Owned<lang::OrderedScope> makeLocalScope();
 
         /**
          * Whether a name is conflicted in this scope, meaning there are multiple elements with the same name.
@@ -98,6 +125,30 @@ namespace lang
          * @return True if the name is conflicted, false otherwise.
          */
         [[nodiscard]] virtual bool isNameConflicted(lang::Identifier const& name) const = 0;
+
+        /**
+         * Add an description element to this scope.
+         * @param description The description to add.
+         */
+        virtual void addDescription(Owned<lang::Description> description) = 0;
+
+        /**
+         * Add a function to this scope.
+         * @param function The function to add.
+         */
+        virtual void addFunction(lang::OwningHandle<lang::Function> function) = 0;
+
+        /**
+         * Add a variable to this scope.
+         * @param variable The variable to add.
+         */
+        virtual void addVariable(lang::OwningHandle<lang::Variable> variable) = 0;
+
+        /**
+         * Add a type to this scope.
+         * @param type The type to add.
+         */
+        virtual void addType(lang::OwningHandle<lang::Type> type) = 0;
 
         /**
          * Register the usage of a variable in this scope. Only variables that are registered will be resolved.
@@ -127,7 +178,15 @@ namespace lang
          * Add a type to this scope. Undefined types will be resolved.
          * @param type The type to add.
          */
-        void addType(lang::ResolvingHandle<lang::Type> type);
+        void registerUsageIfUndefined(lang::ResolvingHandle<lang::Type> type);
+
+        /**
+         * Connect a given variable with a fitting definition, following the definition order.
+         * Only ordered scopes will connect variables.
+         * @return If no connection was possible or the scope is not ordered, the variable is returned.
+         */
+        virtual Optional<OwningHandle<lang::Variable>> connectWithDefinitionAccordingToOrdering(
+            lang::OwningHandle<lang::Variable> variable);
 
         /**
          * Resolve all undefined usages to find their definitions.
@@ -202,10 +261,11 @@ namespace lang
         ~Scope() override = default;
 
       protected:
-        virtual void onSubScope(LocalScope* local_scope);
+        virtual void onSubScope(Scope* sub_scope);
 
       private:
-        size_t temp_name_counter_ = 0;
+        lang::Scope* containing_scope_  = nullptr;
+        size_t       temp_name_counter_ = 0;
 
         std::vector<VariableDependency>                         variable_dependencies_;
         std::map<lang::ResolvingHandle<lang::Variable>, size_t> variable_to_dependency_index_;

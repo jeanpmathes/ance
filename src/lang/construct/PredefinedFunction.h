@@ -38,7 +38,6 @@ namespace lang
         void build(CompileContext& context) override;
 
         llvm::DIScope*                                      getDebugScope(CompileContext& context) const override;
-        lang::LocalScope*                                   getInsideScope() override;
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 
       public:

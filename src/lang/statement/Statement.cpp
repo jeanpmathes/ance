@@ -53,12 +53,12 @@ lang::Scope* Statement::scope() const
     return containing_scope_;
 }
 
-lang::LocalScope* Statement::getBlockScope()
+lang::Scope* Statement::getBlockScope()
 {
     return nullptr;
 }
 
-lang::LocalScope const* Statement::getBlockScope() const
+lang::Scope const* Statement::getBlockScope() const
 {
     return nullptr;
 }

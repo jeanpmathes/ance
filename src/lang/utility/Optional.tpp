@@ -1,5 +1,7 @@
 #include "Optional.h"
 
+#include <cassert>
+
 template<Moveable T>
 Optional<T>::Optional() = default;
 
@@ -93,12 +95,14 @@ bool Optional<T>::hasValue() const
 template<Moveable T>
 T& Optional<T>::value()
 {
+    assert(hasValue());
     return *std::launder(reinterpret_cast<T*>(storage_.data()));
 }
 
 template<Moveable T>
 T const& Optional<T>::value() const
 {
+    assert(hasValue());
     return *std::launder(reinterpret_cast<T const*>(storage_.data()));
 }
 

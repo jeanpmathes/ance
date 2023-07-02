@@ -30,39 +30,44 @@ lang::StatementFunction::StatementFunction(Function&                            
     , access_(access)
     , initial_block_(lang::BasicBlock::createEmpty())
 {
-    setupCode();
+
 }
 
-std::pair<llvm::FunctionType*, llvm::Function*> lang::StatementFunction::getNativeRepresentation() const
-{
-    return std::make_pair(native_type_, native_function_);
-}
-
-void lang::StatementFunction::setupCode()
+void lang::StatementFunction::setup()
 {
     function().addChild(code_);
+
+    for (auto& parameter : this->parameters()) { function().prepareDefinition(parameter->name()); }
 
     code_.setContainingScope(this->function());
     inside_scope_ = code_.getBlockScope();
     assert(inside_scope_);
 
-    code_.walkDefinitions();
-
-    scope().addType(returnType());
+    scope().registerUsageIfUndefined(returnType());
 
     unsigned no = 1;
     for (auto& parameter : this->parameters())
     {
-        scope().addType(parameter->type());
+        scope().registerUsageIfUndefined(parameter->type());
 
-        auto arg = function().defineParameterVariable(parameter->name(),
-                                                      parameter->type(),
-                                                      parameter->typeLocation(),
-                                                      parameter,
-                                                      no++,
-                                                      parameter->location());
-        arguments_.emplace_back(arg);
+        auto parameter_variable = lang::LocalVariable::makeParameterVariable(parameter->name(),
+                                                                             parameter->type(),
+                                                                             parameter->typeLocation(),
+                                                                             parameter,
+                                                                             no++,
+                                                                             function(),
+                                                                             parameter->location());
+        arguments_.emplace_back(parameter_variable.handle());
+
+        function().addVariable(std::move(parameter_variable));
     }
+
+    code_.walkDefinitions();
+}
+
+std::pair<llvm::FunctionType*, llvm::Function*> lang::StatementFunction::getNativeRepresentation() const
+{
+    return std::make_pair(native_type_, native_function_);
 }
 
 lang::AccessModifier lang::StatementFunction::access() const
@@ -154,7 +159,6 @@ void lang::StatementFunction::build(CompileContext& context)
 
     context.ir().SetInsertPoint(decl);
     function().buildDeclarations(context);
-    inside_scope_->buildDeclarations(context);
 
     llvm::BasicBlock* defs = llvm::BasicBlock::Create(context.llvmContext(), "defs", native_function_);
 
@@ -167,11 +171,6 @@ void lang::StatementFunction::build(CompileContext& context)
 
     context.ir().SetCurrentDebugLocation(llvm::DebugLoc());
     context.di().finalizeSubprogram(native_function_->getSubprogram());
-}
-
-lang::LocalScope* lang::StatementFunction::getInsideScope()
-{
-    return inside_scope_;
 }
 
 std::vector<lang::BasicBlock*> const& lang::StatementFunction::getBasicBlocks() const

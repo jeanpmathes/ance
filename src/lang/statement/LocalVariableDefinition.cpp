@@ -60,7 +60,7 @@ void LocalVariableDefinition::setScope(lang::Scope& scope)
 {
     Statement::setScope(scope);
 
-    scope.asLocalScope()->prepareDefinition(name_);
+    scope.asOrderedScope()->prepareDefinition(name_);
 }
 
 void LocalVariableDefinition::walkDefinitions()
@@ -70,14 +70,17 @@ void LocalVariableDefinition::walkDefinitions()
     Optional<Shared<lang::Value>> assigned_value;
     if (assigned_.hasValue()) { assigned_value = assigned_.value()->getValue(); }
 
-    variable_ = scope()->asLocalScope()->defineLocalVariable(name_,
-                                                             type_,
-                                                             type_location_,
-                                                             assigner_,
-                                                             assigned_value,
-                                                             location());
+    lang::OwningHandle<lang::Variable> variable = lang::LocalVariable::makeLocalVariable(name_,
+                                                                                         type_,
+                                                                                         type_location_,
+                                                                                         assigner_,
+                                                                                         assigned_value,
+                                                                                         *scope(),
+                                                                                         location());
+    variable_                                   = variable.handle();
 
-    if (type_opt_.hasValue()) scope()->addType(type_opt_.value());
+    scope()->addVariable(std::move(variable));
+    if (type_opt_.hasValue()) scope()->registerUsageIfUndefined(type_opt_.value());
 }
 
 void LocalVariableDefinition::postResolve()

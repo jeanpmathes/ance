@@ -75,14 +75,14 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * For compound statements the block scope is the scope that contains all the statements.
      * @return The block scope, or nullptr.
      */
-    [[nodiscard]] virtual lang::LocalScope* getBlockScope();
+    [[nodiscard]] virtual lang::Scope* getBlockScope();
 
     /**
      * Get the block scope of the statement, if any.
      * For compound statements the block scope is the scope that contains all the statements.
      * @return The block scope, or nullptr.
      */
-    [[nodiscard]] virtual lang::LocalScope const* getBlockScope() const;
+    [[nodiscard]] virtual lang::Scope const* getBlockScope() const;
 
     /**
      * Get whether this statement is a compound statement.

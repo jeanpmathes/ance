@@ -4,6 +4,36 @@
 #include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
 
+lang::Scope::Scope() = default;
+lang::Scope::Scope(lang::Scope* containing_scope) : containing_scope_(containing_scope) {}
+
+lang::Scope* lang::Scope::scope()
+{
+    assert(containing_scope_ != nullptr);
+    return containing_scope_;
+}
+
+lang::Scope const* lang::Scope::scope() const
+{
+    assert(containing_scope_ != nullptr);
+    return containing_scope_;
+}
+
+lang::GlobalScope* lang::Scope::getGlobalScope()
+{
+    return scope()->getGlobalScope();
+}
+
+lang::GlobalScope const* lang::Scope::getGlobalScope() const
+{
+    return scope()->getGlobalScope();
+}
+
+lang::OrderedScope* lang::Scope::asOrderedScope()
+{
+    return nullptr;
+}
+
 lang::Context& lang::Scope::context()
 {
     return getGlobalScope()->context();
@@ -14,17 +44,12 @@ lang::Context const& lang::Scope::context() const
     return getGlobalScope()->context();
 }
 
-lang::LocalScope* lang::Scope::asLocalScope()
-{
-    return nullptr;
-}
-
 std::string lang::Scope::getTemporaryName()
 {
     return "$temp" + std::to_string(temp_name_counter_++);
 }
 
-Owned<lang::LocalScope> lang::Scope::makeLocalScope()
+Owned<lang::OrderedScope> lang::Scope::makeLocalScope()
 {
     auto local_scope = makeOwned<lang::LocalScope>(this);
     addChild(*local_scope);
@@ -34,12 +59,18 @@ Owned<lang::LocalScope> lang::Scope::makeLocalScope()
     return local_scope;
 }
 
-void lang::Scope::addType(lang::ResolvingHandle<lang::Type> type)
+void lang::Scope::registerUsageIfUndefined(lang::ResolvingHandle<lang::Type> type)
 {
     if (!type->isDefined()) { registerUsage(type); }
 }
 
-void lang::Scope::onSubScope(lang::LocalScope*) {}
+Optional<lang::OwningHandle<lang::Variable>> lang::Scope::connectWithDefinitionAccordingToOrdering(
+    lang::OwningHandle<lang::Variable> variable)
+{
+    return variable;
+}
+
+void lang::Scope::onSubScope(lang::Scope*) {}
 
 void lang::Scope::addDependency(lang::ResolvingHandle<lang::Variable> variable)
 {

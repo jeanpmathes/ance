@@ -23,7 +23,7 @@ bool lang::Variable::isDefined() const
 
 lang::GlobalVariable* lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang::Type> type,
                                                      lang::Location                    type_location,
-                                                     GlobalScope&                      containing_scope,
+                                                     Scope&                            containing_scope,
                                                      lang::AccessModifier              access,
                                                      bool                              is_import,
                                                      lang::GlobalVariable::Initializer init,

@@ -42,7 +42,7 @@ void Allocation::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    scope()->addType(allocated_type_);
+    scope()->registerUsageIfUndefined(allocated_type_);
 }
 
 void Allocation::defineType(lang::ResolvingHandle<lang::Type> type)

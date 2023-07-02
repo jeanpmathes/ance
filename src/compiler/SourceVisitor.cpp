@@ -37,7 +37,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 {
     auto                   access     = lang::AccessModifier::EXTERN_ACCESS;
     lang::Identifier const identifier = lang::Identifier::like(ProjectDescription::ANCE_PROJECT_DEFINITION_FUNCTION);
-    lang::ResolvingHandle<lang::Type> return_type = unit_.globalScope().context().getUnitType();
+    lang::ResolvingHandle<lang::Type> return_type = context().getUnitType();
 
     lang::Location const declaration_location = lang::Location::global();
     lang::Location const definition_location  = lang::Location::global();
@@ -45,7 +45,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
     std::vector<Shared<lang::Parameter>> parameters;
 
     parameters.emplace_back(makeShared<lang::Parameter>(
-        unit_.globalScope().context().getPointerType(lang::makeHandled<lang::Type>(lang::Identifier::like("Project"))),
+        context().getPointerType(lang::makeHandled<lang::Type>(lang::Identifier::like("Project"))),
         lang::Location::global(),
         lang::Identifier::like("project"),
         lang::Location::global()));
@@ -163,8 +163,7 @@ std::any SourceVisitor::visitFunctionDescription(anceParser::FunctionDescription
     auto                              access     = std::any_cast<lang::AccessModifier>(visit(ctx->accessModifier()));
     lang::Identifier const            identifier = ident(ctx->IDENTIFIER());
     lang::ResolvingHandle<lang::Type> return_type =
-        ctx->type() ? erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()))
-                    : unit_.globalScope().context().getUnitType();
+        ctx->type() ? erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type())) : context().getUnitType();
 
     lang::Location const declaration_location = location(ctx);
     lang::Location const definition_location =
@@ -500,12 +499,8 @@ std::any SourceVisitor::visitAllocation(anceParser::AllocationContext* ctx)
 
     if (ctx->expression()) { count = std::any_cast<Expression*>(visit(ctx->expression())); }
 
-    return static_cast<Expression*>(new Allocation(allocator,
-                                                   type,
-                                                   wrap(count),
-                                                   location(ctx),
-                                                   location(ctx->type()),
-                                                   unit_.globalScope().context()));
+    return static_cast<Expression*>(
+        new Allocation(allocator, type, wrap(count), location(ctx), location(ctx->type()), context()));
 }
 
 std::any SourceVisitor::visitAddressof(anceParser::AddressofContext* ctx)
@@ -711,8 +706,7 @@ std::any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx
 
     if (ctx->prefix) { prefix = ctx->prefix->getText(); }
 
-    Shared<lang::Constant> string =
-        makeShared<lang::StringConstant>(prefix, ctx->STRING()->getText(), unit_.globalScope().context());
+    Shared<lang::Constant> string = makeShared<lang::StringConstant>(prefix, ctx->STRING()->getText(), context());
     return static_cast<Expression*>(new ConstantLiteral(string, location(ctx)));
 }
 
@@ -722,8 +716,7 @@ std::any SourceVisitor::visitCharLiteral(anceParser::CharLiteralContext* ctx)
 
     if (ctx->prefix) { prefix = ctx->prefix->getText(); }
 
-    Shared<lang::Constant> byte =
-        makeShared<lang::CharConstant>(prefix, ctx->CHAR()->getText(), unit_.globalScope().context());
+    Shared<lang::Constant> byte = makeShared<lang::CharConstant>(prefix, ctx->CHAR()->getText(), context());
     return static_cast<Expression*>(new ConstantLiteral(byte, location(ctx)));
 }
 
@@ -735,28 +728,28 @@ std::any SourceVisitor::visitFloatingPointLiteral(anceParser::FloatingPointLiter
     {
         flt = makeShared<lang::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
                                               llvm::APFloat::IEEEhalf(),
-                                              unit_.globalScope().context().getHalfType());
+                                              context().getHalfType());
     }
 
     if (ctx->SINGLE())
     {
         flt = makeShared<lang::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
                                               llvm::APFloat::IEEEsingle(),
-                                              unit_.globalScope().context().getSingleType());
+                                              context().getSingleType());
     }
 
     if (ctx->DOUBLE())
     {
         flt = makeShared<lang::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
                                               llvm::APFloat::IEEEdouble(),
-                                              unit_.globalScope().context().getDoubleType());
+                                              context().getDoubleType());
     }
 
     if (ctx->QUAD())
     {
         flt = makeShared<lang::FloatConstant>(ctx->getText().erase(ctx->getText().size() - 1),
                                               llvm::APFloat::IEEEquad(),
-                                              unit_.globalScope().context().getQuadType());
+                                              context().getQuadType());
     }
 
     return static_cast<Expression*>(new ConstantLiteral(flt.value(), location(ctx)));
@@ -764,36 +757,34 @@ std::any SourceVisitor::visitFloatingPointLiteral(anceParser::FloatingPointLiter
 
 std::any SourceVisitor::visitTrue(anceParser::TrueContext* ctx)
 {
-    Shared<lang::Constant> constant = lang::BooleanConstant::createTrue(unit_.globalScope().context());
+    Shared<lang::Constant> constant = lang::BooleanConstant::createTrue(context());
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitFalse(anceParser::FalseContext* ctx)
 {
-    Shared<lang::Constant> constant = lang::BooleanConstant::createFalse(unit_.globalScope().context());
+    Shared<lang::Constant> constant = lang::BooleanConstant::createFalse(context());
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitNull(anceParser::NullContext* ctx)
 {
-    Shared<lang::Constant> constant = lang::NullConstant::create(unit_.globalScope().context());
+    Shared<lang::Constant> constant = lang::NullConstant::create(context());
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitSizeLiteral(anceParser::SizeLiteralContext* ctx)
 {
-    std::string const      value = ctx->INTEGER()->getText();
-    Shared<lang::Constant> constant =
-        makeShared<lang::IntegerConstant>(value, 10, unit_.globalScope().context().getSizeType());
+    std::string const      value    = ctx->INTEGER()->getText();
+    Shared<lang::Constant> constant = makeShared<lang::IntegerConstant>(value, 10, context().getSizeType());
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ctx)
 {
-    std::string const      value = ctx->SIGNED_INTEGER()->getText();
-    Shared<lang::Constant> constant =
-        makeShared<lang::IntegerConstant>(value, 10, unit_.globalScope().context().getDiffType());
+    std::string const      value    = ctx->SIGNED_INTEGER()->getText();
+    Shared<lang::Constant> constant = makeShared<lang::IntegerConstant>(value, 10, context().getDiffType());
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
@@ -804,7 +795,7 @@ std::any SourceVisitor::visitUiptrLiteral(anceParser::UiptrLiteralContext* ctx)
     value.erase(0, 2);
 
     Shared<lang::Constant> constant =
-        makeShared<lang::IntegerConstant>(value, 16, unit_.globalScope().context().getUnsignedIntegerPointerType());
+        makeShared<lang::IntegerConstant>(value, 16, context().getUnsignedIntegerPointerType());
 
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
@@ -820,14 +811,10 @@ std::any SourceVisitor::visitNormalInteger(anceParser::NormalIntegerContext* ctx
     {
         uint64_t const size = parseIntegerTypeSize(ctx->width->getText());
         integer_constant =
-            makeShared<lang::IntegerConstant>(literal_text,
-                                              10,
-                                              unit_.globalScope().context().getFixedWidthIntegerType(size, is_signed));
+            makeShared<lang::IntegerConstant>(literal_text, 10, context().getFixedWidthIntegerType(size, is_signed));
     }
     else
-    {
-        integer_constant = makeShared<lang::IntegerConstant>(literal_text, is_signed, unit_.globalScope().context());
-    }
+    { integer_constant = makeShared<lang::IntegerConstant>(literal_text, is_signed, context()); }
 
     return static_cast<Expression*>(new ConstantLiteral(integer_constant.value(), location(ctx)));
 }
@@ -860,15 +847,13 @@ std::any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerContext* c
     integer_str.erase(0, 2);
 
     Shared<lang::Constant> integer_constant =
-        makeShared<lang::IntegerConstant>(integer_str,
-                                          radix,
-                                          unit_.globalScope().context().getFixedWidthIntegerType(size, false));
+        makeShared<lang::IntegerConstant>(integer_str, radix, context().getFixedWidthIntegerType(size, false));
     return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitUnitLiteral(anceParser::UnitLiteralContext* ctx)
 {
-    Shared<lang::Constant> constant = lang::UnitConstant::create(unit_.globalScope().context());
+    Shared<lang::Constant> constant = lang::UnitConstant::create(context());
     return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
 }
 
@@ -879,20 +864,20 @@ std::any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ctx)
     bool const     is_signed = integer_type_str[0] == 'i';
     uint64_t const size      = parseIntegerTypeSize(integer_type_str.substr(1));
 
-    lang::ResolvingHandle<lang::Type> type = unit_.globalScope().context().getFixedWidthIntegerType(size, is_signed);
+    lang::ResolvingHandle<lang::Type> type = context().getFixedWidthIntegerType(size, is_signed);
     return erase(type);
 }
 
 std::any SourceVisitor::visitBooleanType(anceParser::BooleanTypeContext*)
 {
-    return erase(unit_.globalScope().context().getBooleanType());
+    return erase(context().getBooleanType());
 }
 
 std::any SourceVisitor::visitArrayType(anceParser::ArrayTypeContext* ctx)
 {
     auto                              element_type = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
     uint64_t const                    size         = parseCompoundTypeSize(ctx->INTEGER()->getText());
-    lang::ResolvingHandle<lang::Type> type         = unit_.globalScope().context().getArrayType(element_type, size);
+    lang::ResolvingHandle<lang::Type> type         = context().getArrayType(element_type, size);
 
     return erase(type);
 }
@@ -901,7 +886,7 @@ std::any SourceVisitor::visitVectorType(anceParser::VectorTypeContext* ctx)
 {
     auto                              element_type = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
     uint64_t const                    size         = parseCompoundTypeSize(ctx->INTEGER()->getText());
-    lang::ResolvingHandle<lang::Type> type         = unit_.globalScope().context().getVectorType(element_type, size);
+    lang::ResolvingHandle<lang::Type> type         = context().getVectorType(element_type, size);
 
     return erase(type);
 }
@@ -914,7 +899,7 @@ std::any SourceVisitor::visitKeywordType(anceParser::KeywordTypeContext* ctx)
 std::any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)
 {
     auto                              element_type = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
-    lang::ResolvingHandle<lang::Type> type         = unit_.globalScope().context().getPointerType(element_type);
+    lang::ResolvingHandle<lang::Type> type         = context().getPointerType(element_type);
 
     return erase(type);
 }
@@ -922,7 +907,7 @@ std::any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)
 std::any SourceVisitor::visitBuffer(anceParser::BufferContext* ctx)
 {
     auto                              element_type = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
-    lang::ResolvingHandle<lang::Type> type         = unit_.globalScope().context().getBufferType(element_type);
+    lang::ResolvingHandle<lang::Type> type         = context().getBufferType(element_type);
 
     return erase(type);
 }
@@ -930,7 +915,7 @@ std::any SourceVisitor::visitBuffer(anceParser::BufferContext* ctx)
 std::any SourceVisitor::visitReference(anceParser::ReferenceContext* ctx)
 {
     auto                              element_type = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
-    lang::ResolvingHandle<lang::Type> type         = unit_.globalScope().context().getReferenceType(element_type);
+    lang::ResolvingHandle<lang::Type> type         = context().getReferenceType(element_type);
 
     return erase(type);
 }
@@ -1161,4 +1146,9 @@ uint64_t SourceVisitor::parseInRange(std::string const& str, uint64_t max)
     if (value > max) { value = max + 1; }
 
     return value;
+}
+
+lang::Context& SourceVisitor::context()
+{
+    return unit_.globalScope().context();
 }

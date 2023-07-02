@@ -60,11 +60,6 @@ llvm::DIScope* lang::PredefinedFunction::getDebugScope(CompileContext&) const
     return native_function_->getSubprogram();
 }
 
-lang::LocalScope* lang::PredefinedFunction::getInsideScope()
-{
-    return nullptr;
-}
-
 std::vector<lang::BasicBlock*> const& lang::PredefinedFunction::getBasicBlocks() const
 {
     static std::vector<lang::BasicBlock*> const empty;

@@ -25,6 +25,11 @@ lang::FunctionDefinition::FunctionDefinition(Function&                          
     , signature_(lang::Signature::fromParameters(name(), parameters_))
 {}
 
+void lang::FunctionDefinition::setup()
+{
+    // Intentionally empty.
+}
+
 lang::Identifier const& lang::FunctionDefinition::name() const
 {
     return function_.name();
@@ -205,14 +210,4 @@ llvm::CallInst* lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Val
     auto* content_value = context.ir().CreateCall(native_type, native_function, args);
     if (!native_type->getReturnType()->isVoidTy()) content_value->setName(name() + ".call");
     return content_value;
-}
-
-lang::GlobalScope* lang::FunctionDefinition::getGlobalScope()
-{
-    return containing_scope_.getGlobalScope();
-}
-
-lang::GlobalScope const* lang::FunctionDefinition::getGlobalScope() const
-{
-    return containing_scope_.getGlobalScope();
 }

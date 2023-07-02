@@ -44,7 +44,7 @@ namespace lang
          * @param function The function that contains the basic block.
          * @return The created basic block.
          */
-        static Owned<BasicBlock> createReturning(lang::LocalScope& scope, Expression& expression, Function& function);
+        static Owned<BasicBlock> createReturning(lang::Scope& scope, Expression& expression, Function& function);
 
         /**
          * Create a basic block that branches depending on the value of an expression.
@@ -371,7 +371,7 @@ namespace lang
             class Returning : public Base
             {
               public:
-                explicit Returning(lang::LocalScope& scope, Expression& return_value);
+                explicit Returning(lang::Scope& scope, Expression& return_value);
                 ~Returning() override = default;
 
               public:
@@ -401,7 +401,7 @@ namespace lang
                 std::list<Statement*> statements_ {};
                 lang::BasicBlock*     unreachable_next_ {nullptr};
                 Expression&           return_value_;
-                lang::LocalScope&     scope_;
+                lang::Scope&          scope_;
             };
 
             class Branching : public Base

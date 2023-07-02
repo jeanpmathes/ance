@@ -42,6 +42,8 @@ namespace lang
                           Scope&                               containing_scope,
                           lang::Location                       declaration_location);
 
+        void setup() override;
+
         [[nodiscard]] lang::AccessModifier access() const override;
         [[nodiscard]] Statement const*     code() const override;
 
@@ -53,7 +55,6 @@ namespace lang
         void build(CompileContext& context) override;
 
         llvm::DIScope*    getDebugScope(CompileContext& context) const override;
-        lang::LocalScope* getInsideScope() override;
 
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 
@@ -68,11 +69,8 @@ namespace lang
         [[nodiscard]] std::vector<Optional<lang::ResolvingHandle<lang::Variable>>> const& arguments() const;
 
       private:
-        void setupCode();
-
-      private:
-        Statement&        code_;
-        lang::LocalScope* inside_scope_ {nullptr};
+        Statement&   code_;
+        lang::Scope* inside_scope_ {nullptr};
 
         lang::AccessModifier access_;
 

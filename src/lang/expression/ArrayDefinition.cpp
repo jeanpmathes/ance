@@ -36,7 +36,7 @@ void ArrayDefinition::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    if (declared_type_.hasValue()) scope()->addType(declared_type_.value());
+    if (declared_type_.hasValue()) scope()->registerUsageIfUndefined(declared_type_.value());
 }
 
 void ArrayDefinition::defineType(lang::ResolvingHandle<lang::Type> type)

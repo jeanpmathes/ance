@@ -58,7 +58,7 @@ lang::Location lang::Member::location() const
 
 void lang::Member::setScope(lang::Scope* scope)
 {
-    scope->addType(type());
+    scope->registerUsageIfUndefined(type());
     if (constant_init_.hasValue()) { constant_init_.value()->type(); }
 }
 

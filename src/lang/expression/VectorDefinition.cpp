@@ -38,7 +38,7 @@ void VectorDefinition::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    if (type_.hasValue()) scope()->addType(type_.value());
+    if (type_.hasValue()) scope()->registerUsageIfUndefined(type_.value());
 }
 
 void VectorDefinition::defineType(lang::ResolvingHandle<lang::Type> type)

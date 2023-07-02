@@ -92,7 +92,7 @@ void Application::validate(ValidationLogger& validation_logger) const
 
     if (getType() == UnitResult::EXECUTABLE)
     {
-        if (!this->globalScope().hasEntry())
+        if (!this->globalScope().hasEntryPoint())
         {
             validation_logger.logError("Entry point 'main() : u32' could not be found", lang::Location::global());
         }

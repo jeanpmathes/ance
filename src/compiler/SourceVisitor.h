@@ -10,6 +10,11 @@
 
 class Unit;
 
+namespace lang
+{
+    class Context;
+}
+
 /**
  * The ance syntax visitor creating the application. Base class is generated.
  */
@@ -155,6 +160,8 @@ class SourceVisitor : public anceBaseVisitor
     static uint64_t parseCompoundTypeSize(std::string const& str);
 
     static uint64_t parseInRange(std::string const& str, uint64_t max);
+
+    lang::Context& context();
 
   private:
     FileContext* file_context_;
