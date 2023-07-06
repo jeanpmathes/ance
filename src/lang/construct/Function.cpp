@@ -238,6 +238,8 @@ std::vector<lang::BasicBlock*> const& lang::Function::getBasicBlocks() const
 void lang::Function::postResolve()
 {
     definition_.value()->postResolve();
+
+    Scope::postResolve();
 }
 
 void lang::Function::setImportExportAttributes(llvm::Function*      function,

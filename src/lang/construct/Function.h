@@ -250,7 +250,7 @@ namespace lang
 
         llvm::DIScope* getDebugScope(CompileContext& context) const override;
 
-        bool isPartOfFunction() const override;
+        [[nodiscard]] bool isPartOfFunction() const override;
 
         /**
          * Get the basic blocks for this function.

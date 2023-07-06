@@ -25,6 +25,11 @@ namespace lang
         [[nodiscard]] bool              isDefined() const override;
         [[nodiscard]] Identifier const& name() const override;
 
+        void setScope(lang::Scope& scope);
+
+        lang::Scope*                     scope();
+        [[nodiscard]] lang::Scope const* scope() const;
+
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
 
         void resolve();
@@ -42,6 +47,7 @@ namespace lang
 
       private:
         lang::Identifier name_;
+        lang::Scope*     scope_ = nullptr;
     };
 }
 

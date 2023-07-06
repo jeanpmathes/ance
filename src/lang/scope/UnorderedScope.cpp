@@ -201,17 +201,17 @@ static void registerEntityUsage(lang::ResolvingHandle<E>                        
     undefined_entities.emplace(entity->name(), lang::OwningHandle<E>::takeOwnership(entity));
 }
 
-void lang::UnorderedScope::registerUsage(lang::ResolvingHandle<lang::Variable> variable)
+void lang::UnorderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Variable> variable)
 {
     registerEntityUsage(variable, global_undefined_variables_, global_defined_variables_);
 }
 
-void lang::UnorderedScope::registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
+void lang::UnorderedScope::onRegisterUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
 {
     registerEntityUsage(function_group, undefined_function_groups_, defined_function_groups_);
 }
 
-void lang::UnorderedScope::registerUsage(lang::ResolvingHandle<lang::Type> type)
+void lang::UnorderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Type> type)
 {
     registerEntityUsage(type, undefined_types_, defined_types_);
 }
@@ -262,6 +262,8 @@ void lang::UnorderedScope::postResolve()
     {
         for (auto& description : descriptions) { description.description->postResolve(); }
     }
+
+    Scope::postResolve();
 }
 
 template<typename E>
@@ -342,6 +344,8 @@ lang::ResolvingHandle<lang::FunctionGroup> lang::UnorderedScope::prepareDefinedF
 
     lang::ResolvingHandle<lang::FunctionGroup> defined = undefined->handle();
     defined_function_groups_.emplace(name, std::move(undefined.value()));
+
+    defined->setScope(*this);
 
     return defined;
 }

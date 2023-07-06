@@ -54,7 +54,7 @@ bool lang::OrderedScope::wasVariableDropped(lang::Variable const& variable) cons
     return !active_variables_.contains(variable.name()) && defined_variables_.contains(variable.name());
 }
 
-void lang::OrderedScope::registerUsage(lang::ResolvingHandle<lang::Variable> variable)
+void lang::OrderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Variable> variable)
 {
     assert(!variable->isDefined());
 
@@ -77,7 +77,7 @@ void lang::OrderedScope::registerUsage(lang::ResolvingHandle<lang::Variable> var
     undefined_variables_.emplace(variable->name(), std::move(owned_variable.value()));
 }
 
-void lang::OrderedScope::registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
+void lang::OrderedScope::onRegisterUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
 {
     assert(!function_group->isDefined());
 
@@ -106,7 +106,7 @@ void lang::OrderedScope::registerUsage(lang::ResolvingHandle<lang::FunctionGroup
                                        lang::OwningHandle<lang::FunctionGroup>::takeOwnership(function_group));
 }
 
-void lang::OrderedScope::registerUsage(lang::ResolvingHandle<lang::Type> type)
+void lang::OrderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Type> type)
 {
     assert(!type->isDefined());
 
@@ -186,6 +186,8 @@ void lang::OrderedScope::resolve()
 void lang::OrderedScope::postResolve()
 {
     // Nothing to do.
+
+    Scope::postResolve();
 }
 
 bool lang::OrderedScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)

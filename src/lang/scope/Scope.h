@@ -154,20 +154,26 @@ namespace lang
          * Register the usage of a variable in this scope. Only variables that are registered will be resolved.
          * @param variable The variable to register and resolve. A variable can be registered multiple times, but must be undefined.
          */
-        virtual void registerUsage(lang::ResolvingHandle<lang::Variable> variable) = 0;
+        void registerUsage(lang::ResolvingHandle<lang::Variable> variable);
 
         /**
          * Register the usage of a function group in this scope. Only function groups that are registered will be resolved.
          * @param function The function group to register and resolve. A function group can be registered multiple times, but must be undefined.
          */
-        virtual void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function) = 0;
+        void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function);
 
         /**
          * Register the usage of a type in this scope. Only types that are registered will be resolved.
          * @param type The type to register and resolve. A type can be registered multiple times, but must be undefined.
          */
-        virtual void registerUsage(lang::ResolvingHandle<lang::Type> type) = 0;
+        void registerUsage(lang::ResolvingHandle<lang::Type> type);
 
+      protected:
+        virtual void onRegisterUsage(lang::ResolvingHandle<lang::Variable> variable)      = 0;
+        virtual void onRegisterUsage(lang::ResolvingHandle<lang::FunctionGroup> function) = 0;
+        virtual void onRegisterUsage(lang::ResolvingHandle<lang::Type> type)              = 0;
+
+      public:
         /**
          * Add the definition for a type. A scope can ignore definitions.
          * @param type The type to define.
@@ -196,7 +202,7 @@ namespace lang
         /**
          * Perform operations that require resolved definitions and have to be done before validation.
          */
-        virtual void postResolve() = 0;
+        virtual void postResolve();
 
         /**
          * Resolve the definition of a function group.
@@ -226,17 +232,17 @@ namespace lang
         virtual void buildFinalization(CompileContext& context) = 0;
 
         /**
-         * Add a dependency on a variable.
-         * @param variable The variable to add a dependency on. Must be defined.
-         */
-        void addDependency(lang::ResolvingHandle<lang::Variable> variable);
-
-        /**
-         * Add a dependency on a function.
-         * @param function The function to add a dependency on. Must be defined.
+         * Add a dependency to a function.
+         * @param function The function to add a dependency to.
          */
         void addDependency(lang::ResolvingHandle<lang::Function> function);
 
+      private:
+        void addDependency(lang::ResolvingHandle<lang::Variable> variable);
+        void addDependency(lang::ResolvingHandle<lang::FunctionGroup> function);
+        void addDependency(lang::ResolvingHandle<lang::Type> type);
+
+      public:
         struct VariableDependency {
             explicit VariableDependency(lang::ResolvingHandle<lang::Variable> var) : variable(std::move(var)) {}
             VariableDependency(VariableDependency& other)  = default;
@@ -258,6 +264,18 @@ namespace lang
          */
         std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies();
 
+        /**
+         * Get the function group dependencies.
+         * @return The function group dependencies.
+         */
+        std::vector<lang::ResolvingHandle<lang::FunctionGroup>> getFunctionGroupDependencies();
+
+        /**
+         * Get the type dependencies.
+         * @return The type dependencies.
+         */
+        std::vector<lang::ResolvingHandle<lang::Type>> getTypeDependencies();
+
         ~Scope() override = default;
 
       protected:
@@ -267,11 +285,21 @@ namespace lang
         lang::Scope* containing_scope_  = nullptr;
         size_t       temp_name_counter_ = 0;
 
+        std::vector<lang::ResolvingHandle<lang::Variable>>      used_variables_;
+        std::vector<lang::ResolvingHandle<lang::FunctionGroup>> used_function_groups_;
+        std::vector<lang::ResolvingHandle<lang::Type>>          used_types_;
+
         std::vector<VariableDependency>                         variable_dependencies_;
         std::map<lang::ResolvingHandle<lang::Variable>, size_t> variable_to_dependency_index_;
 
         std::vector<lang::ResolvingHandle<lang::Function>> function_dependencies_;
         std::set<lang::ResolvingHandle<lang::Function>>    function_dependencies_set_;
+
+        std::vector<lang::ResolvingHandle<lang::FunctionGroup>> function_group_dependencies_;
+        std::set<lang::ResolvingHandle<lang::FunctionGroup>>    function_group_dependencies_set_;
+
+        std::vector<lang::ResolvingHandle<lang::Type>> type_dependencies_;
+        std::set<lang::ResolvingHandle<lang::Type>>    type_dependencies_set_;
     };
 }
 #endif

@@ -59,6 +59,24 @@ Owned<lang::OrderedScope> lang::Scope::makeLocalScope()
     return local_scope;
 }
 
+void lang::Scope::registerUsage(lang::ResolvingHandle<lang::Variable> variable)
+{
+    used_variables_.emplace_back(variable);
+    onRegisterUsage(variable);
+}
+
+void lang::Scope::registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function)
+{
+    used_function_groups_.emplace_back(function);
+    onRegisterUsage(function);
+}
+
+void lang::Scope::registerUsage(lang::ResolvingHandle<lang::Type> type)
+{
+    used_types_.emplace_back(type);
+    onRegisterUsage(type);
+}
+
 void lang::Scope::registerUsageIfUndefined(lang::ResolvingHandle<lang::Type> type)
 {
     if (!type->isDefined()) { registerUsage(type); }
@@ -71,6 +89,39 @@ Optional<lang::OwningHandle<lang::Variable>> lang::Scope::connectWithDefinitionA
 }
 
 void lang::Scope::onSubScope(lang::Scope*) {}
+
+void lang::Scope::postResolve()
+{
+    for (auto& variable : used_variables_)
+    {
+        if (variable->isDefined()) { addDependency(variable); }
+    }
+
+    for (auto& function_group : used_function_groups_)
+    {
+        if (function_group->isDefined()) { addDependency(function_group); }
+    }
+
+    for (auto& type : used_types_)
+    {
+        if (type->isDefined()) { addDependency(type); }
+    }
+}
+
+void lang::Scope::addDependency(lang::ResolvingHandle<lang::Function> function)
+{
+    assert(function->isDefined());
+
+    if (function->scope() == this) return;
+
+    if (!function_dependencies_set_.contains(function))
+    {
+        function_dependencies_set_.emplace(function);
+        function_dependencies_.emplace_back(function);
+    }
+
+    if (scope() != this) scope()->addDependency(function);
+}
 
 void lang::Scope::addDependency(lang::ResolvingHandle<lang::Variable> variable)
 {
@@ -86,22 +137,37 @@ void lang::Scope::addDependency(lang::ResolvingHandle<lang::Variable> variable)
 
     variable_dependencies_[variable_to_dependency_index_.at(variable)].count++;
 
-    scope()->addDependency(variable);
+    if (scope() != this) scope()->addDependency(variable);
 }
 
-void lang::Scope::addDependency(lang::ResolvingHandle<lang::Function> function)
+void lang::Scope::addDependency(lang::ResolvingHandle<lang::FunctionGroup> function)
 {
     assert(function->isDefined());
 
     if (function->scope() == this) return;
 
-    if (!function_dependencies_set_.contains(function))
+    if (!function_group_dependencies_set_.contains(function))
     {
-        function_dependencies_set_.emplace(function);
-        function_dependencies_.emplace_back(function);
+        function_group_dependencies_set_.emplace(function);
+        function_group_dependencies_.emplace_back(function);
     }
 
-    scope()->addDependency(function);
+    if (scope() != this) scope()->addDependency(function);
+}
+
+void lang::Scope::addDependency(lang::ResolvingHandle<lang::Type> type)
+{
+    assert(type->isDefined());
+
+    if (type->getContainingScope() == this) return;
+
+    if (!type_dependencies_set_.contains(type))
+    {
+        type_dependencies_set_.emplace(type);
+        type_dependencies_.emplace_back(type);
+    }
+
+    if (scope() != this) scope()->addDependency(type);
 }
 
 std::vector<lang::Scope::VariableDependency> lang::Scope::getVariableDependencies()
@@ -112,4 +178,14 @@ std::vector<lang::Scope::VariableDependency> lang::Scope::getVariableDependencie
 std::vector<lang::ResolvingHandle<lang::Function>> lang::Scope::getFunctionDependencies()
 {
     return function_dependencies_;
+}
+
+std::vector<lang::ResolvingHandle<lang::FunctionGroup>> lang::Scope::getFunctionGroupDependencies()
+{
+    return function_group_dependencies_;
+}
+
+std::vector<lang::ResolvingHandle<lang::Type>> lang::Scope::getTypeDependencies()
+{
+    return type_dependencies_;
 }

@@ -31,7 +31,6 @@ class VariableAccess
 
   protected:
     void walkDefinitions() override;
-    void postResolve() override;
 
   public:
     [[nodiscard]] bool isNamed() const override;

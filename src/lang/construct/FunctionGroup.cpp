@@ -18,6 +18,24 @@ lang::Identifier const& lang::FunctionGroup::name() const
     return name_;
 }
 
+void lang::FunctionGroup::setScope(lang::Scope& scope)
+{
+    assert(scope_ == nullptr);
+    scope_ = &scope;
+}
+
+lang::Scope* lang::FunctionGroup::scope()
+{
+    assert(scope_ != nullptr);
+    return scope_;
+}
+
+lang::Scope const* lang::FunctionGroup::scope() const
+{
+    assert(scope_ != nullptr);
+    return scope_;
+}
+
 bool lang::FunctionGroup::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>>)
 {
     return false;

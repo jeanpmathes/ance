@@ -24,13 +24,6 @@ void VariableAccess::walkDefinitions()
     scope()->registerUsage(variable_);
 }
 
-void VariableAccess::postResolve()
-{
-    Expression::postResolve();
-
-    if (variable_->isDefined()) { scope()->addDependency(variable_); }
-}
-
 void VariableAccess::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     type.reroute(variable_->type());

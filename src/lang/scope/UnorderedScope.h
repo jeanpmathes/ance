@@ -47,9 +47,9 @@ namespace lang
          */
         void validate(ValidationLogger& validation_logger) const;
 
-        void registerUsage(lang::ResolvingHandle<lang::Variable> variable) override;
-        void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
-        void registerUsage(lang::ResolvingHandle<lang::Type> type) override;
+        void onRegisterUsage(lang::ResolvingHandle<lang::Variable> variable) override;
+        void onRegisterUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
+        void onRegisterUsage(lang::ResolvingHandle<lang::Type> type) override;
 
         void registerDefinition(lang::ResolvingHandle<lang::Type> type) override;
 
