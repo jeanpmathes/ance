@@ -94,6 +94,13 @@ void lang::CodeBlock::walkDefinitions()
     for (auto& sub : subs_) { sub->walkDefinitions(); }
 }
 
+void lang::CodeBlock::postResolve()
+{
+    Statement::postResolve();
+
+    if (scoped_) scope_.value()->postResolve();
+}
+
 std::vector<Owned<lang::BasicBlock>> lang::CodeBlock::createBasicBlocks(lang::BasicBlock& entry, Function& function)
 {
     std::vector<Owned<lang::BasicBlock>> blocks;

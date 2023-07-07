@@ -59,6 +59,7 @@ namespace lang
         void setScope(Scope& scope) override;
 
         void walkDefinitions() override;
+        void postResolve() override;
 
         std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, Function& function) override;
 
