@@ -159,7 +159,7 @@ void lang::Scope::addDependency(lang::ResolvingHandle<lang::Type> type)
 {
     assert(type->isDefined());
 
-    if (type->getContainingScope() == this) return;
+    if (type->scope() == this) return;
 
     if (!type_dependencies_set_.contains(type))
     {

@@ -271,13 +271,13 @@ void lang::Type::setContainingScope(lang::Scope* scope)
     if (definition_.hasValue()) { definition_.value()->setContainingScope(scope); }
 }
 
-lang::Scope* lang::Type::getContainingScope()
+lang::Scope* lang::Type::scope()
 {
     assert(definition_.hasValue());
     return definition_.value()->scope();
 }
 
-lang::Scope const* lang::Type::getContainingScope() const
+lang::Scope const* lang::Type::scope() const
 {
     assert(isDefined());
     return definition_.value()->scope();

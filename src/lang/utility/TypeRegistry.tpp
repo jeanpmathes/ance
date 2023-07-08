@@ -43,7 +43,7 @@ void lang::TypeRegistry<OTHER_KEY>::resolve()
         for (auto& used_type : type_keys)
         {
             if (used_type->isDefined()) continue;
-            type->getContainingScope()->resolveDefinition(used_type);
+            type->scope()->resolveDefinition(used_type);
         }
     }
 

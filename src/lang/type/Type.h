@@ -309,13 +309,13 @@ namespace lang
          * Get the scope that contains this type.
          * @return The scope that contains the type.
          */
-        [[nodiscard]] lang::Scope* getContainingScope();
+        [[nodiscard]] lang::Scope* scope();
 
         /**
          * Get the scope that contains this type.
          * @return The scope that contains the type.
          */
-        [[nodiscard]] lang::Scope const* getContainingScope() const;
+        [[nodiscard]] lang::Scope const* scope() const;
 
         void postResolve();
 
