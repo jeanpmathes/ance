@@ -15,7 +15,12 @@ lang::Location Expression::location() const
     return location_;
 }
 
-lang::Scope* Expression::scope() const
+lang::Scope* Expression::scope()
+{
+    return containing_scope_;
+}
+
+lang::Scope const* Expression::scope() const
 {
     return containing_scope_;
 }

@@ -86,6 +86,12 @@ namespace lang
         virtual lang::OrderedScope* asOrderedScope();
 
         /**
+         * Get this scope as an ordered scope.
+         * @return An ordered scope, or nullptr if this scope is not an ordered scope.
+         */
+        lang::OrderedScope const* asOrderedScope() const;
+
+        /**
          * Get the context the global scope is in.
          */
         virtual lang::Context& context();
@@ -104,7 +110,7 @@ namespace lang
          * Get the name for a temporary element like a variable or function.
          * @return A name that that will not clash with any other element in this scope.
          */
-        std::string getTemporaryName();
+        std::string getTemporaryName() const;
 
         /**
          * Get the debug scope for this scope.
@@ -283,7 +289,6 @@ namespace lang
 
       private:
         lang::Scope* containing_scope_  = nullptr;
-        size_t       temp_name_counter_ = 0;
 
         std::vector<lang::ResolvingHandle<lang::Variable>>      used_variables_;
         std::vector<lang::ResolvingHandle<lang::FunctionGroup>> used_function_groups_;

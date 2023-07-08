@@ -48,7 +48,12 @@ void Statement::setScope(lang::Scope& scope)
     for (auto& substatement : substatements_) { substatement.get().setContainingScope(scope); }
 }
 
-lang::Scope* Statement::scope() const
+lang::Scope* Statement::scope()
+{
+    return containing_scope_;
+}
+
+lang::Scope const* Statement::scope() const
 {
     return containing_scope_;
 }

@@ -34,6 +34,12 @@ lang::OrderedScope* lang::Scope::asOrderedScope()
     return nullptr;
 }
 
+lang::OrderedScope const* lang::Scope::asOrderedScope() const
+{
+    auto* self = const_cast<lang::Scope*>(this);
+    return self->asOrderedScope();
+}
+
 lang::Context& lang::Scope::context()
 {
     return getGlobalScope()->context();
@@ -44,9 +50,13 @@ lang::Context const& lang::Scope::context() const
     return getGlobalScope()->context();
 }
 
-std::string lang::Scope::getTemporaryName()
+std::string lang::Scope::getTemporaryName() const
 {
-    return "$temp" + std::to_string(temp_name_counter_++);
+    assert(this);// Just to supress warnings that this method could be static.
+                 // It is not static because a different naming scheme or thread-safety might be required later.
+
+    static uint64_t temp_name_counter = 0;
+    return "$temp" + std::to_string(temp_name_counter++);
 }
 
 Owned<lang::OrderedScope> lang::Scope::makeLocalScope()

@@ -33,8 +33,9 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     explicit Expression(lang::Location location);
 
   public:
-    [[nodiscard]] lang::Location location() const;
-    [[nodiscard]] lang::Scope*   scope() const;
+    [[nodiscard]] lang::Location     location() const;
+    [[nodiscard]] lang::Scope*       scope();
+    [[nodiscard]] lang::Scope const* scope() const;
 
     /**
      * Set the scope containing this expression.
