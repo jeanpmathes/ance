@@ -7,9 +7,11 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Value.h>
 
+#include "lang/Element.h"
+#include "lang/construct/Entity.h"
+
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
-#include "lang/Element.h"
 #include "lang/construct/GlobalVariable.h"
 #include "lang/construct/VariableDefinition.h"
 #include "lang/utility/Identifier.h"
@@ -36,6 +38,7 @@ namespace lang
      */
     class Variable
         : public HandleTarget<lang::Variable>
+        , public Entity
     {
       public:
         /**
@@ -48,7 +51,7 @@ namespace lang
          * Check if this variable is defined.
          * @return Whether it is defined.
          */
-        [[nodiscard]] bool isDefined() const;
+        [[nodiscard]] bool isDefined() const override;
 
         /**
          * Define this variable as a global variable.
@@ -97,12 +100,17 @@ namespace lang
          * Get the name.
          * @return The name.
          */
-        [[nodiscard]] Identifier const& name() const;
+        [[nodiscard]] Identifier const& name() const override;
         /**
          * Get the containing scope.
          * @return The scope.
          */
-        [[nodiscard]] lang::Scope* scope() const;
+        [[nodiscard]] lang::Scope* scope() override;
+        /**
+         * Get the containing scope.
+         * @return The scope.
+         */
+        [[nodiscard]] lang::Scope const* scope() const override;
         /**
          * Get the value type.
          * @return The type.
@@ -186,6 +194,8 @@ namespace lang
          * Get an undefined variable with the same name.
          */
         [[nodiscard]] lang::ResolvingHandle<lang::Variable> toUndefined() const;
+
+        ResolvingHandle<lang::Entity> getUndefinedClone(Context& new_context) const override;
 
       private:
         lang::Identifier                          name_;

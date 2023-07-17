@@ -267,5 +267,5 @@ std::vector<std::reference_wrapper<const lang::Type>> lang::ReferenceType::getCo
 
 lang::ResolvingHandle<lang::Type> lang::ReferenceType::clone(lang::Context& new_context) const
 {
-    return new_context.getReferenceType(element_type_->createUndefinedClone(new_context));
+    return new_context.getReferenceType(element_type_->getUndefinedTypeClone(new_context));
 }

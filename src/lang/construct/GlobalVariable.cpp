@@ -201,7 +201,7 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::GlobalVariable::getAllV
 
         auto function_variable_dependencies = function->getVariableDependencies();
         for (auto& variable_dependency : function_variable_dependencies)
-            dependencies.emplace_back(variable_dependency.variable);
+            dependencies.emplace_back(variable_dependency.entity.as<lang::Variable>().value());
 
         auto function_function_dependencies = function->getFunctionDependencies();
         functions_to_check.insert(functions_to_check.end(),

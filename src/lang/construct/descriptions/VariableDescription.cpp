@@ -117,7 +117,7 @@ void lang::VariableDescription::performInitialization()
             variable_init = std::ref(*init_function);
             init_scope    = &*init_function;
 
-            scope().addFunction(std::move(init_function));
+            scope().addEntity(std::move(init_function));
         }
         else if (init_expression_.hasValue())
         {
@@ -145,7 +145,7 @@ void lang::VariableDescription::performInitialization()
                                                 is_constant_,
                                                 location_);
 
-    scope().addVariable(std::move(variable));
+    scope().addEntity(std::move(variable));
 }
 
 void lang::VariableDescription::resolve()
@@ -259,7 +259,7 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
     }
 
     auto expanded = makeOwned<lang::VariableDescription>(name_,
-                                                         type_handle_->createUndefinedClone(new_context),
+                                                         type_handle_->getUndefinedTypeClone(new_context),
                                                          type_location_,
                                                          access(),
                                                          std::move(expanded_init_block),

@@ -8,6 +8,10 @@
 #include <ranges>
 #include <vector>
 
+#include "lang/construct/Function.h"
+#include "lang/construct/FunctionGroup.h"
+#include "lang/construct/Variable.h"
+#include "lang/type/Type.h"
 #include "lang/utility/Identifier.h"
 
 class ConstantExpression;
@@ -30,16 +34,14 @@ namespace lang
         [[nodiscard]] bool isNameConflicted(lang::Identifier const& name) const override;
 
         void addDescription(Owned<lang::Description> description) override;
-        void addFunction(lang::OwningHandle<lang::Function> function) override;
-        void addVariable(lang::OwningHandle<lang::Variable> variable) override;
-        void addType(lang::OwningHandle<lang::Type> type) override;
+        void addEntity(lang::OwningHandle<lang::Entity> entity) override;
 
         /**
-         * Get a type defined in this scope by it's name.
-         * @param string The name of the type.
-         * @return The type, or nothing if no such type is defined.
+         * Get an entity defined in this scope by it's name.
+         * @param string The name of the entity.
+         * @return The entity, or nothing if no such entity is defined.
          */
-        Optional<lang::ResolvingHandle<lang::Type>> getType(Identifier string);
+        Optional<lang::ResolvingHandle<lang::Entity>> getEntity(Identifier string);
 
         /**
          * Validate the descriptions in this scope. In contrast to an ordered scope, the unordered scope owns the contained descriptions, which is why it validates them.
@@ -47,18 +49,12 @@ namespace lang
          */
         void validate(ValidationLogger& validation_logger) const;
 
-        void onRegisterUsage(lang::ResolvingHandle<lang::Variable> variable) override;
-        void onRegisterUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
-        void onRegisterUsage(lang::ResolvingHandle<lang::Type> type) override;
-
-        void registerDefinition(lang::ResolvingHandle<lang::Type> type) override;
+        void onRegisterUsage(lang::ResolvingHandle<lang::Entity> entity) override;
 
         void resolve() override;
         void postResolve() override;
 
-        bool resolveDefinition(lang::ResolvingHandle<lang::Variable> variable) override;
-        bool resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
-        bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) override;
+        bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) override;
 
         /**
          * Build all initialization required by global entities.
@@ -85,14 +81,28 @@ namespace lang
         [[nodiscard]] std::map<lang::Identifier, std::vector<AssociatedDescription>> const& getCompatibleDescriptions()
             const;
 
-        [[nodiscard]] auto getFunctionGroups() { return defined_function_groups_ | std::views::values; }
-        [[nodiscard]] auto getFunctionGroups() const { return defined_function_groups_ | std::views::values; }
+      private:
+        template<typename Target>
+        static bool isOfType(lang::OwningHandle<lang::Entity> const& entity)
+        {
+            return entity.handle().get().template is<Target>();
+        }
 
-        [[nodiscard]] auto getVariables() { return global_defined_variables_ | std::views::values; }
-        [[nodiscard]] auto getVariables() const { return global_defined_variables_ | std::views::values; }
+        template<typename Target>
+        static bool castToType(lang::OwningHandle<lang::Entity> const& entity)
+        {
+            return entity.handle().get().template as<Target>();
+        }
 
-        [[nodiscard]] auto getTypes() { return defined_types_ | std::views::values; }
-        [[nodiscard]] auto getTypes() const { return defined_types_ | std::views::values; }
+      public:
+        [[nodiscard]] std::vector<lang::ResolvingHandle<lang::FunctionGroup>>        getFunctionGroups();
+        [[nodiscard]] std::vector<std::reference_wrapper<lang::FunctionGroup const>> getFunctionGroups() const;
+
+        [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Variable>>        getVariables();
+        [[nodiscard]] std::vector<std::reference_wrapper<lang::Variable const>> getVariables() const;
+
+        [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Type>>        getTypes();
+        [[nodiscard]] std::vector<std::reference_wrapper<lang::Type const>> getTypes() const;
 
       private:
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);
@@ -101,16 +111,10 @@ namespace lang
         std::map<lang::Identifier, std::vector<AssociatedDescription>> compatible_descriptions_;
         std::map<lang::Identifier, std::vector<AssociatedDescription>> incompatible_descriptions_;
 
-        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> undefined_function_groups_;
-        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>> defined_function_groups_;
-
-        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_undefined_variables_;
-        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>> global_defined_variables_;
-
-        std::map<lang::Identifier, lang::OwningHandle<lang::Type>> undefined_types_;
-        std::map<lang::Identifier, lang::OwningHandle<lang::Type>> defined_types_;
-
         std::set<lang::Identifier> defined_names_;
+
+        std::map<lang::Identifier, lang::OwningHandle<lang::Entity>> undefined_entities_;
+        std::map<lang::Identifier, lang::OwningHandle<lang::Entity>> defined_entities_;
     };
 }
 

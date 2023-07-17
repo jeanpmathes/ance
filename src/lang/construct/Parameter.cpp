@@ -69,7 +69,7 @@ llvm::Value* lang::Parameter::getContentValue() const
 
 Shared<lang::Parameter> lang::Parameter::expand(lang::Context& new_context) const
 {
-    return makeShared<lang::Parameter>(type_->createUndefinedClone(new_context), type_location_, name_, location_);
+    return makeShared<lang::Parameter>(type_->getUndefinedTypeClone(new_context), type_location_, name_, location_);
 }
 
 void lang::Parameter::synchronize(lang::Parameter* parameter, Storage& storage)

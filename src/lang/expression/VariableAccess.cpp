@@ -50,7 +50,7 @@ bool VariableAccess::validateAssignment(lang::Value const& value,
 
 bool VariableAccess::isVariableDropped(ValidationLogger& validation_logger) const
 {
-    if (!variable_->isDefined() && scope()->asOrderedScope()->wasVariableDropped(variable_))
+    if (!variable_->isDefined() && scope()->asOrderedScope()->wasEntityDropped(variable_))
     {
         validation_logger.logError("Variable with name '" + variable_->name() + "' was dropped", location());
         return true;

@@ -122,7 +122,7 @@ llvm::Constant* lang::Member::getInitialValue(llvm::Module& m) const
 
 Owned<lang::Member> lang::Member::expand(lang::Context& new_context) const
 {
-    lang::ResolvingHandle<lang::Type> type = type_->createUndefinedClone(new_context);
+    lang::ResolvingHandle<lang::Type> type = type_->getUndefinedTypeClone(new_context);
 
     Optional<Owned<ConstantExpression>> expanded_init_expression;
 

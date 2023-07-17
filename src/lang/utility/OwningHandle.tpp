@@ -8,9 +8,43 @@ lang::OwningHandle<T>::OwningHandle(Owned<T> owner, ResolvingHandle<T> handle)
 {}
 
 template<typename T>
+template<typename U>
+    requires MoveConvertible<T*, U*>
+lang::OwningHandle<T>::OwningHandle(lang::OwningHandle<U>&& value) noexcept
+    : owner_(std::move(value.owner_))
+    , handle_(std::move(value.handle_))
+{}
+
+template<typename T>
+template<typename U>
+    requires MoveConvertible<T*, U*>
+lang::OwningHandle<T>& lang::OwningHandle<T>::operator=(lang::OwningHandle<U>&& value) noexcept
+{
+    owner_  = std::move(value.owner_);
+    handle_ = std::move(value.handle_);
+    return *this;
+}
+
+template<typename T>
 lang::OwningHandle<T> lang::OwningHandle<T>::takeOwnership(ResolvingHandle<T> handle)
 {
     return lang::OwningHandle<T>(handle.take(), handle);
+}
+
+template<typename T>
+template<typename Original>
+lang::OwningHandle<T> lang::OwningHandle<T>::cast(lang::OwningHandle<Original>&& owning_handle)
+{
+    auto handle = owning_handle.handle_;
+
+    assert(handle.template is<T>());
+
+    auto old_owning_pointer = unwrap(std::move(owning_handle.owner_));
+    auto new_owning_pointer = dynamic_cast<T*>(old_owning_pointer);
+
+    assert(new_owning_pointer != nullptr);
+
+    return lang::OwningHandle<T>(std::move(wrap(new_owning_pointer).value()), handle.template as<T>().value());
 }
 
 template<typename T>

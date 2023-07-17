@@ -96,5 +96,5 @@ llvm::DIType* lang::ArrayType::createDebugType(CompileContext& context) const
 
 lang::ResolvingHandle<lang::Type> lang::ArrayType::clone(lang::Context& new_context) const
 {
-    return new_context.getArrayType(element_type_->createUndefinedClone(new_context), size_.value());
+    return new_context.getArrayType(element_type_->getUndefinedTypeClone(new_context), size_.value());
 }

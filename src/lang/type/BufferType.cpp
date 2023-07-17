@@ -128,5 +128,5 @@ lang::Type const* lang::BufferType::getPointeeType() const
 
 lang::ResolvingHandle<lang::Type> lang::BufferType::clone(lang::Context& new_context) const
 {
-    return new_context.getBufferType(element_type_->createUndefinedClone(new_context));
+    return new_context.getBufferType(element_type_->getUndefinedTypeClone(new_context));
 }

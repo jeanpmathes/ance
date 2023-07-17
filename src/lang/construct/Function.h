@@ -39,6 +39,7 @@ namespace lang
         : public lang::OrderedScope
         , public HandleTarget<lang::Function>
         , public lang::Element<Function, ANCE_CONSTRUCTS>
+        , public Entity
     {
       public:
         /**
@@ -51,7 +52,7 @@ namespace lang
          * Get the name of this function.
          * @return The name.
          */
-        [[nodiscard]] Identifier const& name() const;
+        [[nodiscard]] Identifier const& name() const override;
 
         /**
          * Get the linkage name of this function.
@@ -62,7 +63,7 @@ namespace lang
         /**
          * Get whether this function is defined.
          */
-        [[nodiscard]] bool isDefined() const;
+        [[nodiscard]] bool isDefined() const override;
 
         /**
          * Define this function as imported.
@@ -272,8 +273,10 @@ namespace lang
                                               bool                 is_imported,
                                               CompileContext&      context);
 
+        ResolvingHandle<lang::Entity> getUndefinedClone(Context& new_context) const override;
+
       private:
-        lang::Identifier name_;
+        lang::Identifier                          name_;
         Optional<Owned<lang::FunctionDefinition>> definition_ {};
     };
 }

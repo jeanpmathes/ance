@@ -61,7 +61,7 @@ void LocalReferenceVariableDefinition::walkDefinitions()
                                                location());
     variable_ = variable.handle();
 
-    scope()->addVariable(std::move(variable));
+    scope()->addEntity(std::move(variable));
     scope()->registerUsageIfUndefined(type_);
 }
 
@@ -105,7 +105,7 @@ Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressio
     Statements statements;
 
     statements.emplace_back(makeOwned<LocalReferenceVariableDefinition>(name_,
-                                                                        type_->createUndefinedClone(new_context),
+                                                                        type_->getUndefinedTypeClone(new_context),
                                                                         type_location_,
                                                                         std::move(subexpressions[0]),
                                                                         location()));

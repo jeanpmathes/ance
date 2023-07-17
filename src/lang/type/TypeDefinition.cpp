@@ -75,7 +75,7 @@ bool lang::TypeDefinition::isImported() const
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::clone(lang::Context&) const
 {
     assert(!isCustom() && "TypeDefinition::clone() called on custom type definition.");
-    throw std::runtime_error("Not implemented.");
+    throw std::logic_error("Not implemented.");
 }
 
 lang::FixedWidthIntegerType const* lang::TypeDefinition::isFixedWidthIntegerType() const

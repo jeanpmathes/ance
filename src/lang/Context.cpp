@@ -35,19 +35,23 @@ lang::Context::Context(lang::GlobalScope& global_scope, bool contains_runtime)
 
     // These types are keyword types, which means that the global scope resolves them by name:
 
-    global_scope_.registerDefinition(getHalfType());
-    global_scope_.registerDefinition(getSingleType());
-    global_scope_.registerDefinition(getDoubleType());
-    global_scope_.registerDefinition(getQuadType());
+    auto register_type = [&](lang::ResolvingHandle<lang::Type> type) {
+        global_scope_.addEntity(lang::OwningHandle<lang::Type>::takeOwnership(type));
+    };
 
-    global_scope_.registerDefinition(getUnitType());
-    global_scope_.registerDefinition(getBooleanType());
-    global_scope_.registerDefinition(getCharType());
-    global_scope_.registerDefinition(getSizeType());
-    global_scope_.registerDefinition(getDiffType());
-    global_scope_.registerDefinition(getUnsignedIntegerPointerType());
-    global_scope_.registerDefinition(getOpaquePointerType());
-    global_scope_.registerDefinition(getNullPointerType());
+    register_type(getHalfType());
+    register_type(getSingleType());
+    register_type(getDoubleType());
+    register_type(getQuadType());
+
+    register_type(getUnitType());
+    register_type(getBooleanType());
+    register_type(getCharType());
+    register_type(getSizeType());
+    register_type(getDiffType());
+    register_type(getUnsignedIntegerPointerType());
+    register_type(getOpaquePointerType());
+    register_type(getNullPointerType());
 }
 
 void lang::Context::resolve()

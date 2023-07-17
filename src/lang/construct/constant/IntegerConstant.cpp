@@ -43,7 +43,7 @@ std::string lang::IntegerConstant::toString() const
             prefix = "0x";
             break;
         default:
-            throw std::runtime_error("Invalid radix");
+            throw std::logic_error("Invalid radix");
     }
 
     return prefix + text_ + ":" + integer_type_->getSuffix();
@@ -141,5 +141,5 @@ bool lang::IntegerConstant::equals(lang::Constant const* other) const
 
 Shared<lang::Constant> lang::IntegerConstant::clone(lang::Context& new_context) const
 {
-    return Shared<Constant>(*(new IntegerConstant(text_, radix_, type_->createUndefinedClone(new_context))));
+    return Shared<Constant>(*(new IntegerConstant(text_, radix_, type_->getUndefinedTypeClone(new_context))));
 }

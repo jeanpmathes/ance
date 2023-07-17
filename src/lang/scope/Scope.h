@@ -89,7 +89,7 @@ namespace lang
          * Get this scope as an ordered scope.
          * @return An ordered scope, or nullptr if this scope is not an ordered scope.
          */
-        lang::OrderedScope const* asOrderedScope() const;
+        [[nodiscard]] lang::OrderedScope const* asOrderedScope() const;
 
         /**
          * Get the context the global scope is in.
@@ -110,7 +110,7 @@ namespace lang
          * Get the name for a temporary element like a variable or function.
          * @return A name that that will not clash with any other element in this scope.
          */
-        std::string getTemporaryName() const;
+        [[nodiscard]] std::string getTemporaryName() const;
 
         /**
          * Get the debug scope for this scope.
@@ -139,66 +139,34 @@ namespace lang
         virtual void addDescription(Owned<lang::Description> description) = 0;
 
         /**
-         * Add a function to this scope.
-         * @param function The function to add.
+         * Add an entity to this scope.
+         * @param entity The entity to add.
          */
-        virtual void addFunction(lang::OwningHandle<lang::Function> function) = 0;
+        virtual void addEntity(lang::OwningHandle<lang::Entity> entity) = 0;
 
         /**
-         * Add a variable to this scope.
-         * @param variable The variable to add.
+         * Register the usage of a entity in this scope. Only entity that are registered will be resolved.
+         * @param entity The entity to register and resolve. An entity can be registered multiple times, but must be undefined.
          */
-        virtual void addVariable(lang::OwningHandle<lang::Variable> variable) = 0;
-
-        /**
-         * Add a type to this scope.
-         * @param type The type to add.
-         */
-        virtual void addType(lang::OwningHandle<lang::Type> type) = 0;
-
-        /**
-         * Register the usage of a variable in this scope. Only variables that are registered will be resolved.
-         * @param variable The variable to register and resolve. A variable can be registered multiple times, but must be undefined.
-         */
-        void registerUsage(lang::ResolvingHandle<lang::Variable> variable);
-
-        /**
-         * Register the usage of a function group in this scope. Only function groups that are registered will be resolved.
-         * @param function The function group to register and resolve. A function group can be registered multiple times, but must be undefined.
-         */
-        void registerUsage(lang::ResolvingHandle<lang::FunctionGroup> function);
-
-        /**
-         * Register the usage of a type in this scope. Only types that are registered will be resolved.
-         * @param type The type to register and resolve. A type can be registered multiple times, but must be undefined.
-         */
-        void registerUsage(lang::ResolvingHandle<lang::Type> type);
+        void registerUsage(lang::ResolvingHandle<lang::Entity> entity);
 
       protected:
-        virtual void onRegisterUsage(lang::ResolvingHandle<lang::Variable> variable)      = 0;
-        virtual void onRegisterUsage(lang::ResolvingHandle<lang::FunctionGroup> function) = 0;
-        virtual void onRegisterUsage(lang::ResolvingHandle<lang::Type> type)              = 0;
+        virtual void onRegisterUsage(lang::ResolvingHandle<lang::Entity> entity) = 0;
 
       public:
-        /**
-         * Add the definition for a type. A scope can ignore definitions.
-         * @param type The type to define.
-         */
-        virtual void registerDefinition(lang::ResolvingHandle<lang::Type> type) = 0;
-
         /**
          * Add a type to this scope. Undefined types will be resolved.
          * @param type The type to add.
          */
-        void registerUsageIfUndefined(lang::ResolvingHandle<lang::Type> type);
+        void registerUsageIfUndefined(lang::ResolvingHandle<lang::Entity> type);
 
         /**
-         * Connect a given variable with a fitting definition, following the definition order.
-         * Only ordered scopes will connect variables.
-         * @return If no connection was possible or the scope is not ordered, the variable is returned.
+         * Connect a given entity with a fitting definition, following the definition order.
+         * Only ordered scopes will connect entities.
+         * @return If no connection was possible or the scope is not ordered, the entity is returned.
          */
-        virtual Optional<OwningHandle<lang::Variable>> connectWithDefinitionAccordingToOrdering(
-            lang::OwningHandle<lang::Variable> variable);
+        virtual Optional<OwningHandle<lang::Entity>> connectWithDefinitionAccordingToOrdering(
+            lang::OwningHandle<lang::Entity> variable);
 
         /**
          * Resolve all undefined usages to find their definitions.
@@ -211,25 +179,11 @@ namespace lang
         virtual void postResolve();
 
         /**
-         * Resolve the definition of a function group.
-         * @param function The function group to find a definition for.
+         * Resolve the definition of an entity.
+         * @param entity The entity to resolve.
          * @return True if a definition was found.
          */
-        virtual bool resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function) = 0;
-
-        /**
-         * Resolve the definition of a variable.
-         * @param variable The variable to find a definition for.
-         * @return True if a definition was found.
-         */
-        virtual bool resolveDefinition(lang::ResolvingHandle<lang::Variable> variable) = 0;
-
-        /**
-         * Resolve the definition of a type.
-         * @param type The type to find a definition for.
-         * @return True if a definition was found.
-         */
-        virtual bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) = 0;
+        virtual bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) = 0;
 
         /**
          * Build the finalization for all entities in this scope.
@@ -244,25 +198,46 @@ namespace lang
         void addDependency(lang::ResolvingHandle<lang::Function> function);
 
       private:
-        void addDependency(lang::ResolvingHandle<lang::Variable> variable);
-        void addDependency(lang::ResolvingHandle<lang::FunctionGroup> function);
-        void addDependency(lang::ResolvingHandle<lang::Type> type);
+        void addDependency(lang::ResolvingHandle<lang::Entity> entity);
 
       public:
-        struct VariableDependency {
-            explicit VariableDependency(lang::ResolvingHandle<lang::Variable> var) : variable(std::move(var)) {}
-            VariableDependency(VariableDependency& other)  = default;
-            VariableDependency(VariableDependency&& other) = default;
+        template<typename E>
+        struct Dependency {
+            explicit Dependency(lang::ResolvingHandle<E> dep) : entity(std::move(dep)) {}
+            Dependency(lang::ResolvingHandle<E> dep, size_t initial_count)
+                : entity(std::move(dep))
+                , count(initial_count)
+            {}
+            Dependency(Dependency& other)           = default;
+            Dependency(Dependency&& other) noexcept = default;
 
-            lang::ResolvingHandle<lang::Variable> variable;
-            size_t                                count {0};
+            lang::ResolvingHandle<E> entity;
+            size_t                   count {0};
         };
+
+        /**
+         * Get the dependencies of this scope and their count.
+         * @return The dependencies.
+         */
+        std::vector<Dependency<lang::Entity>> getDependencies();
 
         /**
          * Get the variable dependencies and their count.
          * @return The variable dependencies.
          */
-        std::vector<VariableDependency> getVariableDependencies();
+        std::vector<Dependency<lang::Variable>> getVariableDependencies();
+
+        /**
+         * Get the function dependencies and their count.
+         * @return The function dependencies.
+         */
+        std::vector<Dependency<lang::FunctionGroup>> getFunctionGroupDependencies();
+
+        /**
+         * Get the type dependencies and their count.
+         * @return The type dependencies.
+         */
+        std::vector<Dependency<lang::Type>> getTypeDependencies();
 
         /**
          * Get the function dependencies.
@@ -270,41 +245,20 @@ namespace lang
          */
         std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies();
 
-        /**
-         * Get the function group dependencies.
-         * @return The function group dependencies.
-         */
-        std::vector<lang::ResolvingHandle<lang::FunctionGroup>> getFunctionGroupDependencies();
-
-        /**
-         * Get the type dependencies.
-         * @return The type dependencies.
-         */
-        std::vector<lang::ResolvingHandle<lang::Type>> getTypeDependencies();
-
         ~Scope() override = default;
 
       protected:
         virtual void onSubScope(Scope* sub_scope);
 
       private:
-        lang::Scope* containing_scope_  = nullptr;
+        lang::Scope* containing_scope_ = nullptr;
 
-        std::vector<lang::ResolvingHandle<lang::Variable>>      used_variables_;
-        std::vector<lang::ResolvingHandle<lang::FunctionGroup>> used_function_groups_;
-        std::vector<lang::ResolvingHandle<lang::Type>>          used_types_;
-
-        std::vector<VariableDependency>                         variable_dependencies_;
-        std::map<lang::ResolvingHandle<lang::Variable>, size_t> variable_to_dependency_index_;
+        std::vector<lang::ResolvingHandle<lang::Entity>>      used_entities_;
+        std::vector<Dependency<lang::Entity>>                 entity_dependencies_;
+        std::map<lang::ResolvingHandle<lang::Entity>, size_t> entity_to_dependency_index_;
 
         std::vector<lang::ResolvingHandle<lang::Function>> function_dependencies_;
         std::set<lang::ResolvingHandle<lang::Function>>    function_dependencies_set_;
-
-        std::vector<lang::ResolvingHandle<lang::FunctionGroup>> function_group_dependencies_;
-        std::set<lang::ResolvingHandle<lang::FunctionGroup>>    function_group_dependencies_set_;
-
-        std::vector<lang::ResolvingHandle<lang::Type>> type_dependencies_;
-        std::set<lang::ResolvingHandle<lang::Type>>    type_dependencies_set_;
     };
 }
 #endif

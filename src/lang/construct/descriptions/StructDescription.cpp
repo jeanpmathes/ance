@@ -56,7 +56,7 @@ void lang::StructDescription::performInitialization()
 
     self_ = type.handle();
 
-    scope().addType(std::move(type));
+    scope().addEntity(std::move(type));
 
     for (auto& member : members_) { member->setScope(&scope()); }
 }

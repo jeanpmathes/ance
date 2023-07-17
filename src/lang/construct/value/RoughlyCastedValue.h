@@ -9,7 +9,7 @@
 namespace lang
 {
     /**
-     * Create a value that is result of a rough cast.
+     * Create a value that is result of a rough as.
      */
     class RoughlyCastedValue : public Value
     {

@@ -409,5 +409,5 @@ llvm::DIType* lang::VectorType::createDebugType(CompileContext& context) const
 
 lang::ResolvingHandle<lang::Type> lang::VectorType::clone(lang::Context& new_context) const
 {
-    return new_context.getVectorType(element_type_->createUndefinedClone(new_context), size_.value());
+    return new_context.getVectorType(element_type_->getUndefinedTypeClone(new_context), size_.value());
 }

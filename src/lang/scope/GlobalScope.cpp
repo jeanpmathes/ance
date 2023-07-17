@@ -4,7 +4,6 @@
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Assigner.h"
-#include "lang/construct/GlobalVariable.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/StructType.h"
 #include "lang/type/TypeAlias.h"
@@ -84,7 +83,7 @@ void lang::GlobalScope::determineFlow()
 
 void lang::GlobalScope::validateFlow(ValidationLogger& validation_logger) const
 {
-    for (auto& group : getFunctionGroups()) { group->validateFlow(validation_logger); }
+    for (auto& group : getFunctionGroups()) { group.get().validateFlow(validation_logger); }
 }
 
 bool lang::GlobalScope::hasEntryPoint() const

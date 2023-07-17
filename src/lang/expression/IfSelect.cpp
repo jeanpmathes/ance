@@ -95,7 +95,7 @@ Expression::Expansion IfSelect::expandWith(Expressions subexpressions, lang::Con
     Statements before;
 
     before.emplace_back(makeOwned<LocalVariableDefinition>(temp_name,
-                                                           type().createUndefinedClone(new_context),
+                                                           type().getUndefinedTypeClone(new_context),
                                                            location(),
                                                            lang::Assigner::COPY_ASSIGNMENT,
                                                            std::nullopt,

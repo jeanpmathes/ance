@@ -45,7 +45,7 @@ bool SizeofType::validate(ValidationLogger& validation_logger) const
 Expression::Expansion SizeofType::expandWith(Expressions, lang::Context& new_context) const
 {
     return {Statements(),
-            makeOwned<SizeofType>(type_->createUndefinedClone(new_context), type_location_, location()),
+            makeOwned<SizeofType>(type_->getUndefinedTypeClone(new_context), type_location_, location()),
             Statements()};
 }
 

@@ -35,7 +35,12 @@ namespace lang
         /**
          * Get the scope in which this variable is defined.
          */
-        [[nodiscard]] lang::Scope* scope() const;
+        [[nodiscard]] lang::Scope* scope();
+
+        /**
+         * Get the scope in which this variable is defined.
+         */
+        [[nodiscard]] lang::Scope const* scope() const;
 
         /**
          * Get the type of this variable.

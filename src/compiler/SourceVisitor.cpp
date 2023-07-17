@@ -450,16 +450,13 @@ std::any SourceVisitor::visitMemberAccess(anceParser::MemberAccessContext* ctx)
 
 std::any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
 {
-    Optional<lang::ResolvingHandle<lang::FunctionGroup>> function_group;
-    Optional<lang::ResolvingHandle<lang::Type>>          constructed_type;
+    Optional<lang::ResolvingHandle<lang::Entity>> callable;
 
-    if (ctx->type()) { constructed_type = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type())); }
+    if (ctx->type()) { callable = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type())); }
     else
     {
         lang::Identifier const identifier = ident(ctx->IDENTIFIER());
-
-        function_group   = lang::makeHandled<lang::FunctionGroup>(identifier);
-        constructed_type = lang::makeHandled<lang::Type>(identifier);
+        callable                          = lang::makeHandled<lang::Type>(identifier);
     }
 
     auto arguments = std::any_cast<std::vector<Expression*>>(visit(ctx->arguments()));
@@ -468,10 +465,8 @@ std::any SourceVisitor::visitFunctionCall(anceParser::FunctionCallContext* ctx)
     unique_expressions.reserve(arguments.size());
     for (Expression* argument_ptr : arguments) { unique_expressions.emplace_back(*argument_ptr); }
 
-    return static_cast<Expression*>(new FunctionCall(std::move(function_group),
-                                                     constructed_type.value(),
-                                                     std::move(unique_expressions),
-                                                     location(ctx)));
+    return static_cast<Expression*>(
+        new FunctionCall(std::move(callable.value()), std::move(unique_expressions), location(ctx)));
 }
 
 std::any SourceVisitor::visitArguments(anceParser::ArgumentsContext* ctx)
@@ -893,7 +888,11 @@ std::any SourceVisitor::visitVectorType(anceParser::VectorTypeContext* ctx)
 
 std::any SourceVisitor::visitKeywordType(anceParser::KeywordTypeContext* ctx)
 {
-    return erase(unit_.globalScope().getType(createIdentifier(ctx->getText(), location(ctx))).value());
+    return erase(unit_.globalScope()
+                     .getEntity(createIdentifier(ctx->getText(), location(ctx)))
+                     .value()
+                     .as<lang::Type>()
+                     .value());
 }
 
 std::any SourceVisitor::visitPointer(anceParser::PointerContext* ctx)

@@ -252,3 +252,8 @@ void lang::Function::setImportExportAttributes(llvm::Function*      function,
     if (is_imported) { function->setDLLStorageClass(llvm::GlobalValue::DLLStorageClassTypes::DLLImportStorageClass); }
     else { function->setDLLStorageClass(llvm::GlobalValue::DLLStorageClassTypes::DLLExportStorageClass); }
 }
+
+lang::ResolvingHandle<lang::Entity> lang::Function::getUndefinedClone(lang::Context&) const
+{
+    return lang::makeHandled<lang::Function>(name());
+}

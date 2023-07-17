@@ -131,7 +131,7 @@ void lang::FunctionGroup::build(CompileContext& compile_context)
     for (auto& function : functions()) function->build(compile_context);
 }
 
-lang::ResolvingHandle<lang::FunctionGroup> lang::FunctionGroup::toUndefined() const
+lang::ResolvingHandle<lang::Entity> lang::FunctionGroup::getUndefinedClone(lang::Context&) const
 {
     return lang::makeHandled<lang::FunctionGroup>(name());
 }

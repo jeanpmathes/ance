@@ -23,10 +23,22 @@ class Owned
     Owned(Owned<T>&& value) noexcept;
 
     template<typename U>
-        requires std::is_base_of_v<T, U>
+        requires MoveConvertible<T*, U*>
     explicit(false) Owned(Owned<U>&& value) noexcept;// NOLINT(google-explicit-constructor)
 
+    template<typename U>
+        requires CopyConvertible<T*, U*>
+    explicit(false) Owned(Owned<U>& value) noexcept;// NOLINT(google-explicit-constructor)
+
     Owned<T>& operator=(Owned<T>&& value) noexcept;
+
+    template<typename U>
+        requires MoveConvertible<T*, U*>
+    Owned<T>& operator=(Owned<U>&& value) noexcept;
+
+    template<typename U>
+        requires CopyConvertible<T*, U*>
+    Owned<T>& operator=(Owned<U>& value) noexcept;
 
     static T* release(Owned<T>&& value);
 
@@ -105,14 +117,22 @@ class Shared
     Shared(Shared<T>& value) noexcept;
 
     template<typename U>
-        requires std::is_base_of_v<T, U>
+        requires MoveConvertible<T*, U*>
     explicit(false) Shared(Shared<U>&& value) noexcept;// NOLINT(google-explicit-constructor)
 
     template<typename U>
-        requires std::is_base_of_v<T, U>
+        requires CopyConvertible<T*, U*>
     explicit(false) Shared(Shared<U>& value) noexcept;// NOLINT(google-explicit-constructor)
 
     Shared<T>& operator=(Shared<T> value) noexcept;
+
+    template<typename U>
+        requires MoveConvertible<T*, U*>
+    Shared<T>& operator=(Shared<U>&& value) noexcept;
+
+    template<typename U>
+        requires CopyConvertible<T*, U*>
+    Shared<T>& operator=(Shared<U>& value) noexcept;
 
     bool operator==(Shared<T> const& other) const noexcept;
     bool operator!=(Shared<T> const& other) const noexcept;

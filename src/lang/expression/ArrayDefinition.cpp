@@ -108,7 +108,7 @@ bool ArrayDefinition::validate(ValidationLogger& validation_logger) const
 Expression::Expansion ArrayDefinition::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
     Optional<lang::ResolvingHandle<lang::Type>> type;
-    if (declared_type_.hasValue()) type = declared_type_.value()->createUndefinedClone(new_context);
+    if (declared_type_.hasValue()) type = declared_type_.value()->getUndefinedTypeClone(new_context);
 
     return {Statements(),
             makeOwned<ArrayDefinition>(type, type_location_, std::move(subexpressions), location()),

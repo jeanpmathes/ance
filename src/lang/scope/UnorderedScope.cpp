@@ -53,54 +53,39 @@ void lang::UnorderedScope::addDescription(Owned<lang::Description> description)
                                                                std::move(description));
 }
 
-void lang::UnorderedScope::addFunction(lang::OwningHandle<lang::Function> function)
+void lang::UnorderedScope::addEntity(lang::OwningHandle<lang::Entity> entity)
 {
-    assert(!defined_names_.contains(function->name()) || defined_function_groups_.contains(function->name()));
+    assert(!defined_names_.contains(entity->name()) || defined_entities_.contains(entity->name()));
 
-    defined_names_.emplace(function->name());
+    defined_names_.emplace(entity->name());
 
-    lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(function->name());
-    group->addFunction(std::move(function));
-}
-
-void lang::UnorderedScope::addVariable(lang::OwningHandle<lang::Variable> variable)
-{
-    assert(!defined_names_.contains(variable->name()) || global_undefined_variables_.contains(variable->name()));
-
-    defined_names_.emplace(variable->name());
-
-    if (global_undefined_variables_.contains(variable->name()))
+    if (entity.handle().is<Function>())
     {
-        global_undefined_variables_.at(variable->name()).handle().reroute(variable.handle());
-        global_undefined_variables_.erase(variable->name());
+        lang::OwningHandle<lang::Function> function = lang::OwningHandle<lang::Function>::cast(std::move(entity));
+
+        lang::ResolvingHandle<lang::FunctionGroup> group = prepareDefinedFunctionGroup(function->name());
+        group->addFunction(std::move(function));
     }
-
-    global_defined_variables_.emplace(variable->name(), std::move(variable));
-}
-
-void lang::UnorderedScope::addType(lang::OwningHandle<lang::Type> type)
-{
-    assert(!defined_names_.contains(type->name()) || undefined_types_.contains(type->name()));
-
-    defined_names_.emplace(type->name());
-
-    if (undefined_types_.contains(type->name()))
+    else
     {
-        undefined_types_.at(type->name()).handle().reroute(type.handle());
-        undefined_types_.erase(type->name());
+        if (undefined_entities_.contains(entity->name()))
+        {
+            undefined_entities_.at(entity->name()).handle().reroute(entity.handle());
+            undefined_entities_.erase(entity->name());
+        }
+
+        entity->setContainingScope(this);
+        defined_entities_.emplace(entity->name(), std::move(entity));
     }
-
-    type->setContainingScope(this);
-    defined_types_.emplace(type->name(), std::move(type));
 }
 
-Optional<lang::ResolvingHandle<lang::Type>> lang::UnorderedScope::getType(Identifier string)
+Optional<lang::ResolvingHandle<lang::Entity>> lang::UnorderedScope::getEntity(Identifier string)
 {
-    auto it = defined_types_.find(string);
+    auto iterator = defined_entities_.find(string);
 
-    if (it != defined_types_.end())
+    if (iterator != defined_entities_.end())
     {
-        auto& [name, type] = *it;
+        auto& [name, type] = *iterator;
         return type.handle();
     }
     else return {};
@@ -168,69 +153,41 @@ void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
         }
     }
 
-    for (auto& [key, function] : defined_function_groups_) { function->validate(validation_logger); }
+    for (auto& [name, entity] : defined_entities_)
+    {
+        auto const* function_group = entity.handle().get().as<FunctionGroup>();
+        if (function_group != nullptr) function_group->validate(validation_logger);
+    }
 
-    auto& global_defined_variables = const_cast<UnorderedScope*>(this)->global_defined_variables_;
+    auto& defined_entities = const_cast<UnorderedScope*>(this)->defined_entities_;
 
     std::vector<lang::ResolvingHandle<lang::Variable>> global_variables;
-    global_variables.reserve(global_defined_variables.size());
-    for (auto& [name, variable] : global_defined_variables) { global_variables.emplace_back(variable.handle()); }
+    for (auto& [name, entity] : defined_entities)
+    {
+        Optional<lang::ResolvingHandle<lang::Variable>> variable = entity.handle().as<lang::Variable>();
+        if (variable.hasValue()) global_variables.emplace_back(variable.value());
+    }
 
     lang::GlobalVariable::determineOrder(global_variables, &validation_logger);
 }
 
-template<typename E>
-static void registerEntityUsage(lang::ResolvingHandle<E>                           entity,
-                                std::map<lang::Identifier, lang::OwningHandle<E>>& undefined_entities,
-                                std::map<lang::Identifier, lang::OwningHandle<E>>& defined_entities)
+void lang::UnorderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Entity> entity)
 {
     assert(!entity->isDefined());
 
-    if (undefined_entities.contains(entity->name()))
+    if (undefined_entities_.contains(entity->name()))
     {
-        entity.reroute(undefined_entities.at(entity->name()).handle());
+        entity.reroute(undefined_entities_.at(entity->name()).handle());
         return;
     }
 
-    if (defined_entities.contains(entity->name()))
+    if (defined_entities_.contains(entity->name()))
     {
-        entity.reroute(defined_entities.at(entity->name()).handle());
+        entity.reroute(defined_entities_.at(entity->name()).handle());
         return;
     }
 
-    undefined_entities.emplace(entity->name(), lang::OwningHandle<E>::takeOwnership(entity));
-}
-
-void lang::UnorderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Variable> variable)
-{
-    registerEntityUsage(variable, global_undefined_variables_, global_defined_variables_);
-}
-
-void lang::UnorderedScope::onRegisterUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
-{
-    registerEntityUsage(function_group, undefined_function_groups_, defined_function_groups_);
-}
-
-void lang::UnorderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Type> type)
-{
-    registerEntityUsage(type, undefined_types_, defined_types_);
-}
-
-void lang::UnorderedScope::registerDefinition(lang::ResolvingHandle<lang::Type> type)
-{
-    assert(type->isDefined());
-    assert(not defined_types_.contains(type->name()));
-
-    defined_types_.emplace(type->name(), lang::OwningHandle<lang::Type>::takeOwnership(type));
-    type->setContainingScope(this);
-
-    if (undefined_types_.contains(type->name()))
-    {
-        lang::OwningHandle<lang::Type> undefined = std::move(undefined_types_.at(type->name()));
-        undefined_types_.erase(type->name());
-
-        undefined.handle().reroute(type);
-    }
+    undefined_entities_.emplace(entity->name(), lang::OwningHandle<Entity>::takeOwnership(entity));
 }
 
 void lang::UnorderedScope::resolve()
@@ -240,7 +197,11 @@ void lang::UnorderedScope::resolve()
         for (auto& description : descriptions) { description.description->initialize(*this); }
     }
 
-    for (auto& [key, group] : defined_function_groups_) { group->resolve(); }
+    for (auto& [name, entity] : defined_entities_)
+    {
+        auto function_group = entity.handle().as<FunctionGroup>();
+        if (function_group.hasValue()) (**function_group).resolve();
+    }
 
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
@@ -252,11 +213,19 @@ void lang::UnorderedScope::resolve()
 
 void lang::UnorderedScope::postResolve()
 {
-    for (auto& [name, type] : defined_types_) { type->postResolve(); }
+    for (auto& [name, entity] : defined_entities_)
+    {
+        auto type = entity.handle().as<Type>();
+        if (type.hasValue()) (**type).postResolve();
+    }
 
     onPostResolve();
 
-    for (auto& [key, group] : defined_function_groups_) { group->postResolve(); }
+    for (auto& [name, entity] : defined_entities_)
+    {
+        auto function_group = entity.handle().as<FunctionGroup>();
+        if (function_group.hasValue()) (**function_group).postResolve();
+    }
 
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
@@ -266,48 +235,42 @@ void lang::UnorderedScope::postResolve()
     Scope::postResolve();
 }
 
-template<typename E>
-static bool resolveEntityDefinition(lang::ResolvingHandle<E>                           entity,
-                                    std::map<lang::Identifier, lang::OwningHandle<E>>& defined_entities)
+bool lang::UnorderedScope::resolveDefinition(lang::ResolvingHandle<lang::Entity> entity)
 {
-    if (defined_entities.contains(entity->name()))
+    if (defined_entities_.contains(entity->name()))
     {
-        entity.reroute(defined_entities.at(entity->name()).handle());
+        entity.reroute(defined_entities_.at(entity->name()).handle());
         return true;
     }
+
+    lang::Scope* parent = scope();
+
+    if (parent != this) return parent->resolveDefinition(entity);
 
     return false;
 }
 
-bool lang::UnorderedScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
-{
-    return resolveEntityDefinition(variable, global_defined_variables_);
-}
-
-bool lang::UnorderedScope::resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group)
-{
-    return resolveEntityDefinition(function_group, defined_function_groups_);
-}
-
-bool lang::UnorderedScope::resolveDefinition(lang::ResolvingHandle<lang::Type> type)
-{
-    return resolveEntityDefinition(type, defined_types_);
-}
-
 void lang::UnorderedScope::buildInitialization(CompileContext& context)
 {
-    std::vector<lang::ResolvingHandle<lang::Variable>> global_variables;
-    global_variables.reserve(global_defined_variables_.size());
-    for (auto& [name, variable] : global_defined_variables_) { global_variables.emplace_back(variable.handle()); }
+    std::vector<lang::ResolvingHandle<lang::Variable>> variables;
+    for (auto& [name, entity] : defined_entities_)
+    {
+        auto variable = entity.handle().as<Variable>();
+        if (variable.hasValue()) variables.emplace_back(variable.value());
+    }
 
-    global_variables = GlobalVariable::determineOrder(global_variables, nullptr);
+    variables = GlobalVariable::determineOrder(variables, nullptr);
 
-    for (auto& variable : global_variables) { variable->buildDefinition(context); }
+    for (auto& variable : variables) { variable->buildDefinition(context); }
 }
 
 void lang::UnorderedScope::buildFinalization(CompileContext& context)
 {
-    for (auto& [name, variable] : global_defined_variables_) { variable->buildFinalization(context); }
+    for (auto& [name, entity] : defined_entities_)
+    {
+        auto variable = entity.handle().as<Variable>();
+        if (variable.hasValue()) (**variable).buildFinalization(context);
+    }
 }
 
 std::map<lang::Identifier, std::vector<lang::UnorderedScope::AssociatedDescription>>& lang::UnorderedScope::
@@ -324,28 +287,85 @@ std::map<lang::Identifier, std::vector<lang::UnorderedScope::AssociatedDescripti
 
 lang::ResolvingHandle<lang::FunctionGroup> lang::UnorderedScope::prepareDefinedFunctionGroup(Identifier name)
 {
-    if (defined_function_groups_.find(name) != defined_function_groups_.end())
+    if (defined_entities_.contains(name))
     {
-        return defined_function_groups_.at(name).handle();
+        auto function_group = defined_entities_.at(name).handle().as<FunctionGroup>();
+        if (function_group.hasValue()) return function_group.value();
+
+        throw std::logic_error("Entity with name '" + name + "' is not a function group.");
     }
 
-    Optional<lang::OwningHandle<lang::FunctionGroup>> undefined;
+    lang::OwningHandle<lang::FunctionGroup> function_group =
+        lang::OwningHandle<lang::FunctionGroup>::takeOwnership(lang::makeHandled<lang::FunctionGroup>(name));
 
-    if (undefined_function_groups_.contains(name))
+    if (undefined_entities_.contains(name))
     {
-        undefined = std::move(undefined_function_groups_.at(name));
-        undefined_function_groups_.erase(name);
-    }
-    else
-    {
-        undefined =
-            lang::OwningHandle<lang::FunctionGroup>::takeOwnership(lang::makeHandled<lang::FunctionGroup>(name));
+        undefined_entities_.at(name).handle().reroute(function_group.handle());
+        undefined_entities_.erase(name);
     }
 
-    lang::ResolvingHandle<lang::FunctionGroup> defined = undefined->handle();
-    defined_function_groups_.emplace(name, std::move(undefined.value()));
+    lang::ResolvingHandle<lang::FunctionGroup> handle = function_group.handle();
+    defined_entities_.emplace(name, std::move(function_group));
 
-    defined->setScope(*this);
+    handle->setScope(*this);
 
-    return defined;
+    return handle;
+}
+
+template<typename Target>
+static std::vector<lang::ResolvingHandle<Target>> getHandles(
+    std::map<lang::Identifier, lang::OwningHandle<lang::Entity>>& entities)
+{
+    std::vector<lang::ResolvingHandle<Target>> result;
+    for (auto& [name, entity] : entities)
+    {
+        auto target = entity.handle().as<Target>();
+        if (target.hasValue()) result.emplace_back(target.value());
+    }
+
+    return result;
+}
+
+template<typename Target>
+static std::vector<std::reference_wrapper<Target const>> getReferences(
+    std::map<lang::Identifier, lang::OwningHandle<lang::Entity>> const& entities)
+{
+    std::vector<std::reference_wrapper<Target const>> result;
+    for (auto& [name, entity] : entities)
+    {
+        auto target = entity.handle().get().as<Target>();
+        if (target != nullptr) result.emplace_back(*target);
+    }
+
+    return result;
+}
+
+std::vector<lang::ResolvingHandle<lang::FunctionGroup>> lang::UnorderedScope::getFunctionGroups()
+{
+    return getHandles<FunctionGroup>(defined_entities_);
+}
+
+std::vector<std::reference_wrapper<const lang::FunctionGroup>> lang::UnorderedScope::getFunctionGroups() const
+{
+    return getReferences<FunctionGroup>(defined_entities_);
+}
+
+std::vector<lang::ResolvingHandle<lang::Variable>> lang::UnorderedScope::getVariables()
+{
+    return getHandles<Variable>(defined_entities_);
+}
+
+std::vector<std::reference_wrapper<const lang::Variable>> lang::UnorderedScope::getVariables() const
+{
+    return getReferences<Variable>(defined_entities_);
+}
+
+std::vector<lang::ResolvingHandle<lang::Type>> lang::UnorderedScope::getTypes()
+{
+    return getHandles<Type>(defined_entities_);
+}
+
+std::vector<std::reference_wrapper<const lang::Type>> lang::UnorderedScope::getTypes() const
+{
+    return getReferences<Type>(defined_entities_);
 }

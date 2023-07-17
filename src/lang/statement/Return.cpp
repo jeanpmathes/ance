@@ -49,7 +49,7 @@ Statements Return::expandWith(Expressions subexpressions, Statements, lang::Cont
 
         statements.emplace_back(
             makeOwned<LocalVariableDefinition>(temp_name,
-                                               expression()->type().createUndefinedClone(new_context),
+                                               expression()->type().getUndefinedTypeClone(new_context),
                                                location(),
                                                lang::Assigner::COPY_ASSIGNMENT,
                                                std::move(subexpressions[0]),

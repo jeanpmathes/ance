@@ -24,21 +24,19 @@ class FunctionCall
   public:
     /**
      * Create a new function call.
-     * @param function_group The function group to call, if there is any.
-     * @param type_function_group A type to be used instead of the function group, if necessary.
+     * @param callable The callable to call.
      * @param arguments The arguments to pass to the called function.
      * @param location The source location.
      */
-    FunctionCall(Optional<lang::ResolvingHandle<lang::FunctionGroup>> function_group,
-                 lang::ResolvingHandle<lang::Type>                    type_function_group,
-                 std::vector<Owned<Expression>>                       arguments,
-                 lang::Location                                       location);
+    FunctionCall(lang::ResolvingHandle<lang::Entity> callable,
+                 std::vector<Owned<Expression>>      arguments,
+                 lang::Location                      location);
 
     [[nodiscard]] lang::Callable const&                                 callable() const;
     [[nodiscard]] std::vector<std::reference_wrapper<Expression const>> arguments() const;
 
   private:
-    lang::Callable& getCallable();
+    lang::Callable& callable();
 
   protected:
     void walkDefinitions() override;
@@ -60,9 +58,8 @@ class FunctionCall
     std::vector<lang::ResolvingHandle<lang::Function>>    function();
     std::vector<std::reference_wrapper<lang::Type const>> argumentTypes() const;
 
-    Optional<lang::ResolvingHandle<lang::FunctionGroup>> function_group_;
-    lang::ResolvingHandle<lang::Type>                    type_function_group_;
-    std::vector<Owned<Expression>>                       arguments_;
+    lang::ResolvingHandle<lang::Entity> callable_;
+    std::vector<Owned<Expression>>      arguments_;
 
     mutable lang::Callable const*                              used_callable_ {};
     mutable bool                                               overload_resolved_ {false};

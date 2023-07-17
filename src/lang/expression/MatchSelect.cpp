@@ -81,7 +81,7 @@ Expression::Expansion MatchSelect::expandWith(Expressions subexpressions, lang::
     Statements statements;
 
     statements.emplace_back(makeOwned<LocalVariableDefinition>(temp_name,
-                                                               type().createUndefinedClone(new_context),
+                                                               type().getUndefinedTypeClone(new_context),
                                                                location(),
                                                                lang::Assigner::COPY_ASSIGNMENT,
                                                                std::nullopt,

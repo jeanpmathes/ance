@@ -22,45 +22,37 @@ namespace lang
         [[nodiscard]] bool isNameConflicted(lang::Identifier const& name) const override;
 
         void addDescription(Owned<lang::Description> description) override;
-        void addFunction(lang::OwningHandle<lang::Function> function) override;
-        void addVariable(lang::OwningHandle<lang::Variable> variable) override;
-        void addType(lang::OwningHandle<lang::Type> type) override;
+        void addEntity(lang::OwningHandle<lang::Entity> entity) override;
 
         /**
-         * Prepare the definition of a new variable. This will block resolution above this scope.
-         * @param name The name of the variable.
+         * Prepare the definition of a new entity. This will block resolution above this scope.
+         * @param name The name of the entity.
          */
         void prepareDefinition(Identifier name);
 
         /**
-         * Drop a variable. A variable must be defined in this scope to be dropped.
-         * @param variable The variable to drop.
-         * @return True if the variable was dropped, false otherwise.
+         * Drop an. An entity must be defined in this scope to be dropped.
+         * @param entity The entity to drop.
+         * @return True if the entity was dropped, false otherwise.
          */
-        bool drop(lang::ResolvingHandle<lang::Variable> variable);
+        bool drop(lang::ResolvingHandle<lang::Entity> entity);
 
         /**
-         * Check if a variable with the specified name was defined and then dropped.
-         * @param variable The variable to check.
-         * @return True if the variable was dropped, false otherwise.
+         * Check if an entity with the specified name was defined and then dropped.
+         * @param entity The entity to check.
+         * @return True if the entity was dropped, false otherwise.
          */
-        [[nodiscard]] bool wasVariableDropped(lang::Variable const& variable) const;
+        [[nodiscard]] bool wasEntityDropped(lang::Entity const& entity) const;
 
-        void onRegisterUsage(lang::ResolvingHandle<lang::Variable> variable) override;
-        void onRegisterUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
-        void onRegisterUsage(lang::ResolvingHandle<lang::Type> type) override;
+        void onRegisterUsage(lang::ResolvingHandle<lang::Entity> entity) override;
 
-        void registerDefinition(lang::ResolvingHandle<lang::Type> type) override;
-
-        Optional<OwningHandle<lang::Variable>> connectWithDefinitionAccordingToOrdering(
-            lang::OwningHandle<lang::Variable> variable) override;
+        Optional<OwningHandle<lang::Entity>> connectWithDefinitionAccordingToOrdering(
+            lang::OwningHandle<lang::Entity> variable) override;
 
         void resolve() override;
         void postResolve() override;
 
-        bool resolveDefinition(lang::ResolvingHandle<lang::Variable> variable) override;
-        bool resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group) override;
-        bool resolveDefinition(lang::ResolvingHandle<lang::Type> type) override;
+        bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) override;
 
         /**
          * Build all variable declarations.
@@ -75,19 +67,10 @@ namespace lang
       private:
         std::set<lang::Identifier> blockers_ {};
 
-        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>>              undefined_variables_ {};
-        std::map<lang::Identifier, lang::OwningHandle<lang::Variable>>              blocked_variables_ {};
-        std::map<lang::Identifier, std::vector<lang::OwningHandle<lang::Variable>>> defined_variables_ {};
-
-        std::map<lang::Identifier, lang::ResolvingHandle<lang::Variable>> active_variables_ {};
-
-        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>>         undefined_function_groups_ {};
-        std::map<lang::Identifier, lang::OwningHandle<lang::FunctionGroup>>         blocked_function_groups_ {};
-        std::map<lang::Identifier, std::vector<lang::OwningHandle<lang::Function>>> defined_functions_ {};
-
-        std::map<lang::Identifier, lang::OwningHandle<lang::Type>>              undefined_types_ {};
-        std::map<lang::Identifier, lang::OwningHandle<lang::Type>>              blocked_types_ {};
-        std::map<lang::Identifier, std::vector<lang::OwningHandle<lang::Type>>> defined_types_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::Entity>>              undefined_entities_ {};
+        std::map<lang::Identifier, lang::OwningHandle<lang::Entity>>              blocked_entities_ {};
+        std::map<lang::Identifier, std::vector<lang::OwningHandle<lang::Entity>>> defined_entities_ {};
+        std::map<lang::Identifier, lang::ResolvingHandle<lang::Entity>>           active_entities_ {};
 
         std::map<lang::Identifier, std::vector<Owned<lang::Description>>> descriptions_ {};
 

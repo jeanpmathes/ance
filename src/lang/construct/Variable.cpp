@@ -73,7 +73,12 @@ lang::Identifier const& lang::Variable::name() const
     return name_;
 }
 
-lang::Scope* lang::Variable::scope() const
+lang::Scope* lang::Variable::scope()
+{
+    return definition_.hasValue() ? definition_.value()->scope() : nullptr;
+}
+
+lang::Scope const* lang::Variable::scope() const
 {
     return definition_.hasValue() ? definition_.value()->scope() : nullptr;
 }
@@ -150,11 +155,6 @@ void lang::Variable::setValue(Shared<Value> value, CompileContext& context)
     definition_.value()->setValue(value, context);
 }
 
-lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const
-{
-    return lang::makeHandled<lang::Variable>(name());
-}
-
 std::vector<lang::ResolvingHandle<lang::Variable>> lang::Variable::getVariableDependencies()
 {
     return definition_.value()->getVariableDependencies();
@@ -163,4 +163,14 @@ std::vector<lang::ResolvingHandle<lang::Variable>> lang::Variable::getVariableDe
 std::vector<lang::ResolvingHandle<lang::Function>> lang::Variable::getFunctionDependencies()
 {
     return definition_.value()->getFunctionDependencies();
+}
+
+lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const
+{
+    return lang::makeHandled<lang::Variable>(name());
+}
+
+lang::ResolvingHandle<lang::Entity> lang::Variable::getUndefinedClone(lang::Context&) const
+{
+    return toUndefined();
 }

@@ -127,5 +127,5 @@ lang::Type const* lang::PointerType::getPointeeType() const
 
 lang::ResolvingHandle<lang::Type> lang::PointerType::clone(lang::Context& new_context) const
 {
-    return new_context.getPointerType(element_type_->createUndefinedClone(new_context));
+    return new_context.getPointerType(element_type_->getUndefinedTypeClone(new_context));
 }

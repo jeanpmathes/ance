@@ -54,7 +54,7 @@ std::reference_wrapper<lang::Visitable<ANCE_CONSTRUCTS> const> Case::code() cons
 
     if (std::holds_alternative<Owned<Expression>>(code_)) { return *std::get<Owned<Expression>>(code_); }
 
-    throw std::runtime_error("Case::code() called on invalid case");
+    throw std::logic_error("Case::code() called on invalid case");
 }
 
 void Case::setContainingScope(lang::Scope& scope)

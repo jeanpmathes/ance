@@ -2,6 +2,7 @@
 #define ANCE_SRC_LANG_ELEMENT_H_
 
 #include "lang/Visitor.h"
+
 #include "lang/utility/Location.h"
 
 namespace lang

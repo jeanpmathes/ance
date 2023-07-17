@@ -79,7 +79,7 @@ void LocalVariableDefinition::walkDefinitions()
                                                                                          location());
     variable_                                   = variable.handle();
 
-    scope()->addVariable(std::move(variable));
+    scope()->addEntity(std::move(variable));
     if (type_opt_.hasValue()) scope()->registerUsageIfUndefined(type_opt_.value());
 }
 
@@ -135,7 +135,7 @@ Statements LocalVariableDefinition::expandWith(Expressions subexpressions, State
     Statements statements;
 
     Optional<lang::ResolvingHandle<lang::Type>> type;
-    if (type_opt_.hasValue()) type = type_opt_.value()->createUndefinedClone(new_context);
+    if (type_opt_.hasValue()) type = type_opt_.value()->getUndefinedTypeClone(new_context);
 
     Optional<Owned<Expression>> assigned;
     if (subexpressions.size() == 1) assigned = std::move(subexpressions[0]);

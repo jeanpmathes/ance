@@ -17,22 +17,12 @@ void lang::OrderedScope::addDescription(Owned<lang::Description> description)
     descriptions_[description->name()].emplace_back(std::move(description));
 }
 
-void lang::OrderedScope::addFunction(lang::OwningHandle<lang::Function> function)
+void lang::OrderedScope::addEntity(lang::OwningHandle<lang::Entity> entity)
 {
-    defined_functions_[function->name()].emplace_back(std::move(function));
-}
+    assert(blockers_.contains(entity->name()));
 
-void lang::OrderedScope::addVariable(lang::OwningHandle<lang::Variable> variable)
-{
-    assert(blockers_.contains(variable->name()));
-
-    active_variables_.insert_or_assign(variable->name(), variable.handle());
-    defined_variables_[variable->name()].emplace_back(std::move(variable));
-}
-
-void lang::OrderedScope::addType(lang::OwningHandle<lang::Type> type)
-{
-    defined_types_[type->name()].emplace_back(std::move(type));
+    active_entities_.insert_or_assign(entity->name(), entity.handle());
+    defined_entities_[entity->name()].emplace_back(std::move(entity));
 }
 
 void lang::OrderedScope::prepareDefinition(lang::Identifier name)
@@ -40,105 +30,49 @@ void lang::OrderedScope::prepareDefinition(lang::Identifier name)
     blockers_.emplace(name);
 }
 
-bool lang::OrderedScope::drop(lang::ResolvingHandle<lang::Variable> variable)
+bool lang::OrderedScope::drop(lang::ResolvingHandle<lang::Entity> entity)
 {
-    if (!variable->isDefined() || !active_variables_.contains(variable->name())) return false;
+    if (!entity->isDefined() || !active_entities_.contains(entity->name())) return false;
 
-    active_variables_.erase(variable->name());
+    active_entities_.erase(entity->name());
 
     return true;
 }
 
-bool lang::OrderedScope::wasVariableDropped(lang::Variable const& variable) const
+bool lang::OrderedScope::wasEntityDropped(lang::Entity const& entity) const
 {
-    return !active_variables_.contains(variable.name()) && defined_variables_.contains(variable.name());
+    return !active_entities_.contains(entity.name()) && defined_entities_.contains(entity.name());
 }
 
-void lang::OrderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Variable> variable)
+void lang::OrderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Entity> entity)
 {
-    assert(!variable->isDefined());
+    assert(!entity->isDefined());
 
-    if (undefined_variables_.contains(variable->name()))
+    if (undefined_entities_.contains(entity->name()))
     {
-        variable.reroute(undefined_variables_.at(variable->name()).handle());
+        entity.reroute(undefined_entities_.at(entity->name()).handle());
         return;
     }
 
-    lang::Scope*                           current        = this;
-    Optional<OwningHandle<lang::Variable>> owned_variable = lang::OwningHandle<lang::Variable>::takeOwnership(variable);
+    lang::Scope*                         current      = this;
+    Optional<OwningHandle<lang::Entity>> owned_entity = lang::OwningHandle<lang::Entity>::takeOwnership(entity);
 
     while (current != current->scope())
     {
-        owned_variable = current->connectWithDefinitionAccordingToOrdering(std::move(owned_variable.value()));
-        if (!owned_variable.hasValue()) return;
+        owned_entity = current->connectWithDefinitionAccordingToOrdering(std::move(owned_entity.value()));
+        if (!owned_entity.hasValue()) return;
         current = current->scope();
     }
 
-    undefined_variables_.emplace(variable->name(), std::move(owned_variable.value()));
+    undefined_entities_.emplace(entity->name(), std::move(owned_entity.value()));
 }
 
-void lang::OrderedScope::onRegisterUsage(lang::ResolvingHandle<lang::FunctionGroup> function_group)
+Optional<lang::OwningHandle<lang::Entity>> lang::OrderedScope::connectWithDefinitionAccordingToOrdering(
+    lang::OwningHandle<lang::Entity> variable)
 {
-    assert(!function_group->isDefined());
+    auto it = active_entities_.find(variable->name());
 
-    if (undefined_function_groups_.find(function_group->name()) != undefined_function_groups_.end())
-    {
-        function_group.reroute(undefined_function_groups_.at(function_group->name()).handle());
-        return;
-    }
-
-    if (blockers_.contains(function_group->name()))
-    {
-        if (blocked_function_groups_.contains(function_group->name()))
-        {
-            function_group.reroute(blocked_function_groups_.at(function_group->name()).handle());
-        }
-        else
-        {
-            blocked_function_groups_.at(function_group->name()) =
-                lang::OwningHandle<lang::FunctionGroup>::takeOwnership(function_group);
-        }
-
-        return;
-    }
-
-    undefined_function_groups_.emplace(function_group->name(),
-                                       lang::OwningHandle<lang::FunctionGroup>::takeOwnership(function_group));
-}
-
-void lang::OrderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Type> type)
-{
-    assert(!type->isDefined());
-
-    if (undefined_types_.contains(type->name()))
-    {
-        type.reroute(undefined_types_.at(type->name()).handle());
-        return;
-    }
-
-    if (blockers_.contains(type->name()))
-    {
-        if (blocked_types_.contains(type->name())) { type.reroute(blocked_types_.at(type->name()).handle()); }
-        else { blocked_types_.emplace(type->name(), lang::OwningHandle<lang::Type>::takeOwnership(type)); }
-
-        return;
-    }
-
-    undefined_types_.emplace(type->name(), lang::OwningHandle<lang::Type>::takeOwnership(type));
-}
-
-void lang::OrderedScope::registerDefinition(lang::ResolvingHandle<lang::Type> type)
-{
-    assert(type->isDefined());
-    // Not yet supported.
-}
-
-Optional<lang::OwningHandle<lang::Variable>> lang::OrderedScope::connectWithDefinitionAccordingToOrdering(
-    lang::OwningHandle<lang::Variable> variable)
-{
-    auto it = active_variables_.find(variable->name());
-
-    if (it != active_variables_.end())
+    if (it != active_entities_.end())
     {
         variable.handle().reroute(it->second);
         return std::nullopt;
@@ -146,30 +80,16 @@ Optional<lang::OwningHandle<lang::Variable>> lang::OrderedScope::connectWithDefi
 
     if (blockers_.contains(variable->name()))
     {
-        if (blocked_variables_.contains(variable->name()))
+        if (blocked_entities_.contains(variable->name()))
         {
-            variable.handle().reroute(blocked_variables_.at(variable->name()).handle());
+            variable.handle().reroute(blocked_entities_.at(variable->name()).handle());
         }
-        else { blocked_variables_.emplace(variable->name(), std::move(variable)); }
+        else { blocked_entities_.emplace(variable->name(), std::move(variable)); }
 
         return std::nullopt;
     }
 
     return variable;
-}
-
-template<typename E>
-static void resolveEntities(lang::Scope& scope, std::map<lang::Identifier, E>& entities)
-{
-    auto it = entities.begin();
-
-    while (it != entities.end())
-    {
-        auto& [name, entity] = *it;
-
-        if (scope.resolveDefinition(entity.handle())) { it = entities.erase(it); }
-        else { ++it; }
-    }
 }
 
 void lang::OrderedScope::resolve()
@@ -178,9 +98,15 @@ void lang::OrderedScope::resolve()
 
     lang::Scope& parent = *scope();
 
-    resolveEntities(parent, undefined_function_groups_);
-    resolveEntities(parent, undefined_variables_);
-    resolveEntities(parent, undefined_types_);
+    auto iterator = undefined_entities_.begin();
+
+    while (iterator != undefined_entities_.end())
+    {
+        auto& [name, entity] = *iterator;
+
+        if (parent.resolveDefinition(entity.handle())) { iterator = undefined_entities_.erase(iterator); }
+        else { ++iterator; }
+    }
 }
 
 void lang::OrderedScope::postResolve()
@@ -190,29 +116,21 @@ void lang::OrderedScope::postResolve()
     Scope::postResolve();
 }
 
-bool lang::OrderedScope::resolveDefinition(lang::ResolvingHandle<lang::Variable> variable)
+bool lang::OrderedScope::resolveDefinition(lang::ResolvingHandle<lang::Entity> entity)
 {
-    // If the variable were defined in this scope, we would have found it when registering the usage.
-    return scope()->resolveDefinition(variable);
-}
-
-bool lang::OrderedScope::resolveDefinition(lang::ResolvingHandle<lang::FunctionGroup> function_group)
-{
-    // If the variable were defined in this scope, we would have found it when registering the usage.
-    return scope()->resolveDefinition(function_group);
-}
-
-bool lang::OrderedScope::resolveDefinition(lang::ResolvingHandle<lang::Type> type)
-{
-    // If the variable were defined in this scope, we would have found it when registering the usage.
-    return scope()->resolveDefinition(type);
+    // If the entity were defined in this scope, we would have found it when registering the usage.
+    return scope()->resolveDefinition(entity);
 }
 
 void lang::OrderedScope::buildDeclarations(CompileContext& context)
 {
-    for (auto& [name, variables] : defined_variables_)
+    for (auto& [name, entities] : defined_entities_)
     {
-        for (auto& variable : variables) { variable->buildDeclaration(context); }
+        for (auto& entity : entities)
+        {
+            Optional<lang::ResolvingHandle<lang::Variable>> variable = entity.handle().as<lang::Variable>();
+            if (variable.hasValue()) { (**variable).buildDeclaration(context); }
+        }
     }
     for (auto& sub_scope : sub_scopes_)
     {
@@ -222,7 +140,11 @@ void lang::OrderedScope::buildDeclarations(CompileContext& context)
 
 void lang::OrderedScope::buildFinalization(CompileContext& context)
 {
-    for (auto& [name, variable] : active_variables_) { variable->buildFinalization(context); }
+    for (auto& [name, entity] : active_entities_)
+    {
+        Optional<lang::ResolvingHandle<lang::Variable>> variable = entity.as<lang::Variable>();
+        if (variable.hasValue()) { (**variable).buildFinalization(context); }
+    }
 }
 
 void lang::OrderedScope::onSubScope(lang::Scope* sub_scope)

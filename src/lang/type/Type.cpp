@@ -11,7 +11,6 @@
 #include "lang/type/VectorType.h"
 #include "lang/utility/Identifier.h"
 #include "lang/utility/Storage.h"
-#include "validation/ValidationLogger.h"
 
 lang::Type::Type(Identifier name) : name_(name)
 {
@@ -27,7 +26,7 @@ lang::Type::Type() : name_(lang::Identifier::like("")) {}
 
 lang::ResolvingHandle<lang::Type> lang::Type::getUndefined()
 {
-    return ResolvingHandle<Type>(Owned<Type>(*(new Type())));
+    return wrapHandled(Owned<Type>(*(new Type())));
 }
 
 lang::Identifier const& lang::Type::name() const
@@ -655,11 +654,16 @@ Shared<lang::Value> lang::Type::makeActual(Shared<lang::Value> value)
     return makeShared<lang::RoughlyCastedValue>(actual_type, value);
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::createUndefinedClone(lang::Context& new_context) const
+lang::ResolvingHandle<lang::Type> lang::Type::getUndefinedTypeClone(lang::Context& new_context) const
 {
     if (isDefined() && !isCustom()) return definition_.value()->clone(new_context);
 
     return lang::makeHandled<lang::Type>(name());
+}
+
+lang::ResolvingHandle<lang::Entity> lang::Type::getUndefinedClone(lang::Context& new_context) const
+{
+    return getUndefinedTypeClone(new_context);
 }
 
 lang::ResolvingHandle<lang::Type> lang::Type::getDetachedIfUndefined()

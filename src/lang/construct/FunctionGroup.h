@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "lang/construct/Entity.h"
+
 #include "lang/construct/Function.h"
 #include "lang/utility/OwningHandle.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -18,6 +20,7 @@ namespace lang
     class FunctionGroup
         : public HandleTarget<FunctionGroup>
         , public Callable
+        , public Entity
     {
       public:
         explicit FunctionGroup(Identifier name);
@@ -27,8 +30,8 @@ namespace lang
 
         void setScope(lang::Scope& scope);
 
-        lang::Scope*                     scope();
-        [[nodiscard]] lang::Scope const* scope() const;
+        lang::Scope*                     scope() override;
+        [[nodiscard]] lang::Scope const* scope() const override;
 
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
 
@@ -40,10 +43,7 @@ namespace lang
         void createNativeBacking(CompileContext& compile_context);
         void build(CompileContext& compile_context);
 
-        /**
-         * Get an undefined function group with the same name.
-         */
-        [[nodiscard]] lang::ResolvingHandle<lang::FunctionGroup> toUndefined() const;
+        ResolvingHandle<lang::Entity> getUndefinedClone(Context& new_context) const override;
 
       private:
         lang::Identifier name_;

@@ -9,43 +9,31 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-FunctionCall::FunctionCall(Optional<lang::ResolvingHandle<lang::FunctionGroup>> function_group,
-                           lang::ResolvingHandle<lang::Type>                    type_function_group,
-                           std::vector<Owned<Expression>>                       arguments,
-                           lang::Location                                       location)
+FunctionCall::FunctionCall(lang::ResolvingHandle<lang::Entity> callable,
+                           std::vector<Owned<Expression>>      arguments,
+                           lang::Location                      location)
     : Expression(location)
-    , function_group_(std::move(function_group))
-    , type_function_group_(std::move(type_function_group))
+    , callable_(callable)
     , arguments_(std::move(arguments))
 {
     for (auto& argument : arguments_) { addSubexpression(*argument); }
 }
 
-template<typename OUT, typename IN>
-struct GetCallable {
-    static OUT get(IN self)
-    {
-        if (!self->used_callable_)
-        {
-            if (self->function_group_.hasValue() && self->function_group_.value()->isDefined())
-            {
-                self->used_callable_ = &*self->function_group_.value();
-            }
-            else { self->used_callable_ = &*self->type_function_group_; }
-        }
-
-        return const_cast<OUT>(*self->used_callable_);
-    }
-};
-
 lang::Callable const& FunctionCall::callable() const
 {
-    return GetCallable<lang::Callable const&, FunctionCall const*>::get(this);
+    if (used_callable_ == nullptr)
+    {
+        if (callable_.is<lang::FunctionGroup>()) { used_callable_ = callable_.as<lang::FunctionGroup>(); }
+        else if (callable_.is<lang::Type>()) { used_callable_ = callable_.as<lang::Type>(); }
+        else throw std::logic_error("Callable is neither a function group nor a type.");
+    }
+
+    return *used_callable_;
 }
 
-lang::Callable& FunctionCall::getCallable()
+lang::Callable& FunctionCall::callable()
 {
-    return GetCallable<lang::Callable&, FunctionCall*>::get(this);
+    return const_cast<lang::Callable&>(static_cast<FunctionCall const*>(this)->callable());
 }
 
 std::vector<std::reference_wrapper<Expression const>> FunctionCall::arguments() const
@@ -62,8 +50,7 @@ void FunctionCall::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    if (function_group_.hasValue()) scope()->registerUsage(function_group_.value());
-    if (!type_function_group_->isDefined()) scope()->registerUsage(type_function_group_);
+    scope()->registerUsageIfUndefined(callable_);
 }
 
 void FunctionCall::postResolve()
@@ -82,7 +69,7 @@ void FunctionCall::postResolve()
         argument_types.emplace_back(argument_type);
     }
 
-    getCallable().requestOverload(argument_types);
+    callable().requestOverload(argument_types);
 
     if (function().size() == 1 && function().front()->isDefined()) scope()->addDependency(function().front());
 
@@ -151,13 +138,8 @@ bool FunctionCall::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion FunctionCall::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
-    Optional<lang::ResolvingHandle<lang::FunctionGroup>> fng;
-
     return {Statements(),
-            makeOwned<FunctionCall>(function_group_.hasValue() ? function_group_.value()->toUndefined() : fng,
-                                    type_function_group_->createUndefinedClone(new_context),
-                                    std::move(subexpressions),
-                                    location()),
+            makeOwned<FunctionCall>(callable_->getUndefinedClone(new_context), std::move(subexpressions), location()),
             Statements()};
 }
 
@@ -176,7 +158,7 @@ std::vector<lang::ResolvingHandle<lang::Function>> FunctionCall::function()
 {
     if (!overload_resolved_)
     {
-        function_          = getCallable().resolveOverload(argumentTypes());
+        function_          = callable().resolveOverload(argumentTypes());
         overload_resolved_ = true;
     }
 

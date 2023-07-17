@@ -52,7 +52,7 @@ void lang::AliasDescription::performInitialization()
 
     self_ = type.handle();
 
-    scope().addType(std::move(type));
+    scope().addEntity(std::move(type));
     scope().registerUsageIfUndefined(actual_);
 }
 
@@ -89,7 +89,7 @@ lang::Description::Descriptions lang::AliasDescription::expand(lang::Context& ne
 
     result.emplace_back(makeOwned<AliasDescription>(access(),
                                                     name_,
-                                                    actual_->createUndefinedClone(new_context),
+                                                    actual_->getUndefinedTypeClone(new_context),
                                                     definition_location_,
                                                     actual_type_location_));
 

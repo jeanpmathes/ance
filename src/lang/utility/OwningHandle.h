@@ -17,7 +17,28 @@ namespace lang
         OwningHandle(OwningHandle&& other) noexcept            = default;
         OwningHandle& operator=(OwningHandle&& other) noexcept = default;
 
+        template<typename U>
+            requires MoveConvertible<T*, U*>
+        explicit(false) OwningHandle(OwningHandle<U>&& value) noexcept;// NOLINT(google-explicit-constructor)
+
+        template<typename U>
+            requires MoveConvertible<T*, U*>
+        OwningHandle<T>& operator=(OwningHandle<U>&& value) noexcept;
+
+        /**
+         * Take ownership of a resolving handle.
+         * @param handle The handle to take ownership of. It must currently own itself.
+         * @return The owning handle.
+         */
         static lang::OwningHandle<T> takeOwnership(lang::ResolvingHandle<T> handle);
+
+        /**
+         * Cast an owning handle of different type to this type.
+         * @param owning_handle The handle to cast.
+         * @return The casted handle.
+         */
+        template<typename Original>
+        static lang::OwningHandle<T> cast(lang::OwningHandle<Original>&& owning_handle);
 
         lang::ResolvingHandle<T>                               handle();
         std::reference_wrapper<lang::ResolvingHandle<T> const> handle() const;
@@ -31,6 +52,9 @@ namespace lang
         T const& operator*() const noexcept;
 
         ~OwningHandle();
+
+        template<typename Other>
+        friend class OwningHandle;
 
       private:
         Owned<T>                 owner_ {};

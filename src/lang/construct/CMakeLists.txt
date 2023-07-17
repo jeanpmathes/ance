@@ -3,6 +3,7 @@ add_subdirectory(value)
 add_subdirectory(descriptions)
 
 target_sources(ance PRIVATE
+               Entity.cpp
                BasicBlock.cpp
                BasicBlockDefinitionSimple.cpp
                BasicBlockDefinitionFinalizing.cpp

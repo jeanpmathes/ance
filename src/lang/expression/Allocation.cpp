@@ -79,7 +79,7 @@ Expression::Expansion Allocation::expandWith(Expressions subexpressions, lang::C
     {
         return {Statements(),
                 makeOwned<Allocation>(allocation_,
-                                      allocated_type_->createUndefinedClone(new_context),
+                                      allocated_type_->getUndefinedTypeClone(new_context),
                                       std::move(subexpressions[0]),
                                       location(),
                                       allocated_type_location_,
@@ -90,7 +90,7 @@ Expression::Expansion Allocation::expandWith(Expressions subexpressions, lang::C
     {
         return {Statements(),
                 makeOwned<Allocation>(allocation_,
-                                      allocated_type_->createUndefinedClone(new_context),
+                                      allocated_type_->getUndefinedTypeClone(new_context),
                                       std::nullopt,
                                       location(),
                                       allocated_type_location_,

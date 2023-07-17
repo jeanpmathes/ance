@@ -49,7 +49,7 @@ namespace lang
          */
         [[nodiscard]] lang::Context const& context() const override;
 
-        bool isPartOfFunction() const override;
+        [[nodiscard]] bool isPartOfFunction() const override;
 
         lang::GlobalScope*                     getGlobalScope() override;
         [[nodiscard]] lang::GlobalScope const* getGlobalScope() const override;

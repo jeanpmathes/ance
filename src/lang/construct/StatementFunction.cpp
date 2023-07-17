@@ -59,7 +59,7 @@ void lang::StatementFunction::setup()
                                                                              parameter->location());
         arguments_.emplace_back(parameter_variable.handle());
 
-        function().addVariable(std::move(parameter_variable));
+        function().addEntity(std::move(parameter_variable));
     }
 
     code_.walkDefinitions();

@@ -52,7 +52,7 @@ Statements While::expandWith(Expressions subexpressions, Statements substatement
     Statements statements;
 
     statements.emplace_back(makeOwned<LocalVariableDefinition>(temp_name,
-                                                               condition_->type().createUndefinedClone(new_context),
+                                                               condition_->type().getUndefinedTypeClone(new_context),
                                                                location(),
                                                                lang::Assigner::COPY_ASSIGNMENT,
                                                                std::move(condition),

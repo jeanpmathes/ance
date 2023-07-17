@@ -72,7 +72,7 @@ void lang::FunctionDescription::performInitialization()
 
     function_ = &*function;
 
-    scope().addFunction(std::move(function));
+    scope().addEntity(std::move(function));
 }
 
 lang::Function const* lang::FunctionDescription::function() const
@@ -147,7 +147,7 @@ lang::Description::Descriptions lang::FunctionDescription::expand(lang::Context&
 
     auto expanded = makeOwned<lang::FunctionDescription>(access(),
                                                          name_,
-                                                         return_type_->createUndefinedClone(new_context),
+                                                         return_type_->getUndefinedTypeClone(new_context),
                                                          return_type_location_,
                                                          expanded_parameters,
                                                          std::move(code),

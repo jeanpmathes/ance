@@ -26,7 +26,12 @@ lang::Identifier const& lang::VariableDefinition::name() const
     return self_->name();
 }
 
-lang::Scope* lang::VariableDefinition::scope() const
+lang::Scope* lang::VariableDefinition::scope()
+{
+    return &scope_;
+}
+
+lang::Scope const* lang::VariableDefinition::scope() const
 {
     return &scope_;
 }

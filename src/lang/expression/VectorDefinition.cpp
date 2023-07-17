@@ -103,7 +103,7 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
 Expression::Expansion VectorDefinition::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
     Optional<lang::ResolvingHandle<lang::Type>> type;
-    if (type_.hasValue()) type = type_.value()->createUndefinedClone(new_context);
+    if (type_.hasValue()) type = type_.value()->getUndefinedTypeClone(new_context);
 
     return {Statements(),
             makeOwned<VectorDefinition>(type, type_location_, std::move(subexpressions), location()),

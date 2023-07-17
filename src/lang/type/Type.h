@@ -12,11 +12,13 @@
 #include "lang/BinaryOperator.h"
 #include "lang/UnaryOperator.h"
 #include "lang/construct/Callable.h"
+#include "lang/construct/Entity.h"
 #include "lang/type/StateCount.h"
 #include "lang/type/TypeDefinition.h"
 #include "lang/utility/Identifier.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
+#include "validation/ValidationLogger.h"
 
 namespace lang
 {
@@ -43,6 +45,7 @@ namespace lang
     class Type
         : public Callable
         , public HandleTarget<lang::Type>
+        , public Entity
     {
       public:
         /**
@@ -82,7 +85,7 @@ namespace lang
          * Use this only when the type is safe to use. Otherwise use the other overload.
          * @return The annotated name.
          */
-        [[nodiscard]] std::string getAnnotatedName() const;
+        [[nodiscard]] std::string getAnnotatedName() const override;
         [[nodiscard]] std::string getAnnotatedName(bool is_safe) const override;
 
         /**
@@ -303,19 +306,19 @@ namespace lang
          * Set the scope that contains this type. The type must be already defined.
          * @param scope The scope that contains the type.
          */
-        void setContainingScope(lang::Scope* scope);
+        void setContainingScope(lang::Scope* scope) override;
 
         /**
          * Get the scope that contains this type.
          * @return The scope that contains the type.
          */
-        [[nodiscard]] lang::Scope* scope();
+        [[nodiscard]] lang::Scope* scope() override;
 
         /**
          * Get the scope that contains this type.
          * @return The scope that contains the type.
          */
-        [[nodiscard]] lang::Scope const* scope() const;
+        [[nodiscard]] lang::Scope const* scope() const override;
 
         void postResolve();
 
@@ -636,6 +639,21 @@ namespace lang
         static bool isMatching(lang::Type const& expected, lang::Type const& actual);
 
         /**
+         * Check if an entity is matching the expected cmp type.
+         * @tparam Expected The expected type.
+         * @param actual The actual entity.
+         * @return True if the entity is matching.
+         */
+        template<typename Expected>
+        static bool isMatching(lang::Entity const& actual)
+        {
+            auto const* actual_pointer   = &actual;
+            auto const* expected_pointer = dynamic_cast<Expected const*>(actual_pointer);
+
+            return expected_pointer != nullptr;
+        }
+
+        /**
          * Validate that a type matches the expected type.
          * @param expected The expected type.
          * @param actual The actual type.
@@ -649,6 +667,31 @@ namespace lang
                                   ValidationLogger& validation_logger);
 
         /**
+         * Validate that an entity matches the expected cmp type.
+         * @tparam Expected The expected type.
+         * @param actual The actual entity.
+         * @param expected_name The name of the expected type.
+         * @param location The source location to use for logging.
+         * @param validation_logger The validation logger.
+         * @return True if the entity matches.
+         */
+        template<typename Expected>
+        static bool checkMismatch(lang::Entity const& actual,
+                                  std::string const&  expected_name,
+                                  lang::Location      location,
+                                  ValidationLogger&   validation_logger)
+        {
+            bool const is_matching = isMatching<Expected>(actual);
+
+            if (!is_matching)
+            {
+                validation_logger.logError("Cannot implicitly convert " + actual.getAnnotatedName() + " to '"
+                                               + expected_name + "'",
+                                           location);
+            }
+        }
+
+        /**
          * Transform a value so it matches an expected type.
          * @param expected The expected type.
          * @param value The value to transform.
@@ -658,6 +701,17 @@ namespace lang
         static Shared<lang::Value> makeMatching(lang::ResolvingHandle<lang::Type> expected,
                                                 Shared<lang::Value>               value,
                                                 CompileContext&                   context);
+
+        template<typename Expected>
+        static lang::ResolvingHandle<Expected> makeMatching(lang::ResolvingHandle<Entity> value)
+        {
+            bool const is_matching = isMatching<Expected>(*value);
+
+            if (is_matching) { return value.template as<Expected>().value(); }
+
+            assert(false && "Cannot make the value matching, was mismatch checked before?");
+            throw std::logic_error("Cannot make the value matching, was mismatch checked before?");
+        }
 
         /**
          * Get the referenced type, meaning the type itself if it is not a reference type, or the element type.
@@ -700,7 +754,9 @@ namespace lang
          * Get an undefined type with the same name. Types given by literals cannot be undefined.
          * Therefore, for these types the returned type will already defined - but in the new context.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> createUndefinedClone(lang::Context& new_context) const;
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> getUndefinedTypeClone(lang::Context& new_context) const;
+
+        ResolvingHandle<lang::Entity> getUndefinedClone(Context& new_context) const override;
 
         /**
          * Get a separate type get if the type is undefined, otherwise return the same type.
@@ -742,8 +798,8 @@ namespace lang
         bool operator!=(lang::Type const& other) const;
 
       protected:
-        lang::Callable&       getFunctionSource() override;
-        lang::Callable const& getFunctionSource() const override;
+        lang::Callable&                     getFunctionSource() override;
+        [[nodiscard]] lang::Callable const& getFunctionSource() const override;
 
       private:
         lang::Identifier                      name_;
