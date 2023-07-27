@@ -494,8 +494,7 @@ std::any SourceVisitor::visitAllocation(anceParser::AllocationContext* ctx)
 
     if (ctx->expression()) { count = std::any_cast<Expression*>(visit(ctx->expression())); }
 
-    return static_cast<Expression*>(
-        new Allocation(allocator, type, wrap(count), location(ctx), location(ctx->type()), context()));
+    return static_cast<Expression*>(new Allocation(allocator, type, wrap(count), location(ctx), location(ctx->type())));
 }
 
 std::any SourceVisitor::visitAddressof(anceParser::AddressofContext* ctx)

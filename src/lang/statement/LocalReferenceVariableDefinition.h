@@ -59,9 +59,9 @@ class LocalReferenceVariableDefinition
     void doBuild(CompileContext& context) override;
 
   private:
-    lang::Identifier                  name_;
-    lang::ResolvingHandle<lang::Type> type_;
-    lang::Location                    type_location_;
+    lang::Identifier                    name_;
+    lang::ResolvingHandle<lang::Entity> type_;
+    lang::Location                      type_location_;
     Owned<Expression>                 reference_;
 
     Optional<lang::ResolvingHandle<lang::Variable>> variable_ {};

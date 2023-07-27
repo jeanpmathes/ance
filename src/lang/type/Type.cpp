@@ -759,6 +759,20 @@ lang::Callable const& lang::Type::getFunctionSource() const
     return isDefined() ? getActualType() : *this;
 }
 
+bool lang::Type::isTypeUndefined(lang::Type const&  type,
+                                 lang::Scope const* scope,
+                                 lang::Location     location,
+                                 ValidationLogger&  validation_logger)
+{
+    if (type.isDefined()) return false;
+    if (scope != nullptr && scope->isNameConflicted(type.name()))
+        return true;// Conflict is already logged, no need to log again.
+
+    validation_logger.logError("Name " + type.getAnnotatedName() + " is undefined in current context", location);
+
+    return true;
+}
+
 enum TypeClass : uint8_t
 {
     CUSTOM,

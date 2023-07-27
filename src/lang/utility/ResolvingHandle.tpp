@@ -176,8 +176,8 @@ Shared<lang::HandleNavigator<typename lang::HandleConfig<T>::BaseType>> lang::Re
 template<typename T>
 bool lang::ResolvingHandle<T>::operator==(ResolvingHandle<T> const& other) const
 {
-    T const* target       = get();
-    T const* other_target = other.get();
+    auto const* target       = navigator_->get();
+    auto const* other_target = other.navigator_->get();
 
     return target == other_target;
 }
@@ -191,8 +191,8 @@ bool lang::ResolvingHandle<T>::operator!=(lang::ResolvingHandle<T> const& other)
 template<typename T>
 bool lang::ResolvingHandle<T>::operator<(lang::ResolvingHandle<T> const& other) const
 {
-    T const* target       = get();
-    T const* other_target = other.get();
+    auto const* target       = navigator_->get();
+    auto const* other_target = other.navigator_->get();
 
     return target < other_target;
 }

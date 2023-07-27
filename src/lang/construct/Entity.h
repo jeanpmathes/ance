@@ -88,6 +88,16 @@ namespace lang
          * Therefore, for these entities the returned entity will already defined - but in the new context.
          */
         virtual lang::ResolvingHandle<lang::Entity> getUndefinedClone(lang::Context& new_context) const = 0;
+
+        template<typename Desired>
+        lang::ResolvingHandle<Desired> getUndefinedClone(lang::Context& new_context) const
+        {
+            auto const* self = dynamic_cast<Desired const*>(this);
+
+            if (self != nullptr) { return this->getUndefinedClone(new_context).as<Desired>().value(); }
+
+            return lang::makeHandled<Desired>(name());
+        }
     };
 }
 

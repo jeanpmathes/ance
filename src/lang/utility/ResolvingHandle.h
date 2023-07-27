@@ -74,8 +74,8 @@ namespace lang
         friend class ResolvingHandle;
 
       private:
-        T*       get();
-        T const* get() const;
+        T*                     get();
+        [[nodiscard]] T const* get() const;
 
       public:
         /**

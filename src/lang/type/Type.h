@@ -685,10 +685,12 @@ namespace lang
 
             if (!is_matching)
             {
-                validation_logger.logError("Cannot implicitly convert " + actual.getAnnotatedName() + " to '"
-                                               + expected_name + "'",
+                validation_logger.logError("Cannot implicitly convert " + actual.getAnnotatedName() + " to a "
+                                               + expected_name,
                                            location);
             }
+
+            return !is_matching;
         }
 
         /**
@@ -796,6 +798,14 @@ namespace lang
          * @return True if the types are not equal.
          */
         bool operator!=(lang::Type const& other) const;
+
+        /*
+         * Check whether a type is undefined. If so, a message is logged.
+         */
+        static bool isTypeUndefined(lang::Type const&  type,
+                                    lang::Scope const* scope,
+                                    lang::Location     location,
+                                    ValidationLogger&  validation_logger);
 
       protected:
         lang::Callable&                     getFunctionSource() override;

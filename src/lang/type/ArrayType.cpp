@@ -61,7 +61,7 @@ bool lang::ArrayType::validate(ValidationLogger& validation_logger, lang::Locati
         return false;
     }
 
-    if (lang::validation::isTypeUndefined(element_type_, scope(), element_type_->name().location(), validation_logger))
+    if (lang::Type::isTypeUndefined(element_type_, scope(), element_type_->name().location(), validation_logger))
         return false;
 
     if (element_type_->isReferenceType())

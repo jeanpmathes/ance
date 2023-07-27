@@ -17,9 +17,10 @@ ArrayDefinition::ArrayDefinition(Optional<lang::ResolvingHandle<lang::Type>> typ
     for (auto& element : elements_) { addSubexpression(*element); }
 }
 
-Optional<lang::ResolvingHandle<lang::Type>> const& ArrayDefinition::elementType() const
+Optional<std::reference_wrapper<const lang::Type>> ArrayDefinition::elementType() const
 {
-    return declared_type_;
+    if (declared_type_.hasValue()) return std::cref(*declared_type_.value().as<lang::Type>());
+    return std::nullopt;
 }
 
 std::vector<std::reference_wrapper<Expression const>> ArrayDefinition::values() const
@@ -45,7 +46,10 @@ void ArrayDefinition::defineType(lang::ResolvingHandle<lang::Type> type)
 
     if (declared_type_.hasValue())
     {
-        type.reroute(scope()->context().getArrayType(declared_type_.value(), elements_.size()));
+        if (!declared_type_.value().is<lang::Type>()) return;
+
+        type.reroute(
+            scope()->context().getArrayType(declared_type_.value().as<lang::Type>().value(), elements_.size()));
         return;
     }
 
@@ -75,11 +79,12 @@ bool ArrayDefinition::validate(ValidationLogger& validation_logger) const
 
     if (declared_type_.hasValue())
     {
-        lang::Type const& type = declared_type_.value();
+        if (lang::validation::isUndefined(declared_type_.value(), scope(), type_location_, validation_logger))
+            return false;
+        if (lang::Type::checkMismatch<lang::Type>(declared_type_.value(), "type", type_location_, validation_logger))
+            return false;
 
-        if (lang::validation::isTypeUndefined(type, scope(), type_location_, validation_logger)) return false;
-
-        assert(this->type().getElementType() == type);
+        assert(this->type().getElementType() == *declared_type_.value().as<lang::Type>());
     }
     else
     {
@@ -108,7 +113,7 @@ bool ArrayDefinition::validate(ValidationLogger& validation_logger) const
 Expression::Expansion ArrayDefinition::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
     Optional<lang::ResolvingHandle<lang::Type>> type;
-    if (declared_type_.hasValue()) type = declared_type_.value()->getUndefinedTypeClone(new_context);
+    if (declared_type_.hasValue()) type = declared_type_.value()->getUndefinedClone<lang::Type>(new_context);
 
     return {Statements(),
             makeOwned<ArrayDefinition>(type, type_location_, std::move(subexpressions), location()),
@@ -119,6 +124,7 @@ void ArrayDefinition::doBuild(CompileContext& context)
 {
     std::vector<Shared<lang::Value>> elements;
 
+    elements.reserve(elements_.size());
     for (auto& element : elements_)
     {
         elements.push_back(lang::Type::makeMatching(type()->getElementType(), element->getValue(), context));

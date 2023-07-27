@@ -10,18 +10,17 @@ VectorDefinition::VectorDefinition(Optional<lang::ResolvingHandle<lang::Type>> t
                                    std::vector<Owned<Expression>>              elements,
                                    lang::Location                              location)
     : Expression(location)
-    , type_(std::move(type))
+    , declared_type_(std::move(type))
     , type_location_(type_location)
     , elements_(std::move(elements))
 {
     for (auto& element : elements_) { addSubexpression(*element); }
 }
 
-lang::Type const* VectorDefinition::elementType() const
+Optional<std::reference_wrapper<const lang::Type>> VectorDefinition::elementType() const
 {
-    if (type_.hasValue()) { return &*(type_.value()); }
-
-    return nullptr;
+    if (declared_type_.hasValue()) return std::cref(*declared_type_.value().as<lang::Type>());
+    return std::nullopt;
 }
 
 std::vector<std::reference_wrapper<Expression const>> VectorDefinition::values() const
@@ -38,14 +37,21 @@ void VectorDefinition::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    if (type_.hasValue()) scope()->registerUsageIfUndefined(type_.value());
+    if (declared_type_.hasValue()) scope()->registerUsageIfUndefined(declared_type_.value());
 }
 
 void VectorDefinition::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (scope() == nullptr) return;
 
-    if (type_.hasValue()) { type.reroute(scope()->context().getVectorType(type_.value(), elements_.size())); }
+    if (declared_type_.hasValue())
+    {
+        if (!declared_type_.value().is<lang::Type>()) return;
+
+        type.reroute(
+            scope()->context().getVectorType(declared_type_.value().as<lang::Type>().value(), elements_.size()));
+        return;
+    }
     else
     {
         auto types        = Expression::getTypes(elements_);
@@ -72,11 +78,14 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
         return false;
     }
 
-    if (type_.hasValue())
+    if (declared_type_.hasValue())
     {
-        lang::Type const& type = type_.value();
+        if (lang::validation::isUndefined(declared_type_.value(), scope(), type_location_, validation_logger))
+            return false;
+        if (lang::Type::checkMismatch<lang::Type>(declared_type_.value(), "type", type_location_, validation_logger))
+            return false;
 
-        if (lang::validation::isTypeUndefined(type, scope(), type_location_, validation_logger)) return false;
+        assert(this->type().getElementType() == *declared_type_.value().as<lang::Type>());
     }
     else
     {
@@ -103,7 +112,7 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
 Expression::Expansion VectorDefinition::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
     Optional<lang::ResolvingHandle<lang::Type>> type;
-    if (type_.hasValue()) type = type_.value()->getUndefinedTypeClone(new_context);
+    if (declared_type_.hasValue()) type = declared_type_.value()->getUndefinedClone<lang::Type>(new_context);
 
     return {Statements(),
             makeOwned<VectorDefinition>(type, type_location_, std::move(subexpressions), location()),
@@ -114,6 +123,7 @@ void VectorDefinition::doBuild(CompileContext& context)
 {
     std::vector<Shared<lang::Value>> elements;
 
+    elements.reserve(elements_.size());
     for (auto& element : elements_)
     {
         elements.push_back(lang::Type::makeMatching(type()->getElementType(), element->getValue(), context));

@@ -27,7 +27,7 @@ class ArrayDefinition
                     std::vector<Owned<Expression>>              elements,
                     lang::Location                              location);
 
-    [[nodiscard]] Optional<lang::ResolvingHandle<lang::Type>> const&    elementType() const;
+    [[nodiscard]] Optional<std::reference_wrapper<const lang::Type>>    elementType() const;
     [[nodiscard]] std::vector<std::reference_wrapper<Expression const>> values() const;
 
   protected:
@@ -46,8 +46,8 @@ class ArrayDefinition
     ~ArrayDefinition() override;
 
   private:
-    Optional<lang::ResolvingHandle<lang::Type>> declared_type_;
-    lang::Location                              type_location_;
+    Optional<lang::ResolvingHandle<lang::Entity>> declared_type_;
+    lang::Location                                type_location_;
     std::vector<Owned<Expression>>              elements_;
 };
 

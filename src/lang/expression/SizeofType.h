@@ -37,8 +37,8 @@ class SizeofType
     void doBuild(CompileContext& context) override;
 
   private:
-    lang::ResolvingHandle<lang::Type> type_;
-    lang::Location                    type_location_;
+    lang::ResolvingHandle<lang::Entity> type_;
+    lang::Location                      type_location_;
 };
 
 #endif

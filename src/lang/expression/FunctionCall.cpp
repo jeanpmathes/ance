@@ -19,21 +19,26 @@ FunctionCall::FunctionCall(lang::ResolvingHandle<lang::Entity> callable,
     for (auto& argument : arguments_) { addSubexpression(*argument); }
 }
 
-lang::Callable const& FunctionCall::callable() const
+lang::Entity const& FunctionCall::callee() const
 {
-    if (used_callable_ == nullptr)
+    return *callable_;
+}
+
+lang::Callable const* FunctionCall::getCallable() const
+{
+    if (!used_callable_.hasValue())
     {
         if (callable_.is<lang::FunctionGroup>()) { used_callable_ = callable_.as<lang::FunctionGroup>(); }
         else if (callable_.is<lang::Type>()) { used_callable_ = callable_.as<lang::Type>(); }
-        else throw std::logic_error("Callable is neither a function group nor a type.");
+        else { used_callable_ = nullptr; }
     }
 
-    return *used_callable_;
+    return used_callable_.value();
 }
 
-lang::Callable& FunctionCall::callable()
+lang::Callable* FunctionCall::getCallable()
 {
-    return const_cast<lang::Callable&>(static_cast<FunctionCall const*>(this)->callable());
+    return const_cast<lang::Callable*>(static_cast<FunctionCall const*>(this)->getCallable());
 }
 
 std::vector<std::reference_wrapper<Expression const>> FunctionCall::arguments() const
@@ -57,7 +62,7 @@ void FunctionCall::postResolve()
 {
     Expression::postResolve();
 
-    if (not callable().isDefined()) return;
+    if (getCallable() == nullptr || !getCallable()->isDefined()) return;
 
     std::vector<lang::ResolvingHandle<lang::Type>> argument_types;
     argument_types.reserve(arguments_.size());
@@ -69,7 +74,7 @@ void FunctionCall::postResolve()
         argument_types.emplace_back(argument_type);
     }
 
-    callable().requestOverload(argument_types);
+    getCallable()->requestOverload(argument_types);
 
     if (function().size() == 1 && function().front()->isDefined()) scope()->addDependency(function().front());
 
@@ -79,7 +84,7 @@ void FunctionCall::postResolve()
 
 void FunctionCall::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (!used_callable_) return;
+    if (!used_callable_.hasValue()) return;
 
     for (auto& argument : arguments_)
     {
@@ -105,33 +110,34 @@ bool FunctionCall::validate(ValidationLogger& validation_logger) const
 
     if (!valid) return false;
 
-    if (!callable().isDefined())
+    if (lang::validation::isUndefined(callable_, scope(), location(), validation_logger)) return false;
+    if (getCallable() == nullptr)
     {
-        validation_logger.logError("Name '" + callable().name() + "' is undefined in current context", location());
+        validation_logger.logError("Provided value " + callable_->getAnnotatedName() + "is not callable", location());
         return false;
     }
 
-    bool const is_resolving_valid = callable().validateResolution(argumentTypes(), location(), validation_logger);
+    bool const is_resolving_valid = getCallable()->validateResolution(argumentTypes(), location(), validation_logger);
     if (!is_resolving_valid) return false;
 
-    auto functions = callable().resolveOverload(argumentTypes());
+    auto functions = getCallable()->resolveOverload(argumentTypes());
 
     if (functions.empty())
     {
-        validation_logger.logError("Cannot resolve " + callable().getAnnotatedName(true) + " function overload",
+        validation_logger.logError("Cannot resolve " + getCallable()->getAnnotatedName(true) + " function overload",
                                    location());
         return false;
     }
 
     if (functions.size() > 1)
     {
-        validation_logger.logError("Ambiguous function call to " + callable().getAnnotatedName(true), location());
+        validation_logger.logError("Ambiguous function call to " + getCallable()->getAnnotatedName(true), location());
         return false;
     }
 
     std::reference_wrapper<lang::Function const> const actual_function = functions.front();
 
-    if (lang::validation::isFunctionUndefined(actual_function, scope(), location(), validation_logger)) return false;
+    if (lang::validation::isUndefined(actual_function, scope(), location(), validation_logger)) return false;
 
     return actual_function.get().validateCall(arguments, location(), validation_logger);
 }
@@ -158,7 +164,7 @@ std::vector<lang::ResolvingHandle<lang::Function>> FunctionCall::function()
 {
     if (!overload_resolved_)
     {
-        function_          = callable().resolveOverload(argumentTypes());
+        function_ = getCallable() != nullptr ? getCallable()->resolveOverload(argumentTypes()) : decltype(function_)();
         overload_resolved_ = true;
     }
 

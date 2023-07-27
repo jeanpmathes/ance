@@ -89,6 +89,9 @@ class Optional
     [[nodiscard]] T const& valueOr(T const& default_value) const
         requires(!Copyable<T>);
 
+    template<Moveable>
+    friend class Optional;
+
   private:
     alignas(T) std::array<std::byte, sizeof(T)> storage_ {};
     bool has_value_ {false};

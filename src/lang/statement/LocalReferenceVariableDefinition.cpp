@@ -32,7 +32,7 @@ lang::Identifier const& LocalReferenceVariableDefinition::name() const
 
 lang::Type const& LocalReferenceVariableDefinition::type() const
 {
-    return type_;
+    return *type_.as<lang::Type>();
 }
 
 Expression const& LocalReferenceVariableDefinition::reference() const
@@ -51,42 +51,47 @@ void LocalReferenceVariableDefinition::walkDefinitions()
 {
     Statement::walkDefinitions();
 
-    lang::OwningHandle<lang::Variable> variable =
-        lang::LocalVariable::makeLocalVariable(name_,
-                                               type_,
-                                               type_location_,
-                                               lang::Assigner::REFERENCE_BINDING,
-                                               reference_->getValue(),
-                                               *scope(),
-                                               location());
-    variable_ = variable.handle();
+    if (type_.is<lang::Type>())
+    {
+        lang::OwningHandle<lang::Variable> variable =
+            lang::LocalVariable::makeLocalVariable(name_,
+                                                   type_.as<lang::Type>().value(),
+                                                   type_location_,
+                                                   lang::Assigner::REFERENCE_BINDING,
+                                                   reference_->getValue(),
+                                                   *scope(),
+                                                   location());
+        variable_ = variable.handle();
 
-    scope()->addEntity(std::move(variable));
-    scope()->registerUsageIfUndefined(type_);
+        scope()->addEntity(std::move(variable));
+        scope()->registerUsageIfUndefined(type_);
+    }
 }
 
 void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger) const
 {
+    if (lang::validation::isUndefined(type_, scope(), type_location_, validation_logger)) return;
+    if (lang::Type::checkMismatch<lang::Type>(type_, "type", type_location_, validation_logger)) return;
+
     assert(variable_.hasValue());
+    auto type = type_.as<lang::Type>();
 
-    if (lang::validation::isTypeUndefined(type_, scope(), type_location_, validation_logger)) return;
-
-    if (!type_->isReferenceType())
+    if (!type->isReferenceType())
     {
         validation_logger.logError("Cannot bind reference to variable of non-reference type "
-                                       + type_->getAnnotatedName(),
+                                       + type->getAnnotatedName(),
                                    type_location_);
         return;
     }
 
-    if (!type_->validate(validation_logger, type_location_)) return;
+    if (!type->validate(validation_logger, type_location_)) return;
 
     bool const reference_is_valid = reference_->validate(validation_logger);
     if (!reference_is_valid) return;
 
     lang::Type const& reference_type = reference_->type();
 
-    lang::Type const& declared_referenced_type = type_->getElementType();
+    lang::Type const& declared_referenced_type = type->getElementType();
     lang::Type const& provided_referenced_type = reference_type.getElementType();
 
     if (!lang::Type::areSame(declared_referenced_type, provided_referenced_type))
@@ -105,10 +110,10 @@ Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressio
     Statements statements;
 
     statements.emplace_back(makeOwned<LocalReferenceVariableDefinition>(name_,
-                                                                        type_->getUndefinedTypeClone(new_context),
-                                                                        type_location_,
-                                                                        std::move(subexpressions[0]),
-                                                                        location()));
+                                                    type_->getUndefinedClone<lang::Type>(new_context),
+                                                    type_location_,
+                                                    std::move(subexpressions[0]),
+                                                    location()));
 
     return statements;
 }

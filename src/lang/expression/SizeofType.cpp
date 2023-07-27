@@ -20,7 +20,7 @@ SizeofType::SizeofType(lang::ResolvingHandle<lang::Type> type, lang::Location ty
 
 lang::Type const& SizeofType::targetType() const
 {
-    return type_;
+    return *type_.as<lang::Type>();
 }
 
 void SizeofType::walkDefinitions()
@@ -37,22 +37,25 @@ void SizeofType::defineType(lang::ResolvingHandle<lang::Type> type)
 
 bool SizeofType::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isTypeUndefined(type_, scope(), type_location_, validation_logger)) return false;
+    if (lang::validation::isUndefined(type_, scope(), type_location_, validation_logger)) return false;
+    if (lang::Type::checkMismatch<lang::Type>(type_, "type", type_location_, validation_logger)) return false;
 
-    return type_->validate(validation_logger, type_location_);
+    return type_.as<lang::Type>()->validate(validation_logger, type_location_);
 }
 
 Expression::Expansion SizeofType::expandWith(Expressions, lang::Context& new_context) const
 {
     return {Statements(),
-            makeOwned<SizeofType>(type_->getUndefinedTypeClone(new_context), type_location_, location()),
+            makeOwned<SizeofType>(type_->getUndefinedClone<lang::Type>(new_context), type_location_, location()),
             Statements()};
 }
 
 void SizeofType::doBuild(CompileContext& context)
 {
+    auto actual_type = lang::Type::makeMatching<lang::Type>(type_);
+
     llvm::Value* content_value =
-        lang::SizeType::buildContentValue(type_->getContentSize(context.llvmModule()), context);
+        lang::SizeType::buildContentValue(actual_type->getContentSize(context.llvmModule()), context);
     llvm::Value* native_value = lang::values::contentToNative(type(), content_value, context);
 
     Shared<lang::WrappedNativeValue> value = makeShared<lang::WrappedNativeValue>(type(), native_value);

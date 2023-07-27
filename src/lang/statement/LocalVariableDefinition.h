@@ -60,12 +60,12 @@ class LocalVariableDefinition
     void doBuild(CompileContext& context) override;
 
   private:
-    lang::Identifier                            name_;
-    Optional<lang::ResolvingHandle<lang::Type>> type_opt_;
-    lang::ResolvingHandle<lang::Type>           type_;
-    lang::Location                              type_location_;
-    lang::Assigner                              assigner_;
-    Optional<Owned<Expression>>                      assigned_;
+    lang::Identifier                              name_;
+    Optional<lang::ResolvingHandle<lang::Entity>> type_opt_;
+    lang::ResolvingHandle<lang::Entity>           type_;
+    lang::Location                                type_location_;
+    lang::Assigner                                assigner_;
+    Optional<Owned<Expression>>                   assigned_;
 
     Optional<lang::ResolvingHandle<lang::Variable>> variable_ {};
 };

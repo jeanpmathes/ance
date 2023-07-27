@@ -32,11 +32,12 @@ class FunctionCall
                  std::vector<Owned<Expression>>      arguments,
                  lang::Location                      location);
 
-    [[nodiscard]] lang::Callable const&                                 callable() const;
+    [[nodiscard]] lang::Entity const&                                   callee() const;
     [[nodiscard]] std::vector<std::reference_wrapper<Expression const>> arguments() const;
 
   private:
-    lang::Callable& callable();
+    [[nodiscard]] lang::Callable const* getCallable() const;
+    lang::Callable*                     getCallable();
 
   protected:
     void walkDefinitions() override;
@@ -61,7 +62,7 @@ class FunctionCall
     lang::ResolvingHandle<lang::Entity> callable_;
     std::vector<Owned<Expression>>      arguments_;
 
-    mutable lang::Callable const*                              used_callable_ {};
+    mutable Optional<lang::Callable const*>                    used_callable_ {};
     mutable bool                                               overload_resolved_ {false};
     mutable std::vector<lang::ResolvingHandle<lang::Function>> function_ {};
 

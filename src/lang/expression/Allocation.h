@@ -26,14 +26,12 @@ class Allocation
      * @param count An expression providing the number of elements to allocate.
      * @param location The source location.
      * @param allocated_type_location The source location of the type that is allocated.
-     * @param context The context this expression is created in.
      */
     Allocation(Runtime::Allocator                allocation,
                lang::ResolvingHandle<lang::Type> type,
                Optional<Owned<Expression>>       count,
                lang::Location                    location,
-               lang::Location                    allocated_type_location,
-               lang::Context&                    context);
+               lang::Location                    allocated_type_location);
 
     [[nodiscard]] Runtime::Allocator allocator() const;
     [[nodiscard]] lang::Type const&  allocatedType() const;
@@ -55,11 +53,10 @@ class Allocation
     ~Allocation() override;
 
   private:
-    Runtime::Allocator                allocation_;
-    lang::ResolvingHandle<lang::Type> allocated_type_;
-    lang::Location                    allocated_type_location_;
+    Runtime::Allocator                  allocation_;
+    lang::ResolvingHandle<lang::Entity> allocated_type_;
+    lang::Location                      allocated_type_location_;
     Optional<Owned<Expression>>       count_;
-    lang::ResolvingHandle<lang::Type> return_type_;
 };
 
 #endif

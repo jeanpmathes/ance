@@ -79,7 +79,7 @@ void lang::StructDescription::validate(ValidationLogger& validation_logger) cons
 
         if (!type.isDefined())
         {
-            valid = not lang::validation::isTypeUndefined(type, &scope(), member->location(), validation_logger);
+            valid = not lang::validation::isUndefined(type, &scope(), member->location(), validation_logger);
             continue;
         }
 

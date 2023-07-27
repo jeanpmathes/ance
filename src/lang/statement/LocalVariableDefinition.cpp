@@ -39,8 +39,10 @@ lang::Type const* LocalVariableDefinition::type() const
 {
     if (type_opt_.hasValue())
     {
-        lang::Type const& type = type_opt_.value();
-        return &type;
+        auto type_ptr = type_opt_.value().as<lang::Type>();
+        assert(type_ptr != nullptr);
+
+        return type_ptr;
     }
 
     return nullptr;
@@ -70,17 +72,21 @@ void LocalVariableDefinition::walkDefinitions()
     Optional<Shared<lang::Value>> assigned_value;
     if (assigned_.hasValue()) { assigned_value = assigned_.value()->getValue(); }
 
-    lang::OwningHandle<lang::Variable> variable = lang::LocalVariable::makeLocalVariable(name_,
-                                                                                         type_,
-                                                                                         type_location_,
-                                                                                         assigner_,
-                                                                                         assigned_value,
-                                                                                         *scope(),
-                                                                                         location());
-    variable_                                   = variable.handle();
+    if (type_.is<lang::Type>())
+    {
+        lang::OwningHandle<lang::Variable> variable =
+            lang::LocalVariable::makeLocalVariable(name_,
+                                                   type_.as<lang::Type>().value(),
+                                                   type_location_,
+                                                   assigner_,
+                                                   assigned_value,
+                                                   *scope(),
+                                                   location());
+        variable_ = variable.handle();
 
-    scope()->addEntity(std::move(variable));
-    if (type_opt_.hasValue()) scope()->registerUsageIfUndefined(type_opt_.value());
+        scope()->addEntity(std::move(variable));
+        if (type_opt_.hasValue()) scope()->registerUsageIfUndefined(type_opt_.value());
+    }
 }
 
 void LocalVariableDefinition::postResolve()
@@ -90,14 +96,6 @@ void LocalVariableDefinition::postResolve()
 
 void LocalVariableDefinition::validate(ValidationLogger& validation_logger) const
 {
-    assert(variable_.hasValue());
-    auto const& variable = *variable_;
-
-    auto tn = type_->name();
-    (void) tn;
-
-    assert(variable->type() == type_);
-
     if (assigned_.hasValue())
     {
         if (!assigned_.value()->validate(validation_logger)) return;
@@ -109,11 +107,19 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
         return;
     }
 
-    if (lang::validation::isTypeUndefined(type_, scope(), type_location_, validation_logger)) return;
+    if (lang::validation::isUndefined(type_, scope(), type_location_, validation_logger)) return;
+    if (lang::Type::checkMismatch<lang::Type>(type_, "type", type_location_, validation_logger)) return;
 
-    if (!type_->validate(validation_logger, type_location_)) return;
+    auto type = type_.as<lang::Type>();
 
-    if (type_->isReferenceType())
+    assert(variable_.hasValue());
+    auto const& variable = *variable_;
+
+    assert(variable->type() == *type);
+
+    if (!type->validate(validation_logger, type_location_)) return;
+
+    if (type->isReferenceType())
     {
         validation_logger.logError("Cannot declare variable of reference type without binding to a value", location());
         return;
@@ -135,7 +141,7 @@ Statements LocalVariableDefinition::expandWith(Expressions subexpressions, State
     Statements statements;
 
     Optional<lang::ResolvingHandle<lang::Type>> type;
-    if (type_opt_.hasValue()) type = type_opt_.value()->getUndefinedTypeClone(new_context);
+    if (type_opt_.hasValue()) type = type_opt_.value()->getUndefinedClone<lang::Type>(new_context);
 
     Optional<Owned<Expression>> assigned;
     if (subexpressions.size() == 1) assigned = std::move(subexpressions[0]);

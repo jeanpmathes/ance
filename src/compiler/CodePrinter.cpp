@@ -142,7 +142,10 @@ std::any CodePrinter::visit(ArrayDefinition const& array_definition)
 {
     out_ << "[";
 
-    if (array_definition.elementType().hasValue()) { out_ << array_definition.elementType().value()->name() << " | "; }
+    if (array_definition.elementType().hasValue())
+    {
+        out_ << array_definition.elementType().value().get().name() << " | ";
+    }
 
     bool is_first = true;
     for (auto& value : array_definition.values())
@@ -194,7 +197,7 @@ std::any CodePrinter::visit(ConstantLiteral const& constant_literals)
 
 std::any CodePrinter::visit(FunctionCall const& function_call)
 {
-    out_ << function_call.callable().name() << "(";
+    out_ << function_call.callee().name() << "(";
 
     bool first = true;
 
@@ -306,7 +309,10 @@ std::any CodePrinter::visit(VectorDefinition const& vector_definition)
 {
     out_ << "<";
 
-    if (vector_definition.elementType() != nullptr) { out_ << vector_definition.elementType()->name() << " | "; }
+    if (vector_definition.elementType().hasValue())
+    {
+        out_ << vector_definition.elementType().value().get().name() << " | ";
+    }
 
     bool is_first = true;
     for (auto& value : vector_definition.values())

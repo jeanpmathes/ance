@@ -14,12 +14,12 @@ Drop::Drop(lang::ResolvingHandle<lang::Variable> variable, lang::Location locati
 
 lang::ResolvingHandle<lang::Variable> Drop::variable()
 {
-    return variable_;
+    return variable_.as<lang::Variable>().value();
 }
 
 lang::Variable const& Drop::variable() const
 {
-    return variable_;
+    return *variable_.as<lang::Variable>();
 }
 
 void Drop::walkDefinitions()
@@ -30,7 +30,8 @@ void Drop::walkDefinitions()
 
 void Drop::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isNameUndefined(variable_, scope(), location(), validation_logger)) return;
+    if (lang::validation::isUndefined(variable_, scope(), location(), validation_logger)) return;
+    if (lang::Type::checkMismatch<lang::Variable>(variable_, "value", location(), validation_logger)) return;
 
     if (!dropped_)
     {
@@ -40,16 +41,17 @@ void Drop::validate(ValidationLogger& validation_logger) const
     }
 }
 
-Statements Drop::expandWith(Expressions, Statements, lang::Context&) const
+Statements Drop::expandWith(Expressions, Statements, lang::Context& new_context) const
 {
     Statements statements;
 
-    statements.emplace_back(makeOwned<Drop>(variable_->toUndefined(), location()));
+    statements.emplace_back(makeOwned<Drop>(variable_->getUndefinedClone<lang::Variable>(new_context), location()));
 
     return statements;
 }
 
 void Drop::doBuild(CompileContext& context)
 {
-    variable_->buildFinalization(context);
+    auto variable = lang::Type::makeMatching<lang::Variable>(variable_);
+    variable->buildFinalization(context);
 }

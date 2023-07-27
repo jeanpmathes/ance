@@ -69,7 +69,7 @@ llvm::PointerType* lang::ReferenceType::getContentType(llvm::LLVMContext& c) con
 
 bool lang::ReferenceType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
-    if (lang::validation::isTypeUndefined(element_type_, scope(), element_type_->name().location(), validation_logger))
+    if (lang::Type::isTypeUndefined(element_type_, scope(), element_type_->name().location(), validation_logger))
         return false;
 
     if (element_type_->isReferenceType())

@@ -39,7 +39,7 @@ class Drop
     void doBuild(CompileContext& context) override;
 
   private:
-    lang::ResolvingHandle<lang::Variable> variable_;
-    bool                                  dropped_;
+    lang::ResolvingHandle<lang::Entity> variable_;
+    bool                                dropped_;
 };
 #endif

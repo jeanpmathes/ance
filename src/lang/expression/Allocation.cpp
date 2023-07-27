@@ -11,14 +11,12 @@ Allocation::Allocation(Runtime::Allocator                allocation,
                        lang::ResolvingHandle<lang::Type> type,
                        Optional<Owned<Expression>>       count,
                        lang::Location                    location,
-                       lang::Location                    allocated_type_location,
-                       lang::Context&                    context)
+                       lang::Location                    allocated_type_location)
     : Expression(location)
     , allocation_(allocation)
     , allocated_type_(type)
     , allocated_type_location_(allocated_type_location)
     , count_(std::move(count))
-    , return_type_(count_.hasValue() ? context.getBufferType(type) : context.getPointerType(type))
 {
     if (count_.hasValue()) addSubexpression(*count_.value());
 }
@@ -30,7 +28,7 @@ Runtime::Allocator Allocation::allocator() const
 
 lang::Type const& Allocation::allocatedType() const
 {
-    return allocated_type_;
+    return *allocated_type_.as<lang::Type>();
 }
 
 Expression const* Allocation::count() const
@@ -47,16 +45,26 @@ void Allocation::walkDefinitions()
 
 void Allocation::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    type.reroute(return_type_);
+    if (scope() == nullptr) return;
+
+    if (allocated_type_.is<lang::Type>())
+    {
+        auto allocated_type = allocated_type_.as<lang::Type>().value();
+        type.reroute(count_.hasValue() ? scope()->context().getBufferType(allocated_type)
+                                       : scope()->context().getPointerType(allocated_type));
+    }
 }
 
 bool Allocation::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isTypeUndefined(allocated_type_, scope(), allocated_type_location_, validation_logger))
+    if (lang::validation::isUndefined(allocated_type_, scope(), allocated_type_location_, validation_logger))
         return false;
 
-    bool is_valid = allocated_type_->validate(validation_logger, location())
-                 && return_type_->validate(validation_logger, location());
+    if (lang::Type::checkMismatch<lang::Type>(allocated_type_, "type", allocated_type_location_, validation_logger))
+        return false;
+
+    bool is_valid = allocated_type_.as<lang::Type>()->validate(validation_logger, location())
+                 && type().validate(validation_logger, location());
 
     if (count_.hasValue())
     {
@@ -79,22 +87,20 @@ Expression::Expansion Allocation::expandWith(Expressions subexpressions, lang::C
     {
         return {Statements(),
                 makeOwned<Allocation>(allocation_,
-                                      allocated_type_->getUndefinedTypeClone(new_context),
+                                      allocated_type_->getUndefinedClone<lang::Type>(new_context),
                                       std::move(subexpressions[0]),
                                       location(),
-                                      allocated_type_location_,
-                                      new_context),
+                                      allocated_type_location_),
                 Statements()};
     }
     else
     {
         return {Statements(),
                 makeOwned<Allocation>(allocation_,
-                                      allocated_type_->getUndefinedTypeClone(new_context),
+                                      allocated_type_->getUndefinedClone<lang::Type>(new_context),
                                       std::nullopt,
                                       location(),
-                                      allocated_type_location_,
-                                      new_context),
+                                      allocated_type_location_),
                 Statements()};
     }
 }
@@ -108,7 +114,9 @@ void Allocation::doBuild(CompileContext& context)
         count = lang::Type::makeMatching(context.types().getSizeType(), count_.value()->getValue(), context);
     }
 
-    Shared<lang::Value> ptr = context.runtime().allocate(allocation_, allocated_type_, count, context);
+    auto allocated_type = lang::Type::makeMatching<lang::Type>(allocated_type_);
+
+    Shared<lang::Value> ptr = context.runtime().allocate(allocation_, allocated_type, count, context);
     setValue(ptr);
 }
 

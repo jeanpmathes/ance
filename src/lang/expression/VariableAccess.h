@@ -54,7 +54,7 @@ class VariableAccess
     ~VariableAccess() override;
 
   private:
-    lang::ResolvingHandle<lang::Variable> variable_;
+    lang::ResolvingHandle<lang::Entity> variable_;
 };
 
 #endif
