@@ -42,6 +42,7 @@ void lang::Function::defineAsImported(Scope&                                    
                                                     return_type_location,
                                                     parameters,
                                                     location);
+
     (**definition_).setup();
 }
 
@@ -63,6 +64,7 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
                                                   containing_scope,
                                                   declaration_location,
                                                   definition_location);
+
     (**definition_).setup();
 }
 
@@ -74,7 +76,6 @@ lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHand
                                                              lang::Scope&         containing_scope,
                                                              lang::Location       location)
 {
-
     auto definition = makeOwned<lang::PredefinedFunction>(*this,
                                                           containing_scope,
                                                           access_modifier,
@@ -235,11 +236,21 @@ std::vector<lang::BasicBlock*> const& lang::Function::getBasicBlocks() const
     return definition_.value()->getBasicBlocks();
 }
 
+void lang::Function::resolveFollowingOrder()
+{
+    definition_.value()->resolveFollowingOrder();
+}
+
 void lang::Function::postResolve()
 {
     definition_.value()->postResolve();
 
     Scope::postResolve();
+}
+
+void lang::Function::buildDeclarationsFollowingOrder(CompileContext& context)
+{
+    definition_.value()->buildDeclarationsFollowingOrder(context);
 }
 
 void lang::Function::setImportExportAttributes(llvm::Function*      function,

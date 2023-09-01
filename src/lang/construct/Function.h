@@ -259,7 +259,10 @@ namespace lang
          */
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const;
 
+        void resolveFollowingOrder() override;
         void postResolve() override;
+
+        void buildDeclarationsFollowingOrder(CompileContext& context) override;
 
         /**
          * Set the import/export attributes of a function.

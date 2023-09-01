@@ -76,8 +76,8 @@ void AnceCompiler::compile(std::filesystem::path const& out)
 
     if (unit_.isUsingRuntime()) context_.runtime().init(context_);
 
-    unit_.globalScope().createNativeBacking(context_);
-    unit_.globalScope().buildFunctions(context_);
+    unit_.globalScope().buildDeclarations(context_);
+    unit_.globalScope().buildDefinitions(context_);
 
     assert(context_.allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
 

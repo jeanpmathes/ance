@@ -9,9 +9,10 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-VariableAccess::VariableAccess(lang::ResolvingHandle<lang::Variable> variable, lang::Location location)
+VariableAccess::VariableAccess(lang::ResolvingHandle<lang::Variable> variable, bool is_defined, lang::Location location)
     : Expression(location)
     , variable_(std::move(variable))
+    , is_defined_(is_defined)
 {}
 
 lang::Variable const& VariableAccess::variable() const
@@ -21,7 +22,7 @@ lang::Variable const& VariableAccess::variable() const
 
 void VariableAccess::walkDefinitions()
 {
-    scope()->registerUsage(variable_);
+    scope()->registerUsage(variable_, !is_defined_);
 }
 
 void VariableAccess::defineType(lang::ResolvingHandle<lang::Type> type)
@@ -40,10 +41,15 @@ bool VariableAccess::isNamed() const
 
 bool VariableAccess::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isUndefined(variable_, scope(), location(), validation_logger)) return false;
     if (lang::Type::checkMismatch<lang::Variable>(variable_, "value", location(), validation_logger)) return false;
 
     if (isVariableDropped(validation_logger)) return false;
+
+    if (!is_defined_)
+    {
+        validation_logger.logError("No read from uninitialized '" + variable_->name() + "' allowed", location());
+        return false;
+    }
 
     return variable_.as<lang::Variable>()->validateGetValue(validation_logger, location());
 }
@@ -52,7 +58,6 @@ bool VariableAccess::validateAssignment(lang::Value const& value,
                                         lang::Location     value_location,
                                         ValidationLogger&  validation_logger) const
 {
-    if (lang::validation::isUndefined(variable_, scope(), location(), validation_logger)) return false;
     if (lang::Type::checkMismatch<lang::Variable>(variable_, "value", location(), validation_logger)) return false;
 
     if (isVariableDropped(validation_logger)) return false;
@@ -73,9 +78,10 @@ bool VariableAccess::isVariableDropped(ValidationLogger& validation_logger) cons
 
 Expression::Expansion VariableAccess::expandWith(Expressions, lang::Context& new_context) const
 {
-    return {Statements(),
-            makeOwned<VariableAccess>(variable_->getUndefinedClone<lang::Variable>(new_context), location()),
-            Statements()};
+    return {
+        Statements(),
+        makeOwned<VariableAccess>(variable_->getUndefinedClone<lang::Variable>(new_context), is_defined_, location()),
+        Statements()};
 }
 
 void VariableAccess::doBuild(CompileContext& context)

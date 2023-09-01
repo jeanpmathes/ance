@@ -85,7 +85,7 @@ void LocalVariableDefinition::walkDefinitions()
         variable_ = variable.handle();
 
         scope()->addEntity(std::move(variable));
-        if (type_opt_.hasValue()) scope()->registerUsageIfUndefined(type_opt_.value());
+        if (type_opt_.hasValue()) scope()->registerUsage(type_opt_.value());
     }
 }
 
@@ -107,7 +107,6 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
         return;
     }
 
-    if (lang::validation::isUndefined(type_, scope(), type_location_, validation_logger)) return;
     if (lang::Type::checkMismatch<lang::Type>(type_, "type", type_location_, validation_logger)) return;
 
     auto type = type_.as<lang::Type>();
@@ -154,5 +153,5 @@ Statements LocalVariableDefinition::expandWith(Expressions subexpressions, State
 
 void LocalVariableDefinition::doBuild(CompileContext& context)
 {
-    (*variable_)->buildDefinition(context);
+    (*variable_)->buildInitialization(context);
 }

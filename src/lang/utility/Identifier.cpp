@@ -40,6 +40,11 @@ void lang::Identifier::synchronize(lang::Identifier* identifier, Storage& storag
     if (storage.isReading()) { *identifier = like(content, identifier->location_); }
 }
 
+std::weak_ordering lang::Identifier::operator<=>(lang::Identifier const& other) const
+{
+    return string_ <=> other.string_;
+}
+
 std::ostream& operator<<(std::ostream& os, lang::Identifier const& identifier)
 {
     os << identifier.text();

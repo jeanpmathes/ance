@@ -90,6 +90,7 @@ namespace lang
 
         std::vector<lang::TypeDefinition const*>              getDependencies() const override;
         std::vector<std::reference_wrapper<const lang::Type>> getContained() const override;
+        std::vector<lang::ResolvingHandle<lang::Type>>        extractTypesToResolve() override;
 
         ~ReferenceType() override = default;
 

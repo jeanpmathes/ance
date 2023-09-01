@@ -229,6 +229,8 @@ namespace lang
         bool checkDependencies(ValidationLogger& validation_logger) const;
         bool hasCyclicDependency() const;
 
+        virtual std::vector<lang::ResolvingHandle<lang::Type>> extractTypesToResolve();
+
         /**
          * Get the type dependencies of this type.
          * A type depends on another, if the memory layout of the type depends on the other.

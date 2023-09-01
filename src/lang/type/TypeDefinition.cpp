@@ -752,6 +752,11 @@ bool lang::TypeDefinition::hasCyclicDependency() const
     return false;
 }
 
+std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeDefinition::extractTypesToResolve()
+{
+    return {};
+}
+
 std::vector<lang::TypeDefinition const*> lang::TypeDefinition::getDependencies() const
 {
     std::vector<lang::TypeDefinition const*> dependencies;

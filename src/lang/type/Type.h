@@ -799,13 +799,19 @@ namespace lang
          */
         bool operator!=(lang::Type const& other) const;
 
-        /*
+        /**
          * Check whether a type is undefined. If so, a message is logged.
          */
         static bool isTypeUndefined(lang::Type const&  type,
                                     lang::Scope const* scope,
                                     lang::Location     location,
                                     ValidationLogger&  validation_logger);
+
+        /**
+         * Get handles to the types that need to be resolved for this type to be valid.
+         * @return The types to resolve.
+         */
+        std::vector<lang::ResolvingHandle<lang::Type>> extractTypesToResolve();
 
       protected:
         lang::Callable&                     getFunctionSource() override;

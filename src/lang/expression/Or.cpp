@@ -79,16 +79,16 @@ Expression::Expansion Or::expandWith(Expressions subexpressions, lang::Context& 
 
     before.emplace_back(
         makeOwned<If>(makeOwned<UnaryOperation>(lang::UnaryOperator::NOT,
-                                                makeOwned<VariableAccess>(make_temp_variable(), location()),
+                                                makeOwned<VariableAccess>(make_temp_variable(), true, location()),
                                                 location()),
-                      makeOwned<Assignment>(makeOwned<VariableAccess>(make_temp_variable(), location()),
+                      makeOwned<Assignment>(makeOwned<VariableAccess>(make_temp_variable(), true, location()),
                                             lang::Assigner::COPY_ASSIGNMENT,
                                             std::move(rhs),
                                             location()),
                       std::nullopt,
                       location()));
 
-    Owned<Expression> result = makeOwned<VariableAccess>(make_temp_variable(), location());
+    Owned<Expression> result = makeOwned<VariableAccess>(make_temp_variable(), true, location());
 
     if (negate_) { result = makeOwned<UnaryOperation>(lang::UnaryOperator::NOT, std::move(result), location()); }
 

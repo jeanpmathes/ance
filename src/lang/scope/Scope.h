@@ -44,7 +44,7 @@ namespace lang
       protected:
         /**
          * Creates a new scope without a parent scope.
-         * If this is used, the getters must be overridden.
+         * If this is used, the getters must be overridden or setContainingScope must be called.
          */
         explicit Scope();
 
@@ -55,6 +55,8 @@ namespace lang
         explicit Scope(lang::Scope* containing_scope);
 
       public:
+        void setContainingScope(lang::Scope& containing_scope);
+
         /**
          * Get the containing scope or the global scope if there is no containing scope.
          * @return The containing scope.
@@ -121,9 +123,10 @@ namespace lang
 
         /**
          * Create a local scope in this scope.
+         * @param code_block The code block containing the local scope.
          * @return The created local scope.
          */
-        Owned<lang::OrderedScope> makeLocalScope();
+        Owned<lang::OrderedScope> makeLocalScope(lang::CodeBlock& code_block);
 
         /**
          * Whether a name is conflicted in this scope, meaning there are multiple elements with the same name.
@@ -146,20 +149,15 @@ namespace lang
 
         /**
          * Register the usage of a entity in this scope. Only entity that are registered will be resolved.
-         * @param entity The entity to register and resolve. An entity can be registered multiple times, but must be undefined.
+         * @param entity The entity to register and resolve. An entity can be registered multiple times.
+         * @param is_only_declared Whether a declaration is sufficient or a definition is required.
          */
-        void registerUsage(lang::ResolvingHandle<lang::Entity> entity);
+        void registerUsage(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared = false);
 
       protected:
         virtual void onRegisterUsage(lang::ResolvingHandle<lang::Entity> entity) = 0;
 
       public:
-        /**
-         * Add a type to this scope. Undefined types will be resolved.
-         * @param type The type to add.
-         */
-        void registerUsageIfUndefined(lang::ResolvingHandle<lang::Entity> type);
-
         /**
          * Connect a given entity with a fitting definition, following the definition order.
          * Only ordered scopes will connect entities.
@@ -186,19 +184,18 @@ namespace lang
         virtual bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) = 0;
 
         /**
+         * Build the declarations for all entities in this scope.
+         * @param context The current compile context.
+         */
+        virtual void buildDeclarations(CompileContext& context) = 0;
+        /**
          * Build the finalization for all entities in this scope.
          * @param context The current compile context.
          */
         virtual void buildFinalization(CompileContext& context) = 0;
 
-        /**
-         * Add a dependency to a function.
-         * @param function The function to add a dependency to.
-         */
-        void addDependency(lang::ResolvingHandle<lang::Function> function);
-
       private:
-        void addDependency(lang::ResolvingHandle<lang::Entity> entity);
+        void addDependency(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared);
 
       public:
         template<typename E>
@@ -216,49 +213,37 @@ namespace lang
         };
 
         /**
-         * Get the dependencies of this scope and their count.
+         * Get the dependencies on declarations of this scope and their count.
          * @return The dependencies.
          */
-        std::vector<Dependency<lang::Entity>> getDependencies();
+        std::vector<Dependency<lang::Entity>> getDependenciesOnDeclaration();
+        /**
+         * Get the dependencies on delcaraions of this scope and their count.
+         * @return The dependencies.
+         */
+        [[nodiscard]] std::vector<std::reference_wrapper<lang::Entity const>> getDependenciesOnDeclaration() const;
 
         /**
-         * Get the variable dependencies and their count.
-         * @return The variable dependencies.
+         * Get the dependencies on definitions of this scope and their count.
+         * @return The dependencies.
          */
-        std::vector<Dependency<lang::Variable>> getVariableDependencies();
-
+        std::vector<Dependency<lang::Entity>> getDependenciesOnDefinition();
         /**
-         * Get the function dependencies and their count.
-         * @return The function dependencies.
+         * Get the dependencies on definitions of this scope and their count.
+         * @return The dependencies.
          */
-        std::vector<Dependency<lang::FunctionGroup>> getFunctionGroupDependencies();
-
-        /**
-         * Get the type dependencies and their count.
-         * @return The type dependencies.
-         */
-        std::vector<Dependency<lang::Type>> getTypeDependencies();
-
-        /**
-         * Get the function dependencies.
-         * @return The function dependencies.
-         */
-        std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies();
+        [[nodiscard]] std::vector<std::reference_wrapper<lang::Entity const>> getDependenciesOnDefinition() const;
 
         ~Scope() override = default;
-
-      protected:
-        virtual void onSubScope(Scope* sub_scope);
 
       private:
         lang::Scope* containing_scope_ = nullptr;
 
-        std::vector<lang::ResolvingHandle<lang::Entity>>      used_entities_;
-        std::vector<Dependency<lang::Entity>>                 entity_dependencies_;
-        std::map<lang::ResolvingHandle<lang::Entity>, size_t> entity_to_dependency_index_;
+        std::vector<Dependency<lang::Entity>>                 entity_declaration_dependencies_;
+        std::map<lang::ResolvingHandle<lang::Entity>, size_t> entity_to_declaration_dependency_index_;
 
-        std::vector<lang::ResolvingHandle<lang::Function>> function_dependencies_;
-        std::set<lang::ResolvingHandle<lang::Function>>    function_dependencies_set_;
+        std::vector<Dependency<lang::Entity>>                 entity_definition_dependencies_;
+        std::map<lang::ResolvingHandle<lang::Entity>, size_t> entity_to_definition_dependency_index_;
     };
 }
 #endif

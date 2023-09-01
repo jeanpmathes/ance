@@ -203,6 +203,13 @@ std::vector<std::reference_wrapper<lang::Type const>> lang::SequenceType::getCon
     return {element_type_};
 }
 
+std::vector<lang::ResolvingHandle<lang::Type>> lang::SequenceType::extractTypesToResolve()
+{
+    std::vector<ResolvingHandle<Type>> types_to_resolve;
+    types_to_resolve.emplace_back(element_type_);
+    return types_to_resolve;
+}
+
 Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Value>> values, CompileContext& context)
 {
     assert(size_.hasValue());

@@ -483,7 +483,7 @@ std::any SourceVisitor::visitVariableAccess(anceParser::VariableAccessContext* c
     lang::Identifier const identifier = ident(ctx->IDENTIFIER());
     auto                   variable   = lang::makeHandled<lang::Variable>(identifier);
 
-    return static_cast<Expression*>(new VariableAccess(variable, location(ctx)));
+    return static_cast<Expression*>(new VariableAccess(variable, true, location(ctx)));
 }
 
 std::any SourceVisitor::visitAllocation(anceParser::AllocationContext* ctx)

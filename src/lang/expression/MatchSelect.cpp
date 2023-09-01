@@ -89,7 +89,7 @@ Expression::Expansion MatchSelect::expandWith(Expressions subexpressions, lang::
 
     statements.emplace_back(makeOwned<Match>(std::move(cases), std::move(condition), location()));
 
-    auto result = makeOwned<VariableAccess>(make_temp_variable(), location());
+    auto result = makeOwned<VariableAccess>(make_temp_variable(), true, location());
 
     Statements after;
 

@@ -2,6 +2,8 @@
 #define ANCE_SRC_LANG_CONSTRUCT_DESCRIPTIONS_VARIABLEDESCRIPTION_H_
 
 #include "Description.h"
+#include <experimental/vector>
+#include <vector>
 
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
@@ -59,11 +61,21 @@ namespace lang
         [[nodiscard]] Expression const*           initializer() const;
         [[nodiscard]] InitializerFunction const*  initializerFunction() const;
 
-        void resolve() override;
+        [[nodiscard]] std::vector<std::reference_wrapper<Entity const>> getProvidedEntities() const override;
+        [[nodiscard]] std::vector<Dependency>                           getDeclarationDependencies() const override;
+        [[nodiscard]] std::vector<Dependency>                           getDefinitionDependencies() const override;
+
+        void resolveDeclaration() override;
+        void resolveDefinition() override;
         void postResolve() override;
         void validate(ValidationLogger& validation_logger) const override;
 
         [[nodiscard]] Descriptions expand(lang::Context& new_context) const override;
+
+        void buildDeclaration(CompileContext& context) override;
+        void buildDefinition(CompileContext& context) override;
+        void buildInitialization(CompileContext& context) override;
+        void buildFinalization(CompileContext& context) override;
 
       protected:
         void performInitialization() override;
@@ -84,7 +96,8 @@ namespace lang
         Optional<Owned<Expression>> init_expression_;
         Optional<Owned<Statement>>  init_block_;
 
-        lang::GlobalVariable*      global_variable_ {nullptr};
+        lang::ResolvingHandle<lang::Variable> variable_handle_;
+        lang::GlobalVariable*                 global_variable_ {nullptr};
         lang::InitializerFunction* init_function_ {nullptr};
     };
 }

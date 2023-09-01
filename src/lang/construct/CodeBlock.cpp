@@ -66,7 +66,6 @@ void lang::CodeBlock::append(Owned<CodeBlock> block)
         for (auto& sub : block->subs_)
         {
             addSubstatement(*sub);
-
             subs_.push_back(std::move(sub));
         }
 
@@ -80,7 +79,7 @@ void lang::CodeBlock::setScope(Scope& scope)
 
     if (scoped_)
     {
-        scope_  = scope.makeLocalScope();
+        scope_  = scope.makeLocalScope(*this);
         created = scope_.value().get();
     }
 
@@ -133,12 +132,12 @@ std::vector<Owned<lang::BasicBlock>> lang::CodeBlock::createBasicBlocks(lang::Ba
 
 lang::Scope* lang::CodeBlock::getBlockScope()
 {
-    return scope_->get();
+    return getPtr(scope_);
 }
 
 lang::Scope const* lang::CodeBlock::getBlockScope() const
 {
-    return scope_->get();
+    return getPtr(scope_);
 }
 
 bool lang::CodeBlock::isCompound() const

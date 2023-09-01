@@ -132,6 +132,8 @@ namespace lang
          */
         [[nodiscard]] virtual bool isImported() const;
 
+        virtual void resolveFollowingOrder();
+
         /**
          * Called after the resolve step.
          */
@@ -231,7 +233,9 @@ namespace lang
         [[nodiscard]] virtual std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const = 0;
 
       public:
-        virtual llvm::DIScope*                 getDebugScope(CompileContext& context) const = 0;
+        virtual void buildDeclarationsFollowingOrder(CompileContext& context);
+
+        virtual llvm::DIScope* getDebugScope(CompileContext& context) const = 0;
 
         [[nodiscard]] virtual std::vector<lang::BasicBlock*> const& getBasicBlocks() const = 0;
 

@@ -37,7 +37,7 @@ void VectorDefinition::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    if (declared_type_.hasValue()) scope()->registerUsageIfUndefined(declared_type_.value());
+    if (declared_type_.hasValue()) scope()->registerUsage(declared_type_.value());
 }
 
 void VectorDefinition::defineType(lang::ResolvingHandle<lang::Type> type)
@@ -80,8 +80,6 @@ bool VectorDefinition::validate(ValidationLogger& validation_logger) const
 
     if (declared_type_.hasValue())
     {
-        if (lang::validation::isUndefined(declared_type_.value(), scope(), type_location_, validation_logger))
-            return false;
         if (lang::Type::checkMismatch<lang::Type>(declared_type_.value(), "type", type_location_, validation_logger))
             return false;
 

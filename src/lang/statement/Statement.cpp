@@ -68,6 +68,25 @@ lang::Scope const* Statement::getBlockScope() const
     return nullptr;
 }
 
+std::vector<std::reference_wrapper<lang::Scope>> Statement::getSubScopesInOrder()
+{
+    std::vector<std::reference_wrapper<lang::Scope>> sub_scopes;
+
+    for (auto& substatement : substatements_)
+    {
+        if (auto sub_scope = substatement.get().getBlockScope()) { sub_scopes.emplace_back(*sub_scope); }
+        else
+        {
+            auto sub_sub_scopes = substatement.get().getSubScopesInOrder();
+            sub_scopes.insert(sub_scopes.end(),
+                              std::make_move_iterator(sub_sub_scopes.begin()),
+                              std::make_move_iterator(sub_sub_scopes.end()));
+        }
+    }
+
+    return sub_scopes;
+}
+
 bool Statement::isCompound() const
 {
     return false;

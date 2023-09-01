@@ -94,7 +94,7 @@ Optional<lang::OwningHandle<lang::Entity>> lang::OrderedScope::connectWithDefini
 
 void lang::OrderedScope::resolve()
 {
-    for (auto& sub_scope : sub_scopes_) { sub_scope->resolve(); }
+    resolveFollowingOrder();
 
     lang::Scope& parent = *scope();
 
@@ -132,10 +132,8 @@ void lang::OrderedScope::buildDeclarations(CompileContext& context)
             if (variable.hasValue()) { (**variable).buildDeclaration(context); }
         }
     }
-    for (auto& sub_scope : sub_scopes_)
-    {
-        if (auto ordered_sub_scope = sub_scope->asOrderedScope()) ordered_sub_scope->buildDeclarations(context);
-    }
+
+    buildDeclarationsFollowingOrder(context);
 }
 
 void lang::OrderedScope::buildFinalization(CompileContext& context)
@@ -145,9 +143,4 @@ void lang::OrderedScope::buildFinalization(CompileContext& context)
         Optional<lang::ResolvingHandle<lang::Variable>> variable = entity.as<lang::Variable>();
         if (variable.hasValue()) { (**variable).buildFinalization(context); }
     }
-}
-
-void lang::OrderedScope::onSubScope(lang::Scope* sub_scope)
-{
-    sub_scopes_.emplace_back(sub_scope);
 }

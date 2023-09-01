@@ -57,9 +57,20 @@ namespace lang
         [[nodiscard]] lang::Function const* function() const;
         [[nodiscard]] Statement const*      code() const;
 
+        [[nodiscard]] std::vector<std::reference_wrapper<Entity const>> getProvidedEntities() const override;
+        [[nodiscard]] std::vector<Dependency>                           getDeclarationDependencies() const override;
+        [[nodiscard]] std::vector<Dependency>                           getDefinitionDependencies() const override;
+
+        void resolveDeclaration() override;
+        void resolveDefinition() override;
+        void postResolve() override;
+
         void validate(ValidationLogger& validation_logger) const override;
 
         [[nodiscard]] Descriptions expand(lang::Context& new_context) const override;
+
+        void buildDeclaration(CompileContext& context) override;
+        void buildDefinition(CompileContext& context) override;
 
       protected:
         void performInitialization() override;
@@ -74,7 +85,7 @@ namespace lang
         lang::Location                       declaration_location_;
         lang::Location                       definition_location_;
 
-        lang::Function* function_ {nullptr};
+        Optional<lang::ResolvingHandle<lang::Function>> function_;
     };
 }
 

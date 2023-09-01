@@ -34,16 +34,25 @@ namespace lang
 
         ~AliasDescription() override = default;
 
-        [[nodiscard]] Identifier const&    name() const override;
-        [[nodiscard]] lang::Type const&    actual() const;
-        [[nodiscard]] bool                 isOverloadAllowed() const override;
+        [[nodiscard]] Identifier const& name() const override;
+        [[nodiscard]] lang::Type const& actual() const;
+        [[nodiscard]] bool              isOverloadAllowed() const override;
+
+        [[nodiscard]] std::vector<std::reference_wrapper<Entity const>> getProvidedEntities() const override;
+        [[nodiscard]] std::vector<Dependency>                           getDeclarationDependencies() const override;
+        [[nodiscard]] std::vector<Dependency>                           getDefinitionDependencies() const override;
 
         void validate(ValidationLogger& validation_logger) const override;
 
         [[nodiscard]] Descriptions expand(lang::Context& new_context) const override;
 
+        void buildDeclaration(CompileContext& context) override;
+        void buildDefinition(CompileContext& context) override;
+
       protected:
         void performInitialization() override;
+        void resolveDeclaration() override;
+        void resolveDefinition() override;
         void sync(Storage& storage) override;
 
       private:
@@ -52,7 +61,7 @@ namespace lang
         lang::Location                    definition_location_;
         lang::Location                    actual_type_location_;
 
-        Optional<lang::ResolvingHandle<lang::Type>> self_ = {};
+        lang::ResolvingHandle<lang::Type> self_;
     };
 }
 

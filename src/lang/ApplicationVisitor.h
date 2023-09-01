@@ -67,6 +67,7 @@ namespace lang
 
 #include "lang/scope/GlobalScope.h"
 #include "lang/scope/LocalScope.h"
+#include "lang/scope/StructScope.h"
 
 #include "lang/statement/Assertion.h"
 #include "lang/statement/Assignment.h"

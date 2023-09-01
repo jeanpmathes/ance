@@ -61,12 +61,9 @@ namespace lang
          */
         [[nodiscard]] bool isFinal() const;
 
-        [[nodiscard]] virtual std::vector<lang::ResolvingHandle<lang::Variable>> getVariableDependencies();
-        [[nodiscard]] virtual std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies();
-
-        virtual void buildDeclaration(CompileContext& context)  = 0;
-        virtual void buildDefinition(CompileContext& context)   = 0;
-        virtual void buildFinalization(CompileContext& context) = 0;
+        virtual void buildDeclaration(CompileContext& context)    = 0;
+        virtual void buildInitialization(CompileContext& context) = 0;
+        virtual void buildFinalization(CompileContext& context)   = 0;
 
         virtual Shared<lang::Value> getValue(CompileContext& context) = 0;
         virtual void                setValue(Shared<lang::Value> value, CompileContext& context);

@@ -115,6 +115,11 @@ std::vector<std::reference_wrapper<const lang::Type>> lang::PointerType::getCont
     return {element_type_};
 }
 
+std::vector<lang::ResolvingHandle<lang::Type>> lang::PointerType::extractTypesToResolve()
+{
+    return {};// A pointer does not depend on the pointee type.
+}
+
 Optional<lang::ResolvingHandle<lang::Type>> lang::PointerType::getPointeeType()
 {
     return element_type_;

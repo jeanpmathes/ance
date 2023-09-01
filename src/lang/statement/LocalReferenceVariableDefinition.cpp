@@ -64,13 +64,12 @@ void LocalReferenceVariableDefinition::walkDefinitions()
         variable_ = variable.handle();
 
         scope()->addEntity(std::move(variable));
-        scope()->registerUsageIfUndefined(type_);
+        scope()->registerUsage(type_);
     }
 }
 
 void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isUndefined(type_, scope(), type_location_, validation_logger)) return;
     if (lang::Type::checkMismatch<lang::Type>(type_, "type", type_location_, validation_logger)) return;
 
     assert(variable_.hasValue());
@@ -120,5 +119,5 @@ Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressio
 
 void LocalReferenceVariableDefinition::doBuild(CompileContext& context)
 {
-    (*variable_)->buildDefinition(context);
+    (*variable_)->buildInitialization(context);
 }

@@ -52,7 +52,7 @@ namespace lang
                                                                         lang::Location location);
 
         void buildDeclaration(CompileContext& context) override;
-        void buildDefinition(CompileContext& context) override;
+        void buildInitialization(CompileContext& context) override;
         void buildFinalization(CompileContext& context) override;
 
         Shared<lang::Value> getValue(CompileContext& context) override;

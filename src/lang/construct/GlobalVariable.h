@@ -52,29 +52,8 @@ namespace lang
         [[nodiscard]] bool                 isConstant() const;
         [[nodiscard]] lang::Assigner       assigner() const;
 
-        [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies() override;
-        [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Variable>> getVariableDependencies() override;
-
-        /**
-         * Get all variable dependencies of a variable by traversing the function dependencies.
-         * @param variable The variable to get the dependencies for.
-         * @return The dependencies.
-         */
-        static std::vector<lang::ResolvingHandle<lang::Variable>> getAllVariableDependencies(
-            lang::ResolvingHandle<lang::Variable> variable);
-
-        /**
-         * Determine the initialization order for global variables. If no order is possible, the validation logger will be used.
-         * @param variables The variables to determine the order for.
-         * @param validation_logger The validation logger to log errors to. Pass null to ignore errors.
-         * @return The order, or an empty vector if no order is possible.
-         */
-        static std::vector<lang::ResolvingHandle<lang::Variable>> determineOrder(
-            std::vector<lang::ResolvingHandle<lang::Variable>> variables,
-            ValidationLogger*                                  validation_logger);
-
         void buildDeclaration(CompileContext& context) override;
-        void buildDefinition(CompileContext& context) override;
+        void buildInitialization(CompileContext& context) override;
         void buildFinalization(CompileContext& context) override;
 
         Shared<lang::Value> getValue(CompileContext& context) override;

@@ -105,6 +105,7 @@ bool lang::FunctionDefinition::isImported() const
     return false;
 }
 
+void lang::FunctionDefinition::resolveFollowingOrder() {}
 void lang::FunctionDefinition::postResolve() {}
 
 bool lang::FunctionDefinition::validateCall(
@@ -211,3 +212,5 @@ llvm::CallInst* lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Val
     if (!native_type->getReturnType()->isVoidTy()) content_value->setName(name() + ".call");
     return content_value;
 }
+
+void lang::FunctionDefinition::buildDeclarationsFollowingOrder(CompileContext&) {}

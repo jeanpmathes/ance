@@ -46,6 +46,7 @@ namespace lang
 
       public:
         std::vector<std::reference_wrapper<const lang::Type>> getContained() const override;
+        std::vector<lang::ResolvingHandle<lang::Type>>        extractTypesToResolve() override;
 
       private:
         llvm::Value* buildGetElementPointer(llvm::Value* struct_ptr, int32_t member_index, CompileContext& context);

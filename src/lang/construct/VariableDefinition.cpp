@@ -56,16 +56,6 @@ bool lang::VariableDefinition::isFinal() const
     return is_final_;
 }
 
-std::vector<lang::ResolvingHandle<lang::Variable>> lang::VariableDefinition::getVariableDependencies()
-{
-    return {};
-}
-
-std::vector<lang::ResolvingHandle<lang::Function>> lang::VariableDefinition::getFunctionDependencies()
-{
-    return {};
-}
-
 void lang::VariableDefinition::setValue(Shared<lang::Value> value, CompileContext& context)
 {
     if (type()->getStateCount().isUnit()) return;

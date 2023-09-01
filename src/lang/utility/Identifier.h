@@ -48,20 +48,11 @@ namespace lang
          */
         static void synchronize(lang::Identifier* identifier, Storage& storage);
 
+        std::weak_ordering operator<=>(Identifier const& other) const;
+
       private:
         std::string_view string_;
         lang::Location   location_;
-    };
-}
-
-namespace std
-{
-    template<>
-    struct less<lang::Identifier> {
-        bool operator()(lang::Identifier const& lhs, lang::Identifier const& rhs) const
-        {
-            return lhs.text() < rhs.text();
-        }
     };
 }
 

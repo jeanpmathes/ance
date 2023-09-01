@@ -99,22 +99,16 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::getEntryPoint()
     return potential_function.value();
 }
 
-void lang::GlobalScope::createNativeBacking(CompileContext& context)
+void lang::GlobalScope::buildDeclarations(CompileContext& context)
 {
-    for (auto& function_group : getFunctionGroups()) { function_group->createNativeBacking(context); }
-
-    for (auto& variable : getVariables()) { variable->buildDeclaration(context); }
-
-    for (auto& type : getTypes()) { type->buildNativeDeclaration(context); }
+    UnorderedScope::buildDeclarations(context);
     (**context_).buildNativeDeclarations(context);
-
-    for (auto& type : getTypes()) { type->buildNativeDefinition(context); }
-    (**context_).buildNativeDefinitions(context);
 }
 
-void lang::GlobalScope::buildFunctions(CompileContext& context)
+void lang::GlobalScope::buildDefinitions(CompileContext& context)
 {
-    for (auto& function_group : getFunctionGroups()) { function_group->build(context); }
+    UnorderedScope::buildDefinitions(context);
+    (**context_).buildNativeDefinitions(context);
 }
 
 Optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntryPoint()
@@ -141,6 +135,7 @@ Optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntryPoin
 void lang::GlobalScope::onResolve()
 {
     // Type registries are currently incorrect, as they resolve type dependencies in an incorrect scope.
+    // It would be good to no longer need this at all.
     (**context_).resolve();
 }
 

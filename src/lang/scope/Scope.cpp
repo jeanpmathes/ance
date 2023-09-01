@@ -5,7 +5,16 @@
 #include "lang/type/Type.h"
 
 lang::Scope::Scope() = default;
-lang::Scope::Scope(lang::Scope* containing_scope) : containing_scope_(containing_scope) {}
+lang::Scope::Scope(lang::Scope* containing_scope) : containing_scope_(containing_scope)
+{
+    assert(containing_scope != nullptr);
+}
+
+void lang::Scope::setContainingScope(lang::Scope& containing_scope)
+{
+
+    containing_scope_ = &containing_scope;
+}
 
 lang::Scope* lang::Scope::scope()
 {
@@ -59,25 +68,28 @@ std::string lang::Scope::getTemporaryName() const
     return "$temp" + std::to_string(temp_name_counter++);
 }
 
-Owned<lang::OrderedScope> lang::Scope::makeLocalScope()
+Owned<lang::OrderedScope> lang::Scope::makeLocalScope(lang::CodeBlock& code_block)
 {
-    auto local_scope = makeOwned<lang::LocalScope>(this);
+    auto local_scope = makeOwned<lang::LocalScope>(this, code_block);
     addChild(*local_scope);
-
-    onSubScope(local_scope.get());
-
     return local_scope;
 }
 
-void lang::Scope::registerUsage(lang::ResolvingHandle<lang::Entity> entity)
+void lang::Scope::registerUsage(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared)
 {
-    used_entities_.emplace_back(entity);
-    onRegisterUsage(entity);
-}
-
-void lang::Scope::registerUsageIfUndefined(lang::ResolvingHandle<lang::Entity> entity)
-{
-    if (!entity->isDefined()) { registerUsage(entity); }
+    if (auto type = entity.as<lang::Type>(); type.hasValue())
+    {
+        for (auto& extracted : (**type).extractTypesToResolve())
+        {
+            if (!extracted->isDefined()) { onRegisterUsage(extracted); }
+            addDependency(extracted, is_only_declared);
+        }
+    }
+    else
+    {
+        if (!entity->isDefined()) { onRegisterUsage(entity); }
+        addDependency(entity, is_only_declared);
+    }
 }
 
 Optional<lang::OwningHandle<lang::Entity>> lang::Scope::connectWithDefinitionAccordingToOrdering(
@@ -86,99 +98,61 @@ Optional<lang::OwningHandle<lang::Entity>> lang::Scope::connectWithDefinitionAcc
     return entity;
 }
 
-void lang::Scope::onSubScope(lang::Scope*) {}
-
 void lang::Scope::postResolve()
+{}
+
+void lang::Scope::addDependency(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared)
 {
-    for (auto& entity : used_entities_)
+    if (is_only_declared)
     {
-        if (entity->isDefined()) { addDependency(entity); }
-    }
-}
-
-void lang::Scope::addDependency(lang::ResolvingHandle<lang::Function> function)
-{
-    assert(function->isDefined());
-
-    if (function->scope() == this) return;
-
-    if (!function_dependencies_set_.contains(function))
-    {
-        function_dependencies_set_.emplace(function);
-        function_dependencies_.emplace_back(function);
-    }
-
-    if (scope() != this) scope()->addDependency(function);
-}
-
-void lang::Scope::addDependency(lang::ResolvingHandle<lang::Entity> entity)
-{
-    assert(entity->isDefined());
-
-    if (entity->scope() == this) return;
-
-    if (!entity_to_dependency_index_.contains(entity))
-    {
-        entity_to_dependency_index_.emplace(entity, entity_dependencies_.size());
-        entity_dependencies_.emplace_back(entity);
-    }
-
-    entity_dependencies_[entity_to_dependency_index_.at(entity)].count++;
-
-    if (scope() != this) scope()->addDependency(entity);
-}
-
-std::vector<lang::Scope::Dependency<lang::Entity>> lang::Scope::getDependencies()
-{
-    return entity_dependencies_;
-}
-
-std::vector<lang::Scope::Dependency<lang::Variable>> lang::Scope::getVariableDependencies()
-{
-    std::vector<Dependency<lang::Variable>> result;
-
-    for (auto& dependency : entity_dependencies_)
-    {
-        if (lang::Type::isMatching<lang::Variable>(dependency.entity))
+        if (!entity_to_declaration_dependency_index_.contains(entity))
         {
-            result.emplace_back(lang::Type::makeMatching<Variable>(dependency.entity), dependency.count);
+            entity_to_declaration_dependency_index_.emplace(entity, entity_declaration_dependencies_.size());
+            entity_declaration_dependencies_.emplace_back(entity);
         }
+
+        entity_declaration_dependencies_[entity_to_declaration_dependency_index_.at(entity)].count++;
     }
+    else
+    {
+        if (!entity_to_definition_dependency_index_.contains(entity))
+        {
+            entity_to_definition_dependency_index_.emplace(entity, entity_definition_dependencies_.size());
+            entity_definition_dependencies_.emplace_back(entity);
+        }
+
+        entity_definition_dependencies_[entity_to_definition_dependency_index_.at(entity)].count++;
+    }
+
+    if (scope() != this) scope()->addDependency(entity, is_only_declared);
+}
+
+std::vector<lang::Scope::Dependency<lang::Entity>> lang::Scope::getDependenciesOnDeclaration()
+{
+    return entity_declaration_dependencies_;
+}
+
+std::vector<std::reference_wrapper<const lang::Entity>> lang::Scope::getDependenciesOnDeclaration() const
+{
+    std::vector<std::reference_wrapper<const lang::Entity>> result;
+    result.reserve(entity_declaration_dependencies_.size());
+
+    for (auto& dependency : entity_declaration_dependencies_) { result.emplace_back(dependency.entity); }
 
     return result;
 }
 
-std::vector<lang::Scope::Dependency<lang::FunctionGroup>> lang::Scope::getFunctionGroupDependencies()
+std::vector<lang::Scope::Dependency<lang::Entity>> lang::Scope::getDependenciesOnDefinition()
 {
-    std::vector<Dependency<lang::FunctionGroup>> result;
-
-    for (auto& dependency : entity_dependencies_)
-    {
-        if (lang::Type::isMatching<lang::FunctionGroup>(dependency.entity))
-        {
-            result.emplace_back(lang::Type::makeMatching<FunctionGroup>(dependency.entity), dependency.count);
-        }
-    }
-
-    return result;
+    return entity_definition_dependencies_;
 }
 
-std::vector<lang::Scope::Dependency<lang::Type>> lang::Scope::getTypeDependencies()
+std::vector<std::reference_wrapper<const lang::Entity>> lang::Scope::getDependenciesOnDefinition() const
 {
-    std::vector<Dependency<lang::Type>> result;
+    std::vector<std::reference_wrapper<const lang::Entity>> result;
+    result.reserve(entity_definition_dependencies_.size());
 
-    for (auto& dependency : entity_dependencies_)
-    {
-        if (lang::Type::isMatching<lang::Type>(dependency.entity))
-        {
-            result.emplace_back(lang::Type::makeMatching<Type>(dependency.entity), dependency.count);
-        }
-    }
+    for (auto& dependency : entity_definition_dependencies_) { result.emplace_back(dependency.entity); }
 
     return result;
-}
-
-std::vector<lang::ResolvingHandle<lang::Function>> lang::Scope::getFunctionDependencies()
-{
-    return function_dependencies_;
 }

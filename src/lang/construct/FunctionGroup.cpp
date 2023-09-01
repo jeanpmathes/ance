@@ -41,16 +41,6 @@ bool lang::FunctionGroup::requestOverload(std::vector<lang::ResolvingHandle<lang
     return false;
 }
 
-void lang::FunctionGroup::resolve()
-{
-    for (auto& function : functions()) function->resolve();
-}
-
-void lang::FunctionGroup::postResolve()
-{
-    for (auto& function : functions()) function->postResolve();
-}
-
 void lang::FunctionGroup::validate(ValidationLogger& validation_logger) const
 {
     {// Validate that every signature is unique
@@ -119,16 +109,6 @@ void lang::FunctionGroup::determineFlow()
 void lang::FunctionGroup::validateFlow(ValidationLogger& validation_logger) const
 {
     for (auto& function : functions()) function->validateFlow(validation_logger);
-}
-
-void lang::FunctionGroup::createNativeBacking(CompileContext& compile_context)
-{
-    for (auto& function : functions()) function->createNativeBacking(compile_context);
-}
-
-void lang::FunctionGroup::build(CompileContext& compile_context)
-{
-    for (auto& function : functions()) function->build(compile_context);
 }
 
 lang::ResolvingHandle<lang::Entity> lang::FunctionGroup::getUndefinedClone(lang::Context&) const

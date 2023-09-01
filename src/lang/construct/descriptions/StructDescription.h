@@ -38,9 +38,20 @@ namespace lang
         [[nodiscard]] std::vector<std::reference_wrapper<const lang::Member>> members() const;
         [[nodiscard]] bool                                                    isOverloadAllowed() const override;
 
+        [[nodiscard]] std::vector<std::reference_wrapper<Entity const>> getProvidedEntities() const override;
+        [[nodiscard]] std::vector<Dependency>                           getDeclarationDependencies() const override;
+        [[nodiscard]] std::vector<Dependency>                           getDefinitionDependencies() const override;
+
+        void resolveDeclaration() override;
+        void resolveDefinition() override;
+        void postResolve() override;
+
         void validate(ValidationLogger& validation_logger) const override;
 
         [[nodiscard]] Descriptions expand(lang::Context& new_context) const override;
+
+        void buildDeclaration(CompileContext& context) override;
+        void buildDefinition(CompileContext& context) override;
 
       protected:
         void performInitialization() override;
@@ -51,7 +62,8 @@ namespace lang
         std::vector<Owned<lang::Member>> members_;
         lang::Location                   definition_location_;
 
-        Optional<lang::ResolvingHandle<lang::Type>> self_ = {};
+        lang::ResolvingHandle<lang::Type> self_;
+        Optional<Owned<Scope>>            struct_scope_ = {};
     };
 }
 

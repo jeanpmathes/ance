@@ -6,6 +6,7 @@
 
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/descriptions/Description.h"
+#include "lang/utility/SortingGraph.h"
 #include "validation/ValidationLogger.h"
 
 bool lang::UnorderedScope::isNameConflicted(lang::Identifier const& name) const
@@ -91,6 +92,223 @@ Optional<lang::ResolvingHandle<lang::Entity>> lang::UnorderedScope::getEntity(Id
     else return {};
 }
 
+void lang::UnorderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Entity> entity)
+{
+    assert(!entity->isDefined());
+
+    if (undefined_entities_.contains(entity->name()))
+    {
+        entity.reroute(undefined_entities_.at(entity->name()).handle());
+        return;
+    }
+
+    if (defined_entities_.contains(entity->name()))
+    {
+        entity.reroute(defined_entities_.at(entity->name()).handle());
+        return;
+    }
+
+    undefined_entities_.emplace(entity->name(), lang::OwningHandle<Entity>::takeOwnership(entity));
+}
+
+void lang::UnorderedScope::resolve()
+{
+    for (auto& [name, descriptions] : compatible_descriptions_)
+    {
+        for (auto& description : descriptions) { description.description->initialize(*this); }
+    }
+
+    struct ResolvableID {
+        ResolvableKind   kind;
+        lang::Identifier name;
+
+        std::weak_ordering operator<=>(ResolvableID const& other) const
+        {
+            if (kind != other.kind) return kind <=> other.kind;
+            else return name <=> other.name;
+        }
+    };
+
+    struct Resolvable {
+        lang::Identifier                                       name;
+        std::vector<std::reference_wrapper<lang::Description>> group;
+    };
+
+    lang::SortingGraph<ResolvableID, Resolvable> graph;
+    std::map<lang::Identifier, ResolvableID>     declaration_providers;
+    std::map<lang::Identifier, ResolvableID>     definition_providers;
+
+    for (auto& [name, descriptions] : compatible_descriptions_)
+    {
+        Resolvable resolvable = {name, {}};
+
+        resolvable.group.reserve(descriptions.size());
+        for (auto& description : descriptions) { resolvable.group.emplace_back(*description.description); }
+
+        auto const& declaration = graph.addNode({ResolvableKind::DECLARATION, name}, resolvable);
+        auto const& definition  = graph.addNode({ResolvableKind::DEFINITION, name}, resolvable);
+
+        graph.addEdge(definition, declaration);
+
+        assert(!descriptions.empty());
+
+        if (descriptions.front().description->isOverloadAllowed())
+        {
+            declaration_providers.emplace(name, declaration);
+            definition_providers.emplace(name, definition);
+        }
+        else
+        {
+            assert(descriptions.size() == 1);
+
+            for (auto& provided : descriptions.front().description->getProvidedEntities())
+            {
+                declaration_providers.emplace(provided.get().name(), declaration);
+                definition_providers.emplace(provided.get().name(), definition);
+            }
+        }
+    }
+
+    for (auto& [name, descriptions] : compatible_descriptions_)
+    {
+        const ResolvableID     declaration = {ResolvableKind::DECLARATION, name};
+        std::set<ResolvableID> declaration_dependencies;
+
+        for (auto& description : descriptions)
+        {
+            for (auto& [dependency, depends_on_definition] : description.description->getDeclarationDependencies())
+            {
+                if (dependency.get().isDefined()) continue;
+
+                if (depends_on_definition)
+                {
+                    if (definition_providers.contains(dependency.get().name()))
+                    {
+                        declaration_dependencies.emplace(definition_providers.at(dependency.get().name()));
+                    }
+                    else { missing_definitions_.push_back(dependency.get().name()); }
+                }
+                else
+                {
+                    if (declaration_providers.contains(dependency.get().name()))
+                    {
+                        declaration_dependencies.emplace(declaration_providers.at(dependency.get().name()));
+                    }
+                    else { missing_declarations_.push_back(dependency.get().name()); }
+                }
+            }
+        }
+
+        for (auto& dependency : declaration_dependencies) { graph.addEdge(declaration, dependency); }
+
+        const ResolvableID     definition = {ResolvableKind::DEFINITION, name};
+        std::set<ResolvableID> definition_dependencies;
+
+        for (auto& description : descriptions)
+        {
+            for (auto& [dependency, depends_on_definition] : description.description->getDefinitionDependencies())
+            {
+                if (dependency.get().isDefined()) continue;
+
+                if (depends_on_definition)
+                {
+                    if (definition_providers.contains(dependency.get().name()))
+                    {
+                        definition_dependencies.emplace(definition_providers.at(dependency.get().name()));
+                    }
+                    else { missing_definitions_.push_back(dependency.get().name()); }
+                }
+                else
+                {
+                    if (declaration_providers.contains(dependency.get().name()))
+                    {
+                        definition_dependencies.emplace(declaration_providers.at(dependency.get().name()));
+                    }
+                    else { missing_declarations_.push_back(dependency.get().name()); }
+                }
+            }
+        }
+
+        for (auto& dependency : definition_dependencies) { graph.addEdge(definition, dependency); }
+    }
+
+    if (!missing_declarations_.empty()) return;
+
+    std::vector<ResolvableID> const order =
+        graph.sort([&](ResolvableID const& cycle) { cyclic_definitions_.push_back(cycle.name); });
+
+    if (!cyclic_definitions_.empty()) return;
+
+    std::vector<ResolvableGroup> description_order;
+
+    for (auto& id : order)
+    {
+        auto& resolvable = graph[id];
+
+        if (id.kind == ResolvableKind::DECLARATION)
+        {
+            for (auto& description : resolvable.group) { description.get().resolveDeclaration(); }
+        }
+
+        if (id.kind == ResolvableKind::DEFINITION)
+        {
+            for (auto& description : resolvable.group) { description.get().resolveDefinition(); }
+        }
+
+        description_order.push_back({.descriptions = std::move(resolvable.group), .kind = id.kind});
+    }
+
+    description_order_ = std::move(description_order);
+
+    if (scope() != this)
+    {
+        auto iterator = undefined_entities_.begin();
+
+        while (iterator != undefined_entities_.end())
+        {
+            auto& [name, entity] = *iterator;
+
+            if (scope()->resolveDefinition(entity.handle())) { iterator = undefined_entities_.erase(iterator); }
+            else { ++iterator; }
+        }
+    }
+
+    onResolve();
+}
+
+void lang::UnorderedScope::postResolve()
+{
+    for (auto& [name, entity] : defined_entities_)
+    {
+        auto type = entity.handle().as<Type>();
+        if (type.hasValue()) (**type).postResolve();
+    }
+
+    onPostResolve();
+
+    for (auto& [name, descriptions] : compatible_descriptions_)
+    {
+        for (auto& description : descriptions) { description.description->postResolve(); }
+    }
+
+    Scope::postResolve();
+}
+
+bool lang::UnorderedScope::resolveDefinition(lang::ResolvingHandle<lang::Entity> entity)
+{
+    if (defined_entities_.contains(entity->name()))
+    {
+        entity.reroute(defined_entities_.at(entity->name()).handle());
+        return true;
+    }
+
+    lang::Scope* parent = scope();
+
+    if (parent != this) return parent->resolveDefinition(entity);
+
+    return false;
+}
+
 void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
 {
     for (auto const& [name, associated_descriptions] : incompatible_descriptions_)
@@ -144,11 +362,60 @@ void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
         }
     }
 
+    for (auto& name : missing_declarations_)
+    {
+        validation_logger.logError("No declaration for '" + name + "' found", name.location());
+    }
+
+    if (!missing_declarations_.empty()) return;
+
+    for (auto& name : missing_definitions_)
+    {
+        validation_logger.logError("No definition for '" + name + "' found", name.location());
+    }
+
+    if (!missing_definitions_.empty()) return;
+
+    for (auto& name : cyclic_definitions_)
+    {
+        validation_logger.logError("Name '" + name + "' part of cyclic dependency", name.location());
+    }
+
+    if (!cyclic_definitions_.empty()) return;
+
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
         for (auto& description : descriptions)
         {
+            bool missing_dependencies = false;
+
+            for (auto& declaration_dependency : description.description->getDeclarationDependencies())
+            {
+                Entity const& entity = declaration_dependency.entity.get();
+
+                if (!entity.isDefined())
+                {
+                    validation_logger.logError("Name " + entity.getAnnotatedName() + " is undefined in current context",
+                                               entity.name().location());
+                    missing_dependencies = true;
+                }
+            }
+
+            for (auto& definition_dependency : description.description->getDefinitionDependencies())
+            {
+                Entity const& entity = definition_dependency.entity.get();
+
+                if (!entity.isDefined())
+                {
+                    validation_logger.logError("Name " + entity.getAnnotatedName() + " is undefined in current context",
+                                               entity.name().location());
+                    missing_dependencies = true;
+                }
+            }
+
+            if (missing_dependencies) continue;
             if (description.description->isImported()) continue;
+
             description.description->validate(validation_logger);
         }
     }
@@ -167,109 +434,61 @@ void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
         Optional<lang::ResolvingHandle<lang::Variable>> variable = entity.handle().as<lang::Variable>();
         if (variable.hasValue()) global_variables.emplace_back(variable.value());
     }
-
-    lang::GlobalVariable::determineOrder(global_variables, &validation_logger);
 }
 
-void lang::UnorderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Entity> entity)
-{
-    assert(!entity->isDefined());
-
-    if (undefined_entities_.contains(entity->name()))
-    {
-        entity.reroute(undefined_entities_.at(entity->name()).handle());
-        return;
-    }
-
-    if (defined_entities_.contains(entity->name()))
-    {
-        entity.reroute(defined_entities_.at(entity->name()).handle());
-        return;
-    }
-
-    undefined_entities_.emplace(entity->name(), lang::OwningHandle<Entity>::takeOwnership(entity));
-}
-
-void lang::UnorderedScope::resolve()
-{
-    for (auto& [name, descriptions] : compatible_descriptions_)
-    {
-        for (auto& description : descriptions) { description.description->initialize(*this); }
-    }
-
-    for (auto& [name, entity] : defined_entities_)
-    {
-        auto function_group = entity.handle().as<FunctionGroup>();
-        if (function_group.hasValue()) (**function_group).resolve();
-    }
-
-    for (auto& [name, descriptions] : compatible_descriptions_)
-    {
-        for (auto& description : descriptions) { description.description->resolve(); }
-    }
-
-    onResolve();
-}
-
-void lang::UnorderedScope::postResolve()
+void lang::UnorderedScope::buildDeclarations(CompileContext& context)
 {
     for (auto& [name, entity] : defined_entities_)
     {
-        auto type = entity.handle().as<Type>();
-        if (type.hasValue()) (**type).postResolve();
+        if (auto type = castToType<lang::Type>(entity); type.hasValue() and not(**type).isCustom())
+        {
+            (**type).buildNativeDeclaration(context);
+        }
     }
 
-    onPostResolve();
-
-    for (auto& [name, entity] : defined_entities_)
+    for (auto& group : description_order_.value())
     {
-        auto function_group = entity.handle().as<FunctionGroup>();
-        if (function_group.hasValue()) (**function_group).postResolve();
-    }
+        if (group.kind == ResolvableKind::DEFINITION) continue;
 
-    for (auto& [name, descriptions] : compatible_descriptions_)
-    {
-        for (auto& description : descriptions) { description.description->postResolve(); }
+        for (auto& description : group.descriptions) { description.get().buildDeclaration(context); }
     }
-
-    Scope::postResolve();
 }
 
-bool lang::UnorderedScope::resolveDefinition(lang::ResolvingHandle<lang::Entity> entity)
+void lang::UnorderedScope::buildDefinitions(CompileContext& context)
 {
-    if (defined_entities_.contains(entity->name()))
+    for (auto& [name, entity] : defined_entities_)
     {
-        entity.reroute(defined_entities_.at(entity->name()).handle());
-        return true;
+        if (auto type = castToType<lang::Type>(entity); type.hasValue() and not(**type).isCustom())
+        {
+            (**type).buildNativeDefinition(context);
+        }
     }
 
-    lang::Scope* parent = scope();
+    for (auto& group : description_order_.value())
+    {
+        if (group.kind == ResolvableKind::DEFINITION) continue;
 
-    if (parent != this) return parent->resolveDefinition(entity);
-
-    return false;
+        for (auto& description : group.descriptions) { description.get().buildDefinition(context); }
+    }
 }
 
 void lang::UnorderedScope::buildInitialization(CompileContext& context)
 {
-    std::vector<lang::ResolvingHandle<lang::Variable>> variables;
-    for (auto& [name, entity] : defined_entities_)
+    for (auto& group : description_order_.value())
     {
-        auto variable = entity.handle().as<Variable>();
-        if (variable.hasValue()) variables.emplace_back(variable.value());
+        if (group.kind == ResolvableKind::DEFINITION) continue;
+
+        for (auto& description : group.descriptions) { description.get().buildInitialization(context); }
     }
-
-    variables = GlobalVariable::determineOrder(variables, nullptr);
-
-    for (auto& variable : variables) { variable->buildDefinition(context); }
 }
 
 void lang::UnorderedScope::buildFinalization(CompileContext& context)
 {
-    for (auto& [name, entity] : defined_entities_)
+    for (auto& group : description_order_.value())
     {
-        auto variable = entity.handle().as<Variable>();
-        if (variable.hasValue()) (**variable).buildFinalization(context);
+        if (group.kind == ResolvableKind::DEFINITION) continue;
+
+        for (auto& description : group.descriptions) { description.get().buildFinalization(context); }
     }
 }
 

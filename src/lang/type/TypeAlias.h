@@ -137,6 +137,7 @@ namespace lang
       public:
         std::vector<lang::TypeDefinition const*>              getDependencies() const override;
         std::vector<std::reference_wrapper<const lang::Type>> getContained() const override;
+        std::vector<lang::ResolvingHandle<lang::Type>>        extractTypesToResolve() override;
 
       private:
         lang::ResolvingHandle<lang::Type> actual_;

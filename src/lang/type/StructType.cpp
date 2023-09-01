@@ -118,6 +118,25 @@ std::vector<std::reference_wrapper<lang::Type const>> lang::StructType::getConta
     return dependencies;
 }
 
+std::vector<lang::ResolvingHandle<lang::Type>> lang::StructType::extractTypesToResolve()
+{
+    std::vector<lang::ResolvingHandle<lang::Type>> types_to_resolve;
+    std::set<lang::Identifier>                     added;
+
+    for (auto& member : members_)
+    {
+        auto type = member.get().type();
+
+        if (!added.contains(type->name()))
+        {
+            types_to_resolve.emplace_back(type);
+            added.insert(type->name());
+        }
+    }
+
+    return types_to_resolve;
+}
+
 bool lang::StructType::hasMember(lang::Identifier const& name) const
 {
     return member_map_.contains(name);

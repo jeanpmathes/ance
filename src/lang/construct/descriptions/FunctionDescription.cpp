@@ -46,38 +46,33 @@ bool lang::FunctionDescription::isOverloadAllowed() const
 
 void lang::FunctionDescription::performInitialization()
 {
-    lang::OwningHandle<lang::Function> function =
-        lang::OwningHandle<lang::Function>::takeOwnership(lang::makeHandled<lang::Function>(name_));
+    function_ = lang::makeHandled<lang::Function>(name_);
 
     if (code_.hasValue())
     {
-        function->defineAsCustom(access().modifier(),
-                                 return_type_,
-                                 return_type_location_,
-                                 parameters_,
-                                 **code_,
-                                 scope(),
-                                 declaration_location_,
-                                 definition_location_);
+        function_.value()->defineAsCustom(access().modifier(),
+                                          return_type_,
+                                          return_type_location_,
+                                          parameters_,
+                                          **code_,
+                                          scope(),
+                                          declaration_location_,
+                                          definition_location_);
     }
     else
     {
-        function->defineAsImported(scope(),
-                                   access().modifier(),
-                                   return_type_,
-                                   return_type_location_,
-                                   parameters_,
-                                   declaration_location_);
+        function_.value()->defineAsImported(scope(),
+                                            access().modifier(),
+                                            return_type_,
+                                            return_type_location_,
+                                            parameters_,
+                                            declaration_location_);
     }
-
-    function_ = &*function;
-
-    scope().addEntity(std::move(function));
 }
 
 lang::Function const* lang::FunctionDescription::function() const
 {
-    return function_;
+    return &*function_.value();
 }
 
 Statement const* lang::FunctionDescription::code() const
@@ -85,10 +80,74 @@ Statement const* lang::FunctionDescription::code() const
     return getPtr(code_);
 }
 
+std::vector<std::reference_wrapper<const lang::Entity>> lang::FunctionDescription::getProvidedEntities() const
+{
+    return {};// Does not provide any entities as it is part of a function group.
+}
+
+std::vector<lang::Description::Dependency> lang::FunctionDescription::getDeclarationDependencies() const
+{
+    auto* self = const_cast<FunctionDescription*>(this);
+
+    std::vector<Dependency>    dependencies;
+    std::set<lang::Identifier> added;
+
+    auto add = [&](lang::ResolvingHandle<lang::Entity> entity) {
+        if (auto type = entity.as<lang::Type>(); type.hasValue())
+        {
+            for (auto& dependency : (**type).extractTypesToResolve())
+            {
+                if (added.contains(dependency->name())) continue;
+
+                dependencies.emplace_back(dependency);
+                added.insert(dependency->name());
+            }
+        }
+        else if (!added.contains(entity->name()))
+        {
+            dependencies.emplace_back(entity.base());
+            added.insert(entity->name());
+        }
+    };
+
+    add(self->return_type_);
+
+    for (auto parameter : self->parameters_) { add(parameter->type()); }
+
+    return dependencies;
+}
+
+std::vector<lang::Description::Dependency> lang::FunctionDescription::getDefinitionDependencies() const
+{
+    std::vector<Dependency> dependencies;
+
+    for (auto& dependency : function_.value()->getDependenciesOnDeclaration())
+    {
+        dependencies.emplace_back(dependency, false);
+    }
+
+    for (auto& dependency : function_.value()->getDependenciesOnDefinition()) { dependencies.emplace_back(dependency); }
+
+    return dependencies;
+}
+
+void lang::FunctionDescription::resolveDeclaration()
+{
+    scope().addEntity(lang::OwningHandle<lang::Function>::takeOwnership(function_.value()));
+}
+
+void lang::FunctionDescription::resolveDefinition()
+{
+    function_.value()->resolve();
+}
+
+void lang::FunctionDescription::postResolve()
+{
+    function_.value()->postResolve();
+}
+
 void lang::FunctionDescription::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isUndefined(return_type_, &scope(), return_type_location_, validation_logger)) return;
-
     return_type_->validate(validation_logger, return_type_location_);
 
     if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS)
@@ -107,9 +166,6 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
             validation_logger.logWarning("Name '" + parameter->name() + "' already used for a parameter",
                                          parameter->name().location());
         }
-
-        if (lang::validation::isUndefined(parameter->type(), &scope(), parameter->typeLocation(), validation_logger))
-            return;
 
         if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS)
         {
@@ -139,7 +195,7 @@ lang::Description::Descriptions lang::FunctionDescription::expand(lang::Context&
     }
 
     std::vector<Shared<lang::Parameter>> expanded_parameters;
-
+    expanded_parameters.reserve(parameters_.size());
     for (auto& parameter : parameters_) { expanded_parameters.emplace_back(parameter->expand(new_context)); }
 
     auto expanded = makeOwned<lang::FunctionDescription>(access(),
@@ -155,6 +211,16 @@ lang::Description::Descriptions lang::FunctionDescription::expand(lang::Context&
     descriptions.emplace_back(std::move(expanded));
 
     return descriptions;
+}
+
+void lang::FunctionDescription::buildDeclaration(CompileContext& context)
+{
+    function_.value()->createNativeBacking(context);
+}
+
+void lang::FunctionDescription::buildDefinition(CompileContext& context)
+{
+    function_.value()->build(context);
 }
 
 void lang::FunctionDescription::sync(Storage& storage)

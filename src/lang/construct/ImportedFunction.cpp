@@ -27,9 +27,9 @@ lang::ImportedFunction::ImportedFunction(Function& function,
 
 void lang::ImportedFunction::setup()
 {
-    scope().registerUsageIfUndefined(returnType());
+    scope().registerUsage(returnType());
 
-    for (auto& parameter : this->parameters()) { scope().registerUsageIfUndefined(parameter->type()); }
+    for (auto& parameter : this->parameters()) { scope().registerUsage(parameter->type()); }
 }
 
 bool lang::ImportedFunction::isMangled() const

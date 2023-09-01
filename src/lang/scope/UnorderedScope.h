@@ -3,6 +3,7 @@
 
 #include "Scope.h"
 
+#include <experimental/vector>
 #include <map>
 #include <optional>
 #include <ranges>
@@ -56,6 +57,8 @@ namespace lang
 
         bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) override;
 
+        void         buildDeclarations(CompileContext& context) override;
+        virtual void buildDefinitions(CompileContext& context);
         /**
          * Build all initialization required by global entities.
          * @param context The current compile context.
@@ -89,9 +92,9 @@ namespace lang
         }
 
         template<typename Target>
-        static bool castToType(lang::OwningHandle<lang::Entity> const& entity)
+        static Optional<lang::ResolvingHandle<Target>> castToType(lang::OwningHandle<lang::Entity>& entity)
         {
-            return entity.handle().get().template as<Target>();
+            return entity.handle().template as<Target>();
         }
 
       public:
@@ -115,6 +118,23 @@ namespace lang
 
         std::map<lang::Identifier, lang::OwningHandle<lang::Entity>> undefined_entities_;
         std::map<lang::Identifier, lang::OwningHandle<lang::Entity>> defined_entities_;
+
+        std::vector<lang::Identifier> missing_declarations_;
+        std::vector<lang::Identifier> missing_definitions_;
+        std::vector<lang::Identifier> cyclic_definitions_;
+
+        enum ResolvableKind
+        {
+            DEFINITION,
+            DECLARATION
+        };
+
+        struct ResolvableGroup {
+            std::vector<std::reference_wrapper<lang::Description>> descriptions;
+            ResolvableKind                                         kind;
+        };
+
+        std::optional<std::vector<ResolvableGroup>> description_order_;
     };
 }
 

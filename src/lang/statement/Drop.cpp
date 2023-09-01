@@ -30,7 +30,6 @@ void Drop::walkDefinitions()
 
 void Drop::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isUndefined(variable_, scope(), location(), validation_logger)) return;
     if (lang::Type::checkMismatch<lang::Variable>(variable_, "value", location(), validation_logger)) return;
 
     if (!dropped_)

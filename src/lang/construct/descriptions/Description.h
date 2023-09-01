@@ -4,6 +4,7 @@
 #include "lang/Element.h"
 
 #include "lang/Accessibility.h"
+#include "lang/utility/ResolvingHandle.h"
 
 namespace lang
 {
@@ -32,6 +33,20 @@ namespace lang
         [[nodiscard]] virtual bool                    isOverloadAllowed() const = 0;
         [[nodiscard]] lang::Accessibility             access() const;
 
+        struct Dependency {
+            std::reference_wrapper<lang::Entity const> entity;
+            bool                                       depends_on_definition = true;
+
+            explicit Dependency(lang::Entity const& dependee, bool depends_on_dependee_definition = true)
+                : entity(dependee)
+                , depends_on_definition(depends_on_dependee_definition)
+            {}
+        };
+
+        [[nodiscard]] virtual std::vector<std::reference_wrapper<lang::Entity const>> getProvidedEntities() const = 0;
+        [[nodiscard]] virtual std::vector<Dependency> getDeclarationDependencies() const                          = 0;
+        [[nodiscard]] virtual std::vector<Dependency> getDefinitionDependencies() const                           = 0;
+
         /**
          * Initialize the description, which will add the described entity to the passed scope.
          * @param scope The scope.
@@ -39,9 +54,14 @@ namespace lang
         void initialize(lang::Scope& scope);
 
         /**
-         * Call resolve on owned entities.
+         * Resolve all entities required for the declaration.
          */
-        virtual void resolve();
+        virtual void resolveDeclaration();
+
+        /**
+         * Resolve all entities required for the definition.
+         */
+        virtual void resolveDefinition();
 
         /**
          * Called after all entities have been resolved.
@@ -68,6 +88,11 @@ namespace lang
          * @return True if the description is imported.
          */
         [[nodiscard]] bool isImported() const;
+
+        virtual void buildDeclaration(CompileContext& context);
+        virtual void buildDefinition(CompileContext& context);
+        virtual void buildInitialization(CompileContext& context);
+        virtual void buildFinalization(CompileContext& context);
 
       protected:
         /**

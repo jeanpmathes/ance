@@ -116,6 +116,11 @@ std::vector<std::reference_wrapper<const lang::Type>> lang::BufferType::getConta
     return {element_type_};
 }
 
+std::vector<lang::ResolvingHandle<lang::Type>> lang::BufferType::extractTypesToResolve()
+{
+    return {};// A pointer does not depend on the pointee type.
+}
+
 Optional<lang::ResolvingHandle<lang::Type>> lang::BufferType::getPointeeType()
 {
     return element_type_;

@@ -25,10 +25,11 @@ Owned<Statement> lang::InitializerFunction::makeInitializerBlock(lang::Resolving
 {
     Owned<lang::CodeBlock> code = lang::CodeBlock::makeScoped(lang::Location::global());
 
-    Owned<Statement> assignment = makeOwned<Assignment>(makeOwned<VariableAccess>(variable, lang::Location::global()),
-                                                        assigner,
-                                                        std::move(initializer),
-                                                        lang::Location::global());
+    Owned<Statement> assignment =
+        makeOwned<Assignment>(makeOwned<VariableAccess>(variable, false, lang::Location::global()),
+                              assigner,
+                              std::move(initializer),
+                              lang::Location::global());
 
     Owned<lang::CodeBlock> body = lang::CodeBlock::makeWithStatement(std::move(assignment));
     code->append(std::move(body));

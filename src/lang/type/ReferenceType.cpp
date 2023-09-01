@@ -265,6 +265,11 @@ std::vector<std::reference_wrapper<const lang::Type>> lang::ReferenceType::getCo
     return {element_type_};
 }
 
+std::vector<lang::ResolvingHandle<lang::Type>> lang::ReferenceType::extractTypesToResolve()
+{
+    return {};
+}
+
 lang::ResolvingHandle<lang::Type> lang::ReferenceType::clone(lang::Context& new_context) const
 {
     return new_context.getReferenceType(element_type_->getUndefinedTypeClone(new_context));

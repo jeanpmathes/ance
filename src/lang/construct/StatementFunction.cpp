@@ -8,7 +8,6 @@
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
-#include "lang/scope/LocalScope.h"
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
@@ -43,12 +42,12 @@ void lang::StatementFunction::setup()
     inside_scope_ = code_.getBlockScope();
     assert(inside_scope_);
 
-    scope().registerUsageIfUndefined(returnType());
+    scope().registerUsage(returnType());
 
     unsigned no = 1;
     for (auto& parameter : this->parameters())
     {
-        scope().registerUsageIfUndefined(parameter->type());
+        scope().registerUsage(parameter->type());
 
         auto parameter_variable = lang::LocalVariable::makeParameterVariable(parameter->name(),
                                                                              parameter->type(),
@@ -78,6 +77,11 @@ lang::AccessModifier lang::StatementFunction::access() const
 Statement const* lang::StatementFunction::code() const
 {
     return &code_;
+}
+
+void lang::StatementFunction::resolveFollowingOrder()
+{
+    code_.getBlockScope()->resolve();
 }
 
 void lang::StatementFunction::postResolve()
@@ -164,7 +168,7 @@ void lang::StatementFunction::build(CompileContext& context)
 
     context.ir().CreateBr(defs);
     context.ir().SetInsertPoint(defs);
-    for (auto& arg : arguments_) { (*arg)->buildDefinition(context); }
+    for (auto& arg : arguments_) { (*arg)->buildInitialization(context); }
 
     initial_block_->prepareBuild(context, native_function_);
     initial_block_->doBuild(context);
@@ -173,14 +177,19 @@ void lang::StatementFunction::build(CompileContext& context)
     context.di().finalizeSubprogram(native_function_->getSubprogram());
 }
 
-std::vector<lang::BasicBlock*> const& lang::StatementFunction::getBasicBlocks() const
+void lang::StatementFunction::buildDeclarationsFollowingOrder(CompileContext& context)
 {
-    return used_blocks_;
+    code_.getBlockScope()->buildDeclarations(context);
 }
 
 llvm::DIScope* lang::StatementFunction::getDebugScope(CompileContext&) const
 {
     return native_function_->getSubprogram();
+}
+
+std::vector<lang::BasicBlock*> const& lang::StatementFunction::getBasicBlocks() const
+{
+    return used_blocks_;
 }
 
 std::vector<Optional<lang::ResolvingHandle<lang::Variable>>> const& lang::StatementFunction::arguments() const

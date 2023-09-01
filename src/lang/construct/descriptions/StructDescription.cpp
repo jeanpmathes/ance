@@ -1,6 +1,7 @@
 #include "StructDescription.h"
 
 #include "lang/ApplicationVisitor.h"
+#include "lang/scope/StructScope.h"
 #include "lang/type/StructType.h"
 #include "lang/utility/Storage.h"
 #include "validation/Utilities.h"
@@ -14,6 +15,7 @@ lang::StructDescription::StructDescription(lang::Accessibility              acce
     , name_(name)
     , members_(std::move(members))
     , definition_location_(definition_location)
+    , self_(lang::makeHandled<lang::Type>(name_))
 {}
 
 lang::StructDescription::StructDescription(bool from_public_import)
@@ -21,6 +23,7 @@ lang::StructDescription::StructDescription(bool from_public_import)
     , name_(lang::Identifier::empty())
     , members_()
     , definition_location_(lang::Location::global())
+    , self_(lang::Type::getUndefined())
 {}
 
 lang::Identifier const& lang::StructDescription::name() const
@@ -41,31 +44,63 @@ bool lang::StructDescription::isOverloadAllowed() const
     return false;
 }
 
+std::vector<std::reference_wrapper<const lang::Entity>> lang::StructDescription::getProvidedEntities() const
+{
+    return {std::cref(self_.base())};
+}
+
+std::vector<lang::Description::Dependency> lang::StructDescription::getDeclarationDependencies() const
+{
+    return {};
+}
+
+std::vector<lang::Description::Dependency> lang::StructDescription::getDefinitionDependencies() const
+{
+    std::vector<Dependency> dependencies;
+
+    for (auto& dependency : struct_scope_.value()->getDependenciesOnDeclaration())
+    {
+        dependencies.emplace_back(dependency, false);
+    }
+
+    for (auto& dependency : struct_scope_.value()->getDependenciesOnDefinition())
+    {
+        dependencies.emplace_back(dependency);
+    }
+
+    return dependencies;
+}
+
 void lang::StructDescription::performInitialization()
 {
-    lang::OwningHandle<lang::Type> type =
-        lang::OwningHandle<lang::Type>::takeOwnership(lang::makeHandled<lang::Type>(name_));
-
     std::vector<std::reference_wrapper<lang::Member>> members;
     members.reserve(members_.size());
     for (auto& member : members_) { members.emplace_back(*member); }
 
     Owned<lang::TypeDefinition> struct_definition =
         makeOwned<lang::StructType>(access(), name_, members, definition_location_);
-    type->define(std::move(struct_definition));
+    self_->define(std::move(struct_definition));
 
-    self_ = type.handle();
+    struct_scope_ = makeOwned<lang::StructScope>(scope(), self_);
+    for (auto& member : members_) { member->setScope(getPtr(struct_scope_)); }
+}
 
-    scope().addEntity(std::move(type));
+void lang::StructDescription::resolveDeclaration() {}
 
-    for (auto& member : members_) { member->setScope(&scope()); }
+void lang::StructDescription::resolveDefinition()
+{
+    scope().addEntity(lang::OwningHandle<lang::Type>::takeOwnership(self_));
+
+    struct_scope_.value()->resolve();
+}
+
+void lang::StructDescription::postResolve()
+{
+    struct_scope_.value()->postResolve();
 }
 
 void lang::StructDescription::validate(ValidationLogger& validation_logger) const
 {
-    assert(self_.hasValue());
-    lang::Type const& self = self_.value();
-
     if (access().modifier() == lang::AccessModifier::EXTERN_ACCESS)
     {
         validation_logger.logError("Structs cannot be extern", definition_location_);
@@ -77,13 +112,7 @@ void lang::StructDescription::validate(ValidationLogger& validation_logger) cons
     {
         auto const& type = member->type();
 
-        if (!type.isDefined())
-        {
-            valid = not lang::validation::isUndefined(type, &scope(), member->location(), validation_logger);
-            continue;
-        }
-
-        if (type == self)
+        if (type == self_)
         {
             validation_logger.logError("Cannot declare recursive member", member->location());
             valid = false;
@@ -104,7 +133,7 @@ void lang::StructDescription::validate(ValidationLogger& validation_logger) cons
         }
     }
 
-    valid = valid && self.getDefinition()->checkDependencies(validation_logger);
+    valid = valid && self_->getDefinition()->checkDependencies(validation_logger);
 
     if (!valid) return;// These checks depend on the definition being roughly valid.
 
@@ -137,9 +166,21 @@ lang::Description::Descriptions lang::StructDescription::expand(lang::Context& n
     return result;
 }
 
+void lang::StructDescription::buildDeclaration(CompileContext& context)
+{
+    self_->buildNativeDeclaration(context);
+}
+
+void lang::StructDescription::buildDefinition(CompileContext& context)
+{
+    self_->buildNativeDefinition(context);
+}
+
 void lang::StructDescription::sync(Storage& storage)
 {
     storage.sync(name_);
+
+    if (storage.isReading()) { self_ = lang::makeHandled<lang::Type>(name_); }
 
     std::vector<Owned<lang::Member>> members = std::move(members_);
     members_.clear();

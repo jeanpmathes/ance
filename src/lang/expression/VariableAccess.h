@@ -23,9 +23,10 @@ class VariableAccess
     /**
      * Create a new variable access.
      * @param variable The variable to access.
+     * @param is_defined Whether the variable is defined. If not, only write access is allowed.
      * @param location The source location.
      */
-    VariableAccess(lang::ResolvingHandle<lang::Variable> variable, lang::Location location);
+    VariableAccess(lang::ResolvingHandle<lang::Variable> variable, bool is_defined, lang::Location location);
 
     [[nodiscard]] lang::Variable const& variable() const;
 
@@ -55,6 +56,7 @@ class VariableAccess
 
   private:
     lang::ResolvingHandle<lang::Entity> variable_;
+    bool                                is_defined_;
 };
 
 #endif

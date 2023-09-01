@@ -61,7 +61,7 @@ void lang::LocalVariable::buildDeclaration(CompileContext& context)
     native_value_ = context.ir().CreateAlloca(type()->getContentType(context.llvmContext()), nullptr, name().text());
 }
 
-void lang::LocalVariable::buildDefinition(CompileContext& context)
+void lang::LocalVariable::buildInitialization(CompileContext& context)
 {
     assert(native_value_);
 

@@ -402,3 +402,10 @@ std::vector<std::reference_wrapper<const lang::Type>> lang::TypeAlias::getContai
     contained.emplace_back(actual_);
     return contained;
 }
+
+std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeAlias::extractTypesToResolve()
+{
+    std::vector<lang::ResolvingHandle<lang::Type>> types_to_resolve;
+    types_to_resolve.emplace_back(actual_);
+    return types_to_resolve;
+}

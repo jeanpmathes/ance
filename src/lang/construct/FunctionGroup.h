@@ -35,13 +35,9 @@ namespace lang
 
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
 
-        void resolve();
-        void postResolve();
         void validate(ValidationLogger& validation_logger) const;
         void determineFlow();
         void validateFlow(ValidationLogger& validation_logger) const;
-        void createNativeBacking(CompileContext& compile_context);
-        void build(CompileContext& compile_context);
 
         ResolvingHandle<lang::Entity> getUndefinedClone(Context& new_context) const override;
 

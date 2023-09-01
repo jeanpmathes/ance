@@ -48,6 +48,7 @@ namespace lang
 
       public:
         std::vector<std::reference_wrapper<lang::Type const>> getContained() const override;
+        std::vector<lang::ResolvingHandle<lang::Type>>        extractTypesToResolve() override;
 
       public:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;

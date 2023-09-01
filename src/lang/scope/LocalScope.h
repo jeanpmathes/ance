@@ -15,7 +15,7 @@ class Expression;
 namespace lang
 {
     /**
-     * A local scope with local variables. Can be used by functions and similar constructs.
+     * A local scope with local variables. Is used by code blocks.
      */
     class LocalScope
         : public OrderedScope
@@ -25,12 +25,19 @@ namespace lang
         /**
          * Create a new local scope.
          * @param parent The parent scope containing this scope.
+         * @param code_block The code block causing this scope.
          */
-        explicit LocalScope(lang::Scope* parent);
+        LocalScope(lang::Scope* parent, lang::CodeBlock& code_block);
 
-        llvm::DIScope*                         getDebugScope(CompileContext& context) const override;
+        void resolveFollowingOrder() override;
+        void buildDeclarationsFollowingOrder(CompileContext& context) override;
+
+        llvm::DIScope* getDebugScope(CompileContext& context) const override;
 
         [[nodiscard]] bool isPartOfFunction() const override;
+
+      private:
+        lang::CodeBlock& code_block_;
     };
 }
 #endif

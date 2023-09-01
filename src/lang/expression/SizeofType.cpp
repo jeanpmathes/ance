@@ -25,7 +25,7 @@ lang::Type const& SizeofType::targetType() const
 
 void SizeofType::walkDefinitions()
 {
-    scope()->registerUsageIfUndefined(type_);
+    scope()->registerUsage(type_);
 }
 
 void SizeofType::defineType(lang::ResolvingHandle<lang::Type> type)
@@ -37,7 +37,6 @@ void SizeofType::defineType(lang::ResolvingHandle<lang::Type> type)
 
 bool SizeofType::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isUndefined(type_, scope(), type_location_, validation_logger)) return false;
     if (lang::Type::checkMismatch<lang::Type>(type_, "type", type_location_, validation_logger)) return false;
 
     return type_.as<lang::Type>()->validate(validation_logger, type_location_);

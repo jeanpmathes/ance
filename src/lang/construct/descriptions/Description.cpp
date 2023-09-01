@@ -27,7 +27,8 @@ void lang::Description::initialize(lang::Scope& scope)
     performInitialization();
 }
 
-void lang::Description::resolve() {}
+void lang::Description::resolveDeclaration() {}
+void lang::Description::resolveDefinition() {}
 void lang::Description::postResolve() {}
 
 lang::Scope& lang::Description::scope()
@@ -46,6 +47,11 @@ bool lang::Description::isImported() const
 {
     return accessibility_.isImported();
 }
+
+void lang::Description::buildDeclaration(CompileContext&) {}
+void lang::Description::buildDefinition(CompileContext&) {}
+void lang::Description::buildInitialization(CompileContext&) {}
+void lang::Description::buildFinalization(CompileContext&) {}
 
 enum DescriptionType : uint8_t
 {

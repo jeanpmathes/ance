@@ -268,7 +268,7 @@ Owned<Case> Case::expand(lang::ResolvingHandle<lang::Variable> target, lang::Con
                                std::make_move_iterator(before.begin()),
                                std::make_move_iterator(before.end()));
 
-    expanded_statements.emplace_back(makeOwned<Assignment>(makeOwned<VariableAccess>(target, location),
+    expanded_statements.emplace_back(makeOwned<Assignment>(makeOwned<VariableAccess>(target, true, location),
                                                            lang::Assigner::COPY_ASSIGNMENT,
                                                            std::move(value_provider),
                                                            location));

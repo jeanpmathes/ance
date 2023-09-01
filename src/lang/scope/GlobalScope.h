@@ -81,17 +81,8 @@ namespace lang
          */
         lang::ResolvingHandle<lang::Function> getEntryPoint();
 
-        /**
-         * Create the native content backing methods and functions. It is required for the actual build.
-         * @param context The current compile context.
-         */
-        void createNativeBacking(CompileContext& context);
-
-        /**
-         * Build all functions in this scope.
-         * @param context The current compile context.
-         */
-        void buildFunctions(CompileContext& context);
+        void buildDeclarations(CompileContext& context) override;
+        void buildDefinitions(CompileContext& context) override;
 
       protected:
         void onResolve() override;

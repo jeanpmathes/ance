@@ -130,6 +130,18 @@ Destination const* lang::ResolvingHandle<T>::as() const
 }
 
 template<typename T>
+typename lang::HandleConfig<T>::BaseType& lang::ResolvingHandle<T>::base()
+{
+    return *navigator_->get();
+}
+
+template<typename T>
+typename lang::HandleConfig<T>::BaseType const& lang::ResolvingHandle<T>::base() const
+{
+    return *navigator_->get();
+}
+
+template<typename T>
 T* lang::ResolvingHandle<T>::operator->() noexcept
 {
     return get();

@@ -16,6 +16,7 @@ lang::AliasDescription::AliasDescription(lang::Accessibility               acces
     , actual_(std::move(actual))
     , definition_location_(definition_location)
     , actual_type_location_(actual_type_location)
+    , self_(lang::makeHandled<lang::Type>(name_))
 {}
 
 lang::AliasDescription::AliasDescription(bool from_public_import)
@@ -24,6 +25,7 @@ lang::AliasDescription::AliasDescription(bool from_public_import)
     , actual_(lang::Type::getUndefined())
     , definition_location_(lang::Location::global())
     , actual_type_location_(lang::Location::global())
+    , self_(lang::Type::getUndefined())
 {}
 
 lang::Identifier const& lang::AliasDescription::name() const
@@ -41,44 +43,67 @@ bool lang::AliasDescription::isOverloadAllowed() const
     return false;
 }
 
+std::vector<std::reference_wrapper<const lang::Entity>> lang::AliasDescription::getProvidedEntities() const
+{
+    return {std::cref(self_.base())};
+}
+
+std::vector<lang::Description::Dependency> lang::AliasDescription::getDeclarationDependencies() const
+{
+    return {};
+}
+
+std::vector<lang::Description::Dependency> lang::AliasDescription::getDefinitionDependencies() const
+{
+    auto* self = const_cast<AliasDescription*>(this);
+
+    std::vector<Dependency> result;
+
+    if (auto type = self->actual_.as<lang::Type>(); type.hasValue())
+    {
+        for (auto& dependency : (**type).extractTypesToResolve()) { result.emplace_back(dependency); }
+
+        return result;
+    }
+
+    result.emplace_back(std::cref(*self->actual_));
+    return result;
+}
+
 void lang::AliasDescription::performInitialization()
 {
-    lang::OwningHandle<lang::Type> type =
-        lang::OwningHandle<lang::Type>::takeOwnership(lang::makeHandled<lang::Type>(name_));
-
     Owned<lang::TypeDefinition> alias_definition =
         makeOwned<lang::TypeAlias>(access(), name_, actual_, definition_location_);
-    type->define(std::move(alias_definition));
+    self_->define(std::move(alias_definition));
 
-    self_ = type.handle();
+    scope().registerUsage(actual_);
+}
 
-    scope().addEntity(std::move(type));
-    scope().registerUsageIfUndefined(actual_);
+void lang::AliasDescription::resolveDeclaration() {}
+
+void lang::AliasDescription::resolveDefinition()
+{
+    scope().addEntity(OwningHandle<lang::Type>::takeOwnership(self_));
 }
 
 void lang::AliasDescription::validate(ValidationLogger& validation_logger) const
 {
-    assert(self_.hasValue());
-    lang::Type const& self = self_.value();
-
     if (access().modifier() == lang::AccessModifier::EXTERN_ACCESS)
     {
         validation_logger.logError("Aliases cannot be extern", definition_location_);
     }
 
-    if (actual_->getDefinition() == self.getDefinition())
+    if (actual_->getDefinition() == self_->getDefinition())
     {
         validation_logger.logError("Cannot alias self", actual_type_location_);
     }
-
-    if (lang::validation::isUndefined(actual_, &scope(), actual_type_location_, validation_logger)) return;
 
     if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS)
     {
         lang::validation::isTypeExportable(actual_, actual_type_location_, validation_logger);
     }
 
-    self.getDefinition()->checkDependencies(validation_logger);
+    self_->getDefinition()->checkDependencies(validation_logger);
 
     actual_->validate(validation_logger, actual_type_location_);
 }
@@ -96,8 +121,20 @@ lang::Description::Descriptions lang::AliasDescription::expand(lang::Context& ne
     return result;
 }
 
+void lang::AliasDescription::buildDeclaration(CompileContext& context)
+{
+    self_->buildNativeDeclaration(context);
+}
+
+void lang::AliasDescription::buildDefinition(CompileContext& context)
+{
+    self_->buildNativeDefinition(context);
+}
+
 void lang::AliasDescription::sync(Storage& storage)
 {
     storage.sync(name_);
     storage.sync(actual_);
+
+    if (storage.isReading()) { self_ = lang::makeHandled<lang::Type>(name_); }
 }

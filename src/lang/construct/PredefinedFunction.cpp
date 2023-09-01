@@ -68,6 +68,9 @@ std::vector<lang::BasicBlock*> const& lang::PredefinedFunction::getBasicBlocks()
 
 std::pair<llvm::FunctionType*, llvm::Function*> lang::PredefinedFunction::getNativeRepresentation() const
 {
+    assert(native_type_);
+    assert(native_function_);
+
     return std::make_pair(native_type_, native_function_);
 }
 

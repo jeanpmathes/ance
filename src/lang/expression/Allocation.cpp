@@ -40,7 +40,7 @@ void Allocation::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    scope()->registerUsageIfUndefined(allocated_type_);
+    scope()->registerUsage(allocated_type_);
 }
 
 void Allocation::defineType(lang::ResolvingHandle<lang::Type> type)
@@ -57,9 +57,6 @@ void Allocation::defineType(lang::ResolvingHandle<lang::Type> type)
 
 bool Allocation::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::validation::isUndefined(allocated_type_, scope(), allocated_type_location_, validation_logger))
-        return false;
-
     if (lang::Type::checkMismatch<lang::Type>(allocated_type_, "type", allocated_type_location_, validation_logger))
         return false;
 

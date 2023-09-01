@@ -55,7 +55,7 @@ void FunctionCall::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    scope()->registerUsageIfUndefined(callable_);
+    scope()->registerUsage(callable_, true);
 }
 
 void FunctionCall::postResolve()
@@ -75,8 +75,6 @@ void FunctionCall::postResolve()
     }
 
     getCallable()->requestOverload(argument_types);
-
-    if (function().size() == 1 && function().front()->isDefined()) scope()->addDependency(function().front());
 
     function();// This must be called before validation to ensure that overload resolution is done.
     type();
@@ -110,7 +108,6 @@ bool FunctionCall::validate(ValidationLogger& validation_logger) const
 
     if (!valid) return false;
 
-    if (lang::validation::isUndefined(callable_, scope(), location(), validation_logger)) return false;
     if (getCallable() == nullptr)
     {
         validation_logger.logError("Provided value " + callable_->getAnnotatedName() + "is not callable", location());
@@ -136,8 +133,6 @@ bool FunctionCall::validate(ValidationLogger& validation_logger) const
     }
 
     std::reference_wrapper<lang::Function const> const actual_function = functions.front();
-
-    if (lang::validation::isUndefined(actual_function, scope(), location(), validation_logger)) return false;
 
     return actual_function.get().validateCall(arguments, location(), validation_logger);
 }

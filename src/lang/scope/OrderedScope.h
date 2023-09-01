@@ -49,8 +49,9 @@ namespace lang
         Optional<OwningHandle<lang::Entity>> connectWithDefinitionAccordingToOrdering(
             lang::OwningHandle<lang::Entity> variable) override;
 
-        void resolve() override;
-        void postResolve() override;
+        void         resolve() override;
+        virtual void resolveFollowingOrder() = 0;
+        void         postResolve() override;
 
         bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) override;
 
@@ -58,11 +59,9 @@ namespace lang
          * Build all variable declarations.
          * @param context The current compile context.
          */
-        void buildDeclarations(CompileContext& context);
-        void buildFinalization(CompileContext& context) override;
-
-      protected:
-        void onSubScope(Scope* sub_scope) override;
+        void         buildDeclarations(CompileContext& context) override;
+        virtual void buildDeclarationsFollowingOrder(CompileContext& context) = 0;
+        void         buildFinalization(CompileContext& context) override;
 
       private:
         std::set<lang::Identifier> blockers_ {};
@@ -73,8 +72,6 @@ namespace lang
         std::map<lang::Identifier, lang::ResolvingHandle<lang::Entity>>           active_entities_ {};
 
         std::map<lang::Identifier, std::vector<Owned<lang::Description>>> descriptions_ {};
-
-        std::vector<lang::Scope*> sub_scopes_;
     };
 }
 

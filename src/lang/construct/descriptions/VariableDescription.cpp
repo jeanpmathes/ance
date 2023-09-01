@@ -25,6 +25,7 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
     , init_expression_ptr_(getPtr(init))
     , init_expression_(std::move(init))
     , init_block_(std::nullopt)
+    , variable_handle_(lang::makeHandled<lang::Variable>(name_))
 {}
 
 lang::VariableDescription::VariableDescription(lang::Identifier                            name,
@@ -50,6 +51,7 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
     , init_expression_ptr_(init_expression_ptr)
     , init_expression_(std::move(init_expression))
     , init_block_(std::move(init_block))
+    , variable_handle_(lang::makeHandled<lang::Variable>(name_))
 {}
 
 lang::VariableDescription::VariableDescription(bool from_public_import)
@@ -65,6 +67,7 @@ lang::VariableDescription::VariableDescription(bool from_public_import)
     , init_expression_ptr_(nullptr)
     , init_expression_(std::nullopt)
     , init_block_(std::nullopt)
+    , variable_handle_(lang::makeHandled<lang::Variable>(name_))
 {}
 
 lang::Identifier const& lang::VariableDescription::name() const
@@ -92,16 +95,49 @@ lang::InitializerFunction const* lang::VariableDescription::initializerFunction(
     return init_function_;
 }
 
+std::vector<std::reference_wrapper<const lang::Entity>> lang::VariableDescription::getProvidedEntities() const
+{
+    return {std::cref(variable_handle_.base())};
+}
+
+std::vector<lang::Description::Dependency> lang::VariableDescription::getDeclarationDependencies() const
+{
+    std::vector<Dependency> dependencies;
+
+    if (type_.hasValue()) { dependencies.emplace_back(type_.value()); }
+
+    return dependencies;
+}
+
+std::vector<lang::Description::Dependency> lang::VariableDescription::getDefinitionDependencies() const
+{
+    if (init_block_.hasValue())
+    {
+        std::vector<Dependency> dependencies;
+
+        for (auto& dependency : init_block_.value()->getBlockScope()->getDependenciesOnDeclaration())
+        {
+            dependencies.emplace_back(dependency, false);
+        }
+
+        for (auto& dependency : init_block_.value()->getBlockScope()->getDependenciesOnDefinition())
+        {
+            dependencies.emplace_back(dependency);
+        }
+
+        return dependencies;
+    }
+
+    return {};
+}
+
 void lang::VariableDescription::performInitialization()
 {
-    lang::OwningHandle<lang::Variable> variable =
-        lang::OwningHandle<lang::Variable>::takeOwnership(lang::makeHandled<lang::Variable>(name_));
-
     lang::GlobalVariable::Initializer variable_init;
 
     lang::Scope* init_scope = nullptr;
 
-    if (type_.hasValue()) { scope().registerUsageIfUndefined(type_.value()); }
+    if (type_.hasValue()) { scope().registerUsage(type_.value()); }
     else if (init_expression_ptr_ != nullptr) { type_handle_.reroute(init_expression_ptr_->type()); }
 
     if (constant_init_ != nullptr) { variable_init = std::ref(*constant_init_); }
@@ -121,7 +157,7 @@ void lang::VariableDescription::performInitialization()
         }
         else if (init_expression_.hasValue())
         {
-            init_block_ = lang::InitializerFunction::makeInitializerBlock(variable->toUndefined(),
+            init_block_ = lang::InitializerFunction::makeInitializerBlock(variable_handle_->toUndefined(),
                                                                           assigner_,
                                                                           std::move(init_expression_.value()));
 
@@ -134,32 +170,38 @@ void lang::VariableDescription::performInitialization()
         }
     }
 
-    global_variable_ = variable->defineAsGlobal(type_handle_,
-                                                type_location_,
-                                                scope(),
-                                                access().modifier(),
-                                                access().isImported(),
-                                                variable_init,
-                                                init_scope,
-                                                assigner_,
-                                                is_constant_,
-                                                location_);
+    global_variable_ = variable_handle_->defineAsGlobal(type_handle_,
+                                                        type_location_,
+                                                        scope(),
+                                                        access().modifier(),
+                                                        access().isImported(),
+                                                        variable_init,
+                                                        init_scope,
+                                                        assigner_,
+                                                        is_constant_,
+                                                        location_);
 
-    scope().addEntity(std::move(variable));
+    scope().addEntity(OwningHandle<lang::Variable>::takeOwnership(variable_handle_));
 }
 
-void lang::VariableDescription::resolve()
+void lang::VariableDescription::resolveDeclaration() {}
+
+void lang::VariableDescription::resolveDefinition()
 {
     if (init_expression_ptr_ != nullptr && init_block_.hasValue())
     {
         lang::Scope* block_scope = init_block_.value()->getBlockScope();
         if (block_scope != nullptr) { block_scope->resolve(); }
     }
+
+    if (init_function_ != nullptr) { init_function_->function().resolve(); }
 }
 
 void lang::VariableDescription::postResolve()
 {
     if (init_expression_ptr_ != nullptr && init_block_.hasValue()) { init_block_.value()->postResolve(); }
+
+    if (init_function_ != nullptr) { init_function_->function().postResolve(); }
 }
 
 void lang::VariableDescription::validate(ValidationLogger& validation_logger) const
@@ -171,8 +213,6 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
 
     if (type_.hasValue())
     {
-        if (lang::validation::isUndefined(type_handle_, &scope(), type_location_, validation_logger)) return;
-
         if (!type_handle_->validate(validation_logger, type_location_)) return;
 
         if (access().modifier() == lang::AccessModifier::PUBLIC_ACCESS)
@@ -275,10 +315,34 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
     return descriptions;
 }
 
+void lang::VariableDescription::buildDeclaration(CompileContext& context)
+{
+    variable_handle_->buildDeclaration(context);
+
+    if (init_function_ != nullptr) { init_function_->createNativeBacking(context); }
+}
+
+void lang::VariableDescription::buildDefinition(CompileContext& context)
+{
+    if (init_function_ != nullptr) { init_function_->build(context); }
+}
+
+void lang::VariableDescription::buildInitialization(CompileContext& context)
+{
+    variable_handle_->buildInitialization(context);
+}
+
+void lang::VariableDescription::buildFinalization(CompileContext& context)
+{
+    variable_handle_->buildFinalization(context);
+}
+
 void lang::VariableDescription::sync(Storage& storage)
 {
     storage.sync(name_);
     storage.sync(type_handle_);
     storage.sync(is_constant_);
     storage.sync(assigner_);
+
+    if (storage.isReading()) { variable_handle_ = lang::makeHandled<lang::Variable>(name_); }
 }

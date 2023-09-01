@@ -47,6 +47,7 @@ namespace lang
         [[nodiscard]] lang::AccessModifier access() const override;
         [[nodiscard]] Statement const*     code() const override;
 
+        void resolveFollowingOrder() override;
         void postResolve() override;
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
@@ -54,7 +55,9 @@ namespace lang
         void createNativeBacking(CompileContext& context) override;
         void build(CompileContext& context) override;
 
-        llvm::DIScope*    getDebugScope(CompileContext& context) const override;
+        void buildDeclarationsFollowingOrder(CompileContext& context) override;
+
+        llvm::DIScope* getDebugScope(CompileContext& context) const override;
 
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 

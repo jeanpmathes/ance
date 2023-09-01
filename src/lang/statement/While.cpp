@@ -60,7 +60,7 @@ Statements While::expandWith(Expressions subexpressions, Statements substatement
 
     statements.emplace_back(
         makeOwned<If>(makeOwned<UnaryOperation>(lang::UnaryOperator::NOT,
-                                                makeOwned<VariableAccess>(make_temp_variable(), location()),
+                                                makeOwned<VariableAccess>(make_temp_variable(), true, location()),
                                                 location()),
                       makeOwned<Break>(location()),
                       std::nullopt,

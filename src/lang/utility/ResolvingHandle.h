@@ -113,6 +113,9 @@ namespace lang
         template<typename Destination>
         Destination const* as() const;
 
+        typename lang::HandleConfig<T>::BaseType&       base();
+        typename lang::HandleConfig<T>::BaseType const& base() const;
+
       public:
         T* operator->() noexcept;
         T& operator*() noexcept;

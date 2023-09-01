@@ -134,10 +134,10 @@ namespace lang
         void buildDeclaration(CompileContext& context);
 
         /**
-         * Build the variable definition which initializes the storage.
+         * Build the variable initialization which initializes the storage.
          * @param context The current compile context.
          */
-        void buildDefinition(CompileContext& context);
+        void buildInitialization(CompileContext& context);
 
         /**
          * Build the variable finalizer which cleans up the storage.
@@ -177,18 +177,6 @@ namespace lang
          * @param context The current compile context.
          */
         void setValue(Shared<Value> value, CompileContext& context);
-
-        /**
-         * Get the variable dependencies of this variable. Only variables in unordered scope have dependencies.
-         * @return The dependencies.
-         */
-        std::vector<lang::ResolvingHandle<lang::Variable>> getVariableDependencies();
-
-        /**
-         * Get the function dependencies of this variable. Only variables in unordered scope have dependencies.
-         * @return The dependencies.
-         */
-        std::vector<lang::ResolvingHandle<lang::Function>> getFunctionDependencies();
 
         /**
          * Get an undefined variable with the same name.

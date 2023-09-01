@@ -1,5 +1,6 @@
 #include "Type.h"
 
+#include <queue>
 #include <utility>
 
 #include "lang/ApplicationVisitor.h"
@@ -771,6 +772,38 @@ bool lang::Type::isTypeUndefined(lang::Type const&  type,
     validation_logger.logError("Name " + type.getAnnotatedName() + " is undefined in current context", location);
 
     return true;
+}
+
+std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::extractTypesToResolve()
+{
+    std::set<lang::Identifier>                     visited;
+    std::queue<lang::ResolvingHandle<lang::Type>>  to_visit;
+    std::vector<lang::ResolvingHandle<lang::Type>> extracted;
+
+    to_visit.emplace(self());
+    visited.emplace(name());
+
+    while (not to_visit.empty())
+    {
+        auto current = to_visit.front();
+        to_visit.pop();
+
+        if (current->definition_.hasValue())
+        {
+            auto types_to_resolve = current->definition_.value()->extractTypesToResolve();
+
+            for (auto& type_to_resolve : types_to_resolve)
+            {
+                if (visited.contains(type_to_resolve->name())) continue;
+
+                visited.emplace(type_to_resolve->name());
+                to_visit.emplace(type_to_resolve);
+            }
+        }
+        else { extracted.emplace_back(current); }
+    }
+
+    return extracted;
 }
 
 enum TypeClass : uint8_t

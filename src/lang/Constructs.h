@@ -46,6 +46,7 @@ namespace lang
 {
     class GlobalScope;
     class LocalScope;
+    class StructScope;
 }
 
 class Case;
@@ -70,7 +71,7 @@ class Loop;
         lang::StructDescription, lang::AliasDescription, lang::Member, Addressof, Allocation, BinaryOperation,         \
         UnaryOperation, BindRef, BindRefTo, ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType,  \
         Subscript, VariableAccess, MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope,       \
-        lang::LocalScope, Assertion, Assignment, Break, Continue, Delete, ExpressionStatement,                         \
+        lang::LocalScope, lang::StructScope, Assertion, Assignment, Break, Continue, Delete, ExpressionStatement,      \
         LocalReferenceVariableDefinition, LocalVariableDefinition, Drop, Return, If, While, Loop, Match, Case,         \
         VectorDefinition, ArrayDefinition
 #endif
