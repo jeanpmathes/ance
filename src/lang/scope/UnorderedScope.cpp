@@ -286,9 +286,12 @@ void lang::UnorderedScope::postResolve()
 
     onPostResolve();
 
-    for (auto& [name, descriptions] : compatible_descriptions_)
+    for (auto& group : description_order_.value())
     {
-        for (auto& description : descriptions) { description.description->postResolve(); }
+        if (group.kind == ResolvableKind::DEFINITION)
+        {
+            for (auto& description : group.descriptions) { description.get().postResolve(); }
+        }
     }
 
     Scope::postResolve();

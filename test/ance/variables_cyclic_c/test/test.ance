@@ -1,4 +1,0 @@
-project.name <: c"test";
-project.kind <: Executable;
-project.warning_as_error_enabled <: true;
-project.opt_level <: 3;

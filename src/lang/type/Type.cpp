@@ -615,6 +615,12 @@ Shared<lang::Value> lang::Type::makeMatching(lang::ResolvingHandle<lang::Type> e
         return makeMatching(expected, referenced, context);
     }
 
+    std::string e_n(expected->name().text());
+    (void) e_n;
+
+    std::string v_n(value->type()->name().text());
+    (void) v_n;
+
     assert(false && "Cannot make the value matching, was mismatch checked before?");
     throw std::logic_error("Cannot make the value matching, was mismatch checked before?");
 }

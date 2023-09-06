@@ -2,6 +2,7 @@
 #define ANCE_SRC_LANG_STATEMENT_MATCH_H_
 
 #include "Statement.h"
+#include <vector>
 
 #include "lang/Element.h"
 #include "lang/expression/ConstantExpression.h"
@@ -88,6 +89,8 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
      */
     [[nodiscard]] Owned<Case> expand(lang::ResolvingHandle<lang::Variable> target, lang::Context& new_context) const;
 
+    std::vector<std::reference_wrapper<lang::Scope>> getSubScopesInOrder();
+
   private:
     std::vector<Owned<ConstantExpression>>            conditions_;
     std::variant<Owned<Statement>, Owned<Expression>> code_;
@@ -118,6 +121,8 @@ class Match
     void setScope(lang::Scope& scope) override;
     void walkDefinitions() override;
     void postResolve() override;
+
+    std::vector<std::reference_wrapper<lang::Scope>> getSubScopesInOrder() override;
 
     void validate(ValidationLogger& validation_logger) const override;
 

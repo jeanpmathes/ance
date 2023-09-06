@@ -43,6 +43,7 @@ std::vector<std::reference_wrapper<ConstantExpression const>> Case::conditions()
 {
     std::vector<std::reference_wrapper<ConstantExpression const>> result;
 
+    result.reserve(conditions_.size());
     for (auto& condition : conditions_) { result.emplace_back(*condition); }
 
     return result;
@@ -215,6 +216,7 @@ bool Case::validateReturnTypes(lang::Location                  location,
 {
     std::vector<std::reference_wrapper<lang::Type const>> types;
 
+    types.reserve(cases.size());
     for (auto& case_instance : cases) { types.emplace_back(std::get<Owned<Expression>>(case_instance->code_)->type()); }
 
     std::vector<std::reference_wrapper<lang::Type const>> const common_types = lang::Type::getCommonType(types);
@@ -232,6 +234,7 @@ std::vector<lang::ResolvingHandle<lang::Type>> Case::getCommonType(std::vector<O
 {
     std::vector<lang::ResolvingHandle<lang::Type>> types;
 
+    types.reserve(cases.size());
     for (auto& case_instance : cases) { types.emplace_back(std::get<Owned<Expression>>(case_instance->code_)->type()); }
 
     return lang::Type::getCommonType(types);
@@ -293,6 +296,20 @@ Owned<Case> Case::expand(lang::ResolvingHandle<lang::Variable> target, lang::Con
     return Owned<Case>(*(new Case(std::move(expanded_conditions), std::move(new_block))));
 }
 
+std::vector<std::reference_wrapper<lang::Scope>> Case::getSubScopesInOrder()
+{
+    if (std::holds_alternative<Owned<Statement>>(code_))
+    {
+        Statement* code = std::get<Owned<Statement>>(code_).get();
+
+        if (code->getBlockScope() == nullptr) return code->getSubScopesInOrder();
+
+        return {*code->getBlockScope()};
+    }
+
+    return {};
+}
+
 Match::Match(std::vector<Owned<Case>> cases, Owned<Expression> expression, lang::Location location)
     : Statement(location)
     , expression_(std::move(expression))
@@ -317,6 +334,7 @@ std::vector<std::reference_wrapper<Case const>> Match::cases() const
 {
     std::vector<std::reference_wrapper<Case const>> cases;
 
+    cases.reserve(cases_.size());
     for (auto& case_instance : cases_) { cases.emplace_back(*case_instance); }
 
     return cases;
@@ -357,6 +375,21 @@ void Match::postResolve()
     Statement::postResolve();
 
     for (auto& case_ptr : cases_) { case_ptr->postResolve(); }
+}
+
+std::vector<std::reference_wrapper<lang::Scope>> Match::getSubScopesInOrder()
+{
+    std::vector<std::reference_wrapper<lang::Scope>> sub_scopes;
+
+    for (auto& case_ptr : cases_)
+    {
+        auto sub_sub_scopes = case_ptr->getSubScopesInOrder();
+        sub_scopes.insert(sub_scopes.end(),
+                          std::make_move_iterator(sub_sub_scopes.begin()),
+                          std::make_move_iterator(sub_sub_scopes.end()));
+    }
+
+    return sub_scopes;
 }
 
 Statements Match::expandWith(Expressions subexpressions, Statements, lang::Context& new_context) const

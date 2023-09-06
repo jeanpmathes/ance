@@ -48,7 +48,6 @@ class LocalVariableDefinition
 
     void setScope(lang::Scope& scope) override;
     void walkDefinitions() override;
-    void postResolve() override;
 
     void validate(ValidationLogger& validation_logger) const override;
 

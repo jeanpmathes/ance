@@ -93,7 +93,7 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * Get the sub scopes of this statement, if any.
      * @return The ordered sub scopes.
      */
-    [[nodiscard]] std::vector<std::reference_wrapper<lang::Scope>> getSubScopesInOrder();
+    [[nodiscard]] virtual std::vector<std::reference_wrapper<lang::Scope>> getSubScopesInOrder();
 
     /**
      * Get whether this statement is a compound statement.

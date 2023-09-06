@@ -89,11 +89,6 @@ void LocalVariableDefinition::walkDefinitions()
     }
 }
 
-void LocalVariableDefinition::postResolve()
-{
-    Statement::postResolve();
-}
-
 void LocalVariableDefinition::validate(ValidationLogger& validation_logger) const
 {
     if (assigned_.hasValue())
