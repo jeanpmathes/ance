@@ -47,8 +47,9 @@ namespace lang
         /**
          * Validate the descriptions in this scope. In contrast to an ordered scope, the unordered scope owns the contained descriptions, which is why it validates them.
          * @param validation_logger The logger to log errors to.
+         * @return True if all descriptions are valid, false otherwise.
          */
-        void validate(ValidationLogger& validation_logger) const;
+        bool validate(ValidationLogger& validation_logger) const;
 
         void onRegisterUsage(lang::ResolvingHandle<lang::Entity> entity) override;
 
@@ -125,8 +126,8 @@ namespace lang
 
         enum ResolvableKind
         {
-            DEFINITION,
-            DECLARATION
+            DECLARATION,
+            DEFINITION
         };
 
         struct ResolvableGroup {
@@ -134,7 +135,7 @@ namespace lang
             ResolvableKind                                         kind;
         };
 
-        std::optional<std::vector<ResolvableGroup>> description_order_;
+        Optional<std::vector<ResolvableGroup>> description_order_;
     };
 }
 

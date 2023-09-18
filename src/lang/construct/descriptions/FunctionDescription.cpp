@@ -95,7 +95,7 @@ std::vector<lang::Description::Dependency> lang::FunctionDescription::getDeclara
     auto add = [&](lang::ResolvingHandle<lang::Entity> entity) {
         if (auto type = entity.as<lang::Type>(); type.hasValue())
         {
-            for (auto& dependency : (**type).extractTypesToResolve())
+            for (auto& dependency : (**type).getDeclarationDependencies())
             {
                 if (added.contains(dependency->name())) continue;
 
@@ -119,7 +119,32 @@ std::vector<lang::Description::Dependency> lang::FunctionDescription::getDeclara
 
 std::vector<lang::Description::Dependency> lang::FunctionDescription::getDefinitionDependencies() const
 {
-    std::vector<Dependency> dependencies;
+    auto* self = const_cast<FunctionDescription*>(this);
+
+    std::vector<Dependency>    dependencies;
+    std::set<lang::Identifier> added;
+
+    auto add = [&](lang::ResolvingHandle<lang::Entity> entity) {
+        if (auto type = entity.as<lang::Type>(); type.hasValue())
+        {
+            for (auto& dependency : (**type).getDefinitionDependencies())
+            {
+                if (added.contains(dependency->name())) continue;
+
+                dependencies.emplace_back(dependency);
+                added.insert(dependency->name());
+            }
+        }
+        else if (!added.contains(entity->name()))
+        {
+            dependencies.emplace_back(entity.base());
+            added.insert(entity->name());
+        }
+    };
+
+    add(self->return_type_);
+
+    for (auto parameter : self->parameters_) { add(parameter->type()); }
 
     for (auto& dependency : function_.value()->getDependenciesOnDeclaration())
     {

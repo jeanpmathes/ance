@@ -278,6 +278,8 @@ void lang::UnorderedScope::resolve()
 
 void lang::UnorderedScope::postResolve()
 {
+    if (!description_order_.hasValue()) return;
+
     for (auto& [name, entity] : defined_entities_)
     {
         auto type = entity.handle().as<Type>();
@@ -312,8 +314,10 @@ bool lang::UnorderedScope::resolveDefinition(lang::ResolvingHandle<lang::Entity>
     return false;
 }
 
-void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
+bool lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
 {
+    bool valid = true;
+
     for (auto const& [name, associated_descriptions] : incompatible_descriptions_)
     {
         bool              first_source = true;
@@ -345,6 +349,7 @@ void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
             validation_logger.logError("Multiple definitions with the name '" + name
                                            + "' are imported from: " + source_list.str(),
                                        lang::Location::global());
+            valid = false;
         }
 
         for (auto const& internal_conflict : internal_conflicts)
@@ -354,6 +359,7 @@ void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
                 validation_logger.logError("Multiple definitions with the name '" + name
                                                + "' are defined in the same scope",
                                            internal_conflict.location());
+                valid = false;
             }
             else
             {
@@ -361,6 +367,7 @@ void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
                                                + "' are defined in the same scope and imported from: "
                                                + source_list.str(),
                                            internal_conflict.location());
+                valid = false;
             }
         }
     }
@@ -370,21 +377,23 @@ void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
         validation_logger.logError("No declaration for '" + name + "' found", name.location());
     }
 
-    if (!missing_declarations_.empty()) return;
+    if (!missing_declarations_.empty()) return false;
 
     for (auto& name : missing_definitions_)
     {
         validation_logger.logError("No definition for '" + name + "' found", name.location());
     }
 
-    if (!missing_definitions_.empty()) return;
+    if (!missing_definitions_.empty()) return false;
 
     for (auto& name : cyclic_definitions_)
     {
         validation_logger.logError("Name '" + name + "' part of cyclic dependency", name.location());
     }
 
-    if (!cyclic_definitions_.empty()) return;
+    if (!cyclic_definitions_.empty()) return false;
+
+    if (!description_order_.hasValue()) return false;
 
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
@@ -401,6 +410,7 @@ void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
                     validation_logger.logError("Name " + entity.getAnnotatedName() + " is undefined in current context",
                                                entity.name().location());
                     missing_dependencies = true;
+                    valid                = false;
                 }
             }
 
@@ -413,6 +423,7 @@ void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
                     validation_logger.logError("Name " + entity.getAnnotatedName() + " is undefined in current context",
                                                entity.name().location());
                     missing_dependencies = true;
+                    valid                = false;
                 }
             }
 
@@ -429,14 +440,7 @@ void lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
         if (function_group != nullptr) function_group->validate(validation_logger);
     }
 
-    auto& defined_entities = const_cast<UnorderedScope*>(this)->defined_entities_;
-
-    std::vector<lang::ResolvingHandle<lang::Variable>> global_variables;
-    for (auto& [name, entity] : defined_entities)
-    {
-        Optional<lang::ResolvingHandle<lang::Variable>> variable = entity.handle().as<lang::Variable>();
-        if (variable.hasValue()) global_variables.emplace_back(variable.value());
-    }
+    return valid;
 }
 
 void lang::UnorderedScope::buildDeclarations(CompileContext& context)

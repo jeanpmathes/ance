@@ -22,6 +22,7 @@ set(ERROR_OPTIONS
     -Wno-c++98-c++11-compat-pedantic
     -Wno-exit-time-destructors
     -Wno-global-constructors
+    -Wno-unsafe-buffer-usage
     -Wno-switch-enum)
 
 target_compile_options(ance PRIVATE /EHa -MDd ${ERROR_OPTIONS})

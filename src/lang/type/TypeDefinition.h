@@ -221,29 +221,8 @@ namespace lang
 
         virtual llvm::DIType* createDebugType(CompileContext& context) const = 0;
 
-        /**
-         * Check the dependencies of the type definition for cyclic dependencies.
-         * @param validation_logger The validation logger to use.
-         * @return True if the dependencies are valid.
-         */
-        bool checkDependencies(ValidationLogger& validation_logger) const;
-        bool hasCyclicDependency() const;
-
-        virtual std::vector<lang::ResolvingHandle<lang::Type>> extractTypesToResolve();
-
-        /**
-         * Get the type dependencies of this type.
-         * A type depends on another, if the memory layout of the type depends on the other.
-         * @return The type dependencies.
-         */
-        [[nodiscard]] virtual std::vector<lang::TypeDefinition const*> getDependencies() const;
-
-        /**
-         * Get the types contained in this type.
-         * To consider a type is defined and valid, all types it contains must be defined.
-         * @return The types contained in this type.
-         */
-        [[nodiscard]] virtual std::vector<std::reference_wrapper<lang::Type const>> getContained() const;
+        virtual std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies();
+        virtual std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies();
 
         /**
          * Create a constructor for this type. The function is added to the overload list.

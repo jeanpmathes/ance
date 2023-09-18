@@ -88,7 +88,8 @@ void Application::validate(ValidationLogger& validation_logger) const
                                    lang::Location::global());
     }
 
-    this->globalScope().validate(validation_logger);
+    bool const valid = this->globalScope().validate(validation_logger);
+    if (!valid) return;
 
     if (getType() == UnitResult::EXECUTABLE)
     {

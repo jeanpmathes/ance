@@ -388,24 +388,14 @@ llvm::DIType* lang::TypeAlias::createDebugType(CompileContext& context) const
                                       scope()->getDebugScope(context));
 }
 
-std::vector<lang::TypeDefinition const*> lang::TypeAlias::getDependencies() const
+std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeAlias::getDeclarationDependencies()
 {
-    std::vector<lang::TypeDefinition const*> dependencies;
-    if (actual_->isDefined()) dependencies.push_back(actual_->getDefinition());
-
+    std::vector<ResolvingHandle<Type>> dependencies;
+    dependencies.emplace_back(actual_);
     return dependencies;
 }
 
-std::vector<std::reference_wrapper<const lang::Type>> lang::TypeAlias::getContained() const
+std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeAlias::getDefinitionDependencies()
 {
-    std::vector<std::reference_wrapper<const lang::Type>> contained;
-    contained.emplace_back(actual_);
-    return contained;
-}
-
-std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeAlias::extractTypesToResolve()
-{
-    std::vector<lang::ResolvingHandle<lang::Type>> types_to_resolve;
-    types_to_resolve.emplace_back(actual_);
-    return types_to_resolve;
+    return {};
 }

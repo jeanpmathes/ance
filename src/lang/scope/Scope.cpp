@@ -79,10 +79,23 @@ void lang::Scope::registerUsage(lang::ResolvingHandle<lang::Entity> entity, bool
 {
     if (auto type = entity.as<lang::Type>(); type.hasValue())
     {
-        for (auto& extracted : (**type).extractTypesToResolve())
+        if ((**type).getDefinition() == nullptr)
         {
-            if (!extracted->isDefined()) { onRegisterUsage(extracted); }
-            addDependency(extracted, is_only_declared);
+            if (!(**type).isDefined()) { onRegisterUsage(*type); }
+            addDependency(*type, is_only_declared);
+        }
+        else
+        {
+            for (auto& extracted : (**type).getDeclarationDependencies())
+            {
+                if (!extracted->isDefined()) { onRegisterUsage(extracted); }
+                addDependency(extracted, true);
+            }
+            for (auto& extracted : (**type).getDefinitionDependencies())
+            {
+                if (!extracted->isDefined()) { onRegisterUsage(extracted); }
+                addDependency(extracted, true);
+            }
         }
     }
     else

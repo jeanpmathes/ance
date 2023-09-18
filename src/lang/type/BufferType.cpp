@@ -5,7 +5,6 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
 #include "lang/scope/GlobalScope.h"
-#include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
@@ -106,19 +105,16 @@ llvm::DIType* lang::BufferType::createDebugType(CompileContext& context) const
     return di_type;
 }
 
-std::vector<lang::TypeDefinition const*> lang::BufferType::getDependencies() const
+std::vector<lang::ResolvingHandle<lang::Type>> lang::BufferType::getDeclarationDependencies()
 {
     return {};// A pointer does not depend on the pointee type.
 }
 
-std::vector<std::reference_wrapper<const lang::Type>> lang::BufferType::getContained() const
+std::vector<lang::ResolvingHandle<lang::Type>> lang::BufferType::getDefinitionDependencies()
 {
-    return {element_type_};
-}
-
-std::vector<lang::ResolvingHandle<lang::Type>> lang::BufferType::extractTypesToResolve()
-{
-    return {};// A pointer does not depend on the pointee type.
+    std::vector<ResolvingHandle<Type>> dependencies;
+    dependencies.emplace_back(element_type_);
+    return dependencies;
 }
 
 Optional<lang::ResolvingHandle<lang::Type>> lang::BufferType::getPointeeType()

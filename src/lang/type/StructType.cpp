@@ -99,28 +99,9 @@ llvm::DIType* lang::StructType::createDebugType(CompileContext& context) const
                                          debug_type);
 }
 
-std::vector<std::reference_wrapper<lang::Type const>> lang::StructType::getContained() const
+std::vector<lang::ResolvingHandle<lang::Type>> lang::StructType::getDeclarationDependencies()
 {
-    std::vector<std::reference_wrapper<lang::Type const>> dependencies;
-    std::set<lang::TypeDefinition const*>                 added;
-
-    for (auto& member : members_)
-    {
-        auto const* definition = member.get().type()->getDefinition();
-
-        if (definition && !added.contains(definition))
-        {
-            dependencies.emplace_back(member.get().type());
-            added.insert(definition);
-        }
-    }
-
-    return dependencies;
-}
-
-std::vector<lang::ResolvingHandle<lang::Type>> lang::StructType::extractTypesToResolve()
-{
-    std::vector<lang::ResolvingHandle<lang::Type>> types_to_resolve;
+    std::vector<lang::ResolvingHandle<lang::Type>> dependencies;
     std::set<lang::Identifier>                     added;
 
     for (auto& member : members_)
@@ -129,12 +110,17 @@ std::vector<lang::ResolvingHandle<lang::Type>> lang::StructType::extractTypesToR
 
         if (!added.contains(type->name()))
         {
-            types_to_resolve.emplace_back(type);
+            dependencies.emplace_back(type);
             added.insert(type->name());
         }
     }
 
-    return types_to_resolve;
+    return dependencies;
+}
+
+std::vector<lang::ResolvingHandle<lang::Type>> lang::StructType::getDefinitionDependencies()
+{
+    return {};
 }
 
 bool lang::StructType::hasMember(lang::Identifier const& name) const

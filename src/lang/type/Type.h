@@ -808,10 +808,16 @@ namespace lang
                                     ValidationLogger&  validation_logger);
 
         /**
-         * Get handles to the types that need to be resolved for this type to be valid.
+         * Get handles to the types that need to be resolved for this type to have a valid declaration.
          * @return The types to resolve.
          */
-        std::vector<lang::ResolvingHandle<lang::Type>> extractTypesToResolve();
+        std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies();
+
+        /**
+         * Get handles to the types that need to be resolved for this type to have a valid definition.
+         * @return The types to resolve.
+         */
+        std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies();
 
       protected:
         lang::Callable&                     getFunctionSource() override;

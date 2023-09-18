@@ -255,19 +255,16 @@ Shared<lang::Value> lang::ReferenceType::getReferenced(Shared<lang::Value> value
     return makeShared<lang::WrappedNativeValue>(element_type_, native_referred);
 }
 
-std::vector<lang::TypeDefinition const*> lang::ReferenceType::getDependencies() const
+std::vector<lang::ResolvingHandle<lang::Type>> lang::ReferenceType::getDeclarationDependencies()
 {
-    return {};
+    return {};// A reference does not depend on the referenced type.
 }
 
-std::vector<std::reference_wrapper<const lang::Type>> lang::ReferenceType::getContained() const
+std::vector<lang::ResolvingHandle<lang::Type>> lang::ReferenceType::getDefinitionDependencies()
 {
-    return {element_type_};
-}
-
-std::vector<lang::ResolvingHandle<lang::Type>> lang::ReferenceType::extractTypesToResolve()
-{
-    return {};
+    std::vector<ResolvingHandle<Type>> dependencies;
+    dependencies.emplace_back(element_type_);
+    return dependencies;
 }
 
 lang::ResolvingHandle<lang::Type> lang::ReferenceType::clone(lang::Context& new_context) const

@@ -105,19 +105,16 @@ llvm::DIType* lang::PointerType::createDebugType(CompileContext& context) const
     return di_type;
 }
 
-std::vector<lang::TypeDefinition const*> lang::PointerType::getDependencies() const
+std::vector<lang::ResolvingHandle<lang::Type>> lang::PointerType::getDeclarationDependencies()
 {
     return {};// A pointer does not depend on the pointee type.
 }
 
-std::vector<std::reference_wrapper<const lang::Type>> lang::PointerType::getContained() const
+std::vector<lang::ResolvingHandle<lang::Type>> lang::PointerType::getDefinitionDependencies()
 {
-    return {element_type_};
-}
-
-std::vector<lang::ResolvingHandle<lang::Type>> lang::PointerType::extractTypesToResolve()
-{
-    return {};// A pointer does not depend on the pointee type.
+    std::vector<ResolvingHandle<Type>> dependencies;
+    dependencies.emplace_back(element_type_);
+    return dependencies;
 }
 
 Optional<lang::ResolvingHandle<lang::Type>> lang::PointerType::getPointeeType()

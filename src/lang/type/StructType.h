@@ -45,8 +45,8 @@ namespace lang
         llvm::DIType* createDebugType(CompileContext& context) const override;
 
       public:
-        std::vector<std::reference_wrapper<const lang::Type>> getContained() const override;
-        std::vector<lang::ResolvingHandle<lang::Type>>        extractTypesToResolve() override;
+        std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies() override;
+        std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies() override;
 
       private:
         llvm::Value* buildGetElementPointer(llvm::Value* struct_ptr, int32_t member_index, CompileContext& context);

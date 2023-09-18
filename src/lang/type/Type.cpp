@@ -780,7 +780,7 @@ bool lang::Type::isTypeUndefined(lang::Type const&  type,
     return true;
 }
 
-std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::extractTypesToResolve()
+std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::getDeclarationDependencies()
 {
     std::set<lang::Identifier>                     visited;
     std::queue<lang::ResolvingHandle<lang::Type>>  to_visit;
@@ -796,7 +796,7 @@ std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::extractTypesToResolve
 
         if (current->definition_.hasValue())
         {
-            auto types_to_resolve = current->definition_.value()->extractTypesToResolve();
+            auto types_to_resolve = current->definition_.value()->getDeclarationDependencies();
 
             for (auto& type_to_resolve : types_to_resolve)
             {
@@ -806,7 +806,45 @@ std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::extractTypesToResolve
                 to_visit.emplace(type_to_resolve);
             }
         }
-        else { extracted.emplace_back(current); }
+        else
+        {
+            if (current != self()) extracted.emplace_back(current);
+        }
+    }
+
+    return extracted;
+}
+
+std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::getDefinitionDependencies()
+{
+    std::set<lang::Identifier>                     visited;
+    std::queue<lang::ResolvingHandle<lang::Type>>  to_visit;
+    std::vector<lang::ResolvingHandle<lang::Type>> extracted;
+
+    to_visit.emplace(self());
+    visited.emplace(name());
+
+    while (not to_visit.empty())
+    {
+        auto current = to_visit.front();
+        to_visit.pop();
+
+        if (current->definition_.hasValue())
+        {
+            auto types_to_resolve = current->definition_.value()->getDefinitionDependencies();
+
+            for (auto& type_to_resolve : types_to_resolve)
+            {
+                if (visited.contains(type_to_resolve->name())) continue;
+
+                visited.emplace(type_to_resolve->name());
+                to_visit.emplace(type_to_resolve);
+            }
+        }
+        else
+        {
+            if (current != self()) extracted.emplace_back(current);
+        }
     }
 
     return extracted;

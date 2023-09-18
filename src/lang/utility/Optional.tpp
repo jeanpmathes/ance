@@ -1,6 +1,7 @@
 #include "Optional.h"
 
 #include <cassert>
+#include <memory>
 
 template<Moveable T>
 Optional<T>::Optional() = default;

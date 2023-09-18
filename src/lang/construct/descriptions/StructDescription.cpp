@@ -133,8 +133,6 @@ void lang::StructDescription::validate(ValidationLogger& validation_logger) cons
         }
     }
 
-    valid = valid && self_->getDefinition()->checkDependencies(validation_logger);
-
     if (!valid) return;// These checks depend on the definition being roughly valid.
 
     std::set<lang::Identifier> member_names;

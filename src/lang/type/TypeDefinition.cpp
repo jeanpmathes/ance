@@ -17,29 +17,16 @@ lang::TypeDefinition::TypeDefinition(lang::Identifier name, lang::Location locat
 
 bool lang::TypeDefinition::isFullyDefined() const
 {
-    std::stack<TypeDefinition const*> stack;
-    std::set<TypeDefinition const*>   visited;
+    auto self = const_cast<TypeDefinition*>(this);
 
-    stack.push(this);
-
-    while (!stack.empty())
+    for (auto dependency : self->getDeclarationDependencies())
     {
-        auto const* current = stack.top();
-        stack.pop();
+        if (dependency->getDefinition() == nullptr) return false;
+    }
 
-        if (visited.count(current)) continue;
-        visited.insert(current);
-
-        std::vector<std::reference_wrapper<lang::Type const>> const contained = getContained();
-
-        for (auto const& type : contained)
-        {
-            auto const* definition = type.get().getDefinition();
-
-            if (definition == nullptr) return false;
-
-            stack.push(definition);
-        }
+    for (auto dependency : self->getDefinitionDependencies())
+    {
+        if (dependency->getDefinition() == nullptr) return false;
     }
 
     return true;
@@ -694,84 +681,12 @@ void lang::TypeDefinition::buildSingleCopyInitializerDefinition(llvm::Value*    
 
 void lang::TypeDefinition::buildSingleDefaultFinalizerDefinition(llvm::Value*, CompileContext&) {}
 
-bool lang::TypeDefinition::checkDependencies(ValidationLogger& validation_logger) const
-{
-    if (hasCyclicDependency())
-    {
-        validation_logger.logError("Type " + self()->getAnnotatedName(false) + " has circular dependency",
-                                   this->getDefinitionLocation());
-
-        return false;
-    }
-
-    return true;
-}
-
-bool lang::TypeDefinition::hasCyclicDependency() const
-{
-    if (cyclic_dependency_.hasValue()) { return cyclic_dependency_.value(); }
-
-    int const visited  = 1;
-    int const finished = 2;
-
-    std::stack<std::pair<lang::TypeDefinition const*, bool>> to_check;
-    std::map<lang::TypeDefinition const*, int>               state;
-
-    to_check.emplace(this, false);
-
-    while (!to_check.empty())
-    {
-        auto& [current, visited_children] = to_check.top();
-
-        if (visited_children)
-        {
-            to_check.pop();
-            state[current] = finished;
-        }
-        else
-        {
-            to_check.top() = std::make_pair(current, true);
-
-            if (state[current] == visited)
-            {
-                cyclic_dependency_ = true;
-                return true;
-            }
-
-            state[current] = visited;
-
-            for (auto& dependency : current->getDependencies())
-            {
-                if (state[dependency] == finished) continue;
-                to_check.emplace(dependency, false);
-            }
-        }
-    }
-
-    cyclic_dependency_ = false;
-    return false;
-}
-
-std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeDefinition::extractTypesToResolve()
+std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeDefinition::getDeclarationDependencies()
 {
     return {};
 }
 
-std::vector<lang::TypeDefinition const*> lang::TypeDefinition::getDependencies() const
-{
-    std::vector<lang::TypeDefinition const*> dependencies;
-
-    for (auto contained : getContained())
-    {
-        auto* definition = contained.get().getDefinition();
-
-        if (definition != nullptr) dependencies.push_back(definition);
-    }
-
-    return dependencies;
-}
-
-std::vector<std::reference_wrapper<lang::Type const>> lang::TypeDefinition::getContained() const
+std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeDefinition::getDefinitionDependencies()
 {
     return {};
 }

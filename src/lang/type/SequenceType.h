@@ -47,8 +47,8 @@ namespace lang
         virtual llvm::SmallVector<llvm::Value*> getNativeIndices(llvm::Value* zero, llvm::Value* index);
 
       public:
-        std::vector<std::reference_wrapper<lang::Type const>> getContained() const override;
-        std::vector<lang::ResolvingHandle<lang::Type>>        extractTypesToResolve() override;
+        std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies() override;
+        std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies() override;
 
       public:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;

@@ -88,9 +88,8 @@ namespace lang
         void buildNativeDeclaration(CompileContext& context) override;
         void buildNativeDefinition(CompileContext& context) override;
 
-        std::vector<lang::TypeDefinition const*>              getDependencies() const override;
-        std::vector<std::reference_wrapper<const lang::Type>> getContained() const override;
-        std::vector<lang::ResolvingHandle<lang::Type>>        extractTypesToResolve() override;
+        std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies() override;
+        std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies() override;
 
         ~ReferenceType() override = default;
 

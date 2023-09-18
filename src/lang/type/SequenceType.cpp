@@ -198,16 +198,16 @@ void lang::SequenceType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr,
     }
 }
 
-std::vector<std::reference_wrapper<lang::Type const>> lang::SequenceType::getContained() const
+std::vector<lang::ResolvingHandle<lang::Type>> lang::SequenceType::getDeclarationDependencies()
 {
-    return {element_type_};
+    std::vector<ResolvingHandle<Type>> dependencies;
+    dependencies.emplace_back(element_type_);
+    return dependencies;
 }
 
-std::vector<lang::ResolvingHandle<lang::Type>> lang::SequenceType::extractTypesToResolve()
+std::vector<lang::ResolvingHandle<lang::Type>> lang::SequenceType::getDefinitionDependencies()
 {
-    std::vector<ResolvingHandle<Type>> types_to_resolve;
-    types_to_resolve.emplace_back(element_type_);
-    return types_to_resolve;
+    return {};
 }
 
 Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Value>> values, CompileContext& context)

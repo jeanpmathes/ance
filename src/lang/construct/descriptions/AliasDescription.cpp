@@ -61,12 +61,18 @@ std::vector<lang::Description::Dependency> lang::AliasDescription::getDefinition
 
     if (auto type = self->actual_.as<lang::Type>(); type.hasValue())
     {
-        for (auto& dependency : (**type).extractTypesToResolve()) { result.emplace_back(dependency); }
+        auto declaration_dependencies = (**type).getDeclarationDependencies();
+        for (auto& dependency : declaration_dependencies) { result.emplace_back(dependency, false); }
+        auto definition_dependencies = (**type).getDefinitionDependencies();
+        for (auto& dependency : definition_dependencies) { result.emplace_back(dependency); }
 
-        return result;
+        if (declaration_dependencies.size() + definition_dependencies.size() == 0)
+        {
+            result.emplace_back(std::cref(*self->actual_));
+        }
     }
+    else { result.emplace_back(std::cref(*self->actual_)); }
 
-    result.emplace_back(std::cref(*self->actual_));
     return result;
 }
 
@@ -102,8 +108,6 @@ void lang::AliasDescription::validate(ValidationLogger& validation_logger) const
     {
         lang::validation::isTypeExportable(actual_, actual_type_location_, validation_logger);
     }
-
-    self_->getDefinition()->checkDependencies(validation_logger);
 
     actual_->validate(validation_logger, actual_type_location_);
 }
