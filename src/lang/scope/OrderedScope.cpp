@@ -30,7 +30,7 @@ void lang::OrderedScope::prepareDefinition(lang::Identifier name)
     blockers_.emplace(name);
 }
 
-bool lang::OrderedScope::drop(lang::ResolvingHandle<lang::Entity> entity)
+bool lang::OrderedScope::erase(lang::ResolvingHandle<lang::Entity> entity)
 {
     if (!entity->isDefined() || !active_entities_.contains(entity->name())) return false;
 
@@ -39,7 +39,7 @@ bool lang::OrderedScope::drop(lang::ResolvingHandle<lang::Entity> entity)
     return true;
 }
 
-bool lang::OrderedScope::wasEntityDropped(lang::Entity const& entity) const
+bool lang::OrderedScope::wasEntityErased(lang::Entity const& entity) const
 {
     return !active_entities_.contains(entity.name()) && defined_entities_.contains(entity.name());
 }

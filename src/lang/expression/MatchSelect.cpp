@@ -93,7 +93,7 @@ Expression::Expansion MatchSelect::expandWith(Expressions subexpressions, lang::
 
     Statements after;
 
-    after.emplace_back(makeOwned<Drop>(make_temp_variable(), location()));
+    after.emplace_back(makeOwned<Erase>(make_temp_variable(), location()));
 
     return {std::move(statements), std::move(result), std::move(after)};
 }

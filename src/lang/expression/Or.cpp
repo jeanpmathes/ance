@@ -7,7 +7,7 @@
 #include "lang/expression/UnaryOperation.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/statement/Assignment.h"
-#include "lang/statement/Drop.h"
+#include "lang/statement/Erase.h"
 #include "lang/statement/If.h"
 #include "lang/statement/LocalVariableDefinition.h"
 
@@ -94,7 +94,7 @@ Expression::Expansion Or::expandWith(Expressions subexpressions, lang::Context& 
 
     Statements after;
 
-    after.emplace_back(makeOwned<Drop>(make_temp_variable(), location()));
+    after.emplace_back(makeOwned<Erase>(make_temp_variable(), location()));
 
     return {std::move(before), std::move(result), std::move(after)};
 }

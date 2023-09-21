@@ -43,7 +43,7 @@ bool VariableAccess::validate(ValidationLogger& validation_logger) const
 {
     if (lang::Type::checkMismatch<lang::Variable>(variable_, "value", location(), validation_logger)) return false;
 
-    if (isVariableDropped(validation_logger)) return false;
+    if (isVariableErased(validation_logger)) return false;
 
     if (!is_defined_)
     {
@@ -60,16 +60,16 @@ bool VariableAccess::validateAssignment(lang::Value const& value,
 {
     if (lang::Type::checkMismatch<lang::Variable>(variable_, "value", location(), validation_logger)) return false;
 
-    if (isVariableDropped(validation_logger)) return false;
+    if (isVariableErased(validation_logger)) return false;
 
     return variable_.as<lang::Variable>()->validateSetValue(value, validation_logger, location(), value_location);
 }
 
-bool VariableAccess::isVariableDropped(ValidationLogger& validation_logger) const
+bool VariableAccess::isVariableErased(ValidationLogger& validation_logger) const
 {
-    if (!variable_->isDefined() && scope()->asOrderedScope()->wasEntityDropped(variable_))
+    if (!variable_->isDefined() && scope()->asOrderedScope()->wasEntityErased(variable_))
     {
-        validation_logger.logError("Variable with name '" + variable_->name() + "' was dropped", location());
+        validation_logger.logError("Variable with name '" + variable_->name() + "' was erased", location());
         return true;
     }
 

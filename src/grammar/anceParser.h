@@ -38,7 +38,7 @@ public:
     RuleStructDescription = 11, RuleMember = 12, RuleAccessModifier = 13, 
     RuleCode = 14, RuleBlock = 15, RuleStatement = 16, RuleExpressionStatement = 17, 
     RuleLocalVariableDefinition = 18, RuleLocalReferenceDefinition = 19, 
-    RuleDropStatement = 20, RuleAssignment = 21, RuleAssigner = 22, RuleDeleteStatement = 23, 
+    RuleEraseStatement = 20, RuleAssignment = 21, RuleAssigner = 22, RuleDeleteStatement = 23, 
     RuleBreakStatement = 24, RuleContinueStatement = 25, RuleReturnStatement = 26, 
     RuleAssertStatement = 27, RuleIfStatement = 28, RuleWhileStatement = 29, 
     RuleLoopStatement = 30, RuleMatchStatement = 31, RuleMatchCase = 32, 
@@ -95,7 +95,7 @@ public:
   class ExpressionStatementContext;
   class LocalVariableDefinitionContext;
   class LocalReferenceDefinitionContext;
-  class DropStatementContext;
+  class EraseStatementContext;
   class AssignmentContext;
   class AssignerContext;
   class DeleteStatementContext;
@@ -429,7 +429,7 @@ public:
     ExpressionStatementContext *expressionStatement();
     LocalVariableDefinitionContext *localVariableDefinition();
     LocalReferenceDefinitionContext *localReferenceDefinition();
-    DropStatementContext *dropStatement();
+    EraseStatementContext *eraseStatement();
     AssignmentContext *assignment();
     DeleteStatementContext *deleteStatement();
     BreakStatementContext *breakStatement();
@@ -495,9 +495,9 @@ public:
 
   LocalReferenceDefinitionContext* localReferenceDefinition();
 
-  class  DropStatementContext : public antlr4::ParserRuleContext {
+  class  EraseStatementContext : public antlr4::ParserRuleContext {
   public:
-    DropStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    EraseStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *SEMICOLON();
@@ -507,7 +507,7 @@ public:
    
   };
 
-  DropStatementContext* dropStatement();
+  EraseStatementContext* eraseStatement();
 
   class  AssignmentContext : public antlr4::ParserRuleContext {
   public:

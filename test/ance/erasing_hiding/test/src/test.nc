@@ -1,6 +1,6 @@
 // invalid
 
-// A hidden variable cannot be unhidden by dropping the hiding variable.
+// A hidden variable cannot be unhidden by erasing the hiding variable.
 
 public main () : u32
 {
@@ -10,7 +10,7 @@ public main () : u32
         // The outer x is hidden in this scope.
 
         let x: single <: 0.0s;
-        drop x;
+        erase x;
 
         let z: size <: x; // Will not compile.
     }

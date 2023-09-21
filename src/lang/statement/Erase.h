@@ -1,5 +1,5 @@
-#ifndef ANCE_SRC_LANG_STATEMENT_DROP_H_
-#define ANCE_SRC_LANG_STATEMENT_DROP_H_
+#ifndef ANCE_SRC_LANG_STATEMENT_ERASE_H_
+#define ANCE_SRC_LANG_STATEMENT_ERASE_H_
 
 #include "Statement.h"
 
@@ -10,19 +10,19 @@
 class Expression;
 
 /**
- * The drop statement drops a defined variable.
+ * The erase statement removes a defined variable.
  */
-class Drop
+class Erase
     : public Statement
-    , public lang::Element<Drop, ANCE_CONSTRUCTS>
+    , public lang::Element<Erase, ANCE_CONSTRUCTS>
 {
   public:
     /**
-     * Creates a new drop statement.
-     * @param variable The the variable to drop.
+     * Creates a new erase statement.
+     * @param variable The the variable to erase.
      * @param location The location of the statement.
      */
-    Drop(lang::ResolvingHandle<lang::Variable> variable, lang::Location location);
+    Erase(lang::ResolvingHandle<lang::Variable> variable, lang::Location location);
 
     [[nodiscard]] lang::ResolvingHandle<lang::Variable> variable();
     [[nodiscard]] lang::Variable const&                 variable() const;
@@ -40,6 +40,6 @@ class Drop
 
   private:
     lang::ResolvingHandle<lang::Entity> variable_;
-    bool                                dropped_;
+    bool                                erased_;
 };
 #endif

@@ -1,7 +1,7 @@
 target_sources(ance PRIVATE Assignment.cpp
                LocalVariableDefinition.cpp
                LocalReferenceVariableDefinition.cpp
-               Drop.cpp
+               Erase.cpp
                Delete.cpp
                Break.cpp
                Continue.cpp

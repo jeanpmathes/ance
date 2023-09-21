@@ -412,9 +412,9 @@ std::any CodePrinter::visit(Delete const& delete_statement)
     return {};
 }
 
-std::any CodePrinter::visit(Drop const& drop_statement)
+std::any CodePrinter::visit(Erase const& erase_statement)
 {
-    out_ << "drop " << drop_statement.variable().name() << ";";
+    out_ << "erase " << erase_statement.variable().name() << ";";
 
     return {};
 }

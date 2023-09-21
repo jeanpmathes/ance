@@ -56,7 +56,7 @@ class Assignment;
 class Break;
 class Continue;
 class Delete;
-class Drop;
+class Erase;
 class ExpressionStatement;
 class If;
 class LocalReferenceVariableDefinition;
@@ -72,7 +72,7 @@ class Loop;
         UnaryOperation, BindRef, BindRefTo, ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType,  \
         Subscript, VariableAccess, MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope,       \
         lang::LocalScope, lang::StructScope, Assertion, Assignment, Break, Continue, Delete, ExpressionStatement,      \
-        LocalReferenceVariableDefinition, LocalVariableDefinition, Drop, Return, If, While, Loop, Match, Case,         \
+        LocalReferenceVariableDefinition, LocalVariableDefinition, Erase, Return, If, While, Loop, Match, Case,        \
         VectorDefinition, ArrayDefinition
 #endif
 

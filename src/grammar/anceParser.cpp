@@ -47,7 +47,7 @@ void anceParserInitialize() {
       "functionDescription", "functionBlock", "parameters", "parameter", 
       "typeDescription", "aliasDescription", "structDescription", "member", 
       "accessModifier", "code", "block", "statement", "expressionStatement", 
-      "localVariableDefinition", "localReferenceDefinition", "dropStatement", 
+      "localVariableDefinition", "localReferenceDefinition", "eraseStatement", 
       "assignment", "assigner", "deleteStatement", "breakStatement", "continueStatement", 
       "returnStatement", "assertStatement", "ifStatement", "whileStatement", 
       "loopStatement", "matchStatement", "matchCase", "expression", "unaryOperator", 
@@ -64,7 +64,7 @@ void anceParserInitialize() {
     },
     std::vector<std::string>{
       "", "':'", "'('", "')'", "'{'", "'}'", "','", "'define'", "'alias'", 
-      "'struct'", "'public'", "'private'", "'extern'", "'let'", "'drop'", 
+      "'struct'", "'public'", "'private'", "'extern'", "'let'", "'erase'", 
       "'<:'", "'<-'", "':='", "'delete'", "'break'", "'continue'", "'return'", 
       "'assert'", "'if'", "'then'", "'else'", "'while'", "'do'", "'loop'", 
       "'match'", "'with'", "'|'", "'=>'", "'default'", "'.'", "'['", "']'", 
@@ -1846,8 +1846,8 @@ anceParser::LocalReferenceDefinitionContext* anceParser::StatementContext::local
   return getRuleContext<anceParser::LocalReferenceDefinitionContext>(0);
 }
 
-anceParser::DropStatementContext* anceParser::StatementContext::dropStatement() {
-  return getRuleContext<anceParser::DropStatementContext>(0);
+anceParser::EraseStatementContext* anceParser::StatementContext::eraseStatement() {
+  return getRuleContext<anceParser::EraseStatementContext>(0);
 }
 
 anceParser::AssignmentContext* anceParser::StatementContext::assignment() {
@@ -1942,7 +1942,7 @@ anceParser::StatementContext* anceParser::statement() {
     case 4: {
       enterOuterAlt(_localctx, 4);
       setState(285);
-      dropStatement();
+      eraseStatement();
       break;
     }
 
@@ -2249,36 +2249,36 @@ anceParser::LocalReferenceDefinitionContext* anceParser::localReferenceDefinitio
   return _localctx;
 }
 
-//----------------- DropStatementContext ------------------------------------------------------------------
+//----------------- EraseStatementContext ------------------------------------------------------------------
 
-anceParser::DropStatementContext::DropStatementContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::EraseStatementContext::EraseStatementContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-tree::TerminalNode* anceParser::DropStatementContext::IDENTIFIER() {
+tree::TerminalNode* anceParser::EraseStatementContext::IDENTIFIER() {
   return getToken(anceParser::IDENTIFIER, 0);
 }
 
-tree::TerminalNode* anceParser::DropStatementContext::SEMICOLON() {
+tree::TerminalNode* anceParser::EraseStatementContext::SEMICOLON() {
   return getToken(anceParser::SEMICOLON, 0);
 }
 
 
-size_t anceParser::DropStatementContext::getRuleIndex() const {
-  return anceParser::RuleDropStatement;
+size_t anceParser::EraseStatementContext::getRuleIndex() const {
+  return anceParser::RuleEraseStatement;
 }
 
 
-std::any anceParser::DropStatementContext::accept(tree::ParseTreeVisitor *visitor) {
+std::any anceParser::EraseStatementContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitDropStatement(this);
+    return parserVisitor->visitEraseStatement(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::DropStatementContext* anceParser::dropStatement() {
-  DropStatementContext *_localctx = _tracker.createInstance<DropStatementContext>(_ctx, getState());
-  enterRule(_localctx, 40, anceParser::RuleDropStatement);
+anceParser::EraseStatementContext* anceParser::eraseStatement() {
+  EraseStatementContext *_localctx = _tracker.createInstance<EraseStatementContext>(_ctx, getState());
+  enterRule(_localctx, 40, anceParser::RuleEraseStatement);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {

@@ -49,7 +49,7 @@ class VariableAccess
     void doAssign(Shared<lang::Value> value, CompileContext& context) override;
 
   private:
-    bool isVariableDropped(ValidationLogger& validation_logger) const;
+    bool isVariableErased(ValidationLogger& validation_logger) const;
 
   public:
     ~VariableAccess() override;

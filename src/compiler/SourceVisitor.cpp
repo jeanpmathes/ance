@@ -306,12 +306,12 @@ std::any SourceVisitor::visitLocalReferenceDefinition(anceParser::LocalReference
     return unwrap(lang::CodeBlock::makeWithStatement(std::move(statement)));
 }
 
-std::any SourceVisitor::visitDropStatement(anceParser::DropStatementContext* ctx)
+std::any SourceVisitor::visitEraseStatement(anceParser::EraseStatementContext* ctx)
 {
     lang::Identifier const identifier = ident(ctx->IDENTIFIER());
     auto                   variable   = lang::makeHandled<lang::Variable>(identifier);
 
-    auto statement = makeOwned<Drop>(variable, location(ctx));
+    auto statement = makeOwned<Erase>(variable, location(ctx));
     return unwrap(lang::CodeBlock::makeWithStatement(std::move(statement)));
 }
 

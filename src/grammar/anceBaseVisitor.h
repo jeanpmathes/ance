@@ -103,7 +103,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual std::any visitDropStatement(anceParser::DropStatementContext *ctx) override {
+  virtual std::any visitEraseStatement(anceParser::EraseStatementContext *ctx) override {
     return visitChildren(ctx);
   }
 

@@ -53,7 +53,7 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitExpressionStatement(anceParser::ExpressionStatementContext* ctx) override;
     std::any visitLocalVariableDefinition(anceParser::LocalVariableDefinitionContext* ctx) override;
     std::any visitLocalReferenceDefinition(anceParser::LocalReferenceDefinitionContext* ctx) override;
-    std::any visitDropStatement(anceParser::DropStatementContext* ctx) override;
+    std::any visitEraseStatement(anceParser::EraseStatementContext* ctx) override;
     std::any visitAssignment(anceParser::AssignmentContext* ctx) override;
     std::any visitDeleteStatement(anceParser::DeleteStatementContext* ctx) override;
     std::any visitBreakStatement(anceParser::BreakStatementContext* ctx) override;

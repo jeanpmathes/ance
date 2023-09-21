@@ -31,18 +31,18 @@ namespace lang
         void prepareDefinition(Identifier name);
 
         /**
-         * Drop an. An entity must be defined in this scope to be dropped.
-         * @param entity The entity to drop.
-         * @return True if the entity was dropped, false otherwise.
+         * Erase an entity. An entity must be defined in this scope to be erased.
+         * @param entity The entity to erase.
+         * @return True if the entity was erased, false otherwise.
          */
-        bool drop(lang::ResolvingHandle<lang::Entity> entity);
+        bool erase(lang::ResolvingHandle<lang::Entity> entity);
 
         /**
-         * Check if an entity with the specified name was defined and then dropped.
+         * Check if an entity with the specified name was defined and then erased.
          * @param entity The entity to check.
-         * @return True if the entity was dropped, false otherwise.
+         * @return True if the entity was erased, false otherwise.
          */
-        [[nodiscard]] bool wasEntityDropped(lang::Entity const& entity) const;
+        [[nodiscard]] bool wasEntityErased(lang::Entity const& entity) const;
 
         void onRegisterUsage(lang::ResolvingHandle<lang::Entity> entity) override;
 

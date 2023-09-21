@@ -74,7 +74,7 @@ namespace lang
 #include "lang/statement/Break.h"
 #include "lang/statement/Continue.h"
 #include "lang/statement/Delete.h"
-#include "lang/statement/Drop.h"
+#include "lang/statement/Erase.h"
 #include "lang/statement/ExpressionStatement.h"
 #include "lang/statement/If.h"
 #include "lang/statement/LocalReferenceVariableDefinition.h"

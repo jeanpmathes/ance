@@ -51,7 +51,7 @@ class CodePrinter : public lang::ApplicationVisitorConst
     [[nodiscard]] std::any visit(Break const& break_statement) override;
     [[nodiscard]] std::any visit(Continue const& continue_statement) override;
     [[nodiscard]] std::any visit(Delete const& delete_statement) override;
-    [[nodiscard]] std::any visit(Drop const& drop_statement) override;
+    [[nodiscard]] std::any visit(Erase const& erase_statement) override;
     [[nodiscard]] std::any visit(ExpressionStatement const& expression_statement) override;
     [[nodiscard]] std::any visit(If const& if_statement) override;
     [[nodiscard]] std::any visit(LocalReferenceVariableDefinition const& local_reference_variable_definition) override;

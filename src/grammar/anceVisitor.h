@@ -63,7 +63,7 @@ public:
 
     virtual std::any visitLocalReferenceDefinition(anceParser::LocalReferenceDefinitionContext *context) = 0;
 
-    virtual std::any visitDropStatement(anceParser::DropStatementContext *context) = 0;
+    virtual std::any visitEraseStatement(anceParser::EraseStatementContext *context) = 0;
 
     virtual std::any visitAssignment(anceParser::AssignmentContext *context) = 0;
 

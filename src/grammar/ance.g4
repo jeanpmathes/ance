@@ -74,7 +74,7 @@ statement
     : expressionStatement
     | localVariableDefinition
     | localReferenceDefinition
-    | dropStatement
+    | eraseStatement
     | assignment
     | deleteStatement
     | breakStatement
@@ -99,8 +99,8 @@ localReferenceDefinition
     : 'let' IDENTIFIER ':' type bindRef ';'
     ;
 
-dropStatement
-    : 'drop' IDENTIFIER ';'
+eraseStatement
+    : 'erase' IDENTIFIER ';'
     ;
 
 assignment
