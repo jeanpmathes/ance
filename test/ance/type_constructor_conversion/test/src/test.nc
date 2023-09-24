@@ -1,6 +1,6 @@
 // valid
 
-// Constructors can be used for conversions when there could be a loss of information.
+// Constructors can be used for conversions, but fail when the conversion is not possible.
 
 public main () : u32
 {
@@ -8,10 +8,6 @@ public main () : u32
     let j: u32 <: u32(i);
     let k: uiptr <: j; // The constructor uiptr(j) would be unnecessary.
     let l: u64 <: u64(k);
-
-    let f1: single <: 12.0s;
-    let f2: double <: f1;
-    let f3: single <: single(f2);
 
     let b1: bool <: true;
     let b2: i1 <: i1(b1);

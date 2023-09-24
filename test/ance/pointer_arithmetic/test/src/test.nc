@@ -9,7 +9,7 @@ public main () : u32
     let v2 <: 0x200:uiptr;
     let v3 <: v1 + 0x100:uiptr;
     assert v3 == v2;
-    assert ptr(v3) == ptr(v2);
+    assert v3 as ptr == v2 as ptr;
 
     let v: i32 := 500;
 

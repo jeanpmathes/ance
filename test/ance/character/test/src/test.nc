@@ -11,7 +11,7 @@ public main () : u32
     // Literals can contain hexadecimal escape sequences.
     let c3 <: '\u{1F4A9}';
 
-    let c4: char <: char(u32(c1));
+    let c4: char <: c1 as u32 as char;
     assert c4 == c1;
 
     return 0:32;

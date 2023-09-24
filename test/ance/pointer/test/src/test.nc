@@ -17,22 +17,22 @@ public main () : u32
     let a6: nullptr <: null;
 
     // Pointers can be converted to the opaque pointer type 'ptr' and to the 'uiptr' type.
-    let a7 <: ptr(a1);
-    let a8 <: uiptr(a1);
+    let a7 <: a1 as ptr;
+    let a8 <: a1 as uiptr;
 
     // Values of both of these types can be converted back to pointers and to each other.
-    let a9 <: *u32(a7);
-    let a10 <: *u32(a8);
-    let a11 <: ptr(a8);
-    let a12 <: uiptr(a7);
+    let a9 <: a7 as *u32;
+    let a10 <: a8 as *u32;
+    let a11 <: a8 as ptr;
+    let a12 <: a7 as uiptr;
 
     // Pointers can also directly be converted to each other.
-    let a13 <: *i32(a1);
-    let a14 <: *u32(a13);
+    let a13 <: a1 as *i32;
+    let a14 <: a13 as *u32;
 
     // Buffer-pointers work just like pointers in respect to the above.
-    let a15 <: []u32(a1);
-    let a16 <: *u32(a15);
+    let a15 <: a1 as []u32;
+    let a16 <: a15 as *u32;
 
     return 0:32;
 }
