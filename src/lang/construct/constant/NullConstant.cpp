@@ -2,9 +2,9 @@
 
 #include "lang/ApplicationVisitor.h"
 #include "lang/Context.h"
-#include "lang/type/NullPointerType.h"
+#include "lang/type/NullValueType.h"
 
-lang::NullConstant::NullConstant(lang::Context& new_context) : type_(new_context.getNullPointerType()) {}
+lang::NullConstant::NullConstant(lang::Context& new_context) : type_(new_context.getNullValueType()) {}
 
 std::string lang::NullConstant::toString() const
 {

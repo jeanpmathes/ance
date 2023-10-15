@@ -206,9 +206,9 @@ namespace lang
 
         /**
          * Get whether this type is a type that represents a memory address.
-         * @return True if this type is a memory address type.
+         * @return The address type if this type is an address type, null otherwise.
          */
-        [[nodiscard]] bool isAddressType() const;
+        [[nodiscard]] AddressType const* isAddressType() const;
 
         /**
          * Get whether this type is a buffer type.
@@ -416,6 +416,13 @@ namespace lang
         [[nodiscard]] bool isImplicitlyConvertibleTo(lang::Type const& other) const;
 
         /**
+         * Check whether casting to a specified type is possible.
+         * @param other The other type.
+         * @return True if casting is possible.
+         */
+        [[nodiscard]] bool isCastingPossibleTo(lang::Type const& other) const;
+
+        /**
          * Check if this type has a member with the given name.
          * @param name The name of the member.
          * @return True if the member exists.
@@ -501,6 +508,15 @@ namespace lang
                                         ValidationLogger& validation_logger) const;
 
         /**
+         * Validate an explicit cast.
+         * @param other The other type.
+         * @param location The source location of the cast.
+         * @param validation_logger The validation logger to use.
+         * @return True if the cast is valid.
+         */
+        bool validateCast(lang::Type const& other, lang::Location location, ValidationLogger& validation_logger) const;
+
+        /**
          * Validate a member access.
          * @param name The name of the member.
          * @param validation_logger The validation logger to use.
@@ -557,6 +573,17 @@ namespace lang
         Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                     Shared<Value>                     value,
                                                     CompileContext&                   context);
+
+        /**
+         * Build an explicit cast.
+         * @param other The type to cast to.
+         * @param value The value to cast.
+         * @param context The current compile context.
+         * @return The casted value.
+         */
+        Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+                                      Shared<Value>                     value,
+                                      CompileContext&                   context);
 
         /**
          * Build a member access.

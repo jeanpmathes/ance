@@ -10,9 +10,9 @@
 #include "lang/type/Type.h"
 #include "lang/utility/Values.h"
 
-bool lang::AddressType::isAddressType() const
+lang::AddressType const* lang::AddressType::isAddressType() const
 {
-    return true;
+    return this;
 }
 
 StateCount lang::AddressType::getStateCount() const
@@ -36,6 +36,59 @@ bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::Type co
     }
 
     return false;
+}
+
+bool lang::AddressType::isCastingPossibleTo(lang::Type const& other) const
+{
+    if (getStateCount().isUnit()) return false;
+
+    auto* other_address = other.isAddressType();
+
+    bool const cast_to_other_address = other.isAddressType() || this->getPointeeType() == nullptr
+                                    || other_address->getPointeeType() == nullptr
+                                    || lang::Type::areSame(*getPointeeType(), *other_address->getPointeeType());
+
+    return cast_to_other_address || other.isUnsignedIntegerPointerType();
+}
+
+bool lang::AddressType::validateCast(lang::Type const&, lang::Location, ValidationLogger&) const
+{
+    return true;
+}
+
+Shared<lang::Value> lang::AddressType::buildCast(lang::ResolvingHandle<lang::Type> other,
+                                                 Shared<Value>                     value,
+                                                 CompileContext&                   context)
+{
+    if (other->isAddressType())
+    {
+        value->buildContentValue(context);
+        llvm::Value* content = value->getContentValue();
+
+        llvm::Value* result_content = context.ir().CreateBitCast(content,
+                                                                 other->getContentType(context.llvmContext()),
+                                                                 content->getName() + ".bitcast");
+
+        llvm::Value* result_native = lang::values::contentToNative(other, result_content, context);
+
+        return makeShared<lang::WrappedNativeValue>(other, result_native);
+    }
+
+    if (other->isUnsignedIntegerPointerType())
+    {
+        value->buildContentValue(context);
+        llvm::Value* content = value->getContentValue();
+
+        llvm::Value* result_content = context.ir().CreatePtrToInt(content,
+                                                                  other->getContentType(context.llvmContext()),
+                                                                  content->getName() + ".ptrtoint");
+
+        llvm::Value* result_native = lang::values::contentToNative(other, result_content, context);
+
+        return makeShared<lang::WrappedNativeValue>(other, result_native);
+    }
+
+    throw std::logic_error("Invalid cast");
 }
 
 lang::ResolvingHandle<lang::Type> lang::AddressType::getOperatorResultType(lang::BinaryOperator op,
@@ -116,55 +169,4 @@ Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
     llvm::Value*                      native_result = lang::values::contentToNative(result_type, result, context);
 
     return makeShared<lang::WrappedNativeValue>(result_type, native_result);
-}
-
-bool lang::AddressType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
-{
-    return parameters.size() == 1 && (parameters[0]->isAddressType() || parameters[0]->isUnsignedIntegerPointerType());
-}
-
-void lang::AddressType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
-                                               lang::PredefinedFunction&                      function,
-                                               CompileContext&                                context)
-{
-    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
-}
-
-void lang::AddressType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                               lang::ResolvingHandle<lang::Type> return_type,
-                                               lang::PredefinedFunction&         function,
-                                               CompileContext&                   context)
-{
-    llvm::Function* native_function;
-    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
-
-    if (parameter_element->isAddressType())
-    {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
-        context.ir().SetInsertPoint(block);
-        {
-            llvm::Value* original = native_function->getArg(0);
-
-            llvm::Value* converted = context.ir().CreateBitCast(original,
-                                                                return_type->getContentType(context.llvmContext()),
-                                                                original->getName() + ".bitcast");
-
-            context.ir().CreateRet(converted);
-        }
-    }
-
-    if (parameter_element->isUnsignedIntegerPointerType())
-    {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
-        context.ir().SetInsertPoint(block);
-        {
-            llvm::Value* original = native_function->getArg(0);
-
-            llvm::Value* converted = context.ir().CreateIntToPtr(original,
-                                                                 return_type->getContentType(context.llvmContext()),
-                                                                 original->getName() + ".inttoptr");
-
-            context.ir().CreateRet(converted);
-        }
-    }
 }

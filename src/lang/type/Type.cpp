@@ -170,7 +170,7 @@ bool lang::Type::isPointerType() const
     return definition_.value()->isPointerType();
 }
 
-bool lang::Type::isAddressType() const
+lang::AddressType const* lang::Type::isAddressType() const
 {
     assert(isDefined());
     return definition_.value()->isAddressType();
@@ -379,6 +379,12 @@ bool lang::Type::isImplicitlyConvertibleTo(lang::Type const& other) const
     return definition_.value()->isImplicitlyConvertibleTo(other);
 }
 
+bool lang::Type::isCastingPossibleTo(lang::Type const& other) const
+{
+    assert(isDefined());
+    return definition_.value()->isCastingPossibleTo(other);
+}
+
 bool lang::Type::hasMember(lang::Identifier const& name) const
 {
     assert(isDefined());
@@ -451,6 +457,14 @@ bool lang::Type::validateImplicitConversion(lang::Type const& other,
     return definition_.value()->validateImplicitConversion(std::move(other), location, validation_logger);
 }
 
+bool lang::Type::validateCast(lang::Type const& other,
+                              lang::Location    location,
+                              ValidationLogger& validation_logger) const
+{
+    assert(isDefined());
+    return definition_.value()->validateCast(std::move(other), location, validation_logger);
+}
+
 bool lang::Type::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const
 {
     assert(isDefined());
@@ -490,6 +504,14 @@ Shared<lang::Value> lang::Type::buildImplicitConversion(lang::ResolvingHandle<la
 {
     assert(isDefined());
     return definition_.value()->buildImplicitConversion(other, std::move(value), context);
+}
+
+Shared<lang::Value> lang::Type::buildCast(lang::ResolvingHandle<lang::Type> other,
+                                          Shared<Value>                     value,
+                                          CompileContext&                   context)
+{
+    assert(isDefined());
+    return definition_.value()->buildCast(other, std::move(value), context);
 }
 
 Shared<lang::Value> lang::Type::buildMemberAccess(Shared<Value>           value,
@@ -614,12 +636,6 @@ Shared<lang::Value> lang::Type::makeMatching(lang::ResolvingHandle<lang::Type> e
 
         return makeMatching(expected, referenced, context);
     }
-
-    std::string e_n(expected->name().text());
-    (void) e_n;
-
-    std::string v_n(value->type()->name().text());
-    (void) v_n;
 
     assert(false && "Cannot make the value matching, was mismatch checked before?");
     throw std::logic_error("Cannot make the value matching, was mismatch checked before?");
@@ -992,7 +1008,7 @@ void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
         }
         case TypeClass::NULL_POINTER:
         {
-            if (storage.isReading()) type.reroute(context()->getNullPointerType());
+            if (storage.isReading()) type.reroute(context()->getNullValueType());
             break;
         }
         case TypeClass::OPAQUE_POINTER:

@@ -6,6 +6,7 @@
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/Scope.h"
 #include "lang/type/BooleanType.h"
+#include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Values.h"
 
@@ -65,6 +66,61 @@ Shared<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::Resol
     llvm::Value* native_content_value = lang::values::contentToNative(other, converted_value, context);
 
     return makeShared<WrappedNativeValue>(other, native_content_value);
+}
+
+bool lang::FloatingPointType::isCastingPossibleTo(lang::Type const& other) const
+{
+    return other.isFloatingPointType() || other.isFixedWidthIntegerType();
+}
+
+bool lang::FloatingPointType::validateCast(lang::Type const&, lang::Location, ValidationLogger&) const
+{
+    return true;
+}
+
+Shared<lang::Value> lang::FloatingPointType::buildCast(lang::ResolvingHandle<lang::Type> other,
+                                                       Shared<Value>                     value,
+                                                       CompileContext&                   context)
+{
+    if (other->isFloatingPointType())
+    {
+        value->buildContentValue(context);
+        llvm::Value* content_value = value->getContentValue();
+
+        llvm::Value* converted_value      = context.ir().CreateFPCast(content_value,
+                                                                 other->getContentType(context.llvmContext()),
+                                                                 content_value->getName() + ".fcast");
+        llvm::Value* native_content_value = lang::values::contentToNative(other, converted_value, context);
+
+        return makeShared<WrappedNativeValue>(other, native_content_value);
+    }
+
+    if (other->isFixedWidthIntegerType())
+    {
+        value->buildContentValue(context);
+        llvm::Value* content_value = value->getContentValue();
+
+        llvm::Value* converted_value;
+
+        if (other->isSigned())
+        {
+            converted_value = context.ir().CreateFPToSI(content_value,
+                                                        other->getContentType(context.llvmContext()),
+                                                        content_value->getName() + ".fcast");
+        }
+        else
+        {
+            converted_value = context.ir().CreateFPToUI(content_value,
+                                                        other->getContentType(context.llvmContext()),
+                                                        content_value->getName() + ".fcast");
+        }
+
+        llvm::Value* native_content_value = lang::values::contentToNative(other, converted_value, context);
+
+        return makeShared<WrappedNativeValue>(other, native_content_value);
+    }
+
+    throw std::runtime_error("Invalid cast");
 }
 
 bool lang::FloatingPointType::isOperatorDefined(lang::UnaryOperator op) const
@@ -210,74 +266,6 @@ Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::BinaryOperator 
 
     llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
     return makeShared<lang::WrappedNativeValue>(return_type, native_result);
-}
-
-bool lang::FloatingPointType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
-{
-    if (parameters.size() == 1)
-    {
-        if (parameters[0]->isFloatingPointType()) return true;
-        if (parameters[0]->isFixedWidthIntegerType()) return true;
-    }
-
-    return false;
-}
-
-void lang::FloatingPointType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
-                                                     lang::PredefinedFunction&                      function,
-                                                     CompileContext&                                context)
-{
-    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
-}
-
-void lang::FloatingPointType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                                     lang::ResolvingHandle<lang::Type> return_type,
-                                                     lang::PredefinedFunction&         function,
-                                                     CompileContext&                   context)
-{
-    llvm::Function* native_function;
-    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
-
-    if (parameter_element->isFloatingPointType())
-    {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
-        context.ir().SetInsertPoint(block);
-        {
-            llvm::Value* original = native_function->getArg(0);
-
-            llvm::Value* converted = context.ir().CreateFPCast(original,
-                                                               return_type->getContentType(context.llvmContext()),
-                                                               original->getName() + ".fcast");
-
-            context.ir().CreateRet(converted);
-        }
-    }
-
-    if (parameter_element->isFixedWidthIntegerType())
-    {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
-        context.ir().SetInsertPoint(block);
-        {
-            llvm::Value* original = native_function->getArg(0);
-
-            llvm::Value* converted;
-
-            if (parameter_element->isSigned())
-            {
-                converted = context.ir().CreateSIToFP(original,
-                                                      return_type->getContentType(context.llvmContext()),
-                                                      original->getName() + ".sitofp");
-            }
-            else
-            {
-                converted = context.ir().CreateUIToFP(original,
-                                                      return_type->getContentType(context.llvmContext()),
-                                                      original->getName() + ".uitofp");
-            }
-
-            context.ir().CreateRet(converted);
-        }
-    }
 }
 
 bool lang::FloatingPointType::isTriviallyDefaultConstructible() const

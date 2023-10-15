@@ -11,8 +11,16 @@ namespace lang
     class AddressType : public virtual TypeDefinition
     {
       public:
-        bool       isAddressType() const final;
-        StateCount getStateCount() const override;
+        AddressType const* isAddressType() const final;
+        StateCount         getStateCount() const override;
+
+        bool                isCastingPossibleTo(Type const& other) const override;
+        bool                validateCast(Type const&       other,
+                                         lang::Location    location,
+                                         ValidationLogger& validation_logger) const override;
+        Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+                                      Shared<Value>                     value,
+                                      CompileContext&                   context) override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
@@ -26,15 +34,6 @@ namespace lang
                                                         Shared<Value>        left,
                                                         Shared<Value>        right,
                                                         CompileContext&      context) override;
-
-        bool        acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
-        void        buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
-                                           lang::PredefinedFunction&                      function,
-                                           CompileContext&                                context) override;
-        static void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                           lang::ResolvingHandle<lang::Type> return_type,
-                                           lang::PredefinedFunction&         function,
-                                           CompileContext&                   context);
 
       protected:
         [[nodiscard]] virtual Optional<lang::ResolvingHandle<lang::Type>> getPointeeType()       = 0;

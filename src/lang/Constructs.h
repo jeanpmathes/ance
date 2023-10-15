@@ -27,6 +27,7 @@ class ArrayDefinition;
 class BinaryOperation;
 class BindRef;
 class BindRefTo;
+class Cast;
 class ConstantLiteral;
 class FunctionCall;
 class IfSelect;
@@ -69,11 +70,11 @@ class Loop;
 #define ANCE_CONSTRUCTS                                                                                                \
     Unit, lang::BasicBlock, lang::CodeBlock, lang::Function, lang::FunctionDescription, lang::VariableDescription,     \
         lang::StructDescription, lang::AliasDescription, lang::Member, Addressof, Allocation, BinaryOperation,         \
-        UnaryOperation, BindRef, BindRefTo, ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression, SizeofType,  \
-        Subscript, VariableAccess, MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope,       \
-        lang::LocalScope, lang::StructScope, Assertion, Assignment, Break, Continue, Delete, ExpressionStatement,      \
-        LocalReferenceVariableDefinition, LocalVariableDefinition, Erase, Return, If, While, Loop, Match, Case,        \
-        VectorDefinition, ArrayDefinition
+        UnaryOperation, BindRef, BindRefTo, Cast, ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression,        \
+        SizeofType, Subscript, VariableAccess, MemberAccess, Indirection, And, Or, IfSelect, MatchSelect,              \
+        lang::GlobalScope, lang::LocalScope, lang::StructScope, Assertion, Assignment, Break, Continue, Delete,        \
+        ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Erase, Return, If, While,      \
+        Loop, Match, Case, VectorDefinition, ArrayDefinition
 #endif
 
 template<typename T>

@@ -6,6 +6,7 @@
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/Scope.h"
 #include "lang/type/BooleanType.h"
+#include "lang/type/VectorType.h"
 #include "lang/utility/Values.h"
 
 StateCount lang::IntegerType::getStateCount() const
@@ -75,13 +76,57 @@ Shared<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHa
     return makeShared<WrappedNativeValue>(other, native_converted_value);
 }
 
+bool lang::IntegerType::isCastingPossibleTo(lang::Type const& other) const
+{
+    return other.isIntegerType() || (this->isUnsignedIntegerPointerType() && other.isOpaquePointerType())
+        || other.isCharType();
+}
+
+bool lang::IntegerType::validateCast(lang::Type const&, lang::Location, ValidationLogger&) const
+{
+    return true;
+}
+
+Shared<lang::Value> lang::IntegerType::buildCast(lang::ResolvingHandle<lang::Type> other,
+                                                 Shared<Value>                     value,
+                                                 CompileContext&                   context)
+{
+    if (other->isIntegerType())
+    {
+        value->buildContentValue(context);
+        llvm::Value* content_value = value->getContentValue();
+
+        llvm::Value* converted_value        = context.ir().CreateIntCast(content_value,
+                                                                  other->getContentType(context.llvmContext()),
+                                                                  isSigned(),
+                                                                  content_value->getName() + ".cast");
+        llvm::Value* native_converted_value = lang::values::contentToNative(other, converted_value, context);
+
+        return makeShared<WrappedNativeValue>(other, native_converted_value);
+    }
+
+    if (other->isOpaquePointerType())
+    {
+        value->buildContentValue(context);
+        llvm::Value* content_value = value->getContentValue();
+
+        llvm::Value* converted_value        = context.ir().CreateIntToPtr(content_value,
+                                                                   other->getContentType(context.llvmContext()),
+                                                                   content_value->getName() + ".cast");
+        llvm::Value* native_converted_value = lang::values::contentToNative(other, converted_value, context);
+
+        return makeShared<WrappedNativeValue>(other, native_converted_value);
+    }
+
+    throw std::logic_error("Invalid cast");
+}
+
 bool lang::IntegerType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
 {
     if (parameters.size() == 1)
     {
         if (parameters[0]->isIntegerType()) return true;
         if (parameters[0]->isBooleanType()) return true;
-        if (parameters[0]->isFloatingPointType()) return true;
     }
 
     return false;
@@ -109,34 +154,91 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
         {
             llvm::Value* original = native_function->getArg(0);
 
+            // Determine whether the value fits into the return type without loss of information.
+            // Abort if it doesn't.
+
+            if (auto other_type = parameter_element->isIntegerType())
+            {
+                auto this_size  = static_cast<unsigned>(getMinimumBitSize());
+                auto other_size = static_cast<unsigned>(other_type->getMinimumBitSize());
+
+                auto check_type = context.types().getBooleanType();
+                if (auto vector = return_type->isVectorType())
+                {
+                    check_type = context.types().getVectorType(check_type, vector->getSize().value());
+                }
+
+                auto build_check = [&context, &check_type](llvm::Value* fits) {
+                    llvm::Value*  fits_native = lang::values::contentToNative(check_type, fits, context);
+                    Shared<Value> fits_value  = makeShared<WrappedNativeValue>(check_type, fits_native);
+
+                    context.runtime().buildAssert(fits_value, "Integer conversion would lose information", context);
+                };
+
+                auto build_constant = [&context, &return_type](llvm::APInt const& value) -> llvm::Constant* {
+                    if (auto vector = return_type->isVectorType())
+                    {
+                        auto element_count =
+                            llvm::ElementCount::getFixed(static_cast<unsigned>(vector->getSize().value()));
+                        return llvm::ConstantVector::getSplat(element_count, context.ir().getInt(value));
+                    }
+                    else { return context.ir().getInt(value); }
+                };
+
+                if (this->isSigned() == other_type->isSigned())
+                {
+                    if (this_size < other_size)
+                    {
+                        llvm::Value* fits;
+
+                        if (isSigned())
+                        {
+                            const llvm::APInt min      = llvm::APInt::getSignedMinValue(this_size).sext(other_size);
+                            llvm::Value*      fits_min = context.ir().CreateICmpSGE(original, build_constant(min));
+
+                            const llvm::APInt max      = llvm::APInt::getSignedMaxValue(this_size).sext(other_size);
+                            llvm::Value*      fits_max = context.ir().CreateICmpSLE(original, build_constant(max));
+
+                            fits = context.ir().CreateAnd(fits_min, fits_max);
+                        }
+                        else
+                        {
+                            const llvm::APInt max = llvm::APInt::getMaxValue(this_size).zext(other_size);
+                            fits                  = context.ir().CreateICmpULE(original, build_constant(max));
+                        }
+
+                        build_check(fits);
+                    }
+                }
+                else if (isSigned())// this is signed and original is unsigned.
+                {
+                    if (this_size <= other_size)
+                    {
+                        const llvm::APInt max  = llvm::APInt::getSignedMaxValue(this_size).zextOrSelf(other_size);
+                        llvm::Value*      fits = context.ir().CreateICmpULE(original, build_constant(max));
+
+                        build_check(fits);
+                    }
+                }
+                else// this is unsigned and original is signed.
+                {
+                    const llvm::APInt zero = llvm::APInt::getNullValue(other_size);
+                    llvm::Value*      fits = context.ir().CreateICmpSGE(original, build_constant(zero));
+
+                    if (this_size < other_size)
+                    {
+                        const llvm::APInt max = llvm::APInt::getMaxValue(this_size).zext(other_size);
+                        fits = context.ir().CreateAnd(fits, context.ir().CreateICmpSLE(original, build_constant(max)));
+                    }
+
+                    build_check(fits);
+                }
+            }
+
             llvm::Value* converted = context.ir().CreateIntCast(original,
                                                                 return_type->getContentType(context.llvmContext()),
                                                                 parameter_element->isSigned(),
                                                                 original->getName() + ".icast");
-            context.ir().CreateRet(converted);
-        }
-    }
-
-    if (parameter_element->isFloatingPointType())
-    {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
-        context.ir().SetInsertPoint(block);
-        {
-            llvm::Value* original = native_function->getArg(0);
-            llvm::Value* converted;
-
-            if (isSigned())
-            {
-                converted = context.ir().CreateFPToSI(original,
-                                                      return_type->getContentType(context.llvmContext()),
-                                                      original->getName() + ".fptosi");
-            }
-            else
-            {
-                converted = context.ir().CreateFPToUI(original,
-                                                      return_type->getContentType(context.llvmContext()),
-                                                      original->getName() + ".fptoui");
-            }
 
             context.ir().CreateRet(converted);
         }

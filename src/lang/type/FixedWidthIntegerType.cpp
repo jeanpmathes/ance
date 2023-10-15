@@ -4,10 +4,12 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
+#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/BooleanType.h"
 #include "lang/type/CharType.h"
 #include "lang/type/SizeType.h"
+#include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
 lang::FixedWidthIntegerType::FixedWidthIntegerType(uint64_t bit_size, bool is_signed)
@@ -44,45 +46,59 @@ bool lang::FixedWidthIntegerType::validate(ValidationLogger& validation_logger, 
     return true;
 }
 
-bool lang::FixedWidthIntegerType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
+bool lang::FixedWidthIntegerType::isCastingPossibleTo(lang::Type const& other) const
 {
-    if (parameters.size() == 1 && parameters[0]->isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS
-        && !is_signed_)
+    if (other.isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_) return true;
+    if (other.isFloatingPointType()) return true;
+
+    return IntegerType::isCastingPossibleTo(other);
+}
+
+bool lang::FixedWidthIntegerType::validateCast(lang::Type const& other,
+                                               lang::Location    location,
+                                               ValidationLogger& validation_logger) const
+{
+    return IntegerType::validateCast(other, location, validation_logger);
+}
+
+Shared<lang::Value> lang::FixedWidthIntegerType::buildCast(lang::ResolvingHandle<lang::Type> other,
+                                                           Shared<Value>                     value,
+                                                           CompileContext&                   context)
+{
+    if (other->isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_)
     {
-        return true;
+        value->buildNativeValue(context);
+        llvm::Value* native_value = value->getNativeValue();
+
+        return makeShared<lang::WrappedNativeValue>(other, native_value);
     }
 
-    return IntegerType::acceptOverloadRequest(parameters);
-}
-
-void lang::FixedWidthIntegerType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
-                                                         lang::PredefinedFunction&                      function,
-                                                         CompileContext&                                context)
-{
-    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
-}
-
-void lang::FixedWidthIntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                                         lang::ResolvingHandle<lang::Type> return_type,
-                                                         lang::PredefinedFunction&         function,
-                                                         CompileContext&                   context)
-{
-    llvm::Function* native_function;
-    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
-
-    if (parameter_element->isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_)
+    if (other->isFloatingPointType())
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
-        context.ir().SetInsertPoint(block);
+        value->buildContentValue(context);
+        llvm::Value* content_value = value->getContentValue();
+
+        llvm::Value* converted_value;
+
+        if (isSigned())
         {
-            llvm::Value* original = native_function->getArg(0);
-            context.ir().CreateRet(original);
+            converted_value = context.ir().CreateSIToFP(content_value,
+                                                        other->getContentType(context.llvmContext()),
+                                                        content_value->getName() + ".cast");
+        }
+        else
+        {
+            converted_value = context.ir().CreateUIToFP(content_value,
+                                                        other->getContentType(context.llvmContext()),
+                                                        content_value->getName() + ".cast");
         }
 
-        return;
+        llvm::Value* native_converted_value = lang::values::contentToNative(other, converted_value, context);
+
+        return makeShared<WrappedNativeValue>(other, native_converted_value);
     }
 
-    IntegerType::buildRequestedOverload(parameter_element, return_type, function, context);
+    return IntegerType::buildCast(other, value, context);
 }
 
 std::string lang::FixedWidthIntegerType::createMangledName() const

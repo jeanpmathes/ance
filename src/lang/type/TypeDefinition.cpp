@@ -135,9 +135,9 @@ bool lang::TypeDefinition::isPointerType() const
     return false;
 }
 
-bool lang::TypeDefinition::isAddressType() const
+lang::AddressType const* lang::TypeDefinition::isAddressType() const
 {
-    return false;
+    return nullptr;
 }
 
 bool lang::TypeDefinition::isBufferType() const
@@ -330,6 +330,11 @@ bool lang::TypeDefinition::isImplicitlyConvertibleTo(lang::Type const&) const
     return false;
 }
 
+bool lang::TypeDefinition::isCastingPossibleTo(lang::Type const&) const
+{
+    return false;
+}
+
 bool lang::TypeDefinition::hasMember(lang::Identifier const&) const
 {
     return false;
@@ -379,6 +384,11 @@ bool lang::TypeDefinition::validateImplicitConversion(lang::Type const&, lang::L
     return false;
 }
 
+bool lang::TypeDefinition::validateCast(lang::Type const&, lang::Location, ValidationLogger&) const
+{
+    return false;
+}
+
 bool lang::TypeDefinition::validateMemberAccess(lang::Identifier const&, ValidationLogger&) const
 {
     return false;
@@ -412,6 +422,11 @@ Shared<lang::Value> lang::TypeDefinition::buildImplicitConversion(lang::Resolvin
                                                                   CompileContext&)
 {
     throw std::logic_error("Implicit conversion not defined");
+}
+
+Shared<lang::Value> lang::TypeDefinition::buildCast(lang::ResolvingHandle<lang::Type>, Shared<Value>, CompileContext&)
+{
+    throw std::logic_error("Cast not defined");
 }
 
 Shared<lang::Value> lang::TypeDefinition::buildMemberAccess(Shared<Value>, lang::Identifier const&, CompileContext&)

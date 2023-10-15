@@ -54,6 +54,16 @@ namespace lang
                                                     Shared<Value>                     value,
                                                     CompileContext&                   context) override;
 
+      public:
+        bool                isCastingPossibleTo(Type const& other) const override;
+        bool                validateCast(Type const&       other,
+                                         lang::Location    location,
+                                         ValidationLogger& validation_logger) const override;
+        Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+                                      Shared<Value>                     value,
+                                      CompileContext&                   context) override;
+
+      protected:
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
         void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
                                     lang::PredefinedFunction&                      function,

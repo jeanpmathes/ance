@@ -1,20 +1,21 @@
-#ifndef ANCE_SRC_LANG_TYPE_NULLPOINTERTYPE_H_
-#define ANCE_SRC_LANG_TYPE_NULLPOINTERTYPE_H_
+#ifndef ANCE_SRC_LANG_TYPE_NULLVALUETYPE_H_
+#define ANCE_SRC_LANG_TYPE_NULLVALUETYPE_H_
 
 #include "AddressType.h"
 
 namespace lang
 {
     /**
-     * The type of the null pointer literal. Can be implicitly converted to any address type.
+     * The type of the null value/pointer literal. Can be implicitly converted to any address type.
      */
-    class NullPointerType : public lang::AddressType
+    class NullValueType : public lang::AddressType
     {
       public:
-        NullPointerType();
-        ~NullPointerType() override = default;
+        NullValueType();
+        ~NullValueType() override = default;
 
-        bool isNullValueType() const override;
+        bool       isNullValueType() const override;
+        StateCount getStateCount() const override;
 
         bool                isImplicitlyConvertibleTo(lang::Type const& other) const override;
         bool                validateImplicitConversion(lang::Type const& other,

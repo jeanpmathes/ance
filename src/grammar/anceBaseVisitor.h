@@ -167,6 +167,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitCast(anceParser::CastContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitIfExpression(anceParser::IfExpressionContext *ctx) override {
     return visitChildren(ctx);
   }

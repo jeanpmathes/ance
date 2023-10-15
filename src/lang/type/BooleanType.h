@@ -3,12 +3,14 @@
 
 #include "TypeDefinition.h"
 
+#include "lang/type/VectorizableType.h"
+
 namespace lang
 {
     /**
      * The boolean type.
      */
-    class BooleanType : public lang::TypeDefinition
+    class BooleanType : public lang::VectorizableType
     {
       public:
         BooleanType();
@@ -20,6 +22,8 @@ namespace lang
         llvm::Constant* getDefaultContent(llvm::Module& m) const override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
+        using TypeDefinition::buildOperator;
+
         bool                              isOperatorDefined(lang::UnaryOperator op) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
         bool                              validateOperator(lang::UnaryOperator op,
@@ -28,6 +32,10 @@ namespace lang
         Shared<lang::Value>               buildOperator(lang::UnaryOperator op,
                                                         Shared<Value>       value,
                                                         CompileContext&     context) override;
+        Shared<Value>                     buildOperator(lang::UnaryOperator               op,
+                                                        Shared<lang::Value>               value,
+                                                        lang::ResolvingHandle<lang::Type> return_type,
+                                                        CompileContext&                   context) override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
@@ -41,11 +49,20 @@ namespace lang
                                                         Shared<Value>        left,
                                                         Shared<Value>        right,
                                                         CompileContext&      context) override;
+        Shared<Value>                     buildOperator(lang::BinaryOperator              op,
+                                                        Shared<Value>                     left,
+                                                        Shared<Value>                     right,
+                                                        lang::ResolvingHandle<lang::Type> return_type,
+                                                        CompileContext&                   context) override;
 
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
         void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
                                     lang::PredefinedFunction&                      function,
                                     CompileContext&                                context) override;
+        void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                    lang::ResolvingHandle<lang::Type> return_type,
+                                    lang::PredefinedFunction&         function,
+                                    CompileContext&                   context) override;
 
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;

@@ -32,33 +32,6 @@ llvm::Type* lang::CharType::getContentType(llvm::LLVMContext& c) const
     return llvm::Type::getIntNTy(c, static_cast<unsigned>(SIZE_IN_BITS));
 }
 
-bool lang::CharType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
-{
-    if (parameters.size() == 1 && parameters[0]->isFixedWidthIntegerType(SIZE_IN_BITS, false)) return true;
-
-    return false;
-}
-
-void lang::CharType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
-                                            lang::PredefinedFunction&                      function,
-                                            CompileContext&                                context)
-{
-    llvm::Function* native_function;
-    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
-
-    if (parameters.size() == 1 && parameters[0]->isFixedWidthIntegerType(SIZE_IN_BITS, false))
-    {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
-        context.ir().SetInsertPoint(block);
-        {
-            llvm::Value* original = native_function->getArg(0);
-            context.ir().CreateRet(original);
-        }
-
-        return;
-    }
-}
-
 bool lang::CharType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
 {
     if (not op.isEquality()) return false;
@@ -115,6 +88,35 @@ Shared<lang::Value> lang::CharType::buildOperator(lang::BinaryOperator op,
     llvm::Value*                      native_result = lang::values::contentToNative(result_type, result, context);
 
     return makeShared<lang::WrappedNativeValue>(result_type, native_result);
+}
+
+bool lang::CharType::isCastingPossibleTo(lang::Type const& other) const
+{
+    if (other.isFixedWidthIntegerType(SIZE_IN_BITS, false)) return true;
+
+    return TypeDefinition::isCastingPossibleTo(other);
+}
+
+bool lang::CharType::validateCast(lang::Type const& other,
+                                  lang::Location    location,
+                                  ValidationLogger& validation_logger) const
+{
+    return TypeDefinition::validateCast(other, location, validation_logger);
+}
+
+Shared<lang::Value> lang::CharType::buildCast(lang::ResolvingHandle<lang::Type> other,
+                                              Shared<Value>                     value,
+                                              CompileContext&                   context)
+{
+    if (other->isFixedWidthIntegerType(SIZE_IN_BITS, false))
+    {
+        value->buildNativeValue(context);
+        llvm::Value* native_value = value->getNativeValue();
+
+        return makeShared<lang::WrappedNativeValue>(other, native_value);
+    }
+
+    return TypeDefinition::buildCast(other, value, context);
 }
 
 bool lang::CharType::isTriviallyDefaultConstructible() const

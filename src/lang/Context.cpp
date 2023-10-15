@@ -8,7 +8,7 @@
 #include "lang/type/DoubleType.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/HalfType.h"
-#include "lang/type/NullPointerType.h"
+#include "lang/type/NullValueType.h"
 #include "lang/type/OpaquePointerType.h"
 #include "lang/type/PointerType.h"
 #include "lang/type/QuadType.h"
@@ -51,7 +51,7 @@ lang::Context::Context(lang::GlobalScope& global_scope, bool contains_runtime)
     register_type(getDiffType());
     register_type(getUnsignedIntegerPointerType());
     register_type(getOpaquePointerType());
-    register_type(getNullPointerType());
+    register_type(getNullValueType());
 }
 
 void lang::Context::resolve()
@@ -166,10 +166,10 @@ lang::ResolvingHandle<lang::Type> lang::Context::getHalfType() const
     return half_type_.value();
 }
 
-lang::ResolvingHandle<lang::Type> lang::Context::getNullPointerType() const
+lang::ResolvingHandle<lang::Type> lang::Context::getNullValueType() const
 {
     if (!null_pointer_type_.hasValue())
-        null_pointer_type_ = lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new NullPointerType())));
+        null_pointer_type_ = lang::makeHandled<lang::Type>(Owned<lang::TypeDefinition>(*(new NullValueType())));
 
     return null_pointer_type_.value();
 }

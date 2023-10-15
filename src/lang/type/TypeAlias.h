@@ -38,7 +38,7 @@ namespace lang
         [[nodiscard]] bool                         isUnitType() const override;
         [[nodiscard]] bool                         isNullValueType() const override;
         [[nodiscard]] bool                         isPointerType() const override;
-        [[nodiscard]] bool                         isAddressType() const override;
+        [[nodiscard]] lang::AddressType const*     isAddressType() const override;
         [[nodiscard]] bool                         isBufferType() const override;
         [[nodiscard]] bool                         isOpaquePointerType() const override;
         [[nodiscard]] bool                         isReferenceType() const override;
@@ -79,6 +79,14 @@ namespace lang
         Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                     Shared<Value>                     value,
                                                     CompileContext&                   context) override;
+
+        bool                isCastingPossibleTo(Type const& other) const override;
+        bool                validateCast(Type const&       other,
+                                         lang::Location    location,
+                                         ValidationLogger& validation_logger) const override;
+        Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+                                      Shared<Value>                     value,
+                                      CompileContext&                   context) override;
 
         bool                        isOperatorDefined(lang::UnaryOperator op) const override;
         ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;

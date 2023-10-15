@@ -32,14 +32,13 @@ namespace lang
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
-        bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
-        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
-                                    lang::PredefinedFunction&                      function,
-                                    CompileContext&                                context) override;
-        void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                    lang::ResolvingHandle<lang::Type> return_type,
-                                    lang::PredefinedFunction&         function,
-                                    CompileContext&                   context) override;
+        bool                isCastingPossibleTo(Type const& other) const override;
+        bool                validateCast(Type const&       other,
+                                         lang::Location    location,
+                                         ValidationLogger& validation_logger) const override;
+        Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+                                      Shared<Value>                     value,
+                                      CompileContext&                   context) override;
 
       private:
         uint64_t bit_size_;

@@ -7,6 +7,7 @@
 #include "lang/construct/value/Value.h"
 #include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/Type.h"
+#include "lang/type/VectorType.h"
 #include "lang/utility/Values.h"
 
 lang::BooleanType::BooleanType() : TypeDefinition(lang::Identifier::like("bool")) {}
@@ -81,6 +82,14 @@ Shared<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator op,
                                                      Shared<Value>       value,
                                                      CompileContext&     context)
 {
+    return buildOperator(op, value, getOperatorResultType(op), context);
+}
+
+Shared<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator               op,
+                                                     Shared<lang::Value>               value,
+                                                     lang::ResolvingHandle<lang::Type> return_type,
+                                                     CompileContext&                   context)
+{
     value->buildContentValue(context);
     llvm::Value* content_value = value->getContentValue();
 
@@ -98,9 +107,8 @@ Shared<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator op,
             result = nullptr;
     }
 
-    lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op);
-    llvm::Value*                      native_result = lang::values::contentToNative(result_type, result, context);
-    return makeShared<lang::WrappedNativeValue>(result_type, native_result);
+    llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
+    return makeShared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
 bool lang::BooleanType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
@@ -131,6 +139,15 @@ Shared<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperator op,
                                                      Shared<Value>        left,
                                                      Shared<Value>        right,
                                                      CompileContext&      context)
+{
+    return buildOperator(op, left, right, getOperatorResultType(op, right->type()), context);
+}
+
+Shared<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperator              op,
+                                                     Shared<lang::Value>               left,
+                                                     Shared<lang::Value>               right,
+                                                     lang::ResolvingHandle<lang::Type> return_type,
+                                                     CompileContext&                   context)
 {
     right = lang::Type::getValueOrReferencedValue(right, context);
 
@@ -164,10 +181,8 @@ Shared<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperator op,
             throw std::logic_error("Invalid operator for boolean type");
     }
 
-    lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op, right->type());
-    llvm::Value*                      native_result = lang::values::contentToNative(result_type, result, context);
-
-    return makeShared<lang::WrappedNativeValue>(result_type, native_result);
+    llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
+    return makeShared<lang::WrappedNativeValue>(return_type, native_result);
 }
 
 bool lang::BooleanType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
@@ -184,29 +199,41 @@ void lang::BooleanType::buildRequestedOverload(std::vector<lang::ResolvingHandle
                                                lang::PredefinedFunction&                      function,
                                                CompileContext&                                context)
 {
+    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
+}
+
+void lang::BooleanType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
+                                               lang::ResolvingHandle<lang::Type> return_type,
+                                               lang::PredefinedFunction&         function,
+                                               CompileContext&                   context)
+{
     llvm::Function* native_function;
     std::tie(std::ignore, native_function) = function.getNativeRepresentation();
 
-    if (parameters.size() == 1)
+    if (parameter_element->isFixedWidthIntegerType() || parameter_element->isSizeType()
+        || parameter_element->isDiffType())
     {
-        if (parameters[0]->isFixedWidthIntegerType() || parameters[0]->isSizeType() || parameters[0]->isDiffType())
+        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
+        context.ir().SetInsertPoint(block);
         {
-            llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
-            context.ir().SetInsertPoint(block);
+            llvm::Value* original = native_function->getArg(0);
+
+            llvm::Constant* true_const  = llvm::ConstantInt::getTrue(context.llvmContext());
+            llvm::Constant* false_const = llvm::ConstantInt::getFalse(context.llvmContext());
+            llvm::Constant* zero        = llvm::Constant::getNullValue(original->getType());
+
+            if (auto* vector = return_type->isVectorType())
             {
-                llvm::Value* original = native_function->getArg(0);
-
-                llvm::Value* is_nonzero =
-                    context.ir().CreateICmpNE(original, llvm::ConstantInt::get(original->getType(), 0, false), ".icmp");
-
-                llvm::Value* converted =
-                    context.ir().CreateSelect(is_nonzero,
-                                              llvm::ConstantInt::getTrue(getContentType(context.llvmContext())),
-                                              llvm::ConstantInt::getFalse(getContentType(context.llvmContext())),
-                                              ".select");
-
-                context.ir().CreateRet(converted);
+                auto element_count = llvm::ElementCount::getFixed(static_cast<unsigned>(vector->getSize().value()));
+                true_const         = llvm::ConstantVector::getSplat(element_count, true_const);
+                false_const        = llvm::ConstantVector::getSplat(element_count, false_const);
             }
+
+            llvm::Value* is_nonzero = context.ir().CreateICmpNE(original, zero, ".icmp");
+
+            llvm::Value* converted = context.ir().CreateSelect(is_nonzero, true_const, false_const, ".select");
+
+            context.ir().CreateRet(converted);
         }
     }
 }

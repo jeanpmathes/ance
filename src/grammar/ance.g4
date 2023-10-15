@@ -165,6 +165,7 @@ expression
     | bindRef # Ref
     | sizeofType # SizeOf
     | sizeofExpression # SizeOf
+    | expression 'as' type # Cast
     | independentExpression # Independent
     | '(' expression ')' # Parenthesis
     | unaryOperator expression # UnaryOperation

@@ -13,6 +13,7 @@
 #include "lang/type/PointerType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
+#include "lang/type/VectorType.h"
 #include "lang/utility/Values.h"
 
 void Runtime::init(CompileContext& context)
@@ -155,17 +156,26 @@ void Runtime::buildAssert(Shared<lang::Value> value, std::string const& descript
 {
     assert(is_initialized_);
 
-    assert(value->type()->isBooleanType());
+    if (!context.unit().isAssertionsEnabled()) return;
 
-    if (context.unit().isAssertionsEnabled())
+    llvm::Value* description_ptr = context.ir().CreateGlobalStringPtr(description);
+
+    value->buildContentValue(context);
+    llvm::Value* truth_value = value->getContentValue();
+
+    if (value->type()->isBooleanType()) { context.ir().CreateCall(assertion_, {truth_value, description_ptr}); }
+    else if (value->type()->isVectorType() && value->type()->getElementType()->isBooleanType())
     {
-        llvm::Value* description_ptr = context.ir().CreateGlobalStringPtr(description);
+        auto vector_type = value->type()->isVectorType();
+        assert(vector_type != nullptr);
 
-        value->buildContentValue(context);
-        llvm::Value* truth_value = value->getContentValue();
-
-        context.ir().CreateCall(assertion_, {truth_value, description_ptr});
+        for (size_t i = 0; i < vector_type->getSize().value(); ++i)
+        {
+            llvm::Value* element = context.ir().CreateExtractElement(truth_value, i);
+            context.ir().CreateCall(assertion_, {element, description_ptr});
+        }
     }
+    else { throw std::runtime_error("Invalid assertion value type"); }
 }
 
 void Runtime::buildAbort(std::string const& reason, CompileContext& context)

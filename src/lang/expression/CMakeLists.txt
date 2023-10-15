@@ -18,6 +18,7 @@ target_sources(ance PRIVATE Expression.cpp
                BinaryOperation.cpp
                And.cpp
                Or.cpp
+               Cast.cpp
                UnaryOperation.cpp
                IfSelect.cpp
                VectorDefinition.cpp

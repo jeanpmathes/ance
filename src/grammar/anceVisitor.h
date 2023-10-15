@@ -95,6 +95,8 @@ public:
 
     virtual std::any visitDefaultCase(anceParser::DefaultCaseContext *context) = 0;
 
+    virtual std::any visitCast(anceParser::CastContext *context) = 0;
+
     virtual std::any visitIfExpression(anceParser::IfExpressionContext *context) = 0;
 
     virtual std::any visitVariable(anceParser::VariableContext *context) = 0;

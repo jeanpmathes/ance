@@ -77,6 +77,7 @@ class SourceVisitor : public anceBaseVisitor
     std::any visitAddressof(anceParser::AddressofContext* ctx) override;
     std::any visitBindReference(anceParser::BindReferenceContext* ctx) override;
     std::any visitBindReferenceToAddress(anceParser::BindReferenceToAddressContext* ctx) override;
+    std::any visitCast(anceParser::CastContext* ctx) override;
     std::any visitSizeofType(anceParser::SizeofTypeContext* ctx) override;
     std::any visitSizeofExpression(anceParser::SizeofExpressionContext* ctx) override;
     std::any visitSubscript(anceParser::SubscriptContext* ctx) override;

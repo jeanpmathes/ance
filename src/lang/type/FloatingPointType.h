@@ -30,6 +30,14 @@ namespace lang
                                                     Shared<Value>                     value,
                                                     CompileContext&                   context) override;
 
+        bool                isCastingPossibleTo(Type const& other) const override;
+        bool                validateCast(Type const&       other,
+                                         lang::Location    location,
+                                         ValidationLogger& validation_logger) const override;
+        Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+                                      Shared<Value>                     value,
+                                      CompileContext&                   context) override;
+
         bool                              isOperatorDefined(lang::UnaryOperator op) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
         bool                              validateOperator(lang::UnaryOperator op,
@@ -60,15 +68,6 @@ namespace lang
                                                         Shared<Value>                     right,
                                                         lang::ResolvingHandle<lang::Type> return_type,
                                                         CompileContext&                   context) override;
-
-        bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
-        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
-                                    lang::PredefinedFunction&                      function,
-                                    CompileContext&                                context) override;
-        void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                    lang::ResolvingHandle<lang::Type> return_type,
-                                    lang::PredefinedFunction&         function,
-                                    CompileContext&                   context) override;
 
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;

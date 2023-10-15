@@ -9,3 +9,11 @@ lang::VectorizableType* lang::VectorizableType::isVectorizable()
 {
     return this;
 }
+
+void lang::VectorizableType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>,
+                                                    lang::ResolvingHandle<lang::Type>,
+                                                    lang::PredefinedFunction&,
+                                                    CompileContext&)
+{
+    throw std::runtime_error("No overloads available for this type");
+}

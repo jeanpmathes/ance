@@ -26,6 +26,7 @@ namespace lang
     class VectorizableType;
     class FloatingPointType;
     class FixedWidthIntegerType;
+    class AddressType;
     class VectorType;
     class ArrayType;
     class IntegerType;
@@ -82,9 +83,9 @@ namespace lang
         [[nodiscard]] virtual bool                     isDiffType() const;
         [[nodiscard]] virtual bool                     isUnitType() const;
         [[nodiscard]] virtual bool                     isNullValueType() const;
-        [[nodiscard]] virtual bool                     isPointerType() const;
-        [[nodiscard]] virtual bool                     isAddressType() const;
-        [[nodiscard]] virtual bool                     isBufferType() const;
+        [[nodiscard]] virtual bool                         isPointerType() const;
+        [[nodiscard]] virtual AddressType const*           isAddressType() const;
+        [[nodiscard]] virtual bool                         isBufferType() const;
         [[nodiscard]] virtual bool                     isOpaquePointerType() const;
         [[nodiscard]] virtual bool                     isReferenceType() const;
         [[nodiscard]] virtual bool                     isStructType() const;
@@ -133,6 +134,7 @@ namespace lang
                                                                         lang::ResolvingHandle<lang::Type> other);
         virtual lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op);
         virtual bool                              isImplicitlyConvertibleTo(lang::Type const& other) const;
+        virtual bool                              isCastingPossibleTo(lang::Type const& other) const;
         virtual bool                              hasMember(lang::Identifier const& name) const;
         virtual lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name);
         virtual bool                              definesIndirection() const;
@@ -154,6 +156,9 @@ namespace lang
         virtual bool validateImplicitConversion(lang::Type const& other,
                                                 lang::Location    location,
                                                 ValidationLogger& validation_logger) const;
+        virtual bool validateCast(lang::Type const& other,
+                                  lang::Location    location,
+                                  ValidationLogger& validation_logger) const;
         virtual bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const;
         virtual bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const;
 
@@ -166,6 +171,9 @@ namespace lang
         virtual Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
                                                             Shared<Value>                     value,
                                                             CompileContext&                   context);
+        virtual Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+                                              Shared<Value>                     value,
+                                              CompileContext&                   context);
         virtual Shared<lang::Value> buildMemberAccess(Shared<Value>           value,
                                                       lang::Identifier const& name,
                                                       CompileContext&         context);

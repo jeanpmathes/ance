@@ -518,6 +518,15 @@ std::any SourceVisitor::visitBindReferenceToAddress(anceParser::BindReferenceToA
     return static_cast<Expression*>(new BindRefTo(Owned<Expression>(address), location(ctx)));
 }
 
+std::any SourceVisitor::visitCast(anceParser::CastContext* ctx)
+{
+    auto type = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
+
+    Expression& value = *std::any_cast<Expression*>(visit(ctx->expression()));
+
+    return static_cast<Expression*>(new Cast(Owned<Expression>(value), type, location(ctx), location(ctx->type())));
+}
+
 std::any SourceVisitor::visitSizeofType(anceParser::SizeofTypeContext* ctx)
 {
     auto type = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));

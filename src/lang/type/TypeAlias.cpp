@@ -107,7 +107,7 @@ bool lang::TypeAlias::isNullValueType() const
     return actual_->isNullValueType();
 }
 
-bool lang::TypeAlias::isAddressType() const
+lang::AddressType const* lang::TypeAlias::isAddressType() const
 {
     return actual_->isAddressType();
 }
@@ -232,6 +232,25 @@ Shared<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::ResolvingHand
                                                              CompileContext&                   context)
 {
     return actual_->buildImplicitConversion(other, value, context);
+}
+
+bool lang::TypeAlias::isCastingPossibleTo(lang::Type const& other) const
+{
+    return actual_->isCastingPossibleTo(other);
+}
+
+bool lang::TypeAlias::validateCast(lang::Type const& other,
+                                   lang::Location    location,
+                                   ValidationLogger& validation_logger) const
+{
+    return actual_->validateCast(other, location, validation_logger);
+}
+
+Shared<lang::Value> lang::TypeAlias::buildCast(lang::ResolvingHandle<lang::Type> other,
+                                               Shared<Value>                     value,
+                                               CompileContext&                   context)
+{
+    return actual_->buildCast(other, value, context);
 }
 
 bool lang::TypeAlias::isOperatorDefined(lang::UnaryOperator op) const

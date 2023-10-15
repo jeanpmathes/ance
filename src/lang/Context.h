@@ -81,10 +81,10 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getHalfType() const;
 
         /**
-         * Get the null pointer type.
-         * @return The null pointer type.
+         * Get the null value type, which is the type of the null pointer literal.
+         * @return The null value type.
          */
-        lang::ResolvingHandle<lang::Type> getNullPointerType() const;
+        lang::ResolvingHandle<lang::Type> getNullValueType() const;
 
         /**
          * Get the opaque pointer type.

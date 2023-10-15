@@ -22,11 +22,6 @@ namespace lang
         llvm::Constant* getDefaultContent(llvm::Module& m) const override;
         llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
 
-        bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
-        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
-                                    lang::PredefinedFunction&                      function,
-                                    CompileContext&                                context) override;
-
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
                                                                 lang::ResolvingHandle<lang::Type> other) override;
@@ -39,6 +34,14 @@ namespace lang
                                                         Shared<Value>        left,
                                                         Shared<Value>        right,
                                                         CompileContext&      context) override;
+
+        bool                isCastingPossibleTo(Type const& other) const override;
+        bool                validateCast(Type const&       other,
+                                         lang::Location    location,
+                                         ValidationLogger& validation_logger) const override;
+        Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+                                      Shared<Value>                     value,
+                                      CompileContext&                   context) override;
 
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;

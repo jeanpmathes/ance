@@ -48,7 +48,7 @@ namespace lang
         virtual void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
                                             lang::ResolvingHandle<lang::Type> return_type,
                                             lang::PredefinedFunction&         function,
-                                            CompileContext&                   context) = 0;
+                                            CompileContext&                   context);
     };
 }
 
