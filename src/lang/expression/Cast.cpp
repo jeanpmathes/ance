@@ -56,14 +56,13 @@ bool Cast::validate(ValidationLogger& validation_logger) const
 
     if (valid)
     {
-        if (source_type.isImplicitlyConvertibleTo(destination_type))
-        {
-            validation_logger.logWarning("Cast can be replaced with implicit conversion", location());
-        }
-
         if (lang::Type::areSame(source_type, destination_type))
         {
             validation_logger.logWarning("Cast is redundant", location());
+        }
+        else if (source_type.isImplicitlyConvertibleTo(destination_type))
+        {
+            validation_logger.logWarning("Cast can be replaced with implicit conversion", location());
         }
     }
 

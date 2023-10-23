@@ -29,6 +29,7 @@ class CodePrinter : public lang::ApplicationVisitorConst
     [[nodiscard]] std::any visit(BinaryOperation const& binary_operation) override;
     [[nodiscard]] std::any visit(BindRef const& bind_ref) override;
     [[nodiscard]] std::any visit(BindRefTo const& bind_ref_to) override;
+    [[nodiscard]] std::any visit(Cast const& cast) override;
     [[nodiscard]] std::any visit(ConstantLiteral const& constant_literal) override;
     [[nodiscard]] std::any visit(FunctionCall const& function_call) override;
     [[nodiscard]] std::any visit(IfSelect const& if_select) override;

@@ -172,14 +172,21 @@ std::any CodePrinter::visit(BinaryOperation const& binary_operation)
 
 std::any CodePrinter::visit(BindRef const& bind_ref)
 {
-    out_ << "ref " << visitTree(bind_ref.value());
+    out_ << "ref " << visitTree(bind_ref.value()) << " ";
 
     return {};
 }
 
 std::any CodePrinter::visit(BindRefTo const& bind_ref_to)
 {
-    out_ << "ref to " << visitTree(bind_ref_to.address());
+    out_ << "ref to " << visitTree(bind_ref_to.address()) << " ";
+
+    return {};
+}
+
+std::any CodePrinter::visit(Cast const& visitable)
+{
+    out_ << visitTree(visitable.value()) << " as " << visitable.type().name() << " ";
 
     return {};
 }
