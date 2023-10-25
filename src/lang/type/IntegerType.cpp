@@ -91,7 +91,15 @@ Shared<lang::Value> lang::IntegerType::buildCast(lang::ResolvingHandle<lang::Typ
                                                  Shared<Value>                     value,
                                                  CompileContext&                   context)
 {
-    if (other->isIntegerType())
+    return buildCast(other, value, other, context);
+}
+
+Shared<lang::Value> lang::IntegerType::buildCast(lang::ResolvingHandle<lang::Type> other,
+                                                 Shared<Value>                     value,
+                                                 lang::ResolvingHandle<lang::Type> element_type,
+                                                 CompileContext&                   context)
+{
+    if (element_type->isIntegerType())
     {
         value->buildContentValue(context);
         llvm::Value* content_value = value->getContentValue();
@@ -105,7 +113,7 @@ Shared<lang::Value> lang::IntegerType::buildCast(lang::ResolvingHandle<lang::Typ
         return makeShared<WrappedNativeValue>(other, native_converted_value);
     }
 
-    if (other->isOpaquePointerType())
+    if (element_type->isOpaquePointerType())
     {
         value->buildContentValue(context);
         llvm::Value* content_value = value->getContentValue();

@@ -62,6 +62,10 @@ namespace lang
         Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
                                       Shared<Value>                     value,
                                       CompileContext&                   context) override;
+        Shared<Value>       buildCast(lang::ResolvingHandle<lang::Type> other,
+                                      Shared<Value>                     value,
+                                      lang::ResolvingHandle<lang::Type> element_type,
+                                      CompileContext&                   context) override;
 
       protected:
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;

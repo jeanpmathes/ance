@@ -164,6 +164,61 @@ Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::ResolvingHan
     }
 }
 
+bool lang::VectorType::isCastingPossibleTo(lang::Type const& other) const
+{
+    return element_type_->isCastingPossibleTo(other.getElementType());
+}
+
+bool lang::VectorType::validateCast(lang::Type const& other,
+                                    lang::Location    location,
+                                    ValidationLogger& validation_logger) const
+{
+    return element_type_->validateCast(other.getElementType(), location, validation_logger);
+}
+
+Shared<lang::Value> lang::VectorType::buildCast(lang::ResolvingHandle<lang::Type> other,
+                                                Shared<Value>                     value,
+                                                CompileContext&                   context)
+{
+    if (auto element_vector = element_type_->isVectorizable())
+    {
+        return element_vector->buildCast(other, value, other->getElementType(), context);
+    }
+    else
+    {
+        llvm::Value* result_ptr =
+            context.ir().CreateAlloca(other->getContentType(context.llvmContext()), nullptr, "alloca");
+
+        VectorType* other_as_vector = other->isVectorType();
+
+        value->buildNativeValue(context);
+
+        for (uint64_t index = 0; index < size_.value(); index++)
+        {
+            llvm::Constant* index_content =
+                llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), index);
+
+            auto index_value = [&]() {
+                llvm::Value* index_native =
+                    lang::values::contentToNative(context.types().getSizeType(), index_content, context);
+                return makeShared<lang::WrappedNativeValue>(context.types().getSizeType(), index_native);
+            };
+
+            auto current_element = lang::Type::getValueOrReferencedValue(
+                buildSubscript(lang::values::clone(value), index_value(), context),
+                context);
+
+            auto result_element = element_type_->buildCast(other->getElementType(), current_element, context);
+            result_element->buildContentValue(context);
+
+            llvm::Value* result_dst_ptr = other_as_vector->buildGetElementPointer(result_ptr, index, context);
+            context.ir().CreateStore(result_element->getContentValue(), result_dst_ptr);
+        }
+
+        return makeShared<lang::WrappedNativeValue>(other, result_ptr);
+    }
+}
+
 bool lang::VectorType::isOperatorDefined(lang::UnaryOperator op) const
 {
     return getElementType().isOperatorDefined(op);

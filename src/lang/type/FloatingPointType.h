@@ -37,6 +37,10 @@ namespace lang
         Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
                                       Shared<Value>                     value,
                                       CompileContext&                   context) override;
+        Shared<Value>       buildCast(lang::ResolvingHandle<lang::Type> other,
+                                      Shared<Value>                     value,
+                                      lang::ResolvingHandle<lang::Type> element_type,
+                                      CompileContext&                   context) override;
 
         bool                              isOperatorDefined(lang::UnaryOperator op) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;

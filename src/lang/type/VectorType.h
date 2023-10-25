@@ -49,6 +49,14 @@ namespace lang
                                                     Shared<Value>                     value,
                                                     CompileContext&                   context) override;
 
+        bool                isCastingPossibleTo(Type const& other) const override;
+        bool                validateCast(Type const&       other,
+                                         lang::Location    location,
+                                         ValidationLogger& validation_logger) const override;
+        Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+                                      Shared<Value>                     value,
+                                      CompileContext&                   context) override;
+
         bool                              isOperatorDefined(lang::UnaryOperator op) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
         bool                              validateOperator(lang::UnaryOperator op,

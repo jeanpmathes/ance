@@ -82,7 +82,15 @@ Shared<lang::Value> lang::FloatingPointType::buildCast(lang::ResolvingHandle<lan
                                                        Shared<Value>                     value,
                                                        CompileContext&                   context)
 {
-    if (other->isFloatingPointType())
+    return buildCast(other, value, other, context);
+}
+
+Shared<lang::Value> lang::FloatingPointType::buildCast(lang::ResolvingHandle<lang::Type> other,
+                                                       Shared<Value>                     value,
+                                                       lang::ResolvingHandle<lang::Type> element_type,
+                                                       CompileContext&                   context)
+{
+    if (element_type->isFloatingPointType())
     {
         value->buildContentValue(context);
         llvm::Value* content_value = value->getContentValue();
@@ -95,7 +103,7 @@ Shared<lang::Value> lang::FloatingPointType::buildCast(lang::ResolvingHandle<lan
         return makeShared<WrappedNativeValue>(other, native_content_value);
     }
 
-    if (other->isFixedWidthIntegerType())
+    if (element_type->isFixedWidthIntegerType())
     {
         value->buildContentValue(context);
         llvm::Value* content_value = value->getContentValue();

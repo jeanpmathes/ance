@@ -26,7 +26,7 @@ namespace lang
                                             Shared<Value>                     left,
                                             Shared<Value>                     right,
                                             lang::ResolvingHandle<lang::Type> return_type,
-                                            CompileContext&                   context) = 0;
+                                            CompileContext&                   context);
 
         /**
          * Build an operation with values of this type or vectors of values of this type.
@@ -34,7 +34,22 @@ namespace lang
         virtual Shared<Value> buildOperator(lang::UnaryOperator               op,
                                             Shared<Value>                     value,
                                             lang::ResolvingHandle<lang::Type> return_type,
-                                            CompileContext&                   context) = 0;
+                                            CompileContext&                   context);
+
+        using TypeDefinition::buildCast;
+
+        /**
+         * Build a cast from a value of this type or a vector of values of this type to another type.
+         * @param other The type to cast to.
+         * @param value The value to cast.
+         * @param element_type The element type of the type to cast to, or the type itself.
+         * @param context The current compilation context.
+         * @return The cast value.
+         */
+        virtual Shared<Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+                                        Shared<Value>                     value,
+                                        lang::ResolvingHandle<lang::Type> element_type,
+                                        CompileContext&                   context);
 
         using TypeDefinition::buildRequestedOverload;
 
