@@ -9,13 +9,13 @@ private fn (a: *Alias) {}
 public main () : u32
 {
     let a: *i8;
-    let b: Alias := a as Alias;
+    let b: Alias := a as ptr as Alias;
 
     let c: **i8;
-    let d: *Alias := c as *Alias;
+    let d: *Alias := c as ptr as *Alias;
 
     let f: []*i8;
-    let g: []Alias := f as []Alias;
+    let g: []Alias := f as ptr as []Alias;
 
     return 0:32;
 }

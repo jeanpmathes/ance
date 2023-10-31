@@ -12,11 +12,11 @@ public main () : u32
 
     let f1: single <: 12.0s;
     let f2: double <: f1;
-    let f3: single <: single(f2);
+    let f3: single <: f2 as single;
 
     let b1: bool <: true;
-    let b2: i1 <: b1 as i1;
-    let b3: bool <: b2 as bool;
+    let b2: i1 <: i1(b1); // Booleans cannot be casted, because constructors allow safe conversion in all cases.
+    let b3: bool <: bool(b2);
 
     return 0:32;
 }

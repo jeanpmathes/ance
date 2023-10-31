@@ -44,9 +44,9 @@ bool lang::AddressType::isCastingPossibleTo(lang::Type const& other) const
 
     auto* other_address = other.isAddressType();
 
-    bool const cast_to_other_address = other.isAddressType() || this->getPointeeType() == nullptr
-                                    || other_address->getPointeeType() == nullptr
-                                    || lang::Type::areSame(*getPointeeType(), *other_address->getPointeeType());
+    bool const cast_to_other_address = other.isAddressType()
+                                    && (this->getPointeeType() == nullptr || other_address->getPointeeType() == nullptr
+                                        || lang::Type::areSame(*getPointeeType(), *other_address->getPointeeType()));
 
     return cast_to_other_address || other.isUnsignedIntegerPointerType();
 }

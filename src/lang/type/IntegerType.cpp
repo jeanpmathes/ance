@@ -78,7 +78,7 @@ Shared<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHa
 
 bool lang::IntegerType::isCastingPossibleTo(lang::Type const& other) const
 {
-    return other.isIntegerType() || (this->isUnsignedIntegerPointerType() && other.isOpaquePointerType())
+    return other.isIntegerType() || (this->isUnsignedIntegerPointerType() && other.isAddressType())
         || other.isCharType();
 }
 
@@ -113,7 +113,7 @@ Shared<lang::Value> lang::IntegerType::buildCast(lang::ResolvingHandle<lang::Typ
         return makeShared<WrappedNativeValue>(other, native_converted_value);
     }
 
-    if (element_type->isOpaquePointerType())
+    if (element_type->isAddressType())
     {
         value->buildContentValue(context);
         llvm::Value* content_value = value->getContentValue();
@@ -168,7 +168,8 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
             if (auto other_type = parameter_element->isIntegerType())
             {
                 auto this_size  = static_cast<unsigned>(getMinimumBitSize());
-                auto other_size = static_cast<unsigned>(other_type->getMinimumBitSize());
+                auto other_size     = static_cast<unsigned>(other_type->getMinimumBitSize());
+                auto other_capacity = static_cast<unsigned>(other_type->getNativeBitSize());
 
                 auto check_type = context.types().getBooleanType();
                 if (auto vector = return_type->isVectorType())
@@ -201,17 +202,17 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
 
                         if (isSigned())
                         {
-                            const llvm::APInt min      = llvm::APInt::getSignedMinValue(this_size).sext(other_size);
+                            const llvm::APInt min      = llvm::APInt::getSignedMinValue(this_size).sext(other_capacity);
                             llvm::Value*      fits_min = context.ir().CreateICmpSGE(original, build_constant(min));
 
-                            const llvm::APInt max      = llvm::APInt::getSignedMaxValue(this_size).sext(other_size);
+                            const llvm::APInt max      = llvm::APInt::getSignedMaxValue(this_size).sext(other_capacity);
                             llvm::Value*      fits_max = context.ir().CreateICmpSLE(original, build_constant(max));
 
                             fits = context.ir().CreateAnd(fits_min, fits_max);
                         }
                         else
                         {
-                            const llvm::APInt max = llvm::APInt::getMaxValue(this_size).zext(other_size);
+                            const llvm::APInt max = llvm::APInt::getMaxValue(this_size).zext(other_capacity);
                             fits                  = context.ir().CreateICmpULE(original, build_constant(max));
                         }
 
@@ -222,7 +223,7 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
                 {
                     if (this_size <= other_size)
                     {
-                        const llvm::APInt max  = llvm::APInt::getSignedMaxValue(this_size).zextOrSelf(other_size);
+                        const llvm::APInt max  = llvm::APInt::getSignedMaxValue(this_size).zextOrSelf(other_capacity);
                         llvm::Value*      fits = context.ir().CreateICmpULE(original, build_constant(max));
 
                         build_check(fits);
@@ -230,12 +231,12 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
                 }
                 else// this is unsigned and original is signed.
                 {
-                    const llvm::APInt zero = llvm::APInt::getNullValue(other_size);
+                    const llvm::APInt zero = llvm::APInt::getNullValue(other_capacity);
                     llvm::Value*      fits = context.ir().CreateICmpSGE(original, build_constant(zero));
 
                     if (this_size < other_size)
                     {
-                        const llvm::APInt max = llvm::APInt::getMaxValue(this_size).zext(other_size);
+                        const llvm::APInt max = llvm::APInt::getMaxValue(this_size).zext(other_capacity);
                         fits = context.ir().CreateAnd(fits, context.ir().CreateICmpSLE(original, build_constant(max)));
                     }
 
