@@ -273,7 +273,7 @@ int main(int argc, char** argv)
 {
     if (argc != 2)
     {
-        std::cout << "ance: command: Requires exactly one argument." << std::endl;
+        std::cout << "ance: command: Requires exactly one argument" << std::endl;
 
         return EXIT_FAILURE;
     }
@@ -300,7 +300,7 @@ int main(int argc, char** argv)
     if (project_file_path.is_relative()) project_file_path = std::filesystem::absolute(project_file_path);
     if (!std::filesystem::exists(project_file_path))
     {
-        std::cout << "ance: input: Project file does not exist." << std::endl;
+        std::cout << "ance: input: Project file does not exist" << std::endl;
         return EXIT_FAILURE;
     }
 
