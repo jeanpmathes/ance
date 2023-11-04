@@ -60,14 +60,14 @@ namespace lang
 
     /**
      * A registry that manages type definitions.
-     * @tparam OTHER_KEY Another key type, can be empty.
+     * @tparam OtherKey Another key type, can be empty.
      */
-    template<typename OTHER_KEY = lang::Empty>
+    template<typename OtherKey = lang::Empty>
     class TypeRegistry : public TypeDefinitionRegistry
     {
       public:
         using UsedTypes = std::vector<TypeHandle>;
-        using Key       = std::pair<UsedTypes, OTHER_KEY>;
+        using Key       = std::pair<UsedTypes, OtherKey>;
         using Entry     = std::pair<Key, TypeHandle>;
 
         TypeRegistry()                                   = default;
@@ -77,8 +77,8 @@ namespace lang
         TypeRegistry(TypeRegistry&)            = default;
         TypeRegistry& operator=(TypeRegistry&) = default;
 
-        Optional<TypeHandle> get(UsedTypes type_keys, OTHER_KEY other_keys);
-        void                 add(UsedTypes&& type_keys, OTHER_KEY other_key, TypeHandle type);
+        Optional<TypeHandle> get(UsedTypes type_keys, OtherKey other_keys);
+        void                 add(UsedTypes&& type_keys, OtherKey other_key, TypeHandle type);
 
         void setDefaultContainingScope(lang::Scope& scope) override;
         void resolve() override;

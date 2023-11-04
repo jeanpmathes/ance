@@ -55,9 +55,9 @@ Optional<T>::Optional(Optional<T>&& optional) noexcept : has_value_(optional.has
 }
 
 template<Moveable T>
-template<typename U>
-    requires MoveConvertible<T, U>
-Optional<T>::Optional(Optional<U>&& optional) : has_value_(optional.has_value_)
+template<typename OtherT>
+    requires MoveConvertible<T, OtherT>
+Optional<T>::Optional(Optional<OtherT>&& optional) : has_value_(optional.has_value_)
 {
     if (has_value_) new (storage_.data()) T(std::move(*optional));
 
@@ -66,9 +66,9 @@ Optional<T>::Optional(Optional<U>&& optional) : has_value_(optional.has_value_)
 }
 
 template<Moveable T>
-template<typename U>
-    requires CopyConvertible<T, U>
-Optional<T>::Optional(Optional<U>& optional) : has_value_(optional.has_value_)
+template<typename OtherT>
+    requires CopyConvertible<T, OtherT>
+Optional<T>::Optional(Optional<OtherT>& optional) : has_value_(optional.has_value_)
 {
     if (has_value_) new (storage_.data()) T(*optional);
 }
@@ -98,9 +98,9 @@ Optional<T>& Optional<T>::operator=(Optional<T>&& optional) noexcept
 }
 
 template<Moveable T>
-template<typename U>
-    requires MoveConvertible<T, U>
-Optional<T>& Optional<T>::operator=(Optional<U>&& optional)
+template<typename OtherT>
+    requires MoveConvertible<T, OtherT>
+Optional<T>& Optional<T>::operator=(Optional<OtherT>&& optional)
 {
     if (has_value_) std::destroy_at(std::launder(reinterpret_cast<T*>(storage_.data())));
 
@@ -111,9 +111,9 @@ Optional<T>& Optional<T>::operator=(Optional<U>&& optional)
 }
 
 template<Moveable T>
-template<typename U>
-    requires CopyConvertible<T, U>
-Optional<T>& Optional<T>::operator=(Optional<U>& optional)
+template<typename OtherT>
+    requires CopyConvertible<T, OtherT>
+Optional<T>& Optional<T>::operator=(Optional<OtherT>& optional)
 {
     if (has_value_) std::destroy_at(std::launder(reinterpret_cast<T*>(storage_.data())));
 

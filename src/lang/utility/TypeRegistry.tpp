@@ -1,7 +1,7 @@
 #include "TypeRegistry.h"
 
-template<typename OTHER_KEY>
-Optional<TypeHandle> lang::TypeRegistry<OTHER_KEY>::get(UsedTypes type_keys, OTHER_KEY other_keys)
+template<typename OtherKey>
+Optional<TypeHandle> lang::TypeRegistry<OtherKey>::get(UsedTypes type_keys, OtherKey other_keys)
 {
     for (auto& [current_key, current_type] : types_)
     {
@@ -13,16 +13,16 @@ Optional<TypeHandle> lang::TypeRegistry<OTHER_KEY>::get(UsedTypes type_keys, OTH
     return {};
 }
 
-template<typename OTHER_KEY>
-void lang::TypeRegistry<OTHER_KEY>::add(UsedTypes&& type_keys, OTHER_KEY other_key, TypeHandle type)
+template<typename OtherKey>
+void lang::TypeRegistry<OtherKey>::add(UsedTypes&& type_keys, OtherKey other_key, TypeHandle type)
 {
     types_.emplace_back(std::make_pair(std::make_pair(std::move(type_keys), other_key), type));
 
     if (scope_ && not type->isCustom()) { type->setContainingScope(scope_); }
 }
 
-template<typename OTHER_KEY>
-void lang::TypeRegistry<OTHER_KEY>::setDefaultContainingScope(lang::Scope& scope)
+template<typename OtherKey>
+void lang::TypeRegistry<OtherKey>::setDefaultContainingScope(lang::Scope& scope)
 {
     scope_ = &scope;
 
@@ -33,8 +33,8 @@ void lang::TypeRegistry<OTHER_KEY>::setDefaultContainingScope(lang::Scope& scope
     }
 }
 
-template<typename OTHER_KEY>
-void lang::TypeRegistry<OTHER_KEY>::resolve()
+template<typename OtherKey>
+void lang::TypeRegistry<OtherKey>::resolve()
 {
     for (auto& [key, type] : types_)
     {
@@ -77,14 +77,14 @@ void lang::TypeRegistry<OTHER_KEY>::resolve()
     types_ = std::move(merged);
 }
 
-template<typename OTHER_KEY>
-void lang::TypeRegistry<OTHER_KEY>::clear()
+template<typename OtherKey>
+void lang::TypeRegistry<OtherKey>::clear()
 {
     types_.clear();
 }
 
-template<typename OTHER_KEY>
-void lang::TypeRegistry<OTHER_KEY>::postResolve()
+template<typename OtherKey>
+void lang::TypeRegistry<OtherKey>::postResolve()
 {
     for (auto& [key, type] : types_)
     {
@@ -92,8 +92,8 @@ void lang::TypeRegistry<OTHER_KEY>::postResolve()
     }
 }
 
-template<typename OTHER_KEY>
-void lang::TypeRegistry<OTHER_KEY>::buildNativeDeclarations(CompileContext& context)
+template<typename OtherKey>
+void lang::TypeRegistry<OtherKey>::buildNativeDeclarations(CompileContext& context)
 {
     for (size_t index = 0; index < types_.size(); ++index)// Allows adding types during iteration.
     {
@@ -102,8 +102,8 @@ void lang::TypeRegistry<OTHER_KEY>::buildNativeDeclarations(CompileContext& cont
     }
 }
 
-template<typename OTHER_KEY>
-void lang::TypeRegistry<OTHER_KEY>::buildNativeDefinitions(CompileContext& context)
+template<typename OtherKey>
+void lang::TypeRegistry<OtherKey>::buildNativeDefinitions(CompileContext& context)
 {
     for (size_t index = 0; index < types_.size(); ++index)// Allows adding types during iteration.
     {

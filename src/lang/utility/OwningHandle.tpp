@@ -8,17 +8,17 @@ lang::OwningHandle<T>::OwningHandle(Owned<T> owner, ResolvingHandle<T> handle)
 {}
 
 template<typename T>
-template<typename U>
-    requires MoveConvertible<T*, U*>
-lang::OwningHandle<T>::OwningHandle(lang::OwningHandle<U>&& value) noexcept
+template<typename OtherT>
+    requires MoveConvertible<T*, OtherT*>
+lang::OwningHandle<T>::OwningHandle(lang::OwningHandle<OtherT>&& value) noexcept
     : owner_(std::move(value.owner_))
     , handle_(std::move(value.handle_))
 {}
 
 template<typename T>
-template<typename U>
-    requires MoveConvertible<T*, U*>
-lang::OwningHandle<T>& lang::OwningHandle<T>::operator=(lang::OwningHandle<U>&& value) noexcept
+template<typename OtherT>
+    requires MoveConvertible<T*, OtherT*>
+lang::OwningHandle<T>& lang::OwningHandle<T>::operator=(lang::OwningHandle<OtherT>&& value) noexcept
 {
     owner_  = std::move(value.owner_);
     handle_ = std::move(value.handle_);

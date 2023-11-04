@@ -171,15 +171,15 @@ class SourceVisitor : public anceBaseVisitor
   private:
     /**
      * Dirty fix to allow passing value to any that has no non-const copy constructor.
-     * @tparam T The type of the value.
+     * @tparam Value The type of the value.
      */
-    template<Copyable T>
+    template<Copyable Value>
     struct Erased {
-        alignas(T) std::array<std::byte, sizeof(T)> mutable data;
+        alignas(Value) std::array<std::byte, sizeof(Value)> mutable data;
 
-        explicit Erased(T value) : data() { new (data.data()) T(value); }
-        Erased(Erased const& other) : data() { new (data.data()) T(other.get()); }
-        Erased(Erased&& other) noexcept : data() { new (data.data()) T(other.get()); }
+        explicit Erased(Value value) : data() { new (data.data()) Value(value); }
+        Erased(Erased const& other) : data() { new (data.data()) Value(other.get()); }
+        Erased(Erased&& other) noexcept : data() { new (data.data()) Value(other.get()); }
         Erased& operator=(Erased const& other)
         {
             get() = other.get();
@@ -191,22 +191,22 @@ class SourceVisitor : public anceBaseVisitor
             return *this;
         }
 
-        T& get() const { return *reinterpret_cast<T*>(data.data()); }
+        Value& get() const { return *reinterpret_cast<Value*>(data.data()); }
 
-        ~Erased() { std::destroy_at(std::launder(reinterpret_cast<T*>(data.data()))); }
+        ~Erased() { std::destroy_at(std::launder(reinterpret_cast<Value*>(data.data()))); }
     };
 
-    template<Copyable T>
-    static T erasedCast(std::any any)
+    template<Copyable Value>
+    static Value erasedCast(std::any any)
     {
-        Erased<T> value = std::any_cast<Erased<T>>(any);
+        Erased<Value> value = std::any_cast<Erased<Value>>(any);
         return value.get();
     }
 
-    template<Copyable T>
-    static Erased<T> erase(T value)
+    template<Copyable Value>
+    static Erased<Value> erase(Value value)
     {
-        Erased<T> any(value);
+        Erased<Value> any(value);
         return any;
     }
 };

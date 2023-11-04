@@ -809,7 +809,7 @@ namespace lang
         static std::vector<std::reference_wrapper<lang::Type const>> getCommonType(
             std::vector<std::reference_wrapper<lang::Type const>> const& types);
 
-        template<typename IN, typename OUT>
+        template<typename In, typename Out>
         friend struct GetCommonType;
 
         /**

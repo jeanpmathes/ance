@@ -16,14 +16,14 @@ concept Copyable = requires(T t, T u) {
     t = u;
 };
 
-template<typename T, typename U>
-concept MoveConvertible = !std::is_same_v<T, U> and requires(T t, U u) {
+template<typename T, typename OtherT>
+concept MoveConvertible = !std::is_same_v<T, OtherT> and requires(T t, OtherT u) {
     T(std::move(u));
     t = std::move(u);
 };
 
-template<typename T, typename U>
-concept CopyConvertible = !std::is_same_v<T, U> and requires(T t, U u) {
+template<typename T, typename OtherT>
+concept CopyConvertible = !std::is_same_v<T, OtherT> and requires(T t, OtherT u) {
     T(u);
     t = u;
 };
@@ -48,26 +48,26 @@ class Optional
         requires Copyable<T>;
     Optional(Optional<T>&& optional) noexcept;
 
-    template<typename U>
-        requires MoveConvertible<T, U>
-    explicit(false) Optional(Optional<U>&& optional);// NOLINT(google-explicit-constructor)
+    template<typename OtherT>
+        requires MoveConvertible<T, OtherT>
+    explicit(false) Optional(Optional<OtherT>&& optional);// NOLINT(google-explicit-constructor)
 
-    template<typename U>
-        requires CopyConvertible<T, U>
-    explicit(false) Optional(Optional<U>& optional);// NOLINT(google-explicit-constructor)
+    template<typename OtherT>
+        requires CopyConvertible<T, OtherT>
+    explicit(false) Optional(Optional<OtherT>& optional);// NOLINT(google-explicit-constructor)
 
     Optional<T>& operator=(Optional<T> optional)
         requires Copyable<T>;
     Optional<T>& operator=(Optional<T>&& optional) noexcept
         requires(!Copyable<T>);
 
-    template<typename U>
-        requires MoveConvertible<T, U>
-    Optional<T>& operator=(Optional<U>&& optional);
+    template<typename OtherT>
+        requires MoveConvertible<T, OtherT>
+    Optional<T>& operator=(Optional<OtherT>&& optional);
 
-    template<typename U>
-        requires CopyConvertible<T, U>
-    Optional<T>& operator=(Optional<U>& optional);
+    template<typename OtherT>
+        requires CopyConvertible<T, OtherT>
+    Optional<T>& operator=(Optional<OtherT>& optional);
 
     ~Optional();
 

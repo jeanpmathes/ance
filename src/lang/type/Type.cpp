@@ -694,11 +694,11 @@ lang::ResolvingHandle<lang::Type> lang::Type::getDetachedIfUndefined()
     return definition_.hasValue() ? self() : lang::makeHandled<lang::Type>(name());
 }
 
-template<typename IN, typename OUT>
+template<typename In, typename Out>
 struct GetCommonType {
-    OUT operator()(IN types) const
+    Out operator()(In types) const
     {
-        OUT common_types;
+        Out common_types;
 
         {// Check if all types are defined.
             for (auto& type : types)

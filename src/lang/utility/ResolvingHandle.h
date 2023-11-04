@@ -41,9 +41,9 @@ namespace lang
       private:
         explicit ResolvingHandle(Owned<T> handled);
 
-        template<typename U>
-        friend lang::ResolvingHandle<U> wrapHandled(Owned<U>&& element)
-            requires std::derived_from<U, HandleTarget<U>>;
+        template<typename TargetT>
+        friend lang::ResolvingHandle<TargetT> wrapHandled(Owned<TargetT>&& element)
+            requires std::derived_from<TargetT, HandleTarget<TargetT>>;
 
         explicit ResolvingHandle(Shared<HandleNavigator<typename lang::HandleConfig<T>::BaseType>> navigator);
 
@@ -54,23 +54,23 @@ namespace lang
 
         ResolvingHandle<T>& operator=(ResolvingHandle<T> value) noexcept;
 
-        template<typename U>
-            requires MoveConvertible<T*, U*>
-        explicit(false) ResolvingHandle(ResolvingHandle<U>&& value) noexcept;// NOLINT(google-explicit-constructor)
+        template<typename OtherT>
+            requires MoveConvertible<T*, OtherT*>
+        explicit(false) ResolvingHandle(ResolvingHandle<OtherT>&& value) noexcept;// NOLINT(google-explicit-constructor)
 
-        template<typename U>
-            requires CopyConvertible<T*, U*>
-        explicit(false) ResolvingHandle(ResolvingHandle<U>& value) noexcept;// NOLINT(google-explicit-constructor)
+        template<typename OtherT>
+            requires CopyConvertible<T*, OtherT*>
+        explicit(false) ResolvingHandle(ResolvingHandle<OtherT>& value) noexcept;// NOLINT(google-explicit-constructor)
 
-        template<typename U>
-            requires MoveConvertible<T*, U*>
-        ResolvingHandle<T>& operator=(ResolvingHandle<U>&& value) noexcept;
+        template<typename OtherT>
+            requires MoveConvertible<T*, OtherT*>
+        ResolvingHandle<T>& operator=(ResolvingHandle<OtherT>&& value) noexcept;
 
-        template<typename U>
-            requires CopyConvertible<T*, U*>
-        ResolvingHandle<T>& operator=(ResolvingHandle<U>& value) noexcept;
+        template<typename OtherT>
+            requires CopyConvertible<T*, OtherT*>
+        ResolvingHandle<T>& operator=(ResolvingHandle<OtherT>& value) noexcept;
 
-        template<typename U>
+        template<typename OtherT>
         friend class ResolvingHandle;
 
       private:
@@ -169,7 +169,7 @@ namespace lang
 
         void target(Shared<HandleNavigator> next);
 
-        template<typename U>
+        template<typename OtherT>
         friend class lang::ResolvingHandle;
 
       public:
@@ -179,28 +179,28 @@ namespace lang
 
     /**
      * The interface expected from handled entities.
-     * @tparam SELF The type of the handled entity.
+     * @tparam Self The type of the handled entity.
      */
-    template<typename SELF>
+    template<typename Self>
     class HandleTarget
     {
       public:
-        void                        setSelf(lang::ResolvingHandle<SELF> handle);
-        SELF const&                 self() const;
-        lang::ResolvingHandle<SELF> self();
+        void                        setSelf(lang::ResolvingHandle<Self> handle);
+        Self const&                 self() const;
+        lang::ResolvingHandle<Self> self();
 
         virtual ~HandleTarget() = default;
 
       private:
-        Optional<lang::ResolvingHandle<SELF>> self_ {};
+        Optional<lang::ResolvingHandle<Self>> self_ {};
     };
 
     template<typename T>
     lang::ResolvingHandle<T> wrapHandled(Owned<T>&& element)
         requires std::derived_from<T, HandleTarget<T>>;
 
-    template<typename T, class... ARGS>
-    lang::ResolvingHandle<T> makeHandled(ARGS&&... args)
+    template<typename T, class... Args>
+    lang::ResolvingHandle<T> makeHandled(Args&&... args)
         requires std::derived_from<T, HandleTarget<T>>;
 }
 

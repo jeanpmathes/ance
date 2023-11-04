@@ -31,31 +31,31 @@ lang::ResolvingHandle<T>& lang::ResolvingHandle<T>::operator=(lang::ResolvingHan
 }
 
 template<typename T>
-template<typename U>
-    requires MoveConvertible<T*, U*>
-lang::ResolvingHandle<T>::ResolvingHandle(lang::ResolvingHandle<U>&& value) noexcept
+template<typename OtherT>
+    requires MoveConvertible<T*, OtherT*>
+lang::ResolvingHandle<T>::ResolvingHandle(lang::ResolvingHandle<OtherT>&& value) noexcept
     : navigator_(std::move(value.navigator_))
 {}
 
 template<typename T>
-template<typename U>
-    requires CopyConvertible<T*, U*>
-lang::ResolvingHandle<T>::ResolvingHandle(lang::ResolvingHandle<U>& value) noexcept : navigator_(value.navigator_)
+template<typename OtherT>
+    requires CopyConvertible<T*, OtherT*>
+lang::ResolvingHandle<T>::ResolvingHandle(lang::ResolvingHandle<OtherT>& value) noexcept : navigator_(value.navigator_)
 {}
 
 template<typename T>
-template<typename U>
-    requires MoveConvertible<T*, U*>
-lang::ResolvingHandle<T>& lang::ResolvingHandle<T>::operator=(lang::ResolvingHandle<U>&& value) noexcept
+template<typename OtherT>
+    requires MoveConvertible<T*, OtherT*>
+lang::ResolvingHandle<T>& lang::ResolvingHandle<T>::operator=(lang::ResolvingHandle<OtherT>&& value) noexcept
 {
     navigator_ = std::move(value.navigator_);
     return *this;
 }
 
 template<typename T>
-template<typename U>
-    requires CopyConvertible<T*, U*>
-lang::ResolvingHandle<T>& lang::ResolvingHandle<T>::operator=(lang::ResolvingHandle<U>& value) noexcept
+template<typename OtherT>
+    requires CopyConvertible<T*, OtherT*>
+lang::ResolvingHandle<T>& lang::ResolvingHandle<T>::operator=(lang::ResolvingHandle<OtherT>& value) noexcept
 {
     navigator_ = value.navigator_;
     return *this;
@@ -102,11 +102,11 @@ void lang::ResolvingHandle<T>::reroute(lang::ResolvingHandle<T> target)
 }
 
 template<typename T>
-template<typename U>
+template<typename OtherT>
 bool lang::ResolvingHandle<T>::is() const
 {
     auto result_base = navigator_->get();
-    auto result      = dynamic_cast<U const*>(result_base);
+    auto result      = dynamic_cast<OtherT const*>(result_base);
 
     return result != nullptr;
 }
@@ -315,29 +315,29 @@ lang::ResolvingHandle<T> lang::wrapHandled(Owned<T>&& element)
     return handle;
 }
 
-template<typename T, class... ARGS>
-lang::ResolvingHandle<T> lang::makeHandled(ARGS&&... args)
+template<typename T, class... Args>
+lang::ResolvingHandle<T> lang::makeHandled(Args&&... args)
     requires std::derived_from<T, HandleTarget<T>>
 {
-    return wrapHandled<T>(makeOwned<T>(std::forward<ARGS>(args)...));
+    return wrapHandled<T>(makeOwned<T>(std::forward<Args>(args)...));
 }
 
-template<typename SELF>
-void lang::HandleTarget<SELF>::setSelf(lang::ResolvingHandle<SELF> handle)
+template<typename Self>
+void lang::HandleTarget<Self>::setSelf(lang::ResolvingHandle<Self> handle)
 {
     assert(not self_.hasValue());
-    self_ = makeOptional<lang::ResolvingHandle<SELF>>(handle);
+    self_ = makeOptional<lang::ResolvingHandle<Self>>(handle);
 }
 
-template<typename SELF>
-lang::ResolvingHandle<SELF> lang::HandleTarget<SELF>::self()
+template<typename Self>
+lang::ResolvingHandle<Self> lang::HandleTarget<Self>::self()
 {
     assert(self_.hasValue());
     return self_.value();
 }
 
-template<typename SELF>
-SELF const& lang::HandleTarget<SELF>::self() const
+template<typename Self>
+Self const& lang::HandleTarget<Self>::self() const
 {
     assert(self_.hasValue());
     return self_.value();

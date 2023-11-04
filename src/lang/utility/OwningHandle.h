@@ -17,13 +17,13 @@ namespace lang
         OwningHandle(OwningHandle&& other) noexcept            = default;
         OwningHandle& operator=(OwningHandle&& other) noexcept = default;
 
-        template<typename U>
-            requires MoveConvertible<T*, U*>
-        explicit(false) OwningHandle(OwningHandle<U>&& value) noexcept;// NOLINT(google-explicit-constructor)
+        template<typename OtherT>
+            requires MoveConvertible<T*, OtherT*>
+        explicit(false) OwningHandle(OwningHandle<OtherT>&& value) noexcept;// NOLINT(google-explicit-constructor)
 
-        template<typename U>
-            requires MoveConvertible<T*, U*>
-        OwningHandle<T>& operator=(OwningHandle<U>&& value) noexcept;
+        template<typename OtherT>
+            requires MoveConvertible<T*, OtherT*>
+        OwningHandle<T>& operator=(OwningHandle<OtherT>&& value) noexcept;
 
         /**
          * Take ownership of a resolving handle.

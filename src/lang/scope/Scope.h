@@ -198,18 +198,18 @@ namespace lang
         void addDependency(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared);
 
       public:
-        template<typename E>
+        template<typename Entity>
         struct Dependency {
-            explicit Dependency(lang::ResolvingHandle<E> dep) : entity(std::move(dep)) {}
-            Dependency(lang::ResolvingHandle<E> dep, size_t initial_count)
+            explicit Dependency(lang::ResolvingHandle<Entity> dep) : entity(std::move(dep)) {}
+            Dependency(lang::ResolvingHandle<Entity> dep, size_t initial_count)
                 : entity(std::move(dep))
                 , count(initial_count)
             {}
             Dependency(Dependency& other)           = default;
             Dependency(Dependency&& other) noexcept = default;
 
-            lang::ResolvingHandle<E> entity;
-            size_t                   count {0};
+            lang::ResolvingHandle<Entity> entity;
+            size_t                        count {0};
         };
 
         /**

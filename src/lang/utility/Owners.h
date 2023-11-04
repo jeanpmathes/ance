@@ -8,8 +8,8 @@
 template<typename T>
 class Owned;
 
-template<typename T, class... ARGS>
-Owned<T> makeOwned(ARGS&&... args);
+template<typename T, class... Args>
+Owned<T> makeOwned(Args&&... args);
 
 /**
  * Owns a value. Prefer this over std::unique_ptr.
@@ -22,23 +22,23 @@ class Owned
     explicit Owned(T& value);
     Owned(Owned<T>&& value) noexcept;
 
-    template<typename U>
-        requires MoveConvertible<T*, U*>
-    explicit(false) Owned(Owned<U>&& value) noexcept;// NOLINT(google-explicit-constructor)
+    template<typename OtherT>
+        requires MoveConvertible<T*, OtherT*>
+    explicit(false) Owned(Owned<OtherT>&& value) noexcept;// NOLINT(google-explicit-constructor)
 
-    template<typename U>
-        requires CopyConvertible<T*, U*>
-    explicit(false) Owned(Owned<U>& value) noexcept;// NOLINT(google-explicit-constructor)
+    template<typename OtherT>
+        requires CopyConvertible<T*, OtherT*>
+    explicit(false) Owned(Owned<OtherT>& value) noexcept;// NOLINT(google-explicit-constructor)
 
     Owned<T>& operator=(Owned<T>&& value) noexcept;
 
-    template<typename U>
-        requires MoveConvertible<T*, U*>
-    Owned<T>& operator=(Owned<U>&& value) noexcept;
+    template<typename OtherT>
+        requires MoveConvertible<T*, OtherT*>
+    Owned<T>& operator=(Owned<OtherT>&& value) noexcept;
 
-    template<typename U>
-        requires CopyConvertible<T*, U*>
-    Owned<T>& operator=(Owned<U>& value) noexcept;
+    template<typename OtherT>
+        requires CopyConvertible<T*, OtherT*>
+    Owned<T>& operator=(Owned<OtherT>& value) noexcept;
 
     static T* release(Owned<T>&& value);
 
@@ -55,20 +55,20 @@ class Owned
     T const& operator*() const;
     T const* operator->() const;
 
-    template<typename U>
+    template<typename OtherT>
     friend class Owned;
 
-    template<typename U, class... ARGS>
-    friend Owned<U> makeOwned(ARGS&&... args);
+    template<typename TargetT, class... Args>
+    friend Owned<TargetT> makeOwned(Args&&... args);
 
   private:
     std::unique_ptr<T> value_;
 };
 
-template<typename T, class... ARGS>
-Owned<T> makeOwned(ARGS&&... args)
+template<typename T, class... Args>
+Owned<T> makeOwned(Args&&... args)
 {
-    return Owned<T>(std::make_unique<T>(std::forward<ARGS>(args)...));
+    return Owned<T>(std::make_unique<T>(std::forward<Args>(args)...));
 }
 
 template<typename T>
@@ -101,8 +101,8 @@ T* unwrap(Owned<T>&& value)
 template<typename T>
 class Shared;
 
-template<typename T, class... ARGS>
-Shared<T> makeShared(ARGS&&... args);
+template<typename T, class... Args>
+Shared<T> makeShared(Args&&... args);
 
 /**
  * Shares a value. Prefer this over std::shared_ptr.
@@ -116,23 +116,23 @@ class Shared
     Shared(Shared<T>&& value) noexcept;
     Shared(Shared<T>& value) noexcept;
 
-    template<typename U>
-        requires MoveConvertible<T*, U*>
-    explicit(false) Shared(Shared<U>&& value) noexcept;// NOLINT(google-explicit-constructor)
+    template<typename OtherT>
+        requires MoveConvertible<T*, OtherT*>
+    explicit(false) Shared(Shared<OtherT>&& value) noexcept;// NOLINT(google-explicit-constructor)
 
-    template<typename U>
-        requires CopyConvertible<T*, U*>
-    explicit(false) Shared(Shared<U>& value) noexcept;// NOLINT(google-explicit-constructor)
+    template<typename OtherT>
+        requires CopyConvertible<T*, OtherT*>
+    explicit(false) Shared(Shared<OtherT>& value) noexcept;// NOLINT(google-explicit-constructor)
 
     Shared<T>& operator=(Shared<T> value) noexcept;
 
-    template<typename U>
-        requires MoveConvertible<T*, U*>
-    Shared<T>& operator=(Shared<U>&& value) noexcept;
+    template<typename OtherT>
+        requires MoveConvertible<T*, OtherT*>
+    Shared<T>& operator=(Shared<OtherT>&& value) noexcept;
 
-    template<typename U>
-        requires CopyConvertible<T*, U*>
-    Shared<T>& operator=(Shared<U>& value) noexcept;
+    template<typename OtherT>
+        requires CopyConvertible<T*, OtherT*>
+    Shared<T>& operator=(Shared<OtherT>& value) noexcept;
 
     bool operator==(Shared<T> const& other) const noexcept;
     bool operator!=(Shared<T> const& other) const noexcept;
@@ -150,20 +150,20 @@ class Shared
     T const& operator*() const;
     T const* operator->() const;
 
-    template<typename U>
+    template<typename OtherT>
     friend class Shared;
 
-    template<typename U, class... ARGS>
-    friend Shared<U> makeShared(ARGS&&... args);
+    template<typename TargetT, class... Args>
+    friend Shared<TargetT> makeShared(Args&&... args);
 
   private:
     std::shared_ptr<T> value_;
 };
 
-template<typename T, class... ARGS>
-Shared<T> makeShared(ARGS&&... args)
+template<typename T, class... Args>
+Shared<T> makeShared(Args&&... args)
 {
-    return Shared<T>(std::make_shared<T>(std::forward<ARGS>(args)...));
+    return Shared<T>(std::make_shared<T>(std::forward<Args>(args)...));
 }
 
 /**
@@ -178,13 +178,13 @@ class Passed
     Passed(Passed<T>&& value) noexcept;
     Passed(Passed<T>& value) noexcept;
 
-    template<typename U>
-        requires std::is_base_of_v<T, U>
-    explicit(false) Passed(Passed<U>&& value) noexcept;// NOLINT(google-explicit-constructor)
+    template<typename OtherT>
+        requires std::is_base_of_v<T, OtherT>
+    explicit(false) Passed(Passed<OtherT>&& value) noexcept;// NOLINT(google-explicit-constructor)
 
-    template<typename U>
-        requires std::is_base_of_v<T, U>
-    explicit(false) Passed(Passed<U>& value) noexcept;// NOLINT(google-explicit-constructor)
+    template<typename OtherT>
+        requires std::is_base_of_v<T, OtherT>
+    explicit(false) Passed(Passed<OtherT>& value) noexcept;// NOLINT(google-explicit-constructor)
 
     Passed<T>& operator=(Passed<T> value) noexcept;
 
@@ -197,7 +197,7 @@ class Passed
     T const& operator*() const;
     T const* operator->() const;
 
-    template<typename U>
+    template<typename OtherT>
     friend class Passed;
 
   private:

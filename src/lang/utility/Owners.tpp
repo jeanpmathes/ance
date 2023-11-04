@@ -13,9 +13,9 @@ Owned<T>::Owned(Owned<T>&& value) noexcept : value_(std::move(value.value_))
 {}
 
 template<typename T>
-template<typename U>
-    requires MoveConvertible<T*, U*>
-Owned<T>::Owned(Owned<U>&& value) noexcept : value_(std::move(value.value_))
+template<typename OtherT>
+    requires MoveConvertible<T*, OtherT*>
+Owned<T>::Owned(Owned<OtherT>&& value) noexcept : value_(std::move(value.value_))
 {}
 
 template<typename T>
@@ -26,9 +26,9 @@ Owned<T>& Owned<T>::operator=(Owned<T>&& value) noexcept
 }
 
 template<typename T>
-template<typename U>
-    requires MoveConvertible<T*, U*>
-Owned<T>& Owned<T>::operator=(Owned<U>&& value) noexcept
+template<typename OtherT>
+    requires MoveConvertible<T*, OtherT*>
+Owned<T>& Owned<T>::operator=(Owned<OtherT>&& value) noexcept
 {
     value_ = std::move(value.value_);
     return *this;
@@ -92,15 +92,15 @@ Shared<T>::Shared(Shared<T>& value) noexcept : value_(value.value_)
 {}
 
 template<typename T>
-template<typename U>
-    requires MoveConvertible<T*, U*>
-Shared<T>::Shared(Shared<U>&& value) noexcept : value_(std::move(value.value_))
+template<typename OtherT>
+    requires MoveConvertible<T*, OtherT*>
+Shared<T>::Shared(Shared<OtherT>&& value) noexcept : value_(std::move(value.value_))
 {}
 
 template<typename T>
-template<typename U>
-    requires CopyConvertible<T*, U*>
-Shared<T>::Shared(Shared<U>& value) noexcept : value_(value.value_)
+template<typename OtherT>
+    requires CopyConvertible<T*, OtherT*>
+Shared<T>::Shared(Shared<OtherT>& value) noexcept : value_(value.value_)
 {}
 
 template<typename T>
@@ -111,18 +111,18 @@ Shared<T>& Shared<T>::operator=(Shared<T> value) noexcept
 }
 
 template<typename T>
-template<typename U>
-    requires MoveConvertible<T*, U*>
-Shared<T>& Shared<T>::operator=(Shared<U>&& value) noexcept
+template<typename OtherT>
+    requires MoveConvertible<T*, OtherT*>
+Shared<T>& Shared<T>::operator=(Shared<OtherT>&& value) noexcept
 {
     value_ = std::move(value.value_);
     return *this;
 }
 
 template<typename T>
-template<typename U>
-    requires CopyConvertible<T*, U*>
-Shared<T>& Shared<T>::operator=(Shared<U>& value) noexcept
+template<typename OtherT>
+    requires CopyConvertible<T*, OtherT*>
+Shared<T>& Shared<T>::operator=(Shared<OtherT>& value) noexcept
 {
     value_ = value.value_;
     return *this;
@@ -189,15 +189,15 @@ Passed<T>::Passed(Passed<T>& value) noexcept : reference_(value.reference_)
 {}
 
 template<typename T>
-template<typename U>
-    requires std::is_base_of_v<T, U>
-Passed<T>::Passed(Passed<U>&& value) noexcept : reference_(value.reference_)
+template<typename OtherT>
+    requires std::is_base_of_v<T, OtherT>
+Passed<T>::Passed(Passed<OtherT>&& value) noexcept : reference_(value.reference_)
 {}
 
 template<typename T>
-template<typename U>
-    requires std::is_base_of_v<T, U>
-Passed<T>::Passed(Passed<U>& value) noexcept : reference_(value.reference_)
+template<typename OtherT>
+    requires std::is_base_of_v<T, OtherT>
+Passed<T>::Passed(Passed<OtherT>& value) noexcept : reference_(value.reference_)
 {}
 
 template<typename T>
