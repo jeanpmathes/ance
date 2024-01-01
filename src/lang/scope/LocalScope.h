@@ -32,7 +32,7 @@ namespace lang
         void resolveFollowingOrder() override;
         void buildDeclarationsFollowingOrder(CompileContext& context) override;
 
-        llvm::DIScope* getDebugScope(CompileContext& context) const override;
+        Execution::Scoped getDebugScope(CompileContext& context) const override;
 
         [[nodiscard]] bool isPartOfFunction() const override;
 

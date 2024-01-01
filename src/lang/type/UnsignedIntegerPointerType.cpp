@@ -29,21 +29,14 @@ void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::ResolvingHan
                                                               lang::PredefinedFunction&         function,
                                                               CompileContext&                   context)
 {
-    llvm::Function* native_function;
-    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
-
     if (parameter_element->isAddressType())
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
-        context.ir().SetInsertPoint(block);
+        context.exec().enterFunctionBody(function.getFunctionHandle(context));
         {
-            llvm::Value* original = native_function->getArg(0);
+            Shared<lang::Value> argument = function.getArgument(0);
+            Shared<lang::Value> result   = context.exec().computePointerToInteger(argument);
 
-            llvm::Value* converted = context.ir().CreatePtrToInt(original,
-                                                                 return_type->getContentType(context.llvmContext()),
-                                                                 original->getName() + ".ptrtoint");
-
-            context.ir().CreateRet(converted);
+            context.exec().performReturn(result);
         }
 
         return;
@@ -60,12 +53,6 @@ std::string lang::UnsignedIntegerPointerType::createMangledName() const
 void lang::UnsignedIntegerPointerType::init(llvm::DataLayout const& data_layout)
 {
     size_ = std::max(static_cast<unsigned int>(MINIMUM_BIT_SIZE), data_layout.getPointerSizeInBits());
-}
-
-unsigned int lang::UnsignedIntegerPointerType::sizeInBits()
-{
-    assert(size_ != 0);
-    return size_;
 }
 
 Optional<size_t> lang::UnsignedIntegerPointerType::getBitSize() const

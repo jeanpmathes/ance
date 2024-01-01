@@ -57,22 +57,6 @@ bool lang::PointerType::validate(ValidationLogger& validation_logger, lang::Loca
     return true;
 }
 
-llvm::Type* lang::PointerType::getIndexedType(CompileContext& context) const
-{
-    return element_type_->getContentType(context.llvmContext());
-}
-
-llvm::Value* lang::PointerType::getIndexingPointer(Shared<Value> indexed, CompileContext& context)
-{
-    indexed->buildContentValue(context);
-    return indexed->getContentValue();
-}
-
-llvm::SmallVector<llvm::Value*> lang::PointerType::getNativeIndices(llvm::Value*, llvm::Value* index)
-{
-    return {index};
-}
-
 bool lang::PointerType::isTriviallyDefaultConstructible() const
 {
     return true;
@@ -93,16 +77,14 @@ std::string lang::PointerType::createMangledName() const
     return std::string("p") + "(" + element_type_->getMangledName() + ")";
 }
 
-llvm::DIType* lang::PointerType::createDebugType(CompileContext& context) const
+Execution::Type lang::PointerType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
+    return context.exec().registerAddressType(self());
+}
 
-    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
-
-    llvm::DIType* element_di_type = element_type_->getDebugType(context);
-    llvm::DIType* di_type         = context.di().createPointerType(element_di_type, size_in_bits);
-
-    return di_type;
+Execution::IndexingMode lang::PointerType::getIndexingMode() const
+{
+    return Execution::IndexingMode::POINTER;
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::PointerType::getDeclarationDependencies()

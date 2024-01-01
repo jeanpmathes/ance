@@ -19,8 +19,8 @@ namespace lang
         [[nodiscard]] StateCount getStateCount() const override;
         [[nodiscard]] bool       isBooleanType() const override;
 
-        llvm::Constant* getDefaultContent(llvm::Module& m) const override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
+        llvm::Constant* getDefaultContent(CompileContext& context) const override;
+        llvm::Type*     getContentType(CompileContext& context) const override;
 
         using TypeDefinition::buildOperator;
 
@@ -32,10 +32,6 @@ namespace lang
         Shared<lang::Value>               buildOperator(lang::UnaryOperator op,
                                                         Shared<Value>       value,
                                                         CompileContext&     context) override;
-        Shared<Value>                     buildOperator(lang::UnaryOperator               op,
-                                                        Shared<lang::Value>               value,
-                                                        lang::ResolvingHandle<lang::Type> return_type,
-                                                        CompileContext&                   context) override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
@@ -49,11 +45,6 @@ namespace lang
                                                         Shared<Value>        left,
                                                         Shared<Value>        right,
                                                         CompileContext&      context) override;
-        Shared<Value>                     buildOperator(lang::BinaryOperator              op,
-                                                        Shared<Value>                     left,
-                                                        Shared<Value>                     right,
-                                                        lang::ResolvingHandle<lang::Type> return_type,
-                                                        CompileContext&                   context) override;
 
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
         void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
@@ -70,7 +61,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) const override;
+        Execution::Type createDebugType(CompileContext& context) const override;
 
       public:
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;

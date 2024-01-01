@@ -8,7 +8,6 @@
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
@@ -35,6 +34,16 @@ lang::CustomFunction::CustomFunction(Function&                            functi
 bool lang::CustomFunction::isMangled() const
 {
     return access() != lang::AccessModifier::EXTERN_ACCESS;
+}
+
+Optional<lang::Location> lang::CustomFunction::getDefinitionLocation() const
+{
+    return definition_location_;
+}
+
+bool lang::CustomFunction::isConstructor() const
+{
+    return false;
 }
 
 bool lang::CustomFunction::validateFlow(ValidationLogger& validation_logger) const
@@ -88,45 +97,4 @@ void lang::CustomFunction::validateUnreachable(ValidationLogger& validation_logg
     {
         validation_logger.logWarning("Unreachable code in function '" + name() + "'", *unreachable_code_location);
     }
-}
-
-void lang::CustomFunction::createNativeBacking(CompileContext& context)
-{
-    StatementFunction::createNativeBacking(context);
-
-    auto [native_type, native_function] = getNativeRepresentation();
-
-    std::vector<llvm::Metadata*> di_types;
-    di_types.push_back(returnType()->getDebugType(context));
-
-    for (auto const pair : llvm::zip(parameters(), native_function->args()))
-    {
-        auto& [parameter, argument] = pair;
-        di_types.push_back(parameter->type().getDebugType(context));
-    }
-
-    llvm::DISubroutineType* debug_type = context.di().createSubroutineType(context.di().getOrCreateTypeArray(di_types));
-    llvm::DISubprogram*     subprogram =
-        context.di().createFunction(scope().getDebugScope(context),
-                                    name().text(),
-                                    native_function->getName(),
-                                    context.getSourceFile(location()),
-                                    static_cast<unsigned>(location().line()),
-                                    debug_type,
-                                    static_cast<unsigned>(definition_location_.line()),
-                                    llvm::DINode::DIFlags::FlagPrototyped,
-                                    llvm::DISubprogram::toSPFlags(false, true, false, 0U, name().text() == "main"));
-
-    native_function->setSubprogram(subprogram);
-}
-
-llvm::DISubprogram* lang::CustomFunction::debugSubprogram() const
-{
-    auto [native_type, native_function] = getNativeRepresentation();
-    return native_function->getSubprogram();
-}
-
-llvm::DIScope* lang::CustomFunction::getDebugScope(CompileContext&) const
-{
-    return debugSubprogram();
 }

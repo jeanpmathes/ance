@@ -1,4 +1,4 @@
-target_sources(ance PRIVATE Values.cpp
+target_sources(ance PRIVATE
                Location.cpp
                Identifier.cpp
                StringStorage.cpp

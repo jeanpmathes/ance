@@ -7,12 +7,11 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/value/Value.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/VectorizableType.h"
-#include "lang/utility/Values.h"
+
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
@@ -54,22 +53,22 @@ lang::Type const& lang::VectorType::getActualType() const
     return actual_type_.value();
 }
 
-llvm::Constant* lang::VectorType::getDefaultContent(llvm::Module& m) const
+llvm::Constant* lang::VectorType::getDefaultContent(CompileContext& context) const
 {
-    std::vector<llvm::Constant*> const content(size_.value(), element_type_->getDefaultContent(m));
+    std::vector<llvm::Constant*> const content(size_.value(), element_type_->getDefaultContent(context));
     return llvm::ConstantVector::get(content);
 }
 
-llvm::Type* lang::VectorType::getContentType(llvm::LLVMContext& c) const
+llvm::Type* lang::VectorType::getContentType(CompileContext& context) const
 {
     llvm::Type* content_type;
 
     if (element_type_->isVectorizable())
     {
         content_type =
-            llvm::FixedVectorType::get(element_type_->getContentType(c), static_cast<unsigned>(size_.value()));
+            llvm::FixedVectorType::get(element_type_->getContentType(context), static_cast<unsigned>(size_.value()));
     }
-    else { content_type = llvm::ArrayType::get(element_type_->getContentType(c), size_.value()); }
+    else { content_type = llvm::ArrayType::get(element_type_->getContentType(context), size_.value()); }
 
     return content_type;
 }
@@ -130,37 +129,29 @@ Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::ResolvingHan
     }
     else
     {
-        llvm::Value* result_ptr =
-            context.ir().CreateAlloca(other->getContentType(context.llvmContext()), nullptr, "alloca");
-
         VectorType* other_as_vector = other->isVectorType();
+        assert(other_as_vector != nullptr);
 
-        value->buildNativeValue(context);
+        Shared<lang::Value> result_ptr = context.exec().performStackAllocation(other);
 
-        for (uint64_t index = 0; index < size_.value(); index++)
+        for (size_t index = 0; index < size_.value(); index++)
         {
-            llvm::Constant* index_content =
-                llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), index);
+            Shared<lang::Constant> index_constant = context.exec().getSizeValue(index);
 
-            auto index_value = [&]() {
-                llvm::Value* index_native =
-                    lang::values::contentToNative(context.types().getSizeType(), index_content, context);
-                return makeShared<lang::WrappedNativeValue>(context.types().getSizeType(), index_native);
-            };
+            Shared<lang::Value> current_element_ref = buildSubscriptInBounds(value, index_constant, context);
+            Shared<lang::Value> current_element     = context.exec().performDereference(current_element_ref);
 
-            auto current_element = lang::Type::getValueOrReferencedValue(
-                buildSubscript(lang::values::clone(value), index_value(), context),
-                context);
-
-            auto result_element =
+            Shared<lang::Value> result_element =
                 element_type_->buildImplicitConversion(other->getElementType(), current_element, context);
-            result_element->buildContentValue(context);
+            Shared<lang::Value> result_dst_ref = buildSubscriptInBounds(result_ptr, index_constant, context);
+            Shared<lang::Value> result_dst_ptr = context.exec().computePointerFromReference(result_dst_ref);
 
-            llvm::Value* result_dst_ptr = other_as_vector->buildGetElementPointer(result_ptr, index, context);
-            context.ir().CreateStore(result_element->getContentValue(), result_dst_ptr);
+            context.exec().performStoreToAddress(result_dst_ptr, result_element);
         }
 
-        return makeShared<lang::WrappedNativeValue>(other, result_ptr);
+        Shared<lang::Value> result = context.exec().performLoadFromAddress(result_ptr);
+
+        return result;
     }
 }
 
@@ -182,40 +173,33 @@ Shared<lang::Value> lang::VectorType::buildCast(lang::ResolvingHandle<lang::Type
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
-        return element_vector->buildCast(other, value, other->getElementType(), context);
+        return element_vector->buildCast(other, value, context);
     }
     else
     {
-        llvm::Value* result_ptr =
-            context.ir().CreateAlloca(other->getContentType(context.llvmContext()), nullptr, "alloca");
-
         VectorType* other_as_vector = other->isVectorType();
+        assert(other_as_vector != nullptr);
 
-        value->buildNativeValue(context);
+        Shared<lang::Value> result_ptr = context.exec().performStackAllocation(other);
 
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            llvm::Constant* index_content =
-                llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), index);
+            Shared<lang::Constant> index_constant = context.exec().getSizeValue(index);
 
-            auto index_value = [&]() {
-                llvm::Value* index_native =
-                    lang::values::contentToNative(context.types().getSizeType(), index_content, context);
-                return makeShared<lang::WrappedNativeValue>(context.types().getSizeType(), index_native);
-            };
+            Shared<lang::Value> current_element_ref = buildSubscriptInBounds(value, index_constant, context);
+            Shared<lang::Value> current_element     = context.exec().performDereference(current_element_ref);
 
-            auto current_element = lang::Type::getValueOrReferencedValue(
-                buildSubscript(lang::values::clone(value), index_value(), context),
-                context);
+            Shared<lang::Value> result_element =
+                element_type_->buildCast(other->getElementType(), current_element, context);
+            Shared<lang::Value> result_dst_ref = buildSubscriptInBounds(result_ptr, index_constant, context);
+            Shared<lang::Value> result_dst_ptr = context.exec().computePointerFromReference(result_dst_ref);
 
-            auto result_element = element_type_->buildCast(other->getElementType(), current_element, context);
-            result_element->buildContentValue(context);
-
-            llvm::Value* result_dst_ptr = other_as_vector->buildGetElementPointer(result_ptr, index, context);
-            context.ir().CreateStore(result_element->getContentValue(), result_dst_ptr);
+            context.exec().performStoreToAddress(result_dst_ptr, result_element);
         }
 
-        return makeShared<lang::WrappedNativeValue>(other, result_ptr);
+        Shared<lang::Value> result = context.exec().performLoadFromAddress(result_ptr);
+
+        return result;
     }
 }
 
@@ -242,42 +226,29 @@ Shared<lang::Value> lang::VectorType::buildOperator(lang::UnaryOperator op,
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
-        return element_vector->buildOperator(op, value, getOperatorResultType(op), context);
+        return element_vector->buildOperator(op, value, context);
     }
     else
     {
-        llvm::Value* result_ptr =
-            context.ir().CreateAlloca(getOperatorResultType(op)->getContentType(context.llvmContext()),
-                                      nullptr,
-                                      "alloca");
-
-        VectorType* result_type_as_vector = getOperatorResultType(op)->isVectorType();
-
-        value->buildNativeValue(context);
+        Shared<lang::Value> result_ptr = context.exec().performStackAllocation(getOperatorResultType(op));
 
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            llvm::Constant* index_content =
-                llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), index);
+            Shared<lang::Constant> index_constant = context.exec().getSizeValue(index);
 
-            auto index_value = [&]() {
-                llvm::Value* index_native =
-                    lang::values::contentToNative(context.types().getSizeType(), index_content, context);
-                return makeShared<lang::WrappedNativeValue>(context.types().getSizeType(), index_native);
-            };
+            Shared<lang::Value> current_element_ref = buildSubscriptInBounds(value, index_constant, context);
+            Shared<lang::Value> current_element     = context.exec().performDereference(current_element_ref);
 
-            auto element = lang::Type::getValueOrReferencedValue(
-                value->type()->buildSubscript(lang::values::clone(value), index_value(), context),
-                context);
+            Shared<lang::Value> result_element = element_type_->buildOperator(op, current_element, context);
+            Shared<lang::Value> result_dst_ref = buildSubscriptInBounds(result_ptr, index_constant, context);
+            Shared<lang::Value> result_dst_ptr = context.exec().computePointerFromReference(result_dst_ref);
 
-            auto result_element = element_type_->buildOperator(op, element, context);
-            result_element->buildContentValue(context);
-
-            llvm::Value* result_dst_ptr = result_type_as_vector->buildGetElementPointer(result_ptr, index, context);
-            context.ir().CreateStore(result_element->getContentValue(), result_dst_ptr);
+            context.exec().performStoreToAddress(result_dst_ptr, result_element);
         }
 
-        return makeShared<lang::WrappedNativeValue>(getOperatorResultType(op), result_ptr);
+        Shared<lang::Value> result = context.exec().performLoadFromAddress(result_ptr);
+
+        return result;
     }
 }
 
@@ -315,46 +286,36 @@ Shared<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperator op,
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
-        return element_vector->buildOperator(op, left, right, getOperatorResultType(op, right->type()), context);
+        return element_vector->buildOperator(op, left, right, context);
     }
     else
     {
-        llvm::Value* result_ptr =
-            context.ir().CreateAlloca(getOperatorResultType(op, right->type())->getContentType(context.llvmContext()),
-                                      nullptr,
-                                      "alloca");
-
         VectorType* result_type_as_vector = getOperatorResultType(op, right->type())->isVectorType();
+        assert(result_type_as_vector != nullptr);
 
-        left->buildNativeValue(context);
-        right->buildNativeValue(context);
+        Shared<lang::Value> result_ptr =
+            context.exec().performStackAllocation(getOperatorResultType(op, right->type()));
 
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            llvm::Constant* index_content =
-                llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), index);
+            Shared<lang::Constant> index_constant = context.exec().getSizeValue(index);
 
-            auto index_value = [&]() {
-                llvm::Value* index_native =
-                    lang::values::contentToNative(context.types().getSizeType(), index_content, context);
-                return makeShared<lang::WrappedNativeValue>(context.types().getSizeType(), index_native);
-            };
+            Shared<lang::Value> left_element_ref = buildSubscriptInBounds(left, index_constant, context);
+            Shared<lang::Value> left_element     = context.exec().performDereference(left_element_ref);
 
-            auto left_element = lang::Type::getValueOrReferencedValue(
-                left->type()->buildSubscript(lang::values::clone(left), index_value(), context),
-                context);
-            auto right_element = lang::Type::getValueOrReferencedValue(
-                right->type()->buildSubscript(lang::values::clone(right), index_value(), context),
-                context);
+            Shared<lang::Value> right_element_ref = buildSubscriptInBounds(right, index_constant, context);
+            Shared<lang::Value> right_element     = context.exec().performDereference(right_element_ref);
 
-            auto result_element = element_type_->buildOperator(op, left_element, right_element, context);
-            result_element->buildContentValue(context);
+            Shared<lang::Value> result_element = element_type_->buildOperator(op, left_element, right_element, context);
+            Shared<lang::Value> result_dst_ref = buildSubscriptInBounds(result_ptr, index_constant, context);
+            Shared<lang::Value> result_dst_ptr = context.exec().computePointerFromReference(result_dst_ref);
 
-            llvm::Value* result_dst_ptr = result_type_as_vector->buildGetElementPointer(result_ptr, index, context);
-            context.ir().CreateStore(result_element->getContentValue(), result_dst_ptr);
+            context.exec().performStoreToAddress(result_dst_ptr, result_element);
         }
 
-        return makeShared<lang::WrappedNativeValue>(getOperatorResultType(op, right->type()), result_ptr);
+        Shared<lang::Value> result = context.exec().performLoadFromAddress(result_ptr);
+
+        return result;
     }
 }
 
@@ -395,48 +356,32 @@ void lang::VectorType::buildRequestedOverload(std::vector<ResolvingHandle<lang::
         assert(overloads.size() == 1);
         lang::ResolvingHandle<Function> element_ctor = overloads.front();
 
-        llvm::Function* native_function;
-        std::tie(std::ignore, native_function) = function.getNativeRepresentation();
-
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
-        context.ir().SetInsertPoint(block);
+        context.exec().enterFunctionBody(function.getFunctionHandle(context));
         {
-            llvm::Value* original_content = native_function->getArg(0);
-            llvm::Value* original_native  = lang::values::contentToNative(other_type, original_content, context);
+            Shared<lang::Value> original = function.getArgument(0);
 
-            Shared<lang::Value> original_value = makeShared<lang::WrappedNativeValue>(other_type, original_native);
-
-            llvm::Value* result_ptr =
-                context.ir().CreateAlloca(getContentType(context.llvmContext()), nullptr, "alloca");
+            Shared<lang::Value> result_ptr = context.exec().performStackAllocation(self());
 
             for (uint64_t index = 0; index < size_.value(); index++)
             {
-                llvm::Constant* index_content =
-                    llvm::ConstantInt::get(context.types().getSizeType()->getContentType(context.llvmContext()), index);
+                Shared<lang::Constant> index_constant = context.exec().getSizeValue(index);
 
-                auto index_value = [&]() {
-                    llvm::Value* index_native =
-                        lang::values::contentToNative(context.types().getSizeType(), index_content, context);
-                    return makeShared<lang::WrappedNativeValue>(context.types().getSizeType(), index_native);
-                };
-
-                auto element_ref      = other_type->buildSubscript(original_value, index_value(), context);
-                auto original_element = lang::Type::getValueOrReferencedValue(element_ref, context);
+                Shared<lang::Value> original_element_ref = buildSubscriptInBounds(original, index_constant, context);
+                Shared<lang::Value> original_element     = context.exec().performDereference(original_element_ref);
 
                 std::vector<Shared<lang::Value>> ctor_parameters;
                 ctor_parameters.emplace_back(original_element);
 
-                auto converted_element = element_ctor->buildCall(ctor_parameters, context);
+                Shared<lang::Value> converted_element = element_ctor->buildCall(ctor_parameters, context);
 
-                converted_element->buildContentValue(context);
+                Shared<lang::Value> result_element_ref = buildSubscriptInBounds(result_ptr, index_constant, context);
+                Shared<lang::Value> result_element_ptr = context.exec().computePointerFromReference(result_element_ref);
 
-                llvm::Value* result_dst_ptr = buildGetElementPointer(result_ptr, index, context);
-                context.ir().CreateStore(converted_element->getContentValue(), result_dst_ptr);
+                context.exec().performStoreToAddress(result_element_ptr, converted_element);
             }
 
-            llvm::Value* converted = lang::values::nativeToContent(self(), result_ptr, context);
-
-            context.ir().CreateRet(converted);
+            Shared<lang::Value> result = context.exec().performLoadFromAddress(result_ptr);
+            context.exec().performReturn(result);
         }
     }
 }
@@ -447,19 +392,14 @@ std::string lang::VectorType::createMangledName() const
          + std::string(")");
 }
 
-llvm::DIType* lang::VectorType::createDebugType(CompileContext& context) const
+Execution::Type lang::VectorType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl          = context.llvmModule().getDataLayout();
-    llvm::Type*             vector_type = getContentType(context.llvmContext());
+    return context.exec().registerVectorType(self());
+}
 
-    uint64_t const size            = dl.getTypeSizeInBits(vector_type);
-    auto           alignment       = static_cast<uint32_t>(dl.getABITypeAlignment(vector_type));
-    llvm::DIType*  element_di_type = element_type_->getDebugType(context);
-
-    llvm::SmallVector<llvm::Metadata*, 1> subscripts;
-    subscripts.push_back(context.di().getOrCreateSubrange(0, static_cast<int64_t>(size_.value())));
-
-    return context.di().createVectorType(size, alignment, element_di_type, context.di().getOrCreateArray(subscripts));
+Execution::IndexingMode lang::VectorType::getIndexingMode() const
+{
+    return Execution::IndexingMode::SEQUENCE;
 }
 
 lang::ResolvingHandle<lang::Type> lang::VectorType::clone(lang::Context& new_context) const

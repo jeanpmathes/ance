@@ -1,10 +1,11 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_CONSTANT_CONSTANT_H_
 #define ANCE_SRC_LANG_CONSTRUCT_CONSTANT_CONSTANT_H_
 
-#include "lang/construct/value/Value.h"
-
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
+
+#include "lang/construct/value/Value.h"
+#include "validation/ValidationLogger.h"
 
 namespace lang
 {
@@ -34,17 +35,17 @@ namespace lang
 
         /**
          * Build the content constant of this constant.
-         * @param m The module.
+         * @param context The module.
          */
-        void buildContentConstant(llvm::Module& m);
+        void buildContentConstant(CompileContext& context);
 
       protected:
         /**
          * Build the content of this constant.
-         * @param m The module.
+         * @param context The module.
          * @return The content constant.
          */
-        virtual llvm::Constant* createContent(llvm::Module& m) = 0;
+        virtual llvm::Constant* createContent(CompileContext& context) = 0;
 
       public:
         /**
@@ -60,11 +61,7 @@ namespace lang
          */
         virtual bool equals(lang::Constant const* other) const = 0;
 
-        void buildNativeValue(CompileContext& context) final;
         void buildContentValue(CompileContext& context) final;
-
-        [[nodiscard]] llvm::Value* getNativeValue() const final;
-        [[nodiscard]] llvm::Value* getContentValue() const final;
 
         /**
          * Clone this constant.
@@ -73,7 +70,6 @@ namespace lang
         [[nodiscard]] virtual Shared<Constant> clone(lang::Context& new_context) const = 0;
 
       protected:
-        llvm::Value*    native_value_ {nullptr};
         llvm::Constant* content_constant_ {nullptr};
     };
 }

@@ -4,11 +4,9 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/Scope.h"
 #include "lang/statement/Statement.h"
 #include "lang/type/SizeType.h"
-#include "lang/utility/Values.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
@@ -52,11 +50,5 @@ Expression::Expansion SizeofType::expandWith(Expressions, lang::Context& new_con
 void SizeofType::doBuild(CompileContext& context)
 {
     auto actual_type = lang::Type::makeMatching<lang::Type>(type_);
-
-    llvm::Value* content_value =
-        lang::SizeType::buildContentValue(actual_type->getContentSize(context.llvmModule()), context);
-    llvm::Value* native_value = lang::values::contentToNative(type(), content_value, context);
-
-    Shared<lang::WrappedNativeValue> value = makeShared<lang::WrappedNativeValue>(type(), native_value);
-    setValue(value);
+    setValue(context.exec().getSizeOf(actual_type));
 }

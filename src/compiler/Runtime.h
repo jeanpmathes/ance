@@ -39,16 +39,16 @@ class Runtime
     [[nodiscard]] static bool isNameReserved(lang::Identifier const& name);
 
   private:
-    llvm::Function*              allocate_dynamic_ {nullptr};
+    Execution::Function          allocate_dynamic_ {};
     const static constexpr char* ALLOCATE_DYNAMIC_NAME = "__allocate__";
 
-    llvm::Function*              delete_dynamic_ {nullptr};
+    Execution::Function          delete_dynamic_ {};
     const static constexpr char* DELETE_DYNAMIC_NAME = "__free__";
 
-    llvm::Function*              assertion_ {nullptr};
+    Execution::Function          assertion_ {};
     const static constexpr char* ASSERTION_NAME = "__assert__";
 
-    llvm::Function*              abort_ {nullptr};
+    Execution::Function          abort_ {};
     const static constexpr char* ABORT_NAME = "__abort__";
 
     inline static std::vector<std::string> reserved_names_ {ALLOCATE_DYNAMIC_NAME,
@@ -87,11 +87,11 @@ class Runtime
 
     /**
      * Free dynamically allocated memory.
-     * @param value A pointer to the memory.
+     * @param address A pointer to the memory.
      * @param delete_buffer Whether the memory is a single element or a buffer of multiple elements.
      * @param context The current compile context.
      */
-    void deleteDynamic(Shared<lang::Value> value, bool delete_buffer, CompileContext& context);
+    void deleteDynamic(Shared<lang::Value> address, bool delete_buffer, CompileContext& context);
 
     /**
      * Build an assertion. Only performed when assertions are enabled.
@@ -111,13 +111,14 @@ class Runtime
   private:
     bool is_initialized_ {false};
 
-    llvm::Value* allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
-                                   llvm::Value*                      count_value,
-                                   CompileContext&                   context);
+    Shared<lang::Value> allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
+                                          Shared<lang::Value>               count,
+                                          CompileContext&                   context);
 
-    llvm::Value* allocateDynamic(lang::ResolvingHandle<lang::Type> type,
-                                 llvm::Value*                      count_value,
-                                 CompileContext&                   context);
+    Shared<lang::Value> allocateDynamic(lang::ResolvingHandle<lang::Type> type,
+                                        Shared<lang::Value>               count,
+                                        bool                              is_buffer,
+                                        CompileContext&                   context);
 };
 
 #endif

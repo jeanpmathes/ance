@@ -29,8 +29,8 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getActualType() override;
         lang::Type const&                 getActualType() const override;
 
-        llvm::Constant*    getDefaultContent(llvm::Module& m) const override;
-        llvm::PointerType* getContentType(llvm::LLVMContext& c) const override;
+        llvm::Constant*    getDefaultContent(CompileContext& context) const override;
+        llvm::PointerType* getContentType(CompileContext& context) const override;
 
         bool isSubscriptDefined() const override;
 
@@ -69,7 +69,7 @@ namespace lang
                                                         CompileContext&     context) override;
 
         bool                              hasMember(lang::Identifier const& name) const override;
-        lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name) override;
+        Member& getMember(lang::Identifier const& name) override;
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildMemberAccess(Shared<Value>           value,
                                               lang::Identifier const& name,
@@ -80,9 +80,9 @@ namespace lang
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildIndirection(Shared<Value> value, CompileContext& context) override;
 
-        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context) override;
-        void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context) override;
-        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context) override;
+        void performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context) override;
+        void performCopyInitializer(Shared<Value> ptr, Shared<Value> original, CompileContext& context) override;
+        void performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context) override;
 
         void createConstructors() override;
         void buildNativeDeclaration(CompileContext& context) override;
@@ -99,25 +99,9 @@ namespace lang
 
       protected:
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) const override;
+        Execution::Type createDebugType(CompileContext& context) const override;
 
       public:
-        /**
-         * Get the referenced backing value.
-         * @param value A native value for a reference-type variable.
-         * @param context The current compile context.
-         * @return A native value for the referenced value.
-         */
-        llvm::Value* getReferenced(llvm::Value* value, CompileContext& context) const;
-
-        /**
-         * Get the referenced value.
-         * @param value A value of reference type.
-         * @param context The current compile context.
-         * @return The referenced value.
-         */
-        Shared<lang::Value> getReferenced(Shared<lang::Value> value, CompileContext& context);
-
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }

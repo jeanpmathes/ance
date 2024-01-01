@@ -3,7 +3,6 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/Type.h"
-#include "lang/utility/Values.h"
 
 Expression* lang::Constant::getBackingExpression() const
 {
@@ -15,37 +14,20 @@ bool lang::Constant::validate(ValidationLogger&, lang::Location) const
     return true;
 }
 
-void lang::Constant::buildContentConstant(llvm::Module& m)
+void lang::Constant::buildContentConstant(CompileContext& context)
 {
-    assert(!content_constant_ && "A constant may only be built once.");
-    content_constant_ = createContent(m);
+    if (content_constant_) return;
+    content_constant_ = createContent(context);
 }
 
 llvm::Constant* lang::Constant::getContentConstant()
 {
-    assert(content_constant_ && "Constant has to be built before accessing content constant.");
+    assert(content_constant_);
     return content_constant_;
-}
-
-void lang::Constant::buildNativeValue(CompileContext& context)
-{
-    buildContentConstant(context.llvmModule());
-    native_value_ = lang::values::contentToNative(type(), content_constant_, context);
 }
 
 void lang::Constant::buildContentValue(CompileContext& context)
 {
-    buildContentConstant(context.llvmModule());
-}
-
-llvm::Value* lang::Constant::getNativeValue() const
-{
-    assert(native_value_ && "Value has to be built before accessing native value.");
-    return native_value_;
-}
-
-llvm::Value* lang::Constant::getContentValue() const
-{
-    assert(content_constant_ && "Value has to be built before accessing content value.");
-    return content_constant_;
+    buildContentConstant(context);
+    content_value_ = content_constant_;
 }

@@ -72,7 +72,7 @@ namespace lang
                                              Scope&                            containing_scope,
                                              lang::AccessModifier              access,
                                              bool                              is_import,
-                                             lang::GlobalVariable::Initializer init,
+                                             lang::Initializer                 init,
                                              lang::Scope*                      init_scope,
                                              lang::Assigner                    assigner,
                                              bool                              is_constant,
@@ -85,7 +85,7 @@ namespace lang
          * @param containing_scope The containing scope.
          * @param is_final Whether the variable is final.
          * @param value The initial value.
-         * @param parameter_no The parameter number. Use zero if this is not a parameter.
+         * @param parameter_index The index of the parameter, if this is a parameter.
          * @param location The source location.
          */
         void defineAsLocal(lang::ResolvingHandle<lang::Type> type,
@@ -93,7 +93,7 @@ namespace lang
                            Scope&                            containing_scope,
                            bool                              is_final,
                            Optional<Shared<lang::Value>>     value,
-                           unsigned                          parameter_no,
+                           Optional<unsigned>                parameter_index,
                            lang::Location                    location);
 
         /**
@@ -166,11 +166,19 @@ namespace lang
                               lang::Location     assigned_location) const;
 
         /**
+         * Get a pointer to the current value of the variable.
+         * @param context The current compile context.
+         * @return A pointer to the value.
+         */
+        Shared<lang::Value> getValuePointer(CompileContext& context);
+
+        /**
          * Get the current value of the variable.
          * @param context The current compile context.
-         * @return The current value.
+         * @return The value.
          */
         Shared<lang::Value> getValue(CompileContext& context);
+
         /**
          * Set the current value of the variable.
          * @param value The new value.

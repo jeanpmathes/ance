@@ -133,7 +133,7 @@ std::vector<lang::Description::Dependency> lang::VariableDescription::getDefinit
 
 void lang::VariableDescription::performInitialization()
 {
-    lang::GlobalVariable::Initializer variable_init;
+    lang::Initializer variable_init;
 
     lang::Scope* init_scope = nullptr;
 

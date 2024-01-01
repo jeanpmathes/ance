@@ -42,24 +42,12 @@ bool lang::InitializerFunction::isMangled() const
     return false;
 }
 
-void lang::InitializerFunction::createNativeBacking(CompileContext& context)
+Optional<lang::Location> lang::InitializerFunction::getDefinitionLocation() const
 {
-    StatementFunction::createNativeBacking(context);
+    return lang::Location::global();
+}
 
-    auto [native_type, native_function] = getNativeRepresentation();
-
-    llvm::DISubroutineType* debug_type =
-        context.di().createSubroutineType(context.di().getOrCreateTypeArray({returnType()->getDebugType(context)}));
-    llvm::DISubprogram* subprogram =
-        context.di().createFunction(scope().getDebugScope(context),
-                                    name().text(),
-                                    native_function->getName(),
-                                    nullptr,
-                                    0,
-                                    debug_type,
-                                    0,
-                                    llvm::DINode::DIFlags::FlagPrototyped,
-                                    llvm::DISubprogram::toSPFlags(false, true, false, 0U, false));
-
-    native_function->setSubprogram(subprogram);
+bool lang::InitializerFunction::isConstructor() const
+{
+    return false;
 }

@@ -3,11 +3,9 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/Scope.h"
 #include "lang/type/BooleanType.h"
 #include "lang/type/VectorType.h"
-#include "lang/utility/Values.h"
 
 StateCount lang::IntegerType::getStateCount() const
 {
@@ -21,14 +19,14 @@ StateCount lang::IntegerType::getStateCount() const
     return SpecialCount::PLATFORM_DEPENDENT;
 }
 
-llvm::Constant* lang::IntegerType::getDefaultContent(llvm::Module& m) const
+llvm::Constant* lang::IntegerType::getDefaultContent(CompileContext& context) const
 {
-    return llvm::ConstantInt::get(getContentType(m.getContext()), 0, false);
+    return llvm::ConstantInt::get(getContentType(context), 0, false);
 }
 
-llvm::Type* lang::IntegerType::getContentType(llvm::LLVMContext& c) const
+llvm::Type* lang::IntegerType::getContentType(CompileContext& context) const
 {
-    return llvm::Type::getIntNTy(c, static_cast<unsigned>(getNativeBitSize()));
+    return llvm::Type::getIntNTy(context.exec().llvmContext(), static_cast<unsigned>(getNativeBitSize()));
 }
 
 lang::IntegerType const* lang::IntegerType::isIntegerType() const
@@ -64,16 +62,7 @@ Shared<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHa
                                                                Shared<Value>                     value,
                                                                CompileContext&                   context)
 {
-    value->buildContentValue(context);
-    llvm::Value* content_value = value->getContentValue();
-
-    llvm::Value* converted_value        = context.ir().CreateIntCast(content_value,
-                                                              other->getContentType(context.llvmContext()),
-                                                              isSigned(),
-                                                              content_value->getName() + ".icast");
-    llvm::Value* native_converted_value = lang::values::contentToNative(other, converted_value, context);
-
-    return makeShared<WrappedNativeValue>(other, native_converted_value);
+    return context.exec().computeConversionOnI(value, other);
 }
 
 bool lang::IntegerType::isCastingPossibleTo(lang::Type const& other) const
@@ -91,39 +80,14 @@ Shared<lang::Value> lang::IntegerType::buildCast(lang::ResolvingHandle<lang::Typ
                                                  Shared<Value>                     value,
                                                  CompileContext&                   context)
 {
-    return buildCast(other, value, other, context);
-}
-
-Shared<lang::Value> lang::IntegerType::buildCast(lang::ResolvingHandle<lang::Type> other,
-                                                 Shared<Value>                     value,
-                                                 lang::ResolvingHandle<lang::Type> element_type,
-                                                 CompileContext&                   context)
-{
-    if (element_type->isIntegerType())
+    if (other->isXOrVectorOfX([](auto& t) { return t.isIntegerType(); }))
     {
-        value->buildContentValue(context);
-        llvm::Value* content_value = value->getContentValue();
-
-        llvm::Value* converted_value        = context.ir().CreateIntCast(content_value,
-                                                                  other->getContentType(context.llvmContext()),
-                                                                  isSigned(),
-                                                                  content_value->getName() + ".cast");
-        llvm::Value* native_converted_value = lang::values::contentToNative(other, converted_value, context);
-
-        return makeShared<WrappedNativeValue>(other, native_converted_value);
+        return context.exec().computeConversionOnI(value, other);
     }
 
-    if (element_type->isAddressType())
+    if (other->isXOrVectorOfX([](auto& t) { return t.isAddressType(); }))
     {
-        value->buildContentValue(context);
-        llvm::Value* content_value = value->getContentValue();
-
-        llvm::Value* converted_value        = context.ir().CreateIntToPtr(content_value,
-                                                                   other->getContentType(context.llvmContext()),
-                                                                   content_value->getName() + ".cast");
-        llvm::Value* native_converted_value = lang::values::contentToNative(other, converted_value, context);
-
-        return makeShared<WrappedNativeValue>(other, native_converted_value);
+        return context.exec().computeIntegerToPointer(value, other);
     }
 
     throw std::logic_error("Invalid cast");
@@ -152,71 +116,59 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
                                                lang::PredefinedFunction&         function,
                                                CompileContext&                   context)
 {
-    llvm::Function* native_function;
-    std::tie(std::ignore, native_function) = function.getNativeRepresentation();
-
     if (parameter_element->isIntegerType() || parameter_element->isBooleanType())
     {
-        llvm::BasicBlock* block = llvm::BasicBlock::Create(context.llvmContext(), "block", native_function);
-        context.ir().SetInsertPoint(block);
+        context.exec().enterFunctionBody(function.getFunctionHandle(context));
         {
-            llvm::Value* original = native_function->getArg(0);
+            Shared<lang::Value> original   = function.getArgument(0);
+            auto                other_type = original->type();
 
             // Determine whether the value fits into the return type without loss of information.
             // Abort if it doesn't.
 
-            if (auto other_type = parameter_element->isIntegerType())
+            if (auto other_integer_type = parameter_element->isIntegerType())
             {
-                auto this_size  = static_cast<unsigned>(getMinimumBitSize());
-                auto other_size     = static_cast<unsigned>(other_type->getMinimumBitSize());
-                auto other_capacity = static_cast<unsigned>(other_type->getNativeBitSize());
+                auto this_size      = static_cast<unsigned>(getMinimumBitSize());
+                auto other_size     = static_cast<unsigned>(other_integer_type->getMinimumBitSize());
+                auto other_capacity = static_cast<unsigned>(other_integer_type->getNativeBitSize());
 
-                auto check_type = context.types().getBooleanType();
-                if (auto vector = return_type->isVectorType())
-                {
-                    check_type = context.types().getVectorType(check_type, vector->getSize().value());
-                }
+                std::string const error_message = "Integer conversion would lose information";
 
-                auto build_check = [&context, &check_type](llvm::Value* fits) {
-                    llvm::Value*  fits_native = lang::values::contentToNative(check_type, fits, context);
-                    Shared<Value> fits_value  = makeShared<WrappedNativeValue>(check_type, fits_native);
-
-                    context.runtime().buildAssert(fits_value, "Integer conversion would lose information", context);
-                };
-
-                auto build_constant = [&context, &return_type](llvm::APInt const& value) -> llvm::Constant* {
-                    if (auto vector = return_type->isVectorType())
-                    {
-                        auto element_count =
-                            llvm::ElementCount::getFixed(static_cast<unsigned>(vector->getSize().value()));
-                        return llvm::ConstantVector::getSplat(element_count, context.ir().getInt(value));
-                    }
-                    else { return context.ir().getInt(value); }
-                };
-
-                if (this->isSigned() == other_type->isSigned())
+                if (this->isSigned() == other_integer_type->isSigned())
                 {
                     if (this_size < other_size)
                     {
-                        llvm::Value* fits;
-
                         if (isSigned())
                         {
                             const llvm::APInt min      = llvm::APInt::getSignedMinValue(this_size).sext(other_capacity);
-                            llvm::Value*      fits_min = context.ir().CreateICmpSGE(original, build_constant(min));
+                            Shared<lang::Value> min_value = context.exec().getInteger(min, other_type);
+                            Shared<lang::Value> fits_min =
+                                context.exec().performOperator(lang::BinaryOperator::GREATER_THAN_OR_EQUAL,
+                                                               original,
+                                                               min_value);
 
                             const llvm::APInt max      = llvm::APInt::getSignedMaxValue(this_size).sext(other_capacity);
-                            llvm::Value*      fits_max = context.ir().CreateICmpSLE(original, build_constant(max));
+                            Shared<lang::Value> max_value = context.exec().getInteger(max, other_type);
+                            Shared<lang::Value> fits_max =
+                                context.exec().performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL,
+                                                               original,
+                                                               max_value);
 
-                            fits = context.ir().CreateAnd(fits_min, fits_max);
+                            Shared<lang::Value> fits =
+                                context.exec().performOperator(lang::BinaryOperator::BITWISE_AND, fits_min, fits_max);
+                            context.runtime().buildAssert(fits, error_message, context);
                         }
                         else
                         {
                             const llvm::APInt max = llvm::APInt::getMaxValue(this_size).zext(other_capacity);
-                            fits                  = context.ir().CreateICmpULE(original, build_constant(max));
-                        }
+                            Shared<lang::Value> max_value = context.exec().getInteger(max, other_type);
 
-                        build_check(fits);
+                            Shared<lang::Value> fits =
+                                context.exec().performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL,
+                                                               original,
+                                                               max_value);
+                            context.runtime().buildAssert(fits, error_message, context);
+                        }
                     }
                 }
                 else if (isSigned())// this is signed and original is unsigned.
@@ -224,32 +176,54 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
                     if (this_size <= other_size)
                     {
                         const llvm::APInt max  = llvm::APInt::getSignedMaxValue(this_size).zextOrSelf(other_capacity);
-                        llvm::Value*      fits = context.ir().CreateICmpULE(original, build_constant(max));
+                        Shared<lang::Value> max_value = context.exec().getInteger(max, other_type);
 
-                        build_check(fits);
+                        Shared<lang::Value> fits =
+                            context.exec().performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL,
+                                                           original,
+                                                           max_value);
+                        context.runtime().buildAssert(fits, error_message, context);
                     }
                 }
                 else// this is unsigned and original is signed.
                 {
                     const llvm::APInt zero = llvm::APInt::getNullValue(other_capacity);
-                    llvm::Value*      fits = context.ir().CreateICmpSGE(original, build_constant(zero));
+                    Shared<lang::Value> zero_value = context.exec().getInteger(zero, other_type);
+
+                    Shared<lang::Value> fits =
+                        context.exec().performOperator(lang::BinaryOperator::GREATER_THAN_OR_EQUAL,
+                                                       original,
+                                                       zero_value);
 
                     if (this_size < other_size)
                     {
                         const llvm::APInt max = llvm::APInt::getMaxValue(this_size).zext(other_capacity);
-                        fits = context.ir().CreateAnd(fits, context.ir().CreateICmpSLE(original, build_constant(max)));
+                        Shared<lang::Value> max_value = context.exec().getInteger(max, other_type);
+
+                        Shared<lang::Value> fits_max =
+                            context.exec().performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL,
+                                                           original,
+                                                           max_value);
+                        fits = context.exec().performOperator(lang::BinaryOperator::BITWISE_AND, fits, fits_max);
                     }
 
-                    build_check(fits);
+                    context.runtime().buildAssert(fits, error_message, context);
                 }
             }
 
-            llvm::Value* converted = context.ir().CreateIntCast(original,
-                                                                return_type->getContentType(context.llvmContext()),
-                                                                parameter_element->isSigned(),
-                                                                original->getName() + ".icast");
+            if (parameter_element->isIntegerType())
+            {
+                Shared<lang::Value> result = context.exec().computeConversionOnI(original, return_type);
+                context.exec().performReturn(result);
+            }
+            else if (parameter_element->isBooleanType())
+            {
+                Shared<lang::Constant> zero = context.exec().getZero(return_type);
+                Shared<lang::Constant> one  = context.exec().getOne(return_type);
 
-            context.ir().CreateRet(converted);
+                Shared<lang::Value> result = context.exec().performSelect(original, one, zero);
+                context.exec().performReturn(result);
+            }
         }
     }
 }
@@ -273,36 +247,7 @@ Shared<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator op,
                                                      Shared<Value>       value,
                                                      CompileContext&     context)
 {
-    return buildOperator(op, value, getOperatorResultType(op), context);
-}
-
-Shared<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator               op,
-                                                     Shared<Value>                     value,
-                                                     lang::ResolvingHandle<lang::Type> return_type,
-                                                     CompileContext&                   context)
-{
-    value->buildContentValue(context);
-    llvm::Value* content_value = value->getContentValue();
-
-    llvm::Value* result;
-
-    switch (op)
-    {
-        case lang::UnaryOperator::BITWISE_NOT:
-            result = context.ir().CreateNot(content_value, content_value->getName() + ".not");
-            break;
-
-        case lang::UnaryOperator::NEGATION:
-            result = context.ir().CreateNeg(content_value, content_value->getName() + ".neg");
-            break;
-
-        default:
-            assert(false);
-            result = nullptr;
-    }
-
-    llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
-    return makeShared<lang::WrappedNativeValue>(return_type, native_result);
+    return context.exec().performOperator(op, value);
 }
 
 bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
@@ -352,92 +297,11 @@ Shared<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator op,
                                                      Shared<Value>        right,
                                                      CompileContext&      context)
 {
-    return buildOperator(op, left, right, getOperatorResultType(op, right->type()), context);
-}
+    if (right->type()->isReferenceType()) right = context.exec().performDereference(right);
 
-Shared<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator              op,
-                                                     Shared<Value>                     left,
-                                                     Shared<Value>                     right,
-                                                     lang::ResolvingHandle<lang::Type> return_type,
-                                                     CompileContext&                   context)
-{
-    right = lang::Type::getValueOrReferencedValue(right, context);
+    right = context.exec().computeConversionOnI(right, left->type());
 
-    left->buildContentValue(context);
-    right->buildContentValue(context);
-
-    llvm::Value* left_value  = left->getContentValue();
-    llvm::Value* right_value = right->getContentValue();
-
-    llvm::Value* result;
-
-    switch (op)
-    {
-        case lang::BinaryOperator::ADDITION:
-            result = context.ir().CreateAdd(left_value, right_value, left_value->getName() + ".add");
-            break;
-        case lang::BinaryOperator::SUBTRACTION:
-            result = context.ir().CreateSub(left_value, right_value, left_value->getName() + ".sub");
-            break;
-        case lang::BinaryOperator::MULTIPLICATION:
-            result = context.ir().CreateMul(left_value, right_value, left_value->getName() + ".mul");
-            break;
-        case lang::BinaryOperator::DIVISION:
-            if (isSigned()) result = context.ir().CreateSDiv(left_value, right_value, left_value->getName() + ".sdiv");
-            else result = context.ir().CreateUDiv(left_value, right_value, left_value->getName() + ".udiv");
-            break;
-        case lang::BinaryOperator::REMAINDER:
-            if (isSigned()) result = context.ir().CreateSRem(left_value, right_value, left_value->getName() + ".srem");
-            else result = context.ir().CreateURem(left_value, right_value, left_value->getName() + ".urem");
-            break;
-        case lang::BinaryOperator::LESS_THAN:
-            if (isSigned())
-                result = context.ir().CreateICmpSLT(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context.ir().CreateICmpULT(left_value, right_value, left_value->getName() + ".icmp");
-            break;
-        case lang::BinaryOperator::LESS_THAN_OR_EQUAL:
-            if (isSigned())
-                result = context.ir().CreateICmpSLE(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context.ir().CreateICmpULE(left_value, right_value, left_value->getName() + ".icmp");
-            break;
-        case lang::BinaryOperator::GREATER_THAN:
-            if (isSigned())
-                result = context.ir().CreateICmpSGT(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context.ir().CreateICmpUGT(left_value, right_value, left_value->getName() + ".icmp");
-            break;
-        case lang::BinaryOperator::GREATER_THAN_OR_EQUAL:
-            if (isSigned())
-                result = context.ir().CreateICmpSGE(left_value, right_value, left_value->getName() + ".icmp");
-            else result = context.ir().CreateICmpUGE(left_value, right_value, left_value->getName() + ".icmp");
-            break;
-        case lang::BinaryOperator::EQUAL:
-            result = context.ir().CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
-            break;
-        case lang::BinaryOperator::NOT_EQUAL:
-            result = context.ir().CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
-            break;
-        case lang::BinaryOperator::BITWISE_AND:
-            result = context.ir().CreateAnd(left_value, right_value, left_value->getName() + ".and");
-            break;
-        case lang::BinaryOperator::BITWISE_OR:
-            result = context.ir().CreateOr(left_value, right_value, left_value->getName() + ".or");
-            break;
-        case lang::BinaryOperator::BITWISE_XOR:
-            result = context.ir().CreateXor(left_value, right_value, left_value->getName() + ".xor");
-            break;
-        case lang::BinaryOperator::SHIFT_LEFT:
-            right_value = context.ir().CreateIntCast(right_value, left_value->getType(), false);
-            result      = context.ir().CreateShl(left_value, right_value, left_value->getName() + ".shl");
-            break;
-        case lang::BinaryOperator::SHIFT_RIGHT:
-            right_value = context.ir().CreateIntCast(right_value, left_value->getType(), false);
-            if (isSigned()) result = context.ir().CreateAShr(left_value, right_value, left_value->getName() + ".ashr");
-            else result = context.ir().CreateLShr(left_value, right_value, left_value->getName() + ".lshr");
-            break;
-    }
-
-    llvm::Value* native_result = lang::values::contentToNative(return_type, result, context);
-    return makeShared<lang::WrappedNativeValue>(return_type, native_result);
+    return context.exec().performOperator(op, left, right);
 }
 
 bool lang::IntegerType::isTriviallyDefaultConstructible() const
@@ -455,13 +319,7 @@ bool lang::IntegerType::isTriviallyDestructible() const
     return true;
 }
 
-llvm::DIType* lang::IntegerType::createDebugType(CompileContext& context) const
+Execution::Type lang::IntegerType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
-
-    std::string const name         = std::string(this->name().text());
-    uint64_t const    size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
-    auto              encoding     = isSigned() ? llvm::dwarf::DW_ATE_signed : llvm::dwarf::DW_ATE_unsigned;
-
-    return context.di().createBasicType(name, size_in_bits, encoding);
+    return context.exec().registerIntegerType(self());
 }

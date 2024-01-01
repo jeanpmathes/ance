@@ -5,7 +5,6 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/Assigner.h"
 #include "lang/type/FixedWidthIntegerType.h"
-#include "lang/type/StructType.h"
 #include "lang/type/TypeAlias.h"
 #include "lang/utility/Storage.h"
 #include "validation/ValidationLogger.h"
@@ -50,9 +49,9 @@ lang::GlobalScope const* lang::GlobalScope::getGlobalScope() const
     return this;
 }
 
-llvm::DIScope* lang::GlobalScope::getDebugScope(CompileContext& context) const
+Execution::Scoped lang::GlobalScope::getDebugScope(CompileContext&) const
 {
-    return &context.llvmUnit();
+    return Execution::Application::GLOBAL_SCOPE;
 }
 
 Owned<lang::GlobalScope> lang::GlobalScope::expand() const

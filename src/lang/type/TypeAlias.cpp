@@ -5,7 +5,6 @@
 #include "lang/scope/Scope.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Identifier.h"
-#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::TypeAlias::TypeAlias(lang::Accessibility               accessibility,
@@ -177,14 +176,14 @@ lang::Type const& lang::TypeAlias::getActualType() const
     return actually_actual_.value();
 }
 
-llvm::Constant* lang::TypeAlias::getDefaultContent(llvm::Module& m) const
+llvm::Constant* lang::TypeAlias::getDefaultContent(CompileContext& context) const
 {
-    return actual_->getDefaultContent(m);
+    return actual_->getDefaultContent(context);
 }
 
-llvm::Type* lang::TypeAlias::getContentType(llvm::LLVMContext& c) const
+llvm::Type* lang::TypeAlias::getContentType(CompileContext& context) const
 {
-    return actual_->getContentType(c);
+    return actual_->getContentType(context);
 }
 
 bool lang::TypeAlias::validate(ValidationLogger&, lang::Location) const
@@ -308,9 +307,9 @@ bool lang::TypeAlias::hasMember(lang::Identifier const& name) const
     return actual_->hasMember(name);
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeAlias::getMemberType(lang::Identifier const& name)
+lang::Member& lang::TypeAlias::getMember(lang::Identifier const& name)
 {
-    return actual_->getMemberType(name);
+    return actual_->getMember(name);
 }
 
 bool lang::TypeAlias::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const
@@ -345,19 +344,19 @@ Shared<lang::Value> lang::TypeAlias::buildIndirection(Shared<Value> value, Compi
     return actual_->buildIndirection(value, context);
 }
 
-void lang::TypeAlias::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
+void lang::TypeAlias::performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context)
 {
-    actual_->buildDefaultInitializer(ptr, count, context);
+    actual_->performDefaultInitializer(ptr, count, context);
 }
 
-void lang::TypeAlias::buildCopyInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
+void lang::TypeAlias::performCopyInitializer(Shared<Value> destination, Shared<Value> count, CompileContext& context)
 {
-    actual_->buildCopyInitializer(ptr, count, context);
+    actual_->performCopyInitializer(destination, count, context);
 }
 
-void lang::TypeAlias::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
+void lang::TypeAlias::performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context)
 {
-    actual_->buildFinalizer(ptr, count, context);
+    actual_->performFinalizer(ptr, count, context);
 }
 
 bool lang::TypeAlias::isTriviallyDefaultConstructible() const
@@ -398,13 +397,13 @@ std::string lang::TypeAlias::createMangledName() const
     return getActualType().getMangledName();
 }
 
-llvm::DIType* lang::TypeAlias::createDebugType(CompileContext& context) const
+Execution::Type lang::TypeAlias::createDebugType(CompileContext& context) const
 {
-    return context.di().createTypedef(actual_->getDebugType(context),
-                                      name().text(),
-                                      context.getSourceFile(getDefinitionLocation()),
-                                      static_cast<unsigned>(getDefinitionLocation().line()),
-                                      scope()->getDebugScope(context));
+    return context.exec().createAlias(name(),
+                                      CustomType::getAccessibility().modifier(),
+                                      actual_,
+                                      *scope(),
+                                      getDefinitionLocation());
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeAlias::getDeclarationDependencies()

@@ -52,19 +52,14 @@ namespace lang
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
-        void createNativeBacking(CompileContext& context) override;
         void build(CompileContext& context) override;
 
         void buildDeclarationsFollowingOrder(CompileContext& context) override;
-
-        llvm::DIScope* getDebugScope(CompileContext& context) const override;
 
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 
       protected:
         using FunctionDefinition::buildCall;
-
-        [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
 
         [[nodiscard]] BasicBlock const&        getInitialBlock() const;
         [[nodiscard]] Optional<lang::Location> findUnreachableCode() const;
@@ -82,9 +77,6 @@ namespace lang
         Owned<lang::BasicBlock>              initial_block_;
         std::vector<Owned<lang::BasicBlock>> blocks_ {};
         std::vector<lang::BasicBlock*>       used_blocks_ {};
-
-        llvm::FunctionType* native_type_ {nullptr};
-        llvm::Function*     native_function_ {nullptr};
     };
 }
 

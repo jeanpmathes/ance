@@ -16,8 +16,8 @@ namespace lang
       public:
         [[nodiscard]] StateCount getStateCount() const override;
 
-        llvm::Constant* getDefaultContent(llvm::Module& m) const override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
+        llvm::Constant* getDefaultContent(CompileContext& context) const override;
+        llvm::Type*     getContentType(CompileContext& context) const override;
 
         IntegerType const* isIntegerType() const override;
 
@@ -62,10 +62,6 @@ namespace lang
         Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
                                       Shared<Value>                     value,
                                       CompileContext&                   context) override;
-        Shared<Value>       buildCast(lang::ResolvingHandle<lang::Type> other,
-                                      Shared<Value>                     value,
-                                      lang::ResolvingHandle<lang::Type> element_type,
-                                      CompileContext&                   context) override;
 
       protected:
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
@@ -87,10 +83,6 @@ namespace lang
         Shared<lang::Value>               buildOperator(lang::UnaryOperator op,
                                                         Shared<Value>       value,
                                                         CompileContext&     context) override;
-        Shared<lang::Value>               buildOperator(lang::UnaryOperator               op,
-                                                        Shared<Value>                     value,
-                                                        lang::ResolvingHandle<lang::Type> return_type,
-                                                        CompileContext&                   context) override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
@@ -104,17 +96,12 @@ namespace lang
                                                         Shared<Value>        left,
                                                         Shared<Value>        right,
                                                         CompileContext&      context) override;
-        Shared<Value>                     buildOperator(lang::BinaryOperator              op,
-                                                        Shared<Value>                     left,
-                                                        Shared<Value>                     right,
-                                                        lang::ResolvingHandle<lang::Type> return_type,
-                                                        CompileContext&                   context) override;
 
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        llvm::DIType* createDebugType(CompileContext& context) const override;
+        Execution::Type createDebugType(CompileContext& context) const override;
     };
 }
 

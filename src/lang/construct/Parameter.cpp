@@ -4,7 +4,6 @@
 
 #include "lang/type/Type.h"
 #include "lang/utility/Storage.h"
-#include "lang/utility/Values.h"
 
 lang::Parameter::Parameter(lang::ResolvingHandle<lang::Type> type,
                            lang::Location                    type_location,
@@ -14,6 +13,13 @@ lang::Parameter::Parameter(lang::ResolvingHandle<lang::Type> type,
     , type_location_(type_location)
     , name_(name)
     , location_(location)
+{}
+
+lang::Parameter::Parameter(lang::ResolvingHandle<lang::Type> type)
+    : type_(std::move(type))
+    , type_location_(lang::Location::global())
+    , name_(Identifier::empty())
+    , location_(lang::Location::global())
 {}
 
 lang::ResolvingHandle<lang::Type> lang::Parameter::type()
@@ -43,28 +49,14 @@ lang::Location lang::Parameter::typeLocation() const
 
 void lang::Parameter::wrap(llvm::Argument* argument)
 {
-    content_value_ = argument;
-    content_value_->setName(name_ + ".arg");
+    argument_ = argument;
+
+    if (!name_.isEmpty()) { argument_->setName(name_ + ".arg"); }
 }
 
-void lang::Parameter::buildNativeValue(CompileContext& context)
+void lang::Parameter::buildContentValue(CompileContext&)
 {
-    if (!native_value_) { native_value_ = lang::values::contentToNative(type(), content_value_, context); }
-}
-
-void lang::Parameter::buildContentValue(CompileContext& context)
-{
-    if (!content_value_) { content_value_ = lang::values::nativeToContent(type(), native_value_, context); }
-}
-
-llvm::Value* lang::Parameter::getNativeValue() const
-{
-    return native_value_;
-}
-
-llvm::Value* lang::Parameter::getContentValue() const
-{
-    return content_value_;
+    content_value_ = argument_;
 }
 
 Shared<lang::Parameter> lang::Parameter::expand(lang::Context& new_context) const

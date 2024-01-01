@@ -5,7 +5,7 @@
 lang::LocalScope::LocalScope(lang::Scope* parent, lang::CodeBlock& code_block) : Scope(parent), code_block_(code_block)
 {}
 
-llvm::DIScope* lang::LocalScope::getDebugScope(CompileContext& context) const
+Execution::Scoped lang::LocalScope::getDebugScope(CompileContext& context) const
 {
     return scope()->getDebugScope(context);
 }

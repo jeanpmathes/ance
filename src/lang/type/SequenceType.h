@@ -25,7 +25,7 @@ namespace lang
         lang::Type const&           getElementType() const override;
 
         [[nodiscard]] StateCount         getStateCount() const override;
-        [[nodiscard]] Optional<uint64_t> getSize();
+        [[nodiscard]] Optional<uint64_t> getSize() const;
 
         bool                              isSubscriptDefined() const override;
         lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
@@ -36,30 +36,28 @@ namespace lang
         Shared<lang::Value>               buildSubscript(Shared<Value>   indexed,
                                                          Shared<Value>   index,
                                                          CompileContext& context) override;
+        Shared<lang::Value> buildSubscriptInBounds(Shared<Value> indexed, Shared<Value> index, CompileContext& context);
+        Shared<lang::Value> buildSubscript(Shared<Value>   indexed,
+                                           Shared<Value>   index,
+                                           bool            check_bounds,
+                                           CompileContext& context);
 
       protected:
-        llvm::Value* buildGetElementPointer(Shared<Value> indexed, Shared<Value> index, CompileContext& context);
-
-        llvm::Value* buildGetElementPointer(llvm::Value* indexed, uint64_t index, CompileContext& context);
-
-        virtual llvm::Type*                     getIndexedType(CompileContext& context) const;
-        virtual llvm::Value*                    getIndexingPointer(Shared<Value> indexed, CompileContext& context);
-        virtual llvm::SmallVector<llvm::Value*> getNativeIndices(llvm::Value* zero, llvm::Value* index);
+        virtual Execution::IndexingMode getIndexingMode() const = 0;
 
       public:
         std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies() override;
         std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies() override;
 
-      public:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context) override;
-        void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
-                                                  llvm::Value*    src_ptr,
-                                                  CompileContext& context) override;
-        void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context) override;
+        void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) override;
+        void performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
+                                                    Shared<lang::Value> src_ptr,
+                                                    CompileContext& context) override;
+        void buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) override;
 
         /**
          * Create a value with the given elements. Only valid if the type is sized.

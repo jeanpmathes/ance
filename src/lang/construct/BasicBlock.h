@@ -3,8 +3,9 @@
 
 #include "lang/Element.h"
 #include "lang/construct/value/Value.h"
-#include "lang/expression/ConstantExpression.h"
 #include "lang/statement/Statement.h"
+
+class ConstantExpression;
 
 namespace lang
 {

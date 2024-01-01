@@ -34,8 +34,8 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getActualType() override;
         [[nodiscard]] lang::Type const&   getActualType() const override;
 
-        llvm::Constant*  getDefaultContent(llvm::Module& m) const override;
-        llvm::ArrayType* getContentType(llvm::LLVMContext& c) const override;
+        llvm::Constant*  getDefaultContent(CompileContext& context) const override;
+        llvm::ArrayType* getContentType(CompileContext& context) const override;
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
@@ -44,7 +44,8 @@ namespace lang
 
       protected:
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) const override;
+        Execution::Type         createDebugType(CompileContext& context) const override;
+        Execution::IndexingMode getIndexingMode() const override;
 
       private:
         Optional<lang::ResolvingHandle<lang::Type>> actual_type_ {};

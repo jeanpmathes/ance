@@ -4,7 +4,6 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
 
 class Expression;
@@ -12,8 +11,17 @@ class CompileContext;
 
 namespace lang
 {
+    class Type;
+}
+
+namespace lang
+{
     /**
      * Represents any value that can be passed around in the final program.
+     * The value provides two ways of accessing the actual value:
+     * - The native value is a pointer to a stack allocated value.
+     * - The content value is the value stored on the stack or in a register.
+     * Both are converted to each other using load and store operations.
      */
     class Value
     {
@@ -34,7 +42,7 @@ namespace lang
          * Build the native value. The native value is the value actually used in the IR.
          * @param context The native value.
          */
-        virtual void buildNativeValue(CompileContext& context) = 0;
+        virtual void buildNativeValue(CompileContext& context);
         /**
          * Build the content value. The content value is the value stored in the native value.
          * @param context The content value.
@@ -45,16 +53,17 @@ namespace lang
          * Get the native value. It must be built before accessing it.
          * @return The native value.
          */
-        [[nodiscard]] virtual llvm::Value* getNativeValue() const = 0;
+        [[nodiscard]] llvm::Value* getNativeValue() const;
         /**
          * Get the content value. It must be built before accessing it.
          * @return The content value.
          */
-        [[nodiscard]] virtual llvm::Value* getContentValue() const;
+        [[nodiscard]] llvm::Value* getContentValue() const;
 
         virtual ~Value() = default;
 
-      private:
+      protected:
+        llvm::Value* native_value_ {nullptr};
         llvm::Value* content_value_ {nullptr};
     };
 }

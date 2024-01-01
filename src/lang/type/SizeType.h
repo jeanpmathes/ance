@@ -41,14 +41,6 @@ namespace lang
         [[nodiscard]] bool isSizeType() const override;
         [[nodiscard]] bool isDiffType() const override;
 
-        /**
-         * Build a value of the size type from a given type size.
-         * @param size The type size to use as value.
-         * @param context The current compile context.
-         * @return The content value containing the given type size.
-         */
-        static llvm::Value* buildContentValue(llvm::TypeSize size, CompileContext& context);
-
       private:
         inline static unsigned int size_width_ = 0;
         inline static unsigned int diff_width_ = 0;

@@ -3,6 +3,7 @@
 #include <boost/locale/encoding_utf.hpp>
 
 #include "compiler/Application.h"
+#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/CharType.h"
 #include "lang/type/FixedWidthIntegerType.h"
@@ -42,9 +43,16 @@ lang::Type const& lang::CharConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::CharConstant::createContent(llvm::Module& m)
+llvm::Constant* lang::CharConstant::createContent(CompileContext& context)
 {
-    return llvm::ConstantInt::get(type_->getContentType(m.getContext()), char_, false);
+    if (type_->isCharType()) { return context.exec().getCodepointConstant(char_); }
+
+    if (type_->isFixedWidthIntegerType(8, false))
+    {
+        return context.exec().getByteConstant(static_cast<uint8_t>(char_));
+    }
+
+    throw std::logic_error("Invalid type for char constant");
 }
 
 bool lang::CharConstant::equals(lang::Constant const* other) const

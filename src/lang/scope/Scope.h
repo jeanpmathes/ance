@@ -8,6 +8,7 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
+#include "compiler/Execution.h"
 #include "lang/AccessModifier.h"
 #include "lang/Element.h"
 #include "lang/utility/Location.h"
@@ -119,7 +120,7 @@ namespace lang
          * @param context The current compile context.
          * @return The debug scope.
          */
-        virtual llvm::DIScope* getDebugScope(CompileContext& context) const = 0;
+        virtual Execution::Scoped getDebugScope(CompileContext& context) const = 0;
 
         /**
          * Create a local scope in this scope.

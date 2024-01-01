@@ -26,7 +26,7 @@ lang::GlobalVariable* lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang:
                                                      Scope&                            containing_scope,
                                                      lang::AccessModifier              access,
                                                      bool                              is_import,
-                                                     lang::GlobalVariable::Initializer init,
+                                                     lang::Initializer                 init,
                                                      lang::Scope*                      init_scope,
                                                      lang::Assigner                    assigner,
                                                      bool                              is_constant,
@@ -55,7 +55,7 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type> type,
                                    Scope&                            containing_scope,
                                    bool                              is_final,
                                    Optional<Shared<lang::Value>>     value,
-                                   unsigned int                      parameter_no,
+                                   Optional<unsigned>                parameter_index,
                                    lang::Location                    location)
 {
     definition_ = makeOwned<lang::LocalVariable>(self(),
@@ -64,7 +64,7 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type> type,
                                                  containing_scope,
                                                  is_final,
                                                  value,
-                                                 parameter_no,
+                                                 parameter_index,
                                                  location);
 }
 
@@ -144,9 +144,15 @@ bool lang::Variable::validateSetValue(lang::Value const& value,
     return lang::Type::checkMismatch(target_type, value.type(), assigned_location, validation_logger);
 }
 
+Shared<lang::Value> lang::Variable::getValuePointer(CompileContext& context)
+{
+    return definition_.value()->getValuePointer(context);
+}
+
 Shared<lang::Value> lang::Variable::getValue(CompileContext& context)
 {
-    return definition_.value()->getValue(context);
+    Shared<lang::Value> pointer = getValuePointer(context);
+    return context.exec().performLoadFromAddress(pointer);
 }
 
 void lang::Variable::setValue(Shared<Value> value, CompileContext& context)

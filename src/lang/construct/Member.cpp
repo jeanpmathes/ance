@@ -7,7 +7,6 @@
 #include "lang/scope/Scope.h"
 #include "lang/statement/Statement.h"
 #include "lang/utility/Storage.h"
-#include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
 lang::Member::Member(lang::AccessModifier                access,
@@ -56,6 +55,20 @@ lang::Location lang::Member::location() const
     return location_;
 }
 
+void lang::Member::setIndex(size_t index)
+{
+    assert(index_ == std::numeric_limits<size_t>::max());
+    assert(index != std::numeric_limits<size_t>::max());
+
+    index_ = index;
+}
+
+size_t lang::Member::index() const
+{
+    assert(index_ != std::numeric_limits<size_t>::max());
+    return index_;
+}
+
 void lang::Member::setScope(lang::Scope* scope)
 {
     scope->registerUsage(type());
@@ -89,35 +102,32 @@ bool lang::Member::validate(ValidationLogger& validation_logger) const
     return true;
 }
 
-llvm::Constant* lang::Member::getConstantInitializer(llvm::Module& m) const
+Shared<lang::Constant> lang::Member::getConstantInitializer(CompileContext& context)
 {
-    if (constant_init_.hasValue()) { return getInitialValue(m); }
-    else { return type().getDefaultContent(m); }
+    if (constant_init_.hasValue()) { return getInitialValue(context); }
+    else { return type()->getDefault(context); }
 }
 
-void lang::Member::buildInitialization(llvm::Value* ptr, CompileContext& context)
+void lang::Member::buildInitialization(Shared<lang::Value> ptr, CompileContext& context)
 {
     if (constant_init_.hasValue())
     {
-        llvm::Value* content   = getInitialValue(context.llvmModule());
-        llvm::Value* value_ptr = lang::values::contentToNative(type(), content, context);
+        Shared<lang::Value> value_ptr = context.exec().performStackAllocation(type());
+        context.exec().performStoreToAddress(value_ptr, getInitialValue(context));
 
-        type()->buildCopyInitializer(ptr, value_ptr, context);
+        type()->performCopyInitializer(ptr, value_ptr, context);
     }
-    else { type()->buildDefaultInitializer(ptr, context); }
+    else { type()->performDefaultInitializer(ptr, context); }
 }
 
-llvm::Constant* lang::Member::getInitialValue(llvm::Module& m) const
+Shared<lang::Constant> lang::Member::getInitialValue(CompileContext& context) const
 {
-    if (!initial_value_)
+    if (!initial_value_.hasValue())
     {
-        // The llvm constant does not allow to change the ance constant.
-        Shared<lang::Constant> constant = const_cast<Member*>(this)->constant_init_.value()->getConstantValue();
-        constant->buildContentConstant(m);
-        initial_value_ = constant->getContentConstant();
+        initial_value_ = const_cast<Member*>(this)->constant_init_.value()->getConstantValue();
     }
 
-    return initial_value_;
+    return initial_value_.value()->clone(context.ctx());
 }
 
 Owned<lang::Member> lang::Member::expand(lang::Context& new_context) const

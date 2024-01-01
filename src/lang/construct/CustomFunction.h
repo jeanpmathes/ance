@@ -45,17 +45,12 @@ namespace lang
 
         [[nodiscard]] bool isMangled() const override;
 
+      protected:
+        Optional<lang::Location> getDefinitionLocation() const override;
+        bool                     isConstructor() const override;
+
+      public:
         bool validateFlow(ValidationLogger& validation_logger) const override;
-
-        void createNativeBacking(CompileContext& context) override;
-
-        /**
-         * Get the debug subprogram.
-         * @return The debug subprogram.
-         */
-        [[nodiscard]] llvm::DISubprogram* debugSubprogram() const;
-
-        llvm::DIScope* getDebugScope(CompileContext& context) const override;
 
       protected:
         using FunctionDefinition::buildCall;

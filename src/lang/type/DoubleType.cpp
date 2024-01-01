@@ -1,18 +1,19 @@
 #include "DoubleType.h"
 
+#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
 
 lang::DoubleType::DoubleType() : TypeDefinition(lang::Identifier::like("double")) {}
 
-llvm::Constant* lang::DoubleType::getDefaultContent(llvm::Module& m) const
+llvm::Constant* lang::DoubleType::getDefaultContent(CompileContext& context) const
 {
-    return llvm::ConstantFP::get(getContentType(m.getContext()), 0);
+    return llvm::ConstantFP::get(getContentType(context), 0);
 }
 
-llvm::Type* lang::DoubleType::getContentType(llvm::LLVMContext& c) const
+llvm::Type* lang::DoubleType::getContentType(CompileContext& context) const
 {
-    return llvm::Type::getDoubleTy(c);
+    return llvm::Type::getDoubleTy(context.exec().llvmContext());
 }
 
 size_t lang::DoubleType::getPrecision() const

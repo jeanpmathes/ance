@@ -57,12 +57,6 @@ namespace lang
          */
         static void init(llvm::DataLayout const& data_layout);
 
-        /**
-         * Get the bit size of the type.
-         * @return The size of the type.
-         */
-        static unsigned int sizeInBits();
-
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }

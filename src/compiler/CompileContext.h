@@ -7,6 +7,7 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
+#include "compiler/Execution.h"
 #include "lang/utility/Location.h"
 
 namespace lang
@@ -18,6 +19,7 @@ namespace lang
 class SourceTree;
 class Unit;
 class Runtime;
+class Execution;
 
 /**
  * A class to simplify passing around the objects required for building the application.
@@ -60,37 +62,13 @@ class CompileContext
      * It contains all builtin types.
      * @return The language context.
      */
-    lang::Context& types();
+    lang::Context& ctx();
 
     /**
-     * Get the llvmContext.
-     * @return The llvmContext.
+     * Get the current execution backend.
+     * @return The execution backend.
      */
-    llvm::LLVMContext& llvmContext();
-
-    /**
-     * Get the module.
-     * @return The module.
-     */
-    llvm::Module& llvmModule();
-
-    /**
-     * Get the ir builder.
-     * @return The ir builder.
-     */
-    llvm::IRBuilder<>& ir();
-
-    /**
-     * Get the di builder.
-     * @return The di builder.
-     */
-    llvm::DIBuilder& di();
-
-    /**
-     * Get the llvm compile unit.
-     * @return The llvm compile unit.
-     */
-    llvm::DICompileUnit& llvmUnit();
+    Execution& exec();
 
     /**
      * Get the debug information for a source file that contains the given location.
@@ -133,11 +111,7 @@ class CompileContext
   private:
     Unit&                unit_;
     Runtime&             runtime_;
-    llvm::LLVMContext&   context_;
-    llvm::Module&        module_;
-    llvm::IRBuilder<>&   ir_builder_;
-    llvm::DIBuilder&     di_builder_;
-    llvm::DICompileUnit* di_unit_ {nullptr};
+    std::unique_ptr<Execution> execution_;
 
     struct SourceFile {
         std::filesystem::path path;

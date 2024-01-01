@@ -20,19 +20,33 @@ lang::Type const& lang::DelayedValue::type() const
 void lang::DelayedValue::setValue(Shared<lang::Value> value)
 {
     assert(not value_.hasValue());
-    assert(lang::Type::areSame(value->type(), type()) && "Type has to match.");
+    assert(lang::Type::areSame(value->type(), type()));
 
     value_ = value;
 }
 
 void lang::DelayedValue::buildNativeValue(CompileContext& context)
 {
-    expression_->build(context);
-    assert(value_.hasValue() && "setValue must be called in expression when their value is used");
+    if (!built_)
+    {
+        expression_->build(context);
+        assert(value_.hasValue());
+        built_ = true;
+    }
+
     value_.value()->buildNativeValue(context);
+    native_value_ = value_.value()->getNativeValue();
 }
 
-llvm::Value* lang::DelayedValue::getNativeValue() const
+void lang::DelayedValue::buildContentValue(CompileContext& context)
 {
-    return value_.value()->getNativeValue();
+    if (!built_)
+    {
+        expression_->build(context);
+        assert(value_.hasValue());
+        built_ = true;
+    }
+
+    value_.value()->buildContentValue(context);
+    content_value_ = value_.value()->getContentValue();
 }

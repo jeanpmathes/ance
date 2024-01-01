@@ -16,6 +16,12 @@ concept Copyable = requires(T t, T u) {
     t = u;
 };
 
+template<typename T>
+concept ConstCopyable = requires(T const t, T u) {
+    T(t);
+    u = t;
+};
+
 template<typename T, typename OtherT>
 concept MoveConvertible = !std::is_same_v<T, OtherT> and requires(T t, OtherT u) {
     T(std::move(u));
@@ -28,6 +34,12 @@ concept CopyConvertible = !std::is_same_v<T, OtherT> and requires(T t, OtherT u)
     t = u;
 };
 
+template<typename T, typename OtherT>
+concept ConstCopyConvertible = !std::is_same_v<T, OtherT> and requires(T const& t, OtherT u) {
+    T(u);
+    u = t;
+};
+
 /**
  * A custom optional that does not require a non-const copy constructor.
  * @tparam T The type of the optional.
@@ -38,23 +50,31 @@ class Optional
   public:
     Optional();
     explicit(false) Optional(std::nullopt_t);// NOLINT(google-explicit-constructor)
+    explicit(false) Optional(T const& value) // NOLINT(google-explicit-constructor)
+        requires ConstCopyable<T>;
     explicit(false) Optional(T value)        // NOLINT(google-explicit-constructor)
-        requires Copyable<T>;
+        requires(!ConstCopyable<T> and Copyable<T>);
     explicit(false) Optional(T&& value)      // NOLINT(google-explicit-constructor)
-        requires(!Copyable<T>);
+        requires(!ConstCopyable<T> and !Copyable<T>);
     Optional<T>& operator=(T value);
 
+    Optional(Optional<T> const& optional)
+        requires ConstCopyable<T>;
     Optional(Optional<T>& optional)
-        requires Copyable<T>;
+        requires(!ConstCopyable<T> and Copyable<T>);
     Optional(Optional<T>&& optional) noexcept;
+
+    template<typename OtherT>
+        requires ConstCopyConvertible<T, OtherT>
+    explicit(false) Optional(Optional<OtherT> const& optional);// NOLINT(google-explicit-constructor)
+
+    template<typename OtherT>
+        requires(!ConstCopyConvertible<T, OtherT> and CopyConvertible<T, OtherT>)
+    explicit(false) Optional(Optional<OtherT>& optional);// NOLINT(google-explicit-constructor)
 
     template<typename OtherT>
         requires MoveConvertible<T, OtherT>
     explicit(false) Optional(Optional<OtherT>&& optional);// NOLINT(google-explicit-constructor)
-
-    template<typename OtherT>
-        requires CopyConvertible<T, OtherT>
-    explicit(false) Optional(Optional<OtherT>& optional);// NOLINT(google-explicit-constructor)
 
     Optional<T>& operator=(Optional<T> optional)
         requires Copyable<T>;

@@ -24,25 +24,30 @@ namespace lang
                            lang::AccessModifier                 access_modifier,
                            bool                                 is_imported,
                            lang::ResolvingHandle<lang::Type>    return_type,
-                           bool                                 preserve_unit_return,
+                           bool                                 is_constructor,
                            std::vector<Shared<lang::Parameter>> parameters,
                            lang::Location                       location);
 
         [[nodiscard]] bool isMangled() const override;
         [[nodiscard]] bool isImported() const override;
+        [[nodiscard]] AccessModifier access() const override;
 
+      protected:
+        Optional<lang::Location> getDefinitionLocation() const override;
+        bool                     isConstructor() const override;
+
+      public:
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
-        void createNativeBacking(CompileContext& context) override;
         void build(CompileContext& context) override;
 
-        llvm::DIScope*                                      getDebugScope(CompileContext& context) const override;
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 
-      public:
-        [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
+        [[nodiscard]] Execution::Function getFunctionHandle(CompileContext& context) const;
+        Shared<lang::Value>               getArgument(size_t index);
 
+      public:
         void setCallValidator(
             std::function<bool(std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const&,
                                lang::Location,
@@ -55,10 +60,7 @@ namespace lang
       private:
         lang::AccessModifier access_modifier_;
         bool                 is_imported_;
-        bool                 preserve_unit_return_;
-
-        llvm::FunctionType* native_type_ {nullptr};
-        llvm::Function*     native_function_ {nullptr};
+        bool                 is_constructor_;
 
         std::function<bool(std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const&,
                            lang::Location,

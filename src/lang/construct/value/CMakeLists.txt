@@ -3,4 +3,5 @@ target_sources(ance PRIVATE
                RoughlyCastedValue.cpp
                Value.cpp
                NoValue.cpp
-               WrappedNativeValue.cpp)
+               WrappedNativeValue.cpp
+               WrappedContentValue.cpp)

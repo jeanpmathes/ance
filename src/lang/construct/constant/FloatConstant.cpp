@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "compiler/CompileContext.h"
 #include "lang/type/Type.h"
 
 lang::FloatConstant::FloatConstant(std::string const&                number,
@@ -34,9 +35,9 @@ lang::Type const& lang::FloatConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::FloatConstant::createContent(llvm::Module& m)
+llvm::Constant* lang::FloatConstant::createContent(CompileContext& context)
 {
-    return llvm::ConstantFP::get(type_->getContentType(m.getContext()), float_);
+    return context.exec().getFloatConstant(float_);
 }
 
 bool lang::FloatConstant::equals(lang::Constant const* other) const

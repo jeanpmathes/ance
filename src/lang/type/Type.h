@@ -8,13 +8,13 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 
+#include "compiler/Execution.h"
 #include "lang/Accessibility.h"
 #include "lang/BinaryOperator.h"
 #include "lang/UnaryOperator.h"
 #include "lang/construct/Callable.h"
 #include "lang/construct/Entity.h"
 #include "lang/type/StateCount.h"
-#include "lang/type/TypeDefinition.h"
 #include "lang/utility/Identifier.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -25,8 +25,10 @@ namespace lang
     class Scope;
     class Value;
     class Function;
+    class TypeDefinition;
     class VectorizableType;
     class FloatingPointType;
+    class AddressType;
     class FixedWidthIntegerType;
     class VectorType;
     class ArrayType;
@@ -297,6 +299,13 @@ namespace lang
         [[nodiscard]] lang::Type const& getActualType() const;
 
         /**
+         * Test whether this type is fitting a predicate or is a vector of a type that is fitting a predicate.
+         * @param predicate The predicate.
+         * @return True if this type is fitting the predicate or is a vector of a type that is fitting the predicate.
+         */
+        [[nodiscard]] bool isXOrVectorOfX(std::function<bool(lang::Type const&)> const& predicate) const;
+
+        /**
          * Get the accessibility for this type.
          * @return The accessibility.
          */
@@ -327,43 +336,43 @@ namespace lang
 
         /**
          * Get the default content of a value of this type.
-         * @param m The module.
+         * @param context The module.
          * @return The default content.
          */
-        llvm::Constant* getDefaultContent(llvm::Module& m) const;
+        llvm::Constant* getDefaultContent(CompileContext& context) const;
+
+        /**
+         * Get the default constant of this type.
+         * @return The default constant.
+         */
+        Shared<lang::Constant> getDefault(CompileContext& context);
 
         /**
          * Get the native type. Values of this type are passed around using this type.
-         * @param c The llvm context.
+         * @param context The compile context.
          * @return The native type.
          */
-        llvm::Type* getNativeType(llvm::LLVMContext& c) const;
+        llvm::Type* getNativeType(CompileContext& context) const;
         /**
          * Get the content type. The semantic meaning of this type uses the content type.
-         * @param c The llvm context.
+         * @param context The compile context.
          * @return The content type.
          */
-        llvm::Type* getContentType(llvm::LLVMContext& c) const;
+        llvm::Type* getContentType(CompileContext& context) const;
 
         /**
          * Get the debug type, containing information for debuggers.
          * @param context The current compile context.
          * @return The debug type.
          */
-        llvm::DIType* getDebugType(CompileContext& context) const;
+        Execution::Type getDebugType(CompileContext& context) const;
 
         /**
-         * Get the size of the native type.
-         * @param m The llvm module.
-         * @return The native size.
-         */
-        llvm::TypeSize getNativeSize(llvm::Module& m);
-        /**
          * Get the size of the content type.
-         * @param m The llvm module.
+         * @param context The compile context.
          * @return The content size.
          */
-        llvm::TypeSize getContentSize(llvm::Module& m);
+        llvm::TypeSize getContentSize(CompileContext& context) const;
 
         /**
          * See if the subscript operation is defined for this type.
@@ -430,11 +439,12 @@ namespace lang
         [[nodiscard]] bool hasMember(lang::Identifier const& name) const;
 
         /**
-         * Get the type of a member.
+         * Get the member with the given name.
+         * Check if the member exists before calling this function.
          * @param name The name of the member.
-         * @return The type of the member.
+         * @return The member.
          */
-        lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name);
+        Member& getMember(lang::Identifier const& name);
 
         /**
          * Get whether this type defines the indirection operator.
@@ -609,7 +619,7 @@ namespace lang
          * @param ptr A pointer to where the value should be initialized.
          * @param context The current compile context.
          */
-        void buildDefaultInitializer(llvm::Value* ptr, CompileContext& context);
+        void performDefaultInitializer(Shared<Value> ptr, CompileContext& context);
 
         /**
          * Build the default initializer for this type, initializing multiple instances.
@@ -617,22 +627,22 @@ namespace lang
          * @param count The number of instances to initialize.
          * @param context The current compile context.
          */
-        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context);
+        void performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context);
 
         /**
          * Build the copy initializer for this type.
-         * @param ptr A pointer to where the value should be initialized.
-         * @param original A pointer to the original value.
+         * @param destination A pointer to where the value should be initialized.
+         * @param source A pointer to the original value.
          * @param context The current compile context.
          */
-        void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context);
+        void performCopyInitializer(Shared<Value> destination, Shared<Value> source, CompileContext& context);
 
         /**
          * Build the destructor for this type.
          * @param ptr The pointer to the value to destruct.
          * @param context The current compile context.
          */
-        void buildFinalizer(llvm::Value* ptr, CompileContext& context);
+        void performFinalizer(Shared<Value> ptr, CompileContext& context);
 
         /**
          * Build the default destructor for this type.
@@ -640,7 +650,7 @@ namespace lang
          * @param count The number of instances to destruct.
          * @param context The current compile context.
          */
-        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context);
+        void performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context);
 
         /**
          * Build the native backing required for the declaration.
@@ -747,22 +757,7 @@ namespace lang
          * @param type The type to get the referenced type of.
          * @return The dereferenced type.
          */
-        static lang::ResolvingHandle<lang::Type> getReferencedType(lang::ResolvingHandle<lang::Type> type);
-
-        /**
-         * Get the referenced type, meaning the type itself if it is not a reference type, or the element type.
-         * @param type The type to get the referenced type of.
-         * @return The dereferenced type.
-         */
         static lang::Type const& getReferencedType(lang::Type const& type);
-
-        /**
-         * Get the value directly, or the referenced value if it is a reference type.
-         * @param value The value to get the referenced value of.
-         * @param context The current compile context.
-         * @return The referenced value.
-         */
-        static Shared<lang::Value> getValueOrReferencedValue(Shared<lang::Value> value, CompileContext& context);
 
         /**
          * Check if the actual types of two types are the same.
@@ -775,9 +770,10 @@ namespace lang
         /**
          * Get the value as its actual type.
          * @param value The value to change the type of.
+         * @param context The current compile context.
          * @return The value with the actual type.
          */
-        static Shared<lang::Value> makeActual(Shared<lang::Value> value);
+        static Shared<lang::Value> makeActual(Shared<lang::Value> value, CompileContext& context);
 
         /**
          * Get an undefined type with the same name. Types given by literals cannot be undefined.
@@ -845,6 +841,13 @@ namespace lang
          * @return The types to resolve.
          */
         std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies();
+
+        /**
+         * Whether this type is a compound type, meaning it is created from other types.
+         * Examples are arrays, vectors, pointers, structs, etc.
+         * @return True if this type is a compound type.
+         */
+        [[nodiscard]] bool isCompound();
 
       protected:
         lang::Callable&                     getFunctionSource() override;

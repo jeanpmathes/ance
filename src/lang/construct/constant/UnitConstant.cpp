@@ -20,9 +20,9 @@ lang::Type const& lang::UnitConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::UnitConstant::createContent(llvm::Module& m)
+llvm::Constant* lang::UnitConstant::createContent(CompileContext& context)
 {
-    return type_->getDefaultContent(m);
+    return type_->getDefaultContent(context);
 }
 
 bool lang::UnitConstant::equals(lang::Constant const* other) const

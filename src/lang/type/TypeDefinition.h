@@ -11,6 +11,7 @@
 #include "lang/Accessibility.h"
 #include "lang/BinaryOperator.h"
 #include "lang/UnaryOperator.h"
+#include "lang/construct/Function.h"
 #include "lang/type/StateCount.h"
 #include "lang/utility/Identifier.h"
 #include "lang/utility/Location.h"
@@ -117,14 +118,13 @@ namespace lang
         void postResolve();
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters);
 
-        virtual llvm::Constant* getDefaultContent(llvm::Module& m) const = 0;
+        virtual llvm::Constant* getDefaultContent(CompileContext& context) const = 0;
 
-        llvm::Type*         getNativeType(llvm::LLVMContext& c) const;
-        virtual llvm::Type* getContentType(llvm::LLVMContext& c) const = 0;
-        llvm::DIType*       getDebugType(CompileContext& context) const;
+        llvm::Type*         getNativeType(CompileContext& context) const;
+        virtual llvm::Type* getContentType(CompileContext& context) const = 0;
+        Execution::Type     getDebugType(CompileContext& context) const;
 
-        llvm::TypeSize getNativeSize(llvm::Module& m);
-        llvm::TypeSize getContentSize(llvm::Module& m);
+        llvm::TypeSize getContentSize(CompileContext& context) const;
 
         virtual bool                              isSubscriptDefined() const;
         virtual lang::ResolvingHandle<lang::Type> getSubscriptReturnType();
@@ -136,7 +136,7 @@ namespace lang
         virtual bool                              isImplicitlyConvertibleTo(lang::Type const& other) const;
         virtual bool                              isCastingPossibleTo(lang::Type const& other) const;
         virtual bool                              hasMember(lang::Identifier const& name) const;
-        virtual lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name);
+        virtual Member&                           getMember(lang::Identifier const&);
         virtual bool                              definesIndirection() const;
         virtual lang::ResolvingHandle<lang::Type> getIndirectionType();
 
@@ -179,11 +179,11 @@ namespace lang
                                                       CompileContext&         context);
         virtual Shared<lang::Value> buildIndirection(Shared<Value> value, CompileContext& context);
 
-        void         buildDefaultInitializer(llvm::Value* ptr, CompileContext& context);
-        virtual void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context);
-        virtual void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context);
-        void         buildFinalizer(llvm::Value* ptr, CompileContext& context);
-        virtual void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context);
+        void         performDefaultInitializer(Shared<Value> ptr, CompileContext& context);
+        virtual void performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context);
+        virtual void performCopyInitializer(Shared<Value> destination, Shared<Value> source, CompileContext& context);
+        void         performFinalizer(Shared<Value> ptr, CompileContext& context);
+        virtual void performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context);
 
         virtual void buildNativeDeclaration(CompileContext& context);
         virtual void buildNativeDefinition(CompileContext& context);
@@ -213,21 +213,21 @@ namespace lang
         /**
          * Build the part of the definition that default-initializes a single element of this type.
          */
-        virtual void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context);
+        virtual void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context);
         /**
          * Build the part of the definition that copies a single element of this type.
          */
-        virtual void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
-                                                          llvm::Value*    src_ptr,
-                                                          CompileContext& context);
+        virtual void performSingleCopyInitializerDefinition(Shared<lang::Value> dst_ptr,
+                                                            Shared<lang::Value> src_ptr,
+                                                            CompileContext& context);
         /**
          * Build the part of the definition that default-finalizes a single element of this type.
          */
-        virtual void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context);
+        virtual void buildSingleDefaultFinalizerDefinition(Shared<lang::Value>, CompileContext&);
 
         virtual std::string createMangledName() const = 0;
 
-        virtual llvm::DIType* createDebugType(CompileContext& context) const = 0;
+        virtual Execution::Type createDebugType(CompileContext& context) const = 0;
 
         virtual std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies();
         virtual std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies();
@@ -259,16 +259,14 @@ namespace lang
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self() const;
 
       protected:
-        llvm::Function* default_initializer_ {nullptr};
-        llvm::Function* copy_initializer_ {nullptr};
-        llvm::Function* default_finalizer_ {nullptr};
+        Optional<Execution::Function>        default_initializer_ {};
+        std::vector<Shared<lang::Parameter>> default_initializer_parameters_ {};
 
-      private:
-        void buildPointerIteration(llvm::Function*                                    function,
-                                   llvm::Value*                                       ptr,
-                                   llvm::Value*                                       count,
-                                   std::function<void(llvm::Value*, CompileContext&)> operation,
-                                   CompileContext&                                    context) const;
+        Optional<Execution::Function>        copy_initializer_ {};
+        std::vector<Shared<lang::Parameter>> copy_initializer_parameters_ {};
+
+        Optional<Execution::Function>        default_finalizer_ {};
+        std::vector<Shared<lang::Parameter>> default_finalizer_parameters_ {};
 
       private:
         lang::Identifier    name_;
@@ -276,7 +274,7 @@ namespace lang
         mutable std::string mangled_name_ {};
         lang::Type*         type_ {nullptr};
         lang::Scope*          containing_scope_ {nullptr};
-        mutable llvm::DIType* debug_type_ {nullptr};
+        mutable Optional<Execution::Type> debug_type_ {std::nullopt};
 
         lang::PredefinedFunction* default_constructor_ {nullptr};
 

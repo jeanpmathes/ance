@@ -11,8 +11,16 @@ Optional<T>::Optional(std::nullopt_t)
 {}
 
 template<Moveable T>
+Optional<T>::Optional(T const& value)
+    requires ConstCopyable<T>
+    : has_value_(true)
+{
+    new (storage_.data()) T(value);
+}
+
+template<Moveable T>
 Optional<T>::Optional(T value)
-    requires Copyable<T>
+    requires(!ConstCopyable<T> and Copyable<T>)
     : has_value_(true)
 {
     new (storage_.data()) T(std::move(value));
@@ -20,7 +28,7 @@ Optional<T>::Optional(T value)
 
 template<Moveable T>
 Optional<T>::Optional(T&& value)
-    requires(!Copyable<T>)
+    requires(!ConstCopyable<T> and !Copyable<T>)
     : has_value_(true)
 {
     new (storage_.data()) T(std::move(value));
@@ -38,8 +46,16 @@ Optional<T>& Optional<T>::operator=(T value)
 }
 
 template<Moveable T>
+Optional<T>::Optional(Optional<T> const& optional)
+    requires ConstCopyable<T>
+    : has_value_(optional.has_value_)
+{
+    if (has_value_) new (storage_.data()) T(*optional);
+}
+
+template<Moveable T>
 Optional<T>::Optional(Optional<T>& optional)
-    requires Copyable<T>
+    requires(!ConstCopyable<T> and Copyable<T>)
     : has_value_(optional.has_value_)
 {
     if (has_value_) new (storage_.data()) T(*optional);
@@ -56,6 +72,22 @@ Optional<T>::Optional(Optional<T>&& optional) noexcept : has_value_(optional.has
 
 template<Moveable T>
 template<typename OtherT>
+    requires ConstCopyConvertible<T, OtherT>
+Optional<T>::Optional(Optional<OtherT> const& optional) : has_value_(optional.has_value_)
+{
+    if (has_value_) new (storage_.data()) T(*optional);
+}
+
+template<Moveable T>
+template<typename OtherT>
+    requires(!ConstCopyConvertible<T, OtherT> and CopyConvertible<T, OtherT>)
+Optional<T>::Optional(Optional<OtherT>& optional) : has_value_(optional.has_value_)
+{
+    if (has_value_) new (storage_.data()) T(*optional);
+}
+
+template<Moveable T>
+template<typename OtherT>
     requires MoveConvertible<T, OtherT>
 Optional<T>::Optional(Optional<OtherT>&& optional) : has_value_(optional.has_value_)
 {
@@ -63,14 +95,6 @@ Optional<T>::Optional(Optional<OtherT>&& optional) : has_value_(optional.has_val
 
     optional.has_value_ = false;
     optional.storage_   = {};
-}
-
-template<Moveable T>
-template<typename OtherT>
-    requires CopyConvertible<T, OtherT>
-Optional<T>::Optional(Optional<OtherT>& optional) : has_value_(optional.has_value_)
-{
-    if (has_value_) new (storage_.data()) T(*optional);
 }
 
 template<Moveable T>

@@ -20,20 +20,10 @@ lang::Type const& lang::NoValue::type() const
 
 void lang::NoValue::buildNativeValue(CompileContext&)
 {
-    throw std::logic_error("Cannot build value provided by unexpanded expression.");
+    throw std::logic_error("Cannot build value provided by unexpanded expression");
 }
 
 void lang::NoValue::buildContentValue(CompileContext&)
 {
-    throw std::logic_error("Cannot build value provided by unexpanded expression.");
-}
-
-llvm::Value* lang::NoValue::getNativeValue() const
-{
-    throw std::logic_error("Cannot get value provided by unexpanded expression.");
-}
-
-llvm::Value* lang::NoValue::getContentValue() const
-{
-    throw std::logic_error("Cannot get value provided by unexpanded expression.");
+    throw std::logic_error("Cannot build value provided by unexpanded expression");
 }

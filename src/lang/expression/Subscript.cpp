@@ -67,9 +67,7 @@ Expression::Expansion Subscript::expandWith(Expressions subexpressions, lang::Co
 
 void Subscript::doBuild(CompileContext& context)
 {
-    Shared<lang::Value> return_value =
-        indexed_->type()->buildSubscript(indexed_->getValue(), index_->getValue(), context);
-    setValue(return_value);
+    setValue(indexed_->type()->buildSubscript(indexed_->getValue(), index_->getValue(), context));
 }
 
 Subscript::~Subscript() = default;

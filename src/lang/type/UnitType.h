@@ -15,8 +15,8 @@ namespace lang
 
         [[nodiscard]] StateCount getStateCount() const override;
 
-        llvm::Constant*   getDefaultContent(llvm::Module& m) const override;
-        llvm::StructType* getContentType(llvm::LLVMContext& c) const override;
+        llvm::Constant*   getDefaultContent(CompileContext& context) const override;
+        llvm::StructType* getContentType(CompileContext& context) const override;
 
         [[nodiscard]] bool isUnitType() const override;
 
@@ -33,13 +33,13 @@ namespace lang
                                                         Shared<Value>        right,
                                                         CompileContext&      context) override;
 
-        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context) override;
-        void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context) override;
-        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context) override;
+        void performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context) override;
+        void performCopyInitializer(Shared<Value> ptr, Shared<Value> original, CompileContext& context) override;
+        void performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context) override;
 
       protected:
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) const override;
+        Execution::Type createDebugType(CompileContext& context) const override;
 
       public:
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;

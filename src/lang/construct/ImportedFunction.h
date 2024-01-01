@@ -30,24 +30,22 @@ namespace lang
 
         [[nodiscard]] bool isMangled() const override;
         [[nodiscard]] bool isImported() const override;
+        AccessModifier     access() const override;
 
+      protected:
+        Optional<lang::Location> getDefinitionLocation() const override;
+        bool                     isConstructor() const override;
+
+      public:
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
-        void createNativeBacking(CompileContext& context) override;
         void build(CompileContext& context) override;
 
-        llvm::DIScope*                                      getDebugScope(CompileContext& context) const override;
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
-
-      protected:
-        [[nodiscard]] std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const override;
 
       private:
         lang::AccessModifier access_;
-
-        llvm::FunctionType* native_type_ {nullptr};
-        llvm::Function*     native_function_ {nullptr};
     };
 }
 

@@ -24,37 +24,33 @@ namespace lang
         [[nodiscard]] StateCount getStateCount() const override;
         bool                     isStructType() const override;
 
-        llvm::Constant*   getDefaultContent(llvm::Module& m) const override;
-        llvm::StructType* getContentType(llvm::LLVMContext& c) const override;
+        llvm::Constant*   getDefaultContent(CompileContext& context) const override;
+        llvm::StructType* getContentType(CompileContext& context) const override;
 
         bool                              hasMember(lang::Identifier const& name) const override;
-        lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name) override;
+        Member& getMember(lang::Identifier const& name) override;
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildMemberAccess(Shared<Value>           value,
                                               lang::Identifier const& name,
                                               CompileContext&         context) override;
 
       protected:
-        void buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context) override;
-        void buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
-                                                  llvm::Value*    src_ptr,
-                                                  CompileContext& context) override;
-        void buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context) override;
+        void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) override;
+        void performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
+                                                    Shared<lang::Value> src_ptr,
+                                                    CompileContext& context) override;
+        void buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) const override;
+        Execution::Type createDebugType(CompileContext& context) const override;
 
       public:
         std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies() override;
         std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies() override;
 
       private:
-        llvm::Value* buildGetElementPointer(llvm::Value* struct_ptr, int32_t member_index, CompileContext& context);
-
-      private:
         std::vector<std::reference_wrapper<lang::Member>>                members_;
         std::map<lang::Identifier, std::reference_wrapper<lang::Member>> member_map_ {};
-        std::map<lang::Identifier, int32_t>                              member_indices_ {};
 
         mutable llvm::StructType* native_type_ {nullptr};
     };

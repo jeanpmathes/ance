@@ -12,7 +12,7 @@ namespace lang
     {
       protected:
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) const override;
+        Execution::Type createDebugType(CompileContext& context) const override;
 
       public:
         ~FloatingPointType() override = default;
@@ -37,10 +37,6 @@ namespace lang
         Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
                                       Shared<Value>                     value,
                                       CompileContext&                   context) override;
-        Shared<Value>       buildCast(lang::ResolvingHandle<lang::Type> other,
-                                      Shared<Value>                     value,
-                                      lang::ResolvingHandle<lang::Type> element_type,
-                                      CompileContext&                   context) override;
 
         bool                              isOperatorDefined(lang::UnaryOperator op) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
@@ -50,10 +46,6 @@ namespace lang
         Shared<lang::Value>               buildOperator(lang::UnaryOperator op,
                                                         Shared<Value>       value,
                                                         CompileContext&     context) override;
-        Shared<lang::Value>               buildOperator(lang::UnaryOperator               op,
-                                                        Shared<Value>                     value,
-                                                        lang::ResolvingHandle<lang::Type> return_type,
-                                                        CompileContext&                   context) override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
@@ -67,11 +59,6 @@ namespace lang
                                                         Shared<Value>        left,
                                                         Shared<Value>        right,
                                                         CompileContext&      context) override;
-        Shared<Value>                     buildOperator(lang::BinaryOperator              op,
-                                                        Shared<Value>                     left,
-                                                        Shared<Value>                     right,
-                                                        lang::ResolvingHandle<lang::Type> return_type,
-                                                        CompileContext&                   context) override;
 
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;

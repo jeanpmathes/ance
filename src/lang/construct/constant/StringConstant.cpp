@@ -4,6 +4,7 @@
 
 #include <boost/locale/encoding_utf.hpp>
 
+#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Context.h"
 #include "lang/construct/constant/CharConstant.h"
@@ -35,38 +36,24 @@ lang::Type const& lang::StringConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::StringConstant::createContent(llvm::Module& m)
+llvm::Constant* lang::StringConstant::createContent(CompileContext& context)
 {
     switch (kind_)
     {
         case BYTE:
         {
             auto const& data = std::get<std::string>(data_);
-            return llvm::ConstantDataArray::getString(m.getContext(), data, false);
+            return context.exec().getByteStringConstant(data);
         }
         case CHAR:
         {
             auto const& data = std::get<std::u32string>(data_);
-            auto const* ptr  = reinterpret_cast<char const*>(data.data());
-            llvm::Type* type = type_->getElementType()->getContentType(m.getContext());
-
-            return llvm::ConstantDataArray::getRaw(ptr, data.size(), type);
+            return context.exec().getCodepointStringConstant(data);
         }
         case C_STRING:
         {
             auto const&     data        = std::get<std::string>(data_);
-            llvm::Constant* content     = llvm::ConstantDataArray::getString(m.getContext(), data, true);
-            auto*           str_arr_ptr = new llvm::GlobalVariable(m,
-                                                         content->getType(),
-                                                         true,
-                                                         llvm::GlobalValue::PrivateLinkage,
-                                                         content,
-                                                         "data.str");
-
-            llvm::Constant* zero = llvm::ConstantInt::get(llvm::Type::getInt64Ty(m.getContext()), 0);
-            std::array<llvm::Constant*, 2> const indices = {zero, zero};
-
-            return llvm::ConstantExpr::getInBoundsGetElementPtr(str_arr_ptr->getValueType(), str_arr_ptr, indices);
+            return context.exec().getCStringConstant(data);
         }
     }
 }

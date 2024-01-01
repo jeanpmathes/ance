@@ -3,25 +3,25 @@
 #include <utility>
 
 #include "compiler/CompileContext.h"
-#include "lang/utility/Values.h"
 
-lang::WrappedNativeValue::WrappedNativeValue(lang::ResolvingHandle<lang::Type> type, llvm::Value* value)
-    : type_(std::move(type))
-    , value_(value)
+lang::WrappedNativeValue::WrappedNativeValue(lang::ResolvingHandle<lang::Type> type) : type_(std::move(type))
 {}
 
-Shared<lang::Value> lang::WrappedNativeValue::makeDefault(lang::ResolvingHandle<lang::Type> type,
-                                                          CompileContext&                   context)
+lang::WrappedNativeValue::WrappedNativeValue(lang::ResolvingHandle<lang::Type> type,
+                                             llvm::Value*                      value,
+                                             CompileContext&                   context)
+    : type_(std::move(type))
 {
-    llvm::Value* content_value = type->getDefaultContent(context.llvmModule());
-    llvm::Value* native_value  = lang::values::contentToNative(type, content_value, context);
-
-    return makeShared<WrappedNativeValue>(type, native_value);
+    native_value_ = value;
+    assert(native_value_->getType() == type_->getNativeType(context));
 }
 
-void lang::WrappedNativeValue::setValue(llvm::Value* value)
+void lang::WrappedNativeValue::setValue(llvm::Value* value, CompileContext& context)
 {
-    value_ = value;
+    assert(native_value_ == nullptr);
+    assert(value->getType() == type_->getNativeType(context));
+
+    native_value_ = value;
 }
 
 lang::ResolvingHandle<lang::Type> lang::WrappedNativeValue::type()
@@ -35,9 +35,3 @@ lang::Type const& lang::WrappedNativeValue::type() const
 }
 
 void lang::WrappedNativeValue::buildNativeValue(CompileContext&) {}
-
-llvm::Value* lang::WrappedNativeValue::getNativeValue() const
-{
-    assert(value_);
-    return value_;
-}

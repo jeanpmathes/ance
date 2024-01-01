@@ -6,10 +6,8 @@
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/constant/Constant.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/expression/ConstantExpression.h"
 #include "lang/scope/GlobalScope.h"
-#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 namespace llvm
@@ -62,60 +60,7 @@ lang::Assigner lang::GlobalVariable::assigner() const
 
 void lang::GlobalVariable::buildDeclaration(CompileContext& context)
 {
-    llvm::Constant* native_initializer = nullptr;
-
-    if (init_.hasValue())
-    {
-        if (auto* constant_init = std::get_if<std::reference_wrapper<ConstantExpression>>(&init_.value()))
-        {
-            Shared<lang::Constant> initial_value = constant_init->get().getConstantValue();
-            initial_value->buildContentConstant(context.llvmModule());
-            native_initializer = initial_value->getContentConstant();
-        }
-        else
-        {
-            // Will be initialized at startup.
-            assert(std::holds_alternative<std::reference_wrapper<lang::Function>>(init_.value()));
-            native_initializer = llvm::Constant::getNullValue(type()->getContentType(context.llvmContext()));
-        }
-    }
-    else if (!is_import_) { native_initializer = type()->getDefaultContent(context.llvmModule()); }
-
-    llvm::Type*       native_type  = type()->getContentType(context.llvmModule().getContext());
-    std::string const linkage_name = std::string(name().text());
-
-    native_variable_ = new llvm::GlobalVariable(context.llvmModule(),
-                                                native_type,
-                                                is_constant_,
-                                                access_.linkage(),
-                                                native_initializer,
-                                                linkage_name,
-                                                nullptr,
-                                                llvm::GlobalValue::NotThreadLocal,
-                                                llvm::None,
-                                                is_import_);
-
-    llvm::GlobalValue::DLLStorageClassTypes dll_storage_class = llvm::GlobalValue::DefaultStorageClass;
-    if (access_ == AccessModifier::PUBLIC_ACCESS)
-    {
-        dll_storage_class =
-            is_import_ ? llvm::GlobalValue::DLLImportStorageClass : llvm::GlobalValue::DLLExportStorageClass;
-    }
-    native_variable_->setDLLStorageClass(dll_storage_class);
-    native_variable_->setDSOLocal(!is_import_);
-
-    llvm::MaybeAlign const alignment = context.llvmModule().getDataLayout().getABITypeAlign(native_type);
-    native_variable_->setAlignment(alignment);
-
-    auto* debug_info = context.di().createGlobalVariableExpression(&context.llvmUnit(),
-                                                                   name().text(),
-                                                                   name().text(),
-                                                                   context.getSourceFile(location()),
-                                                                   static_cast<unsigned>(location().line()),
-                                                                   type()->getDebugType(context),
-                                                                   access_ == AccessModifier::PRIVATE_ACCESS);
-
-    native_variable_->addDebugInfo(debug_info);
+    variable_handle_ = context.exec().createGlobalVariable(name(), access(), is_import_, type(), is_constant_, init_, location());
 }
 
 void lang::GlobalVariable::buildInitialization(CompileContext& context)
@@ -133,23 +78,23 @@ void lang::GlobalVariable::buildFinalization(CompileContext& context)
 {
     assert(not finalized_);
 
-    type()->buildFinalizer(native_variable_, context);
+    type()->performFinalizer(context.exec().computeAddressOfVariable(variable_handle_.value()), context);
 
     finalized_ = true;
 }
 
-Shared<lang::Value> lang::GlobalVariable::getValue(CompileContext&)
+Shared<lang::Value> lang::GlobalVariable::getValuePointer(CompileContext& context)
 {
-    assert(native_variable_);
-    return makeShared<lang::WrappedNativeValue>(type(), native_variable_);
+    assert(variable_handle_.hasValue());
+    return context.exec().computeAddressOfVariable(variable_handle_.value());
 }
 
 void lang::GlobalVariable::storeValue(Shared<lang::Value> value, CompileContext& context)
 {
-    assert(native_variable_);
+    assert(variable_handle_.hasValue());
 
-    value = lang::Type::makeMatching(type(), value, context);
-    value->buildNativeValue(context);
+    Shared<lang::Value> variable_pointer = context.exec().computeAddressOfVariable(variable_handle_.value());
+    Shared<lang::Value> value_pointer = context.exec().computeAddressOf(value);
 
-    type()->buildCopyInitializer(native_variable_, value->getNativeValue(), context);
+    type()->performCopyInitializer(variable_pointer, value_pointer, context);
 }

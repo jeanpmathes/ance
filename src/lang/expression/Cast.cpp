@@ -1,6 +1,7 @@
 #include "Cast.h"
 
 #include "lang/ApplicationVisitor.h"
+#include "lang/type/TypeDefinition.h"
 
 Cast::Cast(Owned<Expression>                 value,
            lang::ResolvingHandle<lang::Type> type,

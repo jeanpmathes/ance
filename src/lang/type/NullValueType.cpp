@@ -3,9 +3,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/type/Type.h"
-#include "lang/utility/Values.h"
 
 lang::NullValueType::NullValueType() : TypeDefinition(lang::Identifier::like("nullptr")) {}
 
@@ -33,23 +31,18 @@ Shared<lang::Value> lang::NullValueType::buildImplicitConversion(lang::Resolving
                                                                  Shared<Value>,
                                                                  CompileContext& context)
 {
-    llvm::Type* other_type = other->getContentType(context.llvmContext());
-    assert(other_type->isPointerTy());
-
-    llvm::Value* null         = llvm::ConstantPointerNull::get(llvm::dyn_cast<llvm::PointerType>(other_type));
-    llvm::Value* native_value = lang::values::contentToNative(other, null, context);
-
-    return makeShared<lang::WrappedNativeValue>(other, native_value);
+    return context.exec().getNull(other);
 }
 
-llvm::Constant* lang::NullValueType::getDefaultContent(llvm::Module& m) const
+llvm::Constant* lang::NullValueType::getDefaultContent(CompileContext& context) const
 {
-    return llvm::ConstantPointerNull::get(llvm::PointerType::get(llvm::Type::getInt8Ty(m.getContext()), 0));
+    return llvm::ConstantPointerNull::get(
+        llvm::PointerType::get(llvm::Type::getInt8Ty(context.exec().llvmContext()), 0));
 }
 
-llvm::Type* lang::NullValueType::getContentType(llvm::LLVMContext& c) const
+llvm::Type* lang::NullValueType::getContentType(CompileContext& context) const
 {
-    return llvm::PointerType::get(llvm::Type::getInt8Ty(c), 0);
+    return llvm::PointerType::get(llvm::Type::getInt8Ty(context.exec().llvmContext()), 0);
 }
 
 std::string lang::NullValueType::createMangledName() const
@@ -57,18 +50,9 @@ std::string lang::NullValueType::createMangledName() const
     return "nullptr";
 }
 
-llvm::DIType* lang::NullValueType::createDebugType(CompileContext& context) const
+Execution::Type lang::NullValueType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
-
-    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
-
-    std::string const name     = std::string(this->name().text());
-    auto              encoding = llvm::dwarf::DW_ATE_address;
-
-    llvm::DIType* di_type = context.di().createBasicType(name, size_in_bits, encoding);
-
-    return di_type;
+    return context.exec().registerOpaqueAddressType(self());
 }
 
 Optional<lang::ResolvingHandle<lang::Type>> lang::NullValueType::getPointeeType()

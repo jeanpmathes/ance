@@ -1,6 +1,5 @@
 #include "ImportedFunction.h"
 
-#include <set>
 #include <utility>
 
 #include "compiler/CompileContext.h"
@@ -42,6 +41,21 @@ bool lang::ImportedFunction::isImported() const
     return true;
 }
 
+lang::AccessModifier lang::ImportedFunction::access() const
+{
+    return access_;
+}
+
+Optional<lang::Location> lang::ImportedFunction::getDefinitionLocation() const
+{
+    return std::nullopt;
+}
+
+bool lang::ImportedFunction::isConstructor() const
+{
+    return false;
+}
+
 void lang::ImportedFunction::determineFlow() {}
 
 bool lang::ImportedFunction::validateFlow(ValidationLogger&) const
@@ -49,33 +63,10 @@ bool lang::ImportedFunction::validateFlow(ValidationLogger&) const
     return true;
 }
 
-void lang::ImportedFunction::createNativeBacking(CompileContext& context)
-{
-    std::tie(native_type_, native_function_) = createNativeFunction(llvm::GlobalValue::LinkageTypes::ExternalLinkage,
-                                                                    context.llvmContext(),
-                                                                    context.llvmModule());
-
-    lang::Function::setImportExportAttributes(native_function_, access_, true, context);
-
-    auto params = parameters();
-
-    for (unsigned int i = 0; i < params.size(); ++i) { params[i]->wrap(native_function_->getArg(i)); }
-}
-
 void lang::ImportedFunction::build(CompileContext&) {}
-
-llvm::DIScope* lang::ImportedFunction::getDebugScope(CompileContext&) const
-{
-    return native_function_->getSubprogram();
-}
 
 std::vector<lang::BasicBlock*> const& lang::ImportedFunction::getBasicBlocks() const
 {
     static std::vector<lang::BasicBlock*> const empty;
     return empty;
-}
-
-std::pair<llvm::FunctionType*, llvm::Function*> lang::ImportedFunction::getNativeRepresentation() const
-{
-    return std::make_pair(native_type_, native_function_);
 }

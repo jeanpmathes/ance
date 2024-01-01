@@ -4,7 +4,6 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/Scope.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
@@ -88,9 +87,7 @@ void VariableAccess::doBuild(CompileContext& context)
 {
     auto variable = lang::Type::makeMatching<lang::Variable>(variable_);
 
-    Shared<lang::Value> value = type()->getStateCount().isUnit()
-                                  ? lang::WrappedNativeValue::makeDefault(type(), context)
-                                  : variable->getValue(context);
+    Shared<lang::Value> value = type()->getStateCount().isUnit() ? context.exec().getDefaultValue(type()) : variable->getValue(context);
 
     setValue(value);
 }

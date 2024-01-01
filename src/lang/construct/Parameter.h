@@ -33,6 +33,13 @@ namespace lang
                   Identifier                        name,
                   lang::Location                    location);
 
+        /**
+         * Create a new parameter for usage in internal functions.
+         * This constructor requires less information.
+         * @param type The type of the parameter.
+         */
+        explicit Parameter(lang::ResolvingHandle<lang::Type> type);
+
         [[nodiscard]] lang::ResolvingHandle<lang::Type> type() override;
         [[nodiscard]] lang::Type const&                 type() const override;
 
@@ -62,11 +69,7 @@ namespace lang
 
         Shared<lang::Parameter> expand(lang::Context& new_context) const;
 
-        void buildNativeValue(CompileContext& context) override;
         void buildContentValue(CompileContext& context) override;
-
-        [[nodiscard]] llvm::Value* getNativeValue() const override;
-        [[nodiscard]] llvm::Value* getContentValue() const override;
 
         /**
          * Perform storage synchronization.
@@ -80,8 +83,7 @@ namespace lang
 
         lang::Location location_;
 
-        llvm::Value* native_value_ {nullptr};
-        llvm::Value* content_value_ {nullptr};
+        llvm::Argument* argument_ = nullptr;
     };
 }
 #endif

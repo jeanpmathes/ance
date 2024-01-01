@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 
+#include "compiler/Execution.h"
 #include "lang/Assigner.h"
 #include "lang/Element.h"
 
@@ -32,7 +33,7 @@ namespace lang
                       Scope&                                containing_scope,
                       bool                                  is_final,
                       Optional<Shared<lang::Value>>         value,
-                      unsigned                              parameter_no,
+                      Optional<unsigned>                    parameter_index,
                       lang::Location                        location);
 
         static lang::OwningHandle<lang::Variable> makeLocalVariable(Identifier const&                 name,
@@ -47,7 +48,7 @@ namespace lang
                                                                         lang::ResolvingHandle<lang::Type> type,
                                                                         lang::Location                    type_location,
                                                                         Shared<lang::Value>               value,
-                                                                        unsigned                          parameter_no,
+                                                                        unsigned       parameter_index,
                                                                         lang::Scope&   containing_scope,
                                                                         lang::Location location);
 
@@ -55,17 +56,16 @@ namespace lang
         void buildInitialization(CompileContext& context) override;
         void buildFinalization(CompileContext& context) override;
 
-        Shared<lang::Value> getValue(CompileContext& context) override;
+        Shared<lang::Value> getValuePointer(CompileContext& context) override;
 
       protected:
         void storeValue(Shared<lang::Value> value, CompileContext& context) override;
 
       private:
         Optional<Shared<lang::Value>> initial_value_;
-        unsigned                      parameter_no_;
+        Optional<unsigned>            parameter_index_;
 
-        llvm::Value*           native_value_ {};
-        llvm::DILocalVariable* local_debug_variable_ {nullptr};
+        Optional<Execution::LocalVariable> local_variable_;
     };
 }
 #endif

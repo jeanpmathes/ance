@@ -1,5 +1,6 @@
 #include "NullConstant.h"
 
+#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Context.h"
 #include "lang/type/NullValueType.h"
@@ -21,9 +22,9 @@ lang::Type const& lang::NullConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::NullConstant::createContent(llvm::Module& m)
+llvm::Constant* lang::NullConstant::createContent(CompileContext& context)
 {
-    return type_->getDefaultContent(m);
+    return type_->getDefaultContent(context);
 }
 
 bool lang::NullConstant::equals(lang::Constant const* other) const

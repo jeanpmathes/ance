@@ -2,11 +2,9 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/statement/Statement.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
-#include "lang/utility/Values.h"
 
 SizeofExpression::SizeofExpression(Owned<Expression> expression, lang::Location location)
     : Expression(location)
@@ -39,10 +37,5 @@ Expression::Expansion SizeofExpression::expandWith(Expressions subexpressions, l
 
 void SizeofExpression::doBuild(CompileContext& context)
 {
-    llvm::Value* content_value =
-        lang::SizeType::buildContentValue(expression_->type()->getContentSize(context.llvmModule()), context);
-    llvm::Value* native_value = lang::values::contentToNative(type(), content_value, context);
-
-    Shared<lang::WrappedNativeValue> value = makeShared<lang::WrappedNativeValue>(type(), native_value);
-    setValue(value);
+    setValue(context.exec().getSizeOf(expression_->type()));
 }

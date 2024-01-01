@@ -15,35 +15,35 @@ namespace lang
     {
       public:
         /**
+         * Create a new wrapped native value, the value can be set later.
+         * @param type The type of the value.
+         */
+        explicit WrappedNativeValue(lang::ResolvingHandle<lang::Type> type);
+
+        /**
          * Create a new wrapped native value.
          * @param type The type of the value.
-         * @param value The native value to wrap, can be set later.
-         */
-        explicit WrappedNativeValue(lang::ResolvingHandle<lang::Type> type, llvm::Value* value = nullptr);
-
-        /**
-         * Create a new wrapped native value with a default value for the given type.
-         * @param type The type of the value.
-         * @param context The compile context.
-         * @return The new wrapped native value.
-         */
-        static Shared<lang::Value> makeDefault(lang::ResolvingHandle<lang::Type> type, CompileContext& context);
-
-        /**
-         * Set the wraped value if it is not already set.
          * @param value The native value to wrap.
+         * @param context The compile context.
          */
-        void setValue(llvm::Value* value);
+        explicit WrappedNativeValue(lang::ResolvingHandle<lang::Type> type,
+                                    llvm::Value*                      value,
+                                    CompileContext&                   context);
+
+        /**
+         * Set the wrapped value if it is not already set.
+         * @param value The native value to wrap.
+         * @param context The compile context.
+         */
+        void setValue(llvm::Value* value, CompileContext& context);
 
         lang::ResolvingHandle<lang::Type> type() override;
         [[nodiscard]] lang::Type const&   type() const override;
 
         void                       buildNativeValue(CompileContext& context) override;
-        [[nodiscard]] llvm::Value* getNativeValue() const override;
 
       private:
         lang::ResolvingHandle<lang::Type> type_;
-        llvm::Value*                      value_;
     };
 }
 #endif

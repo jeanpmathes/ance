@@ -16,7 +16,7 @@ namespace lang
         StructScope(Scope& parent, lang::ResolvingHandle<lang::Type> self);
 
         [[nodiscard]] bool isPartOfFunction() const override;
-        llvm::DIScope*     getDebugScope(CompileContext& context) const override;
+        Execution::Scoped  getDebugScope(CompileContext& context) const override;
 
       private:
         lang::Scope*                      parent_;

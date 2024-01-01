@@ -4,9 +4,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/GlobalScope.h"
-#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::ReferenceType::ReferenceType(lang::ResolvingHandle<lang::Type> element_type)
@@ -52,19 +50,19 @@ lang::Type const& lang::ReferenceType::getActualType() const
     return actual_type_.value();
 }
 
-llvm::Constant* lang::ReferenceType::getDefaultContent(llvm::Module& m) const
+llvm::Constant* lang::ReferenceType::getDefaultContent(CompileContext& context) const
 {
     // A default value for a reference does not make sense, except for zero-sized types.
     // They are not stored anywhere, so we can just return a null pointer.
 
     assert(element_type_->getStateCount().isUnit());
 
-    return llvm::ConstantPointerNull::get(llvm::PointerType::get(element_type_->getContentType(m.getContext()), 0));
+    return llvm::ConstantPointerNull::get(llvm::PointerType::get(element_type_->getContentType(context), 0));
 }
 
-llvm::PointerType* lang::ReferenceType::getContentType(llvm::LLVMContext& c) const
+llvm::PointerType* lang::ReferenceType::getContentType(CompileContext& context) const
 {
-    return llvm::PointerType::get(element_type_->getContentType(c), 0);
+    return llvm::PointerType::get(element_type_->getContentType(context), 0);
 }
 
 bool lang::ReferenceType::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -103,7 +101,7 @@ Shared<lang::Value> lang::ReferenceType::buildSubscript(Shared<Value>   indexed,
                                                         Shared<Value>   index,
                                                         CompileContext& context)
 {
-    return element_type_->buildSubscript(getReferenced(indexed, context), index, context);
+    return element_type_->buildSubscript(context.exec().performDereference(indexed), index, context);
 }
 
 bool lang::ReferenceType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
@@ -131,7 +129,7 @@ Shared<lang::Value> lang::ReferenceType::buildOperator(lang::BinaryOperator op,
                                                        Shared<Value>        right,
                                                        CompileContext&      context)
 {
-    return element_type_->buildOperator(op, getReferenced(left, context), right, context);
+    return element_type_->buildOperator(op, context.exec().performDereference(left), right, context);
 }
 
 bool lang::ReferenceType::isOperatorDefined(lang::UnaryOperator op) const
@@ -155,7 +153,7 @@ Shared<lang::Value> lang::ReferenceType::buildOperator(lang::UnaryOperator op,
                                                        Shared<Value>       value,
                                                        CompileContext&     context)
 {
-    return element_type_->buildOperator(op, getReferenced(value, context), context);
+    return element_type_->buildOperator(op, context.exec().performDereference(value), context);
 }
 
 bool lang::ReferenceType::hasMember(lang::Identifier const& name) const
@@ -163,9 +161,9 @@ bool lang::ReferenceType::hasMember(lang::Identifier const& name) const
     return element_type_->hasMember(name);
 }
 
-lang::ResolvingHandle<lang::Type> lang::ReferenceType::getMemberType(lang::Identifier const& name)
+lang::Member& lang::ReferenceType::getMember(lang::Identifier const& name)
 {
-    return element_type_->getMemberType(name);
+    return element_type_->getMember(name);
 }
 
 bool lang::ReferenceType::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const
@@ -197,22 +195,22 @@ bool lang::ReferenceType::validateIndirection(lang::Location location, Validatio
 
 Shared<lang::Value> lang::ReferenceType::buildIndirection(Shared<Value> value, CompileContext& context)
 {
-    return element_type_->buildIndirection(getReferenced(value, context), context);
+    return element_type_->buildIndirection(context.exec().performDereference(value), context);
 }
 
-void lang::ReferenceType::buildDefaultInitializer(llvm::Value*, llvm::Value*, CompileContext&)
+void lang::ReferenceType::performDefaultInitializer(Shared<Value>, Shared<Value>, CompileContext&)
 {
-    throw std::logic_error("Reference does not have a default value.");
+    throw std::logic_error("Reference does not have a default value");
 }
 
-void lang::ReferenceType::buildCopyInitializer(llvm::Value*, llvm::Value*, CompileContext&)
+void lang::ReferenceType::performCopyInitializer(Shared<Value>, Shared<Value>, CompileContext&)
 {
-    throw std::logic_error("Reference does not have a copy value.");
+    throw std::logic_error("Reference does not have a copy value");
 }
 
-void lang::ReferenceType::buildFinalizer(llvm::Value*, llvm::Value*, CompileContext&)
+void lang::ReferenceType::performFinalizer(Shared<Value>, Shared<Value>, CompileContext&)
 {
-    throw std::logic_error("Reference does not have a finalizer.");
+    throw std::logic_error("Reference does not have a finalizer");
 }
 
 void lang::ReferenceType::createConstructors() {}
@@ -226,33 +224,9 @@ std::string lang::ReferenceType::createMangledName() const
     return std::string("ref") + "(" + element_type_->getMangledName() + ")";
 }
 
-llvm::DIType* lang::ReferenceType::createDebugType(CompileContext& context) const
+Execution::Type lang::ReferenceType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl = context.llvmModule().getDataLayout();
-
-    uint64_t const size_in_bits = dl.getTypeSizeInBits(getContentType(context.llvmContext()));
-
-    llvm::DIType* di_type;
-
-    llvm::DIType* element_di_type = element_type_->getDebugType(context);
-    di_type = context.di().createReferenceType(llvm::dwarf::DW_TAG_reference_type, element_di_type, size_in_bits);
-
-    return di_type;
-}
-
-llvm::Value* lang::ReferenceType::getReferenced(llvm::Value* value, CompileContext& context) const
-{
-    return context.ir().CreateLoad(getContentType(context.llvmContext()), value, value->getName() + ".load");
-}
-
-Shared<lang::Value> lang::ReferenceType::getReferenced(Shared<lang::Value> value, CompileContext& context)
-{
-    value->buildNativeValue(context);
-
-    llvm::Value* native_reference = value->getNativeValue();
-    llvm::Value* native_referred  = getReferenced(native_reference, context);
-
-    return makeShared<lang::WrappedNativeValue>(element_type_, native_referred);
+    return context.exec().registerReferenceType(self());
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::ReferenceType::getDeclarationDependencies()

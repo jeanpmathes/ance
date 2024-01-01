@@ -3,12 +3,10 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
+#include "lang/construct/value/RoughlyCastedValue.h"
 #include "lang/construct/value/Value.h"
-#include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/scope/Scope.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
-#include "lang/utility/Values.h"
 
 lang::AddressType const* lang::AddressType::isAddressType() const
 {
@@ -18,24 +16,6 @@ lang::AddressType const* lang::AddressType::isAddressType() const
 StateCount lang::AddressType::getStateCount() const
 {
     return SpecialCount::ABSTRACT;
-}
-
-bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
-{
-    lang::Type const& real_other = lang::Type::getReferencedType(other);
-
-    if (op.isEquality() || (op == lang::BinaryOperator::SUBTRACTION && getPointeeType() != nullptr))
-    {
-        return lang::Type::areSame(real_other, self());
-    }
-
-    if (op == lang::BinaryOperator::ADDITION && getPointeeType() != nullptr)
-    {
-        // The size is only required because implicit operator argument casting does not work yet.
-        return real_other.isDiffType() || real_other.isSizeType();
-    }
-
-    return false;
 }
 
 bool lang::AddressType::isCastingPossibleTo(lang::Type const& other) const
@@ -61,34 +41,30 @@ Shared<lang::Value> lang::AddressType::buildCast(lang::ResolvingHandle<lang::Typ
                                                  CompileContext&                   context)
 {
     if (other->isAddressType())
-    {
-        value->buildContentValue(context);
-        llvm::Value* content = value->getContentValue();
-
-        llvm::Value* result_content = context.ir().CreateBitCast(content,
-                                                                 other->getContentType(context.llvmContext()),
-                                                                 content->getName() + ".bitcast");
-
-        llvm::Value* result_native = lang::values::contentToNative(other, result_content, context);
-
-        return makeShared<lang::WrappedNativeValue>(other, result_native);
-    }
+    { return context.exec().computeCastedAddress(value, other); }
 
     if (other->isUnsignedIntegerPointerType())
-    {
-        value->buildContentValue(context);
-        llvm::Value* content = value->getContentValue();
-
-        llvm::Value* result_content = context.ir().CreatePtrToInt(content,
-                                                                  other->getContentType(context.llvmContext()),
-                                                                  content->getName() + ".ptrtoint");
-
-        llvm::Value* result_native = lang::values::contentToNative(other, result_content, context);
-
-        return makeShared<lang::WrappedNativeValue>(other, result_native);
-    }
+    { return context.exec().computePointerToInteger(value); }
 
     throw std::logic_error("Invalid cast");
+}
+
+bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
+{
+    lang::Type const& real_other = lang::Type::getReferencedType(other);
+
+    if (op.isEquality() || (op == lang::BinaryOperator::SUBTRACTION && getPointeeType() != nullptr))
+    {
+        return lang::Type::areSame(real_other, self());
+    }
+
+    if (op == lang::BinaryOperator::ADDITION && getPointeeType() != nullptr)
+    {
+        // The type 'size' is allowed here only because implicit conversion for operators does not work yet.
+        return real_other.isSizeType() || real_other.isDiffType();
+    }
+
+    return false;
 }
 
 lang::ResolvingHandle<lang::Type> lang::AddressType::getOperatorResultType(lang::BinaryOperator op,
@@ -117,56 +93,31 @@ Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
                                                      Shared<Value>        right,
                                                      CompileContext&      context)
 {
-    right = lang::Type::getValueOrReferencedValue(right, context);
+    if (right->type()->isReferenceType()) right = context.exec().performDereference(right);
 
-    left->buildContentValue(context);
-    right->buildContentValue(context);
-
-    llvm::Value* left_value  = left->getContentValue();
-    llvm::Value* right_value = right->getContentValue();
-
-    llvm::Value* result;
-
-    switch (op)
+    if (op.isEquality())
     {
-        case lang::BinaryOperator::EQUAL:
-            result = context.ir().CreateICmpEQ(left_value, right_value, left_value->getName() + ".icmp");
-            break;
-        case lang::BinaryOperator::NOT_EQUAL:
-            result = context.ir().CreateICmpNE(left_value, right_value, left_value->getName() + ".icmp");
-            break;
-        case lang::BinaryOperator::ADDITION:
-            if (getPointeeType().value()->getStateCount().isUnit())
-                result = getOperatorResultType(op, right->type())->getDefaultContent(context.llvmModule());
-            else
-                result = context.ir().CreateGEP(getPointeeType().value()->getContentType(context.llvmContext()),
-                                                left_value,
-                                                right_value,
-                                                left_value->getName() + ".gep");
-            break;
-        case lang::BinaryOperator::SUBTRACTION:
-            if (getPointeeType().value()->getStateCount().isUnit())
-                result = getOperatorResultType(op, right->type())->getDefaultContent(context.llvmModule());
-            else
-            {
-                result = context.ir().CreatePtrDiff(getPointeeType().value()->getContentType(context.llvmContext()),
-                                                    left_value,
-                                                    right_value,
-                                                    left_value->getName() + ".ptrdiff");
-                result =
-                    context.ir().CreateIntCast(result,
-                                               context.types().getDiffType()->getContentType(context.llvmContext()),
-                                               true,
-                                               left_value->getName() + ".icast");
-            }
-            break;
+        Shared<lang::Value> left_as_integer  = context.exec().computePointerToInteger(left);
+        Shared<lang::Value> right_as_integer = context.exec().computePointerToInteger(right);
 
-        default:
-            throw std::logic_error("Invalid operator for address type");
+        return context.exec().performOperator(op, left_as_integer, right_as_integer);
     }
 
-    lang::ResolvingHandle<lang::Type> result_type   = getOperatorResultType(op, right->type());
-    llvm::Value*                      native_result = lang::values::contentToNative(result_type, result, context);
+    if (op == lang::BinaryOperator::ADDITION)
+    {
+        if (getPointeeType().value()->getStateCount().isUnit())
+            return context.exec().getDefaultValue(getOperatorResultType(op, right->type()));
+        else
+        {
+            if (right->type()->isSizeType())
+                right = right->type()->buildImplicitConversion(context.ctx().getDiffType(), right, context);
+            Shared<lang::Value> pointer =
+                context.exec().computeElementPointer(left, right, Execution::IndexingMode::POINTER, std::nullopt);
+            return makeShared<lang::RoughlyCastedValue>(self(), pointer, context);
+        }
+    }
 
-    return makeShared<lang::WrappedNativeValue>(result_type, native_result);
+    if (op == lang::BinaryOperator::SUBTRACTION) { return context.exec().computeAddressDiff(left, right); }
+
+    throw std::logic_error("Invalid operator for address type");
 }

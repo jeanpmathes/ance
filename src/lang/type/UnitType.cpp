@@ -13,16 +13,16 @@ StateCount lang::UnitType::getStateCount() const
     return StateCount::unit();
 }
 
-llvm::Constant* lang::UnitType::getDefaultContent(llvm::Module& m) const
+llvm::Constant* lang::UnitType::getDefaultContent(CompileContext& context) const
 {
-    return llvm::ConstantStruct::get(getContentType(m.getContext()), {});
+    return llvm::ConstantStruct::get(getContentType(context), {});
 }
 
-llvm::StructType* lang::UnitType::getContentType(llvm::LLVMContext& c) const
+llvm::StructType* lang::UnitType::getContentType(CompileContext& context) const
 {
     if (!native_type_)
     {
-        native_type_ = llvm::StructType::create(c, "unit");
+        native_type_ = llvm::StructType::create(context.exec().llvmContext(), "unit");
 
         std::vector<llvm::Type*> const elements;
         native_type_->setBody(elements, false);
@@ -36,9 +36,9 @@ std::string lang::UnitType::createMangledName() const
     return std::string(name().text());
 }
 
-llvm::DIType* lang::UnitType::createDebugType(CompileContext& context) const
+Execution::Type lang::UnitType::createDebugType(CompileContext& context) const
 {
-    return context.di().createUnspecifiedType(name().text());
+    return context.exec().registerUnitType(self());
 }
 
 bool lang::UnitType::isUnitType() const
@@ -46,17 +46,17 @@ bool lang::UnitType::isUnitType() const
     return true;
 }
 
-void lang::UnitType::buildDefaultInitializer(llvm::Value*, llvm::Value*, CompileContext&)
+void lang::UnitType::performDefaultInitializer(Shared<Value>, Shared<Value>, CompileContext&)
 {
     // No runtime initialization required.
 }
 
-void lang::UnitType::buildCopyInitializer(llvm::Value*, llvm::Value*, CompileContext&)
+void lang::UnitType::performCopyInitializer(Shared<Value>, Shared<Value>, CompileContext&)
 {
     // No runtime copy required.
 }
 
-void lang::UnitType::buildFinalizer(llvm::Value*, llvm::Value*, CompileContext&)
+void lang::UnitType::performFinalizer(Shared<Value>, Shared<Value>, CompileContext&)
 {
     // No runtime finalization required.
 }
@@ -95,5 +95,5 @@ Shared<lang::Value> lang::UnitType::buildOperator(lang::BinaryOperator op,
 
     if (op == BinaryOperator::NOT_EQUAL) return BooleanConstant::createFalse(scope()->context());
 
-    throw std::logic_error("Unit type does not support operator '" + op.toString() + "'.");
+    throw std::logic_error("Unit type does not support operator '" + op.toString() + "'");
 }

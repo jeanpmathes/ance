@@ -10,6 +10,8 @@ target_sources(ance PRIVATE AnceCompiler.cpp
                ControlFlowGraphPrinter.cpp
                UnitResult.cpp
                Project.cpp
+               Execution.cpp
+               NativeBuild.cpp
                Unit.cpp
                ProjectDescription.cpp
                OptLevel.cpp

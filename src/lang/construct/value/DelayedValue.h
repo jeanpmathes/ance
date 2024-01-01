@@ -28,12 +28,13 @@ namespace lang
          */
         void setValue(Shared<lang::Value> value);
 
-        void                       buildNativeValue(CompileContext& context) override;
-        [[nodiscard]] llvm::Value* getNativeValue() const override;
+        void buildNativeValue(CompileContext& context) override;
+        void buildContentValue(CompileContext& context) override;
 
       private:
         Passed<DelayableExpression>   expression_;
         Optional<Shared<lang::Value>> value_ {};
+        bool                          built_ = false;
     };
 }
 

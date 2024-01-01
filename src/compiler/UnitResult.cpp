@@ -35,7 +35,7 @@ void UnitResult::addLinkerArguments(std::vector<char const*>& args, std::string 
                 break;
         }
     }
-    else { throw std::logic_error("Not supported."); }
+    else { throw std::logic_error("Not supported"); }
 }
 
 std::string UnitResult::getExtension(llvm::Triple const& triple) const
@@ -55,6 +55,6 @@ std::string UnitResult::getExtension(llvm::Triple const& triple) const
         }
 
         default:
-            throw std::logic_error("Not supported.");
+            throw std::logic_error("Not supported");
     }
 }

@@ -35,8 +35,11 @@ namespace lang
 
         [[nodiscard]] bool isMangled() const override;
 
-        void createNativeBacking(CompileContext& context) override;
+      protected:
+        Optional<lang::Location> getDefinitionLocation() const override;
+        bool                     isConstructor() const override;
 
+      public:
         /**
          * Create a code block that initializes a global variable.
          * @param variable The variable to initialize.

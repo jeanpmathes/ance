@@ -1,5 +1,6 @@
 #include "BooleanConstant.h"
 
+#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Context.h"
 #include "lang/type/BooleanType.h"
@@ -24,10 +25,9 @@ lang::Type const& lang::BooleanConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::BooleanConstant::createContent(llvm::Module& m)
+llvm::Constant* lang::BooleanConstant::createContent(CompileContext& context)
 {
-    return boolean_ ? llvm::ConstantInt::getTrue(type_->getContentType(m.getContext()))
-                    : llvm::ConstantInt::getFalse(type_->getContentType(m.getContext()));
+    return context.exec().getBooleanConstant(boolean_);
 }
 
 bool lang::BooleanConstant::equals(lang::Constant const* other) const

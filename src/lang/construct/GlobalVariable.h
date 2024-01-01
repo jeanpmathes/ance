@@ -4,9 +4,11 @@
 #include "VariableDefinition.h"
 
 #include <string>
+#include <variant>
 
 #include <llvm/IR/LLVMContext.h>
 
+#include "compiler/Execution.h"
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
 #include "lang/Element.h"
@@ -30,9 +32,6 @@ namespace lang
         : public VariableDefinition
     {
       public:
-        using Initializer =
-            Optional<std::variant<std::reference_wrapper<lang::Function>, std::reference_wrapper<ConstantExpression>>>;
-
         /**
          * Create a new global variable definition.
          */
@@ -42,7 +41,7 @@ namespace lang
                        Scope&                                containing_scope,
                        lang::AccessModifier                  access,
                        bool                                  is_import,
-                       Initializer                           init,
+                       lang::Initializer                     init,
                        lang::Scope*                          init_scope,
                        Assigner                              assigner,
                        bool                                  is_constant,
@@ -56,7 +55,7 @@ namespace lang
         void buildInitialization(CompileContext& context) override;
         void buildFinalization(CompileContext& context) override;
 
-        Shared<lang::Value> getValue(CompileContext& context) override;
+        Shared<lang::Value> getValuePointer(CompileContext& context) override;
 
       protected:
         void storeValue(Shared<lang::Value> value, CompileContext& context) override;
@@ -69,7 +68,7 @@ namespace lang
         lang::Scope*         init_scope_;
         Assigner             assigner_;
 
-        llvm::GlobalVariable* native_variable_ {nullptr};
+        Optional<Execution::GlobalVariable> variable_handle_;
         bool                  finalized_ {false};
     };
 }

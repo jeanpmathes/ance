@@ -3,8 +3,9 @@
 #include <queue>
 #include <utility>
 
+#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/Function.h"
+#include "lang/construct/constant/WrappedConstant.h"
 #include "lang/construct/value/RoughlyCastedValue.h"
 #include "lang/type/ArrayType.h"
 #include "lang/type/FixedWidthIntegerType.h"
@@ -260,6 +261,11 @@ lang::Type const& lang::Type::getActualType() const
     return definition_.value()->getActualType();
 }
 
+bool lang::Type::isXOrVectorOfX(std::function<bool(lang::Type const&)> const& predicate) const
+{
+    return predicate(*this) || (isVectorType() && getElementType().isXOrVectorOfX(predicate));
+}
+
 lang::Accessibility const& lang::Type::getAccessibility() const
 {
     assert(isDefined());
@@ -300,40 +306,40 @@ bool lang::Type::enableImplicitConversionOnCall() const
     return false;
 }
 
-llvm::Constant* lang::Type::getDefaultContent(llvm::Module& m) const
+llvm::Constant* lang::Type::getDefaultContent(CompileContext& context) const
 {
     assert(isDefined());
-    return definition_.value()->getDefaultContent(m);
+    return definition_.value()->getDefaultContent(context);
 }
 
-llvm::Type* lang::Type::getNativeType(llvm::LLVMContext& c) const
+Shared<lang::Constant> lang::Type::getDefault(CompileContext& context)
+{
+    llvm::Constant* content = getDefaultContent(context);
+    return makeShared<lang::WrappedConstant>(self(), content);
+}
+
+llvm::Type* lang::Type::getNativeType(CompileContext& context) const
 {
     assert(isDefined());
-    return definition_.value()->getNativeType(c);
+    return definition_.value()->getNativeType(context);
 }
 
-llvm::Type* lang::Type::getContentType(llvm::LLVMContext& c) const
+llvm::Type* lang::Type::getContentType(CompileContext& context) const
 {
     assert(isDefined());
-    return definition_.value()->getContentType(c);
+    return definition_.value()->getContentType(context);
 }
 
-llvm::DIType* lang::Type::getDebugType(CompileContext& context) const
+Execution::Type lang::Type::getDebugType(CompileContext& context) const
 {
     assert(isDefined());
     return definition_.value()->getDebugType(context);
 }
 
-llvm::TypeSize lang::Type::getNativeSize(llvm::Module& m)
+llvm::TypeSize lang::Type::getContentSize(CompileContext& context) const
 {
     assert(isDefined());
-    return definition_.value()->getNativeSize(m);
-}
-
-llvm::TypeSize lang::Type::getContentSize(llvm::Module& m)
-{
-    assert(isDefined());
-    return definition_.value()->getContentSize(m);
+    return definition_.value()->getContentSize(context);
 }
 
 bool lang::Type::isSubscriptDefined() const
@@ -391,10 +397,10 @@ bool lang::Type::hasMember(lang::Identifier const& name) const
     return definition_.value()->hasMember(name);
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::getMemberType(lang::Identifier const& name)
+lang::Member& lang::Type::getMember(lang::Identifier const& name)
 {
     assert(isDefined());
-    return definition_.value()->getMemberType(name);
+    return definition_.value()->getMember(name);
 }
 
 bool lang::Type::definesIndirection() const
@@ -528,34 +534,34 @@ Shared<lang::Value> lang::Type::buildIndirection(Shared<Value> value, CompileCon
     return definition_.value()->buildIndirection(std::move(value), context);
 }
 
-void lang::Type::buildDefaultInitializer(llvm::Value* ptr, CompileContext& context)
+void lang::Type::performDefaultInitializer(Shared<Value> ptr, CompileContext& context)
 {
     assert(isDefined());
-    definition_.value()->buildDefaultInitializer(ptr, context);
+    definition_.value()->performDefaultInitializer(ptr, context);
 }
 
-void lang::Type::buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context)
+void lang::Type::performCopyInitializer(Shared<Value> destination, Shared<Value> source, CompileContext& context)
 {
     assert(isDefined());
-    definition_.value()->buildCopyInitializer(ptr, original, context);
+    definition_.value()->performCopyInitializer(destination, source, context);
 }
 
-void lang::Type::buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
+void lang::Type::performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context)
 {
     assert(isDefined());
-    definition_.value()->buildDefaultInitializer(ptr, count, context);
+    definition_.value()->performDefaultInitializer(ptr, count, context);
 }
 
-void lang::Type::buildFinalizer(llvm::Value* ptr, CompileContext& context)
+void lang::Type::performFinalizer(Shared<Value> ptr, CompileContext& context)
 {
     assert(isDefined());
-    definition_.value()->buildFinalizer(ptr, context);
+    definition_.value()->performFinalizer(ptr, context);
 }
 
-void lang::Type::buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context)
+void lang::Type::performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context)
 {
     assert(isDefined());
-    definition_.value()->buildFinalizer(ptr, count, context);
+    definition_.value()->performFinalizer(ptr, count, context);
 }
 
 void lang::Type::buildNativeDeclaration(CompileContext& context)
@@ -624,27 +630,19 @@ Shared<lang::Value> lang::Type::makeMatching(lang::ResolvingHandle<lang::Type> e
                                              Shared<lang::Value>               value,
                                              CompileContext&                   context)
 {
-    if (areSame(expected, value->type())) return makeActual(value);
+    if (areSame(expected, value->type())) return makeActual(value, context);
 
     if (value->type()->isImplicitlyConvertibleTo(expected))
         return value->type()->buildImplicitConversion(expected, value, context);
 
     if (value->type()->isReferenceType())
     {
-        auto* reference_type           = dynamic_cast<lang::ReferenceType*>(value->type()->definition_.value().get());
-        Shared<lang::Value> referenced = reference_type->getReferenced(value, context);
-
+        Shared<lang::Value> referenced = context.exec().performDereference(value);
         return makeMatching(expected, referenced, context);
     }
 
     assert(false && "Cannot make the value matching, was mismatch checked before?");
     throw std::logic_error("Cannot make the value matching, was mismatch checked before?");
-}
-
-lang::ResolvingHandle<lang::Type> lang::Type::getReferencedType(lang::ResolvingHandle<lang::Type> type)
-{
-    if (type->isReferenceType()) type = type->getElementType();
-    return type;
 }
 
 lang::Type const& lang::Type::getReferencedType(lang::Type const& type)
@@ -653,28 +651,17 @@ lang::Type const& lang::Type::getReferencedType(lang::Type const& type)
     return type;
 }
 
-Shared<lang::Value> lang::Type::getValueOrReferencedValue(Shared<lang::Value> value, CompileContext& context)
-{
-    if (value->type()->isReferenceType())
-    {
-        auto* reference_type = dynamic_cast<lang::ReferenceType*>(value->type()->definition_.value().get());
-        return reference_type->getReferenced(value, context);
-    }
-
-    return value;
-}
-
 bool lang::Type::areSame(lang::Type const& lhs, lang::Type const& rhs)
 {
     return lhs.getActualType() == rhs.getActualType();
 }
 
-Shared<lang::Value> lang::Type::makeActual(Shared<lang::Value> value)
+Shared<lang::Value> lang::Type::makeActual(Shared<lang::Value> value, CompileContext& context)
 {
     lang::ResolvingHandle<lang::Type> actual_type = value->type()->getActualType();
     if (actual_type == value->type()) return value;
 
-    return makeShared<lang::RoughlyCastedValue>(actual_type, value);
+    return makeShared<lang::RoughlyCastedValue>(actual_type, value, context);
 }
 
 lang::ResolvingHandle<lang::Type> lang::Type::getUndefinedTypeClone(lang::Context& new_context) const
@@ -864,6 +851,11 @@ std::vector<lang::ResolvingHandle<lang::Type>> lang::Type::getDefinitionDependen
     }
 
     return extracted;
+}
+
+bool lang::Type::isCompound()
+{
+    return !getDeclarationDependencies().empty() || !getDefinitionDependencies().empty();
 }
 
 enum TypeClass : uint8_t

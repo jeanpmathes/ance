@@ -101,10 +101,10 @@ void Expression::doAssign(Shared<lang::Value> value, CompileContext& context)
     value                                 = lang::Type::makeMatching(target_type, value, context);
     Shared<lang::Value> expression_return = getValue();
 
-    expression_return->buildContentValue(context);
-    value->buildNativeValue(context);
+    Shared<lang::Value> return_pointer = context.exec().computePointerFromReference(expression_return);
+    Shared<lang::Value> value_pointer  = context.exec().computeAddressOf(value);
 
-    target_type->buildCopyInitializer(expression_return->getContentValue(), value->getNativeValue(), context);
+    target_type->performCopyInitializer(return_pointer, value_pointer, context);
 }
 
 void Expression::addSubexpression(Expression& subexpression)

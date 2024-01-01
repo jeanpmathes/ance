@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "compiler/Execution.h"
 #include "lang/Element.h"
 #include "lang/construct/BasicBlock.h"
 #include "lang/construct/Parameter.h"
@@ -155,7 +156,7 @@ namespace lang
          * Create the native content of this function, allowing building function code and calling this function.
          * @param context The current compile context.
          */
-        virtual void createNativeBacking(CompileContext& context) = 0;
+        void createNativeBacking(CompileContext& context);
 
         /**
          * Build the function definition. This will be called after building the name.
@@ -205,37 +206,27 @@ namespace lang
         [[nodiscard]] std::vector<Shared<lang::Parameter>> parameters();
 
         /**
-         * A helper to create a native function.
-         * @param linkage The linkage type.
-         * @param c The llvm context.
-         * @param m The llvm module.
-         * @param preserve_unit_return Whether to preserve the unit return type or replace it with void.
-         * @return The native function type and the native function.
-         */
-        std::pair<llvm::FunctionType*, llvm::Function*> createNativeFunction(llvm::GlobalValue::LinkageTypes linkage,
-                                                                             llvm::LLVMContext&              c,
-                                                                             llvm::Module&                   m,
-                                                                             bool preserve_unit_return = false);
-
-        /**
-         * A helper to build a call to a native function.
-         * @param arguments The arguments to pass to the called function.
-         * @param native_type The type of the native function to call.
-         * @param native_function The native function to call.
+         * A helper to create a backing function.
+         * @param access The access level of the function.
+         * @param is_imported Whether this function is imported.
+         * @param definition_location The location of the function definition.
+         * @param is_constructor Whether this function is a constructor.
          * @param context The current compile context.
-         * @return The return value.
+         * @return The created function.
          */
-        llvm::CallInst* buildCall(std::vector<Shared<lang::Value>> arguments,
-                                  llvm::FunctionType*              native_type,
-                                  llvm::Function*                  native_function,
-                                  CompileContext&                  context);
+        Execution::Function createBackingFunction(lang::AccessModifier     access,
+                                                  bool                     is_imported,
+                                                  Optional<lang::Location> definition_location,
+                                                  bool                     is_constructor,
+                                                  CompileContext&          context);
 
-        [[nodiscard]] virtual std::pair<llvm::FunctionType*, llvm::Function*> getNativeRepresentation() const = 0;
+        [[nodiscard]] virtual Optional<lang::Location> getDefinitionLocation() const = 0;
+        [[nodiscard]] virtual bool                     isConstructor() const         = 0;
 
       public:
         virtual void buildDeclarationsFollowingOrder(CompileContext& context);
 
-        virtual llvm::DIScope* getDebugScope(CompileContext& context) const = 0;
+        Execution::Scoped getDebugScope() const;
 
         [[nodiscard]] virtual std::vector<lang::BasicBlock*> const& getBasicBlocks() const = 0;
 
@@ -252,6 +243,7 @@ namespace lang
 
       protected:
         lang::Signature signature_;
+        Optional<Execution::Function> function_handle_ = {};
     };
 }
 

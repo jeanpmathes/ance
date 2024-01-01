@@ -8,7 +8,7 @@ lang::PredefinedFunction::PredefinedFunction(lang::Function&                    
                                              lang::AccessModifier                 access_modifier,
                                              bool                                 is_imported,
                                              lang::ResolvingHandle<lang::Type>    return_type,
-                                             bool                                 preserve_unit_return,
+                                             bool                                 is_constructor,
                                              std::vector<Shared<lang::Parameter>> parameters,
                                              lang::Location                       location)
     : lang::FunctionDefinition(function,
@@ -19,7 +19,7 @@ lang::PredefinedFunction::PredefinedFunction(lang::Function&                    
                                location)
     , access_modifier_(access_modifier)
     , is_imported_(is_imported)
-    , preserve_unit_return_(preserve_unit_return)
+    , is_constructor_(is_constructor)
 {}
 
 bool lang::PredefinedFunction::isMangled() const
@@ -32,33 +32,28 @@ bool lang::PredefinedFunction::isImported() const
     return is_imported_;
 }
 
+lang::AccessModifier lang::PredefinedFunction::access() const
+{
+    return access_modifier_;
+}
+
+Optional<lang::Location> lang::PredefinedFunction::getDefinitionLocation() const
+{
+    return std::nullopt;
+}
+
+bool lang::PredefinedFunction::isConstructor() const
+{
+    return is_constructor_;
+}
+
 void lang::PredefinedFunction::determineFlow() {}
 bool lang::PredefinedFunction::validateFlow(ValidationLogger&) const
 {
     return true;
 }
 
-void lang::PredefinedFunction::createNativeBacking(CompileContext& context)
-{
-    llvm::GlobalValue::LinkageTypes const linkage = access_modifier_.linkage();
-    if (is_imported_) { assert(linkage == llvm::GlobalValue::LinkageTypes::ExternalLinkage); }
-
-    std::tie(native_type_, native_function_) =
-        createNativeFunction(linkage, context.llvmContext(), context.llvmModule(), preserve_unit_return_);
-
-    lang::Function::setImportExportAttributes(native_function_, access_modifier_, is_imported_, context);
-
-    auto params = parameters();
-
-    for (unsigned int i = 0; i < params.size(); ++i) { params[i]->wrap(native_function_->getArg(i)); }
-}
-
 void lang::PredefinedFunction::build(CompileContext&) {}
-
-llvm::DIScope* lang::PredefinedFunction::getDebugScope(CompileContext&) const
-{
-    return native_function_->getSubprogram();
-}
 
 std::vector<lang::BasicBlock*> const& lang::PredefinedFunction::getBasicBlocks() const
 {
@@ -66,12 +61,17 @@ std::vector<lang::BasicBlock*> const& lang::PredefinedFunction::getBasicBlocks()
     return empty;
 }
 
-std::pair<llvm::FunctionType*, llvm::Function*> lang::PredefinedFunction::getNativeRepresentation() const
+Execution::Function lang::PredefinedFunction::getFunctionHandle(CompileContext&) const
 {
-    assert(native_type_);
-    assert(native_function_);
+    assert(function_handle_.hasValue());
+    return function_handle_.value();
+}
 
-    return std::make_pair(native_type_, native_function_);
+Shared<lang::Value> lang::PredefinedFunction::getArgument(size_t index)
+{
+    auto params = parameters();
+    assert(index < params.size());
+    return params[index];
 }
 
 void lang::PredefinedFunction::setCallValidator(

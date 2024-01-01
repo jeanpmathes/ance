@@ -1,5 +1,6 @@
 #include "CompileContext.h"
 
+#include "compiler/NativeBuild.h"
 #include "compiler/Project.h"
 #include "compiler/SourceTree.h"
 #include "lang/ApplicationVisitor.h"
@@ -14,10 +15,7 @@ CompileContext::CompileContext(Unit&              unit,
                                SourceTree&        source_tree)
     : unit_(unit)
     , runtime_(runtime)
-    , context_(c)
-    , module_(m)
-    , ir_builder_(ir)
-    , di_builder_(di)
+    , execution_(nullptr)
 {
     llvm::DIFile* project_file =
         di.createFile(unit_.getProjectFile().filename().generic_string(), unit_.getProjectDirectory().generic_string());
@@ -25,8 +23,10 @@ CompileContext::CompileContext(Unit&              unit,
     bool const is_optimized = unit_.getOptimizationLevel().isOptimized();
     auto const debug_kind   = unit_.getOptimizationLevel().getDebugEmissionKind();
 
-    di_unit_ =
+    llvm::DICompileUnit* di_unit =
         di.createCompileUnit(llvm::dwarf::DW_LANG_C, project_file, "ance-000", is_optimized, "", 0, "", debug_kind);
+
+    execution_ = std::make_unique<NativeBuild>(*this, c, m, ir, di, di_unit);
 
     for (auto& source_file : source_tree.getSourceFiles())
     {
@@ -48,34 +48,14 @@ Runtime& CompileContext::runtime()
     return runtime_;
 }
 
-lang::Context& CompileContext::types()
+lang::Context& CompileContext::ctx()
 {
     return unit_.globalScope().context();
 }
 
-llvm::LLVMContext& CompileContext::llvmContext()
+Execution& CompileContext::exec()
 {
-    return context_;
-}
-
-llvm::Module& CompileContext::llvmModule()
-{
-    return module_;
-}
-
-llvm::IRBuilder<>& CompileContext::ir()
-{
-    return ir_builder_;
-}
-
-llvm::DIBuilder& CompileContext::di()
-{
-    return di_builder_;
-}
-
-llvm::DICompileUnit& CompileContext::llvmUnit()
-{
-    return *di_unit_;
+    return *execution_;
 }
 
 llvm::DIFile* CompileContext::getSourceFile(lang::Location location)
@@ -96,10 +76,11 @@ void CompileContext::setDebugLocation(lang::Location location, lang::Scope& scop
 {
     debug_loc_stack_.push(current_debug_location_);
 
-    ir().SetCurrentDebugLocation(location.getDebugLoc(llvmContext(), scope.getDebugScope(*this)));
+    exec().ir().SetCurrentDebugLocation(
+        location.getDebugLoc(exec().llvmContext(), exec().llvmScope(scope.getDebugScope(*this))));
 
     current_debug_location_.location    = location;
-    current_debug_location_.di_location = ir().getCurrentDebugLocation();
+    current_debug_location_.di_location = exec().ir().getCurrentDebugLocation();
 }
 
 void CompileContext::resetDebugLocation()
@@ -107,7 +88,7 @@ void CompileContext::resetDebugLocation()
     current_debug_location_ = debug_loc_stack_.top();
     debug_loc_stack_.pop();
 
-    ir().SetCurrentDebugLocation(current_debug_location_.di_location);
+    exec().ir().SetCurrentDebugLocation(current_debug_location_.di_location);
 }
 
 bool CompileContext::allDebugLocationsPopped()

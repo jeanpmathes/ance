@@ -42,6 +42,7 @@ namespace lang
 
         [[nodiscard]] std::string_view text() const;
         [[nodiscard]] lang::Location   location() const;
+        [[nodiscard]] bool             isEmpty() const;
 
         /**
          * Perform storage synchronization.

@@ -8,6 +8,7 @@
 #include "lang/construct/Function.h"
 #include "lang/expression/Addressof.h"
 #include "lang/expression/BindRef.h"
+#include "lang/type/TypeDefinition.h"
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 

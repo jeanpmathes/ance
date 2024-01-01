@@ -108,13 +108,12 @@ void Allocation::doBuild(CompileContext& context)
 
     if (count_.hasValue())
     {
-        count = lang::Type::makeMatching(context.types().getSizeType(), count_.value()->getValue(), context);
+        count = lang::Type::makeMatching(context.ctx().getSizeType(), count_.value()->getValue(), context);
     }
 
     auto allocated_type = lang::Type::makeMatching<lang::Type>(allocated_type_);
 
-    Shared<lang::Value> ptr = context.runtime().allocate(allocation_, allocated_type, count, context);
-    setValue(ptr);
+    setValue(context.runtime().allocate(allocation_, allocated_type, count, context));
 }
 
 Allocation::~Allocation() = default;

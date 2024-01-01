@@ -96,12 +96,12 @@ void lang::BasicBlock::Definition::Returning::reach() const {}
 void lang::BasicBlock::Definition::Returning::prepareBuild(CompileContext& context, llvm::Function* native_function)
 {
     std::string const name = "b" + std::to_string(index_);
-    native_block_          = llvm::BasicBlock::Create(context.llvmContext(), name, native_function);
+    native_block_          = llvm::BasicBlock::Create(context.exec().llvmContext(), name, native_function);
 }
 
 void lang::BasicBlock::Definition::Returning::doBuild(CompileContext& context)
 {
-    context.ir().SetInsertPoint(native_block_);
+    context.exec().ir().SetInsertPoint(native_block_);
 
     for (auto& statement : statements_) { statement->build(context); }
 
@@ -112,7 +112,7 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext& context)
         current = current->scope();
     }
 
-    if (self()->containing_function_->returnType()->isUnitType()) { context.ir().CreateRetVoid(); }
+    if (self()->containing_function_->returnType()->isUnitType()) { context.exec().ir().CreateRetVoid(); }
     else
     {
         Shared<lang::Value> return_value = return_value_.getValue();
@@ -120,7 +120,7 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext& context)
         return_value = lang::Type::makeMatching(self()->containing_function_->returnType(), return_value, context);
         return_value->buildContentValue(context);
 
-        context.ir().CreateRet(return_value->getContentValue());
+        context.exec().ir().CreateRet(return_value->getContentValue());
     }
 }
 

@@ -56,9 +56,9 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getActualType() override;
         [[nodiscard]] lang::Type const&   getActualType() const override;
 
-        llvm::Constant* getDefaultContent(llvm::Module& m) const override;
+        llvm::Constant* getDefaultContent(CompileContext& context) const override;
 
-        llvm::Type* getContentType(llvm::LLVMContext& c) const override;
+        llvm::Type* getContentType(CompileContext& context) const override;
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
@@ -111,7 +111,7 @@ namespace lang
                                                         CompileContext&      context) override;
 
         bool                              hasMember(lang::Identifier const& name) const override;
-        lang::ResolvingHandle<lang::Type> getMemberType(lang::Identifier const& name) override;
+        Member& getMember(lang::Identifier const& name) override;
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildMemberAccess(Shared<Value>           value,
                                               lang::Identifier const& name,
@@ -122,9 +122,9 @@ namespace lang
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildIndirection(Shared<Value> value, CompileContext& context) override;
 
-        void buildDefaultInitializer(llvm::Value* ptr, llvm::Value* count, CompileContext& context) override;
-        void buildCopyInitializer(llvm::Value* ptr, llvm::Value* original, CompileContext& context) override;
-        void buildFinalizer(llvm::Value* ptr, llvm::Value* count, CompileContext& context) override;
+        void performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context) override;
+        void performCopyInitializer(Shared<Value> destination, Shared<Value> source, CompileContext& context) override;
+        void performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context) override;
 
         bool isTriviallyDefaultConstructible() const override;
         bool isTriviallyCopyConstructible() const override;
@@ -140,7 +140,7 @@ namespace lang
 
       protected:
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) const override;
+        Execution::Type createDebugType(CompileContext& context) const override;
 
       public:
         std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies() override;

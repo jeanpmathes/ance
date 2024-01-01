@@ -41,15 +41,15 @@ lang::Type const& lang::ArrayType::getActualType() const
     return actual_type_.value();
 }
 
-llvm::Constant* lang::ArrayType::getDefaultContent(llvm::Module& m) const
+llvm::Constant* lang::ArrayType::getDefaultContent(CompileContext& context) const
 {
-    std::vector<llvm::Constant*> const content(size_.value(), element_type_->getDefaultContent(m));
-    return llvm::ConstantArray::get(getContentType(m.getContext()), content);
+    std::vector<llvm::Constant*> const content(size_.value(), element_type_->getDefaultContent(context));
+    return llvm::ConstantArray::get(getContentType(context), content);
 }
 
-llvm::ArrayType* lang::ArrayType::getContentType(llvm::LLVMContext& c) const
+llvm::ArrayType* lang::ArrayType::getContentType(CompileContext& context) const
 {
-    return llvm::ArrayType::get(element_type_->getContentType(c), size_.value());
+    return llvm::ArrayType::get(element_type_->getContentType(context), size_.value());
 }
 
 bool lang::ArrayType::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -79,19 +79,14 @@ std::string lang::ArrayType::createMangledName() const
          + std::string(")");
 }
 
-llvm::DIType* lang::ArrayType::createDebugType(CompileContext& context) const
+Execution::Type lang::ArrayType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl         = context.llvmModule().getDataLayout();
-    llvm::Type*             array_type = getContentType(context.llvmContext());
+    return context.exec().registerArrayType(self());
+}
 
-    uint64_t const size            = dl.getTypeSizeInBits(array_type);
-    auto           alignment       = static_cast<uint32_t>(dl.getABITypeAlignment(array_type));
-    llvm::DIType*  element_di_type = element_type_->getDebugType(context);
-
-    llvm::SmallVector<llvm::Metadata*, 1> subscripts;
-    subscripts.push_back(context.di().getOrCreateSubrange(0, static_cast<int64_t>(size_.value())));
-
-    return context.di().createArrayType(size, alignment, element_di_type, context.di().getOrCreateArray(subscripts));
+Execution::IndexingMode lang::ArrayType::getIndexingMode() const
+{
+    return Execution::IndexingMode::SEQUENCE;
 }
 
 lang::ResolvingHandle<lang::Type> lang::ArrayType::clone(lang::Context& new_context) const

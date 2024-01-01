@@ -1,18 +1,19 @@
 #include "SingleType.h"
 
+#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
 
 lang::SingleType::SingleType() : TypeDefinition(lang::Identifier::like("single")) {}
 
-llvm::Constant* lang::SingleType::getDefaultContent(llvm::Module& m) const
+llvm::Constant* lang::SingleType::getDefaultContent(CompileContext& context) const
 {
-    return llvm::ConstantFP::get(getContentType(m.getContext()), 0);
+    return llvm::ConstantFP::get(getContentType(context), 0);
 }
 
-llvm::Type* lang::SingleType::getContentType(llvm::LLVMContext& c) const
+llvm::Type* lang::SingleType::getContentType(CompileContext& context) const
 {
-    return llvm::Type::getFloatTy(c);
+    return llvm::Type::getFloatTy(context.exec().llvmContext());
 }
 
 size_t lang::SingleType::getPrecision() const

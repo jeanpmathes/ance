@@ -5,10 +5,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/value/Value.h"
-#include "lang/construct/value/WrappedNativeValue.h"
 #include "lang/scope/Scope.h"
-#include "lang/utility/Values.h"
-#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::StructType::StructType(lang::Accessibility                               accessibility,
@@ -19,12 +16,11 @@ lang::StructType::StructType(lang::Accessibility                               a
     , CustomType(accessibility)
     , members_(std::move(members))
 {
-    int32_t index = 0;
 
     for (auto& member : members_)
     {
         member_map_.emplace(member.get().name(), member);
-        member_indices_[member.get().name()] = index++;
+        member.get().setIndex(member_map_.size() - 1);
     }
 }
 
@@ -42,26 +38,32 @@ bool lang::StructType::isStructType() const
     return true;
 }
 
-llvm::Constant* lang::StructType::getDefaultContent(llvm::Module& m) const
+llvm::Constant* lang::StructType::getDefaultContent(CompileContext& context) const
 {
     std::vector<llvm::Constant*> values;
 
     values.reserve(members_.size());
-    for (auto& member : members_) { values.push_back(member.get().getConstantInitializer(m)); }
+    for (auto& member : members_)
+    {
+        Shared<lang::Constant> initializer = member.get().getConstantInitializer(context);
 
-    return llvm::ConstantStruct::get(getContentType(m.getContext()), values);
+        initializer->buildContentConstant(context);
+        values.push_back(initializer->getContentConstant());
+    }
+
+    return llvm::ConstantStruct::get(getContentType(context), values);
 }
 
-llvm::StructType* lang::StructType::getContentType(llvm::LLVMContext& c) const
+llvm::StructType* lang::StructType::getContentType(CompileContext& context) const
 {
     if (!native_type_)
     {
-        native_type_ = llvm::StructType::create(c, getMangledName());
+        native_type_ = llvm::StructType::create(context.exec().llvmContext(), getMangledName());
 
         std::vector<llvm::Type*> member_types;
 
         member_types.reserve(members_.size());
-        for (auto& member : members_) { member_types.push_back(member.get().type()->getContentType(c)); }
+        for (auto& member : members_) { member_types.push_back(member.get().type()->getContentType(context)); }
 
         native_type_->setBody(member_types);
     }
@@ -74,29 +76,14 @@ std::string lang::StructType::createMangledName() const
     return "struct(" + name() + ")";
 }
 
-llvm::DIType* lang::StructType::createDebugType(CompileContext& context) const
+Execution::Type lang::StructType::createDebugType(CompileContext& context) const
 {
-    llvm::DataLayout const& dl         = context.llvmModule().getDataLayout();
-    llvm::Type*             array_type = getContentType(context.llvmContext());
-
-    uint64_t const size      = dl.getTypeSizeInBits(array_type);
-    auto           alignment = static_cast<uint32_t>(dl.getABITypeAlignment(array_type));
-
-    std::vector<llvm::Metadata*> member_types;
-    member_types.reserve(members_.size());
-    for (auto& member : members_) { member_types.push_back(member.get().type()->getDebugType(context)); }
-
-    llvm::MDTuple* debug_type = llvm::MDNode::get(context.llvmContext(), member_types);
-
-    return context.di().createStructType(scope()->getDebugScope(context),
-                                         name().text(),
-                                         context.getSourceFile(getDefinitionLocation()),
-                                         static_cast<unsigned>(getDefinitionLocation().line()),
-                                         size,
-                                         alignment,
-                                         llvm::DINode::FlagZero,
-                                         nullptr,
-                                         debug_type);
+    return context.exec().createStruct(name(),
+                                       CustomType::getAccessibility().modifier(),
+                                       self(),
+                                       members_,
+                                       *scope(),
+                                       getDefinitionLocation());
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::StructType::getDeclarationDependencies()
@@ -128,11 +115,11 @@ bool lang::StructType::hasMember(lang::Identifier const& name) const
     return member_map_.contains(name);
 }
 
-lang::ResolvingHandle<lang::Type> lang::StructType::getMemberType(lang::Identifier const& name)
+lang::Member& lang::StructType::getMember(lang::Identifier const& name)
 {
-    if (member_map_.contains(name)) { return member_map_.at(name).get().type(); }
+    if (member_map_.contains(name)) { return member_map_.at(name); }
 
-    return lang::Type::getUndefined();
+    return TypeDefinition::getMember(name);
 }
 
 bool lang::StructType::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const
@@ -150,64 +137,38 @@ Shared<lang::Value> lang::StructType::buildMemberAccess(Shared<Value>           
                                                         lang::Identifier const& name,
                                                         CompileContext&         context)
 {
-    lang::ResolvingHandle<lang::Type> return_type  = context.types().getReferenceType(getMemberType(name));
-    int32_t const                     member_index = member_indices_[name];
+    Shared<lang::Value> struct_ptr = context.exec().computeAddressOf(value);
+    Shared<lang::Value> member_ptr = context.exec().computeMemberPointer(struct_ptr, name);
 
-    llvm::Value* struct_ptr;
-
-    if (value->type()->isReferenceType())
-    {
-        value->buildContentValue(context);
-        struct_ptr = value->getContentValue();
-    }
-    else
-    {
-        value->buildNativeValue(context);
-        struct_ptr = value->getNativeValue();
-    }
-
-    llvm::Value* member_ptr   = buildGetElementPointer(struct_ptr, member_index, context);
-    llvm::Value* native_value = lang::values::contentToNative(return_type, member_ptr, context);
-
-    return makeShared<lang::WrappedNativeValue>(return_type, native_value);
+    return context.exec().computeReferenceFromPointer(member_ptr);
 }
 
-void lang::StructType::buildSingleDefaultInitializerDefinition(llvm::Value* ptr, CompileContext& context)
+void lang::StructType::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context)
 {
-    for (size_t index = 0; index < members_.size(); index++)
+    for (auto member : members_)
     {
-        llvm::Value* member_ptr = buildGetElementPointer(ptr, static_cast<int32_t>(index), context);
-        members_[index].get().buildInitialization(member_ptr, context);
+        Shared<lang::Value> member_ptr = context.exec().computeMemberPointer(ptr, member.get().name());
+        member.get().buildInitialization(member_ptr, context);
     }
 }
 
-void lang::StructType::buildSingleCopyInitializerDefinition(llvm::Value*    dts_ptr,
-                                                            llvm::Value*    src_ptr,
-                                                            CompileContext& context)
+void lang::StructType::performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
+                                                              Shared<lang::Value> src_ptr,
+                                                              CompileContext& context)
 {
-    for (size_t index = 0; index < members_.size(); index++)
+    for (auto member : members_)
     {
-        llvm::Value* dst_member_ptr = buildGetElementPointer(dts_ptr, static_cast<int32_t>(index), context);
-        llvm::Value* src_member_ptr = buildGetElementPointer(src_ptr, static_cast<int32_t>(index), context);
-        members_[index].get().type()->buildCopyInitializer(dst_member_ptr, src_member_ptr, context);
+        Shared<lang::Value> dst_member_ptr = context.exec().computeMemberPointer(dts_ptr, member.get().name());
+        Shared<lang::Value> src_member_ptr = context.exec().computeMemberPointer(src_ptr, member.get().name());
+        member.get().type()->performCopyInitializer(dst_member_ptr, src_member_ptr, context);
     }
 }
 
-void lang::StructType::buildSingleDefaultFinalizerDefinition(llvm::Value* ptr, CompileContext& context)
+void lang::StructType::buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context)
 {
-    for (size_t index = 0; index < members_.size(); index++)
+    for (auto member : members_)
     {
-        llvm::Value* member_ptr = buildGetElementPointer(ptr, static_cast<int32_t>(index), context);
-        members_[index].get().type()->buildFinalizer(member_ptr, context);
+        Shared<lang::Value> member_ptr = context.exec().computeMemberPointer(ptr, member.get().name());
+        member.get().type()->performFinalizer(member_ptr, context);
     }
-}
-
-llvm::Value* lang::StructType::buildGetElementPointer(llvm::Value*    struct_ptr,
-                                                      int32_t         member_index,
-                                                      CompileContext& context)
-{
-    return context.ir().CreateStructGEP(getContentType(context.llvmContext()),
-                                        struct_ptr,
-                                        static_cast<unsigned>(member_index),
-                                        struct_ptr->getName() + ".gep");
 }

@@ -7,7 +7,7 @@
 #include "lang/construct/Function.h"
 #include "lang/expression/Expression.h"
 #include "lang/type/Type.h"
-#include "validation/Utilities.h"
+#include "lang/type/TypeDefinition.h"
 #include "validation/ValidationLogger.h"
 
 LocalVariableDefinition::LocalVariableDefinition(lang::Identifier                            name,

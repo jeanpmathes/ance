@@ -55,9 +55,9 @@ Expression::Expansion BindRefTo::expandWith(Expressions subexpressions, lang::Co
     return {Statements(), makeOwned<BindRefTo>(std::move(subexpressions[0]), location()), Statements()};
 }
 
-void BindRefTo::doBuild(CompileContext&)
+void BindRefTo::doBuild(CompileContext& context)
 {
-    setValue(makeShared<lang::RoughlyCastedValue>(type(), address_->getValue()));
+    setValue(makeShared<lang::RoughlyCastedValue>(type(), address_->getValue(), context));
 }
 
 BindRefTo::~BindRefTo() = default;

@@ -11,10 +11,7 @@
 #include "lang/AccessModifier.h"
 #include "lang/Element.h"
 #include "lang/construct/BasicBlock.h"
-#include "lang/construct/CodeBlock.h"
-#include "lang/construct/FunctionDefinition.h"
 #include "lang/construct/Parameter.h"
-#include "lang/construct/Signature.h"
 #include "lang/utility/OwningHandle.h"
 
 namespace lang
@@ -25,6 +22,8 @@ namespace lang
     class CodeBlock;
     class PredefinedFunction;
     class InitializerFunction;
+    class FunctionDefinition;
+    class Signature;
 }
 
 class CompileContext;
@@ -104,7 +103,7 @@ namespace lang
         /**
          * Define this function as a predefined function.
          * @param return_type The return type of the function.
-         * @param preserve_unit_return Whether to preserve the unit return type.
+         * @param is_constructor Whether the function is a constructor.
          * @param parameters The parameters for this function.
          * @param access_modifier The access level of the function.
          * @param is_imported Whether this function is imported.
@@ -113,11 +112,11 @@ namespace lang
          * @return The predefined function.
          */
         PredefinedFunction& defineAsPredefined(lang::ResolvingHandle<lang::Type>           return_type,
-                                               bool                                        preserve_unit_return,
+                                               bool                                        is_constructor,
                                                std::vector<Shared<lang::Parameter>> const& parameters,
                                                lang::AccessModifier                        access_modifier,
                                                bool                                        is_imported,
-                                               Scope&                                      containing_scope,
+                                               lang::Scope&                                containing_scope,
                                                lang::Location                              location);
 
         /**
@@ -249,7 +248,7 @@ namespace lang
         lang::Scope*                     scope() override;
         [[nodiscard]] lang::Scope const* scope() const override;
 
-        llvm::DIScope* getDebugScope(CompileContext& context) const override;
+        Execution::Scoped getDebugScope(CompileContext& context) const override;
 
         [[nodiscard]] bool isPartOfFunction() const override;
 
@@ -263,18 +262,6 @@ namespace lang
         void postResolve() override;
 
         void buildDeclarationsFollowingOrder(CompileContext& context) override;
-
-        /**
-         * Set the import/export attributes of a function.
-         * @param function The function to set the attributes for.
-         * @param access_modifier The access modifier of the function.
-         * @param is_imported True if the function is imported, false otherwise.
-         * @param context The current compile context.
-         */
-        static void setImportExportAttributes(llvm::Function*      function,
-                                              lang::AccessModifier access_modifier,
-                                              bool                 is_imported,
-                                              CompileContext&      context);
 
         ResolvingHandle<lang::Entity> getUndefinedClone(Context& new_context) const override;
 

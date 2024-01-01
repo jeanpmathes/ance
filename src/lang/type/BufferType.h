@@ -33,11 +33,6 @@ namespace lang
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
-      protected:
-        llvm::Type*                     getIndexedType(CompileContext& context) const override;
-        llvm::Value*                    getIndexingPointer(Shared<Value> indexed, CompileContext& context) override;
-        llvm::SmallVector<llvm::Value*> getNativeIndices(llvm::Value* zero, llvm::Value* index) override;
-
       public:
         ~BufferType() override = default;
 
@@ -47,7 +42,8 @@ namespace lang
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) const override;
+        Execution::Type         createDebugType(CompileContext& context) const override;
+        Execution::IndexingMode getIndexingMode() const override;
 
       public:
         std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies() override;

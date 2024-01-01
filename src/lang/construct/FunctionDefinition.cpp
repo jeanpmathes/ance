@@ -6,8 +6,6 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/constant/UnitConstant.h"
-#include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
 lang::FunctionDefinition::FunctionDefinition(Function&                            function,
@@ -108,6 +106,11 @@ bool lang::FunctionDefinition::isImported() const
 void lang::FunctionDefinition::resolveFollowingOrder() {}
 void lang::FunctionDefinition::postResolve() {}
 
+void lang::FunctionDefinition::createNativeBacking(CompileContext& context)
+{
+    function_handle_ = createBackingFunction(access(), isImported(), getDefinitionLocation(), isConstructor(), context);
+}
+
 bool lang::FunctionDefinition::validateCall(
     std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
     lang::Location                                                                           location,
@@ -148,14 +151,7 @@ bool lang::FunctionDefinition::doCallValidation(
 Shared<lang::Value> lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Value>> arguments,
                                                         CompileContext&                  context)
 {
-    auto [native_type, native_function] = getNativeRepresentation();
-
-    llvm::Value* content_value = buildCall(std::move(arguments), native_type, native_function, context);
-
-    if (returnType()->isUnitType()) { return lang::UnitConstant::create(scope().context()); }
-
-    llvm::Value* native_value = lang::values::contentToNative(returnType(), content_value, context);
-    return {makeShared<lang::WrappedNativeValue>(returnType(), native_value)};
+    return context.exec().performFunctionCall(function_handle_.value(), std::move(arguments));
 }
 
 std::vector<Shared<lang::Parameter>> const& lang::FunctionDefinition::parameters() const
@@ -168,49 +164,27 @@ std::vector<Shared<lang::Parameter>> lang::FunctionDefinition::parameters()
     return parameters_;
 }
 
-std::pair<llvm::FunctionType*, llvm::Function*> lang::FunctionDefinition::createNativeFunction(
-    llvm::GlobalValue::LinkageTypes linkage,
-    llvm::LLVMContext&              c,
-    llvm::Module&                   m,
-    bool                            preserve_unit_return)
+Execution::Function lang::FunctionDefinition::createBackingFunction(lang::AccessModifier     access,
+                                                                    bool                     is_imported,
+                                                                    Optional<lang::Location> definition_location,
+                                                                    bool                     is_constructor,
+                                                                    CompileContext&          context)
 {
-    std::string const native_name = function_.getLinkageName();
-
-    std::vector<llvm::Type*> param_types;
-    param_types.reserve(parameters_.size());
-
-    for (auto& param : parameters_) { param_types.push_back(param->type()->getContentType(c)); }
-
-    llvm::Type* return_type = returnType()->getContentType(c);
-    if (returnType()->isUnitType() && not preserve_unit_return) { return_type = llvm::Type::getVoidTy(c); }
-
-    llvm::FunctionType* native_type     = llvm::FunctionType::get(return_type, param_types, false);
-    llvm::Function*     native_function = llvm::Function::Create(native_type, linkage, native_name, m);
-
-    return {native_type, native_function};
-}
-
-llvm::CallInst* lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Value>> arguments,
-                                                    llvm::FunctionType*              native_type,
-                                                    llvm::Function*                  native_function,
-                                                    CompileContext&                  context)
-{
-    std::vector<llvm::Value*> args;
-    args.reserve(arguments.size());
-
-    assert(arguments.size() == parameters_.size());
-
-    for (auto [param, arg] : llvm::zip(parameters_, arguments))
-    {
-        Shared<lang::Value> matched_arg = lang::Type::makeMatching(param->type(), arg, context);
-
-        matched_arg->buildContentValue(context);
-        args.push_back(matched_arg->getContentValue());
-    }
-
-    auto* content_value = context.ir().CreateCall(native_type, native_function, args);
-    if (!native_type->getReturnType()->isVoidTy()) content_value->setName(name() + ".call");
-    return content_value;
+    return context.exec().createFunction(name(),
+                                         function_.getLinkageName(),
+                                         access,
+                                         is_imported,
+                                         parameters_,
+                                         returnType(),
+                                         &scope(),
+                                         is_constructor,
+                                         location(),
+                                         definition_location);
 }
 
 void lang::FunctionDefinition::buildDeclarationsFollowingOrder(CompileContext&) {}
+
+Execution::Scoped lang::FunctionDefinition::getDebugScope() const
+{
+    return function_handle_.value();
+}

@@ -1,5 +1,7 @@
 #include "FunctionDescription.h"
 
+#include <utility>
+
 #include "lang/ApplicationVisitor.h"
 #include "lang/utility/Storage.h"
 #include "validation/Utilities.h"
@@ -15,7 +17,7 @@ lang::FunctionDescription::FunctionDescription(lang::Accessibility              
                                                lang::Location                       definition_location)
     : Description(accessibility)
     , name_(name)
-    , return_type_(return_type)
+    , return_type_(std::move(return_type))
     , return_type_location_(return_type_location)
     , parameters_(std::move(parameters))
     , code_(std::move(code))
@@ -93,8 +95,12 @@ std::vector<lang::Description::Dependency> lang::FunctionDescription::getDeclara
     std::set<lang::Identifier> added;
 
     auto add = [&](lang::ResolvingHandle<lang::Entity> entity) {
+        bool compound = false;
+
         if (auto type = entity.as<lang::Type>(); type.hasValue())
         {
+            compound = type.value()->isCompound();
+
             for (auto& dependency : (**type).getDeclarationDependencies())
             {
                 if (added.contains(dependency->name())) continue;
@@ -103,9 +109,10 @@ std::vector<lang::Description::Dependency> lang::FunctionDescription::getDeclara
                 added.insert(dependency->name());
             }
         }
-        else if (!added.contains(entity->name()))
+
+        if (!compound && !added.contains(entity->name()))
         {
-            dependencies.emplace_back(entity.base());
+            dependencies.emplace_back(entity);
             added.insert(entity->name());
         }
     };
@@ -125,8 +132,12 @@ std::vector<lang::Description::Dependency> lang::FunctionDescription::getDefinit
     std::set<lang::Identifier> added;
 
     auto add = [&](lang::ResolvingHandle<lang::Entity> entity) {
+        bool compound = false;
+
         if (auto type = entity.as<lang::Type>(); type.hasValue())
         {
+            compound = type.value()->isCompound();
+
             for (auto& dependency : (**type).getDefinitionDependencies())
             {
                 if (added.contains(dependency->name())) continue;
@@ -135,9 +146,10 @@ std::vector<lang::Description::Dependency> lang::FunctionDescription::getDefinit
                 added.insert(dependency->name());
             }
         }
-        else if (!added.contains(entity->name()))
+
+        if (!compound && !added.contains(entity->name()))
         {
-            dependencies.emplace_back(entity.base());
+            dependencies.emplace_back(entity);
             added.insert(entity->name());
         }
     };

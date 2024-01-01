@@ -4,12 +4,9 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
-#include "lang/construct/value/WrappedNativeValue.h"
+#include "lang/construct/value/RoughlyCastedValue.h"
 #include "lang/scope/GlobalScope.h"
-#include "lang/type/BooleanType.h"
 #include "lang/type/CharType.h"
-#include "lang/type/SizeType.h"
-#include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
 lang::FixedWidthIntegerType::FixedWidthIntegerType(uint64_t bit_size, bool is_signed)
@@ -67,35 +64,12 @@ Shared<lang::Value> lang::FixedWidthIntegerType::buildCast(lang::ResolvingHandle
 {
     if (other->isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_)
     {
-        value->buildNativeValue(context);
-        llvm::Value* native_value = value->getNativeValue();
-
-        return makeShared<lang::WrappedNativeValue>(other, native_value);
+        return makeShared<RoughlyCastedValue>(other, value, context);
     }
 
-    if (other->isFloatingPointType())
+    if (other->isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
     {
-        value->buildContentValue(context);
-        llvm::Value* content_value = value->getContentValue();
-
-        llvm::Value* converted_value;
-
-        if (isSigned())
-        {
-            converted_value = context.ir().CreateSIToFP(content_value,
-                                                        other->getContentType(context.llvmContext()),
-                                                        content_value->getName() + ".cast");
-        }
-        else
-        {
-            converted_value = context.ir().CreateUIToFP(content_value,
-                                                        other->getContentType(context.llvmContext()),
-                                                        content_value->getName() + ".cast");
-        }
-
-        llvm::Value* native_converted_value = lang::values::contentToNative(other, converted_value, context);
-
-        return makeShared<WrappedNativeValue>(other, native_converted_value);
+        return context.exec().computeConversionI2FP(value, other);
     }
 
     return IntegerType::buildCast(other, value, context);

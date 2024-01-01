@@ -3,7 +3,7 @@
 
 #include "lang/construct/value/Value.h"
 
-#include "lang/expression/UnexpandedExpression.h"
+class UnexpandedExpression;
 
 namespace lang
 {
@@ -22,9 +22,6 @@ namespace lang
 
         void buildNativeValue(CompileContext& context) override;
         void buildContentValue(CompileContext& context) override;
-
-        [[nodiscard]] llvm::Value* getNativeValue() const override;
-        [[nodiscard]] llvm::Value* getContentValue() const override;
 
       private:
         Passed<UnexpandedExpression> unexpanded_expression_;

@@ -6,9 +6,9 @@
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/ImportedFunction.h"
+#include "lang/construct/InitializerFunction.h"
 #include "lang/construct/LocalVariable.h"
 #include "lang/construct/PredefinedFunction.h"
-#include "lang/scope/LocalScope.h"
 #include "validation/ValidationLogger.h"
 
 lang::Function::Function(Identifier function_name) : name_(function_name) {}
@@ -69,7 +69,7 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
 }
 
 lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHandle<lang::Type> return_type,
-                                                             bool                              preserve_unit_return,
+                                                             bool                                        is_constructor,
                                                              std::vector<Shared<lang::Parameter>> const& parameters,
                                                              lang::AccessModifier access_modifier,
                                                              bool                 is_imported,
@@ -81,7 +81,7 @@ lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHand
                                                           access_modifier,
                                                           is_imported,
                                                           return_type,
-                                                          preserve_unit_return,
+                                                          is_constructor,
                                                           parameters,
                                                           location);
 
@@ -221,9 +221,9 @@ lang::Scope const* lang::Function::scope() const
     return &definition_.value()->scope();
 }
 
-llvm::DIScope* lang::Function::getDebugScope(CompileContext& context) const
+Execution::Scoped lang::Function::getDebugScope(CompileContext&) const
 {
-    return definition_.value()->getDebugScope(context);
+    return definition_.value()->getDebugScope();
 }
 
 bool lang::Function::isPartOfFunction() const
@@ -251,17 +251,6 @@ void lang::Function::postResolve()
 void lang::Function::buildDeclarationsFollowingOrder(CompileContext& context)
 {
     definition_.value()->buildDeclarationsFollowingOrder(context);
-}
-
-void lang::Function::setImportExportAttributes(llvm::Function*      function,
-                                               lang::AccessModifier access_modifier,
-                                               bool                 is_imported,
-                                               CompileContext&)
-{
-    if (access_modifier.linkage() != llvm::GlobalValue::LinkageTypes::ExternalLinkage) return;
-
-    if (is_imported) { function->setDLLStorageClass(llvm::GlobalValue::DLLStorageClassTypes::DLLImportStorageClass); }
-    else { function->setDLLStorageClass(llvm::GlobalValue::DLLStorageClassTypes::DLLExportStorageClass); }
 }
 
 lang::ResolvingHandle<lang::Entity> lang::Function::getUndefinedClone(lang::Context&) const

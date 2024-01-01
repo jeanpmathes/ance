@@ -4,7 +4,6 @@
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-#include "lang/Context.h"
 #include "lang/Element.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Location.h"
@@ -14,6 +13,7 @@ namespace lang
 {
     class Value;
     class Scope;
+    class Context;
 }
 
 class Statement;

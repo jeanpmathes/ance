@@ -65,7 +65,8 @@ namespace lang
         virtual void buildInitialization(CompileContext& context) = 0;
         virtual void buildFinalization(CompileContext& context)   = 0;
 
-        virtual Shared<lang::Value> getValue(CompileContext& context) = 0;
+        virtual Shared<lang::Value> getValuePointer(CompileContext& context) = 0;
+        Shared<lang::Value>         getValue(CompileContext& context);
         virtual void                setValue(Shared<lang::Value> value, CompileContext& context);
 
         virtual ~VariableDefinition() = default;

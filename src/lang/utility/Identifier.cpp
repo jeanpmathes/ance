@@ -29,6 +29,11 @@ lang::Location lang::Identifier::location() const
     return location_;
 }
 
+bool lang::Identifier::isEmpty() const
+{
+    return string_.empty();
+}
+
 void lang::Identifier::synchronize(lang::Identifier* identifier, Storage& storage)
 {
     std::string content;

@@ -43,6 +43,9 @@ namespace lang
         [[nodiscard]] lang::Assigner assigner() const;
         [[nodiscard]] lang::Location location() const;
 
+        void                 setIndex(size_t index);
+        [[nodiscard]] size_t index() const;
+
         /**
          * Set the scope that contains the member.
          */
@@ -59,14 +62,14 @@ namespace lang
          * Gets the constant initializer of the member.
          * @return The constant initializer of the member.
          */
-        llvm::Constant* getConstantInitializer(llvm::Module& m) const;
+        Shared<lang::Constant> getConstantInitializer(CompileContext& context);
 
         /**
          * Build the initialization of this member.
          * @param ptr The pointer to the member.
          * @param context The compile context.
          */
-        void buildInitialization(llvm::Value* ptr, CompileContext& context);
+        void buildInitialization(Shared<lang::Value> ptr, CompileContext& context);
 
         Owned<Member> expand(lang::Context& new_context) const;
 
@@ -76,7 +79,7 @@ namespace lang
         static void synchronize(lang::Member* member, Storage& storage);
 
       private:
-        llvm::Constant* getInitialValue(llvm::Module& m) const;
+        Shared<lang::Constant> getInitialValue(CompileContext& context) const;
 
       private:
         lang::AccessModifier                access_;
@@ -87,7 +90,9 @@ namespace lang
         lang::Location                      location_;
         lang::Location                      type_location_;
 
-        mutable llvm::Constant* initial_value_ {nullptr};
+        size_t index_ = std::numeric_limits<size_t>::max();
+
+        mutable Optional<Shared<lang::Constant>> initial_value_ = std::nullopt;
     };
 }
 

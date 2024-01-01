@@ -20,7 +20,7 @@ namespace lang
         explicit Context(GlobalScope& global_scope, bool contains_runtime);
 
         /**
-         * Perform resolving on all types that require it.
+         * Perform resolving on all type that require it.
          */
         void resolve();
 

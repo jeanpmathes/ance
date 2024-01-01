@@ -29,9 +29,9 @@ void MemberAccess::defineType(lang::ResolvingHandle<lang::Type> type)
 
     auto value_type = value_->type();
 
-    if (value_type->isDefined())
+    if (value_type->isDefined() && value_type->hasMember(member_))
     {
-        type.reroute(scope()->context().getReferenceType(value_type->getMemberType(member_)));
+        type.reroute(scope()->context().getReferenceType(value_type->getMember(member_).type()));
     }
 }
 

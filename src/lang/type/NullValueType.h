@@ -26,11 +26,11 @@ namespace lang
                                                     CompileContext&                   context) override;
 
       protected:
-        llvm::Constant* getDefaultContent(llvm::Module& m) const override;
-        llvm::Type*     getContentType(llvm::LLVMContext& c) const override;
+        llvm::Constant* getDefaultContent(CompileContext& context) const override;
+        llvm::Type*     getContentType(CompileContext& context) const override;
 
         std::string   createMangledName() const override;
-        llvm::DIType* createDebugType(CompileContext& context) const override;
+        Execution::Type createDebugType(CompileContext& context) const override;
 
         Optional<lang::ResolvingHandle<lang::Type>> getPointeeType() override;
         Type const*                                 getPointeeType() const override;

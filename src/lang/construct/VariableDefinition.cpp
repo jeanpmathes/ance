@@ -56,6 +56,11 @@ bool lang::VariableDefinition::isFinal() const
     return is_final_;
 }
 
+Shared<lang::Value> lang::VariableDefinition::getValue(CompileContext& context)
+{
+    return context.exec().performLoadFromAddress(getValuePointer(context));
+}
+
 void lang::VariableDefinition::setValue(Shared<lang::Value> value, CompileContext& context)
 {
     if (type()->getStateCount().isUnit()) return;
@@ -63,16 +68,18 @@ void lang::VariableDefinition::setValue(Shared<lang::Value> value, CompileContex
     if (type()->isReferenceType())
     {
         Shared<lang::Value> reference = getValue(context);
+        Shared<lang::Value> pointer   = context.exec().computePointerFromReference(reference);
 
         lang::ResolvingHandle<lang::Type> target_type = type()->getElementType();
         value                                         = lang::Type::makeMatching(target_type, value, context);
 
-        reference->buildContentValue(context);
-        value->buildNativeValue(context);
-
-        target_type->buildCopyInitializer(reference->getContentValue(), value->getNativeValue(), context);
+        target_type->performCopyInitializer(pointer, context.exec().computeAddressOf(value), context);
     }
-    else { storeValue(value, context); }
+    else
+    {
+        value = lang::Type::makeMatching(type(), value, context);
+        storeValue(value, context);
+    }
 }
 
 lang::ResolvingHandle<lang::Variable> lang::VariableDefinition::self()

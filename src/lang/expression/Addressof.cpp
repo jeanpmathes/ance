@@ -1,8 +1,8 @@
 #include "Addressof.h"
 
+#include "compiler/CompileContext.h"
+#include "compiler/Execution.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/utility/Values.h"
 #include "validation/ValidationLogger.h"
 
 Addressof::Addressof(Owned<Expression> arg, lang::Location location) : Expression(location), arg_(std::move(arg))
@@ -51,12 +51,9 @@ Expression::Expansion Addressof::expandWith(Expressions subexpressions, lang::Co
 void Addressof::doBuild(CompileContext& context)
 {
     Shared<lang::Value> value = arg_->getValue();
-    value->buildNativeValue(context);
+    Shared<lang::Value> address = context.exec().computeAddressOf(value);
 
-    llvm::Value* address = value->getNativeValue();
-    if (!arg_->type()->isReferenceType()) address = lang::values::contentToNative(type(), address, context);
-
-    setValue(makeShared<lang::WrappedNativeValue>(type(), address));
+    setValue(address);
 }
 
 Addressof::~Addressof() = default;

@@ -19,13 +19,6 @@ bool lang::SizeType::isDiffType() const
     return (kind_ == DIFF_KIND);
 }
 
-llvm::Value* lang::SizeType::buildContentValue(llvm::TypeSize size, CompileContext& contex)
-{
-    return llvm::ConstantInt::get(contex.types().getSizeType()->getContentType(contex.llvmContext()),
-                                  size.getFixedSize(),
-                                  false);
-}
-
 std::string lang::SizeType::createMangledName() const
 {
     return std::string(name().text());
