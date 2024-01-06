@@ -1,3 +1,4 @@
+#include <chrono>
 #include <filesystem>
 #include <iostream>
 
@@ -100,6 +101,7 @@ static bool build(SourceTree&                  tree,
 static Optional<bool> buildProject(Project&              project,
                                    Packages const&       packages,
                                    std::set<std::string> included_packages,
+                                   std::optional<std::chrono::steady_clock::time_point> const& start_time,
                                    std::ostream&         root_out);
 
 static Optional<Owned<Project>> prepareProject(std::filesystem::path const&           project_file_path,
@@ -191,6 +193,7 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
 static Optional<bool> buildProject(Project&              project,
                                    Packages const&       packages,
                                    std::set<std::string> included_packages,
+                                   std::optional<std::chrono::steady_clock::time_point> const& start_time,
                                    std::ostream&         root_out)
 {
     Application&            application = project.getApplication();
@@ -244,7 +247,18 @@ static Optional<bool> buildProject(Project&              project,
         ok = build(tree, info.triple, obj_dir, bin_dir, info.out);
         if (!ok) return false;
 
-        info.out << "ance: build: Success" << std::endl;
+        info.out << "ance: build: Success";
+
+        if (start_time.has_value())
+        {
+            std::chrono::steady_clock::time_point const end_time = std::chrono::steady_clock::now();
+            std::chrono::duration<double> const         elapsed  = end_time - *start_time;
+
+            info.out << " ( " << std::format("{:.2f}", elapsed.count()) << "s )";
+        }
+
+        info.out << std::endl;
+
         return true;
     }
     else
@@ -262,9 +276,14 @@ static bool run(std::ostream&                          out,
     out << "======================== Build [ " << project_file_path.stem().string()
         << " ] ========================" << std::endl;
 
+    std::chrono::steady_clock::time_point const start = std::chrono::steady_clock::now();
+
     auto project = prepareProject(project_file_path, override_build_dir, out, packages);
 
-    if (project.hasValue()) { return buildProject(**project, packages, {(**project).getName()}, out).valueOr(true); }
+    if (project.hasValue())
+    {
+        return buildProject(**project, packages, {(**project).getName()}, start, out).valueOr(true);
+    }
 
     return false;
 }

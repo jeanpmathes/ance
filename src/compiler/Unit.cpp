@@ -178,7 +178,7 @@ std::pair<bool, size_t> Unit::buildPackageDependencies(Packages const&          
         Optional<std::filesystem::path> const destination = bld_dir / package.name;
         std::filesystem::create_directories(destination.value());
 
-        Optional<bool> is_ok = build(**project, packages, new_included_packages, root_out);
+        Optional<bool> is_ok = build(**project, packages, new_included_packages, std::nullopt, root_out);
 
         if (is_ok.valueOr(is_binary_dir_fresh))
         {

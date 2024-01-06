@@ -125,6 +125,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     using BuildFunctionType = Optional<bool>(Project&        project,
                                              Packages const& packages,
                                              std::set<std::string>,
+                                             std::optional<std::chrono::steady_clock::time_point> const&,
                                              std::ostream&);
 
     using BuildFunction = std::function<BuildFunctionType>;

@@ -59,7 +59,7 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
 
     if (unit_.getOptimizationLevel().getDebugEmissionKind() == llvm::DICompileUnit::DebugEmissionKind::FullDebug)
     {
-        args.push_back("/debug:FULL");
+        args.push_back("/debug:full");
         args.push_back("/debug:dwarf");
     }
     else { args.push_back("/ltcg"); }
