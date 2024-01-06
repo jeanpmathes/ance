@@ -39,13 +39,11 @@ Shared<lang::Value> NativeBuild::getDefaultValue(lang::ResolvingHandle<lang::Typ
     return makeShared<lang::WrappedContentValue>(type, content_value, context_);
 }
 
-Shared<lang::Constant> NativeBuild::getCString(std::string string)
+Shared<lang::Constant> NativeBuild::getCString(std::string const& string)
 {
-    llvm::Constant* constant = ir_builder_.CreateGlobalStringPtr(string);
-
     return makeShared<lang::WrappedConstant>(
         context_.ctx().getPointerType(context_.ctx().getFixedWidthIntegerType(8, false)),
-        constant);
+        getCStringConstant(string));
 }
 
 Shared<lang::Constant> NativeBuild::getSizeValue(size_t size)
@@ -195,33 +193,46 @@ llvm::Constant* NativeBuild::getIntegerConstant(llvm::APInt int_value)
                                   int_value);
 }
 
-llvm::Constant* NativeBuild::getByteStringConstant(std::string string)
+llvm::Constant* NativeBuild::getByteStringConstant(std::string const& string)
 {
-    return llvm::ConstantDataArray::getString(llvm_context_, string, false);
+    auto iterator = byte_strings_.find(string);
+    if (iterator == byte_strings_.end())
+    {
+        llvm::Constant* constant        = llvm::ConstantDataArray::getString(llvm_context_, string, false);
+        std::tie(iterator, std::ignore) = byte_strings_.emplace(string, constant);
+    }
+
+    auto const& [_, constant] = *iterator;
+    return constant;
 }
 
-llvm::Constant* NativeBuild::getCodepointStringConstant(std::u32string string)
+llvm::Constant* NativeBuild::getCodepointStringConstant(std::u32string const& string)
 {
-    auto const* ptr  = reinterpret_cast<char const*>(string.data());
-    llvm::Type* type = context_.ctx().getCharType()->getContentType(context_);
+    auto iterator = codepoint_strings_.find(string);
+    if (iterator == codepoint_strings_.end())
+    {
+        auto const* ptr  = reinterpret_cast<char const*>(string.data());
+        llvm::Type* type = context_.ctx().getCharType()->getContentType(context_);
 
-    return llvm::ConstantDataArray::getRaw(ptr, string.size(), type);
+        llvm::Constant* constant        = llvm::ConstantDataArray::getRaw(ptr, string.size(), type);
+        std::tie(iterator, std::ignore) = codepoint_strings_.emplace(string, constant);
+    }
+
+    auto const& [_, constant] = *iterator;
+    return constant;
 }
 
-llvm::Constant* NativeBuild::getCStringConstant(std::string string)
+llvm::Constant* NativeBuild::getCStringConstant(std::string const& string)
 {
-    llvm::Constant* content     = llvm::ConstantDataArray::getString(llvm_context_, string, true);
-    auto*           str_arr_ptr = new llvm::GlobalVariable(llvm_module_,
-                                                 content->getType(),
-                                                 true,
-                                                 llvm::GlobalValue::PrivateLinkage,
-                                                 content,
-                                                 "data.str");
+    auto iterator = c_strings_.find(string);
+    if (iterator == c_strings_.end())
+    {
+        llvm::Constant* constant        = ir_builder_.CreateGlobalStringPtr(string);
+        std::tie(iterator, std::ignore) = c_strings_.emplace(string, constant);
+    }
 
-    llvm::Constant*                      zero    = llvm::ConstantInt::get(llvm::Type::getInt32Ty(llvm_context_), 0);
-    std::array<llvm::Constant*, 2> const indices = {zero, zero};
-
-    return llvm::ConstantExpr::getInBoundsGetElementPtr(str_arr_ptr->getValueType(), str_arr_ptr, indices);
+    auto const& [_, constant] = *iterator;
+    return constant;
 }
 
 Execution::Function NativeBuild::createFunction(lang::Identifier const&               name,

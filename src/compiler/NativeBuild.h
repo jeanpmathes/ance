@@ -3,6 +3,8 @@
 
 #include "Execution.h"
 
+#include <map>
+
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
@@ -23,7 +25,7 @@ class NativeBuild : public Execution
     ~NativeBuild() override = default;
 
     Shared<lang::Value>    getDefaultValue(lang::ResolvingHandle<lang::Type> type) override;
-    Shared<lang::Constant> getCString(std::string string) override;
+    Shared<lang::Constant> getCString(std::string const& string) override;
     Shared<lang::Constant> getSizeValue(std::size_t size) override;
     Shared<lang::Constant> getDiffValue(std::ptrdiff_t diff) override;
     Shared<lang::Constant> getSizeOf(lang::ResolvingHandle<lang::Type> type) override;
@@ -39,9 +41,9 @@ class NativeBuild : public Execution
     llvm::Constant* getByteConstant(uint8_t byte) override;
     llvm::Constant* getFloatConstant(llvm::APFloat float_value) override;
     llvm::Constant* getIntegerConstant(llvm::APInt int_value) override;
-    llvm::Constant* getByteStringConstant(std::string string) override;
-    llvm::Constant* getCodepointStringConstant(std::u32string string) override;
-    llvm::Constant* getCStringConstant(std::string string) override;
+    llvm::Constant* getByteStringConstant(std::string const& string) override;
+    llvm::Constant* getCodepointStringConstant(std::u32string const& string) override;
+    llvm::Constant* getCStringConstant(std::string const& string) override;
 
     Function            createFunction(lang::Identifier const&               name,
                                        std::string const&                    linkage_name,
@@ -162,6 +164,10 @@ class NativeBuild : public Execution
     llvm::DICompileUnit* llvm_di_unit_;
     llvm::IRBuilder<>&   ir_builder_;
     llvm::DIBuilder&     di_builder_;
+
+    std::map<std::string, llvm::Constant*>    byte_strings_      = {};
+    std::map<std::u32string, llvm::Constant*> codepoint_strings_ = {};
+    std::map<std::string, llvm::Constant*>    c_strings_         = {};
 
     struct NativeFunction {
         llvm::Function*                                llvm_function;

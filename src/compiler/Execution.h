@@ -41,7 +41,7 @@ class Execution
      * @param string The string to get as a constant.
      * @return The constant.
      */
-    virtual Shared<lang::Constant> getCString(std::string string) = 0;
+    virtual Shared<lang::Constant> getCString(std::string const& string) = 0;
 
     /**
      * Get the given size as a constant.
@@ -114,9 +114,9 @@ class Execution
     virtual llvm::Constant* getByteConstant(uint8_t byte)                     = 0;
     virtual llvm::Constant* getFloatConstant(llvm::APFloat float_value)       = 0;
     virtual llvm::Constant* getIntegerConstant(llvm::APInt int_value)         = 0;
-    virtual llvm::Constant* getByteStringConstant(std::string string)         = 0;
-    virtual llvm::Constant* getCodepointStringConstant(std::u32string string) = 0;
-    virtual llvm::Constant* getCStringConstant(std::string string)            = 0;
+    virtual llvm::Constant* getByteStringConstant(std::string const& string)         = 0;
+    virtual llvm::Constant* getCodepointStringConstant(std::u32string const& string) = 0;
+    virtual llvm::Constant* getCStringConstant(std::string const& string)            = 0;
 
     enum class Application : size_t
     {
