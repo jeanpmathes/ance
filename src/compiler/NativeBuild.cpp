@@ -15,6 +15,18 @@
 #include "lang/type/SizeType.h"
 #include "lang/type/VectorType.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-macros"
+
+#define LLVM_CONCAT_NAME(value, name) value->getName() + name
+#define LLVM_DROP_NAME(value, name) ""
+
+#pragma clang diagnostic pop
+
+#define LLVM_BUILD_NAME(value, name) LLVM_DROP_NAME(value, name)
+#define LLVM_NAME(value, name) LLVM_BUILD_NAME(value, name)
+#define LLVM_NAME2(lhs, rhs, name) lhs->getName().empty() ? LLVM_BUILD_NAME(rhs, name) : LLVM_BUILD_NAME(lhs, name)
+
 template<class>
 inline constexpr bool False = false;
 
@@ -333,7 +345,7 @@ Shared<lang::Value> NativeBuild::performFunctionCall(Function function, std::vec
 
     auto* return_value_content = ir().CreateCall(native_function, native_arguments);
     if (!native_function->getFunctionType()->getReturnType()->isVoidTy())
-        return_value_content->setName(native_function->getName() + ".call");
+        return_value_content->setName(LLVM_NAME(native_function, ".call"));
 
     if (return_type->isUnitType()) { return lang::UnitConstant::create(context_.ctx()); }
 
@@ -705,7 +717,7 @@ Shared<lang::Value> NativeBuild::computeAllocatedSize(lang::ResolvingHandle<lang
         count.value()->buildContentValue(context_);
         llvm::Value* count_content = count.value()->getContentValue();
 
-        allocated_size = ir().CreateMul(count_content, element_size, count_content->getName() + ".mul");
+        allocated_size = ir().CreateMul(count_content, element_size, LLVM_NAME(count_content, ".mul"));
     }
 
     return makeShared<lang::WrappedContentValue>(size_type, allocated_size, context_);
@@ -762,7 +774,7 @@ Shared<lang::Value> NativeBuild::computeElementPointer(Shared<lang::Value> seque
         bounds_diff_value->buildContentValue(context_);
         llvm::Value* native_bounds = bounds_diff_value->getContentValue();
 
-        llvm::Value* in_bounds = ir().CreateICmpULT(native_index, native_bounds, native_index->getName() + ".icmp");
+        llvm::Value* in_bounds = ir().CreateICmpULT(native_index, native_bounds, LLVM_NAME(native_index, ".icmp"));
 
         Shared<lang::Value> truth =
             makeShared<lang::WrappedContentValue>(context_.ctx().getBooleanType(), in_bounds, context_);
@@ -771,7 +783,7 @@ Shared<lang::Value> NativeBuild::computeElementPointer(Shared<lang::Value> seque
     }
 
     lang::ResolvingHandle<lang::Type> ptr_type = context_.ctx().getPointerType(element_type.value());
-    llvm::Value* element_ptr = ir().CreateGEP(base_type, sequence_ptr, indices, sequence_ptr->getName() + ".gep");
+    llvm::Value* element_ptr = ir().CreateGEP(base_type, sequence_ptr, indices, LLVM_NAME(sequence_ptr, ".gep"));
 
     return makeShared<lang::WrappedContentValue>(ptr_type, element_ptr, context_);
 }
@@ -794,7 +806,7 @@ Shared<lang::Value> NativeBuild::computeMemberPointer(Shared<lang::Value>     st
     llvm::Value* member_ptr = ir().CreateStructGEP(struct_type->getContentType(context_),
                                                    struct_ptr_content,
                                                    static_cast<unsigned int>(member_index),
-                                                   struct_ptr_content->getName() + ".gep");
+                                                   LLVM_NAME(struct_ptr_content, ".gep"));
 
     return makeShared<lang::WrappedContentValue>(member_ptr_type, member_ptr, context_);
 }
@@ -861,8 +873,7 @@ Shared<lang::Value> NativeBuild::computeCastedAddress(Shared<lang::Value>       
     llvm::Value* address_content = address->getContentValue();
 
     llvm::Value* casted_address_content = ir().CreateBitCast(address_content,
-                                                             new_type->getContentType(context_),
-                                                             address_content->getName() + ".bitcast");
+                                                             new_type->getContentType(context_), LLVM_NAME(address_content, ".bitcast"));
 
     return makeShared<lang::WrappedContentValue>(new_type, casted_address_content, context_);
 }
@@ -877,7 +888,7 @@ Shared<lang::Value> NativeBuild::computeConversionOnFP(Shared<lang::Value>      
     llvm::Value* content_value = value->getContentValue();
 
     llvm::Value* converted_value =
-        ir().CreateFPCast(content_value, destination_type->getContentType(context_), content_value->getName() + ".f2f");
+        ir().CreateFPCast(content_value, destination_type->getContentType(context_), LLVM_NAME(content_value, ".f2f"));
 
     return makeShared<lang::WrappedContentValue>(destination_type, converted_value, context_);
 }
@@ -894,7 +905,7 @@ Shared<lang::Value> NativeBuild::computeConversionOnI(Shared<lang::Value>       
     llvm::Value* converted_value = ir().CreateIntCast(content_value,
                                                       destination_type->getContentType(context_),
                                                       value->type()->isSigned(),
-                                                      content_value->getName() + ".i2i");
+                                                      LLVM_NAME(content_value, ".i2i"));
 
     return makeShared<lang::WrappedContentValue>(destination_type, converted_value, context_);
 }
@@ -914,13 +925,13 @@ Shared<lang::Value> NativeBuild::computeConversionFP2I(Shared<lang::Value>      
     {
         converted_value = ir().CreateFPToSI(content_value,
                                             destination_type->getContentType(context_),
-                                            content_value->getName() + ".f2i");
+                                            LLVM_NAME(content_value, ".f2i"));
     }
     else
     {
         converted_value = ir().CreateFPToUI(content_value,
                                             destination_type->getContentType(context_),
-                                            content_value->getName() + ".f2i");
+                                            LLVM_NAME(content_value, ".f2i"));
     }
 
     return makeShared<lang::WrappedContentValue>(destination_type, converted_value, context_);
@@ -941,13 +952,13 @@ Shared<lang::Value> NativeBuild::computeConversionI2FP(Shared<lang::Value>      
     {
         converted_value = ir().CreateSIToFP(content_value,
                                             destination_type->getContentType(context_),
-                                            content_value->getName() + ".i2f");
+                                            LLVM_NAME(content_value, ".i2f"));
     }
     else
     {
         converted_value = ir().CreateUIToFP(content_value,
                                             destination_type->getContentType(context_),
-                                            content_value->getName() + ".i2f");
+                                            LLVM_NAME(content_value, ".i2f"));
     }
 
     return makeShared<lang::WrappedContentValue>(destination_type, converted_value, context_);
@@ -978,7 +989,7 @@ Shared<lang::Value> NativeBuild::computeAddressIsNotNull(Shared<lang::Value> add
     address->buildContentValue(context_);
     llvm::Value* content_value = address->getContentValue();
 
-    llvm::Value* is_not_null = ir().CreateIsNotNull(content_value, content_value->getName() + ".nnull");
+    llvm::Value* is_not_null = ir().CreateIsNotNull(content_value, LLVM_NAME(content_value, ".nnull"));
 
     return makeShared<lang::WrappedContentValue>(context_.ctx().getBooleanType(), is_not_null, context_);
 }
@@ -999,13 +1010,14 @@ Shared<lang::Value> NativeBuild::computeAddressDiff(Shared<lang::Value> lhs, Sha
     llvm::Value* left_value  = lhs->getContentValue();
     llvm::Value* right_value = rhs->getContentValue();
 
-    llvm::StringRef name = left_value->getName();
-    if (name.empty()) name = right_value->getName();
-
-    llvm::Value* diff =
-        ir().CreatePtrDiff(element_type->getContentType(context_), left_value, right_value, name + ".ptrdiff");
-    llvm::Value* result =
-        ir().CreateIntCast(diff, context_.ctx().getDiffType()->getContentType(context_), true, name + ".icast");
+    llvm::Value* diff = ir().CreatePtrDiff(element_type->getContentType(context_),
+                                           left_value,
+                                           right_value,
+                                           LLVM_NAME2(left_value, right_value, ".diff"));
+    llvm::Value* result = ir().CreateIntCast(diff,
+                                             context_.ctx().getDiffType()->getContentType(context_),
+                                             true,
+                                             LLVM_NAME(diff, ".diff"));
 
     return makeShared<lang::WrappedContentValue>(context_.ctx().getDiffType(), result, context_);
 }
@@ -1159,23 +1171,22 @@ Shared<lang::Value> NativeBuild::performOperator(lang::UnaryOperator op, Shared<
     llvm::Value* content_value = value->getContentValue();
 
     llvm::Value*          result = nullptr;
-    llvm::StringRef const name   = content_value->getName();
 
     switch (op)
     {
         case lang::UnaryOperator::NOT:
             if (is_integer_type) { throw std::logic_error("Undefined behaviour"); }
             if (is_float_type) { throw std::logic_error("Undefined behaviour"); }
-            if (is_boolean_type) { result = ir().CreateNot(content_value, name + ".not"); }
+            if (is_boolean_type) { result = ir().CreateNot(content_value, LLVM_NAME(content_value, ".not")); }
             break;
         case lang::UnaryOperator::BITWISE_NOT:
-            if (is_integer_type) { result = ir().CreateNot(content_value, name + ".not"); }
+            if (is_integer_type) { result = ir().CreateNot(content_value, LLVM_NAME(content_value, ".not")); }
             if (is_float_type) { throw std::logic_error("Undefined behaviour"); }
-            if (is_boolean_type) { result = ir().CreateNot(content_value, name + ".not"); }
+            if (is_boolean_type) { result = ir().CreateNot(content_value, LLVM_NAME(content_value, ".not")); }
             break;
         case lang::UnaryOperator::NEGATION:
-            if (is_integer_type) { result = ir().CreateNeg(content_value, name + ".neg"); }
-            if (is_float_type) { result = ir().CreateFNeg(content_value, name + ".neg"); }
+            if (is_integer_type) { result = ir().CreateNeg(content_value, LLVM_NAME(content_value, ".neg")); }
+            if (is_float_type) { result = ir().CreateFNeg(content_value, LLVM_NAME(content_value, ".neg")); }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
             break;
     }
@@ -1203,9 +1214,6 @@ Shared<lang::Value> NativeBuild::performOperator(lang::BinaryOperator op,
 
     llvm::Value* result = nullptr;
 
-    llvm::StringRef name = left_value->getName();
-    if (name.empty()) { name = right_value->getName(); }
-
     bool const is_integer_type = lhs->type()->isXOrVectorOfX([](auto& t) { return t.isIntegerType(); });
     bool const is_float_type   = rhs->type()->isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); });
     bool const is_boolean_type = rhs->type()->isXOrVectorOfX([](auto& t) { return t.isBooleanType(); });
@@ -1215,109 +1223,191 @@ Shared<lang::Value> NativeBuild::performOperator(lang::BinaryOperator op,
     switch (op)
     {
         case lang::BinaryOperator::ADDITION:
-            if (is_integer_type) { result = ir().CreateAdd(left_value, right_value, name + ".add"); }
-            if (is_float_type) { result = ir().CreateFAdd(left_value, right_value, name + ".fadd"); }
+            if (is_integer_type)
+            {
+                result = ir().CreateAdd(left_value, right_value, LLVM_NAME2(left_value, right_value, ".add"));
+            }
+            if (is_float_type)
+            {
+                result = ir().CreateFAdd(left_value, right_value, LLVM_NAME2(left_value, right_value, ".fadd"));
+            }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
             break;
         case lang::BinaryOperator::SUBTRACTION:
-            if (is_integer_type) { result = ir().CreateSub(left_value, right_value, name + ".sub"); }
-            if (is_float_type) { result = ir().CreateFSub(left_value, right_value, name + ".fsub"); }
+            if (is_integer_type)
+            {
+                result = ir().CreateSub(left_value, right_value, LLVM_NAME2(left_value, right_value, ".sub"));
+            }
+            if (is_float_type)
+            {
+                result = ir().CreateFSub(left_value, right_value, LLVM_NAME2(left_value, right_value, ".fsub"));
+            }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
             break;
         case lang::BinaryOperator::MULTIPLICATION:
-            if (is_integer_type) { result = ir().CreateMul(left_value, right_value, name + ".mul"); }
-            if (is_float_type) { result = ir().CreateFMul(left_value, right_value, name + ".fmul"); }
+            if (is_integer_type)
+            {
+                result = ir().CreateMul(left_value, right_value, LLVM_NAME2(left_value, right_value, ".mul"));
+            }
+            if (is_float_type)
+            {
+                result = ir().CreateFMul(left_value, right_value, LLVM_NAME2(left_value, right_value, ".fmul"));
+            }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
             break;
         case lang::BinaryOperator::DIVISION:
             if (is_integer_type)
             {
-                if (is_signed) result = ir().CreateSDiv(left_value, right_value, name + ".sdiv");
-                else result = ir().CreateUDiv(left_value, right_value, name + ".udiv");
+                if (is_signed)
+                    result = ir().CreateSDiv(left_value, right_value, LLVM_NAME2(left_value, right_value, ".sdiv"));
+                else result = ir().CreateUDiv(left_value, right_value, LLVM_NAME2(left_value, right_value, ".udiv"));
             }
-            if (is_float_type) { result = ir().CreateFDiv(left_value, right_value, name + ".fdiv"); }
+            if (is_float_type)
+            {
+                result = ir().CreateFDiv(left_value, right_value, LLVM_NAME2(left_value, right_value, ".fdiv"));
+            }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
             break;
         case lang::BinaryOperator::REMAINDER:
             if (is_integer_type)
             {
-                if (is_signed) result = ir().CreateSRem(left_value, right_value, name + ".srem");
-                else result = ir().CreateURem(left_value, right_value, name + ".urem");
+                if (is_signed)
+                    result = ir().CreateSRem(left_value, right_value, LLVM_NAME2(left_value, right_value, ".srem"));
+                else result = ir().CreateURem(left_value, right_value, LLVM_NAME2(left_value, right_value, ".urem"));
             }
-            if (is_float_type) { result = ir().CreateFRem(left_value, right_value, name + ".frem"); }
+            if (is_float_type)
+            {
+                result = ir().CreateFRem(left_value, right_value, LLVM_NAME2(left_value, right_value, ".frem"));
+            }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
             break;
         case lang::BinaryOperator::LESS_THAN:
             if (is_integer_type)
             {
-                if (is_signed) result = ir().CreateICmpSLT(left_value, right_value, name + ".icmp");
-                else result = ir().CreateICmpULT(left_value, right_value, name + ".icmp");
+                if (is_signed)
+                    result = ir().CreateICmpSLT(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
+                else result = ir().CreateICmpULT(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
             }
-            if (is_float_type) { result = ir().CreateFCmpULT(left_value, right_value, name + ".fcmp"); }
+            if (is_float_type)
+            {
+                result = ir().CreateFCmpULT(left_value, right_value, LLVM_NAME2(left_value, right_value, ".fcmp"));
+            }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
             break;
         case lang::BinaryOperator::LESS_THAN_OR_EQUAL:
             if (is_integer_type)
             {
-                if (is_signed) result = ir().CreateICmpSLE(left_value, right_value, name + ".icmp");
-                else result = ir().CreateICmpULE(left_value, right_value, name + ".icmp");
+                if (is_signed)
+                    result = ir().CreateICmpSLE(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
+                else result = ir().CreateICmpULE(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
             }
-            if (is_float_type) { result = ir().CreateFCmpULE(left_value, right_value, name + ".fcmp"); }
+            if (is_float_type)
+            {
+                result = ir().CreateFCmpULE(left_value, right_value, LLVM_NAME2(left_value, right_value, ".fcmp"));
+            }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
             break;
         case lang::BinaryOperator::GREATER_THAN:
             if (is_integer_type)
             {
-                if (is_signed) result = ir().CreateICmpSGT(left_value, right_value, name + ".icmp");
-                else result = ir().CreateICmpUGT(left_value, right_value, name + ".icmp");
+                if (is_signed)
+                    result = ir().CreateICmpSGT(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
+                else result = ir().CreateICmpUGT(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
             }
-            if (is_float_type) { result = ir().CreateFCmpUGT(left_value, right_value, name + ".fcmp"); }
+            if (is_float_type)
+            {
+                result = ir().CreateFCmpUGT(left_value, right_value, LLVM_NAME2(left_value, right_value, ".fcmp"));
+            }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
             break;
         case lang::BinaryOperator::GREATER_THAN_OR_EQUAL:
             if (is_integer_type)
             {
-                if (is_signed) result = ir().CreateICmpSGE(left_value, right_value, name + ".icmp");
-                else result = ir().CreateICmpUGE(left_value, right_value, name + ".icmp");
+                if (is_signed)
+                    result = ir().CreateICmpSGE(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
+                else result = ir().CreateICmpUGE(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
             }
-            if (is_float_type) { result = ir().CreateFCmpUGE(left_value, right_value, name + ".fcmp"); }
+            if (is_float_type)
+            {
+                result = ir().CreateFCmpUGE(left_value, right_value, LLVM_NAME2(left_value, right_value, ".fcmp"));
+            }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
             break;
         case lang::BinaryOperator::EQUAL:
-            if (is_integer_type) { result = ir().CreateICmpEQ(left_value, right_value, name + ".icmp"); }
-            if (is_float_type) { result = ir().CreateFCmpUEQ(left_value, right_value, name + ".fcmp"); }
-            if (is_boolean_type) { result = ir().CreateICmpEQ(left_value, right_value, name + ".icmp"); }
+            if (is_integer_type)
+            {
+                result = ir().CreateICmpEQ(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
+            }
+            if (is_float_type)
+            {
+                result = ir().CreateFCmpUEQ(left_value, right_value, LLVM_NAME2(left_value, right_value, ".fcmp"));
+            }
+            if (is_boolean_type)
+            {
+                result = ir().CreateICmpEQ(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
+            }
             break;
         case lang::BinaryOperator::NOT_EQUAL:
-            if (is_integer_type) { result = ir().CreateICmpNE(left_value, right_value, name + ".icmp"); }
-            if (is_float_type) { result = ir().CreateFCmpUNE(left_value, right_value, name + ".fcmp"); }
-            if (is_boolean_type) { result = ir().CreateICmpNE(left_value, right_value, name + ".icmp"); }
+            if (is_integer_type)
+            {
+                result = ir().CreateICmpNE(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
+            }
+            if (is_float_type)
+            {
+                result = ir().CreateFCmpUNE(left_value, right_value, LLVM_NAME2(left_value, right_value, ".fcmp"));
+            }
+            if (is_boolean_type)
+            {
+                result = ir().CreateICmpNE(left_value, right_value, LLVM_NAME2(left_value, right_value, ".icmp"));
+            }
             break;
         case lang::BinaryOperator::BITWISE_AND:
-            if (is_integer_type) { result = ir().CreateAnd(left_value, right_value, name + ".and"); }
+            if (is_integer_type)
+            {
+                result = ir().CreateAnd(left_value, right_value, LLVM_NAME2(left_value, right_value, ".and"));
+            }
             if (is_float_type) { throw std::logic_error("Undefined behaviour"); }
-            if (is_boolean_type) { result = ir().CreateAnd(left_value, right_value, name + ".and"); }
+            if (is_boolean_type)
+            {
+                result = ir().CreateAnd(left_value, right_value, LLVM_NAME2(left_value, right_value, ".and"));
+            }
             break;
         case lang::BinaryOperator::BITWISE_OR:
-            if (is_integer_type) { result = ir().CreateOr(left_value, right_value, name + ".or"); }
+            if (is_integer_type)
+            {
+                result = ir().CreateOr(left_value, right_value, LLVM_NAME2(left_value, right_value, ".or"));
+            }
             if (is_float_type) { throw std::logic_error("Undefined behaviour"); }
-            if (is_boolean_type) { result = ir().CreateOr(left_value, right_value, name + ".or"); }
+            if (is_boolean_type)
+            {
+                result = ir().CreateOr(left_value, right_value, LLVM_NAME2(left_value, right_value, ".or"));
+            }
             break;
         case lang::BinaryOperator::BITWISE_XOR:
-            if (is_integer_type) { result = ir().CreateXor(left_value, right_value, name + ".xor"); }
+            if (is_integer_type)
+            {
+                result = ir().CreateXor(left_value, right_value, LLVM_NAME2(left_value, right_value, ".xor"));
+            }
             if (is_float_type) { throw std::logic_error("Undefined behaviour"); }
-            if (is_boolean_type) { result = ir().CreateXor(left_value, right_value, name + ".xor"); }
+            if (is_boolean_type)
+            {
+                result = ir().CreateXor(left_value, right_value, LLVM_NAME2(left_value, right_value, ".xor"));
+            }
             break;
         case lang::BinaryOperator::SHIFT_LEFT:
-            if (is_integer_type) { result = ir().CreateShl(left_value, right_value, name + ".shl"); }
+            if (is_integer_type)
+            {
+                result = ir().CreateShl(left_value, right_value, LLVM_NAME2(left_value, right_value, ".shl"));
+            }
             if (is_float_type) { throw std::logic_error("Undefined behaviour"); }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
             break;
         case lang::BinaryOperator::SHIFT_RIGHT:
             if (is_integer_type)
             {
-                if (is_signed) result = ir().CreateAShr(left_value, right_value, name + ".ashr");
-                else result = ir().CreateLShr(left_value, right_value, name + ".lshr");
+                if (is_signed)
+                    result = ir().CreateAShr(left_value, right_value, LLVM_NAME2(left_value, right_value, ".ashr"));
+                else result = ir().CreateLShr(left_value, right_value, LLVM_NAME2(left_value, right_value, ".lshr"));
             }
             if (is_float_type) { throw std::logic_error("Undefined behaviour"); }
             if (is_boolean_type) { throw std::logic_error("Undefined behaviour"); }
@@ -1347,7 +1437,7 @@ Shared<lang::Value> NativeBuild::performSelect(Shared<lang::Value> condition,
     llvm::Value* result_content = ir().CreateSelect(condition_content,
                                                     true_value_content,
                                                     false_value_content,
-                                                    condition_content->getName() + ".select");
+                                                    LLVM_NAME(condition_content, ".select"));
 
     return makeShared<lang::WrappedContentValue>(true_value->type(), result_content, context_);
 }
