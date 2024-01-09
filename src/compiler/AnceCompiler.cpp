@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 
+#include <llvm/Analysis/ModuleSummaryAnalysis.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Verifier.h>
@@ -60,13 +61,13 @@ AnceCompiler::AnceCompiler(SourceTree& tree, llvm::Triple const& triple)
     module_.addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
 }
 
-void AnceCompiler::compile(std::filesystem::path const& out)
+void AnceCompiler::compile(std::filesystem::path const& ilr, std::filesystem::path const& obj)
 {
     // Print control flow graph.
 
     if (unit_.isEmittingExtras())
     {
-        std::filesystem::path const cfg_path = out.parent_path() / "cfg.gml";
+        std::filesystem::path const cfg_path = ilr.parent_path() / "cfg.gml";
         std::ofstream               cfg_out(cfg_path);
         ControlFlowGraphPrinter     cfg_printer(cfg_out);
         cfg_printer.visit(unit_);
@@ -122,6 +123,8 @@ void AnceCompiler::compile(std::filesystem::path const& out)
     llvm::CGSCCAnalysisManager    cgscc_analysis_manager;
     llvm::ModuleAnalysisManager   module_analysis_manager;
 
+    module_analysis_manager.registerPass([&] { return llvm::ModuleSummaryIndexAnalysis(); });
+
     pass_builder.registerModuleAnalyses(module_analysis_manager);
     pass_builder.registerFunctionAnalyses(function_analysis_manager);
     pass_builder.registerCGSCCAnalyses(cgscc_analysis_manager);
@@ -140,7 +143,7 @@ void AnceCompiler::compile(std::filesystem::path const& out)
     }
     else
     {
-        llvm::ModulePassManager pass_manager = pass_builder.buildPerModuleDefaultPipeline(opt_level);
+        llvm::ModulePassManager pass_manager = pass_builder.buildPerModuleDefaultPipeline(opt_level, true);
         pass_manager.run(module_, module_analysis_manager);
     }
 
@@ -154,25 +157,29 @@ void AnceCompiler::compile(std::filesystem::path const& out)
     if (unit_.isEmittingExtras())
     {
         std::error_code      ec;
-        llvm::raw_fd_ostream out_stream(out.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
+        llvm::raw_fd_ostream out_stream(ilr.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
 
         if (ec) { std::cerr << "IO error while creating IR file stream: " << ec.message() << std::endl; }
 
         module_.print(out_stream, nullptr);
     }
-}
 
-void AnceCompiler::emitObject(std::filesystem::path const& out)
-{
+    // Emit object file.
 
-    std::error_code      ec;
-    llvm::raw_fd_ostream file(out.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
+    {
+        std::error_code      ec;
+        llvm::raw_fd_ostream file(obj.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
 
-    if (ec) { std::cerr << "IO error while creating object file stream: " << ec.message() << std::endl; }
+        if (ec) { std::cerr << "IO error while creating object file stream: " << ec.message() << std::endl; }
 
-    llvm::WriteBitcodeToFile(module_, file);
+        llvm::ModuleSummaryIndex* index = nullptr;
+        if (opt_level != llvm::OptimizationLevel::O0)
+            index = module_analysis_manager.getCachedResult<llvm::ModuleSummaryIndexAnalysis>(module_);
 
-    file.flush();
+        llvm::WriteBitcodeToFile(module_, file, false, index, true);
+
+        file.flush();
+    }
 }
 
 llvm::Function* AnceCompiler::buildInit()

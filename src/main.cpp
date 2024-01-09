@@ -90,8 +90,7 @@ static bool build(SourceTree&                  tree,
     std::filesystem::path const obj = obj_dir / (tree.unit().getName() + ".obj");
     std::filesystem::path const res = getResultPath(bin_dir, tree.unit(), tree.unit().getTargetTriple());
 
-    compiler.compile(ilr);
-    compiler.emitObject(obj);
+    compiler.compile(ilr, obj);
 
     tree.unit().exportPackage(bin_dir);
 

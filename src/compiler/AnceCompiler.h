@@ -28,15 +28,11 @@ class AnceCompiler
     AnceCompiler(SourceTree& tree, llvm::Triple const& triple);
 
     /**
-     * Compile the application.
-     * @param out Path to emit the llvm IR at.
+     * Compile the application, emitting an object file and potentially an IR file.
+     * @param ilr The path at which to emit the IR file.
+     * @param obj The path at which to emit the object file.
      */
-    void compile(std::filesystem::path const& out);
-    /**
-     * Emit object files.
-     * @param out The path of the object files.
-     */
-    void emitObject(std::filesystem::path const& out);
+    void compile(std::filesystem::path const& ilr, std::filesystem::path const& obj);
 
   private:
     llvm::Function* buildInit();
