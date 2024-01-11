@@ -29,13 +29,17 @@ namespace lang
                                                            lang::Location       right_location,
                                                            ValidationLogger&    validation_logger) const override;
         Shared<lang::Value>               buildOperator(lang::BinaryOperator op,
-                                                        Shared<Value>        left,
-                                                        Shared<Value>        right,
+                                                        Shared<lang::Value>  left,
+                                                        Shared<lang::Value>  right,
                                                         CompileContext&      context) override;
 
-        void performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context) override;
-        void performCopyInitializer(Shared<Value> ptr, Shared<Value> original, CompileContext& context) override;
-        void performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context) override;
+        void performDefaultInitializer(Shared<lang::Value> ptr,
+                                       Shared<lang::Value> count,
+                                       CompileContext&     context) override;
+        void performCopyInitializer(Shared<lang::Value> ptr,
+                                    Shared<lang::Value> original,
+                                    CompileContext&     context) override;
+        void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) override;
 
       protected:
         std::string   createMangledName() const override;

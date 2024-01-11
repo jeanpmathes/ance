@@ -142,5 +142,5 @@ bool lang::IntegerConstant::equals(lang::Constant const* other) const
 
 Shared<lang::Constant> lang::IntegerConstant::clone(lang::Context& new_context) const
 {
-    return Shared<Constant>(*(new IntegerConstant(text_, radix_, type_->getUndefinedTypeClone(new_context))));
+    return Shared<lang::Constant>(*(new IntegerConstant(text_, radix_, type_->getUndefinedTypeClone(new_context))));
 }

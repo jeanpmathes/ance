@@ -549,7 +549,9 @@ namespace lang
          * @param context The current compile context.
          * @return The return value.
          */
-        Shared<lang::Value> buildSubscript(Shared<Value> indexed, Shared<Value> index, CompileContext& context);
+        Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
+                                           Shared<lang::Value> index,
+                                           CompileContext&     context);
 
         /**
          * Build a binary operation.
@@ -560,8 +562,8 @@ namespace lang
          * @return The result value.
          */
         Shared<lang::Value> buildOperator(lang::BinaryOperator op,
-                                          Shared<Value>        left,
-                                          Shared<Value>        right,
+                                          Shared<lang::Value>  left,
+                                          Shared<lang::Value>  right,
                                           CompileContext&      context);
 
         /**
@@ -571,7 +573,7 @@ namespace lang
          * @param context The current compile context.
          * @return The result value.
          */
-        Shared<lang::Value> buildOperator(lang::UnaryOperator op, Shared<Value> value, CompileContext& context);
+        Shared<lang::Value> buildOperator(lang::UnaryOperator op, Shared<lang::Value> value, CompileContext& context);
 
         /**
          * Build an implicit conversion.
@@ -581,7 +583,7 @@ namespace lang
          * @return The converted value.
          */
         Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                    Shared<Value>                     value,
+                                                    Shared<lang::Value>               value,
                                                     CompileContext&                   context);
 
         /**
@@ -592,7 +594,7 @@ namespace lang
          * @return The casted value.
          */
         Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
-                                      Shared<Value>                     value,
+                                      Shared<lang::Value>               value,
                                       CompileContext&                   context);
 
         /**
@@ -602,7 +604,7 @@ namespace lang
          * @param context The current compile context.
          * @return The result value.
          */
-        Shared<lang::Value> buildMemberAccess(Shared<Value>           value,
+        Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
                                               lang::Identifier const& name,
                                               CompileContext&         context);
 
@@ -612,14 +614,14 @@ namespace lang
          * @param context The current compile context.
          * @return The result value, which is a reference of indirection return type.
          */
-        Shared<lang::Value> buildIndirection(Shared<Value> value, CompileContext& context);
+        Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context);
 
         /**
          * Build the default initializer for this type.
          * @param ptr A pointer to where the value should be initialized.
          * @param context The current compile context.
          */
-        void performDefaultInitializer(Shared<Value> ptr, CompileContext& context);
+        void performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context);
 
         /**
          * Build the default initializer for this type, initializing multiple instances.
@@ -627,7 +629,7 @@ namespace lang
          * @param count The number of instances to initialize.
          * @param context The current compile context.
          */
-        void performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context);
+        void performDefaultInitializer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context);
 
         /**
          * Build the copy initializer for this type.
@@ -635,14 +637,16 @@ namespace lang
          * @param source A pointer to the original value.
          * @param context The current compile context.
          */
-        void performCopyInitializer(Shared<Value> destination, Shared<Value> source, CompileContext& context);
+        void performCopyInitializer(Shared<lang::Value> destination,
+                                    Shared<lang::Value> source,
+                                    CompileContext&     context);
 
         /**
          * Build the destructor for this type.
          * @param ptr The pointer to the value to destruct.
          * @param context The current compile context.
          */
-        void performFinalizer(Shared<Value> ptr, CompileContext& context);
+        void performFinalizer(Shared<lang::Value> ptr, CompileContext& context);
 
         /**
          * Build the default destructor for this type.
@@ -650,7 +654,7 @@ namespace lang
          * @param count The number of instances to destruct.
          * @param context The current compile context.
          */
-        void performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context);
+        void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context);
 
         /**
          * Build the native backing required for the declaration.

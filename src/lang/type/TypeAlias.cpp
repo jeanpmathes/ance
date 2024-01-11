@@ -209,7 +209,9 @@ bool lang::TypeAlias::validateSubscript(lang::Location    indexed_location,
     return actual_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildSubscript(Shared<Value> indexed, Shared<Value> index, CompileContext& context)
+Shared<lang::Value> lang::TypeAlias::buildSubscript(Shared<lang::Value> indexed,
+                                                    Shared<lang::Value> index,
+                                                    CompileContext&     context)
 {
     return actual_->buildSubscript(indexed, index, context);
 }
@@ -227,7 +229,7 @@ bool lang::TypeAlias::validateImplicitConversion(lang::Type const& other,
 }
 
 Shared<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                             Shared<Value>                     value,
+                                                             Shared<lang::Value>               value,
                                                              CompileContext&                   context)
 {
     return actual_->buildImplicitConversion(other, value, context);
@@ -246,7 +248,7 @@ bool lang::TypeAlias::validateCast(lang::Type const& other,
 }
 
 Shared<lang::Value> lang::TypeAlias::buildCast(lang::ResolvingHandle<lang::Type> other,
-                                               Shared<Value>                     value,
+                                               Shared<lang::Value>               value,
                                                CompileContext&                   context)
 {
     return actual_->buildCast(other, value, context);
@@ -269,7 +271,9 @@ bool lang::TypeAlias::validateOperator(lang::UnaryOperator op,
     return actual_->validateOperator(op, location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildOperator(lang::UnaryOperator op, Shared<Value> value, CompileContext& context)
+Shared<lang::Value> lang::TypeAlias::buildOperator(lang::UnaryOperator op,
+                                                   Shared<lang::Value> value,
+                                                   CompileContext&     context)
 {
     return actual_->buildOperator(op, value, context);
 }
@@ -295,8 +299,8 @@ bool lang::TypeAlias::validateOperator(lang::BinaryOperator op,
 }
 
 Shared<lang::Value> lang::TypeAlias::buildOperator(lang::BinaryOperator op,
-                                                   Shared<Value>        left,
-                                                   Shared<Value>        right,
+                                                   Shared<lang::Value>  left,
+                                                   Shared<lang::Value>  right,
                                                    CompileContext&      context)
 {
     return actual_->buildOperator(op, left, right, context);
@@ -317,7 +321,7 @@ bool lang::TypeAlias::validateMemberAccess(lang::Identifier const& name, Validat
     return actual_->validateMemberAccess(name, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildMemberAccess(Shared<Value>           value,
+Shared<lang::Value> lang::TypeAlias::buildMemberAccess(Shared<lang::Value>     value,
                                                        lang::Identifier const& name,
                                                        CompileContext&         context)
 {
@@ -339,22 +343,26 @@ bool lang::TypeAlias::validateIndirection(lang::Location location, ValidationLog
     return actual_->validateIndirection(location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildIndirection(Shared<Value> value, CompileContext& context)
+Shared<lang::Value> lang::TypeAlias::buildIndirection(Shared<lang::Value> value, CompileContext& context)
 {
     return actual_->buildIndirection(value, context);
 }
 
-void lang::TypeAlias::performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context)
+void lang::TypeAlias::performDefaultInitializer(Shared<lang::Value> ptr,
+                                                Shared<lang::Value> count,
+                                                CompileContext&     context)
 {
     actual_->performDefaultInitializer(ptr, count, context);
 }
 
-void lang::TypeAlias::performCopyInitializer(Shared<Value> destination, Shared<Value> count, CompileContext& context)
+void lang::TypeAlias::performCopyInitializer(Shared<lang::Value> destination,
+                                             Shared<lang::Value> count,
+                                             CompileContext&     context)
 {
     actual_->performCopyInitializer(destination, count, context);
 }
 
-void lang::TypeAlias::performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context)
+void lang::TypeAlias::performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context)
 {
     actual_->performFinalizer(ptr, count, context);
 }

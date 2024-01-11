@@ -57,8 +57,8 @@ bool lang::SequenceType::validateSubscript(lang::Location,
     return lang::Type::checkMismatch(scope()->context().getSizeType(), index_type, index_location, validation_logger);
 }
 
-Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<Value>   indexed,
-                                                       Shared<Value>   index,
+Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> indexed,
+                                                       Shared<lang::Value> index,
                                                        CompileContext& context)
 {
     return buildSubscript(indexed, index, true, context);

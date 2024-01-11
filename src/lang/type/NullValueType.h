@@ -22,7 +22,7 @@ namespace lang
                                                        lang::Location    location,
                                                        ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                    Shared<Value>                     value,
+                                                    Shared<lang::Value>               value,
                                                     CompileContext&                   context) override;
 
       protected:

@@ -37,7 +37,7 @@ bool lang::AddressType::validateCast(lang::Type const&, lang::Location, Validati
 }
 
 Shared<lang::Value> lang::AddressType::buildCast(lang::ResolvingHandle<lang::Type> other,
-                                                 Shared<Value>                     value,
+                                                 Shared<lang::Value>               value,
                                                  CompileContext&                   context)
 {
     if (other->isAddressType())
@@ -89,8 +89,8 @@ bool lang::AddressType::validateOperator(lang::BinaryOperator,
 }
 
 Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
-                                                     Shared<Value>        left,
-                                                     Shared<Value>        right,
+                                                     Shared<lang::Value>  left,
+                                                     Shared<lang::Value>  right,
                                                      CompileContext&      context)
 {
     if (right->type()->isReferenceType()) right = context.exec().performDereference(right);

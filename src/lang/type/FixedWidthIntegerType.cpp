@@ -59,7 +59,7 @@ bool lang::FixedWidthIntegerType::validateCast(lang::Type const& other,
 }
 
 Shared<lang::Value> lang::FixedWidthIntegerType::buildCast(lang::ResolvingHandle<lang::Type> other,
-                                                           Shared<Value>                     value,
+                                                           Shared<lang::Value>               value,
                                                            CompileContext&                   context)
 {
     if (other->isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_)

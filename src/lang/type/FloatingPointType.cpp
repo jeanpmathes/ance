@@ -44,7 +44,7 @@ bool lang::FloatingPointType::validateImplicitConversion(lang::Type const&, lang
 }
 
 Shared<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                     Shared<Value>                     value,
+                                                                     Shared<lang::Value>               value,
                                                                      CompileContext&                   context)
 {
     return context.exec().computeConversionOnFP(value, other);
@@ -61,7 +61,7 @@ bool lang::FloatingPointType::validateCast(lang::Type const&, lang::Location, Va
 }
 
 Shared<lang::Value> lang::FloatingPointType::buildCast(lang::ResolvingHandle<lang::Type> other,
-                                                       Shared<Value>                     value,
+                                                       Shared<lang::Value>               value,
                                                        CompileContext&                   context)
 {
     if (other->isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
@@ -93,7 +93,7 @@ bool lang::FloatingPointType::validateOperator(lang::UnaryOperator, lang::Locati
 }
 
 Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator op,
-                                                           Shared<Value>       value,
+                                                           Shared<lang::Value> value,
                                                            CompileContext&     context)
 {
     return context.exec().performOperator(op, value);
@@ -129,8 +129,8 @@ bool lang::FloatingPointType::validateOperator(lang::BinaryOperator,
 }
 
 Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::BinaryOperator op,
-                                                           Shared<Value>        left,
-                                                           Shared<Value>        right,
+                                                           Shared<lang::Value>  left,
+                                                           Shared<lang::Value>  right,
                                                            CompileContext&      context)
 {
     if (left->type()->isReferenceType()) left = context.exec().performDereference(left);

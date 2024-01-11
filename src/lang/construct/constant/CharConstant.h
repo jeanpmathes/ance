@@ -37,7 +37,7 @@ namespace lang
         bool equals(lang::Constant const* other) const override;
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
-        Shared<Constant> clone(lang::Context& new_context) const override;
+        Shared<lang::Constant> clone(lang::Context& new_context) const override;
 
         /**
          * Parse a character from a string.

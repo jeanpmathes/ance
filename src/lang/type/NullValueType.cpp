@@ -28,7 +28,7 @@ bool lang::NullValueType::validateImplicitConversion(lang::Type const&, lang::Lo
 }
 
 Shared<lang::Value> lang::NullValueType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                                 Shared<Value>,
+                                                                 Shared<lang::Value>,
                                                                  CompileContext& context)
 {
     return context.exec().getNull(other);

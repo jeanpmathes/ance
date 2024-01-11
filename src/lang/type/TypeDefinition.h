@@ -162,28 +162,36 @@ namespace lang
         virtual bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const;
         virtual bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const;
 
-        virtual Shared<lang::Value> buildSubscript(Shared<Value> indexed, Shared<Value> index, CompileContext& context);
+        virtual Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
+                                                   Shared<lang::Value> index,
+                                                   CompileContext&     context);
         virtual Shared<lang::Value> buildOperator(lang::BinaryOperator op,
-                                                  Shared<Value>        left,
-                                                  Shared<Value>        right,
+                                                  Shared<lang::Value>  left,
+                                                  Shared<lang::Value>  right,
                                                   CompileContext&      context);
-        virtual Shared<lang::Value> buildOperator(lang::UnaryOperator op, Shared<Value> value, CompileContext& context);
+        virtual Shared<lang::Value> buildOperator(lang::UnaryOperator op,
+                                                  Shared<lang::Value> value,
+                                                  CompileContext&     context);
         virtual Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                            Shared<Value>                     value,
+                                                            Shared<lang::Value>               value,
                                                             CompileContext&                   context);
         virtual Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
-                                              Shared<Value>                     value,
+                                              Shared<lang::Value>               value,
                                               CompileContext&                   context);
-        virtual Shared<lang::Value> buildMemberAccess(Shared<Value>           value,
+        virtual Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
                                                       lang::Identifier const& name,
                                                       CompileContext&         context);
-        virtual Shared<lang::Value> buildIndirection(Shared<Value> value, CompileContext& context);
+        virtual Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context);
 
-        void         performDefaultInitializer(Shared<Value> ptr, CompileContext& context);
-        virtual void performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context);
-        virtual void performCopyInitializer(Shared<Value> destination, Shared<Value> source, CompileContext& context);
-        void         performFinalizer(Shared<Value> ptr, CompileContext& context);
-        virtual void performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context);
+        void         performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context);
+        virtual void performDefaultInitializer(Shared<lang::Value> ptr,
+                                               Shared<lang::Value> count,
+                                               CompileContext&     context);
+        virtual void performCopyInitializer(Shared<lang::Value> destination,
+                                            Shared<lang::Value> source,
+                                            CompileContext&     context);
+        void         performFinalizer(Shared<lang::Value> ptr, CompileContext& context);
+        virtual void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context);
 
         virtual void buildNativeDeclaration(CompileContext& context);
         virtual void buildNativeDefinition(CompileContext& context);

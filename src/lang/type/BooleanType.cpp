@@ -71,7 +71,7 @@ bool lang::BooleanType::validateOperator(lang::UnaryOperator, lang::Location, Va
 }
 
 Shared<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator op,
-                                                     Shared<Value>       value,
+                                                     Shared<lang::Value> value,
                                                      CompileContext&     context)
 {
     return context.exec().performOperator(op, value);
@@ -102,8 +102,8 @@ bool lang::BooleanType::validateOperator(lang::BinaryOperator,
 }
 
 Shared<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperator op,
-                                                     Shared<Value>        left,
-                                                     Shared<Value>        right,
+                                                     Shared<lang::Value>  left,
+                                                     Shared<lang::Value>  right,
                                                      CompileContext&      context)
 {
     if (right->type()->isReferenceType()) right = context.exec().performDereference(right);

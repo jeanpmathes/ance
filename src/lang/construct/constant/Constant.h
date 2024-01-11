@@ -67,7 +67,7 @@ namespace lang
          * Clone this constant.
          * @return The cloned constant.
          */
-        [[nodiscard]] virtual Shared<Constant> clone(lang::Context& new_context) const = 0;
+        [[nodiscard]] virtual Shared<lang::Constant> clone(lang::Context& new_context) const = 0;
 
       protected:
         llvm::Constant* content_constant_ {nullptr};

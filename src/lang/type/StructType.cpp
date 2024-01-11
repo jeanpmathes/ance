@@ -133,7 +133,7 @@ bool lang::StructType::validateMemberAccess(lang::Identifier const& name, Valida
     return true;
 }
 
-Shared<lang::Value> lang::StructType::buildMemberAccess(Shared<Value>           value,
+Shared<lang::Value> lang::StructType::buildMemberAccess(Shared<lang::Value>     value,
                                                         lang::Identifier const& name,
                                                         CompileContext&         context)
 {

@@ -35,7 +35,7 @@ namespace lang
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
-        Shared<Constant> clone(lang::Context& new_context) const override;
+        Shared<lang::Constant> clone(lang::Context& new_context) const override;
 
       private:
         enum Kind

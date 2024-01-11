@@ -184,7 +184,7 @@ namespace lang
          * @param value The new value.
          * @param context The current compile context.
          */
-        void setValue(Shared<Value> value, CompileContext& context);
+        void setValue(Shared<lang::Value> value, CompileContext& context);
 
         /**
          * Get an undefined variable with the same name.

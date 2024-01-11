@@ -30,7 +30,7 @@ namespace lang
                                                            lang::Location      location,
                                                            ValidationLogger&   validation_logger) const override;
         Shared<lang::Value>               buildOperator(lang::UnaryOperator op,
-                                                        Shared<Value>       value,
+                                                        Shared<lang::Value> value,
                                                         CompileContext&     context) override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
@@ -42,8 +42,8 @@ namespace lang
                                                            lang::Location       right_location,
                                                            ValidationLogger&    validation_logger) const override;
         Shared<lang::Value>               buildOperator(lang::BinaryOperator op,
-                                                        Shared<Value>        left,
-                                                        Shared<Value>        right,
+                                                        Shared<lang::Value>  left,
+                                                        Shared<lang::Value>  right,
                                                         CompileContext&      context) override;
 
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;

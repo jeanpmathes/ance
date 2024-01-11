@@ -68,8 +68,8 @@ namespace lang
                                                             lang::Type const& index_type,
                                                             lang::Location    index_location,
                                                             ValidationLogger& validation_logger) const override;
-        Shared<lang::Value>               buildSubscript(Shared<Value>   indexed,
-                                                         Shared<Value>   index,
+        Shared<lang::Value>               buildSubscript(Shared<lang::Value> indexed,
+                                                         Shared<lang::Value> index,
                                                          CompileContext& context) override;
 
         bool                isImplicitlyConvertibleTo(lang::Type const& other) const override;
@@ -77,7 +77,7 @@ namespace lang
                                                        lang::Location    location,
                                                        ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                    Shared<Value>                     value,
+                                                    Shared<lang::Value>               value,
                                                     CompileContext&                   context) override;
 
         bool                isCastingPossibleTo(Type const& other) const override;
@@ -85,7 +85,7 @@ namespace lang
                                          lang::Location    location,
                                          ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
-                                      Shared<Value>                     value,
+                                      Shared<lang::Value>               value,
                                       CompileContext&                   context) override;
 
         bool                        isOperatorDefined(lang::UnaryOperator op) const override;
@@ -94,7 +94,7 @@ namespace lang
                                                      lang::Location      location,
                                                      ValidationLogger&   validation_logger) const override;
         Shared<lang::Value>         buildOperator(lang::UnaryOperator op,
-                                                  Shared<Value>       value,
+                                                  Shared<lang::Value> value,
                                                   CompileContext&     context) override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
@@ -106,25 +106,29 @@ namespace lang
                                                            lang::Location       right_location,
                                                            ValidationLogger&    validation_logger) const override;
         Shared<lang::Value>               buildOperator(lang::BinaryOperator op,
-                                                        Shared<Value>        left,
-                                                        Shared<Value>        right,
+                                                        Shared<lang::Value>  left,
+                                                        Shared<lang::Value>  right,
                                                         CompileContext&      context) override;
 
         bool                              hasMember(lang::Identifier const& name) const override;
         Member& getMember(lang::Identifier const& name) override;
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildMemberAccess(Shared<Value>           value,
+        Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
                                               lang::Identifier const& name,
                                               CompileContext&         context) override;
 
         bool                              definesIndirection() const override;
         lang::ResolvingHandle<lang::Type> getIndirectionType() override;
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildIndirection(Shared<Value> value, CompileContext& context) override;
+        Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context) override;
 
-        void performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context) override;
-        void performCopyInitializer(Shared<Value> destination, Shared<Value> source, CompileContext& context) override;
-        void performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context) override;
+        void performDefaultInitializer(Shared<lang::Value> ptr,
+                                       Shared<lang::Value> count,
+                                       CompileContext&     context) override;
+        void performCopyInitializer(Shared<lang::Value> destination,
+                                    Shared<lang::Value> source,
+                                    CompileContext&     context) override;
+        void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) override;
 
         bool isTriviallyDefaultConstructible() const override;
         bool isTriviallyCopyConstructible() const override;

@@ -97,8 +97,8 @@ bool lang::ReferenceType::validateSubscript(lang::Location    indexed_location,
     return element_type_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
 }
 
-Shared<lang::Value> lang::ReferenceType::buildSubscript(Shared<Value>   indexed,
-                                                        Shared<Value>   index,
+Shared<lang::Value> lang::ReferenceType::buildSubscript(Shared<lang::Value> indexed,
+                                                        Shared<lang::Value> index,
                                                         CompileContext& context)
 {
     return element_type_->buildSubscript(context.exec().performDereference(indexed), index, context);
@@ -125,8 +125,8 @@ bool lang::ReferenceType::validateOperator(lang::BinaryOperator op,
 }
 
 Shared<lang::Value> lang::ReferenceType::buildOperator(lang::BinaryOperator op,
-                                                       Shared<Value>        left,
-                                                       Shared<Value>        right,
+                                                       Shared<lang::Value>  left,
+                                                       Shared<lang::Value>  right,
                                                        CompileContext&      context)
 {
     return element_type_->buildOperator(op, context.exec().performDereference(left), right, context);
@@ -150,7 +150,7 @@ bool lang::ReferenceType::validateOperator(lang::UnaryOperator op,
 }
 
 Shared<lang::Value> lang::ReferenceType::buildOperator(lang::UnaryOperator op,
-                                                       Shared<Value>       value,
+                                                       Shared<lang::Value> value,
                                                        CompileContext&     context)
 {
     return element_type_->buildOperator(op, context.exec().performDereference(value), context);
@@ -171,7 +171,7 @@ bool lang::ReferenceType::validateMemberAccess(lang::Identifier const& name, Val
     return element_type_->validateMemberAccess(name, validation_logger);
 }
 
-Shared<lang::Value> lang::ReferenceType::buildMemberAccess(Shared<Value>           value,
+Shared<lang::Value> lang::ReferenceType::buildMemberAccess(Shared<lang::Value>     value,
                                                            lang::Identifier const& name,
                                                            CompileContext&         context)
 {
@@ -193,22 +193,22 @@ bool lang::ReferenceType::validateIndirection(lang::Location location, Validatio
     return element_type_->validateIndirection(location, validation_logger);
 }
 
-Shared<lang::Value> lang::ReferenceType::buildIndirection(Shared<Value> value, CompileContext& context)
+Shared<lang::Value> lang::ReferenceType::buildIndirection(Shared<lang::Value> value, CompileContext& context)
 {
     return element_type_->buildIndirection(context.exec().performDereference(value), context);
 }
 
-void lang::ReferenceType::performDefaultInitializer(Shared<Value>, Shared<Value>, CompileContext&)
+void lang::ReferenceType::performDefaultInitializer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&)
 {
     throw std::logic_error("Reference does not have a default value");
 }
 
-void lang::ReferenceType::performCopyInitializer(Shared<Value>, Shared<Value>, CompileContext&)
+void lang::ReferenceType::performCopyInitializer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&)
 {
     throw std::logic_error("Reference does not have a copy value");
 }
 
-void lang::ReferenceType::performFinalizer(Shared<Value>, Shared<Value>, CompileContext&)
+void lang::ReferenceType::performFinalizer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&)
 {
     throw std::logic_error("Reference does not have a finalizer");
 }

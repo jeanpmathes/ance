@@ -38,7 +38,7 @@ bool lang::IndirectType::validateIndirection(lang::Location, ValidationLogger&) 
     return true;
 }
 
-Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<Value> value, CompileContext& context)
+Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<lang::Value> value, CompileContext& context)
 {
     auto value_reference = context.ctx().getReferenceType(value_type_);
 

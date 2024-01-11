@@ -483,29 +483,33 @@ bool lang::Type::validateIndirection(lang::Location location, ValidationLogger& 
     return definition_.value()->validateIndirection(location, validation_logger);
 }
 
-Shared<lang::Value> lang::Type::buildSubscript(Shared<Value> indexed, Shared<Value> index, CompileContext& context)
+Shared<lang::Value> lang::Type::buildSubscript(Shared<lang::Value> indexed,
+                                               Shared<lang::Value> index,
+                                               CompileContext&     context)
 {
     assert(isDefined());
     return definition_.value()->buildSubscript(std::move(indexed), std::move(index), context);
 }
 
 Shared<lang::Value> lang::Type::buildOperator(lang::BinaryOperator op,
-                                              Shared<Value>        left,
-                                              Shared<Value>        right,
+                                              Shared<lang::Value>  left,
+                                              Shared<lang::Value>  right,
                                               CompileContext&      context)
 {
     assert(isDefined());
     return definition_.value()->buildOperator(op, std::move(left), std::move(right), context);
 }
 
-Shared<lang::Value> lang::Type::buildOperator(lang::UnaryOperator op, Shared<Value> value, CompileContext& context)
+Shared<lang::Value> lang::Type::buildOperator(lang::UnaryOperator op,
+                                              Shared<lang::Value> value,
+                                              CompileContext&     context)
 {
     assert(isDefined());
     return definition_.value()->buildOperator(op, std::move(value), context);
 }
 
 Shared<lang::Value> lang::Type::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                        Shared<Value>                     value,
+                                                        Shared<lang::Value>               value,
                                                         CompileContext&                   context)
 {
     assert(isDefined());
@@ -513,14 +517,14 @@ Shared<lang::Value> lang::Type::buildImplicitConversion(lang::ResolvingHandle<la
 }
 
 Shared<lang::Value> lang::Type::buildCast(lang::ResolvingHandle<lang::Type> other,
-                                          Shared<Value>                     value,
+                                          Shared<lang::Value>               value,
                                           CompileContext&                   context)
 {
     assert(isDefined());
     return definition_.value()->buildCast(other, std::move(value), context);
 }
 
-Shared<lang::Value> lang::Type::buildMemberAccess(Shared<Value>           value,
+Shared<lang::Value> lang::Type::buildMemberAccess(Shared<lang::Value>     value,
                                                   lang::Identifier const& name,
                                                   CompileContext&         context)
 {
@@ -528,37 +532,39 @@ Shared<lang::Value> lang::Type::buildMemberAccess(Shared<Value>           value,
     return definition_.value()->buildMemberAccess(std::move(value), name, context);
 }
 
-Shared<lang::Value> lang::Type::buildIndirection(Shared<Value> value, CompileContext& context)
+Shared<lang::Value> lang::Type::buildIndirection(Shared<lang::Value> value, CompileContext& context)
 {
     assert(isDefined());
     return definition_.value()->buildIndirection(std::move(value), context);
 }
 
-void lang::Type::performDefaultInitializer(Shared<Value> ptr, CompileContext& context)
+void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context)
 {
     assert(isDefined());
     definition_.value()->performDefaultInitializer(ptr, context);
 }
 
-void lang::Type::performCopyInitializer(Shared<Value> destination, Shared<Value> source, CompileContext& context)
+void lang::Type::performCopyInitializer(Shared<lang::Value> destination,
+                                        Shared<lang::Value> source,
+                                        CompileContext&     context)
 {
     assert(isDefined());
     definition_.value()->performCopyInitializer(destination, source, context);
 }
 
-void lang::Type::performDefaultInitializer(Shared<Value> ptr, Shared<Value> count, CompileContext& context)
+void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context)
 {
     assert(isDefined());
     definition_.value()->performDefaultInitializer(ptr, count, context);
 }
 
-void lang::Type::performFinalizer(Shared<Value> ptr, CompileContext& context)
+void lang::Type::performFinalizer(Shared<lang::Value> ptr, CompileContext& context)
 {
     assert(isDefined());
     definition_.value()->performFinalizer(ptr, context);
 }
 
-void lang::Type::performFinalizer(Shared<Value> ptr, Shared<Value> count, CompileContext& context)
+void lang::Type::performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context)
 {
     assert(isDefined());
     definition_.value()->performFinalizer(ptr, count, context);

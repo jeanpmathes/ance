@@ -28,7 +28,7 @@ namespace lang
 
         bool equals(lang::Constant const* other) const override;
 
-        [[nodiscard]] Shared<Constant> clone(lang::Context& new_context) const override;
+        [[nodiscard]] Shared<lang::Constant> clone(lang::Context& new_context) const override;
 
         /**
          * Create a boolean constant with the false value.

@@ -54,8 +54,8 @@ bool lang::CharType::validateOperator(lang::BinaryOperator,
 }
 
 Shared<lang::Value> lang::CharType::buildOperator(lang::BinaryOperator op,
-                                                  Shared<Value>        left,
-                                                  Shared<Value>        right,
+                                                  Shared<lang::Value>  left,
+                                                  Shared<lang::Value>  right,
                                                   CompileContext&      context)
 {
     if (right->type()->isReferenceType()) right = context.exec().performDereference(right);
@@ -83,7 +83,7 @@ bool lang::CharType::validateCast(lang::Type const& other,
 }
 
 Shared<lang::Value> lang::CharType::buildCast(lang::ResolvingHandle<lang::Type> other,
-                                              Shared<Value>                     value,
+                                              Shared<lang::Value>               value,
                                               CompileContext&                   context)
 {
     if (other->isFixedWidthIntegerType(SIZE_IN_BITS, false))

@@ -33,7 +33,7 @@ namespace lang
 
         bool equals(lang::Constant const* other) const override;
 
-        Shared<Constant> clone(lang::Context& new_context) const override;
+        Shared<lang::Constant> clone(lang::Context& new_context) const override;
 
       private:
         std::string                       text_;

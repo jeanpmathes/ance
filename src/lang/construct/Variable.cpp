@@ -155,7 +155,7 @@ Shared<lang::Value> lang::Variable::getValue(CompileContext& context)
     return context.exec().performLoadFromAddress(pointer);
 }
 
-void lang::Variable::setValue(Shared<Value> value, CompileContext& context)
+void lang::Variable::setValue(Shared<lang::Value> value, CompileContext& context)
 {
     definition_.value()->setValue(value, context);
 }

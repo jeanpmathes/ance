@@ -46,17 +46,17 @@ bool lang::UnitType::isUnitType() const
     return true;
 }
 
-void lang::UnitType::performDefaultInitializer(Shared<Value>, Shared<Value>, CompileContext&)
+void lang::UnitType::performDefaultInitializer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&)
 {
     // No runtime initialization required.
 }
 
-void lang::UnitType::performCopyInitializer(Shared<Value>, Shared<Value>, CompileContext&)
+void lang::UnitType::performCopyInitializer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&)
 {
     // No runtime copy required.
 }
 
-void lang::UnitType::performFinalizer(Shared<Value>, Shared<Value>, CompileContext&)
+void lang::UnitType::performFinalizer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&)
 {
     // No runtime finalization required.
 }
@@ -87,8 +87,8 @@ bool lang::UnitType::validateOperator(lang::BinaryOperator,
 }
 
 Shared<lang::Value> lang::UnitType::buildOperator(lang::BinaryOperator op,
-                                                  Shared<Value>,
-                                                  Shared<Value>,
+                                                  Shared<lang::Value>,
+                                                  Shared<lang::Value>,
                                                   CompileContext&)
 {
     if (op == BinaryOperator::EQUAL) return BooleanConstant::createTrue(scope()->context());

@@ -120,7 +120,7 @@ bool lang::VectorType::validateImplicitConversion(lang::Type const& other,
 }
 
 Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                              Shared<Value>                     value,
+                                                              Shared<lang::Value>               value,
                                                               CompileContext&                   context)
 {
     if (auto element_vector = element_type_->isVectorizable())
@@ -168,7 +168,7 @@ bool lang::VectorType::validateCast(lang::Type const& other,
 }
 
 Shared<lang::Value> lang::VectorType::buildCast(lang::ResolvingHandle<lang::Type> other,
-                                                Shared<Value>                     value,
+                                                Shared<lang::Value>               value,
                                                 CompileContext&                   context)
 {
     if (auto element_vector = element_type_->isVectorizable())
@@ -221,7 +221,7 @@ bool lang::VectorType::validateOperator(lang::UnaryOperator op,
 }
 
 Shared<lang::Value> lang::VectorType::buildOperator(lang::UnaryOperator op,
-                                                    Shared<Value>       value,
+                                                    Shared<lang::Value> value,
                                                     CompileContext&     context)
 {
     if (auto element_vector = element_type_->isVectorizable())
@@ -280,8 +280,8 @@ bool lang::VectorType::validateOperator(lang::BinaryOperator op,
 }
 
 Shared<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperator op,
-                                                    Shared<Value>        left,
-                                                    Shared<Value>        right,
+                                                    Shared<lang::Value>  left,
+                                                    Shared<lang::Value>  right,
                                                     CompileContext&      context)
 {
     if (auto element_vector = element_type_->isVectorizable())

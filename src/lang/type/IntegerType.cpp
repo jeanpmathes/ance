@@ -59,7 +59,7 @@ bool lang::IntegerType::validateImplicitConversion(lang::Type const&, lang::Loca
 }
 
 Shared<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
-                                                               Shared<Value>                     value,
+                                                               Shared<lang::Value>               value,
                                                                CompileContext&                   context)
 {
     return context.exec().computeConversionOnI(value, other);
@@ -77,7 +77,7 @@ bool lang::IntegerType::validateCast(lang::Type const&, lang::Location, Validati
 }
 
 Shared<lang::Value> lang::IntegerType::buildCast(lang::ResolvingHandle<lang::Type> other,
-                                                 Shared<Value>                     value,
+                                                 Shared<lang::Value>               value,
                                                  CompileContext&                   context)
 {
     if (other->isXOrVectorOfX([](auto& t) { return t.isIntegerType(); }))
@@ -244,7 +244,7 @@ bool lang::IntegerType::validateOperator(lang::UnaryOperator, lang::Location, Va
 }
 
 Shared<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator op,
-                                                     Shared<Value>       value,
+                                                     Shared<lang::Value> value,
                                                      CompileContext&     context)
 {
     return context.exec().performOperator(op, value);
@@ -293,8 +293,8 @@ bool lang::IntegerType::validateOperator(lang::BinaryOperator,
 }
 
 Shared<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator op,
-                                                     Shared<Value>        left,
-                                                     Shared<Value>        right,
+                                                     Shared<lang::Value>  left,
+                                                     Shared<lang::Value>  right,
                                                      CompileContext&      context)
 {
     if (right->type()->isReferenceType()) right = context.exec().performDereference(right);
