@@ -68,7 +68,7 @@ bool IfSelect::validate(ValidationLogger& validation_logger) const
 
     if (!valid) return false;
 
-    valid &= lang::Type::checkMismatch(scope()->context().getBooleanType(),
+    valid &= lang::Type::checkMismatch(scope().context().getBooleanType(),
                                        condition_->type(),
                                        condition_->location(),
                                        validation_logger);
@@ -86,7 +86,7 @@ bool IfSelect::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion IfSelect::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
-    auto temp_name          = lang::Identifier::like(scope()->getTemporaryName(), location());
+    auto temp_name          = lang::Identifier::like(scope().getTemporaryName(), location());
     auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
     auto condition          = std::move(subexpressions[0]);
     auto then_expression    = std::move(subexpressions[1]);

@@ -62,13 +62,13 @@ namespace lang
          * Get the containing scope or the global scope if there is no containing scope.
          * @return The containing scope.
          */
-        virtual lang::Scope* scope();
+        virtual lang::Scope& scope();
 
         /**
          * Get the containing scope or the global scope if there is no containing scope.
          * @return The containing scope.
          */
-        [[nodiscard]] virtual lang::Scope const* scope() const;
+        [[nodiscard]] virtual lang::Scope const& scope() const;
 
         /**
          * Get the global scope.

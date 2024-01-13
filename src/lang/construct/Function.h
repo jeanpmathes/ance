@@ -245,8 +245,8 @@ namespace lang
          */
         Shared<lang::Value> buildCall(std::vector<Shared<lang::Value>> const& arguments, CompileContext& context);
 
-        lang::Scope*                     scope() override;
-        [[nodiscard]] lang::Scope const* scope() const override;
+        lang::Scope&                     scope() override;
+        [[nodiscard]] lang::Scope const& scope() const override;
 
         Execution::Scoped getDebugScope(CompileContext& context) const override;
 

@@ -64,7 +64,7 @@ void lang::LocalVariable::buildInitialization(CompileContext& context)
 {
     assert(local_variable_.hasValue());
 
-    context.exec().defineLocalVariable(local_variable_.value(), *scope(), parameter_index_, location());
+    context.exec().defineLocalVariable(local_variable_.value(), scope(), parameter_index_, location());
 
     Shared<lang::Value> pointer = getValuePointer(context);
 

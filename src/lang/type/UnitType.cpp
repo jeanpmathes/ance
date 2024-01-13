@@ -91,9 +91,9 @@ Shared<lang::Value> lang::UnitType::buildOperator(lang::BinaryOperator op,
                                                   Shared<lang::Value>,
                                                   CompileContext&)
 {
-    if (op == BinaryOperator::EQUAL) return BooleanConstant::createTrue(scope()->context());
+    if (op == BinaryOperator::EQUAL) return BooleanConstant::createTrue(scope().context());
 
-    if (op == BinaryOperator::NOT_EQUAL) return BooleanConstant::createFalse(scope()->context());
+    if (op == BinaryOperator::NOT_EQUAL) return BooleanConstant::createFalse(scope().context());
 
     throw std::logic_error("Unit type does not support operator '" + op.toString() + "'");
 }

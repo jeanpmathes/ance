@@ -40,18 +40,18 @@ void Allocation::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    scope()->registerUsage(allocated_type_);
+    scope().registerUsage(allocated_type_);
 }
 
 void Allocation::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (scope() == nullptr) return;
+    if (!isInitialized()) return;
 
     if (allocated_type_.is<lang::Type>())
     {
         auto allocated_type = allocated_type_.as<lang::Type>().value();
-        type.reroute(count_.hasValue() ? scope()->context().getBufferType(allocated_type)
-                                       : scope()->context().getPointerType(allocated_type));
+        type.reroute(count_.hasValue() ? scope().context().getBufferType(allocated_type)
+                                       : scope().context().getPointerType(allocated_type));
     }
 }
 
@@ -67,13 +67,13 @@ bool Allocation::validate(ValidationLogger& validation_logger) const
     {
         count_.value()->validate(validation_logger);
 
-        is_valid &= lang::Type::checkMismatch(scope()->context().getSizeType(),
+        is_valid &= lang::Type::checkMismatch(scope().context().getSizeType(),
                                               count_.value()->type(),
                                               count_.value()->location(),
                                               validation_logger);
     }
 
-    is_valid &= scope()->context().validateRuntimeDependency(location(), validation_logger);
+    is_valid &= scope().context().validateRuntimeDependency(location(), validation_logger);
 
     return is_valid;
 }

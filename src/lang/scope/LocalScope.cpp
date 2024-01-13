@@ -7,7 +7,7 @@ lang::LocalScope::LocalScope(lang::Scope* parent, lang::CodeBlock& code_block) :
 
 Execution::Scoped lang::LocalScope::getDebugScope(CompileContext& context) const
 {
-    return scope()->getDebugScope(context);
+    return scope().getDebugScope(context);
 }
 
 bool lang::LocalScope::isPartOfFunction() const

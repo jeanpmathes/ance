@@ -46,7 +46,7 @@ bool lang::SequenceType::isSubscriptDefined() const
 
 lang::ResolvingHandle<lang::Type> lang::SequenceType::getSubscriptReturnType()
 {
-    return scope()->context().getReferenceType(element_type_);
+    return scope().context().getReferenceType(element_type_);
 }
 
 bool lang::SequenceType::validateSubscript(lang::Location,
@@ -54,7 +54,7 @@ bool lang::SequenceType::validateSubscript(lang::Location,
                                            lang::Location    index_location,
                                            ValidationLogger& validation_logger) const
 {
-    return lang::Type::checkMismatch(scope()->context().getSizeType(), index_type, index_location, validation_logger);
+    return lang::Type::checkMismatch(scope().context().getSizeType(), index_type, index_location, validation_logger);
 }
 
 Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> indexed,
@@ -81,7 +81,7 @@ Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> index
 
     Optional<uint64_t> bounds = check_bounds ? size_ : std::nullopt;
 
-    index = lang::Type::makeMatching(scope()->context().getSizeType(), index, context);
+    index                             = lang::Type::makeMatching(scope().context().getSizeType(), index, context);
     Shared<lang::Value> index_as_diff = context.exec().computeConversionOnI(index, context.ctx().getDiffType());
 
     Shared<lang::Value> sequence_ptr =

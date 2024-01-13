@@ -16,26 +16,26 @@ void lang::Scope::setContainingScope(lang::Scope& containing_scope)
     containing_scope_ = &containing_scope;
 }
 
-lang::Scope* lang::Scope::scope()
+lang::Scope& lang::Scope::scope()
 {
     assert(containing_scope_ != nullptr);
-    return containing_scope_;
+    return *containing_scope_;
 }
 
-lang::Scope const* lang::Scope::scope() const
+lang::Scope const& lang::Scope::scope() const
 {
     assert(containing_scope_ != nullptr);
-    return containing_scope_;
+    return *containing_scope_;
 }
 
 lang::GlobalScope* lang::Scope::getGlobalScope()
 {
-    return scope()->getGlobalScope();
+    return scope().getGlobalScope();
 }
 
 lang::GlobalScope const* lang::Scope::getGlobalScope() const
 {
-    return scope()->getGlobalScope();
+    return scope().getGlobalScope();
 }
 
 lang::OrderedScope* lang::Scope::asOrderedScope()
@@ -137,7 +137,7 @@ void lang::Scope::addDependency(lang::ResolvingHandle<lang::Entity> entity, bool
         entity_definition_dependencies_[entity_to_definition_dependency_index_.at(entity)].count++;
     }
 
-    if (scope() != this) scope()->addDependency(entity, is_only_declared);
+    if (&scope() != this) scope().addDependency(entity, is_only_declared);
 }
 
 std::vector<lang::Scope::Dependency<lang::Entity>> lang::Scope::getDependenciesOnDeclaration()

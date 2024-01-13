@@ -67,13 +67,13 @@ namespace lang
          * Get the scope this entity is defined in.
          * @return The scope.
          */
-        [[nodiscard]] virtual lang::Scope* scope() = 0;
+        [[nodiscard]] virtual lang::Scope& scope() = 0;
 
         /**
          * Get the scope this entity is defined in.
          * @return The scope.
          */
-        [[nodiscard]] virtual lang::Scope const* scope() const = 0;
+        [[nodiscard]] virtual lang::Scope const& scope() const = 0;
 
         /**
          * Set the scope this entity is defined in.

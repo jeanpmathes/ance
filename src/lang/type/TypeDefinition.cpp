@@ -230,16 +230,16 @@ void lang::TypeDefinition::setContainingScope(lang::Scope* scope)
     containing_scope_ = scope;
 }
 
-lang::Scope* lang::TypeDefinition::scope()
+lang::Scope& lang::TypeDefinition::scope()
 {
     assert(containing_scope_);
-    return containing_scope_;
+    return *containing_scope_;
 }
 
-lang::Scope const* lang::TypeDefinition::scope() const
+lang::Scope const& lang::TypeDefinition::scope() const
 {
     assert(containing_scope_);
-    return containing_scope_;
+    return *containing_scope_;
 }
 
 void lang::TypeDefinition::postResolve()
@@ -509,7 +509,7 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
                                                              isImported(),
                                                              default_initializer_parameters_,
                                                              context.ctx().getUnitType(),
-                                                             scope(),
+                                                             &scope(),
                                                              false,
                                                              lang::Location::global(),
                                                              std::nullopt);
@@ -527,7 +527,7 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
                                                           isImported(),
                                                           copy_initializer_parameters_,
                                                           context.ctx().getUnitType(),
-                                                          scope(),
+                                                          &scope(),
                                                           false,
                                                           lang::Location::global(),
                                                           std::nullopt);
@@ -545,7 +545,7 @@ void lang::TypeDefinition::buildNativeDeclaration(CompileContext& context)
                                                            isImported(),
                                                            default_finalizer_parameters_,
                                                            context.ctx().getUnitType(),
-                                                           scope(),
+                                                           &scope(),
                                                            false,
                                                            lang::Location::global(),
                                                            std::nullopt);
@@ -701,7 +701,7 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
                                                                                  parameters,
                                                                                  getAccessibility().modifier(),
                                                                                  isImported(),
-                                                                                 *scope(),
+                                                                                 scope(),
                                                                                  lang::Location::global());
 
     predefined_function.setCallValidator(

@@ -60,12 +60,12 @@ void LocalReferenceVariableDefinition::walkDefinitions()
                                                    type_location_,
                                                    lang::Assigner::REFERENCE_BINDING,
                                                    reference_->getValue(),
-                                                   *scope(),
+                                                   scope(),
                                                    location());
         variable_ = variable.handle();
 
-        scope()->addEntity(std::move(variable));
-        scope()->registerUsage(type_);
+        scope().addEntity(std::move(variable));
+        scope().registerUsage(type_);
     }
 }
 

@@ -20,14 +20,12 @@ Expression const& Indirection::value() const
 
 void Indirection::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (scope() == nullptr) return;
+    if (!isInitialized()) return;
 
     auto value_type = value_->type();
 
     if (value_type->isDefined())
-    {
-        type.reroute(scope()->context().getReferenceType(value_type->getIndirectionType()));
-    }
+    { type.reroute(scope().context().getReferenceType(value_type->getIndirectionType())); }
 }
 
 bool Indirection::validate(ValidationLogger& validation_logger) const

@@ -55,7 +55,7 @@ void FunctionCall::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    scope()->registerUsage(callable_, true);
+    scope().registerUsage(callable_, true);
 }
 
 void FunctionCall::postResolve()

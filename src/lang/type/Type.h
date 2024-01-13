@@ -321,13 +321,13 @@ namespace lang
          * Get the scope that contains this type.
          * @return The scope that contains the type.
          */
-        [[nodiscard]] lang::Scope* scope() override;
+        [[nodiscard]] lang::Scope& scope() override;
 
         /**
          * Get the scope that contains this type.
          * @return The scope that contains the type.
          */
-        [[nodiscard]] lang::Scope const* scope() const override;
+        [[nodiscard]] lang::Scope const& scope() const override;
 
         void postResolve();
 
@@ -830,7 +830,7 @@ namespace lang
          * Check whether a type is undefined. If so, a message is logged.
          */
         static bool isTypeUndefined(lang::Type const&  type,
-                                    lang::Scope const* scope,
+                                    lang::Scope const& scope,
                                     lang::Location     location,
                                     ValidationLogger&  validation_logger);
 

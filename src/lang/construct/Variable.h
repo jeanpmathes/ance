@@ -105,12 +105,12 @@ namespace lang
          * Get the containing scope.
          * @return The scope.
          */
-        [[nodiscard]] lang::Scope* scope() override;
+        [[nodiscard]] lang::Scope& scope() override;
         /**
          * Get the containing scope.
          * @return The scope.
          */
-        [[nodiscard]] lang::Scope const* scope() const override;
+        [[nodiscard]] lang::Scope const& scope() const override;
         /**
          * Get the value type.
          * @return The type.

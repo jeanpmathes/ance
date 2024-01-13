@@ -24,8 +24,8 @@ lang::Variable const& Erase::variable() const
 
 void Erase::walkDefinitions()
 {
-    scope()->registerUsage(variable_);
-    erased_ = scope()->asOrderedScope()->erase(variable_);
+    scope().registerUsage(variable_);
+    erased_ = scope().asOrderedScope()->erase(variable_);
 }
 
 void Erase::validate(ValidationLogger& validation_logger) const

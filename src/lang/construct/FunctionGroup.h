@@ -30,8 +30,8 @@ namespace lang
 
         void setScope(lang::Scope& scope);
 
-        lang::Scope*                     scope() override;
-        [[nodiscard]] lang::Scope const* scope() const override;
+        lang::Scope&                     scope() override;
+        [[nodiscard]] lang::Scope const& scope() const override;
 
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
 

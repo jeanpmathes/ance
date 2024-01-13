@@ -109,7 +109,7 @@ void lang::BasicBlock::Definition::Returning::doBuild(CompileContext& context)
     while (current->isPartOfFunction())
     {
         current->buildFinalization(context);
-        current = current->scope();
+        current = &current->scope();
     }
 
     if (self()->containing_function_->returnType()->isUnitType()) { context.exec().ir().CreateRetVoid(); }

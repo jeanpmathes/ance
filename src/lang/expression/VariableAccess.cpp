@@ -21,7 +21,7 @@ lang::Variable const& VariableAccess::variable() const
 
 void VariableAccess::walkDefinitions()
 {
-    scope()->registerUsage(variable_, !is_defined_);
+    scope().registerUsage(variable_, !is_defined_);
 }
 
 void VariableAccess::defineType(lang::ResolvingHandle<lang::Type> type)
@@ -66,7 +66,7 @@ bool VariableAccess::validateAssignment(lang::Value const& value,
 
 bool VariableAccess::isVariableErased(ValidationLogger& validation_logger) const
 {
-    if (!variable_->isDefined() && scope()->asOrderedScope()->wasEntityErased(variable_))
+    if (!variable_->isDefined() && scope().asOrderedScope()->wasEntityErased(variable_))
     {
         validation_logger.logError("Variable with name '" + variable_->name() + "' was erased", location());
         return true;

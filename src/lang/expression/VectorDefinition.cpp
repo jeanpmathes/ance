@@ -37,19 +37,19 @@ void VectorDefinition::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    if (declared_type_.hasValue()) scope()->registerUsage(declared_type_.value());
+    if (declared_type_.hasValue()) scope().registerUsage(declared_type_.value());
 }
 
 void VectorDefinition::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (scope() == nullptr) return;
+    if (!isInitialized()) return;
 
     if (declared_type_.hasValue())
     {
         if (!declared_type_.value().is<lang::Type>()) return;
 
         type.reroute(
-            scope()->context().getVectorType(declared_type_.value().as<lang::Type>().value(), elements_.size()));
+            scope().context().getVectorType(declared_type_.value().as<lang::Type>().value(), elements_.size()));
         return;
     }
     else
@@ -59,7 +59,7 @@ void VectorDefinition::defineType(lang::ResolvingHandle<lang::Type> type)
 
         if (common_types.size() == 1)
         {
-            type.reroute(scope()->context().getVectorType(common_types.front(), elements_.size()));
+            type.reroute(scope().context().getVectorType(common_types.front(), elements_.size()));
         }
     }
 }

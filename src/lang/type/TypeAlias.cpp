@@ -410,7 +410,7 @@ Execution::Type lang::TypeAlias::createDebugType(CompileContext& context) const
     return context.exec().createAlias(name(),
                                       CustomType::getAccessibility().modifier(),
                                       actual_,
-                                      *scope(),
+                                      scope(),
                                       getDefinitionLocation());
 }
 

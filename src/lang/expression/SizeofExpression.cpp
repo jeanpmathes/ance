@@ -20,9 +20,9 @@ Expression const& SizeofExpression::expression() const
 
 void SizeofExpression::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (scope() == nullptr) return;
+    if (!isInitialized()) return;
 
-    type.reroute(scope()->context().getSizeType());
+    type.reroute(scope().context().getSizeType());
 }
 
 bool SizeofExpression::validate(ValidationLogger& validation_logger) const

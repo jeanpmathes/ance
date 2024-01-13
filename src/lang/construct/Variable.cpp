@@ -73,14 +73,16 @@ lang::Identifier const& lang::Variable::name() const
     return name_;
 }
 
-lang::Scope* lang::Variable::scope()
+lang::Scope& lang::Variable::scope()
 {
-    return definition_.hasValue() ? definition_.value()->scope() : nullptr;
+    assert(definition_.hasValue());
+    return definition_.value()->scope();
 }
 
-lang::Scope const* lang::Variable::scope() const
+lang::Scope const& lang::Variable::scope() const
 {
-    return definition_.hasValue() ? definition_.value()->scope() : nullptr;
+    assert(definition_.hasValue());
+    return definition_.value()->scope();
 }
 
 lang::ResolvingHandle<lang::Type> lang::Variable::type()

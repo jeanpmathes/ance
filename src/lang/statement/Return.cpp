@@ -24,7 +24,7 @@ std::vector<Owned<lang::BasicBlock>> Return::createBasicBlocks(lang::BasicBlock&
     assert(return_value_.hasValue());
 
     std::vector<Owned<lang::BasicBlock>> blocks;
-    blocks.push_back(lang::BasicBlock::createReturning(*scope(), **return_value_, function));
+    blocks.push_back(lang::BasicBlock::createReturning(scope(), **return_value_, function));
 
     entry.link(*blocks.front());
 
@@ -44,7 +44,7 @@ Statements Return::expandWith(Expressions subexpressions, Statements, lang::Cont
 
     if (return_value_.hasValue())
     {
-        auto temp_name          = lang::Identifier::like(scope()->getTemporaryName(), location());
+        auto temp_name          = lang::Identifier::like(scope().getTemporaryName(), location());
         auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
 
         statements.emplace_back(

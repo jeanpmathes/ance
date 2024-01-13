@@ -39,7 +39,7 @@ bool lang::CharType::isOperatorDefined(lang::BinaryOperator op, lang::Type const
 lang::ResolvingHandle<lang::Type> lang::CharType::getOperatorResultType(lang::BinaryOperator op,
                                                                         lang::ResolvingHandle<lang::Type>)
 {
-    if (op.isEquality()) return scope()->context().getBooleanType();
+    if (op.isEquality()) return scope().context().getBooleanType();
 
     return lang::Type::getUndefined();
 }

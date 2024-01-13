@@ -41,7 +41,7 @@ lang::ResolvingHandle<lang::Type> lang::VectorType::getActualType()
     {
         lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
         if (actual_element_type == element_type_) { actual_type_ = self(); }
-        else { actual_type_ = scope()->context().getVectorType(actual_element_type, size_.value()); }
+        else { actual_type_ = scope().context().getVectorType(actual_element_type, size_.value()); }
     }
 
     return actual_type_.value();
@@ -210,7 +210,7 @@ bool lang::VectorType::isOperatorDefined(lang::UnaryOperator op) const
 
 lang::ResolvingHandle<lang::Type> lang::VectorType::getOperatorResultType(lang::UnaryOperator op)
 {
-    return scope()->context().getVectorType(element_type_->getOperatorResultType(op), size_.value());
+    return scope().context().getVectorType(element_type_->getOperatorResultType(op), size_.value());
 }
 
 bool lang::VectorType::validateOperator(lang::UnaryOperator op,
@@ -267,7 +267,7 @@ bool lang::VectorType::isOperatorDefined(lang::BinaryOperator op, lang::Type con
 lang::ResolvingHandle<lang::Type> lang::VectorType::getOperatorResultType(lang::BinaryOperator              op,
                                                                           lang::ResolvingHandle<lang::Type> other)
 {
-    return scope()->context().getVectorType(element_type_->getOperatorResultType(op, other), size_.value());
+    return scope().context().getVectorType(element_type_->getOperatorResultType(op, other), size_.value());
 }
 
 bool lang::VectorType::validateOperator(lang::BinaryOperator op,

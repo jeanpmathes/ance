@@ -260,7 +260,7 @@ void lang::UnorderedScope::resolve()
 
     description_order_ = std::move(description_order);
 
-    if (scope() != this)
+    if (&scope() != this)
     {
         auto iterator = undefined_entities_.begin();
 
@@ -268,7 +268,7 @@ void lang::UnorderedScope::resolve()
         {
             auto& [name, entity] = *iterator;
 
-            if (scope()->resolveDefinition(entity.handle())) { iterator = undefined_entities_.erase(iterator); }
+            if (scope().resolveDefinition(entity.handle())) { iterator = undefined_entities_.erase(iterator); }
             else { ++iterator; }
         }
     }
@@ -307,7 +307,7 @@ bool lang::UnorderedScope::resolveDefinition(lang::ResolvingHandle<lang::Entity>
         return true;
     }
 
-    lang::Scope* parent = scope();
+    lang::Scope* parent = &scope();
 
     if (parent != this) return parent->resolveDefinition(entity);
 

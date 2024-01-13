@@ -70,11 +70,11 @@ bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::Type co
 lang::ResolvingHandle<lang::Type> lang::AddressType::getOperatorResultType(lang::BinaryOperator op,
                                                                            lang::ResolvingHandle<lang::Type>)
 {
-    if (op.isEquality()) return scope()->context().getBooleanType();
+    if (op.isEquality()) return scope().context().getBooleanType();
 
     if (op == lang::BinaryOperator::ADDITION) return self();
 
-    if (op == lang::BinaryOperator::SUBTRACTION) return scope()->context().getDiffType();
+    if (op == lang::BinaryOperator::SUBTRACTION) return scope().context().getDiffType();
 
     return lang::Type::getUndefined();
 }

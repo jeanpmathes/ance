@@ -277,13 +277,13 @@ void lang::Type::setContainingScope(lang::Scope* scope)
     if (definition_.hasValue()) { definition_.value()->setContainingScope(scope); }
 }
 
-lang::Scope* lang::Type::scope()
+lang::Scope& lang::Type::scope()
 {
     assert(definition_.hasValue());
     return definition_.value()->scope();
 }
 
-lang::Scope const* lang::Type::scope() const
+lang::Scope const& lang::Type::scope() const
 {
     assert(isDefined());
     return definition_.value()->scope();
@@ -776,13 +776,12 @@ lang::Callable const& lang::Type::getFunctionSource() const
 }
 
 bool lang::Type::isTypeUndefined(lang::Type const&  type,
-                                 lang::Scope const* scope,
+                                 lang::Scope const& scope,
                                  lang::Location     location,
                                  ValidationLogger&  validation_logger)
 {
     if (type.isDefined()) return false;
-    if (scope != nullptr && scope->isNameConflicted(type.name()))
-        return true;// Conflict is already logged, no need to log again.
+    if (scope.isNameConflicted(type.name())) return true;// Conflict is already logged, no need to log again.
 
     validation_logger.logError("Name " + type.getAnnotatedName() + " is undefined in current context", location);
 

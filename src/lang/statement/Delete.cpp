@@ -43,7 +43,7 @@ void Delete::validate(ValidationLogger& validation_logger) const
                                    to_delete_->location());
     }
 
-    scope()->context().validateRuntimeDependency(location(), validation_logger);
+    scope().context().validateRuntimeDependency(location(), validation_logger);
 }
 
 Statements Delete::expandWith(Expressions subexpressions, Statements, lang::Context&) const

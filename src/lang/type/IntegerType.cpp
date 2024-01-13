@@ -278,7 +278,7 @@ lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang:
                                                                            lang::ResolvingHandle<lang::Type>)
 {
     if (op.isArithmetic() || op.isBitwise() || op.isShift()) return self()->getActualType();
-    if (op.isRelational() || op.isEquality()) return scope()->context().getBooleanType();
+    if (op.isRelational() || op.isEquality()) return scope().context().getBooleanType();
 
     return lang::Type::getUndefined();
 }

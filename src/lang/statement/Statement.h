@@ -68,12 +68,12 @@ class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     /**
      * Get the containing scope.
      */
-    [[nodiscard]] lang::Scope* scope();
+    [[nodiscard]] lang::Scope& scope();
 
     /**
      * Get the containing scope.
      */
-    [[nodiscard]] lang::Scope const* scope() const;
+    [[nodiscard]] lang::Scope const& scope() const;
 
     /**
      * Get the block scope of the statement, if any.

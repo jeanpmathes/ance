@@ -25,13 +25,13 @@ lang::Identifier const& MemberAccess::member() const
 
 void MemberAccess::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (scope() == nullptr) return;
+    if (!isInitialized()) return;
 
     auto value_type = value_->type();
 
     if (value_type->isDefined() && value_type->hasMember(member_))
     {
-        type.reroute(scope()->context().getReferenceType(value_type->getMember(member_).type()));
+        type.reroute(scope().context().getReferenceType(value_type->getMember(member_).type()));
     }
 }
 

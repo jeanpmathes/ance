@@ -48,14 +48,14 @@ void Statement::setScope(lang::Scope& scope)
     for (auto& substatement : substatements_) { substatement.get().setContainingScope(scope); }
 }
 
-lang::Scope* Statement::scope()
+lang::Scope& Statement::scope()
 {
-    return containing_scope_;
+    return *containing_scope_;
 }
 
-lang::Scope const* Statement::scope() const
+lang::Scope const& Statement::scope() const
 {
-    return containing_scope_;
+    return *containing_scope_;
 }
 
 lang::Scope* Statement::getBlockScope()
@@ -182,7 +182,7 @@ Statements Statement::arrangeExpandedStatements(Statements before, Statements ex
 
 void Statement::build(CompileContext& context)
 {
-    context.setDebugLocation(location(), *scope());
+    context.setDebugLocation(location(), scope());
     doBuild(context);
     context.resetDebugLocation();
 }

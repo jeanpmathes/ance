@@ -114,7 +114,7 @@ lang::ResolvingHandle<lang::Type> lang::FloatingPointType::getOperatorResultType
                                                                                  lang::ResolvingHandle<lang::Type>)
 {
     if (op.isArithmetic()) return self()->getActualType();
-    if (op.isRelational() || op.isEquality()) return scope()->context().getBooleanType();
+    if (op.isRelational() || op.isEquality()) return scope().context().getBooleanType();
 
     return lang::Type::getUndefined();
 }

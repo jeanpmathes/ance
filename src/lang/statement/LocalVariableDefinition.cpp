@@ -80,12 +80,12 @@ void LocalVariableDefinition::walkDefinitions()
                                                    type_location_,
                                                    assigner_,
                                                    assigned_value,
-                                                   *scope(),
+                                                   scope(),
                                                    location());
         variable_ = variable.handle();
 
-        scope()->addEntity(std::move(variable));
-        if (type_opt_.hasValue()) scope()->registerUsage(type_opt_.value());
+        scope().addEntity(std::move(variable));
+        if (type_opt_.hasValue()) scope().registerUsage(type_opt_.value());
     }
 }
 

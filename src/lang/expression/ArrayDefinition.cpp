@@ -37,19 +37,18 @@ void ArrayDefinition::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    if (declared_type_.hasValue()) scope()->registerUsage(declared_type_.value());
+    if (declared_type_.hasValue()) scope().registerUsage(declared_type_.value());
 }
 
 void ArrayDefinition::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (scope() == nullptr) return;
+    if (!isInitialized()) return;
 
     if (declared_type_.hasValue())
     {
         if (!declared_type_.value().is<lang::Type>()) return;
 
-        type.reroute(
-            scope()->context().getArrayType(declared_type_.value().as<lang::Type>().value(), elements_.size()));
+        type.reroute(scope().context().getArrayType(declared_type_.value().as<lang::Type>().value(), elements_.size()));
         return;
     }
 
@@ -58,7 +57,7 @@ void ArrayDefinition::defineType(lang::ResolvingHandle<lang::Type> type)
 
     if (common_types.size() == 1)
     {
-        type.reroute(scope()->context().getArrayType(common_types.front(), elements_.size()));
+        type.reroute(scope().context().getArrayType(common_types.front(), elements_.size()));
         return;
     }
 }

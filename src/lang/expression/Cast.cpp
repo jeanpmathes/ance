@@ -34,7 +34,7 @@ void Cast::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    scope()->registerUsage(type_);
+    scope().registerUsage(type_);
 }
 
 bool Cast::validate(ValidationLogger& validation_logger) const

@@ -35,7 +35,7 @@ void While::validate(ValidationLogger& validation_logger) const
 
     block_->validate(validation_logger);
 
-    lang::Type::checkMismatch(scope()->context().getBooleanType(),
+    lang::Type::checkMismatch(scope().context().getBooleanType(),
                               condition_->type(),
                               condition_->location(),
                               validation_logger);
@@ -43,7 +43,7 @@ void While::validate(ValidationLogger& validation_logger) const
 
 Statements While::expandWith(Expressions subexpressions, Statements substatements, lang::Context& new_context) const
 {
-    auto temp_name          = lang::Identifier::like(scope()->getTemporaryName(), location());
+    auto temp_name          = lang::Identifier::like(scope().getTemporaryName(), location());
     auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
 
     auto condition = std::move(subexpressions[0]);

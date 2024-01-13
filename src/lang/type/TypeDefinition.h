@@ -112,8 +112,8 @@ namespace lang
         [[nodiscard]] virtual lang::Accessibility const& getAccessibility() const;
 
         void         setContainingScope(Scope* scope);
-        Scope*       scope();
-        Scope const* scope() const;
+        Scope&       scope();
+        Scope const& scope() const;
 
         void postResolve();
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters);

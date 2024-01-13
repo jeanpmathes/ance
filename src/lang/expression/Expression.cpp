@@ -15,14 +15,21 @@ lang::Location Expression::location() const
     return location_;
 }
 
-lang::Scope* Expression::scope()
+lang::Scope& Expression::scope()
 {
-    return containing_scope_;
+    assert(containing_scope_ != nullptr);
+    return *containing_scope_;
 }
 
-lang::Scope const* Expression::scope() const
+lang::Scope const& Expression::scope() const
 {
-    return containing_scope_;
+    assert(containing_scope_ != nullptr);
+    return *containing_scope_;
+}
+
+bool Expression::isInitialized() const
+{
+    return containing_scope_ != nullptr;
 }
 
 lang::ResolvingHandle<lang::Type> Expression::type()

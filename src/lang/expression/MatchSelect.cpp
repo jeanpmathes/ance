@@ -69,7 +69,7 @@ bool MatchSelect::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion MatchSelect::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
-    auto temp_name = lang::Identifier::like(scope()->getTemporaryName(), location());
+    auto temp_name = lang::Identifier::like(scope().getTemporaryName(), location());
     auto condition = std::move(subexpressions[0]);
 
     auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };

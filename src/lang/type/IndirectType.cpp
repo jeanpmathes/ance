@@ -44,7 +44,7 @@ Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<lang::Value> val
 
     if (getIndirectionType()->getStateCount().isUnit()) return context.exec().getDefaultValue(value_reference);
 
-    if (scope()->context().isContainingRuntime())
+    if (scope().context().isContainingRuntime())
     {
         Shared<lang::Value> not_null = context.exec().computeAddressIsNotNull(value);
         context.runtime().buildAssert(not_null, "Null pointer dereference at " + context.getLocationString(), context);

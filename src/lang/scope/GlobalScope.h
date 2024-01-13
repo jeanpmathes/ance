@@ -37,8 +37,8 @@ namespace lang
       public:
         explicit GlobalScope(bool is_containing_runtime);
 
-        Scope*                     scope() override;
-        [[nodiscard]] Scope const* scope() const override;
+        Scope&                     scope() override;
+        [[nodiscard]] Scope const& scope() const override;
 
         /**
          * Get the context, in which all basic systems like the typesystem are defined.

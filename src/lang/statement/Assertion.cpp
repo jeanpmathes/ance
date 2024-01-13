@@ -26,12 +26,12 @@ void Assertion::validate(ValidationLogger& validation_logger) const
     bool const is_valid = condition_->validate(validation_logger);
     if (!is_valid) return;
 
-    lang::Type::checkMismatch(scope()->context().getBooleanType(),
+    lang::Type::checkMismatch(scope().context().getBooleanType(),
                               condition_->type(),
                               condition_->location(),
                               validation_logger);
 
-    scope()->context().validateRuntimeDependency(location(), validation_logger);
+    scope().context().validateRuntimeDependency(location(), validation_logger);
 }
 
 Statements Assertion::expandWith(Expressions subexpressions, Statements, lang::Context&) const

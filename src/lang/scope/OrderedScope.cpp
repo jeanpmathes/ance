@@ -9,7 +9,7 @@ lang::OrderedScope* lang::OrderedScope::asOrderedScope()
 
 bool lang::OrderedScope::isNameConflicted(lang::Identifier const& name) const
 {
-    return scope()->isNameConflicted(name);// Redefinition allowed, so no conflict.
+    return scope().isNameConflicted(name);// Redefinition allowed, so no conflict.
 }
 
 void lang::OrderedScope::addDescription(Owned<lang::Description> description)
@@ -57,11 +57,11 @@ void lang::OrderedScope::onRegisterUsage(lang::ResolvingHandle<lang::Entity> ent
     lang::Scope*                         current      = this;
     Optional<OwningHandle<lang::Entity>> owned_entity = lang::OwningHandle<lang::Entity>::takeOwnership(entity);
 
-    while (current != current->scope())
+    while (current != &current->scope())
     {
         owned_entity = current->connectWithDefinitionAccordingToOrdering(std::move(owned_entity.value()));
         if (!owned_entity.hasValue()) return;
-        current = current->scope();
+        current = &current->scope();
     }
 
     undefined_entities_.emplace(entity->name(), std::move(owned_entity.value()));
@@ -96,7 +96,7 @@ void lang::OrderedScope::resolve()
 {
     resolveFollowingOrder();
 
-    lang::Scope& parent = *scope();
+    lang::Scope& parent = scope();
 
     auto iterator = undefined_entities_.begin();
 
@@ -119,7 +119,7 @@ void lang::OrderedScope::postResolve()
 bool lang::OrderedScope::resolveDefinition(lang::ResolvingHandle<lang::Entity> entity)
 {
     // If the entity were defined in this scope, we would have found it when registering the usage.
-    return scope()->resolveDefinition(entity);
+    return scope().resolveDefinition(entity);
 }
 
 void lang::OrderedScope::buildDeclarations(CompileContext& context)

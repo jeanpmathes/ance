@@ -38,8 +38,8 @@ Expression const& And::right() const
 
 void And::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (scope() == nullptr) return;
-    type.reroute(scope()->context().getBooleanType());
+    if (!isInitialized()) return;
+    type.reroute(scope().context().getBooleanType());
 }
 
 bool And::validate(ValidationLogger& validation_logger) const
@@ -48,11 +48,11 @@ bool And::validate(ValidationLogger& validation_logger) const
 
     if (!valid) return false;
 
-    valid &= lang::Type::checkMismatch(scope()->context().getBooleanType(),
+    valid &= lang::Type::checkMismatch(scope().context().getBooleanType(),
                                        left_->type(),
                                        left_->location(),
                                        validation_logger);
-    valid &= lang::Type::checkMismatch(scope()->context().getBooleanType(),
+    valid &= lang::Type::checkMismatch(scope().context().getBooleanType(),
                                        right_->type(),
                                        right_->location(),
                                        validation_logger);
@@ -62,7 +62,7 @@ bool And::validate(ValidationLogger& validation_logger) const
 
 Expression::Expansion And::expandWith(Expressions subexpressions, lang::Context& new_context) const
 {
-    auto temp_name          = lang::Identifier::like(scope()->getTemporaryName(), location());
+    auto temp_name          = lang::Identifier::like(scope().getTemporaryName(), location());
     auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
     auto lhs                = std::move(subexpressions[0]);
     auto rhs                = std::move(subexpressions[1]);

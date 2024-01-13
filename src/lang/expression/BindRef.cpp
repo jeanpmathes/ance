@@ -20,7 +20,7 @@ Expression const& BindRef::value() const
 
 void BindRef::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (scope() == nullptr) return;
+    if (!isInitialized()) return;
 
     auto element_type = value_->type();
 
@@ -28,7 +28,7 @@ void BindRef::defineType(lang::ResolvingHandle<lang::Type> type)
     {
         if (element_type->isReferenceType()) { element_type = element_type->getElementType(); }
 
-        type.reroute(scope()->context().getReferenceType(element_type));
+        type.reroute(scope().context().getReferenceType(element_type));
     }
 }
 

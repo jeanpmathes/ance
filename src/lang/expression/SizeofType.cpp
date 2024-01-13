@@ -23,14 +23,14 @@ lang::Type const& SizeofType::targetType() const
 
 void SizeofType::walkDefinitions()
 {
-    scope()->registerUsage(type_);
+    scope().registerUsage(type_);
 }
 
 void SizeofType::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (scope() == nullptr) return;
+    if (!isInitialized()) return;
 
-    type.reroute(scope()->context().getSizeType());
+    type.reroute(scope().context().getSizeType());
 }
 
 bool SizeofType::validate(ValidationLogger& validation_logger) const

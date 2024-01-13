@@ -7,5 +7,5 @@ std::string lang::Entity::getAnnotatedName() const
 
 void lang::Entity::setContainingScope(lang::Scope* scope)
 {
-    assert(scope == this->scope());
+    assert(scope == &this->scope());
 }

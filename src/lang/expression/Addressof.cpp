@@ -17,7 +17,7 @@ Expression const& Addressof::argument() const
 
 void Addressof::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (scope() == nullptr) return;
+    if (!isInitialized()) return;
 
     auto value_type = arg_->type();
 
@@ -25,7 +25,7 @@ void Addressof::defineType(lang::ResolvingHandle<lang::Type> type)
     {
         if (value_type->isReferenceType()) { value_type = value_type->getElementType(); }
 
-        type.reroute(scope()->context().getPointerType(value_type));
+        type.reroute(scope().context().getPointerType(value_type));
     }
 }
 

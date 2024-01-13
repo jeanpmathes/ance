@@ -82,7 +82,7 @@ Execution::Type lang::StructType::createDebugType(CompileContext& context) const
                                        CustomType::getAccessibility().modifier(),
                                        self(),
                                        members_,
-                                       *scope(),
+                                       scope(),
                                        getDefinitionLocation());
 }
 

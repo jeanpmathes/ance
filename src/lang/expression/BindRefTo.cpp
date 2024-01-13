@@ -21,14 +21,14 @@ Expression const& BindRefTo::address() const
 
 void BindRefTo::defineType(lang::ResolvingHandle<lang::Type> type)
 {
-    if (scope() == nullptr) return;
+    if (!isInitialized()) return;
 
     auto argument_type = address_->type();
 
     if (argument_type->isDefined() && (argument_type->isPointerType() || argument_type->isBufferType()))
     {
         auto element_type = argument_type->getElementType();
-        type.reroute(scope()->context().getReferenceType(element_type));
+        type.reroute(scope().context().getReferenceType(element_type));
     }
 }
 

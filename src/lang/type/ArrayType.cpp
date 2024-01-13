@@ -29,7 +29,7 @@ lang::ResolvingHandle<lang::Type> lang::ArrayType::getActualType()
     {
         lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
         if (actual_element_type == element_type_) { actual_type_ = self(); }
-        else { actual_type_ = scope()->context().getArrayType(actual_element_type, size_.value()); }
+        else { actual_type_ = scope().context().getArrayType(actual_element_type, size_.value()); }
     }
 
     return actual_type_.value();

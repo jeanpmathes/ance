@@ -26,14 +26,14 @@ lang::Identifier const& lang::VariableDefinition::name() const
     return self_->name();
 }
 
-lang::Scope* lang::VariableDefinition::scope()
+lang::Scope& lang::VariableDefinition::scope()
 {
-    return &scope_;
+    return scope_;
 }
 
-lang::Scope const* lang::VariableDefinition::scope() const
+lang::Scope const& lang::VariableDefinition::scope() const
 {
-    return &scope_;
+    return scope_;
 }
 
 lang::ResolvingHandle<lang::Type> lang::VariableDefinition::type()

@@ -14,14 +14,14 @@ lang::GlobalScope::GlobalScope(bool is_containing_runtime) : Scope()
     context_ = makeOwned<lang::Context>(*this, is_containing_runtime);
 }
 
-lang::Scope* lang::GlobalScope::scope()
+lang::Scope& lang::GlobalScope::scope()
 {
-    return this;
+    return *this;
 }
 
-lang::Scope const* lang::GlobalScope::scope() const
+lang::Scope const& lang::GlobalScope::scope() const
 {
-    return this;
+    return *this;
 }
 
 lang::Context& lang::GlobalScope::context()

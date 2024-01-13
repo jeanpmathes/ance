@@ -38,7 +38,7 @@ lang::ResolvingHandle<lang::Type> lang::ReferenceType::getActualType()
     {
         lang::ResolvingHandle<lang::Type> actual_element_type = element_type_->getActualType();
         if (actual_element_type == element_type_) { actual_type_ = self(); }
-        else { actual_type_ = scope()->context().getReferenceType(actual_element_type); }
+        else { actual_type_ = scope().context().getReferenceType(actual_element_type); }
     }
 
     return actual_type_.value();

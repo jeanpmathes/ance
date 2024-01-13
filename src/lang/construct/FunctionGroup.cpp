@@ -24,16 +24,16 @@ void lang::FunctionGroup::setScope(lang::Scope& scope)
     scope_ = &scope;
 }
 
-lang::Scope* lang::FunctionGroup::scope()
+lang::Scope& lang::FunctionGroup::scope()
 {
     assert(scope_ != nullptr);
-    return scope_;
+    return *scope_;
 }
 
-lang::Scope const* lang::FunctionGroup::scope() const
+lang::Scope const& lang::FunctionGroup::scope() const
 {
     assert(scope_ != nullptr);
-    return scope_;
+    return *scope_;
 }
 
 bool lang::FunctionGroup::requestOverload(std::vector<lang::ResolvingHandle<lang::Type>>)

@@ -211,14 +211,14 @@ Shared<lang::Value> lang::Function::buildCall(std::vector<Shared<lang::Value>> c
     return definition_.value()->buildCall(arguments, context);
 }
 
-lang::Scope* lang::Function::scope()
+lang::Scope& lang::Function::scope()
 {
-    return &definition_.value()->scope();
+    return definition_.value()->scope();
 }
 
-lang::Scope const* lang::Function::scope() const
+lang::Scope const& lang::Function::scope() const
 {
-    return &definition_.value()->scope();
+    return definition_.value()->scope();
 }
 
 Execution::Scoped lang::Function::getDebugScope(CompileContext&) const

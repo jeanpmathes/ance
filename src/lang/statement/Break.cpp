@@ -16,12 +16,12 @@ std::vector<Owned<lang::BasicBlock>> Break::createBasicBlocks(lang::BasicBlock& 
     assert(loop_parent != nullptr);
 
     std::vector<lang::Scope*> scopes;
-    lang::Scope*              current = scope();
+    lang::Scope*              current = &scope();
 
-    while (current != loop_parent->scope())
+    while (current != &loop_parent->scope())
     {
         scopes.push_back(current);
-        current = current->scope();
+        current = &current->scope();
     }
 
     auto const& [start, end] = loop_parent->getLoopParts();
