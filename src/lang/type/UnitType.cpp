@@ -89,11 +89,11 @@ bool lang::UnitType::validateOperator(lang::BinaryOperator,
 Shared<lang::Value> lang::UnitType::buildOperator(lang::BinaryOperator op,
                                                   Shared<lang::Value>,
                                                   Shared<lang::Value>,
-                                                  CompileContext&)
+                                                  CompileContext& context)
 {
-    if (op == BinaryOperator::EQUAL) return BooleanConstant::createTrue(scope().context());
+    if (op == BinaryOperator::EQUAL) return BooleanConstant::createTrue(context.ctx());
 
-    if (op == BinaryOperator::NOT_EQUAL) return BooleanConstant::createFalse(scope().context());
+    if (op == BinaryOperator::NOT_EQUAL) return BooleanConstant::createFalse(context.ctx());
 
     throw std::logic_error("Unit type does not support operator '" + op.toString() + "'");
 }

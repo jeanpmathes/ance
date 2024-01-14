@@ -219,7 +219,7 @@ namespace lang
          */
         std::vector<Dependency<lang::Entity>> getDependenciesOnDeclaration();
         /**
-         * Get the dependencies on delcaraions of this scope and their count.
+         * Get the dependencies on declarations of this scope and their count.
          * @return The dependencies.
          */
         [[nodiscard]] std::vector<std::reference_wrapper<lang::Entity const>> getDependenciesOnDeclaration() const;

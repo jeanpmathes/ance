@@ -81,7 +81,7 @@ Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> index
 
     Optional<uint64_t> bounds = check_bounds ? size_ : std::nullopt;
 
-    index                             = lang::Type::makeMatching(scope().context().getSizeType(), index, context);
+    index                             = lang::Type::makeMatching(context.ctx().getSizeType(), index, context);
     Shared<lang::Value> index_as_diff = context.exec().computeConversionOnI(index, context.ctx().getDiffType());
 
     Shared<lang::Value> sequence_ptr =
