@@ -91,12 +91,15 @@ test_runs = []
 passing_count: int = 0
 
 for idx, test_case in enumerate(tests):
-    print(f"Running test {test_case.test_name}... ({idx + 1}/{len(tests)})")
+    print(f"Running test {test_case.test_name} ({idx + 1}/{len(tests)}) ...", end="")
     run: TestRun = run_test(test_case)
     test_runs.append(run)
 
     if run.is_passing():
         passing_count += 1
+        print(" OK")
+    else:
+        print(" FAIL")
 
 print("----------- ance test results -----------")
 print(f"{passing_count}/{len(tests)} passing")
