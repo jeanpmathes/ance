@@ -12,17 +12,6 @@
 lang::IndirectType::IndirectType(lang::ResolvingHandle<lang::Type> element_type) : value_type_(std::move(element_type))
 {}
 
-llvm::Constant* lang::IndirectType::getDefaultContent(CompileContext& context) const
-{
-    return llvm::ConstantPointerNull::get(getContentType(context));
-}
-
-llvm::PointerType* lang::IndirectType::getContentType(CompileContext& context) const
-{
-    llvm::Type* native_type = value_type_->getContentType(context);
-    return llvm::PointerType::get(native_type, 0);
-}
-
 bool lang::IndirectType::definesIndirection() const
 {
     return true;
@@ -42,7 +31,7 @@ Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<lang::Value> val
 {
     auto value_reference = context.ctx().getReferenceType(value_type_);
 
-    if (getIndirectionType()->getStateCount().isUnit()) return context.exec().getDefaultValue(value_reference);
+    if (getIndirectionType()->getStateCount().isUnit()) return context.exec().getDefault(value_reference);
 
     if (context.ctx().isContainingRuntime())
     {

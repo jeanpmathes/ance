@@ -29,9 +29,6 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getActualType() override;
         lang::Type const&                 getActualType() const override;
 
-        llvm::Constant*    getDefaultContent(CompileContext& context) const override;
-        llvm::PointerType* getContentType(CompileContext& context) const override;
-
         bool isSubscriptDefined() const override;
 
         lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
@@ -103,7 +100,7 @@ namespace lang
 
       protected:
         std::string   createMangledName() const override;
-        Execution::Type createDebugType(CompileContext& context) const override;
+        Execution::Type createExecutionType(CompileContext& context) const override;
 
       public:
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;

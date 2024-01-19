@@ -36,24 +36,24 @@ lang::Type const& lang::StringConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::StringConstant::createContent(CompileContext& context)
+Shared<lang::Constant> lang::StringConstant::createContent(CompileContext& context)
 {
     switch (kind_)
     {
         case BYTE:
         {
             auto const& data = std::get<std::string>(data_);
-            return context.exec().getByteStringConstant(data);
+            return context.exec().getByteString(data);
         }
         case CHAR:
         {
             auto const& data = std::get<std::u32string>(data_);
-            return context.exec().getCodepointStringConstant(data);
+            return context.exec().getCodepointString(data);
         }
         case C_STRING:
         {
             auto const&     data        = std::get<std::string>(data_);
-            return context.exec().getCStringConstant(data);
+            return context.exec().getCString(data);
         }
     }
 }

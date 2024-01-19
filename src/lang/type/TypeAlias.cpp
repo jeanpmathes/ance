@@ -176,16 +176,6 @@ lang::Type const& lang::TypeAlias::getActualType() const
     return actually_actual_.value();
 }
 
-llvm::Constant* lang::TypeAlias::getDefaultContent(CompileContext& context) const
-{
-    return actual_->getDefaultContent(context);
-}
-
-llvm::Type* lang::TypeAlias::getContentType(CompileContext& context) const
-{
-    return actual_->getContentType(context);
-}
-
 bool lang::TypeAlias::validate(ValidationLogger&, lang::Location) const
 {
     return true;
@@ -405,7 +395,7 @@ std::string lang::TypeAlias::createMangledName() const
     return getActualType().getMangledName();
 }
 
-Execution::Type lang::TypeAlias::createDebugType(CompileContext& context) const
+Execution::Type lang::TypeAlias::createExecutionType(CompileContext& context) const
 {
     return context.exec().createAlias(name(),
                                       CustomType::getAccessibility().modifier(),

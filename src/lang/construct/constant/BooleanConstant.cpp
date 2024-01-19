@@ -25,9 +25,9 @@ lang::Type const& lang::BooleanConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::BooleanConstant::createContent(CompileContext& context)
+Shared<lang::Constant> lang::BooleanConstant::createContent(CompileContext& context)
 {
-    return context.exec().getBooleanConstant(boolean_);
+    return context.exec().getBoolean(boolean_, type_);
 }
 
 bool lang::BooleanConstant::equals(lang::Constant const* other) const

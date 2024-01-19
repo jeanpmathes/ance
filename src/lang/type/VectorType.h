@@ -36,9 +36,6 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getActualType() override;
         [[nodiscard]] lang::Type const&   getActualType() const override;
 
-        llvm::Constant* getDefaultContent(CompileContext& context) const override;
-        llvm::Type*     getContentType(CompileContext& context) const override;
-
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
         bool                isImplicitlyConvertibleTo(lang::Type const& other) const override;
@@ -89,7 +86,7 @@ namespace lang
 
       protected:
         std::string   createMangledName() const override;
-        Execution::Type         createDebugType(CompileContext& context) const override;
+        Execution::Type         createExecutionType(CompileContext& context) const override;
         Execution::IndexingMode getIndexingMode() const override;
 
       private:

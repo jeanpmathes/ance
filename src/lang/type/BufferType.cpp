@@ -77,7 +77,7 @@ std::string lang::BufferType::createMangledName() const
     return std::string("ptr_b") + "(" + element_type_->getMangledName() + ")";
 }
 
-Execution::Type lang::BufferType::createDebugType(CompileContext& context) const
+Execution::Type lang::BufferType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerAddressType(self());
 }

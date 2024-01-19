@@ -16,7 +16,7 @@ std::string lang::FloatingPointType::createMangledName() const
     return std::string(name().text());
 }
 
-Execution::Type lang::FloatingPointType::createDebugType(CompileContext& context) const
+Execution::Type lang::FloatingPointType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerFloatingPointType(self());
 }

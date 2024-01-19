@@ -7,5 +7,5 @@ Shared<lang::Value> Execution::performDereference(Shared<lang::Value> reference)
 
 Shared<lang::Value> Execution::performStackAllocation(lang::ResolvingHandle<lang::Type> type)
 {
-    return performStackAllocation(type, getSizeValue(1));
+    return performStackAllocation(type, getSizeN(1));
 }

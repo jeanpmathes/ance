@@ -20,16 +20,6 @@ bool lang::CharType::isCharType() const
     return true;
 }
 
-llvm::Constant* lang::CharType::getDefaultContent(CompileContext& context) const
-{
-    return llvm::ConstantInt::get(getContentType(context), 0, false);
-}
-
-llvm::Type* lang::CharType::getContentType(CompileContext& context) const
-{
-    return llvm::Type::getIntNTy(context.exec().llvmContext(), static_cast<unsigned>(SIZE_IN_BITS));
-}
-
 bool lang::CharType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
 {
     if (lang::Type::getReferencedType(other).isCharType() && op.isEquality()) return true;
@@ -114,7 +104,7 @@ std::string lang::CharType::createMangledName() const
     return "c";
 }
 
-Execution::Type lang::CharType::createDebugType(CompileContext& context) const
+Execution::Type lang::CharType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerCodepointType(self());
 }

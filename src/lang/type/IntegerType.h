@@ -16,9 +16,6 @@ namespace lang
       public:
         [[nodiscard]] StateCount getStateCount() const override;
 
-        llvm::Constant* getDefaultContent(CompileContext& context) const override;
-        llvm::Type*     getContentType(CompileContext& context) const override;
-
         IntegerType const* isIntegerType() const override;
 
         /**
@@ -101,7 +98,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        Execution::Type createDebugType(CompileContext& context) const override;
+        Execution::Type createExecutionType(CompileContext& context) const override;
     };
 }
 

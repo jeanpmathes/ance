@@ -335,44 +335,11 @@ namespace lang
         [[nodiscard]] bool enableImplicitConversionOnCall() const override;
 
         /**
-         * Get the default content of a value of this type.
-         * @param context The module.
-         * @return The default content.
-         */
-        llvm::Constant* getDefaultContent(CompileContext& context) const;
-
-        /**
-         * Get the default constant of this type.
-         * @return The default constant.
-         */
-        Shared<lang::Constant> getDefault(CompileContext& context);
-
-        /**
-         * Get the native type. Values of this type are passed around using this type.
-         * @param context The compile context.
-         * @return The native type.
-         */
-        llvm::Type* getNativeType(CompileContext& context) const;
-        /**
-         * Get the content type. The semantic meaning of this type uses the content type.
-         * @param context The compile context.
-         * @return The content type.
-         */
-        llvm::Type* getContentType(CompileContext& context) const;
-
-        /**
          * Get the debug type, containing information for debuggers.
          * @param context The current compile context.
          * @return The debug type.
          */
-        Execution::Type getDebugType(CompileContext& context) const;
-
-        /**
-         * Get the size of the content type.
-         * @param context The compile context.
-         * @return The content size.
-         */
-        llvm::TypeSize getContentSize(CompileContext& context) const;
+        Execution::Type getExecutionType(CompileContext& context) const;
 
         /**
          * See if the subscript operation is defined for this type.

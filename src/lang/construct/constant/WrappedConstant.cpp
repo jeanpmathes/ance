@@ -24,7 +24,12 @@ lang::Type const& lang::WrappedConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::WrappedConstant::createContent(CompileContext&)
+Shared<lang::Constant> lang::WrappedConstant::createContent(CompileContext&)
+{
+    throw std::logic_error("Wrapped constants cannot create a content constant");
+}
+
+llvm::Constant* lang::WrappedConstant::getWrappedConstant() const
 {
     return constant_;
 }

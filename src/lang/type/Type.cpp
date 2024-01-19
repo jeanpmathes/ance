@@ -306,40 +306,10 @@ bool lang::Type::enableImplicitConversionOnCall() const
     return false;
 }
 
-llvm::Constant* lang::Type::getDefaultContent(CompileContext& context) const
+Execution::Type lang::Type::getExecutionType(CompileContext& context) const
 {
     assert(isDefined());
-    return definition_.value()->getDefaultContent(context);
-}
-
-Shared<lang::Constant> lang::Type::getDefault(CompileContext& context)
-{
-    llvm::Constant* content = getDefaultContent(context);
-    return makeShared<lang::WrappedConstant>(self(), content);
-}
-
-llvm::Type* lang::Type::getNativeType(CompileContext& context) const
-{
-    assert(isDefined());
-    return definition_.value()->getNativeType(context);
-}
-
-llvm::Type* lang::Type::getContentType(CompileContext& context) const
-{
-    assert(isDefined());
-    return definition_.value()->getContentType(context);
-}
-
-Execution::Type lang::Type::getDebugType(CompileContext& context) const
-{
-    assert(isDefined());
-    return definition_.value()->getDebugType(context);
-}
-
-llvm::TypeSize lang::Type::getContentSize(CompileContext& context) const
-{
-    assert(isDefined());
-    return definition_.value()->getContentSize(context);
+    return definition_.value()->getExecutionType(context);
 }
 
 bool lang::Type::isSubscriptDefined() const

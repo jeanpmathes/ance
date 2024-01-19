@@ -19,9 +19,6 @@ namespace lang
         [[nodiscard]] StateCount getStateCount() const override;
         [[nodiscard]] bool       isBooleanType() const override;
 
-        llvm::Constant* getDefaultContent(CompileContext& context) const override;
-        llvm::Type*     getContentType(CompileContext& context) const override;
-
         using TypeDefinition::buildOperator;
 
         bool                              isOperatorDefined(lang::UnaryOperator op) const override;
@@ -61,7 +58,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
         std::string   createMangledName() const override;
-        Execution::Type createDebugType(CompileContext& context) const override;
+        Execution::Type createExecutionType(CompileContext& context) const override;
 
       public:
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;

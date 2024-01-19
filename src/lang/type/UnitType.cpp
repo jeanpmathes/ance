@@ -13,30 +13,12 @@ StateCount lang::UnitType::getStateCount() const
     return StateCount::unit();
 }
 
-llvm::Constant* lang::UnitType::getDefaultContent(CompileContext& context) const
-{
-    return llvm::ConstantStruct::get(getContentType(context), {});
-}
-
-llvm::StructType* lang::UnitType::getContentType(CompileContext& context) const
-{
-    if (!native_type_)
-    {
-        native_type_ = llvm::StructType::create(context.exec().llvmContext(), "unit");
-
-        std::vector<llvm::Type*> const elements;
-        native_type_->setBody(elements, false);
-    }
-
-    return native_type_;
-}
-
 std::string lang::UnitType::createMangledName() const
 {
     return std::string(name().text());
 }
 
-Execution::Type lang::UnitType::createDebugType(CompileContext& context) const
+Execution::Type lang::UnitType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerUnitType(self());
 }

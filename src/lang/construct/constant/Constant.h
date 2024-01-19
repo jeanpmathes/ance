@@ -45,7 +45,14 @@ namespace lang
          * @param context The module.
          * @return The content constant.
          */
-        virtual llvm::Constant* createContent(CompileContext& context) = 0;
+        virtual Shared<lang::Constant> createContent(CompileContext& context) = 0;
+
+        /**
+         * Get the wrapped llvm constant, if this constant is a wrapped constant.
+         * @return The wrapped llvm constant, or null if this constant is not a wrapped constant.
+         */
+
+        [[nodiscard]] virtual llvm::Constant* getWrappedConstant() const;
 
       public:
         /**
@@ -70,7 +77,7 @@ namespace lang
         [[nodiscard]] virtual Shared<lang::Constant> clone(lang::Context& new_context) const = 0;
 
       protected:
-        llvm::Constant* content_constant_ {nullptr};
+        Optional<Shared<lang::Constant>> backing_constant_;
     };
 }
 #endif

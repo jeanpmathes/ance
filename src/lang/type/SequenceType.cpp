@@ -76,8 +76,7 @@ Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> index
                                                        bool                check_bounds,
                                                        CompileContext&     context)
 {
-    if (getSubscriptReturnType()->getStateCount().isUnit())
-        return context.exec().getDefaultValue(getSubscriptReturnType());
+    if (getSubscriptReturnType()->getStateCount().isUnit()) return context.exec().getDefault(getSubscriptReturnType());
 
     Optional<uint64_t> bounds = check_bounds ? size_ : std::nullopt;
 
@@ -113,7 +112,7 @@ void lang::SequenceType::performSingleDefaultInitializerDefinition(Shared<lang::
     {
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            Shared<lang::Value> index_value = context.exec().getDiffValue(static_cast<std::ptrdiff_t>(index));
+            Shared<lang::Value> index_value = context.exec().getDiffN(static_cast<std::ptrdiff_t>(index));
             Shared<lang::Value> element_ptr =
                 context.exec().computeElementPointer(ptr, index_value, getIndexingMode(), std::nullopt);
 
@@ -130,7 +129,7 @@ void lang::SequenceType::performSingleCopyInitializerDefinition(Shared<lang::Val
     {
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            Shared<lang::Value> index_value = context.exec().getDiffValue(static_cast<std::ptrdiff_t>(index));
+            Shared<lang::Value> index_value = context.exec().getDiffN(static_cast<std::ptrdiff_t>(index));
 
             Shared<lang::Value> dst_element_ptr =
                 context.exec().computeElementPointer(dts_ptr, index_value, getIndexingMode(), std::nullopt);
@@ -148,7 +147,7 @@ void lang::SequenceType::buildSingleDefaultFinalizerDefinition(Shared<lang::Valu
     {
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            Shared<lang::Value> index_value = context.exec().getDiffValue(static_cast<std::ptrdiff_t>(index));
+            Shared<lang::Value> index_value = context.exec().getDiffN(static_cast<std::ptrdiff_t>(index));
             Shared<lang::Value> element_ptr =
                 context.exec().computeElementPointer(ptr, index_value, getIndexingMode(), std::nullopt);
 
@@ -178,7 +177,7 @@ Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Val
 
     for (uint64_t index = 0; index < size_.value(); index++)
     {
-        Shared<lang::Value> index_value = context.exec().getDiffValue(static_cast<std::ptrdiff_t>(index));
+        Shared<lang::Value> index_value = context.exec().getDiffN(static_cast<std::ptrdiff_t>(index));
         Shared<lang::Value> element_ptr =
             context.exec().computeElementPointer(sequence_ptr, index_value, getIndexingMode(), std::nullopt);
 

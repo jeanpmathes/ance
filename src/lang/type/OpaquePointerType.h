@@ -17,11 +17,8 @@ namespace lang
         bool isOpaquePointerType() const override;
 
       protected:
-        llvm::Constant* getDefaultContent(CompileContext& context) const override;
-        llvm::Type*     getContentType(CompileContext& context) const override;
-
         std::string   createMangledName() const override;
-        Execution::Type createDebugType(CompileContext& context) const override;
+        Execution::Type createExecutionType(CompileContext& context) const override;
 
         Optional<lang::ResolvingHandle<lang::Type>> getPointeeType() override;
         Type const*                                 getPointeeType() const override;

@@ -87,7 +87,8 @@ void VariableAccess::doBuild(CompileContext& context)
 {
     auto variable = lang::Type::makeMatching<lang::Variable>(variable_);
 
-    Shared<lang::Value> value = type()->getStateCount().isUnit() ? context.exec().getDefaultValue(type()) : variable->getValue(context);
+    Shared<lang::Value> value =
+        type()->getStateCount().isUnit() ? context.exec().getDefault(type()) : variable->getValue(context);
 
     setValue(value);
 }

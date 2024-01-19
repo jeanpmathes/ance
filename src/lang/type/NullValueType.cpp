@@ -34,23 +34,12 @@ Shared<lang::Value> lang::NullValueType::buildImplicitConversion(lang::Resolving
     return context.exec().getNull(other);
 }
 
-llvm::Constant* lang::NullValueType::getDefaultContent(CompileContext& context) const
-{
-    return llvm::ConstantPointerNull::get(
-        llvm::PointerType::get(llvm::Type::getInt8Ty(context.exec().llvmContext()), 0));
-}
-
-llvm::Type* lang::NullValueType::getContentType(CompileContext& context) const
-{
-    return llvm::PointerType::get(llvm::Type::getInt8Ty(context.exec().llvmContext()), 0);
-}
-
 std::string lang::NullValueType::createMangledName() const
 {
     return "nullptr";
 }
 
-Execution::Type lang::NullValueType::createDebugType(CompileContext& context) const
+Execution::Type lang::NullValueType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerOpaqueAddressType(self());
 }

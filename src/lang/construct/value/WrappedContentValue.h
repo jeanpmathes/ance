@@ -37,12 +37,6 @@ namespace lang
          */
         void setValue(llvm::Value* value, CompileContext& context);
 
-        /**
-         * Set the wrapped value without checking if the type matches.
-         * @param value The native value to wrap.
-         */
-        void setValueUnchecked(llvm::Value* value);
-
         lang::ResolvingHandle<lang::Type> type() override;
         [[nodiscard]] lang::Type const&   type() const override;
 

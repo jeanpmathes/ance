@@ -6,16 +6,6 @@
 
 lang::DoubleType::DoubleType() : TypeDefinition(lang::Identifier::like("double")) {}
 
-llvm::Constant* lang::DoubleType::getDefaultContent(CompileContext& context) const
-{
-    return llvm::ConstantFP::get(getContentType(context), 0);
-}
-
-llvm::Type* lang::DoubleType::getContentType(CompileContext& context) const
-{
-    return llvm::Type::getDoubleTy(context.exec().llvmContext());
-}
-
 size_t lang::DoubleType::getPrecision() const
 {
     return 64;

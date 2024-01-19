@@ -271,21 +271,11 @@ void lang::TypeDefinition::createConstructors()
     default_constructor_ = &createConstructor({});
 }
 
-llvm::Type* lang::TypeDefinition::getNativeType(CompileContext& context) const
+Execution::Type lang::TypeDefinition::getExecutionType(CompileContext& context) const
 {
-    return llvm::PointerType::get(getContentType(context), 0);
-}
-
-Execution::Type lang::TypeDefinition::getDebugType(CompileContext& context) const
-{
-    if (!debug_type_.hasValue()) { debug_type_ = createDebugType(context); }
+    if (!debug_type_.hasValue()) { debug_type_ = createExecutionType(context); }
 
     return debug_type_.value();
-}
-
-llvm::TypeSize lang::TypeDefinition::getContentSize(CompileContext& context) const
-{
-    return context.exec().llvmSizeOf(self());
 }
 
 bool lang::TypeDefinition::isSubscriptDefined() const
@@ -439,7 +429,7 @@ Shared<lang::Value> lang::TypeDefinition::buildIndirection(Shared<lang::Value>, 
 
 void lang::TypeDefinition::performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context)
 {
-    performDefaultInitializer(ptr, context.exec().getSizeValue(1), context);
+    performDefaultInitializer(ptr, context.exec().getSizeN(1), context);
 }
 
 void lang::TypeDefinition::performDefaultInitializer(Shared<lang::Value> ptr,
@@ -480,7 +470,7 @@ void lang::TypeDefinition::performCopyInitializer(Shared<lang::Value> destinatio
 
 void lang::TypeDefinition::performFinalizer(Shared<lang::Value> ptr, CompileContext& context)
 {
-    performFinalizer(ptr, context.exec().getSizeValue(1), context);
+    performFinalizer(ptr, context.exec().getSizeN(1), context);
 }
 
 void lang::TypeDefinition::performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context)
@@ -588,7 +578,9 @@ void lang::TypeDefinition::buildConstructors(CompileContext& context)
 
     context.exec().enterFunctionBody(function_handle);
 
-    if (getStateCount().isUnit()) context.exec().performReturn(context.exec().getDefaultValue(self()));
+    Shared<lang::Value> default_value = context.exec().getDefault(self());
+
+    if (getStateCount().isUnit()) context.exec().performReturn(default_value);
     else
     {
         Shared<lang::Value> ptr = context.exec().performStackAllocation(self());
@@ -652,7 +644,7 @@ void lang::TypeDefinition::performSingleDefaultInitializerDefinition(Shared<lang
 {
     if (getStateCount().isUnit()) return;
 
-    Shared<lang::Value> initial = context.exec().getDefaultValue(self());
+    Shared<lang::Value> initial = context.exec().getDefault(self());
     context.exec().performStoreToAddress(ptr, initial);
 }
 

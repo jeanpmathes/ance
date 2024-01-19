@@ -12,23 +12,12 @@ bool lang::OpaquePointerType::isOpaquePointerType() const
     return true;
 }
 
-llvm::Constant* lang::OpaquePointerType::getDefaultContent(CompileContext& context) const
-{
-    return llvm::ConstantPointerNull::get(
-        llvm::PointerType::get(llvm::Type::getInt8Ty(context.exec().llvmContext()), 0));
-}
-
-llvm::Type* lang::OpaquePointerType::getContentType(CompileContext& context) const
-{
-    return llvm::PointerType::get(llvm::Type::getInt8Ty(context.exec().llvmContext()), 0);
-}
-
 std::string lang::OpaquePointerType::createMangledName() const
 {
     return "ptr";
 }
 
-Execution::Type lang::OpaquePointerType::createDebugType(CompileContext& context) const
+Execution::Type lang::OpaquePointerType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerOpaqueAddressType(self());
 }

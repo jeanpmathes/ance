@@ -16,18 +16,27 @@ bool lang::Constant::validate(ValidationLogger&, lang::Location) const
 
 void lang::Constant::buildContentConstant(CompileContext& context)
 {
-    if (content_constant_) return;
-    content_constant_ = createContent(context);
+    if (backing_constant_.hasValue()) return;
+    if (getWrappedConstant() != nullptr) return;
+
+    backing_constant_ = createContent(context);
+    backing_constant_.value()->buildContentConstant(context);
+}
+
+llvm::Constant* lang::Constant::getWrappedConstant() const
+{
+    return nullptr;
 }
 
 llvm::Constant* lang::Constant::getContentConstant()
 {
-    assert(content_constant_);
-    return content_constant_;
+    if (getWrappedConstant() != nullptr) return getWrappedConstant();
+
+    return backing_constant_.value()->getContentConstant();
 }
 
 void lang::Constant::buildContentValue(CompileContext& context)
 {
     buildContentConstant(context);
-    content_value_ = content_constant_;
+    content_value_ = getContentConstant();
 }

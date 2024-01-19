@@ -12,19 +12,18 @@ lang::WrappedContentValue::WrappedContentValue(lang::ResolvingHandle<lang::Type>
     : type_(std::move(type))
 {
     content_value_ = value;
-    assert(content_value_->getType() == type_->getContentType(context));
+
+    llvm::Type* llvm_type = context.exec().llvmType(type_->getExecutionType(context));
+    assert(content_value_->getType() == llvm_type);
 }
 
 void lang::WrappedContentValue::setValue(llvm::Value* value, CompileContext& context)
 {
     assert(content_value_ == nullptr);
-    assert(value->getType() == type_->getContentType(context));
 
-    content_value_ = value;
-}
+    llvm::Type* llvm_type = context.exec().llvmType(type_->getExecutionType(context));
+    assert(content_value_->getType() == llvm_type);
 
-void lang::WrappedContentValue::setValueUnchecked(llvm::Value* value)
-{
     content_value_ = value;
 }
 

@@ -24,10 +24,12 @@ class NativeBuild : public Execution
                 llvm::DICompileUnit* di_unit);
     ~NativeBuild() override = default;
 
-    Shared<lang::Value>    getDefaultValue(lang::ResolvingHandle<lang::Type> type) override;
+    Shared<lang::Constant> getDefault(lang::ResolvingHandle<lang::Type> type) override;
+    Shared<lang::Constant> getCodepointString(std::u32string const& string) override;
+    Shared<lang::Constant> getByteString(std::string const& string) override;
     Shared<lang::Constant> getCString(std::string const& string) override;
-    Shared<lang::Constant> getSizeValue(std::size_t size) override;
-    Shared<lang::Constant> getDiffValue(std::ptrdiff_t diff) override;
+    Shared<lang::Constant> getSizeN(std::size_t size) override;
+    Shared<lang::Constant> getDiffN(std::ptrdiff_t diff) override;
     Shared<lang::Constant> getSizeOf(lang::ResolvingHandle<lang::Type> type) override;
     Shared<lang::Constant> getN(std::variant<uint64_t, double> n, lang::ResolvingHandle<lang::Type> type) override;
     Shared<lang::Constant> getZero(lang::ResolvingHandle<lang::Type> type) override;
@@ -35,6 +37,9 @@ class NativeBuild : public Execution
     Shared<lang::Constant> getNull(lang::ResolvingHandle<lang::Type> type) override;
     Shared<lang::Constant> getBoolean(bool boolean, lang::ResolvingHandle<lang::Type> type) override;
     Shared<lang::Constant> getInteger(llvm::APInt int_value, lang::ResolvingHandle<lang::Type> type) override;
+    Shared<lang::Constant> getFloatingPoint(llvm::APFloat float_value, lang::ResolvingHandle<lang::Type> type) override;
+    Shared<lang::Constant> getCodepoint(char32_t codepoint) override;
+    Shared<lang::Constant> getByte(uint8_t byte) override;
 
     llvm::Constant* getBooleanConstant(bool boolean) override;
     llvm::Constant* getCodepointConstant(char32_t codepoint) override;
@@ -151,10 +156,13 @@ class NativeBuild : public Execution
     llvm::DICompileUnit& llvmUnit() override;
     llvm::Function*      llvmFunction(Function function) override;
     llvm::DIScope*       llvmScope(Execution::Scoped scoped) override;
-    llvm::DIType*        llvmType(Execution::Type type) override;
+    llvm::Type*          llvmType(Execution::Type type) override;
+    llvm::DIType*        llvmDiType(Execution::Type type) override;
     llvm::TypeSize       llvmSizeOf(lang::ResolvingHandle<lang::Type> type) override;
 
-    llvm::DIType* llvmType(lang::Type const& type);
+    llvm::Type*     llvmType(lang::Type const& type);
+    llvm::DIType*   llvmDiType(lang::Type const& type);
+    llvm::Constant* llvmDefault(lang::Type const& type);
 
   private:
     CompileContext& context_;
@@ -176,7 +184,9 @@ class NativeBuild : public Execution
     };
 
     struct NativeType {
-        llvm::DIType* llvm_type;
+        llvm::Type*     llvm_type;
+        llvm::DIType*   llvm_di_type;
+        llvm::Constant* llvm_default;
     };
 
     struct NativeGlobalVariable {
@@ -198,7 +208,7 @@ class NativeBuild : public Execution
     llvm::Function* current_function_ = nullptr;
 
     lang::Type const* current_recursive_type_      = nullptr;
-    llvm::DIType*     current_recursive_llvm_type_ = nullptr;
+    NativeType        current_recursive_native_type_ = {nullptr, nullptr, nullptr};
 };
 
 #endif

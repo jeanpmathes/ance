@@ -9,17 +9,17 @@ lang::WrappedNativeValue::WrappedNativeValue(lang::ResolvingHandle<lang::Type> t
 
 lang::WrappedNativeValue::WrappedNativeValue(lang::ResolvingHandle<lang::Type> type,
                                              llvm::Value*                      value,
-                                             CompileContext&                   context)
+                                             CompileContext&)
     : type_(std::move(type))
 {
     native_value_ = value;
-    assert(native_value_->getType() == type_->getNativeType(context));
+    assert(native_value_->getType()->isPointerTy());
 }
 
-void lang::WrappedNativeValue::setValue(llvm::Value* value, CompileContext& context)
+void lang::WrappedNativeValue::setValue(llvm::Value* value, CompileContext&)
 {
     assert(native_value_ == nullptr);
-    assert(value->getType() == type_->getNativeType(context));
+    assert(value->getType()->isPointerTy());
 
     native_value_ = value;
 }

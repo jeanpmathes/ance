@@ -20,16 +20,6 @@ bool lang::BooleanType::isBooleanType() const
     return true;
 }
 
-llvm::Constant* lang::BooleanType::getDefaultContent(CompileContext& context) const
-{
-    return llvm::ConstantInt::get(getContentType(context), 0, false);
-}
-
-llvm::Type* lang::BooleanType::getContentType(CompileContext& context) const
-{
-    return llvm::Type::getInt1Ty(context.exec().llvmContext());
-}
-
 bool lang::BooleanType::isTriviallyDefaultConstructible() const
 {
     return true;
@@ -50,7 +40,7 @@ std::string lang::BooleanType::createMangledName() const
     return "b";
 }
 
-Execution::Type lang::BooleanType::createDebugType(CompileContext& context) const
+Execution::Type lang::BooleanType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerBooleanType(self());
 }

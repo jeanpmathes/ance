@@ -106,7 +106,7 @@ Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
     if (op == lang::BinaryOperator::ADDITION)
     {
         if (getPointeeType().value()->getStateCount().isUnit())
-            return context.exec().getDefaultValue(getOperatorResultType(op, right->type()));
+            return context.exec().getDefault(getOperatorResultType(op, right->type()));
         else
         {
             if (right->type()->isSizeType())

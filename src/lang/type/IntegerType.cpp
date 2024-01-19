@@ -19,16 +19,6 @@ StateCount lang::IntegerType::getStateCount() const
     return SpecialCount::PLATFORM_DEPENDENT;
 }
 
-llvm::Constant* lang::IntegerType::getDefaultContent(CompileContext& context) const
-{
-    return llvm::ConstantInt::get(getContentType(context), 0, false);
-}
-
-llvm::Type* lang::IntegerType::getContentType(CompileContext& context) const
-{
-    return llvm::Type::getIntNTy(context.exec().llvmContext(), static_cast<unsigned>(getNativeBitSize()));
-}
-
 lang::IntegerType const* lang::IntegerType::isIntegerType() const
 {
     return this;
@@ -319,7 +309,7 @@ bool lang::IntegerType::isTriviallyDestructible() const
     return true;
 }
 
-Execution::Type lang::IntegerType::createDebugType(CompileContext& context) const
+Execution::Type lang::IntegerType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerIntegerType(self());
 }

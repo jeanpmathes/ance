@@ -105,7 +105,7 @@ bool lang::Member::validate(ValidationLogger& validation_logger) const
 Shared<lang::Constant> lang::Member::getConstantInitializer(CompileContext& context)
 {
     if (constant_init_.hasValue()) { return getInitialValue(context); }
-    else { return type()->getDefault(context); }
+    else { return context.exec().getDefault(type()); }
 }
 
 void lang::Member::buildInitialization(Shared<lang::Value> ptr, CompileContext& context)

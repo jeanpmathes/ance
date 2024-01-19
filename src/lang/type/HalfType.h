@@ -13,9 +13,6 @@ namespace lang
       public:
         HalfType();
 
-        llvm::Constant* getDefaultContent(CompileContext& context) const override;
-        llvm::Type*     getContentType(CompileContext& context) const override;
-
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
 
       private:

@@ -77,7 +77,7 @@ std::string lang::PointerType::createMangledName() const
     return std::string("p") + "(" + element_type_->getMangledName() + ")";
 }
 
-Execution::Type lang::PointerType::createDebugType(CompileContext& context) const
+Execution::Type lang::PointerType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerAddressType(self());
 }

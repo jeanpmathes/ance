@@ -24,9 +24,6 @@ namespace lang
         [[nodiscard]] StateCount getStateCount() const override;
         bool                     isStructType() const override;
 
-        llvm::Constant*   getDefaultContent(CompileContext& context) const override;
-        llvm::StructType* getContentType(CompileContext& context) const override;
-
         bool                              hasMember(lang::Identifier const& name) const override;
         Member& getMember(lang::Identifier const& name) override;
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
@@ -42,7 +39,7 @@ namespace lang
         void buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) override;
 
         std::string   createMangledName() const override;
-        Execution::Type createDebugType(CompileContext& context) const override;
+        Execution::Type createExecutionType(CompileContext& context) const override;
 
       public:
         std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies() override;

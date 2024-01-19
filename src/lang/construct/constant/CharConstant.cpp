@@ -43,14 +43,12 @@ lang::Type const& lang::CharConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::CharConstant::createContent(CompileContext& context)
+Shared<lang::Constant> lang::CharConstant::createContent(CompileContext& context)
 {
-    if (type_->isCharType()) { return context.exec().getCodepointConstant(char_); }
+    if (type_->isCharType()) { return context.exec().getCodepoint(char_); }
 
     if (type_->isFixedWidthIntegerType(8, false))
-    {
-        return context.exec().getByteConstant(static_cast<uint8_t>(char_));
-    }
+    { return context.exec().getByte(static_cast<uint8_t>(char_)); }
 
     throw std::logic_error("Invalid type for char constant");
 }

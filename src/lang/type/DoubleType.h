@@ -16,9 +16,6 @@ namespace lang
       public:
         DoubleType();
 
-        llvm::Constant* getDefaultContent(CompileContext& context) const override;
-        llvm::Type*     getContentType(CompileContext& context) const override;
-
       private:
         [[nodiscard]] size_t getPrecision() const override;
 

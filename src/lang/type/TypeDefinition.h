@@ -118,13 +118,7 @@ namespace lang
         void postResolve();
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters);
 
-        virtual llvm::Constant* getDefaultContent(CompileContext& context) const = 0;
-
-        llvm::Type*         getNativeType(CompileContext& context) const;
-        virtual llvm::Type* getContentType(CompileContext& context) const = 0;
-        Execution::Type     getDebugType(CompileContext& context) const;
-
-        llvm::TypeSize getContentSize(CompileContext& context) const;
+        Execution::Type getExecutionType(CompileContext& context) const;
 
         virtual bool                              isSubscriptDefined() const;
         virtual lang::ResolvingHandle<lang::Type> getSubscriptReturnType();
@@ -235,7 +229,7 @@ namespace lang
 
         virtual std::string createMangledName() const = 0;
 
-        virtual Execution::Type createDebugType(CompileContext& context) const = 0;
+        virtual Execution::Type createExecutionType(CompileContext& context) const = 0;
 
         virtual std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies();
         virtual std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies();

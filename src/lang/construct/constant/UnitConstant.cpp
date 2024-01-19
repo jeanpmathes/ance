@@ -1,5 +1,7 @@
 #include "UnitConstant.h"
 
+#include "compiler/CompileContext.h"
+#include "compiler/Execution.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Context.h"
 
@@ -20,9 +22,9 @@ lang::Type const& lang::UnitConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::UnitConstant::createContent(CompileContext& context)
+Shared<lang::Constant> lang::UnitConstant::createContent(CompileContext& context)
 {
-    return type_->getDefaultContent(context);
+    return context.exec().getDefault(type_);
 }
 
 bool lang::UnitConstant::equals(lang::Constant const* other) const

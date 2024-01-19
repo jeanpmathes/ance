@@ -15,9 +15,6 @@ namespace lang
 
         [[nodiscard]] StateCount getStateCount() const override;
 
-        llvm::Constant*   getDefaultContent(CompileContext& context) const override;
-        llvm::StructType* getContentType(CompileContext& context) const override;
-
         [[nodiscard]] bool isUnitType() const override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
@@ -43,13 +40,10 @@ namespace lang
 
       protected:
         std::string   createMangledName() const override;
-        Execution::Type createDebugType(CompileContext& context) const override;
+        Execution::Type createExecutionType(CompileContext& context) const override;
 
       public:
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
-
-      private:
-        mutable llvm::StructType* native_type_ {nullptr};
     };
 }
 #endif

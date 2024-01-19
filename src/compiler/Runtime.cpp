@@ -72,11 +72,11 @@ Shared<lang::Value> Runtime::allocate(Allocator                         allocati
     lang::ResolvingHandle<lang::Type> return_type =
         count.hasValue() ? context.ctx().getBufferType(type) : context.ctx().getPointerType(type);
 
-    if (type->getStateCount().isUnit()) return context.exec().getDefaultValue(return_type);
+    if (type->getStateCount().isUnit()) return context.exec().getDefault(return_type);
 
     Optional<Shared<lang::Value>> ptr_to_allocated;
 
-    Shared<lang::Value> count_value = count.valueOr(context.exec().getSizeValue(1));
+    Shared<lang::Value> count_value = count.valueOr(context.exec().getSizeN(1));
 
     switch (allocation)
     {
@@ -109,7 +109,7 @@ void Runtime::deleteDynamic(Shared<lang::Value> address, bool delete_buffer, Com
         Shared<lang::Value> memory_as_size_ptr =
             context.exec().computeCastedAddress(address, context.ctx().getPointerType(context.ctx().getSizeType()));
         Shared<lang::Value> count_value_ptr = context.exec().computeElementPointer(memory_as_size_ptr,
-                                                                                   context.exec().getDiffValue(-1),
+                                                                                   context.exec().getDiffN(-1),
                                                                                    Execution::IndexingMode::POINTER,
                                                                                    std::nullopt);
         Shared<lang::Value> count_value     = context.exec().performLoadFromAddress(count_value_ptr);
@@ -193,7 +193,7 @@ Shared<lang::Value> Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> t
         context.exec().performStoreToAddress(header_ptr, count);
 
         Shared<lang::Value> memory_ptr = context.exec().computeElementPointer(header_ptr,
-                                                                              context.exec().getDiffValue(1),
+                                                                              context.exec().getDiffN(1),
                                                                               Execution::IndexingMode::POINTER,
                                                                               std::nullopt);
         opaque_memory_ptr = context.exec().computeCastedAddress(memory_ptr, context.ctx().getOpaquePointerType());

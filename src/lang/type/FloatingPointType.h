@@ -12,7 +12,7 @@ namespace lang
     {
       protected:
         std::string   createMangledName() const override;
-        Execution::Type createDebugType(CompileContext& context) const override;
+        Execution::Type createExecutionType(CompileContext& context) const override;
 
       public:
         ~FloatingPointType() override = default;
@@ -60,13 +60,12 @@ namespace lang
                                                         Shared<lang::Value>  right,
                                                         CompileContext&      context) override;
 
+        [[nodiscard]] virtual size_t getPrecision() const = 0;
+
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
-
-      private:
-        [[nodiscard]] virtual size_t getPrecision() const = 0;
     };
 }
 #endif

@@ -17,5 +17,5 @@ bool lang::StructScope::isPartOfFunction() const
 
 Execution::Scoped lang::StructScope::getDebugScope(CompileContext& context) const
 {
-    return std::get<Execution::Struct>(self_->getDebugType(context));
+    return std::get<Execution::Struct>(self_->getExecutionType(context));
 }

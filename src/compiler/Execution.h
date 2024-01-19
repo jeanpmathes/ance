@@ -30,11 +30,25 @@ class Execution
 {
   public:
     /**
-     * Get the default value for the given type.
-     * @param type The type to get the default value for.
-     * @return The default value.
+     * Get the default constant for the given type.
+     * @param type The type to get the constant value for.
+     * @return The default constant.
      */
-    virtual Shared<lang::Value> getDefaultValue(lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual Shared<lang::Constant> getDefault(lang::ResolvingHandle<lang::Type> type) = 0;
+
+    /**
+     * Get the given string as a constant.
+     * @param string The string to get as a constant.
+     * @return The constant.
+     */
+    virtual Shared<lang::Constant> getCodepointString(std::u32string const& string) = 0;
+
+    /**
+     * Get the given string as a constant.
+     * @param string The string to get as a constant.
+     * @return The constant.
+     */
+    virtual Shared<lang::Constant> getByteString(std::string const& string) = 0;
 
     /**
      * Get the given string as a constant.
@@ -48,14 +62,14 @@ class Execution
      * @param size The size to get as a constant.
      * @return The constant.
      */
-    virtual Shared<lang::Constant> getSizeValue(std::size_t size) = 0;
+    virtual Shared<lang::Constant> getSizeN(std::size_t size) = 0;
 
     /**
      * Get the given difference as a constant.
      * @param diff The difference to get as a constant.
      * @return The constant.
      */
-    virtual Shared<lang::Constant> getDiffValue(std::ptrdiff_t diff) = 0;
+    virtual Shared<lang::Constant> getDiffN(std::ptrdiff_t diff) = 0;
 
     /**
      * Get the size of the given type as a constant.
@@ -109,11 +123,34 @@ class Execution
      */
     virtual Shared<lang::Constant> getInteger(llvm::APInt int_value, lang::ResolvingHandle<lang::Type> type) = 0;
 
-    virtual llvm::Constant* getBooleanConstant(bool boolean)                  = 0;
-    virtual llvm::Constant* getCodepointConstant(char32_t codepoint)          = 0;
-    virtual llvm::Constant* getByteConstant(uint8_t byte)                     = 0;
-    virtual llvm::Constant* getFloatConstant(llvm::APFloat float_value)       = 0;
-    virtual llvm::Constant* getIntegerConstant(llvm::APInt int_value)         = 0;
+    /**
+     * Get the given float as a constant.
+     * @param float_value The float to get as a constant.
+     * @param type The type to get the float as, can be either the float type or a vector of it.
+     * @return The constant.
+     */
+    virtual Shared<lang::Constant> getFloatingPoint(llvm::APFloat                     float_value,
+                                                    lang::ResolvingHandle<lang::Type> type) = 0;
+
+    /**
+     * Get the given codepoint value as a constant.
+     * @param codepoint The codepoint to get as a constant.
+     * @return The constant.
+     */
+    virtual Shared<lang::Constant> getCodepoint(char32_t codepoint) = 0;
+
+    /**
+     * Get the given byte value as a constant.
+     * @param byte The byte to get as a constant.
+     * @return The constant.
+     */
+    virtual Shared<lang::Constant> getByte(uint8_t byte) = 0;
+
+    virtual llvm::Constant* getBooleanConstant(bool boolean)                         = 0;
+    virtual llvm::Constant* getCodepointConstant(char32_t codepoint)                 = 0;
+    virtual llvm::Constant* getByteConstant(uint8_t byte)                            = 0;
+    virtual llvm::Constant* getFloatConstant(llvm::APFloat float_value)              = 0;
+    virtual llvm::Constant* getIntegerConstant(llvm::APInt int_value)                = 0;
     virtual llvm::Constant* getByteStringConstant(std::string const& string)         = 0;
     virtual llvm::Constant* getCodepointStringConstant(std::u32string const& string) = 0;
     virtual llvm::Constant* getCStringConstant(std::string const& string)            = 0;
@@ -587,7 +624,8 @@ class Execution
     virtual llvm::DICompileUnit& llvmUnit()                                         = 0;
     virtual llvm::Function*      llvmFunction(Function function)                    = 0;
     virtual llvm::DIScope*       llvmScope(Scoped scope)                            = 0;
-    virtual llvm::DIType*        llvmType(Type type)                                = 0;
+    virtual llvm::Type*          llvmType(Type type)                                = 0;
+    virtual llvm::DIType*        llvmDiType(Type type)                              = 0;
     virtual llvm::TypeSize       llvmSizeOf(lang::ResolvingHandle<lang::Type> type) = 0;
 
     virtual ~Execution() = default;

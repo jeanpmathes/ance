@@ -50,21 +50,6 @@ lang::Type const& lang::ReferenceType::getActualType() const
     return actual_type_.value();
 }
 
-llvm::Constant* lang::ReferenceType::getDefaultContent(CompileContext& context) const
-{
-    // A default value for a reference does not make sense, except for zero-sized types.
-    // They are not stored anywhere, so we can just return a null pointer.
-
-    assert(element_type_->getStateCount().isUnit());
-
-    return llvm::ConstantPointerNull::get(llvm::PointerType::get(element_type_->getContentType(context), 0));
-}
-
-llvm::PointerType* lang::ReferenceType::getContentType(CompileContext& context) const
-{
-    return llvm::PointerType::get(element_type_->getContentType(context), 0);
-}
-
 bool lang::ReferenceType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (lang::Type::isTypeUndefined(element_type_, scope(), element_type_->name().location(), validation_logger))
@@ -224,7 +209,7 @@ std::string lang::ReferenceType::createMangledName() const
     return std::string("ref") + "(" + element_type_->getMangledName() + ")";
 }
 
-Execution::Type lang::ReferenceType::createDebugType(CompileContext& context) const
+Execution::Type lang::ReferenceType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerReferenceType(self());
 }

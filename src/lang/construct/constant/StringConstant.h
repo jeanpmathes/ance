@@ -29,7 +29,7 @@ namespace lang
         lang::ResolvingHandle<lang::Type> type() override;
         [[nodiscard]] lang::Type const&   type() const override;
 
-        llvm::Constant* createContent(CompileContext& context) override;
+        Shared<lang::Constant> createContent(CompileContext& context) override;
 
         bool equals(lang::Constant const* other) const override;
 

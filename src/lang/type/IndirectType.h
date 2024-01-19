@@ -18,9 +18,6 @@ namespace lang
         explicit IndirectType(lang::ResolvingHandle<lang::Type> element_type);
         ~IndirectType() override = default;
 
-        llvm::Constant*    getDefaultContent(CompileContext& context) const override;
-        llvm::PointerType* getContentType(CompileContext& context) const override;
-
         bool                              definesIndirection() const override;
         lang::ResolvingHandle<lang::Type> getIndirectionType() override;
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;

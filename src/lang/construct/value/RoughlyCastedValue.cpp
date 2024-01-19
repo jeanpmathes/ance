@@ -11,7 +11,10 @@ lang::RoughlyCastedValue::RoughlyCastedValue(lang::ResolvingHandle<lang::Type> t
     : target_type_(std::move(target_type))
     , original_(std::move(original))
 {
-    assert(target_type_->getContentType(context) == original_->type()->getContentType(context));
+    llvm::Type* target_llvm_type   = context.exec().llvmType(target_type_->getExecutionType(context));
+    llvm::Type* original_llvm_type = context.exec().llvmType(original_->type()->getExecutionType(context));
+
+    assert(target_llvm_type == original_llvm_type);
 }
 
 lang::ResolvingHandle<lang::Type> lang::RoughlyCastedValue::type()
@@ -26,8 +29,10 @@ lang::Type const& lang::RoughlyCastedValue::type() const
 
 void lang::RoughlyCastedValue::buildNativeValue(CompileContext& context)
 {
-    assert(target_type_->getNativeType(context) == original_->type()->getNativeType(context)
-           && "Native type has to be equal.");
+    llvm::Type* target_llvm_type   = context.exec().llvmType(target_type_->getExecutionType(context));
+    llvm::Type* original_llvm_type = context.exec().llvmType(original_->type()->getExecutionType(context));
+
+    assert(target_llvm_type == original_llvm_type);
 
     original_->buildNativeValue(context);
     native_value_ = original_->getNativeValue();
@@ -35,8 +40,10 @@ void lang::RoughlyCastedValue::buildNativeValue(CompileContext& context)
 
 void lang::RoughlyCastedValue::buildContentValue(CompileContext& context)
 {
-    assert(target_type_->getNativeType(context) == original_->type()->getNativeType(context)
-           && "Native type has to be equal.");
+    llvm::Type* target_llvm_type   = context.exec().llvmType(target_type_->getExecutionType(context));
+    llvm::Type* original_llvm_type = context.exec().llvmType(original_->type()->getExecutionType(context));
+
+    assert(target_llvm_type == original_llvm_type);
 
     original_->buildContentValue(context);
     content_value_ = original_->getContentValue();

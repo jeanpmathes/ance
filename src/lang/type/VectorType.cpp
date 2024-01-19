@@ -53,26 +53,6 @@ lang::Type const& lang::VectorType::getActualType() const
     return actual_type_.value();
 }
 
-llvm::Constant* lang::VectorType::getDefaultContent(CompileContext& context) const
-{
-    std::vector<llvm::Constant*> const content(size_.value(), element_type_->getDefaultContent(context));
-    return llvm::ConstantVector::get(content);
-}
-
-llvm::Type* lang::VectorType::getContentType(CompileContext& context) const
-{
-    llvm::Type* content_type;
-
-    if (element_type_->isVectorizable())
-    {
-        content_type =
-            llvm::FixedVectorType::get(element_type_->getContentType(context), static_cast<unsigned>(size_.value()));
-    }
-    else { content_type = llvm::ArrayType::get(element_type_->getContentType(context), size_.value()); }
-
-    return content_type;
-}
-
 bool lang::VectorType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (size_.value() > MAX_VECTOR_TYPE_SIZE)
@@ -136,7 +116,7 @@ Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::ResolvingHan
 
         for (size_t index = 0; index < size_.value(); index++)
         {
-            Shared<lang::Constant> index_constant = context.exec().getSizeValue(index);
+            Shared<lang::Constant> index_constant = context.exec().getSizeN(index);
 
             Shared<lang::Value> current_element_ref = buildSubscriptInBounds(value, index_constant, context);
             Shared<lang::Value> current_element     = context.exec().performDereference(current_element_ref);
@@ -184,7 +164,7 @@ Shared<lang::Value> lang::VectorType::buildCast(lang::ResolvingHandle<lang::Type
 
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            Shared<lang::Constant> index_constant = context.exec().getSizeValue(index);
+            Shared<lang::Constant> index_constant = context.exec().getSizeN(index);
 
             Shared<lang::Value> current_element_ref = buildSubscriptInBounds(value, index_constant, context);
             Shared<lang::Value> current_element     = context.exec().performDereference(current_element_ref);
@@ -234,7 +214,7 @@ Shared<lang::Value> lang::VectorType::buildOperator(lang::UnaryOperator op,
 
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            Shared<lang::Constant> index_constant = context.exec().getSizeValue(index);
+            Shared<lang::Constant> index_constant = context.exec().getSizeN(index);
 
             Shared<lang::Value> current_element_ref = buildSubscriptInBounds(value, index_constant, context);
             Shared<lang::Value> current_element     = context.exec().performDereference(current_element_ref);
@@ -298,7 +278,7 @@ Shared<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperator op,
 
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            Shared<lang::Constant> index_constant = context.exec().getSizeValue(index);
+            Shared<lang::Constant> index_constant = context.exec().getSizeN(index);
 
             Shared<lang::Value> left_element_ref = buildSubscriptInBounds(left, index_constant, context);
             Shared<lang::Value> left_element     = context.exec().performDereference(left_element_ref);
@@ -364,7 +344,7 @@ void lang::VectorType::buildRequestedOverload(std::vector<ResolvingHandle<lang::
 
             for (uint64_t index = 0; index < size_.value(); index++)
             {
-                Shared<lang::Constant> index_constant = context.exec().getSizeValue(index);
+                Shared<lang::Constant> index_constant = context.exec().getSizeN(index);
 
                 Shared<lang::Value> original_element_ref = buildSubscriptInBounds(original, index_constant, context);
                 Shared<lang::Value> original_element     = context.exec().performDereference(original_element_ref);
@@ -392,7 +372,7 @@ std::string lang::VectorType::createMangledName() const
          + std::string(")");
 }
 
-Execution::Type lang::VectorType::createDebugType(CompileContext& context) const
+Execution::Type lang::VectorType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerVectorType(self());
 }

@@ -41,17 +41,6 @@ lang::Type const& lang::ArrayType::getActualType() const
     return actual_type_.value();
 }
 
-llvm::Constant* lang::ArrayType::getDefaultContent(CompileContext& context) const
-{
-    std::vector<llvm::Constant*> const content(size_.value(), element_type_->getDefaultContent(context));
-    return llvm::ConstantArray::get(getContentType(context), content);
-}
-
-llvm::ArrayType* lang::ArrayType::getContentType(CompileContext& context) const
-{
-    return llvm::ArrayType::get(element_type_->getContentType(context), size_.value());
-}
-
 bool lang::ArrayType::validate(ValidationLogger& validation_logger, lang::Location location) const
 {
     if (size_.value() > MAX_ARRAY_TYPE_SIZE)
@@ -79,7 +68,7 @@ std::string lang::ArrayType::createMangledName() const
          + std::string(")");
 }
 
-Execution::Type lang::ArrayType::createDebugType(CompileContext& context) const
+Execution::Type lang::ArrayType::createExecutionType(CompileContext& context) const
 {
     return context.exec().registerArrayType(self());
 }

@@ -35,9 +35,9 @@ lang::Type const& lang::FloatConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::FloatConstant::createContent(CompileContext& context)
+Shared<lang::Constant> lang::FloatConstant::createContent(CompileContext& context)
 {
-    return context.exec().getFloatConstant(float_);
+    return context.exec().getFloatingPoint(float_, type_);
 }
 
 bool lang::FloatConstant::equals(lang::Constant const* other) const

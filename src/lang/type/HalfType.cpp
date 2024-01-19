@@ -8,16 +8,6 @@
 
 lang::HalfType::HalfType() : TypeDefinition(lang::Identifier::like("half")) {}
 
-llvm::Constant* lang::HalfType::getDefaultContent(CompileContext& context) const
-{
-    return llvm::ConstantFP::get(getContentType(context), 0);
-}
-
-llvm::Type* lang::HalfType::getContentType(CompileContext& context) const
-{
-    return llvm::Type::getHalfTy(context.exec().llvmContext());
-}
-
 size_t lang::HalfType::getPrecision() const
 {
     return 16;

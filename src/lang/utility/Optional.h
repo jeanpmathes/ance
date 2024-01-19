@@ -56,6 +56,7 @@ class Optional
         requires(!ConstCopyable<T> and Copyable<T>);
     explicit(false) Optional(T&& value)      // NOLINT(google-explicit-constructor)
         requires(!ConstCopyable<T> and !Copyable<T>);
+
     Optional<T>& operator=(T value);
 
     Optional(Optional<T> const& optional)
@@ -80,11 +81,9 @@ class Optional
         requires Copyable<T>;
     Optional<T>& operator=(Optional<T>&& optional) noexcept
         requires(!Copyable<T>);
-
     template<typename OtherT>
         requires MoveConvertible<T, OtherT>
     Optional<T>& operator=(Optional<OtherT>&& optional);
-
     template<typename OtherT>
         requires CopyConvertible<T, OtherT>
     Optional<T>& operator=(Optional<OtherT>& optional);

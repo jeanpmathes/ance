@@ -1,6 +1,7 @@
 #include "NullConstant.h"
 
 #include "compiler/CompileContext.h"
+#include "compiler/Execution.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Context.h"
 #include "lang/type/NullValueType.h"
@@ -22,9 +23,9 @@ lang::Type const& lang::NullConstant::type() const
     return type_;
 }
 
-llvm::Constant* lang::NullConstant::createContent(CompileContext& context)
+Shared<lang::Constant> lang::NullConstant::createContent(CompileContext& context)
 {
-    return type_->getDefaultContent(context);
+    return context.exec().getDefault(type_);
 }
 
 bool lang::NullConstant::equals(lang::Constant const* other) const

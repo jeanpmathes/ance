@@ -38,45 +38,12 @@ bool lang::StructType::isStructType() const
     return true;
 }
 
-llvm::Constant* lang::StructType::getDefaultContent(CompileContext& context) const
-{
-    std::vector<llvm::Constant*> values;
-
-    values.reserve(members_.size());
-    for (auto& member : members_)
-    {
-        Shared<lang::Constant> initializer = member.get().getConstantInitializer(context);
-
-        initializer->buildContentConstant(context);
-        values.push_back(initializer->getContentConstant());
-    }
-
-    return llvm::ConstantStruct::get(getContentType(context), values);
-}
-
-llvm::StructType* lang::StructType::getContentType(CompileContext& context) const
-{
-    if (!native_type_)
-    {
-        native_type_ = llvm::StructType::create(context.exec().llvmContext(), getMangledName());
-
-        std::vector<llvm::Type*> member_types;
-
-        member_types.reserve(members_.size());
-        for (auto& member : members_) { member_types.push_back(member.get().type()->getContentType(context)); }
-
-        native_type_->setBody(member_types);
-    }
-
-    return native_type_;
-}
-
 std::string lang::StructType::createMangledName() const
 {
     return "struct(" + name() + ")";
 }
 
-Execution::Type lang::StructType::createDebugType(CompileContext& context) const
+Execution::Type lang::StructType::createExecutionType(CompileContext& context) const
 {
     return context.exec().createStruct(name(),
                                        CustomType::getAccessibility().modifier(),
