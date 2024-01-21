@@ -221,7 +221,7 @@ lang::Scope const& lang::Function::scope() const
     return definition_.value()->scope();
 }
 
-Execution::Scoped lang::Function::getDebugScope(CompileContext&) const
+Execution::Scoped lang::Function::getExecutionScope(CompileContext&) const
 {
     return definition_.value()->getDebugScope();
 }

@@ -8,8 +8,7 @@ void lang::Value::buildNativeValue(CompileContext& context)
     if (native_value_) return;
     buildContentValue(context);
 
-    native_value_ =
-        context.exec().ir().CreateAlloca(context.exec().llvmType(type()->getExecutionType(context)), nullptr, "store");
+    native_value_ = context.exec().ir().CreateAlloca(context.exec().llvmType(type()), nullptr, "store");
     context.exec().ir().CreateStore(getContentValue(), native_value_);
 }
 
@@ -18,7 +17,7 @@ void lang::Value::buildContentValue(CompileContext& context)
     if (content_value_) return;
     buildNativeValue(context);
 
-    content_value_ = context.exec().ir().CreateLoad(context.exec().llvmType(type()->getExecutionType(context)),
+    content_value_ = context.exec().ir().CreateLoad(context.exec().llvmType(type()),
                                                     getNativeValue(),
                                                     getNativeValue()->getName() + ".load");
 }

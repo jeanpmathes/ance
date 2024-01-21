@@ -76,8 +76,7 @@ void CompileContext::setDebugLocation(lang::Location location, lang::Scope& scop
 {
     debug_loc_stack_.push(current_debug_location_);
 
-    exec().ir().SetCurrentDebugLocation(
-        location.getDebugLoc(exec().llvmContext(), exec().llvmScope(scope.getDebugScope(*this))));
+    exec().ir().SetCurrentDebugLocation(location.getDebugLoc(exec().llvmContext(), exec().llvmScope(scope)));
 
     current_debug_location_.location    = location;
     current_debug_location_.di_location = exec().ir().getCurrentDebugLocation();

@@ -146,15 +146,6 @@ class Execution
      */
     virtual Shared<lang::Constant> getByte(uint8_t byte) = 0;
 
-    virtual llvm::Constant* getBooleanConstant(bool boolean)                         = 0;
-    virtual llvm::Constant* getCodepointConstant(char32_t codepoint)                 = 0;
-    virtual llvm::Constant* getByteConstant(uint8_t byte)                            = 0;
-    virtual llvm::Constant* getFloatConstant(llvm::APFloat float_value)              = 0;
-    virtual llvm::Constant* getIntegerConstant(llvm::APInt int_value)                = 0;
-    virtual llvm::Constant* getByteStringConstant(std::string const& string)         = 0;
-    virtual llvm::Constant* getCodepointStringConstant(std::u32string const& string) = 0;
-    virtual llvm::Constant* getCStringConstant(std::string const& string)            = 0;
-
     enum class Application : size_t
     {
         GLOBAL_SCOPE
@@ -619,14 +610,10 @@ class Execution
 
     virtual llvm::IRBuilder<>&   ir()                                               = 0;
     virtual llvm::DIBuilder&     di()                                               = 0;
-    virtual llvm::Module&        llvmModule()                                       = 0;
     virtual llvm::LLVMContext&   llvmContext()                                      = 0;
-    virtual llvm::DICompileUnit& llvmUnit()                                         = 0;
     virtual llvm::Function*      llvmFunction(Function function)                    = 0;
-    virtual llvm::DIScope*       llvmScope(Scoped scope)                            = 0;
-    virtual llvm::Type*          llvmType(Type type)                                = 0;
-    virtual llvm::DIType*        llvmDiType(Type type)                              = 0;
-    virtual llvm::TypeSize       llvmSizeOf(lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual llvm::DIScope*       llvmScope(lang::Scope const& scope)                = 0;
+    virtual llvm::Type*          llvmType(lang::Type const& type)                   = 0;
 
     virtual ~Execution() = default;
 };

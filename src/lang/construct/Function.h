@@ -248,7 +248,7 @@ namespace lang
         lang::Scope&                     scope() override;
         [[nodiscard]] lang::Scope const& scope() const override;
 
-        Execution::Scoped getDebugScope(CompileContext& context) const override;
+        Execution::Scoped getExecutionScope(CompileContext& context) const override;
 
         [[nodiscard]] bool isPartOfFunction() const override;
 

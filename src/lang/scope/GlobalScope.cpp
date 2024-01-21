@@ -49,7 +49,7 @@ lang::GlobalScope const* lang::GlobalScope::getGlobalScope() const
     return this;
 }
 
-Execution::Scoped lang::GlobalScope::getDebugScope(CompileContext&) const
+Execution::Scoped lang::GlobalScope::getExecutionScope(CompileContext&) const
 {
     return Execution::Application::GLOBAL_SCOPE;
 }

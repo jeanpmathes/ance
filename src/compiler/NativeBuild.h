@@ -41,15 +41,6 @@ class NativeBuild : public Execution
     Shared<lang::Constant> getCodepoint(char32_t codepoint) override;
     Shared<lang::Constant> getByte(uint8_t byte) override;
 
-    llvm::Constant* getBooleanConstant(bool boolean) override;
-    llvm::Constant* getCodepointConstant(char32_t codepoint) override;
-    llvm::Constant* getByteConstant(uint8_t byte) override;
-    llvm::Constant* getFloatConstant(llvm::APFloat float_value) override;
-    llvm::Constant* getIntegerConstant(llvm::APInt int_value) override;
-    llvm::Constant* getByteStringConstant(std::string const& string) override;
-    llvm::Constant* getCodepointStringConstant(std::u32string const& string) override;
-    llvm::Constant* getCStringConstant(std::string const& string) override;
-
     Function            createFunction(lang::Identifier const&               name,
                                        std::string const&                    linkage_name,
                                        Optional<lang::AccessModifier>        access,
@@ -151,16 +142,11 @@ class NativeBuild : public Execution
 
     llvm::IRBuilder<>&   ir() override;
     llvm::DIBuilder&     di() override;
-    llvm::Module&        llvmModule() override;
     llvm::LLVMContext&   llvmContext() override;
-    llvm::DICompileUnit& llvmUnit() override;
     llvm::Function*      llvmFunction(Function function) override;
-    llvm::DIScope*       llvmScope(Execution::Scoped scoped) override;
-    llvm::Type*          llvmType(Execution::Type type) override;
-    llvm::DIType*        llvmDiType(Execution::Type type) override;
-    llvm::TypeSize       llvmSizeOf(lang::ResolvingHandle<lang::Type> type) override;
+    llvm::DIScope*       llvmScope(lang::Scope const& scope) override;
+    llvm::Type*          llvmType(lang::Type const& type) override;
 
-    llvm::Type*     llvmType(lang::Type const& type);
     llvm::DIType*   llvmDiType(lang::Type const& type);
     llvm::Constant* llvmDefault(lang::Type const& type);
 

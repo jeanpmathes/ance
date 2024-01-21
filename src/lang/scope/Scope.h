@@ -116,11 +116,11 @@ namespace lang
         [[nodiscard]] std::string getTemporaryName() const;
 
         /**
-         * Get the debug scope for this scope.
+         * Get the execution scope for this scope.
          * @param context The current compile context.
-         * @return The debug scope.
+         * @return The execution scope.
          */
-        virtual Execution::Scoped getDebugScope(CompileContext& context) const = 0;
+        virtual Execution::Scoped getExecutionScope(CompileContext& context) const = 0;
 
         /**
          * Create a local scope in this scope.

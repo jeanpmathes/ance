@@ -53,7 +53,7 @@ namespace lang
 
         lang::GlobalScope*                     getGlobalScope() override;
         [[nodiscard]] lang::GlobalScope const* getGlobalScope() const override;
-        Execution::Scoped                      getDebugScope(CompileContext& context) const override;
+        Execution::Scoped                      getExecutionScope(CompileContext& context) const override;
 
         [[nodiscard]] Owned<lang::GlobalScope> expand() const;
         void                                   determineFlow();

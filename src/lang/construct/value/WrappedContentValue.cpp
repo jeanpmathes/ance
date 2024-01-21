@@ -13,7 +13,7 @@ lang::WrappedContentValue::WrappedContentValue(lang::ResolvingHandle<lang::Type>
 {
     content_value_ = value;
 
-    llvm::Type* llvm_type = context.exec().llvmType(type_->getExecutionType(context));
+    llvm::Type* llvm_type = context.exec().llvmType(type_);
     assert(content_value_->getType() == llvm_type);
 }
 
@@ -21,7 +21,7 @@ void lang::WrappedContentValue::setValue(llvm::Value* value, CompileContext& con
 {
     assert(content_value_ == nullptr);
 
-    llvm::Type* llvm_type = context.exec().llvmType(type_->getExecutionType(context));
+    llvm::Type* llvm_type = context.exec().llvmType(type_);
     assert(content_value_->getType() == llvm_type);
 
     content_value_ = value;
