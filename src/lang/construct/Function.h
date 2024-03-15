@@ -127,6 +127,22 @@ namespace lang
         InitializerFunction& defineAsInit(Statement& code, Scope& containing_scope);
 
         /**
+         * Define this function as a runtime function, meaning it is part of the runtime library.
+         * @param return_type The return type of the function.
+         * @param parameters The parameters for this function.
+         * @param context The compile context.
+         */
+        void defineAsRuntime(lang::ResolvingHandle<lang::Type>    return_type,
+                             std::vector<Shared<lang::Parameter>> parameters,
+                             CompileContext&                      context);
+
+        /**
+         * Define this function with a given definition.
+         * @param definition The definition.
+         */
+        void define(Owned<lang::FunctionDefinition> definition);
+
+        /**
          * Get the access level of this function.
          * @return The access level.
          */
@@ -157,31 +173,30 @@ namespace lang
         [[nodiscard]] Statement const* code() const;
 
         /**
-         * Get the type of a parameter.
-         * @param index The index of the parameter. Must be smaller than the parameter count.
-         * @return The type of the selected parameter.
+         * Get a parameter by index.
+         * @param index The index of the parameter.
+         * @return The parameter.
          */
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> parameterType(size_t index);
+        Shared<lang::Parameter> parameter(size_t index);
 
         /**
-         * Get the type of a parameter.
-         * @param index The index of the parameter. Must be smaller than the parameter count.
-         * @return The type of the selected parameter.
+         * Get a parameter by index.
+         * @param index The index of the parameter.
+         * @return The parameter.
          */
-        [[nodiscard]] lang::Type const& parameterType(size_t index) const;
-
-        /**
-         * Get the name of a parameter.
-         * @param index The index of the parameter. Must be smaller than the parameter count.
-         * @return The name of the selected parameter.
-         */
-        [[nodiscard]] lang::Identifier const& parameterName(size_t index) const;
+        lang::Parameter const& parameter(size_t index) const;
 
         /**
          * Get the parameter count.
          * @return The number of parameters this function is called with.
          */
         [[nodiscard]] size_t parameterCount() const;
+
+        /**
+         * Get the parameters of this function.
+         * @return The parameters.
+         */
+        [[nodiscard]] std::vector<Shared<lang::Parameter>> const& parameters() const;
 
         /**
          * Get the source location of this function.
@@ -214,27 +229,20 @@ namespace lang
         void validateFlow(ValidationLogger& validation_logger) const;
 
         /**
-         * Create the native content of this function, allowing building function code and calling this function.
+         * Create the declaration of this function, allowing building function code and calling this function.
          * @param context The current compile context.
          */
-        void createNativeBacking(CompileContext& context);
-
-        /**
-         * Build the function definition. This will be called after building the name.
-         * @param context The current compile context.
-         */
-        void build(CompileContext& context);
+        void buildDeclaration(CompileContext& context) const;
 
         /**
          * Validate a call to this function.
-         * @param arguments The arguments that will be passed to the function and their source location.
+         * @param arguments The arguments that will be passed to the function.
          * @param location The source location of the function call.
          * @param validation_logger A logger to log validation messages.
          * @return True if the call is valid.
          */
-        bool validateCall(
-            std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
-            lang::Location                                                                           location,
+        bool validateCall(std::vector<std::reference_wrapper<Expression const>> const& arguments,
+                          lang::Location                                                                           location,
             ValidationLogger& validation_logger) const;
 
         /**
@@ -243,14 +251,18 @@ namespace lang
          * @param context The current compile context.
          * @return The return value.
          */
-        Shared<lang::Value> buildCall(std::vector<Shared<lang::Value>> const& arguments, CompileContext& context);
+        Shared<lang::Value> buildCall(std::vector<Shared<lang::Value>> const& arguments, CompileContext& context) const;
 
         lang::Scope&                     scope() override;
         [[nodiscard]] lang::Scope const& scope() const override;
 
-        Execution::Scoped getExecutionScope(CompileContext& context) const override;
-
         [[nodiscard]] bool isPartOfFunction() const override;
+
+        /**
+         * Get the entry basic block of this function, or null if there is none.
+         * @return The entry basic block.
+         */
+        [[nodiscard]] lang::BasicBlock const* getEntryBlock() const;
 
         /**
          * Get the basic blocks for this function.
@@ -261,7 +273,7 @@ namespace lang
         void resolveFollowingOrder() override;
         void postResolve() override;
 
-        void buildDeclarationsFollowingOrder(CompileContext& context) override;
+        void buildEntityDeclarationsFollowingOrder(CompileContext& context) const override;
 
         ResolvingHandle<lang::Entity> getUndefinedClone(Context& new_context) const override;
 

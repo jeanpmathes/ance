@@ -1,17 +1,15 @@
 #include "ExpressionStatement.h"
 
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/Function.h"
-#include "lang/expression/BuildableExpression.h"
 
-ExpressionStatement::ExpressionStatement(Owned<BuildableExpression> expression, lang::Location location)
+ExpressionStatement::ExpressionStatement(Owned<Expression> expression, lang::Location location)
     : Statement(location)
     , expression_(std::move(expression))
 {
     addSubexpression(*expression_);
 }
 
-BuildableExpression const& ExpressionStatement::expression() const
+Expression const& ExpressionStatement::expression() const
 {
     return *expression_;
 }
@@ -25,14 +23,7 @@ Statements ExpressionStatement::expandWith(Expressions subexpressions, Statement
 {
     Statements statements;
 
-    auto* expression = dynamic_cast<BuildableExpression*>(unwrap(std::move(subexpressions[0])));
-    assert(expression != nullptr);
-    statements.emplace_back(makeOwned<ExpressionStatement>(Owned<BuildableExpression>(*expression), location()));
+    statements.emplace_back(makeOwned<ExpressionStatement>(std::move(subexpressions[0]), location()));
 
     return statements;
-}
-
-void ExpressionStatement::doBuild(CompileContext& context)
-{
-    expression_->build(context);
 }

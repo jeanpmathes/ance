@@ -2,7 +2,7 @@
 
 ControlFlowGraphPrinter::ControlFlowGraphPrinter(std::ostream& out) : out_(out) {}
 
-std::any ControlFlowGraphPrinter::visit(Unit& unit)
+std::any ControlFlowGraphPrinter::visit(Unit const& unit)
 {
     out_ << "graph [" << std::endl;
     out_ << "\tlabel \"\"" << std::endl;
@@ -14,12 +14,16 @@ std::any ControlFlowGraphPrinter::visit(Unit& unit)
     return {};
 }
 
-std::any ControlFlowGraphPrinter::visit(lang::FunctionDescription& function_description)
+std::any ControlFlowGraphPrinter::visit(lang::FunctionDescription const& function_description)
 {
     current_function_ = function_description.function();
     assert(current_function_);
 
-    for (auto& bb : current_function_->getBasicBlocks()) { visit(*bb); }
+    for (auto& basic_block : current_function_->getBasicBlocks())
+    {
+        lang::BasicBlock const& block = *basic_block;
+        visit(block);
+    }
 
     printBlock("exit", NODE_EXIT, BlockStyle::META);
     printGroup(current_function_->signature().toString());
@@ -34,7 +38,7 @@ std::any ControlFlowGraphPrinter::visit(lang::FunctionDescription& function_desc
     return {};
 }
 
-std::any ControlFlowGraphPrinter::visit(lang::BasicBlock& block)
+std::any ControlFlowGraphPrinter::visit(lang::BasicBlock const& block)
 {
     auto id = static_cast<int32_t>(block.getId());
 
@@ -151,7 +155,7 @@ uint32_t ControlFlowGraphPrinter::map(int32_t i)
     auto key = std::make_pair(current_function_, i);
     if (id_map_.contains(key)) { return id_map_[key]; }
 
-    uint32_t id  = node_counter_++;
+    uint32_t const id = node_counter_++;
     id_map_[key] = id;
     return id;
 }
@@ -160,7 +164,7 @@ std::string ControlFlowGraphPrinter::escape(std::string const& s)
 {
     std::string result;
 
-    for (char c : s)
+    for (char const c : s)
     {
         switch (c)
         {

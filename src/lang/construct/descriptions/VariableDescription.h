@@ -19,7 +19,7 @@ namespace lang
     class InitializerFunction;
 }
 
-class ConstantExpression;
+class LiteralExpression;
 
 namespace lang
 {
@@ -72,8 +72,6 @@ namespace lang
 
         [[nodiscard]] Descriptions expand(lang::Context& new_context) const override;
 
-        void buildDeclaration(CompileContext& context) override;
-        void buildDefinition(CompileContext& context) override;
         void buildInitialization(CompileContext& context) override;
         void buildFinalization(CompileContext& context) override;
 
@@ -90,7 +88,7 @@ namespace lang
         lang::Location                              location_;
 
         lang::ResolvingHandle<lang::Type> type_handle_;
-        ConstantExpression*               constant_init_;
+        LiteralExpression*                constant_init_;
         Expression*                       init_expression_ptr_;
 
         Optional<Owned<Expression>> init_expression_;

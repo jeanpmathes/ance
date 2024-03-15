@@ -5,26 +5,16 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/Context.h"
 
-lang::UnitConstant::UnitConstant(lang::Context& new_context) : type_(new_context.getUnitType()) {}
+lang::UnitConstant::UnitConstant(lang::Context& context) : LiteralConstant(context.getUnitType()) {}
 
 std::string lang::UnitConstant::toString() const
 {
     return "()";
 }
 
-lang::ResolvingHandle<lang::Type> lang::UnitConstant::type()
+Shared<lang::Constant> lang::UnitConstant::embed(CompileContext& context) const
 {
-    return type_;
-}
-
-lang::Type const& lang::UnitConstant::type() const
-{
-    return type_;
-}
-
-Shared<lang::Constant> lang::UnitConstant::createContent(CompileContext& context)
-{
-    return context.exec().getDefault(type_);
+    return context.exec().getDefault(type());
 }
 
 bool lang::UnitConstant::equals(lang::Constant const* other) const
@@ -33,12 +23,7 @@ bool lang::UnitConstant::equals(lang::Constant const* other) const
     return other_null != nullptr;
 }
 
-Shared<lang::Constant> lang::UnitConstant::clone(lang::Context& new_context) const
-{
-    return create(new_context);
-}
-
-Shared<lang::UnitConstant> lang::UnitConstant::create(lang::Context& new_context)
+Shared<lang::LiteralConstant> lang::UnitConstant::clone(lang::Context& new_context) const
 {
     return makeShared<lang::UnitConstant>(new_context);
 }

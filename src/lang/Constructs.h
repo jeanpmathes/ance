@@ -8,8 +8,18 @@ class Unit;
 namespace lang
 {
     class BasicBlock;
-    class CodeBlock;
 
+    namespace bb::def
+    {
+        class Empty;
+        class Finalizing;
+        class Simple;
+        class Returning;
+        class Branching;
+        class Matching;
+    }
+
+    class CodeBlock;
     class Function;
 
     class FunctionDescription;
@@ -28,7 +38,7 @@ class BinaryOperation;
 class BindRef;
 class BindRefTo;
 class Cast;
-class ConstantLiteral;
+class LiteralExpression;
 class FunctionCall;
 class IfSelect;
 class Indirection;
@@ -68,9 +78,10 @@ class While;
 class Loop;
 
 #define ANCE_CONSTRUCTS                                                                                                \
-    Unit, lang::BasicBlock, lang::CodeBlock, lang::Function, lang::FunctionDescription, lang::VariableDescription,     \
+    Unit, lang::BasicBlock, lang::bb::def::Empty, lang::bb::def::Finalizing, lang::bb::def::Simple, lang::bb::def::Returning, lang::bb::def::Branching, lang::bb::def::Matching, lang::CodeBlock, lang::Function, lang::FunctionDescription, lang::VariableDescription,     \
         lang::StructDescription, lang::AliasDescription, lang::Member, Addressof, Allocation, BinaryOperation,         \
-        UnaryOperation, BindRef, BindRefTo, Cast, ConstantLiteral, FunctionCall, Parenthesis, SizeofExpression,        \
+        UnaryOperation, BindRef, BindRefTo, Cast,                \
+        LiteralExpression, FunctionCall, Parenthesis, SizeofExpression,        \
         SizeofType, Subscript, VariableAccess, MemberAccess, Indirection, And, Or, IfSelect, MatchSelect,              \
         lang::GlobalScope, lang::LocalScope, lang::StructScope, Assertion, Assignment, Break, Continue, Delete,        \
         ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Erase, Return, If, While,      \

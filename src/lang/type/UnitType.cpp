@@ -18,7 +18,7 @@ std::string lang::UnitType::createMangledName() const
     return std::string(name().text());
 }
 
-Execution::Type lang::UnitType::createExecutionType(CompileContext& context) const
+void lang::UnitType::registerExecutionType(CompileContext& context) const
 {
     return context.exec().registerUnitType(self());
 }
@@ -28,17 +28,17 @@ bool lang::UnitType::isUnitType() const
     return true;
 }
 
-void lang::UnitType::performDefaultInitializer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&)
+void lang::UnitType::performDefaultInitializer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&) const
 {
     // No runtime initialization required.
 }
 
-void lang::UnitType::performCopyInitializer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&)
+void lang::UnitType::performCopyInitializer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&) const
 {
     // No runtime copy required.
 }
 
-void lang::UnitType::performFinalizer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&)
+void lang::UnitType::performFinalizer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&) const
 {
     // No runtime finalization required.
 }
@@ -53,10 +53,10 @@ bool lang::UnitType::isOperatorDefined(lang::BinaryOperator op, lang::Type const
     return op.isEquality() && other.isUnitType();
 }
 
-lang::ResolvingHandle<lang::Type> lang::UnitType::getOperatorResultType(lang::BinaryOperator              op,
-                                                                        lang::ResolvingHandle<lang::Type> other)
+lang::Type const& lang::UnitType::getOperatorResultType(lang::BinaryOperator              ,
+                                                                        lang::Type const& ) const
 {
-    return TypeDefinition::getOperatorResultType(op, other);
+    return scope().context().getBooleanType();
 }
 
 bool lang::UnitType::validateOperator(lang::BinaryOperator,
@@ -71,7 +71,7 @@ bool lang::UnitType::validateOperator(lang::BinaryOperator,
 Shared<lang::Value> lang::UnitType::buildOperator(lang::BinaryOperator op,
                                                   Shared<lang::Value>,
                                                   Shared<lang::Value>,
-                                                  CompileContext& context)
+                                                  CompileContext& context) const
 {
     if (op == BinaryOperator::EQUAL) return BooleanConstant::createTrue(context.ctx());
 

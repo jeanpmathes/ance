@@ -34,8 +34,3 @@ Expression::Expansion SizeofExpression::expandWith(Expressions subexpressions, l
 {
     return {Statements(), makeOwned<SizeofExpression>(std::move(subexpressions[0]), location()), Statements()};
 }
-
-void SizeofExpression::doBuild(CompileContext& context)
-{
-    setValue(context.exec().getSizeOf(expression_->type()));
-}

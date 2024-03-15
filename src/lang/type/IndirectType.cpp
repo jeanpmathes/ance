@@ -5,7 +5,7 @@
 #include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/Value.h"
+#include "lang/construct/Value.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/BooleanType.h"
 
@@ -17,7 +17,7 @@ bool lang::IndirectType::definesIndirection() const
     return true;
 }
 
-lang::ResolvingHandle<lang::Type> lang::IndirectType::getIndirectionType()
+lang::Type const& lang::IndirectType::getIndirectionType() const
 {
     return value_type_;
 }
@@ -27,11 +27,11 @@ bool lang::IndirectType::validateIndirection(lang::Location, ValidationLogger&) 
     return true;
 }
 
-Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<lang::Value> value, CompileContext& context)
+Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<lang::Value> value, CompileContext& context) const
 {
-    auto value_reference = context.ctx().getReferenceType(value_type_);
+    auto const& value_reference = context.ctx().getReferenceType(*value_type_);
 
-    if (getIndirectionType()->getStateCount().isUnit()) return context.exec().getDefault(value_reference);
+    if (getIndirectionType().getStateCount().isUnit()) return context.exec().getDefault(value_reference);
 
     if (context.ctx().isContainingRuntime())
     {

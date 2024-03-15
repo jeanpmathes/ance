@@ -41,7 +41,7 @@ Optional<lang::Location> lang::CustomFunction::getDefinitionLocation() const
     return definition_location_;
 }
 
-bool lang::CustomFunction::isConstructor() const
+bool lang::CustomFunction::preserveUnitReturn() const
 {
     return false;
 }
@@ -62,15 +62,15 @@ void lang::CustomFunction::validateReturn(ValidationLogger& validation_logger) c
 
     for (auto* block : final_blocks)
     {
-        Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> return_value =
-            block->getReturnValue();
+        Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>> return_value =
+            block->getReturnType();
 
         if (return_value.hasValue())
         {
             auto& [value, location] = *return_value;
 
-            if (value.get().type().isDefined())
-                lang::Type::checkMismatch(returnType(), value.get().type(), location, validation_logger);
+            if (value.get().isDefined())
+                lang::Type::checkMismatch(returnType(), value.get(), location, validation_logger);
         }
         else
         {

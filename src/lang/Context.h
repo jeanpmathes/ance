@@ -20,6 +20,11 @@ namespace lang
         explicit Context(GlobalScope& global_scope, bool contains_runtime);
 
         /**
+         * Initialize the context. This will create and register all built-in types.
+         */
+        void initialize();
+
+        /**
          * Perform resolving on all type that require it.
          */
         void resolve();
@@ -29,8 +34,8 @@ namespace lang
          */
         void postResolve();
 
-        void buildNativeDeclarations(CompileContext& context);
-        void buildNativeDefinitions(CompileContext& context);
+        void buildDeclarations(CompileContext& context);
+        void buildDefinitions(CompileContext& context);
 
         /**
          * Get an array type instance.
@@ -53,6 +58,13 @@ namespace lang
          * @return The buffer type instance.
          */
         lang::ResolvingHandle<lang::Type> getBufferType(lang::ResolvingHandle<lang::Type> element_type) const;
+
+        /**
+         * Get a buffer type instance.
+         * @param element_type The element type of the buffer.
+         * @return The buffer type instance.
+         */
+        lang::Type const& getBufferType(lang::Type const& element_type) const;
 
         /**
          * Get the char type.
@@ -100,6 +112,13 @@ namespace lang
         lang::ResolvingHandle<lang::Type> getPointerType(lang::ResolvingHandle<lang::Type> element_type) const;
 
         /**
+         * Get a pointer type instance.
+         * @param element_type The element type of the pointer.
+         * @return The pointer type instance.
+         */
+        lang::Type const& getPointerType(lang::Type const& element_type) const;
+
+        /**
          * Get the quad type.
          * @return The quad type.
          */
@@ -111,6 +130,13 @@ namespace lang
          * @return The reference type instance.
          */
         lang::ResolvingHandle<lang::Type> getReferenceType(lang::ResolvingHandle<lang::Type> element_type) const;
+
+        /**
+         * Get a reference type instance.
+         * @param element_type The element type of the reference.
+         * @return The reference type instance.
+         */
+        lang::Type const& getReferenceType(lang::Type const& element_type) const;
 
         /**
          * Get the single type.
@@ -144,6 +170,14 @@ namespace lang
          */
         lang::ResolvingHandle<lang::Type> getVectorType(lang::ResolvingHandle<lang::Type> element_type,
                                                         uint64_t                          size) const;
+
+        /**
+         * Get a vector type instance.
+         * @param element_type The element type of the vector.
+         * @param size The size of the vector. Must be greater than zero.
+         * @return The vector type instance.
+         */
+        lang::Type const& getVectorType(lang::Type const& element_type, uint64_t size) const;
 
         /**
          * Get the unit type.

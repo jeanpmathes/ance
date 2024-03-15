@@ -24,18 +24,14 @@ class Parenthesis
     [[nodiscard]] bool isNamed() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
-    bool validateAssignment(lang::Value const& value,
+    bool validateAssignment(lang::Type const& value_type,
                             lang::Location     value_location,
                             ValidationLogger&  validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;
 
-    Shared<lang::Value>              getValue() override;
-    [[nodiscard]] lang::Value const& getValue() const override;
-
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doAssign(Shared<lang::Value> value, CompileContext& context) override;
 
   private:
     Owned<Expression> expression_;

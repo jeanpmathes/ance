@@ -27,7 +27,7 @@ namespace lang
     class Value;
 }
 
-class ConstantExpression;
+class LiteralExpression;
 class CompileContext;
 class ValidationLogger;
 
@@ -61,7 +61,6 @@ namespace lang
          * @param access The access modifier.
          * @param is_import Whether the variable is imported.
          * @param init The expression or function used for initialization.
-         * @param init_scope The scope in which initialization is performed.
          * @param assigner The assigner used for initialization.
          * @param is_constant Whether the variable is constant.
          * @param location The source location.
@@ -72,8 +71,7 @@ namespace lang
                                              Scope&                            containing_scope,
                                              lang::AccessModifier              access,
                                              bool                              is_import,
-                                             lang::Initializer                 init,
-                                             lang::Scope*                      init_scope,
+                                             lang::GlobalInitializer           init,
                                              lang::Assigner                    assigner,
                                              bool                              is_constant,
                                              lang::Location                    location);
@@ -84,7 +82,7 @@ namespace lang
          * @param type_location The location of the type.
          * @param containing_scope The containing scope.
          * @param is_final Whether the variable is final.
-         * @param value The initial value.
+         * @param init The initial provider.
          * @param parameter_index The index of the parameter, if this is a parameter.
          * @param location The source location.
          */
@@ -92,8 +90,8 @@ namespace lang
                            lang::Location                    type_location,
                            Scope&                            containing_scope,
                            bool                              is_final,
-                           Optional<Shared<lang::Value>>     value,
-                           Optional<unsigned>                parameter_index,
+                           const lang::LocalInitializer&            init,
+                           const Optional<size_t>&                parameter_index,
                            lang::Location                    location);
 
         /**
@@ -131,19 +129,19 @@ namespace lang
          * Build the variable declaration which prepares the storage.
          * @param context The current compile context.
          */
-        void buildDeclaration(CompileContext& context);
+        void buildDeclaration(CompileContext& context) const;
 
         /**
          * Build the variable initialization which initializes the storage.
          * @param context The current compile context.
          */
-        void buildInitialization(CompileContext& context);
+        void buildInitialization(CompileContext& context) const;
 
         /**
          * Build the variable finalizer which cleans up the storage.
          * @param context The current compile context.
          */
-        void buildFinalization(CompileContext& context);
+        void buildFinalization(CompileContext& context) const;
 
         /**
          * Validate getting a value.
@@ -155,12 +153,12 @@ namespace lang
 
         /**
          * Validate setting a value.
-         * @param value The value to set.
+         * @param value_type The type of the value that is assigned.
          * @param validation_logger A logger to log validation messages.
          * @param assignable_location The source location of the assignable.
          * @param assigned_location The source location of the value that is assigned to the assignable.
          */
-        bool validateSetValue(lang::Value const& value,
+        bool validateSetValue(lang::Type const& value_type,
                               ValidationLogger&  validation_logger,
                               lang::Location     assignable_location,
                               lang::Location     assigned_location) const;
@@ -170,21 +168,14 @@ namespace lang
          * @param context The current compile context.
          * @return A pointer to the value.
          */
-        Shared<lang::Value> getValuePointer(CompileContext& context);
+        Shared<lang::Value> getValuePointer(CompileContext& context) const;
 
         /**
          * Get the current value of the variable.
          * @param context The current compile context.
          * @return The value.
          */
-        Shared<lang::Value> getValue(CompileContext& context);
-
-        /**
-         * Set the current value of the variable.
-         * @param value The new value.
-         * @param context The current compile context.
-         */
-        void setValue(Shared<lang::Value> value, CompileContext& context);
+        Shared<lang::Value> getValue(CompileContext& context) const;
 
         /**
          * Get an undefined variable with the same name.

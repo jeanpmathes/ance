@@ -33,12 +33,22 @@ lang::Identifier const& lang::FunctionDefinition::name() const
     return function_.name();
 }
 
-lang::Scope& lang::FunctionDefinition::scope() const
+lang::Scope& lang::FunctionDefinition::scope()
 {
     return containing_scope_;
 }
 
-lang::Function& lang::FunctionDefinition::function() const
+lang::Scope const& lang::FunctionDefinition::scope() const
+{
+    return containing_scope_;
+}
+
+lang::Function& lang::FunctionDefinition::function()
+{
+    return function_;
+}
+
+lang::Function const& lang::FunctionDefinition::function() const
 {
     return function_;
 }
@@ -73,19 +83,14 @@ lang::Location lang::FunctionDefinition::returnTypeLocation() const
     return return_type_location_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::FunctionDefinition::parameterType(size_t index)
+Shared<lang::Parameter> lang::FunctionDefinition::parameter(size_t index)
 {
-    return parameters_[index]->type();
+    return parameters_[index];
 }
 
-lang::Type const& lang::FunctionDefinition::parameterType(size_t index) const
+lang::Parameter const& lang::FunctionDefinition::parameter(size_t index) const
 {
-    return parameters_[index]->type();
-}
-
-lang::Identifier const& lang::FunctionDefinition::parameterName(size_t index) const
-{
-    return parameters_[index]->name();
+    return *parameters_[index];
 }
 
 size_t lang::FunctionDefinition::parameterCount() const
@@ -98,6 +103,11 @@ lang::Location lang::FunctionDefinition::location() const
     return location_;
 }
 
+bool lang::FunctionDefinition::isRuntime() const
+{
+    return false;
+}
+
 bool lang::FunctionDefinition::isImported() const
 {
     return false;
@@ -106,14 +116,23 @@ bool lang::FunctionDefinition::isImported() const
 void lang::FunctionDefinition::resolveFollowingOrder() {}
 void lang::FunctionDefinition::postResolve() {}
 
-void lang::FunctionDefinition::createNativeBacking(CompileContext& context)
+void lang::FunctionDefinition::buildDeclaration(CompileContext& context) const
 {
-    function_handle_ = createBackingFunction(access(), isImported(), getDefinitionLocation(), isConstructor(), context);
+    context.exec().createFunction(name(),
+                                  function_.getLinkageName(),
+                                  isRuntime() ? std::nullopt : makeOptional<>(access()),
+                                  isImported(),
+                                  parameters_,
+                                  returnType(),
+                                  isRuntime() ? nullptr : &scope(),
+                                  preserveUnitReturn(),
+                                  location(),
+                                  getDefinitionLocation(),
+                                  function());
 }
 
-bool lang::FunctionDefinition::validateCall(
-    std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
-    lang::Location                                                                           location,
+bool lang::FunctionDefinition::validateCall(std::vector<std::reference_wrapper<Expression const>> const& arguments,
+                                            lang::Location                                                                           location,
     ValidationLogger&                                                                        validation_logger) const
 {
     if (arguments.size() != parameters_.size())
@@ -127,10 +146,9 @@ bool lang::FunctionDefinition::validateCall(
 
     for (auto const [param, arg] : llvm::zip(parameters_, arguments))
     {
-        auto const& [arg_value, arg_location] = arg;
-        bool const types_defined              = param->type().isDefined() && arg_value.get().type().isDefined();
+        bool const types_defined = param->type().isDefined() && arg.get().type().isDefined();
         valid &= types_defined
-              && lang::Type::checkMismatch(param->type(), arg_value.get().type(), arg_location, validation_logger);
+              && lang::Type::checkMismatch(param->type(), arg.get().type(), arg.get().location(), validation_logger);
     }
 
     if (!valid) return false;
@@ -140,18 +158,17 @@ bool lang::FunctionDefinition::validateCall(
     return valid;
 }
 
-bool lang::FunctionDefinition::doCallValidation(
-    std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const&,
-    lang::Location,
+bool lang::FunctionDefinition::doCallValidation(std::vector<std::reference_wrapper<Expression const>> const&,
+                                                lang::Location,
     ValidationLogger&) const
 {
     return true;
 }
 
 Shared<lang::Value> lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Value>> arguments,
-                                                        CompileContext&                  context)
+                                                        CompileContext&                  context) const
 {
-    return context.exec().performFunctionCall(function_handle_.value(), std::move(arguments));
+    return context.exec().performFunctionCall(function(), std::move(arguments));
 }
 
 std::vector<Shared<lang::Parameter>> const& lang::FunctionDefinition::parameters() const
@@ -164,27 +181,9 @@ std::vector<Shared<lang::Parameter>> lang::FunctionDefinition::parameters()
     return parameters_;
 }
 
-Execution::Function lang::FunctionDefinition::createBackingFunction(lang::AccessModifier     access,
-                                                                    bool                     is_imported,
-                                                                    Optional<lang::Location> definition_location,
-                                                                    bool                     is_constructor,
-                                                                    CompileContext&          context)
-{
-    return context.exec().createFunction(name(),
-                                         function_.getLinkageName(),
-                                         access,
-                                         is_imported,
-                                         parameters_,
-                                         returnType(),
-                                         &scope(),
-                                         is_constructor,
-                                         location(),
-                                         definition_location);
-}
+void lang::FunctionDefinition::buildDeclarationsFollowingOrder(CompileContext&) const {}
 
-void lang::FunctionDefinition::buildDeclarationsFollowingOrder(CompileContext&) {}
-
-Execution::Scoped lang::FunctionDefinition::getDebugScope() const
+lang::BasicBlock const* lang::FunctionDefinition::getEntryBlock() const
 {
-    return function_handle_.value();
+    return nullptr;
 }

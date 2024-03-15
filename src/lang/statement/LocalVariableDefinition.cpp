@@ -48,6 +48,12 @@ lang::Type const* LocalVariableDefinition::type() const
     return nullptr;
 }
 
+lang::Variable const& LocalVariableDefinition::variable() const
+{
+    assert(variable_.hasValue());
+    return *variable_;
+}
+
 lang::Assigner LocalVariableDefinition::assigner() const
 {
     return assigner_;
@@ -69,8 +75,8 @@ void LocalVariableDefinition::walkDefinitions()
 {
     Statement::walkDefinitions();
 
-    Optional<Shared<lang::Value>> assigned_value;
-    if (assigned_.hasValue()) { assigned_value = assigned_.value()->getValue(); }
+    Expression* assigned_value = nullptr;
+    if (assigned_.hasValue()) { assigned_value = assigned_.value().get(); }
 
     if (type_.is<lang::Type>())
     {
@@ -144,9 +150,4 @@ Statements LocalVariableDefinition::expandWith(Expressions subexpressions, State
         makeOwned<LocalVariableDefinition>(name_, type, type_location_, assigner_, std::move(assigned), location()));
 
     return statements;
-}
-
-void LocalVariableDefinition::doBuild(CompileContext& context)
-{
-    (*variable_)->buildInitialization(context);
 }

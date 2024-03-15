@@ -6,26 +6,16 @@
 #include "lang/Context.h"
 #include "lang/type/NullValueType.h"
 
-lang::NullConstant::NullConstant(lang::Context& new_context) : type_(new_context.getNullValueType()) {}
+lang::NullConstant::NullConstant(lang::Context& new_context) : LiteralConstant(new_context.getNullValueType()) {}
 
 std::string lang::NullConstant::toString() const
 {
     return "null";
 }
 
-lang::ResolvingHandle<lang::Type> lang::NullConstant::type()
+Shared<lang::Constant> lang::NullConstant::embed(CompileContext& context) const
 {
-    return type_;
-}
-
-lang::Type const& lang::NullConstant::type() const
-{
-    return type_;
-}
-
-Shared<lang::Constant> lang::NullConstant::createContent(CompileContext& context)
-{
-    return context.exec().getDefault(type_);
+    return context.exec().getDefault(type());
 }
 
 bool lang::NullConstant::equals(lang::Constant const* other) const
@@ -34,7 +24,7 @@ bool lang::NullConstant::equals(lang::Constant const* other) const
     return other_null != nullptr;
 }
 
-Shared<lang::Constant> lang::NullConstant::clone(lang::Context& new_context) const
+Shared<lang::LiteralConstant> lang::NullConstant::clone(lang::Context& new_context) const
 {
     return create(new_context);
 }

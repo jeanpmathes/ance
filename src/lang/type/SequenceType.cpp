@@ -5,7 +5,7 @@
 #include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/Value.h"
+#include "lang/construct/Value.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/SizeType.h"
 
@@ -44,9 +44,9 @@ bool lang::SequenceType::isSubscriptDefined() const
     return true;
 }
 
-lang::ResolvingHandle<lang::Type> lang::SequenceType::getSubscriptReturnType()
+lang::Type const& lang::SequenceType::getSubscriptReturnType() const
 {
-    return scope().context().getReferenceType(element_type_);
+    return scope().context().getReferenceType(*element_type_);
 }
 
 bool lang::SequenceType::validateSubscript(lang::Location,
@@ -59,14 +59,14 @@ bool lang::SequenceType::validateSubscript(lang::Location,
 
 Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> indexed,
                                                        Shared<lang::Value> index,
-                                                       CompileContext& context)
+                                                       CompileContext& context) const
 {
     return buildSubscript(indexed, index, true, context);
 }
 
 Shared<lang::Value> lang::SequenceType::buildSubscriptInBounds(Shared<lang::Value> indexed,
                                                                Shared<lang::Value> index,
-                                                               CompileContext&     context)
+                                                               CompileContext&     context) const
 {
     return buildSubscript(indexed, index, false, context);
 }
@@ -74,9 +74,9 @@ Shared<lang::Value> lang::SequenceType::buildSubscriptInBounds(Shared<lang::Valu
 Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> indexed,
                                                        Shared<lang::Value> index,
                                                        bool                check_bounds,
-                                                       CompileContext&     context)
+                                                       CompileContext&     context) const
 {
-    if (getSubscriptReturnType()->getStateCount().isUnit()) return context.exec().getDefault(getSubscriptReturnType());
+    if (getSubscriptReturnType().getStateCount().isUnit()) return context.exec().getDefault(getSubscriptReturnType());
 
     Optional<uint64_t> bounds = check_bounds ? size_ : std::nullopt;
 
@@ -106,7 +106,7 @@ bool lang::SequenceType::isTriviallyDestructible() const
     return element_type_->getDefinition()->isTriviallyDestructible();
 }
 
-void lang::SequenceType::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context)
+void lang::SequenceType::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
 {
     if (size_.hasValue())
     {
@@ -123,7 +123,7 @@ void lang::SequenceType::performSingleDefaultInitializerDefinition(Shared<lang::
 
 void lang::SequenceType::performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                                 Shared<lang::Value> src_ptr,
-                                                                CompileContext& context)
+                                                                CompileContext& context) const
 {
     if (size_.hasValue())
     {
@@ -141,7 +141,7 @@ void lang::SequenceType::performSingleCopyInitializerDefinition(Shared<lang::Val
     }
 }
 
-void lang::SequenceType::buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context)
+void lang::SequenceType::buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
 {
     if (size_.hasValue())
     {
@@ -168,7 +168,7 @@ std::vector<lang::ResolvingHandle<lang::Type>> lang::SequenceType::getDefinition
     return {};
 }
 
-Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Value>> values, CompileContext& context)
+Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Value>> values, CompileContext& context) const
 {
     assert(size_.hasValue());
     assert(values.size() == size_.value());

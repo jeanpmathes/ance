@@ -16,7 +16,7 @@ std::string lang::FloatingPointType::createMangledName() const
     return std::string(name().text());
 }
 
-Execution::Type lang::FloatingPointType::createExecutionType(CompileContext& context) const
+void lang::FloatingPointType::registerExecutionType(CompileContext& context) const
 {
     return context.exec().registerFloatingPointType(self());
 }
@@ -43,9 +43,9 @@ bool lang::FloatingPointType::validateImplicitConversion(lang::Type const&, lang
     return true;
 }
 
-Shared<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::Type const& other,
                                                                      Shared<lang::Value>               value,
-                                                                     CompileContext&                   context)
+                                                                     CompileContext&                   context) const
 {
     return context.exec().computeConversionOnFP(value, other);
 }
@@ -60,16 +60,16 @@ bool lang::FloatingPointType::validateCast(lang::Type const&, lang::Location, Va
     return true;
 }
 
-Shared<lang::Value> lang::FloatingPointType::buildCast(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::FloatingPointType::buildCast(lang::Type const& other,
                                                        Shared<lang::Value>               value,
-                                                       CompileContext&                   context)
+                                                       CompileContext&                   context) const
 {
-    if (other->isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
+    if (other.isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
     {
         return context.exec().computeConversionOnFP(value, other);
     }
 
-    if (other->isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
+    if (other.isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
     {
         return context.exec().computeConversionOnFP(value, other);
     }
@@ -82,7 +82,7 @@ bool lang::FloatingPointType::isOperatorDefined(lang::UnaryOperator op) const
     return op == lang::UnaryOperator::NEGATION;
 }
 
-lang::ResolvingHandle<lang::Type> lang::FloatingPointType::getOperatorResultType(lang::UnaryOperator)
+lang::Type const& lang::FloatingPointType::getOperatorResultType(lang::UnaryOperator) const
 {
     return self();
 }
@@ -94,7 +94,7 @@ bool lang::FloatingPointType::validateOperator(lang::UnaryOperator, lang::Locati
 
 Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator op,
                                                            Shared<lang::Value> value,
-                                                           CompileContext&     context)
+                                                           CompileContext&     context) const
 {
     return context.exec().performOperator(op, value);
 }
@@ -110,10 +110,10 @@ bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator op, lang::T
     return false;
 }
 
-lang::ResolvingHandle<lang::Type> lang::FloatingPointType::getOperatorResultType(lang::BinaryOperator op,
-                                                                                 lang::ResolvingHandle<lang::Type>)
+lang::Type const& lang::FloatingPointType::getOperatorResultType(lang::BinaryOperator op,
+                                                                 lang::Type const&) const
 {
-    if (op.isArithmetic()) return self()->getActualType();
+    if (op.isArithmetic()) return self().getActualType();
     if (op.isRelational() || op.isEquality()) return scope().context().getBooleanType();
 
     return lang::Type::getUndefined();
@@ -131,9 +131,9 @@ bool lang::FloatingPointType::validateOperator(lang::BinaryOperator,
 Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::BinaryOperator op,
                                                            Shared<lang::Value>  left,
                                                            Shared<lang::Value>  right,
-                                                           CompileContext&      context)
+                                                           CompileContext&      context) const
 {
-    if (left->type()->isReferenceType()) left = context.exec().performDereference(left);
+    if (left->type().isReferenceType()) left = context.exec().performDereference(left);
 
     return context.exec().performOperator(op, left, right);
 }

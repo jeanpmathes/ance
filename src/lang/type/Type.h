@@ -25,6 +25,7 @@ namespace lang
     class Scope;
     class Value;
     class Function;
+    class Member;
     class TypeDefinition;
     class VectorizableType;
     class FloatingPointType;
@@ -118,6 +119,12 @@ namespace lang
          * @return True if this type is a custom type.
          */
         [[nodiscard]] bool isCustom() const;
+
+        /**
+         * Get whether this type is imported from another package.
+         * @return True if this type is imported.
+         */
+        [[nodiscard]] bool isImported() const;
 
         /**
          * Get whether this type is a fixed width integer type.
@@ -318,6 +325,14 @@ namespace lang
         void setContainingScope(lang::Scope* scope) override;
 
         /**
+         * Enables the creation of derived types, i.e. types that are based on this type and required for internals.
+         * An example for a derived type is a pointer type to this type.
+         * The creation of derived types is disabled by default to prevent infinite recursion.
+         * Creating types trough the context enables the creation of derived types.
+         */
+        void enableDerivedTypeCreation();
+
+        /**
          * Get the scope that contains this type.
          * @return The scope that contains the type.
          */
@@ -335,17 +350,16 @@ namespace lang
         [[nodiscard]] bool enableImplicitConversionOnCall() const override;
 
         /**
-         * Get the debug type, containing information for debuggers.
-         * @param context The current compile context.
-         * @return The debug type.
-         */
-        Execution::Type getExecutionType(CompileContext& context) const;
-
-        /**
          * See if the subscript operation is defined for this type.
          * @return True if the subscript is defined.
          */
         [[nodiscard]] bool isSubscriptDefined() const;
+
+        /**
+         * Get the return type of the get indexer.
+         * @return The return type.
+         */
+        [[nodiscard]] lang::Type const& getSubscriptReturnType() const;
 
         /**
          * Get the return type of the get indexer.
@@ -374,14 +388,18 @@ namespace lang
          * @param other The other type.
          * @return The result type.
          */
-        lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
-                                                                lang::ResolvingHandle<lang::Type> other);
+        [[nodiscard]] lang::Type const& getOperatorResultType(lang::BinaryOperator              op,
+                                                lang::Type const& other) const;
+
+        lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator op, lang::Type const& other);
 
         /**
          * Get the unary operation result type.
          * @param op The operation.
          * @return The result type.
          */
+        [[nodiscard]] lang::Type const& getOperatorResultType(lang::UnaryOperator op) const;
+
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op);
 
         /**
@@ -414,17 +432,27 @@ namespace lang
         Member& getMember(lang::Identifier const& name);
 
         /**
+         * Get the member with the given name.
+         * Check if the member exists before calling this function.
+         * @param name The name of the member.
+         * @return The member.
+         */
+        [[nodiscard]] Member const& getMember(lang::Identifier const& name) const;
+
+        /**
          * Get whether this type defines the indirection operator.
          * @return True if the type defines the indirection operator.
          */
         [[nodiscard]] bool definesIndirection() const;
+
+        lang::ResolvingHandle<lang::Type> getIndirectionType();
 
         /**
          * Get the type this type is an indirection to.
          * The actual return type of the indirection operator is a reference to that type.
          * @return The type this type is an indirection to.
          */
-        lang::ResolvingHandle<lang::Type> getIndirectionType();
+        [[nodiscard]] lang::Type const& getIndirectionType() const;
 
         /**
          * Validate if this type is well-formed.
@@ -518,7 +546,7 @@ namespace lang
          */
         Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
                                            Shared<lang::Value> index,
-                                           CompileContext&     context);
+                                           CompileContext&     context) const;
 
         /**
          * Build a binary operation.
@@ -531,7 +559,7 @@ namespace lang
         Shared<lang::Value> buildOperator(lang::BinaryOperator op,
                                           Shared<lang::Value>  left,
                                           Shared<lang::Value>  right,
-                                          CompileContext&      context);
+                                          CompileContext&      context) const;
 
         /**
          * Build a unary operation.
@@ -540,7 +568,7 @@ namespace lang
          * @param context The current compile context.
          * @return The result value.
          */
-        Shared<lang::Value> buildOperator(lang::UnaryOperator op, Shared<lang::Value> value, CompileContext& context);
+        Shared<lang::Value> buildOperator(lang::UnaryOperator op, Shared<lang::Value> value, CompileContext& context) const;
 
         /**
          * Build an implicit conversion.
@@ -549,9 +577,9 @@ namespace lang
          * @param context The current compile context.
          * @return The converted value.
          */
-        Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+        Shared<lang::Value> buildImplicitConversion(lang::Type const& other,
                                                     Shared<lang::Value>               value,
-                                                    CompileContext&                   context);
+                                                    CompileContext&                   context) const;
 
         /**
          * Build an explicit cast.
@@ -560,9 +588,9 @@ namespace lang
          * @param context The current compile context.
          * @return The casted value.
          */
-        Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+        Shared<lang::Value> buildCast(lang::Type const& other,
                                       Shared<lang::Value>               value,
-                                      CompileContext&                   context);
+                                      CompileContext&                   context) const;
 
         /**
          * Build a member access.
@@ -573,7 +601,7 @@ namespace lang
          */
         Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
                                               lang::Identifier const& name,
-                                              CompileContext&         context);
+                                              CompileContext&         context) const;
 
         /**
          * Build indirection.
@@ -581,14 +609,14 @@ namespace lang
          * @param context The current compile context.
          * @return The result value, which is a reference of indirection return type.
          */
-        Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context);
+        Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context) const;
 
         /**
          * Build the default initializer for this type.
          * @param ptr A pointer to where the value should be initialized.
          * @param context The current compile context.
          */
-        void performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context);
+        void performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context) const;
 
         /**
          * Build the default initializer for this type, initializing multiple instances.
@@ -596,7 +624,7 @@ namespace lang
          * @param count The number of instances to initialize.
          * @param context The current compile context.
          */
-        void performDefaultInitializer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context);
+        void performDefaultInitializer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const;
 
         /**
          * Build the copy initializer for this type.
@@ -606,14 +634,14 @@ namespace lang
          */
         void performCopyInitializer(Shared<lang::Value> destination,
                                     Shared<lang::Value> source,
-                                    CompileContext&     context);
+                                    CompileContext&     context) const;
 
         /**
          * Build the destructor for this type.
          * @param ptr The pointer to the value to destruct.
          * @param context The current compile context.
          */
-        void performFinalizer(Shared<lang::Value> ptr, CompileContext& context);
+        void performFinalizer(Shared<lang::Value> ptr, CompileContext& context) const;
 
         /**
          * Build the default destructor for this type.
@@ -621,19 +649,25 @@ namespace lang
          * @param count The number of instances to destruct.
          * @param context The current compile context.
          */
-        void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context);
+        void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const;
 
         /**
-         * Build the native backing required for the declaration.
+         * Register the type for execution.
          * @param context The current compile context.
          */
-        void buildNativeDeclaration(CompileContext& context);
+        void registerExecutionType(CompileContext& context) const;
 
         /**
-         * Build the native backing required for the definition of this type.
+         * Build the backing required for the declaration.
          * @param context The current compile context.
          */
-        void buildNativeDefinition(CompileContext& context);
+        void buildDeclaration(CompileContext& context) const;
+
+        /**
+         * Build the backing required for the definition of this type.
+         * @param context The current compile context.
+         */
+        void buildDefinition(CompileContext& context) const;
 
         [[nodiscard]] lang::TypeDefinition*       getDefinition();
         [[nodiscard]] lang::TypeDefinition const* getDefinition() const;
@@ -708,7 +742,7 @@ namespace lang
          * @param context The current compile context.
          * @return A value with the expected type. It can be the same value as passed in.
          */
-        static Shared<lang::Value> makeMatching(lang::ResolvingHandle<lang::Type> expected,
+        static Shared<lang::Value> makeMatching(lang::Type const& expected,
                                                 Shared<lang::Value>               value,
                                                 CompileContext&                   context);
 
@@ -718,6 +752,17 @@ namespace lang
             bool const is_matching = isMatching<Expected>(*value);
 
             if (is_matching) { return value.template as<Expected>().value(); }
+
+            assert(false && "Cannot make the value matching, was mismatch checked before?");
+            throw std::logic_error("Cannot make the value matching, was mismatch checked before?");
+        }
+
+        template<typename Expected>
+        static Expected const& makeMatching(lang::Entity const& value)
+        {
+            bool const is_matching = isMatching<Expected>(value);
+
+            if (is_matching) { return *dynamic_cast<Expected const*>(&value); }
 
             assert(false && "Cannot make the value matching, was mismatch checked before?");
             throw std::logic_error("Cannot make the value matching, was mismatch checked before?");
@@ -737,14 +782,6 @@ namespace lang
          * @return True if the types are actually the same.
          */
         static bool areSame(lang::Type const& lhs, lang::Type const& rhs);
-
-        /**
-         * Get the value as its actual type.
-         * @param value The value to change the type of.
-         * @param context The current compile context.
-         * @return The value with the actual type.
-         */
-        static Shared<lang::Value> makeActual(Shared<lang::Value> value, CompileContext& context);
 
         /**
          * Get an undefined type with the same name. Types given by literals cannot be undefined.

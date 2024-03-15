@@ -4,33 +4,42 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 
-lang::BasicBlock::Definition::Finalizing::Finalizing(lang::Scope& scope, std::string info)
-    : scope_(scope)
+lang::bb::def::Finalizing::Finalizing(lang::Scope& scope, std::string info) : scope_(scope)
     , info_(std::move(info))
 {}
 
-bool lang::BasicBlock::Definition::Finalizing::isMeta() const
+lang::BasicBlock const* lang::bb::def::Finalizing::next() const
+{
+    return next_;
+}
+
+lang::Scope const& lang::bb::def::Finalizing::scope() const
+{
+    return scope_;
+}
+
+bool lang::bb::def::Finalizing::isMeta() const
 {
     return true;
 }
 
-void lang::BasicBlock::Definition::Finalizing::complete(size_t& index)
+void lang::bb::def::Finalizing::complete(size_t& index)
 {
     if (next_) next_->complete(index);
 }
 
-void lang::BasicBlock::Definition::Finalizing::setLink(lang::BasicBlock& next)
+void lang::bb::def::Finalizing::setLink(lang::BasicBlock& next)
 {
     lang::BasicBlock* next_ptr = &next;
 
-    assert(next_ptr->definition_.get() != this);
+    assert(&next_ptr->definition() != this);
     assert(next_ == nullptr);
 
     next_ = next_ptr;
     next_->registerIncomingLink(*self());
 }
 
-void lang::BasicBlock::Definition::Finalizing::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
+void lang::bb::def::Finalizing::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
 {
     assert(next_ == former);
     assert(next_ != updated);
@@ -39,17 +48,17 @@ void lang::BasicBlock::Definition::Finalizing::updateLink(lang::BasicBlock* form
     next_->registerIncomingLink(*self());
 }
 
-void lang::BasicBlock::Definition::Finalizing::transferStatements(std::list<Statement*>& list)
+void lang::bb::def::Finalizing::transferStatements(std::list<Statement*>& list)
 {
     assert(list.empty());
 }
 
-void lang::BasicBlock::Definition::Finalizing::simplify()
+void lang::bb::def::Finalizing::simplify()
 {
     if (next_) next_->simplify();
 }
 
-std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Finalizing::getLeaves() const
+std::list<lang::BasicBlock const*> lang::bb::def::Finalizing::getLeaves() const
 {
     std::list<lang::BasicBlock const*> leaves;
 
@@ -59,7 +68,7 @@ std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Finalizing::get
     return leaves;
 }
 
-std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Finalizing::getSuccessors() const
+std::vector<lang::BasicBlock const*> lang::bb::def::Finalizing::getSuccessors() const
 {
     std::vector<lang::BasicBlock const*> successors;
 
@@ -68,44 +77,22 @@ std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Finalizing::g
     return successors;
 }
 
-lang::Location lang::BasicBlock::Definition::Finalizing::getStartLocation() const
+lang::Location lang::bb::def::Finalizing::getStartLocation() const
 {
     return lang::Location::global();
 }
 
-lang::Location lang::BasicBlock::Definition::Finalizing::getEndLocation() const
+lang::Location lang::bb::def::Finalizing::getEndLocation() const
 {
     return lang::Location::global();
 }
 
-void lang::BasicBlock::Definition::Finalizing::reach() const
+void lang::bb::def::Finalizing::reach() const
 {
     if (next_) next_->reach();
 }
 
-void lang::BasicBlock::Definition::Finalizing::prepareBuild(CompileContext& context, llvm::Function* native_function)
-{
-    std::string const name = "b" + std::to_string(index_);
-    native_block_          = llvm::BasicBlock::Create(context.exec().llvmContext(), name, native_function);
-
-    if (next_) next_->prepareBuild(context, native_function);
-}
-
-void lang::BasicBlock::Definition::Finalizing::doBuild(CompileContext& context)
-{
-    context.exec().ir().SetInsertPoint(native_block_);
-
-    scope_.buildFinalization(context);
-
-    if (next_ != nullptr)
-    {
-        context.exec().ir().CreateBr(next_->definition_->getNativeBlock());
-        next_->doBuild(context);
-    }
-    else { context.exec().ir().CreateRetVoid(); }
-}
-
-std::string lang::BasicBlock::Definition::Finalizing::getExitRepresentation()
+std::string lang::bb::def::Finalizing::getExitRepresentation() const
 {
     return "// finalize (" + info_ + ")";
 }

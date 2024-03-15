@@ -54,8 +54,3 @@ Statements Delete::expandWith(Expressions subexpressions, Statements, lang::Cont
 
     return statements;
 }
-
-void Delete::doBuild(CompileContext& context)
-{
-    context.runtime().deleteDynamic(to_delete_->getValue(), delete_buffer_, context);
-}

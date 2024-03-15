@@ -17,7 +17,7 @@ std::string lang::OpaquePointerType::createMangledName() const
     return "ptr";
 }
 
-Execution::Type lang::OpaquePointerType::createExecutionType(CompileContext& context) const
+void lang::OpaquePointerType::registerExecutionType(CompileContext& context) const
 {
     return context.exec().registerOpaqueAddressType(self());
 }

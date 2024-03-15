@@ -42,18 +42,17 @@ Optional<lang::Location> lang::PredefinedFunction::getDefinitionLocation() const
     return std::nullopt;
 }
 
-bool lang::PredefinedFunction::isConstructor() const
+bool lang::PredefinedFunction::preserveUnitReturn() const
 {
     return is_constructor_;
 }
 
 void lang::PredefinedFunction::determineFlow() {}
+
 bool lang::PredefinedFunction::validateFlow(ValidationLogger&) const
 {
     return true;
 }
-
-void lang::PredefinedFunction::build(CompileContext&) {}
 
 std::vector<lang::BasicBlock*> const& lang::PredefinedFunction::getBasicBlocks() const
 {
@@ -61,21 +60,8 @@ std::vector<lang::BasicBlock*> const& lang::PredefinedFunction::getBasicBlocks()
     return empty;
 }
 
-Execution::Function lang::PredefinedFunction::getFunctionHandle(CompileContext&) const
-{
-    assert(function_handle_.hasValue());
-    return function_handle_.value();
-}
-
-Shared<lang::Value> lang::PredefinedFunction::getArgument(size_t index)
-{
-    auto params = parameters();
-    assert(index < params.size());
-    return params[index];
-}
-
 void lang::PredefinedFunction::setCallValidator(
-    std::function<bool(std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const&,
+    std::function<bool(std::vector<std::reference_wrapper<Expression const>> const&,
                        lang::Location,
                        ValidationLogger&)> validator)
 {
@@ -83,7 +69,7 @@ void lang::PredefinedFunction::setCallValidator(
 }
 
 bool lang::PredefinedFunction::doCallValidation(
-    std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
+    std::vector<std::reference_wrapper<Expression const>> const& arguments,
     lang::Location                                                                           location,
     ValidationLogger&                                                                        validation_logger) const
 {

@@ -25,34 +25,19 @@ void Parenthesis::defineType(lang::ResolvingHandle<lang::Type> type)
     type.reroute(expression_->type());
 }
 
-Shared<lang::Value> Parenthesis::getValue()
-{
-    return expression_->getValue();
-}
-
-lang::Value const& Parenthesis::getValue() const
-{
-    return expression_->getValue();
-}
-
 bool Parenthesis::validate(ValidationLogger& validation_logger) const
 {
     return expression_->validate(validation_logger);
 }
 
-bool Parenthesis::validateAssignment(lang::Value const& value,
+bool Parenthesis::validateAssignment(lang::Type const& value_type,
                                      lang::Location     value_location,
                                      ValidationLogger&  validation_logger) const
 {
-    return expression_->validateAssignment(value, value_location, validation_logger);
+    return expression_->validateAssignment(value_type, value_location, validation_logger);
 }
 
 Expression::Expansion Parenthesis::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(), makeOwned<Parenthesis>(std::move(subexpressions[0]), location()), Statements()};
-}
-
-void Parenthesis::doAssign(Shared<lang::Value> value, CompileContext& context)
-{
-    expression_->assign(value, context);
 }

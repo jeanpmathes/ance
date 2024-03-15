@@ -42,13 +42,13 @@ namespace lang
          * Build all native declarations.
          * @param context The compile context.
          */
-        virtual void buildNativeDeclarations(CompileContext& context) = 0;
+        virtual void buildDeclarations(CompileContext& context) = 0;
 
         /**
          * Build all native definitions.
          * @param context The compile context.
          */
-        virtual void buildNativeDefinitions(CompileContext& context) = 0;
+        virtual void buildDefinitions(CompileContext& context) = 0;
 
         /**
          * Clear all types in this registry.
@@ -84,8 +84,8 @@ namespace lang
         void resolve() override;
         void postResolve() override;
 
-        void buildNativeDeclarations(CompileContext& context) override;
-        void buildNativeDefinitions(CompileContext& context) override;
+        void buildDeclarations(CompileContext& context) override;
+        void buildDefinitions(CompileContext& context) override;
 
         void clear() override;
 

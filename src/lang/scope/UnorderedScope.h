@@ -15,7 +15,7 @@
 #include "lang/type/Type.h"
 #include "lang/utility/Identifier.h"
 
-class ConstantExpression;
+class LiteralExpression;
 class Storage;
 
 namespace lang
@@ -58,14 +58,21 @@ namespace lang
 
         bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) override;
 
-        void         buildDeclarations(CompileContext& context) override;
-        virtual void buildDefinitions(CompileContext& context);
+        [[nodiscard]] std::vector<std::reference_wrapper<lang::Type const>> getUsedBuiltInTypes()
+            const;
+        [[nodiscard]] std::vector<std::reference_wrapper<lang::Description const>> getDescriptionsInDeclarationOrder()
+            const;
+        [[nodiscard]] std::vector<std::reference_wrapper<lang::Description const>> getDescriptionsInDefinitionOrder()
+            const;
+
+        void buildEntityDeclarations(CompileContext& context) const override;
+
         /**
          * Build all initialization required by global entities.
          * @param context The current compile context.
          */
-        void buildInitialization(CompileContext& context);
-        void buildFinalization(CompileContext& context) override;
+        void buildEntityInitializations(CompileContext& context) const;
+        void buildEntityFinalizations(CompileContext& context) const override;
 
       protected:
         virtual void onResolve() {}
@@ -84,19 +91,6 @@ namespace lang
         [[nodiscard]] std::map<lang::Identifier, std::vector<AssociatedDescription>>&       getCompatibleDescriptions();
         [[nodiscard]] std::map<lang::Identifier, std::vector<AssociatedDescription>> const& getCompatibleDescriptions()
             const;
-
-      private:
-        template<typename Target>
-        static bool isOfType(lang::OwningHandle<lang::Entity> const& entity)
-        {
-            return entity.handle().get().template is<Target>();
-        }
-
-        template<typename Target>
-        static Optional<lang::ResolvingHandle<Target>> castToType(lang::OwningHandle<lang::Entity>& entity)
-        {
-            return entity.handle().template as<Target>();
-        }
 
       public:
         [[nodiscard]] std::vector<lang::ResolvingHandle<lang::FunctionGroup>>        getFunctionGroups();

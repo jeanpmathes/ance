@@ -39,8 +39,6 @@ class While
   protected:
     Statements arrangeExpandedStatements(Statements before, Statements expanded, Statements after) const override;
 
-    void doBuild(CompileContext& context) override;
-
     [[nodiscard]] bool                                            isLoop() const override;
     [[nodiscard]] std::pair<lang::BasicBlock*, lang::BasicBlock*> getLoopParts() const override;
 

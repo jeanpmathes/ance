@@ -32,40 +32,31 @@ namespace lang
                       lang::Location                        type_location,
                       Scope&                                containing_scope,
                       bool                                  is_final,
-                      Optional<Shared<lang::Value>>         value,
-                      Optional<unsigned>                    parameter_index,
+                      lang::LocalInitializer                init,
+                      Optional<size_t>                    parameter_index,
                       lang::Location                        location);
 
         static lang::OwningHandle<lang::Variable> makeLocalVariable(Identifier const&                 name,
                                                                     lang::ResolvingHandle<lang::Type> type,
                                                                     lang::Location                    type_location,
                                                                     lang::Assigner                    assigner,
-                                                                    Optional<Shared<lang::Value>>     value,
+                                                                    Expression*                  init,
                                                                     lang::Scope&                      containing_scope,
                                                                     lang::Location                    location);
 
-        static lang::OwningHandle<lang::Variable> makeParameterVariable(Identifier const&                 name,
-                                                                        lang::ResolvingHandle<lang::Type> type,
-                                                                        lang::Location                    type_location,
-                                                                        Shared<lang::Value>               value,
-                                                                        unsigned       parameter_index,
-                                                                        lang::Scope&   containing_scope,
-                                                                        lang::Location location);
+        static lang::OwningHandle<lang::Variable> makeParameterVariable(lang::Parameter & parameter,
+                                                                        size_t      parameter_index,
+                                                                        lang::Function&   containing_function);
 
-        void buildDeclaration(CompileContext& context) override;
-        void buildInitialization(CompileContext& context) override;
-        void buildFinalization(CompileContext& context) override;
+        void buildDeclaration(CompileContext& context) const override;
+        void buildInitialization(CompileContext& context) const override;
+        void buildFinalization(CompileContext& context) const override;
 
-        Shared<lang::Value> getValuePointer(CompileContext& context) override;
-
-      protected:
-        void storeValue(Shared<lang::Value> value, CompileContext& context) override;
+        Shared<lang::Value> getValuePointer(CompileContext& context) const override;
 
       private:
-        Optional<Shared<lang::Value>> initial_value_;
-        Optional<unsigned>            parameter_index_;
-
-        Optional<Execution::LocalVariable> local_variable_;
+        lang::LocalInitializer                initializer_;
+        Optional<size_t>            parameter_index_;
     };
 }
 #endif

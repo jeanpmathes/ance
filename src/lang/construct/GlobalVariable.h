@@ -12,6 +12,7 @@
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
 #include "lang/Element.h"
+#include "lang/utility/ResolvingHandle.h"
 
 namespace lang
 {
@@ -21,7 +22,7 @@ namespace lang
     class Variable;
 }
 
-class ConstantExpression;
+class LiteralExpression;
 
 namespace lang
 {
@@ -41,8 +42,7 @@ namespace lang
                        Scope&                                containing_scope,
                        lang::AccessModifier                  access,
                        bool                                  is_import,
-                       lang::Initializer                     init,
-                       lang::Scope*                          init_scope,
+                       lang::GlobalInitializer               init,
                        Assigner                              assigner,
                        bool                                  is_constant,
                        lang::Location                        location);
@@ -51,25 +51,18 @@ namespace lang
         [[nodiscard]] bool                 isConstant() const;
         [[nodiscard]] lang::Assigner       assigner() const;
 
-        void buildDeclaration(CompileContext& context) override;
-        void buildInitialization(CompileContext& context) override;
-        void buildFinalization(CompileContext& context) override;
+        void buildDeclaration(CompileContext& context) const override;
+        void buildInitialization(CompileContext& context) const override;
+        void buildFinalization(CompileContext& context) const override;
 
-        Shared<lang::Value> getValuePointer(CompileContext& context) override;
-
-      protected:
-        void storeValue(Shared<lang::Value> value, CompileContext& context) override;
+        Shared<lang::Value> getValuePointer(CompileContext& context) const override;
 
       private:
         lang::AccessModifier access_;
         bool                 is_import_;
         bool                 is_constant_;
-        Initializer          init_;
-        lang::Scope*         init_scope_;
+        GlobalInitializer    init_;
         Assigner             assigner_;
-
-        Optional<Execution::GlobalVariable> variable_handle_;
-        bool                  finalized_ {false};
     };
 }
 

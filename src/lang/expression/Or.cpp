@@ -12,7 +12,7 @@
 #include "lang/statement/LocalVariableDefinition.h"
 
 Or::Or(bool negate, Owned<Expression> left, Owned<Expression> right, lang::Location location)
-    : UnexpandedExpression(location)
+    : Expression(location)
     , negate_(negate)
     , left_(std::move(left))
     , right_(std::move(right))

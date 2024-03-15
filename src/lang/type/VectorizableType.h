@@ -26,10 +26,10 @@ namespace lang
          * @param function The function to build.
          * @param context The current compilation context.
          */
-        virtual void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                            lang::ResolvingHandle<lang::Type> return_type,
+        virtual void buildRequestedOverload(lang::Type const& parameter_element,
+                                            lang::Type const& return_type,
                                             lang::PredefinedFunction&         function,
-                                            CompileContext&                   context);
+                                            CompileContext&                   context) const;
     };
 }
 

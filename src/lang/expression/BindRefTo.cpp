@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/RoughlyCastedValue.h"
+#include "compiler/RoughlyCastedValue.h"
 #include "lang/statement/Statement.h"
 #include "validation/ValidationLogger.h"
 
@@ -53,11 +53,6 @@ bool BindRefTo::validate(ValidationLogger& validation_logger) const
 Expression::Expansion BindRefTo::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(), makeOwned<BindRefTo>(std::move(subexpressions[0]), location()), Statements()};
-}
-
-void BindRefTo::doBuild(CompileContext& context)
-{
-    setValue(makeShared<lang::RoughlyCastedValue>(type(), address_->getValue(), context));
 }
 
 BindRefTo::~BindRefTo() = default;

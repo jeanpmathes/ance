@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_ALLOCATION_H_
 #define ANCE_SRC_LANG_EXPRESSION_ALLOCATION_H_
 
-#include "DelayableExpression.h"
+#include "Expression.h"
 
 #include <optional>
 
@@ -15,7 +15,7 @@ class Application;
  * An allocation expression.
  */
 class Allocation
-    : public DelayableExpression
+    : public Expression
     , public lang::Element<Allocation, ANCE_CONSTRUCTS>
 {
   public:
@@ -34,7 +34,7 @@ class Allocation
                lang::Location                    allocated_type_location);
 
     [[nodiscard]] Runtime::Allocator allocator() const;
-    [[nodiscard]] lang::Type const&  allocatedType() const;
+    [[nodiscard]] lang::Entity const&  allocatedType() const;
     [[nodiscard]] Expression const*  count() const;
 
   protected:
@@ -47,7 +47,6 @@ class Allocation
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doBuild(CompileContext& context) override;
 
   public:
     ~Allocation() override;

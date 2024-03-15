@@ -38,11 +38,6 @@ Statements Break::expandWith(Expressions, Statements, lang::Context&) const
     return statements;
 }
 
-void Break::doBuild(CompileContext&)
-{
-    // Is handled trough basic blocks.
-}
-
 Statement const* Break::getLoopParent() const
 {
     Statement const* loop_parent = parent();

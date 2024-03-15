@@ -3,7 +3,8 @@
 
 #include <string>
 
-#include "lang/construct/constant/Constant.h"
+#include "LiteralConstant.h"
+
 #include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
 
@@ -13,10 +14,27 @@ namespace lang
 {
     class Type;
 
+    class CharConstantData
+    {
+      public:
+        CharConstantData(std::string const& prefix, std::string const& content, lang::Context& new_context);
+
+        lang::ResolvingHandle<lang::Type> type_;
+
+        bool is_literal_valid_ = true;
+        bool is_prefix_valid_  = true;
+
+        std::string prefix_;
+        std::string content_;
+        char32_t    char_;
+    };
+
     /**
      * A constant for different characters.
      */
-    class CharConstant : public Constant
+    class CharConstant
+        : private CharConstantData
+        , public LiteralConstant
     {
       public:
         /**
@@ -25,19 +43,16 @@ namespace lang
          * @param content The content of the constant.
          * @param new_context The context to create the constant in.
          */
-        explicit CharConstant(std::string const& prefix, std::string const& content, lang::Context& new_context);
+        CharConstant(std::string const& prefix, std::string const& content, lang::Context& new_context);
 
         [[nodiscard]] std::string toString() const override;
 
-        lang::ResolvingHandle<lang::Type> type() override;
-        [[nodiscard]] lang::Type const&   type() const override;
-
-        Shared<lang::Constant> createContent(CompileContext& context) override;
+        Shared<lang::Constant> embed(CompileContext& context) const override;
 
         bool equals(lang::Constant const* other) const override;
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
-        Shared<lang::Constant> clone(lang::Context& new_context) const override;
+        Shared<lang::LiteralConstant> clone(lang::Context& new_context) const override;
 
         /**
          * Parse a character from a string.
@@ -72,15 +87,6 @@ namespace lang
          * @return The parsed character.
          */
         static uint8_t readEscapedByte(std::string const& unparsed, size_t& index, bool& success);
-
-      private:
-        bool is_literal_valid_ = true;
-        bool is_prefix_valid_  = true;
-
-        lang::ResolvingHandle<lang::Type> type_;
-        std::string                       prefix_;
-        std::string                       content_;
-        char32_t                          char_;
     };
 }
 

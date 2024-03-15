@@ -39,8 +39,6 @@ class Return
                                                        Statements expanded,
                                                        Statements after) const override;
 
-    void doBuild(CompileContext& context) override;
-
   private:
     Optional<Owned<Expression>> return_value_;
 };

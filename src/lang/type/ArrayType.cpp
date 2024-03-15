@@ -68,7 +68,7 @@ std::string lang::ArrayType::createMangledName() const
          + std::string(")");
 }
 
-Execution::Type lang::ArrayType::createExecutionType(CompileContext& context) const
+void lang::ArrayType::registerExecutionType(CompileContext& context) const
 {
     return context.exec().registerArrayType(self());
 }

@@ -9,6 +9,7 @@
 #include "lang/construct/InitializerFunction.h"
 #include "lang/construct/LocalVariable.h"
 #include "lang/construct/PredefinedFunction.h"
+#include "lang/construct/RuntimeFunction.h"
 #include "validation/ValidationLogger.h"
 
 lang::Function::Function(Identifier function_name) : name_(function_name) {}
@@ -105,6 +106,20 @@ lang::InitializerFunction& lang::Function::defineAsInit(Statement& code, lang::S
     return initializer_function;
 }
 
+void lang::Function::defineAsRuntime(lang::ResolvingHandle<lang::Type>    return_type,
+                                     std::vector<Shared<lang::Parameter>> parameters,
+                                     CompileContext&                      context)
+{
+    definition_ = makeOwned<lang::RuntimeFunction>(*this, return_type, parameters, context);
+    (**definition_).setup();
+}
+
+void lang::Function::define(Owned<lang::FunctionDefinition> definition)
+{
+    definition_ = std::move(definition);
+    (**definition_).setup();
+}
+
 lang::AccessModifier lang::Function::access() const
 {
     assert(isDefined());
@@ -135,28 +150,28 @@ Statement const* lang::Function::code() const
     return definition_.value()->code();
 }
 
-lang::ResolvingHandle<lang::Type> lang::Function::parameterType(size_t index)
+Shared<lang::Parameter> lang::Function::parameter(size_t index)
 {
     assert(isDefined());
-    return definition_.value()->parameterType(index);
+    return definition_.value()->parameter(index);
 }
 
-lang::Type const& lang::Function::parameterType(size_t index) const
+lang::Parameter const& lang::Function::parameter(size_t index) const
 {
     assert(isDefined());
-    return definition_.value()->parameterType(index);
-}
-
-lang::Identifier const& lang::Function::parameterName(size_t index) const
-{
-    assert(isDefined());
-    return definition_.value()->parameterName(index);
+    return definition_.value()->parameter(index);
 }
 
 size_t lang::Function::parameterCount() const
 {
     assert(isDefined());
     return definition_.value()->parameterCount();
+}
+
+std::vector<Shared<lang::Parameter>> const& lang::Function::parameters() const
+{
+    assert(isDefined());
+    return definition_.value()->parameters();
 }
 
 lang::Location lang::Function::location() const
@@ -187,26 +202,20 @@ void lang::Function::validateFlow(ValidationLogger& validation_logger) const
     definition_.value()->validateFlow(validation_logger);
 }
 
-void lang::Function::createNativeBacking(CompileContext& context)
+void lang::Function::buildDeclaration(CompileContext& context) const
 {
-    definition_.value()->createNativeBacking(context);
+    definition_.value()->buildDeclaration(context);
 }
 
-void lang::Function::build(CompileContext& context)
-{
-    definition_.value()->build(context);
-}
-
-bool lang::Function::validateCall(
-    std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
-    lang::Location                                                                           location,
+bool lang::Function::validateCall(std::vector<std::reference_wrapper<Expression const>> const& arguments,
+                                  lang::Location                                                                           location,
     ValidationLogger&                                                                        validation_logger) const
 {
     return definition_.value()->validateCall(arguments, location, validation_logger);
 }
 
 Shared<lang::Value> lang::Function::buildCall(std::vector<Shared<lang::Value>> const& arguments,
-                                              CompileContext&                         context)
+                                              CompileContext&                         context) const
 {
     return definition_.value()->buildCall(arguments, context);
 }
@@ -221,14 +230,14 @@ lang::Scope const& lang::Function::scope() const
     return definition_.value()->scope();
 }
 
-Execution::Scoped lang::Function::getExecutionScope(CompileContext&) const
-{
-    return definition_.value()->getDebugScope();
-}
-
 bool lang::Function::isPartOfFunction() const
 {
     return true;
+}
+
+lang::BasicBlock const* lang::Function::getEntryBlock() const
+{
+    return definition_.value()->getEntryBlock();
 }
 
 std::vector<lang::BasicBlock*> const& lang::Function::getBasicBlocks() const
@@ -248,7 +257,7 @@ void lang::Function::postResolve()
     Scope::postResolve();
 }
 
-void lang::Function::buildDeclarationsFollowingOrder(CompileContext& context)
+void lang::Function::buildEntityDeclarationsFollowingOrder(CompileContext& context) const
 {
     definition_.value()->buildDeclarationsFollowingOrder(context);
 }

@@ -39,7 +39,7 @@ void BinaryOperation::defineType(lang::ResolvingHandle<lang::Type> type)
 
     if (left_type->isDefined() && right_type->isDefined())
     {
-        type.reroute(left_type->getOperatorResultType(op_, getRightType(op_, left_type, right_type)));
+        type.reroute(left_type->getOperatorResultType(op_, getRightType()));
     }
 }
 
@@ -85,52 +85,16 @@ Expression::Expansion BinaryOperation::expandWith(Expressions subexpressions, la
             Statements()};
 }
 
-void BinaryOperation::doBuild(CompileContext& context)
-{
-    Shared<lang::Value> left_value  = left_->getValue();
-    Shared<lang::Value> right_value = right_->getValue();
-
-    if (!lang::Type::areSame(right_->type(), getRightType()))
-    {
-        right_value = right_->type()->buildImplicitConversion(getRightType(), right_value, context);
-    }
-
-    Shared<lang::Value> result = left_value->type()->buildOperator(op_, left_value, right_value, context);
-    setValue(result);
-}
-
-lang::ResolvingHandle<lang::Type> BinaryOperation::getRightType()
-{
-    return getRightType(op_, left_->type(), right_->type());
-}
-
 lang::Type const& BinaryOperation::getRightType() const
 {
-    return getRightTypeC(op_, left_->type(), right_->type());
-}
+    lang::Type const& left = left_->type();
+    lang::Type const& right = right_->type();
 
-lang::ResolvingHandle<lang::Type> BinaryOperation::getRightType(lang::BinaryOperator              op,
-                                                                lang::ResolvingHandle<lang::Type> left,
-                                                                lang::ResolvingHandle<lang::Type> right)
-{
     if (lang::Type::areSame(left, right)) return right;
 
-    if (!left->isOperatorDefined(op, right) && left->isOperatorDefined(op, left)
-        && right->isImplicitlyConvertibleTo(left))
-    {
-        return left;
-    }
-
-    return right;
-}
-
-lang::Type const& BinaryOperation::getRightTypeC(lang::BinaryOperator op,
-                                                 lang::Type const&    left,
-                                                 lang::Type const&    right)
-{
-    if (lang::Type::areSame(left, right)) return right;
-
-    if (!left.isOperatorDefined(op, right) && left.isOperatorDefined(op, left) && right.isImplicitlyConvertibleTo(left))
+    if (!left.isOperatorDefined(op_, right)
+        && left.isOperatorDefined(op_, left)
+        && right.isImplicitlyConvertibleTo(left))
     {
         return left;
     }

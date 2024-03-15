@@ -4,7 +4,7 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/Value.h"
+#include "lang/construct/Value.h"
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
 
@@ -71,47 +71,24 @@ bool Expression::isNamed() const
     return type().isReferenceType();
 }
 
-bool Expression::validateAssignment(lang::Value const& value,
+bool Expression::validateAssignment(lang::Type const& value_type,
                                     lang::Location     value_location,
                                     ValidationLogger&  validation_logger) const
 {
     if (!validate(validation_logger)) return false;
     if (!type().isDefined()) return false;
-    if (!value.type().isDefined()) return false;
+    if (!value_type.isDefined()) return false;
 
     if (type().isReferenceType())
     {
         lang::Type const& target_type = type().getElementType();
-        return lang::Type::checkMismatch(target_type, value.type(), value_location, validation_logger);
+        return lang::Type::checkMismatch(target_type, value_type, value_location, validation_logger);
     }
     else
     {
         validation_logger.logError("Cannot assign to this expression", location());
         return false;
     }
-}
-
-void Expression::assign(Shared<lang::Value> value, CompileContext& context)
-{
-    context.setDebugLocation(location(), *containing_scope_);
-    doAssign(std::move(value), context);
-    context.resetDebugLocation();
-}
-
-void Expression::doAssign(Shared<lang::Value> value, CompileContext& context)
-{
-    assert(type()->isReferenceType());
-
-    lang::ResolvingHandle<lang::Type> target_type = type()->getElementType();
-    if (target_type->getStateCount().isUnit()) return;
-
-    value                                 = lang::Type::makeMatching(target_type, value, context);
-    Shared<lang::Value> expression_return = getValue();
-
-    Shared<lang::Value> return_pointer = context.exec().computePointerFromReference(expression_return);
-    Shared<lang::Value> value_pointer  = context.exec().computeAddressOf(value);
-
-    target_type->performCopyInitializer(return_pointer, value_pointer, context);
 }
 
 void Expression::addSubexpression(Expression& subexpression)

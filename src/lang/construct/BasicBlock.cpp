@@ -6,18 +6,18 @@
 
 Owned<lang::BasicBlock> lang::BasicBlock::createEmpty()
 {
-    return makeOwned<BasicBlock>(makeOwned<Definition::Empty>());
+    return makeOwned<BasicBlock>(makeOwned<lang::bb::def::Empty>());
 }
 
 Owned<lang::BasicBlock> lang::BasicBlock::createFinalizing(lang::Scope& scope, std::string info)
 {
-    return makeOwned<BasicBlock>(makeOwned<Definition::Finalizing>(scope, std::move(info)));
+    return makeOwned<BasicBlock>(makeOwned<lang::bb::def::Finalizing>(scope, std::move(info)));
 }
 
 Owned<lang::BasicBlock> lang::BasicBlock::createSimple(Statement* statement)
 {
-    if (statement == nullptr) { return makeOwned<BasicBlock>(makeOwned<Definition::Simple>()); }
-    else { return makeOwned<BasicBlock>(makeOwned<Definition::Simple>(*statement)); }
+    if (statement == nullptr) { return makeOwned<BasicBlock>(makeOwned<lang::bb::def::Simple>()); }
+    else { return makeOwned<BasicBlock>(makeOwned<lang::bb::def::Simple>(*statement)); }
 }
 
 Owned<lang::BasicBlock> lang::BasicBlock::createReturning(lang::Scope& scope,
@@ -25,7 +25,7 @@ Owned<lang::BasicBlock> lang::BasicBlock::createReturning(lang::Scope& scope,
                                                           Function&    function)
 {
 
-    auto block = makeOwned<BasicBlock>(makeOwned<Definition::Returning>(scope, expression));
+    auto block = makeOwned<BasicBlock>(makeOwned<lang::bb::def::Returning>(scope, expression));
 
     block->setContainingFunction(function);
 
@@ -39,7 +39,7 @@ std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createBranching(Expressio
 {
     std::vector<Owned<BasicBlock>> blocks;
 
-    blocks.push_back(makeOwned<BasicBlock>(makeOwned<Definition::Branching>(condition)));
+    blocks.push_back(makeOwned<BasicBlock>(makeOwned<lang::bb::def::Branching>(condition)));
     auto& branch = *blocks.back();
 
     Owned<lang::BasicBlock> end_block = lang::BasicBlock::createSimple();
@@ -125,10 +125,10 @@ std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createJump(lang::BasicBlo
 
 std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createMatching(
     Match&                                                         match,
-    std::vector<std::pair<ConstantExpression*, Statement*>> const& cases,
+    std::vector<std::pair<LiteralExpression*, Statement*>> const& cases,
     Function&                                                      function)
 {
-    std::map<Statement*, std::vector<ConstantExpression*>> code_to_case;
+    std::map<Statement*, std::vector<LiteralExpression*>> code_to_case;
 
     for (auto& [case_value, code_block] : cases)
     {
@@ -138,14 +138,14 @@ std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createMatching(
         if (case_value) code_to_case[code_block].push_back(case_value);
     }
 
-    std::vector<std::vector<ConstantExpression*>> case_values;
+    std::vector<std::vector<LiteralExpression*>> case_values;
 
     case_values.reserve(code_to_case.size());
     for (auto& [code_block, targeting_values] : code_to_case) { case_values.push_back(targeting_values); }
 
     std::vector<Owned<BasicBlock>> blocks;
 
-    blocks.push_back(makeOwned<BasicBlock>(makeOwned<Definition::Matching>(match, case_values)));
+    blocks.push_back(makeOwned<BasicBlock>(makeOwned<lang::bb::def::Matching>(match, case_values)));
     auto& branch = *blocks.back();
 
     Owned<lang::BasicBlock> end_block = lang::BasicBlock::createSimple();
@@ -192,12 +192,17 @@ void lang::BasicBlock::setContainingFunction(Function& function)
     containing_function_ = &function;
 }
 
+lang::Function const* lang::BasicBlock::getContainingFunction() const
+{
+    return containing_function_;
+}
+
 void lang::BasicBlock::complete(size_t& index)
 {
     if (finalized_) return;
     finalized_ = true;
 
-    definition_->setIndex(index);
+    definition_->index(index);
     definition_->complete(index);
 }
 
@@ -208,7 +213,7 @@ bool lang::BasicBlock::isUsable() const
 
 size_t lang::BasicBlock::getId() const
 {
-    return definition_->getIndex();
+    return definition_->index();
 }
 
 std::list<lang::BasicBlock const*> lang::BasicBlock::getLeaves() const
@@ -234,10 +239,10 @@ std::vector<lang::BasicBlock const*> lang::BasicBlock::getSuccessors() const
     return definition_->getSuccessors();
 }
 
-Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> lang::BasicBlock::getReturnValue() const
+Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>> lang::BasicBlock::getReturnType() const
 {
     assert(finalized_);
-    return definition_->getReturnValue();
+    return definition_->getReturnType();
 }
 
 lang::Location lang::BasicBlock::getStartLocation() const
@@ -250,24 +255,6 @@ lang::Location lang::BasicBlock::getEndLocation() const
 {
     assert(finalized_);
     return definition_->getEndLocation();
-}
-
-void lang::BasicBlock::prepareBuild(CompileContext& context, llvm::Function* native_function)
-{
-    if (build_prepared_) return;
-    build_prepared_ = true;
-
-    assert(finalized_);
-    definition_->prepareBuild(context, native_function);
-}
-
-void lang::BasicBlock::doBuild(CompileContext& context)
-{
-    if (build_done_) return;
-    build_done_ = true;
-
-    assert(finalized_);
-    definition_->doBuild(context);
 }
 
 void lang::BasicBlock::registerIncomingLink(lang::BasicBlock& predecessor)
@@ -304,7 +291,7 @@ bool lang::BasicBlock::isUnreached() const
     return !reached_ && !unused_ && !isMeta();
 }
 
-std::string lang::BasicBlock::getExitRepresentation()
+std::string lang::BasicBlock::getExitRepresentation() const
 {
     return definition_->getExitRepresentation();
 }
@@ -329,13 +316,13 @@ bool lang::BasicBlock::Definition::Base::isMeta() const
     return false;
 }
 
-void lang::BasicBlock::Definition::Base::setIndex(size_t& index)
+void lang::BasicBlock::Definition::Base::index(size_t& index)
 {
     index_ = index;
     index++;
 }
 
-size_t lang::BasicBlock::Definition::Base::getIndex() const
+size_t lang::BasicBlock::Definition::Base::index() const
 {
     return index_;
 }
@@ -378,13 +365,28 @@ void lang::BasicBlock::Definition::Base::updateIncomingLinks(lang::BasicBlock* u
     incoming_links_.clear();
 }
 
-Optional<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> lang::BasicBlock::Definition::Base::
-    getReturnValue() const
+Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>> lang::BasicBlock::Definition::Base::
+    getReturnType() const
 {
     return std::nullopt;
 }
 
-llvm::BasicBlock* lang::BasicBlock::Definition::Base::getNativeBlock()
+lang::BasicBlock::Definition::Base& lang::BasicBlock::definition()
 {
-    return native_block_;
+    return *definition_;
+}
+
+lang::BasicBlock::Definition::Base const& lang::BasicBlock::definition() const
+{
+    return *definition_;
+}
+
+void lang::BasicBlock::markAsUnused()
+{
+    unused_ = true;
+}
+
+bool lang::BasicBlock::isUnused() const
+{
+    return unused_;
 }

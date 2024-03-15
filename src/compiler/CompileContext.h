@@ -20,6 +20,7 @@ class SourceTree;
 class Unit;
 class Runtime;
 class Execution;
+class NativeBuild;
 
 /**
  * A class to simplify passing around the objects required for building the application.
@@ -43,7 +44,8 @@ class CompileContext
                    llvm::Module&      m,
                    llvm::IRBuilder<>& ir,
                    llvm::DIBuilder&   di,
-                   SourceTree&        source_tree);
+                   SourceTree&        source_tree,
+                   NativeBuild**      native_build);
 
     /**
      * Get the unit.
@@ -89,7 +91,7 @@ class CompileContext
      * @param location The source location.
      * @param scope The current scope.
      */
-    void setDebugLocation(lang::Location location, lang::Scope& scope);
+    void setDebugLocation(lang::Location location, lang::Scope const& scope);
 
     /**
      * Reset the previous debug location.

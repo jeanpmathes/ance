@@ -5,8 +5,7 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/constant/WrappedConstant.h"
-#include "lang/construct/value/RoughlyCastedValue.h"
+#include "compiler/WrappedConstant.h"
 #include "lang/type/ArrayType.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/ReferenceType.h"
@@ -85,6 +84,12 @@ bool lang::Type::isCustom() const
 {
     assert(definition_.hasValue());
     return definition_.value()->isCustom();
+}
+
+bool lang::Type::isImported() const
+{
+    assert(definition_.hasValue());
+    return definition_.value()->isImported();
 }
 
 lang::FixedWidthIntegerType const* lang::Type::isFixedWidthIntegerType() const
@@ -274,7 +279,8 @@ lang::Accessibility const& lang::Type::getAccessibility() const
 
 void lang::Type::setContainingScope(lang::Scope* scope)
 {
-    if (definition_.hasValue()) { definition_.value()->setContainingScope(scope); }
+    if (definition_.hasValue())
+        definition_.value()->setContainingScope(scope);
 }
 
 lang::Scope& lang::Type::scope()
@@ -306,22 +312,27 @@ bool lang::Type::enableImplicitConversionOnCall() const
     return false;
 }
 
-Execution::Type lang::Type::getExecutionType(CompileContext& context) const
-{
-    assert(isDefined());
-    return definition_.value()->getExecutionType(context);
-}
-
 bool lang::Type::isSubscriptDefined() const
 {
     assert(isDefined());
     return definition_.value()->isSubscriptDefined();
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::getSubscriptReturnType()
+lang::Type const& lang::Type::getSubscriptReturnType() const
 {
     assert(isDefined());
     return definition_.value()->getSubscriptReturnType();
+}
+
+lang::ResolvingHandle<lang::Type> lang::Type::getSubscriptReturnType()
+{
+    // This const_cast is safe because with a non-const reference to the current type
+    // we have access to the context containing the non-const type we want to return.
+
+    return const_cast<lang::TypeDefinition*>(
+               const_cast<lang::Type const*>(this)
+                   ->getSubscriptReturnType().getDefinition())
+        ->self();
 }
 
 bool lang::Type::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
@@ -336,17 +347,39 @@ bool lang::Type::isOperatorDefined(lang::UnaryOperator op) const
     return definition_.value()->isOperatorDefined(op);
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::getOperatorResultType(lang::BinaryOperator              op,
-                                                                    lang::ResolvingHandle<lang::Type> other)
+lang::Type const& lang::Type::getOperatorResultType(lang::BinaryOperator              op,
+                                                    lang::Type const& other) const
 {
     assert(isDefined());
     return definition_.value()->getOperatorResultType(op, other);
 }
 
-lang::ResolvingHandle<lang::Type> lang::Type::getOperatorResultType(lang::UnaryOperator op)
+lang::ResolvingHandle<lang::Type> lang::Type::getOperatorResultType(lang::BinaryOperator op, lang::Type const& other)
+{
+    // This const_cast is safe because with a non-const reference to the current type
+    // we have access to the context containing the non-const type we want to return.
+
+    return const_cast<lang::TypeDefinition*>(
+               const_cast<lang::Type const*>(this)
+                   ->getOperatorResultType(op, other).getDefinition())
+        ->self();
+}
+
+lang::Type const& lang::Type::getOperatorResultType(lang::UnaryOperator op) const
 {
     assert(isDefined());
     return definition_.value()->getOperatorResultType(op);
+}
+
+lang::ResolvingHandle<lang::Type> lang::Type::getOperatorResultType(lang::UnaryOperator op)
+{
+    // This const_cast is safe because with a non-const reference to the current type
+    // we have access to the context containing the non-const type we want to return.
+
+    return const_cast<lang::TypeDefinition*>(
+               const_cast<lang::Type const*>(this)
+                   ->getOperatorResultType(op).getDefinition())
+        ->self();
 }
 
 bool lang::Type::isImplicitlyConvertibleTo(lang::Type const& other) const
@@ -373,6 +406,12 @@ lang::Member& lang::Type::getMember(lang::Identifier const& name)
     return definition_.value()->getMember(name);
 }
 
+lang::Member const& lang::Type::getMember(lang::Identifier const& name) const
+{
+    assert(isDefined());
+    return definition_.value()->getMember(name);
+}
+
 bool lang::Type::definesIndirection() const
 {
     assert(isDefined());
@@ -380,6 +419,17 @@ bool lang::Type::definesIndirection() const
 }
 
 lang::ResolvingHandle<lang::Type> lang::Type::getIndirectionType()
+{
+    // This const_cast is safe because with a non-const reference to the current type
+    // we have access to the context containing the non-const type we want to return.
+
+    return const_cast<lang::TypeDefinition*>(
+               const_cast<lang::Type const*>(this)
+                   ->getIndirectionType().getDefinition())
+        ->self();
+}
+
+lang::Type const& lang::Type::getIndirectionType() const
 {
     assert(isDefined());
     return definition_.value()->getIndirectionType();
@@ -455,7 +505,7 @@ bool lang::Type::validateIndirection(lang::Location location, ValidationLogger& 
 
 Shared<lang::Value> lang::Type::buildSubscript(Shared<lang::Value> indexed,
                                                Shared<lang::Value> index,
-                                               CompileContext&     context)
+                                               CompileContext&     context) const
 {
     assert(isDefined());
     return definition_.value()->buildSubscript(std::move(indexed), std::move(index), context);
@@ -464,7 +514,7 @@ Shared<lang::Value> lang::Type::buildSubscript(Shared<lang::Value> indexed,
 Shared<lang::Value> lang::Type::buildOperator(lang::BinaryOperator op,
                                               Shared<lang::Value>  left,
                                               Shared<lang::Value>  right,
-                                              CompileContext&      context)
+                                              CompileContext&      context) const
 {
     assert(isDefined());
     return definition_.value()->buildOperator(op, std::move(left), std::move(right), context);
@@ -472,23 +522,23 @@ Shared<lang::Value> lang::Type::buildOperator(lang::BinaryOperator op,
 
 Shared<lang::Value> lang::Type::buildOperator(lang::UnaryOperator op,
                                               Shared<lang::Value> value,
-                                              CompileContext&     context)
+                                              CompileContext&     context) const
 {
     assert(isDefined());
     return definition_.value()->buildOperator(op, std::move(value), context);
 }
 
-Shared<lang::Value> lang::Type::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::Type::buildImplicitConversion(lang::Type const& other,
                                                         Shared<lang::Value>               value,
-                                                        CompileContext&                   context)
+                                                        CompileContext&                   context) const
 {
     assert(isDefined());
     return definition_.value()->buildImplicitConversion(other, std::move(value), context);
 }
 
-Shared<lang::Value> lang::Type::buildCast(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::Type::buildCast(lang::Type const& other,
                                           Shared<lang::Value>               value,
-                                          CompileContext&                   context)
+                                          CompileContext&                   context) const
 {
     assert(isDefined());
     return definition_.value()->buildCast(other, std::move(value), context);
@@ -496,19 +546,19 @@ Shared<lang::Value> lang::Type::buildCast(lang::ResolvingHandle<lang::Type> othe
 
 Shared<lang::Value> lang::Type::buildMemberAccess(Shared<lang::Value>     value,
                                                   lang::Identifier const& name,
-                                                  CompileContext&         context)
+                                                  CompileContext&         context) const
 {
     assert(isDefined());
     return definition_.value()->buildMemberAccess(std::move(value), name, context);
 }
 
-Shared<lang::Value> lang::Type::buildIndirection(Shared<lang::Value> value, CompileContext& context)
+Shared<lang::Value> lang::Type::buildIndirection(Shared<lang::Value> value, CompileContext& context) const
 {
     assert(isDefined());
     return definition_.value()->buildIndirection(std::move(value), context);
 }
 
-void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context)
+void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context) const
 {
     assert(isDefined());
     definition_.value()->performDefaultInitializer(ptr, context);
@@ -516,40 +566,46 @@ void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr, CompileConte
 
 void lang::Type::performCopyInitializer(Shared<lang::Value> destination,
                                         Shared<lang::Value> source,
-                                        CompileContext&     context)
+                                        CompileContext&     context) const
 {
     assert(isDefined());
     definition_.value()->performCopyInitializer(destination, source, context);
 }
 
-void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context)
+void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const
 {
     assert(isDefined());
     definition_.value()->performDefaultInitializer(ptr, count, context);
 }
 
-void lang::Type::performFinalizer(Shared<lang::Value> ptr, CompileContext& context)
+void lang::Type::performFinalizer(Shared<lang::Value> ptr, CompileContext& context) const
 {
     assert(isDefined());
     definition_.value()->performFinalizer(ptr, context);
 }
 
-void lang::Type::performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context)
+void lang::Type::performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const
 {
     assert(isDefined());
     definition_.value()->performFinalizer(ptr, count, context);
 }
 
-void lang::Type::buildNativeDeclaration(CompileContext& context)
+void lang::Type::registerExecutionType(CompileContext& context) const
 {
     assert(isDefined());
-    definition_.value()->buildNativeDeclaration(context);
+    definition_.value()->registerExecutionType(context);
 }
 
-void lang::Type::buildNativeDefinition(CompileContext& context)
+void lang::Type::buildDeclaration(CompileContext& context) const
 {
     assert(isDefined());
-    definition_.value()->buildNativeDefinition(context);
+    definition_.value()->buildDeclaration(context);
+}
+
+void lang::Type::buildDefinition(CompileContext& context) const
+{
+    assert(isDefined());
+    definition_.value()->buildDefinition(context);
 }
 
 lang::TypeDefinition* lang::Type::getDefinition()
@@ -602,16 +658,16 @@ bool lang::Type::checkMismatch(lang::Type const& expected,
     return matching;
 }
 
-Shared<lang::Value> lang::Type::makeMatching(lang::ResolvingHandle<lang::Type> expected,
+Shared<lang::Value> lang::Type::makeMatching(lang::Type const& expected,
                                              Shared<lang::Value>               value,
                                              CompileContext&                   context)
 {
-    if (areSame(expected, value->type())) return makeActual(value, context);
+    if (areSame(expected, value->type())) return context.exec().computeAsActualType(value);
 
-    if (value->type()->isImplicitlyConvertibleTo(expected))
-        return value->type()->buildImplicitConversion(expected, value, context);
+    if (value->type().isImplicitlyConvertibleTo(expected))
+        return value->type().buildImplicitConversion(expected, value, context);
 
-    if (value->type()->isReferenceType())
+    if (value->type().isReferenceType())
     {
         Shared<lang::Value> referenced = context.exec().performDereference(value);
         return makeMatching(expected, referenced, context);
@@ -630,14 +686,6 @@ lang::Type const& lang::Type::getReferencedType(lang::Type const& type)
 bool lang::Type::areSame(lang::Type const& lhs, lang::Type const& rhs)
 {
     return lhs.getActualType() == rhs.getActualType();
-}
-
-Shared<lang::Value> lang::Type::makeActual(Shared<lang::Value> value, CompileContext& context)
-{
-    lang::ResolvingHandle<lang::Type> actual_type = value->type()->getActualType();
-    if (actual_type == value->type()) return value;
-
-    return makeShared<lang::RoughlyCastedValue>(actual_type, value, context);
 }
 
 lang::ResolvingHandle<lang::Type> lang::Type::getUndefinedTypeClone(lang::Context& new_context) const

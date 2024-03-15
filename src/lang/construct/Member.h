@@ -1,12 +1,12 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_MEMBER_H_
 #define ANCE_SRC_LANG_CONSTRUCT_MEMBER_H_
 
+#include "lang/Element.h"
+
 #include "lang/AccessModifier.h"
 #include "lang/Assigner.h"
-#include "lang/expression/ConstantExpression.h"
+#include "lang/Constructs.h"
 #include "lang/type/Type.h"
-
-class ConstantExpression;
 
 namespace lang
 {
@@ -30,7 +30,7 @@ namespace lang
                lang::Identifier                    name,
                lang::ResolvingHandle<lang::Type>   type,
                lang::Assigner                      assigner,
-               Optional<Owned<ConstantExpression>> constant_init,
+               Optional<Owned<LiteralExpression>> constant_init,
                lang::Location                      location,
                lang::Location                      type_location);
 
@@ -79,20 +79,15 @@ namespace lang
         static void synchronize(lang::Member* member, Storage& storage);
 
       private:
-        Shared<lang::Constant> getInitialValue(CompileContext& context) const;
-
-      private:
         lang::AccessModifier                access_;
         lang::Identifier                    name_;
         lang::ResolvingHandle<lang::Type>   type_;
         lang::Assigner                      assigner_;
-        Optional<Owned<ConstantExpression>> constant_init_;
+        Optional<Owned<LiteralExpression>> constant_init_;
         lang::Location                      location_;
         lang::Location                      type_location_;
 
         size_t index_ = std::numeric_limits<size_t>::max();
-
-        mutable Optional<Shared<lang::Constant>> initial_value_ = std::nullopt;
     };
 }
 

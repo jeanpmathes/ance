@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_SUBSCRIPT_H_
 #define ANCE_SRC_LANG_EXPRESSION_SUBSCRIPT_H_
 
-#include "DelayableExpression.h"
+#include "Expression.h"
 
 #include "lang/Element.h"
 
@@ -9,7 +9,7 @@
  * A subscript operation.
  */
 class Subscript
-    : public DelayableExpression
+    : public Expression
     , public lang::Element<Subscript, ANCE_CONSTRUCTS>
 {
   public:
@@ -30,7 +30,6 @@ class Subscript
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doBuild(CompileContext& context) override;
 
   public:
     ~Subscript() override;

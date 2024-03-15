@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_ARRAYDEFINITION_H_
 #define ANCE_SRC_LANG_EXPRESSION_ARRAYDEFINITION_H_
 
-#include "DelayableExpression.h"
+#include "Expression.h"
 
 #include <set>
 
@@ -18,7 +18,7 @@ namespace lang
  * An expression that defines an array value.
  */
 class ArrayDefinition
-    : public DelayableExpression
+    : public Expression
     , public lang::Element<ArrayDefinition, ANCE_CONSTRUCTS>
 {
   public:
@@ -40,7 +40,6 @@ class ArrayDefinition
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doBuild(CompileContext& context) override;
 
   public:
     ~ArrayDefinition() override;

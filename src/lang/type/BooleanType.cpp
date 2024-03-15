@@ -3,7 +3,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
-#include "lang/construct/value/Value.h"
+#include "lang/construct/Value.h"
 #include "lang/type/Type.h"
 #include "lang/type/VectorType.h"
 
@@ -40,7 +40,7 @@ std::string lang::BooleanType::createMangledName() const
     return "b";
 }
 
-Execution::Type lang::BooleanType::createExecutionType(CompileContext& context) const
+void lang::BooleanType::registerExecutionType(CompileContext& context) const
 {
     return context.exec().registerBooleanType(self());
 }
@@ -50,7 +50,7 @@ bool lang::BooleanType::isOperatorDefined(lang::UnaryOperator op) const
     return op == lang::UnaryOperator::NOT || op == lang::UnaryOperator::BITWISE_NOT;
 }
 
-lang::ResolvingHandle<lang::Type> lang::BooleanType::getOperatorResultType(lang::UnaryOperator)
+lang::Type const& lang::BooleanType::getOperatorResultType(lang::UnaryOperator) const
 {
     return self();
 }
@@ -62,7 +62,7 @@ bool lang::BooleanType::validateOperator(lang::UnaryOperator, lang::Location, Va
 
 Shared<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator op,
                                                      Shared<lang::Value> value,
-                                                     CompileContext&     context)
+                                                     CompileContext&     context) const
 {
     return context.exec().performOperator(op, value);
 }
@@ -74,8 +74,8 @@ bool lang::BooleanType::isOperatorDefined(lang::BinaryOperator op, lang::Type co
     return lang::Type::getReferencedType(other).isBooleanType();
 }
 
-lang::ResolvingHandle<lang::Type> lang::BooleanType::getOperatorResultType(lang::BinaryOperator op,
-                                                                           lang::ResolvingHandle<lang::Type>)
+lang::Type const& lang::BooleanType::getOperatorResultType(lang::BinaryOperator op,
+                                                                           lang::Type const&) const
 {
     if (op.isEquality() || op.isBitwise()) return self();
 
@@ -94,9 +94,9 @@ bool lang::BooleanType::validateOperator(lang::BinaryOperator,
 Shared<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperator op,
                                                      Shared<lang::Value>  left,
                                                      Shared<lang::Value>  right,
-                                                     CompileContext&      context)
+                                                     CompileContext&      context) const
 {
-    if (right->type()->isReferenceType()) right = context.exec().performDereference(right);
+    if (right->type().isReferenceType()) right = context.exec().performDereference(right);
 
     return context.exec().performOperator(op, left, right);
 }
@@ -111,24 +111,24 @@ bool lang::BooleanType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::
     return false;
 }
 
-void lang::BooleanType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+void lang::BooleanType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                                lang::PredefinedFunction&                      function,
-                                               CompileContext&                                context)
+                                               CompileContext&                                context) const
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }
 
-void lang::BooleanType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                               lang::ResolvingHandle<lang::Type> return_type,
+void lang::BooleanType::buildRequestedOverload(lang::Type const& parameter_element,
+                                               lang::Type const& return_type,
                                                lang::PredefinedFunction&         function,
-                                               CompileContext&                   context)
+                                               CompileContext&                   context) const
 {
-    if (parameter_element->isFixedWidthIntegerType() || parameter_element->isSizeType()
-        || parameter_element->isDiffType())
+    if (parameter_element.isFixedWidthIntegerType() || parameter_element.isSizeType()
+        || parameter_element.isDiffType())
     {
-        context.exec().enterFunctionBody(function.getFunctionHandle(context));
+        context.exec().defineFunctionBody(function.function());
         {
-            Shared<lang::Value> original = function.getArgument(0);
+            Shared<lang::Value> original = context.exec().getParameterValue(function.function(), 0);
 
             Shared<lang::Constant> zero = context.exec().getZero(original->type());
             Shared<lang::Value>    is_nonzero =

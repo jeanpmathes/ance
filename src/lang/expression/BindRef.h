@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_BINDREF_H_
 #define ANCE_SRC_LANG_EXPRESSION_BINDREF_H_
 
-#include "UnexpandedExpression.h"
+#include "Expression.h"
 
 #include <optional>
 
@@ -10,7 +10,7 @@
 class Application;
 
 class BindRef
-    : public UnexpandedExpression
+    : public Expression
     , public lang::Element<BindRef, ANCE_CONSTRUCTS>
 {
   public:

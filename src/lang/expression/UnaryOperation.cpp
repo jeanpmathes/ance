@@ -49,12 +49,4 @@ Expression::Expansion UnaryOperation::expandWith(Expressions subexpressions, lan
     return {Statements(), makeOwned<UnaryOperation>(op_, std::move(subexpressions[0]), location()), Statements()};
 }
 
-void UnaryOperation::doBuild(CompileContext& context)
-{
-    Shared<lang::Value> value = operand_->getValue();
-
-    Shared<lang::Value> result = operand_->type()->buildOperator(op_, value, context);
-    setValue(result);
-}
-
 UnaryOperation::~UnaryOperation() = default;

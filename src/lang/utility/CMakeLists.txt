@@ -3,4 +3,5 @@ target_sources(ance PRIVATE
                Identifier.cpp
                StringStorage.cpp
                Storage.cpp
+               Erased.cpp
                Empty.cpp)

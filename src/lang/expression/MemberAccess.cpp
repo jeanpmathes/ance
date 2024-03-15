@@ -54,10 +54,4 @@ Expression::Expansion MemberAccess::expandWith(Expressions subexpressions, lang:
     return {Statements(), makeOwned<MemberAccess>(std::move(subexpressions[0]), member_, location()), Statements()};
 }
 
-void MemberAccess::doBuild(CompileContext& context)
-{
-    Shared<lang::Value> value = value_->type()->buildMemberAccess(value_->getValue(), member_, context);
-    setValue(value);
-}
-
 MemberAccess::~MemberAccess() = default;

@@ -47,7 +47,7 @@ Optional<lang::Location> lang::InitializerFunction::getDefinitionLocation() cons
     return lang::Location::global();
 }
 
-bool lang::InitializerFunction::isConstructor() const
+bool lang::InitializerFunction::preserveUnitReturn() const
 {
     return false;
 }

@@ -3,8 +3,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
-#include "lang/construct/value/RoughlyCastedValue.h"
-#include "lang/construct/value/Value.h"
+#include "lang/construct/Value.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
 
@@ -36,14 +35,14 @@ bool lang::AddressType::validateCast(lang::Type const&, lang::Location, Validati
     return true;
 }
 
-Shared<lang::Value> lang::AddressType::buildCast(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::AddressType::buildCast(lang::Type const& other,
                                                  Shared<lang::Value>               value,
-                                                 CompileContext&                   context)
+                                                 CompileContext&                   context) const
 {
-    if (other->isAddressType())
+    if (other.isAddressType())
     { return context.exec().computeCastedAddress(value, other); }
 
-    if (other->isUnsignedIntegerPointerType())
+    if (other.isUnsignedIntegerPointerType())
     { return context.exec().computePointerToInteger(value); }
 
     throw std::logic_error("Invalid cast");
@@ -67,8 +66,8 @@ bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::Type co
     return false;
 }
 
-lang::ResolvingHandle<lang::Type> lang::AddressType::getOperatorResultType(lang::BinaryOperator op,
-                                                                           lang::ResolvingHandle<lang::Type>)
+lang::Type const& lang::AddressType::getOperatorResultType(lang::BinaryOperator op,
+                                                           lang::Type const&) const
 {
     if (op.isEquality()) return scope().context().getBooleanType();
 
@@ -91,9 +90,9 @@ bool lang::AddressType::validateOperator(lang::BinaryOperator,
 Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
                                                      Shared<lang::Value>  left,
                                                      Shared<lang::Value>  right,
-                                                     CompileContext&      context)
+                                                     CompileContext&      context) const
 {
-    if (right->type()->isReferenceType()) right = context.exec().performDereference(right);
+    if (right->type().isReferenceType()) right = context.exec().performDereference(right);
 
     if (op.isEquality())
     {
@@ -105,15 +104,15 @@ Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
 
     if (op == lang::BinaryOperator::ADDITION)
     {
-        if (getPointeeType().value()->getStateCount().isUnit())
+        if (getPointeeType()->getStateCount().isUnit())
             return context.exec().getDefault(getOperatorResultType(op, right->type()));
         else
         {
-            if (right->type()->isSizeType())
-                right = right->type()->buildImplicitConversion(context.ctx().getDiffType(), right, context);
+            if (right->type().isSizeType())
+                right = right->type().buildImplicitConversion(context.ctx().getDiffType(), right, context);
             Shared<lang::Value> pointer =
                 context.exec().computeElementPointer(left, right, Execution::IndexingMode::POINTER, std::nullopt);
-            return makeShared<lang::RoughlyCastedValue>(self(), pointer, context);
+            return context.exec().computeCastedAddress(pointer, self());
         }
     }
 

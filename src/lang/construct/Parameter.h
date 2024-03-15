@@ -3,12 +3,13 @@
 
 #include <string>
 
-#include "lang/construct/value/Value.h"
 #include "lang/utility/Location.h"
+#include "lang/utility/ResolvingHandle.h"
 
 namespace lang
 {
     class Type;
+    class Value;
 }
 
 class Storage;
@@ -16,9 +17,9 @@ class Storage;
 namespace lang
 {
     /**
-     * A function parameter value.
+     * A function parameter.
      */
-    class Parameter : public lang::Value
+    class Parameter
     {
       public:
         /**
@@ -35,13 +36,20 @@ namespace lang
 
         /**
          * Create a new parameter for usage in internal functions.
-         * This constructor requires less information.
+         * This constructor requires less information but also does not allow all operations.
          * @param type The type of the parameter.
          */
         explicit Parameter(lang::ResolvingHandle<lang::Type> type);
 
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> type() override;
-        [[nodiscard]] lang::Type const&                 type() const override;
+        /**
+         * Create a new parameter for usage in internal functions.
+         * This constructor requires less information but also does not allow all operations.
+         * @param type The type of the parameter.
+         */
+        explicit Parameter(lang::Type const& type);
+
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> type();
+        [[nodiscard]] lang::Type const&                 type() const;
 
         /**
          * Get the parameter name.
@@ -62,14 +70,15 @@ namespace lang
         [[nodiscard]] lang::Location typeLocation() const;
 
         /**
-         * Wrap an llvm argument as content value.
-         * @param argument The native argument of this parameter.
+         * Set the argument variable corresponding to this parameter.
+         * @param variable The variable.
          */
-        void wrap(llvm::Argument* argument);
+        void argument(lang::ResolvingHandle<lang::Variable> variable);
+
+        lang::ResolvingHandle<lang::Variable> argument();
+        [[nodiscard]] lang::Variable const&   argument() const;
 
         Shared<lang::Parameter> expand(lang::Context& new_context) const;
-
-        void buildContentValue(CompileContext& context) override;
 
         /**
          * Perform storage synchronization.
@@ -77,13 +86,15 @@ namespace lang
         static void synchronize(lang::Parameter* parameter, Storage& storage);
 
       private:
-        lang::ResolvingHandle<lang::Type> type_;
+        lang::Type const* type_;
+        Optional<lang::ResolvingHandle<lang::Type>> type_opt_;
+
         lang::Location                    type_location_;
         lang::Identifier                  name_;
 
-        lang::Location location_;
+        Optional<lang::ResolvingHandle<lang::Variable>> argument_;
 
-        llvm::Argument* argument_ = nullptr;
+        lang::Location location_;
     };
 }
 #endif

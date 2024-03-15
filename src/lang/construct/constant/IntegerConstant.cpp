@@ -11,9 +11,9 @@
 #include "validation/ValidationLogger.h"
 
 lang::IntegerConstant::IntegerConstant(std::string integer, uint8_t radix, lang::ResolvingHandle<lang::Type> type)
-    : text_(std::move(integer))
+    : LiteralConstant(type)
+    , text_(std::move(integer))
     , radix_(radix)
-    , type_(type)
     , integer_type_(type->isIntegerType())
 {
     text_.erase(0, std::min(text_.find_first_not_of('0'), text_.size() - 1));
@@ -103,20 +103,10 @@ bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::
     return true;
 }
 
-lang::ResolvingHandle<lang::Type> lang::IntegerConstant::type()
-{
-    return type_;
-}
-
-lang::Type const& lang::IntegerConstant::type() const
-{
-    return type_;
-}
-
-Shared<lang::Constant> lang::IntegerConstant::createContent(CompileContext& context)
+Shared<lang::Constant> lang::IntegerConstant::embed(CompileContext& context) const
 {
     llvm::APInt const integer(static_cast<unsigned int>(integer_type_->getNativeBitSize()), text_, radix_);
-    return context.exec().getInteger(integer, type_);
+    return context.exec().getInteger(integer, type());
 }
 
 bool lang::IntegerConstant::equals(lang::Constant const* other) const
@@ -140,7 +130,8 @@ bool lang::IntegerConstant::equals(lang::Constant const* other) const
     return this_value == other_value;
 }
 
-Shared<lang::Constant> lang::IntegerConstant::clone(lang::Context& new_context) const
+Shared<lang::LiteralConstant> lang::IntegerConstant::clone(lang::Context& new_context) const
 {
-    return Shared<lang::Constant>(*(new IntegerConstant(text_, radix_, type_->getUndefinedTypeClone(new_context))));
+    return Shared<lang::LiteralConstant>(
+        *(new IntegerConstant(text_, radix_, type().getUndefinedTypeClone(new_context))));
 }

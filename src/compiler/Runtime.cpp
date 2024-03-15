@@ -4,8 +4,7 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/RoughlyCastedValue.h"
-#include "lang/construct/value/Value.h"
+#include "lang/construct/Value.h"
 #include "lang/type/BooleanType.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/OpaquePointerType.h"
@@ -16,7 +15,7 @@ void Runtime::init(CompileContext& context)
 {
     auto create_function = [&](char const*                                    name,
                                lang::ResolvingHandle<lang::Type>              return_type,
-                               std::vector<lang::ResolvingHandle<lang::Type>>& parameter_types) -> Execution::Function {
+                               std::vector<lang::ResolvingHandle<lang::Type>>& parameter_types) -> lang::Function* {
         std::vector<Shared<lang::Parameter>> parameters;
         parameters.reserve(parameter_types.size());
         for (lang::ResolvingHandle<lang::Type> parameter_type : parameter_types)
@@ -24,35 +23,44 @@ void Runtime::init(CompileContext& context)
             parameters.emplace_back(makeShared<lang::Parameter>(parameter_type));
         }
 
-        return context.exec().createFunction(lang::Identifier::like(name),
-                                             name,
-                                             std::nullopt,
-                                             true,
-                                             parameters,
-                                             return_type,
-                                             nullptr,
-                                             true,
-                                             lang::Location::global(),
-                                             std::nullopt);
+        lang::ResolvingHandle<lang::Function> function =
+            lang::makeHandled<lang::Function>(lang::Identifier::like(name));
+        function->defineAsRuntime(return_type, parameters, context);
+
+        context.unit().globalScope().addEntity(lang::OwningHandle<lang::Function>::takeOwnership(function));
+
+        lang::Function* function_ptr = &*function;
+        functions_.emplace_back(function_ptr);
+
+        return function_ptr;
     };
 
-    std::vector<lang::ResolvingHandle<lang::Type>> allocate_dynamic_parameters;
-    allocate_dynamic_parameters.emplace_back(context.ctx().getSizeType());
-    allocate_dynamic_ =
-        create_function(ALLOCATE_DYNAMIC_NAME, context.ctx().getOpaquePointerType(), allocate_dynamic_parameters);
+    {
+        std::vector<lang::ResolvingHandle<lang::Type>> parameters;
+        parameters.emplace_back(context.ctx().getSizeType());
+        allocate_dynamic_ = create_function(ALLOCATE_DYNAMIC_NAME, context.ctx().getOpaquePointerType(), parameters);
+    }
 
-    std::vector<lang::ResolvingHandle<lang::Type>> delete_dynamic_parameters;
-    delete_dynamic_parameters.emplace_back(context.ctx().getOpaquePointerType());
-    delete_dynamic_ = create_function(DELETE_DYNAMIC_NAME, context.ctx().getUnitType(), delete_dynamic_parameters);
+    {
+        std::vector<lang::ResolvingHandle<lang::Type>> parameters;
+        parameters.emplace_back(context.ctx().getOpaquePointerType());
+        delete_dynamic_ = create_function(DELETE_DYNAMIC_NAME, context.ctx().getUnitType(), parameters);
+    }
 
-    std::vector<lang::ResolvingHandle<lang::Type>> assertion_parameters;
-    assertion_parameters.emplace_back(context.ctx().getBooleanType());
-    assertion_parameters.emplace_back(context.ctx().getPointerType(context.ctx().getFixedWidthIntegerType(8, false)));
-    assertion_ = create_function(ASSERTION_NAME, context.ctx().getUnitType(), assertion_parameters);
+    {
+        std::vector<lang::ResolvingHandle<lang::Type>> parameters;
+        parameters.emplace_back(context.ctx().getBooleanType());
+        parameters.emplace_back(context.ctx().getPointerType(context.ctx().getFixedWidthIntegerType(8, false)));
+        assertion_ = create_function(ASSERTION_NAME, context.ctx().getUnitType(), parameters);
+    }
 
-    std::vector<lang::ResolvingHandle<lang::Type>> abort_parameters;
-    abort_parameters.emplace_back(context.ctx().getPointerType(context.ctx().getFixedWidthIntegerType(8, false)));
-    abort_ = create_function(ABORT_NAME, context.ctx().getUnitType(), abort_parameters);
+    {
+        std::vector<lang::ResolvingHandle<lang::Type>> parameters;
+        parameters.emplace_back(context.ctx().getPointerType(context.ctx().getFixedWidthIntegerType(8, false)));
+        abort_ = create_function(ABORT_NAME, context.ctx().getUnitType(), parameters);
+    }
+
+    for (lang::Function* function : functions_) { function->buildDeclaration(context); }
 
     is_initialized_ = true;
 }
@@ -63,16 +71,16 @@ bool Runtime::isNameReserved(lang::Identifier const& name)
 }
 
 Shared<lang::Value> Runtime::allocate(Allocator                         allocation,
-                                      lang::ResolvingHandle<lang::Type> type,
+                                      lang::Type const&             type,
                                       Optional<Shared<lang::Value>>     count,
                                       CompileContext&                   context)
 {
     assert(is_initialized_);
 
-    lang::ResolvingHandle<lang::Type> return_type =
+    lang::Type const& return_type =
         count.hasValue() ? context.ctx().getBufferType(type) : context.ctx().getPointerType(type);
 
-    if (type->getStateCount().isUnit()) return context.exec().getDefault(return_type);
+    if (type.getStateCount().isUnit()) return context.exec().getDefault(return_type);
 
     Optional<Shared<lang::Value>> ptr_to_allocated;
 
@@ -89,20 +97,20 @@ Shared<lang::Value> Runtime::allocate(Allocator                         allocati
             break;
     }
 
-    if (count.hasValue()) { type->performDefaultInitializer(ptr_to_allocated.value(), count_value, context); }
-    else { type->performDefaultInitializer(ptr_to_allocated.value(), context); }
+    if (count.hasValue()) { type.performDefaultInitializer(ptr_to_allocated.value(), count_value, context); }
+    else { type.performDefaultInitializer(ptr_to_allocated.value(), context); }
 
-    return makeShared<lang::RoughlyCastedValue>(return_type, ptr_to_allocated.value(), context);
+    return context.exec().computeCastedAddress(ptr_to_allocated.value(), return_type);
 }
 
 void Runtime::deleteDynamic(Shared<lang::Value> address, bool delete_buffer, CompileContext& context)
 {
     assert(is_initialized_);
 
-    assert(delete_buffer || address->type()->isPointerType());// Not deleting a buffer implies a pointer type.
-    assert(!delete_buffer || address->type()->isBufferType());// Deleting a buffer implies a buffer type.
+    assert(delete_buffer || address->type().isPointerType());// Not deleting a buffer implies a pointer type.
+    assert(!delete_buffer || address->type().isBufferType());// Deleting a buffer implies a buffer type.
 
-    if (address->type()->getElementType()->getStateCount().isUnit()) return;
+    if (address->type().getElementType().getStateCount().isUnit()) return;
 
     if (delete_buffer)
     {
@@ -116,19 +124,19 @@ void Runtime::deleteDynamic(Shared<lang::Value> address, bool delete_buffer, Com
 
         Shared<lang::Value> address_as_ptr =
             context.exec().computeCastedAddress(address,
-                                                context.ctx().getPointerType(address->type()->getElementType()));
+                                                context.ctx().getPointerType(address->type().getElementType()));
 
-        address->type()->getElementType()->performFinalizer(address_as_ptr, count_value, context);
+        address->type().getElementType().performFinalizer(address_as_ptr, count_value, context);
 
         address = count_value_ptr;
     }
-    else { address->type()->getElementType()->performFinalizer(address, context); }
+    else { address->type().getElementType().performFinalizer(address, context); }
 
     Shared<lang::Value> opaque_ptr = context.exec().computeCastedAddress(address, context.ctx().getOpaquePointerType());
 
     std::vector<Shared<lang::Value>> parameters;
     parameters.emplace_back(opaque_ptr);
-    context.exec().performFunctionCall(delete_dynamic_, parameters);
+    delete_dynamic_->buildCall(parameters, context);
 }
 
 void Runtime::buildAssert(Shared<lang::Value> value, std::string const& description, CompileContext& context)
@@ -143,7 +151,7 @@ void Runtime::buildAssert(Shared<lang::Value> value, std::string const& descript
     std::vector<Shared<lang::Value>> parameters;
     parameters.emplace_back(truth_value);
     parameters.emplace_back(description_ptr);
-    context.exec().performFunctionCall(assertion_, parameters);
+    assertion_->buildCall(parameters, context);
 }
 
 void Runtime::buildAbort(std::string const& reason, CompileContext& context)
@@ -154,17 +162,17 @@ void Runtime::buildAbort(std::string const& reason, CompileContext& context)
 
     std::vector<Shared<lang::Value>> parameters;
     parameters.emplace_back(reason_ptr);
-    context.exec().performFunctionCall(abort_, parameters);
+    abort_->buildCall(parameters, context);
 }
 
-Shared<lang::Value> Runtime::allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
+Shared<lang::Value> Runtime::allocateAutomatic(lang::Type const&   type,
                                                Shared<lang::Value>               count,
                                                CompileContext&                   context)
 {
     return context.exec().performStackAllocation(type, count);
 }
 
-Shared<lang::Value> Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> type,
+Shared<lang::Value> Runtime::allocateDynamic(lang::Type const&   type,
                                              Shared<lang::Value>               count,
                                              bool                              is_buffer,
                                              CompileContext&                   context)
@@ -181,14 +189,13 @@ Shared<lang::Value> Runtime::allocateDynamic(lang::ResolvingHandle<lang::Type> t
 
     std::vector<Shared<lang::Value>> parameters;
     parameters.emplace_back(size_to_allocate);
-    Shared<lang::Value> opaque_memory_ptr = context.exec().performFunctionCall(allocate_dynamic_, parameters);
+    Shared<lang::Value> opaque_memory_ptr = allocate_dynamic_->buildCall(parameters, context);
 
     if (is_buffer)
     {
         Shared<lang::Value> header_ptr =
             context.exec().computeCastedAddress(opaque_memory_ptr,
                                                 context.ctx().getPointerType(context.ctx().getSizeType()));
-        header_ptr->buildNativeValue(context);
 
         context.exec().performStoreToAddress(header_ptr, count);
 

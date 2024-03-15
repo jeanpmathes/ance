@@ -17,23 +17,23 @@ bool lang::UnsignedIntegerPointerType::acceptOverloadRequest(std::vector<Resolvi
     return IntegerType::acceptOverloadRequest(parameters);
 }
 
-void lang::UnsignedIntegerPointerType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+void lang::UnsignedIntegerPointerType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                                               lang::PredefinedFunction&                      function,
-                                                              CompileContext&                                context)
+                                                              CompileContext&                                context) const
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }
 
-void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                                              lang::ResolvingHandle<lang::Type> return_type,
+void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::Type const& parameter_element,
+                                                              lang::Type const& return_type,
                                                               lang::PredefinedFunction&         function,
-                                                              CompileContext&                   context)
+                                                              CompileContext&                   context) const
 {
-    if (parameter_element->isAddressType())
+    if (parameter_element.isAddressType())
     {
-        context.exec().enterFunctionBody(function.getFunctionHandle(context));
+        context.exec().defineFunctionBody(function.function());
         {
-            Shared<lang::Value> argument = function.getArgument(0);
+            Shared<lang::Value> argument = context.exec().getParameterValue(function.function(), 0);
             Shared<lang::Value> result   = context.exec().computePointerToInteger(argument);
 
             context.exec().performReturn(result);

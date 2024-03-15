@@ -13,7 +13,7 @@ namespace lang
     class Signature
     {
       private:
-        explicit Signature(Identifier const& name, std::vector<lang::ResolvingHandle<lang::Type>>& types);
+        explicit Signature(Identifier const& name, std::vector<Shared<lang::Parameter>> parameters);
 
       public:
         [[nodiscard]] size_t getParameterCount() const;
@@ -66,7 +66,8 @@ namespace lang
 
       private:
         lang::Identifier                               function_name_;
-        std::vector<lang::ResolvingHandle<lang::Type>> types_;
+        std::vector<Shared<lang::Parameter>>           parameters_;
+
         mutable std::string                            mangled_name_ {};
     };
 }

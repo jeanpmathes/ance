@@ -112,27 +112,27 @@ namespace lang
         [[nodiscard]] virtual lang::Accessibility const& getAccessibility() const;
 
         void         setContainingScope(Scope* scope);
+        [[nodiscard]] bool isContainingScopeSet() const;
         Scope&       scope();
         Scope const& scope() const;
 
         void postResolve();
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters);
 
-        Execution::Type getExecutionType(CompileContext& context) const;
-
         virtual bool                              isSubscriptDefined() const;
-        virtual lang::ResolvingHandle<lang::Type> getSubscriptReturnType();
+        virtual lang::Type const& getSubscriptReturnType() const;
         virtual bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const;
         virtual bool isOperatorDefined(lang::UnaryOperator op) const;
-        virtual lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
-                                                                        lang::ResolvingHandle<lang::Type> other);
-        virtual lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op);
+        virtual lang::Type const& getOperatorResultType(lang::BinaryOperator op,
+                                                        lang::Type const& other) const;
+        virtual lang::Type const& getOperatorResultType(lang::UnaryOperator op) const;
         virtual bool                              isImplicitlyConvertibleTo(lang::Type const& other) const;
         virtual bool                              isCastingPossibleTo(lang::Type const& other) const;
         virtual bool                              hasMember(lang::Identifier const& name) const;
         virtual Member&                           getMember(lang::Identifier const&);
+        virtual Member const&                     getMember(lang::Identifier const&) const;
         virtual bool                              definesIndirection() const;
-        virtual lang::ResolvingHandle<lang::Type> getIndirectionType();
+        virtual lang::Type const& getIndirectionType() const;
 
         virtual bool validate(ValidationLogger& validation_logger, lang::Location location) const;
         virtual bool validateSubscript(lang::Location    indexed_location,
@@ -158,37 +158,39 @@ namespace lang
 
         virtual Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
                                                    Shared<lang::Value> index,
-                                                   CompileContext&     context);
+                                                   CompileContext&     context) const;
         virtual Shared<lang::Value> buildOperator(lang::BinaryOperator op,
                                                   Shared<lang::Value>  left,
                                                   Shared<lang::Value>  right,
-                                                  CompileContext&      context);
+                                                  CompileContext&      context) const;
         virtual Shared<lang::Value> buildOperator(lang::UnaryOperator op,
                                                   Shared<lang::Value> value,
-                                                  CompileContext&     context);
-        virtual Shared<lang::Value> buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+                                                  CompileContext&     context) const;
+        virtual Shared<lang::Value> buildImplicitConversion(lang::Type const& other,
                                                             Shared<lang::Value>               value,
-                                                            CompileContext&                   context);
-        virtual Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+                                                            CompileContext&                   context) const;
+        virtual Shared<lang::Value> buildCast(lang::Type const& other,
                                               Shared<lang::Value>               value,
-                                              CompileContext&                   context);
+                                              CompileContext&                   context) const;
         virtual Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
                                                       lang::Identifier const& name,
-                                                      CompileContext&         context);
-        virtual Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context);
+                                                      CompileContext&         context) const;
+        virtual Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context) const;
 
-        void         performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context);
+        void         performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context) const;
         virtual void performDefaultInitializer(Shared<lang::Value> ptr,
                                                Shared<lang::Value> count,
-                                               CompileContext&     context);
+                                               CompileContext&     context) const;
         virtual void performCopyInitializer(Shared<lang::Value> destination,
                                             Shared<lang::Value> source,
-                                            CompileContext&     context);
-        void         performFinalizer(Shared<lang::Value> ptr, CompileContext& context);
-        virtual void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context);
+                                            CompileContext&     context) const;
+        void         performFinalizer(Shared<lang::Value> ptr, CompileContext& context) const;
+        virtual void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const;
 
-        virtual void buildNativeDeclaration(CompileContext& context);
-        virtual void buildNativeDefinition(CompileContext& context);
+        virtual void registerExecutionType(CompileContext& context) const = 0;
+
+        virtual void buildDeclaration(CompileContext& context) const;
+        virtual void buildDefinition(CompileContext& context) const;
 
         virtual void createConstructors();
 
@@ -205,31 +207,29 @@ namespace lang
          */
         [[nodiscard]] virtual bool isTriviallyDestructible() const;
 
-        void defineDefaultInitializer(CompileContext& context);
-        void defineCopyInitializer(CompileContext& context);
-        void defineDefaultFinalizer(CompileContext& context);
+        void defineDefaultInitializer(CompileContext& context) const;
+        void defineCopyInitializer(CompileContext& context) const;
+        void defineDefaultFinalizer(CompileContext& context) const;
 
-        void defineConstructors(CompileContext& context);
-        void buildConstructors(CompileContext& context);
+        void defineConstructors(CompileContext& context) const;
+        void buildConstructors(CompileContext& context) const;
 
         /**
          * Build the part of the definition that default-initializes a single element of this type.
          */
-        virtual void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context);
+        virtual void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const;
         /**
          * Build the part of the definition that copies a single element of this type.
          */
         virtual void performSingleCopyInitializerDefinition(Shared<lang::Value> dst_ptr,
                                                             Shared<lang::Value> src_ptr,
-                                                            CompileContext& context);
+                                                            CompileContext& context) const;
         /**
          * Build the part of the definition that default-finalizes a single element of this type.
          */
-        virtual void buildSingleDefaultFinalizerDefinition(Shared<lang::Value>, CompileContext&);
+        virtual void buildSingleDefaultFinalizerDefinition(Shared<lang::Value>, CompileContext&) const;
 
         virtual std::string createMangledName() const = 0;
-
-        virtual Execution::Type createExecutionType(CompileContext& context) const = 0;
 
         virtual std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies();
         virtual std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies();
@@ -254,35 +254,29 @@ namespace lang
          * @param function The already declared function which has to be built.
          * @param context The current compile context.
          */
-        virtual void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+        virtual void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                             lang::PredefinedFunction&                      function,
-                                            CompileContext&                                context);
+                                            CompileContext&                                context) const;
 
-        [[nodiscard]] lang::ResolvingHandle<lang::Type> self() const;
-
-      protected:
-        Optional<Execution::Function>        default_initializer_ {};
-        std::vector<Shared<lang::Parameter>> default_initializer_parameters_ {};
-
-        Optional<Execution::Function>        copy_initializer_ {};
-        std::vector<Shared<lang::Parameter>> copy_initializer_parameters_ {};
-
-        Optional<Execution::Function>        default_finalizer_ {};
-        std::vector<Shared<lang::Parameter>> default_finalizer_parameters_ {};
+        [[nodiscard]] lang::ResolvingHandle<lang::Type> self();
+        [[nodiscard]] lang::Type const&                 self() const;
 
       private:
         lang::Identifier    name_;
         lang::Location      location_;
         mutable std::string mangled_name_ {};
         lang::Type*         type_ {nullptr};
-        lang::Scope*          containing_scope_ {nullptr};
-        mutable Optional<Execution::Type> debug_type_ {std::nullopt};
+        lang::Scope*        containing_scope_ {nullptr};
 
         lang::PredefinedFunction* default_constructor_ {nullptr};
 
         mutable Optional<bool> cyclic_dependency_ {};
 
-        std::vector<std::pair<std::vector<lang::ResolvingHandle<lang::Type>>, lang::PredefinedFunction*>>
+        Optional<lang::ResolvingHandle<lang::Function>> default_initializer_ {};
+        Optional<lang::ResolvingHandle<lang::Function>> copy_initializer_ {};
+        Optional<lang::ResolvingHandle<lang::Function>> default_finalizer_ {};
+
+        std::vector<std::pair<std::vector<std::reference_wrapper<lang::Type const>>, lang::PredefinedFunction*>>
             requested_constructors_;
     };
 }

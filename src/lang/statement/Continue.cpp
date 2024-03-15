@@ -38,11 +38,6 @@ Statements Continue::expandWith(Expressions, Statements, lang::Context&) const
     return statements;
 }
 
-void Continue::doBuild(CompileContext&)
-{
-    // Is handled trough basic blocks.
-}
-
 Statement const* Continue::getLoopParent() const
 {
     Statement const* loop_parent = parent();

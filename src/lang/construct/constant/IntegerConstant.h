@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_CONSTANT_INTEGERCONSTANT_H_
 #define ANCE_SRC_LANG_CONSTRUCT_CONSTANT_INTEGERCONSTANT_H_
 
-#include "Constant.h"
+#include "LiteralConstant.h"
 
 #include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -18,7 +18,7 @@ namespace lang
     /**
      * An integer constant using any of the integer types.
      */
-    class IntegerConstant : public Constant
+    class IntegerConstant : public LiteralConstant
     {
       public:
         /**
@@ -41,19 +41,15 @@ namespace lang
 
         bool validate(ValidationLogger& validation_logger, lang::Location location) const override;
 
-        lang::ResolvingHandle<lang::Type> type() override;
-        [[nodiscard]] lang::Type const&   type() const override;
-
-        Shared<lang::Constant> createContent(CompileContext& context) override;
+        Shared<lang::Constant> embed(CompileContext& context) const override;
 
         bool equals(lang::Constant const* other) const override;
 
-        Shared<lang::Constant> clone(lang::Context& new_context) const override;
+        Shared<lang::LiteralConstant> clone(lang::Context& new_context) const override;
 
       private:
         std::string                       text_;
         std::uint8_t                      radix_;
-        lang::ResolvingHandle<lang::Type> type_;
         IntegerType const*                integer_type_;
     };
 }

@@ -86,28 +86,29 @@ void lang::TypeRegistry<OtherKey>::clear()
 template<typename OtherKey>
 void lang::TypeRegistry<OtherKey>::postResolve()
 {
-    for (auto& [key, type] : types_)
+    for (size_t index = 0; index < types_.size(); ++index)// Allows adding types during iteration.
     {
+        auto& [key, type] = types_[index];
         if (type->isDefined()) type->postResolve();
     }
 }
 
 template<typename OtherKey>
-void lang::TypeRegistry<OtherKey>::buildNativeDeclarations(CompileContext& context)
+void lang::TypeRegistry<OtherKey>::buildDeclarations(CompileContext& context)
 {
     for (size_t index = 0; index < types_.size(); ++index)// Allows adding types during iteration.
     {
         auto& [key, type] = types_[index];
-        type->buildNativeDeclaration(context);
+        type->buildDeclaration(context);
     }
 }
 
 template<typename OtherKey>
-void lang::TypeRegistry<OtherKey>::buildNativeDefinitions(CompileContext& context)
+void lang::TypeRegistry<OtherKey>::buildDefinitions(CompileContext& context)
 {
     for (size_t index = 0; index < types_.size(); ++index)// Allows adding types during iteration.
     {
         auto& [key, type] = types_[index];
-        type->buildNativeDefinition(context);
+        type->buildDefinition(context);
     }
 }

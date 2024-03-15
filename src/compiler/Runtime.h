@@ -39,22 +39,24 @@ class Runtime
     [[nodiscard]] static bool isNameReserved(lang::Identifier const& name);
 
   private:
-    Execution::Function          allocate_dynamic_ {};
+    lang::Function*              allocate_dynamic_     = nullptr;
     const static constexpr char* ALLOCATE_DYNAMIC_NAME = "__allocate__";
 
-    Execution::Function          delete_dynamic_ {};
+    lang::Function*              delete_dynamic_     = nullptr;
     const static constexpr char* DELETE_DYNAMIC_NAME = "__free__";
 
-    Execution::Function          assertion_ {};
+    lang::Function*              assertion_     = nullptr;
     const static constexpr char* ASSERTION_NAME = "__assert__";
 
-    Execution::Function          abort_ {};
+    lang::Function*              abort_     = nullptr;
     const static constexpr char* ABORT_NAME = "__abort__";
 
     inline static std::vector<std::string> reserved_names_ {ALLOCATE_DYNAMIC_NAME,
                                                             DELETE_DYNAMIC_NAME,
                                                             ASSERTION_NAME,
                                                             ABORT_NAME};
+
+    std::vector<lang::Function*> functions_;
 
   public:
     /**
@@ -81,7 +83,7 @@ class Runtime
      * @return A pointer to the allocated memory.
      */
     Shared<lang::Value> allocate(Allocator                         allocation,
-                                 lang::ResolvingHandle<lang::Type> type,
+                                 lang::Type const&             type,
                                  Optional<Shared<lang::Value>>     count,
                                  CompileContext&                   context);
 
@@ -111,11 +113,10 @@ class Runtime
   private:
     bool is_initialized_ {false};
 
-    Shared<lang::Value> allocateAutomatic(lang::ResolvingHandle<lang::Type> type,
-                                          Shared<lang::Value>               count,
+    Shared<lang::Value> allocateAutomatic(lang::Type const& type, Shared<lang::Value>               count,
                                           CompileContext&                   context);
 
-    Shared<lang::Value> allocateDynamic(lang::ResolvingHandle<lang::Type> type,
+    Shared<lang::Value> allocateDynamic(lang::Type const&   type,
                                         Shared<lang::Value>               count,
                                         bool                              is_buffer,
                                         CompileContext&                   context);

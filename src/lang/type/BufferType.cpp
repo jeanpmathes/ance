@@ -3,7 +3,7 @@
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/Value.h"
+#include "lang/construct/Value.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/SizeType.h"
 #include "validation/Utilities.h"
@@ -77,7 +77,7 @@ std::string lang::BufferType::createMangledName() const
     return std::string("ptr_b") + "(" + element_type_->getMangledName() + ")";
 }
 
-Execution::Type lang::BufferType::createExecutionType(CompileContext& context) const
+void lang::BufferType::registerExecutionType(CompileContext& context) const
 {
     return context.exec().registerAddressType(self());
 }

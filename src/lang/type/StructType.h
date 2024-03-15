@@ -26,20 +26,22 @@ namespace lang
 
         bool                              hasMember(lang::Identifier const& name) const override;
         Member& getMember(lang::Identifier const& name) override;
+        Member const& getMember(lang::Identifier const& name) const override;
+
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
                                               lang::Identifier const& name,
-                                              CompileContext&         context) override;
+                                              CompileContext&         context) const override;
 
       protected:
-        void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) override;
+        void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
         void performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                     Shared<lang::Value> src_ptr,
-                                                    CompileContext& context) override;
-        void buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) override;
+                                                    CompileContext& context) const override;
+        void buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
 
         std::string   createMangledName() const override;
-        Execution::Type createExecutionType(CompileContext& context) const override;
+        void          registerExecutionType(CompileContext& context) const override;
 
       public:
         std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies() override;
@@ -48,8 +50,6 @@ namespace lang
       private:
         std::vector<std::reference_wrapper<lang::Member>>                members_;
         std::map<lang::Identifier, std::reference_wrapper<lang::Member>> member_map_ {};
-
-        mutable llvm::StructType* native_type_ {nullptr};
     };
 }
 

@@ -5,6 +5,7 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "lang/Element.h"
+#include "lang/Located.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -23,7 +24,7 @@ class ValidationLogger;
 /**
  * The base class of all expressions.
  */
-class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
+class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>, public virtual lang::Located
 {
   protected:
     /**
@@ -33,9 +34,9 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     explicit Expression(lang::Location location);
 
   public:
-    [[nodiscard]] lang::Location     location() const;
-    [[nodiscard]] lang::Scope&       scope();
-    [[nodiscard]] lang::Scope const& scope() const;
+    [[nodiscard]] lang::Location     location() const final;
+    [[nodiscard]] lang::Scope&       scope() final;
+    [[nodiscard]] lang::Scope const& scope() const final;
 
     [[nodiscard]] bool isInitialized() const;
 
@@ -67,6 +68,17 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      */
     virtual bool validate(ValidationLogger& validation_logger) const = 0;
 
+    /**
+     * Validate an assignment to this expression.
+     * @param value_type The type of the value to assign.
+     * @param value_location The source location of the value.
+     * @param validation_logger The validation logger to use.
+     * @return True if assigning is valid.
+     */
+    virtual bool validateAssignment(lang::Type const& value_type,
+                                    lang::Location     value_location,
+                                    ValidationLogger&  validation_logger) const;
+
     using Expansion = std::tuple<Statements, Owned<Expression>, Statements>;
 
     /**
@@ -84,24 +96,6 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     [[nodiscard]] virtual Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const = 0;
 
     /**
-     * Validate an assignment to this expression.
-     * @param value The value that would be assigned.
-     * @param value_location The source location of the value.
-     * @param validation_logger The validation logger to use.
-     * @return True if assigning is valid.
-     */
-    virtual bool validateAssignment(lang::Value const& value,
-                                    lang::Location     value_location,
-                                    ValidationLogger&  validation_logger) const;
-
-    /**
-     * Build an assignment to this expression. The value should not be retrieved if assignment took place.
-     * @param value The value to assign.
-     * @param context The current compile context.
-     */
-    void assign(Shared<lang::Value> value, CompileContext& context);
-
-    /**
      * Get the return type of this expression.
      * @return The type of the value of this expression. Might be undefined if the expression is not valid.
      */
@@ -112,18 +106,6 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @return The type of the value of this expression. Might be undefined if the expression is not valid.
      */
     [[nodiscard]] lang::Type const& type() const;
-
-    /**
-     * Get the value returned by this expression.
-     * @return The value. One expression always returns the value.
-     */
-    [[nodiscard]] virtual Shared<lang::Value> getValue() = 0;
-
-    /**
-     * Get the value returned by this expression.
-     * @return The value. One expression always returns the value.
-     */
-    [[nodiscard]] virtual lang::Value const& getValue() const = 0;
 
     ~Expression() override = default;
 
@@ -140,8 +122,6 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>
      * @param scope The containing scope.
      */
     virtual void setScope(lang::Scope& scope);
-
-    virtual void doAssign(Shared<lang::Value> value, CompileContext& context);
 
     /**
      * Add a subexpression to this expression.

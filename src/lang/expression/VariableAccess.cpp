@@ -14,9 +14,9 @@ VariableAccess::VariableAccess(lang::ResolvingHandle<lang::Variable> variable, b
     , is_defined_(is_defined)
 {}
 
-lang::Variable const& VariableAccess::variable() const
+lang::Entity const& VariableAccess::variable() const
 {
-    return *variable_.as<lang::Variable>();
+    return *variable_;
 }
 
 void VariableAccess::walkDefinitions()
@@ -53,7 +53,7 @@ bool VariableAccess::validate(ValidationLogger& validation_logger) const
     return variable_.as<lang::Variable>()->validateGetValue(validation_logger, location());
 }
 
-bool VariableAccess::validateAssignment(lang::Value const& value,
+bool VariableAccess::validateAssignment(lang::Type const& value_type,
                                         lang::Location     value_location,
                                         ValidationLogger&  validation_logger) const
 {
@@ -61,7 +61,7 @@ bool VariableAccess::validateAssignment(lang::Value const& value,
 
     if (isVariableErased(validation_logger)) return false;
 
-    return variable_.as<lang::Variable>()->validateSetValue(value, validation_logger, location(), value_location);
+    return variable_.as<lang::Variable>()->validateSetValue(value_type, validation_logger, location(), value_location);
 }
 
 bool VariableAccess::isVariableErased(ValidationLogger& validation_logger) const
@@ -81,23 +81,6 @@ Expression::Expansion VariableAccess::expandWith(Expressions, lang::Context& new
         Statements(),
         makeOwned<VariableAccess>(variable_->getUndefinedClone<lang::Variable>(new_context), is_defined_, location()),
         Statements()};
-}
-
-void VariableAccess::doBuild(CompileContext& context)
-{
-    auto variable = lang::Type::makeMatching<lang::Variable>(variable_);
-
-    Shared<lang::Value> value =
-        type()->getStateCount().isUnit() ? context.exec().getDefault(type()) : variable->getValue(context);
-
-    setValue(value);
-}
-
-void VariableAccess::doAssign(Shared<lang::Value> value, CompileContext& context)
-{
-    auto variable = lang::Type::makeMatching<lang::Variable>(variable_);
-
-    variable->setValue(value, context);
 }
 
 VariableAccess::~VariableAccess() = default;

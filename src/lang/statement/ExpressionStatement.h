@@ -5,8 +5,6 @@
 
 #include "lang/Element.h"
 
-class BuildableExpression;
-
 /**
  * A statement that consists of an expression.
  */
@@ -20,9 +18,9 @@ class ExpressionStatement
      * @param expression The expression to use for this statement.
      * @param location The source location.
      */
-    ExpressionStatement(Owned<BuildableExpression> expression, lang::Location location);
+    ExpressionStatement(Owned<Expression> expression, lang::Location location);
 
-    [[nodiscard]] BuildableExpression const& expression() const;
+    [[nodiscard]] Expression const& expression() const;
 
     void validate(ValidationLogger& validation_logger) const override;
 
@@ -30,10 +28,7 @@ class ExpressionStatement
                                         Statements     substatements,
                                         lang::Context& new_context) const override;
 
-  protected:
-    void doBuild(CompileContext& context) override;
-
   private:
-    Owned<BuildableExpression> expression_;
+    Owned<Expression> expression_;
 };
 #endif

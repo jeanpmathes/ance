@@ -51,6 +51,13 @@ std::vector<std::reference_wrapper<Expression const>> FunctionCall::arguments() 
     return arguments;
 }
 
+lang::Function const& FunctionCall::function() const
+{
+    assert(overload_resolved_);
+
+    return *function_.front();
+}
+
 void FunctionCall::walkDefinitions()
 {
     Expression::walkDefinitions();
@@ -96,14 +103,14 @@ void FunctionCall::defineType(lang::ResolvingHandle<lang::Type> type)
 
 bool FunctionCall::validate(ValidationLogger& validation_logger) const
 {
-    std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> arguments;
+    std::vector<std::reference_wrapper<Expression const>> arguments;
 
     bool valid = true;
 
     for (auto& arg : arguments_)
     {
         valid &= arg->validate(validation_logger);
-        arguments.emplace_back(arg->getValue(), arg->location());
+        arguments.emplace_back(std::cref(*arg));
     }
 
     if (!valid) return false;
@@ -142,17 +149,6 @@ Expression::Expansion FunctionCall::expandWith(Expressions subexpressions, lang:
     return {Statements(),
             makeOwned<FunctionCall>(callable_->getUndefinedClone(new_context), std::move(subexpressions), location()),
             Statements()};
-}
-
-void FunctionCall::doBuild(CompileContext& context)
-{
-    std::vector<Shared<lang::Value>> arg_values;
-
-    arg_values.reserve(arguments_.size());
-    for (auto& arg : arguments_) { arg_values.push_back(arg->getValue()); }
-
-    Shared<lang::Value> return_value = function().front()->buildCall(arg_values, context);
-    setValue(return_value);
 }
 
 std::vector<lang::ResolvingHandle<lang::Function>> FunctionCall::function()

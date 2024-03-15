@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_IFSELECT_H_
 #define ANCE_SRC_LANG_EXPRESSION_IFSELECT_H_
 
-#include "UnexpandedExpression.h"
+#include "Expression.h"
 
 #include <memory>
 
@@ -11,7 +11,7 @@
  * An if-expression that selects between two expressions. Similar to the ternary operator.
  */
 class IfSelect
-    : public UnexpandedExpression
+    : public Expression
     , public lang::Element<IfSelect, ANCE_CONSTRUCTS>
 {
   public:

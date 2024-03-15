@@ -28,21 +28,21 @@ namespace lang
         [[nodiscard]] Optional<uint64_t> getSize() const;
 
         bool                              isSubscriptDefined() const override;
-        lang::ResolvingHandle<lang::Type> getSubscriptReturnType() override;
+        lang::Type const& getSubscriptReturnType() const override;
         bool                              validateSubscript(lang::Location    indexed_location,
                                                             lang::Type const& index_type,
                                                             lang::Location    index_location,
                                                             ValidationLogger& validation_logger) const override;
         Shared<lang::Value>               buildSubscript(Shared<lang::Value> indexed,
                                                          Shared<lang::Value> index,
-                                                         CompileContext& context) override;
+                                                         CompileContext& context) const override;
         Shared<lang::Value>               buildSubscriptInBounds(Shared<lang::Value> indexed,
                                                                  Shared<lang::Value> index,
-                                                                 CompileContext&     context);
+                                                                 CompileContext&     context) const;
         Shared<lang::Value>               buildSubscript(Shared<lang::Value> indexed,
                                                          Shared<lang::Value> index,
                                                          bool            check_bounds,
-                                           CompileContext& context);
+                                           CompileContext& context) const;
 
       protected:
         virtual Execution::IndexingMode getIndexingMode() const = 0;
@@ -55,11 +55,11 @@ namespace lang
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) override;
+        void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
         void performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                     Shared<lang::Value> src_ptr,
-                                                    CompileContext& context) override;
-        void buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) override;
+                                                    CompileContext& context) const override;
+        void buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
 
         /**
          * Create a value with the given elements. Only valid if the type is sized.
@@ -67,7 +67,7 @@ namespace lang
          * @param context The current compile context.
          * @return The value.
          */
-        Shared<lang::Value> createValue(std::vector<Shared<lang::Value>> values, CompileContext& context);
+        Shared<lang::Value> createValue(std::vector<Shared<lang::Value>> values, CompileContext& context) const;
 
       protected:
         lang::ResolvingHandle<lang::Type> element_type_;

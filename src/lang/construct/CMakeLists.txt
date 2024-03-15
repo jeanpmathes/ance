@@ -1,8 +1,9 @@
-add_subdirectory(constant)
-add_subdirectory(value)
 add_subdirectory(descriptions)
+add_subdirectory(constant)
 
 target_sources(ance PRIVATE
+               Value.cpp
+               Constant.cpp
                Entity.cpp
                BasicBlock.cpp
                BasicBlockDefinitionSimple.cpp
@@ -11,8 +12,10 @@ target_sources(ance PRIVATE
                BasicBlockDefinitionReturning.cpp
                BasicBlockDefinitionBranching.cpp
                BasicBlockDefinitionMatching.cpp
+               RuntimeFunction.cpp
                Function.cpp
                CustomFunction.cpp
+               SpecialMemberFunction.cpp
                ImportedFunction.cpp
                PredefinedFunction.cpp
                StatementFunction.cpp

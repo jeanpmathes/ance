@@ -1,25 +1,44 @@
 #ifndef ANCE_SRC_COMPILER_EXECUTION_H_
 #define ANCE_SRC_COMPILER_EXECUTION_H_
 
+#include <any>
+#include <map>
+#include <utility>
 #include <variant>
+
+#include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/IRBuilder.h>
 
 #include "lang/AccessModifier.h"
 #include "lang/BinaryOperator.h"
 #include "lang/UnaryOperator.h"
-#include "lang/construct/Parameter.h"
-#include "lang/construct/constant/Constant.h"
-#include "lang/construct/value/Value.h"
-#include "lang/utility/ResolvingHandle.h"
+#include "lang/utility/Identifier.h"
+#include "lang/utility/Optional.h"
+#include "lang/utility/Owners.h"
 
-class ConstantExpression;
+class Expression;
+class LiteralExpression;
 
 namespace lang
 {
     class Function;
+    class Variable;
+    class GlobalVariable;
+    class LocalVariable;
     class Member;
+    class Scope;
+    class Type;
 
-    using Initializer =
-        Optional<std::variant<std::reference_wrapper<lang::Function>, std::reference_wrapper<ConstantExpression>>>;
+    class Parameter;
+    class Constant;
+    class Value;
+
+    using GlobalInitializer =
+        Optional<std::variant<std::reference_wrapper<lang::Function>, std::reference_wrapper<LiteralExpression>>>;
+
+    using LocalParameterInitializer = std::pair<std::reference_wrapper<lang::Function const>, size_t>;
+
+    using LocalInitializer = Optional<std::variant<std::reference_wrapper<Expression>, LocalParameterInitializer>>;
 }
 
 /**
@@ -34,7 +53,7 @@ class Execution
      * @param type The type to get the constant value for.
      * @return The default constant.
      */
-    virtual Shared<lang::Constant> getDefault(lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual Shared<lang::Constant> getDefault(lang::Type const& type) = 0;
 
     /**
      * Get the given string as a constant.
@@ -76,7 +95,7 @@ class Execution
      * @param type The type to get the size of.
      * @return The constant.
      */
-    virtual Shared<lang::Constant> getSizeOf(lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual Shared<lang::Constant> getSizeOf(lang::Type const& type) = 0;
 
     /**
      * Get the given number as a constant.
@@ -84,28 +103,28 @@ class Execution
      * @param type The type to get the number as, must be a numeric type or a vector of numeric types.
      * @return The constant.
      */
-    virtual Shared<lang::Constant> getN(std::variant<uint64_t, double> n, lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual Shared<lang::Constant> getN(std::variant<uint64_t, double> n, lang::Type const& type) = 0;
 
     /**
      * Get the zero value for the given type.
      * @param type The type to get the zero value for, must be a numeric type or a vector of numeric types.
      * @return The zero value.
      */
-    virtual Shared<lang::Constant> getZero(lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual Shared<lang::Constant> getZero(lang::Type const& type) = 0;
 
     /**
      * Get the one value for the given type.
      * @param type The type to get the one value for, must be a numeric type or a vector of numeric types.
      * @return The one value.
      */
-    virtual Shared<lang::Constant> getOne(lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual Shared<lang::Constant> getOne(lang::Type const& type) = 0;
 
     /**
      * Get the null value for the given type.
      * @param type The type to get the null value for, must be a pointer or buffer type.
      * @return The null value.
      */
-    virtual Shared<lang::Constant> getNull(lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual Shared<lang::Constant> getNull(lang::Type const& type) = 0;
 
     /**
      * Get the given boolean as a constant.
@@ -113,7 +132,7 @@ class Execution
      * @param type The type to get the boolean as, can be either the boolean type or a vector of it.
      * @return The constant.
      */
-    virtual Shared<lang::Constant> getBoolean(bool boolean, lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual Shared<lang::Constant> getBoolean(bool boolean, lang::Type const& type) = 0;
 
     /**
      * Get the given integer as a constant.
@@ -121,7 +140,7 @@ class Execution
      * @param type The type to get the integer as, can be either the integer type or a vector of it.
      * @return The constant.
      */
-    virtual Shared<lang::Constant> getInteger(llvm::APInt int_value, lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual Shared<lang::Constant> getInteger(llvm::APInt int_value, lang::Type const& type) = 0;
 
     /**
      * Get the given float as a constant.
@@ -129,8 +148,7 @@ class Execution
      * @param type The type to get the float as, can be either the float type or a vector of it.
      * @return The constant.
      */
-    virtual Shared<lang::Constant> getFloatingPoint(llvm::APFloat                     float_value,
-                                                    lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual Shared<lang::Constant> getFloatingPoint(llvm::APFloat                     float_value, lang::Type const& type) = 0;
 
     /**
      * Get the given codepoint value as a constant.
@@ -146,35 +164,6 @@ class Execution
      */
     virtual Shared<lang::Constant> getByte(uint8_t byte) = 0;
 
-    enum class Application : size_t
-    {
-        GLOBAL_SCOPE
-    };
-    enum class Function : size_t
-    {
-    };
-    enum class Struct : size_t
-    {
-    };
-    enum class Alias : size_t
-    {
-    };
-    enum class BasicType : size_t
-    {
-    };
-
-    using Scoped = std::variant<Application, Function, Struct>;
-    using Type   = std::variant<Struct, Alias, BasicType>;
-
-    enum class GlobalVariable : size_t
-    {
-    };
-    enum class LocalVariable : size_t
-    {
-    };
-
-    using Variable = std::variant<GlobalVariable, LocalVariable>;
-
     /**
      * Create a function.
      * @param name The name of the function.
@@ -187,25 +176,34 @@ class Execution
      * @param preserve_unit Whether to preserve a unit return type. Used e.g. for constructors, as they can't return void.
      * @param declaration_location The location of the function declaration.
      * @param definition_location The location of the function definition, meaning the code block. If no debug data is needed, use std::nullopt, else the location or global location if the function has no definition.
-     * @return A handle to the function.
+     * @param function The AST function associated with the execution function.
      */
-    virtual Function createFunction(lang::Identifier const&               name,
-                                    std::string const&                    linkage_name,
+    virtual void createFunction(lang::Identifier const&                     name,
+                                std::string const&                    linkage_name,
                                     Optional<lang::AccessModifier>        access,
                                     bool                                  is_imported,
-                                    std::vector<Shared<lang::Parameter>>& parameters,
-                                    lang::ResolvingHandle<lang::Type>     return_type,
-                                    lang::Scope*                          scope,
-                                    bool                                  preserve_unit,
+                                std::vector<Shared<lang::Parameter>> const& parameters,
+                                lang::Type const&                           return_type,
+                                lang::Scope const*                          scope,
+                                bool                                  preserve_unit,
                                     lang::Location                        declaration_location,
-                                    Optional<lang::Location>              definition_location) = 0;
+                                Optional<lang::Location>                    definition_location,
+                                lang::Function const&                       function) = 0;
+
+    /**
+     * Get the value of a parameter of a function.
+     * @param function The function to get the parameter value from.
+     * @param index The index of the parameter.
+     * @return The value of the parameter.
+     */
+    virtual Shared<lang::Value> getParameterValue(lang::Function const& function, size_t index) = 0;
 
     /**
      * Indicate that the following commands are part of the body of the given function.
      * If the state is currently in another function, the function is exited first.
-     * @param function The function to enter.
+     * @param function The function of which the body is defined.
      */
-    virtual void enterFunctionBody(Function function) = 0;
+    virtual void defineFunctionBody(lang::Function const& function) = 0;
 
     /**
      * Call a function.
@@ -213,156 +211,136 @@ class Execution
      * @param arguments The arguments to pass to the function.
      * @return The result of the function call.
      */
-    virtual Shared<lang::Value> performFunctionCall(Function function, std::vector<Shared<lang::Value>> arguments) = 0;
+    virtual Shared<lang::Value> performFunctionCall(lang::Function const&            function,
+                                                    std::vector<Shared<lang::Value>> arguments) = 0;
 
     /**
      * Create a struct type for execution.
-     * @param name The name of the struct.
-     * @param access The access modifier of the struct.
      * @param type The struct type in the AST.
      * @param members The members of the struct.
-     * @param scope The scope in which the struct is defined.
      * @param definition_location The location of the struct.
-     * @return The handle to the struct.
      */
-    virtual Struct createStruct(lang::Identifier                                  name,
-                                lang::AccessModifier                              access,
-                                lang::Type const&                                 type,
-                                std::vector<std::reference_wrapper<lang::Member>> members,
-                                lang::Scope const&                                scope,
+    virtual void createStruct(lang::Type const&                                 type,
+                              std::vector<std::reference_wrapper<lang::Member>> members,
                                 lang::Location                                    definition_location) = 0;
 
     /**
      * Create an alias for a type.
-     * @param name The name of the alias.
-     * @param access The access modifier of the alias.
-     * @param actual_type The type to alias.
-     * @param scope The scope in which the alias is defined.
+     * @param type The alias type, not the aliased type.
      * @param definition_location The location of the alias.
-     * @return The handle to the alias.
      */
-    virtual Alias createAlias(lang::Identifier     name,
-                              lang::AccessModifier access,
-                              lang::Type const&    actual_type,
-                              lang::Scope const&   scope,
-                              lang::Location       definition_location) = 0;
+    virtual void createAlias(lang::Type const& type, lang::Location definition_location) = 0;
 
     /**
      * Register a reference type for execution.
      * @param reference_type The type to register.
-     * @return The handle to the reference type.
      */
-    virtual BasicType registerReferenceType(lang::Type const& reference_type) = 0;
+    virtual void registerReferenceType(lang::Type const& reference_type) = 0;
 
     /**
      * Register an address type for execution.
      * @param address_type The type to register.
-     * @return The handle to the address type.
      */
-    virtual BasicType registerAddressType(lang::Type const& address_type) = 0;
+    virtual void registerAddressType(lang::Type const& address_type) = 0;
 
     /**
      * Register an opaque address type for execution.
      * @param opaque_pointer_type The type to register.
-     * @return The handle to the opaque address type.
      */
-    virtual BasicType registerOpaqueAddressType(lang::Type const& opaque_pointer_type) = 0;
+    virtual void registerOpaqueAddressType(lang::Type const& opaque_pointer_type) = 0;
 
     /**
      * Register a vector type for execution.
      * @param vector_type The type to register.
-     * @return The handle to the vector type.
      */
-    virtual BasicType registerVectorType(lang::Type const& vector_type) = 0;
+    virtual void registerVectorType(lang::Type const& vector_type) = 0;
 
     /**
      * Register an integer type for execution.
      * @param integer_type The type to register.
-     * @return The handle to the integer type.
      */
-    virtual BasicType registerIntegerType(lang::Type const& integer_type) = 0;
+    virtual void registerIntegerType(lang::Type const& integer_type) = 0;
 
     /**
      * Register a floating point type for execution.
      * @param floating_point_type The type to register.
-     * @return The handle to the floating point type.
      */
-    virtual BasicType registerFloatingPointType(lang::Type const& floating_point_type) = 0;
+    virtual void registerFloatingPointType(lang::Type const& floating_point_type) = 0;
 
     /**
      * Register a boolean type for execution.
      * @param boolean_type The type to register.
-     * @return The handle to the boolean type.
      */
-    virtual BasicType registerBooleanType(lang::Type const& boolean_type) = 0;
+    virtual void registerBooleanType(lang::Type const& boolean_type) = 0;
 
     /**
      * Register a unit type for execution.
      * @param unit_type The type to register.
-     * @return The handle to the unit type.
      */
-    virtual BasicType registerUnitType(lang::Type const& unit_type) = 0;
+    virtual void registerUnitType(lang::Type const& unit_type) = 0;
 
     /**
      * Register a code point type for execution.
      * @param codepoint_type The type to register.
-     * @return The handle to the code point type.
      */
-    virtual BasicType registerCodepointType(lang::Type const& codepoint_type) = 0;
+    virtual void registerCodepointType(lang::Type const& codepoint_type) = 0;
 
     /**
      * Register an array type for execution.
      * @param array_type The type to register.
-     * @return The handle to the array type.
      */
-    virtual BasicType registerArrayType(lang::Type const& array_type) = 0;
+    virtual void registerArrayType(lang::Type const& array_type) = 0;
 
     /**
      * Create a global variable.
-     * @param name The name of the global variable.
-     * @param access The access modifier of the global variable.
+     * @param global_variable The global variable to create.
      * @param is_imported Whether the global variable is imported.
-     * @param type The type of the global variable.
-     * @param is_constant Whether the global variable is constant.
      * @param init The initializer of the global variable.
-     * @param location The location of the global variable.
-     * @return The handle to the global variable.
      */
-    virtual GlobalVariable createGlobalVariable(lang::Identifier                  name,
-                                                lang::AccessModifier              access,
-                                                bool                              is_imported,
-                                                lang::ResolvingHandle<lang::Type> type,
-                                                bool                              is_constant,
-                                                lang::Initializer                 init,
-                                                lang::Location                    location) = 0;
+    virtual void createGlobalVariable(lang::GlobalVariable const& global_variable,
+                                      bool                        is_imported,
+                                      lang::GlobalInitializer     init) = 0;
 
     /**
      * Declare a local variable.
-     * @param name The name of the local variable.
-     * @param type The type of the local variable.
-     * @return The handle to the local variable.
+     * @param local_variable The local variable to declare.
      */
-    virtual LocalVariable declareLocalVariable(lang::Identifier const&           name,
-                                               lang::ResolvingHandle<lang::Type> type) = 0;
+    virtual void declareLocalVariable(lang::LocalVariable const& local_variable) = 0;
 
     /**
      * Define a local variable.
-     * @param variable The variable to define.
+     * @param local_variable The variable to define.
      * @param scope The scope in which the variable is defined.
      * @param parameter_index The index of the parameter that the variable is an alias for, if any.
      * @param location The location of the variable.
      */
-    virtual void defineLocalVariable(Execution::LocalVariable variable,
-                                     lang::Scope&             scope,
-                                     Optional<unsigned>       parameter_index,
+    virtual void defineLocalVariable(lang::LocalVariable const& local_variable,
+                                     lang::Scope const&         scope,
+                                     Optional<size_t>           parameter_index,
                                      lang::Location           location) = 0;
+
+    /**
+     * Compute the value of a local initializer.
+     * @param initializer The initializer to compute the value of.
+     * @return The value of the initializer.
+     */
+    virtual Shared<lang::Value> computeInitializerValue(lang::LocalInitializer const& initializer) = 0;
 
     /**
      * Get the address of a variable.
      * @param variable The variable to get the address of.
      * @return The address of the variable.
      */
-    virtual Shared<lang::Value> computeAddressOfVariable(Variable variable) = 0;
+    virtual Shared<lang::Value> computeAddressOfVariable(lang::Variable const& variable) = 0;
+
+    /**
+     * Get the same value, but with the actual type of the value.
+     * The actual type is the type an alias refers to.
+     * If the value is not of alias type, the value is returned as is.
+     * @param value The value to get the actual type of.
+     * @return The value with the actual type.
+     */
+    virtual Shared<lang::Value> computeAsActualType(Shared<lang::Value> value) = 0;
 
     /**
      * Compute the size in bytes of an allocation of the given type.
@@ -370,8 +348,7 @@ class Execution
      * @param count The number of elements that are allocated. If no count is given, the size of a single element is returned.
      * @return The size of the allocation, as a value with type 'size'.
      */
-    virtual Shared<lang::Value> computeAllocatedSize(lang::ResolvingHandle<lang::Type> type,
-                                                     Optional<Shared<lang::Value>>     count) = 0;
+    virtual Shared<lang::Value> computeAllocatedSize(lang::Type const& type, Optional<Shared<lang::Value>>     count) = 0;
 
     enum class IndexingMode
     {
@@ -423,7 +400,7 @@ class Execution
      * @return A pointer of address type.
      */
     virtual Shared<lang::Value> computeIntegerToPointer(Shared<lang::Value>               integer,
-                                                        lang::ResolvingHandle<lang::Type> pointer_type) = 0;
+                                                        lang::Type const&   pointer_type) = 0;
 
     /**
      * Compute an address cast.
@@ -431,8 +408,7 @@ class Execution
      * @param new_type The new type of the address, must be either a pointer or buffer - or a vector of pointers or buffers.
      * @return The casted address.
      */
-    virtual Shared<lang::Value> computeCastedAddress(Shared<lang::Value>               address,
-                                                     lang::ResolvingHandle<lang::Type> new_type) = 0;
+    virtual Shared<lang::Value> computeCastedAddress(Shared<lang::Value>               address, lang::Type const& new_type) = 0;
 
     /**
      * Compute a floating point conversion.
@@ -441,7 +417,7 @@ class Execution
      * @return The converted value.
      */
     virtual Shared<lang::Value> computeConversionOnFP(Shared<lang::Value>               value,
-                                                      lang::ResolvingHandle<lang::Type> destination_type) = 0;
+                                                      lang::Type const&   destination_type) = 0;
 
     /**
      * Compute an integer conversion.
@@ -449,8 +425,7 @@ class Execution
      * @param destination_type The type to convert to. Must be an integer type or a vector of integer types.
      * @return The converted value.
      */
-    virtual Shared<lang::Value> computeConversionOnI(Shared<lang::Value>               value,
-                                                     lang::ResolvingHandle<lang::Type> destination_type) = 0;
+    virtual Shared<lang::Value> computeConversionOnI(Shared<lang::Value>               value, lang::Type const& destination_type) = 0;
 
     /**
      * Compute an floating point to integer conversion.
@@ -459,7 +434,7 @@ class Execution
      * @return The converted value.
      */
     virtual Shared<lang::Value> computeConversionFP2I(Shared<lang::Value>               value,
-                                                      lang::ResolvingHandle<lang::Type> destination_type) = 0;
+                                                      lang::Type const&   destination_type) = 0;
 
     /**
      * Compute an integer to floating point conversion.
@@ -468,7 +443,7 @@ class Execution
      * @return The converted value.
      */
     virtual Shared<lang::Value> computeConversionI2FP(Shared<lang::Value>               value,
-                                                      lang::ResolvingHandle<lang::Type> destination_type) = 0;
+                                                      lang::Type const&   destination_type) = 0;
 
     /**
      * Compute the pointer to a value from a reference.
@@ -560,7 +535,7 @@ class Execution
      * @param type The type to allocate.
      * @return A pointer to the allocated memory.
      */
-    Shared<lang::Value> performStackAllocation(lang::ResolvingHandle<lang::Type> type);
+    Shared<lang::Value> performStackAllocation(lang::Type const& type);
 
     /**
      * Perform a stack allocation.
@@ -568,8 +543,7 @@ class Execution
      * @param count The number of elements to allocate, given as a value with type 'size'.
      * @return A pointer to the allocated memory.
      */
-    virtual Shared<lang::Value> performStackAllocation(lang::ResolvingHandle<lang::Type> type,
-                                                       Shared<lang::Value>               count) = 0;
+    virtual Shared<lang::Value> performStackAllocation(lang::Type const& type, Shared<lang::Value>               count) = 0;
 
     /**
      * Perform a unary operator.
@@ -608,10 +582,55 @@ class Execution
      */
     virtual Shared<lang::Value> performBooleanCollapse(Shared<lang::Value> value) = 0;
 
+    /**
+     * Reinterpret a integer-like value to another integer-like type.
+     * @param value The value to reinterpret. Must be integer-like.
+     * @param target_type The target type to reinterpret to. Must be integer-like and compatible with the source type.
+     * @return The reinterpreted value.
+     */
+    virtual Shared<lang::Value> performIntegerReinterpretation(Shared<lang::Value> value,
+                                                               lang::Type const&   target_type) = 0;
+
+    /**
+     * A handle that allows to refer to values and constants in the representation used by the concrete execution implementation.
+     */
+    template<bool IsConstant>
+    struct Handle {
+        Execution* execution;
+        std::any   handle;
+
+        Handle(Execution* exec, std::any h) : execution(exec), handle(std::move(h)) {}
+
+        Handle(Handle const& other)            = delete;
+        Handle& operator=(Handle const& other) = delete;
+
+        Handle(Handle&& other) noexcept : execution(other.execution), handle(other.handle) { other.handle = nullptr; }
+        Handle& operator=(Handle&& other) noexcept
+        {
+            execution    = other.execution;
+            handle       = other.handle;
+            other.handle = nullptr;
+            return *this;
+        }
+
+        ~Handle()
+        {
+            if (not handle.has_value()) return;
+
+            if constexpr (IsConstant) execution->releaseConstant(handle);
+            else execution->releaseValue(handle);
+        }
+    };
+
+    virtual void releaseValue(std::any handle)    = 0;
+    virtual void releaseConstant(std::any handle) = 0;
+
+    virtual CompileContext& cc() = 0;
+
     virtual llvm::IRBuilder<>&   ir()                                               = 0;
     virtual llvm::DIBuilder&     di()                                               = 0;
     virtual llvm::LLVMContext&   llvmContext()                                      = 0;
-    virtual llvm::Function*      llvmFunction(Function function)                    = 0;
+    virtual llvm::Function*      llvmFunction(lang::Function const& function)       = 0;
     virtual llvm::DIScope*       llvmScope(lang::Scope const& scope)                = 0;
     virtual llvm::Type*          llvmType(lang::Type const& type)                   = 0;
 

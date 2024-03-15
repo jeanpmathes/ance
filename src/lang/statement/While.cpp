@@ -94,11 +94,6 @@ Statements While::arrangeExpandedStatements(Statements before, Statements expand
     return statements;
 }
 
-void While::doBuild(CompileContext&)
-{
-    // Handled by basic block.
-}
-
 bool While::isLoop() const
 {
     return true;

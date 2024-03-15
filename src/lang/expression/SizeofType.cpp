@@ -16,9 +16,9 @@ SizeofType::SizeofType(lang::ResolvingHandle<lang::Type> type, lang::Location ty
     , type_location_(type_location)
 {}
 
-lang::Type const& SizeofType::targetType() const
+lang::Entity const& SizeofType::target() const
 {
-    return *type_.as<lang::Type>();
+    return *type_;
 }
 
 void SizeofType::walkDefinitions()
@@ -45,10 +45,4 @@ Expression::Expansion SizeofType::expandWith(Expressions, lang::Context& new_con
     return {Statements(),
             makeOwned<SizeofType>(type_->getUndefinedClone<lang::Type>(new_context), type_location_, location()),
             Statements()};
-}
-
-void SizeofType::doBuild(CompileContext& context)
-{
-    auto actual_type = lang::Type::makeMatching<lang::Type>(type_);
-    setValue(context.exec().getSizeOf(actual_type));
 }

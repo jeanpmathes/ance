@@ -41,7 +41,7 @@ namespace lang
 
       protected:
         std::string   createMangledName() const override;
-        Execution::Type         createExecutionType(CompileContext& context) const override;
+        void                    registerExecutionType(CompileContext& context) const override;
         Execution::IndexingMode getIndexingMode() const override;
 
       private:

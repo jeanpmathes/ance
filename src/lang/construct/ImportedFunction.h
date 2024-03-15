@@ -30,17 +30,15 @@ namespace lang
 
         [[nodiscard]] bool isMangled() const override;
         [[nodiscard]] bool isImported() const override;
-        AccessModifier     access() const override;
+        [[nodiscard]] AccessModifier     access() const override;
 
       protected:
         Optional<lang::Location> getDefinitionLocation() const override;
-        bool                     isConstructor() const override;
+        bool                     preserveUnitReturn() const override;
 
       public:
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
-
-        void build(CompileContext& context) override;
 
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 

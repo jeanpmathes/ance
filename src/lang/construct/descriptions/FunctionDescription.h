@@ -69,9 +69,6 @@ namespace lang
 
         [[nodiscard]] Descriptions expand(lang::Context& new_context) const override;
 
-        void buildDeclaration(CompileContext& context) override;
-        void buildDefinition(CompileContext& context) override;
-
       protected:
         void performInitialization() override;
         void sync(Storage& storage) override;

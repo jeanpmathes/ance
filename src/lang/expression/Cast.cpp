@@ -20,9 +20,9 @@ Expression const& Cast::value() const
     return *value_;
 }
 
-lang::Type const& Cast::type() const
+lang::Entity const& Cast::target() const
 {
-    return *type_.as<lang::Type>();
+    return *type_;
 }
 
 void Cast::defineType(lang::ResolvingHandle<lang::Type> type)
@@ -78,20 +78,6 @@ Expression::Expansion Cast::expandWith(Expressions subexpressions, lang::Context
                             type_location_,
                             location()),
             Statements()};
-}
-
-void Cast::doBuild(CompileContext& context)
-{
-    auto target_type = lang::Type::makeMatching<lang::Type>(type_);
-
-    Shared<lang::Value> value = value_->getValue();
-
-    if (lang::Type::areSame(value->type(), *target_type)) { setValue(value); }
-    else
-    {
-        Shared<lang::Value> casted_value = value->type()->buildCast(target_type, value, context);
-        setValue(casted_value);
-    }
 }
 
 Cast::~Cast() = default;

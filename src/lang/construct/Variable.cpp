@@ -26,8 +26,7 @@ lang::GlobalVariable* lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang:
                                                      Scope&                            containing_scope,
                                                      lang::AccessModifier              access,
                                                      bool                              is_import,
-                                                     lang::Initializer                 init,
-                                                     lang::Scope*                      init_scope,
+                                                     lang::GlobalInitializer           init,
                                                      lang::Assigner                    assigner,
                                                      bool                              is_constant,
                                                      lang::Location                    location)
@@ -39,7 +38,6 @@ lang::GlobalVariable* lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang:
                                                                                   access,
                                                                                   is_import,
                                                                                   std::move(init),
-                                                                                  init_scope,
                                                                                   assigner,
                                                                                   is_constant,
                                                                                   location);
@@ -54,8 +52,8 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type> type,
                                    lang::Location                    type_location,
                                    Scope&                            containing_scope,
                                    bool                              is_final,
-                                   Optional<Shared<lang::Value>>     value,
-                                   Optional<unsigned>                parameter_index,
+                                   const lang::LocalInitializer&            init,
+                                   const Optional<size_t>&                parameter_index,
                                    lang::Location                    location)
 {
     definition_ = makeOwned<lang::LocalVariable>(self(),
@@ -63,7 +61,7 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type> type,
                                                  type_location,
                                                  containing_scope,
                                                  is_final,
-                                                 value,
+                                                 init,
                                                  parameter_index,
                                                  location);
 }
@@ -101,17 +99,17 @@ bool lang::Variable::isFinal() const
     return definition_.value()->isFinal();
 }
 
-void lang::Variable::buildDeclaration(CompileContext& context)
+void lang::Variable::buildDeclaration(CompileContext& context) const
 {
     definition_.value()->buildDeclaration(context);
 }
 
-void lang::Variable::buildInitialization(CompileContext& context)
+void lang::Variable::buildInitialization(CompileContext& context) const
 {
     definition_.value()->buildInitialization(context);
 }
 
-void lang::Variable::buildFinalization(CompileContext& context)
+void lang::Variable::buildFinalization(CompileContext& context) const
 {
     definition_.value()->buildFinalization(context);
 }
@@ -124,14 +122,14 @@ bool lang::Variable::validateGetValue(ValidationLogger&, lang::Location) const
     return type().isDefined();
 }
 
-bool lang::Variable::validateSetValue(lang::Value const& value,
+bool lang::Variable::validateSetValue(lang::Type const& value_type,
                                       ValidationLogger&  validation_logger,
                                       lang::Location     assignable_location,
                                       lang::Location     assigned_location) const
 {
     // The following variable methods require that the variable and type is defined.
     if (not type().isDefined()) return false;
-    if (not value.type().isDefined()) return false;
+    if (not value_type.isDefined()) return false;
 
     if (isFinal())
     {
@@ -143,23 +141,18 @@ bool lang::Variable::validateSetValue(lang::Value const& value,
 
     if (type().isReferenceType()) { target_type = type().getElementType(); }
 
-    return lang::Type::checkMismatch(target_type, value.type(), assigned_location, validation_logger);
+    return lang::Type::checkMismatch(target_type, value_type, assigned_location, validation_logger);
 }
 
-Shared<lang::Value> lang::Variable::getValuePointer(CompileContext& context)
+Shared<lang::Value> lang::Variable::getValuePointer(CompileContext& context) const
 {
     return definition_.value()->getValuePointer(context);
 }
 
-Shared<lang::Value> lang::Variable::getValue(CompileContext& context)
+Shared<lang::Value> lang::Variable::getValue(CompileContext& context) const
 {
     Shared<lang::Value> pointer = getValuePointer(context);
     return context.exec().performLoadFromAddress(pointer);
-}
-
-void lang::Variable::setValue(Shared<lang::Value> value, CompileContext& context)
-{
-    definition_.value()->setValue(value, context);
 }
 
 lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const

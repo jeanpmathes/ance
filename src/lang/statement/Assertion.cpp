@@ -42,11 +42,3 @@ Statements Assertion::expandWith(Expressions subexpressions, Statements, lang::C
 
     return statements;
 }
-
-void Assertion::doBuild(CompileContext& context)
-{
-    context.runtime().buildAssert(condition_->getValue(),
-                                  "Assertion failed at [" + context.unit().getName() + "] "
-                                      + context.getLocationString(),
-                                  context);
-}

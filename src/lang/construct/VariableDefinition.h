@@ -2,8 +2,10 @@
 #define ANCE_SRC_LANG_CONSTRUCT_VARIABLEDEFINITION_H_
 
 #include "lang/Element.h"
-#include "lang/construct/value/Value.h"
+
+#include "lang/construct/Value.h"
 #include "lang/utility/Location.h"
+#include "lang/utility/ResolvingHandle.h"
 
 namespace lang
 {
@@ -61,20 +63,16 @@ namespace lang
          */
         [[nodiscard]] bool isFinal() const;
 
-        virtual void buildDeclaration(CompileContext& context)    = 0;
-        virtual void buildInitialization(CompileContext& context) = 0;
-        virtual void buildFinalization(CompileContext& context)   = 0;
+        virtual void buildDeclaration(CompileContext& context) const    = 0;
+        virtual void buildInitialization(CompileContext& context) const = 0;
+        virtual void buildFinalization(CompileContext& context) const   = 0;
 
-        virtual Shared<lang::Value> getValuePointer(CompileContext& context) = 0;
-        Shared<lang::Value>         getValue(CompileContext& context);
-        virtual void                setValue(Shared<lang::Value> value, CompileContext& context);
+        virtual Shared<lang::Value> getValuePointer(CompileContext& context) const = 0;
 
-        virtual ~VariableDefinition() = default;
-
-      protected:
-        virtual void                          storeValue(Shared<lang::Value> value, CompileContext& context) = 0;
         lang::ResolvingHandle<lang::Variable> self();
         [[nodiscard]] lang::Variable const&   self() const;
+
+        virtual ~VariableDefinition() = default;
 
       private:
         lang::ResolvingHandle<lang::Variable> self_;

@@ -1,6 +1,10 @@
 target_sources(ance PRIVATE AnceCompiler.cpp
                AnceLinker.cpp
                Application.cpp
+               RoughlyCastedValue.cpp
+               WrappedContentValue.cpp
+               WrappedNativeValue.cpp
+               WrappedConstant.cpp
                SourceTree.cpp
                FileContext.cpp
                CompileContext.cpp
@@ -8,6 +12,7 @@ target_sources(ance PRIVATE AnceCompiler.cpp
                Runtime.cpp
                SourceVisitor.cpp
                ControlFlowGraphPrinter.cpp
+               NativeBuilder.cpp
                UnitResult.cpp
                Project.cpp
                Execution.cpp

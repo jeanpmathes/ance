@@ -5,7 +5,7 @@
 
 #include "compiler/CodePrinter.h"
 
-class ControlFlowGraphPrinter : public lang::ApplicationVisitorNonConst
+class ControlFlowGraphPrinter : public lang::ApplicationVisitorConst
 {
   private:
     enum class BlockStyle
@@ -16,13 +16,13 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitorNonConst
     };
 
   public:
-    using lang::ApplicationVisitorNonConst::visit;
+    using lang::ApplicationVisitorConst::visit;
 
     explicit ControlFlowGraphPrinter(std::ostream& out);
 
-    std::any visit(Unit& unit) override;
-    std::any visit(lang::FunctionDescription& function) override;
-    std::any visit(lang::BasicBlock& block) override;
+    std::any visit(Unit const& unit) override;
+    std::any visit(lang::FunctionDescription const& function) override;
+    std::any visit(lang::BasicBlock const& block) override;
 
   private:
     void printBlock(std::string const& label, int32_t id, BlockStyle style);

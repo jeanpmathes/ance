@@ -13,11 +13,11 @@ lang::LocalVariable::LocalVariable(lang::ResolvingHandle<lang::Variable> self,
                                    lang::Location                        type_location,
                                    Scope&                                containing_scope,
                                    bool                                  is_final,
-                                   Optional<Shared<lang::Value>>         value,
-                                   Optional<unsigned>                    parameter_index,
+                                   lang::LocalInitializer                init,
+                                   Optional<size_t>                    parameter_index,
                                    lang::Location                        location)
     : VariableDefinition(self, type, type_location, containing_scope, is_final, location)
-    , initial_value_(std::move(value))
+    , initializer_(std::move(init))
     , parameter_index_(std::move(parameter_index))
 {
     // Type is already added in declaring statement.
@@ -27,78 +27,74 @@ lang::OwningHandle<lang::Variable> lang::LocalVariable::makeLocalVariable(lang::
                                                                           lang::ResolvingHandle<lang::Type> type,
                                                                           lang::Location                type_location,
                                                                           lang::Assigner                assigner,
-                                                                          Optional<Shared<lang::Value>> value,
+                                                                          Expression * init,
                                                                           lang::Scope&   containing_scope,
                                                                           lang::Location location)
 {
     bool const is_final = assigner.isFinal();
 
+    lang::LocalInitializer local_initializer;
+    if (init != nullptr)
+    {
+        local_initializer = makeOptional(std::ref(*init));
+    }
+
     lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(name);
-    variable->defineAsLocal(type, type_location, containing_scope, is_final, value, std::nullopt, location);
+    variable->defineAsLocal(type, type_location, containing_scope, is_final, local_initializer, std::nullopt, location);
 
     return lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 
-lang::OwningHandle<lang::Variable> lang::LocalVariable::makeParameterVariable(lang::Identifier const&           name,
-                                                                              lang::ResolvingHandle<lang::Type> type,
-                                                                              lang::Location      type_location,
-                                                                              Shared<lang::Value> value,
-                                                                              unsigned int        parameter_index,
-                                                                              lang::Scope&        containing_scope,
-                                                                              lang::Location      location)
+lang::OwningHandle<lang::Variable> lang::LocalVariable::makeParameterVariable(lang::Parameter & parameter,
+                                                                              size_t      parameter_index,
+                                                                              lang::Function&   containing_function)
 {
     bool const is_final = false;// Assigner has value UNSPECIFIED, so it's not final.
 
-    lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(name);
-    variable->defineAsLocal(type, type_location, containing_scope, is_final, value, parameter_index, location);
+    lang::LocalParameterInitializer initializer = std::make_pair(std::cref(containing_function), parameter_index);
+
+    lang::ResolvingHandle<lang::Variable> variable = lang::makeHandled<lang::Variable>(parameter.name());
+    variable->defineAsLocal(parameter.type(), parameter.typeLocation(), containing_function, is_final, makeOptional(initializer), parameter_index, parameter.location());
 
     return lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 
-void lang::LocalVariable::buildDeclaration(CompileContext& context)
+void lang::LocalVariable::buildDeclaration(CompileContext& context) const
 {
-    local_variable_ = context.exec().declareLocalVariable(name(), type());
+    context.exec().declareLocalVariable(*this);
 }
 
-void lang::LocalVariable::buildInitialization(CompileContext& context)
+void lang::LocalVariable::buildInitialization(CompileContext& context) const
 {
-    assert(local_variable_.hasValue());
-
-    context.exec().defineLocalVariable(local_variable_.value(), scope(), parameter_index_, location());
+    context.exec().defineLocalVariable(*this, scope(), parameter_index_, location());
 
     Shared<lang::Value> pointer = getValuePointer(context);
 
-    if (initial_value_.hasValue())
+    if (initializer_.hasValue())
     {
-        Shared<lang::Value> value = lang::Type::makeMatching(type(), initial_value_.value(), context);
+        Shared<lang::Value> value = context.exec().computeInitializerValue(initializer_);
 
-        if (type()->isReferenceType() || parameter_index_.hasValue())
+        value = lang::Type::makeMatching(type(), value, context);
+
+        if (type().isReferenceType() || parameter_index_.hasValue())
         {
             context.exec().performStoreToAddress(pointer, value);
         }
         else
         {
             Shared<lang::Value> value_ptr = context.exec().computeAddressOf(value);
-            type()->performCopyInitializer(pointer, value_ptr, context);
+            type().performCopyInitializer(pointer, value_ptr, context);
         }
     }
-    else { type()->performDefaultInitializer(pointer, context); }
+    else { type().performDefaultInitializer(pointer, context); }
 }
 
-void lang::LocalVariable::buildFinalization(CompileContext& context)
+void lang::LocalVariable::buildFinalization(CompileContext& context) const
 {
-    if (!type()->isReferenceType()) { type()->performFinalizer(getValuePointer(context), context); }
+    if (!type().isReferenceType()) { type().performFinalizer(getValuePointer(context), context); }
 }
 
-Shared<lang::Value> lang::LocalVariable::getValuePointer(CompileContext& context)
+Shared<lang::Value> lang::LocalVariable::getValuePointer(CompileContext& context) const
 {
-    return context.exec().computeAddressOfVariable(local_variable_.value());
-}
-
-void lang::LocalVariable::storeValue(Shared<lang::Value> value, CompileContext& context)
-{
-    Shared<lang::Value> variable_ptr = getValuePointer(context);
-    Shared<lang::Value> value_ptr    = context.exec().computeAddressOf(value);
-
-    type()->performCopyInitializer(variable_ptr, value_ptr, context);
+    return context.exec().computeAddressOfVariable(self());
 }

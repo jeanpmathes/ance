@@ -186,18 +186,14 @@ std::any CodePrinter::visit(BindRefTo const& bind_ref_to)
 
 std::any CodePrinter::visit(Cast const& visitable)
 {
-    out_ << visitTree(visitable.value()) << " as " << visitable.type().name();
+    out_ << visitTree(visitable.value()) << " as " << visitable.target().name();
 
     return {};
 }
 
-std::any CodePrinter::visit(ConstantLiteral const& constant_literals)
+std::any CodePrinter::visit(LiteralExpression const& constant_literals)
 {
-    if (constant_literals.constant().getBackingExpression())
-    {
-        out_ << visitTree(*constant_literals.constant().getBackingExpression());
-    }
-    else { out_ << constant_literals.constant().toString(); }
+    out_ << constant_literals.constant().toString();
 
     return {};
 }
@@ -284,7 +280,7 @@ std::any CodePrinter::visit(SizeofExpression const& sizeof_expression)
 
 std::any CodePrinter::visit(SizeofType const& sizeof_type)
 {
-    out_ << "sizeof " << sizeof_type.targetType().name();
+    out_ << "sizeof " << sizeof_type.target().name();
 
     return {};
 }
@@ -601,7 +597,7 @@ void CodePrinter::emitFunction(lang::Function const& function)
         for (size_t index = 0; index < function.parameterCount(); index++)
         {
             if (!is_first) out_ << ", ";
-            out_ << function.parameterName(index) + ": " + function.parameterType(index).name();
+            out_ << function.parameter(index).name() + ": " + function.parameter(index).type().name();
 
             is_first = false;
         }

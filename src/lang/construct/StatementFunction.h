@@ -52,10 +52,9 @@ namespace lang
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
-        void build(CompileContext& context) override;
+        void buildDeclarationsFollowingOrder(CompileContext& context) const override;
 
-        void buildDeclarationsFollowingOrder(CompileContext& context) override;
-
+        BasicBlock const*                                   getEntryBlock() const override;
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 
       protected:
@@ -64,15 +63,11 @@ namespace lang
         [[nodiscard]] BasicBlock const&        getInitialBlock() const;
         [[nodiscard]] Optional<lang::Location> findUnreachableCode() const;
 
-        [[nodiscard]] std::vector<Optional<lang::ResolvingHandle<lang::Variable>>> const& arguments() const;
-
       private:
         Statement&   code_;
         lang::Scope* inside_scope_ {nullptr};
 
         lang::AccessModifier access_;
-
-        std::vector<Optional<lang::ResolvingHandle<lang::Variable>>> arguments_ {};
 
         Owned<lang::BasicBlock>              initial_block_;
         std::vector<Owned<lang::BasicBlock>> blocks_ {};

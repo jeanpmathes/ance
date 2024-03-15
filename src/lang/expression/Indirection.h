@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_INDIRECTION_H_
 #define ANCE_SRC_LANG_EXPRESSION_INDIRECTION_H_
 
-#include "DelayableExpression.h"
+#include "Expression.h"
 
 #include "lang/Element.h"
 #include "lang/construct/Variable.h"
@@ -15,7 +15,7 @@ namespace lang
  * The indirection operator is used to access indirect values, e.g. the value pointed to.
  */
 class Indirection
-    : public DelayableExpression
+    : public Expression
     , public lang::Element<Indirection, ANCE_CONSTRUCTS>
 {
   public:
@@ -35,7 +35,6 @@ class Indirection
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doBuild(CompileContext& context) override;
 
   public:
     ~Indirection() override;

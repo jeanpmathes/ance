@@ -156,6 +156,9 @@ class Shared
     template<typename TargetT, class... Args>
     friend Shared<TargetT> makeShared(Args&&... args);
 
+    template<typename OtherT>
+    Shared<OtherT> cast();
+
   private:
     std::shared_ptr<T> value_;
 };

@@ -2,17 +2,13 @@
 
 #include <utility>
 
-#include "compiler/Application.h"
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
-#include "lang/construct/value/Value.h"
-#include "lang/scope/GlobalScope.h"
+#include "lang/construct/Value.h"
 #include "lang/type/ReferenceType.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/VectorizableType.h"
-
-#include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
 lang::VectorType::VectorType(lang::ResolvingHandle<lang::Type> element_type, uint64_t size)
@@ -99,9 +95,9 @@ bool lang::VectorType::validateImplicitConversion(lang::Type const& other,
     return element_type_->validateImplicitConversion(other.getElementType(), location, validation_logger);
 }
 
-Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::Type const& other,
                                                               Shared<lang::Value>               value,
-                                                              CompileContext&                   context)
+                                                              CompileContext&                   context) const
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
@@ -109,7 +105,7 @@ Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::ResolvingHan
     }
     else
     {
-        VectorType* other_as_vector = other->isVectorType();
+        VectorType const* other_as_vector = other.isVectorType();
         assert(other_as_vector != nullptr);
 
         Shared<lang::Value> result_ptr = context.exec().performStackAllocation(other);
@@ -122,7 +118,7 @@ Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::ResolvingHan
             Shared<lang::Value> current_element     = context.exec().performDereference(current_element_ref);
 
             Shared<lang::Value> result_element =
-                element_type_->buildImplicitConversion(other->getElementType(), current_element, context);
+                element_type_->buildImplicitConversion(other.getElementType(), current_element, context);
             Shared<lang::Value> result_dst_ref = buildSubscriptInBounds(result_ptr, index_constant, context);
             Shared<lang::Value> result_dst_ptr = context.exec().computePointerFromReference(result_dst_ref);
 
@@ -147,9 +143,9 @@ bool lang::VectorType::validateCast(lang::Type const& other,
     return element_type_->validateCast(other.getElementType(), location, validation_logger);
 }
 
-Shared<lang::Value> lang::VectorType::buildCast(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::VectorType::buildCast(lang::Type const& other,
                                                 Shared<lang::Value>               value,
-                                                CompileContext&                   context)
+                                                CompileContext&                   context) const
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
@@ -157,7 +153,7 @@ Shared<lang::Value> lang::VectorType::buildCast(lang::ResolvingHandle<lang::Type
     }
     else
     {
-        VectorType* other_as_vector = other->isVectorType();
+        VectorType const* other_as_vector = other.isVectorType();
         assert(other_as_vector != nullptr);
 
         Shared<lang::Value> result_ptr = context.exec().performStackAllocation(other);
@@ -170,7 +166,7 @@ Shared<lang::Value> lang::VectorType::buildCast(lang::ResolvingHandle<lang::Type
             Shared<lang::Value> current_element     = context.exec().performDereference(current_element_ref);
 
             Shared<lang::Value> result_element =
-                element_type_->buildCast(other->getElementType(), current_element, context);
+                element_type_->buildCast(other.getElementType(), current_element, context);
             Shared<lang::Value> result_dst_ref = buildSubscriptInBounds(result_ptr, index_constant, context);
             Shared<lang::Value> result_dst_ptr = context.exec().computePointerFromReference(result_dst_ref);
 
@@ -188,7 +184,7 @@ bool lang::VectorType::isOperatorDefined(lang::UnaryOperator op) const
     return getElementType().isOperatorDefined(op);
 }
 
-lang::ResolvingHandle<lang::Type> lang::VectorType::getOperatorResultType(lang::UnaryOperator op)
+lang::Type const& lang::VectorType::getOperatorResultType(lang::UnaryOperator op) const
 {
     return scope().context().getVectorType(element_type_->getOperatorResultType(op), size_.value());
 }
@@ -202,7 +198,7 @@ bool lang::VectorType::validateOperator(lang::UnaryOperator op,
 
 Shared<lang::Value> lang::VectorType::buildOperator(lang::UnaryOperator op,
                                                     Shared<lang::Value> value,
-                                                    CompileContext&     context)
+                                                    CompileContext&     context) const
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
@@ -244,8 +240,8 @@ bool lang::VectorType::isOperatorDefined(lang::BinaryOperator op, lang::Type con
     return false;
 }
 
-lang::ResolvingHandle<lang::Type> lang::VectorType::getOperatorResultType(lang::BinaryOperator              op,
-                                                                          lang::ResolvingHandle<lang::Type> other)
+lang::Type const& lang::VectorType::getOperatorResultType(lang::BinaryOperator              op,
+                                                                          lang::Type const& other) const
 {
     return scope().context().getVectorType(element_type_->getOperatorResultType(op, other), size_.value());
 }
@@ -262,7 +258,7 @@ bool lang::VectorType::validateOperator(lang::BinaryOperator op,
 Shared<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperator op,
                                                     Shared<lang::Value>  left,
                                                     Shared<lang::Value>  right,
-                                                    CompileContext&      context)
+                                                    CompileContext&      context) const
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
@@ -270,7 +266,7 @@ Shared<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperator op,
     }
     else
     {
-        VectorType* result_type_as_vector = getOperatorResultType(op, right->type())->isVectorType();
+        VectorType const* result_type_as_vector = getOperatorResultType(op, right->type()).isVectorType();
         assert(result_type_as_vector != nullptr);
 
         Shared<lang::Value> result_ptr =
@@ -318,12 +314,12 @@ bool lang::VectorType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::T
     return false;
 }
 
-void lang::VectorType::buildRequestedOverload(std::vector<ResolvingHandle<lang::Type>> parameters,
+void lang::VectorType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                               lang::PredefinedFunction&                function,
-                                              CompileContext&                          context)
+                                              CompileContext&                          context) const
 {
-    lang::ResolvingHandle<lang::Type> other_type         = parameters.front();
-    lang::ResolvingHandle<lang::Type> other_element_type = other_type->getElementType();
+    lang::Type const& other_type         = parameters.front();
+    lang::Type const& other_element_type = other_type.getElementType();
 
     if (auto element_vector = element_type_->isVectorizable())
     {
@@ -331,14 +327,14 @@ void lang::VectorType::buildRequestedOverload(std::vector<ResolvingHandle<lang::
     }
     else
     {
-        std::vector<lang::ResolvingHandle<Function>> overloads = element_type_->resolveOverload({other_element_type});
+        std::vector<std::reference_wrapper<lang::Function const>> overloads = element_type_->resolveOverload({other_element_type});
 
         assert(overloads.size() == 1);
-        lang::ResolvingHandle<Function> element_ctor = overloads.front();
+        lang::Function const& element_ctor = overloads.front();
 
-        context.exec().enterFunctionBody(function.getFunctionHandle(context));
+        context.exec().defineFunctionBody(function.function());
         {
-            Shared<lang::Value> original = function.getArgument(0);
+            Shared<lang::Value> original = context.exec().getParameterValue(function.function(), 0);
 
             Shared<lang::Value> result_ptr = context.exec().performStackAllocation(self());
 
@@ -352,7 +348,7 @@ void lang::VectorType::buildRequestedOverload(std::vector<ResolvingHandle<lang::
                 std::vector<Shared<lang::Value>> ctor_parameters;
                 ctor_parameters.emplace_back(original_element);
 
-                Shared<lang::Value> converted_element = element_ctor->buildCall(ctor_parameters, context);
+                Shared<lang::Value> converted_element = element_ctor.buildCall(ctor_parameters, context);
 
                 Shared<lang::Value> result_element_ref = buildSubscriptInBounds(result_ptr, index_constant, context);
                 Shared<lang::Value> result_element_ptr = context.exec().computePointerFromReference(result_element_ref);
@@ -372,7 +368,7 @@ std::string lang::VectorType::createMangledName() const
          + std::string(")");
 }
 
-Execution::Type lang::VectorType::createExecutionType(CompileContext& context) const
+void lang::VectorType::registerExecutionType(CompileContext& context) const
 {
     return context.exec().registerVectorType(self());
 }

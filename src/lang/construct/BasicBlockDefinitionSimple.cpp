@@ -4,32 +4,42 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 
-lang::BasicBlock::Definition::Simple::Simple() = default;
+lang::bb::def::Simple::Simple() = default;
 
-lang::BasicBlock::Definition::Simple::Simple(Statement& statement)
+lang::bb::def::Simple::Simple(Statement& statement)
 {
     statements_.push_back(&statement);
 }
 
-void lang::BasicBlock::Definition::Simple::complete(size_t& index)
+lang::BasicBlock const* lang::bb::def::Simple::next() const
+{
+    return next_;
+}
+
+std::list<Statement*> const& lang::bb::def::Simple::statements() const
+{
+    return statements_;
+}
+
+void lang::bb::def::Simple::complete(size_t& index)
 {
     for (auto& statement : statements_) { self()->addStatement(*statement); }
 
     if (next_) next_->complete(index);
 }
 
-void lang::BasicBlock::Definition::Simple::setLink(lang::BasicBlock& next)
+void lang::bb::def::Simple::setLink(lang::BasicBlock& next)
 {
     lang::BasicBlock* next_ptr = &next;
 
-    assert(next_ptr->definition_.get() != this);
+    assert(&next_ptr->definition() != this);
     assert(next_ == nullptr);
 
     next_ = next_ptr;
     next_->registerIncomingLink(*self());
 }
 
-void lang::BasicBlock::Definition::Simple::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
+void lang::bb::def::Simple::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
 {
     assert(next_ == former);
     assert(next_ != updated);
@@ -38,7 +48,7 @@ void lang::BasicBlock::Definition::Simple::updateLink(lang::BasicBlock* former, 
     next_->registerIncomingLink(*self());
 }
 
-void lang::BasicBlock::Definition::Simple::simplify()
+void lang::bb::def::Simple::simplify()
 {
     if (!next_) { return; }
 
@@ -50,18 +60,18 @@ void lang::BasicBlock::Definition::Simple::simplify()
         next_->transferStatements(statements_);
         this->updateIncomingLinks(next_);
 
-        self()->unused_ = true;
+        self()->markAsUnused();
     }
 
     next_->simplify();
 }
 
-void lang::BasicBlock::Definition::Simple::transferStatements(std::list<Statement*>& statements)
+void lang::bb::def::Simple::transferStatements(std::list<Statement*>& statements)
 {
     statements_.splice(statements_.begin(), statements);
 }
 
-std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Simple::getLeaves() const
+std::list<lang::BasicBlock const*> lang::bb::def::Simple::getLeaves() const
 {
     std::list<lang::BasicBlock const*> leaves;
 
@@ -71,7 +81,7 @@ std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Simple::getLeav
     return leaves;
 }
 
-std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Simple::getSuccessors() const
+std::vector<lang::BasicBlock const*> lang::bb::def::Simple::getSuccessors() const
 {
     std::vector<lang::BasicBlock const*> successors;
 
@@ -80,48 +90,26 @@ std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Simple::getSu
     return successors;
 }
 
-lang::Location lang::BasicBlock::Definition::Simple::getStartLocation() const
+lang::Location lang::bb::def::Simple::getStartLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.front()->location();
 }
 
-lang::Location lang::BasicBlock::Definition::Simple::getEndLocation() const
+lang::Location lang::bb::def::Simple::getEndLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
-void lang::BasicBlock::Definition::Simple::reach() const
+void lang::bb::def::Simple::reach() const
 {
     if (next_) { next_->reach(); }
 }
 
-void lang::BasicBlock::Definition::Simple::prepareBuild(CompileContext& context, llvm::Function* native_function)
-{
-    std::string const name = "b" + std::to_string(index_);
-    native_block_          = llvm::BasicBlock::Create(context.exec().llvmContext(), name, native_function);
-
-    if (next_) next_->prepareBuild(context, native_function);
-}
-
-void lang::BasicBlock::Definition::Simple::doBuild(CompileContext& context)
-{
-    context.exec().ir().SetInsertPoint(native_block_);
-
-    for (auto& statement : statements_) { statement->build(context); }
-
-    if (next_ != nullptr)
-    {
-        context.exec().ir().CreateBr(next_->definition_->getNativeBlock());
-        next_->doBuild(context);
-    }
-    else { context.exec().ir().CreateRetVoid(); }
-}
-
-std::string lang::BasicBlock::Definition::Simple::getExitRepresentation()
+std::string lang::bb::def::Simple::getExitRepresentation() const
 {
     return "// ---";
 }

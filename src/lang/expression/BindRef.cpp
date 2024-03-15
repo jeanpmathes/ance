@@ -7,7 +7,7 @@
 #include "validation/ValidationLogger.h"
 
 BindRef::BindRef(Owned<Expression> value, lang::Location location)
-    : UnexpandedExpression(location)
+    : Expression(location)
     , value_(std::move(value))
 {
     addSubexpression(*value_);

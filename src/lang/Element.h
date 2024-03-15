@@ -26,7 +26,10 @@ namespace lang
          * @param visitor The visitor to accept.
          * @return The return value.
          */
-        std::any accept(Visitor<TList...>& visitor) override { return visitor.visit(static_cast<Derived&>(*this)); }
+        std::any accept(Visitor<TList...>& visitor) override
+        {
+            return visitor.visit(static_cast<Derived&>(*this));
+        }
 
         /**
          * The accept method of the visitor pattern, the element will call the corresponding visit method.

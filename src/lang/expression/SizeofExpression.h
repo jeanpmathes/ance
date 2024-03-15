@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_SIZEOFEXPRESSION_H_
 #define ANCE_SRC_LANG_EXPRESSION_SIZEOFEXPRESSION_H_
 
-#include "DelayableExpression.h"
+#include "Expression.h"
 
 #include "lang/Element.h"
 
@@ -11,7 +11,7 @@ class Application;
  * Gives the size of a value returned by an expression.
  */
 class SizeofExpression
-    : public DelayableExpression
+    : public Expression
     , public lang::Element<SizeofExpression, ANCE_CONSTRUCTS>
 {
   public:
@@ -30,7 +30,6 @@ class SizeofExpression
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doBuild(CompileContext& context) override;
 
   private:
     Owned<Expression> expression_;

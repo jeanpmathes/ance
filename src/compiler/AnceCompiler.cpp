@@ -14,10 +14,11 @@
 #include <llvm/Support/FileSystem.h>
 
 #include "compiler/ControlFlowGraphPrinter.h"
+#include "compiler/NativeBuild.h"
+#include "compiler/NativeBuilder.h"
 #include "compiler/SourceTree.h"
 #include "compiler/Unit.h"
-#include "lang/construct/value/WrappedNativeValue.h"
-#include "lang/scope/GlobalScope.h"
+#include "compiler/WrappedNativeValue.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/SizeType.h"
 
@@ -28,7 +29,7 @@ AnceCompiler::AnceCompiler(SourceTree& tree, llvm::Triple const& triple)
     , ir_(llvm_context_)
     , di_(module_)
     , runtime_()
-    , context_(unit_, runtime_, llvm_context_, module_, ir_, di_, tree)
+    , context_(unit_, runtime_, llvm_context_, module_, ir_, di_, tree, &native_build_)
 {
     module_.setSourceFileName(tree.unit().getProjectFile().filename().string());
 
@@ -70,17 +71,19 @@ void AnceCompiler::compile(std::filesystem::path const& ilr, std::filesystem::pa
         std::filesystem::path const cfg_path = ilr.parent_path() / "cfg.gml";
         std::ofstream               cfg_out(cfg_path);
         ControlFlowGraphPrinter     cfg_printer(cfg_out);
-        cfg_printer.visit(unit_);
+
+        Unit const& unit = unit_;
+        cfg_printer.visit(unit);
     }
 
     // Begin actual compilation.
 
-    if (unit_.isUsingRuntime()) context_.runtime().init(context_);
+    NativeBuilder builder(*native_build_);
 
-    unit_.globalScope().buildDeclarations(context_);
-    unit_.globalScope().buildDefinitions(context_);
+    Unit const& unit = unit_;
+    builder.visit(unit);
 
-    assert(context_.allDebugLocationsPopped() && "Every setDebugLocation must be ended with a resetDebugLocation!");
+    assert(context_.allDebugLocationsPopped());// Every setDebugLocation must be ended with a resetDebugLocation!
 
     // Prepare entry and exit functions.
 
@@ -194,7 +197,7 @@ llvm::Function* AnceCompiler::buildInit()
 
     ir_.SetInsertPoint(start_block);
 
-    unit_.globalScope().buildInitialization(context_);
+    unit_.globalScope().buildEntityInitializations(context_);
 
     ir_.CreateRetVoid();
     return init;
@@ -212,7 +215,7 @@ llvm::Function* AnceCompiler::buildFinit()
 
     ir_.SetInsertPoint(start_block);
 
-    unit_.globalScope().buildFinalization(context_);
+    unit_.globalScope().buildEntityFinalizations(context_);
 
     ir_.CreateRetVoid();
     return finit;
@@ -238,13 +241,11 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::
 
     ir_.CreateCall(init);
 
-    Optional<Shared<lang::Value>> exitcode = main->buildCall({}, context_);
-    assert(exitcode.hasValue());
+    Shared<lang::Value> exitcode = main->buildCall({}, context_);
 
     ir_.CreateCall(finit);
 
-    exitcode.value()->buildContentValue(context_);
-    ir_.CreateRet(exitcode.value()->getContentValue());
+    ir_.CreateRet(native_build_->llvmContentValue(exitcode));
 }
 
 void AnceCompiler::buildLibStart(llvm::Function* init, llvm::Function* finit)

@@ -51,7 +51,7 @@ Optional<lang::Location> lang::ImportedFunction::getDefinitionLocation() const
     return std::nullopt;
 }
 
-bool lang::ImportedFunction::isConstructor() const
+bool lang::ImportedFunction::preserveUnitReturn() const
 {
     return false;
 }
@@ -62,8 +62,6 @@ bool lang::ImportedFunction::validateFlow(ValidationLogger&) const
 {
     return true;
 }
-
-void lang::ImportedFunction::build(CompileContext&) {}
 
 std::vector<lang::BasicBlock*> const& lang::ImportedFunction::getBasicBlocks() const
 {

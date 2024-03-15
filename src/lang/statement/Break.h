@@ -29,9 +29,6 @@ class Break
                                         Statements     substatements,
                                         lang::Context& new_context) const override;
 
-  protected:
-    void doBuild(CompileContext& context) override;
-
   private:
     [[nodiscard]] Statement const* getLoopParent() const;
 };

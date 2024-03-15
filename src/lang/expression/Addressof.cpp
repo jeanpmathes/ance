@@ -48,12 +48,4 @@ Expression::Expansion Addressof::expandWith(Expressions subexpressions, lang::Co
     return {Statements(), makeOwned<Addressof>(std::move(subexpressions[0]), location()), Statements()};
 }
 
-void Addressof::doBuild(CompileContext& context)
-{
-    Shared<lang::Value> value = arg_->getValue();
-    Shared<lang::Value> address = context.exec().computeAddressOf(value);
-
-    setValue(address);
-}
-
 Addressof::~Addressof() = default;

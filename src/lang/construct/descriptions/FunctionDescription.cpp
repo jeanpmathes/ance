@@ -250,16 +250,6 @@ lang::Description::Descriptions lang::FunctionDescription::expand(lang::Context&
     return descriptions;
 }
 
-void lang::FunctionDescription::buildDeclaration(CompileContext& context)
-{
-    function_.value()->createNativeBacking(context);
-}
-
-void lang::FunctionDescription::buildDefinition(CompileContext& context)
-{
-    function_.value()->build(context);
-}
-
 void lang::FunctionDescription::sync(Storage& storage)
 {
     storage.sync(name_);

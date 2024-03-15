@@ -443,43 +443,63 @@ bool lang::UnorderedScope::validate(ValidationLogger& validation_logger) const
     return valid;
 }
 
-void lang::UnorderedScope::buildDeclarations(CompileContext& context)
+std::vector<std::reference_wrapper<lang::Type const>> lang::UnorderedScope::getUsedBuiltInTypes() const
 {
+    std::vector<std::reference_wrapper<lang::Type const>> used_types;
+
     for (auto& [name, entity] : defined_entities_)
     {
-        if (auto type = castToType<lang::Type>(entity); type.hasValue() and not(**type).isCustom())
+        if (auto* type = entity.handle().get().as<lang::Type>(); type != nullptr and not type->isCustom())
         {
-            (**type).buildNativeDeclaration(context);
+            used_types.emplace_back(*type);
         }
     }
+
+    return used_types;
+}
+
+std::vector<std::reference_wrapper<lang::Description const>>
+lang::UnorderedScope::getDescriptionsInDeclarationOrder() const
+{
+    std::vector<std::reference_wrapper<lang::Description const>> descriptions;
 
     for (auto& group : description_order_.value())
     {
         if (group.kind == ResolvableKind::DEFINITION) continue;
 
-        for (auto& description : group.descriptions) { description.get().buildDeclaration(context); }
-    }
-}
-
-void lang::UnorderedScope::buildDefinitions(CompileContext& context)
-{
-    for (auto& [name, entity] : defined_entities_)
-    {
-        if (auto type = castToType<lang::Type>(entity); type.hasValue() and not(**type).isCustom())
+        for (auto& description : group.descriptions)
         {
-            (**type).buildNativeDefinition(context);
+            descriptions.emplace_back(description.get());
         }
     }
 
-    for (auto& group : description_order_.value())
-    {
-        if (group.kind == ResolvableKind::DEFINITION) continue;
-
-        for (auto& description : group.descriptions) { description.get().buildDefinition(context); }
-    }
+    return descriptions;
 }
 
-void lang::UnorderedScope::buildInitialization(CompileContext& context)
+std::vector<std::reference_wrapper<lang::Description const>>
+lang::UnorderedScope::getDescriptionsInDefinitionOrder() const
+{
+    std::vector<std::reference_wrapper<lang::Description const>> descriptions;
+
+    for (auto& group : description_order_.value())
+    {
+        if (group.kind == ResolvableKind::DECLARATION) continue;
+
+        for (auto& description : group.descriptions)
+        {
+            descriptions.emplace_back(description.get());
+        }
+    }
+
+    return descriptions;
+}
+
+void lang::UnorderedScope::buildEntityDeclarations(CompileContext&) const
+{
+    throw std::logic_error("Must be handled by visitor");
+}
+
+void lang::UnorderedScope::buildEntityInitializations(CompileContext& context) const
 {
     for (auto& group : description_order_.value())
     {
@@ -489,7 +509,7 @@ void lang::UnorderedScope::buildInitialization(CompileContext& context)
     }
 }
 
-void lang::UnorderedScope::buildFinalization(CompileContext& context)
+void lang::UnorderedScope::buildEntityFinalizations(CompileContext& context) const
 {
     for (auto& group : description_order_.value())
     {

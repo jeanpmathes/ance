@@ -5,9 +5,9 @@
 #include "compiler/ProjectDescription.h"
 #include "compiler/Unit.h"
 #include "lang/ApplicationVisitor.h"
+#include "lang/utility/Erased.h"
 
 #include "lang/type/ArrayType.h"
-#include "lang/type/BooleanType.h"
 #include "lang/type/DoubleType.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/VectorType.h"
@@ -144,7 +144,7 @@ std::any SourceVisitor::visitMember(anceParser::MemberContext* ctx)
     lang::Identifier const identifier = ident(ctx->IDENTIFIER());
     auto                   type       = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
 
-    ConstantExpression* const_expr = nullptr;
+    LiteralExpression* const_expr = nullptr;
     lang::Assigner      assigner   = lang::Assigner::UNSPECIFIED;
 
     if (ctx->literalExpression())
@@ -152,7 +152,7 @@ std::any SourceVisitor::visitMember(anceParser::MemberContext* ctx)
         assigner = std::any_cast<lang::Assigner>(visit(ctx->assigner()));
 
         auto* expr = std::any_cast<Expression*>(visit(ctx->literalExpression()));
-        const_expr = dynamic_cast<ConstantExpression*>(expr);
+        const_expr = dynamic_cast<LiteralExpression*>(expr);
     }
 
     return new lang::Member(access, identifier, type, assigner, wrap(const_expr), location(ctx), location(ctx->type()));
@@ -251,11 +251,9 @@ std::any SourceVisitor::visitBlock(anceParser::BlockContext* ctx)
 
 std::any SourceVisitor::visitExpressionStatement(anceParser::ExpressionStatementContext* ctx)
 {
-    BuildableExpression* expression =
-        dynamic_cast<BuildableExpression*>(std::any_cast<Expression*>(visit(ctx->independentExpression())));
-    Owned<BuildableExpression> buildable_expression(*expression);
-
+    Owned<Expression> buildable_expression(*std::any_cast<Expression*>(visit(ctx->independentExpression())));
     auto statement = makeOwned<ExpressionStatement>(std::move(buildable_expression), location(ctx));
+
     return unwrap(lang::CodeBlock::makeWithStatement(std::move(statement)));
 }
 
@@ -422,10 +420,10 @@ std::any SourceVisitor::visitLiteralCase(anceParser::LiteralCaseContext* ctx)
     lang::CodeBlock& code_block = *std::any_cast<lang::CodeBlock*>(visit(ctx->code()));
     auto             block      = Owned<lang::CodeBlock>(code_block);
 
-    std::vector<Owned<ConstantExpression>> cases;
+    std::vector<Owned<LiteralExpression>> cases;
     for (auto& condition_ctx : ctx->literalExpression())
     {
-        auto condition = dynamic_cast<ConstantExpression*>(std::any_cast<Expression*>(visit(condition_ctx)));
+        auto condition = dynamic_cast<LiteralExpression*>(std::any_cast<Expression*>(visit(condition_ctx)));
         cases.emplace_back(*condition);
     }
 
@@ -693,10 +691,10 @@ std::any SourceVisitor::visitLiteralExpressionCase(anceParser::LiteralExpression
     Expression& exp   = *std::any_cast<Expression*>(visit(ctx->expression()));
     auto        block = Owned<Expression>(exp);
 
-    std::vector<Owned<ConstantExpression>> cases;
+    std::vector<Owned<LiteralExpression>> cases;
     for (auto& condition_ctx : ctx->literalExpression())
     {
-        auto& condition = *dynamic_cast<ConstantExpression*>(std::any_cast<Expression*>(visit(condition_ctx)));
+        auto& condition = *dynamic_cast<LiteralExpression*>(std::any_cast<Expression*>(visit(condition_ctx)));
         cases.emplace_back(condition);
     }
 
@@ -709,8 +707,9 @@ std::any SourceVisitor::visitStringLiteral(anceParser::StringLiteralContext* ctx
 
     if (ctx->prefix) { prefix = ctx->prefix->getText(); }
 
-    Shared<lang::Constant> string = makeShared<lang::StringConstant>(prefix, ctx->STRING()->getText(), context());
-    return static_cast<Expression*>(new ConstantLiteral(string, location(ctx)));
+    Shared<lang::LiteralConstant> string =
+        makeShared<lang::StringConstant>(prefix, ctx->STRING()->getText(), context());
+    return static_cast<Expression*>(new LiteralExpression(string, location(ctx)));
 }
 
 std::any SourceVisitor::visitCharLiteral(anceParser::CharLiteralContext* ctx)
@@ -719,13 +718,13 @@ std::any SourceVisitor::visitCharLiteral(anceParser::CharLiteralContext* ctx)
 
     if (ctx->prefix) { prefix = ctx->prefix->getText(); }
 
-    Shared<lang::Constant> byte = makeShared<lang::CharConstant>(prefix, ctx->CHAR()->getText(), context());
-    return static_cast<Expression*>(new ConstantLiteral(byte, location(ctx)));
+    Shared<lang::LiteralConstant> byte = makeShared<lang::CharConstant>(prefix, ctx->CHAR()->getText(), context());
+    return static_cast<Expression*>(new LiteralExpression(byte, location(ctx)));
 }
 
 std::any SourceVisitor::visitFloatingPointLiteral(anceParser::FloatingPointLiteralContext* ctx)
 {
-    Optional<Shared<lang::Constant>> flt;
+    Optional<Shared<lang::LiteralConstant>> flt;
 
     if (ctx->HALF())
     {
@@ -755,41 +754,41 @@ std::any SourceVisitor::visitFloatingPointLiteral(anceParser::FloatingPointLiter
                                               context().getQuadType());
     }
 
-    return static_cast<Expression*>(new ConstantLiteral(flt.value(), location(ctx)));
+    return static_cast<Expression*>(new LiteralExpression(flt.value(), location(ctx)));
 }
 
 std::any SourceVisitor::visitTrue(anceParser::TrueContext* ctx)
 {
-    Shared<lang::Constant> constant = lang::BooleanConstant::createTrue(context());
-    return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
+    Shared<lang::LiteralConstant> constant = lang::BooleanConstant::createTrue(context());
+    return static_cast<Expression*>(new LiteralExpression(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitFalse(anceParser::FalseContext* ctx)
 {
-    Shared<lang::Constant> constant = lang::BooleanConstant::createFalse(context());
-    return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
+    Shared<lang::LiteralConstant> constant = lang::BooleanConstant::createFalse(context());
+    return static_cast<Expression*>(new LiteralExpression(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitNull(anceParser::NullContext* ctx)
 {
-    Shared<lang::Constant> constant = lang::NullConstant::create(context());
-    return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
+    Shared<lang::LiteralConstant> constant = lang::NullConstant::create(context());
+    return static_cast<Expression*>(new LiteralExpression(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitSizeLiteral(anceParser::SizeLiteralContext* ctx)
 {
     std::string const      value    = ctx->INTEGER()->getText();
-    Shared<lang::Constant> constant = makeShared<lang::IntegerConstant>(value, 10, context().getSizeType());
+    Shared<lang::LiteralConstant> constant = makeShared<lang::IntegerConstant>(value, 10, context().getSizeType());
 
-    return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
+    return static_cast<Expression*>(new LiteralExpression(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ctx)
 {
     std::string const      value    = ctx->SIGNED_INTEGER()->getText();
-    Shared<lang::Constant> constant = makeShared<lang::IntegerConstant>(value, 10, context().getDiffType());
+    Shared<lang::LiteralConstant> constant = makeShared<lang::IntegerConstant>(value, 10, context().getDiffType());
 
-    return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
+    return static_cast<Expression*>(new LiteralExpression(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitUiptrLiteral(anceParser::UiptrLiteralContext* ctx)
@@ -797,10 +796,10 @@ std::any SourceVisitor::visitUiptrLiteral(anceParser::UiptrLiteralContext* ctx)
     std::string value = ctx->HEX_INTEGER()->getText();
     value.erase(0, 2);
 
-    Shared<lang::Constant> constant =
+    Shared<lang::LiteralConstant> constant =
         makeShared<lang::IntegerConstant>(value, 16, context().getUnsignedIntegerPointerType());
 
-    return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
+    return static_cast<Expression*>(new LiteralExpression(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitNormalInteger(anceParser::NormalIntegerContext* ctx)
@@ -808,7 +807,7 @@ std::any SourceVisitor::visitNormalInteger(anceParser::NormalIntegerContext* ctx
     bool const        is_signed    = ctx->svalue;
     std::string const literal_text = is_signed ? ctx->svalue->getText() : ctx->uvalue->getText();
 
-    Optional<Shared<lang::Constant>> integer_constant;
+    Optional<Shared<lang::LiteralConstant>> integer_constant;
 
     if (ctx->width)
     {
@@ -819,7 +818,7 @@ std::any SourceVisitor::visitNormalInteger(anceParser::NormalIntegerContext* ctx
     else
     { integer_constant = makeShared<lang::IntegerConstant>(literal_text, is_signed, context()); }
 
-    return static_cast<Expression*>(new ConstantLiteral(integer_constant.value(), location(ctx)));
+    return static_cast<Expression*>(new LiteralExpression(integer_constant.value(), location(ctx)));
 }
 
 std::any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerContext* ctx)
@@ -849,15 +848,15 @@ std::any SourceVisitor::visitSpecialInteger(anceParser::SpecialIntegerContext* c
 
     integer_str.erase(0, 2);
 
-    Shared<lang::Constant> integer_constant =
+    Shared<lang::LiteralConstant> integer_constant =
         makeShared<lang::IntegerConstant>(integer_str, radix, context().getFixedWidthIntegerType(size, false));
-    return static_cast<Expression*>(new ConstantLiteral(integer_constant, location(ctx)));
+    return static_cast<Expression*>(new LiteralExpression(integer_constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitUnitLiteral(anceParser::UnitLiteralContext* ctx)
 {
-    Shared<lang::Constant> constant = lang::UnitConstant::create(context());
-    return static_cast<Expression*>(new ConstantLiteral(constant, location(ctx)));
+    Shared<lang::LiteralConstant> constant = makeShared<lang::UnitConstant>(context());
+    return static_cast<Expression*>(new LiteralExpression(constant, location(ctx)));
 }
 
 std::any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ctx)

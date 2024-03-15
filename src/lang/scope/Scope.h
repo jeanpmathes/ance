@@ -116,13 +116,6 @@ namespace lang
         [[nodiscard]] std::string getTemporaryName() const;
 
         /**
-         * Get the execution scope for this scope.
-         * @param context The current compile context.
-         * @return The execution scope.
-         */
-        virtual Execution::Scoped getExecutionScope(CompileContext& context) const = 0;
-
-        /**
          * Create a local scope in this scope.
          * @param code_block The code block containing the local scope.
          * @return The created local scope.
@@ -188,12 +181,12 @@ namespace lang
          * Build the declarations for all entities in this scope.
          * @param context The current compile context.
          */
-        virtual void buildDeclarations(CompileContext& context) = 0;
+        virtual void buildEntityDeclarations(CompileContext& context) const = 0;
         /**
          * Build the finalization for all entities in this scope.
          * @param context The current compile context.
          */
-        virtual void buildFinalization(CompileContext& context) = 0;
+        virtual void buildEntityFinalizations(CompileContext& context) const = 0;
 
       private:
         void addDependency(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared);

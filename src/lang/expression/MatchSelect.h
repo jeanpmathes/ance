@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_MATCHSELECT_H_
 #define ANCE_SRC_LANG_EXPRESSION_MATCHSELECT_H_
 
-#include "UnexpandedExpression.h"
+#include "Expression.h"
 
 #include <memory>
 
@@ -11,7 +11,7 @@
  * Selects a value from multiple cases.
  */
 class MatchSelect
-    : public UnexpandedExpression
+    : public Expression
     , public lang::Element<MatchSelect, ANCE_CONSTRUCTS>
 {
   public:

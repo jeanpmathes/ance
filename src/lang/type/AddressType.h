@@ -18,13 +18,13 @@ namespace lang
         bool                validateCast(Type const&       other,
                                          lang::Location    location,
                                          ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+        Shared<lang::Value> buildCast(lang::Type const& other,
                                       Shared<lang::Value>               value,
-                                      CompileContext&                   context) override;
+                                      CompileContext&                   context) const override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
-        lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
-                                                                lang::ResolvingHandle<lang::Type> other) override;
+        lang::Type const& getOperatorResultType(lang::BinaryOperator              op,
+                                                                lang::Type const& other) const override;
         bool                              validateOperator(lang::BinaryOperator op,
                                                            lang::Type const&    other,
                                                            lang::Location       left_location,
@@ -33,7 +33,7 @@ namespace lang
         Shared<lang::Value>               buildOperator(lang::BinaryOperator op,
                                                         Shared<lang::Value>  left,
                                                         Shared<lang::Value>  right,
-                                                        CompileContext&      context) override;
+                                                        CompileContext&      context) const override;
 
       protected:
         [[nodiscard]] virtual Optional<lang::ResolvingHandle<lang::Type>> getPointeeType()       = 0;

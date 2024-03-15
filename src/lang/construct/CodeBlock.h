@@ -74,8 +74,6 @@ namespace lang
                                             Statements     substatements,
                                             lang::Context& new_context) const override;
 
-        void doBuild(CompileContext& context) override;
-
       private:
         bool                              scoped_;
         std::vector<Owned<Statement>>       subs_ {};

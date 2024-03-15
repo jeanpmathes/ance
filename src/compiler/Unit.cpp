@@ -252,7 +252,7 @@ void Unit::preValidate()
     global_scope_->postResolve();
 }
 
-void Unit::preBuild()
+void Unit::transformToExecutableForm()
 {
     clearChildren();
     global_scope_ = global_scope_->expand();

@@ -49,14 +49,11 @@ void lang::StatementFunction::setup()
     {
         scope().registerUsage(parameter->type());
 
-        auto parameter_variable = lang::LocalVariable::makeParameterVariable(parameter->name(),
-                                                                             parameter->type(),
-                                                                             parameter->typeLocation(),
-                                                                             parameter,
+        auto parameter_variable = lang::LocalVariable::makeParameterVariable(*parameter,
                                                                              index++,
-                                                                             function(),
-                                                                             parameter->location());
-        arguments_.emplace_back(parameter_variable.handle());
+                                                                             function());
+
+        parameter->argument(parameter_variable.handle());
 
         function().addEntity(std::move(parameter_variable));
     }
@@ -140,40 +137,17 @@ Optional<lang::Location> lang::StatementFunction::findUnreachableCode() const
     return unreachable;
 }
 
-void lang::StatementFunction::build(CompileContext& context)
+void lang::StatementFunction::buildDeclarationsFollowingOrder(CompileContext& context) const
 {
-    llvm::Function* native_function = context.exec().llvmFunction(function_handle_.value());
-    assert(native_function->getSubprogram() != nullptr);
-
-    llvm::BasicBlock* decl = llvm::BasicBlock::Create(context.exec().llvmContext(), "decl", native_function);
-
-    context.exec().ir().SetInsertPoint(decl);
-    function().buildDeclarations(context);
-
-    llvm::BasicBlock* defs = llvm::BasicBlock::Create(context.exec().llvmContext(), "defs", native_function);
-
-    context.exec().ir().CreateBr(defs);
-    context.exec().ir().SetInsertPoint(defs);
-    for (auto& arg : arguments_) { (*arg)->buildInitialization(context); }
-
-    initial_block_->prepareBuild(context, native_function);
-    initial_block_->doBuild(context);
-
-    context.exec().ir().SetCurrentDebugLocation(llvm::DebugLoc());
-    context.exec().di().finalizeSubprogram(native_function->getSubprogram());
+    code_.getBlockScope()->buildEntityDeclarations(context);
 }
 
-void lang::StatementFunction::buildDeclarationsFollowingOrder(CompileContext& context)
+lang::BasicBlock const* lang::StatementFunction::getEntryBlock() const
 {
-    code_.getBlockScope()->buildDeclarations(context);
+    return initial_block_.get();
 }
 
 std::vector<lang::BasicBlock*> const& lang::StatementFunction::getBasicBlocks() const
 {
     return used_blocks_;
-}
-
-std::vector<Optional<lang::ResolvingHandle<lang::Variable>>> const& lang::StatementFunction::arguments() const
-{
-    return arguments_;
 }

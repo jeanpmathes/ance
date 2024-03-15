@@ -2,7 +2,7 @@
 
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/CodeBlock.h"
-#include "lang/construct/constant/Constant.h"
+#include "lang/construct/Constant.h"
 #include "lang/expression/Expression.h"
 #include "lang/expression/VariableAccess.h"
 #include "lang/statement/Assignment.h"
@@ -10,25 +10,25 @@
 
 Case* Case::createDefault(Owned<Statement> code)
 {
-    return new Case(std::vector<Owned<ConstantExpression>>(), std::move(code));
+    return new Case(std::vector<Owned<LiteralExpression>>(), std::move(code));
 }
 
-Case* Case::createCase(std::vector<Owned<ConstantExpression>> conditions, Owned<Statement> code)
+Case* Case::createCase(std::vector<Owned<LiteralExpression>> conditions, Owned<Statement> code)
 {
     return new Case(std::move(conditions), std::move(code));
 }
 
 Case* Case::createDefault(Owned<Expression> expression)
 {
-    return new Case(std::vector<Owned<ConstantExpression>>(), std::move(expression));
+    return new Case(std::vector<Owned<LiteralExpression>>(), std::move(expression));
 }
 
-Case* Case::createCase(std::vector<Owned<ConstantExpression>> conditions, Owned<Expression> expression)
+Case* Case::createCase(std::vector<Owned<LiteralExpression>> conditions, Owned<Expression> expression)
 {
     return new Case(std::move(conditions), std::move(expression));
 }
 
-Case::Case(std::vector<Owned<ConstantExpression>> conditions, std::variant<Owned<Statement>, Owned<Expression>> code)
+Case::Case(std::vector<Owned<LiteralExpression>> conditions, std::variant<Owned<Statement>, Owned<Expression>> code)
     : conditions_(std::move(conditions))
     , code_(std::move(code))
 {
@@ -39,9 +39,9 @@ Case::Case(std::vector<Owned<ConstantExpression>> conditions, std::variant<Owned
     }
 }
 
-std::vector<std::reference_wrapper<ConstantExpression const>> Case::conditions() const
+std::vector<std::reference_wrapper<LiteralExpression const>> Case::conditions() const
 {
-    std::vector<std::reference_wrapper<ConstantExpression const>> result;
+    std::vector<std::reference_wrapper<LiteralExpression const>> result;
 
     result.reserve(conditions_.size());
     for (auto& condition : conditions_) { result.emplace_back(*condition); }
@@ -109,9 +109,9 @@ void Case::postResolve()
     }
 }
 
-std::vector<std::pair<ConstantExpression*, Statement*>> Case::getConditions()
+std::vector<std::pair<LiteralExpression*, Statement*>> Case::getConditions()
 {
-    std::vector<std::pair<ConstantExpression*, Statement*>> conditions;
+    std::vector<std::pair<LiteralExpression*, Statement*>> conditions;
 
     if (conditions_.empty()) { conditions.emplace_back(nullptr, std::get<Owned<Statement>>(code_).get()); }
     else
@@ -133,8 +133,8 @@ bool Case::validateConflicts(Case const& other, ValidationLogger& validation_log
     {
         for (auto& other_condition : other.conditions_)
         {
-            lang::Constant const& condition_constant       = condition->getConstantValue();
-            lang::Constant const& other_condition_constant = other_condition->getConstantValue();
+            lang::LiteralConstant const& condition_constant       = condition->constant();
+            lang::LiteralConstant const& other_condition_constant = other_condition->constant();
 
             if (condition_constant.equals(&other_condition_constant))
             {
@@ -179,13 +179,13 @@ bool Case::validate(lang::Type const& target_type, ssize_t* coverage_count, Vali
 
     *coverage_count = static_cast<ssize_t>(conditions_.size());
 
-    std::vector<std::reference_wrapper<ConstantExpression const>> local_conditions;
+    std::vector<std::reference_wrapper<LiteralExpression const>> local_conditions;
     for (auto& condition : conditions_)
     {
         for (auto& local_condition : local_conditions)
         {
-            lang::Constant const& condition_constant       = condition->getConstantValue();
-            lang::Constant const& local_condition_constant = local_condition.get().getConstantValue();
+            lang::LiteralConstant const& condition_constant       = condition->constant();
+            lang::LiteralConstant const& local_condition_constant = local_condition.get().constant();
 
             if (condition_constant.equals(&local_condition_constant))
             {
@@ -244,7 +244,7 @@ Owned<Case> Case::expand(lang::Context& new_context) const
 {
     Statements expanded_statements = std::get<Owned<Statement>>(code_)->expand(new_context);
 
-    std::vector<Owned<ConstantExpression>> expanded_conditions;
+    std::vector<Owned<LiteralExpression>> expanded_conditions;
 
     for (auto& condition : conditions_)
     {
@@ -253,7 +253,7 @@ Owned<Case> Case::expand(lang::Context& new_context) const
         assert(before.empty());
         assert(after.empty());
 
-        expanded_conditions.emplace_back(*(dynamic_cast<ConstantExpression*>(unwrap(std::move(expanded_condition)))));
+        expanded_conditions.emplace_back(*(dynamic_cast<LiteralExpression*>(unwrap(std::move(expanded_condition)))));
     }
 
     Owned<lang::CodeBlock> new_block = lang::CodeBlock::wrapStatements(std::move(expanded_statements));
@@ -280,7 +280,7 @@ Owned<Case> Case::expand(lang::ResolvingHandle<lang::Variable> target, lang::Con
                                std::make_move_iterator(after.begin()),
                                std::make_move_iterator(after.end()));
 
-    std::vector<Owned<ConstantExpression>> expanded_conditions;
+    std::vector<Owned<LiteralExpression>> expanded_conditions;
 
     for (auto& condition : conditions_)
     {
@@ -289,7 +289,7 @@ Owned<Case> Case::expand(lang::ResolvingHandle<lang::Variable> target, lang::Con
         assert(before_condition.empty());
         assert(after_condition.empty());
 
-        expanded_conditions.emplace_back(*(dynamic_cast<ConstantExpression*>(unwrap(std::move(expanded_condition)))));
+        expanded_conditions.emplace_back(*(dynamic_cast<LiteralExpression*>(unwrap(std::move(expanded_condition)))));
     }
 
     Owned<lang::CodeBlock> new_block = lang::CodeBlock::wrapStatements(std::move(expanded_statements));
@@ -342,7 +342,7 @@ std::vector<std::reference_wrapper<Case const>> Match::cases() const
 
 std::vector<Owned<lang::BasicBlock>> Match::createBasicBlocks(lang::BasicBlock& entry, lang::Function& function)
 {
-    std::vector<std::pair<ConstantExpression*, Statement*>> conditions;
+    std::vector<std::pair<LiteralExpression*, Statement*>> conditions;
 
     for (auto& case_ptr : cases_)
     {
@@ -499,9 +499,4 @@ bool Match::validateCases(lang::Location                  location,
     }
 
     return valid;
-}
-
-void Match::doBuild(CompileContext&)
-{
-    // Handled by basic block.
 }

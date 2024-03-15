@@ -3,28 +3,33 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 
-bool lang::BasicBlock::Definition::Empty::isMeta() const
+lang::BasicBlock const* lang::bb::def::Empty::next() const
+{
+    return next_;
+}
+
+bool lang::bb::def::Empty::isMeta() const
 {
     return true;
 }
 
-void lang::BasicBlock::Definition::Empty::complete(size_t& index)
+void lang::bb::def::Empty::complete(size_t& index)
 {
     if (next_) next_->complete(index);
 }
 
-void lang::BasicBlock::Definition::Empty::setLink(lang::BasicBlock& next)
+void lang::bb::def::Empty::setLink(lang::BasicBlock& next)
 {
     lang::BasicBlock* next_ptr = &next;
 
-    assert(next_ptr->definition_.get() != this);
+    assert(&next_ptr->definition() != this);
     assert(next_ == nullptr);
 
     next_ = next_ptr;
     next_->registerIncomingLink(*self());
 }
 
-void lang::BasicBlock::Definition::Empty::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
+void lang::bb::def::Empty::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
 {
     assert(next_ == former);
     assert(next_ != updated);
@@ -33,17 +38,17 @@ void lang::BasicBlock::Definition::Empty::updateLink(lang::BasicBlock* former, l
     next_->registerIncomingLink(*self());
 }
 
-void lang::BasicBlock::Definition::Empty::transferStatements(std::list<Statement*>&)
+void lang::bb::def::Empty::transferStatements(std::list<Statement*>&)
 {
     assert(false);
 }
 
-void lang::BasicBlock::Definition::Empty::simplify()
+void lang::bb::def::Empty::simplify()
 {
     if (next_) next_->simplify();
 }
 
-std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Empty::getLeaves() const
+std::list<lang::BasicBlock const*> lang::bb::def::Empty::getLeaves() const
 {
     std::list<lang::BasicBlock const*> leaves;
 
@@ -53,7 +58,7 @@ std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Empty::getLeave
     return leaves;
 }
 
-std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Empty::getSuccessors() const
+std::vector<lang::BasicBlock const*> lang::bb::def::Empty::getSuccessors() const
 {
     std::vector<lang::BasicBlock const*> successors;
 
@@ -62,43 +67,22 @@ std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Empty::getSuc
     return successors;
 }
 
-lang::Location lang::BasicBlock::Definition::Empty::getStartLocation() const
+lang::Location lang::bb::def::Empty::getStartLocation() const
 {
     return lang::Location::global();
 }
 
-lang::Location lang::BasicBlock::Definition::Empty::getEndLocation() const
+lang::Location lang::bb::def::Empty::getEndLocation() const
 {
     return lang::Location::global();
 }
 
-void lang::BasicBlock::Definition::Empty::reach() const
+void lang::bb::def::Empty::reach() const
 {
     if (next_) next_->reach();
 }
 
-void lang::BasicBlock::Definition::Empty::prepareBuild(CompileContext& context, llvm::Function* native_function)
-{
-    std::string const name = "b" + std::to_string(index_);
-    native_block_          = llvm::BasicBlock::Create(context.exec().llvmContext(), name, native_function);
-
-    if (next_) next_->prepareBuild(context, native_function);
-}
-
-void lang::BasicBlock::Definition::Empty::doBuild(CompileContext& context)
-{
-    context.exec().ir().CreateBr(native_block_);// Branch from prelude in function to this block
-    context.exec().ir().SetInsertPoint(native_block_);
-
-    if (next_ != nullptr)
-    {
-        context.exec().ir().CreateBr(next_->definition_->getNativeBlock());
-        next_->doBuild(context);
-    }
-    else { context.exec().ir().CreateRetVoid(); }
-}
-
-std::string lang::BasicBlock::Definition::Empty::getExitRepresentation()
+std::string lang::bb::def::Empty::getExitRepresentation() const
 {
     return "// meta ";
 }

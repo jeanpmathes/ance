@@ -12,6 +12,8 @@
 lang::GlobalScope::GlobalScope(bool is_containing_runtime) : Scope()
 {
     context_ = makeOwned<lang::Context>(*this, is_containing_runtime);
+
+    (**context_).initialize();
 }
 
 lang::Scope& lang::GlobalScope::scope()
@@ -47,11 +49,6 @@ lang::GlobalScope* lang::GlobalScope::getGlobalScope()
 lang::GlobalScope const* lang::GlobalScope::getGlobalScope() const
 {
     return this;
-}
-
-Execution::Scoped lang::GlobalScope::getExecutionScope(CompileContext&) const
-{
-    return Execution::Application::GLOBAL_SCOPE;
 }
 
 Owned<lang::GlobalScope> lang::GlobalScope::expand() const
@@ -96,18 +93,6 @@ lang::ResolvingHandle<lang::Function> lang::GlobalScope::getEntryPoint()
     Optional<lang::ResolvingHandle<lang::Function>> potential_function = findEntryPoint();
     assert(potential_function.hasValue());
     return potential_function.value();
-}
-
-void lang::GlobalScope::buildDeclarations(CompileContext& context)
-{
-    UnorderedScope::buildDeclarations(context);
-    (**context_).buildNativeDeclarations(context);
-}
-
-void lang::GlobalScope::buildDefinitions(CompileContext& context)
-{
-    UnorderedScope::buildDefinitions(context);
-    (**context_).buildNativeDefinitions(context);
 }
 
 Optional<lang::ResolvingHandle<lang::Function>> lang::GlobalScope::findEntryPoint()

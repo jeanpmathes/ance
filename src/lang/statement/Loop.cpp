@@ -35,11 +35,6 @@ Statements Loop::expandWith(Expressions, Statements substatements, lang::Context
     return statements;
 }
 
-void Loop::doBuild(CompileContext&)
-{
-    // Handled by basic block.
-}
-
 bool Loop::isLoop() const
 {
     return true;

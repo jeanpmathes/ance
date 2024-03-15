@@ -10,10 +10,10 @@ lang::VectorizableType* lang::VectorizableType::isVectorizable()
     return this;
 }
 
-void lang::VectorizableType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>,
-                                                    lang::ResolvingHandle<lang::Type>,
+void lang::VectorizableType::buildRequestedOverload(lang::Type const&,
+                                                    lang::Type const&,
                                                     lang::PredefinedFunction&,
-                                                    CompileContext&)
+                                                    CompileContext&) const
 {
     throw std::logic_error("No overloads available for this type");
 }

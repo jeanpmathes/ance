@@ -34,26 +34,21 @@ namespace lang
 
       protected:
         Optional<lang::Location> getDefinitionLocation() const override;
-        bool                     isConstructor() const override;
+        bool                     preserveUnitReturn() const override;
 
       public:
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
-        void build(CompileContext& context) override;
-
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
-
-        [[nodiscard]] Execution::Function getFunctionHandle(CompileContext& context) const;
-        Shared<lang::Value>               getArgument(size_t index);
 
       public:
         void setCallValidator(
-            std::function<bool(std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const&,
+            std::function<bool(std::vector<std::reference_wrapper<Expression const>> const&,
                                lang::Location,
                                ValidationLogger&)> validator);
         bool doCallValidation(
-            std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const& arguments,
+            std::vector<std::reference_wrapper<Expression const>> const& arguments,
             lang::Location                                                                           location,
             ValidationLogger& validation_logger) const override;
 
@@ -62,7 +57,7 @@ namespace lang
         bool                 is_imported_;
         bool                 is_constructor_;
 
-        std::function<bool(std::vector<std::pair<std::reference_wrapper<lang::Value const>, lang::Location>> const&,
+        std::function<bool(std::vector<std::reference_wrapper<Expression const>> const&,
                            lang::Location,
                            ValidationLogger&)>
             call_validator_ {};

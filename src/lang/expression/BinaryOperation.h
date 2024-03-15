@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_BINARYOPERATION_H_
 #define ANCE_SRC_LANG_EXPRESSION_BINARYOPERATION_H_
 
-#include "DelayableExpression.h"
+#include "Expression.h"
 
 #include "lang/Element.h"
 
@@ -9,7 +9,7 @@
  * A binary operation, taking two operands and returning a result.
  */
 class BinaryOperation
-    : public DelayableExpression
+    : public Expression
     , public lang::Element<BinaryOperation, ANCE_CONSTRUCTS>
 {
   public:
@@ -33,18 +33,14 @@ class BinaryOperation
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doBuild(CompileContext& context) override;
-
-  private:
-    lang::ResolvingHandle<lang::Type> getRightType();
-    [[nodiscard]] lang::Type const&   getRightType() const;
-
-    static lang::ResolvingHandle<lang::Type> getRightType(lang::BinaryOperator              op,
-                                                          lang::ResolvingHandle<lang::Type> left,
-                                                          lang::ResolvingHandle<lang::Type> right);
-    static lang::Type const& getRightTypeC(lang::BinaryOperator op, lang::Type const& left, lang::Type const& right);
 
   public:
+    /**
+     * Get the type of the right operand, considering possibly needed implicit conversions.
+     * @return The type of the right operand.
+     */
+    [[nodiscard]] lang::Type const& getRightType() const;
+
     ~BinaryOperation() override;
 
   private:

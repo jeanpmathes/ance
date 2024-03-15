@@ -2,10 +2,9 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/constant/Constant.h"
-#include "lang/construct/value/Value.h"
+#include "lang/construct/Constant.h"
+#include "lang/construct/Value.h"
 #include "lang/scope/Scope.h"
-#include "lang/statement/Statement.h"
 #include "lang/utility/Storage.h"
 #include "validation/ValidationLogger.h"
 
@@ -13,7 +12,7 @@ lang::Member::Member(lang::AccessModifier                access,
                      lang::Identifier                    name,
                      lang::ResolvingHandle<lang::Type>   type,
                      lang::Assigner                      assigner,
-                     Optional<Owned<ConstantExpression>> constant_init,
+                     Optional<Owned<LiteralExpression>> constant_init,
                      lang::Location                      location,
                      lang::Location                      type_location)
     : access_(access)
@@ -104,7 +103,7 @@ bool lang::Member::validate(ValidationLogger& validation_logger) const
 
 Shared<lang::Constant> lang::Member::getConstantInitializer(CompileContext& context)
 {
-    if (constant_init_.hasValue()) { return getInitialValue(context); }
+    if (constant_init_.hasValue()) { return constant_init_.value()->constant(context); }
     else { return context.exec().getDefault(type()); }
 }
 
@@ -113,28 +112,18 @@ void lang::Member::buildInitialization(Shared<lang::Value> ptr, CompileContext& 
     if (constant_init_.hasValue())
     {
         Shared<lang::Value> value_ptr = context.exec().performStackAllocation(type());
-        context.exec().performStoreToAddress(value_ptr, getInitialValue(context));
+        context.exec().performStoreToAddress(value_ptr, constant_init_.value()->constant(context));
 
         type()->performCopyInitializer(ptr, value_ptr, context);
     }
     else { type()->performDefaultInitializer(ptr, context); }
 }
 
-Shared<lang::Constant> lang::Member::getInitialValue(CompileContext& context) const
-{
-    if (!initial_value_.hasValue())
-    {
-        initial_value_ = const_cast<Member*>(this)->constant_init_.value()->getConstantValue();
-    }
-
-    return initial_value_.value()->clone(context.ctx());
-}
-
 Owned<lang::Member> lang::Member::expand(lang::Context& new_context) const
 {
     lang::ResolvingHandle<lang::Type> type = type_->getUndefinedTypeClone(new_context);
 
-    Optional<Owned<ConstantExpression>> expanded_init_expression;
+    Optional<Owned<LiteralExpression>> expanded_init_expression;
 
     if (constant_init_.hasValue())
     {
@@ -145,7 +134,7 @@ Owned<lang::Member> lang::Member::expand(lang::Context& new_context) const
 
         Expression* expanded_init_expression_ptr = unwrap(std::move(new_expression));
         expanded_init_expression =
-            Owned<ConstantExpression>(*dynamic_cast<ConstantExpression*>(expanded_init_expression_ptr));
+            Owned<LiteralExpression>(*dynamic_cast<LiteralExpression*>(expanded_init_expression_ptr));
     }
 
     return makeOwned<Member>(access_,

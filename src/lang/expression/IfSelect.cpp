@@ -15,7 +15,7 @@ IfSelect::IfSelect(Owned<Expression> condition,
                    Owned<Expression> then_expression,
                    Owned<Expression> else_expression,
                    lang::Location    location)
-    : UnexpandedExpression(location)
+    : Expression(location)
     , condition_(std::move(condition))
     , then_expression_(std::move(then_expression))
     , else_expression_(std::move(else_expression))

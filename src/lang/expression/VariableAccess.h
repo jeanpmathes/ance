@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_VARIABLEACCESS_H_
 #define ANCE_SRC_LANG_EXPRESSION_VARIABLEACCESS_H_
 
-#include "DelayableExpression.h"
+#include "Expression.h"
 
 #include "lang/Element.h"
 #include "lang/construct/Variable.h"
@@ -16,7 +16,7 @@ namespace lang
  * Access a variable and get or set its current value.
  */
 class VariableAccess
-    : public DelayableExpression
+    : public Expression
     , public lang::Element<VariableAccess, ANCE_CONSTRUCTS>
 {
   public:
@@ -28,7 +28,7 @@ class VariableAccess
      */
     VariableAccess(lang::ResolvingHandle<lang::Variable> variable, bool is_defined, lang::Location location);
 
-    [[nodiscard]] lang::Variable const& variable() const;
+    [[nodiscard]] lang::Entity const& variable() const;
 
   protected:
     void walkDefinitions() override;
@@ -37,7 +37,7 @@ class VariableAccess
     [[nodiscard]] bool isNamed() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
-    bool validateAssignment(lang::Value const& value,
+    bool validateAssignment(lang::Type const& value_type,
                             lang::Location     value_location,
                             ValidationLogger&  validation_logger) const override;
 
@@ -45,8 +45,6 @@ class VariableAccess
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doBuild(CompileContext& context) override;
-    void doAssign(Shared<lang::Value> value, CompileContext& context) override;
 
   private:
     bool isVariableErased(ValidationLogger& validation_logger) const;

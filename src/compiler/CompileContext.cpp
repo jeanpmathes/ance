@@ -12,7 +12,8 @@ CompileContext::CompileContext(Unit&              unit,
                                llvm::Module&      m,
                                llvm::IRBuilder<>& ir,
                                llvm::DIBuilder&   di,
-                               SourceTree&        source_tree)
+                               SourceTree&        source_tree,
+                               NativeBuild**      native_build)
     : unit_(unit)
     , runtime_(runtime)
     , execution_(nullptr)
@@ -26,7 +27,11 @@ CompileContext::CompileContext(Unit&              unit,
     llvm::DICompileUnit* di_unit =
         di.createCompileUnit(llvm::dwarf::DW_LANG_C, project_file, "ance-000", is_optimized, "", 0, "", debug_kind);
 
-    execution_ = std::make_unique<NativeBuild>(*this, c, m, ir, di, di_unit);
+    auto exec = std::make_unique<NativeBuild>(*this, c, m, ir, di, di_unit);
+
+    *native_build = exec.get();
+
+    execution_ = std::move(exec);
 
     for (auto& source_file : source_tree.getSourceFiles())
     {
@@ -72,7 +77,7 @@ std::filesystem::path CompileContext::getSourceFilePath(lang::Location location)
     return source_files_[location.file()].path;
 }
 
-void CompileContext::setDebugLocation(lang::Location location, lang::Scope& scope)
+void CompileContext::setDebugLocation(lang::Location location, lang::Scope const& scope)
 {
     debug_loc_stack_.push(current_debug_location_);
 

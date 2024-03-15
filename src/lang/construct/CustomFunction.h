@@ -47,7 +47,7 @@ namespace lang
 
       protected:
         Optional<lang::Location> getDefinitionLocation() const override;
-        bool                     isConstructor() const override;
+        bool                     preserveUnitReturn() const override;
 
       public:
         bool validateFlow(ValidationLogger& validation_logger) const override;

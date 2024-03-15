@@ -43,6 +43,7 @@ class LocalVariableDefinition
 
     [[nodiscard]] lang::Identifier const& name() const;
     [[nodiscard]] lang::Type const*       type() const;
+    [[nodiscard]] lang::Variable const& variable() const;
     [[nodiscard]] lang::Assigner          assigner() const;
     [[nodiscard]] Expression const*       assigned() const;
 
@@ -54,9 +55,6 @@ class LocalVariableDefinition
     [[nodiscard]] Statements expandWith(Expressions    subexpressions,
                                         Statements     substatements,
                                         lang::Context& new_context) const override;
-
-  protected:
-    void doBuild(CompileContext& context) override;
 
   private:
     lang::Identifier                              name_;

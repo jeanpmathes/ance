@@ -65,9 +65,4 @@ Expression::Expansion Subscript::expandWith(Expressions subexpressions, lang::Co
             Statements()};
 }
 
-void Subscript::doBuild(CompileContext& context)
-{
-    setValue(indexed_->type()->buildSubscript(indexed_->getValue(), index_->getValue(), context));
-}
-
 Subscript::~Subscript() = default;

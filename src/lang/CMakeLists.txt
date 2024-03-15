@@ -9,5 +9,6 @@ target_sources(ance PRIVATE AccessModifier.cpp
                Accessibility.cpp
                Assigner.cpp
                BinaryOperator.cpp
+               Located.cpp
                UnaryOperator.cpp
                Context.cpp)

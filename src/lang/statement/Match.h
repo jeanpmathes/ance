@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "lang/Element.h"
-#include "lang/expression/ConstantExpression.h"
+#include "lang/expression/LiteralExpression.h"
 
 namespace lang
 {
@@ -30,7 +30,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
          * @param code The code to execute.
          * @return The created case.
          */
-    static Case* createCase(std::vector<Owned<ConstantExpression>> conditions, Owned<Statement> code);
+    static Case* createCase(std::vector<Owned<LiteralExpression>> conditions, Owned<Statement> code);
 
     /**
      * Create a default case, using an expression.
@@ -45,20 +45,20 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
      * @param expression The expression that provides a value.
      * @return The created case.
      */
-    static Case* createCase(std::vector<Owned<ConstantExpression>> conditions, Owned<Expression> expression);
+    static Case* createCase(std::vector<Owned<LiteralExpression>> conditions, Owned<Expression> expression);
 
   private:
-    Case(std::vector<Owned<ConstantExpression>> conditions, std::variant<Owned<Statement>, Owned<Expression>> code);
+    Case(std::vector<Owned<LiteralExpression>> conditions, std::variant<Owned<Statement>, Owned<Expression>> code);
 
   public:
-    [[nodiscard]] std::vector<std::reference_wrapper<ConstantExpression const>>  conditions() const;
+    [[nodiscard]] std::vector<std::reference_wrapper<LiteralExpression const>>  conditions() const;
     [[nodiscard]] std::reference_wrapper<lang::Visitable<ANCE_CONSTRUCTS> const> code() const;
 
     void setContainingScope(lang::Scope& scope);
     void walkDefinitions();
     void postResolve();
 
-    std::vector<std::pair<ConstantExpression*, Statement*>> getConditions();
+    std::vector<std::pair<LiteralExpression*, Statement*>> getConditions();
 
     bool validateConflicts(Case const& other, ValidationLogger& validation_logger) const;
     bool validate(lang::Type const& target_type, ssize_t* coverage_count, ValidationLogger& validation_logger) const;
@@ -92,7 +92,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
     std::vector<std::reference_wrapper<lang::Scope>> getSubScopesInOrder();
 
   private:
-    std::vector<Owned<ConstantExpression>>            conditions_;
+    std::vector<Owned<LiteralExpression>>            conditions_;
     std::variant<Owned<Statement>, Owned<Expression>> code_;
 };
 
@@ -150,9 +150,6 @@ class Match
     [[nodiscard]] Statements expandWith(Expressions    subexpressions,
                                         Statements     substatements,
                                         lang::Context& new_context) const override;
-
-  protected:
-    void doBuild(CompileContext& context) override;
 
   private:
     Owned<Expression>        expression_;

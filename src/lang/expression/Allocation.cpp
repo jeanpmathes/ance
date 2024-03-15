@@ -26,9 +26,9 @@ Runtime::Allocator Allocation::allocator() const
     return allocation_;
 }
 
-lang::Type const& Allocation::allocatedType() const
+lang::Entity const& Allocation::allocatedType() const
 {
-    return *allocated_type_.as<lang::Type>();
+    return *allocated_type_;
 }
 
 Expression const* Allocation::count() const
@@ -100,20 +100,6 @@ Expression::Expansion Allocation::expandWith(Expressions subexpressions, lang::C
                                       allocated_type_location_),
                 Statements()};
     }
-}
-
-void Allocation::doBuild(CompileContext& context)
-{
-    Optional<Shared<lang::Value>> count = {};
-
-    if (count_.hasValue())
-    {
-        count = lang::Type::makeMatching(context.ctx().getSizeType(), count_.value()->getValue(), context);
-    }
-
-    auto allocated_type = lang::Type::makeMatching<lang::Type>(allocated_type_);
-
-    setValue(context.runtime().allocate(allocation_, allocated_type, count, context));
 }
 
 Allocation::~Allocation() = default;

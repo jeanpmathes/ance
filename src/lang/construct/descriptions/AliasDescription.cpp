@@ -43,6 +43,11 @@ bool lang::AliasDescription::isOverloadAllowed() const
     return false;
 }
 
+lang::Type const& lang::AliasDescription::type() const
+{
+    return self_;
+}
+
 std::vector<std::reference_wrapper<const lang::Entity>> lang::AliasDescription::getProvidedEntities() const
 {
     return {std::cref(self_.base())};
@@ -123,16 +128,6 @@ lang::Description::Descriptions lang::AliasDescription::expand(lang::Context& ne
                                                     actual_type_location_));
 
     return result;
-}
-
-void lang::AliasDescription::buildDeclaration(CompileContext& context)
-{
-    self_->buildNativeDeclaration(context);
-}
-
-void lang::AliasDescription::buildDefinition(CompileContext& context)
-{
-    self_->buildNativeDefinition(context);
 }
 
 void lang::AliasDescription::sync(Storage& storage)

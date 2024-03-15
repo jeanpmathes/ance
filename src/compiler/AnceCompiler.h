@@ -57,9 +57,11 @@ class AnceCompiler
     llvm::IRBuilder<> ir_;
     llvm::DIBuilder   di_;
     Runtime           runtime_;
-    CompileContext    context_;
 
+    NativeBuild*         native_build_ {nullptr};
     llvm::TargetMachine* target_machine_ {nullptr};
+
+    CompileContext context_;
 };
 
 #endif

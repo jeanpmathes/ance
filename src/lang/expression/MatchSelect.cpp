@@ -8,7 +8,7 @@
 #include "validation/ValidationLogger.h"
 
 MatchSelect::MatchSelect(Owned<Expression> condition, std::vector<Owned<Case>> cases, lang::Location location)
-    : UnexpandedExpression(location)
+    : Expression(location)
     , condition_(std::move(condition))
     , cases_(std::move(cases))
 {

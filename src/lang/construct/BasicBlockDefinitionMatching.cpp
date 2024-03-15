@@ -2,29 +2,47 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/constant/Constant.h"
-#include "lang/construct/value/Value.h"
 #include "lang/statement/Match.h"
 #include "validation/ValidationLogger.h"
 
-lang::BasicBlock::Definition::Matching::Matching(Match& match, std::vector<std::vector<ConstantExpression*>> cases)
+lang::bb::def::Matching::Matching(Match& match, std::vector<std::vector<LiteralExpression*>> cases)
     : match_(match)
     , cases_(std::move(cases))
 {}
 
-void lang::BasicBlock::Definition::Matching::complete(size_t& index)
+std::list<Statement*> const& lang::bb::def::Matching::statements() const
+{
+    return statements_;
+}
+
+Expression const& lang::bb::def::Matching::matched() const
+{
+    return match_.expression();
+}
+
+std::vector<std::vector<LiteralExpression*>> const& lang::bb::def::Matching::cases() const
+{
+    return cases_;
+}
+
+std::vector<lang::BasicBlock*> const& lang::bb::def::Matching::branches() const
+{
+    return branches_;
+}
+
+void lang::bb::def::Matching::complete(size_t& index)
 {
     for (auto& statement : statements_) { self()->addStatement(*statement); }
     for (auto& branch : branches_) { branch->complete(index); }
 }
 
-void lang::BasicBlock::Definition::Matching::setLink(lang::BasicBlock& next)
+void lang::bb::def::Matching::setLink(lang::BasicBlock& next)
 {
     branches_.push_back(&next);
     next.registerIncomingLink(*self());
 }
 
-void lang::BasicBlock::Definition::Matching::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
+void lang::bb::def::Matching::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
 {
     for (auto& branch : branches_)
     {
@@ -38,17 +56,17 @@ void lang::BasicBlock::Definition::Matching::updateLink(lang::BasicBlock* former
     }
 }
 
-void lang::BasicBlock::Definition::Matching::simplify()
+void lang::bb::def::Matching::simplify()
 {
     for (auto& branch : branches_) { branch->simplify(); }
 }
 
-void lang::BasicBlock::Definition::Matching::transferStatements(std::list<Statement*>& statements)
+void lang::bb::def::Matching::transferStatements(std::list<Statement*>& statements)
 {
     statements_.splice(statements_.begin(), statements);
 }
 
-std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Matching::getLeaves() const
+std::list<lang::BasicBlock const*> lang::bb::def::Matching::getLeaves() const
 {
     std::list<lang::BasicBlock const*> leaves;
 
@@ -59,7 +77,7 @@ std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Matching::getLe
 
     return leaves;
 }
-std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Matching::getSuccessors() const
+std::vector<lang::BasicBlock const*> lang::bb::def::Matching::getSuccessors() const
 {
     std::vector<lang::BasicBlock const*> successors;
 
@@ -69,79 +87,26 @@ std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Matching::get
     return successors;
 }
 
-lang::Location lang::BasicBlock::Definition::Matching::getStartLocation() const
+lang::Location lang::bb::def::Matching::getStartLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.front()->location();
 }
 
-lang::Location lang::BasicBlock::Definition::Matching::getEndLocation() const
+lang::Location lang::bb::def::Matching::getEndLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
-void lang::BasicBlock::Definition::Matching::reach() const
+void lang::bb::def::Matching::reach() const
 {
     for (auto& branch : branches_) { branch->reach(); }
 }
 
-void lang::BasicBlock::Definition::Matching::prepareBuild(CompileContext& context, llvm::Function* native_function)
-{
-    std::string const name = "b" + std::to_string(index_);
-    native_block_          = llvm::BasicBlock::Create(context.exec().llvmContext(), name, native_function);
-
-    for (auto& branch : branches_) { branch->prepareBuild(context, native_function); }
-}
-
-void lang::BasicBlock::Definition::Matching::doBuild(CompileContext& context)
-{
-    context.exec().ir().SetInsertPoint(native_block_);
-
-    for (auto& statement : statements_) { statement->build(context); }
-
-    Shared<lang::Value> value = match_.expression().getValue();
-    value->buildContentValue(context);
-
-    llvm::BasicBlock* default_block = nullptr;
-
-    for (auto const [case_value, branch_block] : llvm::zip(cases_, branches_))
-    {
-        if (case_value.empty())
-        {
-            default_block = branch_block->definition_->getNativeBlock();
-            break;
-        }
-    }
-
-    if (!default_block) { default_block = branches_.front()->definition_->getNativeBlock(); }
-
-    auto switch_instance =
-        context.exec().ir().CreateSwitch(value->getContentValue(), default_block, static_cast<unsigned>(cases_.size()));
-
-    for (auto const [case_value, branch_block] : llvm::zip(cases_, branches_))
-    {
-        llvm::BasicBlock* branch_native_block = branch_block->definition_->getNativeBlock();
-
-        if (case_value.empty() || branch_native_block == default_block) continue;
-
-        for (auto& case_value_expression : case_value)
-        {
-            Shared<lang::Constant> constant = case_value_expression->getConstantValue();
-            constant->buildContentConstant(context);
-            llvm::Constant* native_constant = constant->getContentConstant();
-
-            auto native_integer_constant = llvm::cast<llvm::ConstantInt>(native_constant);
-            switch_instance->addCase(native_integer_constant, branch_native_block);
-        }
-    }
-
-    for (auto& branch : branches_) { branch->doBuild(context); }
-}
-
-std::string lang::BasicBlock::Definition::Matching::getExitRepresentation()
+std::string lang::bb::def::Matching::getExitRepresentation() const
 {
     return "// match";
 }

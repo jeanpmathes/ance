@@ -35,8 +35,6 @@ class Loop
                                         lang::Context& new_context) const override;
 
   protected:
-    void doBuild(CompileContext& context) override;
-
     [[nodiscard]] bool                                            isLoop() const override;
     [[nodiscard]] std::pair<lang::BasicBlock*, lang::BasicBlock*> getLoopParts() const override;
 

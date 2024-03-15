@@ -19,9 +19,9 @@ namespace lang
         ~IndirectType() override = default;
 
         bool                              definesIndirection() const override;
-        lang::ResolvingHandle<lang::Type> getIndirectionType() override;
+        lang::Type const& getIndirectionType() const override;
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context) override;
+        Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context) const override;
 
       private:
         lang::ResolvingHandle<lang::Type> value_type_;

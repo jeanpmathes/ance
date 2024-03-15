@@ -22,10 +22,8 @@ void Indirection::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (!isInitialized()) return;
 
-    auto value_type = value_->type();
-
-    if (value_type->isDefined())
-    { type.reroute(scope().context().getReferenceType(value_type->getIndirectionType())); }
+    if (value_->type()->isDefined())
+    { type.reroute(scope().context().getReferenceType(value_->type()->getIndirectionType())); }
 }
 
 bool Indirection::validate(ValidationLogger& validation_logger) const
@@ -45,12 +43,6 @@ bool Indirection::validate(ValidationLogger& validation_logger) const
 Expression::Expansion Indirection::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(), makeOwned<Indirection>(std::move(subexpressions[0]), location()), Statements()};
-}
-
-void Indirection::doBuild(CompileContext& context)
-{
-    Shared<lang::Value> ref = value_->type()->buildIndirection(value_->getValue(), context);
-    setValue(ref);
 }
 
 Indirection::~Indirection() = default;

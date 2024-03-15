@@ -36,9 +36,9 @@ namespace lang
         bool                validateCast(Type const&       other,
                                          lang::Location    location,
                                          ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildCast(lang::ResolvingHandle<lang::Type> other,
+        Shared<lang::Value> buildCast(lang::Type const& other,
                                       Shared<lang::Value>               value,
-                                      CompileContext&                   context) override;
+                                      CompileContext&                   context) const override;
 
       private:
         uint64_t bit_size_;

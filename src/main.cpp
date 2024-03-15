@@ -161,7 +161,7 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
         ok = validateTree(tree, validation_logger, out);
         if (!ok) return std::nullopt;
 
-        project_description.preBuild();
+        project_description.transformToExecutableForm();
 
         ok = validateFlow(tree, validation_logger, out);
         if (!ok) return std::nullopt;
@@ -236,7 +236,7 @@ static Optional<bool> buildProject(Project&              project,
 
         if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input.nc");
 
-        application.preBuild();
+        application.transformToExecutableForm();
 
         if (application.isEmittingExtras()) application.emitAsSource(obj_dir / "input_expanded.nc");
 

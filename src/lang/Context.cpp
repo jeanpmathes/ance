@@ -1,5 +1,7 @@
 #include "Context.h"
 
+#include <utility>
+
 #include "ApplicationVisitor.h"
 #include "lang/type/ArrayType.h"
 #include "lang/type/BooleanType.h"
@@ -32,7 +34,10 @@ lang::Context::Context(lang::GlobalScope& global_scope, bool contains_runtime)
     type_registries_.push_back(&vector_types_);
 
     for (auto& registry : type_registries_) registry->setDefaultContainingScope(global_scope_);
+}
 
+void lang::Context::initialize()
+{
     // These types are keyword types, which means that the global scope resolves them by name:
 
     auto register_type = [&](lang::ResolvingHandle<lang::Type> type) {
@@ -64,14 +69,14 @@ void lang::Context::postResolve()
     for (auto& registry : type_registries_) registry->postResolve();
 }
 
-void lang::Context::buildNativeDeclarations(CompileContext& context)
+void lang::Context::buildDeclarations(CompileContext& context)
 {
-    for (auto& registry : type_registries_) registry->buildNativeDeclarations(context);
+    for (auto& registry : type_registries_) registry->buildDeclarations(context);
 }
 
-void lang::Context::buildNativeDefinitions(CompileContext& context)
+void lang::Context::buildDefinitions(CompileContext& context)
 {
-    for (auto& registry : type_registries_) registry->buildNativeDefinitions(context);
+    for (auto& registry : type_registries_) registry->buildDefinitions(context);
 }
 
 lang::ResolvingHandle<lang::Type> lang::Context::getArrayType(lang::ResolvingHandle<lang::Type> element_type,
@@ -121,6 +126,16 @@ lang::ResolvingHandle<lang::Type> lang::Context::getBufferType(lang::ResolvingHa
 
         return type;
     }
+}
+
+lang::Type const& lang::Context::getBufferType(lang::Type const& element_type) const
+{
+    assert(element_type.isDefined());
+
+    lang::ResolvingHandle<lang::Type> element_type_handle
+        = const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
+
+    return getBufferType(element_type_handle);
 }
 
 lang::ResolvingHandle<lang::Type> lang::Context::getCharType() const
@@ -202,6 +217,16 @@ lang::ResolvingHandle<lang::Type> lang::Context::getPointerType(lang::ResolvingH
     }
 }
 
+lang::Type const& lang::Context::getPointerType(lang::Type const& element_type) const
+{
+    assert(element_type.isDefined());
+
+    lang::ResolvingHandle<lang::Type> element_type_handle
+        = const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
+
+    return getPointerType(element_type_handle);
+}
+
 lang::ResolvingHandle<lang::Type> lang::Context::getQuadType() const
 {
     if (!quad_type_.hasValue())
@@ -229,6 +254,16 @@ lang::ResolvingHandle<lang::Type> lang::Context::getReferenceType(lang::Resolvin
 
         return type;
     }
+}
+
+lang::Type const& lang::Context::getReferenceType(lang::Type const& element_type) const
+{
+    assert(element_type.isDefined());
+
+    lang::ResolvingHandle<lang::Type> element_type_handle
+        = const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
+
+    return getReferenceType(element_type_handle);
 }
 
 lang::ResolvingHandle<lang::Type> lang::Context::getSingleType() const
@@ -287,6 +322,16 @@ lang::ResolvingHandle<lang::Type> lang::Context::getVectorType(lang::ResolvingHa
     }
 }
 
+lang::Type const& lang::Context::getVectorType(lang::Type const& element_type, uint64_t size) const
+{
+    assert(element_type.isDefined());
+
+    lang::ResolvingHandle<lang::Type> element_type_handle
+        = const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
+
+    return getVectorType(element_type_handle, size);
+}
+
 lang::ResolvingHandle<lang::Type> lang::Context::getUnitType() const
 {
     if (!unit_type_.hasValue())
@@ -311,7 +356,7 @@ bool lang::Context::validateRuntimeDependency(lang::Location location, Validatio
 
 void lang::Context::setCurrentDescriptionSource(Optional<DescriptionSource> source)
 {
-    current_description_source_ = source;
+    current_description_source_ = std::move(source);
 }
 
 Optional<std::string> lang::Context::getCurrentDescriptionSourceName() const

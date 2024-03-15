@@ -24,8 +24,8 @@ class Erase
      */
     Erase(lang::ResolvingHandle<lang::Variable> variable, lang::Location location);
 
-    [[nodiscard]] lang::ResolvingHandle<lang::Variable> variable();
-    [[nodiscard]] lang::Variable const&                 variable() const;
+    [[nodiscard]] lang::ResolvingHandle<lang::Entity> variable();
+    [[nodiscard]] lang::Entity const&                 variable() const;
 
     void walkDefinitions() override;
 
@@ -34,9 +34,6 @@ class Erase
     Statements expandWith(Expressions    subexpressions,
                           Statements     substatements,
                           lang::Context& new_context) const override;
-
-  protected:
-    void doBuild(CompileContext& context) override;
 
   private:
     lang::ResolvingHandle<lang::Entity> variable_;

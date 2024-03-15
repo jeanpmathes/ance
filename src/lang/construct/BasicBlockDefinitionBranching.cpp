@@ -4,13 +4,33 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/Value.h"
+#include "lang/construct/Value.h"
 #include "lang/expression/Expression.h"
 #include "lang/type/BooleanType.h"
 
-lang::BasicBlock::Definition::Branching::Branching(Expression& condition) : condition_(condition) {}
+lang::bb::def::Branching::Branching(Expression& condition) : condition_(condition) {}
 
-void lang::BasicBlock::Definition::Branching::complete(size_t& index)
+std::list<Statement*> const& lang::bb::def::Branching::statements() const
+{
+    return statements_;
+}
+
+Expression const& lang::bb::def::Branching::condition() const
+{
+    return condition_;
+}
+
+lang::BasicBlock const* lang::bb::def::Branching::trueNext() const
+{
+    return true_next_;
+}
+
+lang::BasicBlock const* lang::bb::def::Branching::falseNext() const
+{
+    return false_next_;
+}
+
+void lang::bb::def::Branching::complete(size_t& index)
 {
     for (auto& statement : statements_) { self()->addStatement(*statement); }
 
@@ -18,7 +38,7 @@ void lang::BasicBlock::Definition::Branching::complete(size_t& index)
     false_next_->complete(index);
 }
 
-void lang::BasicBlock::Definition::Branching::setLink(lang::BasicBlock& next)
+void lang::bb::def::Branching::setLink(lang::BasicBlock& next)
 {
     lang::BasicBlock* next_ptr = &next;
 
@@ -43,7 +63,7 @@ void lang::BasicBlock::Definition::Branching::setLink(lang::BasicBlock& next)
     assert(false);
 }
 
-void lang::BasicBlock::Definition::Branching::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
+void lang::bb::def::Branching::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
 {
     auto update = [&](lang::BasicBlock*& target) {
         assert(target != updated);
@@ -56,18 +76,18 @@ void lang::BasicBlock::Definition::Branching::updateLink(lang::BasicBlock* forme
     if (false_next_ == former) { update(false_next_); }
 }
 
-void lang::BasicBlock::Definition::Branching::simplify()
+void lang::bb::def::Branching::simplify()
 {
     true_next_->simplify();
     false_next_->simplify();
 }
 
-void lang::BasicBlock::Definition::Branching::transferStatements(std::list<Statement*>& statements)
+void lang::bb::def::Branching::transferStatements(std::list<Statement*>& statements)
 {
     statements_.splice(statements_.begin(), statements);
 }
 
-std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Branching::getLeaves() const
+std::list<lang::BasicBlock const*> lang::bb::def::Branching::getLeaves() const
 {
     std::set<lang::BasicBlock const*> leaves;
 
@@ -78,60 +98,32 @@ std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Branching::getL
     return {leaves.begin(), leaves.end()};
 }
 
-std::vector<lang::BasicBlock const*> lang::BasicBlock::Definition::Branching::getSuccessors() const
+std::vector<lang::BasicBlock const*> lang::bb::def::Branching::getSuccessors() const
 {
     return {true_next_, false_next_};
 }
 
-lang::Location lang::BasicBlock::Definition::Branching::getStartLocation() const
+lang::Location lang::bb::def::Branching::getStartLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.front()->location();
 }
 
-lang::Location lang::BasicBlock::Definition::Branching::getEndLocation() const
+lang::Location lang::bb::def::Branching::getEndLocation() const
 {
     if (statements_.empty()) { return lang::Location::global(); }
 
     return statements_.back()->location();
 }
 
-void lang::BasicBlock::Definition::Branching::reach() const
+void lang::bb::def::Branching::reach() const
 {
     true_next_->reach();
     false_next_->reach();
 }
 
-void lang::BasicBlock::Definition::Branching::prepareBuild(CompileContext& context, llvm::Function* native_function)
-{
-    std::string const name = "b" + std::to_string(index_);
-    native_block_          = llvm::BasicBlock::Create(context.exec().llvmContext(), name, native_function);
-
-    true_next_->prepareBuild(context, native_function);
-    false_next_->prepareBuild(context, native_function);
-}
-
-void lang::BasicBlock::Definition::Branching::doBuild(CompileContext& context)
-{
-    context.exec().ir().SetInsertPoint(native_block_);
-
-    for (auto& statement : statements_) { statement->build(context); }
-
-    Shared<lang::Value> truth         = condition_.getValue();
-    Shared<lang::Value> boolean_truth = lang::Type::makeMatching(context.ctx().getBooleanType(), truth, context);
-
-    boolean_truth->buildContentValue(context);
-
-    context.exec().ir().CreateCondBr(truth->getContentValue(),
-                                     true_next_->definition_->getNativeBlock(),
-                              false_next_->definition_->getNativeBlock());
-
-    true_next_->doBuild(context);
-    false_next_->doBuild(context);
-}
-
-std::string lang::BasicBlock::Definition::Branching::getExitRepresentation()
+std::string lang::bb::def::Branching::getExitRepresentation() const
 {
     return "// branch";
 }

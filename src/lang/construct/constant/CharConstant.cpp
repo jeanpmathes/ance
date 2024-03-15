@@ -9,46 +9,41 @@
 #include "lang/type/FixedWidthIntegerType.h"
 #include "validation/ValidationLogger.h"
 
-lang::CharConstant::CharConstant(std::string const& prefix, std::string const& content, lang::Context& new_context)
-    : type_(new_context.getCharType())
+lang::CharConstantData::CharConstantData(std::string const& prefix,
+                                         std::string const& content,
+                                         lang::Context&     new_context)
+    : type_(lang::Type::getUndefined())
     , prefix_(prefix)
     , content_(content)
-    , char_(0)
 {
     if (prefix.empty())
     {
-        type_ = new_context.getCharType();
-        char_ = parseChar(boost::locale::conv::utf_to_utf<char32_t>(content), is_literal_valid_);
+        type_.reroute(new_context.getCharType());
+        char_ = CharConstant::parseChar(boost::locale::conv::utf_to_utf<char32_t>(content), is_literal_valid_);
     }
     else if (prefix == "8")
     {
-        type_ = new_context.getFixedWidthIntegerType(8, false);
-        char_ = parseByte(content, is_literal_valid_);
+        type_.reroute(new_context.getFixedWidthIntegerType(8, false));
+        char_ = CharConstant::parseByte(content, is_literal_valid_);
     }
     else { is_prefix_valid_ = false; }
 }
+
+lang::CharConstant::CharConstant(std::string const& prefix, std::string const& content, lang::Context& new_context)
+    : CharConstantData(prefix, content, new_context)
+    , LiteralConstant(CharConstantData::type_)
+{}
 
 std::string lang::CharConstant::toString() const
 {
     return prefix_ + content_;
 }
 
-lang::ResolvingHandle<lang::Type> lang::CharConstant::type()
+Shared<lang::Constant> lang::CharConstant::embed(CompileContext& context) const
 {
-    return type_;
-}
+    if (type().isCharType()) { return context.exec().getCodepoint(char_); }
 
-lang::Type const& lang::CharConstant::type() const
-{
-    return type_;
-}
-
-Shared<lang::Constant> lang::CharConstant::createContent(CompileContext& context)
-{
-    if (type_->isCharType()) { return context.exec().getCodepoint(char_); }
-
-    if (type_->isFixedWidthIntegerType(8, false))
-    { return context.exec().getByte(static_cast<uint8_t>(char_)); }
+    if (type().isFixedWidthIntegerType(8, false)) { return context.exec().getByte(static_cast<uint8_t>(char_)); }
 
     throw std::logic_error("Invalid type for char constant");
 }
@@ -58,7 +53,7 @@ bool lang::CharConstant::equals(lang::Constant const* other) const
     auto other_char = dynamic_cast<CharConstant const*>(other);
     if (!other_char) return false;
 
-    return this->char_ == other_char->char_ && lang::Type::areSame(this->type_, other_char->type_);
+    return this->char_ == other_char->char_ && lang::Type::areSame(this->type(), other_char->type());
 }
 
 bool lang::CharConstant::validate(ValidationLogger& validation_logger, lang::Location location) const
@@ -78,7 +73,7 @@ bool lang::CharConstant::validate(ValidationLogger& validation_logger, lang::Loc
     return true;
 }
 
-Shared<lang::Constant> lang::CharConstant::clone(lang::Context& new_context) const
+Shared<lang::LiteralConstant> lang::CharConstant::clone(lang::Context& new_context) const
 {
     return Shared<CharConstant>(*(new CharConstant(prefix_, content_, new_context)));
 }

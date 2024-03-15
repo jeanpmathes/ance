@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_CONSTANT_BOOLEANCONSTANT_H_
 #define ANCE_SRC_LANG_CONSTRUCT_CONSTANT_BOOLEANCONSTANT_H_
 
-#include "Constant.h"
+#include "LiteralConstant.h"
 
 #include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -13,7 +13,7 @@ namespace lang
     /**
      * A constant for boolean values.
      */
-    class BooleanConstant : public Constant
+    class BooleanConstant : public LiteralConstant
     {
       private:
         explicit BooleanConstant(bool boolean, lang::Context& context);
@@ -21,14 +21,11 @@ namespace lang
       public:
         [[nodiscard]] std::string toString() const override;
 
-        lang::ResolvingHandle<lang::Type> type() override;
-        [[nodiscard]] lang::Type const&   type() const override;
-
-        Shared<lang::Constant> createContent(CompileContext& context) override;
+        Shared<lang::Constant> embed(CompileContext& context) const override;
 
         bool equals(lang::Constant const* other) const override;
 
-        [[nodiscard]] Shared<lang::Constant> clone(lang::Context& new_context) const override;
+        [[nodiscard]] Shared<lang::LiteralConstant> clone(lang::Context& new_context) const override;
 
         /**
          * Create a boolean constant with the false value.
@@ -42,7 +39,6 @@ namespace lang
         static Shared<lang::BooleanConstant> createTrue(lang::Context& context);
 
       private:
-        lang::ResolvingHandle<lang::Type> type_;
         bool                              boolean_;
         std::string                       string_;
     };

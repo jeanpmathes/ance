@@ -89,8 +89,6 @@ namespace lang
          */
         [[nodiscard]] bool isImported() const;
 
-        virtual void buildDeclaration(CompileContext& context);
-        virtual void buildDefinition(CompileContext& context);
         virtual void buildInitialization(CompileContext& context);
         virtual void buildFinalization(CompileContext& context);
 

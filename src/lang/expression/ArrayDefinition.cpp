@@ -117,21 +117,4 @@ Expression::Expansion ArrayDefinition::expandWith(Expressions subexpressions, la
             Statements()};
 }
 
-void ArrayDefinition::doBuild(CompileContext& context)
-{
-    std::vector<Shared<lang::Value>> elements;
-
-    elements.reserve(elements_.size());
-    for (auto& element : elements_)
-    {
-        elements.push_back(lang::Type::makeMatching(type()->getElementType(), element->getValue(), context));
-    }
-
-    auto array_type = type()->isArrayType();
-    assert(array_type);
-
-    auto value = array_type->createValue(std::move(elements), context);
-    setValue(value);
-}
-
 ArrayDefinition::~ArrayDefinition() = default;

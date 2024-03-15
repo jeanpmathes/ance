@@ -4,7 +4,7 @@
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
-#include "lang/construct/value/RoughlyCastedValue.h"
+#include "compiler/RoughlyCastedValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/CharType.h"
 #include "validation/ValidationLogger.h"
@@ -58,16 +58,16 @@ bool lang::FixedWidthIntegerType::validateCast(lang::Type const& other,
     return IntegerType::validateCast(other, location, validation_logger);
 }
 
-Shared<lang::Value> lang::FixedWidthIntegerType::buildCast(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::FixedWidthIntegerType::buildCast(lang::Type const& other,
                                                            Shared<lang::Value>               value,
-                                                           CompileContext&                   context)
+                                                           CompileContext&                   context) const
 {
-    if (other->isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_)
+    if (other.isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_)
     {
-        return makeShared<RoughlyCastedValue>(other, value, context);
+        return context.exec().performIntegerReinterpretation(value, other);
     }
 
-    if (other->isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
+    if (other.isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
     {
         return context.exec().computeConversionI2FP(value, other);
     }

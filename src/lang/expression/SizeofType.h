@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_SIZEOFTYPE_H_
 #define ANCE_SRC_LANG_EXPRESSION_SIZEOFTYPE_H_
 
-#include "DelayableExpression.h"
+#include "Expression.h"
 
 #include "lang/Element.h"
 
@@ -11,7 +11,7 @@ class Application;
  * Provides the size of a type.
  */
 class SizeofType
-    : public DelayableExpression
+    : public Expression
     , public lang::Element<SizeofType, ANCE_CONSTRUCTS>
 {
   public:
@@ -22,7 +22,7 @@ class SizeofType
      */
     explicit SizeofType(lang::ResolvingHandle<lang::Type> type, lang::Location type_location, lang::Location location);
 
-    [[nodiscard]] lang::Type const& targetType() const;
+    [[nodiscard]] lang::Entity const& target() const;
 
   protected:
     void walkDefinitions() override;
@@ -34,7 +34,6 @@ class SizeofType
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doBuild(CompileContext& context) override;
 
   private:
     lang::ResolvingHandle<lang::Entity> type_;

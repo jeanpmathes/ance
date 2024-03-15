@@ -117,21 +117,4 @@ Expression::Expansion VectorDefinition::expandWith(Expressions subexpressions, l
             Statements()};
 }
 
-void VectorDefinition::doBuild(CompileContext& context)
-{
-    std::vector<Shared<lang::Value>> elements;
-
-    elements.reserve(elements_.size());
-    for (auto& element : elements_)
-    {
-        elements.push_back(lang::Type::makeMatching(type()->getElementType(), element->getValue(), context));
-    }
-
-    auto vector_type = type()->isVectorType();
-    assert(vector_type);
-
-    auto value = vector_type->createValue(std::move(elements), context);
-    setValue(value);
-}
-
 VectorDefinition::~VectorDefinition() = default;

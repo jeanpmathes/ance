@@ -8,8 +8,8 @@
 lang::FloatConstant::FloatConstant(std::string const&                number,
                                    llvm::fltSemantics const&         semantics,
                                    lang::ResolvingHandle<lang::Type> type)
-    : text_(number)
-    , type_(std::move(type))
+    : LiteralConstant(type)
+    , text_(number)
     , float_(semantics, number)
 {}
 
@@ -17,27 +17,17 @@ std::string lang::FloatConstant::toString() const
 {
     std::string suffix;
 
-    if (type_->isFloatingPointType(16)) suffix += "h";
-    if (type_->isFloatingPointType(32)) suffix += "s";
-    if (type_->isFloatingPointType(64)) suffix += "d";
-    if (type_->isFloatingPointType(128)) suffix += "q";
+    if (type().isFloatingPointType(16)) suffix += "h";
+    if (type().isFloatingPointType(32)) suffix += "s";
+    if (type().isFloatingPointType(64)) suffix += "d";
+    if (type().isFloatingPointType(128)) suffix += "q";
 
     return text_ + suffix;
 }
 
-lang::ResolvingHandle<lang::Type> lang::FloatConstant::type()
+Shared<lang::Constant> lang::FloatConstant::embed(CompileContext& context) const
 {
-    return type_;
-}
-
-lang::Type const& lang::FloatConstant::type() const
-{
-    return type_;
-}
-
-Shared<lang::Constant> lang::FloatConstant::createContent(CompileContext& context)
-{
-    return context.exec().getFloatingPoint(float_, type_);
+    return context.exec().getFloatingPoint(float_, type());
 }
 
 bool lang::FloatConstant::equals(lang::Constant const* other) const
@@ -48,8 +38,8 @@ bool lang::FloatConstant::equals(lang::Constant const* other) const
     return this->float_ == other_float->float_;
 }
 
-Shared<lang::Constant> lang::FloatConstant::clone(lang::Context& new_context) const
+Shared<lang::LiteralConstant> lang::FloatConstant::clone(lang::Context& new_context) const
 {
-    return Shared<lang::Constant>(
-        *(new FloatConstant(text_, float_.getSemantics(), type_->getUndefinedTypeClone(new_context))));
+    return Shared<lang::LiteralConstant>(
+        *(new FloatConstant(text_, float_.getSemantics(), type().getUndefinedTypeClone(new_context))));
 }

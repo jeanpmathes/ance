@@ -21,7 +21,7 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
     , is_constant_(is_constant)
     , location_(location)
     , type_handle_(type_.valueOr(init.hasValue() ? init.value()->type() : lang::Type::getUndefined()))
-    , constant_init_(is_constant ? dynamic_cast<ConstantExpression*>(getPtr(init)) : nullptr)
+    , constant_init_(is_constant ? dynamic_cast<LiteralExpression*>(getPtr(init)) : nullptr)
     , init_expression_ptr_(getPtr(init))
     , init_expression_(std::move(init))
     , init_block_(std::nullopt)
@@ -47,7 +47,7 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
     , location_(location)
     , type_handle_(
           type_.valueOr(init_expression_ptr != nullptr ? init_expression_ptr->type() : lang::Type::getUndefined()))
-    , constant_init_(is_constant_ ? dynamic_cast<ConstantExpression*>(init_expression_ptr) : nullptr)
+    , constant_init_(is_constant_ ? dynamic_cast<LiteralExpression*>(init_expression_ptr) : nullptr)
     , init_expression_ptr_(init_expression_ptr)
     , init_expression_(std::move(init_expression))
     , init_block_(std::move(init_block))
@@ -133,9 +133,7 @@ std::vector<lang::Description::Dependency> lang::VariableDescription::getDefinit
 
 void lang::VariableDescription::performInitialization()
 {
-    lang::Initializer variable_init;
-
-    lang::Scope* init_scope = nullptr;
+    lang::GlobalInitializer variable_init;
 
     if (type_.hasValue()) { scope().registerUsage(type_.value()); }
     else if (init_expression_ptr_ != nullptr) { type_handle_.reroute(init_expression_ptr_->type()); }
@@ -151,7 +149,6 @@ void lang::VariableDescription::performInitialization()
             init_function_ = &init_function->defineAsInit(**init_block_, scope());
 
             variable_init = std::ref(*init_function);
-            init_scope    = &*init_function;
 
             scope().addEntity(std::move(init_function));
         }
@@ -164,8 +161,6 @@ void lang::VariableDescription::performInitialization()
             init_block_.value()->setContainingScope(scope());
             init_block_.value()->walkDefinitions();
 
-            init_scope = init_block_.value()->getBlockScope();
-
             init_expression_ = std::nullopt;
         }
     }
@@ -176,7 +171,6 @@ void lang::VariableDescription::performInitialization()
                                                         access().modifier(),
                                                         access().isImported(),
                                                         variable_init,
-                                                        init_scope,
                                                         assigner_,
                                                         is_constant_,
                                                         location_);
@@ -295,7 +289,7 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
         expanded_init_expression_ptr = new_expression.get();
         expanded_init_expression     = std::move(new_expression);
 
-        if (constant_init_ != nullptr) { assert(dynamic_cast<ConstantExpression*>(expanded_init_expression_ptr)); }
+        if (constant_init_ != nullptr) { assert(dynamic_cast<LiteralExpression*>(expanded_init_expression_ptr)); }
     }
 
     auto expanded = makeOwned<lang::VariableDescription>(name_,
@@ -313,18 +307,6 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
     descriptions.emplace_back(std::move(expanded));
 
     return descriptions;
-}
-
-void lang::VariableDescription::buildDeclaration(CompileContext& context)
-{
-    variable_handle_->buildDeclaration(context);
-
-    if (init_function_ != nullptr) { init_function_->createNativeBacking(context); }
-}
-
-void lang::VariableDescription::buildDefinition(CompileContext& context)
-{
-    if (init_function_ != nullptr) { init_function_->build(context); }
 }
 
 void lang::VariableDescription::buildInitialization(CompileContext& context)

@@ -4,7 +4,7 @@
 
 #include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/value/Value.h"
+#include "lang/construct/Value.h"
 #include "lang/scope/Scope.h"
 #include "validation/ValidationLogger.h"
 
@@ -43,14 +43,9 @@ std::string lang::StructType::createMangledName() const
     return "struct(" + name() + ")";
 }
 
-Execution::Type lang::StructType::createExecutionType(CompileContext& context) const
+void lang::StructType::registerExecutionType(CompileContext& context) const
 {
-    return context.exec().createStruct(name(),
-                                       CustomType::getAccessibility().modifier(),
-                                       self(),
-                                       members_,
-                                       scope(),
-                                       getDefinitionLocation());
+    context.exec().createStruct(self(), members_, getDefinitionLocation());
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::StructType::getDeclarationDependencies()
@@ -89,6 +84,13 @@ lang::Member& lang::StructType::getMember(lang::Identifier const& name)
     return TypeDefinition::getMember(name);
 }
 
+lang::Member const& lang::StructType::getMember(lang::Identifier const& name) const
+{
+    if (member_map_.contains(name)) { return member_map_.at(name); }
+
+    return TypeDefinition::getMember(name);
+}
+
 bool lang::StructType::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const
 {
     if (member_map_.at(name).get().access() == AccessModifier::PRIVATE_ACCESS)
@@ -102,7 +104,7 @@ bool lang::StructType::validateMemberAccess(lang::Identifier const& name, Valida
 
 Shared<lang::Value> lang::StructType::buildMemberAccess(Shared<lang::Value>     value,
                                                         lang::Identifier const& name,
-                                                        CompileContext&         context)
+                                                        CompileContext&         context) const
 {
     Shared<lang::Value> struct_ptr = context.exec().computeAddressOf(value);
     Shared<lang::Value> member_ptr = context.exec().computeMemberPointer(struct_ptr, name);
@@ -110,7 +112,7 @@ Shared<lang::Value> lang::StructType::buildMemberAccess(Shared<lang::Value>     
     return context.exec().computeReferenceFromPointer(member_ptr);
 }
 
-void lang::StructType::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context)
+void lang::StructType::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
 {
     for (auto member : members_)
     {
@@ -121,7 +123,7 @@ void lang::StructType::performSingleDefaultInitializerDefinition(Shared<lang::Va
 
 void lang::StructType::performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                               Shared<lang::Value> src_ptr,
-                                                              CompileContext& context)
+                                                              CompileContext& context) const
 {
     for (auto member : members_)
     {
@@ -131,7 +133,7 @@ void lang::StructType::performSingleCopyInitializerDefinition(Shared<lang::Value
     }
 }
 
-void lang::StructType::buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context)
+void lang::StructType::buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
 {
     for (auto member : members_)
     {

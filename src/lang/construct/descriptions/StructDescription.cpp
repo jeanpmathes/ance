@@ -44,6 +44,11 @@ bool lang::StructDescription::isOverloadAllowed() const
     return false;
 }
 
+lang::Type const& lang::StructDescription::type() const
+{
+    return self_;
+}
+
 std::vector<std::reference_wrapper<const lang::Entity>> lang::StructDescription::getProvidedEntities() const
 {
     return {std::cref(self_.base())};
@@ -162,16 +167,6 @@ lang::Description::Descriptions lang::StructDescription::expand(lang::Context& n
     result.emplace_back(makeOwned<StructDescription>(access(), name_, std::move(members), definition_location_));
 
     return result;
-}
-
-void lang::StructDescription::buildDeclaration(CompileContext& context)
-{
-    self_->buildNativeDeclaration(context);
-}
-
-void lang::StructDescription::buildDefinition(CompileContext& context)
-{
-    self_->buildNativeDefinition(context);
 }
 
 void lang::StructDescription::sync(Storage& storage)

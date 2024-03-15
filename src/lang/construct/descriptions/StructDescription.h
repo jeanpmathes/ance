@@ -38,6 +38,8 @@ namespace lang
         [[nodiscard]] std::vector<std::reference_wrapper<const lang::Member>> members() const;
         [[nodiscard]] bool                                                    isOverloadAllowed() const override;
 
+        [[nodiscard]] lang::Type const& type() const;
+
         [[nodiscard]] std::vector<std::reference_wrapper<Entity const>> getProvidedEntities() const override;
         [[nodiscard]] std::vector<Dependency>                           getDeclarationDependencies() const override;
         [[nodiscard]] std::vector<Dependency>                           getDefinitionDependencies() const override;
@@ -49,9 +51,6 @@ namespace lang
         void validate(ValidationLogger& validation_logger) const override;
 
         [[nodiscard]] Descriptions expand(lang::Context& new_context) const override;
-
-        void buildDeclaration(CompileContext& context) override;
-        void buildDefinition(CompileContext& context) override;
 
       protected:
         void performInitialization() override;

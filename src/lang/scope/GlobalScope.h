@@ -17,7 +17,7 @@
 #include "lang/utility/OwningHandle.h"
 #include "lang/utility/TypeRegistry.h"
 
-class ConstantExpression;
+class LiteralExpression;
 class Storage;
 
 namespace lang
@@ -53,7 +53,6 @@ namespace lang
 
         lang::GlobalScope*                     getGlobalScope() override;
         [[nodiscard]] lang::GlobalScope const* getGlobalScope() const override;
-        Execution::Scoped                      getExecutionScope(CompileContext& context) const override;
 
         [[nodiscard]] Owned<lang::GlobalScope> expand() const;
         void                                   determineFlow();
@@ -80,9 +79,6 @@ namespace lang
          * @return The entry point.
          */
         lang::ResolvingHandle<lang::Function> getEntryPoint();
-
-        void buildDeclarations(CompileContext& context) override;
-        void buildDefinitions(CompileContext& context) override;
 
       protected:
         void onResolve() override;

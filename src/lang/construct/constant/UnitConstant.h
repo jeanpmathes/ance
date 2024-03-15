@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_CONSTANT_UNITCONSTANT_H_
 #define ANCE_SRC_LANG_CONSTRUCT_CONSTANT_UNITCONSTANT_H_
 
-#include "Constant.h"
+#include "LiteralConstant.h"
 
 #include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -13,30 +13,18 @@ namespace lang
     /**
      * The constant unit value.
      */
-    class UnitConstant : public Constant
+    class UnitConstant : public LiteralConstant
     {
       public:
-        explicit UnitConstant(lang::Context& new_context);
+        explicit UnitConstant(lang::Context& context);
 
         [[nodiscard]] std::string toString() const override;
 
-        lang::ResolvingHandle<lang::Type> type() override;
-        [[nodiscard]] lang::Type const&   type() const override;
-
-        Shared<lang::Constant> createContent(CompileContext& context) override;
+        Shared<lang::Constant> embed(CompileContext& context) const override;
 
         bool equals(lang::Constant const* other) const override;
 
-        Shared<lang::Constant> clone(lang::Context& new_context) const override;
-
-        /**
-         * Create a new unit constant.
-         * @return The new unit constant.
-         */
-        static Shared<lang::UnitConstant> create(lang::Context& new_context);
-
-      private:
-        lang::ResolvingHandle<lang::Type> type_;
+        Shared<lang::LiteralConstant> clone(lang::Context& new_context) const override;
     };
 }
 

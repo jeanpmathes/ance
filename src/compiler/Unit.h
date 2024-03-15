@@ -191,9 +191,11 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     virtual void validate(ValidationLogger& validation_logger) const = 0;
 
     /**
-     * Prepare everything for compilation.
+     * Transform the internal representation to an executable form.
+     * This means that the AST is expanded to remove syntactic sugar,
+     * then references are resolved and basic blocks are created.
      */
-    void preBuild();
+    void transformToExecutableForm();
 
     /**
      * Emit the parsed and processed application as source.

@@ -44,6 +44,7 @@ class LocalReferenceVariableDefinition
     [[nodiscard]] lang::Identifier const& name() const;
     [[nodiscard]] lang::Type const&       type() const;
     [[nodiscard]] Expression const&       reference() const;
+    [[nodiscard]] lang::Variable const&  variable() const;
 
   public:
     void setScope(lang::Scope& scope) override;
@@ -54,9 +55,6 @@ class LocalReferenceVariableDefinition
     [[nodiscard]] Statements expandWith(Expressions    subexpressions,
                                         Statements     substatements,
                                         lang::Context& new_context) const override;
-
-  protected:
-    void doBuild(CompileContext& context) override;
 
   private:
     lang::Identifier                    name_;

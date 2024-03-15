@@ -6,7 +6,7 @@
 #include "lang/type/BooleanType.h"
 
 lang::BooleanConstant::BooleanConstant(bool boolean, lang::Context& context)
-    : type_(context.getBooleanType())
+    : LiteralConstant(context.getBooleanType())
     , boolean_(boolean)
 {}
 
@@ -15,19 +15,9 @@ std::string lang::BooleanConstant::toString() const
     return boolean_ ? "true" : "false";
 }
 
-lang::ResolvingHandle<lang::Type> lang::BooleanConstant::type()
+Shared<lang::Constant> lang::BooleanConstant::embed(CompileContext& context) const
 {
-    return type_;
-}
-
-lang::Type const& lang::BooleanConstant::type() const
-{
-    return type_;
-}
-
-Shared<lang::Constant> lang::BooleanConstant::createContent(CompileContext& context)
-{
-    return context.exec().getBoolean(boolean_, type_);
+    return context.exec().getBoolean(boolean_, type());
 }
 
 bool lang::BooleanConstant::equals(lang::Constant const* other) const
@@ -38,7 +28,7 @@ bool lang::BooleanConstant::equals(lang::Constant const* other) const
     return this->boolean_ == other_boolean->boolean_;
 }
 
-Shared<lang::Constant> lang::BooleanConstant::clone(lang::Context& new_context) const
+Shared<lang::LiteralConstant> lang::BooleanConstant::clone(lang::Context& new_context) const
 {
     return Shared<BooleanConstant>(*(new BooleanConstant(boolean_, new_context)));
 }

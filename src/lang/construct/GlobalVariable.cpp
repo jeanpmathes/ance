@@ -5,8 +5,8 @@
 #include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
-#include "lang/construct/constant/Constant.h"
-#include "lang/expression/ConstantExpression.h"
+#include "lang/construct/Constant.h"
+#include "lang/expression/LiteralExpression.h"
 #include "lang/scope/GlobalScope.h"
 #include "validation/ValidationLogger.h"
 
@@ -21,8 +21,7 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
                                      Scope&                                containing_scope,
                                      lang::AccessModifier                  access,
                                      bool                                  is_import,
-                                     Initializer                           init,
-                                     lang::Scope*                          init_scope,
+                                     GlobalInitializer                     init,
                                      Assigner                              assigner,
                                      bool                                  is_constant,
                                      lang::Location                        location)
@@ -31,12 +30,11 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
     , is_import_(is_import)
     , is_constant_(is_constant)
     , init_(std::move(init))
-    , init_scope_(init_scope)
     , assigner_(assigner)
 {
     if (init_.hasValue())
     {
-        if (auto* constant_init = std::get_if<std::reference_wrapper<ConstantExpression>>(&init_.value()))
+        if (auto* constant_init = std::get_if<std::reference_wrapper<LiteralExpression>>(&init_.value()))
         {
             constant_init->get().setContainingScope(containing_scope);
         }
@@ -58,12 +56,12 @@ lang::Assigner lang::GlobalVariable::assigner() const
     return assigner_;
 }
 
-void lang::GlobalVariable::buildDeclaration(CompileContext& context)
+void lang::GlobalVariable::buildDeclaration(CompileContext& context) const
 {
-    variable_handle_ = context.exec().createGlobalVariable(name(), access(), is_import_, type(), is_constant_, init_, location());
+    context.exec().createGlobalVariable(*this, is_import_, init_);
 }
 
-void lang::GlobalVariable::buildInitialization(CompileContext& context)
+void lang::GlobalVariable::buildInitialization(CompileContext& context) const
 {
     if (init_.hasValue())
     {
@@ -74,27 +72,12 @@ void lang::GlobalVariable::buildInitialization(CompileContext& context)
     }
 }
 
-void lang::GlobalVariable::buildFinalization(CompileContext& context)
+void lang::GlobalVariable::buildFinalization(CompileContext& context) const
 {
-    assert(not finalized_);
-
-    type()->performFinalizer(context.exec().computeAddressOfVariable(variable_handle_.value()), context);
-
-    finalized_ = true;
+    type().performFinalizer(context.exec().computeAddressOfVariable(self()), context);
 }
 
-Shared<lang::Value> lang::GlobalVariable::getValuePointer(CompileContext& context)
+Shared<lang::Value> lang::GlobalVariable::getValuePointer(CompileContext& context) const
 {
-    assert(variable_handle_.hasValue());
-    return context.exec().computeAddressOfVariable(variable_handle_.value());
-}
-
-void lang::GlobalVariable::storeValue(Shared<lang::Value> value, CompileContext& context)
-{
-    assert(variable_handle_.hasValue());
-
-    Shared<lang::Value> variable_pointer = context.exec().computeAddressOfVariable(variable_handle_.value());
-    Shared<lang::Value> value_pointer = context.exec().computeAddressOf(value);
-
-    type()->performCopyInitializer(variable_pointer, value_pointer, context);
+    return context.exec().computeAddressOfVariable(self());
 }

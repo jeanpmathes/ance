@@ -46,7 +46,7 @@ void Assignment::validate(ValidationLogger& validation_logger) const
 
     if (assigned_->validate(validation_logger))
     {
-        assignable_->validateAssignment(assigned_->getValue(), assigned_->location(), validation_logger);
+        assignable_->validateAssignment(assigned_->type(), assigned_->location(), validation_logger);
     }
 }
 
@@ -58,9 +58,4 @@ Statements Assignment::expandWith(Expressions subexpressions, Statements, lang::
         makeOwned<Assignment>(std::move(subexpressions[0]), assigner_, std::move(subexpressions[1]), location()));
 
     return statements;
-}
-
-void Assignment::doBuild(CompileContext& context)
-{
-    assignable_->assign(assigned_->getValue(), context);
 }

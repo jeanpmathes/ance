@@ -48,8 +48,6 @@ bool lang::Description::isImported() const
     return accessibility_.isImported();
 }
 
-void lang::Description::buildDeclaration(CompileContext&) {}
-void lang::Description::buildDefinition(CompileContext&) {}
 void lang::Description::buildInitialization(CompileContext&) {}
 void lang::Description::buildFinalization(CompileContext&) {}
 

@@ -27,9 +27,9 @@ bool lang::NullValueType::validateImplicitConversion(lang::Type const&, lang::Lo
     return true;
 }
 
-Shared<lang::Value> lang::NullValueType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::NullValueType::buildImplicitConversion(lang::Type const& other,
                                                                  Shared<lang::Value>,
-                                                                 CompileContext& context)
+                                                                 CompileContext& context) const
 {
     return context.exec().getNull(other);
 }
@@ -39,7 +39,7 @@ std::string lang::NullValueType::createMangledName() const
     return "nullptr";
 }
 
-Execution::Type lang::NullValueType::createExecutionType(CompileContext& context) const
+void lang::NullValueType::registerExecutionType(CompileContext& context) const
 {
     return context.exec().registerOpaqueAddressType(self());
 }

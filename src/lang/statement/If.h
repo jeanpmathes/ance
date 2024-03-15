@@ -41,9 +41,6 @@ class If
                                         Statements     substatements,
                                         lang::Context& new_context) const override;
 
-  protected:
-    void doBuild(CompileContext& context) override;
-
   private:
     Owned<Expression> condition_;
 

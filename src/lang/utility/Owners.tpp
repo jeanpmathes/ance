@@ -177,6 +177,17 @@ T const* Shared<T>::operator->() const
 }
 
 template<typename T>
+template<typename OtherT>
+Shared<OtherT> Shared<T>::cast()
+{
+    auto casted = std::dynamic_pointer_cast<OtherT>(value_);
+
+    assert(casted);
+
+    return Shared<OtherT>(std::move(casted));
+}
+
+template<typename T>
 Passed<T>::Passed(T& value) : reference_(value)
 {}
 

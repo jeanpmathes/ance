@@ -22,17 +22,17 @@ namespace lang
         using TypeDefinition::buildOperator;
 
         bool                              isOperatorDefined(lang::UnaryOperator op) const override;
-        lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::UnaryOperator op) override;
+        lang::Type const& getOperatorResultType(lang::UnaryOperator op) const override;
         bool                              validateOperator(lang::UnaryOperator op,
                                                            lang::Location      location,
                                                            ValidationLogger&   validation_logger) const override;
         Shared<lang::Value>               buildOperator(lang::UnaryOperator op,
                                                         Shared<lang::Value> value,
-                                                        CompileContext&     context) override;
+                                                        CompileContext&     context) const override;
 
         bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
-        lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator              op,
-                                                                lang::ResolvingHandle<lang::Type> other) override;
+        lang::Type const& getOperatorResultType(lang::BinaryOperator              op,
+                                                                lang::Type const& other) const override;
         bool                              validateOperator(lang::BinaryOperator op,
                                                            lang::Type const&    other,
                                                            lang::Location       left_location,
@@ -41,16 +41,16 @@ namespace lang
         Shared<lang::Value>               buildOperator(lang::BinaryOperator op,
                                                         Shared<lang::Value>  left,
                                                         Shared<lang::Value>  right,
-                                                        CompileContext&      context) override;
+                                                        CompileContext&      context) const override;
 
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
-        void buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+        void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                     lang::PredefinedFunction&                      function,
-                                    CompileContext&                                context) override;
-        void buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                    lang::ResolvingHandle<lang::Type> return_type,
+                                    CompileContext&                                context) const override;
+        void buildRequestedOverload(lang::Type const& parameter_element,
+                                    lang::Type const& return_type,
                                     lang::PredefinedFunction&         function,
-                                    CompileContext&                   context) override;
+                                    CompileContext&                   context) const override;
 
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
@@ -58,7 +58,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
         std::string   createMangledName() const override;
-        Execution::Type createExecutionType(CompileContext& context) const override;
+        void          registerExecutionType(CompileContext& context) const override;
 
       public:
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;

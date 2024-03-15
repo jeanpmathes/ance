@@ -12,14 +12,14 @@ Erase::Erase(lang::ResolvingHandle<lang::Variable> variable, lang::Location loca
     , variable_(std::move(variable))
 {}
 
-lang::ResolvingHandle<lang::Variable> Erase::variable()
+lang::ResolvingHandle<lang::Entity> Erase::variable()
 {
-    return variable_.as<lang::Variable>().value();
+    return variable_;
 }
 
-lang::Variable const& Erase::variable() const
+lang::Entity const& Erase::variable() const
 {
-    return *variable_.as<lang::Variable>();
+    return *variable_;
 }
 
 void Erase::walkDefinitions()
@@ -47,10 +47,4 @@ Statements Erase::expandWith(Expressions, Statements, lang::Context& new_context
     statements.emplace_back(makeOwned<Erase>(variable_->getUndefinedClone<lang::Variable>(new_context), location()));
 
     return statements;
-}
-
-void Erase::doBuild(CompileContext& context)
-{
-    auto variable = lang::Type::makeMatching<lang::Variable>(variable_);
-    variable->buildFinalization(context);
 }

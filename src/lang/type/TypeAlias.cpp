@@ -186,7 +186,7 @@ bool lang::TypeAlias::isSubscriptDefined() const
     return actual_->isSubscriptDefined();
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeAlias::getSubscriptReturnType()
+lang::Type const& lang::TypeAlias::getSubscriptReturnType() const
 {
     return actual_->getSubscriptReturnType();
 }
@@ -201,7 +201,7 @@ bool lang::TypeAlias::validateSubscript(lang::Location    indexed_location,
 
 Shared<lang::Value> lang::TypeAlias::buildSubscript(Shared<lang::Value> indexed,
                                                     Shared<lang::Value> index,
-                                                    CompileContext&     context)
+                                                    CompileContext&     context) const
 {
     return actual_->buildSubscript(indexed, index, context);
 }
@@ -218,9 +218,9 @@ bool lang::TypeAlias::validateImplicitConversion(lang::Type const& other,
     return actual_->validateImplicitConversion(other, location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::Type const& other,
                                                              Shared<lang::Value>               value,
-                                                             CompileContext&                   context)
+                                                             CompileContext&                   context) const
 {
     return actual_->buildImplicitConversion(other, value, context);
 }
@@ -237,9 +237,9 @@ bool lang::TypeAlias::validateCast(lang::Type const& other,
     return actual_->validateCast(other, location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildCast(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::TypeAlias::buildCast(lang::Type const& other,
                                                Shared<lang::Value>               value,
-                                               CompileContext&                   context)
+                                               CompileContext&                   context) const
 {
     return actual_->buildCast(other, value, context);
 }
@@ -249,7 +249,7 @@ bool lang::TypeAlias::isOperatorDefined(lang::UnaryOperator op) const
     return actual_->isOperatorDefined(op);
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeAlias::getOperatorResultType(lang::UnaryOperator op)
+lang::Type const& lang::TypeAlias::getOperatorResultType(lang::UnaryOperator op) const
 {
     return actual_->getOperatorResultType(op);
 }
@@ -263,7 +263,7 @@ bool lang::TypeAlias::validateOperator(lang::UnaryOperator op,
 
 Shared<lang::Value> lang::TypeAlias::buildOperator(lang::UnaryOperator op,
                                                    Shared<lang::Value> value,
-                                                   CompileContext&     context)
+                                                   CompileContext&     context) const
 {
     return actual_->buildOperator(op, value, context);
 }
@@ -273,8 +273,8 @@ bool lang::TypeAlias::isOperatorDefined(lang::BinaryOperator op, lang::Type cons
     return actual_->isOperatorDefined(op, other);
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeAlias::getOperatorResultType(lang::BinaryOperator              op,
-                                                                         lang::ResolvingHandle<lang::Type> other)
+lang::Type const& lang::TypeAlias::getOperatorResultType(lang::BinaryOperator              op,
+                                                         lang::Type const& other) const
 {
     return actual_->getOperatorResultType(op, other);
 }
@@ -291,7 +291,7 @@ bool lang::TypeAlias::validateOperator(lang::BinaryOperator op,
 Shared<lang::Value> lang::TypeAlias::buildOperator(lang::BinaryOperator op,
                                                    Shared<lang::Value>  left,
                                                    Shared<lang::Value>  right,
-                                                   CompileContext&      context)
+                                                   CompileContext&      context) const
 {
     return actual_->buildOperator(op, left, right, context);
 }
@@ -306,6 +306,11 @@ lang::Member& lang::TypeAlias::getMember(lang::Identifier const& name)
     return actual_->getMember(name);
 }
 
+lang::Member const& lang::TypeAlias::getMember(lang::Identifier const& name) const
+{
+    return actual_->getMember(name);
+}
+
 bool lang::TypeAlias::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const
 {
     return actual_->validateMemberAccess(name, validation_logger);
@@ -313,7 +318,7 @@ bool lang::TypeAlias::validateMemberAccess(lang::Identifier const& name, Validat
 
 Shared<lang::Value> lang::TypeAlias::buildMemberAccess(Shared<lang::Value>     value,
                                                        lang::Identifier const& name,
-                                                       CompileContext&         context)
+                                                       CompileContext&         context) const
 {
     return actual_->buildMemberAccess(value, name, context);
 }
@@ -323,7 +328,7 @@ bool lang::TypeAlias::definesIndirection() const
     return actual_->definesIndirection();
 }
 
-lang::ResolvingHandle<lang::Type> lang::TypeAlias::getIndirectionType()
+lang::Type const& lang::TypeAlias::getIndirectionType() const
 {
     return actual_->getIndirectionType();
 }
@@ -333,26 +338,26 @@ bool lang::TypeAlias::validateIndirection(lang::Location location, ValidationLog
     return actual_->validateIndirection(location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildIndirection(Shared<lang::Value> value, CompileContext& context)
+Shared<lang::Value> lang::TypeAlias::buildIndirection(Shared<lang::Value> value, CompileContext& context) const
 {
     return actual_->buildIndirection(value, context);
 }
 
 void lang::TypeAlias::performDefaultInitializer(Shared<lang::Value> ptr,
                                                 Shared<lang::Value> count,
-                                                CompileContext&     context)
+                                                CompileContext&     context) const
 {
     actual_->performDefaultInitializer(ptr, count, context);
 }
 
 void lang::TypeAlias::performCopyInitializer(Shared<lang::Value> destination,
                                              Shared<lang::Value> count,
-                                             CompileContext&     context)
+                                             CompileContext&     context) const
 {
     actual_->performCopyInitializer(destination, count, context);
 }
 
-void lang::TypeAlias::performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context)
+void lang::TypeAlias::performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const
 {
     actual_->performFinalizer(ptr, count, context);
 }
@@ -379,28 +384,28 @@ bool lang::TypeAlias::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Ty
     return false;// Overloads are rerouted to the actual type by base class.
 }
 
-void lang::TypeAlias::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>>,
+void lang::TypeAlias::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>>,
                                              lang::PredefinedFunction&,
-                                             CompileContext&)
+                                             CompileContext&) const
 {
     assert(false);// Overloads are rerouted to the actual type by base class.
 }
 
-void lang::TypeAlias::buildNativeDeclaration(CompileContext&) {}
+void lang::TypeAlias::buildDeclaration(CompileContext& context) const
+{
+    registerExecutionType(context);
+}
 
-void lang::TypeAlias::buildNativeDefinition(CompileContext&) {}
+void lang::TypeAlias::buildDefinition(CompileContext&) const {}
 
 std::string lang::TypeAlias::createMangledName() const
 {
     return getActualType().getMangledName();
 }
 
-Execution::Type lang::TypeAlias::createExecutionType(CompileContext& context) const
+void lang::TypeAlias::registerExecutionType(CompileContext& context) const
 {
-    return context.exec().createAlias(name(),
-                                      CustomType::getAccessibility().modifier(),
-                                      actual_,
-                                      scope(),
+    return context.exec().createAlias(self(),
                                       getDefinitionLocation());
 }
 

@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_BINDREFTO_H_
 #define ANCE_SRC_LANG_EXPRESSION_BINDREFTO_H_
 
-#include "DelayableExpression.h"
+#include "Expression.h"
 
 #include <optional>
 
@@ -10,7 +10,7 @@
 class Application;
 
 class BindRefTo
-    : public DelayableExpression
+    : public Expression
     , public lang::Element<BindRefTo, ANCE_CONSTRUCTS>
 {
   public:
@@ -25,7 +25,6 @@ class BindRefTo
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doBuild(CompileContext& context) override;
 
   public:
     ~BindRefTo() override;

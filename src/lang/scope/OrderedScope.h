@@ -55,13 +55,9 @@ namespace lang
 
         bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) override;
 
-        /**
-         * Build all variable declarations.
-         * @param context The current compile context.
-         */
-        void         buildDeclarations(CompileContext& context) override;
-        virtual void buildDeclarationsFollowingOrder(CompileContext& context) = 0;
-        void         buildFinalization(CompileContext& context) override;
+        void         buildEntityDeclarations(CompileContext& context) const override;
+        virtual void buildEntityDeclarationsFollowingOrder(CompileContext& context) const = 0;
+        void         buildEntityFinalizations(CompileContext& context) const override;
 
       private:
         std::set<lang::Identifier> blockers_ {};

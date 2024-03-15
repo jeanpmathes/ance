@@ -4,7 +4,6 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/scope/Scope.h"
-#include "lang/type/BooleanType.h"
 #include "lang/type/VectorType.h"
 
 StateCount lang::IntegerType::getStateCount() const
@@ -40,7 +39,7 @@ bool lang::IntegerType::isImplicitlyConvertibleTo(lang::Type const& other) const
         return can_enlarge || can_gain_sign;
     }
 
-    return self()->isSizeType() && other_integer->isDiffType();
+    return self().isSizeType() && other_integer->isDiffType();
 }
 
 bool lang::IntegerType::validateImplicitConversion(lang::Type const&, lang::Location, ValidationLogger&) const
@@ -48,9 +47,9 @@ bool lang::IntegerType::validateImplicitConversion(lang::Type const&, lang::Loca
     return true;
 }
 
-Shared<lang::Value> lang::IntegerType::buildImplicitConversion(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Type const& other,
                                                                Shared<lang::Value>               value,
-                                                               CompileContext&                   context)
+                                                               CompileContext&                   context) const
 {
     return context.exec().computeConversionOnI(value, other);
 }
@@ -66,16 +65,16 @@ bool lang::IntegerType::validateCast(lang::Type const&, lang::Location, Validati
     return true;
 }
 
-Shared<lang::Value> lang::IntegerType::buildCast(lang::ResolvingHandle<lang::Type> other,
+Shared<lang::Value> lang::IntegerType::buildCast(lang::Type const& other,
                                                  Shared<lang::Value>               value,
-                                                 CompileContext&                   context)
+                                                 CompileContext&                   context) const
 {
-    if (other->isXOrVectorOfX([](auto& t) { return t.isIntegerType(); }))
+    if (other.isXOrVectorOfX([](auto& t) { return t.isIntegerType(); }))
     {
         return context.exec().computeConversionOnI(value, other);
     }
 
-    if (other->isXOrVectorOfX([](auto& t) { return t.isAddressType(); }))
+    if (other.isXOrVectorOfX([](auto& t) { return t.isAddressType(); }))
     {
         return context.exec().computeIntegerToPointer(value, other);
     }
@@ -94,29 +93,29 @@ bool lang::IntegerType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::
     return false;
 }
 
-void lang::IntegerType::buildRequestedOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters,
+void lang::IntegerType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                                lang::PredefinedFunction&                      function,
-                                               CompileContext&                                context)
+                                               CompileContext&                                context) const
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }
 
-void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type> parameter_element,
-                                               lang::ResolvingHandle<lang::Type> return_type,
+void lang::IntegerType::buildRequestedOverload(lang::Type const& parameter_element,
+                                               lang::Type const& return_type,
                                                lang::PredefinedFunction&         function,
-                                               CompileContext&                   context)
+                                               CompileContext&                   context) const
 {
-    if (parameter_element->isIntegerType() || parameter_element->isBooleanType())
+    if (parameter_element.isIntegerType() || parameter_element.isBooleanType())
     {
-        context.exec().enterFunctionBody(function.getFunctionHandle(context));
+        context.exec().defineFunctionBody(function.function());
         {
-            Shared<lang::Value> original   = function.getArgument(0);
-            auto                other_type = original->type();
+            Shared<lang::Value> original   = context.exec().getParameterValue(function.function(), 0);
+            auto const&                other_type = original->type();
 
             // Determine whether the value fits into the return type without loss of information.
             // Abort if it doesn't.
 
-            if (auto other_integer_type = parameter_element->isIntegerType())
+            if (auto other_integer_type = parameter_element.isIntegerType())
             {
                 auto this_size      = static_cast<unsigned>(getMinimumBitSize());
                 auto other_size     = static_cast<unsigned>(other_integer_type->getMinimumBitSize());
@@ -201,12 +200,12 @@ void lang::IntegerType::buildRequestedOverload(lang::ResolvingHandle<lang::Type>
                 }
             }
 
-            if (parameter_element->isIntegerType())
+            if (parameter_element.isIntegerType())
             {
                 Shared<lang::Value> result = context.exec().computeConversionOnI(original, return_type);
                 context.exec().performReturn(result);
             }
-            else if (parameter_element->isBooleanType())
+            else if (parameter_element.isBooleanType())
             {
                 Shared<lang::Constant> zero = context.exec().getZero(return_type);
                 Shared<lang::Constant> one  = context.exec().getOne(return_type);
@@ -223,7 +222,7 @@ bool lang::IntegerType::isOperatorDefined(lang::UnaryOperator op) const
     return op == lang::UnaryOperator::BITWISE_NOT || op == lang::UnaryOperator::NEGATION;
 }
 
-lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang::UnaryOperator)
+lang::Type const& lang::IntegerType::getOperatorResultType(lang::UnaryOperator) const
 {
     return self();
 }
@@ -235,7 +234,7 @@ bool lang::IntegerType::validateOperator(lang::UnaryOperator, lang::Location, Va
 
 Shared<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator op,
                                                      Shared<lang::Value> value,
-                                                     CompileContext&     context)
+                                                     CompileContext&     context) const
 {
     return context.exec().performOperator(op, value);
 }
@@ -264,10 +263,10 @@ bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator op, lang::Type co
     return false;
 }
 
-lang::ResolvingHandle<lang::Type> lang::IntegerType::getOperatorResultType(lang::BinaryOperator op,
-                                                                           lang::ResolvingHandle<lang::Type>)
+lang::Type const& lang::IntegerType::getOperatorResultType(lang::BinaryOperator op,
+                                                           lang::Type const&) const
 {
-    if (op.isArithmetic() || op.isBitwise() || op.isShift()) return self()->getActualType();
+    if (op.isArithmetic() || op.isBitwise() || op.isShift()) return self().getActualType();
     if (op.isRelational() || op.isEquality()) return scope().context().getBooleanType();
 
     return lang::Type::getUndefined();
@@ -285,9 +284,9 @@ bool lang::IntegerType::validateOperator(lang::BinaryOperator,
 Shared<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator op,
                                                      Shared<lang::Value>  left,
                                                      Shared<lang::Value>  right,
-                                                     CompileContext&      context)
+                                                     CompileContext&      context) const
 {
-    if (right->type()->isReferenceType()) right = context.exec().performDereference(right);
+    if (right->type().isReferenceType()) right = context.exec().performDereference(right);
 
     right = context.exec().computeConversionOnI(right, left->type());
 
@@ -309,7 +308,7 @@ bool lang::IntegerType::isTriviallyDestructible() const
     return true;
 }
 
-Execution::Type lang::IntegerType::createExecutionType(CompileContext& context) const
+void lang::IntegerType::registerExecutionType(CompileContext& context) const
 {
     return context.exec().registerIntegerType(self());
 }

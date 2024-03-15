@@ -41,6 +41,12 @@ Expression const& LocalReferenceVariableDefinition::reference() const
     return *reference_;
 }
 
+lang::Variable const& LocalReferenceVariableDefinition::variable() const
+{
+    assert(variable_.hasValue());
+    return *variable_;
+}
+
 void LocalReferenceVariableDefinition::setScope(lang::Scope& scope)
 {
     Statement::setScope(scope);
@@ -59,7 +65,7 @@ void LocalReferenceVariableDefinition::walkDefinitions()
                                                    type_.as<lang::Type>().value(),
                                                    type_location_,
                                                    lang::Assigner::REFERENCE_BINDING,
-                                                   reference_->getValue(),
+                                                   reference_.get(),
                                                    scope(),
                                                    location());
         variable_ = variable.handle();
@@ -116,9 +122,4 @@ Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressio
                                                     location()));
 
     return statements;
-}
-
-void LocalReferenceVariableDefinition::doBuild(CompileContext& context)
-{
-    (*variable_)->buildInitialization(context);
 }

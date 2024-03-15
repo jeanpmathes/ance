@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_FUNCTIONCALL_H_
 #define ANCE_SRC_LANG_EXPRESSION_FUNCTIONCALL_H_
 
-#include "DelayableExpression.h"
+#include "Expression.h"
 
 #include <set>
 
@@ -18,7 +18,7 @@ namespace lang
  * A call to a function.
  */
 class FunctionCall
-    : public DelayableExpression
+    : public Expression
     , public lang::Element<FunctionCall, ANCE_CONSTRUCTS>
 {
   public:
@@ -35,6 +35,8 @@ class FunctionCall
     [[nodiscard]] lang::Entity const&                                   callee() const;
     [[nodiscard]] std::vector<std::reference_wrapper<Expression const>> arguments() const;
 
+    [[nodiscard]] lang::Function const& function() const;
+
   private:
     [[nodiscard]] lang::Callable const* getCallable() const;
     lang::Callable*                     getCallable();
@@ -50,7 +52,6 @@ class FunctionCall
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doBuild(CompileContext& context) override;
 
   public:
     ~FunctionCall() override;

@@ -1,17 +1,13 @@
 target_sources(ance PRIVATE Expression.cpp
-               ConstantExpression.cpp
-               UnexpandedExpression.cpp
                MemberAccess.cpp
                Indirection.cpp
                FunctionCall.cpp
-               ConstantLiteral.cpp
+               LiteralExpression.cpp
                SizeofExpression.cpp
                SizeofType.cpp
                VariableAccess.cpp
                Allocation.cpp
-               DelayableExpression.cpp
                Subscript.cpp
-               BuildableExpression.cpp
                Addressof.cpp
                BindRef.cpp
                BindRefTo.cpp

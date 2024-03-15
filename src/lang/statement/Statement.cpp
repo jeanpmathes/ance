@@ -180,13 +180,6 @@ Statements Statement::arrangeExpandedStatements(Statements before, Statements ex
     return final;
 }
 
-void Statement::build(CompileContext& context)
-{
-    context.setDebugLocation(location(), scope());
-    doBuild(context);
-    context.resetDebugLocation();
-}
-
 void Statement::addSubexpression(Expression& subexpression)
 {
     subexpressions_.emplace_back(subexpression);

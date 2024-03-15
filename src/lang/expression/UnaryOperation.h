@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_UNARYOPERATION_H_
 #define ANCE_SRC_LANG_EXPRESSION_UNARYOPERATION_H_
 
-#include "DelayableExpression.h"
+#include "Expression.h"
 
 #include "lang/Element.h"
 
@@ -9,7 +9,7 @@
  * A unary operation, which is a single operand expression.
  */
 class UnaryOperation
-    : public DelayableExpression
+    : public Expression
     , public lang::Element<UnaryOperation, ANCE_CONSTRUCTS>
 {
   public:
@@ -31,7 +31,6 @@ class UnaryOperation
 
   protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
-    void doBuild(CompileContext& context) override;
 
   public:
     ~UnaryOperation() override;
