@@ -53,9 +53,9 @@ namespace lang
       public:
         /**
          * Initialize the type.
-         * @param data_layout The data layout of the current build target.
+         * @param unit The current unit.
          */
-        static void init(llvm::DataLayout const& data_layout);
+        static void init(Unit& unit);
 
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };

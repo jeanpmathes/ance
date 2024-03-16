@@ -18,23 +18,17 @@ Unit::Unit(bool is_containing_runtime) : Unit(makeOwned<lang::GlobalScope>(is_co
 {
 }
 
-void Unit::setTargetInfo(llvm::Triple const& triple, llvm::DataLayout const& data_layout)
+void Unit::setTargetInfo(TargetDescriptor const& target_descriptor)
 {
-    pointer_size_  = data_layout.getPointerSize();
-    target_triple_ = triple;
+    target_descriptor_ = target_descriptor;
 
     lang::SizeType::init(*this);
-    lang::UnsignedIntegerPointerType::init(data_layout);
+    lang::UnsignedIntegerPointerType::init(*this);
 }
 
-unsigned Unit::getBitness() const
+TargetDescriptor const& Unit::getTarget() const
 {
-    return pointer_size_ * 8;
-}
-
-llvm::Triple const& Unit::getTargetTriple() const
-{
-    return target_triple_;
+    return target_descriptor_;
 }
 
 bool Unit::preparePackageDependencies(Packages const&              packages,

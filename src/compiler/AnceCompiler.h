@@ -7,6 +7,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Target/TargetMachine.h>
 
+#include "TargetDescriptor.h"
 #include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
 #include "lang/construct/Function.h"
@@ -23,9 +24,9 @@ class AnceCompiler
     /**
      * Create a new compiler for a unit.
      * @param tree The source tree.
-     * @param triple The target triple.
+     * @param target_descriptor The target descriptor.
      */
-    AnceCompiler(SourceTree& tree, llvm::Triple const& triple);
+    AnceCompiler(SourceTree& tree, TargetDescriptor const& target_descriptor);
 
     /**
      * Compile the application, emitting an object file and potentially an IR file.
@@ -51,7 +52,8 @@ class AnceCompiler
     static constexpr char const* INTERNAL_FUNCTION_SUFFIX = "$lang";
 
     Unit&             unit_;
-    llvm::Triple      triple_;
+    TargetDescriptor target_descriptor_;
+
     llvm::LLVMContext llvm_context_;
     llvm::Module      module_;
     llvm::IRBuilder<> ir_;

@@ -545,8 +545,6 @@ void lang::TypeDefinition::performFinalizer(Shared<lang::Value> ptr, Shared<lang
 
 void lang::TypeDefinition::buildDeclaration(CompileContext& context) const
 {
-    assert(isImported() ? getAccessibility().modifier().linkage() == llvm::GlobalValue::ExternalLinkage : true);
-
     if (!isTriviallyDefaultConstructible())
     {
         assert(default_initializer_.hasValue());

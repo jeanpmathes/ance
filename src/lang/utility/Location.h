@@ -66,14 +66,6 @@ namespace lang
         [[nodiscard]] bool isSingleLine() const;
 
         /**
-         * Get the debug location for this source location.
-         * @param llvm_context The llvm context.
-         * @param scope The containing debug scope.
-         * @return The debug location.
-         */
-        llvm::DebugLoc getDebugLoc(llvm::LLVMContext& llvm_context, llvm::DIScope* scope) const;
-
-        /**
          * Extend this location to include another location.
          * @param location The location to extend to.
          */

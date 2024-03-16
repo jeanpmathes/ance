@@ -22,9 +22,9 @@
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/SizeType.h"
 
-AnceCompiler::AnceCompiler(SourceTree& tree, llvm::Triple const& triple)
+AnceCompiler::AnceCompiler(SourceTree& tree, TargetDescriptor const& target_descriptor)
     : unit_(tree.unit())
-    , triple_(triple)
+    , target_descriptor_(target_descriptor)
     , module_(tree.unit().getName(), llvm_context_)
     , ir_(llvm_context_)
     , di_(module_)
@@ -33,30 +33,10 @@ AnceCompiler::AnceCompiler(SourceTree& tree, llvm::Triple const& triple)
 {
     module_.setSourceFileName(tree.unit().getProjectFile().filename().string());
 
-    std::string         err;
-    llvm::Target const* t = llvm::TargetRegistry::lookupTarget(triple.str(), err);
+    target_descriptor_.createTargetMachine(unit_.getOptimizationLevel().getCodeGenerationOptimizationLevel());
+    target_descriptor_.configureModule(module_);
 
-    llvm::Optional<llvm::Reloc::Model> rm;
-    rm = llvm::Reloc::Static;
-
-    llvm::Optional<llvm::CodeModel::Model> cm;
-    cm = llvm::CodeModel::Large;
-
-    llvm::TargetOptions const opt;
-
-    target_machine_ = t->createTargetMachine(triple.str(),
-                                             "generic",
-                                             "",
-                                             opt,
-                                             rm,
-                                             cm,
-                                             unit_.getOptimizationLevel().getCodeGenerationOptimizationLevel());
-
-    llvm::DataLayout const dl = target_machine_->createDataLayout();
-    unit_.setTargetInfo(triple, dl);
-
-    module_.setDataLayout(dl);
-    module_.setTargetTriple(triple.str());
+    unit_.setTargetInfo(target_descriptor_);
 
     module_.addModuleFlag(llvm::Module::Warning, "Dwarf Version", llvm::dwarf::DWARF_VERSION);
     module_.addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);

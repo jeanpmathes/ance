@@ -10,11 +10,6 @@
 #include "lang/scope/GlobalScope.h"
 #include "validation/ValidationLogger.h"
 
-namespace llvm
-{
-    class Constant;
-}
-
 lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
                                      lang::ResolvingHandle<lang::Type>     type,
                                      lang::Location                        type_location,

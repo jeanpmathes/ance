@@ -12,7 +12,7 @@ class Application : public Unit
 {
   public:
     struct BuildInfo {
-        llvm::Triple triple;
+        TargetDescriptor target_descriptor;
 
         std::filesystem::path build_dir;
         std::filesystem::path triple_dir;

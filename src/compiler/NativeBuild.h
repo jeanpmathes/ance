@@ -25,6 +25,12 @@ class NativeBuild : public Execution
                 llvm::DICompileUnit* di_unit);
     ~NativeBuild() override = default;
 
+    static void initialize();
+    static void terminate();
+
+    static llvm::GlobalValue::LinkageTypes getLinkage(lang::AccessModifier access);
+    llvm::DILocation*                      getLocation(lang::Location location, llvm::DIScope* scope);
+
     void setActiveVisitor(NativeBuilder* visitor);
 
     Shared<lang::Constant> getDefault(lang::Type const& type) override;

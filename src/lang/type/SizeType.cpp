@@ -26,7 +26,7 @@ std::string lang::SizeType::createMangledName() const
 
 void lang::SizeType::init(Unit& app)
 {
-    size_width_ = std::max(app.getBitness(), static_cast<unsigned int>(MINIMUM_BIT_SIZE));
+    size_width_ = static_cast<unsigned int>(std::max(app.getTarget().getPointerSize() * 8, MINIMUM_BIT_SIZE));
     diff_width_ = size_width_ * 2;
 }
 

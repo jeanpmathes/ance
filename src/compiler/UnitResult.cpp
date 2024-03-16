@@ -7,9 +7,9 @@ UnitResult::operator Value() const
     return value_;
 }
 
-void UnitResult::addLinkerArguments(std::vector<char const*>& args, std::string const& os)
+void UnitResult::addLinkerArguments(std::vector<char const*>& args, TargetDescriptor const& target_descriptor)
 {
-    if (os == "windows")
+    if (target_descriptor.getOS() == TargetDescriptor::WINDOWS)
     {
         switch (value_)
         {
@@ -38,11 +38,11 @@ void UnitResult::addLinkerArguments(std::vector<char const*>& args, std::string 
     else { throw std::logic_error("Not supported"); }
 }
 
-std::string UnitResult::getExtension(llvm::Triple const& triple) const
+std::string UnitResult::getExtension(TargetDescriptor const& target_descriptor) const
 {
-    switch (triple.getOS())
+    switch (target_descriptor.getOS())
     {
-        case llvm::Triple::Win32:
+        case TargetDescriptor::WINDOWS:
         {
             switch (value_)
             {
@@ -53,8 +53,5 @@ std::string UnitResult::getExtension(llvm::Triple const& triple) const
                     return ".dll";
             }
         }
-
-        default:
-            throw std::logic_error("Not supported");
     }
 }

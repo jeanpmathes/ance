@@ -2,20 +2,18 @@
 #include <filesystem>
 #include <iostream>
 
-#include <llvm/Support/Host.h>
-#include <llvm/Support/ManagedStatic.h>
-#include <llvm/Support/TargetSelect.h>
-
 #include <boost/locale.hpp>
 #include <utility>
 
 #include "compiler/AnceCompiler.h"
 #include "compiler/AnceLinker.h"
 #include "compiler/Application.h"
+#include "compiler/NativeBuild.h"
 #include "compiler/Packages.h"
 #include "compiler/Project.h"
 #include "compiler/ProjectDescription.h"
 #include "compiler/SourceTree.h"
+#include "compiler/TargetDescriptor.h"
 #include "lang/ApplicationVisitor.h"
 #include "validation/ValidationLogger.h"
 
@@ -69,18 +67,20 @@ static bool validateFlow(SourceTree& tree, ValidationLogger& validation_logger, 
     return emit(tree, validation_logger, out, "flow");
 }
 
-static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir, Unit& unit, llvm::Triple const& triple)
+static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir,
+                                           Unit&                        unit,
+                                           TargetDescriptor const&      target_descriptor)
 {
-    return bin_dir / (unit.getName() + unit.getType().getExtension(triple));
+    return bin_dir / (unit.getName() + unit.getType().getExtension(target_descriptor));
 }
 
 static bool build(SourceTree&                  tree,
-                  llvm::Triple const&          triple,
+                  TargetDescriptor const&      target_descriptor,
                   std::filesystem::path const& obj_dir,
                   std::filesystem::path const& bin_dir,
                   std::ostream&                out)
 {
-    AnceCompiler compiler(tree, triple);
+    AnceCompiler compiler(tree, target_descriptor);
     AnceLinker   linker(tree.unit());
 
     std::filesystem::create_directories(obj_dir);
@@ -88,7 +88,7 @@ static bool build(SourceTree&                  tree,
 
     std::filesystem::path const ilr = obj_dir / (tree.unit().getName() + ".ll");
     std::filesystem::path const obj = obj_dir / (tree.unit().getName() + ".obj");
-    std::filesystem::path const res = getResultPath(bin_dir, tree.unit(), tree.unit().getTargetTriple());
+    std::filesystem::path const res = getResultPath(bin_dir, tree.unit(), tree.unit().getTarget());
 
     compiler.compile(ilr, obj);
 
@@ -115,9 +115,9 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
     std::filesystem::path const project_definition_bin  = project_definition_root / "bin";
     std::filesystem::path const project_definition_obj  = project_definition_root / "obj";
 
-    llvm::Triple const          triple(llvm::sys::getDefaultTargetTriple());
-    std::filesystem::path const triple_dir = triple.getTriple();
-    std::filesystem::path const bin_suffix = triple_dir / "bin";
+    TargetDescriptor const      target_descriptor = TargetDescriptor::system();
+    std::filesystem::path const target_dir        = target_descriptor.toString();
+    std::filesystem::path const bin_suffix        = target_dir / "bin";
 
     ProjectDescription::Description description;
     ValidationLogger                validation_logger;
@@ -130,7 +130,7 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
 
     ProjectDescription project_description(project_file_path);
 
-    std::filesystem::path const result = getResultPath(project_definition_bin, project_description, triple);
+    std::filesystem::path const result = getResultPath(project_definition_bin, project_description, target_descriptor);
     project_description.setBinaryDescriptionPath(result);
 
     SourceTree tree(project_description);
@@ -166,7 +166,7 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
         ok = validateFlow(tree, validation_logger, out);
         if (!ok) return std::nullopt;
 
-        ok = build(tree, triple, project_definition_obj, project_definition_bin, out);
+        ok = build(tree, target_descriptor, project_definition_obj, project_definition_bin, out);
         if (!ok) return std::nullopt;
     }
 
@@ -179,11 +179,10 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
 
     description = project_description.description();
     return makeOwned<Project>(std::move(description),
-                              Application::BuildInfo {
-                                  .triple            = triple,
-                                  .build_dir         = build_dir,
-                                  .triple_dir        = triple_dir,
-                                  .bin_suffix        = bin_suffix,
+                              Application::BuildInfo {.target_descriptor         = target_descriptor,
+                                                      .build_dir         = build_dir,
+                                                      .triple_dir                = target_dir,
+                                                      .bin_suffix        = bin_suffix,
                                   .validation_logger = validation_logger,
                                   .out               = out,
                                                       .project_description_dirty = project_description_dirty});
@@ -224,7 +223,7 @@ static Optional<bool> buildProject(Project&              project,
 
     SourceTree tree(application);
 
-    if (tree.isYoungerThan(getResultPath(bin_dir, application, info.triple)) || built_count > 0
+    if (tree.isYoungerThan(getResultPath(bin_dir, application, info.target_descriptor)) || built_count > 0
         || info.project_description_dirty)
     {
         size_t const count = tree.parse();
@@ -243,7 +242,7 @@ static Optional<bool> buildProject(Project&              project,
         ok = validateFlow(tree, info.validation_logger, info.out);
         if (!ok) return false;
 
-        ok = build(tree, info.triple, obj_dir, bin_dir, info.out);
+        ok = build(tree, info.target_descriptor, obj_dir, bin_dir, info.out);
         if (!ok) return false;
 
         info.out << "ance: build: Success";
@@ -308,11 +307,7 @@ int main(int argc, char** argv)
 
     Packages const packages(package_directory);
 
-    llvm::InitializeAllTargetInfos();
-    llvm::InitializeAllTargets();
-    llvm::InitializeAllTargetMCs();
-    llvm::InitializeAllAsmParsers();
-    llvm::InitializeAllAsmPrinters();
+    NativeBuild::initialize();
 
     std::filesystem::path project_file_path(argv[1]);
     if (project_file_path.is_relative()) project_file_path = std::filesystem::absolute(project_file_path);
@@ -324,7 +319,7 @@ int main(int argc, char** argv)
 
     auto ok = run(std::cout, project_file_path, std::nullopt, packages);
 
-    llvm::llvm_shutdown();
+    NativeBuild::terminate();
 
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }

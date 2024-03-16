@@ -8,6 +8,7 @@
 
 #include "lang/Element.h"
 
+#include "TargetDescriptor.h"
 #include "compiler/FileContext.h"
 #include "compiler/OptLevel.h"
 #include "compiler/Packages.h"
@@ -41,7 +42,7 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     /**
      * Set information about the compile target machine.
      */
-    void setTargetInfo(llvm::Triple const& triple, llvm::DataLayout const& data_layout);
+    void setTargetInfo(TargetDescriptor const& target_descriptor);
 
     /**
      * Get the name of the unit.
@@ -104,16 +105,10 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     [[nodiscard]] virtual bool isUsingRuntime() const = 0;
 
     /**
-     * Get the bitness of the application.
-     * @return The bitness.
-     */
-    [[nodiscard]] unsigned getBitness() const;
-
-    /**
      * Get the target triple.
      * @return The target triple.
      */
-    [[nodiscard]] llvm::Triple const& getTargetTriple() const;
+    [[nodiscard]] TargetDescriptor const& getTarget() const;
 
     using PrepareFunctionType = Optional<Owned<Project>>(std::filesystem::path const&,
                                                          Optional<std::filesystem::path> const&,
@@ -276,9 +271,9 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
     Owned<lang::GlobalScope> global_scope_;
 
   protected:
-    unsigned      pointer_size_ {0};
-    llvm::Triple  target_triple_;
     SourceVisitor source_visitor_ {*this};
+
+    TargetDescriptor target_descriptor_;
 
   private:
     std::vector<std::tuple<Optional<Owned<Project>>, Packages::Package, bool>> dependencies_ {};

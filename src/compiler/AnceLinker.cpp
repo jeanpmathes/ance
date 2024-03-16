@@ -67,10 +67,9 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     args.push_back("/nologo");
     args.push_back("/errorlimit:0");
 
-    if (unit_.getTargetTriple().isArch64Bit()) { args.push_back("/machine:x64"); }
+    if (unit_.getTarget().is64Bit()) { args.push_back("/machine:x64"); }
 
-    std::string const os = std::string(unit_.getTargetTriple().getOSName());
-    unit_.getType().addLinkerArguments(args, os);
+    unit_.getType().addLinkerArguments(args, unit_.getTarget());
 
     std::string const out = "/out:" + app.string();
     args.push_back(out.c_str());
@@ -92,13 +91,12 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     std::filesystem::path const resource_data_directory = resource_data_directory_path_value;
 
     std::filesystem::path const target_data_directory =
-        resource_data_directory / "targets" / unit_.getTargetTriple().getTriple();
+        resource_data_directory / "targets" / unit_.getTarget().toString();
 
     if (unit_.isUsingRuntime()
         && !(std::filesystem::exists(target_data_directory) && std::filesystem::is_directory(target_data_directory)))
     {
-        stream << "ance: build: no target resources found [ " << unit_.getTargetTriple().getTriple() << " ]"
-               << std::endl;
+        stream << "ance: build: no target resources found [ " << unit_.getTarget().toString() << " ]" << std::endl;
 
         return false;
     }
@@ -108,7 +106,7 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     if (unit_.isUsingRuntime())
     {
         UnitResult const            runtime_type = UnitResult::LIBRARY;
-        std::string const           runtime_file = "runtime" + runtime_type.getExtension(unit_.getTargetTriple());
+        std::string const           runtime_file = "runtime" + runtime_type.getExtension(unit_.getTarget());
         std::filesystem::path const runtime_path = target_data_directory / runtime_file;
         binary_dependencies.push_back(runtime_path.string());
     }
@@ -152,7 +150,7 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     std::string const in = obj.string();
     args.push_back(in.c_str());
 
-    return lldRunSafely(unit_.getTargetTriple().getOS(), args, stream);
+    return lldRunSafely(unit_.getTarget().triple().getOS(), args, stream);
 }
 
 bool AnceLinker::getTargetRequirements(std::vector<std::string>& libs,
@@ -165,9 +163,9 @@ bool AnceLinker::getTargetRequirements(std::vector<std::string>& libs,
     std::string const system_runtime_directory = "ANCE_SYSTEM_RUNTIME_DIRECTORY";
     char const*       system_runtime_path      = std::getenv(system_runtime_directory.c_str());
 
-    if (unit_.getTargetTriple().getOS() == llvm::Triple::Win32)
+    if (unit_.getTarget().getOS() == TargetDescriptor::WINDOWS)
     {
-        std::string const arch_suffix = unit_.getTargetTriple().isArch64Bit() ? "x64" : "x86";
+        std::string const arch_suffix = unit_.getTarget().is64Bit() ? "x64" : "x86";
 
         if (system_sdk_path == nullptr)
         {

@@ -50,9 +50,9 @@ std::string lang::UnsignedIntegerPointerType::createMangledName() const
     return std::string(name().text());
 }
 
-void lang::UnsignedIntegerPointerType::init(llvm::DataLayout const& data_layout)
+void lang::UnsignedIntegerPointerType::init(Unit& unit)
 {
-    size_ = std::max(static_cast<unsigned int>(MINIMUM_BIT_SIZE), data_layout.getPointerSizeInBits());
+    size_ = static_cast<unsigned int>(std::max(unit.getTarget().getPointerSize() * 8, MINIMUM_BIT_SIZE));
 }
 
 Optional<size_t> lang::UnsignedIntegerPointerType::getBitSize() const

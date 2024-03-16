@@ -49,11 +49,6 @@ bool lang::Location::isSingleLine() const
     return start_line_ == end_line_;
 }
 
-llvm::DebugLoc lang::Location::getDebugLoc(llvm::LLVMContext& llvm_context, llvm::DIScope* scope) const
-{
-    return llvm::DILocation::get(llvm_context, static_cast<unsigned>(line()), static_cast<unsigned>(column()), scope);
-}
-
 void lang::Location::extend(lang::Location location)
 {
     if (this->isGlobal())

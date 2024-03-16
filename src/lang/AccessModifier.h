@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_ACCESSMODIFIER_H_
 #define ANCE_SRC_LANG_ACCESSMODIFIER_H_
 
-#include <llvm/IR/GlobalValue.h>
+#include <string>
 
 class Storage;
 
@@ -31,12 +31,6 @@ namespace lang
          * @return The string.
          */
         [[nodiscard]] std::string toString() const;
-
-        /**
-         * Get the corresponding native linkage type.
-         * @return The linkage type.
-         */
-        llvm::GlobalValue::LinkageTypes linkage();
 
         /**
          * Perform storage synchronization.

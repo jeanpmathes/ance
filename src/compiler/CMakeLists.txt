@@ -6,6 +6,7 @@ target_sources(ance PRIVATE AnceCompiler.cpp
                WrappedNativeValue.cpp
                WrappedConstant.cpp
                SourceTree.cpp
+               TargetDescriptor.cpp
                FileContext.cpp
                CompileContext.cpp
                Packages.cpp

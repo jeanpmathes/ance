@@ -1,4 +1,5 @@
 #include "NativeBuild.h"
+#include <llvm/Support/TargetSelect.h>
 
 #include "compiler/CompileContext.h"
 #include "lang/construct/Member.h"
@@ -50,9 +51,50 @@ NativeBuild::NativeBuild(CompileContext&      context,
     , di_builder_(di)
 {}
 
+void NativeBuild::initialize()
+{
+    llvm::InitializeAllTargetInfos();
+    llvm::InitializeAllTargets();
+    llvm::InitializeAllTargetMCs();
+    llvm::InitializeAllAsmParsers();
+    llvm::InitializeAllAsmPrinters();
+}
+
+void NativeBuild::terminate()
+{
+    llvm::llvm_shutdown();
+}
+
 void NativeBuild::setActiveVisitor(NativeBuilder* visitor)
 {
     visitor_ = visitor;
+}
+
+llvm::GlobalValue::LinkageTypes NativeBuild::getLinkage(lang::AccessModifier access)
+{
+    llvm::GlobalValue::LinkageTypes linkage;
+
+    switch (access)
+    {
+        case lang::AccessModifier::PRIVATE_ACCESS:
+            linkage = llvm::GlobalValue::LinkageTypes::PrivateLinkage;
+            break;
+
+        case lang::AccessModifier::EXTERN_ACCESS:
+        case lang::AccessModifier::PUBLIC_ACCESS:
+            linkage = llvm::GlobalValue::LinkageTypes::ExternalLinkage;
+            break;
+    }
+
+    return linkage;
+}
+
+llvm::DILocation* NativeBuild::getLocation(lang::Location location, llvm::DIScope* scope)
+{
+    return llvm::DILocation::get(llvm_context_,
+                                 static_cast<unsigned>(location.line()),
+                                 static_cast<unsigned>(location.column()),
+                                 scope);
 }
 
 Shared<lang::Constant> NativeBuild::getDefault(lang::Type const& type)
@@ -265,7 +307,7 @@ void NativeBuild::createFunction(lang::Identifier const&               name,
     llvm::FunctionType* native_type = llvm::FunctionType::get(native_return_type, native_parameter_types, false);
     llvm::Function*     native_function =
         llvm::Function::Create(native_type,
-                               access.valueOr(lang::AccessModifier::EXTERN_ACCESS).linkage(),
+                               getLinkage(access.valueOr(lang::AccessModifier::EXTERN_ACCESS)),
                                linkage_name,
                                llvm_module_);
 
@@ -289,7 +331,7 @@ void NativeBuild::createFunction(lang::Identifier const&               name,
         native_function->setSubprogram(subprogram);
     }
 
-    if (access.hasValue() && access.value().linkage() == llvm::GlobalValue::LinkageTypes::ExternalLinkage)
+    if (access.hasValue() && getLinkage(access.value()) == llvm::GlobalValue::LinkageTypes::ExternalLinkage)
     {
         if (is_imported)
         {
@@ -688,7 +730,7 @@ void NativeBuild::createGlobalVariable(lang::GlobalVariable const& global_variab
     auto* native_variable = new llvm::GlobalVariable(llvm_module_,
                                                      native_type,
                                                      global_variable.isConstant(),
-                                                     global_variable.access().linkage(),
+                                                     getLinkage(global_variable.access()),
                                                      native_initializer,
                                                      linkage_name,
                                                      nullptr,
@@ -760,7 +802,7 @@ void NativeBuild::defineLocalVariable(lang::LocalVariable const& local_variable,
     di().insertDeclare(native_variable,
                        native_di_variable,
                        di().createExpression(),
-                       location.getDebugLoc(llvmContext(), llvmScope(scope)),
+                       getLocation(location, llvmScope(scope)),
                        ir().GetInsertBlock());
 }
 

@@ -113,7 +113,7 @@ class CompileContext
   private:
     Unit&                unit_;
     Runtime&             runtime_;
-    std::unique_ptr<Execution> execution_;
+    std::unique_ptr<NativeBuild> execution_;
 
     struct SourceFile {
         std::filesystem::path path;
