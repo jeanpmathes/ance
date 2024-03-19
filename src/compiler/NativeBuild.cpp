@@ -140,7 +140,7 @@ Shared<lang::Constant> NativeBuild::getCString(std::string const& string)
     auto iterator = c_strings_.find(string);
     if (iterator == c_strings_.end())
     {
-        llvm::Constant* constant        = ir_builder_.CreateGlobalStringPtr(string);
+        llvm::Constant* constant        = ir_builder_.CreateGlobalStringPtr(string, "", 0, &llvm_module_);
         std::tie(iterator, std::ignore) = c_strings_.emplace(string, constant);
     }
 

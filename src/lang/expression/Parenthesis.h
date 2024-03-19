@@ -23,6 +23,8 @@ class Parenthesis
   public:
     [[nodiscard]] bool isNamed() const override;
 
+    lang::Type const& assignableType() const override;
+
     bool validate(ValidationLogger& validation_logger) const override;
     bool validateAssignment(lang::Type const& value_type,
                             lang::Location     value_location,

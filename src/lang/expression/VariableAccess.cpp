@@ -38,6 +38,11 @@ bool VariableAccess::isNamed() const
     return true;
 }
 
+lang::Type const& VariableAccess::assignableType() const
+{
+    return variable_.as<lang::Variable>()->targetType();
+}
+
 bool VariableAccess::validate(ValidationLogger& validation_logger) const
 {
     if (lang::Type::checkMismatch<lang::Variable>(variable_, "value", location(), validation_logger)) return false;

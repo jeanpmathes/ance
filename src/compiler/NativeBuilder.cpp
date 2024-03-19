@@ -677,7 +677,9 @@ std::any NativeBuilder::visit(VariableAccess const& variable_access)
     }
     else if (variable_access.type().getStateCount().isUnit())
     {
-        return erase(native_build_.getDefault(variable_access.type()));
+        Shared<lang::Value> default_value = native_build_.getDefault(variable_access.type());
+
+        return erase(default_value);
     }
     else
     {
@@ -736,9 +738,22 @@ std::any NativeBuilder::visit(Assignment const& assignment_statement)
     Shared<lang::Value> destination_reference = getV(assignment_statement.assignable());
     assert(destination_reference->type().isReferenceType());
 
-    lang::Type const& target_type = destination_reference->type().getElementType();
-
     assign_ = false;
+
+    lang::Type const& target_type = assignment_statement.assignable().assignableType();
+
+    if (lang::Type::areSame(destination_reference->type().getElementType(),
+                            native_build_.cc().ctx().getReferenceType(target_type)))
+    {
+        // For target type T, destination reference type is &&T, so we need to dereference it to get &T.
+
+        destination_reference = native_build_.performDereference(destination_reference);
+    }
+
+    std::string x(target_type.name().text());
+    (void) x;
+    std::string y(destination_reference->type().name().text());
+    (void) y;
 
     Shared<lang::Value> assigned_value = getV(assignment_statement.assigned());
     assigned_value                     = lang::Type::makeMatching(target_type, assigned_value, native_build_.cc());

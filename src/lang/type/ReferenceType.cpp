@@ -165,7 +165,7 @@ Shared<lang::Value> lang::ReferenceType::buildMemberAccess(Shared<lang::Value>  
                                                            lang::Identifier const& name,
                                                            CompileContext&         context) const
 {
-    return element_type_->buildMemberAccess(value, name, context);
+    return element_type_->buildMemberAccess(context.exec().performDereference(value), name, context);
 }
 
 bool lang::ReferenceType::definesIndirection() const

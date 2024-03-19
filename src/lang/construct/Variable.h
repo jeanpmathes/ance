@@ -120,6 +120,11 @@ namespace lang
          */
         [[nodiscard]] lang::Type const& type() const;
         /**
+         * Get the target type, meaning the type of value that is required when assigning to this variable.
+         * @return The target type.
+         */
+        [[nodiscard]] lang::Type const& targetType() const;
+        /**
          * Get whether this variable is final.
          * @return Whether it is final.
          */

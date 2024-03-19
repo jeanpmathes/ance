@@ -107,6 +107,13 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>, public virtu
      */
     [[nodiscard]] lang::Type const& type() const;
 
+    /**
+     * The type of the assignable value of this expression.
+     * Only valid to call if this expression is an assignable.
+     * @return The type of the assignable value.
+     */
+    [[nodiscard]] virtual lang::Type const& assignableType() const;
+
     ~Expression() override = default;
 
   protected:

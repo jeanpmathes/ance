@@ -44,6 +44,13 @@ lang::Type const& Expression::type() const
     return type_;
 }
 
+lang::Type const& Expression::assignableType() const
+{
+    if (type().isReferenceType()) return type().getElementType();
+
+    throw std::logic_error("Expression is not assignable");
+}
+
 void Expression::setContainingScope(lang::Scope& scope)
 {
     containing_scope_ = &scope;

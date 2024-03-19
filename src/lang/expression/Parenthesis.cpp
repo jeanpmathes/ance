@@ -25,6 +25,11 @@ void Parenthesis::defineType(lang::ResolvingHandle<lang::Type> type)
     type.reroute(expression_->type());
 }
 
+lang::Type const& Parenthesis::assignableType() const
+{
+    return expression_->assignableType();
+}
+
 bool Parenthesis::validate(ValidationLogger& validation_logger) const
 {
     return expression_->validate(validation_logger);

@@ -93,6 +93,13 @@ lang::Type const& lang::Variable::type() const
     return type_;
 }
 
+lang::Type const& lang::Variable::targetType() const
+{
+    if (type().isReferenceType()) { return type().getElementType(); }
+
+    return type();
+}
+
 bool lang::Variable::isFinal() const
 {
     assert(definition_.hasValue());
@@ -137,11 +144,7 @@ bool lang::Variable::validateSetValue(lang::Type const& value_type,
         return false;// Type mismatch is not relevant if assignment is not allowed no matter what.
     }
 
-    std::reference_wrapper<lang::Type const> target_type = type();
-
-    if (type().isReferenceType()) { target_type = type().getElementType(); }
-
-    return lang::Type::checkMismatch(target_type, value_type, assigned_location, validation_logger);
+    return lang::Type::checkMismatch(targetType(), value_type, assigned_location, validation_logger);
 }
 
 Shared<lang::Value> lang::Variable::getValuePointer(CompileContext& context) const
