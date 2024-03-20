@@ -124,9 +124,9 @@ std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createJump(lang::BasicBlo
 }
 
 std::vector<Owned<lang::BasicBlock>> lang::BasicBlock::createMatching(
-    Match&                                                         match,
+    Match&                                                        match,
     std::vector<std::pair<LiteralExpression*, Statement*>> const& cases,
-    Function&                                                      function)
+    Function&                                                     function)
 {
     std::map<Statement*, std::vector<LiteralExpression*>> code_to_case;
 

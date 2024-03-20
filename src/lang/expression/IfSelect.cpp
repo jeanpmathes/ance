@@ -101,16 +101,18 @@ Expression::Expansion IfSelect::expandWith(Expressions subexpressions, lang::Con
                                                            std::nullopt,
                                                            location()));
 
-    before.emplace_back(makeOwned<If>(std::move(condition),
+    before.emplace_back(
+        makeOwned<If>(std::move(condition),
                       makeOwned<Assignment>(makeOwned<VariableAccess>(make_temp_variable(), true, location()),
                                             lang::Assigner::COPY_ASSIGNMENT,
                                             std::move(then_expression),
                                             location()),
-                                      makeOptional<Owned<Statement>>(makeOwned<Assignment>(makeOwned<VariableAccess>(make_temp_variable(), true, location()),
+                      makeOptional<Owned<Statement>>(
+                          makeOwned<Assignment>(makeOwned<VariableAccess>(make_temp_variable(), true, location()),
                                                 lang::Assigner::COPY_ASSIGNMENT,
                                                 std::move(else_expression),
                                                 location())),
-                                      location()));
+                      location()));
 
     Owned<Expression> result = makeOwned<VariableAccess>(make_temp_variable(), true, location());
 

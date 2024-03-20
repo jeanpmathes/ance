@@ -8,7 +8,7 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::ArrayType::ArrayType(lang::ResolvingHandle<lang::Type> element_type, const uint64_t size)
+lang::ArrayType::ArrayType(lang::ResolvingHandle<lang::Type> element_type, uint64_t const size)
     : TypeDefinition(lang::Identifier::like("[" + element_type->name() + "; " + std::to_string(size) + "]"))
     , SequenceType(element_type, size)
 {}

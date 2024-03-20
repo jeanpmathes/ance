@@ -5,7 +5,7 @@
 template<typename T>
 lang::ResolvingHandle<T>::ResolvingHandle(Owned<T> handled)
     : navigator_(Shared<lang::HandleNavigator<typename lang::HandleConfig<T>::BaseType>>(
-        *(new lang::HandleNavigator<typename lang::HandleConfig<T>::BaseType>(std::move(handled)))))
+          *(new lang::HandleNavigator<typename lang::HandleConfig<T>::BaseType>(std::move(handled)))))
 {}
 
 template<typename T>
@@ -154,7 +154,7 @@ T& lang::ResolvingHandle<T>::operator*() noexcept
 }
 
 template<typename T>
-const T* lang::ResolvingHandle<T>::operator->() const noexcept
+T const* lang::ResolvingHandle<T>::operator->() const noexcept
 {
     return get();
 }

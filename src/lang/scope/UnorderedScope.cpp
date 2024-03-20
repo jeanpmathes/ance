@@ -171,7 +171,7 @@ void lang::UnorderedScope::resolve()
 
     for (auto& [name, descriptions] : compatible_descriptions_)
     {
-        const ResolvableID     declaration = {ResolvableKind::DECLARATION, name};
+        ResolvableID const     declaration = {ResolvableKind::DECLARATION, name};
         std::set<ResolvableID> declaration_dependencies;
 
         for (auto& description : descriptions)
@@ -201,7 +201,7 @@ void lang::UnorderedScope::resolve()
 
         for (auto& dependency : declaration_dependencies) { graph.addEdge(declaration, dependency); }
 
-        const ResolvableID     definition = {ResolvableKind::DEFINITION, name};
+        ResolvableID const     definition = {ResolvableKind::DEFINITION, name};
         std::set<ResolvableID> definition_dependencies;
 
         for (auto& description : descriptions)
@@ -458,8 +458,8 @@ std::vector<std::reference_wrapper<lang::Type const>> lang::UnorderedScope::getU
     return used_types;
 }
 
-std::vector<std::reference_wrapper<lang::Description const>>
-lang::UnorderedScope::getDescriptionsInDeclarationOrder() const
+std::vector<std::reference_wrapper<lang::Description const>> lang::UnorderedScope::getDescriptionsInDeclarationOrder()
+    const
 {
     std::vector<std::reference_wrapper<lang::Description const>> descriptions;
 
@@ -467,17 +467,14 @@ lang::UnorderedScope::getDescriptionsInDeclarationOrder() const
     {
         if (group.kind == ResolvableKind::DEFINITION) continue;
 
-        for (auto& description : group.descriptions)
-        {
-            descriptions.emplace_back(description.get());
-        }
+        for (auto& description : group.descriptions) { descriptions.emplace_back(description.get()); }
     }
 
     return descriptions;
 }
 
-std::vector<std::reference_wrapper<lang::Description const>>
-lang::UnorderedScope::getDescriptionsInDefinitionOrder() const
+std::vector<std::reference_wrapper<lang::Description const>> lang::UnorderedScope::getDescriptionsInDefinitionOrder()
+    const
 {
     std::vector<std::reference_wrapper<lang::Description const>> descriptions;
 
@@ -485,10 +482,7 @@ lang::UnorderedScope::getDescriptionsInDefinitionOrder() const
     {
         if (group.kind == ResolvableKind::DECLARATION) continue;
 
-        for (auto& description : group.descriptions)
-        {
-            descriptions.emplace_back(description.get());
-        }
+        for (auto& description : group.descriptions) { descriptions.emplace_back(description.get()); }
     }
 
     return descriptions;
@@ -591,27 +585,7 @@ std::vector<lang::ResolvingHandle<lang::FunctionGroup>> lang::UnorderedScope::ge
     return getHandles<FunctionGroup>(defined_entities_);
 }
 
-std::vector<std::reference_wrapper<const lang::FunctionGroup>> lang::UnorderedScope::getFunctionGroups() const
+std::vector<std::reference_wrapper<lang::FunctionGroup const>> lang::UnorderedScope::getFunctionGroups() const
 {
     return getReferences<FunctionGroup>(defined_entities_);
-}
-
-std::vector<lang::ResolvingHandle<lang::Variable>> lang::UnorderedScope::getVariables()
-{
-    return getHandles<Variable>(defined_entities_);
-}
-
-std::vector<std::reference_wrapper<const lang::Variable>> lang::UnorderedScope::getVariables() const
-{
-    return getReferences<Variable>(defined_entities_);
-}
-
-std::vector<lang::ResolvingHandle<lang::Type>> lang::UnorderedScope::getTypes()
-{
-    return getHandles<Type>(defined_entities_);
-}
-
-std::vector<std::reference_wrapper<const lang::Type>> lang::UnorderedScope::getTypes() const
-{
-    return getReferences<Type>(defined_entities_);
 }

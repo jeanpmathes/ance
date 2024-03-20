@@ -87,13 +87,12 @@ Expression::Expansion BinaryOperation::expandWith(Expressions subexpressions, la
 
 lang::Type const& BinaryOperation::getRightType() const
 {
-    lang::Type const& left = left_->type();
+    lang::Type const& left  = left_->type();
     lang::Type const& right = right_->type();
 
     if (lang::Type::areSame(left, right)) return right;
 
-    if (!left.isOperatorDefined(op_, right)
-        && left.isOperatorDefined(op_, left)
+    if (!left.isOperatorDefined(op_, right) && left.isOperatorDefined(op_, left)
         && right.isImplicitlyConvertibleTo(left))
     {
         return left;

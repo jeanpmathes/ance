@@ -41,7 +41,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        std::string   createMangledName() const override;
+        std::string             createMangledName() const override;
         void                    registerExecutionType(CompileContext& context) const override;
         Execution::IndexingMode getIndexingMode() const override;
 

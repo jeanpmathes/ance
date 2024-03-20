@@ -8,7 +8,7 @@
 #include "validation/Utilities.h"
 #include "validation/ValidationLogger.h"
 
-lang::ImportedFunction::ImportedFunction(Function& function,
+lang::ImportedFunction::ImportedFunction(Function&                            function,
                                          Scope&                               containing_scope,
                                          lang::AccessModifier                 access,
                                          lang::ResolvingHandle<lang::Type>    return_type,

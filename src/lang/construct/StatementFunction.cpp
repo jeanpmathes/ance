@@ -28,9 +28,7 @@ lang::StatementFunction::StatementFunction(Function&                            
     , code_(code)
     , access_(access)
     , initial_block_(lang::BasicBlock::createEmpty())
-{
-
-}
+{}
 
 void lang::StatementFunction::setup()
 {
@@ -49,9 +47,7 @@ void lang::StatementFunction::setup()
     {
         scope().registerUsage(parameter->type());
 
-        auto parameter_variable = lang::LocalVariable::makeParameterVariable(*parameter,
-                                                                             index++,
-                                                                             function());
+        auto parameter_variable = lang::LocalVariable::makeParameterVariable(*parameter, index++, function());
 
         parameter->argument(parameter_variable.handle());
 

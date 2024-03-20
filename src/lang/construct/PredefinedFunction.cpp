@@ -61,17 +61,15 @@ std::vector<lang::BasicBlock*> const& lang::PredefinedFunction::getBasicBlocks()
 }
 
 void lang::PredefinedFunction::setCallValidator(
-    std::function<bool(std::vector<std::reference_wrapper<Expression const>> const&,
-                       lang::Location,
-                       ValidationLogger&)> validator)
+    std::function<bool(std::vector<std::reference_wrapper<Expression const>> const&, lang::Location, ValidationLogger&)>
+        validator)
 {
     call_validator_ = std::move(validator);
 }
 
-bool lang::PredefinedFunction::doCallValidation(
-    std::vector<std::reference_wrapper<Expression const>> const& arguments,
-    lang::Location                                                                           location,
-    ValidationLogger&                                                                        validation_logger) const
+bool lang::PredefinedFunction::doCallValidation(std::vector<std::reference_wrapper<Expression const>> const& arguments,
+                                                lang::Location                                               location,
+                                                ValidationLogger& validation_logger) const
 {
     if (call_validator_) { return call_validator_(arguments, location, validation_logger); }
     return true;

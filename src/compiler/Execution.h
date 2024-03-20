@@ -148,7 +148,7 @@ class Execution
      * @param type The type to get the float as, can be either the float type or a vector of it.
      * @return The constant.
      */
-    virtual Shared<lang::Constant> getFloatingPoint(llvm::APFloat                     float_value, lang::Type const& type) = 0;
+    virtual Shared<lang::Constant> getFloatingPoint(llvm::APFloat float_value, lang::Type const& type) = 0;
 
     /**
      * Get the given codepoint value as a constant.
@@ -165,30 +165,11 @@ class Execution
     virtual Shared<lang::Constant> getByte(uint8_t byte) = 0;
 
     /**
-     * Create a function.
-     * @param name The name of the function.
-     * @param linkage_name The name of the function in native code.
-     * @param access The access modifier of the function. Use std::nullopt for runtime functions.
-     * @param is_imported Whether the function is imported.
-     * @param parameters The parameters of the function.
-     * @param return_type The return type of the function.
-     * @param scope The scope of the function, or nullptr if the function is not part of a scope. Must be supplied for functions with a definition.
-     * @param preserve_unit Whether to preserve a unit return type. Used e.g. for constructors, as they can't return void.
-     * @param declaration_location The location of the function declaration.
-     * @param definition_location The location of the function definition, meaning the code block. If no debug data is needed, use std::nullopt, else the location or global location if the function has no definition.
-     * @param function The AST function associated with the execution function.
+     * Register a function.
+     * This is necessary to call the function.
+     * @param function The AST function to register.
      */
-    virtual void createFunction(lang::Identifier const&                     name,
-                                std::string const&                    linkage_name,
-                                    Optional<lang::AccessModifier>        access,
-                                    bool                                  is_imported,
-                                std::vector<Shared<lang::Parameter>> const& parameters,
-                                lang::Type const&                           return_type,
-                                lang::Scope const*                          scope,
-                                bool                                  preserve_unit,
-                                    lang::Location                        declaration_location,
-                                Optional<lang::Location>                    definition_location,
-                                lang::Function const&                       function) = 0;
+    virtual void registerFunction(lang::Function const& function) = 0;
 
     /**
      * Get the value of a parameter of a function.
@@ -222,7 +203,7 @@ class Execution
      */
     virtual void createStruct(lang::Type const&                                 type,
                               std::vector<std::reference_wrapper<lang::Member>> members,
-                                lang::Location                                    definition_location) = 0;
+                              lang::Location                                    definition_location) = 0;
 
     /**
      * Create an alias for a type.
@@ -317,7 +298,7 @@ class Execution
     virtual void defineLocalVariable(lang::LocalVariable const& local_variable,
                                      lang::Scope const&         scope,
                                      Optional<size_t>           parameter_index,
-                                     lang::Location           location) = 0;
+                                     lang::Location             location) = 0;
 
     /**
      * Compute the value of a local initializer.
@@ -348,7 +329,7 @@ class Execution
      * @param count The number of elements that are allocated. If no count is given, the size of a single element is returned.
      * @return The size of the allocation, as a value with type 'size'.
      */
-    virtual Shared<lang::Value> computeAllocatedSize(lang::Type const& type, Optional<Shared<lang::Value>>     count) = 0;
+    virtual Shared<lang::Value> computeAllocatedSize(lang::Type const& type, Optional<Shared<lang::Value>> count) = 0;
 
     enum class IndexingMode
     {
@@ -399,7 +380,7 @@ class Execution
      * @param pointer_type The type of the pointer to compute.
      * @return A pointer of address type.
      */
-    virtual Shared<lang::Value> computeIntegerToPointer(Shared<lang::Value>               integer,
+    virtual Shared<lang::Value> computeIntegerToPointer(Shared<lang::Value> integer,
                                                         lang::Type const&   pointer_type) = 0;
 
     /**
@@ -408,7 +389,7 @@ class Execution
      * @param new_type The new type of the address, must be either a pointer or buffer - or a vector of pointers or buffers.
      * @return The casted address.
      */
-    virtual Shared<lang::Value> computeCastedAddress(Shared<lang::Value>               address, lang::Type const& new_type) = 0;
+    virtual Shared<lang::Value> computeCastedAddress(Shared<lang::Value> address, lang::Type const& new_type) = 0;
 
     /**
      * Compute a floating point conversion.
@@ -416,7 +397,7 @@ class Execution
      * @param destination_type The type to convert to. Must be a floating point type or a vector of floating point types.
      * @return The converted value.
      */
-    virtual Shared<lang::Value> computeConversionOnFP(Shared<lang::Value>               value,
+    virtual Shared<lang::Value> computeConversionOnFP(Shared<lang::Value> value,
                                                       lang::Type const&   destination_type) = 0;
 
     /**
@@ -425,7 +406,7 @@ class Execution
      * @param destination_type The type to convert to. Must be an integer type or a vector of integer types.
      * @return The converted value.
      */
-    virtual Shared<lang::Value> computeConversionOnI(Shared<lang::Value>               value, lang::Type const& destination_type) = 0;
+    virtual Shared<lang::Value> computeConversionOnI(Shared<lang::Value> value, lang::Type const& destination_type) = 0;
 
     /**
      * Compute an floating point to integer conversion.
@@ -433,7 +414,7 @@ class Execution
      * @param destination_type The type to convert to. Must be an integer type or a vector of integer types.
      * @return The converted value.
      */
-    virtual Shared<lang::Value> computeConversionFP2I(Shared<lang::Value>               value,
+    virtual Shared<lang::Value> computeConversionFP2I(Shared<lang::Value> value,
                                                       lang::Type const&   destination_type) = 0;
 
     /**
@@ -442,7 +423,7 @@ class Execution
      * @param destination_type The type to convert to. Must be a floating point type or a vector of floating point types.
      * @return The converted value.
      */
-    virtual Shared<lang::Value> computeConversionI2FP(Shared<lang::Value>               value,
+    virtual Shared<lang::Value> computeConversionI2FP(Shared<lang::Value> value,
                                                       lang::Type const&   destination_type) = 0;
 
     /**
@@ -543,7 +524,7 @@ class Execution
      * @param count The number of elements to allocate, given as a value with type 'size'.
      * @return A pointer to the allocated memory.
      */
-    virtual Shared<lang::Value> performStackAllocation(lang::Type const& type, Shared<lang::Value>               count) = 0;
+    virtual Shared<lang::Value> performStackAllocation(lang::Type const& type, Shared<lang::Value> count) = 0;
 
     /**
      * Perform a unary operator.
@@ -627,12 +608,12 @@ class Execution
 
     virtual CompileContext& cc() = 0;
 
-    virtual llvm::IRBuilder<>&   ir()                                               = 0;
-    virtual llvm::DIBuilder&     di()                                               = 0;
-    virtual llvm::LLVMContext&   llvmContext()                                      = 0;
-    virtual llvm::Function*      llvmFunction(lang::Function const& function)       = 0;
-    virtual llvm::DIScope*       llvmScope(lang::Scope const& scope)                = 0;
-    virtual llvm::Type*          llvmType(lang::Type const& type)                   = 0;
+    virtual llvm::IRBuilder<>& ir()                                         = 0;
+    virtual llvm::DIBuilder&   di()                                         = 0;
+    virtual llvm::LLVMContext& llvmContext()                                = 0;
+    virtual llvm::Function*    llvmFunction(lang::Function const& function) = 0;
+    virtual llvm::DIScope*     llvmScope(lang::Scope const& scope)          = 0;
+    virtual llvm::Type*        llvmType(lang::Type const& type)             = 0;
 
     virtual ~Execution() = default;
 };

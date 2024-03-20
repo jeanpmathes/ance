@@ -2,9 +2,9 @@
 
 #include <utility>
 
+#include "lang/construct/Variable.h"
 #include "lang/type/Type.h"
 #include "lang/utility/Storage.h"
-#include "lang/construct/Variable.h"
 
 lang::Parameter::Parameter(lang::ResolvingHandle<lang::Type> type,
                            lang::Location                    type_location,
@@ -23,9 +23,7 @@ lang::Parameter::Parameter(lang::ResolvingHandle<lang::Type> type)
     , type_location_(lang::Location::global())
     , name_(Identifier::empty())
     , location_(lang::Location::global())
-{
-
-}
+{}
 
 lang::Parameter::Parameter(lang::Type const& type)
     : type_(&type)
@@ -79,7 +77,10 @@ lang::Variable const& lang::Parameter::argument() const
 
 Shared<lang::Parameter> lang::Parameter::expand(lang::Context& new_context) const
 {
-    return makeShared<lang::Parameter>(type_opt_.value()->getUndefinedTypeClone(new_context), type_location_, name_, location_);
+    return makeShared<lang::Parameter>(type_opt_.value()->getUndefinedTypeClone(new_context),
+                                       type_location_,
+                                       name_,
+                                       location_);
 }
 
 void lang::Parameter::synchronize(lang::Parameter* parameter, Storage& storage)

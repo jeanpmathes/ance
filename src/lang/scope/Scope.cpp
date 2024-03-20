@@ -111,8 +111,7 @@ Optional<lang::OwningHandle<lang::Entity>> lang::Scope::connectWithDefinitionAcc
     return entity;
 }
 
-void lang::Scope::postResolve()
-{}
+void lang::Scope::postResolve() {}
 
 void lang::Scope::addDependency(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared)
 {
@@ -145,9 +144,9 @@ std::vector<lang::Scope::Dependency<lang::Entity>> lang::Scope::getDependenciesO
     return entity_declaration_dependencies_;
 }
 
-std::vector<std::reference_wrapper<const lang::Entity>> lang::Scope::getDependenciesOnDeclaration() const
+std::vector<std::reference_wrapper<lang::Entity const>> lang::Scope::getDependenciesOnDeclaration() const
 {
-    std::vector<std::reference_wrapper<const lang::Entity>> result;
+    std::vector<std::reference_wrapper<lang::Entity const>> result;
     result.reserve(entity_declaration_dependencies_.size());
 
     for (auto& dependency : entity_declaration_dependencies_) { result.emplace_back(dependency.entity); }
@@ -160,9 +159,9 @@ std::vector<lang::Scope::Dependency<lang::Entity>> lang::Scope::getDependenciesO
     return entity_definition_dependencies_;
 }
 
-std::vector<std::reference_wrapper<const lang::Entity>> lang::Scope::getDependenciesOnDefinition() const
+std::vector<std::reference_wrapper<lang::Entity const>> lang::Scope::getDependenciesOnDefinition() const
 {
-    std::vector<std::reference_wrapper<const lang::Entity>> result;
+    std::vector<std::reference_wrapper<lang::Entity const>> result;
     result.reserve(entity_definition_dependencies_.size());
 
     for (auto& dependency : entity_definition_dependencies_) { result.emplace_back(dependency.entity); }

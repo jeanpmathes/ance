@@ -27,22 +27,22 @@ namespace lang
         [[nodiscard]] StateCount         getStateCount() const override;
         [[nodiscard]] Optional<uint64_t> getSize() const;
 
-        bool                              isSubscriptDefined() const override;
-        lang::Type const& getSubscriptReturnType() const override;
-        bool                              validateSubscript(lang::Location    indexed_location,
-                                                            lang::Type const& index_type,
-                                                            lang::Location    index_location,
-                                                            ValidationLogger& validation_logger) const override;
-        Shared<lang::Value>               buildSubscript(Shared<lang::Value> indexed,
-                                                         Shared<lang::Value> index,
-                                                         CompileContext& context) const override;
-        Shared<lang::Value>               buildSubscriptInBounds(Shared<lang::Value> indexed,
-                                                                 Shared<lang::Value> index,
-                                                                 CompileContext&     context) const;
-        Shared<lang::Value>               buildSubscript(Shared<lang::Value> indexed,
-                                                         Shared<lang::Value> index,
-                                                         bool            check_bounds,
-                                           CompileContext& context) const;
+        bool                isSubscriptDefined() const override;
+        lang::Type const&   getSubscriptReturnType() const override;
+        bool                validateSubscript(lang::Location    indexed_location,
+                                              lang::Type const& index_type,
+                                              lang::Location    index_location,
+                                              ValidationLogger& validation_logger) const override;
+        Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
+                                           Shared<lang::Value> index,
+                                           CompileContext&     context) const override;
+        Shared<lang::Value> buildSubscriptInBounds(Shared<lang::Value> indexed,
+                                                   Shared<lang::Value> index,
+                                                   CompileContext&     context) const;
+        Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
+                                           Shared<lang::Value> index,
+                                           bool                check_bounds,
+                                           CompileContext&     context) const;
 
       protected:
         virtual Execution::IndexingMode getIndexingMode() const = 0;
@@ -58,7 +58,7 @@ namespace lang
         void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
         void performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                     Shared<lang::Value> src_ptr,
-                                                    CompileContext& context) const override;
+                                                    CompileContext&     context) const override;
         void buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
 
         /**

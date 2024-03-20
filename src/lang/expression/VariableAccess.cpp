@@ -59,8 +59,8 @@ bool VariableAccess::validate(ValidationLogger& validation_logger) const
 }
 
 bool VariableAccess::validateAssignment(lang::Type const& value_type,
-                                        lang::Location     value_location,
-                                        ValidationLogger&  validation_logger) const
+                                        lang::Location    value_location,
+                                        ValidationLogger& validation_logger) const
 {
     if (lang::Type::checkMismatch<lang::Variable>(variable_, "value", location(), validation_logger)) return false;
 

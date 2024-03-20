@@ -218,9 +218,9 @@ bool lang::TypeAlias::validateImplicitConversion(lang::Type const& other,
     return actual_->validateImplicitConversion(other, location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::Type const& other,
-                                                             Shared<lang::Value>               value,
-                                                             CompileContext&                   context) const
+Shared<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::Type const&   other,
+                                                             Shared<lang::Value> value,
+                                                             CompileContext&     context) const
 {
     return actual_->buildImplicitConversion(other, value, context);
 }
@@ -237,9 +237,9 @@ bool lang::TypeAlias::validateCast(lang::Type const& other,
     return actual_->validateCast(other, location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildCast(lang::Type const& other,
-                                               Shared<lang::Value>               value,
-                                               CompileContext&                   context) const
+Shared<lang::Value> lang::TypeAlias::buildCast(lang::Type const&   other,
+                                               Shared<lang::Value> value,
+                                               CompileContext&     context) const
 {
     return actual_->buildCast(other, value, context);
 }
@@ -273,8 +273,7 @@ bool lang::TypeAlias::isOperatorDefined(lang::BinaryOperator op, lang::Type cons
     return actual_->isOperatorDefined(op, other);
 }
 
-lang::Type const& lang::TypeAlias::getOperatorResultType(lang::BinaryOperator              op,
-                                                         lang::Type const& other) const
+lang::Type const& lang::TypeAlias::getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const
 {
     return actual_->getOperatorResultType(op, other);
 }
@@ -357,7 +356,9 @@ void lang::TypeAlias::performCopyInitializer(Shared<lang::Value> destination,
     actual_->performCopyInitializer(destination, count, context);
 }
 
-void lang::TypeAlias::performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const
+void lang::TypeAlias::performFinalizer(Shared<lang::Value> ptr,
+                                       Shared<lang::Value> count,
+                                       CompileContext&     context) const
 {
     actual_->performFinalizer(ptr, count, context);
 }
@@ -405,8 +406,7 @@ std::string lang::TypeAlias::createMangledName() const
 
 void lang::TypeAlias::registerExecutionType(CompileContext& context) const
 {
-    return context.exec().createAlias(self(),
-                                      getDefinitionLocation());
+    return context.exec().createAlias(self(), getDefinitionLocation());
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeAlias::getDeclarationDependencies()

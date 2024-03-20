@@ -5,8 +5,7 @@
 lang::Signature::Signature(Identifier const& name, std::vector<Shared<lang::Parameter>> parameters)
     : function_name_(name)
     , parameters_(std::move(parameters))
-{
-}
+{}
 
 size_t lang::Signature::getParameterCount() const
 {

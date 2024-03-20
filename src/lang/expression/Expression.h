@@ -24,7 +24,9 @@ class ValidationLogger;
 /**
  * The base class of all expressions.
  */
-class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>, public virtual lang::Located
+class Expression
+    : public virtual lang::Visitable<ANCE_CONSTRUCTS>
+    , public virtual lang::Located
 {
   protected:
     /**
@@ -76,8 +78,8 @@ class Expression : public virtual lang::Visitable<ANCE_CONSTRUCTS>, public virtu
      * @return True if assigning is valid.
      */
     virtual bool validateAssignment(lang::Type const& value_type,
-                                    lang::Location     value_location,
-                                    ValidationLogger&  validation_logger) const;
+                                    lang::Location    value_location,
+                                    ValidationLogger& validation_logger) const;
 
     using Expansion = std::tuple<Statements, Owned<Expression>, Statements>;
 

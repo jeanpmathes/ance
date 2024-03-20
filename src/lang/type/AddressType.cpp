@@ -35,15 +35,13 @@ bool lang::AddressType::validateCast(lang::Type const&, lang::Location, Validati
     return true;
 }
 
-Shared<lang::Value> lang::AddressType::buildCast(lang::Type const& other,
-                                                 Shared<lang::Value>               value,
-                                                 CompileContext&                   context) const
+Shared<lang::Value> lang::AddressType::buildCast(lang::Type const&   other,
+                                                 Shared<lang::Value> value,
+                                                 CompileContext&     context) const
 {
-    if (other.isAddressType())
-    { return context.exec().computeCastedAddress(value, other); }
+    if (other.isAddressType()) { return context.exec().computeCastedAddress(value, other); }
 
-    if (other.isUnsignedIntegerPointerType())
-    { return context.exec().computePointerToInteger(value); }
+    if (other.isUnsignedIntegerPointerType()) { return context.exec().computePointerToInteger(value); }
 
     throw std::logic_error("Invalid cast");
 }
@@ -66,8 +64,7 @@ bool lang::AddressType::isOperatorDefined(lang::BinaryOperator op, lang::Type co
     return false;
 }
 
-lang::Type const& lang::AddressType::getOperatorResultType(lang::BinaryOperator op,
-                                                           lang::Type const&) const
+lang::Type const& lang::AddressType::getOperatorResultType(lang::BinaryOperator op, lang::Type const&) const
 {
     if (op.isEquality()) return scope().context().getBooleanType();
 

@@ -33,9 +33,9 @@ class Allocation
                lang::Location                    location,
                lang::Location                    allocated_type_location);
 
-    [[nodiscard]] Runtime::Allocator allocator() const;
-    [[nodiscard]] lang::Entity const&  allocatedType() const;
-    [[nodiscard]] Expression const*  count() const;
+    [[nodiscard]] Runtime::Allocator  allocator() const;
+    [[nodiscard]] lang::Entity const& allocatedType() const;
+    [[nodiscard]] Expression const*   count() const;
 
   protected:
     void walkDefinitions() override;
@@ -55,7 +55,7 @@ class Allocation
     Runtime::Allocator                  allocation_;
     lang::ResolvingHandle<lang::Entity> allocated_type_;
     lang::Location                      allocated_type_location_;
-    Optional<Owned<Expression>>       count_;
+    Optional<Owned<Expression>>         count_;
 };
 
 #endif

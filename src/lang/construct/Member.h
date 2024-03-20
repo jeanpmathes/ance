@@ -26,13 +26,13 @@ namespace lang
          * @param location The location of the member.
          * @param type_location The location of the type of the member.
          */
-        Member(lang::AccessModifier                access,
-               lang::Identifier                    name,
-               lang::ResolvingHandle<lang::Type>   type,
-               lang::Assigner                      assigner,
+        Member(lang::AccessModifier               access,
+               lang::Identifier                   name,
+               lang::ResolvingHandle<lang::Type>  type,
+               lang::Assigner                     assigner,
                Optional<Owned<LiteralExpression>> constant_init,
-               lang::Location                      location,
-               lang::Location                      type_location);
+               lang::Location                     location,
+               lang::Location                     type_location);
 
         [[nodiscard]] lang::AccessModifier    access() const;
         [[nodiscard]] lang::Identifier const& name() const;
@@ -79,13 +79,13 @@ namespace lang
         static void synchronize(lang::Member* member, Storage& storage);
 
       private:
-        lang::AccessModifier                access_;
-        lang::Identifier                    name_;
-        lang::ResolvingHandle<lang::Type>   type_;
-        lang::Assigner                      assigner_;
+        lang::AccessModifier               access_;
+        lang::Identifier                   name_;
+        lang::ResolvingHandle<lang::Type>  type_;
+        lang::Assigner                     assigner_;
         Optional<Owned<LiteralExpression>> constant_init_;
-        lang::Location                      location_;
-        lang::Location                      type_location_;
+        lang::Location                     location_;
+        lang::Location                     type_location_;
 
         size_t index_ = std::numeric_limits<size_t>::max();
     };

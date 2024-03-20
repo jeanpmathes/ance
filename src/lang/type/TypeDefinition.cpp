@@ -7,10 +7,10 @@
 #include "lang/construct/Function.h"
 #include "lang/construct/Parameter.h"
 #include "lang/construct/PredefinedFunction.h"
+#include "lang/construct/SpecialMemberFunction.h"
 #include "lang/type/SizeType.h"
 #include "lang/type/Type.h"
 #include "validation/ValidationLogger.h"
-#include "lang/construct/SpecialMemberFunction.h"
 
 lang::TypeDefinition::TypeDefinition(lang::Identifier name, lang::Location location) : name_(name), location_(location)
 {}
@@ -258,7 +258,10 @@ void lang::TypeDefinition::postResolve()
         default_initializer_parameters.emplace_back(makeShared<Parameter>(scope().context().getPointerType(self())));
         default_initializer_parameters.emplace_back(makeShared<Parameter>(scope().context().getSizeType()));
 
-        default_initializer_ = lang::SpecialMemberFunction::create(self(), lang::SpecialMemberFunction::Kind::DEFAULT_CONSTRUCTOR, std::move(default_initializer_parameters));
+        default_initializer_ =
+            lang::SpecialMemberFunction::create(self(),
+                                                lang::SpecialMemberFunction::Kind::DEFAULT_CONSTRUCTOR,
+                                                std::move(default_initializer_parameters));
     }
 
     if (!isTriviallyCopyConstructible())
@@ -267,7 +270,9 @@ void lang::TypeDefinition::postResolve()
         copy_initializer_parameters.emplace_back(makeShared<Parameter>(scope().context().getPointerType(self())));
         copy_initializer_parameters.emplace_back(makeShared<Parameter>(scope().context().getPointerType(self())));
 
-        copy_initializer_ = lang::SpecialMemberFunction::create(self(), lang::SpecialMemberFunction::Kind::COPY_CONSTRUCTOR, std::move(copy_initializer_parameters));
+        copy_initializer_ = lang::SpecialMemberFunction::create(self(),
+                                                                lang::SpecialMemberFunction::Kind::COPY_CONSTRUCTOR,
+                                                                std::move(copy_initializer_parameters));
     }
 
     if (!isTriviallyDestructible())
@@ -276,7 +281,9 @@ void lang::TypeDefinition::postResolve()
         default_finalizer_parameters.emplace_back(makeShared<Parameter>(scope().context().getPointerType(self())));
         default_finalizer_parameters.emplace_back(makeShared<Parameter>(scope().context().getSizeType()));
 
-        default_finalizer_ = lang::SpecialMemberFunction::create(self(), lang::SpecialMemberFunction::Kind::DEFAULT_DESTRUCTOR, std::move(default_finalizer_parameters));
+        default_finalizer_ = lang::SpecialMemberFunction::create(self(),
+                                                                 lang::SpecialMemberFunction::Kind::DEFAULT_DESTRUCTOR,
+                                                                 std::move(default_finalizer_parameters));
     }
 }
 
@@ -287,10 +294,7 @@ bool lang::TypeDefinition::requestOverload(std::vector<lang::ResolvingHandle<lan
 
     std::vector<std::reference_wrapper<lang::Type const>> parameter_types;
     parameter_types.reserve(parameters.size());
-    for (auto const& parameter : parameters)
-    {
-        parameter_types.emplace_back(parameter);
-    }
+    for (auto const& parameter : parameters) { parameter_types.emplace_back(parameter); }
 
     for (auto const& [constructor_parameters, function] : requested_constructors_)
     {
@@ -344,8 +348,7 @@ bool lang::TypeDefinition::isOperatorDefined(lang::UnaryOperator) const
     return false;
 }
 
-lang::Type const& lang::TypeDefinition::getOperatorResultType(lang::BinaryOperator,
-                                                                              lang::Type const&) const
+lang::Type const& lang::TypeDefinition::getOperatorResultType(lang::BinaryOperator, lang::Type const&) const
 {
     static lang::ResolvingHandle<lang::Type> undefined = lang::Type::getUndefined();
     return undefined;
@@ -437,7 +440,9 @@ bool lang::TypeDefinition::validateIndirection(lang::Location, ValidationLogger&
     return true;
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildSubscript(Shared<lang::Value>, Shared<lang::Value>, CompileContext&) const
+Shared<lang::Value> lang::TypeDefinition::buildSubscript(Shared<lang::Value>,
+                                                         Shared<lang::Value>,
+                                                         CompileContext&) const
 {
     throw std::logic_error("Subscript not defined");
 }
@@ -462,9 +467,7 @@ Shared<lang::Value> lang::TypeDefinition::buildImplicitConversion(lang::Type con
     throw std::logic_error("Implicit conversion not defined");
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildCast(lang::Type const&,
-                                                    Shared<lang::Value>,
-                                                    CompileContext&) const
+Shared<lang::Value> lang::TypeDefinition::buildCast(lang::Type const&, Shared<lang::Value>, CompileContext&) const
 {
     throw std::logic_error("Cast not defined");
 }
@@ -508,7 +511,7 @@ void lang::TypeDefinition::performDefaultInitializer(Shared<lang::Value> ptr,
 
 void lang::TypeDefinition::performCopyInitializer(Shared<lang::Value> destination,
                                                   Shared<lang::Value> source,
-                                                  CompileContext& context) const
+                                                  CompileContext&     context) const
 {
     if (isTriviallyCopyConstructible())
     {
@@ -531,7 +534,9 @@ void lang::TypeDefinition::performFinalizer(Shared<lang::Value> ptr, CompileCont
     performFinalizer(ptr, context.exec().getSizeN(1), context);
 }
 
-void lang::TypeDefinition::performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const
+void lang::TypeDefinition::performFinalizer(Shared<lang::Value> ptr,
+                                            Shared<lang::Value> count,
+                                            CompileContext&     context) const
 {
     if (isTriviallyDestructible()) return;
 
@@ -662,7 +667,8 @@ void lang::TypeDefinition::defineDefaultFinalizer(CompileContext& context) const
     context.exec().performReturn({});
 }
 
-void lang::TypeDefinition::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
+void lang::TypeDefinition::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr,
+                                                                     CompileContext&     context) const
 {
     if (getStateCount().isUnit()) return;
 
@@ -718,23 +724,21 @@ lang::PredefinedFunction& lang::TypeDefinition::createConstructor(
                                                                                  scope(),
                                                                                  lang::Location::global());
 
-    predefined_function.setCallValidator(
-        [this](std::vector<std::reference_wrapper<Expression const>> const& arguments,
-               lang::Location                                                                           location,
-               ValidationLogger& validation_logger) {
-            if (arguments.size() == 1)
+    predefined_function.setCallValidator([this](std::vector<std::reference_wrapper<Expression const>> const& arguments,
+                                                lang::Location                                               location,
+                                                ValidationLogger& validation_logger) {
+        if (arguments.size() == 1)
+        {
+            auto const& argument = arguments[0];
+
+            if (argument.get().type().isImplicitlyConvertibleTo(self()))
             {
-                auto const& argument = arguments[0];
-
-                if (argument.get().type().isImplicitlyConvertibleTo(self()))
-                {
-                    validation_logger.logWarning("Unnecessary conversion constructor, use implicit conversion",
-                                                 location);
-                }
+                validation_logger.logWarning("Unnecessary conversion constructor, use implicit conversion", location);
             }
+        }
 
-            return true;
-        });
+        return true;
+    });
 
     self()->addFunction(std::move(function));
 

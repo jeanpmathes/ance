@@ -29,6 +29,18 @@ bool lang::Function::isDefined() const
     return definition_.hasValue();
 }
 
+bool lang::Function::isRuntime() const
+{
+    assert(isDefined());
+    return definition_.value()->isRuntime();
+}
+
+bool lang::Function::preserveUnitReturn() const
+{
+    assert(isDefined());
+    return definition_.value()->preserveUnitReturn();
+}
+
 void lang::Function::defineAsImported(Scope&                                      containing_scope,
                                       lang::AccessModifier                        access,
                                       lang::ResolvingHandle<lang::Type>           return_type,
@@ -69,7 +81,7 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
     (**definition_).setup();
 }
 
-lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHandle<lang::Type> return_type,
+lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHandle<lang::Type>           return_type,
                                                              bool                                        is_constructor,
                                                              std::vector<Shared<lang::Parameter>> const& parameters,
                                                              lang::AccessModifier access_modifier,
@@ -180,6 +192,12 @@ lang::Location lang::Function::location() const
     return definition_.value()->location();
 }
 
+Optional<lang::Location> lang::Function::getDefinitionLocation() const
+{
+    assert(isDefined());
+    return definition_.value()->getDefinitionLocation();
+}
+
 bool lang::Function::isMangled() const
 {
     assert(isDefined());
@@ -208,8 +226,8 @@ void lang::Function::buildDeclaration(CompileContext& context) const
 }
 
 bool lang::Function::validateCall(std::vector<std::reference_wrapper<Expression const>> const& arguments,
-                                  lang::Location                                                                           location,
-    ValidationLogger&                                                                        validation_logger) const
+                                  lang::Location                                               location,
+                                  ValidationLogger&                                            validation_logger) const
 {
     return definition_.value()->validateCall(arguments, location, validation_logger);
 }

@@ -26,12 +26,13 @@ namespace lang
         };
 
         SpecialMemberFunction(Function&                            function,
-                              lang::ResolvingHandle<lang::Type> type,
+                              lang::ResolvingHandle<lang::Type>    type,
                               std::vector<Shared<lang::Parameter>> parameters);
 
         void setup() override;
 
-        static lang::ResolvingHandle<lang::Function> create(lang::ResolvingHandle<lang::Type>  type, Kind kind,
+        static lang::ResolvingHandle<lang::Function> create(lang::ResolvingHandle<lang::Type>    type,
+                                                            Kind                                 kind,
                                                             std::vector<Shared<lang::Parameter>> parameters);
 
         [[nodiscard]] bool isMangled() const override;

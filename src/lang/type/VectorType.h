@@ -26,7 +26,7 @@ namespace lang
       public:
         VectorType(lang::ResolvingHandle<lang::Type> element_type, uint64_t size);
 
-        static const uint64_t MAX_VECTOR_TYPE_SIZE = 1ll << 32;
+        static uint64_t const MAX_VECTOR_TYPE_SIZE = 1ll << 32;
 
         VectorType const* isVectorType() const override;
         VectorType*       isVectorType() override;
@@ -42,50 +42,49 @@ namespace lang
         bool                validateImplicitConversion(lang::Type const& other,
                                                        lang::Location    location,
                                                        ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildImplicitConversion(lang::Type const& other,
-                                                    Shared<lang::Value>               value,
-                                                    CompileContext&                   context) const override;
+        Shared<lang::Value> buildImplicitConversion(lang::Type const&   other,
+                                                    Shared<lang::Value> value,
+                                                    CompileContext&     context) const override;
 
         bool                isCastingPossibleTo(Type const& other) const override;
         bool                validateCast(Type const&       other,
                                          lang::Location    location,
                                          ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildCast(lang::Type const& other,
-                                      Shared<lang::Value>               value,
-                                      CompileContext&                   context) const override;
+        Shared<lang::Value> buildCast(lang::Type const&   other,
+                                      Shared<lang::Value> value,
+                                      CompileContext&     context) const override;
 
-        bool                              isOperatorDefined(lang::UnaryOperator op) const override;
-        lang::Type const& getOperatorResultType(lang::UnaryOperator op) const override;
-        bool                              validateOperator(lang::UnaryOperator op,
-                                                           lang::Location      location,
-                                                           ValidationLogger&   validation_logger) const override;
-        Shared<lang::Value>               buildOperator(lang::UnaryOperator op,
-                                                        Shared<lang::Value> value,
-                                                        CompileContext&     context) const override;
+        bool                isOperatorDefined(lang::UnaryOperator op) const override;
+        lang::Type const&   getOperatorResultType(lang::UnaryOperator op) const override;
+        bool                validateOperator(lang::UnaryOperator op,
+                                             lang::Location      location,
+                                             ValidationLogger&   validation_logger) const override;
+        Shared<lang::Value> buildOperator(lang::UnaryOperator op,
+                                          Shared<lang::Value> value,
+                                          CompileContext&     context) const override;
 
-        bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
-        lang::Type const& getOperatorResultType(lang::BinaryOperator              op,
-                                                                lang::Type const& other) const override;
-        bool                              validateOperator(lang::BinaryOperator op,
-                                                           lang::Type const&    other,
-                                                           lang::Location       left_location,
-                                                           lang::Location       right_location,
-                                                           ValidationLogger&    validation_logger) const override;
-        Shared<lang::Value>               buildOperator(lang::BinaryOperator op,
-                                                        Shared<lang::Value>  left,
-                                                        Shared<lang::Value>  right,
-                                                        CompileContext&      context) const override;
+        bool                isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
+        lang::Type const&   getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const override;
+        bool                validateOperator(lang::BinaryOperator op,
+                                             lang::Type const&    other,
+                                             lang::Location       left_location,
+                                             lang::Location       right_location,
+                                             ValidationLogger&    validation_logger) const override;
+        Shared<lang::Value> buildOperator(lang::BinaryOperator op,
+                                          Shared<lang::Value>  left,
+                                          Shared<lang::Value>  right,
+                                          CompileContext&      context) const override;
 
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
         void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                    lang::PredefinedFunction&                      function,
-                                    CompileContext&                                context) const override;
+                                    lang::PredefinedFunction&                             function,
+                                    CompileContext&                                       context) const override;
 
       public:
         ~VectorType() override = default;
 
       protected:
-        std::string   createMangledName() const override;
+        std::string             createMangledName() const override;
         void                    registerExecutionType(CompileContext& context) const override;
         Execution::IndexingMode getIndexingMode() const override;
 

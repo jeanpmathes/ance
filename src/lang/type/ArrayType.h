@@ -26,7 +26,7 @@ namespace lang
       public:
         ArrayType(lang::ResolvingHandle<lang::Type> element_type, uint64_t size);
 
-        static const uint64_t MAX_ARRAY_TYPE_SIZE = 1ll << 32;
+        static uint64_t const MAX_ARRAY_TYPE_SIZE = 1ll << 32;
 
         ArrayType const* isArrayType() const override;
         ArrayType*       isArrayType() override;
@@ -40,7 +40,7 @@ namespace lang
         ~ArrayType() override = default;
 
       protected:
-        std::string   createMangledName() const override;
+        std::string             createMangledName() const override;
         void                    registerExecutionType(CompileContext& context) const override;
         Execution::IndexingMode getIndexingMode() const override;
 

@@ -50,17 +50,7 @@ class NativeBuild : public Execution
     Shared<lang::Constant> getCodepoint(char32_t codepoint) override;
     Shared<lang::Constant> getByte(uint8_t byte) override;
 
-    void                createFunction(lang::Identifier const&                     name,
-                                       std::string const&                    linkage_name,
-                                       Optional<lang::AccessModifier>        access,
-                                       bool                                  is_imported,
-                                       std::vector<Shared<lang::Parameter>> const& parameters,
-                                       lang::Type const&                           return_type,
-                                       lang::Scope const*                          scope,
-                                       bool                                        preserve_unit,
-                                       lang::Location                        declaration_location,
-                                       Optional<lang::Location>                    definition_location,
-                                       lang::Function const&                       function) override;
+    void                registerFunction(lang::Function const& function) override;
     Shared<lang::Value> getParameterValue(lang::Function const& function, size_t index) override;
     void                defineFunctionBody(lang::Function const& function) override;
     Shared<lang::Value> performFunctionCall(lang::Function const&            function,
@@ -68,7 +58,7 @@ class NativeBuild : public Execution
 
     void createStruct(lang::Type const&                                 type,
                       std::vector<std::reference_wrapper<lang::Member>> members,
-                        lang::Location                                    definition_location) override;
+                      lang::Location                                    definition_location) override;
 
     void createAlias(lang::Type const& type, lang::Location definition_location) override;
 
@@ -90,13 +80,13 @@ class NativeBuild : public Execution
     void                defineLocalVariable(lang::LocalVariable const& local_variable,
                                             lang::Scope const&         scope,
                                             Optional<size_t>           parameter_index,
-                                            lang::Location           location) override;
+                                            lang::Location             location) override;
     Shared<lang::Value> computeInitializerValue(lang::LocalInitializer const& initializer) override;
     Shared<lang::Value> computeAddressOfVariable(lang::Variable const& variable) override;
 
     Shared<lang::Value> computeAsActualType(Shared<lang::Value> value) override;
 
-    Shared<lang::Value> computeAllocatedSize(lang::Type const& type, Optional<Shared<lang::Value>>     count) override;
+    Shared<lang::Value> computeAllocatedSize(lang::Type const& type, Optional<Shared<lang::Value>> count) override;
     Shared<lang::Value> computeElementPointer(Shared<lang::Value> sequence,
                                               Shared<lang::Value> index,
                                               IndexingMode        mode,
@@ -105,12 +95,12 @@ class NativeBuild : public Execution
                                              lang::Identifier const& member_name) override;
     Shared<lang::Value> computeAddressOf(Shared<lang::Value> value) override;
     Shared<lang::Value> computePointerToInteger(Shared<lang::Value> pointer) override;
-    Shared<lang::Value> computeIntegerToPointer(Shared<lang::Value>               integer, lang::Type const& pointer_type) override;
-    Shared<lang::Value> computeCastedAddress(Shared<lang::Value>               address, lang::Type const& new_type) override;
-    Shared<lang::Value> computeConversionOnFP(Shared<lang::Value>               value, lang::Type const& destination_type) override;
-    Shared<lang::Value> computeConversionOnI(Shared<lang::Value>               value, lang::Type const& destination_type) override;
-    Shared<lang::Value> computeConversionFP2I(Shared<lang::Value>               value, lang::Type const& destination_type) override;
-    Shared<lang::Value> computeConversionI2FP(Shared<lang::Value>               value, lang::Type const& destination_type) override;
+    Shared<lang::Value> computeIntegerToPointer(Shared<lang::Value> integer, lang::Type const& pointer_type) override;
+    Shared<lang::Value> computeCastedAddress(Shared<lang::Value> address, lang::Type const& new_type) override;
+    Shared<lang::Value> computeConversionOnFP(Shared<lang::Value> value, lang::Type const& destination_type) override;
+    Shared<lang::Value> computeConversionOnI(Shared<lang::Value> value, lang::Type const& destination_type) override;
+    Shared<lang::Value> computeConversionFP2I(Shared<lang::Value> value, lang::Type const& destination_type) override;
+    Shared<lang::Value> computeConversionI2FP(Shared<lang::Value> value, lang::Type const& destination_type) override;
     Shared<lang::Value> computePointerFromReference(Shared<lang::Value> reference) override;
     Shared<lang::Value> computeReferenceFromPointer(Shared<lang::Value> pointer) override;
     Shared<lang::Value> computeAddressIsNotNull(Shared<lang::Value> address) override;
@@ -126,7 +116,7 @@ class NativeBuild : public Execution
     void                performMemoryCopy(Shared<lang::Value> destination,
                                           Shared<lang::Value> source,
                                           Shared<lang::Value> size) override;
-    Shared<lang::Value> performStackAllocation(lang::Type const& type, Shared<lang::Value>               count) override;
+    Shared<lang::Value> performStackAllocation(lang::Type const& type, Shared<lang::Value> count) override;
     Shared<lang::Value> performOperator(lang::UnaryOperator op, Shared<lang::Value> value) override;
     Shared<lang::Value> performOperator(lang::BinaryOperator op,
                                         Shared<lang::Value>  lhs,
@@ -148,12 +138,12 @@ class NativeBuild : public Execution
 
     CompileContext& cc() override;
 
-    llvm::IRBuilder<>&   ir() override;
-    llvm::DIBuilder&     di() override;
-    llvm::LLVMContext&   llvmContext() override;
-    llvm::Function*      llvmFunction(lang::Function const& function) override;
-    llvm::DIScope*       llvmScope(lang::Scope const& scope) override;
-    llvm::Type*          llvmType(lang::Type const& type) override;
+    llvm::IRBuilder<>& ir() override;
+    llvm::DIBuilder&   di() override;
+    llvm::LLVMContext& llvmContext() override;
+    llvm::Function*    llvmFunction(lang::Function const& function) override;
+    llvm::DIScope*     llvmScope(lang::Scope const& scope) override;
+    llvm::Type*        llvmType(lang::Type const& type) override;
 
     llvm::DIType*   llvmDiType(lang::Type const& type);
     llvm::Constant* llvmDefault(lang::Type const& type);
@@ -180,7 +170,7 @@ class NativeBuild : public Execution
     std::map<std::string, llvm::Constant*>    c_strings_         = {};
 
     struct NativeFunction {
-        llvm::Function*                                llvm_function;
+        llvm::Function*                                       llvm_function;
         bool                                                  preserve_unit_return;
         lang::Type const&                                     return_type;
         std::vector<std::reference_wrapper<lang::Type const>> parameter_types;
@@ -193,14 +183,14 @@ class NativeBuild : public Execution
     };
 
     struct NativeGlobalVariable {
-        llvm::GlobalVariable*             llvm_variable;
+        llvm::GlobalVariable* llvm_variable;
         lang::Type const&     type;
     };
 
     struct NativeLocalVariable {
-        llvm::Value*                      llvm_variable;
+        llvm::Value*      llvm_variable;
         lang::Type const& type;
-        lang::Identifier                  name;
+        lang::Identifier  name;
     };
 
     std::map<lang::Function const*, NativeFunction>       functions_;
@@ -212,7 +202,7 @@ class NativeBuild : public Execution
 
     NativeFunction* current_function_ = nullptr;
 
-    lang::Type const* current_recursive_type_      = nullptr;
+    lang::Type const* current_recursive_type_        = nullptr;
     NativeType        current_recursive_native_type_ = {nullptr, nullptr, nullptr};
 
     struct Value {

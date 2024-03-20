@@ -65,6 +65,19 @@ namespace lang
         [[nodiscard]] bool isDefined() const override;
 
         /**
+         * Get whether this function is part of the runtime library.
+         * @return True if this function is part of the runtime library, false otherwise.
+         */
+        [[nodiscard]] bool isRuntime() const;
+
+        /**
+         * Whether to preserve the unit return type or use void.
+         * Has no effect if the return type is not unit.
+         * @return True if the unit return type should be preserved, false if it should be replaced with void.
+         */
+        [[nodiscard]] bool preserveUnitReturn() const;
+
+        /**
          * Define this function as imported.
          * @param containing_scope The function containing scope.
          * @param access The access level.
@@ -184,7 +197,7 @@ namespace lang
          * @param index The index of the parameter.
          * @return The parameter.
          */
-        lang::Parameter const& parameter(size_t index) const;
+        [[nodiscard]] lang::Parameter const& parameter(size_t index) const;
 
         /**
          * Get the parameter count.
@@ -203,6 +216,8 @@ namespace lang
          * @return The source location.
          */
         [[nodiscard]] lang::Location location() const;
+
+        [[nodiscard]] Optional<lang::Location> getDefinitionLocation() const;
 
         /**
          * Get whether this function is mangled.
@@ -242,8 +257,8 @@ namespace lang
          * @return True if the call is valid.
          */
         bool validateCall(std::vector<std::reference_wrapper<Expression const>> const& arguments,
-                          lang::Location                                                                           location,
-            ValidationLogger& validation_logger) const;
+                          lang::Location                                               location,
+                          ValidationLogger&                                            validation_logger) const;
 
         /**
          * Build a call to this function.

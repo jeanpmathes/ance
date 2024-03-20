@@ -27,8 +27,8 @@ class Parenthesis
 
     bool validate(ValidationLogger& validation_logger) const override;
     bool validateAssignment(lang::Type const& value_type,
-                            lang::Location     value_location,
-                            ValidationLogger&  validation_logger) const override;
+                            lang::Location    value_location,
+                            ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;
 

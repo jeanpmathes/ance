@@ -96,7 +96,7 @@ namespace lang
 
         lang::ResolvingHandle<lang::Variable> variable_handle_;
         lang::GlobalVariable*                 global_variable_ {nullptr};
-        lang::InitializerFunction* init_function_ {nullptr};
+        lang::InitializerFunction*            init_function_ {nullptr};
     };
 }
 

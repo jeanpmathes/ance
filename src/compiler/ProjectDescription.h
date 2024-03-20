@@ -31,9 +31,9 @@ class ProjectDescription : public Unit
 
     [[nodiscard]] std::vector<std::pair<std::string, bool>> getDependencies() const override;
     [[nodiscard]] std::vector<std::string>                  getLibraries() const override;
-    [[nodiscard]] std::vector<std::string> getArchives() const override;
-    [[nodiscard]] std::vector<std::string> getLibraryPaths() const override;
-    [[nodiscard]] std::vector<std::string> getBinaryDependencyPaths() const override;
+    [[nodiscard]] std::vector<std::string>                  getArchives() const override;
+    [[nodiscard]] std::vector<std::string>                  getLibraryPaths() const override;
+    [[nodiscard]] std::vector<std::string>                  getBinaryDependencyPaths() const override;
 
   public:
     static constexpr char const* ANCE_PROJECT_DEFINITION_FUNCTION = "define_project";

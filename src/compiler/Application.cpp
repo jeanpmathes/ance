@@ -4,11 +4,11 @@
 #include "compiler/Project.h"
 #include "validation/ValidationLogger.h"
 
-#include "lang/type/HalfType.h"
 #include "lang/type/ArrayType.h"
 #include "lang/type/FixedWidthIntegerType.h"
-#include "lang/type/VectorType.h"
+#include "lang/type/HalfType.h"
 #include "lang/type/SizeType.h"
+#include "lang/type/VectorType.h"
 
 Application::Application(Project& project, BuildInfo build_info)
     : Unit(!project.description().runtime_excluded)

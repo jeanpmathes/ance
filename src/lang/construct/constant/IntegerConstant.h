@@ -48,9 +48,9 @@ namespace lang
         Shared<lang::LiteralConstant> clone(lang::Context& new_context) const override;
 
       private:
-        std::string                       text_;
-        std::uint8_t                      radix_;
-        IntegerType const*                integer_type_;
+        std::string        text_;
+        std::uint8_t       radix_;
+        IntegerType const* integer_type_;
     };
 }
 

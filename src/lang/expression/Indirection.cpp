@@ -24,7 +24,9 @@ void Indirection::defineType(lang::ResolvingHandle<lang::Type> type)
 
     if (value_->type()->isDefined() && value_->type()->definesIndirection()
         && value_->type()->getIndirectionType()->isDefined())
-    { type.reroute(scope().context().getReferenceType(value_->type()->getIndirectionType())); }
+    {
+        type.reroute(scope().context().getReferenceType(value_->type()->getIndirectionType()));
+    }
 }
 
 bool Indirection::validate(ValidationLogger& validation_logger) const

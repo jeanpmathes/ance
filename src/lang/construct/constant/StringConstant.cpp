@@ -76,8 +76,8 @@ lang::StringConstantData::Data lang::StringConstantData::createData(std::string 
 }
 
 lang::ResolvingHandle<lang::Type> lang::StringConstantData::resolveType(Kind           kind,
-                                                                        Data const&                data,
-                                                                    lang::Context&             new_context)
+                                                                        Data const&    data,
+                                                                        lang::Context& new_context)
 {
     switch (kind)
     {

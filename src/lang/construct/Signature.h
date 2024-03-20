@@ -65,10 +65,10 @@ namespace lang
         static bool areSame(Signature const& a, Signature const& b);
 
       private:
-        lang::Identifier                               function_name_;
-        std::vector<Shared<lang::Parameter>>           parameters_;
+        lang::Identifier                     function_name_;
+        std::vector<Shared<lang::Parameter>> parameters_;
 
-        mutable std::string                            mangled_name_ {};
+        mutable std::string mangled_name_ {};
     };
 }
 

@@ -2,9 +2,9 @@
 
 #include "compiler/Application.h"
 #include "compiler/CompileContext.h"
+#include "compiler/RoughlyCastedValue.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
-#include "compiler/RoughlyCastedValue.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/CharType.h"
 #include "validation/ValidationLogger.h"
@@ -58,9 +58,9 @@ bool lang::FixedWidthIntegerType::validateCast(lang::Type const& other,
     return IntegerType::validateCast(other, location, validation_logger);
 }
 
-Shared<lang::Value> lang::FixedWidthIntegerType::buildCast(lang::Type const& other,
-                                                           Shared<lang::Value>               value,
-                                                           CompileContext&                   context) const
+Shared<lang::Value> lang::FixedWidthIntegerType::buildCast(lang::Type const&   other,
+                                                           Shared<lang::Value> value,
+                                                           CompileContext&     context) const
 {
     if (other.isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_)
     {

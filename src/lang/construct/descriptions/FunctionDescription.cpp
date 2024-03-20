@@ -82,7 +82,7 @@ Statement const* lang::FunctionDescription::code() const
     return getPtr(code_);
 }
 
-std::vector<std::reference_wrapper<const lang::Entity>> lang::FunctionDescription::getProvidedEntities() const
+std::vector<std::reference_wrapper<lang::Entity const>> lang::FunctionDescription::getProvidedEntities() const
 {
     return {};// Does not provide any entities as it is part of a function group.
 }

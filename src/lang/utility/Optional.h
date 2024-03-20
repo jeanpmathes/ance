@@ -52,9 +52,9 @@ class Optional
     explicit(false) Optional(std::nullopt_t);// NOLINT(google-explicit-constructor)
     explicit(false) Optional(T const& value) // NOLINT(google-explicit-constructor)
         requires ConstCopyable<T>;
-    explicit(false) Optional(T value)        // NOLINT(google-explicit-constructor)
+    explicit(false) Optional(T value)// NOLINT(google-explicit-constructor)
         requires(!ConstCopyable<T> and Copyable<T>);
-    explicit(false) Optional(T&& value)      // NOLINT(google-explicit-constructor)
+    explicit(false) Optional(T&& value)// NOLINT(google-explicit-constructor)
         requires(!ConstCopyable<T> and !Copyable<T>);
 
     Optional<T>& operator=(T value);

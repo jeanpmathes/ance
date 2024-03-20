@@ -4,9 +4,7 @@
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 
-lang::bb::def::Finalizing::Finalizing(lang::Scope& scope, std::string info) : scope_(scope)
-    , info_(std::move(info))
-{}
+lang::bb::def::Finalizing::Finalizing(lang::Scope& scope, std::string info) : scope_(scope), info_(std::move(info)) {}
 
 lang::BasicBlock const* lang::bb::def::Finalizing::next() const
 {

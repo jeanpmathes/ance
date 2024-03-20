@@ -79,8 +79,8 @@ bool Expression::isNamed() const
 }
 
 bool Expression::validateAssignment(lang::Type const& value_type,
-                                    lang::Location     value_location,
-                                    ValidationLogger&  validation_logger) const
+                                    lang::Location    value_location,
+                                    ValidationLogger& validation_logger) const
 {
     if (!validate(validation_logger)) return false;
     if (!type().isDefined()) return false;

@@ -30,7 +30,7 @@ class Cast
          lang::Location                    location,
          lang::Location                    type_location);
 
-    [[nodiscard]] Expression const& value() const;
+    [[nodiscard]] Expression const&   value() const;
     [[nodiscard]] lang::Entity const& target() const;
 
     void defineType(lang::ResolvingHandle<lang::Type> type) override;

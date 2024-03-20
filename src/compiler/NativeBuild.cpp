@@ -2,19 +2,19 @@
 #include <llvm/Support/TargetSelect.h>
 
 #include "compiler/CompileContext.h"
-#include "lang/construct/Member.h"
-#include "lang/construct/Constant.h"
-#include "lang/construct/constant/UnitConstant.h"
-#include "lang/expression/LiteralExpression.h"
-#include "lang/construct/LocalVariable.h"
-#include "lang/construct/Function.h"
-#include "lang/construct/GlobalVariable.h"
-#include "compiler/WrappedConstant.h"
-#include "lang/construct/Variable.h"
+#include "compiler/NativeBuilder.h"
 #include "compiler/RoughlyCastedValue.h"
+#include "compiler/WrappedConstant.h"
 #include "compiler/WrappedContentValue.h"
 #include "compiler/WrappedNativeValue.h"
-#include "compiler/NativeBuilder.h"
+#include "lang/construct/Constant.h"
+#include "lang/construct/Function.h"
+#include "lang/construct/GlobalVariable.h"
+#include "lang/construct/LocalVariable.h"
+#include "lang/construct/Member.h"
+#include "lang/construct/Variable.h"
+#include "lang/construct/constant/UnitConstant.h"
+#include "lang/expression/LiteralExpression.h"
 #include "lang/scope/Scope.h"
 #include "lang/type/ArrayType.h"
 #include "lang/type/CharType.h"
@@ -116,7 +116,9 @@ Shared<lang::Constant> NativeBuild::getCodepointString(std::u32string const& str
 
     auto const& [_, constant] = *iterator;
 
-    return makeShared<WrappedConstant>(context_.ctx().getArrayType(context_.ctx().getCharType(), string.size()), constant, *this);
+    return makeShared<WrappedConstant>(context_.ctx().getArrayType(context_.ctx().getCharType(), string.size()),
+                                       constant,
+                                       *this);
 }
 
 Shared<lang::Constant> NativeBuild::getByteString(std::string const& string)
@@ -132,7 +134,8 @@ Shared<lang::Constant> NativeBuild::getByteString(std::string const& string)
 
     return makeShared<WrappedConstant>(
         context_.ctx().getArrayType(context_.ctx().getFixedWidthIntegerType(8, false), string.size()),
-        constant, *this);
+        constant,
+        *this);
 }
 
 Shared<lang::Constant> NativeBuild::getCString(std::string const& string)
@@ -146,9 +149,9 @@ Shared<lang::Constant> NativeBuild::getCString(std::string const& string)
 
     auto const& [_, constant] = *iterator;
 
-    return makeShared<WrappedConstant>(
-        context_.ctx().getPointerType(context_.ctx().getFixedWidthIntegerType(8, false)),
-        constant, *this);
+    return makeShared<WrappedConstant>(context_.ctx().getPointerType(context_.ctx().getFixedWidthIntegerType(8, false)),
+                                       constant,
+                                       *this);
 }
 
 Shared<lang::Constant> NativeBuild::getSizeN(size_t size)
@@ -156,7 +159,7 @@ Shared<lang::Constant> NativeBuild::getSizeN(size_t size)
     assert(size < (1ull << lang::SizeType::MINIMUM_BIT_SIZE));
 
     lang::Type const& size_type     = context_.ctx().getSizeType();
-    llvm::Constant*                   size_constant = llvm::ConstantInt::get(llvmType(size_type), size);
+    llvm::Constant*   size_constant = llvm::ConstantInt::get(llvmType(size_type), size);
 
     return makeShared<WrappedConstant>(size_type, size_constant, *this);
 }
@@ -165,8 +168,8 @@ Shared<lang::Constant> NativeBuild::getDiffN(std::ptrdiff_t diff)
 {
     assert(static_cast<size_t>(std::abs(diff)) < (1ull << lang::SizeType::MINIMUM_BIT_SIZE));
 
-    lang::Type const& diff_type = context_.ctx().getDiffType();
-    llvm::Constant*                   diff_constant = llvm::ConstantInt::getSigned(llvmType(diff_type), diff);
+    lang::Type const& diff_type     = context_.ctx().getDiffType();
+    llvm::Constant*   diff_constant = llvm::ConstantInt::getSigned(llvmType(diff_type), diff);
 
     return makeShared<WrappedConstant>(diff_type, diff_constant, *this);
 }
@@ -175,8 +178,8 @@ Shared<lang::Constant> NativeBuild::getSizeOf(lang::Type const& type)
 {
     uint64_t const size = llvm_module_.getDataLayout().getTypeAllocSize(llvmType(type));
 
-    lang::Type const& size_type = context_.ctx().getSizeType();
-    llvm::Constant*                   size_constant = llvm::ConstantInt::get(llvmType(size_type), size, false);
+    lang::Type const& size_type     = context_.ctx().getSizeType();
+    llvm::Constant*   size_constant = llvm::ConstantInt::get(llvmType(size_type), size, false);
 
     return makeShared<WrappedConstant>(size_type, size_constant, *this);
 }
@@ -272,75 +275,73 @@ Shared<lang::Constant> NativeBuild::getByte(uint8_t byte)
     return makeShared<WrappedConstant>(context_.ctx().getFixedWidthIntegerType(8, false), constant, *this);
 }
 
-void NativeBuild::createFunction(lang::Identifier const&               name,
-                                    std::string const&                    linkage_name,
-                                    Optional<lang::AccessModifier>        access,
-                                    bool                                  is_imported,
-                                    std::vector<Shared<lang::Parameter>> const& parameters,
-                                    lang::Type const&     return_type,
-                                    lang::Scope const*                          scope,
-                                    bool                                  preserve_unit,
-                                    lang::Location                        declaration_location,
-                                    Optional<lang::Location>              definition_location,
-                                    lang::Function const& function)
+void NativeBuild::registerFunction(lang::Function const& function)
 {
+    Optional<lang::AccessModifier> access = function.isRuntime() ? std::nullopt : makeOptional<>(function.access());
+    lang::Scope const*             scope  = function.isRuntime() ? nullptr : &function.scope();
+
     std::vector<std::reference_wrapper<lang::Type const>> parameter_types;
-    parameter_types.reserve(parameters.size());
+    parameter_types.reserve(function.parameters().size());
 
     std::vector<llvm::Type*> native_parameter_types;
-    native_parameter_types.reserve(parameters.size());
+    native_parameter_types.reserve(function.parameters().size());
 
     std::vector<llvm::Metadata*> parameter_debug_types;
-    parameter_debug_types.reserve(parameters.size() + 1);
+    parameter_debug_types.reserve(function.parameters().size() + 1);
 
-    parameter_debug_types.push_back(llvmDiType(return_type));
-    for (auto& parameter : parameters)
+    parameter_debug_types.push_back(llvmDiType(function.returnType()));
+    for (auto& parameter : function.parameters())
     {
         parameter_types.emplace_back(parameter->type());
         native_parameter_types.push_back(llvmType(parameter->type()));
         parameter_debug_types.push_back(llvmDiType(parameter->type()));
     }
 
-    llvm::Type* native_return_type = llvmType(return_type);
-    if (return_type.isUnitType() && not preserve_unit) { native_return_type = llvm::Type::getVoidTy(llvm_context_); }
+    llvm::Type* native_return_type = llvmType(function.returnType());
+    if (function.returnType().isUnitType() && not function.preserveUnitReturn())
+    {
+        native_return_type = llvm::Type::getVoidTy(llvm_context_);
+    }
 
     llvm::FunctionType* native_type = llvm::FunctionType::get(native_return_type, native_parameter_types, false);
     llvm::Function*     native_function =
         llvm::Function::Create(native_type,
                                getLinkage(access.valueOr(lang::AccessModifier::EXTERN_ACCESS)),
-                               linkage_name,
+                               function.getLinkageName(),
                                llvm_module_);
 
-    if (definition_location.hasValue())
+    if (function.getDefinitionLocation().hasValue())
     {
         assert(scope != nullptr);
 
         llvm::DISubroutineType* debug_type =
             di_builder_.createSubroutineType(di_builder_.getOrCreateTypeArray(parameter_debug_types));
-        llvm::DISubprogram* subprogram =
-            di_builder_.createFunction(llvmScope(*scope),
-                                       name.text(),
-                                       native_function->getName(),
-                                       context_.getSourceFile(declaration_location),
-                                       static_cast<unsigned>(declaration_location.line()),
-                                       debug_type,
-                                       static_cast<unsigned>(definition_location->line()),
-                                       llvm::DINode::DIFlags::FlagPrototyped,
-                                       llvm::DISubprogram::toSPFlags(false, true, false, 0U, name.text() == "main"));
+        llvm::DISubprogram* subprogram = di_builder_.createFunction(
+            llvmScope(*scope),
+            function.name().text(),
+            native_function->getName(),
+            context_.getSourceFile(function.location()),
+            static_cast<unsigned>(function.location().line()),
+            debug_type,
+            static_cast<unsigned>(function.getDefinitionLocation()->line()),
+            llvm::DINode::DIFlags::FlagPrototyped,
+            llvm::DISubprogram::toSPFlags(false, true, false, 0U, function.name().text() == "main"));
 
         native_function->setSubprogram(subprogram);
     }
 
     if (access.hasValue() && getLinkage(access.value()) == llvm::GlobalValue::LinkageTypes::ExternalLinkage)
     {
-        if (is_imported)
+        if (function.isImported())
         {
             native_function->setDLLStorageClass(llvm::GlobalValue::DLLStorageClassTypes::DLLImportStorageClass);
         }
         else { native_function->setDLLStorageClass(llvm::GlobalValue::DLLStorageClassTypes::DLLExportStorageClass); }
     }
 
-    functions_.emplace(&function, NativeFunction{native_function, preserve_unit, return_type, parameter_types});
+    functions_.emplace(
+        &function,
+        NativeFunction {native_function, function.preserveUnitReturn(), function.returnType(), parameter_types});
 }
 
 Shared<lang::Value> NativeBuild::getParameterValue(lang::Function const& function, size_t index)
@@ -356,11 +357,13 @@ void NativeBuild::defineFunctionBody(lang::Function const& function)
 {
     current_function_ = &functions_.at(&function);
 
-    llvm::BasicBlock* block = llvm::BasicBlock::Create(llvmContext(), "entry_of_body", current_function_->llvm_function);
+    llvm::BasicBlock* block =
+        llvm::BasicBlock::Create(llvmContext(), "entry_of_body", current_function_->llvm_function);
     ir().SetInsertPoint(block);
 }
 
-Shared<lang::Value> NativeBuild::performFunctionCall(lang::Function const& function, std::vector<Shared<lang::Value>> arguments)
+Shared<lang::Value> NativeBuild::performFunctionCall(lang::Function const&            function,
+                                                     std::vector<Shared<lang::Value>> arguments)
 {
     auto& [native_function, preserve_unit_return, return_type, parameters] = functions_.at(&function);
 
@@ -377,15 +380,14 @@ Shared<lang::Value> NativeBuild::performFunctionCall(lang::Function const& funct
     if (!native_function->getFunctionType()->getReturnType()->isVoidTy())
         return_value_content->setName(LLVM_NAME(native_function, ".call"));
 
-    if (return_type.isUnitType())
-        return getDefault(return_type);
+    if (return_type.isUnitType()) return getDefault(return_type);
 
     return makeShared<WrappedContentValue>(return_type, return_value_content, *this);
 }
 
 void NativeBuild::createStruct(lang::Type const&                                 type,
                                std::vector<std::reference_wrapper<lang::Member>> members,
-                               lang::Location definition_location)
+                               lang::Location                                    definition_location)
 {
     llvm::DataLayout const& dl = llvm_module_.getDataLayout();
 
@@ -453,14 +455,13 @@ void NativeBuild::createStruct(lang::Type const&                                
     llvm::Constant* default_value               = llvm::ConstantStruct::get(struct_type, llvm_default_values);
     current_recursive_native_type_.llvm_default = default_value;
 
-    current_recursive_type_      = nullptr;
+    current_recursive_type_        = nullptr;
     current_recursive_native_type_ = {nullptr, nullptr, nullptr};
 
     types_[&type] = {struct_type, di_type, default_value};
 }
 
-void NativeBuild::createAlias(lang::Type const&  type,
-                              lang::Location     definition_location)
+void NativeBuild::createAlias(lang::Type const& type, lang::Location definition_location)
 {
     llvm::Type* llvm_type = llvmType(type.getActualType());
 
@@ -504,7 +505,7 @@ void NativeBuild::registerAddressType(lang::Type const& address_type)
 
     uint64_t const size_in_bits    = dl.getTypeSizeInBits(llvm_address_type);
     llvm::DIType*  element_di_type = llvmDiType(address_type.getElementType());
-    llvm::DIType* di_type         = di().createPointerType(element_di_type, size_in_bits);
+    llvm::DIType*  di_type         = di().createPointerType(element_di_type, size_in_bits);
 
     llvm::Constant* default_value = llvm::ConstantPointerNull::get(llvm_address_type);
 
@@ -518,8 +519,8 @@ void NativeBuild::registerOpaqueAddressType(lang::Type const& opaque_pointer_typ
     llvm::PointerType* llvm_opaque_pointer_type = llvm::PointerType::get(llvm::Type::getInt8Ty(llvm_context_), 0);
 
     uint64_t const    size_in_bits = dl.getTypeSizeInBits(llvm_opaque_pointer_type);
-    std::string const name     = std::string(opaque_pointer_type.name().text());
-    auto              encoding = llvm::dwarf::DW_ATE_address;
+    std::string const name         = std::string(opaque_pointer_type.name().text());
+    auto              encoding     = llvm::dwarf::DW_ATE_address;
 
     llvm::DIType* di_type = di().createBasicType(name, size_in_bits, encoding);
 
@@ -703,8 +704,8 @@ void NativeBuild::registerArrayType(lang::Type const& array_type)
 }
 
 void NativeBuild::createGlobalVariable(lang::GlobalVariable const& global_variable,
-                                                            bool                              is_imported,
-                                                            lang::GlobalInitializer     init)
+                                       bool                        is_imported,
+                                       lang::GlobalInitializer     init)
 {
     llvm::Constant* native_initializer = nullptr;
 
@@ -713,7 +714,7 @@ void NativeBuild::createGlobalVariable(lang::GlobalVariable const& global_variab
         if (auto* constant_init = std::get_if<std::reference_wrapper<LiteralExpression>>(&init.value()))
         {
             Shared<lang::Constant> initial_constant = constant_init->get().constant().embed(context_);
-            native_initializer = llvmConstant(initial_constant);
+            native_initializer                      = llvmConstant(initial_constant);
         }
         else
         {
@@ -750,30 +751,33 @@ void NativeBuild::createGlobalVariable(lang::GlobalVariable const& global_variab
     llvm::MaybeAlign const alignment = llvm_module_.getDataLayout().getABITypeAlign(native_type);
     native_variable->setAlignment(alignment);
 
-    auto* debug_info = di().createGlobalVariableExpression(llvm_di_unit_,
-                                                           global_variable.name().text(),
-                                                           global_variable.name().text(),
-                                                           context_.getSourceFile(global_variable.location()),
-                                                           static_cast<unsigned>(global_variable.location().line()),
-                                                           llvmDiType(global_variable.type()),
-                                                           global_variable.access() == lang::AccessModifier::PRIVATE_ACCESS);
+    auto* debug_info =
+        di().createGlobalVariableExpression(llvm_di_unit_,
+                                            global_variable.name().text(),
+                                            global_variable.name().text(),
+                                            context_.getSourceFile(global_variable.location()),
+                                            static_cast<unsigned>(global_variable.location().line()),
+                                            llvmDiType(global_variable.type()),
+                                            global_variable.access() == lang::AccessModifier::PRIVATE_ACCESS);
 
     native_variable->addDebugInfo(debug_info);
 
-    global_variables_.emplace(&global_variable.self(), NativeGlobalVariable{native_variable, global_variable.type()});
+    global_variables_.emplace(&global_variable.self(), NativeGlobalVariable {native_variable, global_variable.type()});
 }
 
 void NativeBuild::declareLocalVariable(lang::LocalVariable const& local_variable)
 {
-    llvm::Value* native_value = ir().CreateAlloca(llvmType(local_variable.type()), nullptr, local_variable.name().text());
+    llvm::Value* native_value =
+        ir().CreateAlloca(llvmType(local_variable.type()), nullptr, local_variable.name().text());
 
-    local_variables_.emplace(&local_variable.self(), NativeLocalVariable{native_value, local_variable.type(), local_variable.name()});
+    local_variables_.emplace(&local_variable.self(),
+                             NativeLocalVariable {native_value, local_variable.type(), local_variable.name()});
 }
 
 void NativeBuild::defineLocalVariable(lang::LocalVariable const& local_variable,
-                                      lang::Scope const&             scope,
-                                      Optional<size_t>       parameter_index,
-                                      lang::Location           location)
+                                      lang::Scope const&         scope,
+                                      Optional<size_t>           parameter_index,
+                                      lang::Location             location)
 {
     auto& [native_variable, type, name] = local_variables_.at(&local_variable.self());
 
@@ -830,14 +834,14 @@ Shared<lang::Value> NativeBuild::computeAddressOfVariable(lang::Variable const& 
     if (global_variables_.contains(&variable))
     {
         auto& [native_variable, type] = global_variables_.at(&variable);
-        lang::Type const& type_ptr                 = context_.ctx().getPointerType(type);
+        lang::Type const& type_ptr    = context_.ctx().getPointerType(type);
         return makeShared<WrappedContentValue>(type_ptr, native_variable, *this);
     }
 
     if (local_variables_.contains(&variable))
     {
         auto& [native_value, type, name] = local_variables_.at(&variable);
-        lang::Type const& type_ptr                    = context_.ctx().getPointerType(type);
+        lang::Type const& type_ptr       = context_.ctx().getPointerType(type);
         return makeShared<WrappedContentValue>(type_ptr, native_value, *this);
     }
 
@@ -852,8 +856,7 @@ Shared<lang::Value> NativeBuild::computeAsActualType(Shared<lang::Value> value)
     return makeShared<RoughlyCastedValue>(actual_type, value, *this);
 }
 
-Shared<lang::Value> NativeBuild::computeAllocatedSize(lang::Type const& type,
-                                                      Optional<Shared<lang::Value>>     count)
+Shared<lang::Value> NativeBuild::computeAllocatedSize(lang::Type const& type, Optional<Shared<lang::Value>> count)
 {
     lang::Type const& size_type = context_.ctx().getSizeType();
 
@@ -923,14 +926,13 @@ Shared<lang::Value> NativeBuild::computeElementPointer(Shared<lang::Value> seque
 
         llvm::Value* in_bounds = ir().CreateICmpULT(native_index, native_bounds, LLVM_NAME(native_index, ".icmp"));
 
-        Shared<lang::Value> truth =
-            makeShared<WrappedContentValue>(context_.ctx().getBooleanType(), in_bounds, *this);
+        Shared<lang::Value> truth = makeShared<WrappedContentValue>(context_.ctx().getBooleanType(), in_bounds, *this);
 
         context_.runtime().buildAssert(truth, "Index out of bounds at " + context_.getLocationString(), context_);
     }
 
-    lang::Type const& ptr_type = context_.ctx().getPointerType(element_type.value());
-    llvm::Value* element_ptr = ir().CreateGEP(base_type, sequence_ptr, indices, LLVM_NAME(sequence_ptr, ".gep"));
+    lang::Type const& ptr_type    = context_.ctx().getPointerType(element_type.value());
+    llvm::Value*      element_ptr = ir().CreateGEP(base_type, sequence_ptr, indices, LLVM_NAME(sequence_ptr, ".gep"));
 
     return makeShared<WrappedContentValue>(ptr_type, element_ptr, *this);
 }
@@ -943,9 +945,9 @@ Shared<lang::Value> NativeBuild::computeMemberPointer(Shared<lang::Value>     st
 
     lang::Type const& struct_type = struct_ptr->type().getElementType();
 
-    lang::Member const&                     member          = struct_type.getMember(member_name);
-    size_t const                      member_index    = member.index();
-    lang::Type const& member_ptr_type = context_.ctx().getPointerType(member.type());
+    lang::Member const& member          = struct_type.getMember(member_name);
+    size_t const        member_index    = member.index();
+    lang::Type const&   member_ptr_type = context_.ctx().getPointerType(member.type());
 
     llvm::Value* struct_ptr_content = llvmContentValue(struct_ptr);
 
@@ -960,17 +962,17 @@ Shared<lang::Value> NativeBuild::computeMemberPointer(Shared<lang::Value>     st
 Shared<lang::Value> NativeBuild::computeAddressOf(Shared<lang::Value> value)
 {
     Optional<std::reference_wrapper<lang::Type const>> ptr_type;
-    llvm::Value*                      ptr;
+    llvm::Value*                                       ptr;
 
     if (value->type().isReferenceType())
     {
         ptr_type = context_.ctx().getPointerType(value->type().getElementType());
-        ptr = llvmContentValue(value);
+        ptr      = llvmContentValue(value);
     }
     else
     {
         ptr_type = context_.ctx().getPointerType(value->type());
-        ptr = llvmNativeValue(value);
+        ptr      = llvmNativeValue(value);
     }
 
     return makeShared<WrappedContentValue>(ptr_type.value(), ptr, *this);
@@ -989,8 +991,7 @@ Shared<lang::Value> NativeBuild::computePointerToInteger(Shared<lang::Value> poi
     return makeShared<WrappedContentValue>(integer_type, integer_content, *this);
 }
 
-Shared<lang::Value> NativeBuild::computeIntegerToPointer(Shared<lang::Value>               integer,
-                                                         lang::Type const& pointer_type)
+Shared<lang::Value> NativeBuild::computeIntegerToPointer(Shared<lang::Value> integer, lang::Type const& pointer_type)
 {
     assert(integer->type().isXOrVectorOfX([](auto& t) { return t.isIntegerType(); }));
 
@@ -1001,8 +1002,7 @@ Shared<lang::Value> NativeBuild::computeIntegerToPointer(Shared<lang::Value>    
     return makeShared<WrappedContentValue>(pointer_type, pointer_content, *this);
 }
 
-Shared<lang::Value> NativeBuild::computeCastedAddress(Shared<lang::Value>               address,
-                                                      lang::Type const& new_type)
+Shared<lang::Value> NativeBuild::computeCastedAddress(Shared<lang::Value> address, lang::Type const& new_type)
 {
     assert(address->type().isXOrVectorOfX(
         [](auto& t) { return t.isPointerType() || t.isBufferType() || t.isOpaquePointerType(); }));
@@ -1014,13 +1014,13 @@ Shared<lang::Value> NativeBuild::computeCastedAddress(Shared<lang::Value>       
 
     llvm::Value* address_content = llvmContentValue(address);
 
-    llvm::Value* casted_address_content = ir().CreateBitCast(address_content, llvmType(new_type), LLVM_NAME(address_content, ".bitcast"));
+    llvm::Value* casted_address_content =
+        ir().CreateBitCast(address_content, llvmType(new_type), LLVM_NAME(address_content, ".bitcast"));
 
     return makeShared<WrappedContentValue>(new_type, casted_address_content, *this);
 }
 
-Shared<lang::Value> NativeBuild::computeConversionOnFP(Shared<lang::Value>               value,
-                                                       lang::Type const& destination_type)
+Shared<lang::Value> NativeBuild::computeConversionOnFP(Shared<lang::Value> value, lang::Type const& destination_type)
 {
     assert(value->type().isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }));
     assert(destination_type.isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }));
@@ -1033,8 +1033,7 @@ Shared<lang::Value> NativeBuild::computeConversionOnFP(Shared<lang::Value>      
     return makeShared<WrappedContentValue>(destination_type, converted_value, *this);
 }
 
-Shared<lang::Value> NativeBuild::computeConversionOnI(Shared<lang::Value>               value,
-                                                      lang::Type const& destination_type)
+Shared<lang::Value> NativeBuild::computeConversionOnI(Shared<lang::Value> value, lang::Type const& destination_type)
 {
     assert(value->type().isXOrVectorOfX([](auto& t) { return t.isIntegerType(); }));
     assert(destination_type.isXOrVectorOfX([](auto& t) { return t.isIntegerType(); }));
@@ -1049,8 +1048,7 @@ Shared<lang::Value> NativeBuild::computeConversionOnI(Shared<lang::Value>       
     return makeShared<WrappedContentValue>(destination_type, converted_value, *this);
 }
 
-Shared<lang::Value> NativeBuild::computeConversionFP2I(Shared<lang::Value>               value,
-                                                       lang::Type const& destination_type)
+Shared<lang::Value> NativeBuild::computeConversionFP2I(Shared<lang::Value> value, lang::Type const& destination_type)
 {
     assert(value->type().isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }));
     assert(destination_type.isXOrVectorOfX([](auto& t) { return t.isIntegerType(); }));
@@ -1061,18 +1059,19 @@ Shared<lang::Value> NativeBuild::computeConversionFP2I(Shared<lang::Value>      
 
     if (destination_type.isSigned())
     {
-        converted_value = ir().CreateFPToSI(content_value, llvmType(destination_type), LLVM_NAME(content_value, ".f2i"));
+        converted_value =
+            ir().CreateFPToSI(content_value, llvmType(destination_type), LLVM_NAME(content_value, ".f2i"));
     }
     else
     {
-        converted_value = ir().CreateFPToUI(content_value, llvmType(destination_type), LLVM_NAME(content_value, ".f2i"));
+        converted_value =
+            ir().CreateFPToUI(content_value, llvmType(destination_type), LLVM_NAME(content_value, ".f2i"));
     }
 
     return makeShared<WrappedContentValue>(destination_type, converted_value, *this);
 }
 
-Shared<lang::Value> NativeBuild::computeConversionI2FP(Shared<lang::Value>               value,
-                                                       lang::Type const& destination_type)
+Shared<lang::Value> NativeBuild::computeConversionI2FP(Shared<lang::Value> value, lang::Type const& destination_type)
 {
     assert(value->type().isXOrVectorOfX([](auto& t) { return t.isIntegerType(); }));
     assert(destination_type.isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }));
@@ -1083,11 +1082,13 @@ Shared<lang::Value> NativeBuild::computeConversionI2FP(Shared<lang::Value>      
 
     if (value->type().isSigned())
     {
-        converted_value = ir().CreateSIToFP(content_value, llvmType(destination_type), LLVM_NAME(content_value, ".i2f"));
+        converted_value =
+            ir().CreateSIToFP(content_value, llvmType(destination_type), LLVM_NAME(content_value, ".i2f"));
     }
     else
     {
-        converted_value = ir().CreateUIToFP(content_value, llvmType(destination_type), LLVM_NAME(content_value, ".i2f"));
+        converted_value =
+            ir().CreateUIToFP(content_value, llvmType(destination_type), LLVM_NAME(content_value, ".i2f"));
     }
 
     return makeShared<WrappedContentValue>(destination_type, converted_value, *this);
@@ -1135,12 +1136,12 @@ Shared<lang::Value> NativeBuild::computeAddressDiff(Shared<lang::Value> lhs, Sha
     llvm::Value* left_value  = llvmContentValue(lhs);
     llvm::Value* right_value = llvmContentValue(rhs);
 
-    llvm::Value* diff   = ir().CreatePtrDiff(llvmType(element_type),
+    llvm::Value* diff = ir().CreatePtrDiff(llvmType(element_type),
                                            left_value,
                                            right_value,
                                            LLVM_NAME2(left_value, right_value, ".diff"));
-    llvm::Value* result = ir().CreateIntCast(diff, llvmType(context_.ctx().getDiffType()), true,
-                                             LLVM_NAME(diff, ".diff"));
+    llvm::Value* result =
+        ir().CreateIntCast(diff, llvmType(context_.ctx().getDiffType()), true, LLVM_NAME(diff, ".diff"));
 
     return makeShared<WrappedContentValue>(context_.ctx().getDiffType(), result, *this);
 }
@@ -1161,7 +1162,7 @@ void NativeBuild::performStoreToAddress(Shared<lang::Value> address, Shared<lang
     assert(lang::Type::areSame(address->type().getElementType(), value->type()));
 
     llvm::Value* address_content = llvmContentValue(address);
-    llvm::Value* value_content = llvmContentValue(value);
+    llvm::Value* value_content   = llvmContentValue(value);
 
     ir().CreateStore(value_content, address_content);
 }
@@ -1180,8 +1181,10 @@ void NativeBuild::performPointerIteration(Shared<lang::Value>                   
     llvm::Type* size_type = llvmType(context_.ctx().getSizeType());
 
     llvm::BasicBlock* iteration_start = ir().GetInsertBlock();
-    llvm::BasicBlock* iteration_body  = llvm::BasicBlock::Create(llvmContext(), "iteration_body", current_function_->llvm_function);
-    llvm::BasicBlock* iteration_end   = llvm::BasicBlock::Create(llvmContext(), "iteration_end", current_function_->llvm_function);
+    llvm::BasicBlock* iteration_body =
+        llvm::BasicBlock::Create(llvmContext(), "iteration_body", current_function_->llvm_function);
+    llvm::BasicBlock* iteration_end =
+        llvm::BasicBlock::Create(llvmContext(), "iteration_end", current_function_->llvm_function);
 
     ir().CreateBr(iteration_body);
 
@@ -1193,9 +1196,7 @@ void NativeBuild::performPointerIteration(Shared<lang::Value>                   
         llvm::Value* element_ptr = llvmContentValue(pointer);
         if (!element_type.getStateCount().isUnit())
         {
-            element_ptr = ir().CreateInBoundsGEP(llvmType(element_type), element_ptr,
-                                                 current_index,
-                                                 "element_ptr");
+            element_ptr = ir().CreateInBoundsGEP(llvmType(element_type), element_ptr, current_index, "element_ptr");
         }
 
         body(makeShared<WrappedContentValue>(ptr_type, element_ptr, *this));
@@ -1213,7 +1214,8 @@ void NativeBuild::performPointerIteration(Shared<lang::Value>                   
 void NativeBuild::performReturn(Optional<Shared<lang::Value>> value)
 {
     assert(current_function_ != nullptr);
-    assert(lang::Type::areSame(current_function_->return_type, value.hasValue() ? value.value()->type() : context_.ctx().getUnitType()));
+    assert(lang::Type::areSame(current_function_->return_type,
+                               value.hasValue() ? value.value()->type() : context_.ctx().getUnitType()));
 
     if (value.hasValue())
     {
@@ -1231,15 +1233,12 @@ void NativeBuild::performReturn(Optional<Shared<lang::Value>> value)
     {
         if (current_function_->preserve_unit_return)
         {
-            Shared<lang::Value> unit_value = getDefault(context_.ctx().getUnitType());
+            Shared<lang::Value> unit_value    = getDefault(context_.ctx().getUnitType());
             llvm::Value*        content_value = llvmContentValue(unit_value);
 
             ir().CreateRet(content_value);
         }
-        else
-        {
-            ir().CreateRetVoid();
-        }
+        else { ir().CreateRetVoid(); }
     }
 }
 
@@ -1249,7 +1248,7 @@ void NativeBuild::performMemoryClear(Shared<lang::Value> address, Shared<lang::V
     assert(lang::Type::areSame(size->type(), context_.ctx().getSizeType()));
 
     llvm::Value* address_content = llvmContentValue(address);
-    llvm::Value* size_content = llvmContentValue(size);
+    llvm::Value* size_content    = llvmContentValue(size);
 
     ir().CreateMemSet(address_content,
                       llvm::ConstantInt::get(llvm::Type::getInt8Ty(llvmContext()), 0),
@@ -1266,15 +1265,14 @@ void NativeBuild::performMemoryCopy(Shared<lang::Value> destination,
     assert(lang::Type::areSame(source->type().getElementType(), destination->type().getElementType()));
     assert(lang::Type::areSame(size->type(), context_.ctx().getSizeType()));
 
-    llvm::Value* source_content = llvmContentValue(source);
+    llvm::Value* source_content      = llvmContentValue(source);
     llvm::Value* destination_content = llvmContentValue(destination);
-    llvm::Value* size_content = llvmContentValue(size);
+    llvm::Value* size_content        = llvmContentValue(size);
 
     ir().CreateMemCpy(destination_content, llvm::Align(1), source_content, llvm::Align(1), size_content);
 }
 
-Shared<lang::Value> NativeBuild::performStackAllocation(lang::Type const& type,
-                                                        Shared<lang::Value>               count)
+Shared<lang::Value> NativeBuild::performStackAllocation(lang::Type const& type, Shared<lang::Value> count)
 {
     lang::Type const& ptr_type = context_.ctx().getPointerType(type);
 
@@ -1296,7 +1294,7 @@ Shared<lang::Value> NativeBuild::performOperator(lang::UnaryOperator op, Shared<
 
     llvm::Value* content_value = llvmContentValue(value);
 
-    llvm::Value*          result = nullptr;
+    llvm::Value* result = nullptr;
 
     switch (op)
     {
@@ -1582,7 +1580,8 @@ Shared<lang::Value> NativeBuild::performBooleanCollapse(Shared<lang::Value> valu
     return makeShared<WrappedContentValue>(context_.ctx().getBooleanType(), result, *this);
 }
 
-Shared<lang::Value> NativeBuild::performIntegerReinterpretation(Shared<lang::Value> value, lang::Type const& target_type)
+Shared<lang::Value> NativeBuild::performIntegerReinterpretation(Shared<lang::Value> value,
+                                                                lang::Type const&   target_type)
 {
     return makeShared<RoughlyCastedValue>(target_type, value, *this);
 }
@@ -1591,21 +1590,21 @@ Execution::Handle<false> NativeBuild::allocateNativeValue(llvm::Value* value)
 {
     values_.emplace_back(value, nullptr);
 
-    return { this, std::prev(values_.end()) };
+    return {this, std::prev(values_.end())};
 }
 
 Execution::Handle<false> NativeBuild::allocateContentValue(llvm::Value* value)
 {
     values_.emplace_back(nullptr, value);
 
-    return { this, std::prev(values_.end()) };
+    return {this, std::prev(values_.end())};
 }
 
 Execution::Handle<true> NativeBuild::allocateConstant(llvm::Constant* constant)
 {
     constants_.emplace_back(constant);
 
-    return { this, std::prev(constants_.end()) };
+    return {this, std::prev(constants_.end())};
 }
 
 void NativeBuild::releaseValue(std::any handle)
@@ -1647,14 +1646,12 @@ llvm::Function* NativeBuild::llvmFunction(lang::Function const& function)
 
 llvm::DIScope* NativeBuild::llvmScope(lang::Scope const& scope)
 {
-    if (scope.getGlobalScope() == &scope)
-        return llvm_di_unit_;
+    if (scope.getGlobalScope() == &scope) return llvm_di_unit_;
 
     if (auto function_scope = dynamic_cast<lang::Function const*>(&scope))
         return functions_.at(function_scope).llvm_function->getSubprogram();
 
-    if (auto type_scope = dynamic_cast<lang::Type const*>(&scope))
-        return getNativeType(*type_scope).llvm_di_type;
+    if (auto type_scope = dynamic_cast<lang::Type const*>(&scope)) return getNativeType(*type_scope).llvm_di_type;
 
     return llvmScope(scope.scope());
 }
@@ -1685,8 +1682,8 @@ llvm::Value* NativeBuild::llvmNativeValue(Shared<lang::Value> value)
     Execution::Handle<false> execution_value = value->getExecutionValue();
     assert(execution_value.execution == this);
 
-    auto iterator = std::any_cast<std::list<Value>::iterator>(execution_value.handle);
-    Value const& entry = *iterator;
+    auto         iterator = std::any_cast<std::list<Value>::iterator>(execution_value.handle);
+    Value const& entry    = *iterator;
 
     llvm::Value* native_value = entry.native;
 
@@ -1704,8 +1701,8 @@ llvm::Value* NativeBuild::llvmContentValue(Shared<lang::Value> value)
     Execution::Handle<false> execution_value = value->getExecutionValue();
     assert(execution_value.execution == this);
 
-    auto iterator = std::any_cast<std::list<Value>::iterator>(execution_value.handle);
-    Value const& entry = *iterator;
+    auto         iterator = std::any_cast<std::list<Value>::iterator>(execution_value.handle);
+    Value const& entry    = *iterator;
 
     llvm::Value* content_value = entry.content;
 
@@ -1722,7 +1719,7 @@ llvm::Constant* NativeBuild::llvmConstant(Shared<lang::Constant> constant)
     Execution::Handle<true> execution_constant = constant->getExecutionConstant();
     assert(execution_constant.execution == this);
 
-    auto iterator = std::any_cast<std::list<llvm::Constant*>::iterator>(execution_constant.handle);
+    auto            iterator      = std::any_cast<std::list<llvm::Constant*>::iterator>(execution_constant.handle);
     llvm::Constant* llvm_constant = *iterator;
 
     return llvm_constant;
@@ -1740,10 +1737,7 @@ void NativeBuild::setCurrentFunction(lang::Function const* function)
 
 NativeBuild::NativeType& NativeBuild::getNativeType(lang::Type const& type)
 {
-    if (!types_.contains(&type))
-    {
-        type.registerExecutionType(context_);
-    }
+    if (!types_.contains(&type)) { type.registerExecutionType(context_); }
 
     return types_[&type];
 }

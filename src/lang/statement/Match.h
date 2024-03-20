@@ -51,7 +51,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
     Case(std::vector<Owned<LiteralExpression>> conditions, std::variant<Owned<Statement>, Owned<Expression>> code);
 
   public:
-    [[nodiscard]] std::vector<std::reference_wrapper<LiteralExpression const>>  conditions() const;
+    [[nodiscard]] std::vector<std::reference_wrapper<LiteralExpression const>>   conditions() const;
     [[nodiscard]] std::reference_wrapper<lang::Visitable<ANCE_CONSTRUCTS> const> code() const;
 
     void setContainingScope(lang::Scope& scope);
@@ -92,7 +92,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
     std::vector<std::reference_wrapper<lang::Scope>> getSubScopesInOrder();
 
   private:
-    std::vector<Owned<LiteralExpression>>            conditions_;
+    std::vector<Owned<LiteralExpression>>             conditions_;
     std::variant<Owned<Statement>, Owned<Expression>> code_;
 };
 

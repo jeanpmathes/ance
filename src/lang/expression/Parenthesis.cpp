@@ -36,8 +36,8 @@ bool Parenthesis::validate(ValidationLogger& validation_logger) const
 }
 
 bool Parenthesis::validateAssignment(lang::Type const& value_type,
-                                     lang::Location     value_location,
-                                     ValidationLogger&  validation_logger) const
+                                     lang::Location    value_location,
+                                     ValidationLogger& validation_logger) const
 {
     return expression_->validateAssignment(value_type, value_location, validation_logger);
 }

@@ -47,9 +47,9 @@ bool lang::IntegerType::validateImplicitConversion(lang::Type const&, lang::Loca
     return true;
 }
 
-Shared<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Type const& other,
-                                                               Shared<lang::Value>               value,
-                                                               CompileContext&                   context) const
+Shared<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Type const&   other,
+                                                               Shared<lang::Value> value,
+                                                               CompileContext&     context) const
 {
     return context.exec().computeConversionOnI(value, other);
 }
@@ -65,9 +65,9 @@ bool lang::IntegerType::validateCast(lang::Type const&, lang::Location, Validati
     return true;
 }
 
-Shared<lang::Value> lang::IntegerType::buildCast(lang::Type const& other,
-                                                 Shared<lang::Value>               value,
-                                                 CompileContext&                   context) const
+Shared<lang::Value> lang::IntegerType::buildCast(lang::Type const&   other,
+                                                 Shared<lang::Value> value,
+                                                 CompileContext&     context) const
 {
     if (other.isXOrVectorOfX([](auto& t) { return t.isIntegerType(); }))
     {
@@ -94,23 +94,23 @@ bool lang::IntegerType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::
 }
 
 void lang::IntegerType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                               lang::PredefinedFunction&                      function,
-                                               CompileContext&                                context) const
+                                               lang::PredefinedFunction&                             function,
+                                               CompileContext&                                       context) const
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }
 
-void lang::IntegerType::buildRequestedOverload(lang::Type const& parameter_element,
-                                               lang::Type const& return_type,
-                                               lang::PredefinedFunction&         function,
-                                               CompileContext&                   context) const
+void lang::IntegerType::buildRequestedOverload(lang::Type const&         parameter_element,
+                                               lang::Type const&         return_type,
+                                               lang::PredefinedFunction& function,
+                                               CompileContext&           context) const
 {
     if (parameter_element.isIntegerType() || parameter_element.isBooleanType())
     {
         context.exec().defineFunctionBody(function.function());
         {
             Shared<lang::Value> original   = context.exec().getParameterValue(function.function(), 0);
-            auto const&                other_type = original->type();
+            auto const&         other_type = original->type();
 
             // Determine whether the value fits into the return type without loss of information.
             // Abort if it doesn't.
@@ -129,14 +129,14 @@ void lang::IntegerType::buildRequestedOverload(lang::Type const& parameter_eleme
                     {
                         if (isSigned())
                         {
-                            const llvm::APInt min      = llvm::APInt::getSignedMinValue(this_size).sext(other_capacity);
+                            llvm::APInt const   min = llvm::APInt::getSignedMinValue(this_size).sext(other_capacity);
                             Shared<lang::Value> min_value = context.exec().getInteger(min, other_type);
                             Shared<lang::Value> fits_min =
                                 context.exec().performOperator(lang::BinaryOperator::GREATER_THAN_OR_EQUAL,
                                                                original,
                                                                min_value);
 
-                            const llvm::APInt max      = llvm::APInt::getSignedMaxValue(this_size).sext(other_capacity);
+                            llvm::APInt const   max = llvm::APInt::getSignedMaxValue(this_size).sext(other_capacity);
                             Shared<lang::Value> max_value = context.exec().getInteger(max, other_type);
                             Shared<lang::Value> fits_max =
                                 context.exec().performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL,
@@ -149,7 +149,7 @@ void lang::IntegerType::buildRequestedOverload(lang::Type const& parameter_eleme
                         }
                         else
                         {
-                            const llvm::APInt max = llvm::APInt::getMaxValue(this_size).zext(other_capacity);
+                            llvm::APInt const   max       = llvm::APInt::getMaxValue(this_size).zext(other_capacity);
                             Shared<lang::Value> max_value = context.exec().getInteger(max, other_type);
 
                             Shared<lang::Value> fits =
@@ -164,7 +164,7 @@ void lang::IntegerType::buildRequestedOverload(lang::Type const& parameter_eleme
                 {
                     if (this_size <= other_size)
                     {
-                        const llvm::APInt max  = llvm::APInt::getSignedMaxValue(this_size).zextOrSelf(other_capacity);
+                        llvm::APInt const   max = llvm::APInt::getSignedMaxValue(this_size).zextOrSelf(other_capacity);
                         Shared<lang::Value> max_value = context.exec().getInteger(max, other_type);
 
                         Shared<lang::Value> fits =
@@ -176,7 +176,7 @@ void lang::IntegerType::buildRequestedOverload(lang::Type const& parameter_eleme
                 }
                 else// this is unsigned and original is signed.
                 {
-                    const llvm::APInt zero = llvm::APInt::getNullValue(other_capacity);
+                    llvm::APInt const   zero       = llvm::APInt::getNullValue(other_capacity);
                     Shared<lang::Value> zero_value = context.exec().getInteger(zero, other_type);
 
                     Shared<lang::Value> fits =
@@ -186,7 +186,7 @@ void lang::IntegerType::buildRequestedOverload(lang::Type const& parameter_eleme
 
                     if (this_size < other_size)
                     {
-                        const llvm::APInt max = llvm::APInt::getMaxValue(this_size).zext(other_capacity);
+                        llvm::APInt const   max       = llvm::APInt::getMaxValue(this_size).zext(other_capacity);
                         Shared<lang::Value> max_value = context.exec().getInteger(max, other_type);
 
                         Shared<lang::Value> fits_max =
@@ -263,8 +263,7 @@ bool lang::IntegerType::isOperatorDefined(lang::BinaryOperator op, lang::Type co
     return false;
 }
 
-lang::Type const& lang::IntegerType::getOperatorResultType(lang::BinaryOperator op,
-                                                           lang::Type const&) const
+lang::Type const& lang::IntegerType::getOperatorResultType(lang::BinaryOperator op, lang::Type const&) const
 {
     if (op.isArithmetic() || op.isBitwise() || op.isShift()) return self().getActualType();
     if (op.isRelational() || op.isEquality()) return scope().context().getBooleanType();

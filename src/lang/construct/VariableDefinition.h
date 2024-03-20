@@ -77,10 +77,10 @@ namespace lang
       private:
         lang::ResolvingHandle<lang::Variable> self_;
 
-        lang::Location                    type_location_;
-        lang::Scope&                      scope_;
-        bool                              is_final_;
-        lang::Location                    location_;
+        lang::Location type_location_;
+        lang::Scope&   scope_;
+        bool           is_final_;
+        lang::Location location_;
     };
 }
 

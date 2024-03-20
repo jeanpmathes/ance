@@ -78,14 +78,15 @@ class While;
 class Loop;
 
 #define ANCE_CONSTRUCTS                                                                                                \
-    Unit, lang::BasicBlock, lang::bb::def::Empty, lang::bb::def::Finalizing, lang::bb::def::Simple, lang::bb::def::Returning, lang::bb::def::Branching, lang::bb::def::Matching, lang::CodeBlock, lang::Function, lang::FunctionDescription, lang::VariableDescription,     \
-        lang::StructDescription, lang::AliasDescription, lang::Member, Addressof, Allocation, BinaryOperation,         \
-        UnaryOperation, BindRef, BindRefTo, Cast,                \
-        LiteralExpression, FunctionCall, Parenthesis, SizeofExpression,        \
-        SizeofType, Subscript, VariableAccess, MemberAccess, Indirection, And, Or, IfSelect, MatchSelect,              \
-        lang::GlobalScope, lang::LocalScope, lang::StructScope, Assertion, Assignment, Break, Continue, Delete,        \
-        ExpressionStatement, LocalReferenceVariableDefinition, LocalVariableDefinition, Erase, Return, If, While,      \
-        Loop, Match, Case, VectorDefinition, ArrayDefinition
+    Unit, lang::BasicBlock, lang::bb::def::Empty, lang::bb::def::Finalizing, lang::bb::def::Simple,                    \
+        lang::bb::def::Returning, lang::bb::def::Branching, lang::bb::def::Matching, lang::CodeBlock, lang::Function,  \
+        lang::FunctionDescription, lang::VariableDescription, lang::StructDescription, lang::AliasDescription,         \
+        lang::Member, Addressof, Allocation, BinaryOperation, UnaryOperation, BindRef, BindRefTo, Cast,                \
+        LiteralExpression, FunctionCall, Parenthesis, SizeofExpression, SizeofType, Subscript, VariableAccess,         \
+        MemberAccess, Indirection, And, Or, IfSelect, MatchSelect, lang::GlobalScope, lang::LocalScope,                \
+        lang::StructScope, Assertion, Assignment, Break, Continue, Delete, ExpressionStatement,                        \
+        LocalReferenceVariableDefinition, LocalVariableDefinition, Erase, Return, If, While, Loop, Match, Case,        \
+        VectorDefinition, ArrayDefinition
 #endif
 
 template<typename T>

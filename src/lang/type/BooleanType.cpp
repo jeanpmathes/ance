@@ -74,8 +74,7 @@ bool lang::BooleanType::isOperatorDefined(lang::BinaryOperator op, lang::Type co
     return lang::Type::getReferencedType(other).isBooleanType();
 }
 
-lang::Type const& lang::BooleanType::getOperatorResultType(lang::BinaryOperator op,
-                                                                           lang::Type const&) const
+lang::Type const& lang::BooleanType::getOperatorResultType(lang::BinaryOperator op, lang::Type const&) const
 {
     if (op.isEquality() || op.isBitwise()) return self();
 
@@ -112,19 +111,18 @@ bool lang::BooleanType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::
 }
 
 void lang::BooleanType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                               lang::PredefinedFunction&                      function,
-                                               CompileContext&                                context) const
+                                               lang::PredefinedFunction&                             function,
+                                               CompileContext&                                       context) const
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }
 
-void lang::BooleanType::buildRequestedOverload(lang::Type const& parameter_element,
-                                               lang::Type const& return_type,
-                                               lang::PredefinedFunction&         function,
-                                               CompileContext&                   context) const
+void lang::BooleanType::buildRequestedOverload(lang::Type const&         parameter_element,
+                                               lang::Type const&         return_type,
+                                               lang::PredefinedFunction& function,
+                                               CompileContext&           context) const
 {
-    if (parameter_element.isFixedWidthIntegerType() || parameter_element.isSizeType()
-        || parameter_element.isDiffType())
+    if (parameter_element.isFixedWidthIntegerType() || parameter_element.isSizeType() || parameter_element.isDiffType())
     {
         context.exec().defineFunctionBody(function.function());
         {

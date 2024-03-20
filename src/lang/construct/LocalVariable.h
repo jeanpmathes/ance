@@ -33,20 +33,20 @@ namespace lang
                       Scope&                                containing_scope,
                       bool                                  is_final,
                       lang::LocalInitializer                init,
-                      Optional<size_t>                    parameter_index,
+                      Optional<size_t>                      parameter_index,
                       lang::Location                        location);
 
         static lang::OwningHandle<lang::Variable> makeLocalVariable(Identifier const&                 name,
                                                                     lang::ResolvingHandle<lang::Type> type,
                                                                     lang::Location                    type_location,
                                                                     lang::Assigner                    assigner,
-                                                                    Expression*                  init,
+                                                                    Expression*                       init,
                                                                     lang::Scope&                      containing_scope,
                                                                     lang::Location                    location);
 
-        static lang::OwningHandle<lang::Variable> makeParameterVariable(lang::Parameter & parameter,
-                                                                        size_t      parameter_index,
-                                                                        lang::Function&   containing_function);
+        static lang::OwningHandle<lang::Variable> makeParameterVariable(lang::Parameter& parameter,
+                                                                        size_t           parameter_index,
+                                                                        lang::Function&  containing_function);
 
         void buildDeclaration(CompileContext& context) const override;
         void buildInitialization(CompileContext& context) const override;
@@ -55,8 +55,8 @@ namespace lang
         Shared<lang::Value> getValuePointer(CompileContext& context) const override;
 
       private:
-        lang::LocalInitializer                initializer_;
-        Optional<size_t>            parameter_index_;
+        lang::LocalInitializer initializer_;
+        Optional<size_t>       parameter_index_;
     };
 }
 #endif

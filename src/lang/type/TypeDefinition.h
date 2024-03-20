@@ -111,27 +111,26 @@ namespace lang
 
         [[nodiscard]] virtual lang::Accessibility const& getAccessibility() const;
 
-        void         setContainingScope(Scope* scope);
+        void               setContainingScope(Scope* scope);
         [[nodiscard]] bool isContainingScopeSet() const;
-        Scope&       scope();
-        Scope const& scope() const;
+        Scope&             scope();
+        Scope const&       scope() const;
 
         void postResolve();
         bool requestOverload(std::vector<lang::ResolvingHandle<lang::Type>> parameters);
 
-        virtual bool                              isSubscriptDefined() const;
+        virtual bool              isSubscriptDefined() const;
         virtual lang::Type const& getSubscriptReturnType() const;
-        virtual bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const;
-        virtual bool isOperatorDefined(lang::UnaryOperator op) const;
-        virtual lang::Type const& getOperatorResultType(lang::BinaryOperator op,
-                                                        lang::Type const& other) const;
+        virtual bool              isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const;
+        virtual bool              isOperatorDefined(lang::UnaryOperator op) const;
+        virtual lang::Type const& getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const;
         virtual lang::Type const& getOperatorResultType(lang::UnaryOperator op) const;
-        virtual bool                              isImplicitlyConvertibleTo(lang::Type const& other) const;
-        virtual bool                              isCastingPossibleTo(lang::Type const& other) const;
-        virtual bool                              hasMember(lang::Identifier const& name) const;
-        virtual Member&                           getMember(lang::Identifier const&);
-        virtual Member const&                     getMember(lang::Identifier const&) const;
-        virtual bool                              definesIndirection() const;
+        virtual bool              isImplicitlyConvertibleTo(lang::Type const& other) const;
+        virtual bool              isCastingPossibleTo(lang::Type const& other) const;
+        virtual bool              hasMember(lang::Identifier const& name) const;
+        virtual Member&           getMember(lang::Identifier const&);
+        virtual Member const&     getMember(lang::Identifier const&) const;
+        virtual bool              definesIndirection() const;
         virtual lang::Type const& getIndirectionType() const;
 
         virtual bool validate(ValidationLogger& validation_logger, lang::Location location) const;
@@ -166,12 +165,12 @@ namespace lang
         virtual Shared<lang::Value> buildOperator(lang::UnaryOperator op,
                                                   Shared<lang::Value> value,
                                                   CompileContext&     context) const;
-        virtual Shared<lang::Value> buildImplicitConversion(lang::Type const& other,
-                                                            Shared<lang::Value>               value,
-                                                            CompileContext&                   context) const;
-        virtual Shared<lang::Value> buildCast(lang::Type const& other,
-                                              Shared<lang::Value>               value,
-                                              CompileContext&                   context) const;
+        virtual Shared<lang::Value> buildImplicitConversion(lang::Type const&   other,
+                                                            Shared<lang::Value> value,
+                                                            CompileContext&     context) const;
+        virtual Shared<lang::Value> buildCast(lang::Type const&   other,
+                                              Shared<lang::Value> value,
+                                              CompileContext&     context) const;
         virtual Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
                                                       lang::Identifier const& name,
                                                       CompileContext&         context) const;
@@ -185,7 +184,9 @@ namespace lang
                                             Shared<lang::Value> source,
                                             CompileContext&     context) const;
         void         performFinalizer(Shared<lang::Value> ptr, CompileContext& context) const;
-        virtual void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const;
+        virtual void performFinalizer(Shared<lang::Value> ptr,
+                                      Shared<lang::Value> count,
+                                      CompileContext&     context) const;
 
         virtual void registerExecutionType(CompileContext& context) const = 0;
 
@@ -223,7 +224,7 @@ namespace lang
          */
         virtual void performSingleCopyInitializerDefinition(Shared<lang::Value> dst_ptr,
                                                             Shared<lang::Value> src_ptr,
-                                                            CompileContext& context) const;
+                                                            CompileContext&     context) const;
         /**
          * Build the part of the definition that default-finalizes a single element of this type.
          */
@@ -255,8 +256,8 @@ namespace lang
          * @param context The current compile context.
          */
         virtual void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                            lang::PredefinedFunction&                      function,
-                                            CompileContext&                                context) const;
+                                            lang::PredefinedFunction&                             function,
+                                            CompileContext&                                       context) const;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self();
         [[nodiscard]] lang::Type const&                 self() const;

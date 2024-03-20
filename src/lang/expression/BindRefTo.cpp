@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "lang/ApplicationVisitor.h"
 #include "compiler/RoughlyCastedValue.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/statement/Statement.h"
 #include "validation/ValidationLogger.h"
 

@@ -388,8 +388,7 @@ namespace lang
          * @param other The other type.
          * @return The result type.
          */
-        [[nodiscard]] lang::Type const& getOperatorResultType(lang::BinaryOperator              op,
-                                                lang::Type const& other) const;
+        [[nodiscard]] lang::Type const& getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const;
 
         lang::ResolvingHandle<lang::Type> getOperatorResultType(lang::BinaryOperator op, lang::Type const& other);
 
@@ -568,7 +567,9 @@ namespace lang
          * @param context The current compile context.
          * @return The result value.
          */
-        Shared<lang::Value> buildOperator(lang::UnaryOperator op, Shared<lang::Value> value, CompileContext& context) const;
+        Shared<lang::Value> buildOperator(lang::UnaryOperator op,
+                                          Shared<lang::Value> value,
+                                          CompileContext&     context) const;
 
         /**
          * Build an implicit conversion.
@@ -577,9 +578,9 @@ namespace lang
          * @param context The current compile context.
          * @return The converted value.
          */
-        Shared<lang::Value> buildImplicitConversion(lang::Type const& other,
-                                                    Shared<lang::Value>               value,
-                                                    CompileContext&                   context) const;
+        Shared<lang::Value> buildImplicitConversion(lang::Type const&   other,
+                                                    Shared<lang::Value> value,
+                                                    CompileContext&     context) const;
 
         /**
          * Build an explicit cast.
@@ -588,9 +589,9 @@ namespace lang
          * @param context The current compile context.
          * @return The casted value.
          */
-        Shared<lang::Value> buildCast(lang::Type const& other,
-                                      Shared<lang::Value>               value,
-                                      CompileContext&                   context) const;
+        Shared<lang::Value> buildCast(lang::Type const&   other,
+                                      Shared<lang::Value> value,
+                                      CompileContext&     context) const;
 
         /**
          * Build a member access.
@@ -624,7 +625,9 @@ namespace lang
          * @param count The number of instances to initialize.
          * @param context The current compile context.
          */
-        void performDefaultInitializer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const;
+        void performDefaultInitializer(Shared<lang::Value> ptr,
+                                       Shared<lang::Value> count,
+                                       CompileContext&     context) const;
 
         /**
          * Build the copy initializer for this type.
@@ -742,9 +745,9 @@ namespace lang
          * @param context The current compile context.
          * @return A value with the expected type. It can be the same value as passed in.
          */
-        static Shared<lang::Value> makeMatching(lang::Type const& expected,
-                                                Shared<lang::Value>               value,
-                                                CompileContext&                   context);
+        static Shared<lang::Value> makeMatching(lang::Type const&   expected,
+                                                Shared<lang::Value> value,
+                                                CompileContext&     context);
 
         template<typename Expected>
         static lang::ResolvingHandle<Expected> makeMatching(lang::ResolvingHandle<Entity> value)

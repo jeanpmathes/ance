@@ -28,8 +28,8 @@ namespace lang
                            std::vector<Shared<lang::Parameter>> parameters,
                            lang::Location                       location);
 
-        [[nodiscard]] bool isMangled() const override;
-        [[nodiscard]] bool isImported() const override;
+        [[nodiscard]] bool           isMangled() const override;
+        [[nodiscard]] bool           isImported() const override;
         [[nodiscard]] AccessModifier access() const override;
 
       protected:
@@ -43,23 +43,20 @@ namespace lang
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;
 
       public:
-        void setCallValidator(
-            std::function<bool(std::vector<std::reference_wrapper<Expression const>> const&,
-                               lang::Location,
-                               ValidationLogger&)> validator);
-        bool doCallValidation(
-            std::vector<std::reference_wrapper<Expression const>> const& arguments,
-            lang::Location                                                                           location,
-            ValidationLogger& validation_logger) const override;
+        void setCallValidator(std::function<bool(std::vector<std::reference_wrapper<Expression const>> const&,
+                                                 lang::Location,
+                                                 ValidationLogger&)> validator);
+        bool doCallValidation(std::vector<std::reference_wrapper<Expression const>> const& arguments,
+                              lang::Location                                               location,
+                              ValidationLogger& validation_logger) const override;
 
       private:
         lang::AccessModifier access_modifier_;
         bool                 is_imported_;
         bool                 is_constructor_;
 
-        std::function<bool(std::vector<std::reference_wrapper<Expression const>> const&,
-                           lang::Location,
-                           ValidationLogger&)>
+        std::function<
+            bool(std::vector<std::reference_wrapper<Expression const>> const&, lang::Location, ValidationLogger&)>
             call_validator_ {};
     };
 }

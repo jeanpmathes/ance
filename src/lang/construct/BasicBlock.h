@@ -77,9 +77,9 @@ namespace lang
          * @return The created basic blocks.
          */
         static std::vector<Owned<BasicBlock>> createMatching(
-            Match&                                                         match,
+            Match&                                                        match,
             std::vector<std::pair<LiteralExpression*, Statement*>> const& cases,
-            Function&                                                      function);
+            Function&                                                     function);
 
         /**
          * Create a jump to a basic block.
@@ -215,7 +215,7 @@ namespace lang
                 ~Base() override = default;
 
               public:
-                void        setSelf(BasicBlock* self);
+                void                            setSelf(BasicBlock* self);
                 BasicBlock*                     self();
                 [[nodiscard]] BasicBlock const* self() const;
 
@@ -234,7 +234,7 @@ namespace lang
                 [[nodiscard]] size_t getIncomingLinkCount() const;
                 void                 updateIncomingLinks(BasicBlock* updated);
 
-                [[nodiscard]] virtual std::list<lang::BasicBlock const*> getLeaves() const     = 0;
+                [[nodiscard]] virtual std::list<lang::BasicBlock const*>   getLeaves() const     = 0;
                 [[nodiscard]] virtual std::vector<lang::BasicBlock const*> getSuccessors() const = 0;
 
                 [[nodiscard]] virtual Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>>
@@ -248,7 +248,7 @@ namespace lang
                 [[nodiscard]] virtual std::string getExitRepresentation() const = 0;
 
               protected:
-                size_t            index_ {};
+                size_t index_ {};
 
               private:
                 BasicBlock*              self_ {};

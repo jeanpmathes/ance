@@ -48,7 +48,7 @@ lang::Type const& lang::AliasDescription::type() const
     return self_;
 }
 
-std::vector<std::reference_wrapper<const lang::Entity>> lang::AliasDescription::getProvidedEntities() const
+std::vector<std::reference_wrapper<lang::Entity const>> lang::AliasDescription::getProvidedEntities() const
 {
     return {std::cref(self_.base())};
 }

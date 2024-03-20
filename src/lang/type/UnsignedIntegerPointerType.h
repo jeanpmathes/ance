@@ -25,18 +25,18 @@ namespace lang
         /**
          * The minimum bit size of uiptr value.
          */
-        static const size_t MINIMUM_BIT_SIZE = 64;
+        static size_t const MINIMUM_BIT_SIZE = 64;
 
         bool isUnsignedIntegerPointerType() const override;
 
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
         void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                    lang::PredefinedFunction&                      function,
-                                    CompileContext&                                context) const override;
-        void buildRequestedOverload(lang::Type const& parameter_element,
-                                    lang::Type const& return_type,
-                                    lang::PredefinedFunction&         function,
-                                    CompileContext&                   context) const override;
+                                    lang::PredefinedFunction&                             function,
+                                    CompileContext&                                       context) const override;
+        void buildRequestedOverload(lang::Type const&         parameter_element,
+                                    lang::Type const&         return_type,
+                                    lang::PredefinedFunction& function,
+                                    CompileContext&           context) const override;
 
       private:
         inline static unsigned int size_ = 0;
@@ -44,11 +44,11 @@ namespace lang
       protected:
         std::string createMangledName() const override;
 
-        Optional<size_t>      getBitSize() const override;
-        size_t                getNativeBitSize() const override;
-        bool                  isSigned() const override;
-        size_t                getMinimumBitSize() const override;
-        std::string           getSuffix() const override;
+        Optional<size_t> getBitSize() const override;
+        size_t           getNativeBitSize() const override;
+        bool             isSigned() const override;
+        size_t           getMinimumBitSize() const override;
+        std::string      getSuffix() const override;
 
       public:
         /**

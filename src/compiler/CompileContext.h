@@ -111,8 +111,8 @@ class CompileContext
     std::string getLocationString();
 
   private:
-    Unit&                unit_;
-    Runtime&             runtime_;
+    Unit&                        unit_;
+    Runtime&                     runtime_;
     std::unique_ptr<NativeBuild> execution_;
 
     struct SourceFile {

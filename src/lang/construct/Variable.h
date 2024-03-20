@@ -90,8 +90,8 @@ namespace lang
                            lang::Location                    type_location,
                            Scope&                            containing_scope,
                            bool                              is_final,
-                           const lang::LocalInitializer&            init,
-                           const Optional<size_t>&                parameter_index,
+                           lang::LocalInitializer const&     init,
+                           Optional<size_t> const&           parameter_index,
                            lang::Location                    location);
 
         /**
@@ -164,9 +164,9 @@ namespace lang
          * @param assigned_location The source location of the value that is assigned to the assignable.
          */
         bool validateSetValue(lang::Type const& value_type,
-                              ValidationLogger&  validation_logger,
-                              lang::Location     assignable_location,
-                              lang::Location     assigned_location) const;
+                              ValidationLogger& validation_logger,
+                              lang::Location    assignable_location,
+                              lang::Location    assigned_location) const;
 
         /**
          * Get a pointer to the current value of the variable.

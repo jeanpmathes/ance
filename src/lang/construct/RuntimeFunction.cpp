@@ -7,7 +7,7 @@
 lang::RuntimeFunction::RuntimeFunction(lang::Function&                      function,
                                        lang::ResolvingHandle<lang::Type>    return_type,
                                        std::vector<Shared<lang::Parameter>> parameters,
-                                       CompileContext& context)
+                                       CompileContext&                      context)
     : lang::FunctionDefinition(function,
                                context.unit().globalScope(),
                                return_type,
@@ -48,10 +48,7 @@ bool lang::RuntimeFunction::preserveUnitReturn() const
     return false;
 }
 
-void lang::RuntimeFunction::determineFlow()
-{
-
-}
+void lang::RuntimeFunction::determineFlow() {}
 
 bool lang::RuntimeFunction::validateFlow(ValidationLogger&) const
 {

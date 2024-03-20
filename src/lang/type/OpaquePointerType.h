@@ -17,8 +17,8 @@ namespace lang
         bool isOpaquePointerType() const override;
 
       protected:
-        std::string   createMangledName() const override;
-        void          registerExecutionType(CompileContext& context) const override;
+        std::string createMangledName() const override;
+        void        registerExecutionType(CompileContext& context) const override;
 
         Optional<lang::ResolvingHandle<lang::Type>> getPointeeType() override;
         Type const*                                 getPointeeType() const override;

@@ -78,7 +78,7 @@ T& lang::OwningHandle<T>::operator*() noexcept
 }
 
 template<typename T>
-const T* lang::OwningHandle<T>::operator->() const noexcept
+T const* lang::OwningHandle<T>::operator->() const noexcept
 {
     return owner_.get();
 }

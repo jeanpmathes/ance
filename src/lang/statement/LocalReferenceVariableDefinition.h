@@ -44,7 +44,7 @@ class LocalReferenceVariableDefinition
     [[nodiscard]] lang::Identifier const& name() const;
     [[nodiscard]] lang::Type const&       type() const;
     [[nodiscard]] Expression const&       reference() const;
-    [[nodiscard]] lang::Variable const&  variable() const;
+    [[nodiscard]] lang::Variable const&   variable() const;
 
   public:
     void setScope(lang::Scope& scope) override;
@@ -60,7 +60,7 @@ class LocalReferenceVariableDefinition
     lang::Identifier                    name_;
     lang::ResolvingHandle<lang::Entity> type_;
     lang::Location                      type_location_;
-    Owned<Expression>                 reference_;
+    Owned<Expression>                   reference_;
 
     Optional<lang::ResolvingHandle<lang::Variable>> variable_ {};
 };

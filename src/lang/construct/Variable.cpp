@@ -52,8 +52,8 @@ void lang::Variable::defineAsLocal(lang::ResolvingHandle<lang::Type> type,
                                    lang::Location                    type_location,
                                    Scope&                            containing_scope,
                                    bool                              is_final,
-                                   const lang::LocalInitializer&            init,
-                                   const Optional<size_t>&                parameter_index,
+                                   lang::LocalInitializer const&     init,
+                                   Optional<size_t> const&           parameter_index,
                                    lang::Location                    location)
 {
     definition_ = makeOwned<lang::LocalVariable>(self(),
@@ -130,9 +130,9 @@ bool lang::Variable::validateGetValue(ValidationLogger&, lang::Location) const
 }
 
 bool lang::Variable::validateSetValue(lang::Type const& value_type,
-                                      ValidationLogger&  validation_logger,
-                                      lang::Location     assignable_location,
-                                      lang::Location     assigned_location) const
+                                      ValidationLogger& validation_logger,
+                                      lang::Location    assignable_location,
+                                      lang::Location    assigned_location) const
 {
     // The following variable methods require that the variable and type is defined.
     if (not type().isDefined()) return false;

@@ -12,10 +12,10 @@ class Storage;
  */
 template<typename T>
 concept Storable = requires(T* t, Storage& s) {
-                       {
-                           T::synchronize(t, s)
-                       } -> std::same_as<void>;
-                   };
+    {
+        T::synchronize(t, s)
+    } -> std::same_as<void>;
+};
 
 /**
  * A storable type with relaxed requirements, used for polymorphic types or types that perform their own indirection.
@@ -23,10 +23,10 @@ concept Storable = requires(T* t, Storage& s) {
  */
 template<typename T>
 concept PolymorphicStorable = requires(T t, Storage& s) {
-                                  {
-                                      synchronize(t, s)
-                                  } -> std::same_as<void>;
-                              };
+    {
+        synchronize(t, s)
+    } -> std::same_as<void>;
+};
 
 /**
  * Used to read from and write to.

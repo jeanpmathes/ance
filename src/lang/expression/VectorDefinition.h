@@ -27,7 +27,7 @@ class VectorDefinition
                      std::vector<Owned<Expression>>              elements,
                      lang::Location                              location);
 
-    [[nodiscard]] Optional<std::reference_wrapper<const lang::Type>>    elementType() const;
+    [[nodiscard]] Optional<std::reference_wrapper<lang::Type const>>    elementType() const;
     [[nodiscard]] std::vector<std::reference_wrapper<Expression const>> values() const;
 
   protected:
@@ -47,7 +47,7 @@ class VectorDefinition
   private:
     Optional<lang::ResolvingHandle<lang::Entity>> declared_type_;
     lang::Location                                type_location_;
-    std::vector<Owned<Expression>>              elements_;
+    std::vector<Owned<Expression>>                elements_;
 };
 
 #endif

@@ -51,7 +51,7 @@ class AnceCompiler
   private:
     static constexpr char const* INTERNAL_FUNCTION_SUFFIX = "$lang";
 
-    Unit&             unit_;
+    Unit&            unit_;
     TargetDescriptor target_descriptor_;
 
     llvm::LLVMContext llvm_context_;

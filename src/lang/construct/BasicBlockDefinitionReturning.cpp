@@ -84,7 +84,7 @@ Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>> la
     const
 {
     std::reference_wrapper<lang::Type const> const return_type = return_value_.type();
-    lang::Location const location = return_value_.location();
+    lang::Location const                           location    = return_value_.location();
 
     std::pair<std::reference_wrapper<lang::Type const>, lang::Location> const pair =
         std::make_pair(return_type, location);

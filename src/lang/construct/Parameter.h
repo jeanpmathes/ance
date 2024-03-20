@@ -86,11 +86,11 @@ namespace lang
         static void synchronize(lang::Parameter* parameter, Storage& storage);
 
       private:
-        lang::Type const* type_;
+        lang::Type const*                           type_;
         Optional<lang::ResolvingHandle<lang::Type>> type_opt_;
 
-        lang::Location                    type_location_;
-        lang::Identifier                  name_;
+        lang::Location   type_location_;
+        lang::Identifier name_;
 
         Optional<lang::ResolvingHandle<lang::Variable>> argument_;
 

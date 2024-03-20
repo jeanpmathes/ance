@@ -41,39 +41,38 @@ namespace lang
                                               ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
                                            Shared<lang::Value> index,
-                                           CompileContext& context) const override;
+                                           CompileContext&     context) const override;
 
-        bool isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
-        lang::Type const& getOperatorResultType(lang::BinaryOperator              op,
-                                                                lang::Type const& other) const override;
-        bool                              validateOperator(lang::BinaryOperator op,
-                                                           lang::Type const&    other,
-                                                           lang::Location       left_location,
-                                                           lang::Location       right_location,
-                                                           ValidationLogger&    validation_logger) const override;
-        Shared<lang::Value>               buildOperator(lang::BinaryOperator op,
-                                                        Shared<lang::Value>  left,
-                                                        Shared<lang::Value>  right,
-                                                        CompileContext&      context) const override;
+        bool                isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
+        lang::Type const&   getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const override;
+        bool                validateOperator(lang::BinaryOperator op,
+                                             lang::Type const&    other,
+                                             lang::Location       left_location,
+                                             lang::Location       right_location,
+                                             ValidationLogger&    validation_logger) const override;
+        Shared<lang::Value> buildOperator(lang::BinaryOperator op,
+                                          Shared<lang::Value>  left,
+                                          Shared<lang::Value>  right,
+                                          CompileContext&      context) const override;
 
-        bool                              isOperatorDefined(lang::UnaryOperator op) const override;
-        lang::Type const& getOperatorResultType(lang::UnaryOperator op) const override;
-        bool                              validateOperator(lang::UnaryOperator op,
-                                                           lang::Location      location,
-                                                           ValidationLogger&   validation_logger) const override;
-        Shared<lang::Value>               buildOperator(lang::UnaryOperator op,
-                                                        Shared<lang::Value> value,
-                                                        CompileContext&     context) const override;
+        bool                isOperatorDefined(lang::UnaryOperator op) const override;
+        lang::Type const&   getOperatorResultType(lang::UnaryOperator op) const override;
+        bool                validateOperator(lang::UnaryOperator op,
+                                             lang::Location      location,
+                                             ValidationLogger&   validation_logger) const override;
+        Shared<lang::Value> buildOperator(lang::UnaryOperator op,
+                                          Shared<lang::Value> value,
+                                          CompileContext&     context) const override;
 
-        bool                              hasMember(lang::Identifier const& name) const override;
-        Member& getMember(lang::Identifier const& name) override;
+        bool          hasMember(lang::Identifier const& name) const override;
+        Member&       getMember(lang::Identifier const& name) override;
         Member const& getMember(lang::Identifier const& name) const override;
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
                                               lang::Identifier const& name,
                                               CompileContext&         context) const override;
 
-        bool                              definesIndirection() const override;
+        bool                definesIndirection() const override;
         lang::Type const& getIndirectionType() const override;
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context) const override;
@@ -96,8 +95,8 @@ namespace lang
         Optional<lang::ResolvingHandle<lang::Type>> actual_type_ {};
 
       protected:
-        std::string   createMangledName() const override;
-        void          registerExecutionType(CompileContext& context) const override;
+        std::string createMangledName() const override;
+        void        registerExecutionType(CompileContext& context) const override;
 
       public:
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;

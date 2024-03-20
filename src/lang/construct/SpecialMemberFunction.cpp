@@ -5,8 +5,8 @@
 #include "lang/ApplicationVisitor.h"
 
 lang::SpecialMemberFunction::SpecialMemberFunction(lang::Function&                      function,
-                                                   lang::ResolvingHandle<lang::Type> type,
-                                       std::vector<Shared<lang::Parameter>> parameters)
+                                                   lang::ResolvingHandle<lang::Type>    type,
+                                                   std::vector<Shared<lang::Parameter>> parameters)
     : lang::FunctionDefinition(function,
                                type->scope(),
                                type->scope().context().getUnitType(),
@@ -24,7 +24,7 @@ void lang::SpecialMemberFunction::setup()
 }
 
 lang::ResolvingHandle<lang::Function> lang::SpecialMemberFunction::create(
-    lang::ResolvingHandle<lang::Type>  type,
+    lang::ResolvingHandle<lang::Type>    type,
     lang::SpecialMemberFunction::Kind    kind,
     std::vector<Shared<lang::Parameter>> parameters)
 {
@@ -81,10 +81,7 @@ bool lang::SpecialMemberFunction::preserveUnitReturn() const
     return true;
 }
 
-void lang::SpecialMemberFunction::determineFlow()
-{
-
-}
+void lang::SpecialMemberFunction::determineFlow() {}
 
 bool lang::SpecialMemberFunction::validateFlow(ValidationLogger&) const
 {

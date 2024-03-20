@@ -40,16 +40,16 @@ class Runtime
 
   private:
     lang::Function*              allocate_dynamic_     = nullptr;
-    const static constexpr char* ALLOCATE_DYNAMIC_NAME = "__allocate__";
+    static constexpr char const* ALLOCATE_DYNAMIC_NAME = "__allocate__";
 
     lang::Function*              delete_dynamic_     = nullptr;
-    const static constexpr char* DELETE_DYNAMIC_NAME = "__free__";
+    static constexpr char const* DELETE_DYNAMIC_NAME = "__free__";
 
     lang::Function*              assertion_     = nullptr;
-    const static constexpr char* ASSERTION_NAME = "__assert__";
+    static constexpr char const* ASSERTION_NAME = "__assert__";
 
     lang::Function*              abort_     = nullptr;
-    const static constexpr char* ABORT_NAME = "__abort__";
+    static constexpr char const* ABORT_NAME = "__abort__";
 
     inline static std::vector<std::string> reserved_names_ {ALLOCATE_DYNAMIC_NAME,
                                                             DELETE_DYNAMIC_NAME,
@@ -82,10 +82,10 @@ class Runtime
      * @param context The current compile context.
      * @return A pointer to the allocated memory.
      */
-    Shared<lang::Value> allocate(Allocator                         allocation,
+    Shared<lang::Value> allocate(Allocator                     allocation,
                                  lang::Type const&             type,
-                                 Optional<Shared<lang::Value>>     count,
-                                 CompileContext&                   context);
+                                 Optional<Shared<lang::Value>> count,
+                                 CompileContext&               context);
 
     /**
      * Free dynamically allocated memory.
@@ -113,13 +113,12 @@ class Runtime
   private:
     bool is_initialized_ {false};
 
-    Shared<lang::Value> allocateAutomatic(lang::Type const& type, Shared<lang::Value>               count,
-                                          CompileContext&                   context);
+    Shared<lang::Value> allocateAutomatic(lang::Type const& type, Shared<lang::Value> count, CompileContext& context);
 
     Shared<lang::Value> allocateDynamic(lang::Type const&   type,
-                                        Shared<lang::Value>               count,
-                                        bool                              is_buffer,
-                                        CompileContext&                   context);
+                                        Shared<lang::Value> count,
+                                        bool                is_buffer,
+                                        CompileContext&     context);
 };
 
 #endif

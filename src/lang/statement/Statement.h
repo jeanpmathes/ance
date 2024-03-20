@@ -24,7 +24,9 @@ class ValidationLogger;
 /**
  * Base class of all statements. Statements are building blocks of code and are ordered parts of functions.
  */
-class Statement : public virtual lang::Visitable<ANCE_CONSTRUCTS>, public virtual lang::Located
+class Statement
+    : public virtual lang::Visitable<ANCE_CONSTRUCTS>
+    , public virtual lang::Located
 {
   public:
     /**

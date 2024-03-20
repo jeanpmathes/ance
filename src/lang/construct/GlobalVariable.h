@@ -29,8 +29,7 @@ namespace lang
     /**
      * A global variable.
      */
-    class GlobalVariable
-        : public VariableDefinition
+    class GlobalVariable : public VariableDefinition
     {
       public:
         /**

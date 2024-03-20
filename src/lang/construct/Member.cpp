@@ -8,13 +8,13 @@
 #include "lang/utility/Storage.h"
 #include "validation/ValidationLogger.h"
 
-lang::Member::Member(lang::AccessModifier                access,
-                     lang::Identifier                    name,
-                     lang::ResolvingHandle<lang::Type>   type,
-                     lang::Assigner                      assigner,
+lang::Member::Member(lang::AccessModifier               access,
+                     lang::Identifier                   name,
+                     lang::ResolvingHandle<lang::Type>  type,
+                     lang::Assigner                     assigner,
                      Optional<Owned<LiteralExpression>> constant_init,
-                     lang::Location                      location,
-                     lang::Location                      type_location)
+                     lang::Location                     location,
+                     lang::Location                     type_location)
     : access_(access)
     , name_(name)
     , type_(type)

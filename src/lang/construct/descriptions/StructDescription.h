@@ -35,7 +35,7 @@ namespace lang
         ~StructDescription() override = default;
 
         [[nodiscard]] Identifier const&                                       name() const override;
-        [[nodiscard]] std::vector<std::reference_wrapper<const lang::Member>> members() const;
+        [[nodiscard]] std::vector<std::reference_wrapper<lang::Member const>> members() const;
         [[nodiscard]] bool                                                    isOverloadAllowed() const override;
 
         [[nodiscard]] lang::Type const& type() const;

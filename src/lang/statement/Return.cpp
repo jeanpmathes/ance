@@ -57,7 +57,10 @@ Statements Return::expandWith(Expressions subexpressions, Statements, lang::Cont
 
         return_value_access = makeOwned<VariableAccess>(make_temp_variable(), true, location());
     }
-    else { return_value_access = makeOwned<LiteralExpression>(makeShared<lang::UnitConstant>(new_context), location()); }
+    else
+    {
+        return_value_access = makeOwned<LiteralExpression>(makeShared<lang::UnitConstant>(new_context), location());
+    }
 
     statements.emplace_back(makeOwned<Return>(std::move(return_value_access), location()));
 

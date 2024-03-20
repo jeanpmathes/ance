@@ -31,12 +31,12 @@ namespace lang
         /**
          * The minimum size of a size value.
          */
-        static const size_t MINIMUM_BIT_SIZE = 16;
+        static size_t const MINIMUM_BIT_SIZE = 16;
 
         /**
          * The minimum size of a diff value.
          */
-        static const size_t MINIMUM_DIFF_BIT_SIZE = MINIMUM_BIT_SIZE * 2;
+        static size_t const MINIMUM_DIFF_BIT_SIZE = MINIMUM_BIT_SIZE * 2;
 
         [[nodiscard]] bool isSizeType() const override;
         [[nodiscard]] bool isDiffType() const override;
@@ -48,11 +48,11 @@ namespace lang
       protected:
         std::string createMangledName() const override;
 
-        Optional<size_t>      getBitSize() const override;
-        size_t                getNativeBitSize() const override;
-        bool                  isSigned() const override;
-        size_t                getMinimumBitSize() const override;
-        std::string           getSuffix() const override;
+        Optional<size_t> getBitSize() const override;
+        size_t           getNativeBitSize() const override;
+        bool             isSigned() const override;
+        size_t           getMinimumBitSize() const override;
+        std::string      getSuffix() const override;
 
       public:
         /**

@@ -28,9 +28,9 @@ namespace lang
 
         void setup() override;
 
-        [[nodiscard]] bool isMangled() const override;
-        [[nodiscard]] bool isImported() const override;
-        [[nodiscard]] AccessModifier     access() const override;
+        [[nodiscard]] bool           isMangled() const override;
+        [[nodiscard]] bool           isImported() const override;
+        [[nodiscard]] AccessModifier access() const override;
 
       protected:
         Optional<lang::Location> getDefinitionLocation() const override;

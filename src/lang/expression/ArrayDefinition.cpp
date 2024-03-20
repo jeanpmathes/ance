@@ -17,7 +17,7 @@ ArrayDefinition::ArrayDefinition(Optional<lang::ResolvingHandle<lang::Type>> typ
     for (auto& element : elements_) { addSubexpression(*element); }
 }
 
-Optional<std::reference_wrapper<const lang::Type>> ArrayDefinition::elementType() const
+Optional<std::reference_wrapper<lang::Type const>> ArrayDefinition::elementType() const
 {
     if (declared_type_.hasValue()) return std::cref(*declared_type_.value().as<lang::Type>());
     return std::nullopt;

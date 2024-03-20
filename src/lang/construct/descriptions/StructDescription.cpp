@@ -31,9 +31,9 @@ lang::Identifier const& lang::StructDescription::name() const
     return name_;
 }
 
-std::vector<std::reference_wrapper<const lang::Member>> lang::StructDescription::members() const
+std::vector<std::reference_wrapper<lang::Member const>> lang::StructDescription::members() const
 {
-    std::vector<std::reference_wrapper<const lang::Member>> members;
+    std::vector<std::reference_wrapper<lang::Member const>> members;
     members.reserve(members_.size());
     for (auto& member : members_) { members.emplace_back(*member); }
     return members;
@@ -49,7 +49,7 @@ lang::Type const& lang::StructDescription::type() const
     return self_;
 }
 
-std::vector<std::reference_wrapper<const lang::Entity>> lang::StructDescription::getProvidedEntities() const
+std::vector<std::reference_wrapper<lang::Entity const>> lang::StructDescription::getProvidedEntities() const
 {
     return {std::cref(self_.base())};
 }

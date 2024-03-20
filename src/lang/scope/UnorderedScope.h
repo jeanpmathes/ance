@@ -58,8 +58,7 @@ namespace lang
 
         bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) override;
 
-        [[nodiscard]] std::vector<std::reference_wrapper<lang::Type const>> getUsedBuiltInTypes()
-            const;
+        [[nodiscard]] std::vector<std::reference_wrapper<lang::Type const>>        getUsedBuiltInTypes() const;
         [[nodiscard]] std::vector<std::reference_wrapper<lang::Description const>> getDescriptionsInDeclarationOrder()
             const;
         [[nodiscard]] std::vector<std::reference_wrapper<lang::Description const>> getDescriptionsInDefinitionOrder()
@@ -95,12 +94,6 @@ namespace lang
       public:
         [[nodiscard]] std::vector<lang::ResolvingHandle<lang::FunctionGroup>>        getFunctionGroups();
         [[nodiscard]] std::vector<std::reference_wrapper<lang::FunctionGroup const>> getFunctionGroups() const;
-
-        [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Variable>>        getVariables();
-        [[nodiscard]] std::vector<std::reference_wrapper<lang::Variable const>> getVariables() const;
-
-        [[nodiscard]] std::vector<lang::ResolvingHandle<lang::Type>>        getTypes();
-        [[nodiscard]] std::vector<std::reference_wrapper<lang::Type const>> getTypes() const;
 
       private:
         lang::ResolvingHandle<lang::FunctionGroup> prepareDefinedFunctionGroup(Identifier name);

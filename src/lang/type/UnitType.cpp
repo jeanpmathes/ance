@@ -53,8 +53,7 @@ bool lang::UnitType::isOperatorDefined(lang::BinaryOperator op, lang::Type const
     return op.isEquality() && other.isUnitType();
 }
 
-lang::Type const& lang::UnitType::getOperatorResultType(lang::BinaryOperator              ,
-                                                                        lang::Type const& ) const
+lang::Type const& lang::UnitType::getOperatorResultType(lang::BinaryOperator, lang::Type const&) const
 {
     return scope().context().getBooleanType();
 }

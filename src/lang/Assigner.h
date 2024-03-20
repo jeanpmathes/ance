@@ -40,7 +40,7 @@ namespace lang
         Assigner() = default;
         constexpr Assigner(Value val) : value_(val) {}// NOLINT(google-explicit-constructor)
 
-                 operator Value() const;// NOLINT(google-explicit-constructor)
+        operator Value() const;// NOLINT(google-explicit-constructor)
         explicit operator bool() = delete;
 
         /**

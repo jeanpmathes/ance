@@ -17,17 +17,18 @@ bool lang::UnsignedIntegerPointerType::acceptOverloadRequest(std::vector<Resolvi
     return IntegerType::acceptOverloadRequest(parameters);
 }
 
-void lang::UnsignedIntegerPointerType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                                              lang::PredefinedFunction&                      function,
-                                                              CompileContext&                                context) const
+void lang::UnsignedIntegerPointerType::buildRequestedOverload(
+    std::vector<std::reference_wrapper<lang::Type const>> parameters,
+    lang::PredefinedFunction&                             function,
+    CompileContext&                                       context) const
 {
     if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
 }
 
-void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::Type const& parameter_element,
-                                                              lang::Type const& return_type,
-                                                              lang::PredefinedFunction&         function,
-                                                              CompileContext&                   context) const
+void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::Type const&         parameter_element,
+                                                              lang::Type const&         return_type,
+                                                              lang::PredefinedFunction& function,
+                                                              CompileContext&           context) const
 {
     if (parameter_element.isAddressType())
     {

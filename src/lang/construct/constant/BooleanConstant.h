@@ -39,8 +39,8 @@ namespace lang
         static Shared<lang::BooleanConstant> createTrue(lang::Context& context);
 
       private:
-        bool                              boolean_;
-        std::string                       string_;
+        bool        boolean_;
+        std::string string_;
     };
 }
 

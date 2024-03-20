@@ -97,11 +97,11 @@ static bool build(SourceTree&                  tree,
     return linker.link(obj, res, out);
 }
 
-static Optional<bool> buildProject(Project&              project,
-                                   Packages const&       packages,
-                                   std::set<std::string> included_packages,
+static Optional<bool> buildProject(Project&                                                    project,
+                                   Packages const&                                             packages,
+                                   std::set<std::string>                                       included_packages,
                                    std::optional<std::chrono::steady_clock::time_point> const& start_time,
-                                   std::ostream&         root_out);
+                                   std::ostream&                                               root_out);
 
 static Optional<Owned<Project>> prepareProject(std::filesystem::path const&           project_file_path,
                                                Optional<std::filesystem::path> const& override_build_dir,
@@ -180,19 +180,19 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
     description = project_description.description();
     return makeOwned<Project>(std::move(description),
                               Application::BuildInfo {.target_descriptor         = target_descriptor,
-                                                      .build_dir         = build_dir,
+                                                      .build_dir                 = build_dir,
                                                       .triple_dir                = target_dir,
-                                                      .bin_suffix        = bin_suffix,
-                                  .validation_logger = validation_logger,
-                                  .out               = out,
+                                                      .bin_suffix                = bin_suffix,
+                                                      .validation_logger         = validation_logger,
+                                                      .out                       = out,
                                                       .project_description_dirty = project_description_dirty});
 }
 
-static Optional<bool> buildProject(Project&              project,
-                                   Packages const&       packages,
-                                   std::set<std::string> included_packages,
+static Optional<bool> buildProject(Project&                                                    project,
+                                   Packages const&                                             packages,
+                                   std::set<std::string>                                       included_packages,
                                    std::optional<std::chrono::steady_clock::time_point> const& start_time,
-                                   std::ostream&         root_out)
+                                   std::ostream&                                               root_out)
 {
     Application&            application = project.getApplication();
     Application::BuildInfo& info        = application.getBuildInfo();

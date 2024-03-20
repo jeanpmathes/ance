@@ -6,9 +6,7 @@
 #include "lang/type/ReferenceType.h"
 #include "validation/ValidationLogger.h"
 
-BindRef::BindRef(Owned<Expression> value, lang::Location location)
-    : Expression(location)
-    , value_(std::move(value))
+BindRef::BindRef(Owned<Expression> value, lang::Location location) : Expression(location), value_(std::move(value))
 {
     addSubexpression(*value_);
 }

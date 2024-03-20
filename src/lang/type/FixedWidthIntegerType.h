@@ -25,7 +25,7 @@ namespace lang
         size_t           getMinimumBitSize() const override;
         std::string      getSuffix() const override;
 
-        static const int64_t MAX_INTEGER_SIZE = 1ll << 16;
+        static int64_t const MAX_INTEGER_SIZE = 1ll << 16;
 
         [[nodiscard]] FixedWidthIntegerType const* isFixedWidthIntegerType() const override;
         [[nodiscard]] bool isFixedWidthIntegerType(uint64_t bit_size, bool is_signed) const override;
@@ -36,9 +36,9 @@ namespace lang
         bool                validateCast(Type const&       other,
                                          lang::Location    location,
                                          ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildCast(lang::Type const& other,
-                                      Shared<lang::Value>               value,
-                                      CompileContext&                   context) const override;
+        Shared<lang::Value> buildCast(lang::Type const&   other,
+                                      Shared<lang::Value> value,
+                                      CompileContext&     context) const override;
 
       private:
         uint64_t bit_size_;

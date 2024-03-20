@@ -2,10 +2,10 @@
 
 #include <utility>
 
+#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 #include "lang/statement/Statement.h"
-#include "compiler/CompileContext.h"
 
 LiteralExpression::LiteralExpression(Shared<lang::LiteralConstant> constant, lang::Location location)
     : Expression(location)

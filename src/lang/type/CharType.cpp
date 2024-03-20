@@ -25,8 +25,7 @@ bool lang::CharType::isOperatorDefined(lang::BinaryOperator op, lang::Type const
     return false;
 }
 
-lang::Type const& lang::CharType::getOperatorResultType(lang::BinaryOperator op,
-                                                                        lang::Type const&) const
+lang::Type const& lang::CharType::getOperatorResultType(lang::BinaryOperator op, lang::Type const&) const
 {
     if (op.isEquality()) return scope().context().getBooleanType();
 
@@ -72,9 +71,9 @@ bool lang::CharType::validateCast(lang::Type const& other,
     return TypeDefinition::validateCast(other, location, validation_logger);
 }
 
-Shared<lang::Value> lang::CharType::buildCast(lang::Type const& other,
-                                              Shared<lang::Value>               value,
-                                              CompileContext&                   context) const
+Shared<lang::Value> lang::CharType::buildCast(lang::Type const&   other,
+                                              Shared<lang::Value> value,
+                                              CompileContext&     context) const
 {
     if (other.isFixedWidthIntegerType(SIZE_IN_BITS, false))
     {

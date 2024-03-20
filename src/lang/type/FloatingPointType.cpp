@@ -43,9 +43,9 @@ bool lang::FloatingPointType::validateImplicitConversion(lang::Type const&, lang
     return true;
 }
 
-Shared<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::Type const& other,
-                                                                     Shared<lang::Value>               value,
-                                                                     CompileContext&                   context) const
+Shared<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::Type const&   other,
+                                                                     Shared<lang::Value> value,
+                                                                     CompileContext&     context) const
 {
     return context.exec().computeConversionOnFP(value, other);
 }
@@ -60,9 +60,9 @@ bool lang::FloatingPointType::validateCast(lang::Type const&, lang::Location, Va
     return true;
 }
 
-Shared<lang::Value> lang::FloatingPointType::buildCast(lang::Type const& other,
-                                                       Shared<lang::Value>               value,
-                                                       CompileContext&                   context) const
+Shared<lang::Value> lang::FloatingPointType::buildCast(lang::Type const&   other,
+                                                       Shared<lang::Value> value,
+                                                       CompileContext&     context) const
 {
     if (other.isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
     {
@@ -110,8 +110,7 @@ bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator op, lang::T
     return false;
 }
 
-lang::Type const& lang::FloatingPointType::getOperatorResultType(lang::BinaryOperator op,
-                                                                 lang::Type const&) const
+lang::Type const& lang::FloatingPointType::getOperatorResultType(lang::BinaryOperator op, lang::Type const&) const
 {
     if (op.isArithmetic()) return self().getActualType();
     if (op.isRelational() || op.isEquality()) return scope().context().getBooleanType();

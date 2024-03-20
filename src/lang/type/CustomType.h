@@ -15,7 +15,7 @@ namespace lang
       public:
         explicit CustomType(lang::Accessibility accessibility);
 
-        bool isCustom() const final;
+        bool                       isCustom() const final;
         bool                       isImported() const final;
         lang::Accessibility const& getAccessibility() const final;
 

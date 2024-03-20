@@ -4,8 +4,8 @@
 #include <utility>
 
 #include "compiler/CompileContext.h"
-#include "lang/ApplicationVisitor.h"
 #include "compiler/WrappedConstant.h"
+#include "lang/ApplicationVisitor.h"
 #include "lang/type/ArrayType.h"
 #include "lang/type/FixedWidthIntegerType.h"
 #include "lang/type/ReferenceType.h"
@@ -32,7 +32,7 @@ lang::ResolvingHandle<lang::Type> lang::Type::getUndefined()
 
 lang::Identifier const& lang::Type::name() const
 {
-    static const lang::Identifier undefined = lang::Identifier::like("$undefined");
+    static lang::Identifier const undefined = lang::Identifier::like("$undefined");
 
     if (isDefined()) { return definition_.value()->name(); }
     else { return name_.text().empty() ? undefined : name_; }
@@ -279,8 +279,7 @@ lang::Accessibility const& lang::Type::getAccessibility() const
 
 void lang::Type::setContainingScope(lang::Scope* scope)
 {
-    if (definition_.hasValue())
-        definition_.value()->setContainingScope(scope);
+    if (definition_.hasValue()) definition_.value()->setContainingScope(scope);
 }
 
 lang::Scope& lang::Type::scope()
@@ -330,8 +329,7 @@ lang::ResolvingHandle<lang::Type> lang::Type::getSubscriptReturnType()
     // we have access to the context containing the non-const type we want to return.
 
     return const_cast<lang::TypeDefinition*>(
-               const_cast<lang::Type const*>(this)
-                   ->getSubscriptReturnType().getDefinition())
+               const_cast<lang::Type const*>(this)->getSubscriptReturnType().getDefinition())
         ->self();
 }
 
@@ -347,8 +345,7 @@ bool lang::Type::isOperatorDefined(lang::UnaryOperator op) const
     return definition_.value()->isOperatorDefined(op);
 }
 
-lang::Type const& lang::Type::getOperatorResultType(lang::BinaryOperator              op,
-                                                    lang::Type const& other) const
+lang::Type const& lang::Type::getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const
 {
     assert(isDefined());
     return definition_.value()->getOperatorResultType(op, other);
@@ -360,8 +357,7 @@ lang::ResolvingHandle<lang::Type> lang::Type::getOperatorResultType(lang::Binary
     // we have access to the context containing the non-const type we want to return.
 
     return const_cast<lang::TypeDefinition*>(
-               const_cast<lang::Type const*>(this)
-                   ->getOperatorResultType(op, other).getDefinition())
+               const_cast<lang::Type const*>(this)->getOperatorResultType(op, other).getDefinition())
         ->self();
 }
 
@@ -377,8 +373,7 @@ lang::ResolvingHandle<lang::Type> lang::Type::getOperatorResultType(lang::UnaryO
     // we have access to the context containing the non-const type we want to return.
 
     return const_cast<lang::TypeDefinition*>(
-               const_cast<lang::Type const*>(this)
-                   ->getOperatorResultType(op).getDefinition())
+               const_cast<lang::Type const*>(this)->getOperatorResultType(op).getDefinition())
         ->self();
 }
 
@@ -423,9 +418,7 @@ lang::ResolvingHandle<lang::Type> lang::Type::getIndirectionType()
     // This const_cast is safe because with a non-const reference to the current type
     // we have access to the context containing the non-const type we want to return.
 
-    return const_cast<lang::TypeDefinition*>(
-               const_cast<lang::Type const*>(this)
-                   ->getIndirectionType().getDefinition())
+    return const_cast<lang::TypeDefinition*>(const_cast<lang::Type const*>(this)->getIndirectionType().getDefinition())
         ->self();
 }
 
@@ -528,17 +521,17 @@ Shared<lang::Value> lang::Type::buildOperator(lang::UnaryOperator op,
     return definition_.value()->buildOperator(op, std::move(value), context);
 }
 
-Shared<lang::Value> lang::Type::buildImplicitConversion(lang::Type const& other,
-                                                        Shared<lang::Value>               value,
-                                                        CompileContext&                   context) const
+Shared<lang::Value> lang::Type::buildImplicitConversion(lang::Type const&   other,
+                                                        Shared<lang::Value> value,
+                                                        CompileContext&     context) const
 {
     assert(isDefined());
     return definition_.value()->buildImplicitConversion(other, std::move(value), context);
 }
 
-Shared<lang::Value> lang::Type::buildCast(lang::Type const& other,
-                                          Shared<lang::Value>               value,
-                                          CompileContext&                   context) const
+Shared<lang::Value> lang::Type::buildCast(lang::Type const&   other,
+                                          Shared<lang::Value> value,
+                                          CompileContext&     context) const
 {
     assert(isDefined());
     return definition_.value()->buildCast(other, std::move(value), context);
@@ -572,7 +565,9 @@ void lang::Type::performCopyInitializer(Shared<lang::Value> destination,
     definition_.value()->performCopyInitializer(destination, source, context);
 }
 
-void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const
+void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr,
+                                           Shared<lang::Value> count,
+                                           CompileContext&     context) const
 {
     assert(isDefined());
     definition_.value()->performDefaultInitializer(ptr, count, context);
@@ -658,9 +653,9 @@ bool lang::Type::checkMismatch(lang::Type const& expected,
     return matching;
 }
 
-Shared<lang::Value> lang::Type::makeMatching(lang::Type const& expected,
-                                             Shared<lang::Value>               value,
-                                             CompileContext&                   context)
+Shared<lang::Value> lang::Type::makeMatching(lang::Type const&   expected,
+                                             Shared<lang::Value> value,
+                                             CompileContext&     context)
 {
     if (areSame(expected, value->type())) return context.exec().computeAsActualType(value);
 
@@ -1011,8 +1006,7 @@ void synchronize(lang::ResolvingHandle<lang::Type> type, Storage& storage)
             storage.sync(bits);
             storage.sync(is_signed);
 
-            if (storage.isReading())
-            { type.reroute(context()->getFixedWidthIntegerType(bits, is_signed)); }
+            if (storage.isReading()) { type.reroute(context()->getFixedWidthIntegerType(bits, is_signed)); }
 
             break;
         }

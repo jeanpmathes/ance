@@ -75,7 +75,7 @@ namespace lang
                                             lang::Context& new_context) const override;
 
       private:
-        bool                              scoped_;
+        bool                                scoped_;
         std::vector<Owned<Statement>>       subs_ {};
         Optional<Owned<lang::OrderedScope>> scope_ {};
     };

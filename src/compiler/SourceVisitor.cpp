@@ -145,7 +145,7 @@ std::any SourceVisitor::visitMember(anceParser::MemberContext* ctx)
     auto                   type       = erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type()));
 
     LiteralExpression* const_expr = nullptr;
-    lang::Assigner      assigner   = lang::Assigner::UNSPECIFIED;
+    lang::Assigner     assigner   = lang::Assigner::UNSPECIFIED;
 
     if (ctx->literalExpression())
     {
@@ -252,7 +252,7 @@ std::any SourceVisitor::visitBlock(anceParser::BlockContext* ctx)
 std::any SourceVisitor::visitExpressionStatement(anceParser::ExpressionStatementContext* ctx)
 {
     Owned<Expression> buildable_expression(*std::any_cast<Expression*>(visit(ctx->independentExpression())));
-    auto statement = makeOwned<ExpressionStatement>(std::move(buildable_expression), location(ctx));
+    auto              statement = makeOwned<ExpressionStatement>(std::move(buildable_expression), location(ctx));
 
     return unwrap(lang::CodeBlock::makeWithStatement(std::move(statement)));
 }
@@ -777,7 +777,7 @@ std::any SourceVisitor::visitNull(anceParser::NullContext* ctx)
 
 std::any SourceVisitor::visitSizeLiteral(anceParser::SizeLiteralContext* ctx)
 {
-    std::string const      value    = ctx->INTEGER()->getText();
+    std::string const             value    = ctx->INTEGER()->getText();
     Shared<lang::LiteralConstant> constant = makeShared<lang::IntegerConstant>(value, 10, context().getSizeType());
 
     return static_cast<Expression*>(new LiteralExpression(constant, location(ctx)));
@@ -785,7 +785,7 @@ std::any SourceVisitor::visitSizeLiteral(anceParser::SizeLiteralContext* ctx)
 
 std::any SourceVisitor::visitDiffLiteral(anceParser::DiffLiteralContext* ctx)
 {
-    std::string const      value    = ctx->SIGNED_INTEGER()->getText();
+    std::string const             value    = ctx->SIGNED_INTEGER()->getText();
     Shared<lang::LiteralConstant> constant = makeShared<lang::IntegerConstant>(value, 10, context().getDiffType());
 
     return static_cast<Expression*>(new LiteralExpression(constant, location(ctx)));
@@ -815,8 +815,7 @@ std::any SourceVisitor::visitNormalInteger(anceParser::NormalIntegerContext* ctx
         integer_constant =
             makeShared<lang::IntegerConstant>(literal_text, 10, context().getFixedWidthIntegerType(size, is_signed));
     }
-    else
-    { integer_constant = makeShared<lang::IntegerConstant>(literal_text, is_signed, context()); }
+    else { integer_constant = makeShared<lang::IntegerConstant>(literal_text, is_signed, context()); }
 
     return static_cast<Expression*>(new LiteralExpression(integer_constant.value(), location(ctx)));
 }

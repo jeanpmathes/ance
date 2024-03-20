@@ -13,8 +13,8 @@
 
 void Runtime::init(CompileContext& context)
 {
-    auto create_function = [&](char const*                                    name,
-                               lang::ResolvingHandle<lang::Type>              return_type,
+    auto create_function = [&](char const*                                     name,
+                               lang::ResolvingHandle<lang::Type>               return_type,
                                std::vector<lang::ResolvingHandle<lang::Type>>& parameter_types) -> lang::Function* {
         std::vector<Shared<lang::Parameter>> parameters;
         parameters.reserve(parameter_types.size());
@@ -70,10 +70,10 @@ bool Runtime::isNameReserved(lang::Identifier const& name)
     return std::find(reserved_names_.begin(), reserved_names_.end(), name.text()) != reserved_names_.end();
 }
 
-Shared<lang::Value> Runtime::allocate(Allocator                         allocation,
+Shared<lang::Value> Runtime::allocate(Allocator                     allocation,
                                       lang::Type const&             type,
-                                      Optional<Shared<lang::Value>>     count,
-                                      CompileContext&                   context)
+                                      Optional<Shared<lang::Value>> count,
+                                      CompileContext&               context)
 {
     assert(is_initialized_);
 
@@ -166,16 +166,16 @@ void Runtime::buildAbort(std::string const& reason, CompileContext& context)
 }
 
 Shared<lang::Value> Runtime::allocateAutomatic(lang::Type const&   type,
-                                               Shared<lang::Value>               count,
-                                               CompileContext&                   context)
+                                               Shared<lang::Value> count,
+                                               CompileContext&     context)
 {
     return context.exec().performStackAllocation(type, count);
 }
 
 Shared<lang::Value> Runtime::allocateDynamic(lang::Type const&   type,
-                                             Shared<lang::Value>               count,
-                                             bool                              is_buffer,
-                                             CompileContext&                   context)
+                                             Shared<lang::Value> count,
+                                             bool                is_buffer,
+                                             CompileContext&     context)
 {
     Shared<lang::Value> size_to_allocate = context.exec().computeAllocatedSize(type, count);
 

@@ -95,9 +95,9 @@ bool lang::VectorType::validateImplicitConversion(lang::Type const& other,
     return element_type_->validateImplicitConversion(other.getElementType(), location, validation_logger);
 }
 
-Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::Type const& other,
-                                                              Shared<lang::Value>               value,
-                                                              CompileContext&                   context) const
+Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::Type const&   other,
+                                                              Shared<lang::Value> value,
+                                                              CompileContext&     context) const
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
@@ -143,9 +143,9 @@ bool lang::VectorType::validateCast(lang::Type const& other,
     return element_type_->validateCast(other.getElementType(), location, validation_logger);
 }
 
-Shared<lang::Value> lang::VectorType::buildCast(lang::Type const& other,
-                                                Shared<lang::Value>               value,
-                                                CompileContext&                   context) const
+Shared<lang::Value> lang::VectorType::buildCast(lang::Type const&   other,
+                                                Shared<lang::Value> value,
+                                                CompileContext&     context) const
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
@@ -240,8 +240,7 @@ bool lang::VectorType::isOperatorDefined(lang::BinaryOperator op, lang::Type con
     return false;
 }
 
-lang::Type const& lang::VectorType::getOperatorResultType(lang::BinaryOperator              op,
-                                                                          lang::Type const& other) const
+lang::Type const& lang::VectorType::getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const
 {
     return scope().context().getVectorType(element_type_->getOperatorResultType(op, other), size_.value());
 }
@@ -315,8 +314,8 @@ bool lang::VectorType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::T
 }
 
 void lang::VectorType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                              lang::PredefinedFunction&                function,
-                                              CompileContext&                          context) const
+                                              lang::PredefinedFunction&                             function,
+                                              CompileContext&                                       context) const
 {
     lang::Type const& other_type         = parameters.front();
     lang::Type const& other_element_type = other_type.getElementType();
@@ -327,7 +326,8 @@ void lang::VectorType::buildRequestedOverload(std::vector<std::reference_wrapper
     }
     else
     {
-        std::vector<std::reference_wrapper<lang::Function const>> overloads = element_type_->resolveOverload({other_element_type});
+        std::vector<std::reference_wrapper<lang::Function const>> overloads =
+            element_type_->resolveOverload({other_element_type});
 
         assert(overloads.size() == 1);
         lang::Function const& element_ctor = overloads.front();

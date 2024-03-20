@@ -115,7 +115,8 @@ Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressio
 {
     Statements statements;
 
-    statements.emplace_back(makeOwned<LocalReferenceVariableDefinition>(name_,
+    statements.emplace_back(
+        makeOwned<LocalReferenceVariableDefinition>(name_,
                                                     type_->getUndefinedClone<lang::Type>(new_context),
                                                     type_location_,
                                                     std::move(subexpressions[0]),

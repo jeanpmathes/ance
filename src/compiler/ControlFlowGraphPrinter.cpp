@@ -156,7 +156,7 @@ uint32_t ControlFlowGraphPrinter::map(int32_t i)
     if (id_map_.contains(key)) { return id_map_[key]; }
 
     uint32_t const id = node_counter_++;
-    id_map_[key] = id;
+    id_map_[key]      = id;
     return id;
 }
 

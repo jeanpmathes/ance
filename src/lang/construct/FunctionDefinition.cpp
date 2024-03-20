@@ -118,22 +118,12 @@ void lang::FunctionDefinition::postResolve() {}
 
 void lang::FunctionDefinition::buildDeclaration(CompileContext& context) const
 {
-    context.exec().createFunction(name(),
-                                  function_.getLinkageName(),
-                                  isRuntime() ? std::nullopt : makeOptional<>(access()),
-                                  isImported(),
-                                  parameters_,
-                                  returnType(),
-                                  isRuntime() ? nullptr : &scope(),
-                                  preserveUnitReturn(),
-                                  location(),
-                                  getDefinitionLocation(),
-                                  function());
+    context.exec().registerFunction(function());
 }
 
 bool lang::FunctionDefinition::validateCall(std::vector<std::reference_wrapper<Expression const>> const& arguments,
-                                            lang::Location                                                                           location,
-    ValidationLogger&                                                                        validation_logger) const
+                                            lang::Location                                               location,
+                                            ValidationLogger& validation_logger) const
 {
     if (arguments.size() != parameters_.size())
     {
@@ -160,7 +150,7 @@ bool lang::FunctionDefinition::validateCall(std::vector<std::reference_wrapper<E
 
 bool lang::FunctionDefinition::doCallValidation(std::vector<std::reference_wrapper<Expression const>> const&,
                                                 lang::Location,
-    ValidationLogger&) const
+                                                ValidationLogger&) const
 {
     return true;
 }

@@ -33,8 +33,8 @@ namespace lang
         Shared<lang::LiteralConstant> clone(lang::Context& new_context) const override;
 
       private:
-        std::string                       text_;
-        llvm::APFloat                     float_;
+        std::string   text_;
+        llvm::APFloat float_;
     };
 }
 

@@ -95,7 +95,7 @@ lang::InitializerFunction const* lang::VariableDescription::initializerFunction(
     return init_function_;
 }
 
-std::vector<std::reference_wrapper<const lang::Entity>> lang::VariableDescription::getProvidedEntities() const
+std::vector<std::reference_wrapper<lang::Entity const>> lang::VariableDescription::getProvidedEntities() const
 {
     return {std::cref(variable_handle_.base())};
 }

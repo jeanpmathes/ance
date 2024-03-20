@@ -17,7 +17,7 @@ VectorDefinition::VectorDefinition(Optional<lang::ResolvingHandle<lang::Type>> t
     for (auto& element : elements_) { addSubexpression(*element); }
 }
 
-Optional<std::reference_wrapper<const lang::Type>> VectorDefinition::elementType() const
+Optional<std::reference_wrapper<lang::Type const>> VectorDefinition::elementType() const
 {
     if (declared_type_.hasValue()) return std::cref(*declared_type_.value().as<lang::Type>());
     return std::nullopt;

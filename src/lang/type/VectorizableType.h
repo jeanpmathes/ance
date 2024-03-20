@@ -26,10 +26,10 @@ namespace lang
          * @param function The function to build.
          * @param context The current compilation context.
          */
-        virtual void buildRequestedOverload(lang::Type const& parameter_element,
-                                            lang::Type const& return_type,
-                                            lang::PredefinedFunction&         function,
-                                            CompileContext&                   context) const;
+        virtual void buildRequestedOverload(lang::Type const&         parameter_element,
+                                            lang::Type const&         return_type,
+                                            lang::PredefinedFunction& function,
+                                            CompileContext&           context) const;
     };
 }
 

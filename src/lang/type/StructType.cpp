@@ -123,7 +123,7 @@ void lang::StructType::performSingleDefaultInitializerDefinition(Shared<lang::Va
 
 void lang::StructType::performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                               Shared<lang::Value> src_ptr,
-                                                              CompileContext& context) const
+                                                              CompileContext&     context) const
 {
     for (auto member : members_)
     {

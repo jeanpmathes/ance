@@ -39,7 +39,8 @@ void ValidationLogger::emitMessages(std::vector<std::reference_wrapper<SourceFil
                                     std::ostream&                                          stream,
                                     std::string const&                                     step_name)
 {
-    stream << "ance: validation: (" << step_name << ") " << warningCount() << " warnings, " << errorCount() << " errors" << std::endl;
+    stream << "ance: validation: (" << step_name << ") " << warningCount() << " warnings, " << errorCount() << " errors"
+           << std::endl;
 
     for (auto& entry : entries_)
     {

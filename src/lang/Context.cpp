@@ -132,8 +132,8 @@ lang::Type const& lang::Context::getBufferType(lang::Type const& element_type) c
 {
     assert(element_type.isDefined());
 
-    lang::ResolvingHandle<lang::Type> element_type_handle
-        = const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
+    lang::ResolvingHandle<lang::Type> element_type_handle =
+        const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
 
     return getBufferType(element_type_handle);
 }
@@ -221,8 +221,8 @@ lang::Type const& lang::Context::getPointerType(lang::Type const& element_type) 
 {
     assert(element_type.isDefined());
 
-    lang::ResolvingHandle<lang::Type> element_type_handle
-        = const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
+    lang::ResolvingHandle<lang::Type> element_type_handle =
+        const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
 
     return getPointerType(element_type_handle);
 }
@@ -260,8 +260,8 @@ lang::Type const& lang::Context::getReferenceType(lang::Type const& element_type
 {
     assert(element_type.isDefined());
 
-    lang::ResolvingHandle<lang::Type> element_type_handle
-        = const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
+    lang::ResolvingHandle<lang::Type> element_type_handle =
+        const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
 
     return getReferenceType(element_type_handle);
 }
@@ -326,8 +326,8 @@ lang::Type const& lang::Context::getVectorType(lang::Type const& element_type, u
 {
     assert(element_type.isDefined());
 
-    lang::ResolvingHandle<lang::Type> element_type_handle
-        = const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
+    lang::ResolvingHandle<lang::Type> element_type_handle =
+        const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
 
     return getVectorType(element_type_handle, size);
 }

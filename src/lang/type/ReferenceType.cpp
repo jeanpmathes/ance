@@ -84,7 +84,7 @@ bool lang::ReferenceType::validateSubscript(lang::Location    indexed_location,
 
 Shared<lang::Value> lang::ReferenceType::buildSubscript(Shared<lang::Value> indexed,
                                                         Shared<lang::Value> index,
-                                                        CompileContext& context) const
+                                                        CompileContext&     context) const
 {
     return element_type_->buildSubscript(context.exec().performDereference(indexed), index, context);
 }
@@ -94,8 +94,7 @@ bool lang::ReferenceType::isOperatorDefined(lang::BinaryOperator op, lang::Type 
     return element_type_->isOperatorDefined(op, other);
 }
 
-lang::Type const& lang::ReferenceType::getOperatorResultType(lang::BinaryOperator              op,
-                                                             lang::Type const& other) const
+lang::Type const& lang::ReferenceType::getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const
 {
     return element_type_->getOperatorResultType(op, other);
 }

@@ -59,7 +59,7 @@ bool lang::SequenceType::validateSubscript(lang::Location,
 
 Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> indexed,
                                                        Shared<lang::Value> index,
-                                                       CompileContext& context) const
+                                                       CompileContext&     context) const
 {
     return buildSubscript(indexed, index, true, context);
 }
@@ -106,7 +106,8 @@ bool lang::SequenceType::isTriviallyDestructible() const
     return element_type_->getDefinition()->isTriviallyDestructible();
 }
 
-void lang::SequenceType::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
+void lang::SequenceType::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr,
+                                                                   CompileContext&     context) const
 {
     if (size_.hasValue())
     {
@@ -123,7 +124,7 @@ void lang::SequenceType::performSingleDefaultInitializerDefinition(Shared<lang::
 
 void lang::SequenceType::performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                                 Shared<lang::Value> src_ptr,
-                                                                CompileContext& context) const
+                                                                CompileContext&     context) const
 {
     if (size_.hasValue())
     {
@@ -168,7 +169,8 @@ std::vector<lang::ResolvingHandle<lang::Type>> lang::SequenceType::getDefinition
     return {};
 }
 
-Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Value>> values, CompileContext& context) const
+Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Value>> values,
+                                                    CompileContext&                  context) const
 {
     assert(size_.hasValue());
     assert(values.size() == size_.value());

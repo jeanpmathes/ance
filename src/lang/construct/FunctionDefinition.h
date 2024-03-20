@@ -171,15 +171,15 @@ namespace lang
          * @return True if the call is valid.
          */
         virtual bool validateCall(std::vector<std::reference_wrapper<Expression const>> const& arguments,
-                                  lang::Location                                                                           location,
-            ValidationLogger& validation_logger) const;
+                                  lang::Location                                               location,
+                                  ValidationLogger&                                            validation_logger) const;
 
         /**
          *This method is called in FunctionDefinition::validateCall.
          */
         virtual bool doCallValidation(std::vector<std::reference_wrapper<Expression const>> const& arguments,
-                                      lang::Location                                                                           location,
-            ValidationLogger& validation_logger) const;
+                                      lang::Location                                               location,
+                                      ValidationLogger& validation_logger) const;
 
         /**
          * Build a call to this function.
@@ -215,10 +215,10 @@ namespace lang
         lang::Function& function_;
         lang::Scope&    containing_scope_;
 
-        lang::ResolvingHandle<lang::Type>             return_type_;
-        lang::Location                                return_type_location_;
-        std::vector<Shared<lang::Parameter>>          parameters_;
-        lang::Location                                location_;
+        lang::ResolvingHandle<lang::Type>    return_type_;
+        lang::Location                       return_type_location_;
+        std::vector<Shared<lang::Parameter>> parameters_;
+        lang::Location                       location_;
 
       protected:
         lang::Signature signature_;
