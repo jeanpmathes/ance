@@ -603,19 +603,19 @@ void lang::TypeDefinition::buildConstructors(CompileContext& context) const
 
     if (!default_constructor_) return;
 
-    context.exec().defineFunctionBody(default_constructor_->function());
+    context.exec().defineFunctionBody(default_constructor_->function(), [this](CompileContext& cc) {
+        Shared<lang::Value> default_value = cc.exec().getDefault(self());
 
-    Shared<lang::Value> default_value = context.exec().getDefault(self());
+        if (getStateCount().isUnit()) cc.exec().performReturn(default_value);
+        else
+        {
+            Shared<lang::Value> ptr = cc.exec().performStackAllocation(self());
+            performDefaultInitializer(ptr, cc);
 
-    if (getStateCount().isUnit()) context.exec().performReturn(default_value);
-    else
-    {
-        Shared<lang::Value> ptr = context.exec().performStackAllocation(self());
-        performDefaultInitializer(ptr, context);
-
-        Shared<lang::Value> result = context.exec().performLoadFromAddress(ptr);
-        context.exec().performReturn(result);
-    }
+            Shared<lang::Value> result = cc.exec().performLoadFromAddress(ptr);
+            cc.exec().performReturn(result);
+        }
+    });
 }
 
 bool lang::TypeDefinition::isTriviallyDefaultConstructible() const
@@ -635,36 +635,39 @@ bool lang::TypeDefinition::isTriviallyDestructible() const
 
 void lang::TypeDefinition::defineDefaultInitializer(CompileContext& context) const
 {
-    Shared<lang::Value> ptr   = context.exec().getParameterValue((**default_initializer_), 0);
-    Shared<lang::Value> count = context.exec().getParameterValue((**default_initializer_), 1);
+    context.exec().defineFunctionBody(*default_initializer_, [this](CompileContext& cc) {
+        Shared<lang::Value> ptr   = cc.exec().getParameterValue((**default_initializer_), 0);
+        Shared<lang::Value> count = cc.exec().getParameterValue((**default_initializer_), 1);
 
-    context.exec().defineFunctionBody(*default_initializer_);
-    context.exec().performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
-        performSingleDefaultInitializerDefinition(element_ptr, context);
+        cc.exec().performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
+            this->performSingleDefaultInitializerDefinition(element_ptr, cc);
+        });
+        cc.exec().performReturn({});
     });
-    context.exec().performReturn({});
 }
 
 void lang::TypeDefinition::defineCopyInitializer(CompileContext& context) const
 {
-    Shared<lang::Value> dst_ptr = context.exec().getParameterValue((**copy_initializer_), 0);
-    Shared<lang::Value> src_ptr = context.exec().getParameterValue((**copy_initializer_), 1);
+    context.exec().defineFunctionBody(*copy_initializer_, [this](CompileContext& cc) {
+        Shared<lang::Value> dst_ptr = cc.exec().getParameterValue((**copy_initializer_), 0);
+        Shared<lang::Value> src_ptr = cc.exec().getParameterValue((**copy_initializer_), 1);
 
-    context.exec().defineFunctionBody(*copy_initializer_);
-    performSingleCopyInitializerDefinition(dst_ptr, src_ptr, context);
-    context.exec().performReturn({});
+        performSingleCopyInitializerDefinition(dst_ptr, src_ptr, cc);
+        cc.exec().performReturn({});
+    });
 }
 
 void lang::TypeDefinition::defineDefaultFinalizer(CompileContext& context) const
 {
-    Shared<lang::Value> ptr   = context.exec().getParameterValue((**default_finalizer_), 0);
-    Shared<lang::Value> count = context.exec().getParameterValue((**default_finalizer_), 1);
+    context.exec().defineFunctionBody(*default_finalizer_, [this](CompileContext& cc) {
+        Shared<lang::Value> ptr   = cc.exec().getParameterValue((**default_finalizer_), 0);
+        Shared<lang::Value> count = cc.exec().getParameterValue((**default_finalizer_), 1);
 
-    context.exec().defineFunctionBody(*default_finalizer_);
-    context.exec().performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
-        buildSingleDefaultFinalizerDefinition(element_ptr, context);
+        cc.exec().performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
+            this->performSingleDefaultFinalizerDefinition(element_ptr, cc);
+        });
+        cc.exec().performReturn({});
     });
-    context.exec().performReturn({});
 }
 
 void lang::TypeDefinition::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr,
@@ -686,7 +689,7 @@ void lang::TypeDefinition::performSingleCopyInitializerDefinition(Shared<lang::V
     context.exec().performStoreToAddress(dst_ptr, value);
 }
 
-void lang::TypeDefinition::buildSingleDefaultFinalizerDefinition(Shared<lang::Value>, CompileContext&) const {}
+void lang::TypeDefinition::performSingleDefaultFinalizerDefinition(Shared<lang::Value>, CompileContext&) const {}
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeDefinition::getDeclarationDependencies()
 {

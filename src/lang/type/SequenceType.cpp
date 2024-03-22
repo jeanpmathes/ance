@@ -142,7 +142,7 @@ void lang::SequenceType::performSingleCopyInitializerDefinition(Shared<lang::Val
     }
 }
 
-void lang::SequenceType::buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
+void lang::SequenceType::performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
 {
     if (size_.hasValue())
     {

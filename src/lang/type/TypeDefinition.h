@@ -228,7 +228,7 @@ namespace lang
         /**
          * Build the part of the definition that default-finalizes a single element of this type.
          */
-        virtual void buildSingleDefaultFinalizerDefinition(Shared<lang::Value>, CompileContext&) const;
+        virtual void performSingleDefaultFinalizerDefinition(Shared<lang::Value>, CompileContext&) const;
 
         virtual std::string createMangledName() const = 0;
 

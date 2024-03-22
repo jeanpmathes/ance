@@ -182,9 +182,13 @@ class Execution
     /**
      * Indicate that the following commands are part of the body of the given function.
      * If the state is currently in another function, the function is exited first.
+     * All function operations must be performed in the builder.
+     * The executor is allowed to call this function multiple times and store the lambda for later execution.
      * @param function The function of which the body is defined.
+     * @param builder A function that is called to build the body of the function.
      */
-    virtual void defineFunctionBody(lang::Function const& function) = 0;
+    virtual void defineFunctionBody(lang::Function const&                       function,
+                                    std::function<void(CompileContext&)> const& builder) = 0;
 
     /**
      * Call a function.

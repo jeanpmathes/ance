@@ -52,7 +52,8 @@ class NativeBuild : public Execution
 
     void                registerFunction(lang::Function const& function) override;
     Shared<lang::Value> getParameterValue(lang::Function const& function, size_t index) override;
-    void                defineFunctionBody(lang::Function const& function) override;
+    void                defineFunctionBody(lang::Function const&                       function,
+                                           std::function<void(CompileContext&)> const& builder) override;
     Shared<lang::Value> performFunctionCall(lang::Function const&            function,
                                             std::vector<Shared<lang::Value>> arguments) override;
 

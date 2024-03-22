@@ -65,7 +65,7 @@ namespace lang
         void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                     lang::PredefinedFunction&                             function,
                                     CompileContext&                                       context) const override;
-        void buildRequestedOverload(lang::Type const&         parameter_element,
+        void buildRequestedOverload(lang::Type const&         cc,
                                     lang::Type const&         return_type,
                                     lang::PredefinedFunction& function,
                                     CompileContext&           context) const override;

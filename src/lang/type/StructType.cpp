@@ -133,7 +133,7 @@ void lang::StructType::performSingleCopyInitializerDefinition(Shared<lang::Value
     }
 }
 
-void lang::StructType::buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
+void lang::StructType::performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
 {
     for (auto member : members_)
     {

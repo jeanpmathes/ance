@@ -59,7 +59,7 @@ namespace lang
         void performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                     Shared<lang::Value> src_ptr,
                                                     CompileContext&     context) const override;
-        void buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
+        void performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
 
         /**
          * Create a value with the given elements. Only valid if the type is sized.

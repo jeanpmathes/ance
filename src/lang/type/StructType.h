@@ -38,7 +38,7 @@ namespace lang
         void performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                     Shared<lang::Value> src_ptr,
                                                     CompileContext&     context) const override;
-        void buildSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
+        void performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
 
         std::string createMangledName() const override;
         void        registerExecutionType(CompileContext& context) const override;

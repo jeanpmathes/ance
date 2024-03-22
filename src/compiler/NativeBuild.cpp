@@ -353,13 +353,19 @@ Shared<lang::Value> NativeBuild::getParameterValue(lang::Function const& functio
     return makeShared<WrappedContentValue>(parameters.at(index).get(), arg, *this);
 }
 
-void NativeBuild::defineFunctionBody(lang::Function const& function)
+void NativeBuild::defineFunctionBody(lang::Function const&                       function,
+                                     std::function<void(CompileContext&)> const& builder)
 {
     current_function_ = &functions_.at(&function);
 
     llvm::BasicBlock* block =
         llvm::BasicBlock::Create(llvmContext(), "entry_of_body", current_function_->llvm_function);
     ir().SetInsertPoint(block);
+
+    builder(context_);
+
+    ir().SetInsertPoint(static_cast<llvm::BasicBlock*>(nullptr));
+    current_function_ = nullptr;
 }
 
 Shared<lang::Value> NativeBuild::performFunctionCall(lang::Function const&            function,

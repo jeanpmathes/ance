@@ -76,7 +76,7 @@ namespace lang
                                           CompileContext&      context) const override;
 
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
-        void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
+        void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> cc,
                                     lang::PredefinedFunction&                             function,
                                     CompileContext&                                       context) const override;
 

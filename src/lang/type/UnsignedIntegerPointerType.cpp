@@ -32,13 +32,14 @@ void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::Type const& 
 {
     if (parameter_element.isAddressType())
     {
-        context.exec().defineFunctionBody(function.function());
-        {
-            Shared<lang::Value> argument = context.exec().getParameterValue(function.function(), 0);
-            Shared<lang::Value> result   = context.exec().computePointerToInteger(argument);
+        lang::Function* fn = &function.function();
 
-            context.exec().performReturn(result);
-        }
+        context.exec().defineFunctionBody(function.function(), [fn](CompileContext& cc) {
+            Shared<lang::Value> argument = cc.exec().getParameterValue(*fn, 0);
+            Shared<lang::Value> result   = cc.exec().computePointerToInteger(argument);
+
+            cc.exec().performReturn(result);
+        });
 
         return;
     }
