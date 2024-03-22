@@ -45,7 +45,7 @@ std::string lang::StructType::createMangledName() const
 
 void lang::StructType::registerExecutionType(CompileContext& context) const
 {
-    context.exec().createStruct(self(), members_, getDefinitionLocation());
+    context.exec().registerStruct(self(), members_, getDefinitionLocation());
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::StructType::getDeclarationDependencies()

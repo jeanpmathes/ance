@@ -385,8 +385,8 @@ Shared<lang::Value> NativeBuild::performFunctionCall(lang::Function const&      
     return makeShared<WrappedContentValue>(return_type, return_value_content, *this);
 }
 
-void NativeBuild::createStruct(lang::Type const&                                 type,
-                               std::vector<std::reference_wrapper<lang::Member>> members,
+void NativeBuild::registerStruct(lang::Type const&                                 type,
+                                 std::vector<std::reference_wrapper<lang::Member>> members,
                                lang::Location                                    definition_location)
 {
     llvm::DataLayout const& dl = llvm_module_.getDataLayout();
@@ -461,7 +461,7 @@ void NativeBuild::createStruct(lang::Type const&                                
     types_[&type] = {struct_type, di_type, default_value};
 }
 
-void NativeBuild::createAlias(lang::Type const& type, lang::Location definition_location)
+void NativeBuild::registerAlias(lang::Type const& type, lang::Location definition_location)
 {
     llvm::Type* llvm_type = llvmType(type.getActualType());
 
@@ -703,8 +703,8 @@ void NativeBuild::registerArrayType(lang::Type const& array_type)
     types_[&array_type] = {llvm_array_type, di_type, default_value};
 }
 
-void NativeBuild::createGlobalVariable(lang::GlobalVariable const& global_variable,
-                                       bool                        is_imported,
+void NativeBuild::registerGlobalVariable(lang::GlobalVariable const& global_variable,
+                                         bool                        is_imported,
                                        lang::GlobalInitializer     init)
 {
     llvm::Constant* native_initializer = nullptr;
@@ -1637,11 +1637,6 @@ llvm::DIBuilder& NativeBuild::di()
 llvm::LLVMContext& NativeBuild::llvmContext()
 {
     return llvm_context_;
-}
-
-llvm::Function* NativeBuild::llvmFunction(lang::Function const& function)
-{
-    return functions_.at(&function).llvm_function;
 }
 
 llvm::DIScope* NativeBuild::llvmScope(lang::Scope const& scope)

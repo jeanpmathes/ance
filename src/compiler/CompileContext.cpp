@@ -78,10 +78,10 @@ void CompileContext::setDebugLocation(lang::Location location, lang::Scope const
 {
     debug_loc_stack_.push(current_debug_location_);
 
-    exec().ir().SetCurrentDebugLocation(execution_->getLocation(location, exec().llvmScope(scope)));
+    execution_->ir().SetCurrentDebugLocation(execution_->getLocation(location, execution_->llvmScope(scope)));
 
     current_debug_location_.location    = location;
-    current_debug_location_.di_location = exec().ir().getCurrentDebugLocation();
+    current_debug_location_.di_location = execution_->ir().getCurrentDebugLocation();
 }
 
 void CompileContext::resetDebugLocation()
@@ -89,7 +89,7 @@ void CompileContext::resetDebugLocation()
     current_debug_location_ = debug_loc_stack_.top();
     debug_loc_stack_.pop();
 
-    exec().ir().SetCurrentDebugLocation(current_debug_location_.di_location);
+    execution_->ir().SetCurrentDebugLocation(current_debug_location_.di_location);
 }
 
 bool CompileContext::allDebugLocationsPopped()

@@ -53,7 +53,7 @@ lang::Assigner lang::GlobalVariable::assigner() const
 
 void lang::GlobalVariable::buildDeclaration(CompileContext& context) const
 {
-    context.exec().createGlobalVariable(*this, is_import_, init_);
+    context.exec().registerGlobalVariable(*this, is_import_, init_);
 }
 
 void lang::GlobalVariable::buildInitialization(CompileContext& context) const

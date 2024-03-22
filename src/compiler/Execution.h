@@ -196,21 +196,21 @@ class Execution
                                                     std::vector<Shared<lang::Value>> arguments) = 0;
 
     /**
-     * Create a struct type for execution.
+     * Register a struct type for execution.
      * @param type The struct type in the AST.
      * @param members The members of the struct.
      * @param definition_location The location of the struct.
      */
-    virtual void createStruct(lang::Type const&                                 type,
-                              std::vector<std::reference_wrapper<lang::Member>> members,
+    virtual void registerStruct(lang::Type const&                                 type,
+                                std::vector<std::reference_wrapper<lang::Member>> members,
                               lang::Location                                    definition_location) = 0;
 
     /**
-     * Create an alias for a type.
+     * Register an alias for a type.
      * @param type The alias type, not the aliased type.
      * @param definition_location The location of the alias.
      */
-    virtual void createAlias(lang::Type const& type, lang::Location definition_location) = 0;
+    virtual void registerAlias(lang::Type const& type, lang::Location definition_location) = 0;
 
     /**
      * Register a reference type for execution.
@@ -273,13 +273,13 @@ class Execution
     virtual void registerArrayType(lang::Type const& array_type) = 0;
 
     /**
-     * Create a global variable.
-     * @param global_variable The global variable to create.
+     * Register a global variable.
+     * @param global_variable The global variable to register.
      * @param is_imported Whether the global variable is imported.
      * @param init The initializer of the global variable.
      */
-    virtual void createGlobalVariable(lang::GlobalVariable const& global_variable,
-                                      bool                        is_imported,
+    virtual void registerGlobalVariable(lang::GlobalVariable const& global_variable,
+                                        bool                        is_imported,
                                       lang::GlobalInitializer     init) = 0;
 
     /**
@@ -607,13 +607,6 @@ class Execution
     virtual void releaseConstant(std::any handle) = 0;
 
     virtual CompileContext& cc() = 0;
-
-    virtual llvm::IRBuilder<>& ir()                                         = 0;
-    virtual llvm::DIBuilder&   di()                                         = 0;
-    virtual llvm::LLVMContext& llvmContext()                                = 0;
-    virtual llvm::Function*    llvmFunction(lang::Function const& function) = 0;
-    virtual llvm::DIScope*     llvmScope(lang::Scope const& scope)          = 0;
-    virtual llvm::Type*        llvmType(lang::Type const& type)             = 0;
 
     virtual ~Execution() = default;
 };

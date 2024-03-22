@@ -56,11 +56,11 @@ class NativeBuild : public Execution
     Shared<lang::Value> performFunctionCall(lang::Function const&            function,
                                             std::vector<Shared<lang::Value>> arguments) override;
 
-    void createStruct(lang::Type const&                                 type,
-                      std::vector<std::reference_wrapper<lang::Member>> members,
+    void registerStruct(lang::Type const&                                 type,
+                        std::vector<std::reference_wrapper<lang::Member>> members,
                       lang::Location                                    definition_location) override;
 
-    void createAlias(lang::Type const& type, lang::Location definition_location) override;
+    void registerAlias(lang::Type const& type, lang::Location definition_location) override;
 
     void registerReferenceType(lang::Type const& reference_type) override;
     void registerAddressType(lang::Type const& address_type) override;
@@ -73,8 +73,8 @@ class NativeBuild : public Execution
     void registerCodepointType(lang::Type const& codepoint_type) override;
     void registerArrayType(lang::Type const& array_type) override;
 
-    void                createGlobalVariable(lang::GlobalVariable const& global_variable,
-                                             bool                        is_imported,
+    void                registerGlobalVariable(lang::GlobalVariable const& global_variable,
+                                               bool                        is_imported,
                                              lang::GlobalInitializer     init) override;
     void                declareLocalVariable(lang::LocalVariable const& local_variable) override;
     void                defineLocalVariable(lang::LocalVariable const& local_variable,
@@ -138,12 +138,11 @@ class NativeBuild : public Execution
 
     CompileContext& cc() override;
 
-    llvm::IRBuilder<>& ir() override;
-    llvm::DIBuilder&   di() override;
-    llvm::LLVMContext& llvmContext() override;
-    llvm::Function*    llvmFunction(lang::Function const& function) override;
-    llvm::DIScope*     llvmScope(lang::Scope const& scope) override;
-    llvm::Type*        llvmType(lang::Type const& type) override;
+    llvm::IRBuilder<>& ir();
+    llvm::DIBuilder&   di();
+    llvm::LLVMContext& llvmContext();
+    llvm::DIScope*     llvmScope(lang::Scope const& scope);
+    llvm::Type*        llvmType(lang::Type const& type);
 
     llvm::DIType*   llvmDiType(lang::Type const& type);
     llvm::Constant* llvmDefault(lang::Type const& type);

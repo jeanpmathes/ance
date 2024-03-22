@@ -406,7 +406,7 @@ std::string lang::TypeAlias::createMangledName() const
 
 void lang::TypeAlias::registerExecutionType(CompileContext& context) const
 {
-    return context.exec().createAlias(self(), getDefinitionLocation());
+    return context.exec().registerAlias(self(), getDefinitionLocation());
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeAlias::getDeclarationDependencies()
