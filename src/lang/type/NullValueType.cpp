@@ -54,6 +54,20 @@ lang::Type const* lang::NullValueType::getPointeeType() const
     return nullptr;
 }
 
+bool lang::NullValueType::isTriviallyDefaultConstructible() const
+{
+    return true;
+}
+
+bool lang::NullValueType::isTriviallyCopyConstructible() const
+{
+    return true;
+}
+bool lang::NullValueType::isTriviallyDestructible() const
+{
+    return true;
+}
+
 lang::ResolvingHandle<lang::Type> lang::NullValueType::clone(lang::Context& new_context) const
 {
     return new_context.getNullValueType();

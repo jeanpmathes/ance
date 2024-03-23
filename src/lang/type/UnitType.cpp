@@ -78,3 +78,18 @@ Shared<lang::Value> lang::UnitType::buildOperator(lang::BinaryOperator op,
 
     throw std::logic_error("Unit type does not support operator '" + op.toString() + "'");
 }
+
+bool lang::UnitType::isTriviallyDefaultConstructible() const
+{
+    return true;
+}
+
+bool lang::UnitType::isTriviallyCopyConstructible() const
+{
+    return true;
+}
+
+bool lang::UnitType::isTriviallyDestructible() const
+{
+    return true;
+}

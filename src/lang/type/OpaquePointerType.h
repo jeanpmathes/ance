@@ -24,6 +24,10 @@ namespace lang
         Type const*                                 getPointeeType() const override;
 
       public:
+        bool isTriviallyDefaultConstructible() const override;
+        bool isTriviallyCopyConstructible() const override;
+        bool isTriviallyDestructible() const override;
+
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;
     };
 }

@@ -47,6 +47,10 @@ namespace lang
         std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies() override;
         std::vector<lang::ResolvingHandle<lang::Type>> getDefinitionDependencies() override;
 
+        bool isTriviallyDefaultConstructible() const override;
+        bool isTriviallyCopyConstructible() const override;
+        bool isTriviallyDestructible() const override;
+
       private:
         std::vector<std::reference_wrapper<lang::Member>>                members_;
         std::map<lang::Identifier, std::reference_wrapper<lang::Member>> member_map_ {};

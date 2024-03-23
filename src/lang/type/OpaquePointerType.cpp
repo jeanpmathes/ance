@@ -32,6 +32,21 @@ lang::Type const* lang::OpaquePointerType::getPointeeType() const
     return nullptr;
 }
 
+bool lang::OpaquePointerType::isTriviallyDefaultConstructible() const
+{
+    return true;
+}
+
+bool lang::OpaquePointerType::isTriviallyCopyConstructible() const
+{
+    return true;
+}
+
+bool lang::OpaquePointerType::isTriviallyDestructible() const
+{
+    return true;
+}
+
 lang::ResolvingHandle<lang::Type> lang::OpaquePointerType::clone(lang::Context& new_context) const
 {
     return new_context.getOpaquePointerType();

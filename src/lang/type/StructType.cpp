@@ -141,3 +141,23 @@ void lang::StructType::performSingleDefaultFinalizerDefinition(Shared<lang::Valu
         member.get().type()->performFinalizer(member_ptr, context);
     }
 }
+bool lang::StructType::isTriviallyDefaultConstructible() const
+{
+    return std::all_of(members_.begin(), members_.end(), [](auto& member) {
+        return member.get().type()->getDefinition()->isTriviallyDefaultConstructible();
+    });
+}
+
+bool lang::StructType::isTriviallyCopyConstructible() const
+{
+    return std::all_of(members_.begin(), members_.end(), [](auto& member) {
+        return member.get().type()->getDefinition()->isTriviallyCopyConstructible();
+    });
+}
+
+bool lang::StructType::isTriviallyDestructible() const
+{
+    return std::all_of(members_.begin(), members_.end(), [](auto& member) {
+        return member.get().type()->getDefinition()->isTriviallyDestructible();
+    });
+}
